@@ -24,9 +24,8 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of a random access iterator.
     /// \tparam T           The type of the value to be assigned (deduced).
@@ -69,10 +68,11 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam RaIter        The type of the source iterators used for the
-    ///                     range (deduced).
+    /// \tparam RaIter      The type of the source iterators used for the
+    ///                     range (deduced). This iterator type must meet the
+    ///                     requirements of a random access iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
-    ///                     sentinel type must be a sentinel for InIter.
+    ///                     sentinel type must be a sentinel for RaIter.
     /// \tparam T           The type of the value to be assigned (deduced).
     ///
     /// \param policy       The execution policy to use for the scheduling of
@@ -112,7 +112,7 @@ namespace hpx { namespace ranges {
     ///
     /// \tparam Rng         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
+    ///                     meet the requirements of a forward iterator.
     /// \tparam T           The type of the value to be assigned (deduced).
     ///
     /// \param rng          Refers to the sequence of elements the algorithm
@@ -154,9 +154,8 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of a random access iterator.
     /// \tparam T           The type of the value to be assigned (deduced).
@@ -201,9 +200,9 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam RaIter     The type of the source iterators used for the
-    ///                     range (deduced).
-    ///                     This iterator type must meet the requirements of an random access iterator.
+    /// \tparam RaIter      The type of the source iterators used for the
+    ///                     range (deduced). This iterator type must meet
+    ///                     the requirements of an random access iterator.
     /// \tparam Size        The type of the argument specifying the number of
     ///                     elements to apply \a f to.
     /// \tparam T           The type of the value to be assigned (deduced).
@@ -244,7 +243,7 @@ namespace hpx { namespace ranges {
     ///
     /// \tparam Rng         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
+    ///                     meet the requirements of a forward iterator.
     /// \tparam T           The type of the value to be assigned (deduced).
     ///
     /// \param rng          Refers to the sequence of elements the algorithm
@@ -327,9 +326,6 @@ namespace hpx::ranges {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
 
-            static_assert(hpx::traits::is_forward_iterator_v<iterator_type>,
-                "Requires at least forward iterator.");
-
             return hpx::parallel::detail::fill<iterator_type>().call(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                 hpx::util::end(rng), value);
@@ -407,9 +403,6 @@ namespace hpx::ranges {
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
-
-            static_assert(hpx::traits::is_forward_iterator_v<iterator_type>,
-                "Requires at least forward iterator.");
 
             // if count is representing a negative value, we do nothing
             if (hpx::parallel::detail::is_negative(hpx::util::size(rng)))

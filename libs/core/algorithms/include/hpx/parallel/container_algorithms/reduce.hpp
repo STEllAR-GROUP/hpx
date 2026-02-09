@@ -26,10 +26,11 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam RaIter     The type of the source begin iterator used (deduced).
-    ///                     This iterator type must meet the requirements of an random access iterator.
-    /// \tparam Sent        The type of the source sentinel used (deduced).
-    ///                     This iterator type must meet the requirements of an random access iterator.
+    /// \tparam RaIter      The type of the source begin iterator used (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     random access iterator.
+    /// \tparam Sent        The type of the source sentinel used (deduced). This
+    ///                     sentinel type must be a sentinel for RaIter.
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a copy_if requires \a F to meet the
@@ -102,9 +103,8 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of a random access iterator.
     /// \tparam F           The type of the function/function object to use
@@ -178,10 +178,11 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam RaIter     The type of the source begin iterator used (deduced).
-    ///                     This iterator type must meet the requirements of an random access iterator.
-    /// \tparam Sent        The type of the source sentinel used (deduced).
-    ///                     This iterator type must meet the requirements of an random access iterator.
+    /// \tparam RaIter      The type of the source begin iterator used (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     random access iterator.
+    /// \tparam Sent        The type of the source sentinel used (deduced). This
+    ///                     sentinel type must be a sentinel for RaIter.
     /// \tparam T           The type of the value to be used as initial (and
     ///                     intermediate) values (deduced).
     ///
@@ -237,9 +238,8 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of a random access iterator.
     /// \tparam T           The type of the value to be used as initial (and
@@ -296,10 +296,11 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam RaIter     The type of the source begin iterator used (deduced).
-    ///                     This iterator type must meet the requirements of an random access iterator.
-    /// \tparam Sent        The type of the source sentinel used (deduced).
-    ///                     This iterator type must meet the requirements of an random access iterator.
+    /// \tparam RaIter      The type of the source begin iterator used (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     random access iterator.
+    /// \tparam Sent        The type of the source sentinel used (deduced). This
+    ///                     sentinel type must be a sentinel for RaIter.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -356,9 +357,8 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of a random access iterator.
     ///
@@ -695,20 +695,19 @@ namespace hpx::ranges {
     HPX_CXX_CORE_EXPORT inline constexpr struct reduce_t final
       : hpx::detail::tag_parallel_algorithm<reduce_t>
     {
-        template <typename ExPolicy, typename FwdIter, typename Sent,
-            typename F,
-            typename T = typename std::iterator_traits<FwdIter>::value_type>
+        template <typename ExPolicy, typename RaIter, typename Sent, typename F,
+            typename T = typename std::iterator_traits<RaIter>::value_type>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_random_access_iterator_v<FwdIter> &&
-                hpx::traits::is_sized_sentinel_for_v<Sent, FwdIter>
+                hpx::traits::is_random_access_iterator_v<RaIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, RaIter>
             )
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             T>::type
         tag_fallback_invoke(hpx::ranges::reduce_t, ExPolicy&& policy,
-            FwdIter first, Sent last, T init, F f)
+            RaIter first, Sent last, T init, F f)
         {
             return hpx::parallel::detail::reduce<T>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(init),
@@ -730,29 +729,24 @@ namespace hpx::ranges {
         tag_fallback_invoke(
             hpx::ranges::reduce_t, ExPolicy&& policy, Rng&& rng, T init, F f)
         {
-            static_assert(
-                hpx::traits::is_forward_iterator<typename hpx::traits::
-                        range_traits<Rng>::iterator_type>::value,
-                "Requires at least forward iterator.");
-
             return hpx::parallel::detail::reduce<T>().call(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                 hpx::util::end(rng), HPX_MOVE(init), HPX_MOVE(f));
         }
 
-        template <typename ExPolicy, typename FwdIter, typename Sent,
-            typename T = typename std::iterator_traits<FwdIter>::value_type>
+        template <typename ExPolicy, typename RaIter, typename Sent,
+            typename T = typename std::iterator_traits<RaIter>::value_type>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_random_access_iterator_v<FwdIter> &&
-                hpx::traits::is_sized_sentinel_for_v<Sent, FwdIter>
+                hpx::traits::is_random_access_iterator_v<RaIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, RaIter>
             )
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             T>::type
         tag_fallback_invoke(hpx::ranges::reduce_t, ExPolicy&& policy,
-            FwdIter first, Sent last, T init)
+            RaIter first, Sent last, T init)
         {
             return hpx::parallel::detail::reduce<T>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(init),
@@ -774,31 +768,26 @@ namespace hpx::ranges {
         tag_fallback_invoke(
             hpx::ranges::reduce_t, ExPolicy&& policy, Rng&& rng, T init)
         {
-            static_assert(
-                hpx::traits::is_forward_iterator<typename hpx::traits::
-                        range_traits<Rng>::iterator_type>::value,
-                "Requires at least forward iterator.");
-
             return hpx::parallel::detail::reduce<T>().call(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                 hpx::util::end(rng), HPX_MOVE(init), std::plus<T>{});
         }
 
-        template <typename ExPolicy, typename FwdIter, typename Sent>
+        template <typename ExPolicy, typename RaIter, typename Sent>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_random_access_iterator_v<FwdIter> &&
-                hpx::traits::is_sized_sentinel_for_v<Sent, FwdIter>
+                hpx::traits::is_random_access_iterator_v<RaIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, RaIter>
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            typename std::iterator_traits<FwdIter>::value_type>
+            typename std::iterator_traits<RaIter>::value_type>
         tag_fallback_invoke(
-            hpx::ranges::reduce_t, ExPolicy&& policy, FwdIter first, Sent last)
+            hpx::ranges::reduce_t, ExPolicy&& policy, RaIter first, Sent last)
         {
             using value_type =
-                typename std::iterator_traits<FwdIter>::value_type;
+                typename std::iterator_traits<RaIter>::value_type;
 
             return hpx::parallel::detail::reduce<value_type>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, value_type{},
@@ -822,9 +811,6 @@ namespace hpx::ranges {
                 typename hpx::traits::range_traits<Rng>::iterator_type;
             using value_type =
                 typename std::iterator_traits<iterator_type>::value_type;
-
-            static_assert(hpx::traits::is_forward_iterator_v<iterator_type>,
-                "Requires at least forward iterator.");
 
             return hpx::parallel::detail::reduce<value_type>().call(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),

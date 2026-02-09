@@ -25,15 +25,15 @@ namespace hpx { namespace ranges {
     /// \note   Complexity: O(\a last - \a first) applications of the
     ///         predicate \a op.
     ///
-    /// \tparam FwdIter1    The type of the source iterators used (deduced).
+    /// \tparam InIter      The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     input iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for FwdIter1.
-    /// \tparam FwdIter2    The type of the iterator representing the
+    /// \tparam OutIter     The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     output iterator.
     /// \tparam T           The type of the value to be used as initial (and
     ///                     intermediate) values (deduced).
     /// \tparam Op          The type of the binary function object used for
@@ -95,13 +95,14 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam RaIter1    The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an random access iterator.
+    /// \tparam RaIter1     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of 
+    ///                     an random access iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for RaIter1.
-    /// \tparam RaIter2    The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an random access iterator.
+    /// \tparam RaIter2     The type of the iterator representing the
+    ///                     destination range (deduced). This iterator type must
+    ///                     meet the requirements of an random access iterator.
     /// \tparam T           The type of the value to be used as initial (and
     ///                     intermediate) values (deduced).
     /// \tparam Op          The type of the binary function object used for
@@ -182,7 +183,7 @@ namespace hpx { namespace ranges {
     ///
     /// \tparam Rng         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an forward iterator.
+    ///                     meet the requirements of an input iterator.
     /// \tparam O           The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
@@ -245,9 +246,8 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an random access iterator.
     /// \tparam O           The type of the iterator representing the
@@ -455,10 +455,6 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::exclusive_scan_t, ExPolicy&& policy,
             Rng&& rng, O dest, T init, Op op = Op())
         {
-            static_assert(hpx::traits::is_forward_iterator<
-                              traits::range_iterator_t<Rng>>::value,
-                "Requires at least forward iterator.");
-
             using result_type =
                 exclusive_scan_result<traits::range_iterator_t<Rng>, O>;
 

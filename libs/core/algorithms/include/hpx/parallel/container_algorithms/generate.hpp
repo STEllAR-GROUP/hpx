@@ -25,9 +25,8 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an random access iterator.
     /// \tparam F           The type of the function/function object to use
@@ -58,7 +57,7 @@ namespace hpx { namespace ranges {
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a replace_if algorithm returns a \a hpx::future<RaIter>
+    /// \returns  The \a generate algorithm returns a \a hpx::future<RaIter>
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy
@@ -80,8 +79,9 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam RaIter        The type of the source begin iterator used (deduced).
-    ///                     This iterator type must meet the requirements of an random access iterator.
+    /// \tparam RaIter      The type of the source begin iterator used (deduced).
+    ///                     This iterator type must meet the requirements of 
+    ///                     a random access iterator.
     /// \tparam Sent        The type of the source end iterator used (deduced).
     ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam F           The type of the function/function object to use
@@ -114,7 +114,7 @@ namespace hpx { namespace ranges {
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a replace_if algorithm returns a \a hpx::future<RaIter>
+    /// \returns  The \a generate algorithm returns a \a hpx::future<RaIter>
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy
@@ -150,7 +150,7 @@ namespace hpx { namespace ranges {
     ///                     \a FwdIter can be dereferenced and assigned a value
     ///                     of type \a Ret.
     ///
-    /// \returns  The \a replace_if algorithm returns \a last.
+    /// \returns  The \a generate algorithm returns \a last.
     ///
     template <typename Rng, typename F>
     hpx::traits::range_iterator_t<Rng>
@@ -186,7 +186,7 @@ namespace hpx { namespace ranges {
     ///                     \a FwdIter can be dereferenced and assigned a value
     ///                     of type \a Ret.
     ///
-    /// \returns  The \a replace_if algorithm returns \a last.
+    /// \returns  The \a generate algorithm returns \a last.
     ///
     template <typename Iter, typename Sent, typename F>
     Iter generate(Iter first, Sent last, F&& f);
@@ -201,8 +201,9 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam RaIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an random access iterator.
+    /// \tparam RaIter      The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of 
+    ///                     a random access iterator.
     /// \tparam Size        The type of the argument specifying the number of
     ///                     elements to apply \a f to.
     /// \tparam F           The type of the function/function object to use
@@ -236,7 +237,7 @@ namespace hpx { namespace ranges {
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a replace_if algorithm returns a \a hpx::future<RaIter>
+    /// \returns  The \a generate_n algorithm returns a \a hpx::future<RaIter>
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy
@@ -253,8 +254,9 @@ namespace hpx { namespace ranges {
     /// \note   Complexity: Exactly \a count invocations of \a f and
     ///         assignments, for count > 0.
     ///
-    /// \tparam RaIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an random access iterator.
+    /// \tparam FwdIter     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
     /// \tparam Size        The type of the argument specifying the number of
     ///                     elements to apply \a f to.
     /// \tparam F           The type of the function/function object to use
@@ -276,10 +278,10 @@ namespace hpx { namespace ranges {
     ///                     \a OutputIt can be dereferenced and assigned a value
     ///                     of type \a Ret.
     ///
-    /// \returns  The \a replace_if algorithm returns \a last.
+    /// \returns  The \a generate_n algorithm returns \a last.
     ///
-    template <typename RaIter, typename Size, typename F>
-    RaIter generate_n(RaIter first, Size count, F&& f);
+    template <typename FwdIter, typename Size, typename F>
+    FwdIter generate_n(FwdIter first, Size count, F&& f);
 
     // clang-format on
 }}    // namespace hpx::ranges
@@ -316,9 +318,6 @@ namespace hpx::ranges {
         tag_fallback_invoke(generate_t, ExPolicy&& policy, Rng&& rng, F f)
         {
             using iterator_type = hpx::traits::range_iterator_t<Rng>;
-
-            static_assert(hpx::traits::is_forward_iterator_v<iterator_type>,
-                "Required at least forward iterator.");
 
             return hpx::parallel::detail::generate<iterator_type>().call(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
@@ -374,27 +373,25 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<generate_n_t>
     {
     private:
-        template <typename ExPolicy, typename FwdIter, typename Size,
-            typename F>
+        template <typename ExPolicy, typename RaIter, typename Size, typename F>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_random_access_iterator_v<FwdIter> &&
+                hpx::traits::is_random_access_iterator_v<RaIter> &&
                 std::is_integral_v<Size>
             )
         // clang-format on
-        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            FwdIter>
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, RaIter>
         tag_fallback_invoke(
-            generate_n_t, ExPolicy&& policy, FwdIter first, Size count, F f)
+            generate_n_t, ExPolicy&& policy, RaIter first, Size count, F f)
         {
             if (hpx::parallel::detail::is_negative(count))
             {
                 return hpx::parallel::util::detail::algorithm_result<ExPolicy,
-                    FwdIter>::get(HPX_MOVE(first));
+                    RaIter>::get(HPX_MOVE(first));
             }
 
-            return hpx::parallel::detail::generate_n<FwdIter>().call(
+            return hpx::parallel::detail::generate_n<RaIter>().call(
                 HPX_FORWARD(ExPolicy, policy), first,
                 static_cast<std::size_t>(count), HPX_MOVE(f));
         }

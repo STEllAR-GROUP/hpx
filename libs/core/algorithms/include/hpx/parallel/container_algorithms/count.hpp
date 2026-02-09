@@ -26,9 +26,8 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the comparisons.
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of a random access iterator.
     /// \tparam T           The type of the value to search for (deduced).
@@ -84,8 +83,10 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the comparisons.
-    /// \tparam RaIter        The type of the source iterators used for the
+    /// \tparam RaIter      The type of the source iterators used for the
     ///                     range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     random access iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for InIter.
     /// \tparam T           The type of the value to search for (deduced).
@@ -210,9 +211,8 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the comparisons.
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of a random access iterator.
     /// \tparam F           The type of the function/function object to use
@@ -282,8 +282,10 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the comparisons.
-    /// \tparam RaIter        The type of the source iterators used for the
+    /// \tparam RaIter      The type of the source iterators used for the
     ///                     range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     random access iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for InIter.
     /// \tparam F           The type of the function/function object to use
@@ -353,7 +355,7 @@ namespace hpx { namespace ranges {
     ///
     /// \tparam Rng         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
+    ///                     meet the requirements of a forward iterator.
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a count_if requires \a F to meet the

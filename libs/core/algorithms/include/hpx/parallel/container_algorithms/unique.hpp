@@ -71,10 +71,10 @@ namespace hpx { namespace ranges {
     ///           where ret is a past-the-end iterator for a new
     ///           subrange.
     ///
-    template <typename RaIter, typename Sent,
+    template <typename FwdIter, typename Sent,
         typename Pred = ranges::equal_to,
         typename Proj = hpx::identity>
-    subrange_t<RaIter, Sent> unique(RaIter first, Sent last,
+    subrange_t<FwdIter, Sent> unique(FwdIter first, Sent last,
         Pred&& pred = Pred(), Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
@@ -91,8 +91,9 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam RaIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of a random access iterator.
+    /// \tparam RaIter      The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of 
+    ///                     a random access iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for RaIter.
     /// \tparam Pred        The type of the function/function object to use
@@ -226,9 +227,8 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an random access iterator.
     /// \tparam Pred        The type of the function/function object to use
@@ -374,8 +374,9 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam RaIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of a random access iterator.
+    /// \tparam RaIter      The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of 
+    ///                     a random access iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for FwdIter1.
     /// \tparam O           The type of the iterator representing the
@@ -521,9 +522,8 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range. 
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an random access iterator.
     /// \tparam O           The type of the iterator representing the

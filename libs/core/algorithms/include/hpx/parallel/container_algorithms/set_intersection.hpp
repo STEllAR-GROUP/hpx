@@ -36,23 +36,23 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it applies user-provided function objects.
-    /// \tparam RaIter1       The type of the source iterators used (deduced)
-    ///                     representing the first sequence.
-    ///                     This iterator type must meet the requirements of an random access iterator.
+    /// \tparam RaIter1     The type of the source iterators used (deduced)
+    ///                     representing the first sequence. This type must meet
+    ///                     the requirements of a random access iterator.
     /// \tparam Sent1       The type of the end source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     sentinel for RaIter1.
-    /// \tparam RaIter2       The type of the source iterators used (deduced)
-    ///                     representing the second sequence.
-    ///                     This iterator type must meet the requirements of an random access iterator.
+    ///                     sentinel for Iter1.
+    /// \tparam RaIter2     The type of the source iterators used (deduced)
+    ///                     representing the second sequence. This type must meet
+    ///                     the requirements of a random access iterator.
     /// \tparam Sent2       The type of the end source iterators used (deduced)
     ///                     representing the second sequence.
     ///                     This iterator type must meet the requirements of an
     ///                     sentinel for RaIter2.
-    /// \tparam RaIter3       The type of the iterator representing the
+    /// \tparam RaIter3     The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     output iterator.
+    ///                     random access iterator.
     /// \tparam Pred        The type of an optional function/function object to use.
     ///                     Unlike its sequential form, the parallel
     ///                     overload of \a set_intersection requires \a Pred to meet
@@ -152,20 +152,18 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it applies user-provided function objects.
-    /// \tparam Rng1
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.        The type of the source range used (deduced).
+    /// \tparam Rng1        The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of a random access iterator.
-    /// \tparam Rng2
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.        The type of the source range used (deduced).
+    /// \tparam Rng2        The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of a random access iterator.
-    /// \tparam RaIter3       The type of the iterator representing the
+    /// \tparam RaIter3     The type of the iterator representing the
     ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     output iterator.
+    ///                     This iterator type must meet the requirements of a
+    ///                     random access iterator.
     /// \tparam Pred        The type of an optional function/function object to use.
     ///                     Unlike its sequential form, the parallel
     ///                     overload of \a set_intersection requires \a Pred to meet
@@ -258,20 +256,19 @@ namespace hpx { namespace ranges {
     ///
     /// The resulting range cannot overlap with either of the input ranges.
     ///
-    /// \tparam RaIter1       The type of the source iterators used (deduced)
-    ///                     representing the first sequence.
-    ///                     This iterator type must meet the requirements of an random access iterator.
+    /// \tparam Iter1       The type of the source iterators used (deduced)
+    ///                     representing the first sequence. This iterator type
+    ///                     must meet the requirements of an input iterator.
     /// \tparam Sent1       The type of the end source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     sentinel for RaIter1.
-    /// \tparam RaIter2       The type of the source iterators used (deduced)
-    ///                     representing the second sequence.
-    ///                     This iterator type must meet the requirements of an random access iterator.
+    ///                     sentinel for Iter1.
+    /// \tparam Iter2       The type of the source iterators used (deduced)
+    ///                     representing the second sequence. This iterator type
+    ///                     must meet the requirements of an input iterator.
     /// \tparam Sent2       The type of the end source iterators used (deduced)
-    ///                     representing the second sequence.
-    ///                     This iterator type must meet the requirements of an
-    ///                     sentinel for RaIter2.
-    /// \tparam RaIter3       The type of the iterator representing the
+    ///                     representing the second sequence. This iterator type
+    ///                     must meet the requirements of an sentinel for Iter2.
+    /// \tparam Iter3       The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     output iterator.

@@ -67,11 +67,11 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam RaIter1    The type of the first range of iterators to swap
+    /// \tparam RaIter1     The type of the first range of iterators to swap
     ///                     (deduced).
     /// \tparam Sent1       The type of the first sentinel (deduced). This
     ///                     sentinel type must be a sentinel for RaIter1.
-    /// \tparam RaIter2    The type of the second range of iterators to swap
+    /// \tparam RaIter2     The type of the second range of iterators to swap
     ///                     (deduced).
     /// \tparam Sent2       The type of the second sentinel (deduced). This
     ///                     sentinel type must be a sentinel for RaIter2.
@@ -162,14 +162,12 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng1
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.        The type of the source range used (deduced).
+    /// \tparam Rng1        The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of a random access iterator.
-    /// \tparam Rng2
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.        The type of the destination range used (deduced).
+    /// \tparam Rng2        The range itself must meet the requirements of a
+    ///                     sized range. The type of the destination range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of a random access iterator.
     ///
@@ -329,11 +327,6 @@ namespace hpx::ranges {
         {
             using iterator_type1 = hpx::traits::range_iterator_t<Rng1>;
             using iterator_type2 = hpx::traits::range_iterator_t<Rng2>;
-
-            static_assert(hpx::traits::is_forward_iterator_v<iterator_type1>,
-                "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<iterator_type2>,
-                "Requires at least forward iterator.");
 
             return hpx::parallel::detail::swap_ranges<
                 swap_ranges_result<iterator_type1, iterator_type2>>()

@@ -57,11 +57,11 @@ namespace hpx { namespace ranges {
     ///           false. If the range [first, last) contains less than two
     ///           elements, the function is always true.
     ///
-    template <typename RaIter, typename Sent,
+    template <typename FwdIter, typename Sent,
         typename Pred,
         typename Proj = hpx::identity>
     bool is_partitioned(
-        RaIter first, Sent last, Pred&& pred, Proj&& proj = Proj());
+        FwdIter first, Sent last, Pred&& pred, Proj&& proj = Proj());
 
     /// Determines if the range [first, last) is partitioned.
     ///
@@ -72,8 +72,9 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam RaIter     The type of the source iterators used for the
-    ///                     This iterator type must meet the requirements of a random access iterator.
+    /// \tparam RaIter      The type of the source iterators used for the
+    ///                     This iterator type must meet the requirements of 
+    ///                     a random access iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for RaIter.
     /// \tparam Pred        The type of the function/function object to use
@@ -182,9 +183,8 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an random access iterator.
     /// \tparam Pred        The type of the function/function object to use

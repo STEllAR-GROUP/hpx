@@ -56,11 +56,11 @@ namespace hpx { namespace ranges {
     /// \returns  The \a adjacent_find algorithm returns an iterator to the
     ///           first of the identical elements. If no such elements are
     ///           found, \a last is returned.
-    template <typename RaIter, typename Sent,
+    template <typename FwdIter, typename Sent,
         typename Proj = hpx::identity,
         typename Pred = detail::equal_to>
-    RaIter adjacent_find(
-        RaIter first, Sent last, Pred&& pred = Pred(), Proj&& proj = Proj());
+    FwdIter adjacent_find(
+        FwdIter first, Sent last, Pred&& pred = Pred(), Proj&& proj = Proj());
 
     /// Searches the range [first, last) for two consecutive identical elements.
     /// This version uses the given binary predicate pred
@@ -73,7 +73,7 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam RaIter     The type of the source iterators used for the
+    /// \tparam RaIter      The type of the source iterators used for the
     ///                     range (deduced).
     ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
@@ -191,9 +191,8 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an random access iterator.
     /// \tparam Proj        The type of an optional projection function. This

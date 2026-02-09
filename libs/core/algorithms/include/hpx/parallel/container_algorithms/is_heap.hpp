@@ -29,9 +29,8 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an random access iterator.
     /// \tparam Comp        The type of the function/function object to use
@@ -94,11 +93,12 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam RaIter        The type of the begin source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an random access iterator.
+    /// \tparam RaIter      The type of the begin source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of
+    ///                     a random access iterator.
     /// \tparam Sent        The type of the end source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     sentinel for Iter1.
+    ///                     This iterator type must meet the requirements of a
+    ///                     sentinel for RaIter.
     /// \tparam Comp        The type of the function/function object to use
     ///                     (deduced).
     /// \tparam Proj        The type of an optional projection function. This
@@ -157,9 +157,7 @@ namespace hpx { namespace ranges {
     ///         at most 2 * N applications of the projection \a proj,
     ///         where N = last - first.
     ///
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng        The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an random access iterator.
     /// \tparam Comp        The type of the function/function object to use
@@ -201,12 +199,12 @@ namespace hpx { namespace ranges {
     ///         at most 2 * N applications of the projection \a proj,
     ///         where N = last - first.
     ///
-    /// \tparam Iter        The type of the begin source iterators used (deduced).
+    /// \tparam RaIter      The type of the begin source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     random access iterator.
     /// \tparam Sent        The type of the end source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     sentinel for Iter1.
+    ///                     This iterator type must meet the requirements of a
+    ///                     sentinel for RaIter.
     /// \tparam Comp        The type of the function/function object to use
     ///                     (deduced).
     /// \tparam Proj        The type of an optional projection function. This
@@ -254,9 +252,8 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an random access iterator.
     /// \tparam Comp        The type of the function/function object to use
@@ -324,11 +321,12 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam RaIter        The type of the begin source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an random access iterator.
+    /// \tparam RaIter      The type of the begin source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     random access iterator.
     /// \tparam Sent        The type of the end source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     sentinel for Iter1.
+    ///                     sentinel for RaIter.
     /// \tparam Comp        The type of the function/function object to use
     ///                     (deduced).
     /// \tparam Proj        The type of an optional projection function. This
@@ -391,9 +389,7 @@ namespace hpx { namespace ranges {
     ///         at most 2 * N applications of the projection \a proj,
     ///         where N = last - first.
     ///
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an random access iterator.
     /// \tparam Comp        The type of the function/function object to use
@@ -441,11 +437,11 @@ namespace hpx { namespace ranges {
     ///         at most 2 * N applications of the projection \a proj,
     ///         where N = last - first.
     ///
-    /// \tparam RaIter        The type of the begin source iterators used (deduced).
+    /// \tparam RaIter      The type of the begin source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam Sent        The type of the end source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     sentinel for Iter1.
+    ///                     sentinel for RaIter.
     /// \tparam Comp        The type of the function/function object to use
     ///                     (deduced).
     /// \tparam Proj        The type of an optional projection function. This

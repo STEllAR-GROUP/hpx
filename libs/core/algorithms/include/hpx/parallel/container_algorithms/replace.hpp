@@ -88,11 +88,9 @@ namespace hpx { namespace ranges {
     ///          rng with new_value, when the following corresponding
     ///          conditions hold: INVOKE(f, INVOKE(proj, *it)) != false
     ///
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of a random access iterator.
+    ///                     meet the requirements of a input iterator.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a equal requires \a F to meet the
@@ -149,7 +147,7 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam RaIter        The type of the source iterator used (deduced).
+    /// \tparam RaIter      The type of the source iterator used (deduced).
     ///                     The iterator type must
     ///                     meet the requirements of a random access iterator.
     /// \tparam Sent        The type of the end iterators used (deduced). This
@@ -228,9 +226,8 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of a random access iterator.
     /// \tparam Pred        The type of the function/function object to use
@@ -303,11 +300,11 @@ namespace hpx { namespace ranges {
     ///          [first,last) with new_value, when the following corresponding
     ///          conditions hold: INVOKE(proj, *i) == old_value
     ///
-    /// \tparam RaIter        The type of the source iterator used (deduced).
+    /// \tparam Iter        The type of the source iterator used (deduced).
     ///                     The iterator type must
-    ///                     meet the requirements of a random access iterator.
+    ///                     meet the requirements of an input iterator.
     /// \tparam Sent        The type of the end iterators used (deduced). This
-    ///                     sentinel type must be a sentinel for RaIter.
+    ///                     sentinel type must be a sentinel for Iter.
     /// \tparam T1          The type of the old value to replace (deduced).
     /// \tparam T2          The type of the new values to replace (deduced).
     /// \tparam Proj        The type of an optional projection function. This
@@ -327,13 +324,13 @@ namespace hpx { namespace ranges {
     /// The assignments in the parallel \a replace algorithm
     /// execute in sequential order in the calling thread.
     ///
-    /// \returns  The \a replace algorithm returns an \a RaIter.
+    /// \returns  The \a replace algorithm returns an \a Iter.
     ///
-    template <typename RaIter, typename Sent, typename Proj = hpx::identity,
+    template <typename Iter, typename Sent, typename Proj = hpx::identity,
         typename T1 =
-            typename hpx::parallel::traits::projected<RaIter, Proj>::value_type,
+            typename hpx::parallel::traits::projected<Iter, Proj>::value_type,
         typename T2 = T1>
-    RaIter replace(RaIter first, Sent sent, T1 const& old_value,
+    Iter replace(Iter first, Sent sent, T1 const& old_value,
         T2 const& new_value, Proj&& proj = Proj());
 
     /// Replaces all elements satisfying specific criteria with \a new_value
@@ -346,11 +343,9 @@ namespace hpx { namespace ranges {
     ///          rng with new_value, when the following corresponding
     ///          conditions hold: INVOKE(proj, *i) == old_value
     ///
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng          type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of a random access iterator.
+    ///                     meet the requirements of an input iterator.
     /// \tparam T1          The type of the old value to replace (deduced).
     /// \tparam T2          The type of the new values to replace (deduced).
     /// \tparam Proj        The type of an optional projection function. This
@@ -391,7 +386,7 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam RaIter        The type of the source iterator used (deduced).
+    /// \tparam RaIter      The type of the source iterator used (deduced).
     ///                     The iterator type must
     ///                     meet the requirements of a random access iterator.
     /// \tparam Sent        The type of the end iterators used (deduced). This
@@ -453,9 +448,8 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of a random access iterator.
     /// \tparam T1          The type of the old value to replace (deduced).
@@ -662,14 +656,14 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam RaIter1    The type of the source iterator used (deduced).
+    /// \tparam RaIter1     The type of the source iterator used (deduced).
     ///                     The iterator type must
     ///                     meet the requirements of a random access iterator.
     /// \tparam Sent        The type of the end iterators used (deduced). This
     ///                     sentinel type must be a sentinel for InIter.
-    /// \tparam RaIter2    The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an random access iterator.
+    /// \tparam RaIter2     The type of the iterator representing the
+    ///                     destination range (deduced). This iterator type must
+    ///                     meet the requirements of an random access iterator.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a equal requires \a Pred to meet the
@@ -750,14 +744,13 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of a random access iterator.
-    /// \tparam RaIter     The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an random access iterator.
+    /// \tparam RaIter      The type of the iterator representing the
+    ///                     destination range (deduced). This iterator type must
+    ///                     meet the requirements of an random access iterator.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a equal requires \a Pred to meet the
@@ -950,14 +943,14 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam RaIter1    The type of the source iterator used (deduced).
+    /// \tparam RaIter1     The type of the source iterator used (deduced).
     ///                     The iterator type must
-    ///                     meet the requirements of an random access iterator.
+    ///                     meet the requirements of a random access iterator.
     /// \tparam Sent        The type of the end iterators used (deduced). This
     ///                     sentinel type must be a sentinel for RaIter.
-    /// \tparam RaIter2    The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an random access iterator.
+    /// \tparam RaIter2     The type of the iterator representing the
+    ///                     destination range (deduced). This iterator type must
+    ///                     meet the requirements of a random access iterator.
     /// \tparam T1          The type of the old value to replace (deduced).
     /// \tparam T2          The type of the new values to replace (deduced).
     /// \tparam Proj        The type of an optional projection function. This
@@ -1026,9 +1019,8 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of a random access iterator.
     /// \tparam RaIter     The type of the iterator representing the
@@ -1332,10 +1324,6 @@ namespace hpx::ranges {
             Rng&& rng, T1 const& old_value, T2 const& new_value,
             Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator<
-                              hpx::traits::range_iterator_t<Rng>>::value,
-                "Required at least forward iterator.");
-
             using type = typename std::iterator_traits<
                 hpx::traits::range_iterator_t<Rng>>::value_type;
 

@@ -44,8 +44,8 @@ namespace hpx { namespace ranges {
     ///           output iterator to the element in the range, one past
     ///           the last element constructed.
     ///
-    template <typename RaIter, typename Sent>
-    RaIter uninitialized_default_construct(RaIter first, Sent last);
+    template <typename FwdIter, typename Sent>
+    FwdIter uninitialized_default_construct(FwdIter first, Sent last);
 
     /// Constructs objects of type typename iterator_traits<ForwardIt>::value_type
     /// in the uninitialized storage designated by the range
@@ -58,8 +58,9 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam RaIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of a random access iterator.
+    /// \tparam RaIter      The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of 
+    ///                     a random access iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for RaIter.
     ///
@@ -132,9 +133,8 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of a random access iterator.
     ///
@@ -196,8 +196,8 @@ namespace hpx { namespace ranges {
     ///           the iterator to the element in the source range, one past
     ///           the last element constructed.
     ///
-    template <typename RaIter, typename Size>
-    RaIter uninitialized_default_construct_n(RaIter first, Size count);
+    template <typename FwdIter, typename Size>
+    FwdIter uninitialized_default_construct_n(FwdIter first, Size count);
 
     /// Constructs objects of type typename iterator_traits<ForwardIt>::value_type
     /// in the uninitialized storage designated by the range
@@ -211,8 +211,9 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam RaIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of a random access iterator.
+    /// \tparam RaIter      The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of 
+    ///                     a random access iterator.
     /// \tparam Size        The type of the argument specifying the number of
     ///                     elements to apply \a f to.
     ///
@@ -274,22 +275,22 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<uninitialized_default_construct_t>
     {
     private:
-        template <typename RaIter, typename Sent>
+        template <typename FwdIter, typename Sent>
         // clang-format off
             requires(
-                hpx::traits::is_forward_iterator_v<RaIter> &&
-                hpx::traits::is_sentinel_for_v<Sent, RaIter>
+                hpx::traits::is_forward_iterator_v<FwdIter> &&
+                hpx::traits::is_sentinel_for_v<Sent, FwdIter>
             )
         // clang-format on
-        friend RaIter tag_fallback_invoke(
-            hpx::ranges::uninitialized_default_construct_t, RaIter first,
+        friend FwdIter tag_fallback_invoke(
+            hpx::ranges::uninitialized_default_construct_t, FwdIter first,
             Sent last)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<RaIter>,
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::uninitialized_default_construct<
-                RaIter>()
+                FwdIter>()
                 .call(hpx::execution::seq, first, last);
         }
 

@@ -66,13 +66,14 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam RaIter1    The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an random access iterator.
+    /// \tparam RaIter1     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of
+    ///                     a random access iterator.
     /// \tparam Sent1       The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for InIter.
-    /// \tparam RaIter2    The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of a random access iterator.
+    /// \tparam RaIter2     The type of the iterator representing the
+    ///                     destination range (deduced). This iterator type must
+    ///                     meet the requirements of a random access iterator.
     /// \tparam Sent2       The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for InIter2.
     ///
@@ -159,14 +160,12 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng1
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.        The type of the source range used (deduced).
+    /// \tparam Rng1        The type of the source range used (deduced). The
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of a random access iterator.
-    /// \tparam Rng2
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.        The type of the destination range used (deduced).
+    /// \tparam Rng2        The range itself must meet the requirements of a
+    ///                     sized range. The type of the destination range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an random access iterator.
     ///
@@ -259,13 +258,15 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam RaIter1    The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an random access iterator.
+    /// \tparam RaIter1     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of
+    ///                     a random access iterator.
     /// \tparam Size        The type of the argument specifying the number of
     ///                     elements to apply \a f to.
-    /// \tparam RaIter2    The type of the iterator representing the
+    /// \tparam RaIter2     The type of the iterator representing the
     ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of a random access iterator.
+    ///                     This iterator type must meet the requirements of
+    ///                     a random access iterator.
     /// \tparam Sent2       The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for InIter2.
     ///

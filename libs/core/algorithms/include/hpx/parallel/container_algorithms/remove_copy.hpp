@@ -259,9 +259,8 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an random access iterator.
     /// \tparam O           The type of the iterator representing the
@@ -343,7 +342,8 @@ namespace hpx { namespace ranges {
     ///         predicate \a f.
     ///
     /// \tparam I           The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an random access iterator.
+    ///                     This iterator type must meet the requirements of an
+    ///                     input iterator.
     /// \tparam Sent        The type of the end iterators used (deduced). This
     ///                     sentinel type must be a sentinel for I.
     /// \tparam O           The type of the iterator representing the
@@ -395,11 +395,9 @@ namespace hpx { namespace ranges {
     ///         assignments, exactly \a last - \a first applications of the
     ///         predicate \a f.
     ///
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an random access iterator.
+    ///                     meet the requirements of an input iterator.
     /// \tparam O           The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
@@ -452,7 +450,8 @@ namespace hpx { namespace ranges {
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
     /// \tparam I           The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an random access iterator.
+    ///                     This iterator type must meet the requirements of a
+    ///                     random access iterator.
     /// \tparam Sent        The type of the end iterators used (deduced). This
     ///                     sentinel type must be a sentinel for I.
     /// \tparam O           The type of the iterator representing the
@@ -524,15 +523,14 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an random access iterator.
     /// \tparam O           The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     output iterator.
+    ///                     random access iterator.
     /// \tparam T           The type that the result of dereferencing InIter is
     ///                     compared to.
     /// \tparam Proj        The type of an optional projection function. This
@@ -710,10 +708,6 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::remove_copy_if_t, ExPolicy&& policy,
             Rng&& rng, O dest, Pred pred, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator<
-                              hpx::traits::range_iterator_t<Rng>>::value,
-                "Required at least forward iterator.");
-
             return hpx::parallel::detail::remove_copy_if<hpx::parallel::util::
                     in_out_result<hpx::traits::range_iterator_t<Rng>, O>>()
                 .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
@@ -823,10 +817,6 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::remove_copy_t, ExPolicy&& policy,
             Rng&& rng, O dest, T const& value, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator<
-                              hpx::traits::range_iterator_t<Rng>>::value,
-                "Required at least forward iterator.");
-
             using type = typename std::iterator_traits<
                 hpx::traits::range_iterator_t<Rng>>::value_type;
 

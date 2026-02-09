@@ -88,13 +88,13 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam RaIter1    The type of the begin source iterators used
+    /// \tparam RaIter1     The type of the begin source iterators used
     ///                     (deduced). This iterator type must meet the
     ///                     requirements of an random access iterator.
     /// \tparam Sent1       The type of the end source iterators used(deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     sentinel for Iter1.
-    /// \tparam RaIter2    The type of the begin destination iterators used
+    /// \tparam RaIter2     The type of the begin destination iterators used
     ///                     deduced). This iterator type must meet the
     ///                     requirements of a random access iterator.
     /// \tparam Sent2       The type of the end destination iterators used
@@ -217,14 +217,12 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng1
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.        The type of the source range used (deduced).
+    /// \tparam Rng1        The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an random access iterator.
-    /// \tparam Rng2
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.        The type of the destination range used (deduced).
+    /// \tparam Rng2        The range itself must meet the requirements of a
+    ///                     sized range. The type of the destination range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an random access iterator.
     /// \tparam Pred        The binary predicate that compares the projected
@@ -427,15 +425,6 @@ namespace hpx::ranges {
             Rng1&& rng1, Rng2&& rng2, Pred pred = Pred(), Proj1 proj1 = Proj1(),
             Proj2 proj2 = Proj2())
         {
-            using iterator_type1 = hpx::traits::range_iterator_t<Rng1>;
-            using iterator_type2 = hpx::traits::range_iterator_t<Rng2>;
-
-            static_assert(hpx::traits::is_forward_iterator_v<iterator_type1>,
-                "Required at least forward iterator.");
-
-            static_assert(hpx::traits::is_forward_iterator_v<iterator_type2>,
-                "Required at least forward iterator.");
-
             return hpx::parallel::detail::starts_with().call(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng1),
                 hpx::util::end(rng1), hpx::util::begin(rng2),

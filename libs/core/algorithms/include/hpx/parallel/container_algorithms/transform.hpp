@@ -25,13 +25,13 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the invocations of \a f.
-    /// \tparam RaIter1    The type of the source iterators for the first
+    /// \tparam RaIter1     The type of the source iterators for the first
     ///                     range used (deduced).
     ///                     This iterator type must meet the requirements of a random access iterator.
     /// \tparam Sent1       The type of the end source iterators used (deduced).
     ///                     This iterator type must meet the requirements of a
     ///                     sentinel for RaIter1.
-    /// \tparam RaIter2    The type of the source iterators for the first
+    /// \tparam RaIter2     The type of the source iterators for the first
     ///                     range used (deduced).
     ///                     This iterator type must meet the requirements of a random access iterator.
     /// \tparam F           The type of the function/function object to use
@@ -106,14 +106,13 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the invocations of \a f.
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of a random access iterator.
     /// \tparam FwdIter     The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of a random access iterator.
+    ///                     destination range (deduced). This iterator type
+    ///                     must meet the requirements of a forward iterator.
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a transform requires \a F to meet the
@@ -185,21 +184,21 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the invocations of \a f.
-    /// \tparam RaIter1    The type of the source iterators for the first
-    ///                     range used (deduced).
-    ///                     This iterator type must meet the requirements of a random access iterator.
+    /// \tparam RaIter1     The type of the source iterators for the first
+    ///                     range used (deduced). This iterator type must
+    ///                     meet the requirements of a random access iterator.
     /// \tparam Sent1       The type of the end source iterators used (deduced).
     ///                     This iterator type must meet the requirements of a
     ///                     sentinel for RaIter1.
-    /// \tparam RaIter2    The type of the source iterators for the first
-    ///                     range used (deduced).
-    ///                     This iterator type must meet the requirements of a random access iterator.
+    /// \tparam RaIter2     The type of the source iterators for the first
+    ///                     range used (deduced). This iterator type must
+    ///                     meet the requirements of a random access iterator.
     /// \tparam Sent2       The type of the end source iterators used (deduced).
     ///                     This iterator type must meet the requirements of a
     ///                     sentinel for RaIter2.
     /// \tparam FwdIter3    The type of the source iterators for the first
-    ///                     range used (deduced).
-    ///                     This iterator type must meet the requirements of a random access iterator.
+    ///                     range used (deduced). This iterator type must
+    ///                     meet the requirements of a forward iterator.
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a transform requires \a F to meet the
@@ -291,22 +290,17 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the invocations of \a f.
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.1        The type of the first source range used (deduced).
+    /// \tparam Rng1        The range itself must meet the requirements of a
+    ///                     sized range. The type of the first source range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of a random access iterator.
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.2
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.        The type of the second source range used (deduced).
+    /// \tparam Rng2        The range itself must meet the requirements of a
+    ///                     sized range. The type of the second source range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of a random access iterator.
     /// \tparam FwdIter     The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     output iterator.
+    ///                     destination range (deduced). This iterator type must
+    ///                     meet the requirements of an output iterator.
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a transform requires \a F to meet the
@@ -398,15 +392,15 @@ namespace hpx { namespace ranges {
     ///
     /// \note   Complexity: Exactly size(rng) applications of \a f
     ///
-    /// \tparam RaIter1    The type of the source iterators for the first
-    ///                     range used (deduced).
-    ///                     This iterator type must meet the requirements of a random access iterator.
+    /// \tparam FwdIter1    The type of the source iterators for the first
+    ///                     range used (deduced). This iterator type must
+    ///                     meet the requirements of a forward iterator.
     /// \tparam Sent1       The type of the end source iterators used (deduced).
     ///                     This iterator type must meet the requirements of a
-    ///                     sentinel for RaIter1.
-    /// \tparam RaIter2    The type of the source iterators for the first
-    ///                     range used (deduced).
-    ///                     This iterator type must meet the requirements of a random access iterator.
+    ///                     sentinel for FwdIter1.
+    /// \tparam FwdIter2    The type of the source iterators for the first
+    ///                     range used (deduced). This iterator type
+    ///                     must meet the requirements of a forward iterator.
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a transform requires \a F to meet the
@@ -429,9 +423,9 @@ namespace hpx { namespace ranges {
     ///                     \endcode \n
     ///                     The signature does not need to have const&.
     ///                     The type \a Type must be such that an object of
-    ///                     type \a RaIter1 can be dereferenced and then
+    ///                     type \a FwdIter1 can be dereferenced and then
     ///                     implicitly converted to \a Type. The type \a Ret
-    ///                     must be such that an object of type \a RaIter2 can
+    ///                     must be such that an object of type \a FwdIter2 can
     ///                     be dereferenced and assigned a value of type
     ///                     \a Ret.
     /// \param proj         Specifies the function (or function object) which
@@ -440,18 +434,18 @@ namespace hpx { namespace ranges {
     ///                     \a f is invoked.
     ///
     /// \returns  The \a transform algorithm returns \a
-    ///           ranges::unary_transform_result<RaIter1, RaIter2>.
+    ///           ranges::unary_transform_result<FwdIter1, FwdIter2>.
     ///           The \a transform algorithm returns a tuple holding an iterator
     ///           referring to the first element after the input sequence and
     ///           the output iterator to the
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <typename RaIter1, typename Sent1, typename RaIter2,
+    template <typename FwdIter1, typename Sent1, typename FwdIter2,
         typename F,
         typename Proj = hpx::identity>
-    ranges::unary_transform_result<RaIter1, RaIter2>
-    transform(RaIter1 first, Sent1 last, RaIter2 dest, F&& f,
+    ranges::unary_transform_result<FwdIter1, FwdIter2>
+    transform(FwdIter1 first, Sent1 last, FwdIter2 dest, F&& f,
         Proj&& proj = Proj());
 
     /// Applies the given function \a f to the given range \a rng and stores
@@ -459,14 +453,12 @@ namespace hpx { namespace ranges {
     ///
     /// \note   Complexity: Exactly size(rng) applications of \a f
     ///
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the first source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of a random access iterator.
+    ///                     meet the requirements of an input iterator.
     /// \tparam FwdIter     The type of the iterator representing the
     ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of a random access iterator.
+    ///                     This iterator type must meet the requirements of input iterator.
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a transform requires \a F to meet the
@@ -711,22 +703,22 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<transform_t>
     {
     private:
-        template <typename ExPolicy, typename FwdIter1, typename Sent1,
-            typename FwdIter2, typename F, typename Proj = hpx::identity>
+        template <typename ExPolicy, typename RaIter1, typename Sent1,
+            typename RaIter2, typename F, typename Proj = hpx::identity>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_random_access_iterator_v<FwdIter1> &&
-                hpx::traits::is_sized_sentinel_for_v<Sent1, FwdIter1> &&
-                hpx::traits::is_iterator_v<FwdIter2>
+                hpx::traits::is_random_access_iterator_v<RaIter1> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent1, RaIter1> &&
+                hpx::traits::is_random_access_iterator_v<RaIter2>
             )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::ranges::transform_t,
-            ExPolicy&& policy, FwdIter1 first, Sent1 last, FwdIter2 dest, F f,
+            ExPolicy&& policy, RaIter1 first, Sent1 last, RaIter2 dest, F f,
             Proj proj = Proj())
         {
             return parallel::detail::transform<
-                unary_transform_result<FwdIter1, FwdIter2>>()
+                unary_transform_result<RaIter1, RaIter2>>()
                 .call(HPX_FORWARD(ExPolicy, policy), first, last, dest,
                     HPX_MOVE(f), HPX_MOVE(proj));
         }
@@ -756,26 +748,26 @@ namespace hpx::ranges {
                     hpx::util::end(rng), dest, HPX_MOVE(f), HPX_MOVE(proj));
         }
 
-        template <typename ExPolicy, typename FwdIter1, typename Sent1,
-            typename FwdIter2, typename Sent2, typename FwdIter3, typename F,
+        template <typename ExPolicy, typename RaIter1, typename Sent1,
+            typename RaIter2, typename Sent2, typename FwdIter3, typename F,
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_random_access_iterator_v<FwdIter1> &&
-                hpx::traits::is_sized_sentinel_for_v<Sent1, FwdIter1> &&
-                hpx::traits::is_random_access_iterator_v<FwdIter2> &&
-                hpx::traits::is_sized_sentinel_for_v<Sent2, FwdIter2> &&
+                hpx::traits::is_random_access_iterator_v<RaIter1> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent1, RaIter1> &&
+                hpx::traits::is_random_access_iterator_v<RaIter2> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent2, RaIter2> &&
                 hpx::traits::is_iterator_v<FwdIter3>
             )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::ranges::transform_t,
-            ExPolicy&& policy, FwdIter1 first1, Sent1 last1, FwdIter2 first2,
+            ExPolicy&& policy, RaIter1 first1, Sent1 last1, RaIter2 first2,
             Sent2 last2, FwdIter3 dest, F f, Proj1 proj1 = Proj1(),
             Proj2 proj2 = Proj2())
         {
             return parallel::detail::transform_binary2<
-                binary_transform_result<FwdIter1, FwdIter2, FwdIter3>>()
+                binary_transform_result<RaIter1, RaIter2, FwdIter3>>()
                 .call(HPX_FORWARD(ExPolicy, policy), first1, last1, first2,
                     last2, dest, HPX_MOVE(f), HPX_MOVE(proj1), HPX_MOVE(proj2));
         }

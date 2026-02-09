@@ -79,11 +79,9 @@ namespace hpx { namespace ranges {
     ///         \a util::end(rng) - \a util::begin(rng) applications of
     ///         the operator==() and the projection \a proj.
     ///
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an random access iterator.
+    ///                     meet the requirements of an input iterator.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a remove_if requires \a Pred to meet the
@@ -137,8 +135,9 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam RaIter     The type of the source iterators used for the
-    ///                     This iterator type must meet the requirements of a random access iterator.
+    /// \tparam RaIter      The type of the source iterators used for the
+    ///                     This iterator type must meet the requirements of a
+    ///                     random access iterator.
     /// \tparam Sent        The type of the end iterators used (deduced). This
     ///                     sentinel type must be a sentinel for RaIter.
     /// \tparam Pred        The type of the function/function object to use
@@ -209,9 +208,8 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an random access iterator.
     /// \tparam Pred        The type of the function/function object to use
@@ -279,7 +277,8 @@ namespace hpx { namespace ranges {
     ///         the operator==() and the projection \a proj.
     ///
     /// \tparam Iter        The type of the source iterators used for the
-    ///                     This iterator type must meet the requirements of a random access iterator.
+    ///                     This iterator type must meet the
+    ///                     requirements of a input iterator.
     /// \tparam Sent        The type of the end iterators used (deduced). This
     ///                     sentinel type must be a sentinel for RaIter.
     /// \tparam T           The type of the value to remove (deduced).
@@ -322,11 +321,9 @@ namespace hpx { namespace ranges {
     ///         \a util::end(rng) - \a util::begin(rng) applications of
     ///         the operator==() and the projection \a proj.
     ///
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an random access iterator.
+    ///                     meet the requirements of an input iterator.
     /// \tparam T           The type of the value to remove (deduced).
     ///                     This value type must meet the requirements of
     ///                     \a CopyConstructible.
@@ -368,8 +365,9 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam RaIter     The type of the source iterators used for the
-    ///                     This iterator type must meet the requirements of a random access iterator.
+    /// \tparam RaIter      The type of the source iterators used for the
+    ///                     This iterator type must meet the requirements of a
+    ///                     random access iterator.
     /// \tparam Sent        The type of the end iterators used (deduced). This
     ///                     sentinel type must be a sentinel for RaIter.
     /// \tparam T           The type of the value to remove (deduced).
@@ -428,9 +426,8 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an random access iterator.
     /// \tparam T           The type of the value to remove (deduced).
@@ -597,10 +594,6 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::remove_if_t, ExPolicy&& policy,
             Rng&& rng, Pred pred, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator<
-                              hpx::traits::range_iterator_t<Rng>>::value,
-                "Required at least forward iterator.");
-
             return hpx::parallel::util::make_subrange<
                 hpx::traits::range_iterator_t<Rng>,
                 typename hpx::traits::range_sentinel<Rng>::type>(
@@ -710,10 +703,6 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::remove_t, ExPolicy&& policy, Rng&& rng,
             T const& value, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator<
-                              hpx::traits::range_iterator_t<Rng>>::value,
-                "Required at least forward iterator.");
-
             using type = typename std::iterator_traits<
                 hpx::traits::range_iterator_t<Rng>>::value_type;
 

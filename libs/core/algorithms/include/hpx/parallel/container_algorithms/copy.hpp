@@ -78,9 +78,8 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an random access iterator.
     ///                     The range itself must meet the requirements of a
@@ -134,7 +133,8 @@ namespace hpx { namespace ranges {
     ///                     sentinel for Iter1.
     /// \tparam FwdIter     The type of the iterator representing the
     ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an random access iterator.
+    ///                     This iterator type must meet the requirements of 
+    ///                     a forward iterator.
     ///
     /// \param iter         Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
@@ -278,7 +278,7 @@ namespace hpx { namespace ranges {
     ///                     random access iterator.
     /// \tparam Sent1       The type of the end source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     sentinel for FwdIter1.
+    ///                     sentinel for RaIter1.
     /// \tparam RaIter      The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
@@ -347,9 +347,8 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an random access iterator.
     ///                     The range itself must meet the requirements of a
@@ -468,11 +467,9 @@ namespace hpx { namespace ranges {
     /// range beginning at \a dest. The order of the elements that are not
     /// removed is preserved.
     ///
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an random access iterator.
+    ///                     meet the requirements of an input iterator.
     /// \tparam FwdIter     The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an

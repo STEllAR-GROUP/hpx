@@ -92,10 +92,10 @@ namespace hpx { namespace ranges {
     ///           Additionally if the size of the subsequence is empty \a first is
     ///           returned. If no subsequence is found, \a last is returned.
     ///
-    template <typename RaIter, typename Sent, typename RaIter2, typename Sent2,
-        typename Pred = hpx::ranges::equal_to, typename Proj1 = hpx::identity,
-        typename Proj2 = hpx::identity>
-    RaIter search(RaIter first, Sent last, RaIter2 s_first, Sent2 s_last,
+    template <typename FwdIter, typename Sent, typename FwdIter2,
+        typename Sent2, typename Pred = hpx::ranges::equal_to,
+        typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
+    FwdIter search(FwdIter first, Sent last, FwdIter2 s_first, Sent2 s_last,
         Pred&& op = Pred(), Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
 
     /// Searches the range [first, last) for any elements in the range [s_first, s_last).
@@ -204,10 +204,10 @@ namespace hpx { namespace ranges {
     ///
     /// \tparam Rng1        The type of the examine range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
+    ///                     meet the requirements of a forward iterator.
     /// \tparam Rng2        The type of the search range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
+    ///                     meet the requirements of a forward iterator.
     /// \tparam Pred        The type of an optional function/function object to use.
     ///                     Unlike its sequential form, the parallel
     ///                     overload of \a adjacent_find requires \a Pred to meet the
@@ -275,14 +275,12 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng1
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.        The type of the examine range used (deduced).
+    /// \tparam Rng1        The range itself must meet the requirements of a
+    ///                     sized range. The type of the examine range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of a random access iterator.
-    /// \tparam Rng2
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.        The type of the search range used (deduced).
+    /// \tparam Rng2        The range itself must meet the requirements of a
+    ///                     sized range. The type of the search range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of a random access iterator.
     /// \tparam Pred        The type of an optional function/function object to use.
@@ -424,11 +422,11 @@ namespace hpx { namespace ranges {
     ///           Additionally, if the size of the subsequence is empty or no subsequence
     ///           is found, \a first is also returned.
     ///
-    template <typename RaIter, typename RaIter2, typename Sent2,
+    template <typename FwdIter, typename FwdIter2, typename Sent2,
         typename Pred = hpx::ranges::equal_to, typename Proj1 = hpx::identity,
         typename Proj2 = hpx::identity>
-    RaIter search_n(RaIter first, std::size_t count, RaIter2 s_first,
-        Sent s_last, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
+    FwdIter search_n(FwdIter first, std::size_t count, FwdIter2 s_first,
+        Sent2 s_last, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
         Proj2&& proj2 = Proj2());
 
     /// Searches the range [first, last) for any elements in the range [s_first, s_last).
@@ -442,16 +440,14 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam RaIter     The type of the source iterators used for the
-    ///                     first range (deduced).
-    ///                     This iterator type must meet the requirements of an random access iterator.
-    /// \tparam RaIter2    The type of the source iterators used for the
-    ///                     second range (deduced).
-    ///                     This iterator type must meet the requirements of an random access iterator.
+    /// \tparam RaIter      The type of the source iterators used for the
+    ///                     first range (deduced). This iterator type must meet
+    ///                     the requirements of an random access iterator.
+    /// \tparam RaIter2     The type of the source iterators used for the
+    ///                     second range (deduced). This iterator type must meet
+    ///                     the requirements of an random access iterator.
     /// \tparam Sent2       The type of the source sentinel used for the
     ///                     second range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     sentinel.
     /// \tparam Pred        The type of an optional function/function object to use.
     ///                     Unlike its sequential form, the parallel
     ///                     overload of \a adjacent_find requires \a Pred to meet the
@@ -534,10 +530,10 @@ namespace hpx { namespace ranges {
     ///
     /// \tparam Rng1        The type of the examine range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
+    ///                     meet the requirements of a forward iterator.
     /// \tparam Rng2        The type of the search range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
+    ///                     meet the requirements of a forward iterator.
     /// \tparam Pred        The type of an optional function/function object to use.
     ///                     Unlike its sequential form, the parallel
     ///                     overload of \a adjacent_find requires \a Pred to meet the
@@ -607,14 +603,12 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng1
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.        The type of the examine range used (deduced).
+    /// \tparam Rng1        The range itself must meet the requirements of a
+    ///                     sized range. The type of the examine range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of a random access iterator.
-    /// \tparam Rng2
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.        The type of the search range used (deduced).
+    /// \tparam Rng2        The range itself must meet the requirements of a
+    ///                     sized range. The type of the search range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of a random access iterator.
     /// \tparam Pred        The type of an optional function/function object to use.

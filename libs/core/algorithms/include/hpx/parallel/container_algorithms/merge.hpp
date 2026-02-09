@@ -30,22 +30,17 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.1        The type of the first source range used (deduced).
+    /// \tparam Rng1        The range itself must meet the requirements of a
+    ///                     sized range. The type of the first source range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an random access iterator.
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.2
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.        The type of the second source range used (deduced).
+    /// \tparam Rng2        The range itself must meet the requirements of a
+    ///                     sized range. The type of the second source range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an random access iterator.
-    /// \tparam RaIter3       The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     random access iterator.
+    /// \tparam RaIter3     The type of the iterator representing the
+    ///                     destination range (deduced). This iterator type must
+    ///                     meet the requirements of an random access iterator.
     /// \tparam Comp        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a merge requires \a Comp to meet the
@@ -134,25 +129,21 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam RaIter1       The type of the source iterators used (deduced)
-    ///                     representing the first sequence.
-    ///                     This iterator type must meet the requirements of an
-    ///                     random access iterator.
+    /// \tparam RaIter1     The type of the source iterators used (deduced)
+    ///                     representing the first sequence. This iterator type
+    ///                     must meet the requirements of an random access iterator.
     /// \tparam Sent1       The type of the end source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     sentinel for RaIter1.
-    /// \tparam RaIter2       The type of the source iterators used (deduced)
-    ///                     representing the second sequence.
-    ///                     This iterator type must meet the requirements of an
-    ///                     random access iterator.
+    /// \tparam RaIter2     The type of the source iterators used (deduced)
+    ///                     representing the second sequence. This iterator type
+    ///                     must meet the requirements of an random access iterator.
     /// \tparam Sent2       The type of the end source iterators used (deduced)
-    ///                     representing the second sequence.
-    ///                     This iterator type must meet the requirements of an
-    ///                     sentinel for RaIter2.
-    /// \tparam RaIter3       The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     random access iterator.
+    ///                     representing the second sequence. This iterator type
+    ///                     must meet the requirements of an sentinel for RaIter2.
+    /// \tparam RaIter3     The type of the iterator representing the
+    ///                     destination range (deduced). This iterator type must
+    ///                     meet the requirements of an random access iterator.
     /// \tparam Comp        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a merge requires \a Comp to meet the
@@ -410,12 +401,11 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an random access iterator.
-    /// \tparam RaIter        The type of the source iterators used (deduced).
+    /// \tparam RaIter      The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     random access iterator.
     /// \tparam Comp        The type of the function/function object to use
@@ -488,12 +478,12 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam RaIter        The type of the source iterators used (deduced).
+    /// \tparam RaIter      The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     random access iterator.
     /// \tparam Sent        The type of the end source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     sentinel for RaIter1.
+    ///                     sentinel for RaIter.
     /// \tparam Comp        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a inplace_merge requires \a Comp

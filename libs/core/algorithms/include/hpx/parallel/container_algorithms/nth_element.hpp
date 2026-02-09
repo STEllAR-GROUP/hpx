@@ -239,7 +239,7 @@ namespace hpx { namespace ranges {
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
     /// \param rng          Refers to the sequence of elements the algorithm
-    ///                     will be applied to.
+    ///                     will be applied to. Should be a sized range.
     /// \param nth          Refers to the iterator defining the sort partition
     ///                     point
     /// \param pred         Specifies the comparison function object which

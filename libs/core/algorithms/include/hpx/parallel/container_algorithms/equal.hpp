@@ -24,14 +24,16 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam RaIter1       The type of the source iterators used for the
+    /// \tparam RaIter1     The type of the source iterators used for the
     ///                     first range (deduced).
-    ///                     This iterator type must meet the requirements of an random access iterator.
+    ///                     This iterator type must meet the requirements of a
+    ///                     random access iterator.
     /// \tparam Sent1       The type of the source iterators used for the end of
     ///                     the first range (deduced).
-    /// \tparam RaIter2       The type of the source iterators used for the
+    /// \tparam RaIter2     The type of the source iterators used for the
     ///                     second range (deduced).
-    ///                     This iterator type must meet the requirements of an random access iterator.
+    ///                     This iterator type must meet the requirements of a
+    ///                     random access iterator.
     /// \tparam Sent2       The type of the source iterators used for the end of
     ///                     the second range (deduced).
     /// \tparam Pred        The type of an optional function/function object to use.
@@ -123,14 +125,12 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng1
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.        The type of the first source range used (deduced).
+    /// \tparam Rng1        The range itself must meet the requirements of a
+    ///                     sized range. The type of the first source range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an random access iterator.
-    /// \tparam Rng2
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.        The type of the second source range used (deduced).
+    /// \tparam Rng2        The range itself must meet the requirements of a
+    ///                     sized range. The type of the second source range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an random access iterator.
     /// \tparam Pred        The type of an optional function/function object to use.
@@ -212,14 +212,14 @@ namespace hpx { namespace ranges {
     /// \note   Complexity: At most min(last1 - first1, last2 - first2)
     ///         applications of the predicate \a f.
     ///
-    /// \tparam RaIter1       The type of the source iterators used for the
-    ///                     first range (deduced).
-    ///                     This iterator type must meet the requirements of an random access iterator.
+    /// \tparam Iter1       The type of the source iterators used for the
+    ///                     first range (deduced). This iterator type must 
+    ///                     meet the requirements of an forward iterator.
     /// \tparam Sent1       The type of the source iterators used for the end of
     ///                     the first range (deduced).
-    /// \tparam RaIter2       The type of the source iterators used for the
-    ///                     second range (deduced).
-    ///                     This iterator type must meet the requirements of an random access iterator.
+    /// \tparam Iter2       The type of the source iterators used for the
+    ///                     second range (deduced). This iterator type must 
+    ///                     meet the requirements of an forward iterator.
     /// \tparam Sent2       The type of the source iterators used for the end of
     ///                     the second range (deduced).
     /// \tparam Pred        The type of an optional function/function object to use.
@@ -426,15 +426,6 @@ namespace hpx::ranges {
             Rng2&& rng2, Pred op = Pred(), Proj1 proj1 = Proj1(),
             Proj2 proj2 = Proj2())
         {
-            static_assert(
-                hpx::traits::is_forward_iterator<typename hpx::traits::
-                        range_traits<Rng1>::iterator_type>::value,
-                "Requires at least forward iterator.");
-            static_assert(
-                hpx::traits::is_forward_iterator<typename hpx::traits::
-                        range_traits<Rng2>::iterator_type>::value,
-                "Requires at least forward iterator.");
-
             return hpx::parallel::detail::equal_binary().call(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng1),
                 hpx::util::end(rng1), hpx::util::begin(rng2),

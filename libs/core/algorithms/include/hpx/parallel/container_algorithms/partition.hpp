@@ -85,11 +85,10 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an random access iterator.
+    ///                     meet the requirements of a random access iterator.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a partition requires \a Pred to meet
@@ -199,9 +198,9 @@ namespace hpx { namespace ranges {
     ///           an iterator to the first element of the second group and
     ///           finishing with an iterator equal to last.
     ///
-    template <typename RaIter, typename Sent, typename Pred,
+    template <typename FwdIter, typename Sent, typename Pred,
         typename Proj = hpx::identity>
-    subrange_t<RaIter> partition(RaIter first, Sent last, Pred&& pred,
+    subrange_t<FwdIter> partition(FwdIter first, Sent last, Pred&& pred,
         Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
@@ -218,8 +217,9 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam RaIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an random access iterator.
+    /// \tparam RaIter      The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     random access iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for RaIter.
     /// \tparam Pred        The type of the function/function object to use
@@ -352,9 +352,8 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the invocations of \a f.
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an birdirectional iterator
     /// \tparam Pred        The type of the function/function object to use
@@ -425,8 +424,8 @@ namespace hpx { namespace ranges {
     ///         projection.
     ///
     /// \tparam BidirIter   The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
+    ///                     This iterator type must meet the requirements of a
+    ///                     bidirectional iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for BidirIter.
     /// \tparam Pred        The type of the function/function object to use
@@ -469,9 +468,9 @@ namespace hpx { namespace ranges {
     ///           INVOKE(f, INVOKE (proj, *k)) == false. The relative order of
     ///           the elements in both groups is preserved.
     ///
-    template <typename BidirRaIter, typename Sent, typename Pred,
+    template <typename BidirIter, typename Sent, typename Pred,
         typename Proj = hpx::identity>
-    subrange_t<BidirRaIter> stable_partition(BidirRaIter first, Sent last,
+    subrange_t<BidirIter> stable_partition(BidirIter first, Sent last,
         Pred&& pred, Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
@@ -489,8 +488,9 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the invocations of \a f.
-    /// \tparam BidirRaIter   The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an random access iterator.
+    /// \tparam RaIter      The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     random access iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for BidirRaIter.
     /// \tparam Pred        The type of the function/function object to use
@@ -544,12 +544,12 @@ namespace hpx { namespace ranges {
     ///           If the execution policy is of type \a parallel_task_policy
     ///           the algorithm returns a future<> referring to this iterator.
     ///
-    template <typename ExPolicy, typename BidirRaIter, typename Sent,
+    template <typename ExPolicy, typename RaIter, typename Sent,
         typename Pred,
         typename Proj = hpx::identity>
     typename parallel::util::detail::algorithm_result<ExPolicy,
-        subrange_t<BidirRaIter>>::type
-    stable_partition(ExPolicy&& policy, BidirRaIter first, Sent last,
+        subrange_t<RaIter>>::type
+    stable_partition(ExPolicy&& policy, RaIter first, Sent last,
         Pred&& pred, Proj&& proj = Proj());
 
 ///////////////////////////////////////////////////////////////////////////
@@ -623,12 +623,12 @@ namespace hpx { namespace ranges {
     ///           range, and the destination iterator to the end of the \a
     ///           dest_false range.
     ///
-    template <typename Rng, typename OutRaIter2,
-        typename OutRaIter3, typename Pred,
+    template <typename Rng, typename OutIter2,
+        typename OutIter3, typename Pred,
         typename Proj = hpx::identity>
     partition_copy_result<hpx::traits::range_iterator_t<Rng>,
-        OutRaIter2, OutRaIter3>
-    partition_copy(Rng&& rng, OutRaIter2 dest_true, OutRaIter3 dest_false,
+        OutIter2, OutIter3>
+    partition_copy(Rng&& rng, OutIter2 dest_true, OutIter3 dest_false,
         Pred&& pred, Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
@@ -647,19 +647,20 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an random access iterator.
-    /// \tparam RaIter2    The type of the iterator representing the
+    /// \tparam RaIter2     The type of the iterator representing the
     ///                     destination range for the elements that satisfy
     ///                     the predicate \a pred (deduced).
-    ///                     This iterator type must meet the requirements of an random access iterator.
-    /// \tparam RaIter3    The type of the iterator representing the
+    ///                     This iterator type must meet the requirements of a
+    ///                     random access iterator.
+    /// \tparam RaIter3     The type of the iterator representing the
     ///                     destination range for the elements that don't
     ///                     satisfy the predicate \a pred (deduced).
-    ///                     This iterator type must meet the requirements of an random access iterator.
+    ///                     This iterator type must meet the requirements of a
+    ///                     random access iterator.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a partition_copy requires \a Pred to
@@ -827,18 +828,21 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam RaIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an random access iterator.
+    /// \tparam RaIter      The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     random access iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for RaIter.
-    /// \tparam OutRaIter2    The type of the iterator representing the
+    /// \tparam OutRaIter2  The type of the iterator representing the
     ///                     destination range for the elements that satisfy
     ///                     the predicate \a pred (deduced).
-    ///                     This iterator type must meet the requirements of an random access iterator.
-    /// \tparam OutRaIter3    The type of the iterator representing the
+    ///                     This iterator type must meet the requirements of a
+    ///                     random access iterator.
+    /// \tparam OutRaIter3  The type of the iterator representing the
     ///                     destination range for the elements that don't
     ///                     satisfy the predicate \a pred (deduced).
-    ///                     This iterator type must meet the requirements of an random access iterator.
+    ///                     This iterator type must meet the requirements of a
+    ///                     random access iterator.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a partition_copy requires \a Pred to
@@ -982,9 +986,6 @@ namespace hpx::ranges {
             Rng&& rng, Pred pred, Proj proj = Proj())
         {
             using iterator = hpx::traits::range_iterator_t<Rng>;
-
-            static_assert(hpx::traits::is_forward_iterator_v<iterator>,
-                "Requires at least forward iterator.");
 
             return hpx::parallel::util::make_subrange<
                 hpx::traits::range_iterator_t<Rng>,
@@ -1142,28 +1143,28 @@ namespace hpx::ranges {
                 parallel::detail::advance_to_sentinel(first, last));
         }
 
-        template <typename ExPolicy, typename BidirRaIter, typename Sent,
+        template <typename ExPolicy, typename RaIter, typename Sent,
             typename Pred, typename Proj = hpx::identity>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_random_access_iterator_v<BidirRaIter> &&
-                hpx::traits::is_sized_sentinel_for_v<Sent, BidirRaIter> &&
+                hpx::traits::is_random_access_iterator_v<RaIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, RaIter> &&
                 parallel::traits::is_indirect_callable_v<ExPolicy, Pred,
-                    parallel::traits::projected<Proj, BidirRaIter>
+                    parallel::traits::projected<Proj, RaIter>
                 >
             )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
-            subrange_t<BidirRaIter>>
+            subrange_t<RaIter>>
         tag_fallback_invoke(hpx::ranges::stable_partition_t, ExPolicy&& policy,
-            BidirRaIter first, Sent last, Pred pred, Proj proj = Proj())
+            RaIter first, Sent last, Pred pred, Proj proj = Proj())
         {
             using is_seq = std::integral_constant<bool,
-                !hpx::traits::is_random_access_iterator_v<BidirRaIter>>;
+                !hpx::traits::is_random_access_iterator_v<RaIter>>;
 
-            return hpx::parallel::util::make_subrange<BidirRaIter, BidirRaIter>(
-                hpx::parallel::detail::stable_partition<BidirRaIter>().call2(
+            return hpx::parallel::util::make_subrange<RaIter, RaIter>(
+                hpx::parallel::detail::stable_partition<RaIter>().call2(
                     HPX_FORWARD(ExPolicy, policy), is_seq(), first, last,
                     HPX_MOVE(pred), HPX_MOVE(proj)),
                 parallel::detail::advance_to_sentinel(first, last));

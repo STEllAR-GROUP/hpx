@@ -48,8 +48,8 @@ namespace hpx { namespace ranges {
     ///           The \a shift_left algorithm returns an iterator to the
     ///           end of the resulting range.
     ///
-    template <typename RaIter, typename Sent, typename Size>
-    RaIter shift_left(RaIter first, Sent last, Size n);
+    template <typename FwdIter, typename Sent, typename Size>
+    FwdIter shift_left(FwdIter first, Sent last, Size n);
 
     ///////////////////////////////////////////////////////////////////////////
     /// Shifts the elements in the range [first, last) by n positions towards

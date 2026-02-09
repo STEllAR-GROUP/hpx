@@ -45,8 +45,8 @@ namespace hpx { namespace ranges {
     ///           iterator to the element in the range, one past
     ///           the last element copied.
     ///
-    template <typename RaIter, typename Sent, typename T>
-    RaIter uninitialized_fill(RaIter first, Sent last, T const& value);
+    template <typename FwdIter, typename Sent, typename T>
+    FwdIter uninitialized_fill(FwdIter first, Sent last, T const& value);
 
     /// Copies the given \a value to an uninitialized memory area, defined by
     /// the range [first, last). If an exception is thrown during the
@@ -58,8 +58,9 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam RaIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of a random access iterator.
+    /// \tparam RaIter      The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of 
+    ///                     a random access iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for RaIter.
     /// \tparam T           The type of the value to be assigned (deduced).
@@ -132,9 +133,8 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of a random access iterator.
     /// \tparam T           The type of the value to be assigned (deduced).
@@ -199,8 +199,8 @@ namespace hpx { namespace ranges {
     ///           iterator to the element in the range, one past
     ///           the last element copied.
     ///
-    template <typename RaIter, typename Size, typename T>
-    RaIter uninitialized_fill_n(RaIter first, Size count, T const& value);
+    template <typename FwdIter, typename Size, typename T>
+    FwdIter uninitialized_fill_n(FwdIter first, Size count, T const& value);
 
     /// Copies the given \a value value to the first count elements in an
     /// uninitialized memory area beginning at first. If an exception is thrown
@@ -213,8 +213,9 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam RaIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of a random access iterator.
+    /// \tparam RaIter      The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of 
+    ///                     a random access iterator.
     /// \tparam Size        The type of the argument specifying the number of
     ///                     elements to apply \a f to.
     /// \tparam T           The type of the value to be assigned (deduced).
@@ -276,20 +277,20 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<uninitialized_fill_t>
     {
     private:
-        template <typename RaIter, typename Sent, typename T>
+        template <typename FwdIter, typename Sent, typename T>
         // clang-format off
             requires(
-                hpx::traits::is_forward_iterator_v<RaIter> &&
-                hpx::traits::is_sentinel_for_v<Sent, RaIter>
+                hpx::traits::is_forward_iterator_v<FwdIter> &&
+                hpx::traits::is_sentinel_for_v<Sent, FwdIter>
             )
         // clang-format on
-        friend RaIter tag_fallback_invoke(hpx::ranges::uninitialized_fill_t,
-            RaIter first, Sent last, T const& value)
+        friend FwdIter tag_fallback_invoke(hpx::ranges::uninitialized_fill_t,
+            FwdIter first, Sent last, T const& value)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<RaIter>,
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::detail::uninitialized_fill<RaIter>().call(
+            return hpx::parallel::detail::uninitialized_fill<FwdIter>().call(
                 hpx::execution::seq, first, last, value);
         }
 
@@ -373,20 +374,19 @@ namespace hpx::ranges {
                 hpx::execution::seq, first, count, value);
         }
 
-        template <typename ExPolicy, typename FwdIter, typename Size,
-            typename T>
+        template <typename ExPolicy, typename RaIter, typename Size, typename T>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_random_access_iterator_v<FwdIter> &&
+                hpx::traits::is_random_access_iterator_v<RaIter> &&
                 std::is_integral_v<Size>
             )
         // clang-format on
-        friend parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
+        friend parallel::util::detail::algorithm_result_t<ExPolicy, RaIter>
         tag_fallback_invoke(hpx::ranges::uninitialized_fill_n_t,
-            ExPolicy&& policy, FwdIter first, Size count, T const& value)
+            ExPolicy&& policy, RaIter first, Size count, T const& value)
         {
-            return hpx::parallel::detail::uninitialized_fill_n<FwdIter>().call(
+            return hpx::parallel::detail::uninitialized_fill_n<RaIter>().call(
                 HPX_FORWARD(ExPolicy, policy), first, count, value);
         }
     } uninitialized_fill_n{};

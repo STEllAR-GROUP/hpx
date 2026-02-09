@@ -25,8 +25,8 @@ namespace hpx {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam RaIter        The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    /// \tparam RaIter      The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of a
     ///                     random access iterator.
     /// \tparam Sent        The type of the end source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
@@ -118,12 +118,12 @@ namespace hpx {
     /// \note   Complexity: O(\a last - \a first) applications of the
     ///         predicates \a red_op and \a conv_op.
     ///
-    /// \tparam RaIter        The type of the source iterators used (deduced).
+    /// \tparam Iter        The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     random access iterator.
+    ///                     input iterator.
     /// \tparam Sent        The type of the end source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     sentinel for RaIter.
+    ///                     sentinel for Iter.
     /// \tparam T           The type of the value to be used as initial (and
     ///                     intermediate) values (deduced).
     /// \tparam Reduce      The type of the binary function object used for
@@ -185,9 +185,9 @@ namespace hpx {
     /// that the behavior of transform_reduce may be non-deterministic for
     /// non-associative or non-commutative binary predicate.
     ///
-    template <typename RaIter, typename Sent, typename T, typename Reduce,
+    template <typename Iter, typename Sent, typename T, typename Reduce,
         typename Convert>
-    T transform_reduce(RaIter first, Sent last, T init, Reduce&& red_op,
+    T transform_reduce(Iter first, Sent last, T init, Reduce&& red_op,
         Convert&& conv_op);
 
     /// Returns GENERALIZED_SUM(red_op, init, conv_op(*first), ...,
@@ -200,13 +200,13 @@ namespace hpx {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam RaIter        The type of the source iterators used (deduced).
+    /// \tparam RaIter      The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     random access iterator.
     /// \tparam Sent        The type of the end source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     sentinel for RaIter.
-    /// \tparam RaIter2       The type of the source iterators used (deduced)
+    /// \tparam RaIter2     The type of the source iterators used (deduced)
     ///                     representing the second sequence.
     ///                     This iterator type must meet the requirements of an
     ///                     random access iterator.
@@ -265,14 +265,14 @@ namespace hpx {
     ///
     /// \tparam Iter        The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     random access iterator.
+    ///                     input iterator.
     /// \tparam Sent        The type of the end source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     sentinel for Iter.
     /// \tparam Iter2       The type of the source iterators used (deduced)
     ///                     representing the second sequence.
     ///                     This iterator type must meet the requirements of an
-    ///                     random access iterator.
+    ///                     input iterator.
     /// \tparam T           The type of the value to be used as initial (and
     ///                     intermediate) values (deduced).
     ///
@@ -301,8 +301,8 @@ namespace hpx {
     /// that the behavior of transform_reduce may be non-deterministic for
     /// non-associative or non-commutative binary predicate.
     ///
-    template <typename RaIter, typename Sent, typename RaIter2, typename T>
-    T transform_reduce(RaIter first, Sent last, RaIter2 first2, T init);
+    template <typename Iter, typename Sent, typename Iter2, typename T>
+    T transform_reduce(Iter first, Sent last, Iter2 first2, T init);
 
     /// Returns GENERALIZED_SUM(red_op, init, conv_op(*first), ...,
     /// conv_op(*(first + (last - first) - 1))).
@@ -314,13 +314,13 @@ namespace hpx {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam RaIter        The type of the source iterators used (deduced).
+    /// \tparam RaIter      The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     random access iterator.
     /// \tparam Sent        The type of the end source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     sentinel for RaIter.
-    /// \tparam RaIter2       The type of the source iterators used (deduced)
+    /// \tparam RaIter2     The type of the source iterators used (deduced)
     ///                     representing the second sequence.
     ///                     This iterator type must meet the requirements of an
     ///                     random access iterator.
@@ -415,14 +415,14 @@ namespace hpx {
     ///
     /// \tparam Iter        The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     random access iterator.
+    ///                     input iterator.
     /// \tparam Sent        The type of the end source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     sentinel for Iter.
     /// \tparam Iter2       The type of the source iterators used (deduced)
     ///                     representing the second sequence.
     ///                     This iterator type must meet the requirements of an
-    ///                     random access iterator.
+    ///                     input iterator.
     /// \tparam T           The type of the value to be used as initial (and
     ///                     intermediate) values (deduced).
     /// \tparam Reduce      The type of the binary function object used for
@@ -501,9 +501,8 @@ namespace hpx {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of a random access iterator.
     /// \tparam T           The type of the value to be used as initial (and
@@ -668,12 +667,11 @@ namespace hpx {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of a random access iterator.
-    /// \tparam RaIter2       The type of the second source iterators used
+    /// \tparam Iter2       The type of the second source iterators used
     ///                     (deduced). This iterator type must meet the
     ///                     requirements of an random access iterator.
     /// \tparam T           The type of the value to be used as return)
@@ -703,7 +701,7 @@ namespace hpx {
     ///           \a parallel_task_policy and
     ///           returns \a T otherwise.
     ///
-    template <typename ExPolicy, typename Rng, typename Iter2, typename T>
+    template <typename ExPolicy, typename Rng, typename RaIter2, typename T>
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy, T>
     transform_reduce(ExPolicy&& policy, Rng&& rng, Iter2 first2, T init);
 
@@ -747,12 +745,11 @@ namespace hpx {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of a random access iterator.
-    /// \tparam RaIter2       The type of the second source iterators used
+    /// \tparam Iter2       The type of the second source iterators used
     ///                     (deduced). This iterator type must meet the
     ///                     requirements of an random access iterator.
     /// \tparam T           The type of the value to be used as return)

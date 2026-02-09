@@ -28,14 +28,14 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam RaIter1       The type of the source iterators used for the
-    ///                     first range (deduced).
-    ///                     This iterator type must meet the requirements of an random access iterator.
+    /// \tparam RaIter1     The type of the source iterators used for the
+    ///                     first range (deduced). This iterator type must meet 
+    ///                     the requirements of a random access iterator.
     /// \tparam Sent1       The type of the source iterators used for the end of
     ///                     the first range (deduced).
-    /// \tparam RaIter2       The type of the source iterators used for the
-    ///                     second range (deduced).
-    ///                     This iterator type must meet the requirements of an random access iterator.
+    /// \tparam RaIter2     The type of the source iterators used for the
+    ///                     second range (deduced). This iterator type must meet 
+    ///                     the requirements of a random access iterator.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -83,14 +83,13 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng
-    ///                     The range itself must meet the requirements of a
-    ///                     sized range.         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of a random access iterator.
-    /// \tparam RaIter2       The type of the source iterators used for the
-    ///                     second range (deduced).
-    ///                     This iterator type must meet the requirements of an random access iterator.
+    /// \tparam RaIter2     The type of the source iterators used for the
+    ///                     second range (deduced). This iterator type must 
+    ///                     meet the requirements of a random access iterator.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -132,14 +131,14 @@ namespace hpx { namespace ranges {
     /// \note   Complexity: Performs exactly
     ///         std::distance(begin(rng), end(rng)) assignments.
     ///
-    /// \tparam RaIter1       The type of the source iterators used for the
-    ///                     first range (deduced).
-    ///                     This iterator type must meet the requirements of an random access iterator.
+    /// \tparam Iter1      The type of the source iterators used for the
+    ///                     first range (deduced). This iterator type must meet 
+    ///                     the requirements of a forward iterator.
     /// \tparam Sent1       The type of the source iterators used for the end of
     ///                     the first range (deduced).
-    /// \tparam RaIter2       The type of the source iterators used for the
-    ///                     second range (deduced).
-    ///                     This iterator type must meet the requirements of an random access iterator.
+    /// \tparam Iter2       The type of the source iterators used for the
+    ///                     second range (deduced). This iterator type must meet 
+    ///                     the requirements of a forward iterator.
     ///
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
@@ -153,8 +152,8 @@ namespace hpx { namespace ranges {
     ///           \a last and the output iterator to the element in the
     ///           destination range, one past the last element moved.
     ///
-    template <typename RaIter1, typename Sent1, typename RaIter2>
-    move_result<RaIter1, RaIter2> move(RaIter1 first, Sent1 last, RaIter2 dest);
+    template <typename Iter1, typename Sent1, typename Iter2>
+    move_result<Iter1, Iter2> move(Iter1 first, Sent1 last, Iter2 dest);
 
     /// Moves the elements in the range \a rng to another range beginning
     /// at \a dest. After this operation the elements in the moved-from
