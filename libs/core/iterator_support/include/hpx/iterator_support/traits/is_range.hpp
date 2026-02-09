@@ -160,15 +160,6 @@ namespace hpx::traits {
         is_random_access_range<R>::value;
 
     ///////////////////////////////////////////////////////////////////////////
-#if defined(HPX_HAVE_CXX20_STD_DISABLE_SIZED_RANGE)
-    HPX_CXX_EXPORT template <typename R>
-    inline constexpr bool disable_sized_range =
-        std::ranges::disable_sized_range<R>;
-#else
-    HPX_CXX_EXPORT template <typename R>
-    inline constexpr bool disable_sized_range = false;
-#endif
-
     HPX_CXX_EXPORT template <typename R, typename Enable = void>
     struct is_sized_range : std::false_type
     {
@@ -177,7 +168,7 @@ namespace hpx::traits {
     HPX_CXX_EXPORT template <typename R>
     struct is_sized_range<R,
         std::enable_if_t<is_range_v<R> &&
-            !disable_sized_range<std::remove_cv_t<R>> &&
+            !std::ranges::disable_sized_range<std::remove_cv_t<R>> &&
             (util::detail::has_size_member_v<R> ||
                 util::detail::has_size_v<R> ||
                 is_sized_sentinel_for_v<range_sentinel_t<R>,
