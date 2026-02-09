@@ -650,6 +650,15 @@ int hpx_main()
     test_uninitialized_relocate_overlap_forward_matches_seq(
         hpx::execution::par);
 
+#if defined(HPX_HAVE_CXX17_STD_EXECUTION_POLICIES)
+    test_uninitialized_relocate_overlap_forward_matches_seq(
+        hpx::execution::par_unseq);
+#endif
+
+    // TODO(par(task)):
+    // Add a dedicated async test once the overlap behavior is extended to
+    // properly support parallel task policies and sender-based return types.
+
     return hpx::local::finalize();
 }
 

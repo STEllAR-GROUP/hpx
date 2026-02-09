@@ -902,7 +902,8 @@ namespace hpx::experimental {
             if constexpr (!hpx::is_sequenced_execution_policy_v<ExPolicy>)
             {
                 // if we can check for overlapping ranges
-                if constexpr (hpx::traits::is_contiguous_iterator_v<InIter2> &&
+                if constexpr (hpx::traits::is_contiguous_iterator_v<InIter1> &&
+                    hpx::traits::is_contiguous_iterator_v<InIter2> &&
                     hpx::traits::is_contiguous_iterator_v<FwdIter>)
                 {
                     auto last = std::next(first, count);
@@ -922,7 +923,7 @@ namespace hpx::experimental {
                             return ex::unique_any_sender<
                                 FwdIter>(parallel::util::get_second_element(
                                 hpx::parallel::detail::uninitialized_relocate_n<
-                                    parallel::util::in_out_result<InIter2,
+                                    parallel::util::in_out_result<InIter1,
                                         FwdIter>>()
                                     .call(HPX_FORWARD(ExPolicy, policy), first,
                                         count, dest)));
@@ -931,7 +932,7 @@ namespace hpx::experimental {
                         {
                             return parallel::util::get_second_element(
                                 hpx::parallel::detail::uninitialized_relocate_n<
-                                    parallel::util::in_out_result<InIter2,
+                                    parallel::util::in_out_result<InIter1,
                                         FwdIter>>()
                                     .call(HPX_FORWARD(ExPolicy, policy), first,
                                         count, dest));
