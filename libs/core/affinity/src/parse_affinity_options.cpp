@@ -894,7 +894,7 @@ namespace hpx::threads::detail {
     {
         std::size_t const num_threads = affinities.size();
 
-        check_num_threads(use_process_mask, t, num_threads, ec);
+        // check_num_threads(use_process_mask, t, num_threads, ec);
 
         if (use_process_mask)
         {
@@ -912,8 +912,12 @@ namespace hpx::threads::detail {
 
         // At first, calculate the number of used pus per core. This needs to be
         // done to make sure that we occupy all the available cores
-        for (std::size_t num_thread = 0; num_thread < num_threads; /**/)
+        bool made_progress = true;
+        for (std::size_t num_thread = 0;
+            num_thread < num_threads && made_progress;
+            /**/)
         {
+            made_progress = false;
             for (std::size_t num_core = 0; num_core < num_cores; ++num_core)
             {
                 std::size_t const num_core_pus =
@@ -944,8 +948,14 @@ namespace hpx::threads::detail {
                 pu_indexes[num_core].push_back(next_pu_index[num_core] - 1);
 
                 num_pus_cores[num_core]++;
+                made_progress = true;
                 if (++num_thread == num_threads)
                     break;
+            }
+            if (num_thread < num_threads && !made_progress)
+            {
+                std::fill(next_pu_index.begin(), next_pu_index.end(), 0);
+                made_progress = true;
             }
         }
 
