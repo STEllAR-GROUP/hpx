@@ -11,6 +11,7 @@
 #include <hpx/modules/type_support.hpp>
 
 #include <atomic>
+#include <cstddef>
 #include <random>
 #include <set>
 #include <utility>
