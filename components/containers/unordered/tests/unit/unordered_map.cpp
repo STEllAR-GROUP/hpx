@@ -15,7 +15,6 @@
 #include <algorithm>
 #include <cstddef>
 #include <functional>
-#include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
@@ -26,12 +25,11 @@ HPX_REGISTER_UNORDERED_MAP(std::string, double)
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Key, typename Value, typename Hash, typename KeyEqual>
-void test_global_iteration(
-    hpx::unordered_map<Key, Value, Hash, KeyEqual>& m,
+void test_global_iteration(hpx::unordered_map<Key, Value, Hash, KeyEqual>& m,
     Value const& val = Value())
 {
     std::size_t size = m.size();
-    
+
     //     typedef typename hpx::unordered_map<Key, Value>::iterator iterator;
     //     typedef hpx::traits::segmented_iterator_traits<iterator> traits;
     //     HPX_TEST(traits::is_segmented_iterator::value);
@@ -39,13 +37,14 @@ void test_global_iteration(
     //     typedef typename hpx::unordered_map<Key, Value>::const_iterator const_iterator;
     //     typedef hpx::traits::segmented_iterator_traits<const_iterator> const_traits;
     //     HPX_TEST(const_traits::is_segmented_iterator::value);
-    
+
     for (std::size_t i = 0; i < size; ++i)
     {
         Key key = std::to_string(i);
-        HPX_TEST_EQ(m[key], val);
+        auto f = m.get_value(key);
+        HPX_TEST_EQ(f.get(), val);
     }
-    
+
     //     // test normal iteration
     //     std::size_t count = 0;
     //     std::size_t i = 42;
