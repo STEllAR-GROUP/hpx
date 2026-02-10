@@ -18,6 +18,7 @@
 #include <hpx/modules/io_service.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/static_reinit.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/threadmanager.hpp>
@@ -37,7 +38,6 @@
 #include <hpx/runtime_local/termination_detection.hpp>
 #include <hpx/runtime_local/thread_hooks.hpp>
 #include <hpx/runtime_local/thread_mapper.hpp>
-#include <hpx/synchronization/stop_token.hpp>
 #include <hpx/version.hpp>
 
 #include <atomic>

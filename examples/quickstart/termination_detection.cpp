@@ -10,7 +10,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/lcos.hpp>
-#include <hpx/runtime_local/termination_detection.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/stop_token.hpp>
 
 #include <iostream>
