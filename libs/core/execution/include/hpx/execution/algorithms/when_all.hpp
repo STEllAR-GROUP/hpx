@@ -593,13 +593,13 @@ namespace hpx::execution::experimental {
 
     // the following enables directly using dataflow() with senders
 
-    HPX_CXX_EXPORT template <typename F, typename Sender, typename... Senders>
-        requires(!hpx::traits::is_future_v<std::decay_t<Sender>> &&
+    HPX_CXX_EXPORT template <typename F, typename Sender, typename... Senders,
+        HPX_CONCEPT_REQUIRES_(!hpx::traits::is_future_v<std::decay_t<Sender>> &&
             is_sender_v<Sender> &&
             ((!hpx::traits::is_future_v<std::decay_t<Senders>> &&
                  is_sender_v<Senders>) &&
-                ...))
-    constexpr HPX_FORCEINLINE auto tag_invoke(
+                ...))>
+    HPX_FORCEINLINE constexpr auto tag_invoke(
         hpx::detail::dataflow_t, F&& f, Sender&& sender, Senders&&... senders)
         -> decltype(then(when_all(HPX_FORWARD(Sender, sender),
                              HPX_FORWARD(Senders, senders)...),
@@ -610,13 +610,13 @@ namespace hpx::execution::experimental {
             HPX_FORWARD(F, f));
     }
 
-    HPX_CXX_EXPORT template <typename F, typename Sender, typename... Senders>
-        requires(!hpx::traits::is_future_v<std::decay_t<Sender>> &&
+    HPX_CXX_EXPORT template <typename F, typename Sender, typename... Senders,
+        HPX_CONCEPT_REQUIRES_(!hpx::traits::is_future_v<std::decay_t<Sender>> &&
             is_sender_v<Sender> &&
             ((!hpx::traits::is_future_v<std::decay_t<Senders>> &&
                  is_sender_v<Senders>) &&
-                ...))
-    constexpr HPX_FORCEINLINE auto tag_invoke(hpx::detail::dataflow_t,
+                ...))>
+    HPX_FORCEINLINE constexpr auto tag_invoke(hpx::detail::dataflow_t,
         hpx::launch, F&& f, Sender&& sender, Senders&&... senders)
         -> decltype(then(when_all(HPX_FORWARD(Sender, sender),
                              HPX_FORWARD(Senders, senders)...),
@@ -629,4 +629,3 @@ namespace hpx::execution::experimental {
 }    // namespace hpx::execution::experimental
 
 #endif
-

@@ -286,8 +286,14 @@ struct sender_1
 #if defined(HPX_HAVE_STDEXEC)
     using is_sender = void;
 #endif
-    using completion_signatures = Signatures;
 };
+
+template <typename Signatures, typename Env = ex::no_env>
+constexpr auto tag_invoke(ex::get_completion_signatures_t,
+    sender_1<Signatures> const&, Env = Env{}) noexcept -> Signatures
+{
+    return {};
+}
 
 template <typename Signatures>
 void test_sender1(Signatures)
@@ -295,8 +301,6 @@ void test_sender1(Signatures)
     static_assert(ex::is_sender_v<sender_1<Signatures>>);
 
     sender_1<Signatures> s;
-    static_assert(
-        ex::detail::has_completion_signatures_v<sender_1<Signatures>>);
 
 #if defined(HPX_HAVE_STDEXEC)
     static_assert(std::is_same_v<decltype(ex::get_completion_signatures(
@@ -516,8 +520,7 @@ void test_awaitable_sender1(Signatures&&, Awaiter&&)
     static_assert(ex::is_awaitable_v<awaitable_sender_1<Awaiter>>);
 
     awaitable_sender_1<Awaiter> s;
-    static_assert(
-        !ex::detail::has_completion_signatures_v<awaitable_sender_1<Awaiter>>);
+
 #if defined(HPX_HAVE_STDEXEC)
     static_assert(std::is_same_v<decltype(ex::get_completion_signatures(
                                      s, ex::empty_env{})),
