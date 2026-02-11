@@ -10,6 +10,10 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(concurrency_headers
     hpx/concurrency/barrier.hpp
     hpx/concurrency/cache_line_data.hpp
+    hpx/concurrency/concurrent_queue.hpp
+    hpx/concurrency/concurrent_unordered_map.hpp
+    hpx/concurrency/concurrent_unordered_set.hpp
+    hpx/concurrency/concurrent_vector.hpp
     hpx/concurrency/concurrentqueue.hpp
     hpx/concurrency/deque.hpp
     hpx/concurrency/detail/contiguous_index_queue.hpp
@@ -21,6 +25,7 @@ set(concurrency_headers
     hpx/concurrency/detail/tagged_ptr_dcas.hpp
     hpx/concurrency/detail/tagged_ptr_ptrcompression.hpp
     hpx/concurrency/detail/tagged_ptr_pair.hpp
+    hpx/concurrency/hash.hpp
     hpx/concurrency/queue.hpp
     hpx/concurrency/spinlock.hpp
     hpx/concurrency/spinlock_pool.hpp
