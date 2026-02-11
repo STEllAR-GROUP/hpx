@@ -351,7 +351,7 @@ namespace hpx::threads {
 
         /// Construct a hint with mode thread_schedule_hint_mode::thread and the
         /// given hint as the local thread number.
-        constexpr explicit thread_schedule_hint(std::int16_t thread_hint,
+        constexpr explicit thread_schedule_hint(std::int16_t const thread_hint,
             thread_placement_hint placement = thread_placement_hint::none,
             thread_execution_hint runs_as_child = default_runs_as_child_hint,
             thread_sharing_hint sharing = thread_sharing_hint::none) noexcept
@@ -366,8 +366,8 @@ namespace hpx::threads {
 
         /// Construct a hint with the given mode and hint. The numerical hint is
         /// unused when the mode is thread_schedule_hint_mode::none.
-        constexpr thread_schedule_hint(thread_schedule_hint_mode mode,
-            std::int16_t hint,
+        constexpr thread_schedule_hint(thread_schedule_hint_mode const mode,
+            std::int16_t const hint,
             thread_placement_hint placement = thread_placement_hint::none,
             thread_execution_hint runs_as_child = default_runs_as_child_hint,
             thread_sharing_hint sharing = thread_sharing_hint::none) noexcept
