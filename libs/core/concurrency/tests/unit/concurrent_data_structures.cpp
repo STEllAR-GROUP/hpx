@@ -50,7 +50,15 @@ void test_concurrent_vector()
         t.join();
 
     HPX_TEST_EQ(static_cast<int>(v.size()), 1000);
+    HPX_TEST_EQ(static_cast<int>(v.size()), 1000);
     HPX_TEST_EQ(count.load(), 1000);
+
+    // Test accessor
+    if (v.size() > 0)
+    {
+        v[0] = 999;
+        HPX_TEST_EQ(static_cast<int>(v[0]), 999);
+    }
 }
 
 void test_concurrent_unordered_map()
@@ -92,6 +100,11 @@ void test_concurrent_unordered_map()
 
     for (auto& t : threads)
         t.join();
+
+    std::atomic<int> sum{0};
+    m.for_each([&sum](auto const& kv) { sum += kv.second; });
+    // 10 threads * sum(1..100) = 10 * 5050 = 50500
+    HPX_TEST_EQ(sum.load(), 50500);
 }
 
 void test_concurrent_unordered_set()
@@ -116,6 +129,10 @@ void test_concurrent_unordered_set()
 
     HPX_TEST_EQ(static_cast<int>(s.size()), 1000);
     HPX_TEST_EQ(count.load(), 1000);
+
+    std::atomic<int> set_count{0};
+    s.for_each([&set_count](auto const&) { set_count++; });
+    HPX_TEST_EQ(set_count.load(), 1000);
 }
 
 void test_concurrent_queue()
