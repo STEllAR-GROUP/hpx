@@ -1630,10 +1630,11 @@ namespace hpx {
     namespace parallel::detail {
 
         HPX_CXX_CORE_EXPORT template <typename BidiIter>
-        struct find_last : public algorithm<find_last<BidiIter>, BidiIter>
+        struct find_last_impl
+          : public algorithm<find_last_impl<BidiIter>, BidiIter>
         {
-            constexpr find_last() noexcept
-              : algorithm<find_last, BidiIter>("find_last")
+            constexpr find_last_impl() noexcept
+              : algorithm<find_last_impl, BidiIter>("find_last")
             {
             }
 
@@ -1697,10 +1698,11 @@ namespace hpx {
         ///////////////////////////////////////////////////////////////////////
         // find_last_if
         HPX_CXX_CORE_EXPORT template <typename BidiIter>
-        struct find_last_if : public algorithm<find_last_if<BidiIter>, BidiIter>
+        struct find_last_if_impl
+          : public algorithm<find_last_if_impl<BidiIter>, BidiIter>
         {
-            constexpr find_last_if() noexcept
-              : algorithm<find_last_if, BidiIter>("find_last_if")
+            constexpr find_last_if_impl() noexcept
+              : algorithm<find_last_if_impl, BidiIter>("find_last_if")
             {
             }
 
@@ -1765,11 +1767,11 @@ namespace hpx {
         ///////////////////////////////////////////////////////////////////////
         // find_last_if_not
         HPX_CXX_CORE_EXPORT template <typename BidiIter>
-        struct find_last_if_not
-          : public algorithm<find_last_if_not<BidiIter>, BidiIter>
+        struct find_last_if_not_impl
+          : public algorithm<find_last_if_not_impl<BidiIter>, BidiIter>
         {
-            constexpr find_last_if_not() noexcept
-              : algorithm<find_last_if_not, BidiIter>("find_last_if_not")
+            constexpr find_last_if_not_impl() noexcept
+              : algorithm<find_last_if_not_impl, BidiIter>("find_last_if_not")
             {
             }
 
@@ -1832,31 +1834,8 @@ namespace hpx {
         };
     }    // namespace parallel::detail
 
-    /// Returns the last element in the range [first, last) that is equal
-    /// to value
-    ///
-    /// \note   Complexity: At most last - first
-    ///         applications of the operator==().
-    ///
-    /// \tparam BidiIter    The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of a
-    ///                     bidirectional iterator.
-    /// \tparam T           The type of the value to find (deduced).
-    ///
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     of the range the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements of
-    ///                     the range the algorithm will be applied to.
-    /// \param val          the value to compare the elements to
-    ///
-    /// \returns  The \a find_last algorithm returns the last element in the range
-    ///           [first,last) that is equal to \a val.
-    ///           If no such element in the range of [first,last) is equal to
-    ///           \a val, then the algorithm returns \a last.
-    ///
-    template <typename BidiIter, typename T>
-    BidiIter find_last(BidiIter first, BidiIter last, T const& val);
-
+    ///////////////////////////////////////////////////////////////////////////
+    // CPO for hpx::find_last
     /// Returns the last element in the range [first, last) that is equal
     /// to value
     ///
@@ -1900,43 +1879,49 @@ namespace hpx {
     ///           If no such element in the range of [first,last) is equal to
     ///           \a val, then the algorithm returns \a last.
     ///
-    template <typename ExPolicy, typename BidiIter, typename T>
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, BidiIter>
-    find_last(ExPolicy&& policy, BidiIter first, BidiIter last, T const& val);
+    HPX_CXX_EXPORT inline constexpr struct find_last_t final
+      : hpx::detail::tag_parallel_algorithm<find_last_t>
+    {
+    private:
+        template <typename BidiIter,
+            typename T = typename std::iterator_traits<BidiIter>::value_type>
+        // clang-format off
+        requires (
+            hpx::traits::is_iterator_v<BidiIter>
+        )
+        // clang-format on
+        friend BidiIter tag_fallback_invoke(
+            find_last_t, BidiIter first, BidiIter last, T const& val)
+        {
+            static_assert(hpx::traits::is_bidirectional_iterator_v<BidiIter>,
+                "Requires at least bidirectional iterator.");
 
-    /// Returns the last element in the range [first, last) for which
-    /// predicate \a pred returns true.
-    ///
-    /// \note   Complexity: At most last - first
-    ///         applications of the predicate.
-    ///
-    /// \tparam BidiIter    The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of a
-    ///                     bidirectional iterator.
-    /// \tparam Pred        The type of the function/function object to use
-    ///                     (deduced).
-    ///
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     of the range the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements of
-    ///                     the range the algorithm will be applied to.
-    /// \param pred         The unary predicate which returns true for the
-    ///                     required element. The signature of the predicate
-    ///                     should be equivalent to:
-    ///                     \code
-    ///                     bool pred(const Type &a);
-    ///                     \endcode \n
-    ///                     The signature does not need to have const &, but
-    ///                     the function must not modify the objects passed to
-    ///                     it.
-    ///
-    /// \returns  The \a find_last_if algorithm returns the last element in the range
-    ///           [first,last) that satisfies the predicate \a pred.
-    ///           If no such element exists, the algorithm returns \a last.
-    ///
-    template <typename BidiIter, typename Pred>
-    BidiIter find_last_if(BidiIter first, BidiIter last, Pred&& pred);
+            return hpx::parallel::detail::find_last_impl<BidiIter>().call(
+                hpx::execution::seq, first, last, val, hpx::identity_v);
+        }
 
+        template <typename ExPolicy, typename BidiIter,
+            typename T = typename std::iterator_traits<BidiIter>::value_type>
+        // clang-format off
+        requires (
+            hpx::is_execution_policy_v<ExPolicy> &&
+            hpx::traits::is_iterator_v<BidiIter>
+        )
+        // clang-format on
+        friend decltype(auto) tag_fallback_invoke(find_last_t,
+            ExPolicy&& policy, BidiIter first, BidiIter last, T const& val)
+        {
+            static_assert(hpx::traits::is_bidirectional_iterator_v<BidiIter>,
+                "Requires at least bidirectional iterator.");
+
+            return hpx::parallel::detail::find_last_impl<BidiIter>().call(
+                HPX_FORWARD(ExPolicy, policy), first, last, val,
+                hpx::identity_v);
+        }
+    } find_last{};
+
+    ///////////////////////////////////////////////////////////////////////////
+    // CPO for hpx::find_last_if
     /// Returns the last element in the range [first, last) for which
     /// predicate \a pred returns true.
     ///
@@ -1988,43 +1973,50 @@ namespace hpx {
     ///           [first,last) that satisfies the predicate \a pred.
     ///           If no such element exists, the algorithm returns \a last.
     ///
-    template <typename ExPolicy, typename BidiIter, typename Pred>
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, BidiIter>
-    find_last_if(ExPolicy&& policy, BidiIter first, BidiIter last, Pred&& pred);
+    HPX_CXX_EXPORT inline constexpr struct find_last_if_t final
+      : hpx::detail::tag_parallel_algorithm<find_last_if_t>
+    {
+    private:
+        template <typename BidiIter, typename Pred>
+        // clang-format off
+        requires (
+            hpx::traits::is_iterator_v<BidiIter> &&
+            hpx::is_invocable_v<Pred, hpx::traits::iter_value_t<BidiIter>>
+        )
+        // clang-format on
+        friend BidiIter tag_fallback_invoke(
+            find_last_if_t, BidiIter first, BidiIter last, Pred pred)
+        {
+            static_assert(hpx::traits::is_bidirectional_iterator_v<BidiIter>,
+                "Requires at least bidirectional iterator.");
 
-    /// Returns the last element in the range [first, last) for which
-    /// predicate \a pred returns false.
-    ///
-    /// \note   Complexity: At most last - first
-    ///         applications of the predicate.
-    ///
-    /// \tparam BidiIter    The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of a
-    ///                     bidirectional iterator.
-    /// \tparam Pred        The type of the function/function object to use
-    ///                     (deduced).
-    ///
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     of the range the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements of
-    ///                     the range the algorithm will be applied to.
-    /// \param pred         The unary predicate which returns false for the
-    ///                     required element. The signature of the predicate
-    ///                     should be equivalent to:
-    ///                     \code
-    ///                     bool pred(const Type &a);
-    ///                     \endcode \n
-    ///                     The signature does not need to have const &, but
-    ///                     the function must not modify the objects passed to
-    ///                     it.
-    ///
-    /// \returns  The \a find_last_if_not algorithm returns the last element in the
-    ///           range [first,last) that does not satisfy the predicate \a pred.
-    ///           If no such element exists, the algorithm returns \a last.
-    ///
-    template <typename BidiIter, typename Pred>
-    BidiIter find_last_if_not(BidiIter first, BidiIter last, Pred&& pred);
+            return hpx::parallel::detail::find_last_if_impl<BidiIter>().call(
+                hpx::execution::seq, first, last, HPX_MOVE(pred),
+                hpx::identity_v);
+        }
 
+        template <typename ExPolicy, typename BidiIter, typename Pred>
+        // clang-format off
+        requires (
+            hpx::is_execution_policy_v<ExPolicy> &&
+            hpx::traits::is_iterator_v<BidiIter> &&
+            hpx::is_invocable_v<Pred, hpx::traits::iter_value_t<BidiIter>>
+        )
+        // clang-format on
+        friend decltype(auto) tag_fallback_invoke(find_last_if_t,
+            ExPolicy&& policy, BidiIter first, BidiIter last, Pred pred)
+        {
+            static_assert(hpx::traits::is_bidirectional_iterator_v<BidiIter>,
+                "Requires at least bidirectional iterator.");
+
+            return hpx::parallel::detail::find_last_if_impl<BidiIter>().call(
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(pred),
+                hpx::identity_v);
+        }
+    } find_last_if{};
+
+    ///////////////////////////////////////////////////////////////////////////
+    // CPO for hpx::find_last_if_not
     /// Returns the last element in the range [first, last) for which
     /// predicate \a pred returns false.
     ///
@@ -2076,100 +2068,6 @@ namespace hpx {
     ///           range [first,last) that does not satisfy the predicate \a pred.
     ///           If no such element exists, the algorithm returns \a last.
     ///
-    template <typename ExPolicy, typename BidiIter, typename Pred>
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, BidiIter>
-    find_last_if_not(
-        ExPolicy&& policy, BidiIter first, BidiIter last, Pred&& pred);
-
-    ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::find_last
-    HPX_CXX_EXPORT inline constexpr struct find_last_t final
-      : hpx::detail::tag_parallel_algorithm<find_last_t>
-    {
-    private:
-        template <typename BidiIter,
-            typename T = typename std::iterator_traits<BidiIter>::value_type>
-        // clang-format off
-        requires (
-            hpx::traits::is_iterator_v<BidiIter>
-        )
-        // clang-format on
-        friend BidiIter tag_fallback_invoke(
-            find_last_t, BidiIter first, BidiIter last, T const& val)
-        {
-            static_assert(hpx::traits::is_bidirectional_iterator_v<BidiIter>,
-                "Requires at least bidirectional iterator.");
-
-            return hpx::parallel::detail::find_last<BidiIter>().call(
-                hpx::execution::seq, first, last, val, hpx::identity_v);
-        }
-
-        template <typename ExPolicy, typename BidiIter,
-            typename T = typename std::iterator_traits<BidiIter>::value_type>
-        // clang-format off
-        requires (
-            hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::traits::is_iterator_v<BidiIter>
-        )
-        // clang-format on
-        friend decltype(auto) tag_fallback_invoke(find_last_t,
-            ExPolicy&& policy, BidiIter first, BidiIter last, T const& val)
-        {
-            static_assert(hpx::traits::is_bidirectional_iterator_v<BidiIter>,
-                "Requires at least bidirectional iterator.");
-
-            return hpx::parallel::detail::find_last<BidiIter>().call(
-                HPX_FORWARD(ExPolicy, policy), first, last, val,
-                hpx::identity_v);
-        }
-    } find_last{};
-
-    ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::find_last_if
-    HPX_CXX_EXPORT inline constexpr struct find_last_if_t final
-      : hpx::detail::tag_parallel_algorithm<find_last_if_t>
-    {
-    private:
-        template <typename BidiIter, typename Pred>
-        // clang-format off
-        requires (
-            hpx::traits::is_iterator_v<BidiIter> &&
-            hpx::is_invocable_v<Pred, hpx::traits::iter_value_t<BidiIter>>
-        )
-        // clang-format on
-        friend BidiIter tag_fallback_invoke(
-            find_last_if_t, BidiIter first, BidiIter last, Pred pred)
-        {
-            static_assert(hpx::traits::is_bidirectional_iterator_v<BidiIter>,
-                "Requires at least bidirectional iterator.");
-
-            return hpx::parallel::detail::find_last_if<BidiIter>().call(
-                hpx::execution::seq, first, last, HPX_MOVE(pred),
-                hpx::identity_v);
-        }
-
-        template <typename ExPolicy, typename BidiIter, typename Pred>
-        // clang-format off
-        requires (
-            hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::traits::is_iterator_v<BidiIter> &&
-            hpx::is_invocable_v<Pred, hpx::traits::iter_value_t<BidiIter>>
-        )
-        // clang-format on
-        friend decltype(auto) tag_fallback_invoke(find_last_if_t,
-            ExPolicy&& policy, BidiIter first, BidiIter last, Pred pred)
-        {
-            static_assert(hpx::traits::is_bidirectional_iterator_v<BidiIter>,
-                "Requires at least bidirectional iterator.");
-
-            return hpx::parallel::detail::find_last_if<BidiIter>().call(
-                HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(pred),
-                hpx::identity_v);
-        }
-    } find_last_if{};
-
-    ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::find_last_if_not
     HPX_CXX_EXPORT inline constexpr struct find_last_if_not_t final
       : hpx::detail::tag_parallel_algorithm<find_last_if_not_t>
     {
@@ -2187,9 +2085,9 @@ namespace hpx {
             static_assert(hpx::traits::is_bidirectional_iterator_v<BidiIter>,
                 "Requires at least bidirectional iterator.");
 
-            return hpx::parallel::detail::find_last_if_not<BidiIter>().call(
-                hpx::execution::seq, first, last, HPX_MOVE(pred),
-                hpx::identity_v);
+            return hpx::parallel::detail::find_last_if_not_impl<BidiIter>()
+                .call(hpx::execution::seq, first, last, HPX_MOVE(pred),
+                    hpx::identity_v);
         }
 
         template <typename ExPolicy, typename BidiIter, typename Pred>
@@ -2206,9 +2104,9 @@ namespace hpx {
             static_assert(hpx::traits::is_bidirectional_iterator_v<BidiIter>,
                 "Requires at least bidirectional iterator.");
 
-            return hpx::parallel::detail::find_last_if_not<BidiIter>().call(
-                HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(pred),
-                hpx::identity_v);
+            return hpx::parallel::detail::find_last_if_not_impl<BidiIter>()
+                .call(HPX_FORWARD(ExPolicy, policy), first, last,
+                    HPX_MOVE(pred), hpx::identity_v);
         }
     } find_last_if_not{};
 
