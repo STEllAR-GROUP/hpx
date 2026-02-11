@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <functional>
 #include <mutex>
+#include <stdexcept>
 #include <unordered_set>
 #include <utility>
 
@@ -22,6 +23,10 @@ namespace hpx::concurrent {
         typename Allocator = std::allocator<Key>>
     class concurrent_unordered_set
     {
+    private:
+        mutable hpx::util::spinlock mutex_;
+        std::unordered_set<Key, Hash, KeyEqual, Allocator> set_;
+
     public:
         using key_type = Key;
         using value_type = Key;
@@ -30,26 +35,47 @@ namespace hpx::concurrent {
         using hasher = Hash;
         using key_equal = KeyEqual;
         using allocator_type = Allocator;
-        using reference = value_type&;
-        using const_reference = value_type const&;
-        using pointer = typename std::allocator_traits<Allocator>::pointer;
-        using const_pointer =
-            typename std::allocator_traits<Allocator>::const_pointer;
 
-        using iterator = typename std::unordered_set<Key, Hash, KeyEqual,
-            Allocator>::iterator;
-        using const_iterator = typename std::unordered_set<Key, Hash, KeyEqual,
-            Allocator>::const_iterator;
-        using local_iterator = typename std::unordered_set<Key, Hash, KeyEqual,
-            Allocator>::local_iterator;
-        using const_local_iterator = typename std::unordered_set<Key, Hash,
-            KeyEqual, Allocator>::const_local_iterator;
+        class const_accessor;
+        using reference = const_accessor;
+        using const_reference = const_accessor;
 
-    private:
-        mutable hpx::util::spinlock mutex_;
-        std::unordered_set<Key, Hash, KeyEqual, Allocator> set_;
+        class const_accessor
+        {
+            friend class concurrent_unordered_set;
+            std::unique_lock<hpx::util::spinlock> lock_;
+            Key const* value_;
 
-    public:
+            const_accessor(
+                std::unique_lock<hpx::util::spinlock>&& l, Key const* v)
+              : lock_(std::move(l))
+              , value_(v)
+            {
+            }
+
+        public:
+            const_accessor() = default;
+
+            bool empty() const
+            {
+                return value_ == nullptr;
+            }
+
+            operator Key const&() const
+            {
+                if (!value_)
+                    throw std::runtime_error("Empty accessor dereference");
+                return *value_;
+            }
+
+            Key const& get() const
+            {
+                if (!value_)
+                    throw std::runtime_error("Empty accessor dereference");
+                return *value_;
+            }
+        };
+
         concurrent_unordered_set() = default;
 
         explicit concurrent_unordered_set(size_type bucket_count,
@@ -65,13 +91,15 @@ namespace hpx::concurrent {
         }
 
         concurrent_unordered_set(concurrent_unordered_set const& other)
-          : set_(other.set_)
         {
+            std::lock_guard<hpx::util::spinlock> lock(other.mutex_);
+            set_ = other.set_;
         }
 
         concurrent_unordered_set(concurrent_unordered_set&& other) noexcept
-          : set_(std::move(other.set_))
         {
+            std::lock_guard<hpx::util::spinlock> lock(other.mutex_);
+            set_ = std::move(other.set_);
         }
 
         concurrent_unordered_set& operator=(
@@ -118,32 +146,6 @@ namespace hpx::concurrent {
             return set_.max_size();
         }
 
-        // Iterators
-        iterator begin() noexcept
-        {
-            return set_.begin();
-        }
-        const_iterator begin() const noexcept
-        {
-            return set_.begin();
-        }
-        const_iterator cbegin() const noexcept
-        {
-            return set_.cbegin();
-        }
-        iterator end() noexcept
-        {
-            return set_.end();
-        }
-        const_iterator end() const noexcept
-        {
-            return set_.end();
-        }
-        const_iterator cend() const noexcept
-        {
-            return set_.cend();
-        }
-
         // Modifiers
         void clear() noexcept
         {
@@ -151,22 +153,16 @@ namespace hpx::concurrent {
             set_.clear();
         }
 
-        std::pair<iterator, bool> insert(value_type const& value)
+        bool insert(value_type const& value)
         {
             std::lock_guard<hpx::util::spinlock> lock(mutex_);
-            return set_.insert(value);
+            return set_.insert(value).second;
         }
 
-        std::pair<iterator, bool> insert(value_type&& value)
+        bool insert(value_type&& value)
         {
             std::lock_guard<hpx::util::spinlock> lock(mutex_);
-            return set_.insert(std::move(value));
-        }
-
-        iterator erase(const_iterator pos)
-        {
-            std::lock_guard<hpx::util::spinlock> lock(mutex_);
-            return set_.erase(pos);
+            return set_.insert(std::move(value)).second;
         }
 
         size_type erase(Key const& key)
@@ -195,22 +191,33 @@ namespace hpx::concurrent {
             return set_.count(key);
         }
 
-        iterator find(Key const& key)
+        bool find(Key const& key, const_accessor& result) const
         {
-            std::lock_guard<hpx::util::spinlock> lock(mutex_);
-            return set_.find(key);
-        }
-
-        const_iterator find(Key const& key) const
-        {
-            std::lock_guard<hpx::util::spinlock> lock(mutex_);
-            return set_.find(key);
+            std::unique_lock<hpx::util::spinlock> lock(mutex_);
+            auto it = set_.find(key);
+            if (it != set_.end())
+            {
+                result = const_accessor(std::move(lock), &(*it));
+                return true;
+            }
+            return false;
         }
 
         bool contains(Key const& key) const
         {
             std::lock_guard<hpx::util::spinlock> lock(mutex_);
             return set_.find(key) != set_.end();
+        }
+
+        // Thread-safe iteration
+        template <typename F>
+        void for_each(F&& f) const
+        {
+            std::lock_guard<hpx::util::spinlock> lock(mutex_);
+            for (auto const& elem : set_)
+            {
+                f(elem);
+            }
         }
 
         // Bucket interface

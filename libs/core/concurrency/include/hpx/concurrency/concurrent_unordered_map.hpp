@@ -12,8 +12,10 @@
 #include <algorithm>
 #include <functional>
 #include <mutex>
+#include <optional>
 #include <unordered_map>
 #include <utility>
+#include <vector>
 
 namespace hpx::concurrent {
 
@@ -22,6 +24,10 @@ namespace hpx::concurrent {
         typename Allocator = std::allocator<std::pair<Key const, T>>>
     class concurrent_unordered_map
     {
+    private:
+        mutable hpx::util::spinlock mutex_;
+        std::unordered_map<Key, T, Hash, KeyEqual, Allocator> map_;
+
     public:
         using key_type = Key;
         using mapped_type = T;
@@ -31,27 +37,93 @@ namespace hpx::concurrent {
         using hasher = Hash;
         using key_equal = KeyEqual;
         using allocator_type = Allocator;
-        using reference = value_type&;
-        using const_reference = value_type const&;
-        using pointer = typename std::allocator_traits<Allocator>::pointer;
-        using const_pointer =
-            typename std::allocator_traits<Allocator>::const_pointer;
 
-        // Note: Iterators are not thread-safe if modifications happen concurrently.
-        using iterator = typename std::unordered_map<Key, T, Hash, KeyEqual,
-            Allocator>::iterator;
-        using const_iterator = typename std::unordered_map<Key, T, Hash,
-            KeyEqual, Allocator>::const_iterator;
-        using local_iterator = typename std::unordered_map<Key, T, Hash,
-            KeyEqual, Allocator>::local_iterator;
-        using const_local_iterator = typename std::unordered_map<Key, T, Hash,
-            KeyEqual, Allocator>::const_local_iterator;
+        class accessor;
+        class const_accessor;
 
-    private:
-        mutable hpx::util::spinlock mutex_;
-        std::unordered_map<Key, T, Hash, KeyEqual, Allocator> map_;
+        using reference = accessor;
+        using const_reference = const_accessor;
 
-    public:
+        // Accessors
+        class accessor
+        {
+            friend class concurrent_unordered_map;
+            std::unique_lock<hpx::util::spinlock> lock_;
+            T* value_;
+
+            accessor(std::unique_lock<hpx::util::spinlock>&& l, T* v)
+              : lock_(std::move(l))
+              , value_(v)
+            {
+            }
+
+        public:
+            accessor() = default;
+
+            bool empty() const
+            {
+                return value_ == nullptr;
+            }
+
+            operator T&() const
+            {
+                if (!value_)
+                    throw std::runtime_error("Empty accessor dereference");
+                return *value_;
+            }
+
+            T& get() const
+            {
+                if (!value_)
+                    throw std::runtime_error("Empty accessor dereference");
+                return *value_;
+            }
+
+            accessor& operator=(T const& v)
+            {
+                if (!value_)
+                    throw std::runtime_error("Empty accessor dereference");
+                *value_ = v;
+                return *this;
+            }
+        };
+
+        class const_accessor
+        {
+            friend class concurrent_unordered_map;
+            std::unique_lock<hpx::util::spinlock> lock_;
+            T const* value_;
+
+            const_accessor(
+                std::unique_lock<hpx::util::spinlock>&& l, T const* v)
+              : lock_(std::move(l))
+              , value_(v)
+            {
+            }
+
+        public:
+            const_accessor() = default;
+
+            bool empty() const
+            {
+                return value_ == nullptr;
+            }
+
+            operator T const&() const
+            {
+                if (!value_)
+                    throw std::runtime_error("Empty accessor dereference");
+                return *value_;
+            }
+
+            T const& get() const
+            {
+                if (!value_)
+                    throw std::runtime_error("Empty accessor dereference");
+                return *value_;
+            }
+        };
+
         concurrent_unordered_map() = default;
 
         explicit concurrent_unordered_map(size_type bucket_count,
@@ -67,13 +139,15 @@ namespace hpx::concurrent {
         }
 
         concurrent_unordered_map(concurrent_unordered_map const& other)
-          : map_(other.map_)
         {
+            std::lock_guard<hpx::util::spinlock> lock(other.mutex_);
+            map_ = other.map_;
         }
 
         concurrent_unordered_map(concurrent_unordered_map&& other) noexcept
-          : map_(std::move(other.map_))
         {
+            std::lock_guard<hpx::util::spinlock> lock(other.mutex_);
+            map_ = std::move(other.map_);
         }
 
         concurrent_unordered_map& operator=(
@@ -97,6 +171,7 @@ namespace hpx::concurrent {
             if (this != &other)
             {
                 std::lock_guard<hpx::util::spinlock> lock(mutex_);
+                std::lock_guard<hpx::util::spinlock> other_lock(other.mutex_);
                 map_ = std::move(other.map_);
             }
             return *this;
@@ -120,32 +195,6 @@ namespace hpx::concurrent {
             return map_.max_size();
         }
 
-        // Iterators
-        iterator begin() noexcept
-        {
-            return map_.begin();
-        }
-        const_iterator begin() const noexcept
-        {
-            return map_.begin();
-        }
-        const_iterator cbegin() const noexcept
-        {
-            return map_.cbegin();
-        }
-        iterator end() noexcept
-        {
-            return map_.end();
-        }
-        const_iterator end() const noexcept
-        {
-            return map_.end();
-        }
-        const_iterator cend() const noexcept
-        {
-            return map_.cend();
-        }
-
         // Modifiers
         void clear() noexcept
         {
@@ -153,35 +202,16 @@ namespace hpx::concurrent {
             map_.clear();
         }
 
-        std::pair<iterator, bool> insert(value_type const& value)
+        bool insert(value_type const& value)
         {
             std::lock_guard<hpx::util::spinlock> lock(mutex_);
-            return map_.insert(value);
+            return map_.insert(value).second;
         }
 
-        std::pair<iterator, bool> insert(value_type&& value)
+        bool insert(value_type&& value)
         {
             std::lock_guard<hpx::util::spinlock> lock(mutex_);
-            return map_.insert(std::move(value));
-        }
-
-        template <typename P>
-        std::pair<iterator, bool> insert(P&& value)
-        {
-            std::lock_guard<hpx::util::spinlock> lock(mutex_);
-            return map_.insert(std::forward<P>(value));
-        }
-
-        iterator erase(const_iterator pos)
-        {
-            std::lock_guard<hpx::util::spinlock> lock(mutex_);
-            return map_.erase(pos);
-        }
-
-        iterator erase(iterator pos)
-        {
-            std::lock_guard<hpx::util::spinlock> lock(mutex_);
-            return map_.erase(pos);
+            return map_.insert(std::move(value)).second;
         }
 
         size_type erase(Key const& key)
@@ -204,28 +234,28 @@ namespace hpx::concurrent {
         }
 
         // Lookup
-        T& at(Key const& key)
+        accessor operator[](Key const& key)
         {
-            std::lock_guard<hpx::util::spinlock> lock(mutex_);
-            return map_.at(key);
+            std::unique_lock<hpx::util::spinlock> lock(mutex_);
+            return accessor(std::move(lock), &map_[key]);
         }
 
-        T const& at(Key const& key) const
+        accessor operator[](Key&& key)
         {
-            std::lock_guard<hpx::util::spinlock> lock(mutex_);
-            return map_.at(key);
+            std::unique_lock<hpx::util::spinlock> lock(mutex_);
+            return accessor(std::move(lock), &map_[std::move(key)]);
         }
 
-        T& operator[](Key const& key)
+        accessor at(Key const& key)
         {
-            std::lock_guard<hpx::util::spinlock> lock(mutex_);
-            return map_[key];
+            std::unique_lock<hpx::util::spinlock> lock(mutex_);
+            return accessor(std::move(lock), &map_.at(key));
         }
 
-        T& operator[](Key&& key)
+        const_accessor at(Key const& key) const
         {
-            std::lock_guard<hpx::util::spinlock> lock(mutex_);
-            return map_[std::move(key)];
+            std::unique_lock<hpx::util::spinlock> lock(mutex_);
+            return const_accessor(std::move(lock), &map_.at(key));
         }
 
         size_type count(Key const& key) const
@@ -234,22 +264,55 @@ namespace hpx::concurrent {
             return map_.count(key);
         }
 
-        iterator find(Key const& key)
+        bool find(Key const& key, accessor& result)
         {
-            std::lock_guard<hpx::util::spinlock> lock(mutex_);
-            return map_.find(key);
+            std::unique_lock<hpx::util::spinlock> lock(mutex_);
+            auto it = map_.find(key);
+            if (it != map_.end())
+            {
+                result = accessor(std::move(lock), &it->second);
+                return true;
+            }
+            return false;
         }
 
-        const_iterator find(Key const& key) const
+        bool find(Key const& key, const_accessor& result) const
         {
-            std::lock_guard<hpx::util::spinlock> lock(mutex_);
-            return map_.find(key);
+            std::unique_lock<hpx::util::spinlock> lock(mutex_);
+            auto it = map_.find(key);
+            if (it != map_.end())
+            {
+                result = const_accessor(std::move(lock), &it->second);
+                return true;
+            }
+            return false;
         }
 
         bool contains(Key const& key) const
         {
             std::lock_guard<hpx::util::spinlock> lock(mutex_);
             return map_.find(key) != map_.end();
+        }
+
+        // Thread-safe iteration
+        template <typename F>
+        void for_each(F&& f)
+        {
+            std::lock_guard<hpx::util::spinlock> lock(mutex_);
+            for (auto& kv : map_)
+            {
+                f(kv);
+            }
+        }
+
+        template <typename F>
+        void for_each(F&& f) const
+        {
+            std::lock_guard<hpx::util::spinlock> lock(mutex_);
+            for (auto const& kv : map_)
+            {
+                f(kv);
+            }
         }
 
         // Bucket interface
