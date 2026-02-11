@@ -2093,14 +2093,16 @@ namespace hpx {
             hpx::traits::is_iterator_v<BidiIter>
         )
         // clang-format on
-        friend BidiIter tag_fallback_invoke(
+        friend hpx::util::iterator_range<BidiIter> tag_fallback_invoke(
             find_last_t, BidiIter first, BidiIter last, T const& val)
         {
             static_assert(hpx::traits::is_bidirectional_iterator_v<BidiIter>,
                 "Requires at least bidirectional iterator.");
 
-            return hpx::parallel::detail::find_last_impl<BidiIter>().call(
-                hpx::execution::seq, first, last, val, hpx::identity_v);
+            return hpx::util::iterator_range<BidiIter>(
+                hpx::parallel::detail::find_last_impl<BidiIter>().call(
+                    hpx::execution::seq, first, last, val, hpx::identity_v),
+                last);
         }
 
         template <typename ExPolicy, typename BidiIter,
@@ -2117,9 +2119,29 @@ namespace hpx {
             static_assert(hpx::traits::is_bidirectional_iterator_v<BidiIter>,
                 "Requires at least bidirectional iterator.");
 
-            return hpx::parallel::detail::find_last_impl<BidiIter>().call(
-                HPX_FORWARD(ExPolicy, policy), first, last, val,
-                hpx::identity_v);
+            using result_type =
+                hpx::parallel::util::detail::algorithm_result<ExPolicy,
+                    hpx::util::iterator_range<BidiIter>>;
+
+            auto result =
+                hpx::parallel::detail::find_last_impl<BidiIter>().call(
+                    HPX_FORWARD(ExPolicy, policy), first, last, val,
+                    hpx::identity_v);
+
+            if constexpr (hpx::is_async_execution_policy_v<ExPolicy>)
+            {
+                return result_type::get(hpx::future<BidiIter>(HPX_MOVE(result))
+                        .then([last](hpx::future<BidiIter>&& f)
+                                  -> hpx::util::iterator_range<BidiIter> {
+                            return hpx::util::iterator_range<BidiIter>(
+                                f.get(), last);
+                        }));
+            }
+            else
+            {
+                return result_type::get(hpx::util::iterator_range<BidiIter>(
+                    HPX_MOVE(result), last));
+            }
         }
     } find_last{};
 
@@ -2136,15 +2158,17 @@ namespace hpx {
             hpx::is_invocable_v<Pred, hpx::traits::iter_value_t<BidiIter>>
         )
         // clang-format on
-        friend BidiIter tag_fallback_invoke(
+        friend hpx::util::iterator_range<BidiIter> tag_fallback_invoke(
             find_last_if_t, BidiIter first, BidiIter last, Pred pred)
         {
             static_assert(hpx::traits::is_bidirectional_iterator_v<BidiIter>,
                 "Requires at least bidirectional iterator.");
 
-            return hpx::parallel::detail::find_last_if_impl<BidiIter>().call(
-                hpx::execution::seq, first, last, HPX_MOVE(pred),
-                hpx::identity_v);
+            return hpx::util::iterator_range<BidiIter>(
+                hpx::parallel::detail::find_last_if_impl<BidiIter>().call(
+                    hpx::execution::seq, first, last, HPX_MOVE(pred),
+                    hpx::identity_v),
+                last);
         }
 
         template <typename ExPolicy, typename BidiIter, typename Pred>
@@ -2161,9 +2185,29 @@ namespace hpx {
             static_assert(hpx::traits::is_bidirectional_iterator_v<BidiIter>,
                 "Requires at least bidirectional iterator.");
 
-            return hpx::parallel::detail::find_last_if_impl<BidiIter>().call(
-                HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(pred),
-                hpx::identity_v);
+            using result_type =
+                hpx::parallel::util::detail::algorithm_result<ExPolicy,
+                    hpx::util::iterator_range<BidiIter>>;
+
+            auto result =
+                hpx::parallel::detail::find_last_if_impl<BidiIter>().call(
+                    HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(pred),
+                    hpx::identity_v);
+
+            if constexpr (hpx::is_async_execution_policy_v<ExPolicy>)
+            {
+                return result_type::get(hpx::future<BidiIter>(HPX_MOVE(result))
+                        .then([last](hpx::future<BidiIter>&& f)
+                                  -> hpx::util::iterator_range<BidiIter> {
+                            return hpx::util::iterator_range<BidiIter>(
+                                f.get(), last);
+                        }));
+            }
+            else
+            {
+                return result_type::get(hpx::util::iterator_range<BidiIter>(
+                    HPX_MOVE(result), last));
+            }
         }
     } find_last_if{};
 
@@ -2180,15 +2224,17 @@ namespace hpx {
             hpx::is_invocable_v<Pred, hpx::traits::iter_value_t<BidiIter>>
         )
         // clang-format on
-        friend BidiIter tag_fallback_invoke(
+        friend hpx::util::iterator_range<BidiIter> tag_fallback_invoke(
             find_last_if_not_t, BidiIter first, BidiIter last, Pred pred)
         {
             static_assert(hpx::traits::is_bidirectional_iterator_v<BidiIter>,
                 "Requires at least bidirectional iterator.");
 
-            return hpx::parallel::detail::find_last_if_not_impl<BidiIter>()
-                .call(hpx::execution::seq, first, last, HPX_MOVE(pred),
-                    hpx::identity_v);
+            return hpx::util::iterator_range<BidiIter>(
+                hpx::parallel::detail::find_last_if_not_impl<BidiIter>().call(
+                    hpx::execution::seq, first, last, HPX_MOVE(pred),
+                    hpx::identity_v),
+                last);
         }
 
         template <typename ExPolicy, typename BidiIter, typename Pred>
@@ -2205,9 +2251,29 @@ namespace hpx {
             static_assert(hpx::traits::is_bidirectional_iterator_v<BidiIter>,
                 "Requires at least bidirectional iterator.");
 
-            return hpx::parallel::detail::find_last_if_not_impl<BidiIter>()
-                .call(HPX_FORWARD(ExPolicy, policy), first, last,
-                    HPX_MOVE(pred), hpx::identity_v);
+            using result_type =
+                hpx::parallel::util::detail::algorithm_result<ExPolicy,
+                    hpx::util::iterator_range<BidiIter>>;
+
+            auto result =
+                hpx::parallel::detail::find_last_if_not_impl<BidiIter>().call(
+                    HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(pred),
+                    hpx::identity_v);
+
+            if constexpr (hpx::is_async_execution_policy_v<ExPolicy>)
+            {
+                return result_type::get(hpx::future<BidiIter>(HPX_MOVE(result))
+                        .then([last](hpx::future<BidiIter>&& f)
+                                  -> hpx::util::iterator_range<BidiIter> {
+                            return hpx::util::iterator_range<BidiIter>(
+                                f.get(), last);
+                        }));
+            }
+            else
+            {
+                return result_type::get(hpx::util::iterator_range<BidiIter>(
+                    HPX_MOVE(result), last));
+            }
         }
     } find_last_if_not{};
 

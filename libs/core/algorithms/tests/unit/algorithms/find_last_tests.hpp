@@ -37,7 +37,7 @@ void test_find_last()
                 std::end(c)),
             1);
 
-        HPX_TEST_EQ(*result, 1);
+        HPX_TEST_EQ(*result.begin(), 1);
     }
     {
         auto result = hpx::find_last(seq,
@@ -47,7 +47,7 @@ void test_find_last()
                 std::end(c)),
             1);
 
-        HPX_TEST_EQ(*result, 1);
+        HPX_TEST_EQ(*result.begin(), 1);
     }
 
     // test parallel
@@ -59,7 +59,19 @@ void test_find_last()
                 std::end(c)),
             1);
 
-        HPX_TEST_EQ(*result, 1);
+        HPX_TEST_EQ(*result.begin(), 1);
+    }
+
+    // test parallel task
+    {
+        auto result = hpx::find_last(par(task),
+            test::test_iterator<std::vector<int>::iterator, IteratorTag>(
+                std::begin(c)),
+            test::test_iterator<std::vector<int>::iterator, IteratorTag>(
+                std::end(c)),
+            1);
+
+        HPX_TEST_EQ(*result.get().begin(), 1);
     }
 }
 

@@ -37,7 +37,7 @@ void test_find_last_if_not()
                 std::end(c)),
             [](int v) { return v != 1; });
 
-        HPX_TEST_EQ(*result, 1);
+        HPX_TEST_EQ(*result.begin(), 1);
     }
     {
         auto result = hpx::find_last_if_not(seq,
@@ -47,7 +47,7 @@ void test_find_last_if_not()
                 std::end(c)),
             [](int v) { return v != 1; });
 
-        HPX_TEST_EQ(*result, 1);
+        HPX_TEST_EQ(*result.begin(), 1);
     }
 
     // test parallel
@@ -59,7 +59,7 @@ void test_find_last_if_not()
                 std::end(c)),
             [](int v) { return v != 1; });
 
-        HPX_TEST_EQ(*result, 1);
+        HPX_TEST_EQ(*result.begin(), 1);
     }
 }
 
