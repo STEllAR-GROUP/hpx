@@ -1980,6 +1980,103 @@ namespace hpx::ranges {
                 HPX_MOVE(proj1), HPX_MOVE(proj2));
         }
     } find_first_of{};
+
+    ///////////////////////////////////////////////////////////////////////////
+    // find_last
+    inline constexpr struct find_last_t final
+      : hpx::functional::detail::tag_fallback<find_last_t>
+    {
+    private:
+        template <typename Rng, typename T, typename Proj = hpx::identity>
+        // clang-format off
+        friend constexpr hpx::traits::range_iterator_t<Rng>
+        tag_fallback_invoke(find_last_t, Rng&& rng, T const& val,
+            Proj&& proj = Proj())
+        // clang-format on
+        {
+            return hpx::find_last(hpx::util::begin(rng), hpx::util::end(rng),
+                val, HPX_FORWARD(Proj, proj));
+        }
+
+        template <typename ExPolicy, typename Rng, typename T,
+            typename Proj = hpx::identity>
+        // clang-format off
+        friend typename hpx::parallel::util::detail::algorithm_result<
+            ExPolicy, hpx::traits::range_iterator_t<Rng>>::type
+        tag_fallback_invoke(find_last_t, ExPolicy&& policy, Rng&& rng,
+            T const& val, Proj&& proj = Proj())
+        // clang-format on
+        {
+            return hpx::find_last(HPX_FORWARD(ExPolicy, policy),
+                hpx::util::begin(rng), hpx::util::end(rng), val,
+                HPX_FORWARD(Proj, proj));
+        }
+    } find_last{};
+
+    ///////////////////////////////////////////////////////////////////////////
+    // find_last_if
+    inline constexpr struct find_last_if_t final
+      : hpx::functional::detail::tag_fallback<find_last_if_t>
+    {
+    private:
+        template <typename Rng, typename Pred, typename Proj = hpx::identity>
+        // clang-format off
+        friend constexpr hpx::traits::range_iterator_t<Rng>
+        tag_fallback_invoke(find_last_if_t, Rng&& rng, Pred&& pred,
+            Proj&& proj = Proj())
+        // clang-format on
+        {
+            return hpx::find_last_if(hpx::util::begin(rng), hpx::util::end(rng),
+                HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
+        }
+
+        template <typename ExPolicy, typename Rng, typename Pred,
+            typename Proj = hpx::identity>
+        // clang-format off
+        friend typename hpx::parallel::util::detail::algorithm_result<
+            ExPolicy, hpx::traits::range_iterator_t<Rng>>::type
+        tag_fallback_invoke(find_last_if_t, ExPolicy&& policy, Rng&& rng,
+            Pred&& pred, Proj&& proj = Proj())
+        // clang-format on
+        {
+            return hpx::find_last_if(HPX_FORWARD(ExPolicy, policy),
+                hpx::util::begin(rng), hpx::util::end(rng),
+                HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
+        }
+    } find_last_if{};
+
+    ///////////////////////////////////////////////////////////////////////////
+    // find_last_if_not
+    inline constexpr struct find_last_if_not_t final
+      : hpx::functional::detail::tag_fallback<find_last_if_not_t>
+    {
+    private:
+        template <typename Rng, typename Pred, typename Proj = hpx::identity>
+        // clang-format off
+        friend constexpr hpx::traits::range_iterator_t<Rng>
+        tag_fallback_invoke(find_last_if_not_t, Rng&& rng, Pred&& pred,
+            Proj&& proj = Proj())
+        // clang-format on
+        {
+            return hpx::find_last_if_not(hpx::util::begin(rng),
+                hpx::util::end(rng), HPX_FORWARD(Pred, pred),
+                HPX_FORWARD(Proj, proj));
+        }
+
+        template <typename ExPolicy, typename Rng, typename Pred,
+            typename Proj = hpx::identity>
+        // clang-format off
+        friend typename hpx::parallel::util::detail::algorithm_result<
+            ExPolicy, hpx::traits::range_iterator_t<Rng>>::type
+        tag_fallback_invoke(find_last_if_not_t, ExPolicy&& policy, Rng&& rng,
+            Pred&& pred, Proj&& proj = Proj())
+        // clang-format on
+        {
+            return hpx::find_last_if_not(HPX_FORWARD(ExPolicy, policy),
+                hpx::util::begin(rng), hpx::util::end(rng),
+                HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
+        }
+    } find_last_if_not{};
 }    // namespace hpx::ranges
 
 #endif    // DOXYGEN

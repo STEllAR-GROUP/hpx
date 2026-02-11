@@ -1624,6 +1624,345 @@ namespace hpx {
                 hpx::identity_v);
         }
     } find_first_of{};
+
+    ///////////////////////////////////////////////////////////////////////////
+    // find_last
+    namespace parallel::detail {
+
+        HPX_CXX_CORE_EXPORT template <typename BidiIter>
+        struct find_last : public algorithm<find_last<BidiIter>, BidiIter>
+        {
+            constexpr find_last() noexcept
+              : algorithm<find_last, BidiIter>("find_last")
+            {
+            }
+
+            template <typename ExPolicy, typename Iter, typename Sent,
+                typename T, typename Proj = hpx::identity>
+            static constexpr Iter sequential(ExPolicy&&, Iter first, Sent last,
+                T const& val, Proj&& proj = Proj())
+            {
+                auto last_iter = first;
+                hpx::parallel::detail::advance(
+                    last_iter, hpx::parallel::detail::distance(first, last));
+
+                auto r_first = std::make_reverse_iterator(last_iter);
+                auto r_last = std::make_reverse_iterator(first);
+
+                auto it = std::find_if(
+                    r_first, r_last, [&val, &proj](auto const& v) -> bool {
+                        return HPX_INVOKE(proj, v) == val;
+                    });
+
+                if (it == r_last)
+                    return last_iter;
+                return std::prev(it.base());
+            }
+
+            template <typename ExPolicy, typename Iter, typename Sent,
+                typename T, typename Proj = hpx::identity>
+            static decltype(auto) parallel(ExPolicy&& policy, Iter first,
+                Sent last, T const& val, Proj&& proj = Proj())
+            {
+                using result =
+                    hpx::parallel::util::detail::algorithm_result<ExPolicy,
+                        Iter>;
+
+                auto last_iter = first;
+                hpx::parallel::detail::advance(
+                    last_iter, hpx::parallel::detail::distance(first, last));
+
+                auto r_first = std::make_reverse_iterator(last_iter);
+                auto r_last = std::make_reverse_iterator(first);
+
+                return result::get(
+                    hpx::parallel::util::detail::convert_to_result(
+                        hpx::parallel::detail::find_if<
+                            std::reverse_iterator<Iter>>()
+                            .call(
+                                HPX_FORWARD(ExPolicy, policy), r_first, r_last,
+                                [&val, &proj](auto const& v) -> bool {
+                                    return HPX_INVOKE(proj, v) == val;
+                                },
+                                hpx::identity_v),
+                        [last_iter, r_last](
+                            std::reverse_iterator<Iter> const& it) -> Iter {
+                            if (it == r_last)
+                                return last_iter;
+                            return std::prev(it.base());
+                        }));
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        // find_last_if
+        HPX_CXX_CORE_EXPORT template <typename BidiIter>
+        struct find_last_if : public algorithm<find_last_if<BidiIter>, BidiIter>
+        {
+            constexpr find_last_if() noexcept
+              : algorithm<find_last_if, BidiIter>("find_last_if")
+            {
+            }
+
+            template <typename ExPolicy, typename Iter, typename Sent,
+                typename Pred, typename Proj = hpx::identity>
+            static constexpr Iter sequential(ExPolicy&&, Iter first, Sent last,
+                Pred&& pred, Proj&& proj = Proj())
+            {
+                auto last_iter = first;
+                hpx::parallel::detail::advance(
+                    last_iter, hpx::parallel::detail::distance(first, last));
+
+                auto r_first = std::make_reverse_iterator(last_iter);
+                auto r_last = std::make_reverse_iterator(first);
+
+                auto it = std::find_if(
+                    r_first, r_last, [&pred, &proj](auto const& v) -> bool {
+                        return HPX_INVOKE(pred, HPX_INVOKE(proj, v));
+                    });
+
+                if (it == r_last)
+                    return last_iter;
+                return std::prev(it.base());
+            }
+
+            template <typename ExPolicy, typename Iter, typename Sent,
+                typename Pred, typename Proj = hpx::identity>
+            static decltype(auto) parallel(ExPolicy&& policy, Iter first,
+                Sent last, Pred&& pred, Proj&& proj = Proj())
+            {
+                using result =
+                    hpx::parallel::util::detail::algorithm_result<ExPolicy,
+                        Iter>;
+
+                auto last_iter = first;
+                hpx::parallel::detail::advance(
+                    last_iter, hpx::parallel::detail::distance(first, last));
+
+                auto r_first = std::make_reverse_iterator(last_iter);
+                auto r_last = std::make_reverse_iterator(first);
+
+                return result::get(
+                    hpx::parallel::util::detail::convert_to_result(
+                        hpx::parallel::detail::find_if<
+                            std::reverse_iterator<Iter>>()
+                            .call(
+                                HPX_FORWARD(ExPolicy, policy), r_first, r_last,
+                                [&pred, &proj](auto const& v) -> bool {
+                                    return HPX_INVOKE(
+                                        pred, HPX_INVOKE(proj, v));
+                                },
+                                hpx::identity_v),
+                        [last_iter, r_last](
+                            std::reverse_iterator<Iter> const& it) -> Iter {
+                            if (it == r_last)
+                                return last_iter;
+                            return std::prev(it.base());
+                        }));
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        // find_last_if_not
+        HPX_CXX_CORE_EXPORT template <typename BidiIter>
+        struct find_last_if_not
+          : public algorithm<find_last_if_not<BidiIter>, BidiIter>
+        {
+            constexpr find_last_if_not() noexcept
+              : algorithm<find_last_if_not, BidiIter>("find_last_if_not")
+            {
+            }
+
+            template <typename ExPolicy, typename Iter, typename Sent,
+                typename Pred, typename Proj = hpx::identity>
+            static constexpr Iter sequential(ExPolicy&&, Iter first, Sent last,
+                Pred&& pred, Proj&& proj = Proj())
+            {
+                auto last_iter = first;
+                hpx::parallel::detail::advance(
+                    last_iter, hpx::parallel::detail::distance(first, last));
+
+                auto r_first = std::make_reverse_iterator(last_iter);
+                auto r_last = std::make_reverse_iterator(first);
+
+                auto it = std::find_if(
+                    r_first, r_last, [&pred, &proj](auto const& v) -> bool {
+                        return !HPX_INVOKE(pred, HPX_INVOKE(proj, v));
+                    });
+
+                if (it == r_last)
+                    return last_iter;
+                return std::prev(it.base());
+            }
+
+            template <typename ExPolicy, typename Iter, typename Sent,
+                typename Pred, typename Proj = hpx::identity>
+            static decltype(auto) parallel(ExPolicy&& policy, Iter first,
+                Sent last, Pred&& pred, Proj&& proj = Proj())
+            {
+                using result =
+                    hpx::parallel::util::detail::algorithm_result<ExPolicy,
+                        Iter>;
+
+                auto last_iter = first;
+                hpx::parallel::detail::advance(
+                    last_iter, hpx::parallel::detail::distance(first, last));
+
+                auto r_first = std::make_reverse_iterator(last_iter);
+                auto r_last = std::make_reverse_iterator(first);
+
+                return result::get(
+                    hpx::parallel::util::detail::convert_to_result(
+                        hpx::parallel::detail::find_if<
+                            std::reverse_iterator<Iter>>()
+                            .call(
+                                HPX_FORWARD(ExPolicy, policy), r_first, r_last,
+                                [&pred, &proj](auto const& v) -> bool {
+                                    return !HPX_INVOKE(
+                                        pred, HPX_INVOKE(proj, v));
+                                },
+                                hpx::identity_v),
+                        [last_iter, r_last](
+                            std::reverse_iterator<Iter> const& it) -> Iter {
+                            if (it == r_last)
+                                return last_iter;
+                            return std::prev(it.base());
+                        }));
+            }
+        };
+    }    // namespace parallel::detail
+
+    ///////////////////////////////////////////////////////////////////////////
+    // CPO for hpx::find_last
+    HPX_CXX_EXPORT inline constexpr struct find_last_t final
+      : hpx::detail::tag_parallel_algorithm<find_last_t>
+    {
+    private:
+        template <typename BidiIter,
+            typename T = typename std::iterator_traits<BidiIter>::value_type>
+        // clang-format off
+        requires (
+            hpx::traits::is_iterator_v<BidiIter>
+        )
+        // clang-format on
+        friend BidiIter tag_fallback_invoke(
+            find_last_t, BidiIter first, BidiIter last, T const& val)
+        {
+            static_assert(hpx::traits::is_bidirectional_iterator_v<BidiIter>,
+                "Requires at least bidirectional iterator.");
+
+            return hpx::parallel::detail::find_last<BidiIter>().call(
+                hpx::execution::seq, first, last, val, hpx::identity_v);
+        }
+
+        template <typename ExPolicy, typename BidiIter,
+            typename T = typename std::iterator_traits<BidiIter>::value_type>
+        // clang-format off
+        requires (
+            hpx::is_execution_policy_v<ExPolicy> &&
+            hpx::traits::is_iterator_v<BidiIter>
+        )
+        // clang-format on
+        friend decltype(auto) tag_fallback_invoke(find_last_t,
+            ExPolicy&& policy, BidiIter first, BidiIter last, T const& val)
+        {
+            static_assert(hpx::traits::is_bidirectional_iterator_v<BidiIter>,
+                "Requires at least bidirectional iterator.");
+
+            return hpx::parallel::detail::find_last<BidiIter>().call(
+                HPX_FORWARD(ExPolicy, policy), first, last, val,
+                hpx::identity_v);
+        }
+    } find_last{};
+
+    ///////////////////////////////////////////////////////////////////////////
+    // CPO for hpx::find_last_if
+    HPX_CXX_EXPORT inline constexpr struct find_last_if_t final
+      : hpx::detail::tag_parallel_algorithm<find_last_if_t>
+    {
+    private:
+        template <typename BidiIter, typename Pred>
+        // clang-format off
+        requires (
+            hpx::traits::is_iterator_v<BidiIter> &&
+            hpx::is_invocable_v<Pred, hpx::traits::iter_value_t<BidiIter>>
+        )
+        // clang-format on
+        friend BidiIter tag_fallback_invoke(
+            find_last_if_t, BidiIter first, BidiIter last, Pred pred)
+        {
+            static_assert(hpx::traits::is_bidirectional_iterator_v<BidiIter>,
+                "Requires at least bidirectional iterator.");
+
+            return hpx::parallel::detail::find_last_if<BidiIter>().call(
+                hpx::execution::seq, first, last, HPX_MOVE(pred),
+                hpx::identity_v);
+        }
+
+        template <typename ExPolicy, typename BidiIter, typename Pred>
+        // clang-format off
+        requires (
+            hpx::is_execution_policy_v<ExPolicy> &&
+            hpx::traits::is_iterator_v<BidiIter> &&
+            hpx::is_invocable_v<Pred, hpx::traits::iter_value_t<BidiIter>>
+        )
+        // clang-format on
+        friend decltype(auto) tag_fallback_invoke(find_last_if_t,
+            ExPolicy&& policy, BidiIter first, BidiIter last, Pred pred)
+        {
+            static_assert(hpx::traits::is_bidirectional_iterator_v<BidiIter>,
+                "Requires at least bidirectional iterator.");
+
+            return hpx::parallel::detail::find_last_if<BidiIter>().call(
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(pred),
+                hpx::identity_v);
+        }
+    } find_last_if{};
+
+    ///////////////////////////////////////////////////////////////////////////
+    // CPO for hpx::find_last_if_not
+    HPX_CXX_EXPORT inline constexpr struct find_last_if_not_t final
+      : hpx::detail::tag_parallel_algorithm<find_last_if_not_t>
+    {
+    private:
+        template <typename BidiIter, typename Pred>
+        // clang-format off
+        requires (
+            hpx::traits::is_iterator_v<BidiIter> &&
+            hpx::is_invocable_v<Pred, hpx::traits::iter_value_t<BidiIter>>
+        )
+        // clang-format on
+        friend BidiIter tag_fallback_invoke(
+            find_last_if_not_t, BidiIter first, BidiIter last, Pred pred)
+        {
+            static_assert(hpx::traits::is_bidirectional_iterator_v<BidiIter>,
+                "Requires at least bidirectional iterator.");
+
+            return hpx::parallel::detail::find_last_if_not<BidiIter>().call(
+                hpx::execution::seq, first, last, HPX_MOVE(pred),
+                hpx::identity_v);
+        }
+
+        template <typename ExPolicy, typename BidiIter, typename Pred>
+        // clang-format off
+        requires (
+            hpx::is_execution_policy_v<ExPolicy> &&
+            hpx::traits::is_iterator_v<BidiIter> &&
+            hpx::is_invocable_v<Pred, hpx::traits::iter_value_t<BidiIter>>
+        )
+        // clang-format on
+        friend decltype(auto) tag_fallback_invoke(find_last_if_not_t,
+            ExPolicy&& policy, BidiIter first, BidiIter last, Pred pred)
+        {
+            static_assert(hpx::traits::is_bidirectional_iterator_v<BidiIter>,
+                "Requires at least bidirectional iterator.");
+
+            return hpx::parallel::detail::find_last_if_not<BidiIter>().call(
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(pred),
+                hpx::identity_v);
+        }
+    } find_last_if_not{};
+
 }    // namespace hpx
 
 #endif    // DOXYGEN
