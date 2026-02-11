@@ -7,7 +7,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file parallel/algorithms/find.hpp
-/// \page hpx::find, hpx::find_if, hpx::find_if_not, hpx::find_end, hpx::find_first_of
+/// \page hpx::find, hpx::find_if, hpx::find_if_not, hpx::find_end, hpx::find_first_of, hpx::find_last, hpx::find_last_if, hpx::find_last_if_not
 /// \headerfile hpx/algorithm.hpp
 
 #pragma once
@@ -1831,6 +1831,255 @@ namespace hpx {
             }
         };
     }    // namespace parallel::detail
+
+    /// Returns the last element in the range [first, last) that is equal
+    /// to value
+    ///
+    /// \note   Complexity: At most last - first
+    ///         applications of the operator==().
+    ///
+    /// \tparam BidiIter    The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     bidirectional iterator.
+    /// \tparam T           The type of the value to find (deduced).
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     of the range the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements of
+    ///                     the range the algorithm will be applied to.
+    /// \param val          the value to compare the elements to
+    ///
+    /// \returns  The \a find_last algorithm returns the last element in the range
+    ///           [first,last) that is equal to \a val.
+    ///           If no such element in the range of [first,last) is equal to
+    ///           \a val, then the algorithm returns \a last.
+    ///
+    template <typename BidiIter, typename T>
+    BidiIter find_last(BidiIter first, BidiIter last, T const& val);
+
+    /// Returns the last element in the range [first, last) that is equal
+    /// to value
+    ///
+    /// \note   Complexity: At most last - first
+    ///         applications of the operator==().
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam BidiIter    The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     bidirectional iterator.
+    /// \tparam T           The type of the value to find (deduced).
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     of the range the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements of
+    ///                     the range the algorithm will be applied to.
+    /// \param val          the value to compare the elements to
+    ///
+    /// The comparison operations in the parallel \a find_last algorithm invoked
+    /// with an execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The comparison operations in the parallel \a find_last algorithm invoked
+    /// with an execution policy object of type \a parallel_policy
+    /// or \a parallel_task_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a find_last algorithm returns a \a hpx::future<BidiIter> if the
+    ///           execution policy is of type
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
+    ///           returns \a BidiIter otherwise.
+    ///           The \a find_last algorithm returns the last element in the range
+    ///           [first,last) that is equal to \a val.
+    ///           If no such element in the range of [first,last) is equal to
+    ///           \a val, then the algorithm returns \a last.
+    ///
+    template <typename ExPolicy, typename BidiIter, typename T>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, BidiIter>
+    find_last(ExPolicy&& policy, BidiIter first, BidiIter last, T const& val);
+
+    /// Returns the last element in the range [first, last) for which
+    /// predicate \a pred returns true.
+    ///
+    /// \note   Complexity: At most last - first
+    ///         applications of the predicate.
+    ///
+    /// \tparam BidiIter    The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     bidirectional iterator.
+    /// \tparam Pred        The type of the function/function object to use
+    ///                     (deduced).
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     of the range the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements of
+    ///                     the range the algorithm will be applied to.
+    /// \param pred         The unary predicate which returns true for the
+    ///                     required element. The signature of the predicate
+    ///                     should be equivalent to:
+    ///                     \code
+    ///                     bool pred(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const &, but
+    ///                     the function must not modify the objects passed to
+    ///                     it.
+    ///
+    /// \returns  The \a find_last_if algorithm returns the last element in the range
+    ///           [first,last) that satisfies the predicate \a pred.
+    ///           If no such element exists, the algorithm returns \a last.
+    ///
+    template <typename BidiIter, typename Pred>
+    BidiIter find_last_if(BidiIter first, BidiIter last, Pred&& pred);
+
+    /// Returns the last element in the range [first, last) for which
+    /// predicate \a pred returns true.
+    ///
+    /// \note   Complexity: At most last - first
+    ///         applications of the predicate.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam BidiIter    The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     bidirectional iterator.
+    /// \tparam Pred        The type of the function/function object to use
+    ///                     (deduced).
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     of the range the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements of
+    ///                     the range the algorithm will be applied to.
+    /// \param pred         The unary predicate which returns true for the
+    ///                     required element. The signature of the predicate
+    ///                     should be equivalent to:
+    ///                     \code
+    ///                     bool pred(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const &, but
+    ///                     the function must not modify the objects passed to
+    ///                     it.
+    ///
+    /// The comparison operations in the parallel \a find_last_if algorithm invoked
+    /// with an execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The comparison operations in the parallel \a find_last_if algorithm invoked
+    /// with an execution policy object of type \a parallel_policy
+    /// or \a parallel_task_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a find_last_if algorithm returns a \a hpx::future<BidiIter> if the
+    ///           execution policy is of type
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
+    ///           returns \a BidiIter otherwise.
+    ///           The \a find_last_if algorithm returns the last element in the range
+    ///           [first,last) that satisfies the predicate \a pred.
+    ///           If no such element exists, the algorithm returns \a last.
+    ///
+    template <typename ExPolicy, typename BidiIter, typename Pred>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, BidiIter>
+    find_last_if(ExPolicy&& policy, BidiIter first, BidiIter last, Pred&& pred);
+
+    /// Returns the last element in the range [first, last) for which
+    /// predicate \a pred returns false.
+    ///
+    /// \note   Complexity: At most last - first
+    ///         applications of the predicate.
+    ///
+    /// \tparam BidiIter    The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     bidirectional iterator.
+    /// \tparam Pred        The type of the function/function object to use
+    ///                     (deduced).
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     of the range the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements of
+    ///                     the range the algorithm will be applied to.
+    /// \param pred         The unary predicate which returns false for the
+    ///                     required element. The signature of the predicate
+    ///                     should be equivalent to:
+    ///                     \code
+    ///                     bool pred(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const &, but
+    ///                     the function must not modify the objects passed to
+    ///                     it.
+    ///
+    /// \returns  The \a find_last_if_not algorithm returns the last element in the
+    ///           range [first,last) that does not satisfy the predicate \a pred.
+    ///           If no such element exists, the algorithm returns \a last.
+    ///
+    template <typename BidiIter, typename Pred>
+    BidiIter find_last_if_not(BidiIter first, BidiIter last, Pred&& pred);
+
+    /// Returns the last element in the range [first, last) for which
+    /// predicate \a pred returns false.
+    ///
+    /// \note   Complexity: At most last - first
+    ///         applications of the predicate.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam BidiIter    The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     bidirectional iterator.
+    /// \tparam Pred        The type of the function/function object to use
+    ///                     (deduced).
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     of the range the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements of
+    ///                     the range the algorithm will be applied to.
+    /// \param pred         The unary predicate which returns false for the
+    ///                     required element. The signature of the predicate
+    ///                     should be equivalent to:
+    ///                     \code
+    ///                     bool pred(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const &, but
+    ///                     the function must not modify the objects passed to
+    ///                     it.
+    ///
+    /// The comparison operations in the parallel \a find_last_if_not algorithm
+    /// invoked with an execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The comparison operations in the parallel \a find_last_if_not algorithm
+    /// invoked with an execution policy object of type \a parallel_policy
+    /// or \a parallel_task_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a find_last_if_not algorithm returns a \a hpx::future<BidiIter>
+    ///           if the execution policy is of type
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
+    ///           returns \a BidiIter otherwise.
+    ///           The \a find_last_if_not algorithm returns the last element in the
+    ///           range [first,last) that does not satisfy the predicate \a pred.
+    ///           If no such element exists, the algorithm returns \a last.
+    ///
+    template <typename ExPolicy, typename BidiIter, typename Pred>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, BidiIter>
+    find_last_if_not(
+        ExPolicy&& policy, BidiIter first, BidiIter last, Pred&& pred);
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::find_last
