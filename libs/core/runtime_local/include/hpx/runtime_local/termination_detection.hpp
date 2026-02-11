@@ -46,7 +46,7 @@ namespace hpx::local {
     ///     return hpx::finalize();
     /// }
     /// \endcode
-    HPX_CORE_EXPORT void termination_detection();
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void termination_detection();
 
     /// \brief Wait for all local HPX threads to complete with a timeout.
     ///
@@ -87,7 +87,7 @@ namespace hpx::local {
     /// \endcode
     ///
     /// \see termination_detection()
-    HPX_CORE_EXPORT bool termination_detection(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT bool termination_detection(
         hpx::chrono::steady_duration const& timeout);
 
     /// \brief Wait for all local HPX threads to complete until a deadline.
@@ -129,7 +129,7 @@ namespace hpx::local {
     /// \endcode
     ///
     /// \see termination_detection(std::chrono::duration<double>)
-    HPX_CORE_EXPORT bool termination_detection(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT bool termination_detection(
         hpx::chrono::steady_time_point const& deadline);
 
     /// \brief Wait for all local HPX threads with cancellation support.
@@ -186,9 +186,11 @@ namespace hpx::local {
     /// \endcode
     ///
     /// \see termination_detection(std::chrono::duration<double>)
-    HPX_CORE_EXPORT bool termination_detection(hpx::stop_token stop_token,
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT bool termination_detection(
+        hpx::stop_token stop_token,
         hpx::chrono::steady_duration const& timeout =
             hpx::chrono::steady_duration(
-                (hpx::chrono::steady_clock::duration::max) ()));
+                (hpx::chrono::steady_clock::duration::max)()));
+    /// \endcond
 
 }    // namespace hpx::local
