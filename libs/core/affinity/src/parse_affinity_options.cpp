@@ -837,8 +837,12 @@ namespace hpx::threads::detail {
         std::vector<std::size_t> next_pu_index(num_cores, 0);
         num_pus.resize(num_threads);
 
-        for (std::size_t num_thread = 0; num_thread < num_threads; /**/)
+        bool made_progress = true;
+        for (std::size_t num_thread = 0;
+            num_thread < num_threads && made_progress;
+            /**/)
         {
+            made_progress = false;
             for (std::size_t num_core = 0; num_core < num_cores; ++num_core)
             {
                 if (any(affinities[num_thread]))
@@ -880,8 +884,14 @@ namespace hpx::threads::detail {
                 affinities[num_thread] = t.init_thread_affinity_mask(
                     num_core + used_cores, next_pu_index[num_core] - 1);
 
+                made_progress = true;
                 if (++num_thread == num_threads)
                     return;
+            }
+            if (num_thread < num_threads && !made_progress)
+            {
+                std::fill(next_pu_index.begin(), next_pu_index.end(), 0);
+                made_progress = true;
             }
         }
     }
@@ -894,7 +904,7 @@ namespace hpx::threads::detail {
     {
         std::size_t const num_threads = affinities.size();
 
-        // check_num_threads(use_process_mask, t, num_threads, ec);
+        check_num_threads(use_process_mask, t, num_threads, ec);
 
         if (use_process_mask)
         {
