@@ -266,18 +266,26 @@ void test_stop_token_fast_completion()
 void test_zero_timeout()
 {
     std::atomic<bool> work_started{false};
+    std::atomic<bool> stop_work{false};
 
     // Launch work
-    hpx::post([&work_started] {
+    hpx::post([&work_started, &stop_work] {
         work_started = true;
-        hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
+        // Busy wait to ensure thread is active
+        while (!stop_work.load())
+        {
+            hpx::this_thread::yield();
+        }
     });
 
     // Wait for work to start
     while (!work_started.load())
     {
-        hpx::this_thread::sleep_for(std::chrono::milliseconds(10));
+        hpx::this_thread::yield();
     }
+
+    // Give the work a bit more time to be "in-flight"
+    hpx::this_thread::sleep_for(std::chrono::milliseconds(50));
 
     // Zero timeout should return immediately
     bool completed = hpx::local::termination_detection(std::chrono::seconds(0));
@@ -285,6 +293,7 @@ void test_zero_timeout()
     HPX_TEST(!completed);
 
     // Clean up
+    stop_work = true;
     hpx::local::termination_detection(std::chrono::seconds(5));
 }
 

@@ -2252,6 +2252,12 @@ namespace hpx {
 
             hpx::threads::threadmanager& tm = rt->get_thread_manager();
 
+            // Return immediately if timeout is zero or negative
+            if (timeout.value().count() <= 0)
+            {
+                return false;
+            }
+
             // Wait with timeout using threadmanager's wait_for
             bool completed = tm.wait_for(timeout);
 
@@ -2293,6 +2299,12 @@ namespace hpx {
             }
 
             hpx::threads::threadmanager& tm = rt->get_thread_manager();
+
+            // Return immediately if timeout is zero or negative
+            if (timeout.value().count() <= 0)
+            {
+                return false;
+            }
 
             bool completed = tm.wait_for(stop_token, timeout);
 
