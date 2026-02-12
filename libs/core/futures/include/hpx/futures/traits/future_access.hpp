@@ -23,18 +23,18 @@ namespace hpx::traits {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        HPX_CXX_EXPORT struct future_data_void
+        HPX_CXX_CORE_EXPORT struct future_data_void
         {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename Result>
+        HPX_CXX_CORE_EXPORT template <typename Result>
         struct shared_state_ptr_result
         {
             using type = Result;
         };
 
-        HPX_CXX_EXPORT template <typename Result>
+        HPX_CXX_CORE_EXPORT template <typename Result>
         struct shared_state_ptr_result<Result&>
         {
             using type = Result&;
@@ -46,12 +46,12 @@ namespace hpx::traits {
             using type = future_data_void;
         };
 
-        HPX_CXX_EXPORT template <typename Future>
+        HPX_CXX_CORE_EXPORT template <typename Future>
         using shared_state_ptr_result_t =
             typename shared_state_ptr_result<Future>::type;
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename R, typename Enable = void>
+        HPX_CXX_CORE_EXPORT template <typename R, typename Enable = void>
         struct shared_state_ptr
         {
             using result_type = shared_state_ptr_result_t<R>;
@@ -59,63 +59,63 @@ namespace hpx::traits {
                 hpx::intrusive_ptr<lcos::detail::future_data_base<result_type>>;
         };
 
-        HPX_CXX_EXPORT template <typename Future>
+        HPX_CXX_CORE_EXPORT template <typename Future>
         using shared_state_ptr_t = typename shared_state_ptr<Future>::type;
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename Future, typename Enable = void>
+        HPX_CXX_CORE_EXPORT template <typename Future, typename Enable = void>
         struct shared_state_ptr_for
           : shared_state_ptr<
                 traits::future_traits_t<std::remove_const_t<Future>>>
         {
         };
 
-        HPX_CXX_EXPORT template <typename Future>
+        HPX_CXX_CORE_EXPORT template <typename Future>
         struct shared_state_ptr_for<Future&> : shared_state_ptr_for<Future>
         {
         };
 
-        HPX_CXX_EXPORT template <typename Future>
+        HPX_CXX_CORE_EXPORT template <typename Future>
         struct shared_state_ptr_for<Future&&> : shared_state_ptr_for<Future>
         {
         };
 
-        HPX_CXX_EXPORT template <typename Future>
+        HPX_CXX_CORE_EXPORT template <typename Future>
         struct shared_state_ptr_for<std::vector<Future>>
         {
             using type =
                 std::vector<typename shared_state_ptr_for<Future>::type>;
         };
 
-        HPX_CXX_EXPORT template <typename Future, std::size_t N>
+        HPX_CXX_CORE_EXPORT template <typename Future, std::size_t N>
         struct shared_state_ptr_for<std::array<Future, N>>
         {
             using type =
                 std::array<typename shared_state_ptr_for<Future>::type, N>;
         };
 
-        HPX_CXX_EXPORT template <typename Future>
+        HPX_CXX_CORE_EXPORT template <typename Future>
         using shared_state_ptr_for_t =
             typename shared_state_ptr_for<Future>::type;
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename SharedState, typename Allocator>
+        HPX_CXX_CORE_EXPORT template <typename SharedState, typename Allocator>
         struct shared_state_allocator;
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Enable = void>
     struct is_shared_state : std::false_type
     {
     };
 
-    HPX_CXX_EXPORT template <typename R>
+    HPX_CXX_CORE_EXPORT template <typename R>
     struct is_shared_state<
         hpx::intrusive_ptr<lcos::detail::future_data_base<R>>> : std::true_type
     {
     };
 
-    HPX_CXX_EXPORT template <typename R>
+    HPX_CXX_CORE_EXPORT template <typename R>
     inline constexpr bool is_shared_state_v = is_shared_state<R>::value;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -125,12 +125,12 @@ namespace hpx::traits {
         struct future_access_customization_point;
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct future_access : detail::future_access_customization_point<T>
     {
     };
 
-    HPX_CXX_EXPORT template <typename R>
+    HPX_CXX_CORE_EXPORT template <typename R>
     struct future_access<hpx::future<R>>
     {
         template <typename SharedState>
@@ -200,7 +200,7 @@ namespace hpx::traits {
         }
     };
 
-    HPX_CXX_EXPORT template <typename R>
+    HPX_CXX_CORE_EXPORT template <typename R>
     struct future_access<hpx::shared_future<R>>
     {
         template <typename SharedState>
@@ -270,13 +270,13 @@ namespace hpx::traits {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename SharedState, typename Allocator>
+    HPX_CXX_CORE_EXPORT template <typename SharedState, typename Allocator>
     struct shared_state_allocator
       : detail::shared_state_allocator<SharedState, Allocator>
     {
     };
 
-    HPX_CXX_EXPORT template <typename SharedState, typename Allocator>
+    HPX_CXX_CORE_EXPORT template <typename SharedState, typename Allocator>
     using shared_state_allocator_t =
         typename shared_state_allocator<SharedState, Allocator>::type;
 }    // namespace hpx::traits

@@ -267,6 +267,10 @@ function(add_hpx_executable name)
     endif()
   endif()
 
+  if(${name}_FOLDER AND NOT HPX_WITH_DISTRIBUTED_RUNTIME)
+    string(REGEX REPLACE "/Core" "" ${name}_FOLDER ${${name}_FOLDER})
+  endif()
+
   hpx_setup_target(
     ${name}
     TYPE EXECUTABLE

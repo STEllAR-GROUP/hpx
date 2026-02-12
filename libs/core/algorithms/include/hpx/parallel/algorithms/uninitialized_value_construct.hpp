@@ -193,7 +193,7 @@ namespace hpx::parallel {
         // provide our own implementation of std::uninitialized_value_construct
         // as some versions of MSVC horribly fail at compiling it for some types
         // T
-        HPX_CXX_EXPORT template <typename ExPolicy, typename InIter,
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename InIter,
             typename Sent>
         InIter sequential_uninitialized_value_construct(
             ExPolicy&& policy, InIter first, Sent last)
@@ -209,7 +209,7 @@ namespace hpx::parallel {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename ExPolicy, typename InIter>
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename InIter>
         InIter sequential_uninitialized_value_construct_n(
             ExPolicy&& policy, InIter first, std::size_t count)
         {
@@ -224,7 +224,7 @@ namespace hpx::parallel {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename ExPolicy, typename FwdIter>
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename FwdIter>
         decltype(auto) parallel_uninitialized_value_construct_n(
             ExPolicy&& policy, FwdIter first, std::size_t count)
         {
@@ -275,7 +275,7 @@ namespace hpx::parallel {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename FwdIter>
+        HPX_CXX_CORE_EXPORT template <typename FwdIter>
         struct uninitialized_value_construct
           : public algorithm<uninitialized_value_construct<FwdIter>, FwdIter>
         {
@@ -309,7 +309,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        HPX_CXX_EXPORT template <typename FwdIter>
+        HPX_CXX_CORE_EXPORT template <typename FwdIter>
         struct uninitialized_value_construct_n
           : public algorithm<uninitialized_value_construct_n<FwdIter>, FwdIter>
         {
@@ -343,7 +343,8 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::uninitialized_value_construct
-    HPX_CXX_EXPORT inline constexpr struct uninitialized_value_construct_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct uninitialized_value_construct_t
+        final
       : hpx::detail::tag_parallel_algorithm<uninitialized_value_construct_t>
     {
         template <typename FwdIter>
@@ -389,8 +390,8 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::uninitialized_value_construct_n
-    HPX_CXX_EXPORT inline constexpr struct uninitialized_value_construct_n_t
-        final
+    HPX_CXX_CORE_EXPORT inline constexpr struct
+        uninitialized_value_construct_n_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_value_construct_n_t>
     {
         template <typename FwdIter, typename Size>

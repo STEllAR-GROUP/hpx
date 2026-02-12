@@ -16,7 +16,7 @@
 
 namespace hpx::serialization {
 
-    HPX_CXX_EXPORT template <std::size_t N>
+    HPX_CXX_CORE_EXPORT template <std::size_t N>
     void serialize(input_archive& ar, std::bitset<N>& d, unsigned)
     {
         if constexpr (N <= CHAR_BIT * sizeof(std::uint64_t))
@@ -33,7 +33,7 @@ namespace hpx::serialization {
         }
     }
 
-    HPX_CXX_EXPORT template <std::size_t N>
+    HPX_CXX_CORE_EXPORT template <std::size_t N>
     void serialize(output_archive& ar, std::bitset<N> const& bs, unsigned)
     {
         if constexpr (N <= CHAR_BIT * sizeof(std::uint64_t))

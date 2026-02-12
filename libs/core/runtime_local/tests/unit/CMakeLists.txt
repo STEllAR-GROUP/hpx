@@ -4,9 +4,10 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests thread_mapper)
+set(tests thread_mapper test_termination_detection)
 
 set(thread_mapper_PARAMETERS THREADS_PER_LOCALITY 4)
+set(test_termination_detection_PARAMETERS THREADS_PER_LOCALITY 4)
 
 foreach(test ${tests})
   set(sources ${test}.cpp)

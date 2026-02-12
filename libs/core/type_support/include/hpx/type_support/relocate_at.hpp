@@ -23,7 +23,7 @@ namespace hpx::detail {
 
     // since c++20 std::destroy_at can be used on array types, destructing each
     // element
-    HPX_CXX_EXPORT template <std::destructible T>
+    HPX_CXX_CORE_EXPORT template <std::destructible T>
     struct destroy_guard
     {
         T* t;
@@ -39,8 +39,8 @@ namespace hpx::detail {
 }    // namespace hpx::detail
 
 #if defined(HPX_HAVE_P1144_STD_RELOCATE_AT)
-HPX_CXX_EXPORT using std::relocate;
-HPX_CXX_EXPORT using std::relocate_at;
+HPX_CXX_CORE_EXPORT using std::relocate;
+HPX_CXX_CORE_EXPORT using std::relocate_at;
 #else
 
 namespace hpx::experimental {
@@ -53,11 +53,11 @@ namespace hpx::experimental {
         //
         // The reason for the volatile check is that memmove is not allowed to
         // change the value of a volatile object.
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         concept relocate_using_memmove =
             is_trivially_relocatable_v<T> && !std::is_volatile_v<T>;
 
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
             requires(relocate_using_memmove<T>)
         T* relocate_at_helper(T* src, T* dst) noexcept
         {
@@ -70,7 +70,7 @@ namespace hpx::experimental {
         };
 
         // this is move and destroy
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
             requires(!relocate_using_memmove<T>)
         T* relocate_at_helper(T* src, T* dst) noexcept(
             std::is_nothrow_move_constructible_v<T>)
@@ -79,7 +79,7 @@ namespace hpx::experimental {
             return hpx::construct_at(dst, HPX_MOVE(*src));
         };
 
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         T relocate_helper(T* src) noexcept(
             std::is_nothrow_move_constructible_v<T>)
         {
@@ -113,7 +113,7 @@ namespace hpx::experimental {
         // }
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     T* relocate_at(T* src, T* dst) noexcept(
         // noexcept if the memmove path is taken or if the move path is noexcept
         noexcept(detail::relocate_at_helper(src, dst)))
@@ -124,7 +124,7 @@ namespace hpx::experimental {
         return detail::relocate_at_helper(src, dst);
     }
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     T relocate(T* src) noexcept(noexcept(detail::relocate_helper(src)))
     {
         static_assert(

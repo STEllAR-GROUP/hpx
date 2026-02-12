@@ -31,7 +31,7 @@ namespace hpx::compute::host {
     /// It will distribute work evenly across the passed targets
     ///
     /// \tparam Executor The underlying executor to use
-    HPX_CXX_EXPORT template <
+    HPX_CXX_CORE_EXPORT template <
         typename Executor =
             hpx::execution::experimental::restricted_thread_pool_executor>
     struct block_executor
@@ -320,38 +320,38 @@ namespace hpx::compute::host {
 
 namespace hpx::execution::experimental {
 
-    HPX_CXX_EXPORT template <typename Executor>
+    HPX_CXX_CORE_EXPORT template <typename Executor>
     struct executor_execution_category<compute::host::block_executor<Executor>>
     {
         using type = hpx::execution::parallel_execution_tag;
     };
 
-    HPX_CXX_EXPORT template <typename Executor>
+    HPX_CXX_CORE_EXPORT template <typename Executor>
     struct is_never_blocking_one_way_executor<
         compute::host::block_executor<Executor>>
       : is_never_blocking_one_way_executor<Executor>
     {
     };
 
-    HPX_CXX_EXPORT template <typename Executor>
+    HPX_CXX_CORE_EXPORT template <typename Executor>
     struct is_one_way_executor<compute::host::block_executor<Executor>>
       : is_one_way_executor<Executor>
     {
     };
 
-    HPX_CXX_EXPORT template <typename Executor>
+    HPX_CXX_CORE_EXPORT template <typename Executor>
     struct is_two_way_executor<compute::host::block_executor<Executor>>
       : is_two_way_executor<Executor>
     {
     };
 
-    HPX_CXX_EXPORT template <typename Executor>
+    HPX_CXX_CORE_EXPORT template <typename Executor>
     struct is_bulk_one_way_executor<compute::host::block_executor<Executor>>
       : is_bulk_one_way_executor<Executor>
     {
     };
 
-    HPX_CXX_EXPORT template <typename Executor>
+    HPX_CXX_CORE_EXPORT template <typename Executor>
     struct is_bulk_two_way_executor<compute::host::block_executor<Executor>>
       : is_bulk_two_way_executor<Executor>
     {

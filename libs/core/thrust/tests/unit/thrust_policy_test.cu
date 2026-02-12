@@ -11,9 +11,7 @@
 #include <hpx/init.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/testing.hpp>
-
-#include <hpx/thrust/algorithms.hpp>
-#include <hpx/thrust/policy.hpp>
+#include <hpx/modules/thrust.hpp>
 
 #include <chrono>
 #include <cstddef>

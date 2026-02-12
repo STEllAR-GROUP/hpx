@@ -12,5 +12,5 @@
 
 namespace hpx {
 
-    HPX_CXX_EXPORT using hpx::util::invoke_result;
+    HPX_CXX_CORE_EXPORT using hpx::util::invoke_result;
 }    // namespace hpx

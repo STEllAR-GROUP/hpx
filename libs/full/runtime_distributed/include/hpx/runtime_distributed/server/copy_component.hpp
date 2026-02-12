@@ -10,7 +10,7 @@
 #include <hpx/actions_base/plain_action.hpp>
 #include <hpx/components/get_ptr.hpp>
 #include <hpx/modules/futures.hpp>
-#include <hpx/naming_base/id_type.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/runtime_components/components_fwd.hpp>
 #include <hpx/runtime_distributed/stubs/runtime_support.hpp>
 

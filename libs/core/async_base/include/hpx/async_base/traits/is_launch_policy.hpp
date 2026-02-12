@@ -27,11 +27,11 @@ namespace hpx::traits {
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename Policy>
+    HPX_CXX_CORE_EXPORT template <typename Policy>
     struct is_launch_policy : detail::is_launch_policy<std::decay_t<Policy>>
     {
     };
 
-    HPX_CXX_EXPORT template <typename Policy>
+    HPX_CXX_CORE_EXPORT template <typename Policy>
     inline constexpr bool is_launch_policy_v = is_launch_policy<Policy>::value;
 }    // namespace hpx::traits

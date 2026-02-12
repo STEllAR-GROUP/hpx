@@ -33,8 +33,8 @@
 
 namespace hpx::cuda::experimental {
 
-    HPX_CXX_EXPORT using event_mode = std::true_type;
-    HPX_CXX_EXPORT using callback_mode = std::false_type;
+    HPX_CXX_CORE_EXPORT using event_mode = std::true_type;
+    HPX_CXX_CORE_EXPORT using callback_mode = std::false_type;
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
@@ -46,10 +46,10 @@ namespace hpx::cuda::experimental {
         // by a cuda callback when the stream event occurs
         // 2) an event based callback that must be polled/queried by
         // the runtime to set the future ready state
-        HPX_CXX_EXPORT template <typename Allocator, typename Mode>
+        HPX_CXX_CORE_EXPORT template <typename Allocator, typename Mode>
         struct future_data;
 
-        HPX_CXX_EXPORT template <typename Allocator>
+        HPX_CXX_CORE_EXPORT template <typename Allocator>
         struct future_data<Allocator, event_mode>
           : lcos::detail::future_data_allocator<void, Allocator,
                 future_data<Allocator, event_mode>>
@@ -96,7 +96,7 @@ namespace hpx::cuda::experimental {
             }
         };
 
-        HPX_CXX_EXPORT template <typename Allocator>
+        HPX_CXX_CORE_EXPORT template <typename Allocator>
         struct future_data<Allocator, callback_mode>
           : lcos::detail::future_data_allocator<void, Allocator,
                 future_data<Allocator, callback_mode>>
@@ -171,7 +171,7 @@ namespace hpx::cuda::experimental {
         // -------------------------------------------------------------
         // main API call to get a future from a stream using allocator, and the
         // specified mode
-        HPX_CXX_EXPORT template <typename Allocator, typename Mode>
+        HPX_CXX_CORE_EXPORT template <typename Allocator, typename Mode>
         hpx::future<void> get_future(
             Allocator const& a, cudaStream_t stream, int device)
         {
@@ -211,7 +211,7 @@ namespace hpx::cuda::experimental {
 
         // -------------------------------------------------------------
         // main API call to get a future from a stream using allocator
-        HPX_CXX_EXPORT template <typename Allocator>
+        HPX_CXX_CORE_EXPORT template <typename Allocator>
         hpx::future<void> get_future_with_callback(
             Allocator const& a, cudaStream_t const stream)
         {
@@ -222,7 +222,7 @@ namespace hpx::cuda::experimental {
 
         // -------------------------------------------------------------
         // main API call to get a future from a stream using allocator
-        HPX_CXX_EXPORT template <typename Allocator>
+        HPX_CXX_CORE_EXPORT template <typename Allocator>
         hpx::future<void> get_future_with_event(
             Allocator const& a, cudaStream_t const stream, int device = -1)
         {
@@ -233,17 +233,17 @@ namespace hpx::cuda::experimental {
 
         // -------------------------------------------------------------
         // non allocator version of : get future with a callback set
-        HPX_CXX_EXPORT HPX_CORE_EXPORT hpx::future<void>
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT hpx::future<void>
             get_future_with_callback(cudaStream_t);
 
         // -------------------------------------------------------------
         // non allocator version of : get future with an event set
-        HPX_CXX_EXPORT HPX_CORE_EXPORT hpx::future<void> get_future_with_event(
-            cudaStream_t stream, int device = -1);
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT hpx::future<void>
+        get_future_with_event(cudaStream_t stream, int device = -1);
     }    // namespace detail
 }    // namespace hpx::cuda::experimental
 
-HPX_CXX_EXPORT template <typename Allocator, typename Mode,
+HPX_CXX_CORE_EXPORT template <typename Allocator, typename Mode,
     typename NewAllocator>
 struct hpx::traits::detail::shared_state_allocator<
     hpx::cuda::experimental::detail::future_data<Allocator, Mode>, NewAllocator>

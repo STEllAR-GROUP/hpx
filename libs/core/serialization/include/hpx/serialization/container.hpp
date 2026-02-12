@@ -15,7 +15,7 @@
 
 namespace hpx::serialization {
 
-    HPX_CXX_EXPORT struct erased_output_container
+    HPX_CXX_CORE_EXPORT struct erased_output_container
     {
         virtual ~erased_output_container() = default;
 
@@ -32,7 +32,7 @@ namespace hpx::serialization {
         virtual void flush() = 0;
     };
 
-    HPX_CXX_EXPORT struct erased_input_container
+    HPX_CXX_CORE_EXPORT struct erased_input_container
     {
         virtual ~erased_input_container() = default;
 

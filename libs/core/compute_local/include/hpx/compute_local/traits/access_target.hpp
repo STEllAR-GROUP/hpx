@@ -12,6 +12,6 @@
 
 namespace hpx::compute::traits {
 
-    HPX_CXX_EXPORT template <typename Target, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename Target, typename Enable = void>
     struct access_target;
 }    // namespace hpx::compute::traits

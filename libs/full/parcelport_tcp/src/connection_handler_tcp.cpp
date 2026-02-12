@@ -18,11 +18,11 @@
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/util.hpp>
 
+#include <hpx/modules/parcelset_base.hpp>
 #include <hpx/parcelport_tcp/connection_handler.hpp>
 #include <hpx/parcelport_tcp/locality.hpp>
 #include <hpx/parcelport_tcp/receiver.hpp>
 #include <hpx/parcelport_tcp/sender.hpp>
-#include <hpx/parcelset_base/locality.hpp>
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
 #include <winsock2.h>

@@ -407,7 +407,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::make_heap
-    HPX_CXX_EXPORT inline constexpr struct make_heap_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct make_heap_t final
       : hpx::detail::tag_parallel_algorithm<make_heap_t>
     {
     private:

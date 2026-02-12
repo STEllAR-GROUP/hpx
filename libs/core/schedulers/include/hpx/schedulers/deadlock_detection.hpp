@@ -12,9 +12,9 @@
 #ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
 namespace hpx::threads::policies {
 
-    HPX_CXX_EXPORT HPX_CORE_EXPORT void set_minimal_deadlock_detection_enabled(
-        bool enabled) noexcept;
-    HPX_CXX_EXPORT HPX_CORE_EXPORT bool
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void
+    set_minimal_deadlock_detection_enabled(bool enabled) noexcept;
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT bool
     get_minimal_deadlock_detection_enabled() noexcept;
 }    // namespace hpx::threads::policies
 #endif

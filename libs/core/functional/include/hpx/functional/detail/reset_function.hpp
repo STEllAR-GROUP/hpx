@@ -11,19 +11,19 @@
 
 namespace hpx::util::detail {
 
-    HPX_CXX_EXPORT template <typename Sig, bool Serializable>
+    HPX_CXX_CORE_EXPORT template <typename Sig, bool Serializable>
     void reset_function(hpx::function<Sig, Serializable>& f)
     {
         f.reset();
     }
 
-    HPX_CXX_EXPORT template <typename Sig, bool Serializable>
+    HPX_CXX_CORE_EXPORT template <typename Sig, bool Serializable>
     void reset_function(hpx::move_only_function<Sig, Serializable>& f)
     {
         f.reset();
     }
 
-    HPX_CXX_EXPORT template <typename Function>
+    HPX_CXX_CORE_EXPORT template <typename Function>
     void reset_function(Function& f)
     {
         f = Function();

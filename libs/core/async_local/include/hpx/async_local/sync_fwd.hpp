@@ -19,13 +19,13 @@ namespace hpx {
     namespace detail {
 
         // dispatch point used for sync<Action> implementations
-        HPX_CXX_EXPORT template <typename Action, typename Func,
+        HPX_CXX_CORE_EXPORT template <typename Action, typename Func,
             typename Enable = void>
         struct sync_action_dispatch;
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Action, typename F, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename Action, typename F, typename... Ts>
     HPX_FORCEINLINE auto sync(F&& f, Ts&&... ts)
         -> decltype(detail::sync_action_dispatch<Action, std::decay_t<F>>::call(
             HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));

@@ -21,20 +21,20 @@
 namespace hpx::serialization {
 
     ////////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT union chunk_data
+    HPX_CXX_CORE_EXPORT union chunk_data
     {
         std::size_t index_;    // position inside the data buffer //-V117
         void const* cpos_;     // const pointer to external data buffer //-V117
         void* pos_;            // pointer to external data buffer //-V117
     };
 
-    HPX_CXX_EXPORT enum class chunk_type : std::uint8_t {
+    HPX_CXX_CORE_EXPORT enum class chunk_type : std::uint8_t {
         chunk_type_index = 0,
         chunk_type_const_pointer = 1,
         chunk_type_pointer = 2
     };
 
-    HPX_CXX_EXPORT struct serialization_chunk
+    HPX_CXX_CORE_EXPORT struct serialization_chunk
     {
         chunk_data data_;       // index or pointer
         std::size_t size_;      // size of serialization_chunk starting pos_
@@ -61,7 +61,7 @@ namespace hpx::serialization {
     };
 
     ///////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT [[nodiscard]] constexpr serialization_chunk
+    HPX_CXX_CORE_EXPORT [[nodiscard]] constexpr serialization_chunk
     create_index_chunk(std::size_t index, std::size_t size) noexcept
     {
         serialization_chunk retval = {
@@ -70,7 +70,7 @@ namespace hpx::serialization {
         return retval;
     }
 
-    HPX_CXX_EXPORT [[nodiscard]] constexpr serialization_chunk
+    HPX_CXX_CORE_EXPORT [[nodiscard]] constexpr serialization_chunk
     create_pointer_chunk(
         void const* pos, std::size_t size, std::uint64_t rkey = 0) noexcept
     {

@@ -18,7 +18,7 @@ namespace hpx {
 
     /// The type of the function which is registered to be executed as a
     /// shutdown or pre-shutdown function.
-    HPX_CXX_EXPORT using shutdown_function_type =
+    HPX_CXX_CORE_EXPORT using shutdown_function_type =
         hpx::move_only_function<void()>;
 
     /// \brief Add a function to be executed by a HPX thread during
@@ -38,7 +38,7 @@ namespace hpx {
     ///       exception.
     ///
     /// \see    \a hpx::register_shutdown_function()
-    HPX_CXX_EXPORT HPX_CORE_EXPORT void register_pre_shutdown_function(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void register_pre_shutdown_function(
         shutdown_function_type f);
 
     /// \brief Add a function to be executed by a HPX thread during
@@ -58,6 +58,6 @@ namespace hpx {
     ///       exception.
     ///
     /// \see    \a hpx::register_pre_shutdown_function()
-    HPX_CXX_EXPORT HPX_CORE_EXPORT void register_shutdown_function(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void register_shutdown_function(
         shutdown_function_type f);
 }    // namespace hpx

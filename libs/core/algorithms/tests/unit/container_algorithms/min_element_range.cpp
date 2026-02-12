@@ -23,7 +23,8 @@ void test_min_element_sent()
 {
     using hpx::get;
 
-    auto c = test::random_iota(100);
+    auto c = test::random_repeat(100, std::size_t(50));
+    c[50] = std::size_t(101);
     auto ref = std::min_element(std::begin(c), std::begin(c) + 50);
     auto r = hpx::ranges::min_element(
         std::begin(c), sentinel<size_t>{*(std::begin(c) + 50)});
@@ -55,7 +56,8 @@ void test_min_element_sent(ExPolicy policy)
 
     using hpx::get;
 
-    auto c = test::random_iota(100);
+    auto c = test::random_repeat(100, std::size_t(50));
+    c[50] = std::size_t(101);
     auto ref = std::min_element(std::begin(c), std::begin(c) + 50);
     auto r = hpx::ranges::min_element(
         policy, std::begin(c), sentinel<size_t>{*(std::begin(c) + 50)});
@@ -87,7 +89,7 @@ void test_min_element(IteratorTag)
     typedef test::test_container<std::vector<std::size_t>, IteratorTag>
         test_vector;
 
-    test_vector c = test::random_iota(10007);
+    test_vector c = test::random_repeat(10007, std::size_t(100));
 
     base_iterator ref_end(std::end(c.base()));
 
@@ -117,7 +119,7 @@ void test_min_element(ExPolicy policy, IteratorTag)
     typedef test::test_container<std::vector<std::size_t>, IteratorTag>
         test_vector;
 
-    test_vector c = test::random_iota(10007);
+    test_vector c = test::random_repeat(10007, std::size_t(100));
 
     base_iterator ref_end(std::end(c.base()));
 
@@ -146,7 +148,7 @@ void test_min_element_async(ExPolicy p, IteratorTag)
     typedef test::test_container<std::vector<std::size_t>, IteratorTag>
         test_vector;
 
-    test_vector c = test::random_iota(10007);
+    test_vector c = test::random_repeat(10007, std::size_t(100));
 
     base_iterator ref_end(std::end(c.base()));
 
@@ -201,7 +203,7 @@ void test_min_element_exception(IteratorTag)
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
 
-    std::vector<std::size_t> c = test::random_iota(10007);
+    std::vector<std::size_t> c = test::random_repeat(10007, std::size_t(100));
 
     {
         bool caught_exception = false;
@@ -264,7 +266,7 @@ void test_min_element_exception(ExPolicy policy, IteratorTag)
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
 
-    std::vector<std::size_t> c = test::random_iota(10007);
+    std::vector<std::size_t> c = test::random_repeat(10007, std::size_t(100));
 
     {
         bool caught_exception = false;
@@ -323,7 +325,7 @@ void test_min_element_exception_async(ExPolicy p, IteratorTag)
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
 
-    std::vector<std::size_t> c = test::random_iota(10007);
+    std::vector<std::size_t> c = test::random_repeat(10007, std::size_t(100));
 
     {
         bool returned_from_algorithm = false;
@@ -421,7 +423,7 @@ void test_min_element_bad_alloc(IteratorTag)
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
 
-    std::vector<std::size_t> c = test::random_iota(10007);
+    std::vector<std::size_t> c = test::random_repeat(10007, std::size_t(100));
 
     {
         bool caught_exception = false;
@@ -479,7 +481,7 @@ void test_min_element_bad_alloc(ExPolicy policy, IteratorTag)
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
 
-    std::vector<std::size_t> c = test::random_iota(10007);
+    std::vector<std::size_t> c = test::random_repeat(10007, std::size_t(100));
 
     {
         bool caught_exception = false;
@@ -534,7 +536,7 @@ void test_min_element_bad_alloc_async(ExPolicy p, IteratorTag)
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
 
-    std::vector<std::size_t> c = test::random_iota(10007);
+    std::vector<std::size_t> c = test::random_repeat(10007, std::size_t(100));
 
     {
         bool returned_from_algorithm = false;

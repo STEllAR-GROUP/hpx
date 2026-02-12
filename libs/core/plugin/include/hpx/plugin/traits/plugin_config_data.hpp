@@ -12,7 +12,7 @@ namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
     // Customization point for plugin config data injection
-    HPX_CXX_EXPORT template <typename Plugin, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename Plugin, typename Enable = void>
     struct plugin_config_data
     {
         // by default no additional config data is injected into the factory

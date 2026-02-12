@@ -12,8 +12,8 @@
 #include <hpx/components_base/detail/agas_interface_functions.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/naming_base/id_type.hpp>
 
 #include <cstddef>
 #include <cstdint>

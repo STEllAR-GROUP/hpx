@@ -16,10 +16,10 @@ namespace hpx::threads::detail {
 
 #if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \
     defined(HPX_HAVE_THREAD_IDLE_RATES)
-    HPX_CXX_EXPORT using network_background_callback_type =
+    HPX_CXX_CORE_EXPORT using network_background_callback_type =
         hpx::function<bool(std::size_t, std::int64_t&, std::int64_t&)>;
 #else
-    HPX_CXX_EXPORT using network_background_callback_type =
+    HPX_CXX_CORE_EXPORT using network_background_callback_type =
         hpx::function<bool(std::size_t)>;
 #endif
 }    // namespace hpx::threads::detail

@@ -65,7 +65,7 @@
 
 namespace hpx::parallel::detail::rfa {
 
-    HPX_CXX_EXPORT template <typename F>
+    HPX_CXX_CORE_EXPORT template <typename F>
     struct type4
     {
         F x;
@@ -74,19 +74,19 @@ namespace hpx::parallel::detail::rfa {
         F w;
     };
 
-    HPX_CXX_EXPORT template <typename F>
+    HPX_CXX_CORE_EXPORT template <typename F>
     struct type2
     {
         F x;
         F y;
     };
 
-    HPX_CXX_EXPORT using float4 = type4<float>;
-    HPX_CXX_EXPORT using double4 = type4<double>;
-    HPX_CXX_EXPORT using float2 = type2<float>;
-    HPX_CXX_EXPORT using double2 = type2<double>;
+    HPX_CXX_CORE_EXPORT using float4 = type4<float>;
+    HPX_CXX_CORE_EXPORT using double4 = type4<double>;
+    HPX_CXX_CORE_EXPORT using float2 = type2<float>;
+    HPX_CXX_CORE_EXPORT using double2 = type2<double>;
 
-    HPX_CXX_EXPORT inline auto abs_max(float4 a)
+    HPX_CXX_CORE_EXPORT inline auto abs_max(float4 a)
     {
         auto x = std::abs(a.x);
         auto y = std::abs(a.y);
@@ -96,7 +96,7 @@ namespace hpx::parallel::detail::rfa {
         return *std::max_element(v.begin(), v.end());
     }
 
-    HPX_CXX_EXPORT inline auto abs_max(double4 a)
+    HPX_CXX_CORE_EXPORT inline auto abs_max(double4 a)
     {
         auto x = std::abs(a.x);
         auto y = std::abs(a.y);
@@ -106,7 +106,7 @@ namespace hpx::parallel::detail::rfa {
         return *std::max_element(v.begin(), v.end());
     }
 
-    HPX_CXX_EXPORT inline auto abs_max(float2 a)
+    HPX_CXX_CORE_EXPORT inline auto abs_max(float2 a)
     {
         auto x = std::abs(a.x);
         auto y = std::abs(a.y);
@@ -114,7 +114,7 @@ namespace hpx::parallel::detail::rfa {
         return *std::max_element(v.begin(), v.end());
     }
 
-    HPX_CXX_EXPORT inline auto abs_max(double2 a)
+    HPX_CXX_CORE_EXPORT inline auto abs_max(double2 a)
     {
         auto x = std::abs(a.x);
         auto y = std::abs(a.y);
@@ -132,7 +132,7 @@ namespace hpx::parallel::detail::rfa {
 #define MAX_JUMP 5
     static_assert(MAX_JUMP <= 5, "MAX_JUMP greater than max");
 
-    HPX_CXX_EXPORT template <typename Real>
+    HPX_CXX_CORE_EXPORT template <typename Real>
     inline constexpr Real ldexp_impl(Real arg, int exp) noexcept
     {
         return std::ldexp(arg, exp);
@@ -154,7 +154,7 @@ namespace hpx::parallel::detail::rfa {
         // return arg;
     }
 
-    HPX_CXX_EXPORT template <class ftype>
+    HPX_CXX_CORE_EXPORT template <class ftype>
     struct RFA_bins
     {
         static constexpr auto BIN_WIDTH =
@@ -201,14 +201,14 @@ namespace hpx::parallel::detail::rfa {
         }
     };
 
-    HPX_CXX_EXPORT inline char
+    HPX_CXX_CORE_EXPORT inline char
         hpx_rfa_bin_host_buffer[sizeof(RFA_bins<double>)];
 
     ///Class to hold a reproducible summation of the numbers passed to it
     ///
     ///@param ftype Floating-point data type; either `float` or `double
     ///@param FOLD  The fold; use 3 as a default unless you understand it.
-    HPX_CXX_EXPORT template <class ftype_, int FOLD_ = 3,
+    HPX_CXX_CORE_EXPORT template <class ftype_, int FOLD_ = 3,
         typename std::enable_if_t<std::is_floating_point_v<ftype_>>* = nullptr>
     class alignas(2 * sizeof(ftype_)) reproducible_floating_accumulator
     {

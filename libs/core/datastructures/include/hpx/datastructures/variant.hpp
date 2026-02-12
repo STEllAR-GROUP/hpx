@@ -14,11 +14,11 @@
 
 namespace hpx {
 
-    HPX_CXX_EXPORT using std::get;
-    HPX_CXX_EXPORT using std::holds_alternative;
-    HPX_CXX_EXPORT using std::monostate;
-    HPX_CXX_EXPORT using std::variant;
-    HPX_CXX_EXPORT using std::visit;
+    HPX_CXX_CORE_EXPORT using std::get;
+    HPX_CXX_CORE_EXPORT using std::holds_alternative;
+    HPX_CXX_CORE_EXPORT using std::monostate;
+    HPX_CXX_CORE_EXPORT using std::variant;
+    HPX_CXX_CORE_EXPORT using std::visit;
 }    // namespace hpx
 
 #else
@@ -27,11 +27,11 @@ namespace hpx {
 
 namespace hpx {
 
-    HPX_CXX_EXPORT using hpx::variant_ns::get;
-    HPX_CXX_EXPORT using hpx::variant_ns::holds_alternative;
-    HPX_CXX_EXPORT using hpx::variant_ns::monostate;
-    HPX_CXX_EXPORT using hpx::variant_ns::variant;
-    HPX_CXX_EXPORT using hpx::variant_ns::visit;
+    HPX_CXX_CORE_EXPORT using hpx::variant_ns::get;
+    HPX_CXX_CORE_EXPORT using hpx::variant_ns::holds_alternative;
+    HPX_CXX_CORE_EXPORT using hpx::variant_ns::monostate;
+    HPX_CXX_CORE_EXPORT using hpx::variant_ns::variant;
+    HPX_CXX_CORE_EXPORT using hpx::variant_ns::visit;
 }    // namespace hpx
 
 #endif

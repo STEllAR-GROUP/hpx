@@ -1410,7 +1410,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::find
-    HPX_CXX_EXPORT inline constexpr struct find_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct find_t final
       : hpx::detail::tag_parallel_algorithm<find_t>
     {
     private:
@@ -1507,7 +1507,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::find_if
-    HPX_CXX_EXPORT inline constexpr struct find_if_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct find_if_t final
       : hpx::detail::tag_parallel_algorithm<find_if_t>
     {
     private:
@@ -1614,7 +1614,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::find_if_not
-    HPX_CXX_EXPORT inline constexpr struct find_if_not_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct find_if_not_t final
       : hpx::detail::tag_parallel_algorithm<find_if_not_t>
     {
     private:
@@ -1721,7 +1721,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::find_end
-    HPX_CXX_EXPORT inline constexpr struct find_end_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct find_end_t final
       : hpx::detail::tag_parallel_algorithm<find_end_t>
     {
     private:
@@ -1852,7 +1852,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::find_first_of
-    HPX_CXX_EXPORT inline constexpr struct find_first_of_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct find_first_of_t final
       : hpx::detail::tag_parallel_algorithm<find_first_of_t>
     {
     private:

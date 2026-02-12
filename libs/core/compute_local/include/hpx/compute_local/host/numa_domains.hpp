@@ -15,5 +15,5 @@
 
 namespace hpx::compute::host {
 
-    HPX_CXX_EXPORT HPX_CORE_EXPORT std::vector<target> numa_domains();
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT std::vector<target> numa_domains();
 }    // namespace hpx::compute::host

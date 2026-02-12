@@ -27,7 +27,7 @@ namespace hpx::execution::experimental {
     /// \note This executor parameters type is equivalent to OpenMP's STATIC
     ///       scheduling directive.
     ///
-    HPX_CXX_EXPORT struct default_parameters
+    HPX_CXX_CORE_EXPORT struct default_parameters
     {
         /// Construct a \a default_parameters executor parameters object
         ///

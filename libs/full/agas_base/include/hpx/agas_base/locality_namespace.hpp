@@ -11,9 +11,8 @@
 #include <hpx/config.hpp>
 #include <hpx/agas_base/server/locality_namespace.hpp>
 #include <hpx/modules/futures.hpp>
-#include <hpx/naming_base/address.hpp>
-#include <hpx/naming_base/id_type.hpp>
-#include <hpx/parcelset_base/locality.hpp>
+#include <hpx/modules/naming_base.hpp>
+#include <hpx/modules/parcelset_base.hpp>
 
 #include <cstdint>
 #include <string>

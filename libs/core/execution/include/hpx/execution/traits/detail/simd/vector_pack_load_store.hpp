@@ -21,7 +21,8 @@
 namespace hpx::parallel::traits {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename V, typename ValueType, typename Enable>
+    HPX_CXX_CORE_EXPORT template <typename V, typename ValueType,
+        typename Enable>
     struct vector_pack_load
     {
         template <typename Iter>
@@ -39,7 +40,8 @@ namespace hpx::parallel::traits {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename V, typename ValueType, typename Enable>
+    HPX_CXX_CORE_EXPORT template <typename V, typename ValueType,
+        typename Enable>
     struct vector_pack_store
     {
         template <typename Iter>
