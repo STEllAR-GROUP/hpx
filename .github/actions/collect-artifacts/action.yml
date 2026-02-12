@@ -23,17 +23,17 @@ runs:
       if: always() 
       shell: bash
       run: |
-        cd /hpx/build
+        cd $GITHUB_WORKSPACE/build
         mkdir -p ${{ inputs.job-name }}
         xsltproc \
-          /hpx/source/.github/ci-scripts/conv.xsl Testing/$(head -n 1 < Testing/TAG)/Test.xml \
+          $GITHUB_WORKSPACE/.github/ci-scripts/conv.xsl Testing/$(head -n 1 < Testing/TAG)/Test.xml \
           > ${{ inputs.job-name }}/Test.xml
     
     - name: Move core dumps
       if: failure() && inputs.collect-failure-artifacts == 'true'
       shell: bash
       run: |
-        cd /hpx/build
+        cd $GITHUB_WORKSPACE/build
         mkdir -p ${{ inputs.job-name }}
         cp core.* ${{ inputs.job-name }} || true
     
@@ -41,6 +41,6 @@ runs:
       if: failure() && inputs.collect-failure-artifacts == 'true'
       shell: bash
       run: |
-        cd /hpx/build
+        cd $GITHUB_WORKSPACE/build
         mkdir -p ${{ inputs.job-name }}
         cp debug-log.txt ${{ inputs.job-name }} || true
