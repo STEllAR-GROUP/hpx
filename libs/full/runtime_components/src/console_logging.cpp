@@ -15,13 +15,13 @@
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/static_reinit.hpp>
 #include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime_components/console_logging.hpp>
 #include <hpx/runtime_components/server/console_logging.hpp>
 

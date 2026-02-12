@@ -17,7 +17,7 @@ namespace hpx::serialization::detail {
 
     // This 'container' is used to gather the required archive size for a given
     // type before it is serialized.
-    HPX_CXX_EXPORT class preprocess_container
+    HPX_CXX_CORE_EXPORT class preprocess_container
     {
     public:
         preprocess_container() = default;

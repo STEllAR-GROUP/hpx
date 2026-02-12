@@ -23,7 +23,7 @@
 
 namespace hpx::serialization {
 
-    HPX_CXX_EXPORT template <typename Container>
+    HPX_CXX_CORE_EXPORT template <typename Container>
     struct input_container : erased_input_container
     {
     private:

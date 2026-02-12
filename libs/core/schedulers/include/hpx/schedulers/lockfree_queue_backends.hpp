@@ -20,11 +20,11 @@
 
 namespace hpx::threads::policies {
 
-    struct lockfree_fifo;
+    HPX_CXX_CORE_EXPORT struct lockfree_fifo;
 
     ///////////////////////////////////////////////////////////////////////////////
     // FIFO
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct lockfree_fifo_backend
     {
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
@@ -85,7 +85,7 @@ namespace hpx::threads::policies {
         container_type queue_;
     };
 
-    struct lockfree_fifo
+    HPX_CXX_CORE_EXPORT struct lockfree_fifo
     {
         template <typename T>
         struct apply
@@ -96,7 +96,7 @@ namespace hpx::threads::policies {
 
     ////////////////////////////////////////////////////////////////////////////
     // MoodyCamel FIFO
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct moodycamel_fifo_backend
     {
         using container_type = hpx::concurrency::ConcurrentQueue<T>;
@@ -148,7 +148,7 @@ namespace hpx::threads::policies {
         container_type queue_;
     };
 
-    struct concurrentqueue_fifo
+    HPX_CXX_CORE_EXPORT struct concurrentqueue_fifo
     {
         template <typename T>
         struct apply
@@ -159,9 +159,9 @@ namespace hpx::threads::policies {
 
     // LIFO
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
-    struct lockfree_lifo;
+    HPX_CXX_CORE_EXPORT struct lockfree_lifo;
 
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct lockfree_lifo_backend
     {
         using container_type = hpx::lockfree::deque<T,
@@ -209,7 +209,7 @@ namespace hpx::threads::policies {
         container_type queue_;
     };
 
-    struct lockfree_lifo
+    HPX_CXX_CORE_EXPORT struct lockfree_lifo
     {
         template <typename T>
         struct apply
@@ -220,10 +220,10 @@ namespace hpx::threads::policies {
 
     ////////////////////////////////////////////////////////////////////////////
     // FIFO + stealing at opposite end.
-    struct lockfree_abp_fifo;
-    struct lockfree_abp_lifo;
+    HPX_CXX_CORE_EXPORT struct lockfree_abp_fifo;
+    HPX_CXX_CORE_EXPORT struct lockfree_abp_lifo;
 
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct lockfree_abp_fifo_backend
     {
         using container_type = hpx::lockfree::deque<T,
@@ -269,7 +269,7 @@ namespace hpx::threads::policies {
         container_type queue_;
     };
 
-    struct lockfree_abp_fifo
+    HPX_CXX_CORE_EXPORT struct lockfree_abp_fifo
     {
         template <typename T>
         struct apply
@@ -282,7 +282,7 @@ namespace hpx::threads::policies {
     // LIFO + stealing at opposite end.
     // E.g. ABP (Arora, Blumofe and Plaxton) queuing
     // http://dl.acm.org/citation.cfm?id=277678
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct lockfree_abp_lifo_backend
     {
         using container_type = hpx::lockfree::deque<T,
@@ -332,7 +332,7 @@ namespace hpx::threads::policies {
         container_type queue_;
     };
 
-    struct lockfree_abp_lifo
+    HPX_CXX_CORE_EXPORT struct lockfree_abp_lifo
     {
         template <typename T>
         struct apply

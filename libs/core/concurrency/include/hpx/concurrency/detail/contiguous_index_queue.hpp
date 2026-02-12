@@ -19,9 +19,12 @@
 namespace hpx::concurrency::detail {
 
     /// \brief Identify one of the ends of the queue
-    HPX_CXX_EXPORT enum class queue_end : std::uint8_t { left = 0, right = 1 };
+    HPX_CXX_CORE_EXPORT enum class queue_end : std::uint8_t {
+        left = 0,
+        right = 1
+    };
 
-    HPX_CXX_EXPORT template <queue_end Which>
+    HPX_CXX_CORE_EXPORT template <queue_end Which>
     struct opposite_end;
 
     template <>
@@ -36,7 +39,7 @@ namespace hpx::concurrency::detail {
         static constexpr queue_end value = queue_end::left;
     };
 
-    HPX_CXX_EXPORT template <queue_end Which>
+    HPX_CXX_CORE_EXPORT template <queue_end Which>
     inline constexpr queue_end opposite_end_v = opposite_end<Which>::value;
 
     /// \brief A concurrent queue which can only hold contiguous ranges of
@@ -47,7 +50,7 @@ namespace hpx::concurrency::detail {
     /// decrements the next element that will be popped from the right, if there
     /// are items left. Popping from the left increments the next element that
     /// will be popped from the left, if there are items left.
-    HPX_CXX_EXPORT template <typename T = std::uint32_t>
+    HPX_CXX_CORE_EXPORT template <typename T = std::uint32_t>
     class contiguous_index_queue
     {
         static_assert(sizeof(T) <= 4,    //-V112

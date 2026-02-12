@@ -16,11 +16,11 @@
 
 namespace hpx {
 
-    HPX_CXX_EXPORT using std::bad_optional_access;
-    HPX_CXX_EXPORT using std::make_optional;
-    HPX_CXX_EXPORT using std::nullopt;
-    HPX_CXX_EXPORT using std::nullopt_t;
-    HPX_CXX_EXPORT using std::optional;
+    HPX_CXX_CORE_EXPORT using std::bad_optional_access;
+    HPX_CXX_CORE_EXPORT using std::make_optional;
+    HPX_CXX_CORE_EXPORT using std::nullopt;
+    HPX_CXX_CORE_EXPORT using std::nullopt_t;
+    HPX_CXX_CORE_EXPORT using std::optional;
 }    // namespace hpx
 
 #else
@@ -31,11 +31,11 @@ namespace hpx {
 
 namespace hpx {
 
-    HPX_CXX_EXPORT using hpx::optional_ns::bad_optional_access;
-    HPX_CXX_EXPORT using hpx::optional_ns::make_optional;
-    HPX_CXX_EXPORT using hpx::optional_ns::nullopt;
-    HPX_CXX_EXPORT using hpx::optional_ns::nullopt_t;
-    HPX_CXX_EXPORT using hpx::optional_ns::optional;
+    HPX_CXX_CORE_EXPORT using hpx::optional_ns::bad_optional_access;
+    HPX_CXX_CORE_EXPORT using hpx::optional_ns::make_optional;
+    HPX_CXX_CORE_EXPORT using hpx::optional_ns::nullopt;
+    HPX_CXX_CORE_EXPORT using hpx::optional_ns::nullopt_t;
+    HPX_CXX_CORE_EXPORT using hpx::optional_ns::optional;
 }    // namespace hpx
 
 #include <hpx/config/warnings_suffix.hpp>

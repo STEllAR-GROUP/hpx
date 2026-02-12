@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,8 +10,8 @@
 #include <hpx/modules/allocator_support.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/thread_support.hpp>
+#include <hpx/naming_base/gid_type.hpp>
 #include <hpx/naming_base/naming_base.hpp>
 
 #include <cstddef>
@@ -28,21 +28,24 @@ namespace hpx {
     namespace naming::detail {
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_EXPORT void intrusive_ptr_add_ref(id_type_impl* p) noexcept;
-        HPX_EXPORT void intrusive_ptr_release(id_type_impl* p) noexcept;
+        HPX_CXX_EXPORT HPX_EXPORT void intrusive_ptr_add_ref(
+            id_type_impl* p) noexcept;
+        HPX_CXX_EXPORT HPX_EXPORT void intrusive_ptr_release(
+            id_type_impl* p) noexcept;
 
-        extern HPX_EXPORT void (*gid_managed_deleter)(
+        HPX_CXX_EXPORT extern HPX_EXPORT void (*gid_managed_deleter)(
             id_type_impl const* p) noexcept;
-        extern HPX_EXPORT void (*gid_unmanaged_deleter)(
+        HPX_CXX_EXPORT extern HPX_EXPORT void (*gid_unmanaged_deleter)(
             id_type_impl const* p) noexcept;
     }    // namespace naming::detail
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT std::ostream& operator<<(std::ostream& os, id_type const& id);
+    HPX_CXX_EXPORT HPX_EXPORT std::ostream& operator<<(
+        std::ostream& os, id_type const& id);
 
     ///////////////////////////////////////////////////////////////////////////
     // the local gid is actually just a wrapper around the real thing
-    struct id_type
+    HPX_CXX_EXPORT struct id_type
     {
     private:
         friend struct naming::detail::id_type_impl;
@@ -136,19 +139,19 @@ namespace hpx {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    static id_type const invalid_id = id_type();
+    HPX_CXX_EXPORT inline id_type const invalid_id = id_type();
 
     namespace naming {
 
         ///////////////////////////////////////////////////////////////////////////
-        HPX_EXPORT char const* get_management_type_name(
+        HPX_CXX_EXPORT HPX_EXPORT char const* get_management_type_name(
             id_type::management_type m) noexcept;
 
         ///////////////////////////////////////////////////////////////////////
         // Handle conversion to/from locality_id
         // FIXME: these names are confusing, 'id' appears in identifiers far too
         // frequently.
-        inline id_type get_id_from_locality_id(
+        HPX_CXX_EXPORT inline id_type get_id_from_locality_id(
             std::uint32_t locality_id) noexcept
         {
             return {(static_cast<std::uint64_t>(locality_id) + 1)
@@ -156,19 +159,21 @@ namespace hpx {
                 0, id_type::management_type::unmanaged};
         }
 
-        inline std::uint32_t get_locality_id_from_id(id_type const& id) noexcept
+        HPX_CXX_EXPORT inline std::uint32_t get_locality_id_from_id(
+            id_type const& id) noexcept
         {
             return static_cast<std::uint32_t>(
                        id.get_msb() >> naming::gid_type::locality_id_shift) -
                 1;
         }
 
-        inline id_type get_locality_from_id(id_type const& id) noexcept
+        HPX_CXX_EXPORT inline id_type get_locality_from_id(
+            id_type const& id) noexcept
         {
             return get_id_from_locality_id(get_locality_id_from_id(id));
         }
 
-        inline bool is_locality(id_type const& id) noexcept
+        HPX_CXX_EXPORT inline bool is_locality(id_type const& id) noexcept
         {
             return is_locality(id.get_gid());
         }
@@ -178,13 +183,14 @@ namespace hpx {
     namespace naming::detail {
 
         ///////////////////////////////////////////////////////////////////////
-        inline void set_dont_store_in_cache(id_type const& id) noexcept
+        HPX_CXX_EXPORT inline void set_dont_store_in_cache(
+            id_type const& id) noexcept
         {
             id.set_msb(id.get_msb() | gid_type::dont_cache_mask);
         }
 
         ///////////////////////////////////////////////////////////////////////
-        struct id_type_impl : gid_type
+        HPX_CXX_EXPORT struct id_type_impl : gid_type
         {
         public:
             id_type_impl(id_type_impl const&) = delete;
@@ -347,24 +353,28 @@ namespace hpx {
     }
 
     // comparison is required as well
-    inline bool operator!=(id_type const& lhs, id_type const& rhs) noexcept
+    HPX_CXX_EXPORT inline bool operator!=(
+        id_type const& lhs, id_type const& rhs) noexcept
     {
         return !(lhs == rhs);
     }
 
-    inline bool operator<=(id_type const& lhs, id_type const& rhs) noexcept
+    HPX_CXX_EXPORT inline bool operator<=(
+        id_type const& lhs, id_type const& rhs) noexcept
     {
         // Deduced from <.
         return !(rhs < lhs);
     }
 
-    inline bool operator>(id_type const& lhs, id_type const& rhs) noexcept
+    HPX_CXX_EXPORT inline bool operator>(
+        id_type const& lhs, id_type const& rhs) noexcept
     {
         // Deduced from <.
         return rhs < lhs;
     }
 
-    inline bool operator>=(id_type const& lhs, id_type const& rhs) noexcept
+    HPX_CXX_EXPORT inline bool operator>=(
+        id_type const& lhs, id_type const& rhs) noexcept
     {
         // Deduced from <.
         return !(lhs < rhs);

@@ -11,7 +11,7 @@
 #include <hpx/components/get_ptr.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/traits/component_supports_migration.hpp>
-#include <hpx/naming_base/id_type.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/runtime_distributed/find_here.hpp>
 #include <hpx/runtime_distributed/stubs/runtime_support.hpp>
 

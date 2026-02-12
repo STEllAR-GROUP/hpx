@@ -40,7 +40,7 @@ namespace hpx::execution::experimental {
     // 3.  execution::get_stop_token() (with no arguments) is
     //     expression-equivalent to execution::read(execution::get_stop_token).
     //
-    HPX_CXX_EXPORT
+    HPX_CXX_CORE_EXPORT
     HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct get_stop_token_t final
       : hpx::functional::detail::tag_fallback<get_stop_token_t>
     {
@@ -57,14 +57,15 @@ namespace hpx::execution::experimental {
 
     } get_stop_token{};
 
-    HPX_CXX_EXPORT constexpr auto tag_fallback_invoke(get_stop_token_t) noexcept
+    HPX_CXX_CORE_EXPORT constexpr auto tag_fallback_invoke(
+        get_stop_token_t) noexcept
     {
         return hpx::execution::experimental::read(get_stop_token);
     }
 
     // Helper template allowing to extract the type of the stop_token extracted
     // from a receiver environment.
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     using stop_token_of_t = std::remove_cv_t<
         std::remove_reference_t<decltype(get_stop_token(std::declval<T>()))>>;
 }    // namespace hpx::execution::experimental

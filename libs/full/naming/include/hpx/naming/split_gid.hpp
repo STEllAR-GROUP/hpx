@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/futures.hpp>
-#include <hpx/naming_base/gid_type.hpp>
+#include <hpx/modules/naming_base.hpp>
 
 #include <mutex>
 

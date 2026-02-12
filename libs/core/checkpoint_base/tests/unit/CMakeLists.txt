@@ -15,7 +15,7 @@ foreach(test ${tests})
     ${test}_test INTERNAL_FLAGS
     SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
-    FOLDER "Tests/Unit/Modules/Full/CheckpointBase/"
+    FOLDER "Tests/Unit/Modules/Core/CheckpointBase/"
   )
 
   add_hpx_unit_test("modules.checkpoint_base" ${test} ${${test}_PARAMETERS})

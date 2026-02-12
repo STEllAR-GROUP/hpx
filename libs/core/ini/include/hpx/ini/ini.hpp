@@ -35,7 +35,7 @@
 namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT class HPX_CORE_EXPORT section
+    HPX_CXX_CORE_EXPORT class HPX_CORE_EXPORT section
     {
     public:
         using entry_changed_func =

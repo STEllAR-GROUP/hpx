@@ -34,7 +34,7 @@ namespace hpx::execution::experimental {
     /// This executor parameters type makes sure that as many loop iterations
     /// are combined as necessary to run for the amount of time specified.
     ///
-    HPX_CXX_EXPORT struct auto_chunk_size
+    HPX_CXX_CORE_EXPORT struct auto_chunk_size
     {
     public:
         /// Construct an \a auto_chunk_size executor parameters object
@@ -45,7 +45,7 @@ namespace hpx::execution::experimental {
         ///
         constexpr explicit auto_chunk_size(
             std::uint64_t const num_iters_for_timing = 0) noexcept
-          : min_time_(200000)
+          : min_time_(std::chrono::nanoseconds(200000))
           , num_iters_for_timing_(num_iters_for_timing)
         {
         }
@@ -60,7 +60,8 @@ namespace hpx::execution::experimental {
         ///
         explicit auto_chunk_size(hpx::chrono::steady_duration const& rel_time,
             std::uint64_t const num_iters_for_timing = 0) noexcept
-          : min_time_(rel_time.value().count())
+          : min_time_(std::chrono::duration_cast<std::chrono::nanoseconds>(
+                rel_time.value()))
           , num_iters_for_timing_(num_iters_for_timing)
         {
         }
@@ -98,7 +99,8 @@ namespace hpx::execution::experimental {
                 if (test_chunk_size != 0)
                 {
                     t = (high_resolution_clock::now() - t) / test_chunk_size;
-                    if (t != 0 && this_.min_time_ >= t)
+                    if (t != 0 &&
+                        this_.min_time_ >= std::chrono::nanoseconds(t))
                     {
                         // return execution time for one iteration
                         return std::chrono::nanoseconds(t);
@@ -118,13 +120,14 @@ namespace hpx::execution::experimental {
             std::size_t const cores, std::size_t const count) noexcept
         {
             // return chunk size which will create the required amount of work
-            if (iteration_duration.value().count() != 0)
+            if (iteration_duration.value() !=
+                std::chrono::steady_clock::duration::zero())
             {
                 auto const ns =
                     std::chrono::duration_cast<std::chrono::nanoseconds>(
                         iteration_duration.value());
                 return (std::min) (count,
-                    (std::size_t) (this_.min_time_ / ns.count()));
+                    (std::size_t) (this_.min_time_.count() / ns.count()));
             }
             return (count + cores - 1) / cores;
         }
@@ -145,8 +148,8 @@ namespace hpx::execution::experimental {
 
     private:
         /// \cond NOINTERNAL
-        // target time for on thread (nanoseconds)
-        std::uint64_t min_time_;
+        // target time for one thread (nanoseconds)
+        std::chrono::nanoseconds min_time_;
 
         // number of iteration to use for timing
         std::uint64_t num_iters_for_timing_;

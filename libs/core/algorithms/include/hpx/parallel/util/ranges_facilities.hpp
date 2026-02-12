@@ -19,7 +19,7 @@
 namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Iter>
+    HPX_CXX_CORE_EXPORT template <typename Iter>
     // clang-format off
         requires (
             hpx::traits::is_input_iterator_v<Iter> ||
@@ -33,7 +33,7 @@ namespace hpx::ranges {
         return first;
     }
 
-    HPX_CXX_EXPORT template <typename Iter, typename Sent>
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent>
     // clang-format off
         requires(
             hpx::traits::is_sentinel_for_v<Sent, Iter> &&
@@ -45,7 +45,7 @@ namespace hpx::ranges {
         return hpx::parallel::detail::advance_to_sentinel(first, bound);
     }
 
-    HPX_CXX_EXPORT template <typename Iter, typename Sent>
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent>
     // clang-format off
         requires (
             hpx::traits::is_sentinel_for_v<Sent, Iter> &&

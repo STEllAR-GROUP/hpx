@@ -14,7 +14,8 @@
 
 namespace hpx::string_util {
 
-    HPX_CXX_EXPORT template <typename Char, typename Traits, typename Alloc>
+    HPX_CXX_CORE_EXPORT template <typename Char, typename Traits,
+        typename Alloc>
     void trim(std::basic_string<Char, Traits, Alloc>& s)
     {
         // When using the pre-C++11 ABI in libstdc++, basic_string::erase
@@ -28,7 +29,8 @@ namespace hpx::string_util {
         s.erase(last.base(), std::end(s));
     }
 
-    HPX_CXX_EXPORT template <typename Char, typename Traits, typename Alloc>
+    HPX_CXX_CORE_EXPORT template <typename Char, typename Traits,
+        typename Alloc>
     std::basic_string<Char, Traits, Alloc> trim_copy(
         std::basic_string<Char, Traits, Alloc> const& s)
     {

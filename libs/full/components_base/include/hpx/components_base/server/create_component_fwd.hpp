@@ -9,7 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/naming_base/gid_type.hpp>
+#include <hpx/modules/naming_base.hpp>
 
 #include <cstddef>
 #include <utility>

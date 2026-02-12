@@ -11,7 +11,7 @@
 
 namespace hpx::agas {
 
-    HPX_CXX_EXPORT enum class service_mode {
+    HPX_CXX_CORE_EXPORT enum class service_mode {
         invalid = -1,
         bootstrap = 0,
         hosted = 1

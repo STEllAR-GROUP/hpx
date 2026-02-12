@@ -33,7 +33,7 @@
 namespace hpx::cuda::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT struct target
+    HPX_CXX_CORE_EXPORT struct target
     {
     public:
         struct HPX_CORE_EXPORT native_handle_type
@@ -169,8 +169,8 @@ namespace hpx::cuda::experimental {
         native_handle_type handle_;
     };
 
-    HPX_CXX_EXPORT using detail::get_future_with_callback;
-    HPX_CXX_EXPORT HPX_CORE_EXPORT target& get_default_target();
+    HPX_CXX_CORE_EXPORT using detail::get_future_with_callback;
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT target& get_default_target();
 }    // namespace hpx::cuda::experimental
 
 #include <hpx/config/warnings_suffix.hpp>

@@ -12,5 +12,5 @@
 namespace hpx::util {
 
     // forward declaration only
-    HPX_CXX_EXPORT class HPX_CORE_EXPORT runtime_configuration;
+    HPX_CXX_CORE_EXPORT class HPX_CORE_EXPORT runtime_configuration;
 }    // namespace hpx::util

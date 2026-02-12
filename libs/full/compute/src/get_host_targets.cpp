@@ -12,11 +12,11 @@
 #include <hpx/compute/host/get_targets.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/futures.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/topology.hpp>
-#include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime_distributed/find_here.hpp>
 
 #include <vector>

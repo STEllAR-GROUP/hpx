@@ -904,7 +904,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::transform_reduce
-    HPX_CXX_EXPORT inline constexpr struct transform_reduce_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct transform_reduce_t final
       : hpx::detail::tag_parallel_algorithm<transform_reduce_t>
     {
     private:

@@ -385,7 +385,7 @@ namespace hpx::lcos::detail {
     };
 }    // namespace hpx::lcos::detail
 
-HPX_CXX_EXPORT template <typename Future, typename F, typename ContResult,
+HPX_CXX_CORE_EXPORT template <typename Future, typename F, typename ContResult,
     typename Allocator>
 struct hpx::traits::detail::shared_state_allocator<
     hpx::lcos::detail::continuation<Future, F, ContResult>, Allocator>
@@ -526,7 +526,7 @@ namespace hpx::lcos::detail {
     };
 }    // namespace hpx::lcos::detail
 
-HPX_CXX_EXPORT template <typename ContResult, typename Allocator>
+HPX_CXX_CORE_EXPORT template <typename ContResult, typename Allocator>
 struct hpx::traits::detail::shared_state_allocator<
     hpx::lcos::detail::unwrap_continuation<ContResult>, Allocator>
 {
@@ -569,14 +569,14 @@ namespace hpx::lcos::detail {
         return result;
     }
 
-    HPX_CXX_EXPORT template <typename Allocator, typename Future>
+    HPX_CXX_CORE_EXPORT template <typename Allocator, typename Future>
     traits::detail::shared_state_ptr_t<future_unwrap_result_t<Future>>
     unwrap_alloc(Allocator const& a, Future&& future, error_code& ec)
     {
         return unwrap_impl_alloc(a, HPX_FORWARD(Future, future), ec);
     }
 
-    HPX_CXX_EXPORT template <typename Future>
+    HPX_CXX_CORE_EXPORT template <typename Future>
     traits::detail::shared_state_ptr_t<future_unwrap_result_t<Future>> unwrap(
         Future&& future, error_code& ec)
     {

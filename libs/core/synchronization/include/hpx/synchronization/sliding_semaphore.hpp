@@ -39,7 +39,7 @@ namespace hpx {
     /// semaphore will not limit the number of threads which are allowed to
     /// proceed, but will make sure that the difference between the (arbitrary)
     /// number passed to set and wait does not exceed a given threshold.
-    HPX_CXX_EXPORT template <typename Mutex = hpx::spinlock>
+    HPX_CXX_CORE_EXPORT template <typename Mutex = hpx::spinlock>
     class sliding_semaphore_var
     {
     private:
@@ -138,7 +138,7 @@ namespace hpx {
         hpx::intrusive_ptr<data_type> data_;
     };
 
-    HPX_CXX_EXPORT using sliding_semaphore = sliding_semaphore_var<>;
+    HPX_CXX_CORE_EXPORT using sliding_semaphore = sliding_semaphore_var<>;
 }    // namespace hpx
 
 #include <hpx/config/warnings_suffix.hpp>

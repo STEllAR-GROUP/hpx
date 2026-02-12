@@ -36,7 +36,7 @@ namespace hpx::util::logging {
     namespace formatter {
 
         /// @brief What to use as base class, for your formatter classes
-        HPX_CXX_EXPORT struct HPX_CORE_EXPORT manipulator
+        HPX_CXX_CORE_EXPORT struct HPX_CORE_EXPORT manipulator
         {
             virtual void operator()(std::ostream&) const = 0;
 
@@ -69,7 +69,7 @@ namespace hpx::util::logging {
     namespace destination {
 
         /// @brief What to use as base class, for your destination classes
-        HPX_CXX_EXPORT struct HPX_CORE_EXPORT manipulator
+        HPX_CXX_CORE_EXPORT struct HPX_CORE_EXPORT manipulator
         {
             virtual void operator()(message const&) = 0;
 

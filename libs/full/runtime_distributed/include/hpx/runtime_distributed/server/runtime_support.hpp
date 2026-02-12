@@ -19,11 +19,11 @@
 #include <hpx/components_base/server/create_component.hpp>
 #include <hpx/components_base/traits/is_component.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/parcelset_base.hpp>
 #include <hpx/modules/plugin.hpp>
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/synchronization.hpp>
-#include <hpx/parcelset_base/locality.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/plugin_factories/plugin_factory_base.hpp>
 #include <hpx/runtime_components/components_fwd.hpp>

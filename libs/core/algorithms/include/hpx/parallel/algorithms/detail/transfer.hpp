@@ -25,7 +25,7 @@ namespace hpx::parallel {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename FwdIter, typename OutIter>
+        HPX_CXX_CORE_EXPORT template <typename FwdIter, typename OutIter>
         struct iterators_are_segmented
           : std::integral_constant<bool,
                 hpx::traits::segmented_iterator_traits<
@@ -35,7 +35,7 @@ namespace hpx::parallel {
         {
         };
 
-        HPX_CXX_EXPORT template <typename FwdIter, typename OutIter>
+        HPX_CXX_CORE_EXPORT template <typename FwdIter, typename OutIter>
         struct iterators_are_not_segmented
           : std::integral_constant<bool,
                 !hpx::traits::segmented_iterator_traits<
@@ -47,7 +47,7 @@ namespace hpx::parallel {
 
         ///////////////////////////////////////////////////////////////////////
         // parallel version
-        HPX_CXX_EXPORT template <typename Algo, typename ExPolicy,
+        HPX_CXX_CORE_EXPORT template <typename Algo, typename ExPolicy,
             typename FwdIter1, typename Sent1, typename FwdIter2>
         decltype(auto) transfer_(ExPolicy&& policy, FwdIter1 first, Sent1 last,
             FwdIter2 dest, std::false_type)
@@ -58,7 +58,7 @@ namespace hpx::parallel {
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         // forward declare segmented version
-        HPX_CXX_EXPORT template <typename Algo, typename ExPolicy,
+        HPX_CXX_CORE_EXPORT template <typename Algo, typename ExPolicy,
             typename FwdIter1, typename Sent1, typename FwdIter2>
         typename util::detail::algorithm_result<ExPolicy,
             util::in_out_result<FwdIter1, FwdIter2>>::type
@@ -104,7 +104,7 @@ namespace hpx::parallel {
         //           element in the destination range, one past the last element
         //           transferred.
         //
-        HPX_CXX_EXPORT template <typename Algo, typename ExPolicy,
+        HPX_CXX_CORE_EXPORT template <typename Algo, typename ExPolicy,
             typename FwdIter1, typename Sent1, typename FwdIter2>
         // clang-format off
             requires (

@@ -84,7 +84,7 @@ namespace hpx {
     // implementation of a counting semaphore with a unit resource count.
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename Mutex = hpx::spinlock>
+        HPX_CXX_CORE_EXPORT template <typename Mutex = hpx::spinlock>
         class binary_semaphore : public counting_semaphore<1, Mutex>
         {
         public:
@@ -103,7 +103,7 @@ namespace hpx {
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT using binary_semaphore = detail::binary_semaphore<>;
+    HPX_CXX_CORE_EXPORT using binary_semaphore = detail::binary_semaphore<>;
 }    // namespace hpx
 
 #endif

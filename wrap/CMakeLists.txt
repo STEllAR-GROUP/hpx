@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2025 Hartmut Kaiser
+# Copyright (c) 2007-2026 Hartmut Kaiser
 # Copyright (c)      2011 Bryce Lelbach
 # Copyright (c)      2018 Nikunj Gupta
 #
@@ -55,6 +55,9 @@ target_include_directories(
 
 if(HPX_WITH_CXX_MODULES)
   hpx_configure_module_consumer(hpx_wrap hpx_core_module_if)
+  if(TARGET hpx_full_module_if)
+    hpx_configure_module_consumer(hpx_wrap hpx_full_module_if)
+  endif()
 endif()
 
 set_property(TARGET hpx_wrap PROPERTY FOLDER "Core")
@@ -112,6 +115,9 @@ if(NOT MSVC)
 
   if(HPX_WITH_CXX_MODULES)
     hpx_configure_module_consumer(hpx_auto_wrap hpx_core_module_if)
+    if(TARGET hpx_full_module_if)
+      hpx_configure_module_consumer(hpx_auto_wrap hpx_full_module_if)
+    endif()
   endif()
 
   set_property(TARGET hpx_auto_wrap PROPERTY FOLDER "Core")

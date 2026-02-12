@@ -365,7 +365,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::includes
-    HPX_CXX_EXPORT inline constexpr struct includes_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct includes_t final
       : hpx::detail::tag_parallel_algorithm<includes_t>
     {
     private:

@@ -7,9 +7,9 @@
 #pragma once
 
 #include <hpx/modules/coroutines.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/naming_base/naming_base.hpp>
 
 namespace hpx::traits {
 

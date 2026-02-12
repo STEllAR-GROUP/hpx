@@ -454,7 +454,7 @@ namespace hpx::parallel {
 
         ///////////////////////////////////////////////////////////////////////
         // Our own version of the sequential inclusive_scan.
-        HPX_CXX_EXPORT template <typename InIter, typename Sent,
+        HPX_CXX_CORE_EXPORT template <typename InIter, typename Sent,
             typename OutIter, typename T, typename Op>
         constexpr util::in_out_result<InIter, OutIter>
         sequential_inclusive_scan(
@@ -468,7 +468,7 @@ namespace hpx::parallel {
             return util::in_out_result<InIter, OutIter>{first, dest};
         }
 
-        HPX_CXX_EXPORT template <typename InIter, typename Sent,
+        HPX_CXX_CORE_EXPORT template <typename InIter, typename Sent,
             typename OutIter, typename Op>
         constexpr util::in_out_result<InIter, OutIter>
         sequential_inclusive_scan_noinit(
@@ -484,8 +484,8 @@ namespace hpx::parallel {
             return util::in_out_result<InIter, OutIter>{first, dest};
         }
 
-        HPX_CXX_EXPORT template <typename InIter, typename OutIter, typename T,
-            typename Op>
+        HPX_CXX_CORE_EXPORT template <typename InIter, typename OutIter,
+            typename T, typename Op>
         constexpr T sequential_inclusive_scan_n(
             InIter first, std::size_t count, OutIter dest, T init, Op&& op)
         {
@@ -498,7 +498,7 @@ namespace hpx::parallel {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename IterPair>
+        HPX_CXX_CORE_EXPORT template <typename IterPair>
         struct inclusive_scan
           : public algorithm<inclusive_scan<IterPair>, IterPair>
         {
@@ -637,7 +637,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::inclusive_scan
-    HPX_CXX_EXPORT inline constexpr struct inclusive_scan_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct inclusive_scan_t final
       : hpx::detail::tag_parallel_algorithm<inclusive_scan_t>
     {
         template <typename InIter, typename OutIter>

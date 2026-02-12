@@ -151,7 +151,7 @@ namespace hpx::parallel::detail {
     // -------------------------------------------------------------------
     // simple iterator helper object for access to prev/next items
     // -------------------------------------------------------------------
-    HPX_CXX_EXPORT struct reduce_stencil_transformer
+    HPX_CXX_CORE_EXPORT struct reduce_stencil_transformer
     {
         // declare result type as a template
         template <typename T>
@@ -181,7 +181,7 @@ namespace hpx::parallel::detail {
     // -------------------------------------------------------------------
     // transform iterator using reduce_stencil_transformer helper
     // -------------------------------------------------------------------
-    HPX_CXX_EXPORT template <typename Iterator,
+    HPX_CXX_CORE_EXPORT template <typename Iterator,
         typename Transformer = detail::reduce_stencil_transformer>
     class reduce_stencil_iterator
       : public hpx::util::transform_iterator<Iterator, Transformer>
@@ -203,7 +203,7 @@ namespace hpx::parallel::detail {
         }
     };
 
-    HPX_CXX_EXPORT template <typename Iterator, typename Transformer>
+    HPX_CXX_CORE_EXPORT template <typename Iterator, typename Transformer>
     reduce_stencil_iterator<Iterator, Transformer> make_reduce_stencil_iterator(
         Iterator const& it, Transformer const& t)
     {
@@ -213,7 +213,7 @@ namespace hpx::parallel::detail {
     // -------------------------------------------------------------------
     // state of a reduce by key step
     // -------------------------------------------------------------------
-    HPX_CXX_EXPORT struct reduce_key_series_states
+    HPX_CXX_CORE_EXPORT struct reduce_key_series_states
     {
         bool start;    // START of a segment
         bool end;      // END of a segment
@@ -228,8 +228,8 @@ namespace hpx::parallel::detail {
     // -------------------------------------------------------------------
     // callable that actually computes the state using the stencil iterator
     // -------------------------------------------------------------------
-    HPX_CXX_EXPORT template <typename Transformer, typename StencilIterType,
-        typename KeyStateIterType, typename Compare>
+    HPX_CXX_CORE_EXPORT template <typename Transformer,
+        typename StencilIterType, typename KeyStateIterType, typename Compare>
     struct reduce_stencil_generate
     {
         using element_type = typename Transformer::template result<Transformer(
@@ -267,7 +267,7 @@ namespace hpx::parallel::detail {
     // -------------------------------------------------------------------
     // Zip iterator has 3 iterators inside
     // Iter1, key type : Iter2, value type : Iter3, state type
-    HPX_CXX_EXPORT template <typename ZIter, typename iKey, typename iVal>
+    HPX_CXX_CORE_EXPORT template <typename ZIter, typename iKey, typename iVal>
     constexpr util::in_out_result<iKey, iVal> make_pair_result(
         ZIter zipiter, iKey key_start, iVal val_start)
     {
@@ -279,7 +279,7 @@ namespace hpx::parallel::detail {
     }
 
     // async version that returns future<pair> from future<zip_iterator<blah>>
-    HPX_CXX_EXPORT template <typename ZIter, typename iKey, typename iVal>
+    HPX_CXX_CORE_EXPORT template <typename ZIter, typename iKey, typename iVal>
     hpx::future<util::in_out_result<iKey, iVal>> make_pair_result(
         hpx::future<ZIter>&& ziter, iKey key_start, iVal val_start)
     {
@@ -300,7 +300,7 @@ namespace hpx::parallel::detail {
     // internal algorithms. Async execution is handled by the wrapper layer that
     // calls this.
     // -------------------------------------------------------------------
-    HPX_CXX_EXPORT template <typename ExPolicy, typename RanIter,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename RanIter,
         typename RanIter2, typename FwdIter1, typename FwdIter2,
         typename Compare, typename Func>
     util::in_out_result<FwdIter1, FwdIter2> reduce_by_key_impl(
@@ -450,7 +450,7 @@ namespace hpx::parallel::detail {
 
     ///////////////////////////////////////////////////////////////////////
     // reduce_by_key wrapper struct
-    HPX_CXX_EXPORT template <typename FwdIter1, typename FwdIter2>
+    HPX_CXX_CORE_EXPORT template <typename FwdIter1, typename FwdIter2>
     struct reduce_by_key
       : public algorithm<reduce_by_key<FwdIter1, FwdIter2>,
             util::in_out_result<FwdIter1, FwdIter2>>
@@ -507,7 +507,7 @@ namespace hpx::experimental {
     }
 #endif
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename RanIter,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename RanIter,
         typename RanIter2, typename FwdIter1, typename FwdIter2,
         typename Compare = std::equal_to<>, typename Func = std::plus<>>
     // clang-format off

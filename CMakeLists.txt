@@ -2158,6 +2158,16 @@ if(HPX_WITH_COMPILER_WARNINGS)
       hpx_add_compile_flag(-wd4244)
     endif()
 
+    # when compiling with modules enabled, the following warning can't be
+    # disabled inline
+    if(HPX_WITH_CXX_MODULES)
+      # 'symbol' needs to have dll-interface to be used by clients of 'symbol'
+      hpx_add_compile_flag(-wd4251)
+      # non dll-interface struct 'symbol' used as base for dll-interface class
+      # 'symbol'
+      hpx_add_compile_flag(-wd4275)
+    endif()
+
   else() # Trial and error approach for any other compiler ...
     hpx_add_compile_flag_if_available(-Wall)
     hpx_add_compile_flag_if_available(-Wno-strict-aliasing)

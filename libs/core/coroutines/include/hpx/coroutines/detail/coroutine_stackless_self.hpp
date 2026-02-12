@@ -19,7 +19,7 @@
 
 namespace hpx::threads::coroutines::detail {
 
-    HPX_CXX_EXPORT class coroutine_stackless_self : public coroutine_self
+    HPX_CXX_CORE_EXPORT class coroutine_stackless_self : public coroutine_self
     {
     public:
         explicit coroutine_stackless_self(stackless_coroutine* pimpl) noexcept

@@ -14,6 +14,6 @@ namespace hpx::util {
 
     /// Attaches a debugger if \c category is equal to the configuration entry
     /// hpx.attach-debugger.
-    HPX_CXX_EXPORT void HPX_CORE_EXPORT may_attach_debugger(
+    HPX_CXX_CORE_EXPORT void HPX_CORE_EXPORT may_attach_debugger(
         std::string const& category);
 }    // namespace hpx::util

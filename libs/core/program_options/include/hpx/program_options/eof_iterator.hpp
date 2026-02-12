@@ -44,7 +44,7 @@ namespace hpx::program_options {
         and 'dereference'. It's very good for the cases where data extraction
         implicitly moves data pointer, like for stream operation.
     */
-    HPX_CXX_EXPORT template <class Derived, class ValueType>
+    HPX_CXX_CORE_EXPORT template <class Derived, class ValueType>
     class eof_iterator
       : public util::iterator_facade<Derived, ValueType const,
             std::forward_iterator_tag>
