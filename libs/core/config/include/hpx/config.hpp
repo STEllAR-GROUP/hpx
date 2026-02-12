@@ -267,12 +267,14 @@
 
 #if !defined(HPX_WINDOWS)
 #  if defined(HPX_DEBUG) && defined(HPX_DEBUG_POSTFIX)
-#    define HPX_MAKE_DLL_STRING(n)  "lib" + (n) + HPX_DEBUG_POSTFIX_STR + HPX_SHARED_LIB_EXTENSION
+#    define HPX_MAKE_DLL_STRING(n)                                             \
+        "lib" + (n) + HPX_DEBUG_POSTFIX_STR + HPX_SHARED_LIB_EXTENSION
 #  else
 #    define HPX_MAKE_DLL_STRING(n)  "lib" + (n) + HPX_SHARED_LIB_EXTENSION
 #  endif
 #elif defined(HPX_DEBUG) && defined(HPX_DEBUG_POSTFIX)
-#  define HPX_MAKE_DLL_STRING(n)   ((n) + HPX_DEBUG_POSTFIX_STR + HPX_SHARED_LIB_EXTENSION)
+#  define HPX_MAKE_DLL_STRING(n)                                               \
+      ((n) + HPX_DEBUG_POSTFIX_STR + HPX_SHARED_LIB_EXTENSION)
 #else
 #  define HPX_MAKE_DLL_STRING(n)   ((n) + HPX_SHARED_LIB_EXTENSION)
 #endif

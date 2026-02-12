@@ -121,6 +121,10 @@ used CMake options.
 
    Build tests.
 
+.. option:: HPX_DEBUG_POSTFIX
+
+   Set the postfix for debug libraries. The default is ``d``. This variable is used to set ``CMAKE_DEBUG_POSTFIX`` and is only relevant for Debug builds or multi-configuration generators.
+
 For a complete list of available |cmake|_ variables that influence the build of
 |hpx|, see :ref:`cmake_variables`.
 
