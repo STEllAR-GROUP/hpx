@@ -158,7 +158,7 @@ void test_concurrent_queue()
     HPX_TEST_EQ(popped_count, 1000);
 }
 
-int hpx_main()
+int hpx_main(hpx::program_options::variables_map&)
 {
     test_concurrent_vector();
     test_concurrent_unordered_map();

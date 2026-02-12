@@ -10,19 +10,11 @@
 #include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/timing.hpp>
 
-// clang-format off
-#include <hpx/concurrency/concurrent_unordered_map.hpp>
-#include <hpx/concurrency/concurrent_vector.hpp>
-// clang-format on
-#include <iostream>
-
-#include <atomic>
 #include <cstdint>
 #include <iostream>
 #include <mutex>
 #include <random>
 #include <string>
-#include <thread>
 #include <unordered_map>
 #include <vector>
 
@@ -50,6 +42,12 @@ struct std_vector_mutex
     {
         std::lock_guard<std::mutex> l(mtx);
         return vec.size();
+    }
+
+    void clear()
+    {
+        std::lock_guard<std::mutex> l(mtx);
+        vec.clear();
     }
 };
 
@@ -104,6 +102,12 @@ struct std_vector_spinlock
         std::lock_guard<hpx::util::spinlock> l(mtx);
         return vec.size();
     }
+
+    void clear()
+    {
+        std::lock_guard<hpx::util::spinlock> l(mtx);
+        vec.clear();
+    }
 };
 
 template <typename Key, typename Val>
@@ -156,31 +160,14 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
             for (int iter = 0; iter < iterations; ++iter)
             {
-                vec.clear();    // Ensure clean state if possible, though vector usually grows.
-                // Creating new vector per iteration might be fairer but slower?
-                // The original test accumulated? No, it just pushed.
-                // If we clear, we test cold cache maybe.
-                // Note: hpx::concurrent::vector might not fully clear memory?
-                // Actually, let's just create a new vector each time?
-                // The lambda takes `vec` by reference. So we can't recreate it easily.
-                // But we can clear it.
-                // Optimization: The benchmark measures "Push Back". If we reuse, size grows.
-                // If we clear, we measure from empty.
                 if constexpr (requires { vec.clear(); })
                 {
                     vec.clear();
                 }
                 else
                 {
-                    // std_vector_mutex etc support clear?
-                    // They have vec member.
-                    // But strictly, the passed object `vec` is the wrapper.
-                    // The wrapper has `std::vector` or `concurrent_vector`.
-                    // `concurrent_vector` has clear().
-                    // Wrappers `std_vector_mutex` don't expose clear() in the original code!
-                    // I should add clear() to wrappers or just assume we add on top?
-                    // If we add on top, memory usage grows huge.
-                    // I will add clear() to wrappers later.
+                    // If no clear() method, assume wrapper exposes inner container directly or just skip.
+                    // But now all our wrappers have clear().
                 }
 
                 threads.clear();
@@ -287,12 +274,6 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
             for (int iter = 0; iter < iterations; ++iter)
             {
-                // We rely on 'm' being cleared or just grow?
-                // If we don't clear, we insert duplicates or collisions?
-                // Maps handle duplicates (updates) or reject?
-                // std::unordered_map inserts if not exists.
-                // So subsequent iterations do NOTHING if keys are same.
-                // We must CLEAR.
                 if constexpr (requires { m.map.clear(); })
                 {
                     m.map.clear();
