@@ -8,6 +8,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/concurrency/spinlock.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/type_support/assert_owns_lock.hpp>
 
 #include <algorithm>
 #include <deque>
@@ -43,33 +45,46 @@ namespace hpx::concurrent {
         {
             friend class concurrent_vector;
             std::unique_lock<hpx::util::spinlock> lock_;
-            T* value_;
+            T* value_ = nullptr;
 
-            accessor(std::unique_lock<hpx::util::spinlock>&& l, T* v)
-              : lock_(std::move(l))
-              , value_(v)
+            accessor(std::unique_lock<hpx::util::spinlock>&& l, T& v)
+              : lock_(HPX_MOVE(l))
+              , value_(&v)
             {
+                HPX_ASSERT_OWNS_LOCK(lock_);
+            }
+
+            void validate() const
+            {
+                if (!value_)
+                {
+                    HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                        "concurrent_vector::accessor",
+                        "Empty accessor dereference");
+                }
             }
 
         public:
             accessor() = default;
 
+            operator bool() const
+            {
+                return value_ != nullptr;
+            }
+
             operator T&() const
             {
-                if (!value_)
-                    throw std::runtime_error("Empty accessor dereference");
+                validate();
                 return *value_;
             }
             T& get() const
             {
-                if (!value_)
-                    throw std::runtime_error("Empty accessor dereference");
+                validate();
                 return *value_;
             }
             accessor& operator=(T const& v)
             {
-                if (!value_)
-                    throw std::runtime_error("Empty accessor dereference");
+                validate();
                 *value_ = v;
                 return *this;
             }
@@ -79,28 +94,42 @@ namespace hpx::concurrent {
         {
             friend class concurrent_vector;
             std::unique_lock<hpx::util::spinlock> lock_;
-            T const* value_;
+            T const* value_ = nullptr;
 
             const_accessor(
-                std::unique_lock<hpx::util::spinlock>&& l, T const* v)
-              : lock_(std::move(l))
-              , value_(v)
+                std::unique_lock<hpx::util::spinlock>&& l, T const& v)
+              : lock_(HPX_MOVE(l))
+              , value_(&v)
             {
+                HPX_ASSERT_OWNS_LOCK(lock_);
+            }
+
+            void validate() const
+            {
+                if (!value_)
+                {
+                    HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                        "concurrent_vector::const_accessor",
+                        "Empty accessor dereference");
+                }
             }
 
         public:
             const_accessor() = default;
 
+            operator bool() const
+            {
+                return value_ != nullptr;
+            }
+
             operator T const&() const
             {
-                if (!value_)
-                    throw std::runtime_error("Empty accessor dereference");
+                validate();
                 return *value_;
             }
             T const& get() const
             {
-                if (!value_)
-                    throw std::runtime_error("Empty accessor dereference");
+                validate();
                 return *value_;
             }
         };
@@ -225,7 +254,7 @@ namespace hpx::concurrent {
         concurrent_vector(concurrent_vector&& other) noexcept
         {
             std::lock_guard<hpx::util::spinlock> lock(other.mutex_);
-            data_ = std::move(other.data_);
+            data_ = HPX_MOVE(other.data_);
         }
 
         concurrent_vector& operator=(concurrent_vector const& other)
@@ -246,9 +275,12 @@ namespace hpx::concurrent {
         {
             if (this != &other)
             {
-                std::lock_guard<hpx::util::spinlock> lock(mutex_);
-                std::lock_guard<hpx::util::spinlock> other_lock(other.mutex_);
-                data_ = std::move(other.data_);
+                std::lock(mutex_, other.mutex_);
+                std::lock_guard<hpx::util::spinlock> lock(
+                    mutex_, std::adopt_lock);
+                std::lock_guard<hpx::util::spinlock> other_lock(
+                    other.mutex_, std::adopt_lock);
+                data_ = HPX_MOVE(other.data_);
             }
             return *this;
         }
@@ -257,49 +289,49 @@ namespace hpx::concurrent {
         accessor operator[](size_type pos)
         {
             std::unique_lock<hpx::util::spinlock> lock(mutex_);
-            return accessor(std::move(lock), &data_[pos]);
+            return accessor(HPX_MOVE(lock), data_[pos]);
         }
 
         const_accessor operator[](size_type pos) const
         {
             std::unique_lock<hpx::util::spinlock> lock(mutex_);
-            return const_accessor(std::move(lock), &data_[pos]);
+            return const_accessor(HPX_MOVE(lock), data_[pos]);
         }
 
         accessor at(size_type pos)
         {
             std::unique_lock<hpx::util::spinlock> lock(mutex_);
-            return accessor(std::move(lock), &data_.at(pos));
+            return accessor(HPX_MOVE(lock), data_.at(pos));
         }
 
         const_accessor at(size_type pos) const
         {
             std::unique_lock<hpx::util::spinlock> lock(mutex_);
-            return const_accessor(std::move(lock), &data_.at(pos));
+            return const_accessor(HPX_MOVE(lock), data_.at(pos));
         }
 
         accessor front()
         {
             std::unique_lock<hpx::util::spinlock> lock(mutex_);
-            return accessor(std::move(lock), &data_.front());
+            return accessor(HPX_MOVE(lock), data_.front());
         }
 
         const_accessor front() const
         {
             std::unique_lock<hpx::util::spinlock> lock(mutex_);
-            return const_accessor(std::move(lock), &data_.front());
+            return const_accessor(HPX_MOVE(lock), data_.front());
         }
 
         accessor back()
         {
             std::unique_lock<hpx::util::spinlock> lock(mutex_);
-            return accessor(std::move(lock), &data_.back());
+            return accessor(HPX_MOVE(lock), data_.back());
         }
 
         const_accessor back() const
         {
             std::unique_lock<hpx::util::spinlock> lock(mutex_);
-            return const_accessor(std::move(lock), &data_.back());
+            return const_accessor(HPX_MOVE(lock), data_.back());
         }
 
         // Iterators
@@ -346,6 +378,8 @@ namespace hpx::concurrent {
 
         size_type max_size() const noexcept
         {
+            // Consistent with map
+            std::lock_guard<hpx::util::spinlock> lock(mutex_);
             return data_.max_size();
         }
 
@@ -379,7 +413,7 @@ namespace hpx::concurrent {
         void push_back(T&& value)
         {
             std::lock_guard<hpx::util::spinlock> lock(mutex_);
-            data_.push_back(std::move(value));
+            data_.push_back(HPX_MOVE(value));
         }
 
         iterator grow_by(size_type n)

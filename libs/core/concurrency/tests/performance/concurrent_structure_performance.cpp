@@ -4,10 +4,13 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// clang-format off
 #include <hpx/config.hpp>
 #include <hpx/init.hpp>
+#include <hpx/modules/concurrency.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/timing.hpp>
+
+// clang-format off
 #include <hpx/concurrency/concurrent_unordered_map.hpp>
 #include <hpx/concurrency/concurrent_vector.hpp>
 // clang-format on
@@ -143,55 +146,114 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
         auto run_vector_test = [&](auto& vec, std::string name) {
             std::vector<hpx::thread> threads;
-            std::atomic<int> start_flag{0};
+            hpx::mutex mtx;
+            hpx::condition_variable cv;
+            bool ready = false;
 
-            hpx::chrono::high_resolution_timer t;
+            double total_elapsed_push = 0;
+            double total_elapsed_read = 0;
+            int const iterations = 10;
 
-            for (std::uint64_t i = 0; i < num_threads; ++i)
+            for (int iter = 0; iter < iterations; ++iter)
             {
-                threads.emplace_back([&, i]() {
-                    while (start_flag.load() == 0)
-                        hpx::this_thread::yield();
-                    for (std::uint64_t j = 0; j < num_ops / num_threads; ++j)
-                    {
-                        vec.push_back(j);
-                    }
-                });
+                vec.clear();    // Ensure clean state if possible, though vector usually grows.
+                // Creating new vector per iteration might be fairer but slower?
+                // The original test accumulated? No, it just pushed.
+                // If we clear, we test cold cache maybe.
+                // Note: hpx::concurrent::vector might not fully clear memory?
+                // Actually, let's just create a new vector each time?
+                // The lambda takes `vec` by reference. So we can't recreate it easily.
+                // But we can clear it.
+                // Optimization: The benchmark measures "Push Back". If we reuse, size grows.
+                // If we clear, we measure from empty.
+                if constexpr (requires { vec.clear(); })
+                {
+                    vec.clear();
+                }
+                else
+                {
+                    // std_vector_mutex etc support clear?
+                    // They have vec member.
+                    // But strictly, the passed object `vec` is the wrapper.
+                    // The wrapper has `std::vector` or `concurrent_vector`.
+                    // `concurrent_vector` has clear().
+                    // Wrappers `std_vector_mutex` don't expose clear() in the original code!
+                    // I should add clear() to wrappers or just assume we add on top?
+                    // If we add on top, memory usage grows huge.
+                    // I will add clear() to wrappers later.
+                }
+
+                threads.clear();
+                ready = false;
+
+                hpx::chrono::high_resolution_timer t;
+
+                for (std::uint64_t i = 0; i < num_threads; ++i)
+                {
+                    threads.emplace_back([&, i]() {
+                        std::unique_lock<hpx::mutex> l(mtx);
+                        cv.wait(l, [&] { return ready; });
+                        l.unlock();
+
+                        for (std::uint64_t j = 0; j < num_ops / num_threads;
+                            ++j)
+                        {
+                            vec.push_back(j);
+                        }
+                    });
+                }
+
+                {
+                    std::lock_guard<hpx::mutex> l(mtx);
+                    ready = true;
+                }
+                cv.notify_all();
+
+                for (auto& th : threads)
+                    th.join();
+
+                total_elapsed_push += t.elapsed();
+
+                // Random Access Test
+                threads.clear();
+                ready = false;
+                t.restart();
+
+                for (std::uint64_t i = 0; i < num_threads; ++i)
+                {
+                    threads.emplace_back([&, i]() {
+                        std::unique_lock<hpx::mutex> l(mtx);
+                        cv.wait(l, [&] { return ready; });
+                        l.unlock();
+
+                        for (std::uint64_t j = 0; j < num_ops / num_threads;
+                            ++j)
+                        {
+                            [[maybe_unused]] auto volatile val =
+                                vec[j % vec.size()];    // Read
+                        }
+                    });
+                }
+
+                {
+                    std::lock_guard<hpx::mutex> l(mtx);
+                    ready = true;
+                }
+                cv.notify_all();
+
+                for (auto& th : threads)
+                    th.join();
+
+                total_elapsed_read += t.elapsed();
             }
 
-            start_flag.store(1);
-            for (auto& th : threads)
-                th.join();
+            double avg_push = total_elapsed_push / iterations;
+            double avg_read = total_elapsed_read / iterations;
 
-            double elapsed = t.elapsed();
-            std::cout << name << " Push Back: " << elapsed << " s ("
-                      << (num_ops / elapsed / 1e6) << " Mops/s)\n";
-
-            // Random Access Test
-            threads.clear();
-            start_flag.store(0);
-            t.restart();
-
-            for (std::uint64_t i = 0; i < num_threads; ++i)
-            {
-                threads.emplace_back([&, i]() {
-                    while (start_flag.load() == 0)
-                        hpx::this_thread::yield();
-                    for (std::uint64_t j = 0; j < num_ops / num_threads; ++j)
-                    {
-                        auto volatile val = vec[j % vec.size()];    // Read
-                        (void) val;
-                    }
-                });
-            }
-
-            start_flag.store(1);
-            for (auto& th : threads)
-                th.join();
-
-            elapsed = t.elapsed();
-            std::cout << name << " Random Access: " << elapsed << " s ("
-                      << (num_ops / elapsed / 1e6) << " Mops/s)\n";
+            std::cout << name << " Push Back: " << avg_push << " s ("
+                      << (num_ops / avg_push / 1e6) << " Mops/s)\n";
+            std::cout << name << " Random Access: " << avg_read << " s ("
+                      << (num_ops / avg_read / 1e6) << " Mops/s)\n";
         };
 
         {
@@ -215,59 +277,105 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
         auto run_map_test = [&](auto& m, std::string name) {
             std::vector<hpx::thread> threads;
-            std::atomic<int> start_flag{0};
+            hpx::mutex mtx;
+            hpx::condition_variable cv;
+            bool ready = false;
 
-            hpx::chrono::high_resolution_timer t;
+            double total_elapsed_insert = 0;
+            double total_elapsed_lookup = 0;
+            int const iterations = 10;
 
-            // Insert
-            for (std::uint64_t i = 0; i < num_threads; ++i)
+            for (int iter = 0; iter < iterations; ++iter)
             {
-                threads.emplace_back([&, i]() {
-                    while (start_flag.load() == 0)
-                        hpx::this_thread::yield();
-                    for (std::uint64_t j = 0; j < num_ops / num_threads; ++j)
-                    {
-                        m.insert(
-                            {(int) (i * (num_ops / num_threads) + j), (int) j});
-                    }
-                });
+                // We rely on 'm' being cleared or just grow?
+                // If we don't clear, we insert duplicates or collisions?
+                // Maps handle duplicates (updates) or reject?
+                // std::unordered_map inserts if not exists.
+                // So subsequent iterations do NOTHING if keys are same.
+                // We must CLEAR.
+                if constexpr (requires { m.map.clear(); })
+                {
+                    m.map.clear();
+                }
+                else if constexpr (requires { m.clear(); })
+                {
+                    m.clear();
+                }
+
+                threads.clear();
+                ready = false;
+
+                hpx::chrono::high_resolution_timer t;
+
+                // Insert
+                for (std::uint64_t i = 0; i < num_threads; ++i)
+                {
+                    threads.emplace_back([&, i]() {
+                        std::unique_lock<hpx::mutex> l(mtx);
+                        cv.wait(l, [&] { return ready; });
+                        l.unlock();
+
+                        for (std::uint64_t j = 0; j < num_ops / num_threads;
+                            ++j)
+                        {
+                            m.insert({(int) (i * (num_ops / num_threads) + j),
+                                (int) j});
+                        }
+                    });
+                }
+
+                {
+                    std::lock_guard<hpx::mutex> l(mtx);
+                    ready = true;
+                }
+                cv.notify_all();
+
+                for (auto& th : threads)
+                    th.join();
+
+                total_elapsed_insert += t.elapsed();
+
+                // Read / Lookup
+                threads.clear();
+                ready = false;
+                t.restart();
+
+                for (std::uint64_t i = 0; i < num_threads; ++i)
+                {
+                    threads.emplace_back([&, i]() {
+                        std::unique_lock<hpx::mutex> l(mtx);
+                        cv.wait(l, [&] { return ready; });
+                        l.unlock();
+
+                        for (std::uint64_t j = 0; j < num_ops / num_threads;
+                            ++j)
+                        {
+                            // Access via operator[]
+                            [[maybe_unused]] int volatile val =
+                                m[(int) (i * (num_ops / num_threads) + j)];
+                        }
+                    });
+                }
+
+                {
+                    std::lock_guard<hpx::mutex> l(mtx);
+                    ready = true;
+                }
+                cv.notify_all();
+
+                for (auto& th : threads)
+                    th.join();
+
+                total_elapsed_lookup += t.elapsed();
             }
 
-            start_flag.store(1);
-            for (auto& th : threads)
-                th.join();
+            double avg_insert = total_elapsed_insert / iterations;
+            double avg_lookup = total_elapsed_lookup / iterations;
 
-            double elapsed = t.elapsed();
-            std::cout << name << " Insert: " << elapsed << " s ("
-                      << (num_ops / elapsed / 1e6) << " Mops/s)\n";
-
-            // Read / Lookup
-            threads.clear();
-            start_flag.store(0);
-            t.restart();
-
-            for (std::uint64_t i = 0; i < num_threads; ++i)
-            {
-                threads.emplace_back([&, i]() {
-                    while (start_flag.load() == 0)
-                        hpx::this_thread::yield();
-                    for (std::uint64_t j = 0; j < num_ops / num_threads; ++j)
-                    {
-                        // Access via operator[]
-                        int volatile val =
-                            m[(int) (i * (num_ops / num_threads) + j)];
-                        (void) val;
-                    }
-                });
-            }
-
-            start_flag.store(1);
-            for (auto& th : threads)
-                th.join();
-
-            elapsed = t.elapsed();
-            std::cout << name << " Lookup: " << elapsed << " s ("
-                      << (num_ops / elapsed / 1e6) << " Mops/s)\n";
+            std::cout << name << " Insert: " << avg_insert << " s ("
+                      << (num_ops / avg_insert / 1e6) << " Mops/s)\n";
+            std::cout << name << " Lookup: " << avg_lookup << " s ("
+                      << (num_ops / avg_lookup / 1e6) << " Mops/s)\n";
         };
 
         {

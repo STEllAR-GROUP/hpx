@@ -8,13 +8,14 @@
 #include <hpx/concurrency/concurrent_unordered_map.hpp>
 #include <hpx/concurrency/concurrent_unordered_set.hpp>
 #include <hpx/concurrency/concurrent_vector.hpp>
+#include <hpx/init.hpp>
+#include <hpx/thread.hpp>
 
 #include <hpx/modules/testing.hpp>
 
 #include <algorithm>
 #include <atomic>
 #include <string>
-#include <thread>
 #include <vector>
 
 void test_concurrent_vector()
@@ -22,7 +23,7 @@ void test_concurrent_vector()
     hpx::concurrent::concurrent_vector<int> v;
     std::atomic<int> count{0};
 
-    std::vector<std::thread> threads;
+    std::vector<hpx::thread> threads;
     for (int i = 0; i < 10; ++i)
     {
         threads.emplace_back([&v, &count, i]() {
@@ -54,7 +55,7 @@ void test_concurrent_unordered_map()
     hpx::concurrent::concurrent_unordered_map<int, int> m;
     std::atomic<int> count{0};
 
-    std::vector<std::thread> threads;
+    std::vector<hpx::thread> threads;
     for (int i = 0; i < 10; ++i)
     {
         threads.emplace_back([&m, &count, i]() {
@@ -92,6 +93,8 @@ void test_concurrent_unordered_map()
     std::atomic<int> sum{0};
     m.for_each([&sum](auto const& kv) { sum += kv.second; });
     // 10 threads * sum(1..100) = 10 * 5050 = 50500
+    // Wait, original logic: j goes 0..99. sum(1..100) is sum(j+1).
+    // range 0..99 -> values 1..100. Correct.
     HPX_TEST_EQ(sum.load(), 50500);
 }
 
@@ -100,7 +103,7 @@ void test_concurrent_unordered_set()
     hpx::concurrent::concurrent_unordered_set<int> s;
     std::atomic<int> count{0};
 
-    std::vector<std::thread> threads;
+    std::vector<hpx::thread> threads;
     for (int i = 0; i < 10; ++i)
     {
         threads.emplace_back([&s, &count, i]() {
@@ -128,7 +131,7 @@ void test_concurrent_queue()
     hpx::concurrent::concurrent_queue<int> q(100);
     std::atomic<int> count{0};
 
-    std::vector<std::thread> threads;
+    std::vector<hpx::thread> threads;
     for (int i = 0; i < 10; ++i)
     {
         threads.emplace_back([&q, &count, i]() {
@@ -155,12 +158,18 @@ void test_concurrent_queue()
     HPX_TEST_EQ(popped_count, 1000);
 }
 
-int main()
+int hpx_main()
 {
     test_concurrent_vector();
     test_concurrent_unordered_map();
     test_concurrent_unordered_set();
     test_concurrent_queue();
 
-    return hpx::util::report_errors();
+    return hpx::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    hpx::init_params init_args;
+    return hpx::init(hpx_main, argc, argv, init_args);
 }
