@@ -2592,9 +2592,7 @@ namespace hpx::ranges {
     {
     private:
         template <typename ExPolicy, typename Iter, typename Sent,
-            typename Proj = hpx::identity,
-            typename T = typename hpx::parallel::traits::projected<Iter,
-                Proj>::value_type>
+            typename Proj = hpx::identity, typename T>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
@@ -2635,9 +2633,7 @@ namespace hpx::ranges {
         }
 
         template <typename ExPolicy, typename Rng,
-            typename Proj = hpx::identity,
-            typename T = typename hpx::parallel::traits::projected<
-                hpx::traits::range_iterator_t<Rng>, Proj>::value_type>
+            typename Proj = hpx::identity, typename T>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
@@ -2664,8 +2660,7 @@ namespace hpx::ranges {
         }
 
         template <typename Iter, typename Sent, typename Proj = hpx::identity,
-            typename T = typename hpx::parallel::traits::projected<Iter,
-                Proj>::value_type>
+            typename T>
         // clang-format off
             requires(
                 hpx::traits::is_sentinel_for_v<Sent, Iter> &&
@@ -2685,9 +2680,7 @@ namespace hpx::ranges {
                 last);
         }
 
-        template <typename Rng, typename Proj = hpx::identity,
-            typename T = typename hpx::parallel::traits::projected<
-                hpx::traits::range_iterator_t<Rng>, Proj>::value_type>
+        template <typename Rng, typename Proj = hpx::identity, typename T>
         // clang-format off
             requires(
                 hpx::traits::is_range_v<Rng> &&

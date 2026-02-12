@@ -1994,13 +1994,9 @@ namespace hpx {
                     hpx::parallel::util::detail::convert_to_result(
                         hpx::parallel::detail::find_if<
                             std::reverse_iterator<Iter>>()
-                            .call(
-                                HPX_FORWARD(ExPolicy, policy), r_first, r_last,
-                                [&pred, &proj](auto const& v) -> bool {
-                                    return HPX_INVOKE(
-                                        pred, HPX_INVOKE(proj, v));
-                                },
-                                hpx::identity_v),
+                            .call(HPX_FORWARD(ExPolicy, policy), r_first,
+                                r_last, HPX_FORWARD(Pred, pred),
+                                HPX_FORWARD(Proj, proj)),
                         [last_iter, r_last](
                             std::reverse_iterator<Iter> const& it) -> Iter {
                             if (it == r_last)
@@ -2065,11 +2061,10 @@ namespace hpx {
                             std::reverse_iterator<Iter>>()
                             .call(
                                 HPX_FORWARD(ExPolicy, policy), r_first, r_last,
-                                [&pred, &proj](auto const& v) -> bool {
-                                    return !HPX_INVOKE(
-                                        pred, HPX_INVOKE(proj, v));
+                                [&pred](auto const& v) -> bool {
+                                    return !HPX_INVOKE(pred, v);
                                 },
-                                hpx::identity_v),
+                                HPX_FORWARD(Proj, proj)),
                         [last_iter, r_last](
                             std::reverse_iterator<Iter> const& it) -> Iter {
                             if (it == r_last)
@@ -2086,8 +2081,7 @@ namespace hpx {
       : hpx::detail::tag_parallel_algorithm<find_last_t>
     {
     private:
-        template <typename BidiIter,
-            typename T = typename std::iterator_traits<BidiIter>::value_type>
+        template <typename BidiIter, typename T>
         // clang-format off
         requires (
             hpx::traits::is_iterator_v<BidiIter>
@@ -2103,8 +2097,7 @@ namespace hpx {
                 hpx::execution::seq, first, last, val, hpx::identity_v);
         }
 
-        template <typename ExPolicy, typename BidiIter,
-            typename T = typename std::iterator_traits<BidiIter>::value_type>
+        template <typename ExPolicy, typename BidiIter, typename T>
         // clang-format off
         requires (
             hpx::is_execution_policy_v<ExPolicy> &&
