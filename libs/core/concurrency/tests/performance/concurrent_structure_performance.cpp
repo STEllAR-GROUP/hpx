@@ -6,7 +6,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/init.hpp>
-#include <hpx/modules/concurrency.hpp>
+#include <hpx/concurrency/concurrent_unordered_map.hpp>
+#include <hpx/concurrency/concurrent_vector.hpp>
 #include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/timing.hpp>
 
