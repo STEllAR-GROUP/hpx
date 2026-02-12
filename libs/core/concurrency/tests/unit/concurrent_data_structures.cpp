@@ -8,7 +8,7 @@
 #include <hpx/concurrency/concurrent_unordered_map.hpp>
 #include <hpx/concurrency/concurrent_unordered_set.hpp>
 #include <hpx/concurrency/concurrent_vector.hpp>
-#include <hpx/concurrency/hash.hpp>
+
 #include <hpx/modules/testing.hpp>
 
 #include <algorithm>
@@ -16,18 +16,6 @@
 #include <string>
 #include <thread>
 #include <vector>
-
-void test_tbb_hash()
-{
-    hpx::concurrent::tbb_hash<int> h;
-    int key = 42;
-    size_t hash_val = h(key);
-    HPX_TEST(hash_val != 0);    // Basic check
-
-    hpx::concurrent::tbb_hasher<int> hasher;
-    size_t hasher_val = hasher(key);
-    HPX_TEST_EQ(hash_val, hasher_val);
-}
 
 void test_concurrent_vector()
 {
@@ -173,7 +161,6 @@ int main()
     test_concurrent_unordered_map();
     test_concurrent_unordered_set();
     test_concurrent_queue();
-    test_tbb_hash();
 
     return hpx::util::report_errors();
 }

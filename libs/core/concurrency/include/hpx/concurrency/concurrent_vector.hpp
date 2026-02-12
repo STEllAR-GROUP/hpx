@@ -106,16 +106,14 @@ namespace hpx::concurrent {
         };
 
         // Custom Index-based Iterator (Stable against growth)
-        template <bool IsConst>
+        template <bool IsConst, typename AccessorType>
         class iterator_impl
         {
             friend class concurrent_vector;
-            using VectorT = std::conditional_t<IsConst, concurrent_vector const,
-                concurrent_vector>;
-            using AccessorT =
-                std::conditional_t<IsConst, const_accessor, accessor>;
+            using VectorPtr = std::conditional_t<IsConst,
+                concurrent_vector const*, concurrent_vector*>;
 
-            VectorT* vec_;
+            VectorPtr vec_;
             size_type index_;
 
         public:
@@ -123,14 +121,14 @@ namespace hpx::concurrent {
             using difference_type = std::ptrdiff_t;
             using value_type = T;
             using pointer = T*;
-            using reference = AccessorT;
+            using reference = AccessorType;
 
             iterator_impl()
               : vec_(nullptr)
               , index_(0)
             {
             }
-            iterator_impl(VectorT* vec, size_type index)
+            iterator_impl(VectorPtr vec, size_type index)
               : vec_(vec)
               , index_(index)
             {
@@ -200,8 +198,8 @@ namespace hpx::concurrent {
             }
         };
 
-        using iterator = iterator_impl<false>;
-        using const_iterator = iterator_impl<true>;
+        using iterator = iterator_impl<false, accessor>;
+        using const_iterator = iterator_impl<true, const_accessor>;
         using reverse_iterator = std::reverse_iterator<iterator>;
         using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 

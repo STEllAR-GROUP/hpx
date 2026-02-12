@@ -25,7 +25,6 @@ set(concurrency_headers
     hpx/concurrency/detail/tagged_ptr_dcas.hpp
     hpx/concurrency/detail/tagged_ptr_ptrcompression.hpp
     hpx/concurrency/detail/tagged_ptr_pair.hpp
-    hpx/concurrency/hash.hpp
     hpx/concurrency/queue.hpp
     hpx/concurrency/spinlock.hpp
     hpx/concurrency/spinlock_pool.hpp
