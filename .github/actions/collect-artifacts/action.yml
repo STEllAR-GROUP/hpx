@@ -1,0 +1,46 @@
+# Copyright (c) 2026 The STE||AR Group
+#
+# SPDX-License-Identifier: BSL-1.0
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+name: 'Collect Test Artifacts'
+description: 'Convert XML, move core dumps and debug logs'
+
+inputs:
+  job-name:
+    description: 'Job name for artifact directory'
+    required: true
+  collect-failure-artifacts:
+    description: 'Collect core dumps and debug logs on failure'
+    required: false
+    default: 'true'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Convert XML
+      if: always() 
+      shell: bash
+      run: |
+        cd /hpx/build
+        mkdir -p ${{ inputs.job-name }}
+        xsltproc \
+          /hpx/source/.github/ci-scripts/conv.xsl Testing/$(head -n 1 < Testing/TAG)/Test.xml \
+          > ${{ inputs.job-name }}/Test.xml
+    
+    - name: Move core dumps
+      if: failure() && inputs.collect-failure-artifacts == 'true'
+      shell: bash
+      run: |
+        cd /hpx/build
+        mkdir -p ${{ inputs.job-name }}
+        cp core.* ${{ inputs.job-name }} || true
+    
+    - name: Move debug logs
+      if: failure() && inputs.collect-failure-artifacts == 'true'
+      shell: bash
+      run: |
+        cd /hpx/build
+        mkdir -p ${{ inputs.job-name }}
+        cp debug-log.txt ${{ inputs.job-name }} || true
