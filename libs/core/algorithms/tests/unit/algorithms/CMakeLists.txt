@@ -44,14 +44,14 @@ set(tests
     fill
     filln
     find
+    find_last
+    find_last_if
+    find_last_if_not
     findend
     findfirstof
     findfirstof_binary
     findif
     findifnot
-    find_last
-    find_last_if
-    find_last_if_not
     foreach
     foreach_executors
     foreach_prefetching
@@ -182,9 +182,6 @@ if(HPX_WITH_STDEXEC)
       findfirstof_sender
       findif_sender
       findifnot_sender
-      find_last_sender
-      find_last_if_sender
-      find_last_if_not_sender
       foreach_sender
       foreachn_sender
       generate_sender

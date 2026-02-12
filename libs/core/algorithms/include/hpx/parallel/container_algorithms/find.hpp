@@ -2612,7 +2612,7 @@ namespace hpx::ranges {
                 hpx::parallel::util::detail::algorithm_result<ExPolicy,
                     hpx::ranges::subrange_t<Iter, Sent>>;
 
-            auto result = hpx::parallel::detail::find_last_impl<Iter>().call(
+            auto result = hpx::parallel::detail::find_last<Iter>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, val,
                 HPX_MOVE(proj));
 
@@ -2654,7 +2654,7 @@ namespace hpx::ranges {
 
             return hpx::parallel::util::detail::algorithm_result<ExPolicy,
                 hpx::ranges::subrange_t<iterator_type>>::
-                get(hpx::parallel::detail::find_last_impl<iterator_type>().call(
+                get(hpx::parallel::detail::find_last<iterator_type>().call(
                     HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                     hpx::util::end(rng), val, HPX_MOVE(proj)));
         }
@@ -2675,7 +2675,7 @@ namespace hpx::ranges {
                 "Requires at least bidirectional iterator.");
 
             return hpx::ranges::subrange_t<Iter, Sent>(
-                hpx::parallel::detail::find_last_impl<Iter>().call(
+                hpx::parallel::detail::find_last<Iter>().call(
                     hpx::execution::seq, first, last, val, HPX_MOVE(proj)),
                 last);
         }
@@ -2698,7 +2698,7 @@ namespace hpx::ranges {
                 "Requires at least bidirectional iterator.");
 
             return hpx::ranges::subrange_t<iterator_type>(
-                hpx::parallel::detail::find_last_impl<iterator_type>().call(
+                hpx::parallel::detail::find_last<iterator_type>().call(
                     hpx::execution::seq, hpx::util::begin(rng),
                     hpx::util::end(rng), val, HPX_MOVE(proj)),
                 hpx::util::end(rng));
@@ -2735,7 +2735,7 @@ namespace hpx::ranges {
                 hpx::parallel::util::detail::algorithm_result<ExPolicy,
                     hpx::ranges::subrange_t<Iter, Sent>>;
 
-            auto result = hpx::parallel::detail::find_last_if_impl<Iter>().call(
+            auto result = hpx::parallel::detail::find_last_if<Iter>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last,
                 HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
 
@@ -2782,10 +2782,9 @@ namespace hpx::ranges {
 
             return hpx::parallel::util::detail::algorithm_result<ExPolicy,
                 hpx::ranges::subrange_t<iterator_type>>::
-                get(hpx::parallel::detail::find_last_if_impl<iterator_type>()
-                        .call(HPX_FORWARD(ExPolicy, policy),
-                            hpx::util::begin(rng), hpx::util::end(rng),
-                            HPX_MOVE(pred), HPX_MOVE(proj)));
+                get(hpx::parallel::detail::find_last_if<iterator_type>().call(
+                    HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                    hpx::util::end(rng), HPX_MOVE(pred), HPX_MOVE(proj)));
         }
 
         template <typename Iter, typename Sent, typename Pred,
@@ -2807,7 +2806,7 @@ namespace hpx::ranges {
                 "Requires at least bidirectional iterator.");
 
             return hpx::ranges::subrange_t<Iter, Sent>(
-                hpx::parallel::detail::find_last_if_impl<Iter>().call(
+                hpx::parallel::detail::find_last_if<Iter>().call(
                     hpx::execution::seq, first, last, HPX_MOVE(pred),
                     HPX_MOVE(proj)),
                 last);
@@ -2833,9 +2832,9 @@ namespace hpx::ranges {
                 hpx::traits::is_bidirectional_iterator_v<iterator_type>,
                 "Requires at least bidirectional iterator.");
 
-            return hpx::parallel::detail::find_last_if_impl<iterator_type>()
-                .call(hpx::execution::seq, hpx::util::begin(rng),
-                    hpx::util::end(rng), HPX_MOVE(pred), HPX_MOVE(proj));
+            return hpx::parallel::detail::find_last_if<iterator_type>().call(
+                hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
+                HPX_MOVE(pred), HPX_MOVE(proj));
         }
     } find_last_if{};
 
@@ -2869,10 +2868,9 @@ namespace hpx::ranges {
                 hpx::parallel::util::detail::algorithm_result<ExPolicy,
                     hpx::ranges::subrange_t<Iter, Sent>>;
 
-            auto result =
-                hpx::parallel::detail::find_last_if_not_impl<Iter>().call(
-                    HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(pred),
-                    HPX_MOVE(proj));
+            auto result = hpx::parallel::detail::find_last_if_not<Iter>().call(
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(pred),
+                HPX_MOVE(proj));
 
             if constexpr (hpx::is_async_execution_policy_v<ExPolicy>)
             {
@@ -2916,8 +2914,8 @@ namespace hpx::ranges {
                 "Requires at least bidirectional iterator.");
 
             return hpx::parallel::util::detail::algorithm_result<ExPolicy,
-                hpx::ranges::subrange_t<iterator_type>>::get(hpx::parallel::
-                    detail::find_last_if_not_impl<iterator_type>()
+                hpx::ranges::subrange_t<iterator_type>>::
+                get(hpx::parallel::detail::find_last_if_not<iterator_type>()
                         .call(HPX_FORWARD(ExPolicy, policy),
                             hpx::util::begin(rng), hpx::util::end(rng),
                             HPX_MOVE(pred), HPX_MOVE(proj)));
@@ -2942,7 +2940,7 @@ namespace hpx::ranges {
                 "Requires at least bidirectional iterator.");
 
             return hpx::ranges::subrange_t<Iter, Sent>(
-                hpx::parallel::detail::find_last_if_not_impl<Iter>().call(
+                hpx::parallel::detail::find_last_if_not<Iter>().call(
                     hpx::execution::seq, first, last, HPX_MOVE(pred),
                     HPX_MOVE(proj)),
                 last);
@@ -2971,9 +2969,9 @@ namespace hpx::ranges {
                 "Requires at least bidirectional iterator.");
 
             return hpx::ranges::subrange_t<iterator_type>(
-                hpx::parallel::detail::find_last_if_not_impl<iterator_type>()
-                    .call(hpx::execution::seq, hpx::util::begin(rng),
-                        hpx::util::end(rng), HPX_MOVE(pred), HPX_MOVE(proj)),
+                hpx::parallel::detail::find_last_if_not<iterator_type>().call(
+                    hpx::execution::seq, hpx::util::begin(rng),
+                    hpx::util::end(rng), HPX_MOVE(pred), HPX_MOVE(proj)),
                 hpx::util::end(rng));
         }
     } find_last_if_not{};

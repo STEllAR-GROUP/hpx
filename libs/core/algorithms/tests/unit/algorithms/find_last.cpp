@@ -1,54 +1,93 @@
-//  Copyright (c) 2026 Arpit Khandelwal
+//  Copyright (c) 2024 Arpit Khandelwal
+//  Copyright (c) 2021 Srinivas Yadav
+//  Copyright (c) 2014 Grant Mercer
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/algorithm.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 
-#include <cstddef>
 #include <iostream>
-#include <iterator>
-#include <numeric>
-#include <random>
 #include <string>
 #include <vector>
 
 #include "find_last_tests.hpp"
 
+////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_find_last()
+{
+    using namespace hpx::execution;
+
+    test_find_last(IteratorTag());
+
+    test_find_last(seq, IteratorTag());
+    test_find_last(par, IteratorTag());
+    test_find_last(par_unseq, IteratorTag());
+
+    test_find_last_async(seq(task), IteratorTag());
+    test_find_last_async(par(task), IteratorTag());
+}
+
 void find_last_test()
 {
     test_find_last<std::random_access_iterator_tag>();
-    test_find_last<std::bidirectional_iterator_tag>();
+    test_find_last<std::forward_iterator_tag>();
+}
+
+////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_find_last_exception()
+{
+    using namespace hpx::execution;
+
+    test_find_last_exception(IteratorTag());
+
+    test_find_last_exception(seq, IteratorTag());
+    test_find_last_exception(par, IteratorTag());
+
+    test_find_last_exception_async(seq(task), IteratorTag());
+    test_find_last_exception_async(par(task), IteratorTag());
 }
 
 void find_last_exception_test()
 {
     test_find_last_exception<std::random_access_iterator_tag>();
-    test_find_last_exception<std::bidirectional_iterator_tag>();
+    test_find_last_exception<std::forward_iterator_tag>();
+}
+
+////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_find_last_bad_alloc()
+{
+    using namespace hpx::execution;
+
+    test_find_last_bad_alloc(seq, IteratorTag());
+    test_find_last_bad_alloc(par, IteratorTag());
+
+    test_find_last_bad_alloc_async(seq(task), IteratorTag());
+    test_find_last_bad_alloc_async(par(task), IteratorTag());
 }
 
 void find_last_bad_alloc_test()
 {
     test_find_last_bad_alloc<std::random_access_iterator_tag>();
-    test_find_last_bad_alloc<std::bidirectional_iterator_tag>();
+    test_find_last_bad_alloc<std::forward_iterator_tag>();
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int) std::time(nullptr);
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
     std::cout << "using seed: " << seed << std::endl;
-    std::srand(seed);
+    gen.seed(seed);
 
     find_last_test();
     find_last_exception_test();
     find_last_bad_alloc_test();
-
     return hpx::local::finalize();
 }
 
@@ -70,5 +109,8 @@ int main(int argc, char* argv[])
     init_args.desc_cmdline = desc_commandline;
     init_args.cfg = cfg;
 
-    return hpx::local::init(hpx_main, argc, argv, init_args);
+    HPX_TEST_EQ_MSG(hpx::local::init(hpx_main, argc, argv, init_args), 0,
+        "HPX main exited with non-zero status");
+
+    return hpx::util::report_errors();
 }
