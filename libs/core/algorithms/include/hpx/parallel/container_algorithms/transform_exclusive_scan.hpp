@@ -475,7 +475,8 @@ namespace hpx::ranges {
         {
             static_assert(std::input_iterator<InIter>,
                 "Requires at least input iterator.");
-            static_assert(std::output_iterator<OutIter>,
+            static_assert(
+                std::output_iterator<OutIter, hpx::traits::iter_value_t<InIter>>,
                 "Requires at least output iterator.");
 
             using result_type =
@@ -542,8 +543,7 @@ namespace hpx::ranges {
                 >
             )
         // clang-format on
-        friend transform_exclusive_scan_result<
-            std::ranges::iterator_t<Rng>, O>
+        friend transform_exclusive_scan_result<std::ranges::iterator_t<Rng>, O>
         tag_fallback_invoke(hpx::ranges::transform_exclusive_scan_t, Rng&& rng,
             O dest, T init, BinOp binary_op, UnOp unary_op)
         {
@@ -580,11 +580,10 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            transform_exclusive_scan_result<std::ranges::iterator_t<Rng>,
-                O>>::type
-        tag_fallback_invoke(hpx::ranges::transform_exclusive_scan_t,
-            ExPolicy&& policy, Rng&& rng, O dest, T init, BinOp binary_op,
-            UnOp unary_op)
+            transform_exclusive_scan_result<std::ranges::iterator_t<Rng>, O>>::
+            type tag_fallback_invoke(hpx::ranges::transform_exclusive_scan_t,
+                ExPolicy&& policy, Rng&& rng, O dest, T init, BinOp binary_op,
+                UnOp unary_op)
         {
             using iterator_type = std::ranges::iterator_t<Rng>;
 

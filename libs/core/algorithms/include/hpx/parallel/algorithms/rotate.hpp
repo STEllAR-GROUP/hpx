@@ -505,7 +505,8 @@ namespace hpx {
         {
             static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
-            static_assert(std::output_iterator<OutIter>,
+            static_assert(
+                std::output_iterator<OutIter, hpx::traits::iter_value_t<FwdIter>>,
                 "Requires at least output iterator.");
 
             return parallel::util::get_second_element(

@@ -312,8 +312,8 @@ namespace hpx {
             typename Pred = parallel::detail::equal_to>
         // clang-format off
             requires (
-                std::forward_iterator<FwdIter>::value &&
-                std::forward_iterator<FwdIter2>::value &&
+                std::forward_iterator<FwdIter> &&
+                std::forward_iterator<FwdIter2> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits <FwdIter>::value_type,
                     typename std::iterator_traits <FwdIter2>::value_type
@@ -333,8 +333,8 @@ namespace hpx {
         // clang-format off
             requires (
                 is_execution_policy<ExPolicy>::value &&
-                std::forward_iterator<FwdIter>::value &&
-                std::forward_iterator<FwdIter2>::value &&
+                std::forward_iterator<FwdIter> &&
+                std::forward_iterator<FwdIter2> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits <FwdIter>::value_type,
                     typename std::iterator_traits <FwdIter2>::value_type
@@ -359,8 +359,8 @@ namespace hpx {
             typename Pred = parallel::detail::equal_to>
         // clang-format off
             requires (
-                std::forward_iterator<FwdIter>::value &&
-                std::forward_iterator<FwdIter2>::value &&
+                std::forward_iterator<FwdIter> &&
+                std::forward_iterator<FwdIter2> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits <FwdIter>::value_type,
                     typename std::iterator_traits <FwdIter2>::value_type
@@ -381,8 +381,8 @@ namespace hpx {
         // clang-format off
             requires (
                 is_execution_policy<ExPolicy>::value &&
-                std::forward_iterator<FwdIter>::value &&
-                std::forward_iterator<FwdIter2>::value &&
+                std::forward_iterator<FwdIter> &&
+                std::forward_iterator<FwdIter2> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits <FwdIter>::value_type,
                     typename std::iterator_traits <FwdIter2>::value_type
@@ -390,10 +390,9 @@ namespace hpx {
             )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter>::type
-        tag_fallback_invoke(hpx::search_n_t, ExPolicy&& policy, FwdIter first,
-            std::size_t count, FwdIter2 s_first, FwdIter2 s_last,
-            Pred op = Pred())
+            FwdIter>::type tag_fallback_invoke(hpx::search_n_t,
+            ExPolicy&& policy, FwdIter first, std::size_t count,
+            FwdIter2 s_first, FwdIter2 s_last, Pred op = Pred())
         {
             return hpx::parallel::detail::search_n<FwdIter, FwdIter>().call(
                 HPX_FORWARD(ExPolicy, policy), first, count, s_first, s_last,

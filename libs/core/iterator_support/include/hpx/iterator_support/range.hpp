@@ -299,15 +299,6 @@ namespace hpx::util {
         };
 
         ///////////////////////////////////////////////////////////////////////////
-        HPX_CXX_CORE_EXPORT template <typename T, typename Enable = void>
-        struct is_range : std::false_type
-        {
-        };
-
-        HPX_CXX_CORE_EXPORT template <typename T>
-        inline constexpr bool is_range_v = is_range<T>::value;
-
-        ///////////////////////////////////////////////////////////////////////////
         // return whether a given type is a range generator (i.e. exposes supports
         // an iterate function that returns a range
         HPX_CXX_CORE_EXPORT template <typename T, typename Enable = void>
@@ -396,15 +387,4 @@ namespace hpx::util {
     }    // namespace range_adl
 
     HPX_CXX_CORE_EXPORT using namespace range_adl;
-
-    namespace detail {
-
-        HPX_CXX_CORE_EXPORT template <typename T>
-        struct is_range_generator<T,
-            std::enable_if_t<
-                is_range_v<decltype(hpx::util::iterate(std::declval<T&>()))>>>
-          : std::true_type
-        {
-        };
-    }    // namespace detail
 }    // namespace hpx::util

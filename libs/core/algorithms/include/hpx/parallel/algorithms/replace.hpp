@@ -666,8 +666,8 @@ namespace hpx {
         friend void tag_fallback_invoke(hpx::replace_if_t, Iter first,
             Iter last, Pred pred, T const& new_value)
         {
-            static_assert(std::input_iterator<Iter>,
-                "Required at least input iterator.");
+            static_assert(
+                std::input_iterator<Iter>, "Required at least input iterator.");
 
             hpx::parallel::detail::replace_if<Iter>().call(
                 hpx::execution::sequenced_policy{}, first, last, HPX_MOVE(pred),
@@ -771,7 +771,8 @@ namespace hpx {
             static_assert(std::input_iterator<InIter>,
                 "Required at least input iterator.");
 
-            static_assert(std::output_iterator<OutIter>,
+            static_assert(
+                std::output_iterator<OutIter, hpx::traits::iter_value_t<InIter>>,
                 "Required at least output iterator.");
 
             return parallel::util::get_second_element(
@@ -832,7 +833,8 @@ namespace hpx {
             static_assert(std::input_iterator<InIter>,
                 "Required at least input iterator.");
 
-            static_assert(std::output_iterator<OutIter>,
+            static_assert(
+                std::output_iterator<OutIter, hpx::traits::iter_value_t<InIter>>,
                 "Required at least output iterator.");
 
             typedef typename std::iterator_traits<InIter>::value_type Type;

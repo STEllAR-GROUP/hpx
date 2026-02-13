@@ -84,8 +84,8 @@ namespace hpx::compute {
         }
 
         template <typename InIter,
-            typename Enable = typename std::enable_if<
-                hpx::traits::is_input_iterator<InIter>::value>::type>
+            typename Enable =
+                typename std::enable_if<std::input_iterator<InIter>>::type>
         vector(InIter first, InIter last, Allocator const& alloc)
           : size_(std::distance(first, last))
           , capacity_(size_)

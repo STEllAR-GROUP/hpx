@@ -135,8 +135,7 @@ namespace hpx { namespace ranges {
     ///           pair(first + (last - middle), last).
     ///
     template <typename Rng>
-    subrange_t<std::ranges::iterator_t<Rng>,
-        std::ranges::iterator_t<Rng>>
+    subrange_t<std::ranges::iterator_t<Rng>, std::ranges::iterator_t<Rng>>
     rotate(Rng&& rng, std::ranges::iterator_t<Rng> middle);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -190,10 +189,8 @@ namespace hpx { namespace ranges {
     ///
     template <typename ExPolicy, typename Rng>
     typename parallel::util::detail::algorithm_result<ExPolicy,
-        subrange_t<std::ranges::iterator_t<Rng>,
-            std::ranges::iterator_t<Rng>>>
-    rotate(ExPolicy&& policy, Rng&& rng,
-        std::ranges::iterator_t<Rng> middle);
+        subrange_t<std::ranges::iterator_t<Rng>, std::ranges::iterator_t<Rng>>>
+    rotate(ExPolicy&& policy, Rng&& rng, std::ranges::iterator_t<Rng> middle);
 
     ///////////////////////////////////////////////////////////////////////////
     /// Copies the elements from the range [first, last), to another range
@@ -334,8 +331,7 @@ namespace hpx { namespace ranges {
     ///
     template <typename Rng, typename OutIter>
     rotate_copy_result<std::ranges::iterator_t<Rng>, OutIter> rotate_copy(
-        Rng&& rng, std::ranges::iterator_t<Rng> middle,
-        OutIter dest_first);
+        Rng&& rng, std::ranges::iterator_t<Rng> middle, OutIter dest_first);
 
     ///////////////////////////////////////////////////////////////////////////
     /// Uses \a rng as the source range, as if using \a util::begin(rng) as
@@ -474,11 +470,10 @@ namespace hpx::ranges {
             std::ranges::iterator_t<Rng> middle)
         {
             return hpx::parallel::util::get_subrange<
-                std::ranges::iterator_t<Rng>,
-                typename hpx::traits::range_sentinel<Rng>::type>(
-                hpx::parallel::detail::rotate<parallel::util::in_out_result<
-                    std::ranges::iterator_t<Rng>,
-                    typename hpx::traits::range_sentinel<Rng>::type>>()
+                std::ranges::iterator_t<Rng>, std::ranges::sentinel_t<Rng>>(
+                hpx::parallel::detail::rotate<
+                    parallel::util::in_out_result<std::ranges::iterator_t<Rng>,
+                        std::ranges::sentinel_t<Rng>>>()
                     .call(hpx::execution::seq, hpx::util::begin(rng), middle,
                         hpx::util::end(rng)));
         }
@@ -498,15 +493,13 @@ namespace hpx::ranges {
         {
             using is_seq = std::integral_constant<bool,
                 hpx::is_sequenced_execution_policy_v<ExPolicy> ||
-                    !std::bidirectional_iterator<
-                        std::ranges::iterator_t<Rng>>>;
+                    !std::bidirectional_iterator<std::ranges::iterator_t<Rng>>>;
 
             return hpx::parallel::util::get_subrange<
-                std::ranges::iterator_t<Rng>,
-                typename hpx::traits::range_sentinel<Rng>::type>(
-                hpx::parallel::detail::rotate<parallel::util::in_out_result<
-                    std::ranges::iterator_t<Rng>,
-                    typename hpx::traits::range_sentinel<Rng>::type>>()
+                std::ranges::iterator_t<Rng>, std::ranges::sentinel_t<Rng>>(
+                hpx::parallel::detail::rotate<
+                    parallel::util::in_out_result<std::ranges::iterator_t<Rng>,
+                        std::ranges::sentinel_t<Rng>>>()
                     .call2(HPX_FORWARD(ExPolicy, policy), is_seq(),
                         hpx::util::begin(rng), middle, hpx::util::end(rng)));
         }
@@ -535,7 +528,8 @@ namespace hpx::ranges {
         {
             static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
-            static_assert(std::output_iterator<OutIter>,
+            static_assert(
+                std::output_iterator<OutIter, hpx::traits::iter_value_t<FwdIter>>,
                 "Requires at least output iterator.");
 
             return hpx::parallel::detail::rotate_copy<
@@ -584,8 +578,8 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::rotate_copy_t, Rng&& rng,
             std::ranges::iterator_t<Rng> middle, OutIter dest_first)
         {
-            return hpx::parallel::detail::rotate_copy<rotate_copy_result<
-                std::ranges::iterator_t<Rng>, OutIter>>()
+            return hpx::parallel::detail::rotate_copy<
+                rotate_copy_result<std::ranges::iterator_t<Rng>, OutIter>>()
                 .call(hpx::execution::seq, hpx::util::begin(rng), middle,
                     hpx::util::end(rng), dest_first);
         }
@@ -601,16 +595,14 @@ namespace hpx::ranges {
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
             rotate_copy_result<std::ranges::iterator_t<Rng>, OutIter>>
         tag_fallback_invoke(hpx::ranges::rotate_copy_t, ExPolicy&& policy,
-            Rng&& rng, std::ranges::iterator_t<Rng> middle,
-            OutIter dest_first)
+            Rng&& rng, std::ranges::iterator_t<Rng> middle, OutIter dest_first)
         {
             using is_seq = std::integral_constant<bool,
                 hpx::is_sequenced_execution_policy_v<ExPolicy> ||
-                    !std::bidirectional_iterator<
-                        std::ranges::iterator_t<Rng>>>;
+                    !std::bidirectional_iterator<std::ranges::iterator_t<Rng>>>;
 
-            return hpx::parallel::detail::rotate_copy<rotate_copy_result<
-                std::ranges::iterator_t<Rng>, OutIter>>()
+            return hpx::parallel::detail::rotate_copy<
+                rotate_copy_result<std::ranges::iterator_t<Rng>, OutIter>>()
                 .call2(HPX_FORWARD(ExPolicy, policy), is_seq(),
                     hpx::util::begin(rng), middle, hpx::util::end(rng),
                     dest_first);

@@ -509,8 +509,8 @@ namespace hpx::ranges {
             hpx::ranges::remove_if_t, Iter first, Sent sent, Pred pred,
             Proj proj = Proj())
         {
-            static_assert(std::input_iterator<Iter>,
-                "Required at least input iterator.");
+            static_assert(
+                std::input_iterator<Iter>, "Required at least input iterator.");
 
             return hpx::parallel::util::make_subrange<Iter, Sent>(
                 hpx::parallel::detail::remove_if<Iter>().call(
@@ -531,19 +531,15 @@ namespace hpx::ranges {
                 >
             )
         // clang-format on
-        friend subrange_t<std::ranges::iterator_t<Rng>>
-        tag_fallback_invoke(
+        friend subrange_t<std::ranges::iterator_t<Rng>> tag_fallback_invoke(
             hpx::ranges::remove_if_t, Rng&& rng, Pred pred, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_input_iterator<
-                              std::ranges::iterator_t<Rng>>::value,
+            static_assert(std::input_iterator<std::ranges::iterator_t<Rng>>,
                 "Required at least input iterator.");
 
             return hpx::parallel::util::make_subrange<
-                std::ranges::iterator_t<Rng>,
-                typename hpx::traits::range_sentinel<Rng>::type>(
-                hpx::parallel::detail::remove_if<
-                    std::ranges::iterator_t<Rng>>()
+                std::ranges::iterator_t<Rng>, std::ranges::sentinel_t<Rng>>(
+                hpx::parallel::detail::remove_if<std::ranges::iterator_t<Rng>>()
                     .call(hpx::execution::seq, hpx::util::begin(rng),
                         hpx::util::end(rng), HPX_MOVE(pred), HPX_MOVE(proj)),
                 hpx::util::end(rng));
@@ -594,15 +590,12 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::remove_if_t, ExPolicy&& policy,
             Rng&& rng, Pred pred, Proj proj = Proj())
         {
-            static_assert(hpx::std::forward_iterator<
-                              std::ranges::iterator_t<Rng>>::value,
+            static_assert(std::forward_iterator<std::ranges::iterator_t<Rng>>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::util::make_subrange<
-                std::ranges::iterator_t<Rng>,
-                typename hpx::traits::range_sentinel<Rng>::type>(
-                hpx::parallel::detail::remove_if<
-                    std::ranges::iterator_t<Rng>>()
+                std::ranges::iterator_t<Rng>, std::ranges::sentinel_t<Rng>>(
+                hpx::parallel::detail::remove_if<std::ranges::iterator_t<Rng>>()
                     .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                         hpx::util::end(rng), HPX_MOVE(pred), HPX_MOVE(proj)),
                 hpx::util::end(rng));
@@ -628,8 +621,8 @@ namespace hpx::ranges {
         friend subrange_t<Iter, Sent> tag_fallback_invoke(hpx::ranges::remove_t,
             Iter first, Sent last, T const& value, Proj proj = Proj())
         {
-            static_assert(std::input_iterator<Iter>,
-                "Required at least input iterator.");
+            static_assert(
+                std::input_iterator<Iter>, "Required at least input iterator.");
 
             using type = typename std::iterator_traits<Iter>::value_type;
 
@@ -648,12 +641,11 @@ namespace hpx::ranges {
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng>
             )
         // clang-format on
-        friend subrange_t<std::ranges::iterator_t<Rng>>
-        tag_fallback_invoke(hpx::ranges::remove_t, Rng&& rng, T const& value,
+        friend subrange_t<std::ranges::iterator_t<Rng>> tag_fallback_invoke(
+            hpx::ranges::remove_t, Rng&& rng, T const& value,
             Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_input_iterator<
-                              std::ranges::iterator_t<Rng>>::value,
+            static_assert(std::input_iterator<std::ranges::iterator_t<Rng>>,
                 "Required at least input iterator.");
 
             using type = typename std::iterator_traits<
@@ -709,8 +701,7 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::remove_t, ExPolicy&& policy, Rng&& rng,
             T const& value, Proj proj = Proj())
         {
-            static_assert(hpx::std::forward_iterator<
-                              std::ranges::iterator_t<Rng>>::value,
+            static_assert(std::forward_iterator<std::ranges::iterator_t<Rng>>,
                 "Required at least forward iterator.");
 
             using type = typename std::iterator_traits<

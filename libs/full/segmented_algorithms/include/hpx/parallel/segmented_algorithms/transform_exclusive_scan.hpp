@@ -34,10 +34,11 @@ namespace hpx { namespace segmented {
     OutIter tag_invoke(hpx::transform_exclusive_scan_t, InIter first,
         InIter last, OutIter dest, T init, Op&& op, Conv&& conv)
     {
-        static_assert(std::input_iterator<InIter>,
-            "Requires at least input iterator.");
+        static_assert(
+            std::input_iterator<InIter>, "Requires at least input iterator.");
 
-        static_assert(std::output_iterator<OutIter>,
+        static_assert(
+            std::output_iterator<OutIter, hpx::traits::iter_value_t<InIter>>,
             "Requires at least output iterator.");
 
         if (first == last)

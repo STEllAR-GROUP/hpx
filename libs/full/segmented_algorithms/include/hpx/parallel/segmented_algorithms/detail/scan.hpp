@@ -531,8 +531,8 @@ namespace hpx::parallel {
             using difference_type = typename std::iterator_traits<
                 segment_iterator_in>::difference_type;
 
-            using forced_seq = std::integral_constant<bool,
-                !hpx::std::forward_iterator<SegIter>::value>;
+            using forced_seq =
+                std::integral_constant<bool, !std::forward_iterator<SegIter>>;
 
             using local_iterator_in_tuple =
                 hpx::tuple<local_iterator_type_in, local_iterator_type_in>;
@@ -681,8 +681,8 @@ namespace hpx::parallel {
             using difference_type = typename std::iterator_traits<
                 segment_iterator>::difference_type;
 
-            using forced_seq = std::integral_constant<bool,
-                !hpx::std::forward_iterator<SegIter>::value>;
+            using forced_seq =
+                std::integral_constant<bool, !std::forward_iterator<SegIter>>;
 
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);

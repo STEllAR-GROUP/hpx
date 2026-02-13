@@ -563,9 +563,10 @@ namespace hpx::parallel {
                 ExPolicy, InIter first, Sent last, OutIter dest, Pred&& pred,
                 Proj&& proj)
             {
+                using type = std::bool_constant<std::forward_iterator<InIter>>;
+
                 return sequential_unique_copy(first, last, dest,
-                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj),
-                    hpx::std::forward_iterator<InIter>());
+                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj), type());
             }
 
             template <typename ExPolicy, typename FwdIter1, typename Sent,
@@ -777,9 +778,9 @@ namespace hpx {
             )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter2>::type
-        tag_fallback_invoke(hpx::unique_copy_t, ExPolicy&& policy,
-            FwdIter1 first, FwdIter1 last, FwdIter2 dest, Pred pred = Pred())
+            FwdIter2>::type tag_fallback_invoke(hpx::unique_copy_t,
+            ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest,
+            Pred pred = Pred())
         {
             static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");

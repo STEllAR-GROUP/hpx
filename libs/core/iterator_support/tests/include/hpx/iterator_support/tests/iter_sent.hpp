@@ -32,32 +32,28 @@ private:
 };
 
 template <typename Iter, typename ValueType,
-    typename Enable =
-        std::enable_if_t<hpx::std::forward_iterator<Iter>::value>>
+    typename Enable = std::enable_if_t<std::forward_iterator<Iter>>>
 bool operator==(Iter it, sentinel<ValueType> s)
 {
     return *it == s.get_stop();
 }
 
 template <typename Iter, typename ValueType,
-    typename Enable =
-        std::enable_if_t<hpx::std::forward_iterator<Iter>::value>>
+    typename Enable = std::enable_if_t<std::forward_iterator<Iter>>>
 bool operator==(sentinel<ValueType> s, Iter it)
 {
     return *it == s.get_stop();
 }
 
 template <typename Iter, typename ValueType,
-    typename Enable =
-        std::enable_if_t<hpx::std::forward_iterator<Iter>::value>>
+    typename Enable = std::enable_if_t<std::forward_iterator<Iter>>>
 bool operator!=(Iter it, sentinel<ValueType> s)
 {
     return *it != s.get_stop();
 }
 
 template <typename Iter, typename ValueType,
-    typename Enable =
-        std::enable_if_t<hpx::std::forward_iterator<Iter>::value>>
+    typename Enable = std::enable_if_t<std::forward_iterator<Iter>>>
 bool operator!=(sentinel<ValueType> s, Iter it)
 {
     return *it != s.get_stop();
@@ -71,6 +67,8 @@ struct iterator
     using iterator_category = std::forward_iterator_tag;
     using pointer = Value const*;
     using reference = Value const&;
+
+    iterator() = default;
 
     explicit iterator(Value initialState)
       : state(initialState)
@@ -167,6 +165,26 @@ struct iterator
     bool operator>=(iterator const& that) const
     {
         return this->state >= that.state;
+    }
+
+    friend bool operator==(iterator const& it, sentinel<Value> s)
+    {
+        return it.state == s.get_stop();
+    }
+
+    friend bool operator==(sentinel<Value> s, iterator const& it)
+    {
+        return it.state == s.get_stop();
+    }
+
+    friend bool operator!=(iterator const& it, sentinel<Value> s)
+    {
+        return it.state != s.get_stop();
+    }
+
+    friend bool operator!=(sentinel<Value> s, iterator const& it)
+    {
+        return it.state != s.get_stop();
     }
 
 protected:

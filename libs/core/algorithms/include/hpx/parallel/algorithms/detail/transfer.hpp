@@ -121,7 +121,8 @@ namespace hpx::parallel {
                 "Required at least forward iterator.");
             static_assert(std::forward_iterator<FwdIter2> ||
                     (hpx::is_sequenced_execution_policy_v<ExPolicy> &&
-                        std::output_iterator<FwdIter2>),
+                        std::output_iterator<
+                            hpx::traits::iter_value_t<FwdIter1>, FwdIter2>),
                 "Requires at least forward iterator or sequential execution.");
 
 #if defined(HPX_COMPUTE_DEVICE_CODE)
