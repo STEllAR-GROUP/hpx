@@ -1,13 +1,9 @@
 //  Copyright (c) 2026 Pratyksh Gupta
 //
 //  SPDX-License-Identifier: BSL-1.0
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying
-//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
 #include <hpx/init.hpp>
-#include <hpx/concurrency/concurrent_unordered_map.hpp>
-#include <hpx/concurrency/concurrent_vector.hpp>
+#include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/timing.hpp>
 
@@ -179,9 +175,10 @@ int hpx_main(hpx::program_options::variables_map& vm)
                 for (std::uint64_t i = 0; i < num_threads; ++i)
                 {
                     threads.emplace_back([&, i]() {
-                        std::unique_lock<hpx::mutex> l(mtx);
-                        cv.wait(l, [&] { return ready; });
-                        l.unlock();
+                        {
+                            std::unique_lock<hpx::mutex> l(mtx);
+                            cv.wait(l, [&] { return ready; });
+                        }
 
                         for (std::uint64_t j = 0; j < num_ops / num_threads;
                             ++j)
@@ -210,15 +207,17 @@ int hpx_main(hpx::program_options::variables_map& vm)
                 for (std::uint64_t i = 0; i < num_threads; ++i)
                 {
                     threads.emplace_back([&, i]() {
-                        std::unique_lock<hpx::mutex> l(mtx);
-                        cv.wait(l, [&] { return ready; });
-                        l.unlock();
+                        {
+                            std::unique_lock<hpx::mutex> l(mtx);
+                            cv.wait(l, [&] { return ready; });
+                        }
 
                         for (std::uint64_t j = 0; j < num_ops / num_threads;
                             ++j)
                         {
                             [[maybe_unused]] auto volatile val =
                                 vec[j % vec.size()];    // Read
+                            (void) val;
                         }
                     });
                 }
@@ -279,7 +278,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
                 {
                     m.map.clear();
                 }
-                else if constexpr (requires { m.clear(); })
+                else
                 {
                     m.clear();
                 }
@@ -293,9 +292,10 @@ int hpx_main(hpx::program_options::variables_map& vm)
                 for (std::uint64_t i = 0; i < num_threads; ++i)
                 {
                     threads.emplace_back([&, i]() {
-                        std::unique_lock<hpx::mutex> l(mtx);
-                        cv.wait(l, [&] { return ready; });
-                        l.unlock();
+                        {
+                            std::unique_lock<hpx::mutex> l(mtx);
+                            cv.wait(l, [&] { return ready; });
+                        }
 
                         for (std::uint64_t j = 0; j < num_ops / num_threads;
                             ++j)

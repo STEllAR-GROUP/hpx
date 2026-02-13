@@ -9,12 +9,11 @@
 #include <hpx/config.hpp>
 #include <hpx/concurrency/spinlock.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/type_support/assert_owns_lock.hpp>
+#include <hpx/modules/type_support.hpp>
 
-#include <algorithm>
 #include <functional>
 #include <mutex>
-#include <stdexcept>
+
 #include <type_traits>
 #include <unordered_set>
 #include <utility>
@@ -24,7 +23,7 @@ namespace hpx::concurrent {
     template <typename Key, typename Hash = std::hash<Key>,
         typename KeyEqual = std::equal_to<Key>,
         typename Allocator = std::allocator<Key>>
-    class concurrent_unordered_set
+    class HPX_CXX_CORE_EXPORT concurrent_unordered_set
     {
     private:
         mutable hpx::util::spinlock mutex_;
@@ -75,15 +74,16 @@ namespace hpx::concurrent {
                 return value_ == nullptr;
             }
 
-            operator bool() const
+            template <typename U = Key,
+                typename = std::enable_if_t<!std::is_same_v<U, bool>>>
+            explicit operator bool() const
             {
-                return value_ != nullptr;
+                return !empty();
             }
 
             operator Key const&() const
             {
-                validate();
-                return *value_;
+                return get();
             }
 
             Key const& get() const
@@ -102,6 +102,17 @@ namespace hpx::concurrent {
         {
         }
 
+        concurrent_unordered_set(size_type bucket_count, Allocator const& alloc)
+          : set_(bucket_count, alloc)
+        {
+        }
+
+        concurrent_unordered_set(
+            size_type bucket_count, Hash const& hash, Allocator const& alloc)
+          : set_(bucket_count, hash, alloc)
+        {
+        }
+
         explicit concurrent_unordered_set(Allocator const& alloc)
           : set_(alloc)
         {
@@ -114,9 +125,8 @@ namespace hpx::concurrent {
         }
 
         concurrent_unordered_set(concurrent_unordered_set&& other) noexcept
+          : set_(HPX_MOVE(other.set_))
         {
-            std::lock_guard<hpx::util::spinlock> lock(other.mutex_);
-            set_ = HPX_MOVE(other.set_);
         }
 
         concurrent_unordered_set& operator=(
@@ -224,7 +234,26 @@ namespace hpx::concurrent {
             return const_accessor();
         }
 
+        template <typename K>
+        const_accessor find(K const& key) const
+        {
+            std::unique_lock<hpx::util::spinlock> lock(mutex_);
+            auto it = set_.find(key);
+            if (it != set_.end())
+            {
+                return const_accessor(HPX_MOVE(lock), *it);
+            }
+            return const_accessor();
+        }
+
         bool contains(Key const& key) const
+        {
+            std::lock_guard<hpx::util::spinlock> lock(mutex_);
+            return set_.contains(key);
+        }
+
+        template <typename K>
+        bool contains(K const& key) const
         {
             std::lock_guard<hpx::util::spinlock> lock(mutex_);
             return set_.contains(key);
@@ -237,17 +266,9 @@ namespace hpx::concurrent {
             std::lock_guard<hpx::util::spinlock> lock(mutex_);
             for (auto const& elem : set_)
             {
-                if constexpr (std::is_convertible_v<
-                                  std::invoke_result_t<F, decltype(elem)>,
-                                  bool>)
-                {
-                    if (!f(elem))
-                        break;
-                }
-                else
-                {
-                    f(elem);
-                }
+                static_assert(
+                    std::is_void_v<std::invoke_result_t<F, decltype(elem)>>);
+                f(elem);
             }
         }
 
