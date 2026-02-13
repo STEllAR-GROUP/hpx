@@ -275,5 +275,52 @@ namespace hpx::util {
                 }
             }
         }
+
+        // yield_while_count_timeout is similar to yield_while_count, with the
+        // addition of a timeout parameter and a stop_token. If the timeout is
+        // exceeded or stop is requested, waiting is stopped and the function
+        // returns false. If the predicate is successfully waited for the
+        // function returns true.
+        HPX_CXX_CORE_EXPORT template <typename Predicate, typename StopToken>
+        bool yield_while_count_timeout(Predicate&& predicate,
+            StopToken&& stop_token, std::size_t required_count,
+            hpx::chrono::steady_duration const& rel_time,
+            char const* thread_name = nullptr,
+            bool allow_timed_suspension = true)
+        {
+            // Initialize timer only if needed
+            bool const use_timeout =
+                rel_time.value() != std::chrono::steady_clock::duration(0);
+
+            auto const abs_time = rel_time.from_now();
+
+            std::size_t count = 0;
+            for (std::size_t k = 0; /**/; ++k)
+            {
+                if (stop_token.stop_requested())
+                {
+                    return false;
+                }
+
+                if (use_timeout && abs_time <= hpx::chrono::steady_clock::now())
+                {
+                    return false;
+                }
+
+                if (!predicate())
+                {
+                    if (++count > required_count)
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    count = 0;
+                    detail::yield_k(
+                        allow_timed_suspension ? k : k % 16, thread_name);
+                }
+            }
+        }
     }    // namespace detail
 }    // namespace hpx::util
