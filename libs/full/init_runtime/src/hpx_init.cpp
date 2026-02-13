@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2025 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //  Copyright (c)      2017 Shoshana Jakobovits
 //  Copyright (c) 2010-2011 Phillip LeBlanc, Dylan Stark
 //  Copyright (c)      2011 Bryce Lelbach
@@ -11,12 +11,12 @@
 #include <hpx/hpx_init.hpp>
 
 #include <hpx/assert.hpp>
-#include <hpx/command_line_handling/command_line_handling.hpp>
 #include <hpx/hpx_finalize.hpp>
 #include <hpx/hpx_main_winsocket.hpp>
 #include <hpx/hpx_suspend.hpp>
 #include <hpx/hpx_user_main_config.hpp>
 #include <hpx/modules/algorithms.hpp>
+#include <hpx/modules/command_line_handling.hpp>
 #include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
@@ -47,20 +47,22 @@
 #include <hpx/actions_base/plain_action.hpp>
 #include <hpx/async_distributed/bind_action.hpp>
 #include <hpx/components_base/agas_interface.hpp>
-#include <hpx/init_runtime/detail/init_logging.hpp>
 #include <hpx/init_runtime/pre_main.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/naming.hpp>
 #if defined(HPX_HAVE_NETWORKING)
+#include <hpx/modules/parcelset_base.hpp>
 #include <hpx/parcelports/init_all_parcelports.hpp>
 #include <hpx/parcelset/parcelhandler.hpp>
-#include <hpx/parcelset_base/locality_interface.hpp>
 #endif
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/query_counters.hpp>
 #include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime_distributed/runtime_fwd.hpp>
 #include <hpx/runtime_distributed/runtime_support.hpp>
+#endif
+#if defined(HPX_HAVE_LOGGING)
+#include <hpx/init_runtime/detail/init_logging.hpp>
 #endif
 
 #include <algorithm>

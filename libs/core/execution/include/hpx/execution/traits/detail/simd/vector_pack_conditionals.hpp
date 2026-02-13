@@ -15,7 +15,7 @@
 namespace hpx::parallel::traits {
 
     ////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T, typename Abi>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Abi>
     HPX_HOST_DEVICE HPX_FORCEINLINE auto choose(
         datapar::experimental::simd_mask<T, Abi> const& msk,
         datapar::experimental::simd<T, Abi> const& v_true,
@@ -25,7 +25,7 @@ namespace hpx::parallel::traits {
     }
 
     ////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T, typename Abi>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Abi>
     HPX_HOST_DEVICE HPX_FORCEINLINE void mask_assign(
         datapar::experimental::simd_mask<T, Abi> const& msk,
         datapar::experimental::simd<T, Abi>& v,

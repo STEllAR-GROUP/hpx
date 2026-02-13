@@ -9,10 +9,10 @@
 #pragma once
 
 #include <hpx/iterator_support/tests/iter_sent.hpp>
+#include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/parallel/container_algorithms/stable_sort.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -127,7 +127,7 @@ template <typename T>
 void test_stable_sort1_sent(T)
 {
     auto rand_max_val = std::rand() + 1;
-    std::size_t N = std::rand() % 10007;
+    std::size_t N = std::rand() % 10007 + 1;
 
     // Fill vector with random values
     std::vector<T> c(N);
@@ -152,7 +152,7 @@ void test_stable_sort1_sent(ExPolicy&& policy, T)
     msg(typeid(ExPolicy).name(), typeid(T).name(), "default", sync, random);
 
     auto rand_max_val = std::rand() + 1;
-    std::size_t N = std::rand() % 10007;
+    std::size_t N = std::rand() % 10007 + 1;
 
     // Fill vector with random values
     std::vector<T> c(N);
@@ -178,7 +178,7 @@ void test_stable_sort1_comp_sent(ExPolicy&& policy, T, Compare comp = Compare())
         random);
 
     auto rand_max_val = std::rand() + 1;
-    std::size_t N = std::rand() % 10007;
+    std::size_t N = std::rand() % 10007 + 1;
 
     // Fill vector with random values
     std::vector<T> c(N);

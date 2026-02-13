@@ -19,7 +19,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::util {
 
-    HPX_CXX_EXPORT class backtrace
+    HPX_CXX_CORE_EXPORT class backtrace
     {
     public:
         HPX_CORE_EXPORT explicit backtrace(
@@ -60,7 +60,7 @@ namespace hpx::util {
 
     namespace detail {
 
-        HPX_CXX_EXPORT class trace_manip
+        HPX_CXX_CORE_EXPORT class trace_manip
         {
         public:
             explicit constexpr trace_manip(backtrace const* tr) noexcept
@@ -73,17 +73,17 @@ namespace hpx::util {
             backtrace const* tr_;
         };
 
-        HPX_CXX_EXPORT HPX_CORE_EXPORT std::ostream& operator<<(
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT std::ostream& operator<<(
             std::ostream& out, trace_manip const& t);
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename E>
+    HPX_CXX_CORE_EXPORT template <typename E>
     [[nodiscard]] detail::trace_manip trace(E const& e)
     {
         auto const* tr = dynamic_cast<backtrace const*>(&e);
         return detail::trace_manip(tr);
     }
 
-    HPX_CXX_EXPORT [[nodiscard]] HPX_CORE_EXPORT std::string trace(
+    HPX_CXX_CORE_EXPORT [[nodiscard]] HPX_CORE_EXPORT std::string trace(
         std::size_t frames_no = HPX_HAVE_THREAD_BACKTRACE_DEPTH);
 }    // namespace hpx::util

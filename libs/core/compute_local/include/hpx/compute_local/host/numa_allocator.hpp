@@ -31,7 +31,7 @@
 namespace hpx::parallel::util {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T, typename Executors>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Executors>
     class numa_allocator
     {
         using executor_type = typename Executors::value_type;

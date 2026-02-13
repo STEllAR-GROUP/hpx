@@ -15,7 +15,7 @@
 namespace hpx::util::cache::statistics {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT class local_statistics : public no_statistics
+    HPX_CXX_CORE_EXPORT class local_statistics : public no_statistics
     {
     private:
         [[nodiscard]] static std::size_t get_and_reset(

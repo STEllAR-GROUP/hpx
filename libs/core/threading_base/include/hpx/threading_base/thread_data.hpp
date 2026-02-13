@@ -44,11 +44,11 @@ namespace hpx::threads {
 
     namespace detail {
 
-        HPX_CXX_EXPORT using get_locality_id_type =
+        HPX_CXX_CORE_EXPORT using get_locality_id_type =
             std::uint32_t(hpx::error_code&);
-        HPX_CXX_EXPORT HPX_CORE_EXPORT void set_get_locality_id(
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void set_get_locality_id(
             get_locality_id_type* f);
-        HPX_CXX_EXPORT HPX_CORE_EXPORT std::uint32_t get_locality_id(
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT std::uint32_t get_locality_id(
             hpx::error_code&);
     }    // namespace detail
 
@@ -68,7 +68,7 @@ namespace hpx::threads {
     /// Generally, \a threads are not created or executed directly. All
     /// functionality related to the management of \a threads is implemented by
     /// the thread-manager.
-    HPX_CXX_EXPORT class thread_data
+    HPX_CXX_CORE_EXPORT class thread_data
       : public detail::thread_data_reference_counting
     {
     public:
@@ -276,35 +276,13 @@ namespace hpx::threads {
             return {"<unknown>"};
         }
 #else
-        threads::thread_description get_description() const
-        {
-            std::lock_guard<hpx::util::detail::spinlock> l(
-                spinlock_pool::spinlock_for(this));
-            return description_;
-        }
+        threads::thread_description get_description() const;
         threads::thread_description set_description(
-            threads::thread_description value)
-        {
-            std::lock_guard<hpx::util::detail::spinlock> l(
-                spinlock_pool::spinlock_for(this));
-            std::swap(description_, value);
-            return value;
-        }
+            threads::thread_description value);
 
-        threads::thread_description get_lco_description() const
-        {
-            std::lock_guard<hpx::util::detail::spinlock> l(
-                spinlock_pool::spinlock_for(this));
-            return lco_description_;
-        }
+        threads::thread_description get_lco_description() const;
         threads::thread_description set_lco_description(
-            threads::thread_description value)
-        {
-            std::lock_guard<hpx::util::detail::spinlock> l(
-                spinlock_pool::spinlock_for(this));
-            std::swap(lco_description_, value);
-            return value;
-        }
+            threads::thread_description value);
 #endif
 
 #if !defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
@@ -446,41 +424,11 @@ namespace hpx::threads {
         }
 
         // handle thread interruption
-        bool interruption_requested() const noexcept
-        {
-            std::lock_guard<hpx::util::detail::spinlock> l(
-                spinlock_pool::spinlock_for(this));
-            return requested_interrupt_;
-        }
+        bool interruption_requested() const noexcept;
+        bool interruption_enabled() const noexcept;
+        bool set_interruption_enabled(bool enable) noexcept;
 
-        bool interruption_enabled() const noexcept
-        {
-            std::lock_guard<hpx::util::detail::spinlock> l(
-                spinlock_pool::spinlock_for(this));
-            return enabled_interrupt_;
-        }
-
-        bool set_interruption_enabled(bool enable) noexcept
-        {
-            std::lock_guard<hpx::util::detail::spinlock> l(
-                spinlock_pool::spinlock_for(this));
-            std::swap(enabled_interrupt_, enable);
-            return enable;
-        }
-
-        void interrupt(bool flag = true)
-        {
-            std::unique_lock<hpx::util::detail::spinlock> l(
-                spinlock_pool::spinlock_for(this));
-            if (flag && !enabled_interrupt_)
-            {
-                l.unlock();
-                HPX_THROW_EXCEPTION(hpx::error::thread_not_interruptable,
-                    "thread_data::interrupt",
-                    "interrupts are disabled for this thread");
-            }
-            requested_interrupt_ = flag;
-        }
+        void interrupt(bool flag = true);
 
         bool interruption_point(bool throw_on_interrupt = true);
 
@@ -666,14 +614,14 @@ namespace hpx::threads {
 #endif
     };
 
-    HPX_CXX_EXPORT HPX_FORCEINLINE constexpr thread_data* get_thread_id_data(
-        thread_id_ref_type const& tid) noexcept
+    HPX_CXX_CORE_EXPORT HPX_FORCEINLINE constexpr thread_data*
+    get_thread_id_data(thread_id_ref_type const& tid) noexcept
     {
         return static_cast<thread_data*>(tid.get().get());
     }
 
-    HPX_CXX_EXPORT HPX_FORCEINLINE constexpr thread_data* get_thread_id_data(
-        thread_id_type const& tid) noexcept
+    HPX_CXX_CORE_EXPORT HPX_FORCEINLINE constexpr thread_data*
+    get_thread_id_data(thread_id_type const& tid) noexcept
     {
         return static_cast<thread_data*>(tid.get());
     }

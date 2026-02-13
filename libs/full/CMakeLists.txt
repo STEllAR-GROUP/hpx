@@ -18,7 +18,6 @@ set(_hpx_full_modules
     async_colocated
     async_distributed
     checkpoint
-    checkpoint_base
     collectives
     command_line_handling
     components
@@ -33,6 +32,7 @@ set(_hpx_full_modules
     naming_base
     parcelport_gasnet
     parcelport_lci
+    parcelport_lcw
     parcelport_mpi
     parcelport_tcp
     parcelports

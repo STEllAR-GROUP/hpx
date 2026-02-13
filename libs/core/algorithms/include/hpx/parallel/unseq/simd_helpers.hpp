@@ -1,5 +1,5 @@
 //  Copyright (c) 2022 A Kishore Kumar
-//  Copyright (c) 2023 Hartmut Kaiser
+//  Copyright (c) 2023-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -25,7 +25,7 @@ namespace hpx::parallel::util {
 
     // Compiler and Hardware should also support vector operations for IterDiff,
     // else we see slower performance when compared to sequential version
-    template <typename Iter, typename IterDiff, typename F>
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename IterDiff, typename F>
     Iter unseq_first_n(Iter const first, IterDiff const n, F&& f) noexcept
     {
         // OMP loops can not have ++Iter, only integral types are allowed Hence
@@ -54,7 +54,7 @@ namespace hpx::parallel::util {
         IterDiff i = 0;
         constexpr std::int32_t num_blocks =
             HPX_LANE_SIZE / sizeof(std::int32_t);
-        alignas(HPX_LANE_SIZE) std::int32_t simd_lane[num_blocks] = {0};
+        alignas(HPX_LANE_SIZE) std::int32_t simd_lane[num_blocks] = {};
 
         while (i <= n - num_blocks)
         {
@@ -98,7 +98,8 @@ namespace hpx::parallel::util {
 #endif    // HPX_EARLYEXIT_PRESENT
     }
 
-    template <typename Iter1, typename Iter2, typename IterDiff, typename F>
+    HPX_CXX_CORE_EXPORT template <typename Iter1, typename Iter2,
+        typename IterDiff, typename F>
     std::pair<Iter1, Iter2> unseq2_first_n(Iter1 const first1,
         Iter2 const first2, IterDiff const n, F&& f) noexcept
     {
@@ -118,7 +119,7 @@ namespace hpx::parallel::util {
 
         constexpr std::int32_t num_blocks =
             HPX_LANE_SIZE / sizeof(std::int32_t);
-        alignas(HPX_LANE_SIZE) std::int32_t simd_lane[num_blocks] = {0};
+        alignas(HPX_LANE_SIZE) std::int32_t simd_lane[num_blocks] = {};
 
         IterDiff outer_loop_ind = 0;
         while (outer_loop_ind <= n - num_blocks)

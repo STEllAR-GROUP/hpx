@@ -28,7 +28,7 @@ namespace hpx::threads {
 
         HPX_CORE_EXPORT threads::thread_result_type cleanup_thread();
 
-        template <typename F>
+        HPX_CXX_CORE_EXPORT template <typename F>
         struct thread_function
         {
             HPX_NO_UNIQUE_ADDRESS F f;
@@ -48,10 +48,12 @@ namespace hpx::threads {
             }
         };
 
-        template <typename F, typename Is = util::index_pack<>, typename... Ts>
+        HPX_CXX_CORE_EXPORT template <typename F,
+            typename Is = util::index_pack<>, typename... Ts>
         struct thread_function_nullary;
 
-        template <typename F, std::size_t... Is, typename... Ts>
+        HPX_CXX_CORE_EXPORT template <typename F, std::size_t... Is,
+            typename... Ts>
         struct thread_function_nullary<F, util::index_pack<Is...>, Ts...>
         {
             HPX_NO_UNIQUE_ADDRESS F f;
@@ -83,13 +85,13 @@ namespace hpx::threads {
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename F>
+    HPX_CXX_CORE_EXPORT template <typename F>
     HPX_FORCEINLINE thread_function_type make_thread_function(F&& f)
     {
         return {detail::thread_function<std::decay_t<F>>{HPX_FORWARD(F, f)}};
     }
 
-    HPX_CXX_EXPORT template <typename F, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename F, typename... Ts>
     HPX_FORCEINLINE thread_function_type make_thread_function_nullary(
         F&& f, Ts&&... ts)
     {
@@ -119,13 +121,13 @@ namespace hpx::threads {
     ///                   throw but returns the result code using the parameter
     ///                   \a ec. Otherwise, it throws an instance
     ///                   of hpx#exception.
-    HPX_CXX_EXPORT HPX_CORE_EXPORT void register_thread(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void register_thread(
         threads::thread_init_data& data, threads::thread_pool_base* pool,
         threads::thread_id_ref_type& id, error_code& ec = hpx::throws);
 
-    HPX_CXX_EXPORT HPX_CORE_EXPORT threads::thread_id_ref_type register_thread(
-        threads::thread_init_data& data, threads::thread_pool_base* pool,
-        error_code& ec = hpx::throws);
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT threads::thread_id_ref_type
+    register_thread(threads::thread_init_data& data,
+        threads::thread_pool_base* pool, error_code& ec = hpx::throws);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Create a new \a thread using the given data on the same thread
@@ -147,12 +149,12 @@ namespace hpx::threads {
     ///                   \a hpx#throws this function doesn't throw but returns
     ///                   the result code using the parameter \a ec. Otherwise,
     ///                   it throws an instance of hpx#exception.
-    HPX_CXX_EXPORT HPX_CORE_EXPORT void register_thread(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void register_thread(
         threads::thread_init_data& data, threads::thread_id_ref_type& id,
         error_code& ec = throws);
 
-    HPX_CXX_EXPORT HPX_CORE_EXPORT threads::thread_id_ref_type register_thread(
-        threads::thread_init_data& data, error_code& ec = throws);
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT threads::thread_id_ref_type
+    register_thread(threads::thread_init_data& data, error_code& ec = throws);
 
     /// \brief Create a new work item using the given data.
     ///
@@ -168,7 +170,7 @@ namespace hpx::threads {
     ///                   \a hpx#throws this function doesn't throw but returns
     ///                   the result code using the parameter \a ec. Otherwise,
     ///                   it throws an instance of hpx#exception.
-    HPX_CXX_EXPORT HPX_CORE_EXPORT thread_id_ref_type register_work(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT thread_id_ref_type register_work(
         threads::thread_init_data& data, threads::thread_pool_base* pool,
         error_code& ec = hpx::throws);
 
@@ -188,6 +190,6 @@ namespace hpx::threads {
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise, it throws an instance
     ///                   of hpx#exception.
-    HPX_CXX_EXPORT HPX_CORE_EXPORT thread_id_ref_type register_work(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT thread_id_ref_type register_work(
         threads::thread_init_data& data, error_code& ec = throws);
 }    // namespace hpx::threads

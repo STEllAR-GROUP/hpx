@@ -281,9 +281,9 @@ namespace hpx::util {
     }    // namespace detail
 
     // enable using format in variadic contexts
-    HPX_CXX_EXPORT HPX_CORE_EXPORT std::string const& format();
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT std::string const& format();
 
-    HPX_CXX_EXPORT template <typename... Args>
+    HPX_CXX_CORE_EXPORT template <typename... Args>
     std::string format(std::string_view format_str, Args const&... args)
     {
         detail::format_arg const format_args[] = {
@@ -291,7 +291,7 @@ namespace hpx::util {
         return detail::format(format_str, format_args, sizeof...(Args));
     }
 
-    HPX_CXX_EXPORT template <typename... Args>
+    HPX_CXX_CORE_EXPORT template <typename... Args>
     std::ostream& format_to(
         std::ostream& os, std::string_view format_str, Args const&... args)
     {
@@ -331,7 +331,7 @@ namespace hpx::util {
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename Range>
+    HPX_CXX_CORE_EXPORT template <typename Range>
     detail::format_join<Range> format_join(
         Range const& range, std::string_view delimiter) noexcept
     {

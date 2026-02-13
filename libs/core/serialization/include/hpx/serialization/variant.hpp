@@ -26,7 +26,7 @@ namespace hpx::serialization {
     namespace detail {
 
         ////////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT struct std_variant_save_visitor
+        HPX_CXX_CORE_EXPORT struct std_variant_save_visitor
         {
             explicit constexpr std_variant_save_visitor(
                 output_archive& ar) noexcept
@@ -45,10 +45,10 @@ namespace hpx::serialization {
         };
 
         ////////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename... Ts>
+        HPX_CXX_CORE_EXPORT template <typename... Ts>
         struct std_variant_impl;
 
-        HPX_CXX_EXPORT template <typename T, typename... Ts>
+        HPX_CXX_CORE_EXPORT template <typename T, typename... Ts>
         struct std_variant_impl<T, Ts...>
         {
             template <typename V>
@@ -75,7 +75,7 @@ namespace hpx::serialization {
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename... Ts>
     void save(output_archive& ar, std::variant<Ts...> const& v, unsigned)
     {
         auto const which = static_cast<std::uint64_t>(v.index());
@@ -84,7 +84,7 @@ namespace hpx::serialization {
         std::visit(visitor, v);
     }
 
-    HPX_CXX_EXPORT template <typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename... Ts>
     void load(input_archive& ar, std::variant<Ts...>& v, unsigned)
     {
         std::uint64_t which;
@@ -101,6 +101,6 @@ namespace hpx::serialization {
             ar, static_cast<std::size_t>(which), v);
     }
 
-    HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE(
-        HPX_CXX_EXPORT, (template <typename... Ts>), (std::variant<Ts...>) )
+    HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE(HPX_CXX_CORE_EXPORT,
+        (template <typename... Ts>), (std::variant<Ts...>) )
 }    // namespace hpx::serialization

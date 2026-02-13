@@ -6,7 +6,7 @@
 
 #include <hpx/config.hpp>
 
-// The checked MSVC std library breaks this test
+// The checked MSVC std library breaks compilation of this test
 #if !(defined(HPX_MSVC) && defined(HPX_DEBUG))
 
 #define SHARED_PRIORITY_SCHEDULER_DEBUG true
@@ -36,12 +36,13 @@
 #include <vector>
 
 // The allocator that binds pages to numa domains
-#include <hpx/compute_local/host/numa_binding_allocator.hpp>
+#include <hpx/modules/compute_local.hpp>
+// Scheduler that honours numa placement hints for tasks
+#include <hpx/modules/schedulers.hpp>
+
 // Example binder functions for different page binding mappings
 #include "allocator_binder_linear.hpp"
 #include "allocator_binder_matrix.hpp"
-// Scheduler that honours numa placement hints for tasks
-#include <hpx/modules/schedulers.hpp>
 
 // ------------------------------------------------------------------------
 // allocator maker for this test
@@ -166,7 +167,7 @@ void test_binding(std::shared_ptr<Binder<T>> numa_binder, Allocator& allocator)
 }
 
 // ------------------------------------------------------------------------
-// this is called on an hpx thread after the runtime starts up
+// this is called on a hpx thread after the runtime starts up
 // ------------------------------------------------------------------------
 int hpx_main(hpx::program_options::variables_map& vm)
 {
@@ -218,7 +219,8 @@ void init_resource_partitioner_handler(
     using numa_scheduler =
         hpx::threads::policies::shared_priority_queue_scheduler<>;
     using hpx::threads::policies::scheduler_mode;
-    // setup the default pool with a numa aware scheduler
+
+    // set up the default pool with a numa aware scheduler
     rp.create_thread_pool("default",
         [](hpx::threads::thread_pool_init_parameters init,
             hpx::threads::policies::thread_queue_init_parameters
@@ -242,7 +244,7 @@ void init_resource_partitioner_handler(
 
 // the normal int main function that is called at startup and runs on an OS thread
 // the user must call hpx::init to start the hpx runtime which will execute hpx_main
-// on an hpx thread
+// on a hpx thread
 int main(int argc, char* argv[])
 {
     hpx::program_options::options_description desc_cmdline("Test options");
@@ -278,7 +280,7 @@ int main(int argc, char* argv[])
             .run(),
         vm);
 
-    // Setup the init parameters
+    // Set up the init parameters
     hpx::local::init_params init_args;
     init_args.desc_cmdline = desc_cmdline;
     // Set the callback to init the thread_pools

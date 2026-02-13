@@ -21,7 +21,7 @@
 
 namespace hpx::serialization {
 
-    HPX_CXX_EXPORT template <typename T, std::size_t N, typename Allocator>
+    HPX_CXX_CORE_EXPORT template <typename T, std::size_t N, typename Allocator>
     void load(input_archive& ar, boost::multi_array<T, N, Allocator>& marray,
         unsigned)
     {
@@ -36,7 +36,7 @@ namespace hpx::serialization {
         // clang-format on
     }
 
-    HPX_CXX_EXPORT template <typename T, std::size_t N, typename Allocator>
+    HPX_CXX_CORE_EXPORT template <typename T, std::size_t N, typename Allocator>
     void save(output_archive& ar,
         boost::multi_array<T, N, Allocator> const& marray, unsigned)
     {
@@ -46,7 +46,7 @@ namespace hpx::serialization {
         // clang-format on
     }
 
-    HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE(HPX_CXX_EXPORT,
+    HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE(HPX_CXX_CORE_EXPORT,
         (template <typename T, std::size_t N, typename Allocator>),
         (boost::multi_array<T, N, Allocator>) )
 }    // namespace hpx::serialization

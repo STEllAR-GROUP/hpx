@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2025 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -53,9 +53,18 @@
 ///////////////////////////////////////////////////////////////////////////////
 // C++20 module export definitions
 #if defined(HPX_COMPILE_BMI)
-# define HPX_CXX_EXPORT                  export
-#else
-# define HPX_CXX_EXPORT                  /* empty */
+# if defined(HPX_COMPILE_CORE_WITH_MODULES)
+#  define HPX_CXX_CORE_EXPORT                   export
+# elif defined(HPX_COMPILE_FULL_WITH_MODULES)
+#  define HPX_CXX_EXPORT                        export
+# endif
+#endif
+
+#if !defined(HPX_CXX_CORE_EXPORT)
+# define HPX_CXX_CORE_EXPORT                    /* empty */
+#endif
+#if !defined(HPX_CXX_EXPORT)
+# define HPX_CXX_EXPORT                         /* empty */
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -96,10 +105,3 @@
 #endif
 
 // clang-format on
-
-// Simplify the condition whether HPX modules should be imported or not
-#if !defined(HPX_HAVE_CXX_MODULES) || defined(HPX_CORE_EXPORTS)
-#undef HPX_COMPILE_WITH_MODULES
-#else
-#define HPX_COMPILE_WITH_MODULES
-#endif

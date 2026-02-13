@@ -24,7 +24,7 @@
 namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
-    struct HPX_EXPORT command_line_handling
+    HPX_CXX_EXPORT struct HPX_EXPORT command_line_handling
       : hpx::local::detail::command_line_handling
     {
         using base_type = hpx::local::detail::command_line_handling;

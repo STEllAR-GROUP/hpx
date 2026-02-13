@@ -15,7 +15,7 @@
 
 namespace hpx::detail {
 
-    HPX_CXX_EXPORT template <typename Entry>
+    HPX_CXX_CORE_EXPORT template <typename Entry>
     class intrusive_list
     {
     public:

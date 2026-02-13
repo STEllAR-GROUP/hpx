@@ -1,0 +1,39 @@
+# Copyright (c) 2026 The STE||AR Group
+#
+# SPDX-License-Identifier: BSL-1.0
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+name: Check Modules CMakeLists
+
+on:
+  push
+
+jobs:
+    check-module-cmakelists:
+        runs-on: ubuntu-latest
+        container: stellargroup/build_env:17
+        steps:
+        - uses: actions/checkout@v6
+
+        - name: Check if the headers of the modules are listed in their CMakeLists.txt
+          shell: bash
+          run: |
+            ./tools/check_module_cmakelists.sh
+            if [[ $(wc -l /tmp/missing_files.txt | awk '{print $1}') -gt 1 ]] \
+                || [[ $(wc -l /tmp/missing_deps.txt | awk '{print $1}') -gt 1 ]]; \
+                then exit 1; fi
+
+        - name: Upload Missing Files Artifacts
+          if: success() || failure()
+          uses: actions/upload-artifact@v6
+          with:
+            name: missing_files.txt
+            path: /tmp/missing_files.txt
+
+        - name: Upload Missing Deps Artifacts
+          if: success() || failure()
+          uses: actions/upload-artifact@v6
+          with:
+            name: missing_deps.txt
+            path: /tmp/missing_deps.txt

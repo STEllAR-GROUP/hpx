@@ -26,16 +26,16 @@ namespace hpx::threads::policies {
 
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
-    HPX_CXX_EXPORT using default_background_scheduler_terminated_queue =
+    HPX_CXX_CORE_EXPORT using default_background_scheduler_terminated_queue =
         lockfree_lifo;
 #else
-    HPX_CXX_EXPORT using default_background_scheduler_terminated_queue =
+    HPX_CXX_CORE_EXPORT using default_background_scheduler_terminated_queue =
         lockfree_fifo;
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
     // The background_scheduler_scheduler runs only background work
-    HPX_CXX_EXPORT template <typename Mutex = std::mutex,
+    HPX_CXX_CORE_EXPORT template <typename Mutex = std::mutex,
         typename PendingQueuing = lockfree_fifo,
         typename StagedQueuing = lockfree_fifo,
         typename TerminatedQueuing =

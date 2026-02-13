@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/io_service.hpp>
 #include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
@@ -18,6 +19,7 @@
 #include <hpx/modules/timing.hpp>
 #include <hpx/modules/topology.hpp>
 #include <hpx/threadmanager/threadmanager_fwd.hpp>
+#include <hpx/util/get_entry_as.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -37,7 +39,7 @@ namespace hpx::threads {
     ///////////////////////////////////////////////////////////////////////////
     /// The \a thread-manager class is the central instance of management for
     /// all (non-depleted) threads
-    HPX_CXX_EXPORT class threadmanager
+    HPX_CXX_CORE_EXPORT class threadmanager
     {
     private:
         // we use a simple mutex to protect the data members of the
@@ -135,6 +137,19 @@ namespace hpx::threads {
 
         void wait() const;
         bool wait_for(hpx::chrono::steady_duration const& rel_time) const;
+
+        template <typename StopToken>
+        bool wait_for(StopToken&& stop_token,
+            hpx::chrono::steady_duration const& rel_time) const
+        {
+            auto const shutdown_check_count =
+                hpx::util::get_entry_as<std::size_t>(
+                    rtcfg_, "hpx.shutdown_check_count", 10);
+            return hpx::util::detail::yield_while_count_timeout(
+                [this]() { return is_busy(); },
+                HPX_FORWARD(StopToken, stop_token), shutdown_check_count,
+                rel_time);
+        }
 
         // \brief Suspend all thread pools.
         void suspend() const;

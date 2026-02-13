@@ -426,15 +426,15 @@ namespace hpx { namespace ranges {
 
 namespace hpx::ranges {
 
-    HPX_CXX_EXPORT template <typename I, typename F>
+    HPX_CXX_CORE_EXPORT template <typename I, typename F>
     using for_each_result = in_fun_result<I, F>;
 
-    HPX_CXX_EXPORT template <typename I, typename F>
+    HPX_CXX_CORE_EXPORT template <typename I, typename F>
     using for_each_n_result = in_fun_result<I, F>;
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::for_each
-    HPX_CXX_EXPORT inline constexpr struct for_each_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct for_each_t final
       : hpx::detail::tag_parallel_algorithm<for_each_t>
     {
         template <typename InIter, typename Sent, typename F,
@@ -545,7 +545,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::for_each_n
-    HPX_CXX_EXPORT inline constexpr struct for_each_n_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct for_each_n_t final
       : hpx::detail::tag_parallel_algorithm<for_each_n_t>
     {
         template <typename InIter, typename Size, typename F,

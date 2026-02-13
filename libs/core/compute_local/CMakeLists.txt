@@ -19,12 +19,15 @@ set(compute_local_headers
     hpx/compute_local/host/numa_domains.hpp
     hpx/compute_local/host/target.hpp
     hpx/compute_local/host/traits/access_target.hpp
+    hpx/compute_local/macros.hpp
     hpx/compute_local/serialization/vector.hpp
     hpx/compute_local/traits/access_target.hpp
     hpx/compute_local/traits/allocator_traits.hpp
     hpx/compute_local/traits.hpp
     hpx/compute_local/vector.hpp
 )
+
+set(compute_local_macro_headers hpx/compute_local/macros.hpp)
 
 # cmake-format: off
 set(compute_local_compat_headers
@@ -44,6 +47,7 @@ add_hpx_module(
   GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${compute_local_sources}
   HEADERS ${compute_local_headers}
+  MACRO_HEADERS ${compute_local_macro_headers}
   COMPAT_HEADERS ${compute_local_compat_headers}
   MODULE_DEPENDENCIES
     hpx_algorithms

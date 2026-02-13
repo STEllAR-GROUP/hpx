@@ -20,9 +20,9 @@
 #include <hpx/components_base/server/fixed_component_base.hpp>
 #include <hpx/modules/allocator_support.hpp>
 #include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/naming_base.hpp>
+#include <hpx/modules/parcelset_base.hpp>
 #include <hpx/modules/synchronization.hpp>
-#include <hpx/naming_base/id_type.hpp>
-#include <hpx/parcelset_base/traits/action_get_embedded_parcel.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -134,8 +134,7 @@ namespace hpx::agas::server {
     private:
         // REVIEW: Separate mutexes might reduce contention here. This has to be
         // investigated carefully.
-        mutex_type mutex_;
-
+        mutex_type mutex_ = mutex_type("primary_namespace");
         gva_table_type gvas_;
         refcnt_table_type refcnts_;
 

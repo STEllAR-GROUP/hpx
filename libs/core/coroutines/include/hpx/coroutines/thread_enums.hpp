@@ -24,7 +24,7 @@ namespace hpx::threads {
     ///
     /// The \a thread_schedule_state enumerator encodes the current state of a
     /// \a thread instance
-    HPX_CXX_EXPORT enum class thread_schedule_state : std::int8_t
+    HPX_CXX_CORE_EXPORT enum class thread_schedule_state : std::int8_t
     {
         unknown = 0,
         active = 1,                   /*!< thread is currently active (running,
@@ -57,7 +57,7 @@ namespace hpx::threads {
     };
     // clang-format on
 
-    HPX_CXX_EXPORT HPX_CORE_EXPORT std::ostream& operator<<(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT std::ostream& operator<<(
         std::ostream& os, thread_schedule_state t);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -67,7 +67,7 @@ namespace hpx::threads {
     /// thread_state constant.
     ///
     /// \param state this represents the thread state.
-    HPX_CXX_EXPORT HPX_CORE_EXPORT char const* get_thread_state_name(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT char const* get_thread_state_name(
         thread_schedule_state state) noexcept;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -75,7 +75,7 @@ namespace hpx::threads {
 
     /// This enumeration lists all possible thread-priorities for HPX threads.
     ///
-    HPX_CXX_EXPORT enum class thread_priority : std::int8_t
+    HPX_CXX_CORE_EXPORT enum class thread_priority : std::int8_t
     {
         unknown = -1,
         default_ = 0, /*!< Will assign the priority of the
@@ -115,7 +115,7 @@ namespace hpx::threads {
     };
     // clang-format on
 
-    HPX_CXX_EXPORT HPX_CORE_EXPORT std::ostream& operator<<(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT std::ostream& operator<<(
         std::ostream& os, thread_priority t);
 
     ////////////////////////////////////////////////////////////////////////////
@@ -125,7 +125,7 @@ namespace hpx::threads {
     /// constant.
     ///
     /// \param priority this represents the thread priority.
-    HPX_CXX_EXPORT HPX_CORE_EXPORT char const* get_thread_priority_name(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT char const* get_thread_priority_name(
         thread_priority priority) noexcept;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -133,7 +133,7 @@ namespace hpx::threads {
     ///
     /// The \a thread_restart_state enumerator encodes the reason why a
     /// thread is being restarted
-    HPX_CXX_EXPORT enum class thread_restart_state : std::int8_t {
+    HPX_CXX_CORE_EXPORT enum class thread_restart_state : std::int8_t {
         unknown = 0,
         signaled = 1,     ///< The thread has been signaled
         timeout = 2,      ///< The thread has been reactivated after a timeout
@@ -141,24 +141,24 @@ namespace hpx::threads {
         abort = 4         ///< The thread needs to be aborted
     };
 
-    HPX_CXX_EXPORT HPX_CORE_EXPORT std::ostream& operator<<(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT std::ostream& operator<<(
         std::ostream& os, thread_restart_state t);
 
     /// Get the readable string representing the name of the given
     /// thread_restart_state constant.
-    HPX_CXX_EXPORT HPX_CORE_EXPORT char const* get_thread_state_ex_name(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT char const* get_thread_state_ex_name(
         thread_restart_state state) noexcept;
 
     /// \cond NOINTERNAL
     // special type storing both state in one tagged structure
-    HPX_CXX_EXPORT using thread_state =
+    HPX_CXX_CORE_EXPORT using thread_state =
         threads::detail::combined_tagged_state<thread_schedule_state,
             thread_restart_state>;
     /// \endcond
 
     /// Get the readable string representing the name of the given
     /// thread_state constant.
-    HPX_CXX_EXPORT HPX_CORE_EXPORT char const* get_thread_state_name(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT char const* get_thread_state_name(
         thread_state state) noexcept;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -166,7 +166,7 @@ namespace hpx::threads {
     ///
     /// A \a thread_stacksize references any of the possible stack-sizes for
     /// HPX threads.
-    HPX_CXX_EXPORT enum class thread_stacksize : std::int8_t {
+    HPX_CXX_CORE_EXPORT enum class thread_stacksize : std::int8_t {
         unknown = -1,
         small_ = 1,     ///< use small stack size (the underscore is to work
                         ///  around 'small' being defined to char on Windows)
@@ -182,7 +182,7 @@ namespace hpx::threads {
         maximal = huge,       ///< use maximally stack size
     };
 
-    HPX_CXX_EXPORT HPX_CORE_EXPORT std::ostream& operator<<(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT std::ostream& operator<<(
         std::ostream& os, thread_stacksize t);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -192,14 +192,14 @@ namespace hpx::threads {
     /// constant.
     ///
     /// \param size this represents the stack size
-    HPX_CXX_EXPORT HPX_CORE_EXPORT char const* get_stack_size_enum_name(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT char const* get_stack_size_enum_name(
         thread_stacksize size) noexcept;
 
     ///////////////////////////////////////////////////////////////////////////
     /// \enum thread_schedule_hint_mode
     ///
     /// The type of hint given when creating new tasks.
-    HPX_CXX_EXPORT enum class thread_schedule_hint_mode : std::int8_t {
+    HPX_CXX_CORE_EXPORT enum class thread_schedule_hint_mode : std::int8_t {
         /// A hint that leaves the choice of scheduling entirely up to the
         /// scheduler.
         none = 0,
@@ -225,7 +225,7 @@ namespace hpx::threads {
     /// \enum thread_placement_hint
     ///
     /// The type of hint given to the scheduler related to thread placement
-    HPX_CXX_EXPORT enum class thread_placement_hint : std::int8_t {
+    HPX_CXX_CORE_EXPORT enum class thread_placement_hint : std::int8_t {
         /// No hint is specified. The implementation is free to chose what
         /// placement methods to use.
         none = 0,
@@ -258,7 +258,7 @@ namespace hpx::threads {
     ///
     /// The type of hint given to the scheduler related to whether it is ok to
     /// share the invoked function object between threads
-    HPX_CXX_EXPORT enum class thread_sharing_hint : std::int8_t {
+    HPX_CXX_CORE_EXPORT enum class thread_sharing_hint : std::int8_t {
         /// No hint is specified. The implementation is free to chose what
         /// sharing methods to use.
         none = 0,
@@ -274,7 +274,7 @@ namespace hpx::threads {
         do_not_combine_tasks = 2
     };
 
-    HPX_CXX_EXPORT constexpr bool do_not_share_function(
+    HPX_CXX_CORE_EXPORT constexpr bool do_not_share_function(
         thread_sharing_hint hint) noexcept
     {
         return static_cast<std::int8_t>(hint) &
@@ -282,14 +282,14 @@ namespace hpx::threads {
                 thread_sharing_hint::do_not_share_function);
     }
 
-    HPX_CXX_EXPORT constexpr bool do_not_combine_tasks(
+    HPX_CXX_CORE_EXPORT constexpr bool do_not_combine_tasks(
         thread_sharing_hint hint) noexcept
     {
         return static_cast<std::int8_t>(hint) &
             static_cast<std::int8_t>(thread_sharing_hint::do_not_combine_tasks);
     }
 
-    HPX_CXX_EXPORT constexpr thread_sharing_hint operator|(
+    HPX_CXX_CORE_EXPORT constexpr thread_sharing_hint operator|(
         thread_sharing_hint lhs, thread_sharing_hint rhs) noexcept
     {
         return static_cast<thread_sharing_hint>(
@@ -301,7 +301,7 @@ namespace hpx::threads {
     ///
     /// The type of hint given to the scheduler related running a thread as a
     /// child directly in the context of the parent thread
-    HPX_CXX_EXPORT enum class thread_execution_hint : std::int8_t {
+    HPX_CXX_CORE_EXPORT enum class thread_execution_hint : std::int8_t {
         /// No hint is specified. Always run the thread in its own execution
         /// environment.
         none = 0,
@@ -311,7 +311,7 @@ namespace hpx::threads {
         run_as_child = 1,
     };
 
-    HPX_CXX_EXPORT constexpr bool run_as_child(
+    HPX_CXX_CORE_EXPORT constexpr bool run_as_child(
         thread_execution_hint hint) noexcept
     {
         return static_cast<std::int8_t>(hint) &
@@ -323,10 +323,10 @@ namespace hpx::threads {
     /// will attempt to execute associated threads directly if they have not
     /// started running).
 #if defined(HPX_COROUTINES_HAVE_THREAD_SCHEDULE_HINT_RUNS_AS_CHILD)
-    HPX_CXX_EXPORT inline constexpr thread_execution_hint
+    HPX_CXX_CORE_EXPORT inline constexpr thread_execution_hint
         default_runs_as_child_hint = thread_execution_hint::run_as_child;
 #else
-    HPX_CXX_EXPORT inline constexpr thread_execution_hint
+    HPX_CXX_CORE_EXPORT inline constexpr thread_execution_hint
         default_runs_as_child_hint = thread_execution_hint::none;
 #endif
 
@@ -336,7 +336,7 @@ namespace hpx::threads {
     ///
     /// A scheduler is free to ignore the hint, or modify the hint to suit the
     /// resources available to the scheduler.
-    HPX_CXX_EXPORT struct thread_schedule_hint
+    HPX_CXX_CORE_EXPORT struct thread_schedule_hint
     {
         /// Construct a default hint with mode thread_schedule_hint_mode::none.
         constexpr thread_schedule_hint() noexcept
@@ -351,7 +351,7 @@ namespace hpx::threads {
 
         /// Construct a hint with mode thread_schedule_hint_mode::thread and the
         /// given hint as the local thread number.
-        constexpr explicit thread_schedule_hint(std::int16_t thread_hint,
+        constexpr explicit thread_schedule_hint(std::int16_t const thread_hint,
             thread_placement_hint placement = thread_placement_hint::none,
             thread_execution_hint runs_as_child = default_runs_as_child_hint,
             thread_sharing_hint sharing = thread_sharing_hint::none) noexcept
@@ -366,8 +366,8 @@ namespace hpx::threads {
 
         /// Construct a hint with the given mode and hint. The numerical hint is
         /// unused when the mode is thread_schedule_hint_mode::none.
-        constexpr thread_schedule_hint(thread_schedule_hint_mode mode,
-            std::int16_t hint,
+        constexpr thread_schedule_hint(thread_schedule_hint_mode const mode,
+            std::int16_t const hint,
             thread_placement_hint placement = thread_placement_hint::none,
             thread_execution_hint runs_as_child = default_runs_as_child_hint,
             thread_sharing_hint sharing = thread_sharing_hint::none) noexcept

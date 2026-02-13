@@ -104,7 +104,7 @@ namespace hpx {
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename F>
+    HPX_CXX_CORE_EXPORT template <typename F>
     detail::annotated_function<std::decay_t<F>> annotated_function(
         F&& f, char const* name = nullptr)
     {
@@ -113,7 +113,7 @@ namespace hpx {
         return result_type(HPX_FORWARD(F, f), name);
     }
 
-    HPX_CXX_EXPORT template <typename F>
+    HPX_CXX_CORE_EXPORT template <typename F>
     detail::annotated_function<std::decay_t<F>> annotated_function(
         F&& f, std::string name)
     {
@@ -133,13 +133,13 @@ namespace hpx {
     /// Annotating includes setting the thread description per thread id.
     ///
     /// \param f Function to annotate
-    HPX_CXX_EXPORT template <typename F>
+    HPX_CXX_CORE_EXPORT template <typename F>
     constexpr F&& annotated_function(F&& f, char const* = nullptr) noexcept
     {
         return HPX_FORWARD(F, f);
     }
 
-    HPX_CXX_EXPORT template <typename F>
+    HPX_CXX_CORE_EXPORT template <typename F>
     constexpr F&& annotated_function(F&& f, std::string const&) noexcept
     {
         return HPX_FORWARD(F, f);
@@ -150,7 +150,7 @@ namespace hpx {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 
 ///////////////////////////////////////////////////////////////////////////
-HPX_CXX_EXPORT template <typename F>
+HPX_CXX_CORE_EXPORT template <typename F>
 struct hpx::traits::get_function_address<hpx::detail::annotated_function<F>>
 {
     static constexpr std::size_t call(
@@ -160,7 +160,7 @@ struct hpx::traits::get_function_address<hpx::detail::annotated_function<F>>
     }
 };
 
-HPX_CXX_EXPORT template <typename F>
+HPX_CXX_CORE_EXPORT template <typename F>
 struct hpx::traits::get_function_annotation<hpx::detail::annotated_function<F>>
 {
     static constexpr char const* call(

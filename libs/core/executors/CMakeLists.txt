@@ -26,6 +26,7 @@ set(executors_headers
     hpx/executors/explicit_scheduler_executor.hpp
     hpx/executors/fork_join_executor.hpp
     hpx/executors/limiting_executor.hpp
+    hpx/executors/macros.hpp
     hpx/executors/parallel_executor_aggregated.hpp
     hpx/executors/parallel_executor.hpp
     hpx/executors/post.hpp
@@ -40,6 +41,8 @@ set(executors_headers
     hpx/executors/thread_pool_scheduler_bulk.hpp
 )
 
+set(executors_macro_headers hpx/executors/macros.hpp)
+
 if(HPX_WITH_DATAPAR)
   set(executors_headers
       ${executors_headers} hpx/executors/datapar/execution_policy_fwd.hpp
@@ -51,6 +54,9 @@ endif()
 if(HPX_LIKWID_WITH_LIKWID)
   set(executors_headers ${executors_headers} hpx/executors/likwid_executor.hpp)
   set(additional_dependencies hpx_likwid)
+endif()
+if(HPX_TRACY_WITH_TRACY)
+  set(additional_dependencies hpx_tracy)
 endif()
 
 # Default location is $HPX_ROOT/libs/executors/include_compatibility
@@ -98,6 +104,7 @@ add_hpx_module(
   GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${executors_sources}
   HEADERS ${executors_headers}
+  MACRO_HEADERS ${executors_macro_headers}
   COMPAT_HEADERS ${executors_compat_headers}
   MODULE_DEPENDENCIES
     hpx_allocator_support

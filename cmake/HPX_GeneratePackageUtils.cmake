@@ -14,6 +14,8 @@ endmacro(get_target_property)
 # https://github.com/boost-cmake/bcm/blob/master/share/bcm/cmake/BCMPkgConfig.cmake
 # https://gitlab.kitware.com/cmake/cmake/issues/17984
 
+set(_hpx_generate_package_utils_dir ${CMAKE_CURRENT_LIST_DIR})
+
 # Recursively add the interface_include_dirs of the dependencies and link them
 function(
   hpx_collect_usage_requirements
@@ -396,26 +398,72 @@ function(hpx_generate_pkgconfig_from_target target template is_build)
     hpx_link_libraries hpx_link_options hpx_library_list
   )
 
-  string(TOLOWER ${CMAKE_BUILD_TYPE} build_type)
+  get_property(is_multi_config GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+  if(is_multi_config)
+    # For multi-config generators, we generate a single template and use
+    # configuration-specific file generation.
+    configure_file(
+      ${_hpx_generate_package_utils_dir}/templates/${template}.pc.in
+      ${OUTPUT_DIR}${template}_configurable.pc.in @ONLY ESCAPE_QUOTES
+    )
 
-  configure_file(
-    cmake/templates/${template}.pc.in
-    ${OUTPUT_DIR}${template}_${build_type}.pc.in @ONLY ESCAPE_QUOTES
-  )
-  # Can't use generator expression directly as name of output file (solved in
-  # CMake 3.20)
-  file(
-    GENERATE
-    OUTPUT ${OUTPUT_DIR}/${template}_${build_type}.pc
-    INPUT ${OUTPUT_DIR}${template}_${build_type}.pc.in
-  )
-  # Temporary (to deprecate gradually)
-  if("${build_type}" MATCHES "rel")
+    set(config_types ${CMAKE_CONFIGURATION_TYPES})
+    if(NOT config_types)
+      set(config_types Debug Release RelWithDebInfo MinSizeRel)
+    endif()
+
+    set(default_config "")
+    foreach(config_type ${config_types})
+      string(TOLOWER ${config_type} config_lower)
+
+      file(
+        GENERATE
+        OUTPUT ${OUTPUT_DIR}/${template}_${config_lower}.pc
+        INPUT ${OUTPUT_DIR}${template}_configurable.pc.in
+        CONDITION "$<CONFIG:${config_type}>"
+      )
+
+      # We track a default configuration (preferring Release) to generate the
+      # legacy .pc file for backward compatibility.
+      if(NOT default_config OR "${config_lower}" STREQUAL "release")
+        if(NOT default_config OR NOT "${default_config}" STREQUAL "release")
+          if("${config_lower}" MATCHES "rel")
+            set(default_config ${config_type})
+          endif()
+        endif()
+      endif()
+    endforeach()
+
+    if(default_config)
+      file(
+        GENERATE
+        OUTPUT ${OUTPUT_DIR}/${template}.pc
+        INPUT ${OUTPUT_DIR}${template}_configurable.pc.in
+        CONDITION "$<CONFIG:${default_config}>"
+      )
+    endif()
+  else()
+    # Logic for single-config generators
+    string(TOLOWER ${CMAKE_BUILD_TYPE} build_type)
+
+    configure_file(
+      ${_hpx_generate_package_utils_dir}/templates/${template}.pc.in
+      ${OUTPUT_DIR}${template}_${build_type}.pc.in @ONLY ESCAPE_QUOTES
+    )
+
     file(
       GENERATE
-      OUTPUT ${OUTPUT_DIR}/${template}.pc
+      OUTPUT ${OUTPUT_DIR}/${template}_${build_type}.pc
       INPUT ${OUTPUT_DIR}${template}_${build_type}.pc.in
     )
+
+    if("${build_type}" MATCHES "rel")
+      file(
+        GENERATE
+        OUTPUT ${OUTPUT_DIR}/${template}.pc
+        INPUT ${OUTPUT_DIR}${template}_${build_type}.pc.in
+      )
+    endif()
   endif()
 
 endfunction(hpx_generate_pkgconfig_from_target)

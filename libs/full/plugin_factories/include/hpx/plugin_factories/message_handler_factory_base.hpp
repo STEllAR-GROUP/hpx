@@ -12,8 +12,7 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/plugin.hpp>
 
-#include <hpx/parcelset_base/parcelset_base_fwd.hpp>
-#include <hpx/parcelset_base/policies/message_handler.hpp>
+#include <hpx/modules/parcelset_base.hpp>
 #include <hpx/plugin_factories/plugin_factory_base.hpp>
 
 #include <cstddef>

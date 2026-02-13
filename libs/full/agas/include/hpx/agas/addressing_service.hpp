@@ -18,10 +18,9 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/synchronization.hpp>
-#include <hpx/naming_base/address.hpp>
-#include <hpx/naming_base/id_type.hpp>
 #include <hpx/parcelset/parcelset_fwd.hpp>
 
 #include <atomic>
@@ -72,15 +71,18 @@ namespace hpx { namespace agas {
         mutable hpx::shared_mutex gva_cache_mtx_;
         std::shared_ptr<gva_cache_type> gva_cache_;
 
-        mutable mutex_type migrated_objects_mtx_;
+        mutable mutex_type migrated_objects_mtx_ =
+            mutex_type("addressing_service::migrated_objects_mtx");
         migrated_objects_table_type migrated_objects_table_;
 
-        mutable mutex_type console_cache_mtx_;
+        mutable mutex_type console_cache_mtx_ =
+            mutex_type("addressing_service::console_cache_mtx");
         std::uint32_t console_cache_;
 
         std::size_t const max_refcnt_requests_;
 
-        mutex_type refcnt_requests_mtx_;
+        mutex_type refcnt_requests_mtx_ =
+            mutex_type("addressing_service::refcnt_requests_mtx");
         std::size_t refcnt_requests_count_;
         bool enable_refcnt_caching_;
 

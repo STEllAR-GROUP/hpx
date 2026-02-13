@@ -16,8 +16,8 @@
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
 #include <hpx/components_base/server/fixed_component_base.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/synchronization.hpp>
-#include <hpx/naming_base/id_type.hpp>
 
 #include <atomic>
 #include <cstdint>
@@ -54,7 +54,7 @@ namespace hpx::agas::server {
         using on_event_data_map_type = std::multimap<std::string, hpx::id_type>;
 
     private:
-        mutex_type mutex_;
+        mutex_type mutex_ = mutex_type("symbol_namespace");
         gid_table_type gids_;
         std::string instance_name_;
         on_event_data_map_type on_event_data_;

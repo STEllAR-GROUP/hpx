@@ -23,7 +23,7 @@
 
 namespace hpx::util {
 
-    HPX_CXX_EXPORT template <typename Incrementable,
+    HPX_CXX_CORE_EXPORT template <typename Incrementable,
         typename CategoryOrTraversal = void, typename Difference = void,
         typename Enable = void>
     class counting_iterator;
@@ -91,7 +91,7 @@ namespace hpx::util {
 
     ////////////////////////////////////////////////////////////////////////////
     // specialization for Iterators (non-integral types)
-    HPX_CXX_EXPORT template <typename Incrementable,
+    HPX_CXX_CORE_EXPORT template <typename Incrementable,
         typename CategoryOrTraversal, typename Difference, typename Enable>
     class counting_iterator
       : public detail::counting_iterator_base<Incrementable,
@@ -124,7 +124,7 @@ namespace hpx::util {
         }
     };
 
-    HPX_CXX_EXPORT template <typename Incrementable,
+    HPX_CXX_CORE_EXPORT template <typename Incrementable,
         typename CategoryOrTraversal, typename Difference>
     class counting_iterator<Incrementable, CategoryOrTraversal, Difference,
         std::enable_if_t<std::is_integral_v<Incrementable>>>
@@ -193,7 +193,7 @@ namespace hpx::util {
     };
 
     // Manufacture a counting iterator for an arbitrary incrementable type
-    HPX_CXX_EXPORT template <typename Incrementable>
+    HPX_CXX_CORE_EXPORT template <typename Incrementable>
     counting_iterator(Incrementable x) -> counting_iterator<Incrementable>;
 
     template <typename Incrementable>

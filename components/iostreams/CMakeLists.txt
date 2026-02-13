@@ -15,7 +15,7 @@ set(HPX_COMPONENTS
 )
 
 set(iostreams_headers
-    hpx/components/iostreams/server/buffer.hpp
+    hpx/components/iostreams/server/data_buffer.hpp
     hpx/components/iostreams/server/order_output.hpp
     hpx/components/iostreams/server/output_stream.hpp
     hpx/components/iostreams/export_definitions.hpp

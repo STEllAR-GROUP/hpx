@@ -31,6 +31,7 @@ add_hpx_module(
   HEADERS ${checkpoint_headers}
   COMPAT_HEADERS ${checkpoint_compat_headers}
   DEPENDENCIES hpx_core
-  MODULE_DEPENDENCIES hpx_async_distributed hpx_checkpoint_base hpx_naming
+  MODULE_DEPENDENCIES hpx_async_distributed hpx_actions_base hpx_components_base
+                      hpx_naming hpx_runtime_components hpx_runtime_distributed
   CMAKE_SUBDIRS examples tests
 )

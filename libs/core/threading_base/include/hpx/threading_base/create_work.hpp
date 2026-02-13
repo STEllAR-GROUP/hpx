@@ -12,7 +12,7 @@
 
 namespace hpx::threads::detail {
 
-    HPX_CXX_EXPORT HPX_CORE_EXPORT thread_id_ref_type create_work(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT thread_id_ref_type create_work(
         policies::scheduler_base* scheduler, threads::thread_init_data& data,
         error_code& ec = throws);
 }    // namespace hpx::threads::detail

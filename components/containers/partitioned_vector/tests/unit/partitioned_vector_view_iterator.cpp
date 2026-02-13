@@ -122,7 +122,7 @@ int main()
 {
     using vector_type = hpx::partitioned_vector<double>;
 
-    std::size_t const size_x = 32;
+    std::size_t const size_x = 16;
     std::size_t const size_y = 4;
     std::size_t const size_z = hpx::get_num_localities(hpx::launch::sync);
 

@@ -10,11 +10,11 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/string_util.hpp>
 
 #include <hpx/components_base/component_startup_shutdown.hpp>
-#include <hpx/naming_base/id_type.hpp>
 #include <hpx/parcel_coalescing/counter_registry.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>

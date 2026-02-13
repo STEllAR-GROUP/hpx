@@ -27,7 +27,7 @@
 namespace hpx::parallel::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
     struct datapar_find
     {
         template <typename Iterator, typename Sentinel, typename T,
@@ -58,7 +58,7 @@ namespace hpx::parallel::detail {
         }
     };
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename Iterator,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iterator,
         typename Sentinel, typename T, typename Proj = hpx::identity>
         requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE Iterator tag_invoke(
@@ -79,7 +79,7 @@ namespace hpx::parallel::detail {
         }
     }
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename FwdIter,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename FwdIter,
         typename Token, typename T, typename Proj>
         requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE void tag_invoke(sequential_find_t<ExPolicy>,
@@ -91,7 +91,7 @@ namespace hpx::parallel::detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
     struct datapar_find_if
     {
         template <typename Iterator, typename Sentinel, typename Pred,
@@ -136,7 +136,7 @@ namespace hpx::parallel::detail {
         }
     };
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename Iterator,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iterator,
         typename Sentinel, typename Pred, typename Proj = hpx::identity>
         requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE Iterator tag_invoke(
@@ -158,7 +158,7 @@ namespace hpx::parallel::detail {
         }
     }
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename FwdIter,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename FwdIter,
         typename Token, typename F, typename Proj>
         requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE void tag_invoke(
@@ -169,7 +169,7 @@ namespace hpx::parallel::detail {
             HPX_FORWARD(F, op), HPX_FORWARD(Proj, proj));
     }
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename FwdIter,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename FwdIter,
         typename Token, typename F, typename Proj>
         requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE void tag_invoke(
@@ -182,7 +182,7 @@ namespace hpx::parallel::detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
     struct datapar_find_if_not
     {
         template <typename Iterator, typename Sentinel, typename Pred,
@@ -227,7 +227,7 @@ namespace hpx::parallel::detail {
         }
     };
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename Iterator,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iterator,
         typename Sentinel, typename Pred, typename Proj = hpx::identity>
         requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE Iterator tag_invoke(
@@ -249,7 +249,7 @@ namespace hpx::parallel::detail {
         }
     }
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename FwdIter,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename FwdIter,
         typename Token, typename F, typename Proj>
         requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE void tag_invoke(
@@ -260,7 +260,7 @@ namespace hpx::parallel::detail {
             HPX_FORWARD(F, op), HPX_FORWARD(Proj, proj));
     }
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename FwdIter,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename FwdIter,
         typename Token, typename F, typename Proj>
         requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE void tag_invoke(
@@ -273,7 +273,7 @@ namespace hpx::parallel::detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
     struct datapar_find_end_t
     {
         template <typename Iter1, typename Sent1, typename Iter2,
@@ -333,9 +333,9 @@ namespace hpx::parallel::detail {
         }
     };
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename Iter1, typename Sent1,
-        typename Iter2, typename Sent2, typename Pred, typename Proj1,
-        typename Proj2>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter1,
+        typename Sent1, typename Iter2, typename Sent2, typename Pred,
+        typename Proj1, typename Proj2>
         requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE Iter1 tag_invoke(
         sequential_find_end_t<ExPolicy>, Iter1 first1, Sent1 last1,
@@ -361,8 +361,9 @@ namespace hpx::parallel::detail {
         }
     }
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename Iter1, typename Iter2,
-        typename Token, typename Pred, typename Proj1, typename Proj2>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter1,
+        typename Iter2, typename Token, typename Pred, typename Proj1,
+        typename Proj2>
         requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE void tag_invoke(
         sequential_find_end_t<ExPolicy>, Iter1 it, Iter2 first2,
@@ -390,7 +391,7 @@ namespace hpx::parallel::detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
     struct datapar_find_first_of
     {
         template <typename InIter1, typename InIter2, typename Pred,
@@ -449,7 +450,7 @@ namespace hpx::parallel::detail {
         }
     };
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename InIter1,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename InIter1,
         typename InIter2, typename Pred, typename Proj1, typename Proj2>
         requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE InIter1 tag_invoke(
@@ -477,7 +478,7 @@ namespace hpx::parallel::detail {
         }
     }
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename FwdIter,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename FwdIter,
         typename FwdIter2, typename Token, typename Pred, typename Proj1,
         typename Proj2>
         requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)

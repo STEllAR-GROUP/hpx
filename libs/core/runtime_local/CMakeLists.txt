@@ -33,6 +33,7 @@ set(runtime_local_headers
     hpx/runtime_local/state.hpp
     hpx/runtime_local/shutdown_function.hpp
     hpx/runtime_local/startup_function.hpp
+    hpx/runtime_local/termination_detection.hpp
     hpx/runtime_local/thread_hooks.hpp
     hpx/runtime_local/thread_mapper.hpp
     hpx/runtime_local/thread_pool_helpers.hpp
@@ -86,8 +87,9 @@ set(runtime_local_sources
     thread_stacktrace.cpp
 )
 
+set(additional_dependencies)
 if(HPX_LIKWID_WITH_LIKWID)
-  set(additional_dependencies hpx_likwid)
+  set(additional_dependencies ${additional_dependencies} hpx_likwid)
   set(runtime_local_sources ${runtime_local_sources} likwid_init.cpp)
 endif()
 

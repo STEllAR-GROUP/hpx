@@ -43,6 +43,10 @@ set(concurrency_compat_headers
 # Default location is $HPX_ROOT/libs/concurrency/src
 set(concurrency_sources barrier.cpp)
 
+if(HPX_TRACY_WITH_TRACY)
+  set(additional_dependencies hpx_tracy)
+endif()
+
 include(HPX_AddModule)
 add_hpx_module(
   core concurrency
@@ -51,8 +55,10 @@ add_hpx_module(
   SOURCES ${concurrency_sources}
   HEADERS ${concurrency_headers}
   COMPAT_HEADERS ${concurrency_compat_headers}
-  ADD_TO_GLOBAL_HEADER "hpx/concurrency/detail/contiguous_index_queue.hpp"
-                       "hpx/concurrency/detail/non_contiguous_index_queue.hpp"
+  ADD_TO_GLOBAL_HEADER
+    "hpx/concurrency/detail/contiguous_index_queue.hpp"
+    "hpx/concurrency/detail/non_contiguous_index_queue.hpp"
+    "hpx/concurrency/detail/tagged_ptr.hpp"
   MODULE_DEPENDENCIES
     hpx_allocator_support
     hpx_assertion
@@ -67,5 +73,6 @@ add_hpx_module(
     hpx_thread_support
     hpx_type_support
     hpx_version
+    ${additional_dependencies}
   CMAKE_SUBDIRS examples tests
 )

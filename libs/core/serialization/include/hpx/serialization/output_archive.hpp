@@ -31,7 +31,7 @@ namespace hpx::serialization {
 
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename Container>
+        HPX_CXX_CORE_EXPORT template <typename Container>
         std::unique_ptr<erased_output_container> create_output_container(
             Container& buffer, std::vector<serialization_chunk>* chunks,
             binary_filter* filter,
@@ -69,7 +69,7 @@ namespace hpx::serialization {
             return res;
         }
 
-        HPX_CXX_EXPORT template <typename Container>
+        HPX_CXX_CORE_EXPORT template <typename Container>
         std::unique_ptr<erased_output_container> create_output_container(
             Container& buffer, std::vector<serialization_chunk>* chunks,
             binary_filter* filter,
@@ -92,7 +92,7 @@ namespace hpx::serialization {
     }    // namespace detail
 
     ////////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT struct output_archive : basic_archive<output_archive>
+    HPX_CXX_CORE_EXPORT struct output_archive : basic_archive<output_archive>
     {
     private:
         static constexpr std::uint32_t make_flags(std::uint32_t flags,

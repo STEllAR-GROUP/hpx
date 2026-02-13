@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -31,7 +31,7 @@ namespace hpx {
     ///             the user to take full responsibility for keeping the
     ///             referenced objects alive long enough.
     ///
-    HPX_EXPORT hpx::id_type unmanaged(hpx::id_type const& id);
+    HPX_CXX_EXPORT HPX_EXPORT hpx::id_type unmanaged(hpx::id_type const& id);
 }    // namespace hpx
 
 namespace hpx::naming {

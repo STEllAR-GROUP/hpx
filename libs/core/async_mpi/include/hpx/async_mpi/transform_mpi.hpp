@@ -70,7 +70,7 @@ namespace hpx::mpi::experimental {
                 request);
         }
 
-        HPX_CXX_EXPORT template <typename R, typename F>
+        HPX_CXX_CORE_EXPORT template <typename R, typename F>
         struct transform_mpi_receiver
         {
 #if defined(HPX_HAVE_STDEXEC)
@@ -140,7 +140,7 @@ namespace hpx::mpi::experimental {
             }
         };
 
-        HPX_CXX_EXPORT template <typename Sender, typename F>
+        HPX_CXX_CORE_EXPORT template <typename Sender, typename F>
         struct transform_mpi_sender
         {
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Sender> s;
@@ -269,7 +269,7 @@ namespace hpx::mpi::experimental {
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT inline constexpr struct transform_mpi_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct transform_mpi_t final
       : hpx::functional::detail::tag_fallback<transform_mpi_t>
     {
     private:

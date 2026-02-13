@@ -38,10 +38,10 @@ namespace hpx::threads::policies {
 
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
-    HPX_CXX_EXPORT using default_local_priority_queue_scheduler_terminated_queue =
+    HPX_CXX_CORE_EXPORT using default_local_priority_queue_scheduler_terminated_queue =
         lockfree_lifo;
 #else
-    HPX_CXX_EXPORT using default_local_priority_queue_scheduler_terminated_queue =
+    HPX_CXX_CORE_EXPORT using default_local_priority_queue_scheduler_terminated_queue =
         lockfree_fifo;
 #endif
 
@@ -53,7 +53,7 @@ namespace hpx::threads::policies {
     /// are executed by the first N OS threads before any other work is
     /// executed. Low priority threads are executed by the last OS thread
     /// whenever no other work is available.
-    HPX_CXX_EXPORT template <typename Mutex = std::mutex,
+    HPX_CXX_CORE_EXPORT template <typename Mutex = std::mutex,
         typename PendingQueuing = lockfree_fifo,
         typename StagedQueuing = lockfree_fifo,
         typename TerminatedQueuing =
@@ -750,10 +750,10 @@ namespace hpx::threads::policies {
             }
 
             thread_queue_type* this_queue = queues_[num_thread].data_;
-            for (thread_queue_type* q :
-                {bound_queues_[num_thread].data_, this_queue})
-            {
-                bool result = q->get_next_thread(thrd);
+            bool result = false;
+
+            auto f = [&](thread_queue_type* q) {
+                result = q->get_next_thread(thrd);
 
 #ifdef HPX_HAVE_THREAD_STEALING_COUNTS
                 q->increment_num_pending_accesses();
@@ -767,10 +767,18 @@ namespace hpx::threads::policies {
 
                 // Give up, we should have work to convert.
                 if (q->get_staged_queue_length(std::memory_order_relaxed) != 0)
-                {
-                    return false;
-                }
-            }
+                    return true;
+
+                return false;
+            };
+
+            result = false;
+            if (f(bound_queues_[num_thread].data_))
+                return result;
+
+            result = false;
+            if (f(this_queue))
+                return result;
 
             if (!running)
             {
@@ -1454,13 +1462,16 @@ namespace hpx::threads::policies {
             }
 
             thread_queue_type* this_queue = queues_[num_thread].data_;
-            for (thread_queue_type* q :
-                {bound_queues_[num_thread].data_, this_queue})
-            {
+            auto f = [&](thread_queue_type* q) {
                 result = q->wait_or_add_new(running, added) && result;
-                if (0 != added)
-                    return result;
-            }
+                return 0 != added;
+            };
+
+            if (f(bound_queues_[num_thread].data_))
+                return result;
+
+            if (f(this_queue))
+                return result;
 
             // Check if we have been disabled
             if (!running)

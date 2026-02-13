@@ -38,7 +38,7 @@ namespace hpx::parallel::execution {
     // extensions
 
     // forward declare timed_executor wrapper
-    HPX_CXX_EXPORT template <executor_any BaseExecutor>
+    HPX_CXX_CORE_EXPORT template <executor_any BaseExecutor>
     struct timed_executor;
 
     // define customization points
@@ -66,7 +66,7 @@ namespace hpx::parallel::execution {
     ///       calling execution::post() on the underlying non-time-scheduled
     ///       execution agent.
     ///
-    HPX_CXX_EXPORT inline constexpr struct post_at_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct post_at_t final
       : hpx::functional::detail::tag_fallback<post_at_t>
     {
     private:
@@ -101,7 +101,7 @@ namespace hpx::parallel::execution {
     ///       calling execution::post() on the underlying non-time-scheduled
     ///       execution agent.
     ///
-    HPX_CXX_EXPORT inline constexpr struct post_after_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct post_after_t final
       : hpx::functional::detail::tag_fallback<post_after_t>
     {
     private:
@@ -142,7 +142,7 @@ namespace hpx::parallel::execution {
     ///       calling execution::async_execute() on the underlying
     ///       non-time-scheduled execution agent.
     ///
-    HPX_CXX_EXPORT inline constexpr struct async_execute_at_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct async_execute_at_t final
       : hpx::functional::detail::tag_fallback<async_execute_at_t>
     {
     private:
@@ -178,7 +178,7 @@ namespace hpx::parallel::execution {
     ///       calling execution::async_execute() on the underlying
     ///       non-time-scheduled execution agent.
     ///
-    HPX_CXX_EXPORT inline constexpr struct async_execute_after_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct async_execute_after_t final
       : hpx::functional::detail::tag_fallback<async_execute_after_t>
     {
     private:
@@ -214,7 +214,7 @@ namespace hpx::parallel::execution {
     ///       calling execution::sync_execute() on the underlying
     ///       non-time-scheduled execution agent.
     ///
-    HPX_CXX_EXPORT inline constexpr struct sync_execute_at_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct sync_execute_at_t final
       : hpx::functional::detail::tag_fallback<sync_execute_at_t>
     {
     private:
@@ -250,7 +250,7 @@ namespace hpx::parallel::execution {
     ///       calling execution::sync_execute() on the underlying
     ///       non-time-scheduled execution agent.
     ///
-    HPX_CXX_EXPORT inline constexpr struct sync_execute_after_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct sync_execute_after_t final
       : hpx::functional::detail::tag_fallback<sync_execute_after_t>
     {
     private:

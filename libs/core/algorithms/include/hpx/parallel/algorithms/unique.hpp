@@ -331,8 +331,8 @@ namespace hpx::parallel {
         /// \cond NOINTERNAL
 
         // sequential unique with projection function
-        HPX_CXX_EXPORT template <typename FwdIter, typename Sent, typename Pred,
-            typename Proj>
+        HPX_CXX_CORE_EXPORT template <typename FwdIter, typename Sent,
+            typename Pred, typename Proj>
         constexpr FwdIter sequential_unique(
             FwdIter first, Sent last, Pred&& pred, Proj&& proj)
         {
@@ -359,7 +359,7 @@ namespace hpx::parallel {
             return ++result;
         }
 
-        HPX_CXX_EXPORT template <typename Iter>
+        HPX_CXX_CORE_EXPORT template <typename Iter>
         struct unique : public algorithm<unique<Iter>, Iter>
         {
             constexpr unique() noexcept
@@ -486,7 +486,7 @@ namespace hpx::parallel {
         /// \cond NOINTERNAL
 
         // sequential unique_copy with projection function
-        HPX_CXX_EXPORT template <typename FwdIter, typename Sent,
+        HPX_CXX_CORE_EXPORT template <typename FwdIter, typename Sent,
             typename OutIter, typename Pred, typename Proj>
         constexpr unique_copy_result<FwdIter, OutIter> sequential_unique_copy(
             FwdIter first, Sent last, OutIter dest, Pred&& pred, Proj&& proj,
@@ -519,7 +519,7 @@ namespace hpx::parallel {
         }
 
         // sequential unique_copy with projection function
-        HPX_CXX_EXPORT template <typename InIter, typename Sent,
+        HPX_CXX_CORE_EXPORT template <typename InIter, typename Sent,
             typename OutIter, typename Pred, typename Proj>
         constexpr unique_copy_result<InIter, OutIter> sequential_unique_copy(
             InIter first, Sent last, OutIter dest, Pred&& pred, Proj&& proj,
@@ -549,7 +549,7 @@ namespace hpx::parallel {
                 HPX_MOVE(first), HPX_MOVE(dest)};
         }
 
-        HPX_CXX_EXPORT template <typename IterPair>
+        HPX_CXX_CORE_EXPORT template <typename IterPair>
         struct unique_copy : public algorithm<unique_copy<IterPair>, IterPair>
         {
             constexpr unique_copy() noexcept
@@ -683,7 +683,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::unique
-    HPX_CXX_EXPORT inline constexpr struct unique_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct unique_t final
       : hpx::detail::tag_parallel_algorithm<unique_t>
     {
         template <typename FwdIter,
@@ -734,7 +734,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::unique_copy
-    HPX_CXX_EXPORT inline constexpr struct unique_copy_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct unique_copy_t final
       : hpx::detail::tag_parallel_algorithm<unique_copy_t>
     {
         template <typename InIter, typename OutIter,
