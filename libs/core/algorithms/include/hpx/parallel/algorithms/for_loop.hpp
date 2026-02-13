@@ -1066,7 +1066,7 @@ namespace hpx::parallel {
                     loop_iter(hpx::util::begin(g), hpx::util::end(g),
                         part_index, current_thread);
                 }
-                else if constexpr (hpx::traits::is_range_v<B>)
+                else if constexpr (std::ranges::range<B>)
                 {
                     loop_iter(hpx::util::begin(part_begin),
                         hpx::util::end(part_begin), part_index, current_thread);
@@ -1128,7 +1128,7 @@ namespace hpx::parallel {
                     parallel::util::loop_ind<std::decay_t<ExPolicy>>(
                         hpx::util::begin(g), hpx::util::end(g), f_);
                 }
-                else if constexpr (hpx::traits::is_range_v<IterOrR>)
+                else if constexpr (std::ranges::range<IterOrR>)
                 {
                     parallel::util::loop(hpx::util::begin(part_begin),
                         hpx::util::end(part_begin), f_);
@@ -1488,7 +1488,7 @@ namespace hpx::parallel {
             }
 
             static_assert(
-                std::is_integral_v<B> || hpx::traits::is_forward_iterator_v<B>,
+                std::is_integral_v<B> || std::forward_iterator<B>,
                 "Requires at least forward iterator or integral loop "
                 "boundaries.");
 
@@ -1516,11 +1516,11 @@ namespace hpx::parallel {
                 }
             }
 
-            using iterator = hpx::traits::range_iterator_t<R>;
-            static_assert((hpx::traits::is_range_v<R> &&
-                              hpx::traits::is_forward_iterator_v<iterator>) ||
+            using iterator = std::ranges::iterator_t<R>;
+            static_assert((std::ranges::range<R> &&
+                              std::forward_iterator<iterator>) ||
                     (hpx::traits::is_range_generator_v<R> &&
-                        hpx::traits::is_input_iterator_v<iterator>),
+                        std::input_iterator<iterator>),
                 "For ranges, requires at least forward iterator boundaries, "
                 "for range generators requires at least input iterator "
                 "boundaries.");
@@ -1557,11 +1557,11 @@ namespace hpx::parallel {
             if (stride < 0)
             {
                 HPX_ASSERT(std::is_integral_v<E> ||
-                    hpx::traits::is_bidirectional_iterator_v<E>);
+                    std::bidirectional_iterator<E>);
             }
 
             static_assert(
-                std::is_integral_v<B> || hpx::traits::is_forward_iterator_v<B>,
+                std::is_integral_v<B> || std::forward_iterator<B>,
                 "Requires at least forward iterator or integral loop "
                 "boundaries.");
 
@@ -1596,11 +1596,11 @@ namespace hpx::parallel {
             // bidirectional iterator
             if (stride < 0)
             {
-                HPX_ASSERT(hpx::traits::is_bidirectional_iterator_v<
+                HPX_ASSERT(std::bidirectional_iterator<
                     hpx::traits::range_category_t<R>>);
             }
 
-            static_assert(hpx::traits::is_forward_iterator_v<
+            static_assert(std::forward_iterator<
                               hpx::traits::range_category_t<R>>,
                 "Requires at least forward iterator or integral loop "
                 "boundaries.");
@@ -1628,11 +1628,11 @@ namespace hpx::parallel {
             if (stride < 0)
             {
                 HPX_ASSERT(std::is_integral_v<B> ||
-                    hpx::traits::is_bidirectional_iterator_v<B>);
+                    std::bidirectional_iterator<B>);
             }
 
             static_assert(
-                std::is_integral_v<B> || hpx::traits::is_forward_iterator_v<B>,
+                std::is_integral_v<B> || std::forward_iterator<B>,
                 "Requires at least forward iterator or integral loop "
                 "boundaries.");
 

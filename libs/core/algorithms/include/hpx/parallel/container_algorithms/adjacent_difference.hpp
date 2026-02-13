@@ -356,15 +356,15 @@ namespace hpx::ranges {
              requires (
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
-                hpx::traits::is_sentinel_for_v<Sent, FwdIter1>
+                std::sentinel_for<Sent, FwdIter1>
             )
         // clang-format on
         friend FwdIter2 tag_fallback_invoke(hpx::ranges::adjacent_difference_t,
             FwdIter1 first, Sent last, FwdIter2 dest)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Required at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::adjacent_difference<FwdIter2>().call(
@@ -373,16 +373,16 @@ namespace hpx::ranges {
 
         template <typename Rng, typename FwdIter2>
         // clang-format off
-            requires(hpx::traits::is_range_v<Rng> &&
+            requires(std::ranges::range<Rng> &&
                 hpx::traits::is_iterator_v<FwdIter2>)
         // clang-format on
         friend FwdIter2 tag_fallback_invoke(
             hpx::ranges::adjacent_difference_t, Rng&& rng, FwdIter2 dest)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<
-                              hpx::traits::range_iterator_t<Rng>>,
+            static_assert(std::forward_iterator<
+                              std::ranges::iterator_t<Rng>>,
                 "Required at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::adjacent_difference<FwdIter2>().call(
@@ -397,16 +397,16 @@ namespace hpx::ranges {
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
-                hpx::traits::is_sentinel_for_v<Sent, FwdIter1>
+                std::sentinel_for<Sent, FwdIter1>
             )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(
             hpx::ranges::adjacent_difference_t, ExPolicy&& policy,
             FwdIter1 first, Sent last, FwdIter2 dest)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Required at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::adjacent_difference<FwdIter2>().call(
@@ -418,7 +418,7 @@ namespace hpx::ranges {
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                std::ranges::range<Rng> &&
                 hpx::traits::is_iterator_v<FwdIter2>
             )
         // clang-format on
@@ -426,10 +426,10 @@ namespace hpx::ranges {
             hpx::ranges::adjacent_difference_t, ExPolicy&& policy, Rng&& rng,
             FwdIter2 dest)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<
-                              hpx::traits::range_iterator_t<Rng>>,
+            static_assert(std::forward_iterator<
+                              std::ranges::iterator_t<Rng>>,
                 "Required at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::adjacent_difference<FwdIter2>().call(
@@ -442,14 +442,14 @@ namespace hpx::ranges {
         // clang-format off
             requires(hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
-                hpx::traits::is_sentinel_for_v<Sent, FwdIter1>)
+                std::sentinel_for<Sent, FwdIter1>)
         // clang-format on
         friend FwdIter2 tag_fallback_invoke(hpx::ranges::adjacent_difference_t,
             FwdIter1 first, Sent last, FwdIter2 dest, Op op)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Required at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::adjacent_difference<FwdIter2>().call(
@@ -460,17 +460,17 @@ namespace hpx::ranges {
         template <typename Rng, typename FwdIter2, typename Op>
         // clang-format off
              requires (
-                hpx::traits::is_range_v<Rng> &&
+                std::ranges::range<Rng> &&
                 hpx::traits::is_iterator_v<FwdIter2>
             )
         // clang-format on
         friend FwdIter2 tag_fallback_invoke(
             hpx::ranges::adjacent_difference_t, Rng&& rng, FwdIter2 dest, Op op)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<
-                              hpx::traits::range_iterator_t<Rng>>,
+            static_assert(std::forward_iterator<
+                              std::ranges::iterator_t<Rng>>,
                 "Required at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::adjacent_difference<FwdIter2>().call(
@@ -485,16 +485,16 @@ namespace hpx::ranges {
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
-                hpx::traits::is_sentinel_for_v<Sent, FwdIter1>
+                std::sentinel_for<Sent, FwdIter1>
             )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(
             hpx::ranges::adjacent_difference_t, ExPolicy&& policy,
             FwdIter1 first, Sent last, FwdIter2 dest, Op op)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Required at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::adjacent_difference<FwdIter2>().call(
@@ -506,7 +506,7 @@ namespace hpx::ranges {
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                std::ranges::range<Rng> &&
                 hpx::traits::is_iterator_v<FwdIter2>
             )
         // clang-format on
@@ -514,10 +514,10 @@ namespace hpx::ranges {
             hpx::ranges::adjacent_difference_t, ExPolicy&& policy, Rng&& rng,
             FwdIter2 dest, Op op)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<
-                              hpx::traits::range_iterator_t<Rng>>,
+            static_assert(std::forward_iterator<
+                              std::ranges::iterator_t<Rng>>,
                 "Required at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::adjacent_difference<FwdIter2>().call(

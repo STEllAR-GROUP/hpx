@@ -41,7 +41,7 @@ namespace hpx::parallel::util::detail {
 
     HPX_CXX_CORE_EXPORT template <typename Range>
     struct chunk_size_iterator_category<Range,
-        std::enable_if_t<hpx::traits::is_range_v<Range>>>
+        std::enable_if_t<std::ranges::range<Range>>>
     {
         using type = hpx::traits::range_category_t<Range>;
     };
@@ -77,9 +77,9 @@ namespace hpx::parallel::util::detail {
 
     HPX_CXX_CORE_EXPORT template <typename Range>
     struct iterator_type<Range,
-        std::enable_if_t<hpx::traits::is_range_v<Range>>>
+        std::enable_if_t<std::ranges::range<Range>>>
     {
-        using type = hpx::traits::range_iterator_t<Range>;
+        using type = std::ranges::iterator_t<Range>;
     };
 
     HPX_CXX_CORE_EXPORT template <typename IterOrR>
@@ -99,7 +99,7 @@ namespace hpx::parallel::util::detail {
 
         static_assert(std::is_integral_v<IterOrR> ||
             hpx::traits::is_iterator_v<IterOrR> ||
-            hpx::traits::is_range_v<IterOrR> ||
+            std::ranges::range<IterOrR> ||
             hpx::traits::is_range_generator_v<IterOrR>);
 
         static constexpr bool is_iterator = hpx::traits::is_iterator_v<IterOrR>;
@@ -261,7 +261,7 @@ namespace hpx::parallel::util::detail {
 
         template <typename Iter = IterOrR>
         // clang-format off
-            requires (hpx::traits::is_bidirectional_iterator_v<
+            requires (std::bidirectional_iterator<
                                       iterator_type_t<Iter>> ||
                 hpx::traits::is_range_generator_v<Iter> ||
                 std::is_integral_v<Iter>
@@ -274,7 +274,7 @@ namespace hpx::parallel::util::detail {
 
         template <typename Iter = IterOrR>
         // clang-format off
-            requires (hpx::traits::is_random_access_iterator_v<
+            requires (std::random_access_iterator<
                                       iterator_type_t<Iter>> ||
                 hpx::traits::is_range_generator_v<Iter> ||
                 std::is_integral_v<Iter>
@@ -295,7 +295,7 @@ namespace hpx::parallel::util::detail {
 
         template <typename Iter = IterOrR>
         // clang-format off
-            requires (hpx::traits::is_random_access_iterator_v<
+            requires (std::random_access_iterator<
                                       iterator_type_t<Iter>> ||
                 hpx::traits::is_range_generator_v<Iter> ||
                 std::is_integral_v<Iter>
@@ -330,7 +330,7 @@ namespace hpx::parallel::util::detail {
 
         static_assert(std::is_integral_v<IterOrR> ||
             hpx::traits::is_iterator_v<IterOrR> ||
-            hpx::traits::is_range_v<IterOrR> ||
+            std::ranges::range<IterOrR> ||
             hpx::traits::is_range_generator_v<IterOrR>);
 
         static constexpr bool is_iterator = hpx::traits::is_iterator_v<IterOrR>;
@@ -507,7 +507,7 @@ namespace hpx::parallel::util::detail {
 
         template <typename Iter = IterOrR>
         // clang-format off
-            requires (hpx::traits::is_bidirectional_iterator_v<
+            requires (std::bidirectional_iterator<
                                       iterator_type_t<Iter>> ||
                 hpx::traits::is_range_generator_v<Iter> ||
                 std::is_integral_v<Iter>
@@ -520,7 +520,7 @@ namespace hpx::parallel::util::detail {
 
         template <typename Iter = IterOrR>
         // clang-format off
-            requires (hpx::traits::is_random_access_iterator_v<
+            requires (std::random_access_iterator<
                                       iterator_type_t<Iter>> ||
                 hpx::traits::is_range_generator_v<Iter> ||
                 std::is_integral_v<Iter>
@@ -541,7 +541,7 @@ namespace hpx::parallel::util::detail {
 
         template <typename Iter = IterOrR>
         // clang-format off
-            requires (hpx::traits::is_random_access_iterator_v<
+            requires (std::random_access_iterator<
                                       iterator_type_t<Iter>> ||
                 hpx::traits::is_range_generator_v<Iter> ||
                 std::is_integral_v<Iter>

@@ -536,9 +536,9 @@ namespace hpx {
             InIter first, InIter last, OutIter dest, BinOp binary_op,
             UnOp unary_op)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Requires at least input iterator.");
-            static_assert(hpx::traits::is_output_iterator_v<OutIter>,
+            static_assert(std::output_iterator<OutIter>,
                 "Requires at least output iterator.");
 
             using result_type = parallel::util::in_out_result<InIter, OutIter>;
@@ -571,9 +571,9 @@ namespace hpx {
             FwdIter1 first, FwdIter1 last, FwdIter2 dest, BinOp binary_op,
             UnOp unary_op)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Requires at least forward iterator.");
 
             using result_type =
@@ -606,9 +606,9 @@ namespace hpx {
             InIter first, InIter last, OutIter dest, BinOp binary_op,
             UnOp unary_op, T init)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Requires at least input iterator.");
-            static_assert(hpx::traits::is_output_iterator_v<OutIter>,
+            static_assert(std::output_iterator<OutIter>,
                 "Requires at least output iterator.");
 
             using result_type = parallel::util::in_out_result<InIter, OutIter>;
@@ -643,9 +643,9 @@ namespace hpx {
             FwdIter1 first, FwdIter1 last, FwdIter2 dest, BinOp binary_op,
             UnOp unary_op, T init)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Requires at least forward iterator.");
 
             using result_type =

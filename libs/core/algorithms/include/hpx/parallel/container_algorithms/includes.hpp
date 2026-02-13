@@ -376,9 +376,9 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_sentinel_for_v<Sent1, Iter1> &&
+                std::sentinel_for<Sent1, Iter1> &&
                 hpx::parallel::traits::is_projected_v<Proj1, Iter1> &&
-                hpx::traits::is_sentinel_for_v<Sent2, Iter2> &&
+                std::sentinel_for<Sent2, Iter2> &&
                 hpx::parallel::traits::is_projected_v<Proj2, Iter2> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy, Pred,
                     hpx::parallel::traits::projected<Proj1, Iter1>,
@@ -391,9 +391,9 @@ namespace hpx::ranges {
             Sent1 last1, Iter2 first2, Sent2 last2, Pred op = Pred(),
             Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<Iter1>,
+            static_assert(std::forward_iterator<Iter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<Iter2>,
+            static_assert(std::forward_iterator<Iter2>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::includes().call(
@@ -406,9 +406,9 @@ namespace hpx::ranges {
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
             requires(
-                hpx::traits::is_sentinel_for_v<Sent1, Iter1> &&
+                std::sentinel_for<Sent1, Iter1> &&
                 hpx::parallel::traits::is_projected_v<Proj1, Iter1> &&
-                hpx::traits::is_sentinel_for_v<Sent2, Iter2> &&
+                std::sentinel_for<Sent2, Iter2> &&
                 hpx::parallel::traits::is_projected_v<Proj2, Iter2> &&
                 hpx::parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Pred,
@@ -421,9 +421,9 @@ namespace hpx::ranges {
             Iter2 first2, Sent2 last2, Pred op = Pred(), Proj1 proj1 = Proj1(),
             Proj2 proj2 = Proj2())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<Iter1>,
+            static_assert(std::forward_iterator<Iter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<Iter2>,
+            static_assert(std::forward_iterator<Iter2>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::includes().call(hpx::execution::seq,
@@ -437,9 +437,9 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng1> &&
+                std::ranges::range<Rng1> &&
                 hpx::parallel::traits::is_projected_range_v<Proj1, Rng1> &&
-                hpx::traits::is_range_v<Rng2> &&
+                std::ranges::range<Rng2> &&
                 hpx::parallel::traits::is_projected_range_v<Proj2, Rng2> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy, Pred,
                     hpx::parallel::traits::projected_range<Proj1, Rng1>,
@@ -452,12 +452,12 @@ namespace hpx::ranges {
             Rng2&& rng2, Pred op = Pred(), Proj1 proj1 = Proj1(),
             Proj2 proj2 = Proj2())
         {
-            using iterator_type1 = hpx::traits::range_iterator_t<Rng1>;
-            using iterator_type2 = hpx::traits::range_iterator_t<Rng2>;
+            using iterator_type1 = std::ranges::iterator_t<Rng1>;
+            using iterator_type2 = std::ranges::iterator_t<Rng2>;
 
-            static_assert(hpx::traits::is_forward_iterator_v<iterator_type1>,
+            static_assert(std::forward_iterator<iterator_type1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<iterator_type2>,
+            static_assert(std::forward_iterator<iterator_type2>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::includes().call(
@@ -472,9 +472,9 @@ namespace hpx::ranges {
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
             requires(
-                hpx::traits::is_range_v<Rng1> &&
+                std::ranges::range<Rng1> &&
                 hpx::parallel::traits::is_projected_range_v<Proj1, Rng1> &&
-                hpx::traits::is_range_v<Rng2> &&
+                std::ranges::range<Rng2> &&
                 hpx::parallel::traits::is_projected_range_v<Proj2, Rng2> &&
                 hpx::parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Pred,
@@ -486,12 +486,12 @@ namespace hpx::ranges {
         friend bool tag_fallback_invoke(includes_t, Rng1&& rng1, Rng2&& rng2,
             Pred op = Pred(), Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
         {
-            using iterator_type1 = hpx::traits::range_iterator_t<Rng1>;
-            using iterator_type2 = hpx::traits::range_iterator_t<Rng2>;
+            using iterator_type1 = std::ranges::iterator_t<Rng1>;
+            using iterator_type2 = std::ranges::iterator_t<Rng2>;
 
-            static_assert(hpx::traits::is_forward_iterator_v<iterator_type1>,
+            static_assert(std::forward_iterator<iterator_type1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<iterator_type2>,
+            static_assert(std::forward_iterator<iterator_type2>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::includes().call(hpx::execution::seq,

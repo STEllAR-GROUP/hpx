@@ -111,7 +111,7 @@ namespace hpx::parallel {
             using result = util::detail::algorithm_result<ExPolicy, SegIter>;
 
             using forced_seq = std::integral_constant<bool,
-                !hpx::traits::is_forward_iterator_v<SegIter>>;
+                !std::forward_iterator<SegIter>>;
 
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);
@@ -186,7 +186,7 @@ namespace hpx::segmented {
             hpx::traits::is_segmented_iterator_v<InIter>)
     InIter tag_invoke(hpx::for_each_t, InIter first, InIter last, F&& f)
     {
-        static_assert((hpx::traits::is_forward_iterator_v<InIter>),
+        static_assert((std::forward_iterator<InIter>),
             "Requires at least input iterator.");
 
         using iterator_traits = hpx::traits::segmented_iterator_traits<InIter>;
@@ -211,7 +211,7 @@ namespace hpx::segmented {
     tag_invoke(
         hpx::for_each_t, ExPolicy&& policy, SegIter first, SegIter last, F&& f)
     {
-        static_assert((hpx::traits::is_forward_iterator_v<SegIter>),
+        static_assert((std::forward_iterator<SegIter>),
             "Requires at least forward iterator.");
 
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
@@ -238,7 +238,7 @@ namespace hpx::segmented {
             hpx::traits::is_segmented_iterator_v<InIter>)
     InIter tag_invoke(hpx::for_each_n_t, InIter first, Size count, F&& f)
     {
-        static_assert((hpx::traits::is_input_iterator_v<InIter>),
+        static_assert((std::input_iterator<InIter>),
             "Requires at least input iterator.");
 
         using iterator_traits = hpx::traits::segmented_iterator_traits<InIter>;
@@ -265,7 +265,7 @@ namespace hpx::segmented {
     tag_invoke(
         hpx::for_each_n_t, ExPolicy&& policy, SegIter first, Size count, F&& f)
     {
-        static_assert((hpx::traits::is_forward_iterator_v<SegIter>),
+        static_assert((std::forward_iterator<SegIter>),
             "Requires at least input iterator.");
 
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;

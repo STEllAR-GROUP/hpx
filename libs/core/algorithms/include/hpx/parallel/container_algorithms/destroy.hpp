@@ -50,7 +50,7 @@ namespace hpx { namespace ranges {
     ///
     template <typename ExPolicy, typename Rng>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-        hpx::traits::range_iterator_t<Rng>>
+        std::ranges::iterator_t<Rng>>
     destroy(ExPolicy&& policy, Rng&& rng);
 
     /// Destroys objects of type typename iterator_traits<ForwardIt>::value_type
@@ -232,16 +232,16 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng>
+                std::ranges::range<Rng>
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            hpx::traits::range_iterator_t<Rng>>
+            std::ranges::iterator_t<Rng>>
         tag_fallback_invoke(destroy_t, ExPolicy&& policy, Rng&& rng)
         {
-            using iterator_type = hpx::traits::range_iterator_t<Rng>;
+            using iterator_type = std::ranges::iterator_t<Rng>;
 
-            static_assert(hpx::traits::is_forward_iterator_v<iterator_type>,
+            static_assert(std::forward_iterator<iterator_type>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::destroy<iterator_type>().call(
@@ -253,13 +253,13 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_sentinel_for_v<Sent, Iter>
+                std::sentinel_for<Sent, Iter>
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, Iter>
         tag_fallback_invoke(destroy_t, ExPolicy&& policy, Iter first, Sent last)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<Iter>,
+            static_assert(std::forward_iterator<Iter>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::destroy<Iter>().call(
@@ -267,13 +267,13 @@ namespace hpx::ranges {
         }
 
         template <typename Rng>
-            requires(hpx::traits::is_range_v<Rng>)
-        friend hpx::traits::range_iterator_t<Rng> tag_fallback_invoke(
+            requires(std::ranges::range<Rng>)
+        friend std::ranges::iterator_t<Rng> tag_fallback_invoke(
             destroy_t, Rng&& rng)
         {
-            using iterator_type = hpx::traits::range_iterator_t<Rng>;
+            using iterator_type = std::ranges::iterator_t<Rng>;
 
-            static_assert(hpx::traits::is_forward_iterator_v<iterator_type>,
+            static_assert(std::forward_iterator<iterator_type>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::destroy<iterator_type>().call(
@@ -285,7 +285,7 @@ namespace hpx::ranges {
             requires(hpx::traits::is_iterator_v<Iter>)
         friend Iter tag_fallback_invoke(destroy_t, Iter first, Sent last)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<Iter>,
+            static_assert(std::forward_iterator<Iter>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::destroy<Iter>().call(
@@ -312,7 +312,7 @@ namespace hpx::ranges {
         tag_fallback_invoke(
             destroy_n_t, ExPolicy&& policy, FwdIter first, Size count)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             // if count is representing a negative value, we do nothing
@@ -337,7 +337,7 @@ namespace hpx::ranges {
         friend FwdIter tag_fallback_invoke(
             destroy_n_t, FwdIter first, Size count)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             // if count is representing a negative value, we do nothing

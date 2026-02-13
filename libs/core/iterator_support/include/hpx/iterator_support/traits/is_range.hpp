@@ -13,15 +13,9 @@
 #include <iterator>
 #include <type_traits>
 #include <utility>
+#include <ranges>
 
 namespace hpx::traits {
-
-    ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_CORE_EXPORT template <typename T>
-    using is_range = util::detail::is_range<T>;
-
-    HPX_CXX_CORE_EXPORT template <typename T>
-    inline constexpr bool is_range_v = is_range<T>::value;
 
     ///////////////////////////////////////////////////////////////////////////
     // return whether a given type is a range generator (i.e. exposes supports
@@ -32,38 +26,12 @@ namespace hpx::traits {
     HPX_CXX_CORE_EXPORT template <typename T>
     inline constexpr bool is_range_generator_v = is_range_generator<T>::value;
 
-    ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_CORE_EXPORT template <typename T, typename Enable = void>
-    struct range_iterator : util::detail::iterator<T>
-    {
-    };
-
-    HPX_CXX_CORE_EXPORT template <typename Range>
-    struct range_iterator<Range, std::enable_if_t<is_range_generator_v<Range>>>
-    {
-        // clang-format off
-        using type = typename range_iterator<decltype(
-            hpx::util::iterate(std::declval<Range&>()))>::type;
-        // clang-format on
-    };
-
-    HPX_CXX_CORE_EXPORT template <typename T, typename Enable = void>
-    struct range_sentinel : util::detail::sentinel<T>
-    {
-    };
-
-    HPX_CXX_CORE_EXPORT template <typename T>
-    using range_iterator_t = typename range_iterator<T>::type;
-
-    HPX_CXX_CORE_EXPORT template <typename T>
-    using range_sentinel_t = typename range_sentinel<T>::type;
-
     // return the iterator category encapsulated by the range
     HPX_CXX_CORE_EXPORT template <typename T>
-    using range_category_t = iter_category_t<range_iterator_t<T>>;
+    using range_category_t = iter_category_t<std::ranges::iterator_t<T>>;
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_CORE_EXPORT template <typename R, bool IsRange = is_range<R>::value>
+    HPX_CXX_CORE_EXPORT template <typename R, bool IsRange = std::ranges::range<R>>
     struct range_traits
     {
     };

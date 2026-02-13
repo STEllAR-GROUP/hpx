@@ -207,7 +207,7 @@ namespace hpx::util {
         // prevent this function from being instantiated if not needed
         template <typename Iterator = Base,
             typename Enable =
-                std::enable_if_t<traits::is_bidirectional_iterator_v<Iterator>>>
+                std::enable_if_t<std::bidirectional_iterator<Iterator>>>
         HPX_HOST_DEVICE HPX_FORCEINLINE void decrement() noexcept(
             noexcept(--std::declval<Base&>()))
         {

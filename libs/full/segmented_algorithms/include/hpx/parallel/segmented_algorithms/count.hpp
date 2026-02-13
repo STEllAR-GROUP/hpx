@@ -107,7 +107,7 @@ namespace hpx { namespace parallel {
             typedef typename traits::local_iterator local_iterator_type;
 
             typedef std::integral_constant<bool,
-                !hpx::traits::is_forward_iterator_v<SegIterB>>
+                !std::forward_iterator<SegIterB>>
                 forced_seq;
 
             typedef typename std::iterator_traits<SegIterB>::difference_type
@@ -261,7 +261,7 @@ namespace hpx { namespace parallel {
             typedef typename traits::local_iterator local_iterator_type;
 
             typedef std::integral_constant<bool,
-                !hpx::traits::is_forward_iterator_v<SegIterB>>
+                !std::forward_iterator<SegIterB>>
                 forced_seq;
 
             typedef typename std::iterator_traits<SegIterB>::difference_type
@@ -348,7 +348,7 @@ namespace hpx { namespace segmented {
     typename std::iterator_traits<InIter>::difference_type tag_invoke(
         hpx::count_t, InIter first, InIter last, T const& value)
     {
-        static_assert((hpx::traits::is_input_iterator_v<InIter>),
+        static_assert((std::input_iterator<InIter>),
             "Requires at least input iterator.");
 
         using difference_type =
@@ -374,7 +374,7 @@ namespace hpx { namespace segmented {
     tag_invoke(hpx::count_t, ExPolicy&& policy, SegIter first, SegIter last,
         T const& value)
     {
-        static_assert((hpx::traits::is_forward_iterator_v<SegIter>),
+        static_assert((std::forward_iterator<SegIter>),
             "Requires at least forward iterator.");
 
         using difference_type =
@@ -400,7 +400,7 @@ namespace hpx { namespace segmented {
     typename std::iterator_traits<InIter>::difference_type tag_invoke(
         hpx::count_if_t, InIter first, InIter last, F&& f)
     {
-        static_assert((hpx::traits::is_input_iterator_v<InIter>),
+        static_assert((std::input_iterator<InIter>),
             "Requires at least input iterator.");
 
         using difference_type =
@@ -426,7 +426,7 @@ namespace hpx { namespace segmented {
     tag_invoke(
         hpx::count_if_t, ExPolicy&& policy, SegIter first, SegIter last, F&& f)
     {
-        static_assert((hpx::traits::is_forward_iterator_v<SegIter>),
+        static_assert((std::forward_iterator<SegIter>),
             "Requires at least forward iterator.");
 
         using difference_type =

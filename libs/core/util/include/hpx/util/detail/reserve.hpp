@@ -50,7 +50,7 @@ namespace hpx::traits::detail {
         Container& v, Range const& r)
     {
         using iterator_type = typename range_traits<Range>::iterator_type;
-        if constexpr (is_random_access_iterator_v<iterator_type> &&
+        if constexpr (std::random_access_iterator<iterator_type> &&
             is_reservable_v<Container>)
         {
             v.reserve(hpx::util::size(r));
@@ -61,7 +61,7 @@ namespace hpx::traits::detail {
     HPX_FORCEINLINE void reserve_if_random_access_by_range(
         Container& v, Iterator begin, Iterator end)
     {
-        if constexpr (is_random_access_iterator_v<Iterator> &&
+        if constexpr (std::random_access_iterator<Iterator> &&
             is_reservable_v<Container>)
         {
             v.reserve(std::distance(begin, end));

@@ -235,9 +235,9 @@ namespace hpx {
         friend FwdIter2 tag_fallback_invoke(hpx::swap_ranges_t, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::swap_ranges<FwdIter2>().call(
@@ -255,9 +255,9 @@ namespace hpx {
         friend decltype(auto) tag_fallback_invoke(hpx::swap_ranges_t,
             ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::swap_ranges<FwdIter2>().call(

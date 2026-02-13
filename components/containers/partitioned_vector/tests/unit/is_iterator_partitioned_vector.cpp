@@ -26,7 +26,7 @@ void is_iterator()
 
 void is_forward_iterator()
 {
-    using hpx::traits::is_forward_iterator;
+    using hpx::std::forward_iterator;
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
     using iterator = hpx::segmented::vector_iterator<int, std::vector<int>>;

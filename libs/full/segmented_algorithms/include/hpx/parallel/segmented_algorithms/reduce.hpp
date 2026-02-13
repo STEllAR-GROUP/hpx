@@ -112,7 +112,7 @@ namespace hpx { namespace parallel {
             typedef util::detail::algorithm_result<ExPolicy, T> result;
 
             typedef std::integral_constant<bool,
-                !hpx::traits::is_forward_iterator_v<SegIterB>>
+                !std::forward_iterator<SegIterB>>
                 forced_seq;
 
             segment_iterator sit = traits::segment(first);
@@ -195,10 +195,10 @@ namespace hpx { namespace segmented {
             hpx::traits::is_segmented_iterator_v<InIterE>)
     T tag_invoke(hpx::reduce_t, InIterB first, InIterE last, T init, F&& f)
     {
-        static_assert(hpx::traits::is_input_iterator_v<InIterB>,
+        static_assert(std::input_iterator<InIterB>,
             "Requires at least input iterator.");
 
-        static_assert(hpx::traits::is_input_iterator_v<InIterE>,
+        static_assert(std::input_iterator<InIterE>,
             "Requires at least input iterator.");
 
         if (first == last)
@@ -222,10 +222,10 @@ namespace hpx { namespace segmented {
     tag_invoke(hpx::reduce_t, ExPolicy&& policy, InIterB first, InIterE last,
         T init, F&& f)
     {
-        static_assert(hpx::traits::is_input_iterator_v<InIterB>,
+        static_assert(std::input_iterator<InIterB>,
             "Requires at least input iterator.");
 
-        static_assert(hpx::traits::is_input_iterator_v<InIterE>,
+        static_assert(std::input_iterator<InIterE>,
             "Requires at least input iterator.");
 
         if (first == last)

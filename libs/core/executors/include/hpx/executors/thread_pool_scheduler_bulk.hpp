@@ -430,7 +430,7 @@ namespace hpx::execution::experimental::detail {
         }
 
         using range_value_type =
-            hpx::traits::iter_value_t<hpx::traits::range_iterator_t<Shape>>;
+            hpx::traits::iter_value_t<std::ranges::iterator_t<Shape>>;
 
         template <typename... Ts>
         void execute(Ts&&... ts)

@@ -371,10 +371,10 @@ namespace hpx {
             InIter first, InIter last, RandIter d_first, RandIter d_last,
             Comp comp = Comp())
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Requires at least input iterator.");
 
-            static_assert(hpx::traits::is_random_access_iterator_v<RandIter>,
+            static_assert(std::random_access_iterator<RandIter>,
                 "Requires at least random access iterator.");
 
             using result_type = parallel::util::in_out_result<InIter, RandIter>;
@@ -403,10 +403,10 @@ namespace hpx {
             FwdIter first, FwdIter last, RandIter d_first, RandIter d_last,
             Comp comp = Comp())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
-            static_assert(hpx::traits::is_random_access_iterator_v<RandIter>,
+            static_assert(std::random_access_iterator<RandIter>,
                 "Requires at least random access iterator.");
 
             using result_type =

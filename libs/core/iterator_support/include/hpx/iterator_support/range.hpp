@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/iterator_support/traits/is_sentinel_for.hpp>
 
 #include <cstddef>
 #include <iterator>
@@ -357,7 +356,7 @@ namespace hpx::util {
         }
 
         HPX_CXX_CORE_EXPORT template <typename C,
-            typename Enable = std::enable_if_t < detail::is_range_v<C> ||
+            typename Enable = std::enable_if_t < std::ranges::range<C> ||
                 detail::is_range_generator_v<C> >>
                     [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE
                         std::size_t
@@ -368,7 +367,7 @@ namespace hpx::util {
         }
 
         HPX_CXX_CORE_EXPORT template <typename C,
-            typename Enable = std::enable_if_t < detail::is_range_v<C> ||
+            typename Enable = std::enable_if_t < std::ranges::range<C> ||
                 detail::is_range_generator_v<C> >>
                     [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE bool
                     empty(C const& c) noexcept(
@@ -399,14 +398,6 @@ namespace hpx::util {
     HPX_CXX_CORE_EXPORT using namespace range_adl;
 
     namespace detail {
-
-        HPX_CXX_CORE_EXPORT template <typename T>
-        struct is_range<T,
-            std::enable_if_t<hpx::traits::is_sentinel_for_v<
-                typename util::detail::sentinel<T>::type,
-                typename util::detail::iterator<T>::type>>> : std::true_type
-        {
-        };
 
         HPX_CXX_CORE_EXPORT template <typename T>
         struct is_range_generator<T,

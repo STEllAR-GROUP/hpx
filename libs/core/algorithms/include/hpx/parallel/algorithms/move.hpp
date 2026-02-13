@@ -138,7 +138,7 @@ namespace hpx::parallel {
             template <typename ExPolicy, typename InIter, typename Sent,
                 typename OutIter>
             static constexpr std::enable_if_t<
-                !hpx::traits::is_random_access_iterator_v<InIter>,
+                !std::random_access_iterator<InIter>,
                 util::in_out_result<InIter, OutIter>>
             sequential(ExPolicy, InIter first, Sent last, OutIter dest)
             {
@@ -148,7 +148,7 @@ namespace hpx::parallel {
             template <typename ExPolicy, typename InIter, typename Sent,
                 typename OutIter>
             static constexpr std::enable_if_t<
-                hpx::traits::is_random_access_iterator_v<InIter>,
+                std::random_access_iterator<InIter>,
                 util::in_out_result<InIter, OutIter>>
             sequential(ExPolicy, InIter first, Sent last, OutIter dest)
             {

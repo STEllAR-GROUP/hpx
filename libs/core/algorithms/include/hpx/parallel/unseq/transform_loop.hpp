@@ -30,8 +30,8 @@ namespace hpx::parallel::util {
                 OutIter HPX_RESTRICT dest, F&& f)
             {
                 constexpr bool iterators_are_random_access =
-                    hpx::traits::is_random_access_iterator_v<InIter> &&
-                    hpx::traits::is_random_access_iterator_v<OutIter>;
+                    std::random_access_iterator<InIter> &&
+                    std::random_access_iterator<OutIter>;
 
                 if constexpr (iterators_are_random_access)
                 {
@@ -80,8 +80,8 @@ namespace hpx::parallel::util {
                 OutIter HPX_RESTRICT dest, F&& f)
             {
                 constexpr bool iterators_are_random_access =
-                    hpx::traits::is_random_access_iterator_v<InIter> &&
-                    hpx::traits::is_random_access_iterator_v<OutIter>;
+                    std::random_access_iterator<InIter> &&
+                    std::random_access_iterator<OutIter>;
 
                 if constexpr (iterators_are_random_access)
                 {
@@ -132,8 +132,8 @@ namespace hpx::parallel::util {
                     OutIter HPX_RESTRICT dest, F&& f)
             {
                 constexpr bool iterators_are_random_access =
-                    hpx::traits::is_random_access_iterator_v<InIter> &&
-                    hpx::traits::is_random_access_iterator_v<OutIter>;
+                    std::random_access_iterator<InIter> &&
+                    std::random_access_iterator<OutIter>;
 
                 if constexpr (iterators_are_random_access)
                 {
@@ -191,8 +191,8 @@ namespace hpx::parallel::util {
                     OutIter HPX_RESTRICT dest, F&& f)
             {
                 constexpr bool iterators_are_random_access =
-                    hpx::traits::is_random_access_iterator_v<InIter> &&
-                    hpx::traits::is_random_access_iterator_v<OutIter>;
+                    std::random_access_iterator<InIter> &&
+                    std::random_access_iterator<OutIter>;
 
                 if constexpr (iterators_are_random_access)
                 {
@@ -251,9 +251,9 @@ namespace hpx::parallel::util {
                     F&& f)
             {
                 constexpr bool iterators_are_random_access =
-                    hpx::traits::is_random_access_iterator_v<InIter1> &&
-                    hpx::traits::is_random_access_iterator_v<InIter2> &&
-                    hpx::traits::is_random_access_iterator_v<OutIter>;
+                    std::random_access_iterator<InIter1> &&
+                    std::random_access_iterator<InIter2> &&
+                    std::random_access_iterator<OutIter>;
 
                 if constexpr (iterators_are_random_access)
                 {
@@ -307,9 +307,9 @@ namespace hpx::parallel::util {
                     F&& f)
             {
                 constexpr bool iterators_are_random_access =
-                    hpx::traits::is_random_access_iterator_v<InIter1> &&
-                    hpx::traits::is_random_access_iterator_v<InIter2> &&
-                    hpx::traits::is_random_access_iterator_v<OutIter>;
+                    std::random_access_iterator<InIter1> &&
+                    std::random_access_iterator<InIter2> &&
+                    std::random_access_iterator<OutIter>;
 
                 if constexpr (iterators_are_random_access)
                 {
@@ -341,9 +341,9 @@ namespace hpx::parallel::util {
                     OutIter dest, F&& f)
             {
                 constexpr bool iterators_are_random_access =
-                    hpx::traits::is_random_access_iterator_v<InIter1> &&
-                    hpx::traits::is_random_access_iterator_v<InIter2> &&
-                    hpx::traits::is_random_access_iterator_v<OutIter>;
+                    std::random_access_iterator<InIter1> &&
+                    std::random_access_iterator<InIter2> &&
+                    std::random_access_iterator<OutIter>;
 
                 if constexpr (iterators_are_random_access)
                 {
@@ -413,9 +413,9 @@ namespace hpx::parallel::util {
                     F&& f)
             {
                 constexpr bool iterators_are_random_access =
-                    hpx::traits::is_random_access_iterator_v<InIter1> &&
-                    hpx::traits::is_random_access_iterator_v<InIter2> &&
-                    hpx::traits::is_random_access_iterator_v<OutIter>;
+                    std::random_access_iterator<InIter1> &&
+                    std::random_access_iterator<InIter2> &&
+                    std::random_access_iterator<OutIter>;
 
                 if constexpr (iterators_are_random_access)
                 {
@@ -469,9 +469,9 @@ namespace hpx::parallel::util {
                     F&& f)
             {
                 constexpr bool iterators_are_random_access =
-                    hpx::traits::is_random_access_iterator_v<InIter1> &&
-                    hpx::traits::is_random_access_iterator_v<InIter2> &&
-                    hpx::traits::is_random_access_iterator_v<OutIter>;
+                    std::random_access_iterator<InIter1> &&
+                    std::random_access_iterator<InIter2> &&
+                    std::random_access_iterator<OutIter>;
 
                 if constexpr (iterators_are_random_access)
                 {
@@ -503,9 +503,9 @@ namespace hpx::parallel::util {
                     OutIter HPX_RESTRICT dest, F&& f)
             {
                 constexpr bool iterators_are_random_access =
-                    hpx::traits::is_random_access_iterator_v<InIter1> &&
-                    hpx::traits::is_random_access_iterator_v<InIter2> &&
-                    hpx::traits::is_random_access_iterator_v<OutIter>;
+                    std::random_access_iterator<InIter1> &&
+                    std::random_access_iterator<InIter2> &&
+                    std::random_access_iterator<OutIter>;
 
                 if constexpr (iterators_are_random_access)
                 {

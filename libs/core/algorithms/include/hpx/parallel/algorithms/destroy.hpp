@@ -304,7 +304,7 @@ namespace hpx {
         friend decltype(auto) tag_fallback_invoke(
             destroy_t, ExPolicy&& policy, FwdIter first, FwdIter last)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::util::detail::algorithm_result<ExPolicy>::get(
@@ -320,7 +320,7 @@ namespace hpx {
         // clang-format on
         friend void tag_fallback_invoke(destroy_t, FwdIter first, FwdIter last)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Required at least forward iterator.");
 
             hpx::parallel::detail::destroy<FwdIter>().call(
@@ -344,7 +344,7 @@ namespace hpx {
         friend decltype(auto) tag_fallback_invoke(
             destroy_n_t, ExPolicy&& policy, FwdIter first, Size count)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
             constexpr bool has_scheduler_executor =
                 hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
@@ -377,7 +377,7 @@ namespace hpx {
         friend FwdIter tag_fallback_invoke(
             destroy_n_t, FwdIter first, Size count)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             // if count is representing a negative value, we do nothing
