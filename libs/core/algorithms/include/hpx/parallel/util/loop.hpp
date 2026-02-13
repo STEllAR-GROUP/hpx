@@ -45,7 +45,7 @@ namespace hpx::parallel::util {
             template <typename Begin, typename End, typename CancelToken,
                 typename F>
                 requires(hpx::traits::is_iterator_v<End> &&
-                    hpx::traits::is_forward_iterator_v<Begin>)
+                    std::forward_iterator<Begin>)
             HPX_HOST_DEVICE HPX_FORCEINLINE static Begin call(
                 Begin it, End end, CancelToken& tok, F&& f)
             {
@@ -212,7 +212,7 @@ namespace hpx::parallel::util {
             HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Begin call(
                 Begin start, End sent, F&& f)
             {
-                if constexpr (hpx::traits::is_random_access_iterator_v<Begin>)
+                if constexpr (std::random_access_iterator<Begin>)
                 {
                     auto end = start;
                     auto const len =
@@ -453,7 +453,7 @@ namespace hpx::parallel::util {
             std::size_t count, F&& f)
         {
             using pred = std::integral_constant<bool,
-                hpx::traits::is_random_access_iterator_v<Iter> ||
+                std::random_access_iterator<Iter> ||
                     std::is_integral_v<Iter>>;
 
             return detail::loop_n_helper::call(
@@ -466,7 +466,7 @@ namespace hpx::parallel::util {
             CancelToken& tok, F&& f)
         {
             using pred = std::integral_constant<bool,
-                hpx::traits::is_random_access_iterator_v<Iter> ||
+                std::random_access_iterator<Iter> ||
                     std::is_integral_v<Iter>>;
 
             return detail::loop_n_helper::call(
@@ -580,7 +580,7 @@ namespace hpx::parallel::util {
                     return start;
                 }
 
-                if constexpr (hpx::traits::is_random_access_iterator_v<Iter>)
+                if constexpr (std::random_access_iterator<Iter>)
                 {
                     auto it = hpx::util::get_unwrapped(start);
 
@@ -620,7 +620,7 @@ namespace hpx::parallel::util {
             Iter it, std::size_t count, F&& f)
         {
             using pred = std::integral_constant<bool,
-                hpx::traits::is_random_access_iterator_v<Iter> ||
+                std::random_access_iterator<Iter> ||
                     std::is_integral_v<Iter>>;
 
             return detail::loop_n_ind_helper::call(
@@ -633,7 +633,7 @@ namespace hpx::parallel::util {
             Iter it, std::size_t count, CancelToken& tok, F&& f)
         {
             using pred = std::integral_constant<bool,
-                hpx::traits::is_random_access_iterator_v<Iter> ||
+                std::random_access_iterator<Iter> ||
                     std::is_integral_v<Iter>>;
 
             return detail::loop_n_ind_helper::call(

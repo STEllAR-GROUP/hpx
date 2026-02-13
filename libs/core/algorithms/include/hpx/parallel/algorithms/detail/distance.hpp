@@ -23,11 +23,11 @@ namespace hpx::parallel::detail {
         // we add this since passing in random access iterators
         // as begin and end might not pass the sized sentinel check
         if constexpr (std::is_same_v<InIterB, InIterE> &&
-            hpx::traits::is_random_access_iterator_v<InIterB>)
+            std::random_access_iterator<InIterB>)
         {
             return last - first;
         }
-        else if constexpr (hpx::traits::is_sized_sentinel_for_v<InIterE,
+        else if constexpr (std::sized_sentinel_for<InIterE,
                                InIterB>)
         {
             return last - first;

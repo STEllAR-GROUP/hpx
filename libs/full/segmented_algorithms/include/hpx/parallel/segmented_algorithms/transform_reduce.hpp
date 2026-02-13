@@ -114,7 +114,7 @@ namespace hpx { namespace parallel {
             typedef util::detail::algorithm_result<ExPolicy, T> result;
 
             typedef std::integral_constant<bool,
-                !hpx::traits::is_forward_iterator_v<FwdIter>>
+                !std::forward_iterator<FwdIter>>
                 forced_seq;
 
             segment_iterator sit = traits::segment(first);
@@ -292,7 +292,7 @@ namespace hpx { namespace parallel {
             segment_iterator2 sit2 = traits1::segment(first2);
 
             typedef std::integral_constant<bool,
-                !hpx::traits::is_forward_iterator_v<FwdIter1>>
+                !std::forward_iterator<FwdIter1>>
                 forced_seq;
 
             std::vector<shared_future<T>> segments;
@@ -379,7 +379,7 @@ namespace hpx { namespace segmented {
         SegIter first, SegIter last, T&& init, Reduce&& red_op,
         Convert&& conv_op)
     {
-        static_assert(hpx::traits::is_input_iterator_v<SegIter>,
+        static_assert(std::input_iterator<SegIter>,
             "Requires at least input iterator.");
 
         using init_type = typename std::decay<T>::type;
@@ -406,7 +406,7 @@ namespace hpx { namespace segmented {
     tag_invoke(hpx::transform_reduce_t, ExPolicy&& policy, SegIter first,
         SegIter last, T&& init, Reduce&& red_op, Convert&& conv_op)
     {
-        static_assert(hpx::traits::is_forward_iterator_v<SegIter>,
+        static_assert(std::forward_iterator<SegIter>,
             "Requires at least forward iterator.");
 
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
@@ -434,8 +434,8 @@ namespace hpx { namespace segmented {
     T tag_invoke(hpx::transform_reduce_t, FwdIter1 first1, FwdIter1 last1,
         FwdIter2 first2, T init, Reduce&& red_op, Convert&& conv_op)
     {
-        static_assert(hpx::traits::is_input_iterator_v<FwdIter1> &&
-                hpx::traits::is_input_iterator_v<FwdIter2>,
+        static_assert(std::input_iterator<FwdIter1> &&
+                std::input_iterator<FwdIter2>,
             "Requires at least input iterator.");
 
         if (first1 == last1)
@@ -462,8 +462,8 @@ namespace hpx { namespace segmented {
         FwdIter1 last1, FwdIter2 first2, T init, Reduce&& red_op,
         Convert&& conv_op)
     {
-        static_assert(hpx::traits::is_forward_iterator_v<FwdIter1> &&
-                hpx::traits::is_forward_iterator_v<FwdIter2>,
+        static_assert(std::forward_iterator<FwdIter1> &&
+                std::forward_iterator<FwdIter2>,
             "Requires at least forward iterator.");
 
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;

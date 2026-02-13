@@ -144,7 +144,7 @@ namespace hpx::parallel {
                 local_output_iterator_type>;
 
             using forced_seq = std::integral_constant<bool,
-                !hpx::traits::is_forward_iterator<SegIter>::value>;
+                !hpx::std::forward_iterator<SegIter>::value>;
 
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);

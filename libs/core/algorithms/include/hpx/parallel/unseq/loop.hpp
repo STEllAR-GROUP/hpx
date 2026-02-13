@@ -80,7 +80,7 @@ namespace hpx::parallel::util {
             HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Begin call(
                 Begin HPX_RESTRICT it, End HPX_RESTRICT end, F&& f)
             {
-                if constexpr (hpx::traits::is_random_access_iterator_v<Begin>)
+                if constexpr (std::random_access_iterator<Begin>)
                 {
                     return unseq_loop_n::call(
                         it, std::distance(it, end), HPX_FORWARD(F, f));
@@ -115,7 +115,7 @@ namespace hpx::parallel::util {
             HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Begin call(
                 Begin HPX_RESTRICT it, End HPX_RESTRICT end, F&& f)
             {
-                if constexpr (hpx::traits::is_random_access_iterator_v<Begin>)
+                if constexpr (std::random_access_iterator<Begin>)
                 {
                     return unseq_loop_n_ind::call(
                         it, std::distance(it, end), HPX_FORWARD(F, f));
@@ -140,8 +140,8 @@ namespace hpx::parallel::util {
                 InIter2 HPX_RESTRICT it2, F&& f)
             {
                 constexpr bool iterators_are_random_access =
-                    hpx::traits::is_random_access_iterator_v<InIter1> &&
-                    hpx::traits::is_random_access_iterator_v<InIter2>;
+                    std::random_access_iterator<InIter1> &&
+                    std::random_access_iterator<InIter2>;
 
                 if constexpr (iterators_are_random_access)
                 {

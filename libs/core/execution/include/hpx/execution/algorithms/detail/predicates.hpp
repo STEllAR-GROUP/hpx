@@ -144,7 +144,7 @@ namespace hpx::parallel::detail {
     HPX_CXX_CORE_EXPORT template <typename Iterable>
     struct calculate_next<Iterable,
         std::enable_if_t<hpx::traits::is_iterator_v<Iterable> &&
-            !hpx::traits::is_bidirectional_iterator_v<Iterable>>>
+            !std::bidirectional_iterator<Iterable>>>
     {
         template <typename Iter, typename Stride>
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr static Iter call(
@@ -180,7 +180,7 @@ namespace hpx::parallel::detail {
 
     HPX_CXX_CORE_EXPORT template <typename Iterable>
     struct calculate_next<Iterable,
-        std::enable_if_t<hpx::traits::is_bidirectional_iterator_v<Iterable>>>
+        std::enable_if_t<std::bidirectional_iterator<Iterable>>>
     {
         template <typename Iter, typename Stride>
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr static Iter call(

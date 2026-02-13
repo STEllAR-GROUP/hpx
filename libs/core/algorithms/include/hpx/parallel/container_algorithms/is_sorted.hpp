@@ -420,7 +420,7 @@ namespace hpx { namespace ranges {
     ///
     template <typename Rng, typename Pred = hpx::parallel::detail::less,
         typename Proj = hpx::identity>
-    hpx::traits::range_iterator_t<Rng>
+    std::ranges::iterator_t<Rng>
     is_sorted_until(Rng&& rng, Pred&& pred = Pred(), Proj&& proj = Proj());
 
     /// Returns the first element in the range rng that is not sorted.
@@ -488,7 +488,7 @@ namespace hpx { namespace ranges {
         typename Pred = hpx::parallel::detail::less,
         typename Proj = hpx::identity>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-        hpx::traits::range_iterator_t<Rng>>
+        std::ranges::iterator_t<Rng>>
     is_sorted_until(ExPolicy&& policy, Rng&& rng, Pred&& pred = Pred(),
         Proj&& proj = Proj());
     // clang-format on
@@ -519,8 +519,8 @@ namespace hpx::ranges {
             typename Proj = hpx::identity>
         // clang-format off
             requires(
-                hpx::traits::is_forward_iterator_v<FwdIter> &&
-                hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
+                std::forward_iterator<FwdIter> &&
+                std::sentinel_for<Sent, FwdIter> &&
                 hpx::parallel::traits::is_projected_v<Proj, FwdIter> &&
                 hpx::parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Pred,
@@ -543,8 +543,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_forward_iterator_v<FwdIter> &&
-                hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
+                std::forward_iterator<FwdIter> &&
+                std::sentinel_for<Sent, FwdIter> &&
                 hpx::parallel::traits::is_projected_v<Proj, FwdIter> &&
                 hpx::parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Pred,
@@ -566,7 +566,7 @@ namespace hpx::ranges {
             typename Proj = hpx::identity>
         // clang-format off
             requires(
-                hpx::traits::is_range_v<Rng> &&
+                std::ranges::range<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Pred,
@@ -579,8 +579,8 @@ namespace hpx::ranges {
             Pred pred = Pred(), Proj proj = Proj())
         {
             return hpx::parallel::detail::is_sorted<
-                hpx::traits::range_iterator_t<Rng>,
-                hpx::traits::range_iterator_t<Rng>>()
+                std::ranges::iterator_t<Rng>,
+                std::ranges::iterator_t<Rng>>()
                 .call(hpx::execution::seq, hpx::util::begin(rng),
                     hpx::util::end(rng), HPX_MOVE(pred), HPX_MOVE(proj));
         }
@@ -591,7 +591,7 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                std::ranges::range<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Pred,
@@ -605,8 +605,8 @@ namespace hpx::ranges {
             Rng&& rng, Pred pred = Pred(), Proj proj = Proj())
         {
             return hpx::parallel::detail::is_sorted<
-                hpx::traits::range_iterator_t<Rng>,
-                hpx::traits::range_iterator_t<Rng>>()
+                std::ranges::iterator_t<Rng>,
+                std::ranges::iterator_t<Rng>>()
                 .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                     hpx::util::end(rng), HPX_MOVE(pred), HPX_MOVE(proj));
         }
@@ -621,8 +621,8 @@ namespace hpx::ranges {
             typename Proj = hpx::identity>
         // clang-format off
             requires(
-                hpx::traits::is_forward_iterator_v<FwdIter> &&
-                hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
+                std::forward_iterator<FwdIter> &&
+                std::sentinel_for<Sent, FwdIter> &&
                 hpx::parallel::traits::is_projected_v<Proj, FwdIter> &&
                 hpx::parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Pred,
@@ -645,8 +645,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_forward_iterator_v<FwdIter> &&
-                hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
+                std::forward_iterator<FwdIter> &&
+                std::sentinel_for<Sent, FwdIter> &&
                 hpx::parallel::traits::is_projected_v<Proj, FwdIter> &&
                 hpx::parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Pred,
@@ -669,7 +669,7 @@ namespace hpx::ranges {
             typename Proj = hpx::identity>
         // clang-format off
             requires(
-                hpx::traits::is_range_v<Rng> &&
+                std::ranges::range<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Pred,
@@ -678,13 +678,13 @@ namespace hpx::ranges {
                 >
             )
         // clang-format on
-        friend hpx::traits::range_iterator_t<Rng> tag_fallback_invoke(
+        friend std::ranges::iterator_t<Rng> tag_fallback_invoke(
             hpx::ranges::is_sorted_until_t, Rng&& rng, Pred pred = Pred(),
             Proj proj = Proj())
         {
             return hpx::parallel::detail::is_sorted_until<
-                hpx::traits::range_iterator_t<Rng>,
-                hpx::traits::range_iterator_t<Rng>>()
+                std::ranges::iterator_t<Rng>,
+                std::ranges::iterator_t<Rng>>()
                 .call(hpx::execution::seq, hpx::util::begin(rng),
                     hpx::util::end(rng), HPX_MOVE(pred), HPX_MOVE(proj));
         }
@@ -695,7 +695,7 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                std::ranges::range<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Pred,
@@ -705,13 +705,13 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            hpx::traits::range_iterator_t<Rng>>
+            std::ranges::iterator_t<Rng>>
         tag_fallback_invoke(hpx::ranges::is_sorted_until_t, ExPolicy&& policy,
             Rng&& rng, Pred pred = Pred(), Proj proj = Proj())
         {
             return hpx::parallel::detail::is_sorted_until<
-                hpx::traits::range_iterator_t<Rng>,
-                hpx::traits::range_iterator_t<Rng>>()
+                std::ranges::iterator_t<Rng>,
+                std::ranges::iterator_t<Rng>>()
                 .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                     hpx::util::end(rng), HPX_MOVE(pred), HPX_MOVE(proj));
         }

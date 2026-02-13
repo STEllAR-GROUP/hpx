@@ -15,6 +15,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <iterator>
 #include <type_traits>
 #include <utility>
 
@@ -33,7 +34,7 @@ namespace hpx::parallel::util {
                     OutIter>
                 call(InIterB start, InIterE sent, OutIter out, F&& f)
             {
-                if constexpr (hpx::traits::is_random_access_iterator_v<InIterB>)
+                if constexpr (std::random_access_iterator<InIterB>)
                 {
                     auto end = start;
                     auto const len =
@@ -53,7 +54,7 @@ namespace hpx::parallel::util {
                         *dest = HPX_INVOKE(f, first);
                     }
 
-                    if constexpr (!hpx::traits::is_input_iterator_v<OutIter>)
+                    if constexpr (!std::input_iterator<OutIter>)
                     {
                         return {end, dest};
                     }
@@ -119,7 +120,7 @@ namespace hpx::parallel::util {
                     OutIter>
                 call(InIterB start, InIterE sent, OutIter out, F&& f)
             {
-                if constexpr (hpx::traits::is_random_access_iterator_v<InIterB>)
+                if constexpr (std::random_access_iterator<InIterB>)
                 {
                     auto end = start;
                     auto const len =
@@ -139,7 +140,7 @@ namespace hpx::parallel::util {
                         *dest = HPX_INVOKE(f, *first);
                     }
 
-                    if constexpr (!hpx::traits::is_input_iterator_v<OutIter>)
+                    if constexpr (!std::input_iterator<OutIter>)
                     {
                         return {end, dest};
                     }
@@ -303,7 +304,7 @@ namespace hpx::parallel::util {
                 call(InIter1B start1, InIter1E sent1, InIter2 start2,
                     OutIter out, F&& f)
             {
-                if constexpr (hpx::traits::is_random_access_iterator_v<
+                if constexpr (std::random_access_iterator<
                                   InIter1B>)
                 {
                     auto end1 = start1;
@@ -325,7 +326,7 @@ namespace hpx::parallel::util {
                         *dest = HPX_INVOKE(f, *first1, *first2);
                     }
 
-                    if constexpr (!hpx::traits::is_input_iterator_v<OutIter>)
+                    if constexpr (!std::input_iterator<OutIter>)
                     {
                         return {end1, std::next(start2, len), dest};
                     }
@@ -354,7 +355,7 @@ namespace hpx::parallel::util {
                 call(InIter1B start1, InIter1E sent1, InIter2 start2,
                     InIter2 sent2, OutIter out, F&& f)
             {
-                if constexpr (hpx::traits::is_random_access_iterator_v<
+                if constexpr (std::random_access_iterator<
                                   InIter1B>)
                 {
                     auto end1 = start1;
@@ -381,7 +382,7 @@ namespace hpx::parallel::util {
                         *dest = HPX_INVOKE(f, *first1, *first2);
                     }
 
-                    if constexpr (!hpx::traits::is_input_iterator_v<OutIter>)
+                    if constexpr (!std::input_iterator<OutIter>)
                     {
                         return {end1, end2, dest};
                     }
@@ -554,7 +555,7 @@ namespace hpx::parallel::util {
                 hpx::parallel::util::transform_loop_n_t<ExPolicy>, Iter it,
                 std::size_t count, OutIter dest, F&& f)
         {
-            using pred = hpx::traits::is_random_access_iterator<Iter>;
+            bool pred = std::random_access_iterator<Iter>;
 
             return detail::transform_loop_n<Iter>::call(
                 it, count, dest, HPX_FORWARD(F, f), pred());
@@ -658,7 +659,7 @@ namespace hpx::parallel::util {
                     break;
                 }
 
-                if constexpr (!hpx::traits::is_input_iterator_v<OutIter>)
+                if constexpr (!std::input_iterator<OutIter>)
                 {
                     return {std::next(start, num), dest};
                 }
@@ -823,9 +824,9 @@ namespace hpx::parallel::util {
                     return hpx::make_tuple(start1, start2, out);
                 }
 
-                if constexpr (hpx::traits::is_random_access_iterator_v<
+                if constexpr (std::random_access_iterator<
                                   InIter1> &&
-                    hpx::traits::is_random_access_iterator_v<InIter2>)
+                    std::random_access_iterator<InIter2>)
                 {
                     auto first1 = hpx::util::get_unwrapped(start1);
                     auto first2 = hpx::util::get_unwrapped(start2);
@@ -834,7 +835,7 @@ namespace hpx::parallel::util {
                     call_iteration(
                         first1, num, first2, dest, HPX_FORWARD(F, f));
 
-                    if constexpr (!hpx::traits::is_input_iterator_v<OutIter>)
+                    if constexpr (!std::input_iterator<OutIter>)
                     {
                         return hpx::make_tuple(std::next(start1, num),
                             std::next(start2, num), dest);

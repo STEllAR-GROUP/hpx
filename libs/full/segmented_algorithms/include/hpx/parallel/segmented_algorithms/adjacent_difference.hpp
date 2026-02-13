@@ -152,7 +152,7 @@ namespace hpx::parallel {
                     FwdIter2>;
 
             using forced_seq = std::integral_constant<bool,
-                !hpx::traits::is_forward_iterator_v<FwdIter1>>;
+                !std::forward_iterator<FwdIter1>>;
 
             segment_iterator1 sit = traits1::segment(first);
             segment_iterator1 send = traits1::segment(last);
@@ -257,9 +257,9 @@ namespace hpx::segmented {
     tag_invoke(hpx::adjacent_difference_t, ExPolicy&& policy, FwdIter1 first,
         FwdIter1 last, FwdIter2 dest, Op&& op)
     {
-        static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+        static_assert(std::forward_iterator<FwdIter1>,
             "Requires at least forward iterator.");
-        static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+        static_assert(std::forward_iterator<FwdIter2>,
             "Requires at least forward iterator.");
 
         if (first == last)
@@ -288,9 +288,9 @@ namespace hpx::segmented {
     InIter2 tag_invoke(hpx::adjacent_difference_t, InIter1 first, InIter1 last,
         InIter2 dest, Op&& op)
     {
-        static_assert(hpx::traits::is_input_iterator_v<InIter1>,
+        static_assert(std::input_iterator<InIter1>,
             "Requires at least input iterator.");
-        static_assert(hpx::traits::is_input_iterator_v<InIter2>,
+        static_assert(std::input_iterator<InIter2>,
             "Requires at least input iterator.");
 
         if (first == last)

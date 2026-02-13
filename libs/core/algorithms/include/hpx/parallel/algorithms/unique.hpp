@@ -565,7 +565,7 @@ namespace hpx::parallel {
             {
                 return sequential_unique_copy(first, last, dest,
                     HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj),
-                    hpx::traits::is_forward_iterator<InIter>());
+                    hpx::std::forward_iterator<InIter>());
             }
 
             template <typename ExPolicy, typename FwdIter1, typename Sent,
@@ -700,7 +700,7 @@ namespace hpx {
         friend FwdIter tag_fallback_invoke(
             hpx::unique_t, FwdIter first, FwdIter last, Pred pred = Pred())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::unique<FwdIter>().call(
@@ -723,7 +723,7 @@ namespace hpx {
         friend decltype(auto) tag_fallback_invoke(hpx::unique_t,
             ExPolicy&& policy, FwdIter first, FwdIter last, Pred pred = Pred())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::unique<FwdIter>().call(
@@ -752,7 +752,7 @@ namespace hpx {
         friend OutIter tag_fallback_invoke(hpx::unique_copy_t, InIter first,
             InIter last, OutIter dest, Pred pred = Pred())
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Requires at least input iterator.");
 
             using result_type = parallel::util::in_out_result<InIter, OutIter>;
@@ -781,7 +781,7 @@ namespace hpx {
         tag_fallback_invoke(hpx::unique_copy_t, ExPolicy&& policy,
             FwdIter1 first, FwdIter1 last, FwdIter2 dest, Pred pred = Pred())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");
 
             using result_type =

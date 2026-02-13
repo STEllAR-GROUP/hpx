@@ -23,9 +23,9 @@ namespace hpx::parallel::traits {
 
     HPX_CXX_CORE_EXPORT template <typename Proj, typename Rng>
     struct projected_range_result_of<Proj, Rng,
-        std::enable_if_t<hpx::traits::is_range_v<Rng>>>
+        std::enable_if_t<std::ranges::range<Rng>>>
       : detail::projected_result_of<std::decay_t<Proj>,
-            hpx::traits::range_iterator_t<Rng>>
+            std::ranges::iterator_t<Rng>>
     {
     };
 
@@ -38,9 +38,9 @@ namespace hpx::parallel::traits {
 
     HPX_CXX_CORE_EXPORT template <typename Proj, typename Rng>
     struct is_projected_range<Proj, Rng,
-        std::enable_if_t<hpx::traits::is_range_v<Rng>>>
+        std::enable_if_t<std::ranges::range<Rng>>>
       : detail::is_projected<std::decay_t<Proj>,
-            hpx::traits::range_iterator_t<Rng>>
+            std::ranges::iterator_t<Rng>>
     {
     };
 
@@ -57,9 +57,9 @@ namespace hpx::parallel::traits {
 
     HPX_CXX_CORE_EXPORT template <typename Proj, typename Rng>
     struct projected_range<Proj, Rng,
-        std::enable_if_t<hpx::traits::is_range_v<Rng>>>
+        std::enable_if_t<std::ranges::range<Rng>>>
     {
         using projector_type = std::decay_t<Proj>;
-        using iterator_type = hpx::traits::range_iterator_t<Rng>;
+        using iterator_type = std::ranges::iterator_t<Rng>;
     };
 }    // namespace hpx::parallel::traits

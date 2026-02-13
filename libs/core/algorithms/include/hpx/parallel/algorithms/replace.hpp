@@ -666,7 +666,7 @@ namespace hpx {
         friend void tag_fallback_invoke(hpx::replace_if_t, Iter first,
             Iter last, Pred pred, T const& new_value)
         {
-            static_assert(hpx::traits::is_input_iterator_v<Iter>,
+            static_assert(std::input_iterator<Iter>,
                 "Required at least input iterator.");
 
             hpx::parallel::detail::replace_if<Iter>().call(
@@ -689,7 +689,7 @@ namespace hpx {
             ExPolicy&& policy, FwdIter first, FwdIter last, Pred pred,
             T const& new_value)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Required at least forward iterator.");
 
             return parallel::util::detail::algorithm_result<ExPolicy>::get(
@@ -715,7 +715,7 @@ namespace hpx {
         friend void tag_fallback_invoke(hpx::replace_t, InIter first,
             InIter last, T const& old_value, T const& new_value)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Required at least input iterator.");
 
             typedef typename std::iterator_traits<InIter>::value_type Type;
@@ -738,7 +738,7 @@ namespace hpx {
             ExPolicy&& policy, FwdIter first, FwdIter last, T const& old_value,
             T const& new_value)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Required at least forward iterator.");
 
             return hpx::replace_if(
@@ -768,10 +768,10 @@ namespace hpx {
         friend OutIter tag_fallback_invoke(hpx::replace_copy_if_t, InIter first,
             InIter last, OutIter dest, Pred pred, T const& new_value)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Required at least input iterator.");
 
-            static_assert(hpx::traits::is_output_iterator_v<OutIter>,
+            static_assert(std::output_iterator<OutIter>,
                 "Required at least output iterator.");
 
             return parallel::util::get_second_element(
@@ -798,10 +798,10 @@ namespace hpx {
             ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest,
             Pred pred, T const& new_value)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Required at least forward iterator.");
 
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Required at least forward iterator.");
 
             return parallel::util::get_second_element(
@@ -829,10 +829,10 @@ namespace hpx {
         friend OutIter tag_fallback_invoke(hpx::replace_copy_t, InIter first,
             InIter last, OutIter dest, T const& old_value, T const& new_value)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Required at least input iterator.");
 
-            static_assert(hpx::traits::is_output_iterator_v<OutIter>,
+            static_assert(std::output_iterator<OutIter>,
                 "Required at least output iterator.");
 
             typedef typename std::iterator_traits<InIter>::value_type Type;
@@ -856,10 +856,10 @@ namespace hpx {
             ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest,
             T const& old_value, T const& new_value)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Required at least forward iterator.");
 
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Required at least forward iterator.");
 
             return hpx::replace_copy_if(

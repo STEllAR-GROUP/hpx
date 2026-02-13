@@ -28,7 +28,7 @@ namespace hpx::parallel::detail {
         sequential_reduce_t<ExPolicy>, ExPolicy&&, InIterB first, InIterE last,
         T init, Reduce&& r)
     {
-        if constexpr (hpx::traits::is_random_access_iterator_v<InIterB>)
+        if constexpr (std::random_access_iterator<InIterB>)
         {
             return hpx::parallel::util::detail::unseq_reduce_n::reduce(first,
                 std::distance(first, last), HPX_FORWARD(T, init),
@@ -49,7 +49,7 @@ namespace hpx::parallel::detail {
         sequential_reduce_t<ExPolicy>, FwdIter part_begin,
         std::size_t part_size, T init, Reduce r)
     {
-        if constexpr (hpx::traits::is_random_access_iterator_v<FwdIter>)
+        if constexpr (std::random_access_iterator<FwdIter>)
         {
             return hpx::parallel::util::detail::unseq_reduce_n::reduce(
                 part_begin, part_size, HPX_FORWARD(T, init),
@@ -69,7 +69,7 @@ namespace hpx::parallel::detail {
         sequential_reduce_t<ExPolicy>, ExPolicy&&, Iter first, Sent last,
         T init, Reduce&& r, Convert&& conv)
     {
-        if constexpr (hpx::traits::is_random_access_iterator_v<Iter>)
+        if constexpr (std::random_access_iterator<Iter>)
         {
             return hpx::parallel::util::detail::unseq_reduce_n::reduce(first,
                 std::distance(first, last), HPX_FORWARD(T, init),
@@ -91,7 +91,7 @@ namespace hpx::parallel::detail {
         sequential_reduce_t<ExPolicy>, Iter part_begin, std::size_t part_size,
         T init, Reduce r, Convert conv)
     {
-        if constexpr (hpx::traits::is_random_access_iterator_v<Iter>)
+        if constexpr (std::random_access_iterator<Iter>)
         {
             return hpx::parallel::util::detail::unseq_reduce_n::reduce(
                 part_begin, part_size, HPX_FORWARD(T, init),
@@ -113,8 +113,8 @@ namespace hpx::parallel::detail {
         T init, Reduce&& r, Convert&& conv)
     {
         constexpr bool iterators_are_random_access =
-            hpx::traits::is_random_access_iterator_v<Iter1> &&
-            hpx::traits::is_random_access_iterator_v<Iter2>;
+            std::random_access_iterator<Iter1> &&
+            std::random_access_iterator<Iter2>;
 
         if constexpr (iterators_are_random_access)
         {

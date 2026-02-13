@@ -31,13 +31,13 @@ namespace hpx::iostream::detail {
     //------------------Definition of resolve-------------------------------------//
     HPX_CXX_CORE_EXPORT template <typename Mode, typename Ch, typename T>
     struct resolve_traits
-      : std::conditional<traits::is_output_iterator_v<T>,
+      : std::conditional<std::output_iterator<T>,
             output_iterator_adapter<Mode, Ch, T>, T const&>
     {
     };
 
     HPX_CXX_CORE_EXPORT template <typename Mode, typename Ch, typename T>
-        requires(!iostream::is_std_io_v<T> && !traits::is_range_v<T>)
+        requires(!iostream::is_std_io_v<T> && !std::ranges::range<T>)
     constexpr resolve_traits<Mode, Ch, T>::type resolve(T const& t) noexcept
     {
         using return_type = resolve_traits<Mode, Ch, T>::type;

@@ -38,7 +38,7 @@ namespace hpx::iostream::detail {
     HPX_CXX_CORE_EXPORT template <typename Mode, typename Range>
     class range_adapter
     {
-        using iterator = traits::range_iterator_t<Range>;
+        using iterator = std::ranges::iterator_t<Range>;
         using iter_cat = std::iterator_traits<iterator>::iterator_category;
 
     public:

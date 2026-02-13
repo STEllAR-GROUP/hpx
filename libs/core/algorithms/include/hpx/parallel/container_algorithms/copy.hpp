@@ -547,7 +547,7 @@ namespace hpx::ranges {
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
-                hpx::traits::is_sentinel_for_v<Sent1, FwdIter1> &&
+                std::sentinel_for<Sent1, FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter>
             )
         // clang-format on
@@ -567,7 +567,7 @@ namespace hpx::ranges {
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                std::ranges::range<Rng> &&
                 hpx::traits::is_iterator_v<FwdIter>
             )
         // clang-format on
@@ -591,7 +591,7 @@ namespace hpx::ranges {
         // clang-format off
             requires (
                 hpx::traits::is_iterator_v<FwdIter1> &&
-                hpx::traits::is_sentinel_for_v<Sent1, FwdIter1> &&
+                std::sentinel_for<Sent1, FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter>
             )
         // clang-format on
@@ -608,7 +608,7 @@ namespace hpx::ranges {
         template <typename Rng, typename FwdIter>
         // clang-format off
             requires (
-                hpx::traits::is_range_v<Rng> &&
+                std::ranges::range<Rng> &&
                 hpx::traits::is_iterator_v<FwdIter>
             )
         // clang-format on
@@ -647,9 +647,9 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::copy_n_t, ExPolicy&& policy,
             FwdIter1 first, Size count, FwdIter2 dest)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Required at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2> ||
+            static_assert(std::forward_iterator<FwdIter2> ||
                     hpx::is_sequenced_execution_policy_v<ExPolicy>,
                 "Requires at least forward iterator or sequential execution.");
 
@@ -677,9 +677,9 @@ namespace hpx::ranges {
         friend ranges::copy_n_result<FwdIter1, FwdIter2> tag_fallback_invoke(
             hpx::ranges::copy_n_t, FwdIter1 first, Size count, FwdIter2 dest)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Required at least forward iterator.");
-            static_assert(hpx::traits::is_output_iterator_v<FwdIter2>,
+            static_assert(std::output_iterator<FwdIter2>,
                 "Requires at least output iterator.");
 
             // if count is representing a negative value, we do nothing
@@ -708,7 +708,7 @@ namespace hpx::ranges {
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
-                hpx::traits::is_sentinel_for_v<Sent1, FwdIter1> &&
+                std::sentinel_for<Sent1, FwdIter1> &&
                 hpx::parallel::traits::is_projected_v<Proj, FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy, Pred,
@@ -722,12 +722,12 @@ namespace hpx::ranges {
             FwdIter1 iter, Sent1 sent, FwdIter dest, Pred pred,
             Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Required at least forward iterator.");
 
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter> ||
+            static_assert(std::forward_iterator<FwdIter> ||
                     (hpx::is_sequenced_execution_policy_v<ExPolicy> &&
-                        hpx::traits::is_output_iterator_v<FwdIter>),
+                        std::output_iterator<FwdIter>),
                 "Requires at least forward iterator or sequential execution.");
 
             return hpx::parallel::detail::copy_if<
@@ -741,7 +741,7 @@ namespace hpx::ranges {
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                std::ranges::range<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy, Pred,
@@ -756,9 +756,9 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::copy_if_t, ExPolicy&& policy,
             Rng&& rng, FwdIter dest, Pred pred, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter> ||
+            static_assert(std::forward_iterator<FwdIter> ||
                     (hpx::is_sequenced_execution_policy_v<ExPolicy> &&
-                        hpx::traits::is_output_iterator_v<FwdIter>),
+                        std::output_iterator<FwdIter>),
                 "Requires at least forward iterator or sequential execution.");
 
             return hpx::parallel::detail::copy_if<
@@ -774,7 +774,7 @@ namespace hpx::ranges {
         // clang-format off
             requires (
                 hpx::traits::is_iterator_v<FwdIter1> &&
-                hpx::traits::is_sentinel_for_v<Sent1, FwdIter1> &&
+                std::sentinel_for<Sent1, FwdIter1> &&
                 hpx::parallel::traits::is_projected_v<Proj, FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::parallel::traits::is_indirect_callable_v<
@@ -787,10 +787,10 @@ namespace hpx::ranges {
             hpx::ranges::copy_if_t, FwdIter1 iter, Sent1 sent, FwdIter dest,
             Pred pred, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Required at least forward iterator.");
 
-            static_assert(hpx::traits::is_output_iterator_v<FwdIter>,
+            static_assert(std::output_iterator<FwdIter>,
                 "Required at least output iterator.");
 
             return hpx::parallel::detail::copy_if<
@@ -803,7 +803,7 @@ namespace hpx::ranges {
             typename Proj = hpx::identity>
         // clang-format off
             requires (
-                hpx::traits::is_range_v<Rng> &&
+                std::ranges::range<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::parallel::traits::is_indirect_callable_v<
@@ -817,7 +817,7 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::copy_if_t, Rng&& rng, FwdIter dest,
             Pred pred, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_output_iterator_v<FwdIter>,
+            static_assert(std::output_iterator<FwdIter>,
                 "Required at least output iterator.");
 
             return hpx::parallel::detail::copy_if<

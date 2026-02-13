@@ -110,18 +110,18 @@ namespace hpx::parallel {
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
-                hpx::traits::is_sentinel_for_v<Sent1, FwdIter1> &&
+                std::sentinel_for<Sent1, FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2>
             )
         // clang-format on
         decltype(auto) transfer(
             ExPolicy&& policy, FwdIter1 first, Sent1 last, FwdIter2 dest)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Required at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2> ||
+            static_assert(std::forward_iterator<FwdIter2> ||
                     (hpx::is_sequenced_execution_policy_v<ExPolicy> &&
-                        hpx::traits::is_output_iterator_v<FwdIter2>),
+                        std::output_iterator<FwdIter2>),
                 "Requires at least forward iterator or sequential execution.");
 
 #if defined(HPX_COMPUTE_DEVICE_CODE)

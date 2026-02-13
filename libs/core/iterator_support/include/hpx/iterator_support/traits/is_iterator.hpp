@@ -62,230 +62,56 @@ namespace hpx::traits {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_CORE_EXPORT template <typename T, typename U,
-            typename Enable = void>
-        struct addition_result
-        {
-        };
-
         HPX_CXX_CORE_EXPORT template <typename T, typename U>
-        struct addition_result<T, U,
-            std::void_t<decltype(std::declval<T>() + std::declval<U>())>>
-        {
-            using type = decltype(std::declval<T>() + std::declval<U>());
-        };
-
-        HPX_CXX_CORE_EXPORT template <typename T, typename U>
-        using addition_result_t = typename addition_result<T, U>::type;
+        requires requires(T t, U u) { t+u;}
+        using addition_result_t = decltype(std::declval<T>() + std::declval<U>());
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_CORE_EXPORT template <typename T, typename Enable = void>
-        struct dereference_result
-        {
-        };
-
         HPX_CXX_CORE_EXPORT template <typename T>
-        struct dereference_result<T,
-            std::void_t<decltype(*(std::declval<T&>()))>>
-        {
-            using type = decltype(*(std::declval<T&>()));
-        };
-
-        HPX_CXX_CORE_EXPORT template <typename T>
-        using dereference_result_t = typename dereference_result<T>::type;
+        requires requires(T t) {*t;}
+        using dereference_result_t = decltype(*(std::declval<T&>()));
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_CORE_EXPORT template <typename T, typename U,
-            typename Enable = void>
-        struct inplace_addition_result
-        {
-        };
-
         HPX_CXX_CORE_EXPORT template <typename T, typename U>
-        struct inplace_addition_result<T, U,
-            std::void_t<decltype(std::declval<T>() += std::declval<U>())>>
-        {
-            using type = decltype(std::declval<T>() += std::declval<U>());
-        };
-
-        HPX_CXX_CORE_EXPORT template <typename T, typename U>
+        requires requires(T t, U u) {t += u;}
         using inplace_addition_result_t =
-            typename inplace_addition_result<T, U>::type;
+            decltype(std::declval<T>() += std::declval<U>());
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_CORE_EXPORT template <typename T, typename U,
-            typename Enable = void>
-        struct inplace_subtraction_result
-        {
-        };
-
         HPX_CXX_CORE_EXPORT template <typename T, typename U>
-        struct inplace_subtraction_result<T, U,
-            std::void_t<decltype(std::declval<T>() -= std::declval<U>())>>
-        {
-            using type = decltype(std::declval<T>() -= std::declval<U>());
-        };
+        requires requires(T t, U u) {t - u;}
+        using subtraction_result_t = decltype(std::declval<T>() - std::declval<U>());
 
+        ///////////////////////////////////////////////////////////////////////
         HPX_CXX_CORE_EXPORT template <typename T, typename U>
+        requires requires(T t, U u) {t -= u;}
         using inplace_subtraction_result_t =
-            typename inplace_subtraction_result<T, U>::type;
+            decltype(std::declval<T>() -= std::declval<U>());
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_CORE_EXPORT template <typename T, typename Enable = void>
-        struct predecrement_result
-        {
-        };
-
         HPX_CXX_CORE_EXPORT template <typename T>
-        struct predecrement_result<T,
-            std::void_t<decltype(--std::declval<T&>())>>
-        {
-            using type = decltype(--std::declval<T&>());
-        };
-
-        HPX_CXX_CORE_EXPORT template <typename T>
-        using predecrement_result_t = typename predecrement_result<T>::type;
+        requires requires(T t) {--t;}
+        using predecrement_result_t = decltype(--std::declval<T&>());
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_CORE_EXPORT template <typename T, typename Enable = void>
-        struct preincrement_result
-        {
-        };
-
         HPX_CXX_CORE_EXPORT template <typename T>
-        struct preincrement_result<T,
-            std::void_t<decltype(++std::declval<T&>())>>
-        {
-            using type = decltype(++std::declval<T&>());
-        };
-
-        HPX_CXX_CORE_EXPORT template <typename T>
-        using preincrement_result_t = typename preincrement_result<T>::type;
+        requires requires(T t) {++t;}
+        using preincrement_result_t = decltype(++std::declval<T&>());
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_CORE_EXPORT template <typename T, typename Enable = void>
-        struct postdecrement_result
-        {
-        };
-
         HPX_CXX_CORE_EXPORT template <typename T>
-        struct postdecrement_result<T,
-            std::void_t<decltype(std::declval<T&>()--)>>
-        {
-            using type = decltype(std::declval<T&>()--);
-        };
-
-        HPX_CXX_CORE_EXPORT template <typename T>
-        using postdecrement_result_t = typename postdecrement_result<T>::type;
+        requires requires(T t) {t--;}
+        using postdecrement_result_t = decltype(std::declval<T&>()--);
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_CORE_EXPORT template <typename T, typename Enable = void>
-        struct postincrement_result
-        {
-        };
-
         HPX_CXX_CORE_EXPORT template <typename T>
-        struct postincrement_result<T,
-            std::void_t<decltype(std::declval<T&>()++)>>
-        {
-            using type = decltype(std::declval<T&>()++);
-        };
-
-        HPX_CXX_CORE_EXPORT template <typename T>
-        using postincrement_result_t = typename postincrement_result<T>::type;
+        requires requires(T t) {t++;}
+        using postincrement_result_t = decltype(std::declval<T&>()++);
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_CORE_EXPORT template <typename T, typename U,
-            typename Enable = void>
-        struct subscript_result
-        {
-        };
-
         HPX_CXX_CORE_EXPORT template <typename T, typename U>
-        struct subscript_result<T, U,
-            std::void_t<decltype(std::declval<T&>()[std::declval<U>()])>>
-        {
-            using type = decltype(std::declval<T&>()[std::declval<U>()]);
-        };
-
-        HPX_CXX_CORE_EXPORT template <typename T, typename U>
-        using subscript_result_t = typename subscript_result<T, U>::type;
-
-        ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_CORE_EXPORT template <typename T, typename U,
-            typename Enable = void>
-        struct subtraction_result
-        {
-        };
-
-        HPX_CXX_CORE_EXPORT template <typename T, typename U>
-        struct subtraction_result<T, U,
-            std::void_t<decltype(std::declval<T>() - std::declval<U>())>>
-        {
-            using type = decltype(std::declval<T>() - std::declval<U>());
-        };
-
-        HPX_CXX_CORE_EXPORT template <typename T, typename U>
-        using subtraction_result_t = typename subtraction_result<T, U>::type;
-
-        ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_CORE_EXPORT template <typename Iter, typename Enable = void>
-        struct bidirectional_concept : std::false_type
-        {
-        };
-
-        HPX_CXX_CORE_EXPORT template <typename Iter>
-        struct bidirectional_concept<Iter,
-            std::void_t<dereference_result_t<Iter>,
-                equality_result_t<Iter, Iter>, inequality_result_t<Iter, Iter>,
-                predecrement_result_t<Iter>, preincrement_result_t<Iter>,
-                postdecrement_result_t<Iter>, postincrement_result_t<Iter>>>
-          : std::integral_constant<bool,
-                std::is_convertible_v<bool, equality_result_t<Iter, Iter>> &&
-                    std::is_convertible_v<bool,
-                        inequality_result_t<Iter, Iter>> &&
-                    std::is_same_v<std::add_lvalue_reference_t<Iter>,
-                        predecrement_result_t<Iter>> &&
-                    std::is_same_v<std::add_lvalue_reference_t<Iter>,
-                        preincrement_result_t<Iter>> &&
-                    std::is_same_v<Iter, postdecrement_result_t<Iter>> &&
-                    std::is_same_v<Iter, postincrement_result_t<Iter>>>
-        {
-        };
-
-        ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_CORE_EXPORT template <typename Iter, typename Enable = void>
-        struct random_access_concept : std::false_type
-        {
-        };
-
-        HPX_CXX_CORE_EXPORT template <typename Iter>
-        struct random_access_concept<Iter,
-            std::void_t<dereference_result_t<Iter>,
-                subscript_result_t<Iter, iter_difference_t<Iter>>,
-                addition_result_t<Iter, iter_difference_t<Iter>>,
-                inplace_addition_result_t<Iter, iter_difference_t<Iter>>,
-                subtraction_result_t<Iter, iter_difference_t<Iter>>,
-                subtraction_result_t<Iter, Iter>,
-                inplace_subtraction_result_t<Iter, iter_difference_t<Iter>>>>
-          : std::integral_constant<bool,
-                bidirectional_concept<Iter>::value &&
-                    std::is_same_v<dereference_result_t<Iter>,
-                        subscript_result_t<Iter, iter_difference_t<Iter>>> &&
-                    std::is_same_v<Iter,
-                        addition_result_t<Iter, iter_difference_t<Iter>>> &&
-                    std::is_same_v<std::add_lvalue_reference_t<Iter>,
-                        inplace_addition_result_t<Iter,
-                            iter_difference_t<Iter>>> &&
-                    std::is_same_v<Iter,
-                        subtraction_result_t<Iter, iter_difference_t<Iter>>> &&
-                    std::is_same_v<iter_difference_t<Iter>,
-                        subtraction_result_t<Iter, Iter>> &&
-                    std::is_same_v<std::add_lvalue_reference_t<Iter>,
-                        inplace_subtraction_result_t<Iter,
-                            iter_difference_t<Iter>>>>
-        {
-        };
+        requires requires(T t, U u) {t[u];}
+        using subscript_result_t = decltype(std::declval<T&>()[std::declval<U>()]);
 
         ///////////////////////////////////////////////////////////////////////
         HPX_CXX_CORE_EXPORT template <typename Iter, typename TraversalTag>
@@ -307,20 +133,20 @@ namespace hpx::traits {
         // be properly recognized as satisfying the ForwardIterator concept.
         HPX_CXX_CORE_EXPORT template <typename Iter>
         struct satisfy_traversal_concept<Iter, hpx::forward_traversal_tag>
-          : bidirectional_concept<Iter>
         {
+            static constexpr bool value = std::bidirectional_iterator<Iter>;
         };
 
         HPX_CXX_CORE_EXPORT template <typename Iter>
         struct satisfy_traversal_concept<Iter, hpx::bidirectional_traversal_tag>
-          : bidirectional_concept<Iter>
         {
+            static constexpr bool value = std::bidirectional_iterator<Iter>;
         };
 
         HPX_CXX_CORE_EXPORT template <typename Iter>
         struct satisfy_traversal_concept<Iter, hpx::random_access_traversal_tag>
-          : random_access_concept<Iter>
         {
+            static constexpr bool value = std::random_access_iterator<Iter>;
         };
 
         HPX_CXX_CORE_EXPORT template <typename Iter, typename TraversalTag>
@@ -328,7 +154,7 @@ namespace hpx::traits {
             satisfy_traversal_concept<Iter, TraversalTag>::value;
     }    // namespace detail
 
-    HPX_CXX_CORE_EXPORT template <typename Iter, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename Iter>
     struct is_iterator : detail::is_iterator<std::decay_t<Iter>>
     {
     };
@@ -463,92 +289,6 @@ namespace hpx::traits {
     inline constexpr bool belongs_to_iterator_traversal_v =
         detail::belongs_to_iterator_traversal<std::decay_t<Iter>,
             Traversal>::value;
-
-    ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_CORE_EXPORT template <typename Iter, typename Enable = void>
-    struct is_output_iterator
-      : std::integral_constant<bool,
-            belongs_to_iterator_category_v<Iter, std::output_iterator_tag> ||
-                belongs_to_iterator_traversal_v<Iter,
-                    hpx::incrementable_traversal_tag>>
-    {
-    };
-
-    HPX_CXX_CORE_EXPORT template <typename Iter>
-    using is_output_iterator_t = typename is_output_iterator<Iter>::type;
-
-    HPX_CXX_CORE_EXPORT template <typename Iter>
-    inline constexpr bool is_output_iterator_v =
-        is_output_iterator<Iter>::value;
-
-    ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_CORE_EXPORT template <typename Iter, typename Enable = void>
-    struct is_input_iterator
-      : std::integral_constant<bool,
-            belongs_to_iterator_category_v<Iter, std::input_iterator_tag> ||
-                belongs_to_iterator_traversal_v<Iter,
-                    hpx::single_pass_traversal_tag>>
-    {
-    };
-
-    HPX_CXX_CORE_EXPORT template <typename Iter>
-    using is_input_iterator_t = typename is_input_iterator<Iter>::type;
-
-    HPX_CXX_CORE_EXPORT template <typename Iter>
-    inline constexpr bool is_input_iterator_v = is_input_iterator<Iter>::value;
-
-    ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_CORE_EXPORT template <typename Iter, typename Enable = void>
-    struct is_forward_iterator
-      : std::integral_constant<bool,
-            belongs_to_iterator_category_v<Iter, std::forward_iterator_tag> ||
-                belongs_to_iterator_traversal_v<Iter,
-                    hpx::forward_traversal_tag>>
-    {
-    };
-
-    HPX_CXX_CORE_EXPORT template <typename Iter>
-    using is_forward_iterator_t = typename is_forward_iterator<Iter>::type;
-
-    HPX_CXX_CORE_EXPORT template <typename Iter>
-    inline constexpr bool is_forward_iterator_v =
-        is_forward_iterator<Iter>::value;
-
-    ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_CORE_EXPORT template <typename Iter, typename Enable = void>
-    struct is_bidirectional_iterator
-      : std::integral_constant<bool,
-            belongs_to_iterator_category_v<Iter,
-                std::bidirectional_iterator_tag> ||
-                belongs_to_iterator_traversal_v<Iter,
-                    hpx::bidirectional_traversal_tag>>
-    {
-    };
-
-    HPX_CXX_CORE_EXPORT template <typename Iter>
-    using is_bidirectional_iterator_t =
-        typename is_bidirectional_iterator<Iter>::type;
-
-    HPX_CXX_CORE_EXPORT template <typename Iter>
-    inline constexpr bool is_bidirectional_iterator_v =
-        is_bidirectional_iterator<Iter>::value;
-
-    ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_CORE_EXPORT template <typename Iter, typename Enable = void>
-    struct is_random_access_iterator
-      : std::integral_constant<bool,
-            has_category_v<Iter, std::random_access_iterator_tag> ||
-                has_traversal_v<Iter, hpx::random_access_traversal_tag>>
-    {
-    };
-
-    HPX_CXX_CORE_EXPORT template <typename Iter>
-    using is_random_access_iterator_t =
-        typename is_random_access_iterator<Iter>::type;
-
-    HPX_CXX_CORE_EXPORT template <typename Iter>
-    inline constexpr bool is_random_access_iterator_v =
-        is_random_access_iterator<Iter>::value;
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_CXX_CORE_EXPORT template <typename Iter, typename Enable = void>

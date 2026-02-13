@@ -442,7 +442,7 @@ namespace hpx::parallel::util {
     prefetching::prefetcher_context<Itr, Ts const...> make_prefetcher_context(
         Itr base_begin, Itr base_end, std::size_t p_factor, Ts const&... rngs)
     {
-        static_assert(hpx::traits::is_random_access_iterator_v<Itr>,
+        static_assert(std::random_access_iterator<Itr>,
             "Iterators have to be of random access iterator category");
         static_assert(hpx::util::all_of_v<hpx::traits::is_range<Ts>...>,
             "All variadic parameters have to represent ranges");
