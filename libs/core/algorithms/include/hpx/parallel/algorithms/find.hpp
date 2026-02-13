@@ -1844,7 +1844,7 @@ namespace hpx {
 namespace hpx::parallel::detail {
     ///////////////////////////////////////////////////////////////////////////
     // find_last
-    HPX_CXX_EXPORT template <typename FwdIter>
+    HPX_CXX_CORE_EXPORT template <typename FwdIter>
     struct find_last : public algorithm<find_last<FwdIter>, FwdIter>
     {
         constexpr find_last() noexcept
@@ -1885,7 +1885,7 @@ namespace hpx::parallel::detail {
             decltype(auto) policy =
                 hpx::execution::experimental::adapt_placement_mode(
                     HPX_FORWARD(ExPolicy, orgpolicy),
-                    hpx::threads::thread_placement_hint::breadth_first);
+                    hpx::threads::thread_placement_hint::breadth_first_reverse);
 
             using policy_type = std::decay_t<decltype(policy)>;
 
@@ -1932,7 +1932,7 @@ namespace hpx::parallel::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     // find_last_if
-    HPX_CXX_EXPORT template <typename FwdIter>
+    HPX_CXX_CORE_EXPORT template <typename FwdIter>
     struct find_last_if : public algorithm<find_last_if<FwdIter>, FwdIter>
     {
         constexpr find_last_if() noexcept
@@ -1973,7 +1973,7 @@ namespace hpx::parallel::detail {
             decltype(auto) policy =
                 hpx::execution::experimental::adapt_placement_mode(
                     HPX_FORWARD(ExPolicy, orgpolicy),
-                    hpx::threads::thread_placement_hint::breadth_first);
+                    hpx::threads::thread_placement_hint::breadth_first_reverse);
 
             using policy_type = std::decay_t<decltype(policy)>;
 
@@ -2020,7 +2020,7 @@ namespace hpx::parallel::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     // find_last_if_not
-    HPX_CXX_EXPORT template <typename FwdIter>
+    HPX_CXX_CORE_EXPORT template <typename FwdIter>
     struct find_last_if_not
       : public algorithm<find_last_if_not<FwdIter>, FwdIter>
     {
@@ -2062,7 +2062,7 @@ namespace hpx::parallel::detail {
             decltype(auto) policy =
                 hpx::execution::experimental::adapt_placement_mode(
                     HPX_FORWARD(ExPolicy, orgpolicy),
-                    hpx::threads::thread_placement_hint::breadth_first);
+                    hpx::threads::thread_placement_hint::breadth_first_reverse);
 
             using policy_type = std::decay_t<decltype(policy)>;
 

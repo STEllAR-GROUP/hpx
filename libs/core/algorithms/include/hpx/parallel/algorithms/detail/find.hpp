@@ -474,7 +474,7 @@ namespace hpx::parallel::detail {
             typename Proj = hpx::identity>
         friend constexpr Iterator tag_fallback_invoke(
             sequential_find_last_t<ExPolicy>, Iterator first, Sentinel last,
-            T const& value, Proj proj = Proj())
+            T const& value, Proj&& proj = Proj())
         {
             auto u_last = detail::advance_to_sentinel(first, last);
             if constexpr (hpx::traits::is_bidirectional_iterator_v<Iterator>)
@@ -528,9 +528,10 @@ namespace hpx::parallel::detail {
     HPX_CXX_EXPORT template <typename ExPolicy, typename Iterator,
         typename Sentinel, typename T, typename Proj = hpx::identity>
     constexpr Iterator sequential_find_last(
-        Iterator first, Sentinel last, T const& val, Proj proj = Proj())
+        Iterator first, Sentinel last, T const& val, Proj&& proj = Proj())
     {
-        return sequential_find_last_t<ExPolicy>{}(first, last, val, proj);
+        return sequential_find_last_t<ExPolicy>{}(
+            first, last, val, HPX_FORWARD(Proj, proj));
     }
 
     HPX_CXX_EXPORT template <typename ExPolicy, typename FwdIter,
@@ -556,7 +557,7 @@ namespace hpx::parallel::detail {
             typename Proj = hpx::identity>
         friend inline constexpr Iterator tag_fallback_invoke(
             sequential_find_last_if_t<ExPolicy>, Iterator first, Sentinel last,
-            Pred pred, Proj proj = Proj())
+            Pred pred, Proj&& proj = Proj())
         {
             auto u_last = detail::advance_to_sentinel(first, last);
             if constexpr (hpx::traits::is_bidirectional_iterator_v<Iterator>)
@@ -610,7 +611,7 @@ namespace hpx::parallel::detail {
     HPX_CXX_EXPORT template <typename ExPolicy, typename Iterator,
         typename Sentinel, typename Pred, typename Proj = hpx::identity>
     inline constexpr Iterator sequential_find_last_if(
-        Iterator first, Sentinel last, Pred pred, Proj proj = Proj())
+        Iterator first, Sentinel last, Pred pred, Proj&& proj = Proj())
     {
         return sequential_find_last_if_t<ExPolicy>{}(first, last, pred, proj);
     }
@@ -638,7 +639,7 @@ namespace hpx::parallel::detail {
             typename Proj = hpx::identity>
         friend inline constexpr Iterator tag_fallback_invoke(
             sequential_find_last_if_not_t<ExPolicy>, Iterator first,
-            Sentinel last, Pred pred, Proj proj = Proj())
+            Sentinel last, Pred pred, Proj&& proj = Proj())
         {
             auto u_last = detail::advance_to_sentinel(first, last);
             if constexpr (hpx::traits::is_bidirectional_iterator_v<Iterator>)
@@ -692,7 +693,7 @@ namespace hpx::parallel::detail {
     HPX_CXX_EXPORT template <typename ExPolicy, typename Iterator,
         typename Sentinel, typename Pred, typename Proj = hpx::identity>
     inline constexpr Iterator sequential_find_last_if_not(
-        Iterator first, Sentinel last, Pred pred, Proj proj = Proj())
+        Iterator first, Sentinel last, Pred pred, Proj&& proj = Proj())
     {
         return sequential_find_last_if_not_t<ExPolicy>{}(
             first, last, pred, proj);
