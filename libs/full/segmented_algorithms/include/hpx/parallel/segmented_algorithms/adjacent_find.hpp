@@ -150,8 +150,8 @@ namespace hpx::parallel {
 
             using result = util::detail::algorithm_result<ExPolicy, FwdIter>;
 
-            using forced_seq = std::integral_constant<bool,
-                !hpx::std::forward_iterator<FwdIter>::value>;
+            using forced_seq =
+                std::integral_constant<bool, !std::forward_iterator<FwdIter>>;
 
             segment_iterator1 sit = traits::segment(first);
             segment_iterator1 send = traits::segment(last);
@@ -281,8 +281,8 @@ namespace hpx::segmented {
     InIter tag_invoke(
         hpx::adjacent_find_t, InIter first, InIter last, Pred&& pred = Pred())
     {
-        static_assert((std::input_iterator<InIter>),
-            "Requires at least input iterator.");
+        static_assert(
+            (std::input_iterator<InIter>), "Requires at least input iterator.");
 
         if (first == last)
         {

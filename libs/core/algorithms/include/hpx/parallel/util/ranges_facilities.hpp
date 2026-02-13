@@ -23,7 +23,7 @@ namespace hpx::ranges {
     // clang-format off
         requires (
             std::input_iterator<Iter> ||
-            std::output_iterator<Iter>
+            std::output_iterator<Iter, hpx::traits::iter_value_t<Iter>>
         )
     // clang-format on
     constexpr Iter next(
@@ -38,7 +38,7 @@ namespace hpx::ranges {
         requires(
             std::sentinel_for<Sent, Iter> &&
             (std::input_iterator<Iter> ||
-                std::output_iterator<Iter>) )
+                std::output_iterator<Iter, hpx::traits::iter_value_t<Iter>>) )
     // clang-format on
     constexpr Iter next(Iter first, Sent bound)
     {
@@ -50,7 +50,7 @@ namespace hpx::ranges {
         requires (
             std::sentinel_for<Sent, Iter> &&
             (std::input_iterator<Iter> ||
-                std::output_iterator<Iter>)
+                std::output_iterator<Iter, hpx::traits::iter_value_t<Iter>>)
         )
     // clang-format on
     constexpr Iter next(

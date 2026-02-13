@@ -239,8 +239,8 @@ namespace hpx { namespace ranges {
     ///           an object equal to {last, result + N} where N = last - first
     ///
     template <typename Rng, typename OutIter>
-    reverse_copy_result<std::ranges::iterator_t<Rng>, OutIter>
-    reverse_copy(Rng&& rng, OutIter result);
+    reverse_copy_result<std::ranges::iterator_t<Rng>, OutIter> reverse_copy(
+        Rng&& rng, OutIter result);
 
     /// Copies the elements from the range [first, last) to another range
     /// beginning at result in such a way that the elements in the new
@@ -398,7 +398,7 @@ namespace hpx::ranges {
         friend Iter tag_fallback_invoke(
             hpx::ranges::reverse_t, Iter first, Sent sent)
         {
-            static_assert(hpx::traits::is_bidirectional_iterator<Iter>::value,
+            static_assert(std::bidirectional_iterator<Iter>,
                 "Required at least bidirectional iterator.");
 
             return parallel::detail::reverse<Iter>().call(
@@ -410,12 +410,11 @@ namespace hpx::ranges {
         friend std::ranges::iterator_t<Rng> tag_fallback_invoke(
             hpx::ranges::reverse_t, Rng&& rng)
         {
-            static_assert(hpx::traits::is_bidirectional_iterator<
-                              std::ranges::iterator_t<Rng>>::value,
+            static_assert(
+                std::bidirectional_iterator<std::ranges::iterator_t<Rng>>,
                 "Required at least bidirectional iterator.");
 
-            return parallel::detail::reverse<
-                std::ranges::iterator_t<Rng>>()
+            return parallel::detail::reverse<std::ranges::iterator_t<Rng>>()
                 .call(hpx::execution::sequenced_policy{}, hpx::util::begin(rng),
                     hpx::util::end(rng));
         }
@@ -429,11 +428,10 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            Iter>::type
-        tag_fallback_invoke(
-            hpx::ranges::reverse_t, ExPolicy&& policy, Iter first, Sent sent)
+            Iter>::type tag_fallback_invoke(hpx::ranges::reverse_t,
+            ExPolicy&& policy, Iter first, Sent sent)
         {
-            static_assert(hpx::traits::is_bidirectional_iterator<Iter>::value,
+            static_assert(std::bidirectional_iterator<Iter>,
                 "Required at least bidirectional iterator.");
 
             return parallel::detail::reverse<Iter>().call(
@@ -452,12 +450,11 @@ namespace hpx::ranges {
         tag_fallback_invoke(
             hpx::ranges::reverse_t, ExPolicy&& policy, Rng&& rng)
         {
-            static_assert(hpx::traits::is_bidirectional_iterator<
-                              std::ranges::iterator_t<Rng>>::value,
+            static_assert(
+                std::bidirectional_iterator<std::ranges::iterator_t<Rng>>,
                 "Required at least bidirectional iterator.");
 
-            return parallel::detail::reverse<
-                std::ranges::iterator_t<Rng>>()
+            return parallel::detail::reverse<std::ranges::iterator_t<Rng>>()
                 .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                     hpx::util::end(rng));
         }
@@ -480,10 +477,11 @@ namespace hpx::ranges {
         friend reverse_copy_result<Iter, OutIter> tag_fallback_invoke(
             hpx::ranges::reverse_copy_t, Iter first, Sent last, OutIter result)
         {
-            static_assert(hpx::traits::is_bidirectional_iterator<Iter>::value,
+            static_assert(std::bidirectional_iterator<Iter>,
                 "Required at least bidirectional iterator.");
 
-            static_assert(std::output_iterator<OutIter>,
+            static_assert(
+                std::output_iterator<OutIter, hpx::traits::iter_value_t<Iter>>,
                 "Required at least output iterator.");
 
             return parallel::detail::reverse_copy<
@@ -502,16 +500,16 @@ namespace hpx::ranges {
         tag_fallback_invoke(
             hpx::ranges::reverse_copy_t, Rng&& rng, OutIter result)
         {
-            static_assert(hpx::traits::is_bidirectional_iterator<
-                              std::ranges::iterator_t<Rng>>::value,
+            static_assert(
+                std::bidirectional_iterator<std::ranges::iterator_t<Rng>>,
                 "Required at least bidirectional iterator.");
 
-            static_assert(std::output_iterator<OutIter>,
+            static_assert(
+                std::output_iterator<OutIter, hpx::traits::iter_value_t<std::ranges::iterator_t<Rng>>>,
                 "Required at least output iterator.");
 
-            return parallel::detail::reverse_copy<
-                hpx::parallel::util::in_out_result<
-                    std::ranges::iterator_t<Rng>, OutIter>>()
+            return parallel::detail::reverse_copy<hpx::parallel::util::
+                    in_out_result<std::ranges::iterator_t<Rng>, OutIter>>()
                 .call(hpx::execution::sequenced_policy{}, hpx::util::begin(rng),
                     hpx::util::end(rng), result);
         }
@@ -531,7 +529,7 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::reverse_copy_t, ExPolicy&& policy,
             Iter first, Sent last, FwdIter result)
         {
-            static_assert(hpx::traits::is_bidirectional_iterator<Iter>::value,
+            static_assert(std::bidirectional_iterator<Iter>,
                 "Required at least bidirectional iterator.");
 
             static_assert(std::forward_iterator<FwdIter>,
@@ -555,16 +553,16 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::reverse_copy_t, ExPolicy&& policy,
             Rng&& rng, OutIter result)
         {
-            static_assert(hpx::traits::is_bidirectional_iterator<
-                              std::ranges::iterator_t<Rng>>::value,
+            static_assert(
+                std::bidirectional_iterator<std::ranges::iterator_t<Rng>>,
                 "Required at least bidirectional iterator.");
 
-            static_assert(std::output_iterator<OutIter>,
+            static_assert(
+                std::output_iterator<OutIter, hpx::traits::iter_value_t<std::ranges::iterator_t<Rng>>>,
                 "Required at least output iterator.");
 
-            return parallel::detail::reverse_copy<
-                hpx::parallel::util::in_out_result<
-                    std::ranges::iterator_t<Rng>, OutIter>>()
+            return parallel::detail::reverse_copy<hpx::parallel::util::
+                    in_out_result<std::ranges::iterator_t<Rng>, OutIter>>()
                 .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                     hpx::util::end(rng), result);
         }

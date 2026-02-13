@@ -703,10 +703,8 @@ namespace hpx::ranges {
                 "Requires at least input iterator.");
 
             return hpx::parallel::util::make_subrange<
-                std::ranges::iterator_t<Rng>,
-                typename hpx::traits::range_sentinel<Rng>::type>(
-                hpx::parallel::detail::unique<
-                    std::ranges::iterator_t<Rng>>()
+                std::ranges::iterator_t<Rng>, std::ranges::sentinel_t<Rng>>(
+                hpx::parallel::detail::unique<std::ranges::iterator_t<Rng>>()
                     .call(hpx::execution::seq, hpx::util::begin(rng),
                         hpx::util::end(rng), HPX_MOVE(pred), HPX_MOVE(proj)),
                 hpx::util::end(rng));
@@ -738,10 +736,8 @@ namespace hpx::ranges {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::util::make_subrange<
-                std::ranges::iterator_t<Rng>,
-                typename hpx::traits::range_sentinel<Rng>::type>(
-                hpx::parallel::detail::unique<
-                    std::ranges::iterator_t<Rng>>()
+                std::ranges::iterator_t<Rng>, std::ranges::sentinel_t<Rng>>(
+                hpx::parallel::detail::unique<std::ranges::iterator_t<Rng>>()
                     .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                         hpx::util::end(rng), HPX_MOVE(pred), HPX_MOVE(proj)),
                 hpx::util::end(rng));

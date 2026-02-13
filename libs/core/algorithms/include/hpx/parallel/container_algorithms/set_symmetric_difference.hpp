@@ -491,7 +491,7 @@ namespace hpx::ranges {
                 "Requires at least forward iterator.");
             static_assert(std::forward_iterator<Iter3> ||
                     (hpx::is_sequenced_execution_policy_v<ExPolicy> &&
-                        std::output_iterator<Iter3>),
+                        std::output_iterator<Iter3, hpx::traits::iter_value_t<Iter2>>),
                 "Requires at least forward iterator or sequential execution.");
 
             using is_seq = std::integral_constant<bool,
@@ -543,7 +543,7 @@ namespace hpx::ranges {
                 "Requires at least forward iterator.");
             static_assert(std::forward_iterator<Iter3> ||
                     (hpx::is_sequenced_execution_policy_v<ExPolicy> &&
-                        std::output_iterator<Iter3>),
+                        std::output_iterator<Iter3, hpx::traits::iter_value_t<iterator_type2>>),
                 "Requires at least forward iterator or sequential execution.");
 
             using is_seq = std::integral_constant<bool,
@@ -589,7 +589,8 @@ namespace hpx::ranges {
                 "Requires at least input iterator.");
             static_assert(std::input_iterator<Iter2>,
                 "Requires at least input iterator.");
-            static_assert(std::output_iterator<Iter3>,
+            static_assert(
+                std::output_iterator<Iter3, hpx::traits::iter_value_t<Iter1>>,
                 "Requires at least output iterator.");
 
             using result_type =
@@ -618,8 +619,7 @@ namespace hpx::ranges {
                 >
             )
         // clang-format on
-        friend set_symmetric_difference_result<
-            std::ranges::iterator_t<Rng1>,
+        friend set_symmetric_difference_result<std::ranges::iterator_t<Rng1>,
             std::ranges::iterator_t<Rng2>, Iter3>
         tag_fallback_invoke(set_symmetric_difference_t, Rng1&& rng1,
             Rng2&& rng2, Iter3 dest, Pred op = Pred(), Proj1 proj1 = Proj1(),
@@ -632,7 +632,8 @@ namespace hpx::ranges {
                 "Requires at least input iterator.");
             static_assert(std::input_iterator<iterator_type2>,
                 "Requires at least input iterator.");
-            static_assert(std::output_iterator<Iter3>,
+            static_assert(
+                std::output_iterator<Iter3, hpx::traits::iter_value_t<iterator_type2>>,
                 "Requires at least output iterator.");
 
             using result_type = set_symmetric_difference_result<iterator_type1,

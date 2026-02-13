@@ -425,13 +425,9 @@ namespace hpx::ranges {
             Rng2&& rng2, Pred op = Pred(), Proj1 proj1 = Proj1(),
             Proj2 proj2 = Proj2())
         {
-            static_assert(
-                hpx::std::forward_iterator<typename hpx::traits::
-                        range_traits<Rng1>::iterator_type>::value,
+            static_assert(std::forward_iterator<std::ranges::iterator_t<Rng1>>,
                 "Requires at least forward iterator.");
-            static_assert(
-                hpx::std::forward_iterator<typename hpx::traits::
-                        range_traits<Rng2>::iterator_type>::value,
+            static_assert(std::forward_iterator<std::ranges::iterator_t<Rng2>>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::equal_binary().call(
@@ -487,13 +483,9 @@ namespace hpx::ranges {
         friend bool tag_fallback_invoke(equal_t, Rng1&& rng1, Rng2&& rng2,
             Pred op = Pred(), Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
         {
-            static_assert(
-                hpx::std::forward_iterator<typename hpx::traits::
-                        range_traits<Rng1>::iterator_type>::value,
+            static_assert(std::forward_iterator<std::ranges::iterator_t<Rng1>>,
                 "Requires at least forward iterator.");
-            static_assert(
-                hpx::std::forward_iterator<typename hpx::traits::
-                        range_traits<Rng2>::iterator_type>::value,
+            static_assert(std::forward_iterator<std::ranges::iterator_t<Rng2>>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::equal_binary().call(

@@ -705,9 +705,8 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            T>::type
-        tag_fallback_invoke(hpx::ranges::reduce_t, ExPolicy&& policy,
-            FwdIter first, Sent last, T init, F f)
+            T>::type tag_fallback_invoke(hpx::ranges::reduce_t,
+            ExPolicy&& policy, FwdIter first, Sent last, T init, F f)
         {
             static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
@@ -727,13 +726,12 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            T>::type
-        tag_fallback_invoke(
-            hpx::ranges::reduce_t, ExPolicy&& policy, Rng&& rng, T init, F f)
+            T>::type tag_fallback_invoke(hpx::ranges::reduce_t,
+            ExPolicy&& policy, Rng&& rng, T init, F f)
         {
             static_assert(
-                hpx::std::forward_iterator<typename hpx::traits::
-                        range_traits<Rng>::iterator_type>::value,
+                std::forward_iterator<
+                    typename hpx::traits::range_traits<Rng>::iterator_type>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::reduce<T>().call(
@@ -750,9 +748,8 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            T>::type
-        tag_fallback_invoke(hpx::ranges::reduce_t, ExPolicy&& policy,
-            FwdIter first, Sent last, T init)
+            T>::type tag_fallback_invoke(hpx::ranges::reduce_t,
+            ExPolicy&& policy, FwdIter first, Sent last, T init)
         {
             static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
@@ -772,13 +769,12 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            T>::type
-        tag_fallback_invoke(
-            hpx::ranges::reduce_t, ExPolicy&& policy, Rng&& rng, T init)
+            T>::type tag_fallback_invoke(hpx::ranges::reduce_t,
+            ExPolicy&& policy, Rng&& rng, T init)
         {
             static_assert(
-                hpx::std::forward_iterator<typename hpx::traits::
-                        range_traits<Rng>::iterator_type>::value,
+                std::forward_iterator<
+                    typename hpx::traits::range_traits<Rng>::iterator_type>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::reduce<T>().call(
@@ -856,8 +852,9 @@ namespace hpx::ranges {
         friend T tag_fallback_invoke(
             hpx::ranges::reduce_t, Rng&& rng, T init, F f)
         {
-            static_assert(hpx::traits::is_input_iterator<typename hpx::traits::
-                                  range_traits<Rng>::iterator_type>::value,
+            static_assert(
+                std::input_iterator<
+                    typename hpx::traits::range_traits<Rng>::iterator_type>,
                 "Requires at least input iterator.");
 
             return hpx::parallel::detail::reduce<T>().call(hpx::execution::seq,
@@ -884,8 +881,9 @@ namespace hpx::ranges {
             requires(std::ranges::range<Rng>)
         friend T tag_fallback_invoke(hpx::ranges::reduce_t, Rng&& rng, T init)
         {
-            static_assert(hpx::traits::is_input_iterator<typename hpx::traits::
-                                  range_traits<Rng>::iterator_type>::value,
+            static_assert(
+                std::input_iterator<
+                    typename hpx::traits::range_traits<Rng>::iterator_type>,
                 "Requires at least input iterator.");
 
             return hpx::parallel::detail::reduce<T>().call(hpx::execution::seq,

@@ -76,8 +76,7 @@ namespace hpx::parallel::util::detail {
     };
 
     HPX_CXX_CORE_EXPORT template <typename Range>
-    struct iterator_type<Range,
-        std::enable_if_t<std::ranges::range<Range>>>
+    struct iterator_type<Range, std::enable_if_t<std::ranges::range<Range>>>
     {
         using type = std::ranges::iterator_t<Range>;
     };
@@ -263,6 +262,8 @@ namespace hpx::parallel::util::detail {
         // clang-format off
             requires (std::bidirectional_iterator<
                                       iterator_type_t<Iter>> ||
+                hpx::traits::belongs_to_iterator_category_v<
+                    iterator_type_t<Iter>, std::bidirectional_iterator_tag> ||
                 hpx::traits::is_range_generator_v<Iter> ||
                 std::is_integral_v<Iter>
             )
@@ -276,6 +277,8 @@ namespace hpx::parallel::util::detail {
         // clang-format off
             requires (std::random_access_iterator<
                                       iterator_type_t<Iter>> ||
+                hpx::traits::belongs_to_iterator_category_v<
+                    iterator_type_t<Iter>, std::random_access_iterator_tag> ||
                 hpx::traits::is_range_generator_v<Iter> ||
                 std::is_integral_v<Iter>
             )
@@ -297,6 +300,8 @@ namespace hpx::parallel::util::detail {
         // clang-format off
             requires (std::random_access_iterator<
                                       iterator_type_t<Iter>> ||
+                hpx::traits::belongs_to_iterator_category_v<
+                    iterator_type_t<Iter>, std::random_access_iterator_tag> ||
                 hpx::traits::is_range_generator_v<Iter> ||
                 std::is_integral_v<Iter>
             )
@@ -509,6 +514,8 @@ namespace hpx::parallel::util::detail {
         // clang-format off
             requires (std::bidirectional_iterator<
                                       iterator_type_t<Iter>> ||
+                hpx::traits::belongs_to_iterator_category_v<
+                    iterator_type_t<Iter>, std::bidirectional_iterator_tag> ||
                 hpx::traits::is_range_generator_v<Iter> ||
                 std::is_integral_v<Iter>
             )
@@ -522,6 +529,8 @@ namespace hpx::parallel::util::detail {
         // clang-format off
             requires (std::random_access_iterator<
                                       iterator_type_t<Iter>> ||
+                hpx::traits::belongs_to_iterator_category_v<
+                    iterator_type_t<Iter>, std::random_access_iterator_tag> ||
                 hpx::traits::is_range_generator_v<Iter> ||
                 std::is_integral_v<Iter>
             )
@@ -543,6 +552,8 @@ namespace hpx::parallel::util::detail {
         // clang-format off
             requires (std::random_access_iterator<
                                       iterator_type_t<Iter>> ||
+                hpx::traits::belongs_to_iterator_category_v<
+                    iterator_type_t<Iter>, std::random_access_iterator_tag> ||
                 hpx::traits::is_range_generator_v<Iter> ||
                 std::is_integral_v<Iter>
             )

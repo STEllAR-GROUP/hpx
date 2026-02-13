@@ -25,8 +25,8 @@ namespace hpx::traits::detail {
 
     HPX_CXX_CORE_EXPORT template <typename Range>
     using is_reservable = std::integral_constant < bool,
-          is_range_v<std::decay_t<Range>>&& has_reserve_v < std::decay_t <
-        Range >>>
+          std::ranges::range<std::decay_t<Range>>&& has_reserve_v <
+        std::decay_t < Range >>>
         ;
 
     HPX_CXX_CORE_EXPORT template <typename Range>

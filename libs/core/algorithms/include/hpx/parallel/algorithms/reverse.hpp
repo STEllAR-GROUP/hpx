@@ -384,8 +384,9 @@ namespace hpx {
             static_assert(std::bidirectional_iterator<BidirIter>,
                 "Requires at least bidirectional iterator.");
 
-            static_assert(std::output_iterator<OutIter>,
-                "Requires at least output iterator.");
+            static_assert(
+                std::output_iterator<OutIter, hpx::traits::iter_value_t<BidirIter>>,
+                "Required at least output iterator.");
 
             return parallel::util::get_second_element(
                 parallel::detail::reverse_copy<

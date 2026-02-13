@@ -405,10 +405,10 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            mismatch_result<Iter1, Iter2>>
-        tag_fallback_invoke(mismatch_t, ExPolicy&& policy, Iter1 first1,
-            Sent1 last1, Iter2 first2, Sent2 last2, Pred op = Pred(),
-            Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
+            mismatch_result<Iter1, Iter2>> tag_fallback_invoke(mismatch_t,
+            ExPolicy&& policy, Iter1 first1, Sent1 last1, Iter2 first2,
+            Sent2 last2, Pred op = Pred(), Proj1 proj1 = Proj1(),
+            Proj2 proj2 = Proj2())
         {
             static_assert(std::forward_iterator<Iter1>,
                 "Requires at least forward iterator.");
@@ -446,12 +446,12 @@ namespace hpx::ranges {
             Proj2 proj2 = Proj2())
         {
             static_assert(
-                hpx::std::forward_iterator<typename hpx::traits::
-                        range_traits<Rng1>::iterator_type>::value,
+                std::forward_iterator<
+                    typename hpx::traits::range_traits<Rng1>::iterator_type>,
                 "Requires at least forward iterator.");
             static_assert(
-                hpx::std::forward_iterator<typename hpx::traits::
-                        range_traits<Rng2>::iterator_type>::value,
+                std::forward_iterator<
+                    typename hpx::traits::range_traits<Rng2>::iterator_type>,
                 "Requires at least forward iterator.");
 
             using result_type = mismatch_result<
@@ -516,12 +516,12 @@ namespace hpx::ranges {
             Pred op = Pred(), Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
         {
             static_assert(
-                hpx::std::forward_iterator<typename hpx::traits::
-                        range_traits<Rng1>::iterator_type>::value,
+                std::forward_iterator<
+                    typename hpx::traits::range_traits<Rng1>::iterator_type>,
                 "Requires at least forward iterator.");
             static_assert(
-                hpx::std::forward_iterator<typename hpx::traits::
-                        range_traits<Rng2>::iterator_type>::value,
+                std::forward_iterator<
+                    typename hpx::traits::range_traits<Rng2>::iterator_type>,
                 "Requires at least forward iterator.");
 
             using result_type = mismatch_result<

@@ -369,7 +369,8 @@ namespace hpx::ranges {
         {
             static_assert(std::input_iterator<InIter>,
                 "Requires at least input iterator.");
-            static_assert(std::output_iterator<OutIter>,
+            static_assert(
+                std::output_iterator<OutIter, hpx::traits::iter_value_t<InIter>>,
                 "Requires at least output iterator.");
 
             using result_type = exclusive_scan_result<InIter, OutIter>;
@@ -429,8 +430,7 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::exclusive_scan_t, Rng&& rng, O dest,
             T init, Op op = Op())
         {
-            static_assert(hpx::traits::is_input_iterator<
-                              std::ranges::iterator_t<Rng>>::value,
+            static_assert(std::input_iterator<std::ranges::iterator_t<Rng>>,
                 "Requires at least input iterator.");
 
             using result_type =
@@ -460,8 +460,7 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::exclusive_scan_t, ExPolicy&& policy,
             Rng&& rng, O dest, T init, Op op = Op())
         {
-            static_assert(hpx::std::forward_iterator<
-                              std::ranges::iterator_t<Rng>>::value,
+            static_assert(std::forward_iterator<std::ranges::iterator_t<Rng>>,
                 "Requires at least forward iterator.");
 
             using result_type =

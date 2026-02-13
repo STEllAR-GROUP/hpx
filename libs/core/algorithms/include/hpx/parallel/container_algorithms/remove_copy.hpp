@@ -427,8 +427,8 @@ namespace hpx { namespace ranges {
     template <typename Rng, typename O, typename Proj = hpx::identity,
         typename T = typename hpx::parallel::traits::projected<
             std::ranges::iterator_t<Rng>, Proj>::value_type>
-    remove_copy_result<std::ranges::iterator_t<Rng>, O>
-    ranges::remove_copy(Rng&& rng, O dest, T const& val, Proj&& proj = Proj());
+    remove_copy_result<std::ranges::iterator_t<Rng>, O> ranges::remove_copy(
+        Rng&& rng, O dest, T const& val, Proj&& proj = Proj());
 
     /// Copies the elements in the range, defined by [first, last), to another
     /// range beginning at \a dest. Copies only the elements for which the
@@ -621,10 +621,9 @@ namespace hpx::ranges {
             hpx::ranges::remove_copy_if_t, I first, Sent last, O dest,
             Pred pred, Proj proj = Proj())
         {
-            static_assert(std::input_iterator<I>,
-                "Required input iterator.");
+            static_assert(std::input_iterator<I>, "Required input iterator.");
 
-            static_assert(std::output_iterator<O>,
+            static_assert(std::output_iterator<O, hpx::traits::iter_value_t<I>>,
                 "Required output iterator.");
 
             return hpx::parallel::detail::remove_copy_if<
@@ -650,8 +649,7 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::remove_copy_if_t, Rng&& rng, O dest,
             Pred pred, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_input_iterator<
-                              std::ranges::iterator_t<Rng>>::value,
+            static_assert(std::input_iterator<std::ranges::iterator_t<Rng>>,
                 "Required at least input iterator.");
 
             return hpx::parallel::detail::remove_copy_if<hpx::parallel::util::
@@ -710,8 +708,7 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::remove_copy_if_t, ExPolicy&& policy,
             Rng&& rng, O dest, Pred pred, Proj proj = Proj())
         {
-            static_assert(hpx::std::forward_iterator<
-                              std::ranges::iterator_t<Rng>>::value,
+            static_assert(std::forward_iterator<std::ranges::iterator_t<Rng>>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::remove_copy_if<hpx::parallel::util::
@@ -743,8 +740,8 @@ namespace hpx::ranges {
             hpx::ranges::remove_copy_t, I first, Sent last, O dest,
             T const& value, Proj proj = Proj())
         {
-            static_assert(std::input_iterator<I>,
-                "Required at least input iterator.");
+            static_assert(
+                std::input_iterator<I>, "Required at least input iterator.");
 
             using type = typename std::iterator_traits<I>::value_type;
 
@@ -767,8 +764,7 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::remove_copy_t, Rng&& rng, O dest,
             T const& value, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_input_iterator<
-                              std::ranges::iterator_t<Rng>>::value,
+            static_assert(std::input_iterator<std::ranges::iterator_t<Rng>>,
                 "Required at input forward iterator.");
 
             using type = typename std::iterator_traits<
@@ -825,8 +821,7 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::remove_copy_t, ExPolicy&& policy,
             Rng&& rng, O dest, T const& value, Proj proj = Proj())
         {
-            static_assert(hpx::std::forward_iterator<
-                              std::ranges::iterator_t<Rng>>::value,
+            static_assert(std::forward_iterator<std::ranges::iterator_t<Rng>>,
                 "Required at least forward iterator.");
 
             using type = typename std::iterator_traits<

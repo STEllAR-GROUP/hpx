@@ -1449,9 +1449,8 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            std::ranges::iterator_t<Rng>>
-        tag_fallback_invoke(find_t, ExPolicy&& policy, Rng&& rng, T const& val,
-            Proj proj = Proj())
+            std::ranges::iterator_t<Rng>> tag_fallback_invoke(find_t,
+            ExPolicy&& policy, Rng&& rng, T const& val, Proj proj = Proj())
         {
             using iterator_type = std::ranges::iterator_t<Rng>;
 
@@ -1475,8 +1474,8 @@ namespace hpx::ranges {
         friend Iter tag_fallback_invoke(
             find_t, Iter first, Sent last, T const& val, Proj&& proj = Proj())
         {
-            static_assert(std::input_iterator<Iter>,
-                "Requires at least input iterator.");
+            static_assert(
+                std::input_iterator<Iter>, "Requires at least input iterator.");
 
             return hpx::parallel::detail::find<Iter>().call(
                 hpx::execution::seq, first, last, val, HPX_FORWARD(Proj, proj));
@@ -1524,9 +1523,8 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            Iter>::type
-        tag_fallback_invoke(find_if_t, ExPolicy&& policy, Iter first, Sent last,
-            Pred&& pred, Proj&& proj = Proj())
+            Iter>::type tag_fallback_invoke(find_if_t, ExPolicy&& policy,
+            Iter first, Sent last, Pred&& pred, Proj&& proj = Proj())
         {
             static_assert(std::forward_iterator<Iter>,
                 "Requires at least forward iterator.");
@@ -1551,9 +1549,8 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            std::ranges::iterator_t<Rng>>
-        tag_fallback_invoke(find_if_t, ExPolicy&& policy, Rng&& rng, Pred pred,
-            Proj proj = Proj())
+            std::ranges::iterator_t<Rng>> tag_fallback_invoke(find_if_t,
+            ExPolicy&& policy, Rng&& rng, Pred pred, Proj proj = Proj())
         {
             using iterator_type = std::ranges::iterator_t<Rng>;
 
@@ -1579,8 +1576,8 @@ namespace hpx::ranges {
         friend Iter tag_fallback_invoke(
             find_if_t, Iter first, Sent last, Pred pred, Proj proj = Proj())
         {
-            static_assert(std::input_iterator<Iter>,
-                "Requires at least input iterator.");
+            static_assert(
+                std::input_iterator<Iter>, "Requires at least input iterator.");
 
             return hpx::parallel::detail::find_if<Iter>().call(
                 hpx::execution::seq, first, last, HPX_MOVE(pred),
@@ -1657,9 +1654,8 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            std::ranges::iterator_t<Rng>>
-        tag_fallback_invoke(find_if_not_t, ExPolicy&& policy, Rng&& rng,
-            Pred pred, Proj proj = Proj())
+            std::ranges::iterator_t<Rng>> tag_fallback_invoke(find_if_not_t,
+            ExPolicy&& policy, Rng&& rng, Pred pred, Proj proj = Proj())
         {
             using iterator_type = std::ranges::iterator_t<Rng>;
 
@@ -1685,8 +1681,8 @@ namespace hpx::ranges {
         friend Iter tag_fallback_invoke(
             find_if_not_t, Iter first, Sent last, Pred pred, Proj proj = Proj())
         {
-            static_assert(std::input_iterator<Iter>,
-                "Requires at least input iterator.");
+            static_assert(
+                std::input_iterator<Iter>, "Requires at least input iterator.");
 
             return hpx::parallel::detail::find_if_not<Iter>().call(
                 hpx::execution::seq, first, last, HPX_MOVE(pred),
@@ -1740,17 +1736,15 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            std::ranges::iterator_t<Rng1>>
-        tag_fallback_invoke(find_end_t, ExPolicy&& policy, Rng1&& rng1,
-            Rng2&& rng2, Pred op = Pred(), Proj1 proj1 = Proj1(),
-            Proj2 proj2 = Proj2())
+            std::ranges::iterator_t<Rng1>> tag_fallback_invoke(find_end_t,
+            ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2, Pred op = Pred(),
+            Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
         {
             using iterator_type = std::ranges::iterator_t<Rng1>;
 
             static_assert(std::forward_iterator<iterator_type>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::std::forward_iterator<
-                              std::ranges::iterator_t<Rng2>>::value,
+            static_assert(std::forward_iterator<std::ranges::iterator_t<Rng2>>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::find_end<iterator_type>().call(
@@ -1802,16 +1796,15 @@ namespace hpx::ranges {
                 >
             )
         // clang-format on
-        friend std::ranges::iterator_t<Rng1> tag_fallback_invoke(
-            find_end_t, Rng1&& rng1, Rng2&& rng2, Pred op = Pred(),
-            Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
+        friend std::ranges::iterator_t<Rng1> tag_fallback_invoke(find_end_t,
+            Rng1&& rng1, Rng2&& rng2, Pred op = Pred(), Proj1 proj1 = Proj1(),
+            Proj2 proj2 = Proj2())
         {
             using iterator_type = std::ranges::iterator_t<Rng1>;
 
             static_assert(std::forward_iterator<iterator_type>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::std::forward_iterator<
-                              std::ranges::iterator_t<Rng2>>::value,
+            static_assert(std::forward_iterator<std::ranges::iterator_t<Rng2>>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::find_end<iterator_type>().call(
@@ -1871,17 +1864,15 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            std::ranges::iterator_t<Rng1>>
-        tag_fallback_invoke(find_first_of_t, ExPolicy&& policy, Rng1&& rng1,
-            Rng2&& rng2, Pred op = Pred(), Proj1 proj1 = Proj1(),
-            Proj2 proj2 = Proj2())
+            std::ranges::iterator_t<Rng1>> tag_fallback_invoke(find_first_of_t,
+            ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2, Pred op = Pred(),
+            Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
         {
             using iterator_type = std::ranges::iterator_t<Rng1>;
 
             static_assert(std::forward_iterator<iterator_type>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::std::forward_iterator<
-                              std::ranges::iterator_t<Rng2>>::value,
+            static_assert(std::forward_iterator<std::ranges::iterator_t<Rng2>>,
                 "Subsequence requires at least forward iterator.");
 
             return hpx::parallel::detail::find_first_of<iterator_type>().call(
@@ -1941,8 +1932,7 @@ namespace hpx::ranges {
 
             static_assert(std::forward_iterator<iterator_type>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::std::forward_iterator<
-                              std::ranges::iterator_t<Rng2>>::value,
+            static_assert(std::forward_iterator<std::ranges::iterator_t<Rng2>>,
                 "Subsequence requires at least forward iterator.");
 
             return hpx::parallel::detail::find_first_of<iterator_type>().call(

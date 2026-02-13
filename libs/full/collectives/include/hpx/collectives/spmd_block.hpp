@@ -172,8 +172,7 @@ namespace hpx { namespace lcos {
         }
 
         template <typename Iterator>
-        typename std::enable_if<
-            traits::is_input_iterator<Iterator>::value>::type
+        typename std::enable_if<std::input_iterator<Iterator>>::type
         sync_images(Iterator begin, Iterator end) const
         {
             std::set<std::size_t> images(begin, end);
@@ -235,7 +234,7 @@ namespace hpx { namespace lcos {
         }
 
         template <typename Iterator>
-        typename std::enable_if<traits::is_input_iterator<Iterator>::value,
+        typename std::enable_if<std::input_iterator<Iterator>,
             hpx::future<void>>::type
         sync_images(hpx::launch::async_policy const& policy, Iterator begin,
             Iterator end) const
