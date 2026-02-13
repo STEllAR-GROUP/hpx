@@ -9,24 +9,23 @@
 #include <hpx/config.hpp>
 #include <hpx/concurrency/spinlock.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/type_support/assert_owns_lock.hpp>
+#include <hpx/modules/type_support.hpp>
 
-#include <algorithm>
-#include <deque>
 #include <iterator>
 #include <mutex>
-#include <stdexcept>
+
+#include <type_traits>
 #include <utility>
 #include <vector>
 
 namespace hpx::concurrent {
 
     template <typename T, typename Allocator = std::allocator<T>>
-    class concurrent_vector
+    class HPX_CXX_CORE_EXPORT concurrent_vector
     {
     private:
         mutable hpx::util::spinlock mutex_;
-        std::deque<T, Allocator> data_;
+        std::vector<T, Allocator> data_;
 
     public:
         using value_type = T;
@@ -67,21 +66,29 @@ namespace hpx::concurrent {
         public:
             accessor() = default;
 
-            operator bool() const
+            bool empty() const
             {
-                return value_ != nullptr;
+                return value_ == nullptr;
+            }
+
+            template <typename U = T,
+                typename = std::enable_if_t<!std::is_same_v<U, bool>>>
+            explicit operator bool() const
+            {
+                return !empty();
             }
 
             operator T&() const
             {
-                validate();
-                return *value_;
+                return get();
             }
+
             T& get() const
             {
                 validate();
                 return *value_;
             }
+
             accessor& operator=(T const& v)
             {
                 validate();
@@ -117,16 +124,23 @@ namespace hpx::concurrent {
         public:
             const_accessor() = default;
 
-            operator bool() const
+            bool empty() const
             {
-                return value_ != nullptr;
+                return value_ == nullptr;
+            }
+
+            template <typename U = T,
+                typename = std::enable_if_t<!std::is_same_v<U, bool>>>
+            explicit operator bool() const
+            {
+                return !empty();
             }
 
             operator T const&() const
             {
-                validate();
-                return *value_;
+                return get();
             }
+
             T const& get() const
             {
                 validate();
@@ -252,9 +266,8 @@ namespace hpx::concurrent {
         }
 
         concurrent_vector(concurrent_vector&& other) noexcept
+          : data_(HPX_MOVE(other.data_))
         {
-            std::lock_guard<hpx::util::spinlock> lock(other.mutex_);
-            data_ = HPX_MOVE(other.data_);
         }
 
         concurrent_vector& operator=(concurrent_vector const& other)
@@ -383,12 +396,16 @@ namespace hpx::concurrent {
             return data_.max_size();
         }
 
-        void reserve(size_type /*new_cap*/) {}
+        void reserve(size_type new_cap)
+        {
+            std::lock_guard<hpx::util::spinlock> lock(mutex_);
+            data_.reserve(new_cap);
+        }
 
         size_type capacity() const noexcept
         {
             std::lock_guard<hpx::util::spinlock> lock(mutex_);
-            return data_.size();
+            return data_.capacity();
         }
 
         void shrink_to_fit()
