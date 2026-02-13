@@ -74,8 +74,7 @@ namespace hpx::util {
     };
 
     HPX_CXX_CORE_EXPORT template <typename Range>
-    iterator_range(Range& r)
-        -> iterator_range<std::ranges::iterator_t<Range>>;
+    iterator_range(Range& r) -> iterator_range<std::ranges::iterator_t<Range>>;
 
     HPX_CXX_CORE_EXPORT template <typename Range>
     iterator_range(Range const& r)

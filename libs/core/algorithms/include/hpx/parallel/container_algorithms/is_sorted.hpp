@@ -579,8 +579,7 @@ namespace hpx::ranges {
             Pred pred = Pred(), Proj proj = Proj())
         {
             return hpx::parallel::detail::is_sorted<
-                std::ranges::iterator_t<Rng>,
-                std::ranges::iterator_t<Rng>>()
+                std::ranges::iterator_t<Rng>, std::ranges::iterator_t<Rng>>()
                 .call(hpx::execution::seq, hpx::util::begin(rng),
                     hpx::util::end(rng), HPX_MOVE(pred), HPX_MOVE(proj));
         }
@@ -605,8 +604,7 @@ namespace hpx::ranges {
             Rng&& rng, Pred pred = Pred(), Proj proj = Proj())
         {
             return hpx::parallel::detail::is_sorted<
-                std::ranges::iterator_t<Rng>,
-                std::ranges::iterator_t<Rng>>()
+                std::ranges::iterator_t<Rng>, std::ranges::iterator_t<Rng>>()
                 .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                     hpx::util::end(rng), HPX_MOVE(pred), HPX_MOVE(proj));
         }
@@ -683,8 +681,7 @@ namespace hpx::ranges {
             Proj proj = Proj())
         {
             return hpx::parallel::detail::is_sorted_until<
-                std::ranges::iterator_t<Rng>,
-                std::ranges::iterator_t<Rng>>()
+                std::ranges::iterator_t<Rng>, std::ranges::iterator_t<Rng>>()
                 .call(hpx::execution::seq, hpx::util::begin(rng),
                     hpx::util::end(rng), HPX_MOVE(pred), HPX_MOVE(proj));
         }
@@ -710,8 +707,7 @@ namespace hpx::ranges {
             Rng&& rng, Pred pred = Pred(), Proj proj = Proj())
         {
             return hpx::parallel::detail::is_sorted_until<
-                std::ranges::iterator_t<Rng>,
-                std::ranges::iterator_t<Rng>>()
+                std::ranges::iterator_t<Rng>, std::ranges::iterator_t<Rng>>()
                 .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                     hpx::util::end(rng), HPX_MOVE(pred), HPX_MOVE(proj));
         }

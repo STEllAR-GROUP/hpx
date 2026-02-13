@@ -960,8 +960,8 @@ namespace hpx::ranges {
         friend T tag_fallback_invoke(transform_reduce_t, Iter first, Sent last,
             T init, Reduce red_op, Convert conv_op)
         {
-            static_assert(std::input_iterator<Iter>,
-                "Requires at least input iterator.");
+            static_assert(
+                std::input_iterator<Iter>, "Requires at least input iterator.");
 
             return hpx::parallel::detail::transform_reduce<T>().call(
                 hpx::execution::seq, first, last, HPX_MOVE(init),
@@ -1002,8 +1002,8 @@ namespace hpx::ranges {
         friend T tag_fallback_invoke(
             transform_reduce_t, Iter first, Sent last, Iter2 first2, T init)
         {
-            static_assert(std::input_iterator<Iter>,
-                "Requires at least input iterator.");
+            static_assert(
+                std::input_iterator<Iter>, "Requires at least input iterator.");
             static_assert(std::input_iterator<Iter2>,
                 "Requires at least input iterator.");
 
@@ -1075,8 +1075,8 @@ namespace hpx::ranges {
         friend T tag_fallback_invoke(transform_reduce_t, Iter first, Sent last,
             Iter2 first2, T init, Reduce red_op, Convert conv_op)
         {
-            static_assert(std::input_iterator<Iter>,
-                "Requires at least input iterator.");
+            static_assert(
+                std::input_iterator<Iter>, "Requires at least input iterator.");
             static_assert(std::input_iterator<Iter2>,
                 "Requires at least input iterator.");
 

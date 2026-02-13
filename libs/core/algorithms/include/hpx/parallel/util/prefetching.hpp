@@ -213,8 +213,7 @@ namespace hpx::parallel::util {
             std::size_t range_size_;
 
             static constexpr std::size_t sizeof_first_value_type =
-                sizeof(typename hpx::tuple_element<0,
-                    hpx::tuple<Ts...>>::type);
+                sizeof(typename hpx::tuple_element<0, hpx::tuple<Ts...>>::type);
 
         public:
             prefetcher_context(Itr begin, Itr end, ranges_type const& rngs,

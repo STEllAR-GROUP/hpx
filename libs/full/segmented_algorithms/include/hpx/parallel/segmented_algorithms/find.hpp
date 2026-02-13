@@ -231,8 +231,8 @@ namespace hpx { namespace segmented {
             hpx::traits::is_segmented_iterator_v<SegIter>)
     SegIter tag_invoke(hpx::find_t, SegIter first, SegIter last, T const& val)
     {
-        static_assert(std::input_iterator<SegIter>,
-            "Requires at least input iterator.");
+        static_assert(
+            std::input_iterator<SegIter>, "Requires at least input iterator.");
 
         if (first == last)
         {
@@ -279,8 +279,8 @@ namespace hpx { namespace segmented {
             hpx::traits::is_segmented_iterator_v<FwdIter>)
     FwdIter tag_invoke(hpx::find_if_t, FwdIter first, FwdIter last, F&& f)
     {
-        static_assert(std::input_iterator<FwdIter>,
-            "Requires at least input iterator.");
+        static_assert(
+            std::input_iterator<FwdIter>, "Requires at least input iterator.");
 
         if (first == last)
         {
@@ -329,8 +329,8 @@ namespace hpx { namespace segmented {
             hpx::traits::is_segmented_iterator_v<FwdIter>)
     FwdIter tag_invoke(hpx::find_if_not_t, FwdIter first, FwdIter last, F&& f)
     {
-        static_assert(std::input_iterator<FwdIter>,
-            "Requires at least input iterator.");
+        static_assert(
+            std::input_iterator<FwdIter>, "Requires at least input iterator.");
 
         if (first == last)
         {

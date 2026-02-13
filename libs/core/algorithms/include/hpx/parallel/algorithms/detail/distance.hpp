@@ -27,8 +27,7 @@ namespace hpx::parallel::detail {
         {
             return last - first;
         }
-        else if constexpr (std::sized_sentinel_for<InIterE,
-                               InIterB>)
+        else if constexpr (std::sized_sentinel_for<InIterE, InIterB>)
         {
             return last - first;
         }

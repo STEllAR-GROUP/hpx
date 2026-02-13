@@ -716,11 +716,9 @@ namespace hpx::ranges {
             using iterator_type1 = std::ranges::iterator_t<Rng1>;
             using iterator_type2 = std::ranges::iterator_t<Rng2>;
 
-            static_assert(
-                std::random_access_iterator<iterator_type1>,
+            static_assert(std::random_access_iterator<iterator_type1>,
                 "Required at least random access iterator.");
-            static_assert(
-                std::random_access_iterator<iterator_type2>,
+            static_assert(std::random_access_iterator<iterator_type2>,
                 "Requires at least random access iterator.");
             static_assert(std::random_access_iterator<Iter3>,
                 "Requires at least random access iterator.");
@@ -798,11 +796,9 @@ namespace hpx::ranges {
             using iterator_type1 = std::ranges::iterator_t<Rng1>;
             using iterator_type2 = std::ranges::iterator_t<Rng2>;
 
-            static_assert(
-                std::random_access_iterator<iterator_type1>,
+            static_assert(std::random_access_iterator<iterator_type1>,
                 "Required at least random access iterator.");
-            static_assert(
-                std::random_access_iterator<iterator_type2>,
+            static_assert(std::random_access_iterator<iterator_type2>,
                 "Requires at least random access iterator.");
             static_assert(std::random_access_iterator<Iter3>,
                 "Requires at least random access iterator.");
@@ -881,8 +877,7 @@ namespace hpx::ranges {
         {
             using iterator_type = std::ranges::iterator_t<Rng>;
 
-            static_assert(
-                std::random_access_iterator<iterator_type>,
+            static_assert(std::random_access_iterator<iterator_type>,
                 "Required at least random access iterator.");
             static_assert(std::random_access_iterator<Iter>,
                 "Required at least random access iterator.");
@@ -937,8 +932,7 @@ namespace hpx::ranges {
         {
             using iterator_type = std::ranges::iterator_t<Rng>;
 
-            static_assert(
-                std::random_access_iterator<iterator_type>,
+            static_assert(std::random_access_iterator<iterator_type>,
                 "Required at least random access iterator.");
             static_assert(std::random_access_iterator<Iter>,
                 "Required at least random access iterator.");

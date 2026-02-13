@@ -420,8 +420,8 @@ namespace hpx {
             static_assert(
                 std::input_iterator<InIter>, "Required input iterator.");
 
-            static_assert(
-                std::output_iterator<OutIter, hpx::traits::iter_value_t<InIter>>,
+            static_assert(std::output_iterator<OutIter,
+                              hpx::traits::iter_value_t<InIter>>,
                 "Required output iterator.");
 
             auto&& res = hpx::parallel::detail::remove_copy_if<
@@ -445,9 +445,9 @@ namespace hpx {
             )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter2>::type tag_fallback_invoke(hpx::remove_copy_if_t,
-            ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest,
-            Pred pred)
+            FwdIter2>::type
+        tag_fallback_invoke(hpx::remove_copy_if_t, ExPolicy&& policy,
+            FwdIter1 first, FwdIter1 last, FwdIter2 dest, Pred pred)
         {
             static_assert(std::forward_iterator<FwdIter1>,
                 "Required at least forward iterator.");
@@ -484,8 +484,8 @@ namespace hpx {
             static_assert(std::input_iterator<InIter>,
                 "Requires at least input iterator.");
 
-            static_assert(
-                std::output_iterator<OutIter, hpx::traits::iter_value_t<InIter>>,
+            static_assert(std::output_iterator<OutIter,
+                              hpx::traits::iter_value_t<InIter>>,
                 "Requires at least output iterator.");
 
             using type = typename std::iterator_traits<InIter>::value_type;
@@ -504,9 +504,9 @@ namespace hpx {
             )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter2>::type tag_fallback_invoke(hpx::remove_copy_t,
-            ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest,
-            T const& value)
+            FwdIter2>::type
+        tag_fallback_invoke(hpx::remove_copy_t, ExPolicy&& policy,
+            FwdIter1 first, FwdIter1 last, FwdIter2 dest, T const& value)
         {
             static_assert(std::forward_iterator<FwdIter1>,
                 "Required at least forward iterator.");

@@ -11,9 +11,9 @@
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 
 #include <iterator>
+#include <ranges>
 #include <type_traits>
 #include <utility>
-#include <ranges>
 
 namespace hpx::traits {
 
@@ -31,7 +31,8 @@ namespace hpx::traits {
     using range_category_t = iter_category_t<std::ranges::iterator_t<T>>;
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_CORE_EXPORT template <typename R, bool IsRange = std::ranges::range<R>>
+    HPX_CXX_CORE_EXPORT template <typename R,
+        bool IsRange = std::ranges::range<R>>
     struct range_traits
     {
     };

@@ -1449,8 +1449,9 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            std::ranges::iterator_t<Rng>> tag_fallback_invoke(find_t,
-            ExPolicy&& policy, Rng&& rng, T const& val, Proj proj = Proj())
+            std::ranges::iterator_t<Rng>>
+        tag_fallback_invoke(find_t, ExPolicy&& policy, Rng&& rng, T const& val,
+            Proj proj = Proj())
         {
             using iterator_type = std::ranges::iterator_t<Rng>;
 
@@ -1523,8 +1524,9 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            Iter>::type tag_fallback_invoke(find_if_t, ExPolicy&& policy,
-            Iter first, Sent last, Pred&& pred, Proj&& proj = Proj())
+            Iter>::type
+        tag_fallback_invoke(find_if_t, ExPolicy&& policy, Iter first, Sent last,
+            Pred&& pred, Proj&& proj = Proj())
         {
             static_assert(std::forward_iterator<Iter>,
                 "Requires at least forward iterator.");
@@ -1549,8 +1551,9 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            std::ranges::iterator_t<Rng>> tag_fallback_invoke(find_if_t,
-            ExPolicy&& policy, Rng&& rng, Pred pred, Proj proj = Proj())
+            std::ranges::iterator_t<Rng>>
+        tag_fallback_invoke(find_if_t, ExPolicy&& policy, Rng&& rng, Pred pred,
+            Proj proj = Proj())
         {
             using iterator_type = std::ranges::iterator_t<Rng>;
 
@@ -1654,8 +1657,9 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            std::ranges::iterator_t<Rng>> tag_fallback_invoke(find_if_not_t,
-            ExPolicy&& policy, Rng&& rng, Pred pred, Proj proj = Proj())
+            std::ranges::iterator_t<Rng>>
+        tag_fallback_invoke(find_if_not_t, ExPolicy&& policy, Rng&& rng,
+            Pred pred, Proj proj = Proj())
         {
             using iterator_type = std::ranges::iterator_t<Rng>;
 
@@ -1736,9 +1740,10 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            std::ranges::iterator_t<Rng1>> tag_fallback_invoke(find_end_t,
-            ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2, Pred op = Pred(),
-            Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
+            std::ranges::iterator_t<Rng1>>
+        tag_fallback_invoke(find_end_t, ExPolicy&& policy, Rng1&& rng1,
+            Rng2&& rng2, Pred op = Pred(), Proj1 proj1 = Proj1(),
+            Proj2 proj2 = Proj2())
         {
             using iterator_type = std::ranges::iterator_t<Rng1>;
 
@@ -1864,9 +1869,10 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            std::ranges::iterator_t<Rng1>> tag_fallback_invoke(find_first_of_t,
-            ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2, Pred op = Pred(),
-            Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
+            std::ranges::iterator_t<Rng1>>
+        tag_fallback_invoke(find_first_of_t, ExPolicy&& policy, Rng1&& rng1,
+            Rng2&& rng2, Pred op = Pred(), Proj1 proj1 = Proj1(),
+            Proj2 proj2 = Proj2())
         {
             using iterator_type = std::ranges::iterator_t<Rng1>;
 

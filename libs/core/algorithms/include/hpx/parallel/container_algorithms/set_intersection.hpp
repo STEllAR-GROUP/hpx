@@ -476,7 +476,8 @@ namespace hpx::ranges {
                 "Requires at least forward iterator.");
             static_assert(std::forward_iterator<Iter3> ||
                     (hpx::is_sequenced_execution_policy_v<ExPolicy> &&
-                        std::output_iterator<Iter3, hpx::traits::iter_value_t<Iter2>>),
+                        std::output_iterator<Iter3,
+                            hpx::traits::iter_value_t<Iter2>>),
                 "Requires at least forward iterator or sequential execution.");
 
             using is_seq = std::integral_constant<bool,
@@ -525,7 +526,8 @@ namespace hpx::ranges {
                 "Requires at least forward iterator.");
             static_assert(std::forward_iterator<Iter3> ||
                     (hpx::is_sequenced_execution_policy_v<ExPolicy> &&
-                        std::output_iterator<Iter3, hpx::traits::iter_value_t<iterator_type2>>),
+                        std::output_iterator<Iter3,
+                            hpx::traits::iter_value_t<iterator_type2>>),
                 "Requires at least forward iterator or sequential execution.");
 
             using is_seq = std::integral_constant<bool,
@@ -611,8 +613,8 @@ namespace hpx::ranges {
                 "Requires at least input iterator.");
             static_assert(std::input_iterator<iterator_type2>,
                 "Requires at least input iterator.");
-            static_assert(
-                std::output_iterator<Iter3, hpx::traits::iter_value_t<iterator_type2>>,
+            static_assert(std::output_iterator<Iter3,
+                              hpx::traits::iter_value_t<iterator_type2>>,
                 "Requires at least out iterator.");
 
             using result_type =

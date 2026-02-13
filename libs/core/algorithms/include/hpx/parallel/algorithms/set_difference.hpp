@@ -343,7 +343,8 @@ namespace hpx {
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            FwdIter3> tag_fallback_invoke(set_difference_t, ExPolicy&& policy,
+            FwdIter3>
+        tag_fallback_invoke(set_difference_t, ExPolicy&& policy,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2,
             FwdIter3 dest, Pred op = Pred())
         {
@@ -353,7 +354,8 @@ namespace hpx {
                 "Requires at least forward iterator.");
             static_assert(std::forward_iterator<FwdIter3> ||
                     (hpx::is_sequenced_execution_policy_v<ExPolicy> &&
-                        std::output_iterator<FwdIter3, hpx::traits::iter_value_t<FwdIter2>>),
+                        std::output_iterator<FwdIter3,
+                            hpx::traits::iter_value_t<FwdIter2>>),
                 "Requires at least forward iterator or sequential execution.");
 
             using is_seq = std::integral_constant<bool,
@@ -392,8 +394,8 @@ namespace hpx {
                 "Requires at least input iterator.");
             static_assert(std::input_iterator<FwdIter2>,
                 "Requires at least input iterator.");
-            static_assert(
-                std::output_iterator<FwdIter3, hpx::traits::iter_value_t<FwdIter2>>,
+            static_assert(std::output_iterator<FwdIter3,
+                              hpx::traits::iter_value_t<FwdIter2>>,
                 "Requires at least output iterator.");
 
             using result_type =

@@ -17,6 +17,8 @@
 template <typename ValueType>
 struct sentinel
 {
+    sentinel() = default;
+
     explicit sentinel(ValueType stop_value)
       : stop(stop_value)
     {
@@ -75,7 +77,7 @@ struct iterator
     {
     }
 
-    virtual Value operator*() const
+    virtual reference operator*() const
     {
         return this->state;
     }
