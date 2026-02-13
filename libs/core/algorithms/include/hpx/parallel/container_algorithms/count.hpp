@@ -556,8 +556,8 @@ namespace hpx::ranges {
         tag_fallback_invoke(
             count_t, Iter first, Sent last, T const& value, Proj proj = Proj())
         {
-            static_assert(std::input_iterator<Iter>,
-                "Required at least input iterator.");
+            static_assert(
+                std::input_iterator<Iter>, "Required at least input iterator.");
 
             using difference_type =
                 typename std::iterator_traits<Iter>::difference_type;

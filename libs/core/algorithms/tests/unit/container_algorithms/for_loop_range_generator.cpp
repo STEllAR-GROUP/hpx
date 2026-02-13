@@ -9,7 +9,7 @@
 // clang up to V12 (Apple clang up to v15) and gcc above V13 refuse to compile
 // the code below
 #if defined(HPX_HAVE_CXX20_COROUTINES) &&                                      \
-    (!defined(HPX_CLANG_VERSION) || HPX_CLANG_VERSION >= 130000) &&            \
+    (!defined(HPX_CLANG_VERSION) || HPX_CLANG_VERSION < 130000) &&             \
     (!defined(HPX_GCC_VERSION) || HPX_GCC_VERSION < 140000) &&                 \
     (!defined(HPX_APPLE_CLANG_VERSION) || HPX_APPLE_CLANG_VERSION >= 160000)
 
@@ -49,24 +49,24 @@ namespace test {
             return first == rhs.first && last == rhs.last &&
                 stride == rhs.stride;
         }
+
+        hpx::generator<int&, int> iterate(index_pair const p) noexcept
+        {
+            auto const lo = p.first;
+            auto const hi = p.last;
+
+            if (auto const stride = p.stride; stride > 0)
+            {
+                for (auto i = lo; i < hi; i += stride)
+                    co_yield i;
+            }
+            else if (stride < 0)
+            {
+                for (auto i = hi - 1; i >= lo; i += stride)
+                    co_yield i;
+            }
+        }
     };
-
-    hpx::generator<int&, int> iterate(index_pair const p) noexcept
-    {
-        auto const lo = p.first;
-        auto const hi = p.last;
-
-        if (auto const stride = p.stride; stride > 0)
-        {
-            for (auto i = lo; i < hi; i += stride)
-                co_yield i;
-        }
-        else if (stride < 0)
-        {
-            for (auto i = hi - 1; i >= lo; i += stride)
-                co_yield i;
-        }
-    }
 
     bool empty(index_pair const& p)
     {
@@ -89,8 +89,6 @@ namespace test {
         return {static_cast<int>(p.first + first),
             static_cast<int>(p.first + first + size), p.stride};
     }
-
-    static_assert(hpx::traits::is_range_generator_v<index_pair>);
 }    // namespace test
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -817,8 +817,8 @@ namespace hpx::ranges {
         friend bool tag_fallback_invoke(
             none_of_t, Iter first, Sent last, F f, Proj proj = Proj())
         {
-            static_assert(std::input_iterator<Iter>,
-                "Required at least input iterator.");
+            static_assert(
+                std::input_iterator<Iter>, "Required at least input iterator.");
 
             return hpx::parallel::detail::none_of().call(
                 hpx::execution::seq, first, last, HPX_MOVE(f), HPX_MOVE(proj));
@@ -921,8 +921,8 @@ namespace hpx::ranges {
         friend bool tag_fallback_invoke(
             any_of_t, Iter first, Sent last, F f, Proj proj = Proj())
         {
-            static_assert(std::input_iterator<Iter>,
-                "Required at least input iterator.");
+            static_assert(
+                std::input_iterator<Iter>, "Required at least input iterator.");
 
             return hpx::parallel::detail::any_of().call(
                 hpx::execution::seq, first, last, HPX_MOVE(f), HPX_MOVE(proj));
@@ -1026,8 +1026,8 @@ namespace hpx::ranges {
         friend bool tag_fallback_invoke(
             all_of_t, Iter first, Sent last, F f, Proj proj = Proj())
         {
-            static_assert(std::input_iterator<Iter>,
-                "Required at least input iterator.");
+            static_assert(
+                std::input_iterator<Iter>, "Required at least input iterator.");
 
             return hpx::parallel::detail::all_of().call(
                 hpx::execution::seq, first, last, HPX_MOVE(f), HPX_MOVE(proj));

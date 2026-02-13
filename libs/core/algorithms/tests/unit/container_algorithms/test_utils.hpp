@@ -28,6 +28,8 @@ namespace test {
         requires(hpx::traits::is_iterator<IterType>::value)
     struct sentinel_from_iterator
     {
+        sentinel_from_iterator() = default;
+
         explicit sentinel_from_iterator(IterType end_iter)
           : end(end_iter)
         {
@@ -79,6 +81,15 @@ namespace test {
         explicit constexpr test_iterator(BaseIterator base)
           : base_type(base)
         {
+        }
+
+        template <typename Tag = IteratorTag,
+            typename Enable = std::enable_if_t<
+                std::is_same_v<Tag, std::random_access_iterator_tag>>>
+        HPX_HOST_DEVICE typename base_type::reference operator[](
+            typename base_type::difference_type n) const
+        {
+            return *(this->base() + n);
         }
     };
 
@@ -159,6 +170,17 @@ namespace test {
           : base_type(base)
           , m_callback(f)
         {
+        }
+
+        template <typename Tag = IteratorTag,
+            typename Enable = std::enable_if_t<
+                std::is_same_v<Tag, std::random_access_iterator_tag>>>
+        HPX_HOST_DEVICE typename base_type::reference operator[](
+            typename base_type::difference_type n) const
+        {
+            if (m_callback)
+                m_callback();
+            return *(this->base() + n);
         }
 
     private:

@@ -861,8 +861,8 @@ namespace hpx::ranges {
         {
             static_assert(std::input_iterator<InIter>,
                 "Requires at least input iterator.");
-            static_assert(
-                std::output_iterator<OutIter, hpx::traits::iter_value_t<InIter>>,
+            static_assert(std::output_iterator<OutIter,
+                              hpx::traits::iter_value_t<InIter>>,
                 "Requires at least output iterator.");
 
             using result_type =
@@ -1008,8 +1008,8 @@ namespace hpx::ranges {
         {
             static_assert(std::input_iterator<InIter>,
                 "Requires at least input iterator.");
-            static_assert(
-                std::output_iterator<OutIter, hpx::traits::iter_value_t<InIter>>,
+            static_assert(std::output_iterator<OutIter,
+                              hpx::traits::iter_value_t<InIter>>,
                 "Requires at least output iterator.");
 
             using result_type =

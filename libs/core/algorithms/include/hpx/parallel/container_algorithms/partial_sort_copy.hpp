@@ -376,8 +376,8 @@ namespace hpx::ranges {
             RandIter r_first, Sent2 r_last, Comp comp = Comp(),
             Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
         {
-            static_assert(std::input_iterator<InIter>,
-                "Requires an input iterator.");
+            static_assert(
+                std::input_iterator<InIter>, "Requires an input iterator.");
 
             static_assert(std::random_access_iterator<RandIter>,
                 "Requires a random access iterator.");
@@ -414,8 +414,8 @@ namespace hpx::ranges {
             FwdIter first, Sent1 last, RandIter r_first, Sent2 r_last,
             Comp comp = Comp(), Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
         {
-            static_assert(std::forward_iterator<FwdIter>,
-                "Requires a forward iterator.");
+            static_assert(
+                std::forward_iterator<FwdIter>, "Requires a forward iterator.");
 
             static_assert(std::random_access_iterator<RandIter>,
                 "Requires a random access iterator.");
@@ -456,8 +456,7 @@ namespace hpx::ranges {
             static_assert(std::forward_iterator<iterator_type1>,
                 "Requires a forward iterator.");
 
-            static_assert(
-                std::random_access_iterator<iterator_type2>,
+            static_assert(std::random_access_iterator<iterator_type2>,
                 "Requires a random access iterator.");
 
             return hpx::parallel::detail::partial_sort_copy<result_type>().call(
@@ -499,8 +498,7 @@ namespace hpx::ranges {
             static_assert(std::forward_iterator<iterator_type1>,
                 "Requires a forward iterator.");
 
-            static_assert(
-                std::random_access_iterator<iterator_type2>,
+            static_assert(std::random_access_iterator<iterator_type2>,
                 "Requires a random access iterator.");
 
             return hpx::parallel::detail::partial_sort_copy<result_type>().call(

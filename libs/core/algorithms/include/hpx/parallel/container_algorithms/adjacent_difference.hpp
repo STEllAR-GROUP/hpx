@@ -379,8 +379,7 @@ namespace hpx::ranges {
         friend FwdIter2 tag_fallback_invoke(
             hpx::ranges::adjacent_difference_t, Rng&& rng, FwdIter2 dest)
         {
-            static_assert(std::forward_iterator<
-                              std::ranges::iterator_t<Rng>>,
+            static_assert(std::forward_iterator<std::ranges::iterator_t<Rng>>,
                 "Required at least forward iterator.");
             static_assert(std::forward_iterator<FwdIter2>,
                 "Required at least forward iterator.");
@@ -426,8 +425,7 @@ namespace hpx::ranges {
             hpx::ranges::adjacent_difference_t, ExPolicy&& policy, Rng&& rng,
             FwdIter2 dest)
         {
-            static_assert(std::forward_iterator<
-                              std::ranges::iterator_t<Rng>>,
+            static_assert(std::forward_iterator<std::ranges::iterator_t<Rng>>,
                 "Required at least forward iterator.");
             static_assert(std::forward_iterator<FwdIter2>,
                 "Required at least forward iterator.");
@@ -467,8 +465,7 @@ namespace hpx::ranges {
         friend FwdIter2 tag_fallback_invoke(
             hpx::ranges::adjacent_difference_t, Rng&& rng, FwdIter2 dest, Op op)
         {
-            static_assert(std::forward_iterator<
-                              std::ranges::iterator_t<Rng>>,
+            static_assert(std::forward_iterator<std::ranges::iterator_t<Rng>>,
                 "Required at least forward iterator.");
             static_assert(std::forward_iterator<FwdIter2>,
                 "Required at least forward iterator.");
@@ -514,8 +511,7 @@ namespace hpx::ranges {
             hpx::ranges::adjacent_difference_t, ExPolicy&& policy, Rng&& rng,
             FwdIter2 dest, Op op)
         {
-            static_assert(std::forward_iterator<
-                              std::ranges::iterator_t<Rng>>,
+            static_assert(std::forward_iterator<std::ranges::iterator_t<Rng>>,
                 "Required at least forward iterator.");
             static_assert(std::forward_iterator<FwdIter2>,
                 "Required at least forward iterator.");

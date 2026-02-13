@@ -247,8 +247,9 @@ concept subtraction_result =
     requires { typename hpx::traits::detail::subtraction_result_t<T, U>; };
 
 template <typename T, typename U>
-concept inplace_subtraction_result =
-    requires { typename hpx::traits::detail::inplace_subtraction_result_t<T, U>; };
+concept inplace_subtraction_result = requires {
+    typename hpx::traits::detail::inplace_subtraction_result_t<T, U>;
+};
 
 template <typename T>
 concept predecrement_result =
@@ -269,7 +270,6 @@ concept postincrement_result =
 template <typename T, typename U>
 concept subscript_result =
     requires { typename hpx::traits::detail::subscript_result_t<T, U>; };
-
 
 void addition_result_test()
 {
@@ -292,8 +292,7 @@ void addition_result_test()
 
     HPX_TEST_MSG((std::is_same_v<B, addition_result_t<C, A>>), "deduced type");
 
-    HPX_TEST_MSG(
-        (!addition_result<B, A>), "invalid operation");
+    HPX_TEST_MSG((!addition_result<B, A>), "invalid operation");
 }
 
 void dereference_result_test()
@@ -314,8 +313,7 @@ void dereference_result_test()
 
     HPX_TEST_MSG((std::is_same_v<A, dereference_result_t<B>>), "deduced type");
 
-    HPX_TEST_MSG(
-        (!dereference_result<A>), "invalid operation");
+    HPX_TEST_MSG((!dereference_result<A>), "invalid operation");
 }
 
 void equality_result_test()
@@ -391,8 +389,7 @@ void inplace_addition_result_test()
     HPX_TEST_MSG(
         (std::is_same_v<B, inplace_addition_result_t<C, A>>), "deduced type");
 
-    HPX_TEST_MSG((!inplace_addition_result<B, A>),
-        "invalid operation");
+    HPX_TEST_MSG((!inplace_addition_result<B, A>), "invalid operation");
 }
 
 void inplace_subtraction_result_test()
@@ -417,8 +414,7 @@ void inplace_subtraction_result_test()
     HPX_TEST_MSG((std::is_same_v<B, inplace_subtraction_result_t<C, A>>),
         "deduced type");
 
-    HPX_TEST_MSG((!inplace_subtraction_result<B, A>),
-        "invalid operation");
+    HPX_TEST_MSG((!inplace_subtraction_result<B, A>), "invalid operation");
 }
 
 void predecrement_result_test()
@@ -441,8 +437,7 @@ void predecrement_result_test()
     HPX_TEST_MSG(
         (std::is_same_v<A&, predecrement_result_t<B>>), "deduced type");
 
-    HPX_TEST_MSG(
-        (!predecrement_result<A>), "invalid operation");
+    HPX_TEST_MSG((!predecrement_result<A>), "invalid operation");
 }
 
 void preincrement_result_test()
@@ -465,8 +460,7 @@ void preincrement_result_test()
     HPX_TEST_MSG(
         (std::is_same_v<A&, preincrement_result_t<B>>), "deduced type");
 
-    HPX_TEST_MSG(
-        (!preincrement_result<A>), "invalid operation");
+    HPX_TEST_MSG((!preincrement_result<A>), "invalid operation");
 }
 
 void postdecrement_result_test()
@@ -488,8 +482,7 @@ void postdecrement_result_test()
     HPX_TEST_MSG(
         (std::is_same_v<A, postdecrement_result_t<B>>), "deduced type");
 
-    HPX_TEST_MSG((!postdecrement_result<A>),
-        "invalid operation");
+    HPX_TEST_MSG((!postdecrement_result<A>), "invalid operation");
 }
 
 void postincrement_result_test()
@@ -511,8 +504,7 @@ void postincrement_result_test()
     HPX_TEST_MSG(
         (std::is_same_v<A, postincrement_result_t<B>>), "deduced type");
 
-    HPX_TEST_MSG((!postincrement_result<A>),
-        "invalid operation");
+    HPX_TEST_MSG((!postincrement_result<A>), "invalid operation");
 }
 
 void subscript_result_test()
@@ -536,8 +528,7 @@ void subscript_result_test()
 
     HPX_TEST_MSG((std::is_same_v<B, subscript_result_t<C, A>>), "deduced type");
 
-    HPX_TEST_MSG(
-        (!subscript_result<B, A>), "invalid operation");
+    HPX_TEST_MSG((!subscript_result<B, A>), "invalid operation");
 }
 
 void subtraction_result_test()
@@ -562,10 +553,8 @@ void subtraction_result_test()
     HPX_TEST_MSG(
         (std::is_same_v<B, subtraction_result_t<C, A>>), "deduced type");
 
-    HPX_TEST_MSG((!subtraction_result<B, A>),
-        "invalid operation");
+    HPX_TEST_MSG((!subtraction_result<B, A>), "invalid operation");
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 int main()

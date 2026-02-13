@@ -575,8 +575,9 @@ namespace hpx::ranges {
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
             ranges::copy_result<
                 typename hpx::traits::range_traits<Rng>::iterator_type,
-                FwdIter>> tag_fallback_invoke(hpx::ranges::copy_t,
-            ExPolicy&& policy, Rng&& rng, FwdIter dest)
+                FwdIter>>
+        tag_fallback_invoke(
+            hpx::ranges::copy_t, ExPolicy&& policy, Rng&& rng, FwdIter dest)
         {
             using copy_iter_t = hpx::parallel::detail::copy_iter<
                 typename hpx::traits::range_traits<Rng>::iterator_type,
@@ -679,8 +680,8 @@ namespace hpx::ranges {
         {
             static_assert(std::forward_iterator<FwdIter1>,
                 "Required at least forward iterator.");
-            static_assert(
-                std::output_iterator<FwdIter2, hpx::traits::iter_value_t<FwdIter1>>,
+            static_assert(std::output_iterator<FwdIter2,
+                              hpx::traits::iter_value_t<FwdIter1>>,
                 "Requires at least output iterator.");
 
             // if count is representing a negative value, we do nothing
@@ -728,7 +729,8 @@ namespace hpx::ranges {
 
             static_assert(std::forward_iterator<FwdIter> ||
                     (hpx::is_sequenced_execution_policy_v<ExPolicy> &&
-                        std::output_iterator<FwdIter, hpx::traits::iter_value_t<FwdIter1>>),
+                        std::output_iterator<FwdIter,
+                            hpx::traits::iter_value_t<FwdIter1>>),
                 "Requires at least forward iterator or sequential execution.");
 
             return hpx::parallel::detail::copy_if<
@@ -753,14 +755,15 @@ namespace hpx::ranges {
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
             ranges::copy_if_result<
                 typename hpx::traits::range_traits<Rng>::iterator_type,
-                FwdIter>> tag_fallback_invoke(hpx::ranges::copy_if_t,
-            ExPolicy&& policy, Rng&& rng, FwdIter dest, Pred pred,
-            Proj proj = Proj())
+                FwdIter>>
+        tag_fallback_invoke(hpx::ranges::copy_if_t, ExPolicy&& policy,
+            Rng&& rng, FwdIter dest, Pred pred, Proj proj = Proj())
         {
             static_assert(std::forward_iterator<FwdIter> ||
                     (hpx::is_sequenced_execution_policy_v<ExPolicy> &&
-                        std::output_iterator<FwdIter, hpx::traits::iter_value_t<
-                                                 std::ranges::iterator_t<Rng>>>),
+                        std::output_iterator<FwdIter,
+                            hpx::traits::iter_value_t<
+                                std::ranges::iterator_t<Rng>>>),
                 "Requires at least forward iterator or sequential execution.");
 
             return hpx::parallel::detail::copy_if<
@@ -792,8 +795,8 @@ namespace hpx::ranges {
             static_assert(std::forward_iterator<FwdIter1>,
                 "Required at least forward iterator.");
 
-            static_assert(
-                std::output_iterator<FwdIter, hpx::traits::iter_value_t<FwdIter1>>,
+            static_assert(std::output_iterator<FwdIter,
+                              hpx::traits::iter_value_t<FwdIter1>>,
                 "Required at least output iterator.");
 
             return hpx::parallel::detail::copy_if<
@@ -821,7 +824,8 @@ namespace hpx::ranges {
             Pred pred, Proj proj = Proj())
         {
             static_assert(
-                std::output_iterator<FwdIter, hpx::traits::iter_value_t<std::ranges::iterator_t<Rng>>>,
+                std::output_iterator<FwdIter,
+                    hpx::traits::iter_value_t<std::ranges::iterator_t<Rng>>>,
                 "Required at least output iterator.");
 
             return hpx::parallel::detail::copy_if<

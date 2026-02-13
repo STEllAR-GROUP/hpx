@@ -101,7 +101,7 @@ namespace hpx::util {
             struct fallback
             {
                 template <typename T>
-                fallback(T const&)
+                constexpr fallback(T const&)
                 {
                 }
             };
@@ -162,6 +162,14 @@ namespace hpx::util {
             }
 
             fallback iterate(fallback);
+
+            template <typename C>
+            [[nodiscard]] inline constexpr fallback iterate_impl(
+                C&, ...) noexcept
+            {
+                // Return fallback{0} to satisfy return type
+                return fallback{0};
+            }
 
             template <typename C,
                 typename R = decltype(iterate(std::declval<C&>()))>
@@ -303,6 +311,16 @@ namespace hpx::util {
         // an iterate function that returns a range
         HPX_CXX_CORE_EXPORT template <typename T, typename Enable = void>
         struct is_range_generator : std::false_type
+        {
+        };
+
+        template <typename T>
+        struct is_range_generator<T,
+            std::void_t<decltype(detail::iterate_impl(std::declval<T&>(), 0L))>>
+          : std::integral_constant<bool,
+                !std::is_same_v<decltype(detail::iterate_impl(
+                                    std::declval<T&>(), 0L)),
+                    range_impl::fallback>>
         {
         };
 

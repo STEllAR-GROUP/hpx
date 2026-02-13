@@ -259,8 +259,7 @@ namespace hpx::ranges {
         friend std::ranges::iterator_t<Rng> tag_fallback_invoke(
             hpx::ranges::shift_right_t, Rng&& rng, Size n)
         {
-            static_assert(std::forward_iterator<
-                              std::ranges::iterator_t<Rng>>,
+            static_assert(std::forward_iterator<std::ranges::iterator_t<Rng>>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::shift_right<
@@ -281,8 +280,7 @@ namespace hpx::ranges {
         tag_fallback_invoke(
             hpx::ranges::shift_right_t, ExPolicy&& policy, Rng&& rng, Size n)
         {
-            static_assert(std::forward_iterator<
-                              std::ranges::iterator_t<Rng>>,
+            static_assert(std::forward_iterator<std::ranges::iterator_t<Rng>>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::shift_right<

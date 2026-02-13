@@ -334,12 +334,10 @@ namespace hpx::util {
 
             HPX_HOST_DEVICE iterator_facade_base() = default;
 
-            HPX_HOST_DEVICE constexpr auto operator[](difference_type n) const
+            HPX_HOST_DEVICE constexpr reference operator[](
+                difference_type n) const
             {
-                using use_proxy = use_operator_brackets_proxy<Derived, T>;
-
-                return make_operator_brackets_result<Derived>(
-                    this->derived() + n, use_proxy{});
+                return *(this->derived() + n);
             }
 
             HPX_HOST_DEVICE Derived& operator+=(difference_type n) noexcept(

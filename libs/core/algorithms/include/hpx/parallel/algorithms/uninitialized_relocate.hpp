@@ -417,8 +417,7 @@ namespace hpx::parallel {
         HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename InIter,
             typename FwdIter, typename Size>
             requires(std::input_iterator<InIter> &&
-                std::forward_iterator<FwdIter> &&
-                std::is_integral_v<Size>)
+                std::forward_iterator<FwdIter> && std::is_integral_v<Size>)
         decltype(auto) parallel_uninitialized_relocate_n(
             ExPolicy&& policy, InIter first, Size count, FwdIter dest)
         {
@@ -824,8 +823,8 @@ namespace hpx::experimental {
             FwdIter dest) noexcept(util::detail::relocation_traits<InIter1,
             FwdIter>::is_noexcept_relocatable_v)
         {
-            static_assert(std::input_iterator<InIter1> &&
-                    std::input_iterator<InIter2>,
+            static_assert(
+                std::input_iterator<InIter1> && std::input_iterator<InIter2>,
                 "The 'first' and 'last' arguments must meet the requirements "
                 "of input iterators.");
             static_assert(std::forward_iterator<FwdIter>,
@@ -862,8 +861,8 @@ namespace hpx::experimental {
             FwdIter dest) noexcept(util::detail::relocation_traits<InIter1,
             FwdIter>::is_noexcept_relocatable_v)
         {
-            static_assert(std::input_iterator<InIter1> &&
-                    std::input_iterator<InIter2>,
+            static_assert(
+                std::input_iterator<InIter1> && std::input_iterator<InIter2>,
                 "The 'first' and 'last' arguments must meet the requirements "
                 "of input iterators.");
             static_assert(std::forward_iterator<FwdIter>,

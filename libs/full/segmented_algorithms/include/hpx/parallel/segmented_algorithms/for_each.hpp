@@ -110,8 +110,8 @@ namespace hpx::parallel {
             using local_iterator_type = typename traits::local_iterator;
             using result = util::detail::algorithm_result<ExPolicy, SegIter>;
 
-            using forced_seq = std::integral_constant<bool,
-                !std::forward_iterator<SegIter>>;
+            using forced_seq =
+                std::integral_constant<bool, !std::forward_iterator<SegIter>>;
 
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);
@@ -238,8 +238,8 @@ namespace hpx::segmented {
             hpx::traits::is_segmented_iterator_v<InIter>)
     InIter tag_invoke(hpx::for_each_n_t, InIter first, Size count, F&& f)
     {
-        static_assert((std::input_iterator<InIter>),
-            "Requires at least input iterator.");
+        static_assert(
+            (std::input_iterator<InIter>), "Requires at least input iterator.");
 
         using iterator_traits = hpx::traits::segmented_iterator_traits<InIter>;
 

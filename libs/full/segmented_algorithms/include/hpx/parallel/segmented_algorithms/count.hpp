@@ -348,8 +348,8 @@ namespace hpx { namespace segmented {
     typename std::iterator_traits<InIter>::difference_type tag_invoke(
         hpx::count_t, InIter first, InIter last, T const& value)
     {
-        static_assert((std::input_iterator<InIter>),
-            "Requires at least input iterator.");
+        static_assert(
+            (std::input_iterator<InIter>), "Requires at least input iterator.");
 
         using difference_type =
             typename std::iterator_traits<InIter>::difference_type;
@@ -400,8 +400,8 @@ namespace hpx { namespace segmented {
     typename std::iterator_traits<InIter>::difference_type tag_invoke(
         hpx::count_if_t, InIter first, InIter last, F&& f)
     {
-        static_assert((std::input_iterator<InIter>),
-            "Requires at least input iterator.");
+        static_assert(
+            (std::input_iterator<InIter>), "Requires at least input iterator.");
 
         using difference_type =
             typename std::iterator_traits<InIter>::difference_type;

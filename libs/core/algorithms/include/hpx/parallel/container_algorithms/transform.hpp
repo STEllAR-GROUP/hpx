@@ -847,8 +847,8 @@ namespace hpx::ranges {
                 hpx::traits::is_iterator_v<FwdIter>
             )
         // clang-format on
-        friend ranges::unary_transform_result<
-            std::ranges::iterator_t<Rng>, FwdIter>
+        friend ranges::unary_transform_result<std::ranges::iterator_t<Rng>,
+            FwdIter>
         tag_fallback_invoke(hpx::ranges::transform_t, Rng&& rng, FwdIter dest,
             F f, Proj proj = Proj())
         {
@@ -881,8 +881,8 @@ namespace hpx::ranges {
             Sent1 last1, FwdIter2 first2, Sent2 last2, FwdIter3 dest, F f,
             Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
         {
-            static_assert(std::input_iterator<FwdIter1> &&
-                    std::input_iterator<FwdIter2>,
+            static_assert(
+                std::input_iterator<FwdIter1> && std::input_iterator<FwdIter2>,
                 "Requires at least input iterator.");
 
             return parallel::detail::transform_binary2<
@@ -900,8 +900,7 @@ namespace hpx::ranges {
                 hpx::traits::is_iterator_v<FwdIter>
             )
         // clang-format on
-        friend ranges::binary_transform_result<
-            std::ranges::iterator_t<Rng1>,
+        friend ranges::binary_transform_result<std::ranges::iterator_t<Rng1>,
             std::ranges::iterator_t<Rng2>, FwdIter>
         tag_fallback_invoke(hpx::ranges::transform_t, Rng1&& rng1, Rng2&& rng2,
             FwdIter dest, F f, Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())

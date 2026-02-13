@@ -454,8 +454,7 @@ namespace hpx::ranges {
         {
             using iterator_type = std::ranges::iterator_t<Rng>;
 
-            static_assert(
-                std::random_access_iterator<iterator_type>,
+            static_assert(std::random_access_iterator<iterator_type>,
                 "Requires random access iterator.");
 
             return hpx::parallel::detail::make_heap<iterator_type>().call(
@@ -513,8 +512,7 @@ namespace hpx::ranges {
         {
             using iterator_type = std::ranges::iterator_t<Rng>;
 
-            static_assert(
-                std::random_access_iterator<iterator_type>,
+            static_assert(std::random_access_iterator<iterator_type>,
                 "Requires random access iterator.");
 
             using value_type =
@@ -564,8 +562,7 @@ namespace hpx::ranges {
         {
             using iterator_type = std::ranges::iterator_t<Rng>;
 
-            static_assert(
-                std::random_access_iterator<iterator_type>,
+            static_assert(std::random_access_iterator<iterator_type>,
                 "Requires random access iterator.");
 
             return hpx::parallel::detail::make_heap<iterator_type>().call(
@@ -617,8 +614,7 @@ namespace hpx::ranges {
         {
             using iterator_type = std::ranges::iterator_t<Rng>;
 
-            static_assert(
-                std::random_access_iterator<iterator_type>,
+            static_assert(std::random_access_iterator<iterator_type>,
                 "Requires random access iterator.");
 
             using value_type =

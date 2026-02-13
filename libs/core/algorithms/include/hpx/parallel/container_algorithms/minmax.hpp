@@ -861,8 +861,7 @@ namespace hpx::ranges {
             hpx::ranges::min_element_t, Rng&& rng, F f = F(),
             Proj proj = Proj())
         {
-            static_assert(std::forward_iterator<
-                              std::ranges::iterator_t<Rng>>,
+            static_assert(std::forward_iterator<std::ranges::iterator_t<Rng>>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::min_element<
@@ -920,8 +919,7 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::min_element_t, ExPolicy&& policy,
             Rng&& rng, F f = F(), Proj proj = Proj())
         {
-            static_assert(std::forward_iterator<
-                              std::ranges::iterator_t<Rng>>,
+            static_assert(std::forward_iterator<std::ranges::iterator_t<Rng>>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::min_element<
@@ -979,8 +977,7 @@ namespace hpx::ranges {
             hpx::ranges::max_element_t, Rng&& rng, F f = F(),
             Proj proj = Proj())
         {
-            static_assert(std::forward_iterator<
-                              std::ranges::iterator_t<Rng>>,
+            static_assert(std::forward_iterator<std::ranges::iterator_t<Rng>>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::max_element<
@@ -1038,8 +1035,7 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::max_element_t, ExPolicy&& policy,
             Rng&& rng, F f = F(), Proj proj = Proj())
         {
-            static_assert(std::forward_iterator<
-                              std::ranges::iterator_t<Rng>>,
+            static_assert(std::forward_iterator<std::ranges::iterator_t<Rng>>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::max_element<
@@ -1098,8 +1094,7 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::minmax_element_t, Rng&& rng, F f = F(),
             Proj proj = Proj())
         {
-            static_assert(std::forward_iterator<
-                              std::ranges::iterator_t<Rng>>,
+            static_assert(std::forward_iterator<std::ranges::iterator_t<Rng>>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::minmax_element<
@@ -1157,8 +1152,7 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::minmax_element_t, ExPolicy&& policy,
             Rng&& rng, F f = F(), Proj proj = Proj())
         {
-            static_assert(std::forward_iterator<
-                              std::ranges::iterator_t<Rng>>,
+            static_assert(std::forward_iterator<std::ranges::iterator_t<Rng>>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::minmax_element<

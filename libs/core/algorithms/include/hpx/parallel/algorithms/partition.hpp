@@ -829,8 +829,7 @@ namespace hpx::parallel {
             // block manager for random access iterator.
             template <typename RandIter>
             class block_manager<RandIter,
-                std::enable_if_t<
-                    std::random_access_iterator<RandIter>>>
+                std::enable_if_t<std::random_access_iterator<RandIter>>>
             {
             public:
                 block_manager(

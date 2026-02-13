@@ -195,11 +195,11 @@ namespace hpx { namespace segmented {
             hpx::traits::is_segmented_iterator_v<InIterE>)
     T tag_invoke(hpx::reduce_t, InIterB first, InIterE last, T init, F&& f)
     {
-        static_assert(std::input_iterator<InIterB>,
-            "Requires at least input iterator.");
+        static_assert(
+            std::input_iterator<InIterB>, "Requires at least input iterator.");
 
-        static_assert(std::input_iterator<InIterE>,
-            "Requires at least input iterator.");
+        static_assert(
+            std::input_iterator<InIterE>, "Requires at least input iterator.");
 
         if (first == last)
         {
@@ -222,11 +222,11 @@ namespace hpx { namespace segmented {
     tag_invoke(hpx::reduce_t, ExPolicy&& policy, InIterB first, InIterE last,
         T init, F&& f)
     {
-        static_assert(std::input_iterator<InIterB>,
-            "Requires at least input iterator.");
+        static_assert(
+            std::input_iterator<InIterB>, "Requires at least input iterator.");
 
-        static_assert(std::input_iterator<InIterE>,
-            "Requires at least input iterator.");
+        static_assert(
+            std::input_iterator<InIterE>, "Requires at least input iterator.");
 
         if (first == last)
         {

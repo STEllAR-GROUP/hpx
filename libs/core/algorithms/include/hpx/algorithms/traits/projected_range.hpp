@@ -39,8 +39,7 @@ namespace hpx::parallel::traits {
     HPX_CXX_CORE_EXPORT template <typename Proj, typename Rng>
     struct is_projected_range<Proj, Rng,
         std::enable_if_t<std::ranges::range<Rng>>>
-      : detail::is_projected<std::decay_t<Proj>,
-            std::ranges::iterator_t<Rng>>
+      : detail::is_projected<std::decay_t<Proj>, std::ranges::iterator_t<Rng>>
     {
     };
 
@@ -56,8 +55,7 @@ namespace hpx::parallel::traits {
     };
 
     HPX_CXX_CORE_EXPORT template <typename Proj, typename Rng>
-    struct projected_range<Proj, Rng,
-        std::enable_if_t<std::ranges::range<Rng>>>
+    struct projected_range<Proj, Rng, std::enable_if_t<std::ranges::range<Rng>>>
     {
         using projector_type = std::decay_t<Proj>;
         using iterator_type = std::ranges::iterator_t<Rng>;

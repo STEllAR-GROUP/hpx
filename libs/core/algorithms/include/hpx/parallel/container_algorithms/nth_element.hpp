@@ -388,8 +388,7 @@ namespace hpx::ranges {
         {
             using iterator_type = std::ranges::iterator_t<Rng>;
 
-            static_assert(
-                std::random_access_iterator<iterator_type>,
+            static_assert(std::random_access_iterator<iterator_type>,
                 "Requires at least random access iterator.");
 
             return hpx::parallel::detail::nth_element<iterator_type>().call(
@@ -415,13 +414,12 @@ namespace hpx::ranges {
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
             std::ranges::iterator_t<Rng>>
         tag_fallback_invoke(hpx::ranges::nth_element_t, ExPolicy&& policy,
-            Rng&& rng, std::ranges::iterator_t<Rng> nth,
-            Pred pred = Pred(), Proj proj = Proj())
+            Rng&& rng, std::ranges::iterator_t<Rng> nth, Pred pred = Pred(),
+            Proj proj = Proj())
         {
             using iterator_type = std::ranges::iterator_t<Rng>;
 
-            static_assert(
-                std::random_access_iterator<iterator_type>,
+            static_assert(std::random_access_iterator<iterator_type>,
                 "Requires at least random access iterator.");
 
             return hpx::parallel::detail::nth_element<iterator_type>().call(

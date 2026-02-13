@@ -30,23 +30,26 @@ namespace hpx::experimental::detail {
     template <typename Iterator>
     HPX_FORCEINLINE Iterator previous(Iterator const& it)
     {
-        if constexpr (std::random_access_iterator<Iterator>) { 
-            return it-1; 
-        } 
-        else {
-            return --it; 
-        } 
+        if constexpr (std::random_access_iterator<Iterator>)
+        {
+            return it - 1;
+        }
+        else
+        {
+            return --it;
+        }
     }
-
 
     template <typename Iterator>
     HPX_FORCEINLINE Iterator next(Iterator const& it)
     {
-        if constexpr (std::random_access_iterator<Iterator>) {
-            return it+1;
+        if constexpr (std::random_access_iterator<Iterator>)
+        {
+            return it + 1;
         }
-        else ++it;
-   }
+        else
+            ++it;
+    }
 }    // namespace hpx::experimental::detail
 
 ///////////////////////////////////////////////////////////////////////////////
