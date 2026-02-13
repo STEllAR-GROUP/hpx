@@ -40,9 +40,13 @@ void test_global_iteration(hpx::unordered_map<Key, Value, Hash, KeyEqual>& m,
 
     for (std::size_t i = 0; i < size; ++i)
     {
-        Key key = std::to_string(i);
-        auto f = m.get_value(key);
-        HPX_TEST_EQ(f.get(), val);
+        std::string idx = std::to_string(i);
+        HPX_TEST_EQ(m[idx], val);
+        m[idx] = Value(i + 1);
+        HPX_TEST_EQ(m[idx], Value(i + 1));
+
+        auto f = m.get_value(idx);
+        HPX_TEST_EQ(f.get(), Value(i + 1));
     }
 
     //     // test normal iteration
