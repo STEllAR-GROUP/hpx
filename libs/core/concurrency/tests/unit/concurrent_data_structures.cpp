@@ -43,6 +43,7 @@ void test_concurrent_vector()
     {
         v[0] = 999;
         HPX_TEST_EQ(static_cast<int>(v[0]), 999);
+        HPX_TEST(v[0] == 999);
 
         // Test operator T&
         int& ref = v[0];
@@ -143,11 +144,13 @@ void test_concurrent_unordered_map_extra()
 
     std::string_view key_view = "hello";
     // This should work with our new overloads and transparent hash
-    auto acc = m_str.find(key_view);
-    HPX_TEST(!acc.empty());
-    if (acc)
     {
-        HPX_TEST_EQ(acc.get(), 42);
+        auto acc = m_str.find(key_view);
+        HPX_TEST(!acc.empty());
+        if (acc)
+        {
+            HPX_TEST_EQ(acc.get(), 42);
+        }
     }
 
     HPX_TEST(m_str.contains(key_view));

@@ -8,6 +8,7 @@ if(HPX_WITH_TESTS_BENCHMARKS)
   add_hpx_executable(
     concurrent_structure_performance
     SOURCES concurrent_structure_performance.cpp
-
+    DEPENDENCIES hpx_concurrency hpx_init
+    HPX_PREFIX ${HPX_BUILD_PREFIX}
   )
 endif()

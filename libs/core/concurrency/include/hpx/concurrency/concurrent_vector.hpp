@@ -8,8 +8,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/concurrency/spinlock.hpp>
-#include <hpx/modules/errors.hpp>
-#include <hpx/modules/type_support.hpp>
+#include <hpx/errors/exception.hpp>
+#include <hpx/type_support/assert_owns_lock.hpp>
 
 #include <iterator>
 #include <mutex>
@@ -20,8 +20,9 @@
 
 namespace hpx::concurrent {
 
-    template <typename T, typename Allocator = std::allocator<T>>
-    class HPX_CXX_CORE_EXPORT concurrent_vector
+    HPX_CXX_CORE_EXPORT template <typename T,
+        typename Allocator = std::allocator<T>>
+    class concurrent_vector
     {
     private:
         mutable hpx::util::spinlock mutex_;

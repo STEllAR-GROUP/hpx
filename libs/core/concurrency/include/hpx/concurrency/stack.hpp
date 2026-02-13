@@ -772,8 +772,7 @@ namespace hpx::lockfree {
         pool_t pool;
     };
 
-    HPX_CXX_CORE_EXPORT template <typename T,
-        typename Allocator = std::allocator<T>>
+    template <typename T, typename Allocator = std::allocator<T>>
     class variable_size_stack : public stack<T, Allocator>
     {
         using stack<T, Allocator>::stack;
