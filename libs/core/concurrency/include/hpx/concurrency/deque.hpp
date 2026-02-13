@@ -38,7 +38,8 @@ namespace hpx::lockfree {
 
     // The "left" and "right" terminology is used instead of top and bottom to
     // stay consistent with the paper that this code is based on..
-    HPX_CXX_CORE_EXPORT enum class deque_status_type : std::int8_t {
+    enum class deque_status_type : std::int8_t
+    {
         stable,
         rpush,
         lpush
@@ -56,7 +57,7 @@ namespace hpx::lockfree {
         return static_cast<int>(lhs) == rhs;
     }
 
-    HPX_CXX_CORE_EXPORT template <typename T>
+    template <typename T>
     struct deque_node    //-V690
     {
         using pointer = hpx::lockfree::detail::tagged_ptr<deque_node>;
@@ -100,7 +101,7 @@ namespace hpx::lockfree {
 
     // FIXME: A lot of these methods can be dropped; in fact, it may make sense
     // to re-structure this class like deque_node.
-    HPX_CXX_CORE_EXPORT template <typename T>
+    template <typename T>
     struct deque_anchor    //-V690
     {
         using node = deque_node<T>;

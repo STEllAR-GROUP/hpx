@@ -21,10 +21,10 @@
 
 namespace hpx::concurrent {
 
-    template <typename Key, typename T, typename Hash = std::hash<Key>,
-        typename KeyEqual = std::equal_to<Key>,
+    HPX_CXX_CORE_EXPORT template <typename Key, typename T,
+        typename Hash = std::hash<Key>, typename KeyEqual = std::equal_to<Key>,
         typename Allocator = std::allocator<std::pair<Key const, T>>>
-    class HPX_CXX_CORE_EXPORT concurrent_unordered_map
+    class concurrent_unordered_map
     {
     private:
         mutable hpx::util::spinlock mutex_;
@@ -164,11 +164,6 @@ namespace hpx::concurrent {
         {
         }
 
-        explicit concurrent_unordered_map(Allocator const& alloc)
-          : map_(alloc)
-        {
-        }
-
         concurrent_unordered_map(size_type bucket_count, Allocator const& alloc)
           : map_(bucket_count, alloc)
         {
@@ -177,6 +172,11 @@ namespace hpx::concurrent {
         concurrent_unordered_map(
             size_type bucket_count, Hash const& hash, Allocator const& alloc)
           : map_(bucket_count, hash, alloc)
+        {
+        }
+
+        explicit concurrent_unordered_map(Allocator const& alloc)
+          : map_(alloc)
         {
         }
 

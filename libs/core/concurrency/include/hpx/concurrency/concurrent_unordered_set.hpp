@@ -20,10 +20,10 @@
 
 namespace hpx::concurrent {
 
-    template <typename Key, typename Hash = std::hash<Key>,
+    HPX_CXX_CORE_EXPORT template <typename Key, typename Hash = std::hash<Key>,
         typename KeyEqual = std::equal_to<Key>,
         typename Allocator = std::allocator<Key>>
-    class HPX_CXX_CORE_EXPORT concurrent_unordered_set
+    class concurrent_unordered_set
     {
     private:
         mutable hpx::util::spinlock mutex_;

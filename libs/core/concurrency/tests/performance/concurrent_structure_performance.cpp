@@ -72,6 +72,12 @@ struct std_map_mutex
         std::lock_guard<std::mutex> l(mtx);
         return map.find(key) != map.end();
     }
+
+    void clear()
+    {
+        std::lock_guard<std::mutex> l(mtx);
+        map.clear();
+    }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -130,6 +136,12 @@ struct std_map_spinlock
         std::lock_guard<hpx::util::spinlock> l(mtx);
         return map.find(key) != map.end();
     }
+
+    void clear()
+    {
+        std::lock_guard<hpx::util::spinlock> l(mtx);
+        map.clear();
+    }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -157,15 +169,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
             for (int iter = 0; iter < iterations; ++iter)
             {
-                if constexpr (requires { vec.clear(); })
-                {
-                    vec.clear();
-                }
-                else
-                {
-                    // If no clear() method, assume wrapper exposes inner container directly or just skip.
-                    // But now all our wrappers have clear().
-                }
+                vec.clear();
 
                 threads.clear();
                 ready = false;
@@ -274,14 +278,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
             for (int iter = 0; iter < iterations; ++iter)
             {
-                if constexpr (requires { m.map.clear(); })
-                {
-                    m.map.clear();
-                }
-                else
-                {
-                    m.clear();
-                }
+                m.clear();
 
                 threads.clear();
                 ready = false;
