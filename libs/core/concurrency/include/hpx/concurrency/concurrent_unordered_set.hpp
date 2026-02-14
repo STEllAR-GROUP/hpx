@@ -74,9 +74,8 @@ namespace hpx::concurrent {
                 return value_ == nullptr;
             }
 
-            template <typename U = Key,
-                typename = std::enable_if_t<!std::is_same_v<U, bool>>>
-            explicit operator bool() const
+            explicit operator bool() const noexcept
+                requires(!std::same_as<Key, bool>)
             {
                 return !empty();
             }
@@ -149,11 +148,7 @@ namespace hpx::concurrent {
         {
             if (this != &other)
             {
-                std::lock(mutex_, other.mutex_);
-                std::lock_guard<hpx::util::spinlock> lock(
-                    mutex_, std::adopt_lock);
-                std::lock_guard<hpx::util::spinlock> other_lock(
-                    other.mutex_, std::adopt_lock);
+                std::lock_guard<hpx::util::spinlock> lock(mutex_);
                 set_ = HPX_MOVE(other.set_);
             }
             return *this;
@@ -234,26 +229,7 @@ namespace hpx::concurrent {
             return const_accessor();
         }
 
-        template <typename K>
-        const_accessor find(K const& key) const
-        {
-            std::unique_lock<hpx::util::spinlock> lock(mutex_);
-            auto it = set_.find(key);
-            if (it != set_.end())
-            {
-                return const_accessor(HPX_MOVE(lock), *it);
-            }
-            return const_accessor();
-        }
-
         bool contains(Key const& key) const
-        {
-            std::lock_guard<hpx::util::spinlock> lock(mutex_);
-            return set_.contains(key);
-        }
-
-        template <typename K>
-        bool contains(K const& key) const
         {
             std::lock_guard<hpx::util::spinlock> lock(mutex_);
             return set_.contains(key);
@@ -266,9 +242,16 @@ namespace hpx::concurrent {
             std::lock_guard<hpx::util::spinlock> lock(mutex_);
             for (auto const& elem : set_)
             {
-                static_assert(
-                    std::is_void_v<std::invoke_result_t<F, decltype(elem)>>);
-                f(elem);
+                if constexpr (std::is_void_v<
+                                  std::invoke_result_t<F, decltype(elem)>>)
+                {
+                    f(elem);
+                }
+                else
+                {
+                    if (!f(elem))
+                        break;
+                }
             }
         }
 
