@@ -15,6 +15,7 @@
 #include <mutex>
 
 #include <concepts>
+#include <cstddef>
 #include <stdexcept>
 #include <type_traits>
 #include <unordered_map>

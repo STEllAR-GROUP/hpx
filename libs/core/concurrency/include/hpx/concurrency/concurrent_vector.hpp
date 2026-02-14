@@ -9,9 +9,11 @@
 #include <hpx/config.hpp>
 #include <hpx/concurrency/spinlock.hpp>
 #include <hpx/errors/exception.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/type_support/assert_owns_lock.hpp>
 
 #include <concepts>
+#include <cstddef>
 #include <iterator>
 #include <mutex>
 
