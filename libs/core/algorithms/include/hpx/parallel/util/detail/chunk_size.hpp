@@ -150,8 +150,17 @@ namespace hpx::parallel::util::detail {
             hpx::execution::experimental::get_chunk_size(policy.parameters(),
                 policy.executor(), hpx::chrono::null_duration, cores, count);
 
-        // make sure, chunk size and max_chunks are consistent
-        adjust_chunk_size_and_max_chunks(cores, count, max_chunks, chunk_size);
+        auto [adj_chunk, adj_max] =
+            hpx::execution::experimental::adjust_chunk_size_and_max_chunks(
+                policy.parameters(), policy.executor(), count, cores,
+                max_chunks, chunk_size);
+        if (adj_chunk != 0)
+            chunk_size = adj_chunk;
+        if (adj_max != 0)
+            max_chunks = adj_max;
+        else if (adj_chunk == 0)
+            adjust_chunk_size_and_max_chunks(
+                cores, count, max_chunks, chunk_size);
 
         auto last = next_or_subrange(it_or_r, count, 0);
         Stride stride = parallel::detail::abs(s);
@@ -232,8 +241,17 @@ namespace hpx::parallel::util::detail {
             hpx::execution::experimental::get_chunk_size(policy.parameters(),
                 policy.executor(), iteration_duration, cores, count);
 
-        // make sure, chunk size and max_chunks are consistent
-        adjust_chunk_size_and_max_chunks(cores, count, max_chunks, chunk_size);
+        auto [adj_chunk, adj_max] =
+            hpx::execution::experimental::adjust_chunk_size_and_max_chunks(
+                policy.parameters(), policy.executor(), count, cores,
+                max_chunks, chunk_size);
+        if (adj_chunk != 0)
+            chunk_size = adj_chunk;
+        if (adj_max != 0)
+            max_chunks = adj_max;
+        else if (adj_chunk == 0)
+            adjust_chunk_size_and_max_chunks(
+                cores, count, max_chunks, chunk_size);
 
         auto last = next_or_subrange(it_or_r, count, 0);
 
@@ -411,8 +429,17 @@ namespace hpx::parallel::util::detail {
             hpx::execution::experimental::get_chunk_size(policy.parameters(),
                 policy.executor(), hpx::chrono::null_duration, cores, count);
 
-        // make sure, chunk size and max_chunks are consistent
-        adjust_chunk_size_and_max_chunks(cores, count, max_chunks, chunk_size);
+        auto [adj_chunk, adj_max] =
+            hpx::execution::experimental::adjust_chunk_size_and_max_chunks(
+                policy.parameters(), policy.executor(), count, cores,
+                max_chunks, chunk_size);
+        if (adj_chunk != 0)
+            chunk_size = adj_chunk;
+        if (adj_max != 0)
+            max_chunks = adj_max;
+        else if (adj_chunk == 0)
+            adjust_chunk_size_and_max_chunks(
+                cores, count, max_chunks, chunk_size);
 
         if (stride != 1)
         {
@@ -502,8 +529,17 @@ namespace hpx::parallel::util::detail {
             hpx::execution::experimental::get_chunk_size(policy.parameters(),
                 policy.executor(), iteration_duration, cores, count);
 
-        // make sure, chunk size and max_chunks are consistent
-        adjust_chunk_size_and_max_chunks(cores, count, max_chunks, chunk_size);
+        auto [adj_chunk, adj_max] =
+            hpx::execution::experimental::adjust_chunk_size_and_max_chunks(
+                policy.parameters(), policy.executor(), count, cores,
+                max_chunks, chunk_size);
+        if (adj_chunk != 0)
+            chunk_size = adj_chunk;
+        if (adj_max != 0)
+            max_chunks = adj_max;
+        else if (adj_chunk == 0)
+            adjust_chunk_size_and_max_chunks(
+                cores, count, max_chunks, chunk_size);
 
         if (stride != 1)
         {
