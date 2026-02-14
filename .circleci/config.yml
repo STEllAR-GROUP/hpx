@@ -6,18 +6,18 @@
 #  Distributed under the Boost Software License, Version 1.0. (See accompanying
 #  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-working_dir_default: &working_dir_default # Setting the default working directory
+working_dir_default: &working_dir_default
     working_directory: /hpx/build
 
-docker_default: &docker_default # Setting the default docker image
+docker_default: &docker_default
     docker:
       - image: stellargroup/build_env:17
 
-defaults: &defaults # Defining a default anchor block
+defaults: &defaults
     <<: *working_dir_default
     <<: *docker_default
 
-convert_xml: &convert_xml # Defined in actions\collect-artifact\action.yml
+convert_xml: &convert_xml
     name: Converting XML
     when: always
     command: |
@@ -26,7 +26,7 @@ convert_xml: &convert_xml # Defined in actions\collect-artifact\action.yml
           /hpx/conv.xsl Testing/`head -n 1 < Testing/TAG`/Test.xml \
           > ${CIRCLE_JOB}/Test.xml
 
-move_core_dump: &move_core_dump # Defined in actions\collect-artifact\action.yml
+move_core_dump: &move_core_dump
     name: Moving core dumps
     when: on_fail
     command: |
@@ -34,16 +34,46 @@ move_core_dump: &move_core_dump # Defined in actions\collect-artifact\action.yml
         # Ignore errors if there are no core dumps
         cp core.* ${CIRCLE_JOB} || true
 
-move_debug_log: &move_debug_log # Defined in actions\collect-artifact\action.yml
+move_debug_log: &move_debug_log
     name: Moving debug logs
     when: on_fail
     command: |
         mkdir -p ${CIRCLE_JOB}
         cp debug-log.txt ${CIRCLE_JOB} || true
 
+gh_pages_filter: &gh_pages_filter
+    filters:
+      branches:
+        ignore:
+          - gh-pages
+          - trying
+          - staging
+      tags:
+        ignore: stable
+
+docs_push_filter: &docs_push_filter
+    filters:
+      branches:
+        only:
+          - master
+          - /release.*/
+      tags:
+        ignore: stable
+
 core_dependency: &core_dependency
     requires:
       - components
+    <<: *gh_pages_filter
+
+additional_docs_filter: &additional_docs_filter
+    filters:
+      branches:
+        only:
+          - master
+          - /release.*/
+      tags:
+        ignore: stable
+    <<: *gh_pages_filter
 
 add_github_to_known_hosts: &add_github_to_known_hosts
     run:
@@ -62,7 +92,7 @@ configure_local_git: &configure_local_git
 version: 2
 
 jobs:
-  checkout_code: # Using github actions/checkout@v6
+  checkout_code:
     <<: *docker_default
     working_directory: /hpx
     steps:
@@ -84,9 +114,34 @@ jobs:
             - ./source
             - ./conv.xsl
 
+  # Check circular dependencies with cpp-dependencies tool
+  check_circular_deps:
+    <<: *working_dir_default
+    <<: *docker_default
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Check circular dependencies with cpp-dependencies
+          command: |
+              # Ignore compatibility headers (the last cut -c3- is to remove a
+              # leading ./ in path names)
+              cpp-dependencies \
+                  --dir /hpx/source/libs \
+                  --ignore $(find /hpx/source/libs -type d -wholename '*/include_compatibility' | cut -d'/' -f5-) \
+                  --graph-cycles /tmp/circular_deps.dot
+              dot /tmp/circular_deps.dot -Tsvg -o /tmp/circular_deps.svg
+              if [[ $(wc -l /tmp/circular_deps.dot | awk '{print $1}') -gt 2 ]]; then exit 1; fi
+      - store_artifacts:
+          path: /tmp/circular_deps.dot
+          destination: /hpx/artifacts/circular_deps.dot
+      - store_artifacts:
+          path: /tmp/circular_deps.svg
+          destination: /hpx/artifacts/circular_deps.svg
+
   # Check if the files of the module are listed in the CMakeLists.txt
   # Check if all the module dependencies are listed
-  check_module_cmakelists: # DONE
+  check_module_cmakelists:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -105,7 +160,45 @@ jobs:
           path: /tmp/missing_deps.txt
           destination: /hpx/artifacts/missing_deps.txt
 
-  configure: # Defined in configure-core-core_local-components
+  # Ensure that the modules stay clang-formatted
+  clang_format:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Check that the modules are well clang-formatted
+          command: |
+              cd /hpx/source/libs && shopt -s globstar # to activate the ** globbing
+              clang-format-20 --version
+              clang-format-20 -i **/*.{cpp,hpp}
+              cd /hpx/source/examples
+              clang-format-20 -i **/*.{cpp,hpp}
+              cd /hpx/source/tests
+              clang-format-20 -i **/*.{cpp,hpp}
+              git diff --exit-code > /tmp/modified_clang_format_files.txt
+      - store_artifacts:
+          path: /tmp/modified_clang_format_files.txt
+          destination: /hpx/artifacts/modified_clang_format_files.txt
+
+  # Ensure that CMake files stay cmake-formatted
+  cmake_format:
+    <<: *docker_default
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Check that CMake files are well cmake-formatted
+          command: |
+              cd /hpx/source && shopt -s globstar # to activate the ** globbing
+              cmake-format --version
+              cmake-format -i **/*.cmake **/CMakeLists.txt
+              git diff --exit-code > /tmp/modified_cmake_format_files.txt
+      - store_artifacts:
+          path: /tmp/modified_cmake_format_files.txt
+          destination: /hpx/artifacts/modified_cmake_format_files.txt
+
+  configure:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -114,6 +207,14 @@ jobs:
           name: Running CMake
           command: |
             cmake --version
+            if [ -z "$CIRCLE_PR_NUMBER" ] && \
+                ( [ "$CIRCLE_BRANCH" == "master" ] || \
+                  [[ "$CIRCLE_BRANCH" =~ ^release.* ]] || \
+                  [ -n "$CIRCLE_TAG" ] ); then
+                DOCUMENTATION_OUTPUT_FORMATS="html;singlehtml;latexpdf"
+            else
+                DOCUMENTATION_OUTPUT_FORMATS="html"
+            fi
             # Disable Vc for now as otherwise we need to reconfigure during the
             # install step, which in turn forces everything to be rebuilt.
             # -DHPX_WITH_DATAPAR_VC=On
@@ -146,6 +247,8 @@ jobs:
                 -DHPX_COMMAND_LINE_HANDLING_WITH_JSON_CONFIGURATION_FILES=On \
                 -DHPX_WITH_FETCH_JSON=On \
                 -DCMAKE_EXPORT_COMPILE_COMMANDS=On \
+                -DHPX_WITH_DOCUMENTATION=On \
+                -DHPX_WITH_DOCUMENTATION_OUTPUT_FORMATS="${DOCUMENTATION_OUTPUT_FORMATS}" \
                 -DHPX_WITH_TESTS_COMMAND_LINE=--hpx:queuing=local-workrequesting-fifo \
                 -DHPX_WITH_TESTS_MAX_THREADS_PER_LOCALITY=2
           no_output_timeout: 30m
@@ -154,7 +257,7 @@ jobs:
           paths:
             - ./build
 
-  configure_test_combinations: # DONE
+  configure_test_combinations:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -230,6 +333,71 @@ jobs:
           paths:
             - ./build/bin/inspect
 
+  # We need a full clone here to be able to compare to master.
+  spellcheck:
+    docker:
+      - image: stellargroup/build_env:17
+    resource_class: large  # Increased memory allocation
+    steps:
+      - checkout:
+          path: /hpx/source
+          fetch-depth: 0  # Ensure full history for proper diff
+      - run:
+          name: Running codespell
+          command: |
+            if [[ -n "$CIRCLE_PULL_REQUEST" ]]; then
+                cd /hpx/source
+                codespell --version
+
+                echo "Fetching changed files from origin/master..."
+                git fetch origin master --depth=1
+
+                echo "Files being checked:"
+                git diff --name-only origin/master... > /tmp/file_list.txt
+                cat /tmp/file_list.txt  # Print all files being checked
+
+                set -x  # Enable debug mode
+
+                # Read all changed files into an array
+                mapfile -t FILES < /tmp/file_list.txt
+
+                # Process files in batches of 50
+                for ((i = 0; i < ${#FILES[@]}; i += 50)); do
+                codespell --ignore-words tools/.codespell_whitelist --skip='*.h5,*.png' "${FILES[@]:i:50}" >> /tmp/spelling_suggestions.txt
+                done
+
+                set +x  # Disable debug mode
+
+                # If there are spelling errors, exit with error code 1
+                if [[ -s /tmp/spelling_suggestions.txt ]]; then
+                    echo "Spelling errors found:"
+                    cat /tmp/spelling_suggestions.txt
+                    exit 1
+                fi
+            else
+                echo "Skipping spellcheck on non-PR build"
+            fi
+          when: always
+      - store_artifacts:
+          path: /tmp/spelling_suggestions.txt
+          destination: /hpx/artifacts/spelling_suggestions.txt
+
+  docs-html:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Sphinx Documentation (HTML)
+          command: |
+                ninja -j1 docs-html
+          no_output_timeout: 2h
+      - persist_to_workspace:
+          root: /hpx
+          paths:
+            - ./build
+      - store_artifacts:
+          path: /hpx/build/share/hpx/docs/html
 
   depreport:
     <<: *defaults
@@ -252,7 +420,54 @@ jobs:
       - store_artifacts:
           path: /hpx/build/share/hpx/docs/report
 
-  core_local: # Defined in configure-core-core_local-components
+  docs-singlehtml:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Sphinx Documentation (Single Page HTML)
+          command: |
+                ninja -j1 docs-singlehtml
+          no_output_timeout: 2h
+      - persist_to_workspace:
+          root: /hpx
+          paths:
+            - ./build/share/hpx/docs/singlehtml
+      - store_artifacts:
+          path: /hpx/build/share/hpx/docs/singlehtml
+
+  docs-latexpdf:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Sphinx Documentation (pdf)
+          command: |
+                ninja -j1 docs-latexpdf
+          no_output_timeout: 2h
+      - persist_to_workspace:
+          root: /hpx
+          paths:
+            - ./build/share/hpx/docs/latexpdf
+      - store_artifacts:
+          path: /hpx/build/share/hpx/docs/latexpdf/latex/HPX.pdf
+
+  docs_push:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - <<: *add_github_to_known_hosts
+      - <<: *configure_local_git
+      - run:
+          name: Pushing Sphinx Documentation
+          command: |
+              ninja -j1 git_docs
+          no_output_timeout: 1h
+
+  core_local:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -266,7 +481,7 @@ jobs:
           paths:
             - ./build
 
-  core: # Defined in configure-core-core_local-components
+  core:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -280,7 +495,7 @@ jobs:
           paths:
             - ./build
 
-  components: # Defined in configure-core-core_local-components
+  components:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -294,7 +509,7 @@ jobs:
           paths:
             - ./build
 
-  tests.examples1: # DONE
+  tests.examples1:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -331,7 +546,7 @@ jobs:
           paths:
             - ./build
 
-  tests.examples2: # DONE
+  tests.examples2:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -373,7 +588,7 @@ jobs:
           paths:
             - ./build
 
-  tests.unit1.algorithms: # DONE
+  tests.unit1.algorithms:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -406,7 +621,7 @@ jobs:
       - store_artifacts:
           path: tests.unit1.algorithms
 
-  tests.unit2.algorithms: # DONE
+  tests.unit2.algorithms:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -439,7 +654,7 @@ jobs:
       - store_artifacts:
           path: tests.unit2.algorithms
 
-  tests.unit3.algorithms: # DONE
+  tests.unit3.algorithms:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -474,7 +689,7 @@ jobs:
       - store_artifacts:
           path: tests.unit3.algorithms
 
-  tests.unit4.algorithms: # DONE
+  tests.unit4.algorithms:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -507,7 +722,7 @@ jobs:
       - store_artifacts:
           path: tests.unit4.algorithms
 
-  tests.unit1.container_algorithms: # DONE
+  tests.unit1.container_algorithms:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -542,7 +757,7 @@ jobs:
       - store_artifacts:
           path: tests.unit1.container_algorithms
 
-  tests.unit2.container_algorithms: # DONE
+  tests.unit2.container_algorithms:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -575,7 +790,7 @@ jobs:
       - store_artifacts:
           path: tests.unit2.container_algorithms
 
-  tests.unit1.segmented_algorithms: # DONE
+  tests.unit1.segmented_algorithms:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -607,7 +822,7 @@ jobs:
       - store_artifacts:
           path: tests.unit1.segmented_algorithms
 
-  tests.unit2.segmented_algorithms: # DONE
+  tests.unit2.segmented_algorithms:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -639,7 +854,7 @@ jobs:
       - store_artifacts:
           path: tests.unit2.segmented_algorithms
 
-  tests.unit1: # DONE
+  tests.unit1:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -670,7 +885,7 @@ jobs:
       - store_artifacts:
           path: tests.unit1
 
-  tests.unit2: # DONE
+  tests.unit2:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -705,7 +920,7 @@ jobs:
       - store_artifacts:
           path: tests.unit2
 
-  tests.unit3: # DONE
+  tests.unit3:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -736,7 +951,7 @@ jobs:
       - store_artifacts:
           path: tests.unit3
 
-  tests.unit4: # DONE
+  tests.unit4:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -769,7 +984,7 @@ jobs:
       - store_artifacts:
           path: tests.unit4
 
-  tests.unit5: # DONE
+  tests.unit5:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -800,7 +1015,7 @@ jobs:
       - store_artifacts:
           path: tests.unit5
 
-  tests.regressions1: # DONE
+  tests.regressions1:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -832,7 +1047,7 @@ jobs:
       - store_artifacts:
           path: tests.regressions1
 
-  tests.regressions2: # DONE
+  tests.regressions2:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -868,7 +1083,7 @@ jobs:
       - store_artifacts:
           path: tests.regressions2
 
-  tests.headers1_1: # DONE
+  tests.headers1_1:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -885,7 +1100,7 @@ jobs:
       - store_artifacts:
           path: tests.headers1_1
 
-  tests.headers1_2: # DONE
+  tests.headers1_2:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -902,7 +1117,7 @@ jobs:
       - store_artifacts:
           path: tests.headers1_2
 
-  tests.headers2_1: # DONE
+  tests.headers2_1:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -919,7 +1134,7 @@ jobs:
       - store_artifacts:
           path: tests.headers2_1
 
-  tests.headers2_2: # DONE
+  tests.headers2_2:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -936,7 +1151,7 @@ jobs:
       - store_artifacts:
           path: tests.headers2_2
 
-  tests.headers2_3: # DONE
+  tests.headers2_3:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -953,7 +1168,7 @@ jobs:
       - store_artifacts:
           path: tests.headers2_3
 
-  tests.headers3_1: # DONE
+  tests.headers3_1:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -970,7 +1185,7 @@ jobs:
       - store_artifacts:
           path: tests.headers3_1
 
-  tests.headers3_2: # DONE
+  tests.headers3_2:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -987,7 +1202,7 @@ jobs:
       - store_artifacts:
           path: tests.headers3_2
 
-  tests.headers4_1: # DONE
+  tests.headers4_1:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -1004,7 +1219,7 @@ jobs:
       - store_artifacts:
           path: tests.headers4_2
 
-  tests.headers4_2: # DONE
+  tests.headers4_2:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -1021,7 +1236,7 @@ jobs:
       - store_artifacts:
           path: tests.headers4_2
 
-  tests.performance: # DONE
+  tests.performance:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -1145,41 +1360,50 @@ workflows:
   version: 2
   build-and-test:
     jobs:
-      - spellcheck
-      - checkout_code
+      - checkout_code:
+          <<: *gh_pages_filter
       - check_circular_deps:
           requires:
             - checkout_code
+          <<: *gh_pages_filter
       - check_module_cmakelists:
           requires:
             - checkout_code
+          <<: *gh_pages_filter
       - clang_format:
           requires:
             - checkout_code
+          <<: *gh_pages_filter
       - cmake_format:
           requires:
             - checkout_code
+          <<: *gh_pages_filter
       - configure:
           requires:
             - checkout_code
+          <<: *gh_pages_filter
       - configure_test_combinations:
           requires:
             - checkout_code
+          <<: *gh_pages_filter
       - inspect:
           requires:
             - configure
-      - depreport:
-          requires:
-            - configure
+          <<: *gh_pages_filter
+      - spellcheck:
+          <<: *gh_pages_filter
       - core_local:
           requires:
             - configure
+          <<: *gh_pages_filter
       - core:
           requires:
             - core_local
+          <<: *gh_pages_filter
       - components:
           requires:
             - core
+          <<: *gh_pages_filter
       - tests.examples1:
           <<: *core_dependency
       - tests.examples2:
@@ -1234,6 +1458,47 @@ workflows:
           <<: *core_dependency
       - tests.headers4_2:
           <<: *core_dependency
+      - docs-html:
+          requires:
+            - configure
+            # Force docs to be built after examples so that workspace doesn't
+            # have conflicts.
+            #
+            # We make this depend on example2 only as this takes longer to run
+            # than example1. Making it depend on both causes workspace conflicts.
+            - tests.examples2
+          <<: *gh_pages_filter
+      - depreport:
+          requires:
+            - configure
+          <<: *gh_pages_filter
+      - docs-singlehtml:
+          requires:
+            - configure
+            # Force docs to be built after examples so that workspace doesn't
+            # have conflicts.
+            #
+            # We make this depend on example2 only as this takes longer to run
+            # than example1. Making it depend on both causes workspace conflicts.
+            - tests.examples2
+          <<: *additional_docs_filter
+      - docs-latexpdf:
+          requires:
+            - configure
+            # Force docs to be built after examples so that workspace doesn't
+            # have conflicts.
+            #
+            # We make this depend on example2 only as this takes longer to run
+            # than example1. Making it depend on both causes workspace conflicts.
+            - tests.examples2
+          <<: *additional_docs_filter
+      - docs_push:
+          requires:
+            - docs-html
+            - docs-singlehtml
+            - docs-latexpdf
+            - depreport
+          <<: *docs_push_filter
       - install:
           requires:
             - core
@@ -1263,8 +1528,15 @@ workflows:
             - tests.headers3_2
             - tests.headers4_1
             - tests.headers4_2
+            # prevent docs from being rebuilt
+            - docs-html
+            - docs-singlehtml
+            - docs-latexpdf
+            - depreport
             # prevent inspect from being rebuilt
             - inspect
+          <<: *gh_pages_filter
       - push_stable_tag:
           requires:
             - install
+          <<: *gh_pages_filter
