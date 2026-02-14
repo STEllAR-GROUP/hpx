@@ -327,18 +327,6 @@ namespace hpx::execution::experimental {
 
     namespace detail {
 
-        HPX_CXX_CORE_EXPORT template <typename Sender, typename Enable = void>
-        struct has_completion_signatures : std::false_type
-        {
-        };
-
-        HPX_CXX_CORE_EXPORT template <typename Sender>
-        struct has_completion_signatures<Sender,
-            std::void_t<
-                typename remove_cv_ref_t<Sender>::completion_signatures>>
-          : std::true_type
-        {
-        };
 #if defined(HPX_HAVE_STDEXEC)
     }
 #else
@@ -423,14 +411,8 @@ namespace hpx::execution::experimental {
             static_assert(sizeof(Env),
                 "Incomplete type used with get_completion_signatures");
 
-            if constexpr (meta::value<
-                              detail::has_completion_signatures<Sender>>)
-            {
-                return typename detail::remove_cv_ref_t<
-                    Sender>::completion_signatures{};
-            }
 #if defined(HPX_HAVE_CXX20_COROUTINES)
-            else if constexpr (is_awaitable_v<Sender, detail::env_promise<Env>>)
+            if constexpr (is_awaitable_v<Sender, detail::env_promise<Env>>)
             {
                 using result_type =
                     await_result_t<Sender, detail::env_promise<Env>>;
@@ -450,7 +432,6 @@ namespace hpx::execution::experimental {
                         set_error_t(std::exception_ptr)>{};
                 }
             }
-#endif
             else if constexpr (std::is_same_v<Env, no_env> &&
                 detail::is_enable_sender_v<std::decay_t<Sender>>)
             {
@@ -460,6 +441,17 @@ namespace hpx::execution::experimental {
             {
                 return detail::no_completion_signatures{};
             }
+#else
+            if constexpr (std::is_same_v<Env, no_env> &&
+                detail::is_enable_sender_v<std::decay_t<Sender>>)
+            {
+                return detail::dependent_completion_signatures<no_env>{};
+            }
+            else
+            {
+                return detail::no_completion_signatures{};
+            }
+#endif
         }
     } get_completion_signatures{};
 #endif    // NOT HPX_HAVE_STDEXEC
