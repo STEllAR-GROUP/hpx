@@ -243,8 +243,9 @@ namespace hpx::parallel::detail {
 #endif
 
     // provide implementation of std::find_end supporting iterators/sentinels
-    HPX_CXX_CORE_EXPORT template <typename Iter1, typename Sent1, typename Iter2,
-        typename Sent2, typename Pred, typename Proj1, typename Proj2>
+    HPX_CXX_CORE_EXPORT template <typename Iter1, typename Sent1,
+        typename Iter2, typename Sent2, typename Pred, typename Proj1,
+        typename Proj2>
     constexpr Iter1 sequential_search(Iter1 first1, Sent1 last1, Iter2 first2,
         Sent2 last2, Pred&& op, Proj1&& proj1, Proj2&& proj2)
     {
@@ -352,9 +353,9 @@ namespace hpx::parallel::detail {
     inline constexpr sequential_find_end_t<ExPolicy> sequential_find_end =
         sequential_find_end_t<ExPolicy>{};
 #else
-    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter1, typename Sent1,
-        typename Iter2, typename Sent2, typename Pred, typename Proj1,
-        typename Proj2>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter1,
+        typename Sent1, typename Iter2, typename Sent2, typename Pred,
+        typename Proj1, typename Proj2>
     HPX_HOST_DEVICE HPX_FORCEINLINE Iter1 sequential_find_end(Iter1 first1,
         Sent1 last1, Iter2 first2, Sent2 last2, Pred&& op, Proj1&& proj1,
         Proj2&& proj2)
@@ -364,8 +365,9 @@ namespace hpx::parallel::detail {
             HPX_FORWARD(Proj2, proj2));
     }
 
-    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter1, typename Iter2,
-        typename Token, typename Pred, typename Proj1, typename Proj2>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter1,
+        typename Iter2, typename Token, typename Pred, typename Proj1,
+        typename Proj2>
     HPX_HOST_DEVICE HPX_FORCEINLINE void sequential_find_end(Iter1 it,
         Iter2 first2, std::size_t base_idx, std::size_t part_size,
         std::size_t diff, Token& tok, Pred&& op, Proj1&& proj1, Proj2&& proj2)
