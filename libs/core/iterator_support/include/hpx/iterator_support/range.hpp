@@ -101,7 +101,7 @@ namespace hpx::util {
             struct fallback
             {
                 template <typename T>
-                constexpr fallback(T const&)
+                fallback(T const&)
                 {
                 }
             };
@@ -162,14 +162,6 @@ namespace hpx::util {
             }
 
             fallback iterate(fallback);
-
-            template <typename C>
-            [[nodiscard]] inline constexpr fallback iterate_impl(
-                C&, ...) noexcept
-            {
-                // Return fallback{0} to satisfy return type
-                return fallback{0};
-            }
 
             template <typename C,
                 typename R = decltype(iterate(std::declval<C&>()))>

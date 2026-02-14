@@ -1515,14 +1515,18 @@ namespace hpx::parallel {
                 }
             }
 
-            using iterator = std::ranges::iterator_t<R>;
-            static_assert(
-                (std::ranges::range<R> && std::forward_iterator<iterator>) ||
-                    (hpx::traits::is_range_generator_v<R> &&
-                        std::input_iterator<iterator>),
-                "For ranges, requires at least forward iterator boundaries, "
-                "for range generators requires at least input iterator "
-                "boundaries.");
+            if constexpr (std::ranges::range<R>)
+            {
+                using iterator = std::ranges::iterator_t<R>;
+                static_assert(std::forward_iterator<iterator>,
+                    "For ranges, requires at least forward iterator "
+                    "boundaries.");
+            }
+            else
+            {
+                static_assert(hpx::traits::is_range_generator_v<R>,
+                    "Requires a range or a range generator.");
+            }
 
             std::size_t size = hpx::util::size(r);
             auto&& t = hpx::forward_as_tuple(HPX_FORWARD(Args, args)...);
