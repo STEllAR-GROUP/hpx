@@ -30,16 +30,17 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng1        The type of the first source range used (deduced).
+    /// \tparam Rng1        The range itself must meet the requirements of a
+    ///                     sized range. The type of the first source range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an random access iterator.
-    /// \tparam Rng2        The type of the second source range used (deduced).
+    /// \tparam Rng2        The range itself must meet the requirements of a
+    ///                     sized range. The type of the second source range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an random access iterator.
-    /// \tparam Iter3       The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     random access iterator.
+    /// \tparam RaIter3     The type of the iterator representing the
+    ///                     destination range (deduced). This iterator type must
+    ///                     meet the requirements of an random access iterator.
     /// \tparam Comp        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a merge requires \a Comp to meet the
@@ -69,7 +70,7 @@ namespace hpx { namespace ranges {
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed to
     ///                     it. The types \a Type1 and \a Type2 must be such that
-    ///                     objects of types \a Iter1 and \a Iter2 can be
+    ///                     objects of types \a RaIter1 and \a RaIter2 can be
     ///                     dereferenced and then implicitly converted to
     ///                     both \a Type1 and \a Type2
     /// \param proj1        Specifies the function (or function object) which
@@ -92,25 +93,25 @@ namespace hpx { namespace ranges {
     /// within each thread.
     ///
     /// \returns  The \a merge algorithm returns a
-    /// \a hpx::future<merge_result<Iter1, Iter2, Iter3>>
+    /// \a hpx::future<merge_result<RaIter1, RaIter2, RaIter3>>
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and returns
-    ///           \a merge_result<Iter1, Iter2, Iter3> otherwise.
+    ///           \a merge_result<RaIter1, RaIter2, RaIter3> otherwise.
     ///           The \a merge algorithm returns the tuple of
     ///           the source iterator \a last1,
     ///           the source iterator \a last2,
     ///           the destination iterator to the end of the \a dest range.
     ///
     template <typename ExPolicy, typename Rng1, typename Rng2,
-        typename Iter3, typename Comp = hpx::ranges::less,
+        typename RaIter3, typename Comp = hpx::ranges::less,
         typename Proj1 = hpx::identity,
         typename Proj2 = hpx::identity>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         hpx::ranges::merge_result<
             hpx::traits::range_iterator_t<Rng1>,
-            hpx::traits::range_iterator_t<Rng2>, Iter3>>
-    merge(ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2, Iter3 dest,
+            hpx::traits::range_iterator_t<Rng2>, RaIter3>>
+    merge(ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2, RaIter3 dest,
         Comp&& comp = Comp(), Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
 
     /// Merges two sorted ranges [first1, last1) and [first2, last2)
@@ -128,25 +129,21 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Iter1       The type of the source iterators used (deduced)
-    ///                     representing the first sequence.
-    ///                     This iterator type must meet the requirements of an
-    ///                     random access iterator.
+    /// \tparam RaIter1     The type of the source iterators used (deduced)
+    ///                     representing the first sequence. This iterator type
+    ///                     must meet the requirements of an random access iterator.
     /// \tparam Sent1       The type of the end source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     sentinel for Iter1.
-    /// \tparam Iter2       The type of the source iterators used (deduced)
-    ///                     representing the second sequence.
-    ///                     This iterator type must meet the requirements of an
-    ///                     random access iterator.
+    ///                     sentinel for RaIter1.
+    /// \tparam RaIter2     The type of the source iterators used (deduced)
+    ///                     representing the second sequence. This iterator type
+    ///                     must meet the requirements of an random access iterator.
     /// \tparam Sent2       The type of the end source iterators used (deduced)
-    ///                     representing the second sequence.
-    ///                     This iterator type must meet the requirements of an
-    ///                     sentinel for Iter2.
-    /// \tparam Iter3       The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     random access iterator.
+    ///                     representing the second sequence. This iterator type
+    ///                     must meet the requirements of an sentinel for RaIter2.
+    /// \tparam RaIter3     The type of the iterator representing the
+    ///                     destination range (deduced). This iterator type must
+    ///                     meet the requirements of an random access iterator.
     /// \tparam Comp        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a merge requires \a Comp to meet the
@@ -180,7 +177,7 @@ namespace hpx { namespace ranges {
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed to
     ///                     it. The types \a Type1 and \a Type2 must be such that
-    ///                     objects of types \a Iter1 and \a Iter2 can be
+    ///                     objects of types \a RaIter1 and \a RaIter2 can be
     ///                     dereferenced and then implicitly converted to
     ///                     both \a Type1 and \a Type2
     /// \param proj1        Specifies the function (or function object) which
@@ -203,25 +200,25 @@ namespace hpx { namespace ranges {
     /// within each thread.
     ///
     /// \returns  The \a merge algorithm returns a
-    /// \a hpx::future<merge_result<Iter1, Iter2, Iter3>>
+    /// \a hpx::future<merge_result<RaIter1, RaIter2, RaIter3>>
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and returns
-    ///           \a merge_result<Iter1, Iter2, Iter3> otherwise.
+    ///           \a merge_result<RaIter1, RaIter2, RaIter3> otherwise.
     ///           The \a merge algorithm returns the tuple of
     ///           the source iterator \a last1,
     ///           the source iterator \a last2,
     ///           the destination iterator to the end of the \a dest range.
     ///
-    template <typename ExPolicy, typename Iter1, typename Sent1,
-        typename Iter2, typename Sent2, typename Iter3,
+    template <typename ExPolicy, typename RaIter1, typename Sent1,
+        typename RaIter2, typename Sent2, typename RaIter3,
         typename Comp = hpx::ranges::less,
         typename Proj1 = hpx::identity,
         typename Proj2 = hpx::identity>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-        hpx::ranges::merge_result<Iter1, Iter2, Iter3>>::type
-    merge(ExPolicy&& policy, Iter1 first1, Sent1 last1, Iter2 first2,
-        Sent2 last2, Iter3 dest, Comp&& comp = Comp(), Proj1&& proj1 = Proj1(),
+        hpx::ranges::merge_result<RaIter1, RaIter2, RaIter3>>::type
+    merge(ExPolicy&& policy, RaIter1 first1, Sent1 last1, RaIter2 first2,
+        Sent2 last2, RaIter3 dest, Comp&& comp = Comp(), Proj1&& proj1 = Proj1(),
         Proj2&& proj2 = Proj2());
 
     /// Merges two sorted ranges [first1, last1) and [first2, last2)
@@ -404,10 +401,11 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an random access iterator.
-    /// \tparam Iter        The type of the source iterators used (deduced).
+    /// \tparam RaIter      The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     random access iterator.
     /// \tparam Comp        The type of the function/function object to use
@@ -435,7 +433,7 @@ namespace hpx { namespace ranges {
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed to
     ///                     it. The types \a Type1 and \a Type2 must be
-    ///                     such that objects of types \a Iter can be
+    ///                     such that objects of types \a RaIter can be
     ///                     dereferenced and then implicitly converted to both
     ///                     \a Type1 and \a Type2
     /// \param proj         Specifies the function (or function object) which
@@ -454,17 +452,17 @@ namespace hpx { namespace ranges {
     /// within each thread.
     ///
     /// \returns  The \a inplace_merge algorithm returns a
-    ///           \a hpx::future<Iter> if the execution policy is of type
+    ///           \a hpx::future<RaIter> if the execution policy is of type
     ///           \a sequenced_task_policy or \a parallel_task_policy
-    ///           and returns \a Iter otherwise.
+    ///           and returns \a RaIter otherwise.
     ///           The \a inplace_merge algorithm returns
     ///           the source iterator \a last
     ///
-    template <typename ExPolicy, typename Rng, typename Iter,
+    template <typename ExPolicy, typename Rng, typename RaIter,
         typename Comp = hpx::ranges::less,
         typename Proj = hpx::identity>
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, Iter>
-    inplace_merge(ExPolicy&& policy, Rng&& rng, Iter middle,
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, RaIter>
+    inplace_merge(ExPolicy&& policy, Rng&& rng, RaIter middle,
         Comp&& comp = Comp(), Proj&& proj = Proj());
 
     /// Merges two consecutive sorted ranges [first, middle) and
@@ -480,12 +478,12 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Iter        The type of the source iterators used (deduced).
+    /// \tparam RaIter      The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     random access iterator.
     /// \tparam Sent        The type of the end source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     sentinel for Iter1.
+    ///                     sentinel for RaIter.
     /// \tparam Comp        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a inplace_merge requires \a Comp
@@ -513,7 +511,7 @@ namespace hpx { namespace ranges {
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed to
     ///                     it. The types \a Type1 and \a Type2 must be
-    ///                     such that objects of types \a Iter can be
+    ///                     such that objects of types \a RaIter can be
     ///                     dereferenced and then implicitly converted to both
     ///                     \a Type1 and \a Type2
     /// \param proj         Specifies the function (or function object) which
@@ -532,17 +530,17 @@ namespace hpx { namespace ranges {
     /// within each thread.
     ///
     /// \returns  The \a inplace_merge algorithm returns a
-    ///           \a hpx::future<Iter> if the execution policy is of type
+    ///           \a hpx::future<RaIter> if the execution policy is of type
     ///           \a sequenced_task_policy or \a parallel_task_policy
-    ///           and returns \a Iter otherwise.
+    ///           and returns \a RaIter otherwise.
     ///           The \a inplace_merge algorithm returns
     ///           the source iterator \a last
     ///
-    template <typename ExPolicy, typename Iter, typename Sent,
+    template <typename ExPolicy, typename RaIter, typename Sent,
         typename Comp = hpx::ranges::less,
         typename Proj = hpx::identity>
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, Iter>
-    inplace_merge(ExPolicy&& policy, Iter first, Iter middle, Sent last,
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, RaIter>
+    inplace_merge(ExPolicy&& policy, RaIter first, RaIter middle, Sent last,
         Comp&& comp = Comp(), Proj&& proj = Proj());
 
     /// Merges two consecutive sorted ranges [first, middle) and
@@ -690,16 +688,18 @@ namespace hpx::ranges {
     {
     private:
         template <typename ExPolicy, typename Rng1, typename Rng2,
-            typename Iter3, typename Comp = hpx::ranges::less,
+            typename RaIter3, typename Comp = hpx::ranges::less,
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng1> &&
+                hpx::traits::is_random_access_range_v<Rng1> &&
+                hpx::traits::is_sized_range_v<Rng1> &&
                 hpx::parallel::traits::is_projected_range_v<Proj1, Rng1> &&
-                hpx::traits::is_range_v<Rng2> &&
+                hpx::traits::is_random_access_range_v<Rng2> &&
+                hpx::traits::is_sized_range_v<Rng2> &&
                 hpx::parallel::traits::is_projected_range_v<Proj2, Rng2> &&
-                hpx::traits::is_iterator_v<Iter3> &&
+                hpx::traits::is_random_access_iterator_v<RaIter3> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy, Comp,
                     hpx::parallel::traits::projected_range<Proj1, Rng1>,
                     hpx::parallel::traits::projected_range<Proj2, Rng2>
@@ -708,10 +708,10 @@ namespace hpx::ranges {
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
             hpx::ranges::merge_result<hpx::traits::range_iterator_t<Rng1>,
-                hpx::traits::range_iterator_t<Rng2>, Iter3>>
+                hpx::traits::range_iterator_t<Rng2>, RaIter3>>
         tag_fallback_invoke(merge_t, ExPolicy&& policy, Rng1&& rng1,
-            Rng2&& rng2, Iter3 dest, Comp comp = Comp(), Proj1 proj1 = Proj1(),
-            Proj2 proj2 = Proj2())
+            Rng2&& rng2, RaIter3 dest, Comp comp = Comp(),
+            Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
         {
             using iterator_type1 = hpx::traits::range_iterator_t<Rng1>;
             using iterator_type2 = hpx::traits::range_iterator_t<Rng2>;
@@ -722,11 +722,11 @@ namespace hpx::ranges {
             static_assert(
                 hpx::traits::is_random_access_iterator_v<iterator_type2>,
                 "Requires at least random access iterator.");
-            static_assert(hpx::traits::is_random_access_iterator_v<Iter3>,
+            static_assert(hpx::traits::is_random_access_iterator_v<RaIter3>,
                 "Requires at least random access iterator.");
 
             using result_type = hpx::ranges::merge_result<iterator_type1,
-                iterator_type2, Iter3>;
+                iterator_type2, RaIter3>;
 
             return hpx::parallel::detail::merge<result_type>().call(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng1),
@@ -735,38 +735,41 @@ namespace hpx::ranges {
                 HPX_MOVE(proj2));
         }
 
-        template <typename ExPolicy, typename Iter1, typename Sent1,
-            typename Iter2, typename Sent2, typename Iter3,
+        template <typename ExPolicy, typename RaIter1, typename Sent1,
+            typename RaIter2, typename Sent2, typename RaIter3,
             typename Comp = hpx::ranges::less, typename Proj1 = hpx::identity,
             typename Proj2 = hpx::identity>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_sentinel_for_v<Sent1, Iter1> &&
-                hpx::parallel::traits::is_projected_v<Proj1, Iter1> &&
-                hpx::traits::is_sentinel_for_v<Sent2, Iter2> &&
-                hpx::parallel::traits::is_projected_v<Proj2, Iter2> &&
-                hpx::traits::is_iterator_v<Iter3> &&
+                hpx::traits::is_random_access_iterator_v<RaIter1> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent1, RaIter1> &&
+                hpx::parallel::traits::is_projected_v<Proj1, RaIter1> &&
+                hpx::traits::is_random_access_iterator_v<RaIter2> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent2, RaIter2> &&
+                hpx::parallel::traits::is_projected_v<Proj2, RaIter2> &&
+                hpx::traits::is_random_access_iterator_v<RaIter3> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy, Comp,
-                    hpx::parallel::traits::projected<Proj1, Iter1>,
-                    hpx::parallel::traits::projected<Proj2, Iter2>
+                    hpx::parallel::traits::projected<Proj1, RaIter1>,
+                    hpx::parallel::traits::projected<Proj2, RaIter2>
                 >
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            hpx::ranges::merge_result<Iter1, Iter2, Iter3>>
-        tag_fallback_invoke(merge_t, ExPolicy&& policy, Iter1 first1,
-            Sent1 last1, Iter2 first2, Sent2 last2, Iter3 dest,
+            hpx::ranges::merge_result<RaIter1, RaIter2, RaIter3>>
+        tag_fallback_invoke(merge_t, ExPolicy&& policy, RaIter1 first1,
+            Sent1 last1, RaIter2 first2, Sent2 last2, RaIter3 dest,
             Comp comp = Comp(), Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
         {
-            static_assert(hpx::traits::is_random_access_iterator_v<Iter1>,
+            static_assert(hpx::traits::is_random_access_iterator_v<RaIter1>,
                 "Required at least random access iterator.");
-            static_assert(hpx::traits::is_random_access_iterator_v<Iter2>,
+            static_assert(hpx::traits::is_random_access_iterator_v<RaIter2>,
                 "Requires at least random access iterator.");
-            static_assert(hpx::traits::is_random_access_iterator_v<Iter3>,
+            static_assert(hpx::traits::is_random_access_iterator_v<RaIter3>,
                 "Requires at least random access iterator.");
 
-            using result_type = hpx::ranges::merge_result<Iter1, Iter2, Iter3>;
+            using result_type =
+                hpx::ranges::merge_result<RaIter1, RaIter2, RaIter3>;
 
             return hpx::parallel::detail::merge<result_type>().call(
                 HPX_FORWARD(ExPolicy, policy), first1, last1, first2, last2,
@@ -860,59 +863,61 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<inplace_merge_t>
     {
     private:
-        template <typename ExPolicy, typename Rng, typename Iter,
+        template <typename ExPolicy, typename Rng, typename RaIter,
             typename Comp = hpx::ranges::less, typename Proj = hpx::identity>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
-                hpx::traits::is_iterator_v<Iter> &&
-                hpx::parallel::traits::is_projected_v<Proj, Iter> &&
+                hpx::traits::is_random_access_iterator_v<RaIter> &&
+                hpx::parallel::traits::is_projected_v<Proj, RaIter> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy, Comp,
                     hpx::parallel::traits::projected_range<Proj, Rng>,
                     hpx::parallel::traits::projected_range<Proj, Rng>
                 >
             )
         // clang-format on
-        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, Iter>
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, RaIter>
         tag_fallback_invoke(inplace_merge_t, ExPolicy&& policy, Rng&& rng,
-            Iter middle, Comp comp = Comp(), Proj proj = Proj())
+            RaIter middle, Comp comp = Comp(), Proj proj = Proj())
         {
             using iterator_type = hpx::traits::range_iterator_t<Rng>;
 
             static_assert(
                 hpx::traits::is_random_access_iterator_v<iterator_type>,
                 "Required at least random access iterator.");
-            static_assert(hpx::traits::is_random_access_iterator_v<Iter>,
+            static_assert(hpx::traits::is_random_access_iterator_v<RaIter>,
                 "Required at least random access iterator.");
 
-            return hpx::parallel::detail::inplace_merge<Iter>().call(
+            return hpx::parallel::detail::inplace_merge<RaIter>().call(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng), middle,
                 hpx::util::end(rng), HPX_MOVE(comp), HPX_MOVE(proj));
         }
 
-        template <typename ExPolicy, typename Iter, typename Sent,
+        template <typename ExPolicy, typename RaIter, typename Sent,
             typename Comp = hpx::ranges::less, typename Proj = hpx::identity>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
-                hpx::parallel::traits::is_projected_v<Proj, Iter> &&
+                hpx::traits::is_random_access_iterator_v<RaIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, RaIter> &&
+                hpx::parallel::traits::is_projected_v<Proj, RaIter> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy, Comp,
-                    hpx::parallel::traits::projected<Proj, Iter>,
-                    hpx::parallel::traits::projected<Proj, Iter>
+                    hpx::parallel::traits::projected<Proj, RaIter>,
+                    hpx::parallel::traits::projected<Proj, RaIter>
                 >
             )
         // clang-format on
-        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, Iter>
-        tag_fallback_invoke(inplace_merge_t, ExPolicy&& policy, Iter first,
-            Iter middle, Sent last, Comp comp = Comp(), Proj proj = Proj())
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, RaIter>
+        tag_fallback_invoke(inplace_merge_t, ExPolicy&& policy, RaIter first,
+            RaIter middle, Sent last, Comp comp = Comp(), Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_random_access_iterator_v<Iter>,
+            static_assert(hpx::traits::is_random_access_iterator_v<RaIter>,
                 "Required at least random access iterator.");
 
-            return hpx::parallel::detail::inplace_merge<Iter>().call(
+            return hpx::parallel::detail::inplace_merge<RaIter>().call(
                 HPX_FORWARD(ExPolicy, policy), first, middle, last,
                 HPX_MOVE(comp), HPX_MOVE(proj));
         }

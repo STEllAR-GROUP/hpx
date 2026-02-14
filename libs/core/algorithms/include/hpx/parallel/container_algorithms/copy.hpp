@@ -25,16 +25,16 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter1    The type of the begin source iterators used (deduced).
+    /// \tparam RaIter1     The type of the begin source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     random access iterator.
     /// \tparam Sent1       The type of the end source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     sentinel for Iter1.
-    /// \tparam FwdIter     The type of the iterator representing the
+    /// \tparam RaIter      The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     random access iterator.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -55,18 +55,18 @@ namespace hpx { namespace ranges {
     /// within each thread.
     ///
     /// \returns  The \a copy algorithm returns a
-    ///           \a hpx::future<ranges::copy_result<FwdIter1, FwdIter> > if
+    ///           \a hpx::future<ranges::copy_result<RaIter1, RaIter> > if
     ///           the execution policy is of type
     ///           \a sequenced_task_policy or \a parallel_task_policy and
-    ///           returns \a ranges::copy_result<FwdIter1, FwdIter> otherwise.
+    ///           returns \a ranges::copy_result<RaIter1, RaIter> otherwise.
     ///           The \a copy algorithm returns the pair of the input iterator
     ///           \a last and the output iterator to the element in the
     ///           destination range, one past the last element copied.
-    template <typename ExPolicy, typename FwdIter1, typename Sent1,
-        typename FwdIter>
+    template <typename ExPolicy, typename RaIter1, typename Sent1,
+        typename RaIter>
     typename parallel::util::detail::algorithm_result<ExPolicy,
-        ranges::copy_result<FwdIter1, FwdIter>>::type
-    copy(ExPolicy&& policy, FwdIter1 iter, Sent1 sent, FwdIter dest);
+        ranges::copy_result<RaIter1, RaIter>>::type
+    copy(ExPolicy&& policy, RaIter1 iter, Sent1 sent, RaIter dest);
 
     /// Copies the elements in the range \a rng to another
     /// range beginning at \a dest.
@@ -78,13 +78,16 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
-    /// \tparam FwdIter     The type of the iterator representing the
+    ///                     meet the requirements of an random access iterator.
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.
+    /// \tparam RaIter      The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     random access iterator.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -103,20 +106,20 @@ namespace hpx { namespace ranges {
     /// within each thread.
     ///
     /// \returns  The \a copy algorithm returns a
-    ///           \a hpx::future<ranges::copy_result<iterator_t<Rng>, FwdIter2>>
+    ///           \a hpx::future<ranges::copy_result<iterator_t<Rng>, RaIter>>
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or \a parallel_task_policy and
-    ///           returns \a ranges::copy_result<iterator_t<Rng>, FwdIter2>
+    ///           returns \a ranges::copy_result<iterator_t<Rng>, RaIter>
     ///           otherwise.
     ///           The \a copy algorithm returns the pair of the input iterator
     ///           \a last and the output iterator to the element in the
     ///           destination range, one past the last element copied.
-    template <typename ExPolicy, typename Rng, typename FwdIter>
+    template <typename ExPolicy, typename Rng, typename RaIter>
     typename parallel::util::detail::algorithm_result<ExPolicy,
         ranges::copy_result<
             typename hpx::traits::range_traits<Rng>::iterator_type,
-            FwdIter>>::type
-    copy(ExPolicy&& policy, Rng&& rng, FwdIter dest);
+            RaIter>>::type
+    copy(ExPolicy&& policy, Rng&& rng, RaIter dest);
 
     /// Copies the elements in the range, defined by [first, last), to another
     /// range beginning at \a dest.
@@ -124,15 +127,14 @@ namespace hpx { namespace ranges {
     /// \note   Complexity: Performs exactly \a last - \a first assignments.
     ///
     /// \tparam FwdIter1    The type of the begin source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam Sent1       The type of the end source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     sentinel for Iter1.
     /// \tparam FwdIter     The type of the iterator representing the
     ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     This iterator type must meet the requirements of 
+    ///                     a forward iterator.
     ///
     /// \param iter         Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
@@ -183,15 +185,15 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter1    The type of the source iterators used (deduced).
+    /// \tparam RaIter1     The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     random access iterator.
     /// \tparam Size        The type of the argument specifying the number of
     ///                     elements to apply \a f to.
-    /// \tparam FwdIter2    The type of the iterator representing the
+    /// \tparam RaIter2     The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     random access iterator.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -212,11 +214,11 @@ namespace hpx { namespace ranges {
     /// within each thread.
     ///
     /// \returns  The \a copy_n algorithm returns a
-    ///           \a hpx::future<ranges::copy_n_result<FwdIter1, FwdIter2> >
+    ///           \a hpx::future<ranges::copy_n_result<RaIter1, RaIter2> >
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a ranges::copy_n_result<FwdIter1, FwdIter2>
+    ///           returns \a ranges::copy_n_result<RaIter1, RaIter2>
     ///           otherwise.
     ///           The \a copy algorithm returns the pair of the input iterator
     ///           forwarded to the first element after the last in the input
@@ -224,11 +226,11 @@ namespace hpx { namespace ranges {
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <typename ExPolicy, typename FwdIter1, typename Size,
-        typename FwdIter2>
+    template <typename ExPolicy, typename RaIter1, typename Size,
+        typename RaIter2>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-        ranges::copy_n_result<FwdIter1, FwdIter2>>::type
-    copy_n(ExPolicy&& policy, FwdIter1 first, Size count, FwdIter2 dest);
+        ranges::copy_n_result<RaIter1, RaIter2>>::type
+    copy_n(ExPolicy&& policy, RaIter1 first, Size count, RaIter2 dest);
 
     /// Copies the elements in the range [first, first + count), starting from
     /// first and proceeding to first + count - 1., to another range beginning
@@ -271,16 +273,16 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter1    The type of the begin source iterators used (deduced).
+    /// \tparam RaIter1     The type of the begin source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     random access iterator.
     /// \tparam Sent1       The type of the end source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     sentinel for FwdIter1.
-    /// \tparam FwdIter     The type of the iterator representing the
+    ///                     sentinel for RaIter1.
+    /// \tparam RaIter      The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     output iterator.
+    ///                     random access iterator.
     /// \tparam Pred        The type of an optional function/function object to use.
     /// \tparam Proj        The type of an optional projection function. This
     ///                     defaults to \a hpx::identity
@@ -301,7 +303,7 @@ namespace hpx { namespace ranges {
     ///                     The signature does not need to have const &, but
     ///                     the function must not modify the objects passed to
     ///                     it. The types \a Type1 must be such
-    ///                     that objects of type \a FwdIter
+    ///                     that objects of type \a RaIter
     ///                     can be dereferenced and then implicitly converted
     ///                     to \a Type1 .
     /// \param proj         Specifies the function (or function object) which
@@ -320,21 +322,21 @@ namespace hpx { namespace ranges {
     /// within each thread.
     ///
     /// \returns  The \a copy_if algorithm returns a
-    ///           \a hpx::future<ranges::copy_if_result<iterator_t<Rng>, FwdIter2>>
+    ///           \a hpx::future<ranges::copy_if_result<RaIter1, RaIter>>
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or \a parallel_task_policy and
-    ///           returns \a ranges::copy_if_result<iterator_t<Rng>, FwdIter2>
+    ///           returns \a ranges::copy_if_result<RaIter1, RaIter>
     ///           otherwise.
     ///           The \a copy_if algorithm returns the pair of the input iterator
     ///           \a last and the output iterator to the element in the
     ///           destination range, one past the last element copied.
     ///
-    template <typename ExPolicy, typename FwdIter1, typename Sent1,
-        typename FwdIter, typename Pred,
+    template <typename ExPolicy, typename RaIter1, typename Sent1,
+        typename RaIter, typename Pred,
         typename Proj = hpx::identity>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-        ranges::copy_if_result<FwdIter1, FwdIter>>::type
-    copy_if(ExPolicy&& policy, FwdIter1 iter, Sent1 sent, FwdIter dest, Pred&& pred,
+        ranges::copy_if_result<RaIter1, RaIter>>::type
+    copy_if(ExPolicy&& policy, RaIter1 iter, Sent1 sent, RaIter dest, Pred&& pred,
         Proj&& proj = Proj());
 
     /// Copies the elements in the range, defined by \a rng to another
@@ -345,13 +347,16 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an forward iterator.
-    /// \tparam FwdIter     The type of the iterator representing the
+    ///                     meet the requirements of an random access iterator.
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.
+    /// \tparam RaIter      The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     output iterator.
+    ///                     random access iterator.
     /// \tparam Pred        The type of an optional function/function object to use.
     /// \tparam Proj        The type of an optional projection function. This
     ///                     defaults to \a hpx::identity
@@ -370,7 +375,7 @@ namespace hpx { namespace ranges {
     ///                     The signature does not need to have const &, but
     ///                     the function must not modify the objects passed to
     ///                     it. The types \a Type1 must be such
-    ///                     that objects of type \a FwdIter
+    ///                     that objects of type \a RaIter
     ///                     can be dereferenced and then implicitly converted
     ///                     to \a Type1 .
     /// \param proj         Specifies the function (or function object) which
@@ -389,23 +394,23 @@ namespace hpx { namespace ranges {
     /// within each thread.
     ///
     /// \returns  The \a copy_if algorithm returns a
-    ///           \a hpx::future<ranges::copy_if_result<iterator_t<Rng>, FwdIter2>>
+    ///           \a hpx::future<ranges::copy_if_result<iterator_t<Rng>, RaIter>>
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or \a parallel_task_policy and
-    ///           returns \a ranges::copy_if_result<iterator_t<Rng>, FwdIter2>
+    ///           returns \a ranges::copy_if_result<iterator_t<Rng>, RaIter>
     ///           otherwise.
     ///           The \a copy_if algorithm returns the pair of the input iterator
     ///           \a last and the output iterator to the element in the
     ///           destination range, one past the last element copied.
     ///
-    template <typename ExPolicy, typename Rng, typename FwdIter,
+    template <typename ExPolicy, typename Rng, typename RaIter,
         typename Pred,
         typename Proj = hpx::identity>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         ranges::copy_if_result<
             typename hpx::traits::range_traits<Rng>::iterator_type,
-            FwdIter>>::type
-    copy_if(ExPolicy&& policy, Rng&& rng, FwdIter dest, Pred&& pred,
+            RaIter>>::type
+    copy_if(ExPolicy&& policy, Rng&& rng, RaIter dest, Pred&& pred,
         Proj&& proj = Proj());
 
     /// Copies the elements in the range, defined by [first, last) to another
@@ -413,8 +418,7 @@ namespace hpx { namespace ranges {
     /// removed is preserved.
     ///
     /// \tparam FwdIter1    The type of the begin source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam Sent1       The type of the end source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     sentinel for FwdIter1.
@@ -465,7 +469,7 @@ namespace hpx { namespace ranges {
     ///
     /// \tparam Rng         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an forward iterator.
+    ///                     meet the requirements of an input iterator.
     /// \tparam FwdIter     The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
@@ -541,46 +545,45 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<copy_t>
     {
     private:
-        template <typename ExPolicy, typename FwdIter1, typename Sent1,
-            typename FwdIter>
+        template <typename ExPolicy, typename RaIter1, typename Sent1,
+            typename RaIter>
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<FwdIter1> &&
-                hpx::traits::is_sentinel_for_v<Sent1, FwdIter1> &&
-                hpx::traits::is_iterator_v<FwdIter>
+                hpx::traits::is_random_access_iterator_v<RaIter1> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent1, RaIter1> &&
+                hpx::traits::is_random_access_iterator_v<RaIter>
             )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
-            ranges::copy_result<FwdIter1, FwdIter>>
+            ranges::copy_result<RaIter1, RaIter>>
         tag_fallback_invoke(hpx::ranges::copy_t, ExPolicy&& policy,
-            FwdIter1 iter, Sent1 sent, FwdIter dest)
+            RaIter1 iter, Sent1 sent, RaIter dest)
         {
             using copy_iter_t =
-                hpx::parallel::detail::copy_iter<FwdIter1, FwdIter>;
+                hpx::parallel::detail::copy_iter<RaIter1, RaIter>;
 
             return hpx::parallel::detail::transfer<copy_iter_t>(
                 HPX_FORWARD(ExPolicy, policy), iter, sent, dest);
         }
 
-        template <typename ExPolicy, typename Rng, typename FwdIter>
+        template <typename ExPolicy, typename Rng, typename RaIter>
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
-                hpx::traits::is_iterator_v<FwdIter>
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng> &&
+                hpx::traits::is_random_access_iterator_v<RaIter>
             )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
             ranges::copy_result<
-                typename hpx::traits::range_traits<Rng>::iterator_type,
-                FwdIter>>
+                typename hpx::traits::range_traits<Rng>::iterator_type, RaIter>>
         tag_fallback_invoke(
-            hpx::ranges::copy_t, ExPolicy&& policy, Rng&& rng, FwdIter dest)
+            hpx::ranges::copy_t, ExPolicy&& policy, Rng&& rng, RaIter dest)
         {
             using copy_iter_t = hpx::parallel::detail::copy_iter<
-                typename hpx::traits::range_traits<Rng>::iterator_type,
-                FwdIter>;
+                typename hpx::traits::range_traits<Rng>::iterator_type, RaIter>;
 
             return hpx::parallel::detail::transfer<copy_iter_t>(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
@@ -632,38 +635,32 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<copy_n_t>
     {
     private:
-        template <typename ExPolicy, typename FwdIter1, typename Size,
-            typename FwdIter2>
+        template <typename ExPolicy, typename RaIter1, typename Size,
+            typename RaIter2>
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<FwdIter1> &&
-                hpx::traits::is_iterator_v<FwdIter2> &&
+                hpx::traits::is_random_access_iterator_v<RaIter1> &&
+                hpx::traits::is_random_access_iterator_v<RaIter2> &&
                 std::is_integral_v<Size>
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            ranges::copy_n_result<FwdIter1, FwdIter2>>
+            ranges::copy_n_result<RaIter1, RaIter2>>
         tag_fallback_invoke(hpx::ranges::copy_n_t, ExPolicy&& policy,
-            FwdIter1 first, Size count, FwdIter2 dest)
+            RaIter1 first, Size count, RaIter2 dest)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
-                "Required at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2> ||
-                    hpx::is_sequenced_execution_policy_v<ExPolicy>,
-                "Requires at least forward iterator or sequential execution.");
-
             // if count is representing a negative value, we do nothing
             if (hpx::parallel::detail::is_negative(count))
             {
                 return hpx::parallel::util::detail::algorithm_result<ExPolicy,
-                    ranges::copy_n_result<FwdIter1, FwdIter2>>::
-                    get(ranges::copy_n_result<FwdIter1, FwdIter2>{
-                        HPX_MOVE(first), HPX_MOVE(dest)});
+                    ranges::copy_n_result<RaIter1,
+                        RaIter2>>::get(ranges::copy_n_result<RaIter1, RaIter2>{
+                    HPX_MOVE(first), HPX_MOVE(dest)});
             }
 
             return hpx::parallel::detail::copy_n<
-                ranges::copy_n_result<FwdIter1, FwdIter2>>()
+                ranges::copy_n_result<RaIter1, RaIter2>>()
                 .call(HPX_FORWARD(ExPolicy, policy), first,
                     static_cast<std::size_t>(count), dest);
         }
@@ -677,11 +674,6 @@ namespace hpx::ranges {
         friend ranges::copy_n_result<FwdIter1, FwdIter2> tag_fallback_invoke(
             hpx::ranges::copy_n_t, FwdIter1 first, Size count, FwdIter2 dest)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
-                "Required at least forward iterator.");
-            static_assert(hpx::traits::is_output_iterator_v<FwdIter2>,
-                "Requires at least output iterator.");
-
             // if count is representing a negative value, we do nothing
             if (hpx::parallel::detail::is_negative(count))
             {
@@ -702,48 +694,41 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<copy_if_t>
     {
     private:
-        template <typename ExPolicy, typename FwdIter1, typename Sent1,
-            typename FwdIter, typename Pred, typename Proj = hpx::identity>
+        template <typename ExPolicy, typename RaIter1, typename Sent1,
+            typename RaIter, typename Pred, typename Proj = hpx::identity>
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<FwdIter1> &&
-                hpx::traits::is_sentinel_for_v<Sent1, FwdIter1> &&
-                hpx::parallel::traits::is_projected_v<Proj, FwdIter1> &&
-                hpx::traits::is_iterator_v<FwdIter> &&
+                hpx::traits::is_random_access_iterator_v<RaIter1> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent1, RaIter1> &&
+                hpx::parallel::traits::is_projected_v<Proj, RaIter1> &&
+                hpx::traits::is_random_access_iterator_v<RaIter> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy, Pred,
-                    hpx::parallel::traits::projected<Proj, FwdIter1>
+                    hpx::parallel::traits::projected<Proj, RaIter1>
                 >
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            ranges::copy_if_result<FwdIter1, FwdIter>>
+            ranges::copy_if_result<RaIter1, RaIter>>
         tag_fallback_invoke(hpx::ranges::copy_if_t, ExPolicy&& policy,
-            FwdIter1 iter, Sent1 sent, FwdIter dest, Pred pred,
+            RaIter1 iter, Sent1 sent, RaIter dest, Pred pred,
             Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
-                "Required at least forward iterator.");
-
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter> ||
-                    (hpx::is_sequenced_execution_policy_v<ExPolicy> &&
-                        hpx::traits::is_output_iterator_v<FwdIter>),
-                "Requires at least forward iterator or sequential execution.");
-
             return hpx::parallel::detail::copy_if<
-                hpx::parallel::util::in_out_result<FwdIter1, FwdIter>>()
+                hpx::parallel::util::in_out_result<RaIter1, RaIter>>()
                 .call(HPX_FORWARD(ExPolicy, policy), iter, sent, dest,
                     HPX_MOVE(pred), HPX_MOVE(proj));
         }
 
-        template <typename ExPolicy, typename Rng, typename FwdIter,
+        template <typename ExPolicy, typename Rng, typename RaIter,
             typename Pred, typename Proj = hpx::identity>
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
-                hpx::traits::is_iterator_v<FwdIter> &&
+                hpx::traits::is_random_access_iterator_v<RaIter> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy, Pred,
                     hpx::parallel::traits::projected_range<Proj, Rng>
                 >
@@ -751,20 +736,14 @@ namespace hpx::ranges {
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
             ranges::copy_if_result<
-                typename hpx::traits::range_traits<Rng>::iterator_type,
-                FwdIter>>
+                typename hpx::traits::range_traits<Rng>::iterator_type, RaIter>>
         tag_fallback_invoke(hpx::ranges::copy_if_t, ExPolicy&& policy,
-            Rng&& rng, FwdIter dest, Pred pred, Proj proj = Proj())
+            Rng&& rng, RaIter dest, Pred pred, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter> ||
-                    (hpx::is_sequenced_execution_policy_v<ExPolicy> &&
-                        hpx::traits::is_output_iterator_v<FwdIter>),
-                "Requires at least forward iterator or sequential execution.");
-
             return hpx::parallel::detail::copy_if<
                 hpx::parallel::util::in_out_result<
                     typename hpx::traits::range_traits<Rng>::iterator_type,
-                    FwdIter>>()
+                    RaIter>>()
                 .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                     hpx::util::end(rng), dest, HPX_MOVE(pred), HPX_MOVE(proj));
         }

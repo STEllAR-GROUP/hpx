@@ -97,9 +97,13 @@ void test_set_intersection1_async(ExPolicy&& p, IteratorTag)
 template <typename IteratorTag>
 void test_set_intersection1()
 {
-    using namespace hpx::execution;
-
     test_set_intersection1(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_set_intersection1_parallel()
+{
+    using namespace hpx::execution;
 
     test_set_intersection1(seq, IteratorTag());
     test_set_intersection1(par, IteratorTag());
@@ -113,6 +117,7 @@ void set_intersection_test1()
 {
     test_set_intersection1<std::random_access_iterator_tag>();
     test_set_intersection1<std::forward_iterator_tag>();
+    test_set_intersection1_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -207,9 +212,13 @@ void test_set_intersection2_async(ExPolicy&& p, IteratorTag)
 template <typename IteratorTag>
 void test_set_intersection2()
 {
-    using namespace hpx::execution;
-
     test_set_intersection2(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_set_intersection2_parallel()
+{
+    using namespace hpx::execution;
 
     test_set_intersection2(seq, IteratorTag());
     test_set_intersection2(par, IteratorTag());
@@ -223,6 +232,7 @@ void set_intersection_test2()
 {
     test_set_intersection2<std::random_access_iterator_tag>();
     test_set_intersection2<std::forward_iterator_tag>();
+    test_set_intersection2_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -358,9 +368,13 @@ void test_set_intersection_exception_async(ExPolicy&& p, IteratorTag)
 template <typename IteratorTag>
 void test_set_intersection_exception()
 {
-    using namespace hpx::execution;
-
     test_set_intersection_exception(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_set_intersection_exception_parallel()
+{
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
@@ -376,6 +390,7 @@ void set_intersection_exception_test()
 {
     test_set_intersection_exception<std::random_access_iterator_tag>();
     test_set_intersection_exception<std::forward_iterator_tag>();
+    test_set_intersection_exception_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -506,9 +521,13 @@ void test_set_intersection_bad_alloc_async(ExPolicy&& p, IteratorTag)
 template <typename IteratorTag>
 void test_set_intersection_bad_alloc()
 {
-    using namespace hpx::execution;
-
     test_set_intersection_bad_alloc(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_set_intersection_bad_alloc_parallel()
+{
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
@@ -524,6 +543,7 @@ void set_intersection_bad_alloc_test()
 {
     test_set_intersection_bad_alloc<std::random_access_iterator_tag>();
     test_set_intersection_bad_alloc<std::forward_iterator_tag>();
+    test_set_intersection_bad_alloc_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

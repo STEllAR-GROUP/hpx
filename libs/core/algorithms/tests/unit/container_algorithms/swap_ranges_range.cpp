@@ -101,8 +101,12 @@ void test_swap_ranges_sent(ExPolicy policy, IteratorTag)
     std::fill(
         std::begin(d) + static_cast<std::ptrdiff_t>(len), std::end(d), 200);
 
-    hpx::ranges::swap_ranges(policy, std::begin(c), sentinel<std::size_t>{100},
-        std::begin(d), sentinel<std::size_t>{200});
+    hpx::ranges::swap_ranges(policy, std::begin(c),
+        test::sentinel_from_iterator(
+            std::begin(c) + static_cast<std::ptrdiff_t>(len)),
+        std::begin(d),
+        test::sentinel_from_iterator(
+            std::begin(d) + static_cast<std::ptrdiff_t>(len)));
 
     std::size_t count = 0;
     std::for_each(

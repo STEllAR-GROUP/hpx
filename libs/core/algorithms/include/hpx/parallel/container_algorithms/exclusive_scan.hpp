@@ -25,15 +25,15 @@ namespace hpx { namespace ranges {
     /// \note   Complexity: O(\a last - \a first) applications of the
     ///         predicate \a op.
     ///
-    /// \tparam FwdIter1    The type of the source iterators used (deduced).
+    /// \tparam InIter      The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     input iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for FwdIter1.
-    /// \tparam FwdIter2    The type of the iterator representing the
+    /// \tparam OutIter     The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     output iterator.
     /// \tparam T           The type of the value to be used as initial (and
     ///                     intermediate) values (deduced).
     /// \tparam Op          The type of the binary function object used for
@@ -95,15 +95,14 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter1    The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    /// \tparam RaIter1     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of 
+    ///                     an random access iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
-    ///                     sentinel type must be a sentinel for FwdIter1.
-    /// \tparam FwdIter2    The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     sentinel type must be a sentinel for RaIter1.
+    /// \tparam RaIter2     The type of the iterator representing the
+    ///                     destination range (deduced). This iterator type must
+    ///                     meet the requirements of an random access iterator.
     /// \tparam T           The type of the value to be used as initial (and
     ///                     intermediate) values (deduced).
     /// \tparam Op          The type of the binary function object used for
@@ -144,11 +143,11 @@ namespace hpx { namespace ranges {
     /// within each thread.
     ///
     /// \returns  The \a exclusive_scan algorithm returns a
-    ///           \a hpx::future<util::in_out_result<FwdIter1, FwdIter2>> if
+    ///           \a hpx::future<util::in_out_result<RaIter1, RaIter2>> if
     ///           the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a util::in_out_result<FwdIter1, FwdIter2> otherwise.
+    ///           returns \a util::in_out_result<RaIter1, RaIter2> otherwise.
     ///           The \a exclusive_scan algorithm returns an input iterator to
     ///           the point denoted by the sentinel and an output iterator
     ///           to the element in the destination range, one past the last
@@ -165,13 +164,13 @@ namespace hpx { namespace ranges {
     /// \a op is not mathematically associative, the behavior of
     /// \a inclusive_scan may be non-deterministic.
     ///
-    template <typename ExPolicy, typename FwdIter1, typename Sent,
-        typename FwdIter2,
-        typename T = typename std::iterator_traits<FwdIter1>::value_type,
+    template <typename ExPolicy, typename RaIter1, typename Sent,
+        typename RaIter2,
+        typename T = typename std::iterator_traits<RaIter1>::value_type,
         typename Op = std::plus<T>>
     typename parallel::util::detail::algorithm_result<ExPolicy,
-        exclusive_scan_result<FwdIter1, FwdIter2>>::type
-    exclusive_scan(ExPolicy&& policy, FwdIter1 first, Sent last, FwdIter2 dest,
+        exclusive_scan_result<RaIter1, RaIter2>>::type
+    exclusive_scan(ExPolicy&& policy, RaIter1 first, Sent last, RaIter2 dest,
         T init, Op&& op = Op());
 
     /// Assigns through each iterator \a i in [result, result + (last - first))
@@ -184,7 +183,7 @@ namespace hpx { namespace ranges {
     ///
     /// \tparam Rng         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an forward iterator.
+    ///                     meet the requirements of an input iterator.
     /// \tparam O           The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
@@ -247,13 +246,13 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an forward iterator.
+    ///                     meet the requirements of an random access iterator.
     /// \tparam O           The type of the iterator representing the
     ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam T           The type of the value to be used as initial (and
     ///                     intermediate) values (deduced).
     /// \tparam Op          The type of the binary function object used for
@@ -379,33 +378,28 @@ namespace hpx::ranges {
                 HPX_MOVE(op));
         }
 
-        template <typename ExPolicy, typename FwdIter1, typename Sent,
-            typename FwdIter2,
-            typename T = typename std::iterator_traits<FwdIter1>::value_type,
+        template <typename ExPolicy, typename RaIter1, typename Sent,
+            typename RaIter2,
+            typename T = typename std::iterator_traits<RaIter1>::value_type,
             typename Op = std::plus<>>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<FwdIter1> &&
-                hpx::traits::is_sentinel_for_v<Sent, FwdIter1> &&
-                hpx::traits::is_iterator_v<FwdIter2> &&
+                hpx::traits::is_random_access_iterator_v<RaIter1> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, RaIter1> &&
+                hpx::traits::is_random_access_iterator_v<RaIter2> &&
                 hpx::is_invocable_v<Op,
-                    typename std::iterator_traits<FwdIter1>::value_type,
-                    typename std::iterator_traits<FwdIter1>::value_type
+                    typename std::iterator_traits<RaIter1>::value_type,
+                    typename std::iterator_traits<RaIter1>::value_type
                 >
             )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
-            exclusive_scan_result<FwdIter1, FwdIter2>>
+            exclusive_scan_result<RaIter1, RaIter2>>
         tag_fallback_invoke(hpx::ranges::exclusive_scan_t, ExPolicy&& policy,
-            FwdIter1 first, Sent last, FwdIter2 dest, T init, Op op = Op())
+            RaIter1 first, Sent last, RaIter2 dest, T init, Op op = Op())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
-                "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
-                "Requires at least forward iterator.");
-
-            using result_type = exclusive_scan_result<FwdIter1, FwdIter2>;
+            using result_type = exclusive_scan_result<RaIter1, RaIter2>;
 
             return hpx::parallel::detail::exclusive_scan<result_type>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, dest,
@@ -448,7 +442,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng> &&
                 hpx::is_invocable_v<Op,
                     typename hpx::traits::range_traits<Rng>::value_type,
                     typename hpx::traits::range_traits<Rng>::value_type
@@ -460,10 +455,6 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::exclusive_scan_t, ExPolicy&& policy,
             Rng&& rng, O dest, T init, Op op = Op())
         {
-            static_assert(hpx::traits::is_forward_iterator<
-                              traits::range_iterator_t<Rng>>::value,
-                "Requires at least forward iterator.");
-
             using result_type =
                 exclusive_scan_result<traits::range_iterator_t<Rng>, O>;
 

@@ -19,6 +19,12 @@ void test_destroy()
     using namespace hpx::execution;
 
     test_destroy(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_destroy_parallel()
+{
+    using namespace hpx::execution;
 
     test_destroy(seq, IteratorTag());
     test_destroy(par, IteratorTag());
@@ -32,6 +38,7 @@ void destroy_test()
 {
     test_destroy<std::random_access_iterator_tag>();
     test_destroy<std::forward_iterator_tag>();
+    test_destroy_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -41,6 +48,12 @@ void test_destroy_exception()
     using namespace hpx::execution;
 
     test_destroy_exception(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_destroy_exception_parallel()
+{
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
@@ -56,6 +69,7 @@ void destroy_exception_test()
 {
     test_destroy_exception<std::random_access_iterator_tag>();
     test_destroy_exception<std::forward_iterator_tag>();
+    test_destroy_exception_parallel<std::random_access_iterator_tag>();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -77,7 +91,6 @@ void test_destroy_bad_alloc()
 void destroy_bad_alloc_test()
 {
     test_destroy_bad_alloc<std::random_access_iterator_tag>();
-    test_destroy_bad_alloc<std::forward_iterator_tag>();
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)

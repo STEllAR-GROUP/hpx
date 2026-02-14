@@ -58,8 +58,9 @@ void test_replace_copy_sent(ExPolicy policy)
     int old_value = 42;
     int new_value = 1;
 
-    hpx::ranges::replace_copy(policy, std::begin(c), sentinel<std::int16_t>{50},
-        std::begin(d), old_value, new_value);
+    hpx::ranges::replace_copy(policy, std::begin(c),
+        test::sentinel_from_iterator(std::begin(c) + 50), std::begin(d),
+        old_value, new_value);
     auto result1 = std::count(std::begin(d), std::end(d), old_value);
     auto result2 = std::count(std::begin(d), std::end(d), new_value);
 
@@ -162,25 +163,27 @@ void test_replace_copy_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_replace_copy()
 {
-    using namespace hpx::execution;
     test_replace_copy(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_replace_copy_parallel()
+{
+    using namespace hpx::execution;
+
     test_replace_copy(seq, IteratorTag());
     test_replace_copy(par, IteratorTag());
     test_replace_copy(par_unseq, IteratorTag());
 
     test_replace_copy_async(seq(task), IteratorTag());
     test_replace_copy_async(par(task), IteratorTag());
-
-    test_replace_copy_sent();
-    test_replace_copy_sent(seq);
-    test_replace_copy_sent(par);
-    test_replace_copy_sent(par_unseq);
 }
 
 void replace_copy_test()
 {
     test_replace_copy<std::random_access_iterator_tag>();
     test_replace_copy<std::forward_iterator_tag>();
+    test_replace_copy_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -301,12 +304,17 @@ void test_replace_copy_exception_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_replace_copy_exception()
 {
+    test_replace_copy_exception(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_replace_copy_exception_parallel()
+{
     using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_replace_copy_exception(IteratorTag());
     test_replace_copy_exception(seq, IteratorTag());
     test_replace_copy_exception(par, IteratorTag());
 
@@ -318,6 +326,7 @@ void replace_copy_exception_test()
 {
     test_replace_copy_exception<std::random_access_iterator_tag>();
     test_replace_copy_exception<std::forward_iterator_tag>();
+    test_replace_copy_exception_parallel<std::random_access_iterator_tag>();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -431,12 +440,17 @@ void test_replace_copy_bad_alloc_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_replace_copy_bad_alloc()
 {
+    test_replace_copy_bad_alloc(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_replace_copy_bad_alloc_parallel()
+{
     using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_replace_copy_bad_alloc(IteratorTag());
     test_replace_copy_bad_alloc(seq, IteratorTag());
     test_replace_copy_bad_alloc(par, IteratorTag());
 
@@ -448,6 +462,7 @@ void replace_copy_bad_alloc_test()
 {
     test_replace_copy_bad_alloc<std::random_access_iterator_tag>();
     test_replace_copy_bad_alloc<std::forward_iterator_tag>();
+    test_replace_copy_bad_alloc_parallel<std::random_access_iterator_tag>();
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)

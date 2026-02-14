@@ -150,6 +150,12 @@ void test_equal1()
     using namespace hpx::execution;
 
     test_equal1(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_equal1_parallel()
+{
+    using namespace hpx::execution;
 
     test_equal1(seq, IteratorTag());
     test_equal1(par, IteratorTag());
@@ -163,6 +169,7 @@ void equal_test1()
 {
     test_equal1<std::random_access_iterator_tag>();
     test_equal1<std::forward_iterator_tag>();
+    test_equal1_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -298,6 +305,12 @@ void test_equal2()
     using namespace hpx::execution;
 
     test_equal2(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_equal2_parallel()
+{
+    using namespace hpx::execution;
 
     test_equal2(seq, IteratorTag());
     test_equal2(par, IteratorTag());
@@ -311,6 +324,7 @@ void equal_test2()
 {
     test_equal2<std::random_access_iterator_tag>();
     test_equal2<std::forward_iterator_tag>();
+    test_equal2_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -438,6 +452,12 @@ void test_equal_exception()
     using namespace hpx::execution;
 
     test_equal_exception(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_equal_exception_parallel()
+{
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
@@ -453,6 +473,7 @@ void equal_exception_test()
 {
     test_equal_exception<std::random_access_iterator_tag>();
     test_equal_exception<std::forward_iterator_tag>();
+    test_equal_exception_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -553,7 +574,6 @@ void test_equal_bad_alloc()
 void equal_bad_alloc_test()
 {
     test_equal_bad_alloc<std::random_access_iterator_tag>();
-    test_equal_bad_alloc<std::forward_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

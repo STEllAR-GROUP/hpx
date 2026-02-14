@@ -37,7 +37,7 @@ template <typename IteratorTag>
 void test_partial_sort_range_sent(IteratorTag)
 {
     using compare_t = std::less<std::uint64_t>;
-    std::list<std::uint64_t> lst;
+    std::vector<std::uint64_t> lst;
     std::vector<std::uint64_t> A, B;
     A.reserve(SIZE + 1);
     B.reserve(SIZE + 1);
@@ -46,10 +46,8 @@ void test_partial_sort_range_sent(IteratorTag)
     {
         A.emplace_back(i);
         B.emplace_back(i);
+        lst.emplace_back(i);
     }
-
-    std::shuffle(A.begin(), A.end() - 1, gen);
-    lst.insert(lst.end(), A.begin(), A.end());
 
     for (std::uint64_t i = 0; i <= SIZE; ++i)
     {
@@ -72,7 +70,7 @@ template <typename ExPolicy, typename IteratorTag>
 void test_partial_sort_range_sent(ExPolicy policy, IteratorTag)
 {
     using compare_t = std::less<std::uint64_t>;
-    std::list<std::uint64_t> lst;
+    std::vector<std::uint64_t> lst;
     std::vector<std::uint64_t> A, B;
     A.reserve(SIZE + 1);
     B.reserve(SIZE + 1);
@@ -91,9 +89,9 @@ void test_partial_sort_range_sent(ExPolicy policy, IteratorTag)
         A = B;
 
         hpx::ranges::partial_sort_copy(policy, lst.begin(),
-            sentinel<std::uint64_t>{SIZE}, A.begin(),
-            sentinel<std::uint64_t>{
-                *(A.begin() + static_cast<std::ptrdiff_t>(i))},
+            test::sentinel_from_iterator(lst.end()), A.begin(),
+            test::sentinel_from_iterator(
+                A.begin() + static_cast<std::ptrdiff_t>(i)),
             compare_t());
 
         for (std::uint64_t j = 0; j < i; ++j)
@@ -107,7 +105,7 @@ template <typename ExPolicy, typename IteratorTag>
 void test_partial_sort_range_async_sent(ExPolicy p, IteratorTag)
 {
     using compare_t = std::less<std::uint64_t>;
-    std::list<std::uint64_t> lst;
+    std::vector<std::uint64_t> lst;
     std::vector<std::uint64_t> A, B;
     A.reserve(SIZE + 1);
     B.reserve(SIZE + 1);
@@ -126,9 +124,9 @@ void test_partial_sort_range_async_sent(ExPolicy p, IteratorTag)
         A = B;
 
         auto result = hpx::ranges::partial_sort_copy(p, lst.begin(),
-            sentinel<std::uint64_t>{SIZE}, A.begin(),
-            sentinel<std::uint64_t>{
-                *(A.begin() + static_cast<std::ptrdiff_t>(i))},
+            test::sentinel_from_iterator(lst.end()), A.begin(),
+            test::sentinel_from_iterator(
+                A.begin() + static_cast<std::ptrdiff_t>(i)),
             compare_t());
         result.get();
 
@@ -174,7 +172,7 @@ template <typename ExPolicy, typename IteratorTag>
 void test_partial_sort_range(ExPolicy policy, IteratorTag)
 {
     using compare_t = std::less<std::uint64_t>;
-    std::list<std::uint64_t> lst;
+    std::vector<std::uint64_t> lst;
     std::vector<std::uint64_t> A, B;
     A.reserve(SIZE);
     B.reserve(SIZE);
@@ -205,7 +203,7 @@ template <typename ExPolicy, typename IteratorTag>
 void test_partial_sort_range_async(ExPolicy p, IteratorTag)
 {
     using compare_t = std::less<std::uint64_t>;
-    std::list<std::uint64_t> lst;
+    std::vector<std::uint64_t> lst;
     std::vector<std::uint64_t> A, B;
     A.reserve(SIZE);
     B.reserve(SIZE);
@@ -239,6 +237,14 @@ void test_partial_sort_range()
     using namespace hpx::execution;
 
     test_partial_sort_range(IteratorTag());
+    test_partial_sort_range_sent(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_partial_sort_range_parallel()
+{
+    using namespace hpx::execution;
+
     test_partial_sort_range(seq, IteratorTag());
     test_partial_sort_range(par, IteratorTag());
     test_partial_sort_range(par_unseq, IteratorTag());
@@ -246,7 +252,6 @@ void test_partial_sort_range()
     test_partial_sort_range_async(seq(task), IteratorTag());
     test_partial_sort_range_async(par(task), IteratorTag());
 
-    test_partial_sort_range_sent(IteratorTag());
     test_partial_sort_range_sent(seq, IteratorTag());
     test_partial_sort_range_sent(par, IteratorTag());
     test_partial_sort_range_sent(par_unseq, IteratorTag());
@@ -259,6 +264,7 @@ void partial_sort_range_test()
 {
     test_partial_sort_range<std::random_access_iterator_tag>();
     test_partial_sort_range<std::forward_iterator_tag>();
+    test_partial_sort_range_parallel<std::random_access_iterator_tag>();
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)

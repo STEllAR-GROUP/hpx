@@ -24,16 +24,16 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Iter1       The type of the source iterators used for the
+    /// \tparam RaIter1     The type of the source iterators used for the
     ///                     first range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     This iterator type must meet the requirements of a
+    ///                     random access iterator.
     /// \tparam Sent1       The type of the source iterators used for the end of
     ///                     the first range (deduced).
-    /// \tparam Iter2       The type of the source iterators used for the
+    /// \tparam RaIter2     The type of the source iterators used for the
     ///                     second range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     This iterator type must meet the requirements of a
+    ///                     random access iterator.
     /// \tparam Sent2       The type of the source iterators used for the end of
     ///                     the second range (deduced).
     /// \tparam Pred        The type of an optional function/function object to use.
@@ -107,12 +107,12 @@ namespace hpx { namespace ranges {
     ///           If the length of the range [first1, last1) does not equal
     ///           the length of the range [first2, last2), it returns false.
     ///
-    template <typename ExPolicy, typename Iter1, typename Sent1,
-        typename Iter2, typename Sent2, typename Pred = equal_to,
+    template <typename ExPolicy, typename RaIter1, typename Sent1,
+        typename RaIter2, typename Sent2, typename Pred = equal_to,
         typename Proj1 = hpx::identity,
         typename Proj2 = hpx::identity>
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
-    equal(ExPolicy&& policy, Iter1 first1, Sent1 last1, Iter2 first2, Sent2 last2,
+    equal(ExPolicy&& policy, RaIter1 first1, Sent1 last1, RaIter2 first2, Sent2 last2,
         Pred&& op = Pred(), Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
 
     /// Returns true if the range [first1, last1) is equal to the range
@@ -125,12 +125,14 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng1        The type of the first source range used (deduced).
+    /// \tparam Rng1        The range itself must meet the requirements of a
+    ///                     sized range. The type of the first source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an forward iterator.
-    /// \tparam Rng2        The type of the second source range used (deduced).
+    ///                     meet the requirements of an random access iterator.
+    /// \tparam Rng2        The range itself must meet the requirements of a
+    ///                     sized range. The type of the second source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an forward iterator.
+    ///                     meet the requirements of an random access iterator.
     /// \tparam Pred        The type of an optional function/function object to use.
     ///                     Unlike its sequential form, the parallel
     ///                     overload of \a equal requires \a Pred to meet the
@@ -211,15 +213,13 @@ namespace hpx { namespace ranges {
     ///         applications of the predicate \a f.
     ///
     /// \tparam Iter1       The type of the source iterators used for the
-    ///                     first range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     first range (deduced). This iterator type must 
+    ///                     meet the requirements of an forward iterator.
     /// \tparam Sent1       The type of the source iterators used for the end of
     ///                     the first range (deduced).
     /// \tparam Iter2       The type of the source iterators used for the
-    ///                     second range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     second range (deduced). This iterator type must 
+    ///                     meet the requirements of an forward iterator.
     /// \tparam Sent2       The type of the source iterators used for the end of
     ///                     the second range (deduced).
     /// \tparam Pred        The type of an optional function/function object to use.
@@ -375,30 +375,27 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<equal_t>
     {
     private:
-        template <typename ExPolicy, typename Iter1, typename Sent1,
-            typename Iter2, typename Sent2, typename Pred = equal_to,
+        template <typename ExPolicy, typename RaIter1, typename Sent1,
+            typename RaIter2, typename Sent2, typename Pred = equal_to,
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_sentinel_for_v<Sent1, Iter1> &&
-                hpx::traits::is_sentinel_for_v<Sent2, Iter2> &&
+                hpx::traits::is_random_access_iterator_v<RaIter1> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent1, RaIter1> &&
+                hpx::traits::is_random_access_iterator_v<RaIter2> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent2, RaIter2> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy, Pred,
-                    hpx::parallel::traits::projected<Proj1, Iter1>,
-                    hpx::parallel::traits::projected<Proj2, Iter2>
+                    hpx::parallel::traits::projected<Proj1, RaIter1>,
+                    hpx::parallel::traits::projected<Proj2, RaIter2>
                 >
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
-        tag_fallback_invoke(equal_t, ExPolicy&& policy, Iter1 first1,
-            Sent1 last1, Iter2 first2, Sent2 last2, Pred op = Pred(),
+        tag_fallback_invoke(equal_t, ExPolicy&& policy, RaIter1 first1,
+            Sent1 last1, RaIter2 first2, Sent2 last2, Pred op = Pred(),
             Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<Iter1>,
-                "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<Iter2>,
-                "Requires at least forward iterator.");
-
             return hpx::parallel::detail::equal_binary().call(
                 HPX_FORWARD(ExPolicy, policy), first1, last1, first2, last2,
                 HPX_MOVE(op), HPX_MOVE(proj1), HPX_MOVE(proj2));
@@ -410,7 +407,11 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_random_access_range_v<Rng1> &&
+                hpx::traits::is_sized_range_v<Rng1> &&
                 hpx::parallel::traits::is_projected_range_v<Proj1, Rng1> &&
+                hpx::traits::is_random_access_range_v<Rng2> &&
+                hpx::traits::is_sized_range_v<Rng2> &&
                 hpx::parallel::traits::is_projected_range_v<Proj2, Rng2> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy, Pred,
                     hpx::parallel::traits::projected<Proj1,
@@ -425,15 +426,6 @@ namespace hpx::ranges {
             Rng2&& rng2, Pred op = Pred(), Proj1 proj1 = Proj1(),
             Proj2 proj2 = Proj2())
         {
-            static_assert(
-                hpx::traits::is_forward_iterator<typename hpx::traits::
-                        range_traits<Rng1>::iterator_type>::value,
-                "Requires at least forward iterator.");
-            static_assert(
-                hpx::traits::is_forward_iterator<typename hpx::traits::
-                        range_traits<Rng2>::iterator_type>::value,
-                "Requires at least forward iterator.");
-
             return hpx::parallel::detail::equal_binary().call(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng1),
                 hpx::util::end(rng1), hpx::util::begin(rng2),

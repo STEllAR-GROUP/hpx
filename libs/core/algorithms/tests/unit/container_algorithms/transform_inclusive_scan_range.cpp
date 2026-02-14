@@ -80,9 +80,11 @@ void test_transform_inclusive_scan_sent(ExPolicy policy, IteratorTag)
     auto conv = [](std::size_t val) { return 2 * val; };
 
     auto res1 = hpx::ranges::transform_inclusive_scan(policy, std::begin(c),
-        sentinel<std::size_t>{2}, std::begin(d), op, conv, val);
+        test::sentinel_from_iterator(std::begin(c) + end_len), std::begin(d),
+        op, conv, val);
     auto res2 = hpx::ranges::transform_inclusive_scan(policy, std::begin(c),
-        sentinel<std::size_t>{2}, std::begin(e), op, conv);
+        test::sentinel_from_iterator(std::begin(c) + end_len), std::begin(e),
+        op, conv);
 
     HPX_TEST(res1.in == std::begin(c) + end_len);
     HPX_TEST(res1.out == std::end(d));
@@ -201,9 +203,15 @@ void test_transform_inclusive_scan_async(ExPolicy policy, IteratorTag)
 template <typename IteratorTag>
 void test_transform_inclusive_scan()
 {
+    test_transform_inclusive_scan(IteratorTag());
+    test_transform_inclusive_scan_sent(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_transform_inclusive_scan_parallel()
+{
     using namespace hpx::execution;
 
-    test_transform_inclusive_scan(IteratorTag());
     test_transform_inclusive_scan(seq, IteratorTag());
     test_transform_inclusive_scan(par, IteratorTag());
     test_transform_inclusive_scan(par_unseq, IteratorTag());
@@ -211,7 +219,6 @@ void test_transform_inclusive_scan()
     test_transform_inclusive_scan_async(seq(task), IteratorTag());
     test_transform_inclusive_scan_async(par(task), IteratorTag());
 
-    test_transform_inclusive_scan_sent(IteratorTag());
     test_transform_inclusive_scan_sent(seq, IteratorTag());
     test_transform_inclusive_scan_sent(par, IteratorTag());
     test_transform_inclusive_scan_sent(par_unseq, IteratorTag());
@@ -221,6 +228,8 @@ void transform_inclusive_scan_test()
 {
     test_transform_inclusive_scan<std::random_access_iterator_tag>();
     test_transform_inclusive_scan<std::forward_iterator_tag>();
+
+    test_transform_inclusive_scan_parallel<std::random_access_iterator_tag>();
 }
 
 ////////////////////////////////////////////////////////////////////////////

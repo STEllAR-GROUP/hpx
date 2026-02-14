@@ -5,6 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <iterator>
 
 // Apple Clang and Clang V19.1.1 ICE's while compiling this file
 #if !defined(HPX_APPLE_CLANG_VERSION) &&                                       \
@@ -36,6 +37,21 @@ void test_none_of()
 
     test_none_of(IteratorTag());
     test_none_of_ranges_seq(IteratorTag(), proj());
+}
+
+template <typename IteratorTag>
+void test_none_of_parallel()
+{
+    struct proj
+    {
+        //This projection should cause tests to fail if it is not applied
+        //because it causes predicate to evaluate the opposite
+        constexpr std::size_t operator()(std::size_t x) const
+        {
+            return !static_cast<bool>(x);
+        }
+    };
+    using namespace hpx::execution;
 
     test_none_of(seq, IteratorTag());
     test_none_of(par, IteratorTag());
@@ -80,6 +96,7 @@ void none_of_test()
 {
     test_none_of<std::random_access_iterator_tag>();
     test_none_of<std::forward_iterator_tag>();
+    test_none_of_parallel<std::random_access_iterator_tag>();
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -89,6 +106,12 @@ void test_none_of_exception()
     using namespace hpx::execution;
 
     test_none_of_exception(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_none_of_exception_parallel()
+{
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
@@ -104,6 +127,7 @@ void none_of_exception_test()
 {
     test_none_of_exception<std::random_access_iterator_tag>();
     test_none_of_exception<std::forward_iterator_tag>();
+    test_none_of_exception_parallel<std::random_access_iterator_tag>();
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -125,7 +149,6 @@ void test_none_of_bad_alloc()
 void none_of_bad_alloc_test()
 {
     test_none_of_bad_alloc<std::random_access_iterator_tag>();
-    test_none_of_bad_alloc<std::forward_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
