@@ -1839,8 +1839,6 @@ namespace hpx {
     } find_first_of{};
 }    // namespace hpx
 
-#endif    // DOXYGEN
-
 namespace hpx::parallel::detail {
     ///////////////////////////////////////////////////////////////////////////
     // find_last
@@ -2111,7 +2109,7 @@ namespace hpx::parallel::detail {
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::find_last
-    HPX_CXX_EXPORT inline constexpr struct find_last_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct find_last_t final
       : hpx::detail::tag_parallel_algorithm<find_last_t>
     {
     private:
@@ -2154,7 +2152,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::find_last_if
-    HPX_CXX_EXPORT inline constexpr struct find_last_if_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct find_last_if_t final
       : hpx::detail::tag_parallel_algorithm<find_last_if_t>
     {
     private:
@@ -2197,7 +2195,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::find_last_if_not
-    HPX_CXX_EXPORT inline constexpr struct find_last_if_not_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct find_last_if_not_t final
       : hpx::detail::tag_parallel_algorithm<find_last_if_not_t>
     {
     private:
@@ -2238,3 +2236,5 @@ namespace hpx {
         }
     } find_last_if_not{};
 }    // namespace hpx
+
+#endif    // DOXYGEN
