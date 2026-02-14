@@ -114,7 +114,7 @@ namespace hpx::lcos::local {
         }
 
         template <typename Iterator>
-        std::enable_if_t<traits::is_input_iterator_v<Iterator>> sync_images(
+        std::enable_if_t<std::input_iterator<Iterator>> sync_images(
             Iterator begin, Iterator end) const
         {
             std::set<std::size_t> const images(begin, end);

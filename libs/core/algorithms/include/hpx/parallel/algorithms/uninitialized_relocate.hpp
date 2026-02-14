@@ -416,9 +416,8 @@ namespace hpx::parallel {
         ///////////////////////////////////////////////////////////////////////
         HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename InIter,
             typename FwdIter, typename Size>
-            requires(hpx::traits::is_input_iterator_v<InIter> &&
-                hpx::traits::is_forward_iterator_v<FwdIter> &&
-                std::is_integral_v<Size>)
+            requires(std::input_iterator<InIter> &&
+                std::forward_iterator<FwdIter> && std::is_integral_v<Size>)
         decltype(auto) parallel_uninitialized_relocate_n(
             ExPolicy&& policy, InIter first, Size count, FwdIter dest)
         {
@@ -500,8 +499,8 @@ namespace hpx::parallel {
             // clang-format off
                 requires (
                     hpx::is_sequenced_execution_policy_v<ExPolicy> &&
-                    hpx::traits::is_input_iterator_v<InIter> &&
-                    hpx::traits::is_forward_iterator_v<FwdIter>
+                    std::input_iterator<InIter> &&
+                    std::forward_iterator<FwdIter>
                 )
             // clang-format on
             static util::in_out_result<InIter, FwdIter> sequential(ExPolicy&&,
@@ -521,8 +520,8 @@ namespace hpx::parallel {
             // clang-format off
                 requires (
                     hpx::is_execution_policy_v<ExPolicy> &&
-                    hpx::traits::is_input_iterator_v<InIter> &&
-                    hpx::traits::is_forward_iterator_v<FwdIter>
+                    std::input_iterator<InIter> &&
+                    std::forward_iterator<FwdIter>
                 )
             // clang-format on
             static decltype(auto) parallel(ExPolicy&& policy, InIter first,
@@ -555,9 +554,9 @@ namespace hpx::parallel {
             // clang-format off
                 requires (
                     hpx::is_sequenced_execution_policy_v<ExPolicy>&&
-                    hpx::traits::is_input_iterator_v<InIter1>&&
-                    hpx::traits::is_input_iterator_v<InIter2>&&
-                    hpx::traits::is_forward_iterator_v<FwdIter>
+                    std::input_iterator<InIter1>&&
+                    std::input_iterator<InIter2>&&
+                    std::forward_iterator<FwdIter>
                 )
                 //  clang-format on
             static util::in_out_result<InIter1, FwdIter> sequential(
@@ -578,9 +577,9 @@ namespace hpx::parallel {
             // clang-format off
                 requires (
                     hpx::is_execution_policy_v<ExPolicy>&&
-                    hpx::traits::is_input_iterator_v<InIter1>&&
-                    hpx::traits::is_input_iterator_v<InIter2>&&
-                    hpx::traits::is_forward_iterator_v<FwdIter>
+                    std::input_iterator<InIter1>&&
+                    std::input_iterator<InIter2>&&
+                    std::forward_iterator<FwdIter>
                 )
             // clang-format on
             static decltype(auto) parallel(ExPolicy&& policy, InIter1 first,
@@ -615,8 +614,8 @@ namespace hpx::parallel {
             // clang-format off
                 requires (
                     hpx::is_sequenced_execution_policy_v<ExPolicy> &&
-                    hpx::traits::is_bidirectional_iterator_v<BiIter1> &&
-                    hpx::traits::is_bidirectional_iterator_v<BiIter2>
+                    std::bidirectional_iterator<BiIter1> &&
+                    std::bidirectional_iterator<BiIter2>
                 )
             //  clang-format on
             static util::in_out_result<BiIter1, BiIter2> sequential(
@@ -636,8 +635,8 @@ namespace hpx::parallel {
             // clang-format off
                 requires (
                     hpx::is_execution_policy_v<ExPolicy>&&
-                    hpx::traits::is_bidirectional_iterator_v<BiIter1>&&
-                    hpx::traits::is_bidirectional_iterator_v<BiIter2>
+                    std::bidirectional_iterator<BiIter1>&&
+                    std::bidirectional_iterator<BiIter2>
                 )
             // clang-format on
             static decltype(auto) parallel(ExPolicy&& policy, BiIter1 first,
@@ -677,10 +676,10 @@ namespace hpx::experimental {
             FwdIter dest) noexcept(util::detail::relocation_traits<InIter,
             FwdIter>::is_noexcept_relocatable_v)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "The 'first' argument must meet the requirements "
                 "of an input iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "The 'dest' argument must meet the requirements of a forward "
                 "iterator.");
             static_assert(util::detail::relocation_traits<InIter,
@@ -716,10 +715,10 @@ namespace hpx::experimental {
             FwdIter dest) noexcept(util::detail::relocation_traits<InIter,
             FwdIter>::is_noexcept_relocatable_v)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "The 'first' argument must meet the requirements "
                 "of an input iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "The 'dest' argument must meet the requirements of a forward "
                 "iterator.");
             static_assert(util::detail::relocation_traits<InIter,
@@ -824,11 +823,11 @@ namespace hpx::experimental {
             FwdIter dest) noexcept(util::detail::relocation_traits<InIter1,
             FwdIter>::is_noexcept_relocatable_v)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter1> &&
-                    hpx::traits::is_input_iterator_v<InIter2>,
+            static_assert(
+                std::input_iterator<InIter1> && std::input_iterator<InIter2>,
                 "The 'first' and 'last' arguments must meet the requirements "
                 "of input iterators.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "The 'dest' argument must meet the requirements of a forward "
                 "iterator.");
             static_assert(util::detail::relocation_traits<InIter1,
@@ -862,11 +861,11 @@ namespace hpx::experimental {
             FwdIter dest) noexcept(util::detail::relocation_traits<InIter1,
             FwdIter>::is_noexcept_relocatable_v)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter1> &&
-                    hpx::traits::is_input_iterator_v<InIter2>,
+            static_assert(
+                std::input_iterator<InIter1> && std::input_iterator<InIter2>,
                 "The 'first' and 'last' arguments must meet the requirements "
                 "of input iterators.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "The 'dest' argument must meet the requirements of a forward "
                 "iterator.");
             static_assert(util::detail::relocation_traits<InIter1,
@@ -970,10 +969,10 @@ namespace hpx::experimental {
             BiIter2 dest_last) noexcept(util::detail::relocation_traits<BiIter1,
             BiIter2>::is_noexcept_relocatable_v)
         {
-            static_assert(hpx::traits::is_bidirectional_iterator_v<BiIter1> &&
+            static_assert(std::bidirectional_iterator<BiIter1> &&
                 "The 'first' and 'last' arguments must meet the requirements "
                 "of bidirectional iterators.");
-            static_assert(hpx::traits::is_bidirectional_iterator_v<BiIter2>,
+            static_assert(std::bidirectional_iterator<BiIter2>,
                 "The 'dest_last' argument must meet the requirements of a "
                 "bidirectional iterator.");
             static_assert(util::detail::relocation_traits<BiIter1,
@@ -1006,10 +1005,10 @@ namespace hpx::experimental {
             BiIter2 dest_last) noexcept(util::detail::relocation_traits<BiIter1,
             BiIter2>::is_noexcept_relocatable_v)
         {
-            static_assert(hpx::traits::is_bidirectional_iterator_v<BiIter1>,
+            static_assert(std::bidirectional_iterator<BiIter1>,
                 "The 'first' and 'last' arguments must meet the requirements "
                 "of bidirectional iterators.");
-            static_assert(hpx::traits::is_bidirectional_iterator_v<BiIter2>,
+            static_assert(std::bidirectional_iterator<BiIter2>,
                 "The 'dest' argument must meet the requirements of a "
                 "bidirectional iterator.");
             static_assert(util::detail::relocation_traits<BiIter1,

@@ -106,7 +106,7 @@ namespace hpx { namespace parallel {
             typedef typename traits::local_iterator local_iterator_type;
 
             typedef std::integral_constant<bool,
-                !hpx::traits::is_forward_iterator_v<SegIter>>
+                !std::forward_iterator<SegIter>>
                 forced_seq;
             typedef util::detail::algorithm_result<ExPolicy, SegIter> result;
 
@@ -182,7 +182,7 @@ namespace hpx { namespace segmented {
             hpx::traits::is_segmented_iterator_v<SegIter>)
     SegIter tag_invoke(hpx::generate_t, SegIter first, SegIter last, F&& f)
     {
-        static_assert(hpx::traits::is_forward_iterator_v<SegIter>,
+        static_assert(std::forward_iterator<SegIter>,
             "Requires at least forward iterator.");
 
         if (first == last)
@@ -207,7 +207,7 @@ namespace hpx { namespace segmented {
     tag_invoke(
         hpx::generate_t, ExPolicy&& policy, SegIter first, SegIter last, F&& f)
     {
-        static_assert(hpx::traits::is_forward_iterator_v<SegIter>,
+        static_assert(std::forward_iterator<SegIter>,
             "Requires at least forward iterator.");
 
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;

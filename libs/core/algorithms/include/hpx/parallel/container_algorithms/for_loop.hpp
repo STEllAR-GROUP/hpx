@@ -749,7 +749,7 @@ namespace hpx::ranges::experimental {
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<Iter> &&
-                hpx::traits::is_sentinel_for_v<Sent, Iter>
+                std::sentinel_for<Sent, Iter>
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy>
@@ -770,7 +770,7 @@ namespace hpx::ranges::experimental {
         // clang-format off
             requires(
                 hpx::traits::is_iterator_v<Iter> &&
-                hpx::traits::is_sentinel_for_v<Sent, Iter>
+                std::sentinel_for<Sent, Iter>
             )
         // clang-format on
         friend void tag_fallback_invoke(hpx::ranges::experimental::for_loop_t,
@@ -789,7 +789,7 @@ namespace hpx::ranges::experimental {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                (hpx::traits::is_range_v<R> ||
+                (std::ranges::range<R> ||
                     hpx::traits::is_range_generator_v<R>)
             )
         // clang-format on
@@ -821,7 +821,7 @@ namespace hpx::ranges::experimental {
         template <typename Rng, typename... Args>
         // clang-format off
             requires(
-                hpx::traits::is_range_v<Rng> ||
+                std::ranges::range<Rng> ||
                 hpx::traits::is_range_generator_v<Rng>
             )
         // clang-format on
@@ -860,7 +860,7 @@ namespace hpx::ranges::experimental {
                 hpx::is_execution_policy_v<ExPolicy> &&
                 std::is_integral_v<S> &&
                 hpx::traits::is_iterator_v<Iter> &&
-                hpx::traits::is_sentinel_for_v<Sent, Iter>
+                std::sentinel_for<Sent, Iter>
             )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy>
@@ -883,7 +883,7 @@ namespace hpx::ranges::experimental {
             requires(
                 std::is_integral_v<S> &&
                 hpx::traits::is_iterator_v<Iter> &&
-                hpx::traits::is_sentinel_for_v<Sent, Iter>
+                std::sentinel_for<Sent, Iter>
             )
         // clang-format on
         friend void tag_fallback_invoke(
@@ -905,7 +905,7 @@ namespace hpx::ranges::experimental {
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 std::is_integral_v<S> &&
-                hpx::traits::is_range_v<Rng>
+                std::ranges::range<Rng>
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy>
@@ -928,7 +928,7 @@ namespace hpx::ranges::experimental {
         // clang-format off
             requires(
                 std::is_integral_v<S> &&
-                hpx::traits::is_range_v<Rng>
+                std::ranges::range<Rng>
             )
         // clang-format on
         friend void tag_fallback_invoke(

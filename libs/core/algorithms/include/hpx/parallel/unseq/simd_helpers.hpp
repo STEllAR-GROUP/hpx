@@ -31,7 +31,7 @@ namespace hpx::parallel::util {
         // OMP loops can not have ++Iter, only integral types are allowed Hence
         // perform arithmetic on Iterators which is O(1) only in case of random
         // access iterators
-        static_assert(hpx::traits::is_random_access_iterator_v<Iter>,
+        static_assert(std::random_access_iterator<Iter>,
             "algorithm is efficient only in case of Random Access Iterator");
 
 #if HPX_EARLYEXIT_PRESENT

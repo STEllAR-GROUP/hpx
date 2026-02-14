@@ -26,40 +26,31 @@ int partition_size = 10000;
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::experimental::detail {
-    template <typename Iterator>
-    HPX_FORCEINLINE Iterator previous(Iterator it, std::false_type)
-    {
-        return --it;
-    }
-
-    template <typename Iterator>
-    HPX_FORCEINLINE Iterator previous(Iterator const& it, std::true_type)
-    {
-        return it - 1;
-    }
 
     template <typename Iterator>
     HPX_FORCEINLINE Iterator previous(Iterator const& it)
     {
-        return previous(it, hpx::traits::is_random_access_iterator<Iterator>());
-    }
-
-    template <typename Iterator>
-    HPX_FORCEINLINE Iterator next(Iterator it, std::false_type)
-    {
-        return ++it;
-    }
-
-    template <typename Iterator>
-    HPX_FORCEINLINE Iterator next(Iterator const& it, std::true_type)
-    {
-        return it + 1;
+        if constexpr (std::random_access_iterator<Iterator>)
+        {
+            return it - 1;
+        }
+        else
+        {
+            return --it;
+        }
     }
 
     template <typename Iterator>
     HPX_FORCEINLINE Iterator next(Iterator const& it)
     {
-        return next(it, hpx::traits::is_random_access_iterator<Iterator>());
+        if constexpr (std::random_access_iterator<Iterator>)
+        {
+            return it + 1;
+        }
+        else
+        {
+            return ++it;
+        }
     }
 }    // namespace hpx::experimental::detail
 

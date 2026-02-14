@@ -21,7 +21,7 @@ namespace hpx::parallel::detail {
         {
             return last;
         }
-        else if constexpr (hpx::traits::is_sized_sentinel_for_v<Sent, Iter>)
+        else if constexpr (std::sized_sentinel_for<Sent, Iter>)
         {
             std::advance(first, last - first);
             return first;

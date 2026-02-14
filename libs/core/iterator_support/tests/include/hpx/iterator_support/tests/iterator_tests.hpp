@@ -171,7 +171,7 @@ namespace tests {
 
         // I think we don't really need this as it checks the same things as
         // the above code.
-        HPX_TEST(hpx::traits::is_input_iterator<Iterator>::value);
+        HPX_TEST(std::input_iterator<Iterator>);
     }
 
     template <typename Iterator, typename T>
