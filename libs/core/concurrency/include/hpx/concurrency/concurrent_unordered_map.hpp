@@ -78,9 +78,8 @@ namespace hpx::concurrent {
                 return value_ == nullptr;
             }
 
-            template <typename U = T,
-                typename = std::enable_if_t<!std::is_same_v<U, bool>>>
-            explicit operator bool() const
+            explicit operator bool() const noexcept
+                requires(!std::same_as<T, bool>)
             {
                 return !empty();
             }
@@ -136,9 +135,8 @@ namespace hpx::concurrent {
                 return value_ == nullptr;
             }
 
-            template <typename U = T,
-                typename = std::enable_if_t<!std::is_same_v<U, bool>>>
-            explicit operator bool() const
+            explicit operator bool() const noexcept
+                requires(!std::same_as<T, bool>)
             {
                 return !empty();
             }
@@ -211,11 +209,7 @@ namespace hpx::concurrent {
         {
             if (this != &other)
             {
-                std::lock(mutex_, other.mutex_);
-                std::lock_guard<hpx::util::spinlock> lock(
-                    mutex_, std::adopt_lock);
-                std::lock_guard<hpx::util::spinlock> other_lock(
-                    other.mutex_, std::adopt_lock);
+                std::lock_guard<hpx::util::spinlock> lock(mutex_);
                 map_ = HPX_MOVE(other.map_);
             }
             return *this;
@@ -291,13 +285,6 @@ namespace hpx::concurrent {
             return accessor(HPX_MOVE(lock), map_[HPX_MOVE(key)]);
         }
 
-        template <typename K>
-        accessor operator[](K&& key)
-        {
-            std::unique_lock<hpx::util::spinlock> lock(mutex_);
-            return accessor(HPX_MOVE(lock), map_[HPX_FORWARD(K, key)]);
-        }
-
         accessor at(Key const& key)
         {
             std::unique_lock<hpx::util::spinlock> lock(mutex_);
@@ -327,31 +314,7 @@ namespace hpx::concurrent {
             return accessor();
         }
 
-        template <typename K>
-        accessor find(K const& key)
-        {
-            std::unique_lock<hpx::util::spinlock> lock(mutex_);
-            auto it = map_.find(key);
-            if (it != map_.end())
-            {
-                return accessor(HPX_MOVE(lock), it->second);
-            }
-            return accessor();
-        }
-
         const_accessor find(Key const& key) const
-        {
-            std::unique_lock<hpx::util::spinlock> lock(mutex_);
-            auto it = map_.find(key);
-            if (it != map_.end())
-            {
-                return const_accessor(HPX_MOVE(lock), it->second);
-            }
-            return const_accessor();
-        }
-
-        template <typename K>
-        const_accessor find(K const& key) const
         {
             std::unique_lock<hpx::util::spinlock> lock(mutex_);
             auto it = map_.find(key);
@@ -368,13 +331,6 @@ namespace hpx::concurrent {
             return map_.contains(key);
         }
 
-        template <typename K>
-        bool contains(K const& key) const
-        {
-            std::lock_guard<hpx::util::spinlock> lock(mutex_);
-            return map_.contains(key);
-        }
-
         // Thread-safe iteration
         template <typename F>
         void for_each(F&& f)
@@ -382,9 +338,16 @@ namespace hpx::concurrent {
             std::lock_guard<hpx::util::spinlock> lock(mutex_);
             for (auto& kv : map_)
             {
-                static_assert(
-                    std::is_void_v<std::invoke_result_t<F, decltype(kv)>>);
-                f(kv);
+                if constexpr (std::is_void_v<
+                                  std::invoke_result_t<F, decltype(kv)>>)
+                {
+                    f(kv);
+                }
+                else
+                {
+                    if (!f(kv))
+                        break;
+                }
             }
         }
 
@@ -394,9 +357,16 @@ namespace hpx::concurrent {
             std::lock_guard<hpx::util::spinlock> lock(mutex_);
             for (auto const& kv : map_)
             {
-                static_assert(
-                    std::is_void_v<std::invoke_result_t<F, decltype(kv)>>);
-                f(kv);
+                if constexpr (std::is_void_v<
+                                  std::invoke_result_t<F, decltype(kv)>>)
+                {
+                    f(kv);
+                }
+                else
+                {
+                    if (!f(kv))
+                        break;
+                }
             }
         }
 

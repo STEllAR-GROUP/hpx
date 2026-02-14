@@ -72,9 +72,8 @@ namespace hpx::concurrent {
                 return value_ == nullptr;
             }
 
-            template <typename U = T,
-                typename = std::enable_if_t<!std::is_same_v<U, bool>>>
-            explicit operator bool() const
+            explicit operator bool() const noexcept
+                requires(!std::same_as<T, bool>)
             {
                 return !empty();
             }
@@ -130,9 +129,8 @@ namespace hpx::concurrent {
                 return value_ == nullptr;
             }
 
-            template <typename U = T,
-                typename = std::enable_if_t<!std::is_same_v<U, bool>>>
-            explicit operator bool() const
+            explicit operator bool() const noexcept
+                requires(!std::same_as<T, bool>)
             {
                 return !empty();
             }
@@ -289,11 +287,7 @@ namespace hpx::concurrent {
         {
             if (this != &other)
             {
-                std::lock(mutex_, other.mutex_);
-                std::lock_guard<hpx::util::spinlock> lock(
-                    mutex_, std::adopt_lock);
-                std::lock_guard<hpx::util::spinlock> other_lock(
-                    other.mutex_, std::adopt_lock);
+                std::lock_guard<hpx::util::spinlock> lock(mutex_);
                 data_ = HPX_MOVE(other.data_);
             }
             return *this;

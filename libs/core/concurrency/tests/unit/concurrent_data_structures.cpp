@@ -11,7 +11,6 @@
 
 #include <atomic>
 #include <string>
-#include <string_view>
 #include <vector>
 
 void test_concurrent_vector()
@@ -111,41 +110,18 @@ void test_concurrent_unordered_map()
     HPX_TEST_EQ(sum.load(), 50500);
 }
 
-struct TransparentStringHash
-{
-    using is_transparent = void;
-    size_t operator()(std::string_view sv) const
-    {
-        return std::hash<std::string_view>{}(sv);
-    }
-    size_t operator()(std::string const& s) const
-    {
-        return std::hash<std::string>{}(s);
-    }
-    size_t operator()(char const* s) const
-    {
-        return std::hash<std::string_view>{}(s);
-    }
-};
-
 void test_concurrent_unordered_map_extra()
 {
     // Test constructors
     hpx::concurrent::concurrent_unordered_map<int, int> m1(100);
     HPX_TEST(m1.bucket_count() >= 100);
 
-    // Test heterogeneous lookup with transparent hash
-    using MapType = hpx::concurrent::concurrent_unordered_map<std::string, int,
-        TransparentStringHash, std::equal_to<>>;
-
-    MapType m_str;
+    hpx::concurrent::concurrent_unordered_map<std::string, int> m_str;
     std::string key = "hello";
     m_str.insert({key, 42});
 
-    std::string_view key_view = "hello";
-    // This should work with our new overloads and transparent hash
     {
-        auto acc = m_str.find(key_view);
+        auto acc = m_str.find(key);
         HPX_TEST(!acc.empty());
         if (acc)
         {
@@ -153,11 +129,9 @@ void test_concurrent_unordered_map_extra()
         }
     }
 
-    HPX_TEST(m_str.contains(key_view));
+    HPX_TEST(m_str.contains(key));
 
-    // operator[] heterogeneous - not supported by std::unordered_map yet (C++20)
-    // We test standard operator[]
-    m_str[key] = 43;    // via accessor::operator=
+    m_str[key] = 43;
     HPX_TEST_EQ(m_str[key].get(), 43);
 }
 
@@ -192,21 +166,17 @@ void test_concurrent_unordered_set()
 
 void test_concurrent_unordered_set_extra()
 {
-    using SetType = hpx::concurrent::concurrent_unordered_set<std::string,
-        TransparentStringHash, std::equal_to<>>;
-
-    SetType s;
+    hpx::concurrent::concurrent_unordered_set<std::string> s;
     std::string key = "world";
     s.insert(key);
 
-    std::string_view key_view = "world";
-    HPX_TEST(s.contains(key_view));
+    HPX_TEST(s.contains(key));
 
-    auto acc = s.find(key_view);
+    auto acc = s.find(key);
     HPX_TEST(!acc.empty());
     if (acc)
     {
-        HPX_TEST_EQ(acc.get(), "world");    // accessor to key
+        HPX_TEST_EQ(acc.get(), "world");
     }
 }
 
@@ -245,6 +215,36 @@ void test_concurrent_queue()
     HPX_TEST_EQ(popped_count, 1000);
 }
 
+void test_concurrent_unordered_map_for_each_break()
+{
+    hpx::concurrent::concurrent_unordered_map<int, int> m;
+    for (int i = 0; i < 100; ++i)
+        m.insert({i, i});
+
+    std::atomic<int> count{0};
+    m.for_each([&count](auto const&) {
+        count++;
+        return count.load() < 50;
+    });
+
+    HPX_TEST_EQ(count.load(), 50);
+}
+
+void test_concurrent_unordered_set_for_each_break()
+{
+    hpx::concurrent::concurrent_unordered_set<int> s;
+    for (int i = 0; i < 100; ++i)
+        s.insert(i);
+
+    std::atomic<int> count{0};
+    s.for_each([&count](auto const&) {
+        count++;
+        return count.load() < 50;
+    });
+
+    HPX_TEST_EQ(count.load(), 50);
+}
+
 int hpx_main(hpx::program_options::variables_map&)
 {
     test_concurrent_vector();
@@ -252,9 +252,11 @@ int hpx_main(hpx::program_options::variables_map&)
 
     test_concurrent_unordered_map();
     test_concurrent_unordered_map_extra();
+    test_concurrent_unordered_map_for_each_break();
 
     test_concurrent_unordered_set();
     test_concurrent_unordered_set_extra();
+    test_concurrent_unordered_set_for_each_break();
 
     test_concurrent_queue();
 
