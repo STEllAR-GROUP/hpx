@@ -6,6 +6,7 @@
 
 set(iterator_support_headers
     hpx/iterator_support/detail/minimum_category.hpp
+    hpx/iterator_support/traits/is_foldable.hpp
     hpx/iterator_support/traits/is_iterator.hpp
     hpx/iterator_support/traits/is_range.hpp
     hpx/iterator_support/traits/is_segmented_iterator.hpp
