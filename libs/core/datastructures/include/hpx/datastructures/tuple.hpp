@@ -103,6 +103,7 @@ namespace hpx {
 
 #include <algorithm>
 #include <array>
+#include <concepts>
 #include <cstddef>    // for size_t
 #include <tuple>
 #include <type_traits>
@@ -208,6 +209,21 @@ namespace std {
     };
 
     HPX_CXX_CORE_EXPORT using hpx::std_adl_barrier::get;
+
+    // Specialize basic_common_reference for hpx::tuple so that types like
+    // zip_iterator can satisfy std::indirectly_readable (which requires
+    // common_reference_with between iter_reference_t<I>&& and
+    // iter_value_t<I>&).
+    template <typename... Ts, typename... Us, template <class> class TQual,
+        template <class> class UQual>
+        requires(sizeof...(Ts) == sizeof...(Us)) && requires {
+            typename hpx::tuple<common_reference_t<TQual<Ts>, UQual<Us>>...>;
+        }
+    struct basic_common_reference<hpx::tuple<Ts...>, hpx::tuple<Us...>, TQual,
+        UQual>
+    {
+        using type = hpx::tuple<common_reference_t<TQual<Ts>, UQual<Us>>...>;
+    };
 }    // namespace std
 
 namespace hpx {

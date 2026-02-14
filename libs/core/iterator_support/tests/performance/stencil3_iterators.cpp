@@ -48,7 +48,9 @@ namespace hpx::experimental::detail {
             return it + 1;
         }
         else
-            ++it;
+        {
+            return ++it;
+        }
     }
 }    // namespace hpx::experimental::detail
 

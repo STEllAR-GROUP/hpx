@@ -136,20 +136,20 @@ namespace hpx::traits {
         // be properly recognized as satisfying the ForwardIterator concept.
         HPX_CXX_CORE_EXPORT template <typename Iter>
         struct satisfy_traversal_concept<Iter, hpx::forward_traversal_tag>
+          : std::bool_constant<std::bidirectional_iterator<Iter>>
         {
-            static constexpr bool value = std::bidirectional_iterator<Iter>;
         };
 
         HPX_CXX_CORE_EXPORT template <typename Iter>
         struct satisfy_traversal_concept<Iter, hpx::bidirectional_traversal_tag>
+          : std::bool_constant<std::bidirectional_iterator<Iter>>
         {
-            static constexpr bool value = std::bidirectional_iterator<Iter>;
         };
 
         HPX_CXX_CORE_EXPORT template <typename Iter>
         struct satisfy_traversal_concept<Iter, hpx::random_access_traversal_tag>
+          : std::bool_constant<std::random_access_iterator<Iter>>
         {
-            static constexpr bool value = std::random_access_iterator<Iter>;
         };
 
         HPX_CXX_CORE_EXPORT template <typename Iter, typename TraversalTag>

@@ -181,12 +181,12 @@ struct iterator
 
     friend bool operator!=(iterator const& it, sentinel<Value> s)
     {
-        return it.state != s.get_stop();
+        return !(it == s);
     }
 
     friend bool operator!=(sentinel<Value> s, iterator const& it)
     {
-        return it.state != s.get_stop();
+        return !(s == it);
     }
 
 protected:

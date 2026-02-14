@@ -148,10 +148,24 @@ namespace hpx::segmented {
             local_vector_value_proxy(local_vector_value_proxy const&) = default;
             local_vector_value_proxy(local_vector_value_proxy&&) = default;
 
+            // NOLINTBEGIN(bugprone-unhandled-self-assignment)
             local_vector_value_proxy& operator=(
-                local_vector_value_proxy const&) = default;
+                local_vector_value_proxy const& other) const
+            {
+                T val = static_cast<T>(other);
+                const_cast<local_vector_value_proxy&>(*this).operator=(
+                    HPX_MOVE(val));
+                return const_cast<local_vector_value_proxy&>(*this);
+            }
             local_vector_value_proxy& operator=(
-                local_vector_value_proxy&&) = default;
+                local_vector_value_proxy&& other) const
+            {
+                T val = static_cast<T>(other);
+                const_cast<local_vector_value_proxy&>(*this).operator=(
+                    HPX_MOVE(val));
+                return const_cast<local_vector_value_proxy&>(*this);
+            }
+            // NOLINTEND(bugprone-unhandled-self-assignment)
 
             ~local_vector_value_proxy() = default;
 
@@ -180,7 +194,7 @@ namespace hpx::segmented {
             template <typename T_,
                 typename Enable = std::enable_if_t<!std::is_same_v<
                     std::decay_t<T_>, local_vector_value_proxy>>>
-            local_vector_value_proxy& operator=(T_&& value)
+            local_vector_value_proxy const& operator=(T_&& value) const
             {
                 if (!it_.get_data())
                 {
@@ -255,8 +269,22 @@ namespace hpx::segmented {
             vector_value_proxy(vector_value_proxy const&) = default;
             vector_value_proxy(vector_value_proxy&&) = default;
 
-            vector_value_proxy& operator=(vector_value_proxy const&) = default;
-            vector_value_proxy& operator=(vector_value_proxy&&) = default;
+            // NOLINTBEGIN(bugprone-unhandled-self-assignment)
+            vector_value_proxy& operator=(
+                vector_value_proxy const& other) const
+            {
+                v_->set_value(launch::sync, index_,
+                    other.v_->get_value(launch::sync, other.index_));
+                return const_cast<vector_value_proxy&>(*this);
+            }
+            vector_value_proxy& operator=(
+                vector_value_proxy&& other) const
+            {
+                v_->set_value(launch::sync, index_,
+                    other.v_->get_value(launch::sync, other.index_));
+                return const_cast<vector_value_proxy&>(*this);
+            }
+            // NOLINTEND(bugprone-unhandled-self-assignment)
 
             ~vector_value_proxy() = default;
 
@@ -268,7 +296,7 @@ namespace hpx::segmented {
             template <typename T_,
                 typename Enable = std::enable_if_t<
                     !std::is_same_v<std::decay_t<T_>, vector_value_proxy>>>
-            vector_value_proxy& operator=(T_&& value)
+            vector_value_proxy const& operator=(T_&& value) const
             {
                 v_->set_value(launch::sync, index_, HPX_FORWARD(T_, value));
                 return *this;

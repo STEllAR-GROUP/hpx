@@ -53,9 +53,9 @@ struct bidirectional_traversal_iterator
 {
     using difference_type = int;
     using value_type = int;
-    using iterator_category = std::input_iterator_tag;
+    using iterator_category = std::bidirectional_iterator_tag;
     using pointer = int const*;
-    using reference = void;
+    using reference = int;
 
     int state;
 
@@ -100,35 +100,15 @@ struct bidirectional_traversal_iterator
     {
         return this->state != that.state;
     }
-
-    bool operator<(bidirectional_traversal_iterator const& that) const
-    {
-        return this->state < that.state;
-    }
-
-    bool operator<=(bidirectional_traversal_iterator const& that) const
-    {
-        return this->state <= that.state;
-    }
-
-    bool operator>(bidirectional_traversal_iterator const& that) const
-    {
-        return this->state > that.state;
-    }
-
-    bool operator>=(bidirectional_traversal_iterator const& that) const
-    {
-        return this->state >= that.state;
-    }
 };
 
 struct random_access_traversal_iterator
 {
     using difference_type = int;
     using value_type = int;
-    using iterator_category = std::input_iterator_tag;
-    using pointer = int const*;
-    using reference = void;
+    using iterator_category = std::random_access_iterator_tag;
+    using pointer = void;
+    using reference = int;
 
     int state;
 
@@ -136,11 +116,10 @@ struct random_access_traversal_iterator
     {
         return this->state;
     }
-    int operator->() const = delete;
 
     random_access_traversal_iterator& operator++()
     {
-        ++(this->state);
+        ++this->state;
         return *this;
     }
 
@@ -153,7 +132,7 @@ struct random_access_traversal_iterator
 
     random_access_traversal_iterator& operator--()
     {
-        --(this->state);
+        --this->state;
         return *this;
     }
 
@@ -175,10 +154,16 @@ struct random_access_traversal_iterator
         return *this;
     }
 
-    random_access_traversal_iterator operator+(difference_type n)
+    random_access_traversal_iterator operator+(difference_type n) const
     {
         random_access_traversal_iterator copy = *this;
         return copy += n;
+    }
+
+    friend random_access_traversal_iterator operator+(
+        difference_type n, random_access_traversal_iterator it)
+    {
+        return it += n;
     }
 
     random_access_traversal_iterator& operator-=(difference_type n)
@@ -187,7 +172,7 @@ struct random_access_traversal_iterator
         return *this;
     }
 
-    random_access_traversal_iterator operator-(difference_type n)
+    random_access_traversal_iterator operator-(difference_type n) const
     {
         random_access_traversal_iterator copy = *this;
         return copy -= n;
@@ -199,35 +184,9 @@ struct random_access_traversal_iterator
         return this->state - that.state;
     }
 
-    bool operator==(random_access_traversal_iterator const& that) const
-    {
-        return this->state == that.state;
-    }
+    bool operator==(random_access_traversal_iterator const&) const = default;
 
-    bool operator!=(random_access_traversal_iterator const& that) const
-    {
-        return this->state != that.state;
-    }
-
-    bool operator<(random_access_traversal_iterator const& that) const
-    {
-        return this->state < that.state;
-    }
-
-    bool operator<=(random_access_traversal_iterator const& that) const
-    {
-        return this->state <= that.state;
-    }
-
-    bool operator>(random_access_traversal_iterator const& that) const
-    {
-        return this->state > that.state;
-    }
-
-    bool operator>=(random_access_traversal_iterator const& that) const
-    {
-        return this->state >= that.state;
-    }
+    auto operator<=>(random_access_traversal_iterator const&) const = default;
 };
 
 template <typename T, typename U>
@@ -556,6 +515,592 @@ void subtraction_result_test()
     HPX_TEST_MSG((!subtraction_result<B, A>), "invalid operation");
 }
 
+void bidirectional_concept_test()
+{
+    {
+        using iterator = std::ostream_iterator<int>;
+        HPX_TEST_MSG(
+            (!std::bidirectional_iterator<iterator>), "output iterator");
+    }
+    {
+        using iterator = std::istream_iterator<int>;
+        HPX_TEST_MSG(
+            (!std::bidirectional_iterator<iterator>), "input iterator");
+    }
+    {
+        using iterator = typename std::forward_list<int>::iterator;
+        HPX_TEST_MSG(
+            (!std::bidirectional_iterator<iterator>), "forward iterator");
+    }
+    {
+        using iterator = typename std::list<int>::iterator;
+        HPX_TEST_MSG(
+            (std::bidirectional_iterator<iterator>), "bidirectional iterator");
+    }
+    {
+        using iterator = typename std::vector<int>::iterator;
+        HPX_TEST_MSG(
+            (std::bidirectional_iterator<iterator>), "random access iterator");
+    }
+    {
+        using iterator = bidirectional_traversal_iterator;
+        HPX_TEST_MSG((std::bidirectional_iterator<iterator>),
+            "bidirectional traversal input iterator");
+    }
+    {
+        using iterator = random_access_traversal_iterator;
+        HPX_TEST_MSG((std::bidirectional_iterator<iterator>),
+            "random access traversal input iterator");
+    }
+}
+
+void random_access_concept_test()
+{
+    using namespace hpx::traits;
+    using namespace hpx::traits::detail;
+
+    {
+        using iterator = std::ostream_iterator<int>;
+        HPX_TEST_MSG(
+            (!std::random_access_iterator<iterator>), "output iterator");
+    }
+    {
+        using iterator = std::istream_iterator<int>;
+        HPX_TEST_MSG(
+            (!std::random_access_iterator<iterator>), "input iterator");
+    }
+    {
+        using iterator = typename std::forward_list<int>::iterator;
+        HPX_TEST_MSG(
+            (!std::random_access_iterator<iterator>), "forward iterator");
+    }
+    {
+        using iterator = typename std::list<int>::iterator;
+        HPX_TEST_MSG(
+            (!std::random_access_iterator<iterator>), "bidirectional iterator");
+    }
+    {
+        using iterator = typename std::vector<int>::iterator;
+        HPX_TEST_MSG(
+            (std::random_access_iterator<iterator>), "random access iterator");
+    }
+    {
+        using iterator = bidirectional_traversal_iterator;
+        HPX_TEST_MSG((!std::random_access_iterator<iterator>),
+            "bidirectional traversal input iterator");
+    }
+    {
+        using iterator = random_access_traversal_iterator;
+
+        using namespace hpx::traits::detail;
+        static_assert(std::is_same_v<iterator,
+            addition_result_t<iterator, iter_difference_t<iterator>>>);
+        static_assert(std::is_same_v<
+            typename std::add_lvalue_reference<iterator>::type,
+            inplace_addition_result_t<iterator, iter_difference_t<iterator>>>);
+        static_assert(std::is_same_v<iterator,
+            subtraction_result_t<iterator, iter_difference_t<iterator>>>);
+        static_assert(std::is_same_v<iter_difference_t<iterator>,
+            subtraction_result_t<iterator, iterator>>);
+        static_assert(std::is_same_v<std::add_lvalue_reference_t<iterator>,
+            inplace_subtraction_result_t<iterator,
+                iter_difference_t<iterator>>>);
+
+        HPX_TEST_MSG((std::random_access_iterator<iterator>),
+            "random access traversal input iterator");
+    }
+}
+
+void satisfy_traversal_concept_forward_test()
+{
+    using namespace hpx::traits::detail;
+
+    {
+        using iterator = std::ostream_iterator<int>;
+        HPX_TEST_MSG((!satisfy_traversal_concept<iterator,
+                         hpx::forward_traversal_tag>::value),
+            "output iterator");
+    }
+    {
+        using iterator = std::istream_iterator<int>;
+        HPX_TEST_MSG((!satisfy_traversal_concept<iterator,
+                         hpx::forward_traversal_tag>::value),
+            "input iterator");
+    }
+    {
+        // see comment on definition for explanation
+        using iterator = typename std::forward_list<int>::iterator;
+        HPX_TEST_MSG((!satisfy_traversal_concept<iterator,
+                         hpx::forward_traversal_tag>::value),
+            "forward iterator");
+    }
+    {
+        using iterator = typename std::list<int>::iterator;
+        HPX_TEST_MSG((satisfy_traversal_concept<iterator,
+                         hpx::forward_traversal_tag>::value),
+            "bidirectional iterator");
+    }
+    {
+        using iterator = typename std::vector<int>::iterator;
+        HPX_TEST_MSG((satisfy_traversal_concept<iterator,
+                         hpx::forward_traversal_tag>::value),
+            "random access iterator");
+    }
+    {
+        using iterator = bidirectional_traversal_iterator;
+        HPX_TEST_MSG((satisfy_traversal_concept<iterator,
+                         hpx::forward_traversal_tag>::value),
+            "bidirectional traversal input iterator");
+    }
+    {
+        using iterator = random_access_traversal_iterator;
+        HPX_TEST_MSG((satisfy_traversal_concept<iterator,
+                         hpx::forward_traversal_tag>::value),
+            "random access traversal input iterator");
+    }
+}
+
+void satisfy_traversal_concept_bidirectional_test()
+{
+    using namespace hpx::traits::detail;
+
+    {
+        using iterator = std::ostream_iterator<int>;
+        HPX_TEST_MSG((!satisfy_traversal_concept<iterator,
+                         hpx::bidirectional_traversal_tag>::value),
+            "output iterator");
+    }
+    {
+        using iterator = std::istream_iterator<int>;
+        HPX_TEST_MSG((!satisfy_traversal_concept<iterator,
+                         hpx::bidirectional_traversal_tag>::value),
+            "input iterator");
+    }
+    {
+        using iterator = typename std::forward_list<int>::iterator;
+        HPX_TEST_MSG((!satisfy_traversal_concept<iterator,
+                         hpx::bidirectional_traversal_tag>::value),
+            "forward iterator");
+    }
+    {
+        using iterator = typename std::list<int>::iterator;
+        HPX_TEST_MSG((satisfy_traversal_concept<iterator,
+                         hpx::bidirectional_traversal_tag>::value),
+            "bidirectional iterator");
+    }
+    {
+        using iterator = typename std::vector<int>::iterator;
+        HPX_TEST_MSG((satisfy_traversal_concept<iterator,
+                         hpx::bidirectional_traversal_tag>::value),
+            "random access iterator");
+    }
+    {
+        using iterator = bidirectional_traversal_iterator;
+        HPX_TEST_MSG((satisfy_traversal_concept<iterator,
+                         hpx::bidirectional_traversal_tag>::value),
+            "bidirectional traversal input iterator");
+    }
+    {
+        using iterator = random_access_traversal_iterator;
+        HPX_TEST_MSG((satisfy_traversal_concept<iterator,
+                         hpx::bidirectional_traversal_tag>::value),
+            "random access traversal input iterator");
+    }
+}
+
+void satisfy_traversal_concept_random_access_test()
+{
+    using namespace hpx::traits::detail;
+
+    {
+        using iterator = std::ostream_iterator<int>;
+        HPX_TEST_MSG((!satisfy_traversal_concept<iterator,
+                         hpx::random_access_traversal_tag>::value),
+            "output iterator");
+    }
+    {
+        using iterator = std::istream_iterator<int>;
+        HPX_TEST_MSG((!satisfy_traversal_concept<iterator,
+                         hpx::random_access_traversal_tag>::value),
+            "input iterator");
+    }
+    {
+        using iterator = typename std::forward_list<int>::iterator;
+        HPX_TEST_MSG((!satisfy_traversal_concept<iterator,
+                         hpx::random_access_traversal_tag>::value),
+            "forward iterator");
+    }
+    {
+        using iterator = typename std::list<int>::iterator;
+        HPX_TEST_MSG((!satisfy_traversal_concept<iterator,
+                         hpx::random_access_traversal_tag>::value),
+            "bidirectional iterator");
+    }
+    {
+        using iterator = typename std::vector<int>::iterator;
+        HPX_TEST_MSG((satisfy_traversal_concept<iterator,
+                         hpx::random_access_traversal_tag>::value),
+            "random access iterator");
+    }
+    {
+        using iterator = bidirectional_traversal_iterator;
+        HPX_TEST_MSG((!satisfy_traversal_concept<iterator,
+                         hpx::random_access_traversal_tag>::value),
+            "bidirectional traversal input iterator");
+    }
+    {
+        using iterator = random_access_traversal_iterator;
+        HPX_TEST_MSG((satisfy_traversal_concept<iterator,
+                         hpx::random_access_traversal_tag>::value),
+            "random access traversal input iterator");
+    }
+}
+
+void is_iterator_test()
+{
+    using hpx::traits::is_iterator;
+
+    {
+        using iterator = std::ostream_iterator<int>;
+        HPX_TEST_MSG((is_iterator<iterator>::value), "output iterator");
+    }
+    {
+        using iterator = std::istream_iterator<int>;
+        HPX_TEST_MSG((is_iterator<iterator>::value), "input iterator");
+    }
+    {
+        using iterator = typename std::forward_list<int>::iterator;
+        HPX_TEST_MSG((is_iterator<iterator>::value), "forward iterator");
+    }
+    {
+        using iterator = typename std::list<int>::iterator;
+        HPX_TEST_MSG((is_iterator<iterator>::value), "bidirectional iterator");
+    }
+    {
+        using iterator = typename std::vector<int>::iterator;
+        HPX_TEST_MSG((is_iterator<iterator>::value), "random access iterator");
+    }
+    {
+        using iterator = bidirectional_traversal_iterator;
+        HPX_TEST_MSG((is_iterator<iterator>::value),
+            "bidirectional traversal input iterator");
+    }
+    {
+        using iterator = random_access_traversal_iterator;
+        HPX_TEST_MSG((is_iterator<iterator>::value),
+            "random access traversal input iterator");
+    }
+}
+
+void is_output_iterator_test()
+{
+    {
+        using iterator = std::ostream_iterator<int>;
+        HPX_TEST_MSG((std::output_iterator<iterator, int>), "output iterator");
+    }
+    {
+        using iterator = std::istream_iterator<int>;
+        HPX_TEST_MSG((!std::output_iterator<iterator, int>), "input iterator");
+    }
+    {
+        using iterator = typename std::forward_list<int>::iterator;
+        HPX_TEST_MSG((std::output_iterator<iterator, int>), "forward iterator");
+    }
+    {
+        using iterator = typename std::list<int>::iterator;
+        HPX_TEST_MSG(
+            (std::output_iterator<iterator, int>), "bidirectional iterator");
+    }
+    {
+        using iterator = typename std::vector<int>::iterator;
+        HPX_TEST_MSG(
+            (std::output_iterator<iterator, int>), "random access iterator");
+    }
+    {
+        using iterator = bidirectional_traversal_iterator;
+        // The custom iterator uses 'int' reference, not assignable?
+        // Actually reference is int, so it returns by value. Cannot assign to rvalue.
+        // So this might fail std::output_iterator.
+        // But the previous test passed.
+        // If it fails, we know why.
+        HPX_TEST_MSG((!std::output_iterator<iterator, int>),
+            "bidirectional traversal input iterator (not output)");
+    }
+    {
+        using iterator = random_access_traversal_iterator;
+        HPX_TEST_MSG((!std::output_iterator<iterator, int>),
+            "random access traversal input iterator (not output)");
+    }
+}
+
+void is_input_iterator_test()
+{
+    {
+        using iterator = std::ostream_iterator<int>;
+        HPX_TEST_MSG((!std::input_iterator<iterator>), "output iterator");
+    }
+    {
+        using iterator = std::istream_iterator<int>;
+        HPX_TEST_MSG((std::input_iterator<iterator>), "input iterator");
+    }
+    {
+        using iterator = typename std::forward_list<int>::iterator;
+        HPX_TEST_MSG((std::input_iterator<iterator>), "forward iterator");
+    }
+    {
+        using iterator = typename std::list<int>::iterator;
+        HPX_TEST_MSG((std::input_iterator<iterator>), "bidirectional iterator");
+    }
+    {
+        using iterator = typename std::vector<int>::iterator;
+        HPX_TEST_MSG((std::input_iterator<iterator>), "random access iterator");
+    }
+    {
+        using iterator = bidirectional_traversal_iterator;
+        HPX_TEST_MSG((std::input_iterator<iterator>),
+            "bidirectional traversal input iterator");
+    }
+    {
+        using iterator = random_access_traversal_iterator;
+        HPX_TEST_MSG((std::input_iterator<iterator>),
+            "random access traversal input iterator");
+    }
+    {
+        using base_iterator = std::vector<std::size_t>::iterator;
+        using iterator =
+            test::test_iterator<base_iterator, std::random_access_iterator_tag>;
+
+        HPX_TEST_MSG((std::input_iterator<iterator>), "hpx test iterator");
+    }
+    {
+        using base_iterator = std::vector<std::size_t>::iterator;
+        using iterator =
+            test::test_iterator<base_iterator, std::bidirectional_iterator_tag>;
+
+        HPX_TEST_MSG((std::input_iterator<iterator>), "hpx test iterator");
+    }
+    {
+        using base_iterator = std::vector<std::size_t>::iterator;
+        using iterator =
+            test::test_iterator<base_iterator, std::forward_iterator_tag>;
+
+        HPX_TEST_MSG((std::input_iterator<iterator>), "hpx test iterator");
+    }
+    {
+        using base_iterator = std::vector<std::size_t>::iterator;
+        using iterator =
+            test::test_iterator<base_iterator, std::input_iterator_tag>;
+
+        HPX_TEST_MSG((std::input_iterator<iterator>), "hpx test iterator");
+    }
+}
+
+void is_forward_iterator_test()
+{
+    {
+        using iterator = std::ostream_iterator<int>;
+        HPX_TEST_MSG((!std::forward_iterator<iterator>), "output iterator");
+    }
+    {
+        using iterator = std::istream_iterator<int>;
+        HPX_TEST_MSG((!std::forward_iterator<iterator>), "input iterator");
+    }
+    {
+        using iterator = typename std::forward_list<int>::iterator;
+        HPX_TEST_MSG((std::forward_iterator<iterator>), "forward iterator");
+    }
+    {
+        using iterator = typename std::list<int>::iterator;
+        HPX_TEST_MSG(
+            (std::forward_iterator<iterator>), "bidirectional iterator");
+    }
+    {
+        using iterator = typename std::vector<int>::iterator;
+        HPX_TEST_MSG(
+            (std::forward_iterator<iterator>), "random access iterator");
+    }
+    {
+        using iterator = bidirectional_traversal_iterator;
+        HPX_TEST_MSG((std::forward_iterator<iterator>),
+            "bidirectional traversal input iterator");
+    }
+    {
+        using iterator = random_access_traversal_iterator;
+        HPX_TEST_MSG((std::forward_iterator<iterator>),
+            "random access traversal input iterator");
+    }
+    {
+        using base_iterator = std::vector<std::size_t>::iterator;
+        using iterator =
+            test::test_iterator<base_iterator, std::random_access_iterator_tag>;
+
+        HPX_TEST_MSG((std::forward_iterator<iterator>), "hpx test iterator");
+    }
+    {
+        using base_iterator = std::vector<std::size_t>::iterator;
+        using iterator =
+            test::test_iterator<base_iterator, std::bidirectional_iterator_tag>;
+
+        HPX_TEST_MSG((std::forward_iterator<iterator>), "hpx test iterator");
+    }
+    {
+        using base_iterator = std::vector<std::size_t>::iterator;
+        using iterator =
+            test::test_iterator<base_iterator, std::forward_iterator_tag>;
+
+        HPX_TEST_MSG((std::forward_iterator<iterator>), "hpx test iterator");
+    }
+    {
+        using base_iterator = std::vector<std::size_t>::iterator;
+        using iterator =
+            test::test_iterator<base_iterator, std::input_iterator_tag>;
+
+        HPX_TEST_MSG((!std::forward_iterator<iterator>), "hpx test iterator");
+    }
+}
+
+void is_bidirectional_iterator_test()
+{
+    {
+        using iterator = std::ostream_iterator<int>;
+        HPX_TEST_MSG(
+            (!std::bidirectional_iterator<iterator>), "output iterator");
+    }
+    {
+        using iterator = std::istream_iterator<int>;
+        HPX_TEST_MSG(
+            (!std::bidirectional_iterator<iterator>), "input iterator");
+    }
+    {
+        using iterator = typename std::forward_list<int>::iterator;
+        HPX_TEST_MSG(
+            (!std::bidirectional_iterator<iterator>), "forward iterator");
+    }
+    {
+        using iterator = typename std::list<int>::iterator;
+        HPX_TEST_MSG(
+            (std::bidirectional_iterator<iterator>), "bidirectional iterator");
+    }
+    {
+        using iterator = typename std::vector<int>::iterator;
+        HPX_TEST_MSG(
+            (std::bidirectional_iterator<iterator>), "random access iterator");
+    }
+    {
+        using iterator = bidirectional_traversal_iterator;
+        HPX_TEST_MSG((std::bidirectional_iterator<iterator>),
+            "bidirectional traversal input iterator");
+    }
+    {
+        using iterator = random_access_traversal_iterator;
+        HPX_TEST_MSG((std::bidirectional_iterator<iterator>),
+            "random access traversal input iterator");
+    }
+    {
+        using base_iterator = std::vector<std::size_t>::iterator;
+        using iterator =
+            test::test_iterator<base_iterator, std::random_access_iterator_tag>;
+
+        HPX_TEST_MSG(
+            (std::bidirectional_iterator<iterator>), "hpx test iterator");
+    }
+    {
+        using base_iterator = std::vector<std::size_t>::iterator;
+        using iterator =
+            test::test_iterator<base_iterator, std::bidirectional_iterator_tag>;
+
+        HPX_TEST_MSG(
+            (std::bidirectional_iterator<iterator>), "hpx test iterator");
+    }
+    {
+        using base_iterator = std::vector<std::size_t>::iterator;
+        using iterator =
+            test::test_iterator<base_iterator, std::forward_iterator_tag>;
+
+        HPX_TEST_MSG(
+            (!std::bidirectional_iterator<iterator>), "hpx test iterator");
+    }
+    {
+        using base_iterator = std::vector<std::size_t>::iterator;
+        using iterator =
+            test::test_iterator<base_iterator, std::input_iterator_tag>;
+
+        HPX_TEST_MSG(
+            (!std::bidirectional_iterator<iterator>), "hpx test iterator");
+    }
+}
+
+void is_random_access_iterator_test()
+{
+    {
+        using iterator = std::ostream_iterator<int>;
+        HPX_TEST_MSG(
+            (!std::random_access_iterator<iterator>), "output iterator");
+    }
+    {
+        using iterator = std::istream_iterator<int>;
+        HPX_TEST_MSG(
+            (!std::random_access_iterator<iterator>), "input iterator");
+    }
+    {
+        using iterator = typename std::forward_list<int>::iterator;
+        HPX_TEST_MSG(
+            (!std::random_access_iterator<iterator>), "forward iterator");
+    }
+    {
+        using iterator = typename std::list<int>::iterator;
+        HPX_TEST_MSG(
+            (!std::random_access_iterator<iterator>), "bidirectional iterator");
+    }
+    {
+        using iterator = typename std::vector<int>::iterator;
+        HPX_TEST_MSG(
+            (std::random_access_iterator<iterator>), "random access iterator");
+    }
+    {
+        using iterator = bidirectional_traversal_iterator;
+        HPX_TEST_MSG((!std::random_access_iterator<iterator>),
+            "bidirectional traversal input iterator");
+    }
+    {
+        using iterator = random_access_traversal_iterator;
+        HPX_TEST_MSG((std::random_access_iterator<iterator>),
+            "random access traversal input iterator");
+    }
+    {
+        using base_iterator = std::vector<std::size_t>::iterator;
+        using iterator =
+            test::test_iterator<base_iterator, std::random_access_iterator_tag>;
+
+        HPX_TEST_MSG(
+            (std::random_access_iterator<iterator>), "hpx test iterator");
+    }
+    {
+        using base_iterator = std::vector<std::size_t>::iterator;
+        using iterator =
+            test::test_iterator<base_iterator, std::bidirectional_iterator_tag>;
+
+        HPX_TEST_MSG(
+            (!std::random_access_iterator<iterator>), "hpx test iterator");
+    }
+    {
+        using base_iterator = std::vector<std::size_t>::iterator;
+        using iterator =
+            test::test_iterator<base_iterator, std::forward_iterator_tag>;
+
+        HPX_TEST_MSG(
+            (!std::random_access_iterator<iterator>), "hpx test iterator");
+    }
+    {
+        using base_iterator = std::vector<std::size_t>::iterator;
+        using iterator =
+            test::test_iterator<base_iterator, std::input_iterator_tag>;
+
+        HPX_TEST_MSG(
+            (!std::random_access_iterator<iterator>), "hpx test iterator");
+    }
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 int main()
 {
@@ -572,6 +1117,17 @@ int main()
         postincrement_result_test();
         subscript_result_test();
         subtraction_result_test();
+        bidirectional_concept_test();
+        random_access_concept_test();
+        satisfy_traversal_concept_forward_test();
+        satisfy_traversal_concept_bidirectional_test();
+        satisfy_traversal_concept_random_access_test();
+        is_iterator_test();
+        is_input_iterator_test();
+        is_output_iterator_test();
+        is_forward_iterator_test();
+        is_bidirectional_iterator_test();
+        is_random_access_iterator_test();
     }
 
     return hpx::util::report_errors();
