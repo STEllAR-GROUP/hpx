@@ -11,6 +11,7 @@
 #include <hpx/errors/exception.hpp>
 #include <hpx/type_support/assert_owns_lock.hpp>
 
+#include <concepts>
 #include <iterator>
 #include <mutex>
 
@@ -67,7 +68,7 @@ namespace hpx::concurrent {
         public:
             accessor() = default;
 
-            bool empty() const
+            bool empty() const noexcept
             {
                 return value_ == nullptr;
             }
@@ -124,7 +125,7 @@ namespace hpx::concurrent {
         public:
             const_accessor() = default;
 
-            bool empty() const
+            bool empty() const noexcept
             {
                 return value_ == nullptr;
             }

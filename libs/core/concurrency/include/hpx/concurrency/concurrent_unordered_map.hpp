@@ -14,6 +14,7 @@
 #include <functional>
 #include <mutex>
 
+#include <concepts>
 #include <stdexcept>
 #include <type_traits>
 #include <unordered_map>
@@ -73,7 +74,7 @@ namespace hpx::concurrent {
         public:
             accessor() = default;
 
-            bool empty() const
+            bool empty() const noexcept
             {
                 return value_ == nullptr;
             }
@@ -130,7 +131,7 @@ namespace hpx::concurrent {
         public:
             const_accessor() = default;
 
-            bool empty() const
+            bool empty() const noexcept
             {
                 return value_ == nullptr;
             }

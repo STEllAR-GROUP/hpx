@@ -213,8 +213,6 @@ void test_concurrent_unordered_set_extra()
 
 void test_concurrent_queue()
 {
-    hpx::concurrent::concurrent_queue<int>
-        q;    // Test default ctor too? No cap
     hpx::concurrent::concurrent_queue<int> q100(100);
     std::atomic<int> count{0};
 
