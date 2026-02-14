@@ -63,6 +63,37 @@ void test_concurrent_vector_reserve()
     HPX_TEST_EQ(static_cast<int>(v.size()), 500);
 }
 
+void test_concurrent_vector_grow_by()
+{
+    hpx::concurrent::concurrent_vector<int> v;
+    auto old_size = v.grow_by(10);
+    HPX_TEST_EQ(old_size, 0u);
+    HPX_TEST_EQ(v.size(), 10u);
+
+    old_size = v.grow_by(5, 42);
+    HPX_TEST_EQ(old_size, 10u);
+    HPX_TEST_EQ(v.size(), 15u);
+    HPX_TEST_EQ(static_cast<int>(v[10]), 42);
+}
+
+void test_concurrent_vector_for_each()
+{
+    hpx::concurrent::concurrent_vector<int> v;
+    for (int i = 0; i < 100; ++i)
+        v.push_back(i);
+
+    std::atomic<int> sum{0};
+    v.for_each([&sum](int val) { sum += val; });
+    HPX_TEST_EQ(sum.load(), 4950);
+
+    std::atomic<int> count{0};
+    v.for_each([&count](int) {
+        count++;
+        return count.load() < 50;
+    });
+    HPX_TEST_EQ(count.load(), 50);
+}
+
 void test_concurrent_unordered_map()
 {
     hpx::concurrent::concurrent_unordered_map<int, int> m;
@@ -249,6 +280,8 @@ int hpx_main(hpx::program_options::variables_map&)
 {
     test_concurrent_vector();
     test_concurrent_vector_reserve();
+    test_concurrent_vector_grow_by();
+    test_concurrent_vector_for_each();
 
     test_concurrent_unordered_map();
     test_concurrent_unordered_map_extra();
