@@ -38,8 +38,7 @@ namespace hpx::lockfree {
 
     // The "left" and "right" terminology is used instead of top and bottom to
     // stay consistent with the paper that this code is based on..
-    enum class deque_status_type : std::int8_t
-    {
+    HPX_CXX_CORE_EXPORT enum class deque_status_type : std::int8_t {
         stable,
         rpush,
         lpush
