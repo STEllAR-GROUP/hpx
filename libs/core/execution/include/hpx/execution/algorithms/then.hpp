@@ -167,8 +167,6 @@ namespace hpx::execution::experimental {
                 return tag(s.sender);
             }
 
-            // TODO: add forwarding_sender_query
-
             template <typename Receiver>
             friend auto tag_invoke(
                 connect_t, then_sender&& s, Receiver&& receiver)
