@@ -6,8 +6,6 @@
 
 #pragma once
 
-// This file is only ever included by access.hpp
-// but we will still guard against direct inclusion
 #if defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
 
 #include <algorithm>
