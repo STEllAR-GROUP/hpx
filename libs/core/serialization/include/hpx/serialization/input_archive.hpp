@@ -118,6 +118,12 @@ namespace hpx::serialization {
                     access::has_serialize_v<T> || std::is_empty_v<T> ||
                     hpx::traits::has_serialize_adl_v<T>;
 
+#if defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
+                constexpr bool has_refl_serialize = true;
+#else
+                constexpr bool has_refl_serialize = false;
+#endif
+
                 constexpr bool optimized =
                     hpx::traits::is_bitwise_serializable_v<T> ||
                     !hpx::traits::is_not_bitwise_serializable_v<T>;
@@ -151,18 +157,19 @@ namespace hpx::serialization {
 #endif
                     load_binary(&t, sizeof(t));
                 }
-                else if constexpr (hpx::traits::has_struct_serialization_v<T>)
+                else if constexpr (has_refl_serialize ||
+                    hpx::traits::has_struct_serialization_v<T>)
                 {
-                    // struct serialization
+                    // struct serialization or reflection-based serialization
                     access::serialize(*this, t, 0);
                 }
                 else
                 {
                     static_assert(traits::is_nonintrusive_polymorphic_v<T> ||
-                            has_serialize || optimized ||
+                            has_serialize || optimized || has_refl_serialize ||
                             hpx::traits::has_struct_serialization_v<T>,
                         "traits::is_nonintrusive_polymorphic_v<T> || "
-                        "has_serialize || optimized || "
+                        "has_serialize || optimized || has_refl_serialize || "
                         "hpx::traits::has_struct_serialization_v<T>");
                 }
             }
