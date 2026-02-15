@@ -122,25 +122,6 @@ namespace hpx::util {
         {
             return this->base_reference();
         }
-
-        HPX_HOST_DEVICE void increment()
-        {
-            ++this->base_reference();
-        }
-
-        HPX_HOST_DEVICE void decrement()
-        {
-            --this->base_reference();
-        }
-
-    public:
-        HPX_HOST_DEVICE constexpr Incrementable operator[](
-            typename base_type::difference_type n) const
-        {
-            Incrementable tmp = this->base();
-            std::advance(tmp, n);
-            return tmp;
-        }
     };
 
     HPX_CXX_CORE_EXPORT template <typename Incrementable,
@@ -208,13 +189,6 @@ namespace hpx::util {
             using difference_type = typename base_type::difference_type;
             return static_cast<difference_type>(y.base()) -
                 static_cast<difference_type>(this->base());
-        }
-
-    public:
-        HPX_HOST_DEVICE constexpr Incrementable operator[](
-            typename base_type::difference_type n) const noexcept
-        {
-            return this->base() + static_cast<typename base_type::base_type>(n);
         }
     };
 

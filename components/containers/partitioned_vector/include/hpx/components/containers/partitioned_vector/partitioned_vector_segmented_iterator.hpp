@@ -148,25 +148,6 @@ namespace hpx::segmented {
             local_vector_value_proxy(local_vector_value_proxy const&) = default;
             local_vector_value_proxy(local_vector_value_proxy&&) = default;
 
-            // NOLINTBEGIN(bugprone-unhandled-self-assignment)
-            local_vector_value_proxy& operator=(
-                local_vector_value_proxy const& other) const
-            {
-                T val = static_cast<T>(other);
-                const_cast<local_vector_value_proxy&>(*this).operator=(
-                    HPX_MOVE(val));
-                return const_cast<local_vector_value_proxy&>(*this);
-            }
-            local_vector_value_proxy& operator=(
-                local_vector_value_proxy&& other) const
-            {
-                T val = static_cast<T>(other);
-                const_cast<local_vector_value_proxy&>(*this).operator=(
-                    HPX_MOVE(val));
-                return const_cast<local_vector_value_proxy&>(*this);
-            }
-            // NOLINTEND(bugprone-unhandled-self-assignment)
-
             ~local_vector_value_proxy() = default;
 
             operator T() const
