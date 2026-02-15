@@ -33,6 +33,10 @@
 #endif
 
 #include <stdexec/execution.hpp>
+#include <exec/split.hpp>
+#include <exec/ensure_started.hpp>
+#include <exec/start_detached.hpp>
+#include <exec/execute.hpp>
 
 #if defined(HPX_GCC_VERSION)
 #pragma GCC diagnostic pop
@@ -130,10 +134,6 @@ namespace hpx::execution::experimental {
     HPX_CXX_CORE_EXPORT using stdexec::on;
     HPX_CXX_CORE_EXPORT using stdexec::on_t;
 
-    // Continue on
-    HPX_CXX_CORE_EXPORT using stdexec::continue_on;
-    HPX_CXX_CORE_EXPORT using stdexec::continue_on_t;
-
     // Continues on
     HPX_CXX_CORE_EXPORT using stdexec::continues_on;
     HPX_CXX_CORE_EXPORT using stdexec::continues_on_t;
@@ -158,13 +158,13 @@ namespace hpx::execution::experimental {
     using stdexec::seq;
     using stdexec::unseq;
 
-    // Split
-    HPX_CXX_CORE_EXPORT using stdexec::split;
-    HPX_CXX_CORE_EXPORT using stdexec::split_t;
+    // Split (moved to exec:: namespace in newer stdexec)
+    HPX_CXX_CORE_EXPORT using exec::split;
+    HPX_CXX_CORE_EXPORT using exec::split_t;
 
-    // Ensure started
-    HPX_CXX_CORE_EXPORT using stdexec::ensure_started;
-    HPX_CXX_CORE_EXPORT using stdexec::ensure_started_t;
+    // Ensure started (moved to exec:: namespace in newer stdexec)
+    HPX_CXX_CORE_EXPORT using exec::ensure_started;
+    HPX_CXX_CORE_EXPORT using exec::ensure_started_t;
 
     // Transfer
     HPX_CXX_CORE_EXPORT using stdexec::transfer;
@@ -179,9 +179,9 @@ namespace hpx::execution::experimental {
     // Domain
     HPX_CXX_CORE_EXPORT using stdexec::default_domain;
 
-    // Execute
-    HPX_CXX_CORE_EXPORT using stdexec::execute;
-    HPX_CXX_CORE_EXPORT using stdexec::execute_t;
+    // Execute (moved to exec:: namespace in newer stdexec)
+    HPX_CXX_CORE_EXPORT using exec::execute;
+    HPX_CXX_CORE_EXPORT using exec::execute_t;
 
     // Into Variant
     HPX_CXX_CORE_EXPORT using stdexec::into_variant;
@@ -212,14 +212,13 @@ namespace hpx::execution::experimental {
     HPX_CXX_CORE_EXPORT using stdexec::schedule_from;
     HPX_CXX_CORE_EXPORT using stdexec::schedule_from_t;
 
-    // Start detached
-    HPX_CXX_CORE_EXPORT using stdexec::start_detached;
-    HPX_CXX_CORE_EXPORT using stdexec::start_detached_t;
+    // Start detached (moved to exec:: namespace in newer stdexec)
+    HPX_CXX_CORE_EXPORT using exec::start_detached;
+    HPX_CXX_CORE_EXPORT using exec::start_detached_t;
 
     // Stop token
     HPX_CXX_CORE_EXPORT using stdexec::stop_callback_for_t;
     HPX_CXX_CORE_EXPORT using stdexec::stoppable_token;
-    HPX_CXX_CORE_EXPORT using stdexec::stoppable_token_for;
     HPX_CXX_CORE_EXPORT using stdexec::unstoppable_token;
 
     // Stopped as error
