@@ -667,124 +667,164 @@ namespace hpx::threads::policies {
             }
         }
 
-        bool attempt_stealing_pending(std::size_t num_thread,
+        bool attempt_stealing_pending(std::size_t const num_thread,
             threads::thread_id_ref_type& thrd,
             [[maybe_unused]] thread_queue_type* this_high_priority_queue,
             [[maybe_unused]] thread_queue_type* this_queue)
         {
-            thread_queue_type* q;
-            if (num_thread < num_high_priority_queues_)
+            // Helper to increment steal counters only when enabled.
+#ifdef HPX_HAVE_THREAD_STEALING_COUNTS
+            constexpr auto increment_counters =
+                [](thread_queue_type* from_q,
+                    thread_queue_type* to_q) noexcept {
+                    from_q->increment_num_stolen_from_pending();
+                    to_q->increment_num_stolen_to_pending();
+                };
+#else
+            constexpr auto increment_counters =
+                [](thread_queue_type*, thread_queue_type*) noexcept {};
+#endif
+
+            std::size_t const num_high = num_high_priority_queues_;
+            if (num_thread < num_high)
             {
-                for (std::size_t idx : victim_threads_[num_thread].data_)
+                for (std::size_t const idx : victim_threads_[num_thread].data_)
                 {
                     HPX_ASSERT(idx != num_thread);
 
-                    if (idx < num_high_priority_queues_)
+                    if (idx < num_high)
                     {
-                        q = high_priority_queues_[idx].data_;
+                        thread_queue_type* q = high_priority_queues_[idx].data_;
                         if (q->get_next_thread(thrd, true, true))
                         {
-#ifdef HPX_HAVE_THREAD_STEALING_COUNTS
-                            q->increment_num_stolen_from_pending();
-                            this_high_priority_queue
-                                ->increment_num_stolen_to_pending();
-#endif
+                            increment_counters(q, this_high_priority_queue);
                             return true;
                         }
                     }
 
-                    q = queues_[idx].data_;
-                    if (q->get_next_thread(thrd, true, true))
+                    thread_queue_type* qn = queues_[idx].data_;
+                    if (qn->get_next_thread(thrd, true, true))
                     {
-#ifdef HPX_HAVE_THREAD_STEALING_COUNTS
-                        q->increment_num_stolen_from_pending();
-                        this_queue->increment_num_stolen_to_pending();
-#endif
+                        increment_counters(qn, this_queue);
                         return true;
                     }
                 }
             }
             else
             {
-                for (std::size_t idx : victim_threads_[num_thread].data_)
+                for (std::size_t const idx : victim_threads_[num_thread].data_)
                 {
                     HPX_ASSERT(idx != num_thread);
 
-                    q = queues_[idx].data_;
-                    if (q->get_next_thread(thrd, true, true))
+                    thread_queue_type* qn = queues_[idx].data_;
+                    if (qn->get_next_thread(thrd, true, true))
                     {
-#ifdef HPX_HAVE_THREAD_STEALING_COUNTS
-                        q->increment_num_stolen_from_pending();
-                        this_queue->increment_num_stolen_to_pending();
-#endif
+                        increment_counters(qn, this_queue);
                         return true;
                     }
                 }
             }
+
             return false;
         }
 
         // Return the next thread to be executed, return false if none is
         // available
-        bool get_next_thread(std::size_t num_thread, bool running,
+        bool get_next_thread(std::size_t num_thread, bool const running,
             threads::thread_id_ref_type& thrd, bool enable_stealing)
         {
             HPX_ASSERT(num_thread < num_queues_);
-            thread_queue_type* this_high_priority_queue = nullptr;
 
+            // tri-state result for trying a queue:
+            // - nothing: no work found, no staged items
+            // - found: a thread was popped and 'thrd' is valid -> return true
+            // - staged_non_empty: no thread popped but there is staged work ->
+            //   give up and return false
+            enum class try_result : std::int8_t
+            {
+                staged_non_empty = 0,
+                found = 1,
+                nothing = 2
+            };
+
+            // Helper: try a single queue. Returns
+            // - try_result::staged_non_empty if staged items exist (signal to
+            //   give up)
+            // - try_result::found if a thread was obtained
+            // - try_result::nothing otherwise
+            constexpr auto try_queue =
+                [](thread_queue_type* q,
+                    thread_id_ref_type& next_thrd) noexcept -> try_result {
+                bool const found = q->get_next_thread(next_thrd);
+
+#ifdef HPX_HAVE_THREAD_STEALING_COUNTS
+                q->increment_num_pending_accesses();
+                if (found)
+                    return try_result::found;
+                q->increment_num_pending_misses();
+#else
+                if (found)
+                    return try_result::found;
+#endif
+
+                // If there is staged work waiting to be converted, signal
+                // caller to give up so conversion can proceed instead of
+                // continuing to try other queues.
+                if (q->get_staged_queue_length(std::memory_order_relaxed) != 0)
+                    return try_result::staged_non_empty;
+
+                return try_result::nothing;
+            };
+
+            thread_queue_type* this_high_priority_queue = nullptr;
             if (num_thread < num_high_priority_queues_)
             {
                 this_high_priority_queue =
                     high_priority_queues_[num_thread].data_;
-                bool result = this_high_priority_queue->get_next_thread(thrd);
 
-#ifdef HPX_HAVE_THREAD_STEALING_COUNTS
-                this_high_priority_queue->increment_num_pending_accesses();
-                if (result)
+                if (auto const r = try_queue(this_high_priority_queue, thrd);
+                    r == try_result::found)
+                {
+                    // We successfully popped a thread from the queue
                     return true;
-                this_high_priority_queue->increment_num_pending_misses();
-#else
-                if (result)
-                    return true;
-#endif
+                }
+                else if (r == try_result::staged_non_empty)
+                {
+                    // Staged work exists; give up so it can be converted
+                    return false;
+                }
             }
 
-            thread_queue_type* this_queue = queues_[num_thread].data_;
-            bool result = false;
-
-            auto f = [&](thread_queue_type* q) {
-                result = q->get_next_thread(thrd);
-
-#ifdef HPX_HAVE_THREAD_STEALING_COUNTS
-                q->increment_num_pending_accesses();
-                if (result)
-                    return true;
-                q->increment_num_pending_misses();
-#else
-                if (result)
-                    return true;
-#endif
-
-                // Give up, we should have work to convert.
-                if (q->get_staged_queue_length(std::memory_order_relaxed) != 0)
-                    return true;
-
-                return false;
-            };
-
-            result = false;
-            if (f(bound_queues_[num_thread].data_))
-                return result;
-
-            result = false;
-            if (f(this_queue))
-                return result;
-
-            if (!running)
+            // Try the bound queue (per-thread bound-to-thread queue).
+            if (auto const r = try_queue(bound_queues_[num_thread].data_, thrd);
+                r == try_result::found)
+            {
+                return true;
+            }
+            else if (r == try_result::staged_non_empty)
             {
                 return false;
             }
 
+            // Try the "this" queue (main per-thread queue).
+            thread_queue_type* this_queue = queues_[num_thread].data_;
+            if (auto const r = try_queue(this_queue, thrd);
+                r == try_result::found)
+            {
+                return true;
+            }
+            else if (r == try_result::staged_non_empty)
+            {
+                return false;
+            }
+
+            // If the thread system is shutting down (not running), give up.
+            if (!running)
+                return false;
+
+            // Attempt stealing from other queues if enabled. If stealing
+            // succeeds, attempt_stealing_pending returns true, and we return
+            // true (thread obtained).
             if (enable_stealing &&
                 attempt_stealing_pending(
                     num_thread, thrd, this_high_priority_queue, this_queue))
@@ -792,12 +832,13 @@ namespace hpx::threads::policies {
                 return true;
             }
 
+            // Final fallback: try the global low-priority queue
             return low_priority_queue_.get_next_thread(thrd);
         }
 
         // Schedule the passed thread
         void schedule_thread(threads::thread_id_ref_type thrd,
-            threads::thread_schedule_hint schedulehint,
+            threads::thread_schedule_hint const schedulehint,
             bool allow_fallback = false,
             thread_priority priority = thread_priority::default_) override
         {
@@ -1328,71 +1369,79 @@ namespace hpx::threads::policies {
             return wait_time / (count + 1);
         }
 #endif
-        bool attempt_stealing(std::size_t num_thread, std::size_t& added,
+        bool attempt_stealing(std::size_t const num_thread, std::size_t& added,
             thread_queue_type* this_high_priority_queue,
             thread_queue_type* this_queue)
         {
-            bool result = true;
-            thread_queue_type* q = nullptr;
-            if (num_thread < num_high_priority_queues_)
+            // AND of wait_or_add_new return values
+            bool cumulative_status = true;
+
+            // Helper: try to steal from a single victim queue Parameters:
+            //  - thief_q: the steal target on the thief side (where stolen
+            //             tasks are added)
+            //  - victim_q: the victim's queue to steal from
+            //
+            // Returns true when work was stolen (caller should stop searching)
+            auto try_from_victim = [&](thread_queue_type* thief_q,
+                                       thread_queue_type* victim_q) -> bool {
+                HPX_ASSERT(thief_q != nullptr);
+                HPX_ASSERT(victim_q != nullptr);
+
+                cumulative_status =
+                    thief_q->wait_or_add_new(true, added, victim_q) &&
+                    cumulative_status;
+
+                if (0 != added)
+                {
+#ifdef HPX_HAVE_THREAD_STEALING_COUNTS
+                    victim_q->increment_num_stolen_from_staged(added);
+                    thief_q->increment_num_stolen_to_staged(added);
+#endif
+                    return true;    // stop: work stolen
+                }
+                return false;    // continue searching
+            };
+
+            // If the stealing thread has a high-priority queue, try
+            // high-priority victims first (and then their normal queues).
+            // Otherwise, only try normal queues.
+            std::size_t const num_high = num_high_priority_queues_;
+            if (num_thread < num_high)
             {
                 for (std::size_t idx : victim_threads_[num_thread].data_)
                 {
                     HPX_ASSERT(idx != num_thread);
 
-                    if (idx < num_high_priority_queues_)
+                    if (idx < num_high)
                     {
-                        q = high_priority_queues_[idx].data_;
-                        result = this_high_priority_queue->wait_or_add_new(
-                                     true, added, q) &&
-                            result;
-
-                        if (0 != added)
-                        {
-#ifdef HPX_HAVE_THREAD_STEALING_COUNTS
-                            q->increment_num_stolen_from_staged(added);
-                            this_high_priority_queue
-                                ->increment_num_stolen_to_staged(added);
-#endif
-                            return result;
-                        }
+                        thread_queue_type* victim_hp =
+                            high_priority_queues_[idx].data_;
+                        if (try_from_victim(
+                                this_high_priority_queue, victim_hp))
+                            return true;
                     }
 
-                    q = queues_[idx].data_;
-                    result =
-                        this_queue->wait_or_add_new(true, added, q) && result;
-
-                    if (0 != added)
-                    {
-#ifdef HPX_HAVE_THREAD_STEALING_COUNTS
-                        q->increment_num_stolen_from_staged(added);
-                        this_queue->increment_num_stolen_to_staged(added);
-#endif
-                        return result;
-                    }
+                    thread_queue_type* victim_q = queues_[idx].data_;
+                    if (try_from_victim(this_queue, victim_q))
+                        return true;
                 }
             }
             else
             {
+                // Thief has no high-priority queue: only attempt normal queues
+                HPX_ASSERT(this_queue != nullptr);
+
                 for (std::size_t idx : victim_threads_[num_thread].data_)
                 {
                     HPX_ASSERT(idx != num_thread);
 
-                    q = queues_[idx].data_;
-                    result =
-                        this_queue->wait_or_add_new(true, added, q) && result;
-
-                    if (0 != added)
-                    {
-#ifdef HPX_HAVE_THREAD_STEALING_COUNTS
-                        q->increment_num_stolen_from_staged(added);
-                        this_queue->increment_num_stolen_to_staged(added);
-#endif
-                        return result;
-                    }
+                    thread_queue_type* victim_q = queues_[idx].data_;
+                    if (try_from_victim(this_queue, victim_q))
+                        return true;
                 }
             }
-            return false;
+
+            return false;    // no work stolen
         }
 
 #ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
@@ -1441,37 +1490,39 @@ namespace hpx::threads::policies {
         // manager to allow for maintenance tasks to be executed in the
         // scheduler. Returns true if the OS thread calling this function has to
         // be terminated (i.e. no more work has to be done).
-        bool wait_or_add_new(std::size_t num_thread, bool running,
+        bool wait_or_add_new(std::size_t const num_thread, bool const running,
             [[maybe_unused]] std::int64_t& idle_loop_count,
-            bool enable_stealing, std::size_t& added,
+            bool const enable_stealing, std::size_t& added,
             thread_id_ref_type* = nullptr)
         {
             added = 0;
 
             bool result = true;
+
+            auto try_queue = [&](thread_queue_type* q) -> bool {
+                result = q->wait_or_add_new(running, added) && result;
+                return 0 != added;
+            };
+
             thread_queue_type* this_high_priority_queue = nullptr;
             if (num_thread < num_high_priority_queues_)
             {
                 this_high_priority_queue =
                     high_priority_queues_[num_thread].data_;
-                result =
-                    this_high_priority_queue->wait_or_add_new(running, added) &&
-                    result;
-                if (0 != added)
+                if (try_queue(this_high_priority_queue))
                     return result;
             }
 
+            if (try_queue(bound_queues_[num_thread].data_))
+            {
+                return result;
+            }
+
             thread_queue_type* this_queue = queues_[num_thread].data_;
-            auto f = [&](thread_queue_type* q) {
-                result = q->wait_or_add_new(running, added) && result;
-                return 0 != added;
-            };
-
-            if (f(bound_queues_[num_thread].data_))
+            if (try_queue(this_queue))
+            {
                 return result;
-
-            if (f(this_queue))
-                return result;
+            }
 
             // Check if we have been disabled
             if (!running)
@@ -1612,13 +1663,13 @@ namespace hpx::threads::policies {
                 }
             };
 
-            // check for threads which share the same core...
-            iterate([&](std::size_t other_num_thread) {
+            // check for threads that share the same core...
+            iterate([&](std::size_t const other_num_thread) {
                 return any(core_mask & core_masks[other_num_thread]);
             });
 
-            // check for threads which share the same NUMA domain...
-            iterate([&](std::size_t other_num_thread) {
+            // check for threads that share the same NUMA domain...
+            iterate([&](std::size_t const other_num_thread) {
                 return !any(core_mask & core_masks[other_num_thread]) &&
                     any(numa_mask & numa_masks[other_num_thread]);
             });
@@ -1629,7 +1680,7 @@ namespace hpx::threads::policies {
                     num_thread) &&
                 any(first_mask & pu_mask))
             {
-                iterate([&](std::size_t other_num_thread) {
+                iterate([&](std::size_t const other_num_thread) {
                     // allow stealing from neighboring NUMA domain only
                     std::ptrdiff_t const numa_distance =
                         numa_domains[num_thread] -
