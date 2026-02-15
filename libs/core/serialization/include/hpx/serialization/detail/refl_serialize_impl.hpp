@@ -18,6 +18,18 @@
 #include <memory>
 
 namespace hpx::serialization::detail {
+    template <typename MemberType, typename T>
+    constexpr auto* member_from_offset(T* base, std::size_t offset)
+    {
+        using ByteType =
+            std::conditional_t<std::is_const_v<T>, std::byte const, std::byte>;
+        using Type = std::conditional_t<std::is_const_v<T>, MemberType const,
+            MemberType>;
+
+        return reinterpret_cast<Type*>(
+            reinterpret_cast<ByteType*>(base) + offset);
+    }
+
     HPX_CXX_EXPORT template <typename Archive, typename T>
     void refl_serialize(Archive& ar, T& t, unsigned /*version*/)
     {
@@ -58,26 +70,8 @@ namespace hpx::serialization::detail {
                     "Reflection serialization does not support bitfields");
 
                 using MemberType = typename[:std::meta::type_of(member):];
-                constexpr size_t offset = offset_info.bytes;
-
-                if constexpr (std::is_const_v<T>)
-                {    // save path
-                    auto* member_ptr = reinterpret_cast<MemberType const*>(
-                        reinterpret_cast<std::byte const*>(std::addressof(t)) +
-                        offset);
-                    ar&* member_ptr;
-                }
-                else
-                {    // load path
-                    std::byte* base_addr =
-                        reinterpret_cast<std::byte*>(std::addressof(t));
-                    std::byte* target_addr = base_addr + offset;
-
-                    auto* member_ptr = reinterpret_cast<MemberType*>(
-                        reinterpret_cast<std::byte*>(std::addressof(t)) +
-                        offset);
-                    ar&* member_ptr;
-                }
+                ar&* member_from_offset<MemberType>(
+                    std::addressof(t), offset_info.bytes);
             }
         }
     }
