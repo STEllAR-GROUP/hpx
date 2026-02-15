@@ -121,8 +121,7 @@ namespace hpx::threads::policies {
           , bound_queues_(num_queues_)
           , queues_(num_queues_)
           , high_priority_queues_(num_queues_)
-          , victim_threads_(num_queues_)
-          , victim_offset_(num_queues_)
+          , victims_(num_queues_)
         {
             if (!deferred_initialization)
             {
@@ -677,16 +676,15 @@ namespace hpx::threads::policies {
             if (num_thread < num_high_priority_queues_)
             {
                 std::size_t const offset =
-                    victim_offset_[num_thread].data_.fetch_add(
-                        1, std::memory_order_relaxed);
-                std::size_t const victim_count =
-                    victim_threads_[num_thread].data_.size();
+                    victims_[num_thread].data_.victim_offset_++;
+                std::vector<std::size_t> const& victim_threads =
+                    victims_[num_thread].data_.victim_threads_;
+                std::size_t const victim_count = victim_threads.size();
 
                 for (std::size_t i = 0; i < victim_count; ++i)
                 {
                     std::size_t const idx =
-                        victim_threads_[num_thread]
-                            .data_[(i + offset) % victim_count];
+                        victim_threads[(i + offset) % victim_count];
 
                     HPX_ASSERT(idx != num_thread);
 
@@ -718,16 +716,15 @@ namespace hpx::threads::policies {
             else
             {
                 std::size_t const offset =
-                    victim_offset_[num_thread].data_.fetch_add(
-                        1, std::memory_order_relaxed);
-                std::size_t const victim_count =
-                    victim_threads_[num_thread].data_.size();
+                    victims_[num_thread].data_.victim_offset_++;
+                std::vector<std::size_t> const& victim_threads =
+                    victims_[num_thread].data_.victim_threads_;
+                std::size_t const victim_count = victim_threads.size();
 
                 for (std::size_t i = 0; i < victim_count; ++i)
                 {
                     std::size_t const idx =
-                        victim_threads_[num_thread]
-                            .data_[(i + offset) % victim_count];
+                        victim_threads[(i + offset) % victim_count];
 
                     HPX_ASSERT(idx != num_thread);
 
@@ -1358,16 +1355,15 @@ namespace hpx::threads::policies {
             if (num_thread < num_high_priority_queues_)
             {
                 std::size_t const offset =
-                    victim_offset_[num_thread].data_.fetch_add(
-                        1, std::memory_order_relaxed);
-                std::size_t const victim_count =
-                    victim_threads_[num_thread].data_.size();
+                    victims_[num_thread].data_.victim_offset_++;
+                std::vector<std::size_t> const& victim_threads =
+                    victims_[num_thread].data_.victim_threads_;
+                std::size_t const victim_count = victim_threads.size();
 
                 for (std::size_t i = 0; i < victim_count; ++i)
                 {
                     std::size_t const idx =
-                        victim_threads_[num_thread]
-                            .data_[(i + offset) % victim_count];
+                        victim_threads[(i + offset) % victim_count];
 
                     HPX_ASSERT(idx != num_thread);
 
@@ -1406,16 +1402,15 @@ namespace hpx::threads::policies {
             else
             {
                 std::size_t const offset =
-                    victim_offset_[num_thread].data_.fetch_add(
-                        1, std::memory_order_relaxed);
-                std::size_t const victim_count =
-                    victim_threads_[num_thread].data_.size();
+                    victims_[num_thread].data_.victim_offset_++;
+                std::vector<std::size_t> const& victim_threads =
+                    victims_[num_thread].data_.victim_threads_;
+                std::size_t const victim_count = victim_threads.size();
 
                 for (std::size_t i = 0; i < victim_count; ++i)
                 {
                     std::size_t const idx =
-                        victim_threads_[num_thread]
-                            .data_[(i + offset) % victim_count];
+                        victim_threads[(i + offset) % victim_count];
 
                     HPX_ASSERT(idx != num_thread);
 
@@ -1602,7 +1597,9 @@ namespace hpx::threads::policies {
             // steal from
             std::ptrdiff_t const radius =
                 std::lround(static_cast<double>(num_threads) / 2.0);
-            victim_threads_[num_thread].data_.reserve(num_threads);
+            std::vector<std::size_t>& victim_threads =
+                victims_[num_thread].data_.victim_threads_;
+            victim_threads.reserve(num_threads);
 
             std::size_t const num_pu = affinity_data_.get_pu_num(num_thread);
             mask_cref_type pu_mask = topo.get_thread_affinity_mask(num_pu);
@@ -1633,14 +1630,14 @@ namespace hpx::threads::policies {
 
                     if (f(static_cast<std::size_t>(left)))
                     {
-                        victim_threads_[num_thread].data_.push_back(
+                        victim_threads.push_back(
                             static_cast<std::size_t>(left));
                     }
 
                     std::size_t const right = (num_thread + i) % num_threads;
                     if (f(right))
                     {
-                        victim_threads_[num_thread].data_.push_back(right);
+                        victim_threads.push_back(right);
                     }
                 }
                 if ((num_threads % 2) == 0)
@@ -1648,7 +1645,7 @@ namespace hpx::threads::policies {
                     std::size_t const right = (num_thread + i) % num_threads;
                     if (f(right))
                     {
-                        victim_threads_[num_thread].data_.push_back(right);
+                        victim_threads.push_back(right);
                     }
                 }
             };
@@ -1740,10 +1737,12 @@ namespace hpx::threads::policies {
         std::vector<util::cache_line_data<thread_queue_type*>> queues_;
         std::vector<util::cache_line_data<thread_queue_type*>>
             high_priority_queues_;
-        std::vector<util::cache_line_data<std::vector<std::size_t>>>
-            victim_threads_;
-        std::vector<util::cache_line_data<std::atomic<std::size_t>>>
-            victim_offset_;
+        struct victims
+        {
+            std::vector<std::size_t> victim_threads_;
+            std::size_t victim_offset_ = 0;
+        };
+        std::vector<util::cache_line_data<victims>> victims_;
     };    // namespace hpx::threads::policies
 }    // namespace hpx::threads::policies
 
