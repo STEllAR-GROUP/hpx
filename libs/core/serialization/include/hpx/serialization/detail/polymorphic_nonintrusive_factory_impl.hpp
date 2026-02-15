@@ -8,6 +8,7 @@
 #pragma once
 
 #include <hpx/serialization/access.hpp>
+#include <hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 
 namespace hpx::serialization::detail {
     template <typename Derived>
