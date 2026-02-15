@@ -495,7 +495,7 @@ namespace hpx::parallel::detail {
             else
             {
                 auto result = u_last;
-                for (auto it = first; it != last; ++it)
+                for (auto it = first; it != u_last; ++it)
                 {
                     if (HPX_INVOKE(proj, *it) == value)
                     {
@@ -578,7 +578,7 @@ namespace hpx::parallel::detail {
             else
             {
                 auto result = u_last;
-                for (auto it = first; it != last; ++it)
+                for (auto it = first; it != u_last; ++it)
                 {
                     if (HPX_INVOKE(pred, HPX_INVOKE(proj, *it)))
                     {
@@ -660,7 +660,7 @@ namespace hpx::parallel::detail {
             else
             {
                 auto result = u_last;
-                for (auto it = first; it != last; ++it)
+                for (auto it = first; it != u_last; ++it)
                 {
                     if (!HPX_INVOKE(pred, HPX_INVOKE(proj, *it)))
                     {
