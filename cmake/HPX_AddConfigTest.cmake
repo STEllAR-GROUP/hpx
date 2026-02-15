@@ -696,6 +696,33 @@ function(hpx_check_for_mm_prefetch)
 endfunction()
 
 # ##############################################################################
+function(hpx_check_for_cxx20_std_unordered_transparent_lookup)
+  add_hpx_config_test(
+    HPX_WITH_CXX20_STD_UNORDERED_TRANSPARENT_LOOKUP
+    SOURCE cmake/tests/cxx20_std_unordered_transparent_lookup.cpp
+    FILE ${ARGN}
+  )
+endfunction()
+
+# ##############################################################################
+function(hpx_check_for_cxx23_std_unordered_transparent_erase)
+  add_hpx_config_test(
+    HPX_WITH_CXX23_STD_UNORDERED_TRANSPARENT_ERASE
+    SOURCE cmake/tests/cxx23_std_unordered_transparent_erase.cpp
+    FILE ${ARGN}
+  )
+endfunction()
+
+# ##############################################################################
+function(hpx_check_for_cxx26_std_unordered_transparent_lookup)
+  add_hpx_config_test(
+    HPX_WITH_CXX26_STD_UNORDERED_TRANSPARENT_LOOKUP
+    SOURCE cmake/tests/cxx26_std_unordered_transparent_lookup.cpp
+    FILE ${ARGN}
+  )
+endfunction()
+
+# ##############################################################################
 function(hpx_check_for_stable_inplace_merge)
   add_hpx_config_test(
     HPX_WITH_STABLE_INPLACE_MERGE

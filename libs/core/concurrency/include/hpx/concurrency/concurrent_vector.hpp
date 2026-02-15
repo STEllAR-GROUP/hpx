@@ -23,8 +23,7 @@
 
 namespace hpx::concurrent {
 
-    HPX_CXX_CORE_EXPORT template <typename T,
-        typename Allocator = std::allocator<T>>
+    template <typename T, typename Allocator = std::allocator<T>>
     class concurrent_vector
     {
     private:

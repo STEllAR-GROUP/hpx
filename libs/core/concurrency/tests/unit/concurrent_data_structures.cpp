@@ -10,7 +10,9 @@
 #include <hpx/thread.hpp>
 
 #include <atomic>
+#include <iostream>
 #include <string>
+#include <string_view>
 #include <vector>
 
 void test_concurrent_vector()
@@ -50,6 +52,9 @@ void test_concurrent_vector()
         ref = 888;
         HPX_TEST_EQ(static_cast<int>(v[0]), 888);
     }
+
+    // Test at()
+    HPX_TEST_EQ(static_cast<int>(v.at(0)), 888);
 }
 
 void test_concurrent_vector_reserve()
@@ -139,6 +144,11 @@ void test_concurrent_unordered_map()
     m.for_each([&sum](auto const& kv) { sum += kv.second; });
     // 10 threads * sum(1..100) = 10 * 5050 = 50500
     HPX_TEST_EQ(sum.load(), 50500);
+
+    // Test erase
+    HPX_TEST_EQ(m.erase(0), 1u);
+    HPX_TEST_EQ(m.erase(0), 0u);
+    HPX_TEST_EQ(m.size(), 999u);
 }
 
 void test_concurrent_unordered_map_extra()
@@ -164,6 +174,64 @@ void test_concurrent_unordered_map_extra()
 
     m_str[key] = 43;
     HPX_TEST_EQ(m_str[key].get(), 43);
+
+#if defined(HPX_HAVE_CXX20_STD_UNORDERED_TRANSPARENT_LOOKUP)
+    {
+        struct transparent_hash
+        {
+            using is_transparent = void;
+            std::size_t operator()(std::string_view sv) const
+            {
+                return std::hash<std::string_view>{}(sv);
+            }
+            std::size_t operator()(std::string const& s) const
+            {
+                return std::hash<std::string>{}(s);
+            }
+        };
+
+        struct transparent_equal
+        {
+            using is_transparent = void;
+            bool operator()(std::string_view sv, std::string const& s) const
+            {
+                return sv == s;
+            }
+            bool operator()(std::string const& s, std::string_view sv) const
+            {
+                return s == sv;
+            }
+            bool operator()(std::string const& s1, std::string const& s2) const
+            {
+                return s1 == s2;
+            }
+        };
+
+        hpx::concurrent::concurrent_unordered_map<std::string, int,
+            transparent_hash, transparent_equal>
+            mt;
+        mt.insert({"hello", 42});
+
+        std::string_view sv = "hello";
+        {
+            auto acc = mt.find(sv);
+            HPX_TEST(!acc.empty());
+            HPX_TEST_EQ(acc.get(), 42);
+        }
+        HPX_TEST(mt.contains(sv));
+        HPX_TEST_EQ(mt.count(sv), 1u);
+
+#if defined(HPX_HAVE_CXX23_STD_UNORDERED_TRANSPARENT_ERASE)
+        HPX_TEST_EQ(mt.erase(sv), 1u);
+        HPX_TEST(mt.empty());
+#endif
+
+#if defined(HPX_HAVE_CXX26_STD_UNORDERED_TRANSPARENT_LOOKUP)
+        mt["world"] = 88;
+        HPX_TEST_EQ(mt.at(std::string_view("world")).get(), 88);
+#endif
+    }
+#endif
 }
 
 void test_concurrent_unordered_set()
@@ -193,6 +261,11 @@ void test_concurrent_unordered_set()
     std::atomic<int> set_count{0};
     s.for_each([&set_count](auto const&) { set_count++; });
     HPX_TEST_EQ(set_count.load(), 1000);
+
+    // Test erase
+    HPX_TEST_EQ(s.erase(0), 1u);
+    HPX_TEST_EQ(s.erase(0), 0u);
+    HPX_TEST_EQ(s.size(), 999u);
 }
 
 void test_concurrent_unordered_set_extra()
@@ -203,12 +276,66 @@ void test_concurrent_unordered_set_extra()
 
     HPX_TEST(s.contains(key));
 
-    auto acc = s.find(key);
-    HPX_TEST(!acc.empty());
-    if (acc)
     {
-        HPX_TEST_EQ(acc.get(), "world");
+        auto acc = s.find(key);
+        HPX_TEST(!acc.empty());
+        if (acc)
+        {
+            HPX_TEST_EQ(acc.get(), "world");
+        }
     }
+
+#if defined(HPX_HAVE_CXX20_STD_UNORDERED_TRANSPARENT_LOOKUP)
+    {
+        struct transparent_hash
+        {
+            using is_transparent = void;
+            std::size_t operator()(std::string_view sv) const
+            {
+                return std::hash<std::string_view>{}(sv);
+            }
+            std::size_t operator()(std::string const& s) const
+            {
+                return std::hash<std::string>{}(s);
+            }
+        };
+
+        struct transparent_equal
+        {
+            using is_transparent = void;
+            bool operator()(std::string_view sv, std::string const& s) const
+            {
+                return sv == s;
+            }
+            bool operator()(std::string const& s, std::string_view sv) const
+            {
+                return s == sv;
+            }
+            bool operator()(std::string const& s1, std::string const& s2) const
+            {
+                return s1 == s2;
+            }
+        };
+
+        hpx::concurrent::concurrent_unordered_set<std::string, transparent_hash,
+            transparent_equal>
+            st;
+        st.insert("world");
+
+        std::string_view sv = "world";
+        {
+            auto acc = st.find(sv);
+            HPX_TEST(!acc.empty());
+        }
+        HPX_TEST(st.contains(sv));
+        HPX_TEST_EQ(st.count(sv), 1u);
+
+#if defined(HPX_HAVE_CXX23_STD_UNORDERED_TRANSPARENT_ERASE)
+        HPX_TEST_EQ(st.erase(sv), 1u);
+        HPX_TEST(st.empty());
+#endif
+    }
+#endif
 }
 
 void test_concurrent_queue()
@@ -290,6 +417,8 @@ int hpx_main(hpx::program_options::variables_map&)
     test_concurrent_unordered_set_for_each_break();
 
     test_concurrent_queue();
+
+    std::cout << "All concurrent data structure tests PASSED!" << std::endl;
 
     return hpx::finalize();
 }

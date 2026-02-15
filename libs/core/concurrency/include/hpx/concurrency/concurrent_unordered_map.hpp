@@ -23,8 +23,8 @@
 
 namespace hpx::concurrent {
 
-    HPX_CXX_CORE_EXPORT template <typename Key, typename T,
-        typename Hash = std::hash<Key>, typename KeyEqual = std::equal_to<Key>,
+    template <typename Key, typename T, typename Hash = std::hash<Key>,
+        typename KeyEqual = std::equal_to<Key>,
         typename Allocator = std::allocator<std::pair<Key const, T>>>
     class concurrent_unordered_map
     {
@@ -261,6 +261,15 @@ namespace hpx::concurrent {
             return map_.erase(key);
         }
 
+#if defined(HPX_HAVE_CXX23_STD_UNORDERED_TRANSPARENT_ERASE)
+        template <typename K>
+        size_type erase(K&& key)
+        {
+            std::lock_guard<hpx::util::spinlock> lock(mutex_);
+            return map_.erase(HPX_FORWARD(K, key));
+        }
+#endif
+
         void swap(concurrent_unordered_map& other) noexcept
         {
             if (this != &other)
@@ -287,6 +296,15 @@ namespace hpx::concurrent {
             return accessor(HPX_MOVE(lock), map_[HPX_MOVE(key)]);
         }
 
+#if defined(HPX_HAVE_CXX26_STD_UNORDERED_TRANSPARENT_LOOKUP)
+        template <typename K>
+        accessor operator[](K&& key)
+        {
+            std::unique_lock<hpx::util::spinlock> lock(mutex_);
+            return accessor(HPX_MOVE(lock), map_[HPX_FORWARD(K, key)]);
+        }
+#endif
+
         accessor at(Key const& key)
         {
             std::unique_lock<hpx::util::spinlock> lock(mutex_);
@@ -299,11 +317,36 @@ namespace hpx::concurrent {
             return const_accessor(HPX_MOVE(lock), map_.at(key));
         }
 
+#if defined(HPX_HAVE_CXX26_STD_UNORDERED_TRANSPARENT_LOOKUP)
+        template <typename K>
+        accessor at(K const& key)
+        {
+            std::unique_lock<hpx::util::spinlock> lock(mutex_);
+            return accessor(HPX_MOVE(lock), map_.at(key));
+        }
+
+        template <typename K>
+        const_accessor at(K const& key) const
+        {
+            std::unique_lock<hpx::util::spinlock> lock(mutex_);
+            return const_accessor(HPX_MOVE(lock), map_.at(key));
+        }
+#endif
+
         size_type count(Key const& key) const
         {
             std::lock_guard<hpx::util::spinlock> lock(mutex_);
             return map_.count(key);
         }
+
+#if defined(HPX_HAVE_CXX20_STD_UNORDERED_TRANSPARENT_LOOKUP)
+        template <typename K>
+        size_type count(K const& key) const
+        {
+            std::lock_guard<hpx::util::spinlock> lock(mutex_);
+            return map_.count(key);
+        }
+#endif
 
         accessor find(Key const& key)
         {
@@ -327,11 +370,46 @@ namespace hpx::concurrent {
             return const_accessor();
         }
 
+#if defined(HPX_HAVE_CXX20_STD_UNORDERED_TRANSPARENT_LOOKUP)
+        template <typename K>
+        accessor find(K const& key)
+        {
+            std::unique_lock<hpx::util::spinlock> lock(mutex_);
+            auto it = map_.find(key);
+            if (it != map_.end())
+            {
+                return accessor(HPX_MOVE(lock), it->second);
+            }
+            return accessor();
+        }
+
+        template <typename K>
+        const_accessor find(K const& key) const
+        {
+            std::unique_lock<hpx::util::spinlock> lock(mutex_);
+            auto it = map_.find(key);
+            if (it != map_.end())
+            {
+                return const_accessor(HPX_MOVE(lock), it->second);
+            }
+            return const_accessor();
+        }
+#endif
+
         bool contains(Key const& key) const
         {
             std::lock_guard<hpx::util::spinlock> lock(mutex_);
-            return map_.contains(key);
+            return map_.find(key) != map_.end();
         }
+
+#if defined(HPX_HAVE_CXX20_STD_UNORDERED_TRANSPARENT_LOOKUP)
+        template <typename K>
+        bool contains(K const& key) const
+        {
+            std::lock_guard<hpx::util::spinlock> lock(mutex_);
+            return map_.find(key) != map_.end();
+        }
+#endif
 
         // Thread-safe iteration
         template <typename F>

@@ -171,6 +171,18 @@ function(hpx_perform_cxx_feature_tests)
     DEFINITIONS HPX_HAVE_CXX_LAMBDA_CAPTURE_DECLTYPE
   )
 
+  hpx_check_for_cxx20_std_unordered_transparent_lookup(
+    DEFINITIONS HPX_HAVE_CXX20_STD_UNORDERED_TRANSPARENT_LOOKUP
+  )
+
+  hpx_check_for_cxx23_std_unordered_transparent_erase(
+    DEFINITIONS HPX_HAVE_CXX23_STD_UNORDERED_TRANSPARENT_ERASE
+  )
+
+  hpx_check_for_cxx26_std_unordered_transparent_lookup(
+    DEFINITIONS HPX_HAVE_CXX26_STD_UNORDERED_TRANSPARENT_LOOKUP
+  )
+
   hpx_check_for_builtin_forward_move(DEFINITIONS HPX_HAVE_BUILTIN_FORWARD_MOVE)
 
   hpx_check_for_builtin_frame_address(
