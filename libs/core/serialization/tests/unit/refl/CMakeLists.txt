@@ -9,6 +9,7 @@ set(tests
     reflection_containers
     reflection_pointers
     reflection_polymorphic
+    reflection_polymorphic_simple
     reflection_simple
     reflection_nested_object
     reflection_nested_templ_object
