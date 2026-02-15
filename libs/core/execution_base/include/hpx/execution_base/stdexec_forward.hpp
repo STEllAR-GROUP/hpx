@@ -32,11 +32,11 @@
 #pragma clang diagnostic ignored "-Weverything"
 #endif
 
-#include <stdexec/execution.hpp>
-#include <exec/split.hpp>
 #include <exec/ensure_started.hpp>
-#include <exec/start_detached.hpp>
 #include <exec/execute.hpp>
+#include <exec/split.hpp>
+#include <exec/start_detached.hpp>
+#include <stdexec/execution.hpp>
 
 #if defined(HPX_GCC_VERSION)
 #pragma GCC diagnostic pop
