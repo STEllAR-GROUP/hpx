@@ -5,40 +5,57 @@
 
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/testing.hpp>
-#include <iostream>
 #include <experimental/meta>
-#include <string>
+#include <iostream>
 #include <memory>
+#include <string>
 #include <vector>
 
-struct Base {
+struct Base
+{
     int base_val = 100;
     virtual ~Base() = default;
 };
 HPX_POLYMORPHIC_AUTO_REGISTER(Base)
 
-class DerivedA : public Base {
+class DerivedA : public Base
+{
 private:
     int private_a = 42;
     std::string secret_msg = "shhh";
 
 public:
-    void set_data(int a, std::string s) { private_a = a; secret_msg = s; }
-    int get_a() const { return private_a; }
+    void set_data(int a, std::string s)
+    {
+        private_a = a;
+        secret_msg = s;
+    }
+    int get_a() const
+    {
+        return private_a;
+    }
 };
 HPX_POLYMORPHIC_AUTO_REGISTER(DerivedA)
 
-class DerivedB : public Base {
+class DerivedB : public Base
+{
 private:
     double private_b = 3.14;
 
 public:
-    void set_b(double b) { private_b = b; }
-    double get_b() const { return private_b; }
+    void set_b(double b)
+    {
+        private_b = b;
+    }
+    double get_b() const
+    {
+        return private_b;
+    }
 };
 HPX_POLYMORPHIC_AUTO_REGISTER(DerivedB)
 
-int main() {
+int main()
+{
     std::vector<char> buffer;
 
     // Test Case: DerivedA
@@ -60,7 +77,8 @@ int main() {
         HPX_TEST(output != nullptr);
         auto* check = dynamic_cast<DerivedA*>(output.get());
         HPX_TEST(check != nullptr);
-        if (check) {
+        if (check)
+        {
             HPX_TEST_EQ(check->get_a(), 99);
         }
     }
