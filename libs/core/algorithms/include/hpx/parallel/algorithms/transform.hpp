@@ -404,14 +404,6 @@ namespace hpx::parallel {
                     hpx::get<0>(iters), part_size, hpx::get<1>(iters),
                     transform_projected<F, Proj>(f_, proj_));
             }
-
-            // Overload for stdexec bulk: receives single index
-            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void operator()(
-                std::size_t) const
-            {
-                // This should not be called for transform operations
-                HPX_ASSERT(false);
-            }
         };
 
         HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename F>
@@ -459,12 +451,6 @@ namespace hpx::parallel {
                 auto iters = part_begin.get_iterator_tuple();
                 return util::transform_loop_n_ind<execution_policy_type>(
                     hpx::get<0>(iters), part_size, hpx::get<1>(iters), f_);
-            }
-
-            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void operator()(
-                std::size_t) const
-            {
-                HPX_ASSERT(false);
             }
         };
 
