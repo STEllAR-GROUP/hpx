@@ -167,8 +167,9 @@ namespace hpx::execution::experimental {
               //TODO: Keep an eye on this, it is based on the internal impl of
               // stdexec, so it is subect to change. This is currently relying
               // on the env struct to expose __loop_ as a public member.
-              , loop(*hpx::execution::experimental::get_env(schedule(sched))
-                        .__loop_)
+              , loop(static_cast<hpx::execution::experimental::run_loop&>(
+                    *hpx::execution::experimental::get_env(schedule(sched))
+                        .__loop_))
 #else
               , loop(sched.get_run_loop())
 #endif

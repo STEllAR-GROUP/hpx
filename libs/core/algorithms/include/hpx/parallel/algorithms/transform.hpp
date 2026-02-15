@@ -278,6 +278,7 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/executors.hpp>
@@ -403,6 +404,14 @@ namespace hpx::parallel {
                     hpx::get<0>(iters), part_size, hpx::get<1>(iters),
                     transform_projected<F, Proj>(f_, proj_));
             }
+
+            // Overload for stdexec bulk: receives single index
+            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void operator()(
+                std::size_t) const
+            {
+                // This should not be called for transform operations
+                HPX_ASSERT(false);
+            }
         };
 
         HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename F>
@@ -450,6 +459,12 @@ namespace hpx::parallel {
                 auto iters = part_begin.get_iterator_tuple();
                 return util::transform_loop_n_ind<execution_policy_type>(
                     hpx::get<0>(iters), part_size, hpx::get<1>(iters), f_);
+            }
+
+            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void operator()(
+                std::size_t) const
+            {
+                HPX_ASSERT(false);
             }
         };
 
@@ -621,6 +636,12 @@ namespace hpx::parallel {
                     transform_binary_projected<F_, Proj1, Proj2>{
                         f_, proj1_, proj2_});
             }
+
+            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void operator()(
+                std::size_t) const
+            {
+                HPX_ASSERT(false);
+            }
         };
 
         HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename F>
@@ -677,6 +698,12 @@ namespace hpx::parallel {
                 return util::transform_binary_loop_ind_n<execution_policy_type>(
                     hpx::get<0>(iters), part_size, hpx::get<1>(iters),
                     hpx::get<2>(iters), f_);
+            }
+
+            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void operator()(
+                std::size_t) const
+            {
+                HPX_ASSERT(false);
             }
         };
 
