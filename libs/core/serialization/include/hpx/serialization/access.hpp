@@ -189,3 +189,6 @@ namespace hpx::traits {
 // dependencies as refl_serialize_impl.hpp depends on base_object.hpp
 #include <hpx/serialization/detail/refl_serialize_impl.hpp>
 #endif
+
+// To avoid circular dependencies, we include polymorphic_nonintrusive_factory_impl.hpp
+#include <hpx/serialization/detail/polymorphic_nonintrusive_factory_impl.hpp>
