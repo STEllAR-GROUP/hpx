@@ -13,13 +13,15 @@ namespace hpx::serialization::detail {
     template <typename Derived>
     void register_class<Derived>::save(output_archive& ar, void const* base)
     {
-        hpx::serialization::access::serialize(ar, *static_cast<Derived*>(const_cast<void*>(base)), 0);
+        hpx::serialization::access::serialize(
+            ar, *static_cast<Derived*>(const_cast<void*>(base)), 0);
     }
 
     template <typename Derived>
     void register_class<Derived>::load(input_archive& ar, void* base)
     {
-        hpx::serialization::access::serialize(ar, *static_cast<Derived*>(base), 0);
+        hpx::serialization::access::serialize(
+            ar, *static_cast<Derived*>(base), 0);
     }
 
     template <typename T>
@@ -49,4 +51,4 @@ namespace hpx::serialization::detail {
 
         return t.release();
     }
-}
+}    // namespace hpx::serialization::detail
