@@ -7,8 +7,14 @@
 name: Check Circular Dependencies
 
 on:
-  push
-
+  pull_request:
+  push:
+    branches-ignore:
+      - gh-pages
+      - trying
+      - staging
+    tags-ignore:
+      - stable
 
 jobs:
   check-circular-deps:

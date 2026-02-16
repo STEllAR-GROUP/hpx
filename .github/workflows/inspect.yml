@@ -7,7 +7,14 @@
 name: Inspect
 
 on:
-    push
+  pull_request:
+  push:
+    branches-ignore:
+      - gh-pages
+      - trying
+      - staging
+    tags-ignore:
+      - stable
 
 jobs:
     inspect:

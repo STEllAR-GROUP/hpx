@@ -7,7 +7,14 @@
 name: Build and Test
 
 on:
-    push
+  pull_request:
+  push:
+    branches-ignore:
+      - gh-pages
+      - trying
+      - staging
+    tags-ignore:
+      - stable
 
 jobs:
     configure-core-core_local-components:
