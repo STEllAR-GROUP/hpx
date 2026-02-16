@@ -1200,6 +1200,31 @@ namespace hpx::execution::experimental {
     private:
         std::shared_ptr<shared_data> shared_data_ = nullptr;
 
+        template <typename Parameters>
+            requires(hpx::traits::is_executor_parameters_v<Parameters>)
+        friend std::size_t tag_invoke(
+            hpx::execution::experimental::processing_units_count_t,
+            Parameters&&, fork_join_executor const& exec,
+            hpx::chrono::steady_duration const& = hpx::chrono::null_duration,
+            std::size_t = 0)
+        {
+            return exec.shared_data_->num_threads_;
+        }
+
+        friend std::size_t tag_invoke(
+            hpx::execution::experimental::get_first_core_t,
+            fork_join_executor const& exec) noexcept
+        {
+            auto const& mask = exec.shared_data_->pu_mask_;
+            auto const size = hpx::threads::mask_size(mask);
+            for (std::size_t i = 0; i != size; ++i)
+            {
+                if (hpx::threads::test(mask, i))
+                    return i;
+            }
+            return 0;
+        }
+
         template <typename F, typename S, typename... Ts>
             requires(!std::is_integral_v<S>)
         friend decltype(auto) tag_invoke(
