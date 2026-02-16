@@ -190,8 +190,6 @@ set(algorithms_headers
     hpx/parallel/util/adapt_sharing_mode.hpp
     hpx/parallel/util/adapt_thread_priority.hpp
     hpx/parallel/util/cancellation_token.hpp
-    hpx/parallel/util/cartesian_product.hpp
-    hpx/parallel/util/chunk_by.hpp
     hpx/parallel/util/compare_projected.hpp
     hpx/parallel/util/detail/algorithm_result.hpp
     hpx/parallel/util/detail/chunk_size.hpp
@@ -217,11 +215,8 @@ set(algorithms_headers
     hpx/parallel/util/projection_identity.hpp
     hpx/parallel/util/range.hpp
     hpx/parallel/util/ranges_facilities.hpp
-    hpx/parallel/util/repeat.hpp
     hpx/parallel/util/result_types.hpp
     hpx/parallel/util/scan_partitioner.hpp
-    hpx/parallel/util/slide.hpp
-    hpx/parallel/util/stride.hpp
     hpx/parallel/util/transfer.hpp
     hpx/parallel/util/transform_loop.hpp
     hpx/parallel/util/zip_iterator.hpp
