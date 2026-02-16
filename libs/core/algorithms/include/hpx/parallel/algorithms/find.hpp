@@ -1898,8 +1898,7 @@ namespace hpx::parallel::detail {
                     base_idx, it, part_size, tok, val, HPX_FORWARD(Proj, proj));
             };
 
-            auto f2 = [tok, count, first, last](
-                          auto&&... data) mutable -> Iter {
+            auto f2 = [tok, first, last](auto&&... data) mutable -> Iter {
                 static_assert(sizeof...(data) < 2);
                 if constexpr (sizeof...(data) == 1)
                 {
@@ -1986,8 +1985,7 @@ namespace hpx::parallel::detail {
                     tok, HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
             };
 
-            auto f2 = [tok, count, first, last](
-                          auto&&... data) mutable -> Iter {
+            auto f2 = [tok, first, last](auto&&... data) mutable -> Iter {
                 static_assert(sizeof...(data) < 2);
                 if constexpr (sizeof...(data) == 1)
                 {
@@ -2075,8 +2073,7 @@ namespace hpx::parallel::detail {
                     part_size, tok, HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
             };
 
-            auto f2 = [tok, count, first, last](
-                          auto&&... data) mutable -> Iter {
+            auto f2 = [tok, first, last](auto&&... data) mutable -> Iter {
                 static_assert(sizeof...(data) < 2);
                 if constexpr (sizeof...(data) == 1)
                 {
