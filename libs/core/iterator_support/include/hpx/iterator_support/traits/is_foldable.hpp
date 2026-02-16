@@ -17,17 +17,18 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx::traits {
+namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <class F, class T, class I, class U>
+    HPX_CXX_CORE_EXPORT template <typename F, typename T, typename I,
+        typename U>
     concept is_indirect_binary_left_foldable_impl =
         std::movable<T> && std::movable<U> && std::convertible_to<T, U> &&
         std::invocable<F&, U, std::iter_reference_t<I>> &&
         std::assignable_from<U&,
             std::invoke_result_t<F&, U, std::iter_reference_t<I>>>;
 
-    HPX_CXX_EXPORT template <class F, class T, class I>
+    HPX_CXX_CORE_EXPORT template <typename F, typename T, typename I>
     concept is_indirectly_binary_left_foldable =
         std::copy_constructible<F> && std::indirectly_readable<I> &&
         std::invocable<F&, T, std::iter_reference_t<I>> &&
@@ -41,23 +42,23 @@ namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
-        template <class F>
+        template <typename F>
         class flipped
         {
-            F f;
+            HPX_NO_UNIQUE_ADDRESS F f;
 
         public:
-            template <class T, class U>
-                requires hpx::is_invocable_v<F&, U, T>
-            constexpr hpx::util::invoke_result_t<F&, U, T> operator()(
+            template <typename T, typename U>
+                requires hpx::is_invocable_v<F&, U&&, T&&>
+            constexpr hpx::util::invoke_result_t<F&, U&&, T&&> operator()(
                 T&& t, U&& u)
             {
-                return HPX_INVOKE(f, std::forward<U>(u), std::forward<T>(t));
+                return HPX_INVOKE(f, HPX_FORWARD(u), HPX_FORWARD(t));
             }
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <class F, class T, class I>
+    HPX_CXX_CORE_EXPORT template <typename F, typename T, typename I>
     concept is_indirectly_binary_right_foldable =
         is_indirectly_binary_left_foldable<detail::flipped<F>, T, I>;
-}    // namespace hpx::traits
+}    // namespace hpx

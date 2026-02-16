@@ -16,7 +16,6 @@
 #include <utility>
 #include <vector>
 
-#include "hpx/parallel/container_algorithms/fold.hpp"
 #include "test_utils.hpp"
 
 // Manual implementation of fold algorithms for verification
