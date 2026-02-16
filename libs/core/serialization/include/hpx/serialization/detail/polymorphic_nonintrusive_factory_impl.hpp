@@ -10,6 +10,8 @@
 #include <hpx/serialization/access.hpp>
 #include <hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 
+#include <memory>
+
 namespace hpx::serialization::detail {
     template <typename Derived>
     void register_class<Derived>::save(output_archive& ar, void const* base)

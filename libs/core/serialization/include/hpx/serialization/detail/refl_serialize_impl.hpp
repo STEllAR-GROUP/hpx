@@ -6,28 +6,32 @@
 
 #pragma once
 
+#include <hpx/serialization/config/defines.hpp>
+
+// clang-format off
 #include <hpx/serialization/input_archive.hpp>
 #include <hpx/serialization/output_archive.hpp>
-
 #include <hpx/serialization/base_object.hpp>
+// clang-format on
 
 // This file is only ever included by access.hpp
 // but we will still guard against direct inclusion
 #if defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
+#include <cstddef>
 #include <experimental/meta>
 #include <memory>
 
 namespace hpx::serialization::detail {
     template <typename MemberType, typename T>
-    constexpr auto* member_from_offset(T* base, std::size_t offset)
+    constexpr decltype(auto) member_from_offset(T& base, std::size_t offset)
     {
         using ByteType =
             std::conditional_t<std::is_const_v<T>, std::byte const, std::byte>;
         using Type = std::conditional_t<std::is_const_v<T>, MemberType const,
             MemberType>;
 
-        return reinterpret_cast<Type*>(
-            reinterpret_cast<ByteType*>(base) + offset);
+        return reinterpret_cast<Type&>(
+            *(reinterpret_cast<ByteType*>(std::addressof(base)) + offset));
     }
 
     HPX_CXX_EXPORT template <typename Archive, typename T>
@@ -70,8 +74,7 @@ namespace hpx::serialization::detail {
                     "Reflection serialization does not support bitfields");
 
                 using MemberType = typename[:std::meta::type_of(member):];
-                ar&* member_from_offset<MemberType>(
-                    std::addressof(t), offset_info.bytes);
+                ar& member_from_offset<MemberType>(t, offset_info.bytes);
             }
         }
     }

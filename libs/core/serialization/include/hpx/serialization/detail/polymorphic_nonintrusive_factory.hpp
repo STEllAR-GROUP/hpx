@@ -43,7 +43,7 @@ namespace hpx::serialization::detail {
     {
 
 #if defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
-        [[nodiscard]] char const* operator()() const noexcept
+        [[nodiscard]] constexpr char const* operator()() const noexcept
         {
             // Unless the user specifically creates a specialization of this
             // we should be able to auto generate a full string description
