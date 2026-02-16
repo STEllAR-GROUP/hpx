@@ -196,7 +196,7 @@ namespace hpx::ranges {
     template <typename Rng, typename T, typename F>
     auto fold_left_with_iter(Rng&& rng, T init, F f)
         -> fold_left_with_iter_result<
-            hpx::traits::range_iterator_t<Rng>,
+            std::ranges::iterator_t<Rng>,
             std::decay_t<hpx::util::invoke_result_t<F&, T,
                 hpx::traits::range_reference_t<Rng>>>>;
 
@@ -237,7 +237,7 @@ namespace hpx::ranges {
     template <typename Rng, typename F>
     auto fold_left_first_with_iter(Rng&& rng, F f)
         -> fold_left_first_with_iter_result<
-            hpx::traits::range_iterator_t<Rng>,
+            std::ranges::iterator_t<Rng>,
             hpx::optional<
                 std::decay_t<hpx::util::invoke_result_t<F&,
                     hpx::traits::range_reference_t<Rng>,
@@ -258,6 +258,7 @@ namespace hpx::ranges {
 #include <hpx/parallel/util/ranges_facilities.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 
+#include <ranges>
 #include <type_traits>
 
 namespace hpx::ranges {
@@ -279,9 +280,9 @@ namespace hpx::ranges {
         template <typename InIter, typename Sent, typename T, typename F>
         // clang-format off
         requires (
-            hpx::traits::is_input_iterator_v<InIter> &&
+            std::input_iterator<InIter> &&
             std::is_same_v<T, hpx::traits::iter_value_t<InIter>> &&
-            hpx::traits::is_sentinel_for_v<Sent, InIter> &&
+            std::sentinel_for<Sent, InIter> &&
             hpx::is_indirectly_binary_left_foldable<F, T, InIter>
         )
         // clang-format on
@@ -310,11 +311,11 @@ namespace hpx::ranges {
         template <typename Rng, typename T, typename F>
         // clang-format off
         requires (
-            hpx::traits::is_input_range_v<Rng> &&
+            std::ranges::input_range<Rng> &&
             std::is_same_v<T, hpx::traits::iter_value_t<
-                hpx::traits::range_iterator_t<Rng>>> &&
+                std::ranges::iterator_t<Rng>>> &&
             hpx::is_indirectly_binary_left_foldable<F, T,
-                hpx::traits::range_iterator_t<Rng>>
+                std::ranges::iterator_t<Rng>>
         )
         // clang-format on
         friend auto tag_fallback_invoke(
@@ -335,8 +336,8 @@ namespace hpx::ranges {
         template <typename InIter, typename Sent, typename F>
         // clang-format off
         requires (
-            hpx::traits::is_input_iterator_v<InIter> &&
-            hpx::traits::is_sentinel_for_v<Sent, InIter> &&
+            std::input_iterator<InIter> &&
+            std::sentinel_for<Sent, InIter> &&
             hpx::is_indirectly_binary_left_foldable<F,
                 hpx::traits::iter_value_t<InIter>, InIter>
         )
@@ -368,10 +369,10 @@ namespace hpx::ranges {
         template <typename Rng, typename F>
         // clang-format off
         requires (
-            hpx::traits::is_input_range_v<Rng> &&
+            std::ranges::input_range<Rng> &&
             hpx::is_indirectly_binary_left_foldable<F,
-                hpx::traits::iter_value_t<hpx::traits::range_iterator_t<Rng>>,
-                hpx::traits::range_iterator_t<Rng>>
+                hpx::traits::iter_value_t<std::ranges::iterator_t<Rng>>,
+                std::ranges::iterator_t<Rng>>
         )
         // clang-format on
         friend auto tag_fallback_invoke(
@@ -392,8 +393,8 @@ namespace hpx::ranges {
         template <typename InIter, typename Sent, typename T, typename F>
         // clang-format off
         requires (
-            hpx::traits::is_input_iterator_v<InIter> &&
-            hpx::traits::is_sentinel_for_v<Sent, InIter> &&
+            std::input_iterator<InIter> &&
+            std::sentinel_for<Sent, InIter> &&
             std::is_same_v<T, hpx::traits::iter_value_t<InIter>> &&
             hpx::is_indirectly_binary_left_foldable<F, T, InIter>
         )
@@ -409,11 +410,11 @@ namespace hpx::ranges {
         template <typename Rng, typename T, typename F>
         // clang-format off
         requires (
-            hpx::traits::is_input_range_v<Rng> &&
+            std::ranges::input_range<Rng> &&
             std::is_same_v<T, hpx::traits::iter_value_t<
-                hpx::traits::range_iterator_t<Rng>>> &&
+                std::ranges::iterator_t<Rng>>> &&
             hpx::is_indirectly_binary_left_foldable<F, T,
-                hpx::traits::range_iterator_t<Rng>>
+                std::ranges::iterator_t<Rng>>
         )
         // clang-format on
         friend auto tag_fallback_invoke(
@@ -434,8 +435,8 @@ namespace hpx::ranges {
         template <typename InIter, typename Sent, typename F>
         // clang-format off
         requires (
-            hpx::traits::is_input_iterator_v<InIter> &&
-            hpx::traits::is_sentinel_for_v<Sent, InIter> &&
+            std::input_iterator<InIter> &&
+            std::sentinel_for<Sent, InIter> &&
             hpx::is_indirectly_binary_left_foldable<F,
                 hpx::traits::iter_value_t<InIter>, InIter>
         )
@@ -451,10 +452,10 @@ namespace hpx::ranges {
         template <typename Rng, typename F>
         // clang-format off
         requires (
-            hpx::traits::is_input_range_v<Rng> &&
+            std::ranges::input_range<Rng> &&
             hpx::is_indirectly_binary_left_foldable<F,
-                hpx::traits::iter_value_t<hpx::traits::range_iterator_t<Rng>>,
-                hpx::traits::range_iterator_t<Rng>>
+                hpx::traits::iter_value_t<std::ranges::iterator_t<Rng>>,
+                std::ranges::iterator_t<Rng>>
         )
         // clang-format on
         friend auto tag_fallback_invoke(
@@ -477,7 +478,7 @@ namespace hpx::ranges {
         requires (
             hpx::traits::is_bidirectional_iterator_v<BidIter> &&
             std::is_same_v<T, hpx::traits::iter_value_t<BidIter>> &&
-            hpx::traits::is_sentinel_for_v<Sent, BidIter> &&
+            std::sentinel_for<Sent, BidIter> &&
             hpx::is_indirectly_binary_right_foldable<F, T, BidIter>
         )
         // clang-format on
@@ -505,11 +506,11 @@ namespace hpx::ranges {
         template <typename Rng, typename T, typename F>
         // clang-format off
         requires (
-            hpx::traits::is_bidirectional_range_v<Rng> &&
+            std::ranges::bidirectional_range<Rng> &&
             std::is_same_v<T, hpx::traits::iter_value_t<
-                hpx::traits::range_iterator_t<Rng>>> &&
+                std::ranges::iterator_t<Rng>>> &&
             hpx::is_indirectly_binary_right_foldable<F, T,
-                hpx::traits::range_iterator_t<Rng>>
+                std::ranges::iterator_t<Rng>>
         )
         // clang-format on
         friend auto tag_fallback_invoke(
@@ -531,7 +532,7 @@ namespace hpx::ranges {
         // clang-format off
         requires (
             hpx::traits::is_bidirectional_iterator_v<BidIter> &&
-            hpx::traits::is_sentinel_for_v<Sent, BidIter> &&
+            std::sentinel_for<Sent, BidIter> &&
             hpx::is_indirectly_binary_right_foldable<F,
                 hpx::traits::iter_value_t<BidIter>, BidIter>
         )
@@ -560,10 +561,10 @@ namespace hpx::ranges {
         template <typename Rng, typename F>
         // clang-format off
         requires (
-            hpx::traits::is_bidirectional_range_v<Rng> &&
+            std::ranges::bidirectional_range<Rng> &&
             hpx::is_indirectly_binary_right_foldable<F,
-                hpx::traits::iter_value_t<hpx::traits::range_iterator_t<Rng>>,
-                hpx::traits::range_iterator_t<Rng>>
+                hpx::traits::iter_value_t<std::ranges::iterator_t<Rng>>,
+                std::ranges::iterator_t<Rng>>
         )
         // clang-format on
         friend auto tag_fallback_invoke(

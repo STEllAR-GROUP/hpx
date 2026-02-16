@@ -75,28 +75,4 @@ namespace hpx::traits {
         using iterator_type = typename util::detail::iterator<R>::type;
         using sentinel_type = typename util::detail::sentinel<R>::type;
     };
-
-    ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename R>
-    struct is_input_range
-      : std::integral_constant<bool,
-            is_range_v<R> && is_input_iterator_v<range_iterator_t<R>>>
-    {
-    };
-
-    HPX_CXX_EXPORT template <typename R>
-    inline constexpr bool is_input_range_v = is_input_range<R>::value;
-
-    ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename R>
-    struct is_bidirectional_range
-      : std::integral_constant<bool,
-            is_range_v<R> && is_bidirectional_iterator_v<range_iterator_t<R>>>
-    {
-    };
-
-    HPX_CXX_EXPORT template <typename R>
-    inline constexpr bool is_bidirectional_range_v =
-        is_bidirectional_range<R>::value;
-
 }    // namespace hpx::traits
