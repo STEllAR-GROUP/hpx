@@ -695,7 +695,6 @@ function(hpx_check_for_mm_prefetch)
   )
 endfunction()
 
-
 # ##############################################################################
 function(hpx_check_for_cxx23_std_unordered_transparent_erase)
   add_hpx_config_test(
@@ -713,7 +712,6 @@ function(hpx_check_for_cxx26_std_unordered_transparent_lookup)
     FILE ${ARGN}
   )
 endfunction()
-
 
 # ##############################################################################
 function(hpx_check_for_stable_inplace_merge)

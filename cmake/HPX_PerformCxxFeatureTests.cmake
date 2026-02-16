@@ -171,7 +171,6 @@ function(hpx_perform_cxx_feature_tests)
     DEFINITIONS HPX_HAVE_CXX_LAMBDA_CAPTURE_DECLTYPE
   )
 
-
   hpx_check_for_cxx23_std_unordered_transparent_erase(
     DEFINITIONS HPX_HAVE_CXX23_STD_UNORDERED_TRANSPARENT_ERASE
   )
