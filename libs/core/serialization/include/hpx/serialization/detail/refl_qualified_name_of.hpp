@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <hpx/serialization/config/defines.hpp>
+
 #if defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
 
 #include <algorithm>
@@ -26,14 +28,14 @@ namespace hpx::serialization::detail {
         char data[N + 1]{};    // +1 for null terminator
         static constexpr std::size_t size = N;
 
-        constexpr fixed_string(std::string_view sv)
+        constexpr fixed_string(std::string_view sv) noexcept
         {
             for (std::size_t i = 0; i < sv.size(); ++i)
                 data[i] = sv[i];
         }
 
         template <std::size_t M>
-        constexpr auto operator+(fixed_string<M> const& other) const
+        constexpr auto operator+(fixed_string<M> const& other) const noexcept
         {
             fixed_string<N + M> res("");
             for (std::size_t i = 0; i < N; ++i)
@@ -48,7 +50,7 @@ namespace hpx::serialization::detail {
     template <std::meta::info Scope>
     struct scope_builder
     {
-        static constexpr auto get_value()
+        static constexpr auto get_value() noexcept
         {
             if constexpr (Scope == ^^::)
             {
@@ -56,9 +58,10 @@ namespace hpx::serialization::detail {
             }
             else if constexpr (!std::meta::has_identifier(Scope))
             {
-                // For types without identifiers (primitives, pointers, etc.),
-                // use display_string_of as the fallback, this should guarantee
-                // uniqueness of the string made for a type even though
+                // For types without identifiers (primitives,
+                // pointers, etc.), use display_string_of as the
+                // fallback,  this should guarantee uniqueness of
+                // the string made for a type even though
                 // display_string_of is implementationd defined
                 constexpr auto name_view = std::meta::display_string_of(Scope);
                 return fixed_string<name_view.size()>(name_view);
@@ -84,14 +87,14 @@ namespace hpx::serialization::detail {
     };
 
     template <auto StringGetter>
-    static constexpr auto make_fixed()
+    static constexpr auto make_fixed() noexcept
     {
         constexpr std::string_view sv = StringGetter();
         return fixed_string<sv.size()>(sv);
     }
 
     // Primary template for non-template types
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct qualified_name_of
     {
     private:
@@ -106,7 +109,7 @@ namespace hpx::serialization::detail {
     };
 
     // Partial specialization for template types
-    HPX_CXX_EXPORT template <template <typename...> typename T,
+    HPX_CXX_CORE_EXPORT template <template <typename...> typename T,
         typename... Args>
     struct qualified_name_of<T<Args...>>
     {
@@ -115,7 +118,7 @@ namespace hpx::serialization::detail {
         static constexpr auto scoped_name = scope_builder<dT>::value;
 
         // Recursively call qualified_name_of for each arg
-        static constexpr auto get_args_name()
+        static constexpr auto get_args_name() noexcept
         {
             if constexpr (sizeof...(Args) == 0)
             {
