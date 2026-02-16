@@ -469,7 +469,7 @@
         {                                                                      \
             HPX_PP_CAT(register_class_helper_, __LINE__)()                     \
             {                                                                  \
-                [[maybe_unused]] auto& _ =                                     \
+                [[maybe_unused]] static auto& _ =                              \
                     hpx::serialization::detail::register_class<                \
                         /**/ Class>::instance(); /* force instantiation */     \
             }                                                                  \

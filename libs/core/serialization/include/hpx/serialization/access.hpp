@@ -124,8 +124,7 @@ namespace hpx::serialization {
                     // field has to be serializable and public.
                     serialize_struct(ar, t, 0);
                 }
-#endif
-#if defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
+#else
                 else if constexpr (    // TODO: I think this is too wide a filter
                     std::is_class_v<dT>)
                 {
