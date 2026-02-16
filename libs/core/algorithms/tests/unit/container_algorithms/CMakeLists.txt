@@ -29,6 +29,11 @@ set(tests
     ends_with_range
     equal_range
     equal_binary_range
+    chunk_by_view
+    slide_view
+    stride_view
+    cartesian_product_view
+    repeat_view
     exclusive_scan_range
     fill_range
     filln_range
@@ -40,6 +45,8 @@ set(tests
     find_end_range2
     find_first_of_range
     find_first_of_range2
+    fold_left_range
+    fold_right_range
     for_loop_exception_range
     for_loop_induction_range
     for_loop_induction_async_range

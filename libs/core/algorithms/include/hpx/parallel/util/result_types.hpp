@@ -399,6 +399,39 @@ namespace hpx::parallel::util {
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    HPX_CXX_CORE_EXPORT template <typename I, typename T>
+    struct in_value_result
+    {
+        HPX_NO_UNIQUE_ADDRESS I in;
+        HPX_NO_UNIQUE_ADDRESS T value;
+
+        template <typename I2, typename T2,
+            typename Enable =
+                std::enable_if_t<std::is_convertible_v<I const&, I2> &&
+                    std::is_convertible_v<T const&, T2>>>
+        constexpr operator in_value_result<I2, T2>() const&
+        {
+            return {in, value};
+        }
+
+        template <typename I2, typename T2,
+            typename Enable = std::enable_if_t<std::is_convertible_v<I, I2> &&
+                std::is_convertible_v<T, T2>>>
+        constexpr operator in_value_result<I2, T2>() &&
+        {
+            return {HPX_MOVE(in), HPX_MOVE(value)};
+        }
+
+        template <typename Archive>
+        void serialize(Archive& ar, unsigned)
+        {
+            // clang-format off
+            ar & in & value;
+            // clang-format on
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
         HPX_CXX_EXPORT template <typename ZipIter>
@@ -541,11 +574,12 @@ namespace hpx::parallel::util {
 
 namespace hpx::ranges {
 
-    HPX_CXX_EXPORT using hpx::parallel::util::in_fun_result;
-    HPX_CXX_EXPORT using hpx::parallel::util::in_in_out_result;
-    HPX_CXX_EXPORT using hpx::parallel::util::in_in_result;
-    HPX_CXX_EXPORT using hpx::parallel::util::in_out_out_result;
-    HPX_CXX_EXPORT using hpx::parallel::util::in_out_result;
-    HPX_CXX_EXPORT using hpx::parallel::util::min_max_result;
+    HPX_CXX_CORE_EXPORT using hpx::parallel::util::in_fun_result;
+    HPX_CXX_CORE_EXPORT using hpx::parallel::util::in_in_out_result;
+    HPX_CXX_CORE_EXPORT using hpx::parallel::util::in_in_result;
+    HPX_CXX_CORE_EXPORT using hpx::parallel::util::in_out_out_result;
+    HPX_CXX_CORE_EXPORT using hpx::parallel::util::in_out_result;
+    HPX_CXX_CORE_EXPORT using hpx::parallel::util::in_value_result;
+    HPX_CXX_CORE_EXPORT using hpx::parallel::util::min_max_result;
 }    // namespace hpx::ranges
 // namespace hpx::ranges
