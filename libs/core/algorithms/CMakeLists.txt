@@ -270,17 +270,31 @@ add_hpx_module(
                        "hpx/parallel/util/detail/handle_remote_exceptions.hpp"
   SOURCES ${algorithms_sources}
   MODULE_DEPENDENCIES
+    hpx_async_base
     hpx_async_combinators
     hpx_async_local
+    hpx_concepts
+    hpx_concurrency
     hpx_config
+    hpx_coroutines
+    hpx_datastructures
+    hpx_errors
+    hpx_execution_base
     hpx_execution
     hpx_executors
+    hpx_functional
     hpx_futures
     hpx_iterator_support
+    hpx_itt_notify
     hpx_lcos_local
+    hpx_memory
     hpx_pack_traversal
     hpx_properties
     hpx_serialization
+    hpx_synchronization
+    hpx_tag_invoke
+    hpx_threading_base
+    hpx_type_support
     hpx_util
     ${additional_dependencies}
   CMAKE_SUBDIRS examples tests
