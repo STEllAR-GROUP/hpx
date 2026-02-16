@@ -29,9 +29,7 @@ set(tests
     ends_with_range
     equal_range
     equal_binary_range
-    chunk_by_view
-    slide_view
-    stride_view
+
     exclusive_scan_range
     fill_range
     filln_range

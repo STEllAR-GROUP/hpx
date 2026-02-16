@@ -381,14 +381,16 @@ namespace hpx::parallel::util {
         }
     };
 
-    HPX_CXX_CORE_EXPORT template <typename Iterator, typename Sentinel = Iterator>
+    HPX_CXX_CORE_EXPORT template <typename Iterator,
+        typename Sentinel = Iterator>
     hpx::util::iterator_range<Iterator, Sentinel> make_subrange(
         Iterator iterator, Sentinel sentinel)
     {
         return hpx::util::iterator_range(iterator, sentinel);
     }
 
-    HPX_CXX_CORE_EXPORT template <typename Iterator, typename Sentinel = Iterator>
+    HPX_CXX_CORE_EXPORT template <typename Iterator,
+        typename Sentinel = Iterator>
     hpx::future<hpx::util::iterator_range<Iterator, Sentinel>> make_subrange(
         hpx::future<Iterator>&& iterator, Sentinel sentinel)
     {
