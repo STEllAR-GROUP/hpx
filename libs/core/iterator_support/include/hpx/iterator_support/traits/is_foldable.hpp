@@ -45,7 +45,7 @@ namespace hpx {
         template <typename F>
         class flipped
         {
-            HPX_NO_UNIQUE_ADDRESS F f;
+            F f;
 
         public:
             template <typename T, typename U>
@@ -53,7 +53,7 @@ namespace hpx {
             constexpr hpx::util::invoke_result_t<F&, U&&, T&&> operator()(
                 T&& t, U&& u)
             {
-                return HPX_INVOKE(f, HPX_FORWARD(u), HPX_FORWARD(t));
+                return HPX_INVOKE(f, HPX_FORWARD(U, u), HPX_FORWARD(T, t));
             }
         };
     }    // namespace detail
