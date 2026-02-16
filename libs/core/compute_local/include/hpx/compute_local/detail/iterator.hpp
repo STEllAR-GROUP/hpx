@@ -15,6 +15,7 @@
 
 #include <cstddef>
 #include <iterator>
+#include <type_traits>
 
 namespace hpx::compute::detail {
 
