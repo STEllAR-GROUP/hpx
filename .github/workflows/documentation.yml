@@ -7,7 +7,14 @@
 name: Documentation Build
 
 on:
-  push
+  pull_request:
+  push:
+    branches-ignore:
+      - gh-pages
+      - trying
+      - staging
+    tags-ignore:
+      - stable
 
 jobs:
   build-documentation:

@@ -7,9 +7,14 @@
 name: Configure Test Combinations
 
 on:
+  pull_request:
   push:
     branches-ignore:
       - gh-pages
+      - trying
+      - staging
+    tags-ignore:
+      - stable
 
 jobs:
   configure-test-combinations:
