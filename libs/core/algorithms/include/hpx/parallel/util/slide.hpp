@@ -31,9 +31,7 @@ namespace hpx { namespace views {
 #include <hpx/type_support/decay.hpp>
 
 #include <algorithm>
-#include <concepts>
 #include <iterator>
-#include <type_traits>
 #include <utility>
 
 namespace hpx::ranges::detail {
@@ -101,7 +99,8 @@ namespace hpx::ranges::detail {
             return !(x == y);
         }
 
-        friend constexpr bool operator==(slide_iterator const& x, S const& y)
+        friend constexpr bool operator==(
+            slide_iterator const& x, S const& /* y */)
         {
             return x.at_end_;
         }

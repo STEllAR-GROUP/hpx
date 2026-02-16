@@ -29,10 +29,9 @@ namespace hpx { namespace views {
 #include <hpx/iterator_support/traits/is_range.hpp>
 #include <hpx/type_support/decay.hpp>
 
+#include <hpx/parallel/util/result_types.hpp>
 #include <algorithm>
-#include <concepts>
 #include <iterator>
-#include <type_traits>
 #include <utility>
 
 namespace hpx::ranges::detail {

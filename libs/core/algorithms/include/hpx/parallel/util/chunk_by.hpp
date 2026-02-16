@@ -30,8 +30,8 @@ namespace hpx { namespace views {
 #include <hpx/iterator_support/traits/is_range.hpp>
 #include <hpx/type_support/decay.hpp>
 
+#include <hpx/config.hpp>
 #include <algorithm>
-#include <concepts>
 #include <functional>
 #include <iterator>
 #include <type_traits>

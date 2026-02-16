@@ -31,9 +31,8 @@ namespace hpx { namespace views {
 #include <hpx/iterator_support/traits/is_range.hpp>
 #include <hpx/type_support/decay.hpp>
 
-#include <concepts>
+#include <hpx/type_support/unused.hpp>
 #include <iterator>
-#include <type_traits>
 #include <utility>
 
 namespace hpx::ranges::detail {
@@ -106,7 +105,7 @@ namespace hpx::ranges::detail {
             return *this;
         }
 
-        constexpr reference operator[](difference_type n) const
+        constexpr reference operator[](difference_type /* n */) const
         {
             return *value_;
         }
