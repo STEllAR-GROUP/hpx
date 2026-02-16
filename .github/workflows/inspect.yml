@@ -105,13 +105,13 @@ jobs:
             
             - name: Upload inspect report
               if: always()
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v6
               with:
                 name: hpx-inspect-report
                 path: /hpx/build/hpx_inspect_report.html
 
             - name: Upload inspect binary
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v6
               with:
                 name: inspect-binary
                 path: /hpx/build/bin/inspect
