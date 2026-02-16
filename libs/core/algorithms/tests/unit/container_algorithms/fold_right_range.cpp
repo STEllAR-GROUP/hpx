@@ -7,7 +7,6 @@
 #include <hpx/algorithm.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/parallel/container_algorithms/fold_right.hpp>
 
 #include <numeric>
 #include <string>
@@ -63,7 +62,7 @@ void test_fold_right_order()
     HPX_TEST_EQ(result, std::string("abcd"));
 }
 
-int main(int argc, char* argv[])
+int main()
 {
     test_fold_right();
     test_fold_right_empty();

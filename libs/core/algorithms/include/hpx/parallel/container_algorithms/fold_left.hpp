@@ -14,15 +14,15 @@
 namespace hpx { namespace ranges {
     // clang-format off
 
-    /// Loose implementation of the C++23 fold_left algorithm
+    /// Implementation of the C++23 fold_left algorithm
     template <typename R, typename T, typename F>
     constexpr auto fold_left(R&& r, T init, F f);
 
-    /// Loose implementation of the C++23 fold_left_with_iter algorithm
+    /// Implementation of the C++23 fold_left_with_iter algorithm
     template <typename R, typename T, typename F>
     constexpr auto fold_left_with_iter(R&& r, T init, F f);
 
-    /// Loose implementation of the C++23 fold_left_first algorithm
+    /// Implementation of the C++23 fold_left_first algorithm
     template <typename R, typename F>
     constexpr auto fold_left_first(R&& r, F f);
 
@@ -33,8 +33,10 @@ namespace hpx { namespace ranges {
 
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/range.hpp>
+#include <hpx/iterator_support/traits/is_foldable.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 
 #include <algorithm>
@@ -52,17 +54,17 @@ namespace hpx::ranges::detail {
         if (first == last)
         {
             return hpx::parallel::util::in_value_result<I, U>{
-                std::move(first), std::move(init)};
+                HPX_MOVE(first), HPX_MOVE(init)};
         }
 
-        U accum = std::invoke(f, std::move(init), *first);
+        U accum = std::invoke(f, HPX_MOVE(init), *first);
         for (++first; first != last; ++first)
         {
-            accum = std::invoke(f, std::move(accum), *first);
+            accum = std::invoke(f, HPX_MOVE(accum), *first);
         }
 
         return hpx::parallel::util::in_value_result<I, U>{
-            std::move(first), std::move(accum)};
+            HPX_MOVE(first), HPX_MOVE(accum)};
     }
 
     template <typename I, typename S, typename F>
@@ -73,16 +75,16 @@ namespace hpx::ranges::detail {
 
         if (first == last)
         {
-            return Res{std::move(first), std::nullopt};
+            return Res{HPX_MOVE(first), std::nullopt};
         }
 
         std::optional<U> accum(std::in_place, *first);
         for (++first; first != last; ++first)
         {
-            *accum = std::invoke(f, std::move(*accum), *first);
+            *accum = std::invoke(f, HPX_MOVE(*accum), *first);
         }
 
-        return Res{std::move(first), std::move(accum)};
+        return Res{HPX_MOVE(first), HPX_MOVE(accum)};
     }
 }    // namespace hpx::ranges::detail
 
@@ -92,25 +94,27 @@ namespace hpx::ranges {
     // fold_left_with_iter
     // ----------------------------------------------------------------------
     HPX_CXX_CORE_EXPORT struct fold_left_with_iter_t final
-      : hpx::functional::detail::tag_fallback<fold_left_with_iter_t>
+      : hpx::detail::tag_parallel_algorithm<fold_left_with_iter_t>
     {
     private:
         template <typename I, typename S, typename T, typename F>
         friend constexpr auto tag_fallback_invoke(
             fold_left_with_iter_t, I first, S last, T init, F f)
+            requires hpx::is_indirectly_binary_left_foldable<F, T, I>
         {
             return hpx::ranges::detail::fold_left_with_iter_impl(
-                std::move(first), std::move(last), std::move(init),
-                std::move(f));
+                HPX_MOVE(first), HPX_MOVE(last), HPX_MOVE(init), HPX_MOVE(f));
         }
 
         template <typename R, typename T, typename F>
         friend constexpr auto tag_fallback_invoke(
             fold_left_with_iter_t, R&& r, T init, F f)
+            requires hpx::is_indirectly_binary_left_foldable<F, T,
+                typename hpx::traits::range_traits<R>::iterator_type>
         {
             return hpx::ranges::detail::fold_left_with_iter_impl(
-                hpx::util::begin(r), hpx::util::end(r), std::move(init),
-                std::move(f));
+                hpx::util::begin(r), hpx::util::end(r), HPX_MOVE(init),
+                HPX_MOVE(f));
         }
     };
 
@@ -120,26 +124,28 @@ namespace hpx::ranges {
     // fold_left
     // ----------------------------------------------------------------------
     HPX_CXX_CORE_EXPORT struct fold_left_t final
-      : hpx::functional::detail::tag_fallback<fold_left_t>
+      : hpx::detail::tag_parallel_algorithm<fold_left_t>
     {
     private:
         template <typename I, typename S, typename T, typename F>
         friend constexpr auto tag_fallback_invoke(
             fold_left_t, I first, S last, T init, F f)
+            requires hpx::is_indirectly_binary_left_foldable<F, T, I>
         {
             return hpx::ranges::detail::fold_left_with_iter_impl(
-                std::move(first), std::move(last), std::move(init),
-                std::move(f))
+                HPX_MOVE(first), HPX_MOVE(last), HPX_MOVE(init), HPX_MOVE(f))
                 .value;
         }
 
         template <typename R, typename T, typename F>
         friend constexpr auto tag_fallback_invoke(
             fold_left_t, R&& r, T init, F f)
+            requires hpx::is_indirectly_binary_left_foldable<F, T,
+                typename hpx::traits::range_traits<R>::iterator_type>
         {
             return hpx::ranges::detail::fold_left_with_iter_impl(
-                hpx::util::begin(r), hpx::util::end(r), std::move(init),
-                std::move(f))
+                hpx::util::begin(r), hpx::util::end(r), HPX_MOVE(init),
+                HPX_MOVE(f))
                 .value;
         }
     };
@@ -150,23 +156,29 @@ namespace hpx::ranges {
     // fold_left_first_with_iter
     // ----------------------------------------------------------------------
     HPX_CXX_CORE_EXPORT struct fold_left_first_with_iter_t final
-      : hpx::functional::detail::tag_fallback<fold_left_first_with_iter_t>
+      : hpx::detail::tag_parallel_algorithm<fold_left_first_with_iter_t>
     {
     private:
         template <typename I, typename S, typename F>
         friend constexpr auto tag_fallback_invoke(
             fold_left_first_with_iter_t, I first, S last, F f)
+            requires hpx::is_indirectly_binary_left_foldable<F,
+                typename std::iterator_traits<I>::value_type, I>
         {
             return hpx::ranges::detail::fold_left_first_with_iter_impl(
-                std::move(first), std::move(last), std::move(f));
+                HPX_MOVE(first), HPX_MOVE(last), HPX_MOVE(f));
         }
 
         template <typename R, typename F>
         friend constexpr auto tag_fallback_invoke(
             fold_left_first_with_iter_t, R&& r, F f)
+            requires hpx::is_indirectly_binary_left_foldable<F,
+                typename std::iterator_traits<typename hpx::traits::
+                        range_traits<R>::iterator_type>::value_type,
+                typename hpx::traits::range_traits<R>::iterator_type>
         {
             return hpx::ranges::detail::fold_left_first_with_iter_impl(
-                hpx::util::begin(r), hpx::util::end(r), std::move(f));
+                hpx::util::begin(r), hpx::util::end(r), HPX_MOVE(f));
         }
     };
 
@@ -176,23 +188,29 @@ namespace hpx::ranges {
     // fold_left_first
     // ----------------------------------------------------------------------
     HPX_CXX_CORE_EXPORT struct fold_left_first_t final
-      : hpx::functional::detail::tag_fallback<fold_left_first_t>
+      : hpx::detail::tag_parallel_algorithm<fold_left_first_t>
     {
     private:
         template <typename I, typename S, typename F>
         friend constexpr auto tag_fallback_invoke(
             fold_left_first_t, I first, S last, F f)
+            requires hpx::is_indirectly_binary_left_foldable<F,
+                typename std::iterator_traits<I>::value_type, I>
         {
             return hpx::ranges::detail::fold_left_first_with_iter_impl(
-                std::move(first), std::move(last), std::move(f))
+                HPX_MOVE(first), HPX_MOVE(last), HPX_MOVE(f))
                 .value;
         }
 
         template <typename R, typename F>
         friend constexpr auto tag_fallback_invoke(fold_left_first_t, R&& r, F f)
+            requires hpx::is_indirectly_binary_left_foldable<F,
+                typename std::iterator_traits<typename hpx::traits::
+                        range_traits<R>::iterator_type>::value_type,
+                typename hpx::traits::range_traits<R>::iterator_type>
         {
             return hpx::ranges::detail::fold_left_first_with_iter_impl(
-                hpx::util::begin(r), hpx::util::end(r), std::move(f))
+                hpx::util::begin(r), hpx::util::end(r), HPX_MOVE(f))
                 .value;
         }
     };

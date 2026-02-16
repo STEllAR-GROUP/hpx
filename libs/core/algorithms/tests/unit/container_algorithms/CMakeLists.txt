@@ -29,7 +29,6 @@ set(tests
     ends_with_range
     equal_range
     equal_binary_range
-
     exclusive_scan_range
     fill_range
     filln_range

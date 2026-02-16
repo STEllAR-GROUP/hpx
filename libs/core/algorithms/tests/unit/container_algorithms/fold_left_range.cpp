@@ -7,7 +7,6 @@
 #include <hpx/algorithm.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/parallel/container_algorithms/fold_left.hpp>
 
 #include <numeric>
 #include <string>
@@ -66,7 +65,7 @@ void test_fold_left_first_with_iter()
     HPX_TEST_EQ(*result.value, 15);
 }
 
-int main(int argc, char* argv[])
+int main()
 {
     test_fold_left();
     test_fold_left_empty();

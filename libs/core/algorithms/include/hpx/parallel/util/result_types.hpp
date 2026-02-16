@@ -17,6 +17,7 @@
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/futures.hpp>
 
+#include <concepts>
 #include <type_traits>
 #include <utility>
 
@@ -29,18 +30,17 @@ namespace hpx::parallel::util {
         HPX_NO_UNIQUE_ADDRESS I1 in1;
         HPX_NO_UNIQUE_ADDRESS I2 in2;
 
-        template <typename II1, typename II2,
-            typename Enable =
-                std::enable_if_t<std::is_convertible_v<I1 const&, II1> &&
-                    std::is_convertible_v<I2 const&, II2>>>
+        template <typename II1, typename II2>
+            requires(std::convertible_to<I1 const&, II1> &&
+                std::convertible_to<I2 const&, II2>)
         constexpr operator in_in_result<II1, II2>() const&
         {
             return {in1, in2};
         }
 
-        template <typename II1, typename II2,
-            typename Enable = std::enable_if_t<std::is_convertible_v<I1, II1> &&
-                std::is_convertible_v<I2, II2>>>
+        template <typename II1, typename II2>
+            requires(
+                std::convertible_to<I1, II1> && std::convertible_to<I2, II2>)
         constexpr operator in_in_result<II1, II2>() &&
         {
             return {HPX_MOVE(in1), HPX_MOVE(in2)};
@@ -86,18 +86,16 @@ namespace hpx::parallel::util {
         HPX_NO_UNIQUE_ADDRESS I in;
         HPX_NO_UNIQUE_ADDRESS O out;
 
-        template <typename I2, typename O2,
-            typename Enable =
-                std::enable_if_t<std::is_convertible_v<I const&, I2> &&
-                    std::is_convertible_v<O const&, O2>>>
+        template <typename I2, typename O2>
+            requires(std::convertible_to<I const&, I2> &&
+                std::convertible_to<O const&, O2>)
         constexpr operator in_out_result<I2, O2>() const&
         {
             return {in, out};
         }
 
-        template <typename I2, typename O2,
-            typename Enable = std::enable_if_t<std::is_convertible_v<I, I2> &&
-                std::is_convertible_v<O, O2>>>
+        template <typename I2, typename O2>
+            requires(std::convertible_to<I, I2> && std::convertible_to<O, O2>)
         constexpr operator in_out_result<I2, O2>() &&
         {
             return {HPX_MOVE(in), HPX_MOVE(out)};
@@ -200,16 +198,15 @@ namespace hpx::parallel::util {
         HPX_NO_UNIQUE_ADDRESS T min;
         HPX_NO_UNIQUE_ADDRESS T max;
 
-        template <typename T2,
-            typename Enable =
-                std::enable_if_t<std::is_convertible_v<T const&, T>>>
+        template <typename T2>
+            requires(std::convertible_to<T const&, T>)
         constexpr operator min_max_result<T2>() const&
         {
             return {min, max};
         }
 
-        template <typename T2,
-            typename Enable = std::enable_if_t<std::is_convertible_v<T, T2>>>
+        template <typename T2>
+            requires(std::convertible_to<T, T2>)
         constexpr operator min_max_result<T2>() &&
         {
             return {HPX_MOVE(min), HPX_MOVE(max)};
@@ -232,19 +229,18 @@ namespace hpx::parallel::util {
         HPX_NO_UNIQUE_ADDRESS I2 in2;
         HPX_NO_UNIQUE_ADDRESS O out;
 
-        template <typename II1, typename II2, typename O1,
-            typename Enable =
-                std::enable_if_t<std::is_convertible_v<I1 const&, II1> &&
-                    std::is_convertible_v<I2 const&, II2> &&
-                    std::is_convertible_v<O const&, O1>>>
+        template <typename II1, typename II2, typename O1>
+            requires(std::convertible_to<I1 const&, II1> &&
+                std::convertible_to<I2 const&, II2> &&
+                std::convertible_to<O const&, O1>)
         constexpr operator in_in_out_result<II1, II2, O1>() const&
         {
             return {in1, in2, out};
         }
 
-        template <typename II2, typename II1, typename O1,
-            typename Enable = std::enable_if_t<std::is_convertible_v<I1, II1> &&
-                std::is_convertible_v<I2, II2> && std::is_convertible_v<O, O1>>>
+        template <typename II2, typename II1, typename O1>
+            requires(std::convertible_to<I1, II1> &&
+                std::convertible_to<I2, II2> && std::convertible_to<O, O1>)
         constexpr operator in_in_out_result<II1, II2, O1>() &&
         {
             return {HPX_MOVE(in1), HPX_MOVE(in2), HPX_MOVE(out)};
@@ -293,20 +289,18 @@ namespace hpx::parallel::util {
         HPX_NO_UNIQUE_ADDRESS O1 out1;
         HPX_NO_UNIQUE_ADDRESS O2 out2;
 
-        template <typename II, typename OO1, typename OO2,
-            typename Enable =
-                std::enable_if_t<std::is_convertible_v<I const&, II> &&
-                    std::is_convertible_v<O1 const&, OO1> &&
-                    std::is_convertible_v<O2 const&, OO2>>>
+        template <typename II, typename OO1, typename OO2>
+            requires(std::convertible_to<I const&, II> &&
+                std::convertible_to<O1 const&, OO1> &&
+                std::convertible_to<O2 const&, OO2>)
         constexpr operator in_out_out_result<II, OO1, OO2>() const&
         {
             return {in, out1, out2};
         }
 
-        template <typename II, typename OO1, typename OO2,
-            typename Enable = std::enable_if_t<std::is_convertible_v<I, II> &&
-                std::is_convertible_v<O1, OO1> &&
-                std::is_convertible_v<O2, OO2>>>
+        template <typename II, typename OO1, typename OO2>
+            requires(std::convertible_to<I, II> &&
+                std::convertible_to<O1, OO1> && std::convertible_to<O2, OO2>)
         constexpr operator in_out_out_result<II, OO1, OO2>() &&
         {
             return {HPX_MOVE(in), HPX_MOVE(out1), HPX_MOVE(out2)};
@@ -355,18 +349,16 @@ namespace hpx::parallel::util {
         HPX_NO_UNIQUE_ADDRESS I in;
         HPX_NO_UNIQUE_ADDRESS F fun;
 
-        template <typename I2, typename F2,
-            typename Enable =
-                std::enable_if_t<std::is_convertible_v<I const&, I2> &&
-                    std::is_convertible_v<F const&, F2>>>
+        template <typename I2, typename F2>
+            requires(std::convertible_to<I const&, I2> &&
+                std::convertible_to<F const&, F2>)
         constexpr operator in_fun_result<I2, F2>() const&
         {
             return {in, fun};
         }
 
-        template <typename I2, typename F2,
-            typename Enable = std::enable_if_t<std::is_convertible_v<I, I2> &&
-                std::is_convertible_v<F, F2>>>
+        template <typename I2, typename F2>
+            requires(std::convertible_to<I, I2> && std::convertible_to<F, F2>)
         constexpr operator in_fun_result<I2, F2>() &&
         {
             return {HPX_MOVE(in), HPX_MOVE(fun)};
@@ -405,18 +397,16 @@ namespace hpx::parallel::util {
         HPX_NO_UNIQUE_ADDRESS I in;
         HPX_NO_UNIQUE_ADDRESS T value;
 
-        template <typename I2, typename T2,
-            typename Enable =
-                std::enable_if_t<std::is_convertible_v<I const&, I2> &&
-                    std::is_convertible_v<T const&, T2>>>
+        template <typename I2, typename T2>
+            requires(std::convertible_to<I const&, I2> &&
+                std::convertible_to<T const&, T2>)
         constexpr operator in_value_result<I2, T2>() const&
         {
             return {in, value};
         }
 
-        template <typename I2, typename T2,
-            typename Enable = std::enable_if_t<std::is_convertible_v<I, I2> &&
-                std::is_convertible_v<T, T2>>>
+        template <typename I2, typename T2>
+            requires(std::convertible_to<I, I2> && std::convertible_to<T, T2>)
         constexpr operator in_value_result<I2, T2>() &&
         {
             return {HPX_MOVE(in), HPX_MOVE(value)};
