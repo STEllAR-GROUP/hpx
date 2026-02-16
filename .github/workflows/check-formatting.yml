@@ -9,12 +9,10 @@ name: Check Formatting
 on:
   pull_request:
   push:
-    branches-ignore:
-      - gh-pages
-      - trying
-      - staging
-    tags-ignore:
-      - stable     
+    branches:
+      - master
+      - 'release**'
+  workflow_dispatch:   
 
 jobs:
   clang-format:
