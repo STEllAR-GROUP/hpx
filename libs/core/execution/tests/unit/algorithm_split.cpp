@@ -19,6 +19,59 @@
 
 namespace ex = hpx::execution::experimental;
 
+struct split_value_completion_env
+{
+    ex::run_loop_scheduler scheduler;
+
+    friend ex::run_loop_scheduler tag_invoke(
+        ex::get_completion_scheduler_t<ex::set_value_t>,
+        split_value_completion_env const& env) noexcept
+    {
+        return env.scheduler;
+    }
+};
+
+struct split_fast_path_scheduler_receiver
+{
+    ex::run_loop& loop;
+    ex::run_loop_scheduler scheduler;
+    std::atomic<bool>& set_value_called;
+
+#if defined(HPX_HAVE_STDEXEC)
+    using is_receiver = void;
+#else
+    struct is_receiver
+    {
+    };
+#endif
+
+    friend split_value_completion_env tag_invoke(
+        ex::get_env_t, split_fast_path_scheduler_receiver const& r) noexcept
+    {
+        return {r.scheduler};
+    }
+
+    template <typename Error>
+    friend void tag_invoke(ex::set_error_t,
+        split_fast_path_scheduler_receiver&&, Error&&) noexcept
+    {
+        HPX_TEST(false);
+    }
+
+    friend void tag_invoke(
+        ex::set_stopped_t, split_fast_path_scheduler_receiver&&) noexcept
+    {
+        HPX_TEST(false);
+    }
+
+    friend void tag_invoke(ex::set_value_t,
+        split_fast_path_scheduler_receiver&& r) noexcept
+    {
+        r.set_value_called = true;
+        r.loop.finish();
+    }
+};
+
 // This overload is only used to check dispatching. It is not a useful
 // implementation.
 template <typename Allocator = hpx::util::internal_allocator<>>
@@ -31,6 +84,29 @@ auto tag_invoke(
 
 int main()
 {
+        // If split's predecessor completes inline during start(), add_continuation
+        // takes the fast-path. This completion must still be delivered through the
+        // receiver's completion scheduler and not inline.
+        {
+                std::atomic<bool> set_value_called{false};
+
+                ex::run_loop loop;
+                auto scheduler = loop.get_scheduler();
+
+                auto s = ex::split(ex::just());
+                auto os = ex::connect(std::move(s),
+                        split_fast_path_scheduler_receiver{
+                                loop, scheduler, set_value_called});
+                ex::start(os);
+
+                // If this is true here, completion was delivered inline instead of
+                // being scheduled through the receiver-provided completion scheduler.
+                HPX_TEST(!set_value_called.load());
+
+                loop.run();
+                HPX_TEST(set_value_called.load());
+        }
+
     // Success path
     {
         std::atomic<bool> set_value_called{false};
