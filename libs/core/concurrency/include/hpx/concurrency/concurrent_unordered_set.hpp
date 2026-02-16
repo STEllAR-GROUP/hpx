@@ -22,7 +22,7 @@
 
 namespace hpx::concurrent {
 
-    template <typename Key, typename Hash = std::hash<Key>,
+    HPX_CXX_CORE_EXPORT template <typename Key, typename Hash = std::hash<Key>,
         typename KeyEqual = std::equal_to<Key>,
         typename Allocator = std::allocator<Key>>
     class concurrent_unordered_set
@@ -229,14 +229,12 @@ namespace hpx::concurrent {
             return set_.count(key);
         }
 
-#if defined(HPX_HAVE_CXX20_STD_UNORDERED_TRANSPARENT_LOOKUP)
         template <typename K>
         size_type count(K const& key) const
         {
             std::lock_guard<hpx::util::spinlock> lock(mutex_);
             return set_.count(key);
         }
-#endif
 
         const_accessor find(Key const& key) const
         {
@@ -249,7 +247,6 @@ namespace hpx::concurrent {
             return const_accessor();
         }
 
-#if defined(HPX_HAVE_CXX20_STD_UNORDERED_TRANSPARENT_LOOKUP)
         template <typename K>
         const_accessor find(K const& key) const
         {
@@ -261,7 +258,6 @@ namespace hpx::concurrent {
             }
             return const_accessor();
         }
-#endif
 
         bool contains(Key const& key) const
         {
@@ -269,14 +265,12 @@ namespace hpx::concurrent {
             return set_.find(key) != set_.end();
         }
 
-#if defined(HPX_HAVE_CXX20_STD_UNORDERED_TRANSPARENT_LOOKUP)
         template <typename K>
         bool contains(K const& key) const
         {
             std::lock_guard<hpx::util::spinlock> lock(mutex_);
             return set_.find(key) != set_.end();
         }
-#endif
 
         // Thread-safe iteration
         template <typename F>

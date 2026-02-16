@@ -175,7 +175,6 @@ void test_concurrent_unordered_map_extra()
     m_str[key] = 43;
     HPX_TEST_EQ(m_str[key].get(), 43);
 
-#if defined(HPX_HAVE_CXX20_STD_UNORDERED_TRANSPARENT_LOOKUP)
     {
         struct transparent_hash
         {
@@ -231,7 +230,6 @@ void test_concurrent_unordered_map_extra()
         HPX_TEST_EQ(mt.at(std::string_view("world")).get(), 88);
 #endif
     }
-#endif
 }
 
 void test_concurrent_unordered_set()
@@ -285,7 +283,6 @@ void test_concurrent_unordered_set_extra()
         }
     }
 
-#if defined(HPX_HAVE_CXX20_STD_UNORDERED_TRANSPARENT_LOOKUP)
     {
         struct transparent_hash
         {
@@ -335,7 +332,6 @@ void test_concurrent_unordered_set_extra()
         HPX_TEST(st.empty());
 #endif
     }
-#endif
 }
 
 void test_concurrent_queue()
