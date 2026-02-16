@@ -34,7 +34,7 @@ namespace hpx::serialization::detail {
             *(reinterpret_cast<ByteType*>(std::addressof(base)) + offset));
     }
 
-    HPX_CXX_EXPORT template <typename Archive, typename T>
+    HPX_CXX_CORE_EXPORT template <typename Archive, typename T>
     void refl_serialize(Archive& ar, T& t, unsigned /*version*/)
     {
         constexpr auto ctx = std::meta::access_context::unchecked();

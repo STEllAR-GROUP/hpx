@@ -38,7 +38,7 @@ namespace hpx::traits {
     {
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     inline constexpr bool is_not_bitwise_serializable_v = true;
 #endif
 
