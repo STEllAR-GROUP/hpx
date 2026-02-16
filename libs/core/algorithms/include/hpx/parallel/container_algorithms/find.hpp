@@ -2007,6 +2007,7 @@ namespace hpx {
 #include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/find.hpp>
 
+#include <iterator>
 #include <type_traits>
 #include <utility>
 

@@ -505,6 +505,7 @@ namespace hpx { namespace ranges {
 #include <hpx/parallel/util/detail/sender_util.hpp>
 
 #include <cstddef>
+#include <iterator>
 #include <type_traits>
 #include <utility>
 

@@ -372,6 +372,7 @@ namespace hpx { namespace ranges {
 #include <hpx/parallel/algorithms/reverse.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 
+#include <iterator>
 #include <type_traits>
 #include <utility>
 

@@ -715,6 +715,7 @@ namespace hpx { namespace ranges {
 #include <hpx/parallel/algorithms/all_any_none.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 
+#include <iterator>
 #include <type_traits>
 #include <utility>
 

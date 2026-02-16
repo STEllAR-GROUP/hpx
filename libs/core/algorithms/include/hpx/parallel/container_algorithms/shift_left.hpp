@@ -200,6 +200,7 @@ namespace hpx { namespace ranges {
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/parallel/algorithms/shift_left.hpp>
 
+#include <iterator>
 #include <type_traits>
 #include <utility>
 

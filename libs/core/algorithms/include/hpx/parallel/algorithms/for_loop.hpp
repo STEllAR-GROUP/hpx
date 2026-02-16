@@ -756,6 +756,7 @@ namespace hpx { namespace experimental {
 
 #include <cstddef>
 #include <cstdint>
+#include <iterator>
 #include <type_traits>
 #include <utility>
 

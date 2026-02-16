@@ -15,6 +15,7 @@
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 
+#include <iterator>
 #include <type_traits>
 #include <utility>
 

@@ -489,6 +489,7 @@ namespace hpx { namespace ranges {
 #include <hpx/parallel/algorithms/is_heap.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 
+#include <iterator>
 #include <type_traits>
 #include <utility>
 

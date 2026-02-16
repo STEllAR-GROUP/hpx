@@ -294,6 +294,7 @@ namespace hpx { namespace ranges {
 #include <hpx/parallel/algorithms/generate.hpp>
 
 #include <cstddef>
+#include <iterator>
 #include <type_traits>
 #include <utility>
 

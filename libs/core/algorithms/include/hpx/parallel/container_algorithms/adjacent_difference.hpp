@@ -342,6 +342,7 @@ namespace hpx { namespace ranges {
 #include <hpx/parallel/algorithms/adjacent_difference.hpp>
 
 #include <cstddef>
+#include <iterator>
 #include <type_traits>
 #include <utility>
 

@@ -139,6 +139,7 @@ namespace hpx { namespace experimental {
 /// \cond NOINTERNAL
 #ifdef EXTRA_DEBUG
 #include <iostream>
+#include <iterator>
 #define DEBUG_REDUCE_BY_KEY(a) std::cout << a
 #else
 #define DEBUG_REDUCE_BY_KEY(a)

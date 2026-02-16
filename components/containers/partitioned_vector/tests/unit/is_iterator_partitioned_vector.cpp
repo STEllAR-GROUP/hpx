@@ -13,6 +13,7 @@
 #endif
 
 #include <vector>
+#include <iterator>
 
 void is_iterator()
 {

@@ -312,6 +312,13 @@ namespace boost { namespace inspect {
             "std::ranges::bidirectional_range", {"ranges"}},
         {"(\\bstd\\s*::\\s*ranges\\s*::\\s*iterator_t\\b)",
             "std::ranges::iterator_t", {"ranges"}},
+        // std iterator
+        {"(\\bstd\\s*::\\s*input_iterator\\b)", "std::input_iterator", {"iterator"}},
+        {"(\\bstd\\s*::\\s*output_iterator\\b)", "std::output_iterator", {"iterator"}},
+        {"(\\bstd\\s*::\\s*forward_iterator\\b)", "std::forward_iterator", {"iterator"}},
+        {"(\\bstd\\s*::\\s*bidirectional_iterator\\b)", "std::bidirectional_iterator", {"iterator"}},
+        {"(\\bstd\\s*::\\s*random_access_iterator\\b)", "std::random_access_iterator", {"iterator"}},
+        {"(\\bstd\\s*::\\s*sentinel_for\\b)", "std::sentinel_for", {"iterator"}},
         {nullptr, nullptr, {nullptr}}};
 
     //  include_check constructor  -------------------------------------------//

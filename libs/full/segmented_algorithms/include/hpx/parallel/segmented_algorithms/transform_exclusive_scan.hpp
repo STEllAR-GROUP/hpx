@@ -18,6 +18,7 @@
 #include <hpx/parallel/segmented_algorithms/detail/scan.hpp>
 #include <hpx/parallel/segmented_algorithms/exclusive_scan.hpp>
 
+#include <iterator>
 #include <type_traits>
 #include <utility>
 #include <vector>

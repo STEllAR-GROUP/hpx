@@ -29,6 +29,9 @@ namespace test {
             IteratorTag>;
 
     public:
+        // disable use of brackets_proxy in iterator_facade
+        using use_brackets_proxy = std::false_type;
+
         test_iterator() = default;
 
         explicit constexpr test_iterator(BaseIterator base)
@@ -59,15 +62,16 @@ struct bidirectional_traversal_iterator
 
     int state;
 
-    int operator*() const
+    reference operator*() const
     {
-        return this->state;
+        return state;
     }
-    int operator->() const = delete;
+
+    pointer operator->() const = delete;
 
     bidirectional_traversal_iterator& operator++()
     {
-        ++(this->state);
+        ++state;
         return *this;
     }
 
@@ -80,7 +84,7 @@ struct bidirectional_traversal_iterator
 
     bidirectional_traversal_iterator& operator--()
     {
-        --(this->state);
+        --state;
         return *this;
     }
 
@@ -93,12 +97,12 @@ struct bidirectional_traversal_iterator
 
     bool operator==(bidirectional_traversal_iterator const& that) const
     {
-        return this->state == that.state;
+        return state == that.state;
     }
 
     bool operator!=(bidirectional_traversal_iterator const& that) const
     {
-        return this->state != that.state;
+        return state != that.state;
     }
 };
 
@@ -107,19 +111,21 @@ struct random_access_traversal_iterator
     using difference_type = int;
     using value_type = int;
     using iterator_category = std::random_access_iterator_tag;
-    using pointer = void;
+    using pointer = int const*;
     using reference = int;
 
     int state;
 
-    int operator*() const
+    reference operator*() const
     {
-        return this->state;
+        return state;
     }
+
+    pointer operator->() const = delete;
 
     random_access_traversal_iterator& operator++()
     {
-        ++this->state;
+        ++state;
         return *this;
     }
 
@@ -132,7 +138,7 @@ struct random_access_traversal_iterator
 
     random_access_traversal_iterator& operator--()
     {
-        --this->state;
+        --state;
         return *this;
     }
 
@@ -143,14 +149,14 @@ struct random_access_traversal_iterator
         return copy;
     }
 
-    int operator[](difference_type n) const
+    reference operator[](difference_type n) const
     {
-        return this->state + n;
+        return state + n;
     }
 
     random_access_traversal_iterator& operator+=(difference_type n)
     {
-        this->state += n;
+        state += n;
         return *this;
     }
 
@@ -160,15 +166,9 @@ struct random_access_traversal_iterator
         return copy += n;
     }
 
-    friend random_access_traversal_iterator operator+(
-        difference_type n, random_access_traversal_iterator it)
-    {
-        return it += n;
-    }
-
     random_access_traversal_iterator& operator-=(difference_type n)
     {
-        this->state -= n;
+        state -= n;
         return *this;
     }
 
@@ -181,12 +181,44 @@ struct random_access_traversal_iterator
     difference_type operator-(
         random_access_traversal_iterator const& that) const
     {
-        return this->state - that.state;
+        return state - that.state;
     }
 
-    bool operator==(random_access_traversal_iterator const&) const = default;
+    bool operator==(random_access_traversal_iterator const& that) const
+    {
+        return state == that.state;
+    }
 
-    auto operator<=>(random_access_traversal_iterator const&) const = default;
+    bool operator!=(random_access_traversal_iterator const& that) const
+    {
+        return state != that.state;
+    }
+
+    bool operator<(random_access_traversal_iterator const& that) const
+    {
+        return state < that.state;
+    }
+
+    bool operator<=(random_access_traversal_iterator const& that) const
+    {
+        return state <= that.state;
+    }
+
+    bool operator>(random_access_traversal_iterator const& that) const
+    {
+        return state > that.state;
+    }
+
+    bool operator>=(random_access_traversal_iterator const& that) const
+    {
+        return state >= that.state;
+    }
+
+    friend random_access_traversal_iterator operator+(
+        difference_type n, random_access_traversal_iterator it)
+    {
+        return it += n;
+    }
 };
 
 template <typename T, typename U>

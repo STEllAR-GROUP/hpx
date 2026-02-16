@@ -448,6 +448,7 @@ namespace hpx { namespace ranges {
 #include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/count.hpp>
 
+#include <iterator>
 #include <type_traits>
 #include <utility>
 

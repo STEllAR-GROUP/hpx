@@ -308,7 +308,7 @@ namespace hpx::util {
         }
 
         template <typename Iterator>
-        HPX_HOST_DEVICE typename Iterator::value_type
+        HPX_HOST_DEVICE typename Iterator::reference
         make_operator_brackets_result(Iterator const& iter, std::false_type)
         {
             return *iter;
@@ -334,7 +334,8 @@ namespace hpx::util {
 
             HPX_HOST_DEVICE iterator_facade_base() = default;
 
-            HPX_HOST_DEVICE constexpr auto operator[](difference_type n) const
+            HPX_HOST_DEVICE constexpr decltype(auto) operator[](
+                difference_type n) const
             {
                 using use_proxy = use_operator_brackets_proxy<Derived, T>;
 

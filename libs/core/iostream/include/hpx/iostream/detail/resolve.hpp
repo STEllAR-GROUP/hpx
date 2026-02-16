@@ -22,6 +22,7 @@
 
 #include <cstddef>
 #include <functional>
+#include <iterator>
 #include <type_traits>
 
 #include <hpx/config/warnings_prefix.hpp>

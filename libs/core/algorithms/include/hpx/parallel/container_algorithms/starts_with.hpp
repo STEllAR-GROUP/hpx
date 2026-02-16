@@ -290,6 +290,7 @@ namespace hpx { namespace ranges {
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/parallel/algorithms/starts_with.hpp>
 
+#include <iterator>
 #include <type_traits>
 #include <utility>
 

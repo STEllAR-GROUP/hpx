@@ -16,6 +16,7 @@
 
 #include <cstddef>
 #include <functional>
+#include <iterator>
 #include <map>
 #include <memory>
 #include <mutex>

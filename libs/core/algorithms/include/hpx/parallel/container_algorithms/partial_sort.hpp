@@ -276,6 +276,7 @@ namespace hpx { namespace ranges {
 #include <hpx/parallel/algorithms/partial_sort.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 
+#include <iterator>
 #include <type_traits>
 #include <utility>
 
