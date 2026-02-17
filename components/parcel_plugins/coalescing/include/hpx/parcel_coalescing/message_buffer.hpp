@@ -25,7 +25,7 @@ namespace hpx::plugins::parcel::detail {
     class message_buffer
     {
     public:
-        enum class message_buffer_append_state
+        enum class message_buffer_append_state : std::uint8_t
         {
             normal = 0,
             first_message = 1,
