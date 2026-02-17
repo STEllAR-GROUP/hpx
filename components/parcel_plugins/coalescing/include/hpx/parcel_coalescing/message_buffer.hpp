@@ -38,7 +38,7 @@ namespace hpx::plugins::parcel::detail {
     "Please use message_buffer_append_state::<value> instead."
 
         HPX_DEPRECATED_V(
-            1, 10, HPX_MESSAGE_BUFFER_APPEND_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
+            2, 0, HPX_MESSAGE_BUFFER_APPEND_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
         static constexpr message_buffer_append_state normal =
             message_buffer_append_state::normal;
         HPX_DEPRECATED_V(
