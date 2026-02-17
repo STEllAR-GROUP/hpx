@@ -74,7 +74,9 @@ function check_cmakelists_files() {
 shopt -s globstar
 
 # HPX source directory
-source_dir=/hpx/source
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source_dir="$(cd "$script_dir/.." && pwd)"
+
 # Where to write the dependencies output files
 output_dir=/tmp
 # Helper to filter out the dependencies from other groups
@@ -96,7 +98,10 @@ done
 # Construct a list for each of the module groups
 
 # Find non module headers under the main hpx/ dir to exclude them later
-non_module_files_list=($(ls ../hpx | grep .hpp))
+non_module_files_list=()
+if [ -d ../init/include/hpx ]; then
+    non_module_files_list=($(ls ../init/include/hpx/*.hpp 2>/dev/null | xargs -n1 basename))
+fi
 
 echo "" > $output_dir/missing_files.txt
 echo "" > $output_dir/missing_deps.txt
