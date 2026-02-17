@@ -20,7 +20,6 @@
 #include <concepts>
 #include <type_traits>
 #include <utility>
-#include "hpx/config/export_definitions.hpp"
 
 namespace hpx::parallel::util {
 
