@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/concurrency/detail/concurrent_accessor.hpp>
 #include <hpx/concurrency/spinlock.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/type_support.hpp>
@@ -42,118 +43,11 @@ namespace hpx::concurrent {
         using key_equal = KeyEqual;
         using allocator_type = Allocator;
 
-        class accessor;
-        class const_accessor;
+        using accessor = detail::concurrent_accessor<T, false>;
+        using const_accessor = detail::concurrent_accessor<T, true>;
 
         using reference = accessor;
         using const_reference = const_accessor;
-
-        // Accessors
-        class accessor
-        {
-            friend class concurrent_unordered_map;
-            std::unique_lock<hpx::util::spinlock> lock_;
-            T* value_ = nullptr;
-
-            accessor(std::unique_lock<hpx::util::spinlock>&& l, T& v)
-              : lock_(HPX_MOVE(l))
-              , value_(&v)
-            {
-                HPX_ASSERT_OWNS_LOCK(lock_);
-            }
-
-            void validate() const
-            {
-                if (!value_)
-                {
-                    HPX_THROW_EXCEPTION(hpx::error::invalid_status,
-                        "concurrent_unordered_map::accessor",
-                        "Empty accessor dereference");
-                }
-            }
-
-        public:
-            accessor() = default;
-
-            bool empty() const noexcept
-            {
-                return value_ == nullptr;
-            }
-
-            explicit operator bool() const noexcept
-                requires(!std::same_as<T, bool>)
-            {
-                return !empty();
-            }
-
-            operator T&() const
-            {
-                return get();
-            }
-
-            T& get() const
-            {
-                validate();
-                return *value_;
-            }
-
-            accessor& operator=(T const& v)
-            {
-                validate();
-                *value_ = v;
-                return *this;
-            }
-        };
-
-        class const_accessor
-        {
-            friend class concurrent_unordered_map;
-            std::unique_lock<hpx::util::spinlock> lock_;
-            T const* value_ = nullptr;
-
-            const_accessor(
-                std::unique_lock<hpx::util::spinlock>&& l, T const& v)
-              : lock_(HPX_MOVE(l))
-              , value_(&v)
-            {
-                HPX_ASSERT_OWNS_LOCK(lock_);
-            }
-
-            void validate() const
-            {
-                if (!value_)
-                {
-                    HPX_THROW_EXCEPTION(hpx::error::invalid_status,
-                        "concurrent_unordered_map::const_accessor",
-                        "Empty accessor dereference");
-                }
-            }
-
-        public:
-            const_accessor() = default;
-
-            bool empty() const noexcept
-            {
-                return value_ == nullptr;
-            }
-
-            explicit operator bool() const noexcept
-                requires(!std::same_as<T, bool>)
-            {
-                return !empty();
-            }
-
-            operator T const&() const
-            {
-                return get();
-            }
-
-            T const& get() const
-            {
-                validate();
-                return *value_;
-            }
-        };
 
         concurrent_unordered_map() = default;
 

@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/concurrency/detail/concurrent_accessor.hpp>
 #include <hpx/concurrency/spinlock.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/type_support.hpp>
@@ -40,59 +41,9 @@ namespace hpx::concurrent {
         using key_equal = KeyEqual;
         using allocator_type = Allocator;
 
-        class const_accessor;
+        using const_accessor = detail::concurrent_accessor<Key, true>;
         using reference = const_accessor;
         using const_reference = const_accessor;
-
-        class const_accessor
-        {
-            friend class concurrent_unordered_set;
-            std::unique_lock<hpx::util::spinlock> lock_;
-            Key const* value_ = nullptr;
-
-            const_accessor(
-                std::unique_lock<hpx::util::spinlock>&& l, Key const& v)
-              : lock_(HPX_MOVE(l))
-              , value_(&v)
-            {
-                HPX_ASSERT_OWNS_LOCK(lock_);
-            }
-
-            void validate() const
-            {
-                if (!value_)
-                {
-                    HPX_THROW_EXCEPTION(hpx::error::invalid_status,
-                        "concurrent_unordered_set::const_accessor",
-                        "Empty accessor dereference");
-                }
-            }
-
-        public:
-            const_accessor() = default;
-
-            bool empty() const noexcept
-            {
-                return value_ == nullptr;
-            }
-
-            explicit operator bool() const noexcept
-                requires(!std::same_as<Key, bool>)
-            {
-                return !empty();
-            }
-
-            operator Key const&() const
-            {
-                return get();
-            }
-
-            Key const& get() const
-            {
-                validate();
-                return *value_;
-            }
-        };
 
         concurrent_unordered_set() = default;
 
