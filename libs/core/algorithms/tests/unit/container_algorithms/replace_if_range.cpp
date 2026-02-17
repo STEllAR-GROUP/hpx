@@ -71,8 +71,9 @@ void test_replace_if_sent(ExPolicy policy)
     auto pred = [](std::int16_t const& a) -> bool { return a % 42 == 0; };
 
     auto pre_result = std::count_if(std::begin(c), std::end(c), pred);
-    hpx::ranges::replace_if(policy, std::begin(c), sentinel<std::int16_t>{50},
-        pred, std::int16_t(1));
+    hpx::ranges::replace_if(policy, std::begin(c),
+        test::sentinel_from_iterator(std::begin(c) + 49), pred,
+        std::int16_t(1));
     auto post_result = std::count_if(std::begin(c), std::end(c), pred);
 
     HPX_TEST(pre_result == 2 && post_result == 1);

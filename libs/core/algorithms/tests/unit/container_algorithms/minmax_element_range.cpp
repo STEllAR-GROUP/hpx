@@ -61,28 +61,29 @@ void test_minmax_element_sent(ExPolicy policy)
     auto c = test::random_repeat(100, std::size_t(50));
     c[50] = std::size_t(101);
     auto ref = std::minmax_element(std::begin(c), std::begin(c) + 50);
-    auto r = hpx::ranges::minmax_element(
-        policy, std::begin(c), sentinel<size_t>{*(std::begin(c) + 50)});
+    auto r = hpx::ranges::minmax_element(policy, std::begin(c),
+        test::sentinel_from_iterator(std::begin(c) + 50));
 
     HPX_TEST((r.min == ref.first) && (r.max == ref.second));
 
     auto c1 = std::vector<size_t>{5, 7, 8};
     ref = std::minmax_element(
         std::begin(c1), std::begin(c1) + 2, std::greater<std::size_t>());
-    r = hpx::ranges::minmax_element(policy, std::begin(c1), sentinel<size_t>{8},
+    r = hpx::ranges::minmax_element(policy, std::begin(c1),
+        test::sentinel_from_iterator(std::begin(c1) + 2),
         std::greater<std::size_t>());
 
     HPX_TEST((r.min == ref.first) && (r.max == ref.second));
 
     auto c2 = std::vector<size_t>{2, 2, 2};
     r = hpx::ranges::minmax_element(
-        policy, std::begin(c2), sentinel<size_t>{2});
+        policy, std::begin(c2), test::sentinel_from_iterator(std::begin(c2)));
     HPX_TEST((r.min == std::begin(c2)) && (r.max == std::begin(c2)));
 
     auto c3 = std::vector<size_t>{2, 3, 3, 4};
-    r = hpx::ranges::minmax_element(
-        policy, std::begin(c3), sentinel<size_t>{3});
-    HPX_TEST((*r.min == 2) && (*r.max == 2));
+    r = hpx::ranges::minmax_element(policy, std::begin(c3),
+        test::sentinel_from_iterator(std::begin(c3) + 2));
+    HPX_TEST((*r.min == 2) && (*r.max == 3));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -193,6 +194,13 @@ void test_minmax_element()
     using namespace hpx::execution;
 
     test_minmax_element(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_minmax_element_parallel()
+{
+    using namespace hpx::execution;
+
     test_minmax_element(seq, IteratorTag());
     test_minmax_element(par, IteratorTag());
     test_minmax_element(par_unseq, IteratorTag());
@@ -210,6 +218,7 @@ void minmax_element_test()
 {
     test_minmax_element<std::random_access_iterator_tag>();
     test_minmax_element<std::forward_iterator_tag>();
+    test_minmax_element_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -415,10 +424,17 @@ void test_minmax_element_exception()
 {
     using namespace hpx::execution;
 
+    test_minmax_element_exception(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_minmax_element_exception_parallel()
+{
+    using namespace hpx::execution;
+
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_minmax_element_exception(IteratorTag());
     test_minmax_element_exception(seq, IteratorTag());
     test_minmax_element_exception(par, IteratorTag());
 
@@ -430,6 +446,7 @@ void minmax_element_exception_test()
 {
     test_minmax_element_exception<std::random_access_iterator_tag>();
     test_minmax_element_exception<std::forward_iterator_tag>();
+    test_minmax_element_exception_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -622,10 +639,17 @@ void test_minmax_element_bad_alloc()
 {
     using namespace hpx::execution;
 
+    test_minmax_element_bad_alloc(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_minmax_element_bad_alloc_parallel()
+{
+    using namespace hpx::execution;
+
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_minmax_element_bad_alloc(IteratorTag());
     test_minmax_element_bad_alloc(seq, IteratorTag());
     test_minmax_element_bad_alloc(par, IteratorTag());
 
@@ -637,6 +661,7 @@ void minmax_element_bad_alloc_test()
 {
     test_minmax_element_bad_alloc<std::random_access_iterator_tag>();
     test_minmax_element_bad_alloc<std::forward_iterator_tag>();
+    test_minmax_element_bad_alloc_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

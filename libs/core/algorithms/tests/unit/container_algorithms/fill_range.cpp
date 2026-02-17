@@ -49,7 +49,7 @@ void test_fill_sent(ExPolicy policy)
     std::iota(std::begin(c), std::end(c), std::rand());
 
     hpx::ranges::fill(policy, std::begin(c),
-        sentinel<std::size_t>{*(std::begin(c) + 100)}, 10);
+        test::sentinel_from_iterator(std::begin(c) + 100), 10);
 
     // verify values
     std::size_t count = 0;

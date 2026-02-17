@@ -27,12 +27,12 @@ namespace hpx {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Iter        The type of the begin source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    /// \tparam RaIter      The type of the begin source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     random access iterator.
     /// \tparam Sent        The type of the end source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     sentinel for Iter.
+    ///                     sentinel for RaIter.
     /// \tparam T           The type of the value to find (deduced).
     /// \tparam Proj        The type of an optional projection function. This
     ///                     defaults to \a hpx::identity
@@ -69,12 +69,12 @@ namespace hpx {
     ///           If no such element in the range of [first,last) is equal to
     ///           \a val, then the algorithm returns \a last.
     ///
-    template <typename ExPolicy, typename Iter, typename Sent,
+    template <typename ExPolicy, typename RaIter, typename Sent,
         typename Proj = hpx::identity,
-        typename T = typename hpx::parallel::traits::projected<Iter,
+        typename T = typename hpx::parallel::traits::projected<RaIter,
             Proj>::value_type>
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, Iter>
-    find(ExPolicy&& policy, Iter first, Sent last, T const& val,
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, RaIter>
+    find(ExPolicy&& policy, RaIter first, Sent last, T const& val,
         Proj&& proj = Proj());
 
     /// Returns the first element in the range [first, last) that is equal
@@ -87,9 +87,10 @@ namespace hpx {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
+    ///                     meet the requirements of a random access iterator.
     /// \tparam T           The type of the value to find (deduced).
     /// \tparam Proj        The type of an optional projection function. This
     ///                     defaults to \a hpx::identity
@@ -138,12 +139,12 @@ namespace hpx {
     /// \note   Complexity: At most last - first
     ///         applications of the operator==().
     ///
-    /// \tparam Iter        The type of the begin source iterators used (deduced).
+    /// \tparam InIter      The type of the begin source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     input iterator.
     /// \tparam Sent        The type of the end source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     sentinel for Iter.
+    ///                     sentinel for InIter.
     /// \tparam T           The type of the value to find (deduced).
     /// \tparam Proj        The type of an optional projection function. This
     ///                     defaults to \a hpx::identity
@@ -163,11 +164,11 @@ namespace hpx {
     ///           If no such element in the range of [first,last) is equal to
     ///           \a val, then the algorithm returns \a last.
     ///
-    template <typename Iter, typename Sent,
+    template <typename InIter, typename Sent,
         typename Proj = hpx::identity,
-        typename T = typename hpx::parallel::traits::projected<Iter,
+        typename T = typename hpx::parallel::traits::projected<InIter,
             Proj>::value_type>
-    Iter find(Iter first, Sent last, T const& val, Proj&& proj = Proj());
+    InIter find(InIter first, Sent last, T const& val, Proj&& proj = Proj());
 
     /// Returns the first element in the range [first, last) that is equal
     /// to value
@@ -227,13 +228,12 @@ namespace hpx {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Iter        The type of the source iterators used for the
-    ///                     first range (deduced).
-    ///                     This iterator type must meet the requirements of a
-    ///                     forward iterator.
+    /// \tparam RaIter      The type of the source iterators used for the
+    ///                     first range (deduced). This iterator type must meet
+    ///                     the requirements of a random access iterator.
     /// \tparam Sent        The type of the end source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     sentinel for Iter.
+    ///                     sentinel for RaIter.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a equal requires \a F to meet the
@@ -284,10 +284,10 @@ namespace hpx {
     ///           If no such element exists that satisfies the predicate f, the
     ///           algorithm returns \a last.
     ///
-    template <typename ExPolicy, typename Iter, typename Sent, typename Pred,
+    template <typename ExPolicy, typename RaIter, typename Sent, typename Pred,
         typename Proj = hpx::identity>
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, Iter>
-    find_if(ExPolicy&& policy, Iter first, Sent last,
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, RaIter>
+    find_if(ExPolicy&& policy, RaIter first, Sent last,
         Pred&& pred, Proj&& proj = Proj());
 
     /// Returns the first element in the range \a rng for which
@@ -300,9 +300,10 @@ namespace hpx {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
+    ///                     meet the requirements of a random access iterator.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a equal requires \a F to meet the
@@ -363,13 +364,12 @@ namespace hpx {
     /// \note   Complexity: At most last - first
     ///         applications of the predicate.
     ///
-    /// \tparam Iter        The type of the source iterators used for the
-    ///                     first range (deduced).
-    ///                     This iterator type must meet the requirements of a
-    ///                     forward iterator.
+    /// \tparam InIter      The type of the source iterators used for the
+    ///                     first range (deduced). This iterator type must meet
+    ///                     the requirements of an input iterator.
     /// \tparam Sent        The type of the end source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     sentinel for Iter.
+    ///                     sentinel for InIter.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a equal requires \a F to meet the
@@ -403,9 +403,9 @@ namespace hpx {
     ///           If no such element exists that satisfies the predicate f, the
     ///           algorithm returns \a last.
     ///
-    template <typename Iter, typename Sent, typename Pred,
+    template <typename InIter, typename Sent, typename Pred,
         typename Proj = hpx::identity>
-    Iter find_if(Iter first, Sent last, Pred&& pred, Proj&& proj = Proj());
+    InIter find_if(InIter first, Sent last, Pred&& pred, Proj&& proj = Proj());
 
     /// Returns the first element in the range \a rng for which
     /// predicate \a pred returns true
@@ -462,13 +462,12 @@ namespace hpx {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Iter        The type of the source iterators used for the
-    ///                     first range (deduced).
-    ///                     This iterator type must meet the requirements of a
-    ///                     forward iterator.
+    /// \tparam RaIter      The type of the source iterators used for the
+    ///                     first range (deduced). This iterator type must meet 
+    ///                     the requirements of a random access iterator.
     /// \tparam Sent        The type of the end source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     sentinel for Iter.
+    ///                     sentinel for RaIter.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a equal requires \a F to meet the
@@ -519,11 +518,11 @@ namespace hpx {
     ///           If no such element exists that does not satisfy the predicate f, the
     ///           algorithm returns \a last.
     ///
-    template <typename ExPolicy, typename Iter, typename Sent, typename Pred,
+    template <typename ExPolicy, typename RaIter, typename Sent, typename Pred,
         typename Proj = hpx::identity>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-        Iter>::type
-    find_if_not(ExPolicy&& policy, Iter first, Sent last, Pred&& pred,
+        RaIter>::type
+    find_if_not(ExPolicy&& policy, RaIter first, Sent last, Pred&& pred,
         Proj&& proj = Proj());
 
     /// Returns the first element in the range \a rng for which
@@ -536,9 +535,10 @@ namespace hpx {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
+    ///                     meet the requirements of a random access iterator.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a equal requires \a F to meet the
@@ -599,13 +599,13 @@ namespace hpx {
     /// \note   Complexity: At most last - first
     ///         applications of the predicate.
     ///
-    /// \tparam Iter        The type of the source iterators used for the
+    /// \tparam InIter      The type of the source iterators used for the
     ///                     first range (deduced).
     ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam Sent        The type of the end source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     sentinel for Iter.
+    ///                     sentinel for InIter.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a equal requires \a F to meet the
@@ -639,9 +639,9 @@ namespace hpx {
     ///           If no such element exists that does not satisfy the predicate f, the
     ///           algorithm returns \a last.
     ///
-    template <typename Iter, typename Sent, typename Pred,
+    template <typename InIter, typename Sent, typename Pred,
         typename Proj = hpx::identity>
-    Iter find_if_not(Iter first, Sent last, Pred&& pred, Proj&& proj = Proj());
+    InIter find_if_not(InIter first, Sent last, Pred&& pred, Proj&& proj = Proj());
 
     /// Returns the first element in the range \a rng for which
     /// predicate \a f returns false
@@ -699,12 +699,14 @@ namespace hpx {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng1        The type of the first source range (deduced).
+    /// \tparam Rng1        The range itself must meet the requirements of a
+    ///                     sized range. The type of the first source range (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of a forward iterator.
-    /// \tparam Rng2        The type of the second source range (deduced).
+    ///                     meet the requirements of a random access iterator.
+    /// \tparam Rng2        The range itself must meet the requirements of a
+    ///                     sized range. The type of the second source range (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of a forward iterator.
+    ///                     meet the requirements of a random access iterator.
     /// \tparam Pred        The type of an optional function/function object to use.
     ///                     Unlike its sequential form, the parallel
     ///                     overload of \a replace requires \a Pred to meet the
@@ -790,22 +792,18 @@ namespace hpx {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Iter1       The type of the begin source iterators for the first
-    ///                     sequence used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    /// \tparam RaIter1     The type of the begin source iterators for the first
+    ///                     sequence used (deduced). This iterator type must meet 
+    ///                     the requirements of a random access iterator.
     /// \tparam Sent1       The type of the end source iterators for the first
-    ///                     sequence used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     sentinel for Iter1.
-    /// \tparam Iter2       The type of the begin source iterators for the second
-    ///                     sequence used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     sequence used (deduced). This iterator type must meet 
+    ///                     the requirements of an sentinel for RaIter1.
+    /// \tparam RaIter2     The type of the begin source iterators for the second
+    ///                     sequence used (deduced). This iterator type must meet 
+    ///                     the requirements of an random access iterator.
     /// \tparam Sent2       The type of the end source iterators for the second
-    ///                     sequence used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     sentinel for Iter2.
+    ///                     sequence used (deduced). This iterator type must meet 
+    ///                     the requirements of an sentinel for RaIter2.
     /// \tparam Pred        The type of an optional function/function object to use.
     ///                     Unlike its sequential form, the parallel
     ///                     overload of \a replace requires \a Pred to meet the
@@ -874,12 +872,12 @@ namespace hpx {
     /// This overload of \a find_end is available if the user decides to provide the
     /// algorithm their own predicate \a op.
     ///
-    template <typename ExPolicy, typename Iter1, typename Sent1,
-        typename Iter2, typename Sent2, typename Pred = equal_to,
+    template <typename ExPolicy, typename RaIter1, typename Sent1,
+        typename RaIter2, typename Sent2, typename Pred = equal_to,
         typename Proj1 = hpx::identity,
         typename Proj2 = hpx::identity>
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, Iter1>
-    find_end(ExPolicy&& policy, Iter1 first1, Sent1 last1, Iter2 first2,
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, RaIter1>
+    find_end(ExPolicy&& policy, RaIter1 first1, Sent1 last1, RaIter2 first2,
         Sent2 last2, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
         Proj2&& proj2 = Proj2());
 
@@ -1048,12 +1046,14 @@ namespace hpx {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng1        The type of the first source range (deduced).
+    /// \tparam Rng1        The range itself must meet the requirements of a
+    ///                     sized range. The type of the first source range (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of a forward iterator.
-    /// \tparam Rng2        The type of the second source range (deduced).
+    ///                     meet the requirements of a random access iterator.
+    /// \tparam Rng2        The range itself must meet the requirements of a
+    ///                     sized range. The type of the second source range (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of a forward iterator.
+    ///                     meet the requirements of a random access iterator.
     /// \tparam Pred        The type of an optional function/function object to use.
     ///                     Unlike its sequential form, the parallel
     ///                     overload of \a replace requires \a Pred to meet the
@@ -1140,22 +1140,18 @@ namespace hpx {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Iter1       The type of the begin source iterators for the first
-    ///                     sequence used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    /// \tparam RaIter1     The type of the begin source iterators for the first
+    ///                     sequence used (deduced). This iterator type must meet 
+    ///                     the requirements of a random access iterator.
     /// \tparam Sent1       The type of the end source iterators for the first
-    ///                     sequence used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     sentinel for Iter1.
-    /// \tparam Iter2       The type of the begin source iterators for the second
-    ///                     sequence used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     sequence used (deduced). This iterator type must meet 
+    ///                     the requirements of an sentinel for RaIter1.
+    /// \tparam RaIter2     The type of the begin source iterators for the second
+    ///                     sequence used (deduced). This iterator type must meet 
+    ///                     the requirements of a random access iterator.
     /// \tparam Sent2       The type of the end source iterators for the second
-    ///                     sequence used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     sentinel for Iter2.
+    ///                     sequence used (deduced). This iterator type must meet 
+    ///                     the requirements of an sentinel for RaIter2.
     /// \tparam Pred        The type of an optional function/function object to use.
     ///                     Unlike its sequential form, the parallel
     ///                     overload of \a replace requires \a Pred to meet the
@@ -1225,12 +1221,12 @@ namespace hpx {
     /// This overload of \a find_first_of is available if the user decides to provide the
     /// algorithm their own predicate \a op.
     ///
-    template <typename ExPolicy, typename Iter1, typename Sent1,
-        typename Iter2, typename Sent2, typename Pred = equal_to,
+    template <typename ExPolicy, typename RaIter1, typename Sent1,
+        typename RaIter2, typename Sent2, typename Pred = equal_to,
         typename Proj1 = hpx::identity,
         typename Proj2 = hpx::identity>
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, Iter1>
-    find_first_of(ExPolicy&& policy, Iter1 first1, Sent1 last1, Iter2 first2,
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, RaIter1>
+    find_first_of(ExPolicy&& policy, RaIter1 first1, Sent1 last1, RaIter2 first2,
         Sent2 last2, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
         Proj2&& proj2 = Proj2());
 
@@ -2018,25 +2014,23 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<find_t>
     {
     private:
-        template <typename ExPolicy, typename Iter, typename Sent,
+        template <typename ExPolicy, typename RaIter, typename Sent,
             typename Proj = hpx::identity,
-            typename T = typename hpx::parallel::traits::projected<Iter,
+            typename T = typename hpx::parallel::traits::projected<RaIter,
                 Proj>::value_type>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
-                hpx::parallel::traits::is_projected_v<Proj, Iter>
+                hpx::traits::is_random_access_iterator_v<RaIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, RaIter> &&
+                hpx::parallel::traits::is_projected_v<Proj, RaIter>
             )
         // clang-format on
-        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, Iter>
-        tag_fallback_invoke(find_t, ExPolicy&& policy, Iter first, Sent last,
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, RaIter>
+        tag_fallback_invoke(find_t, ExPolicy&& policy, RaIter first, Sent last,
             T const& val, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<Iter>,
-                "Requires at least forward iterator.");
-
-            return hpx::parallel::detail::find<Iter>().call(
+            return hpx::parallel::detail::find<RaIter>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, val,
                 HPX_MOVE(proj));
         }
@@ -2048,7 +2042,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng>
             )
         // clang-format on
@@ -2059,30 +2054,27 @@ namespace hpx::ranges {
         {
             using iterator_type = hpx::traits::range_iterator_t<Rng>;
 
-            static_assert(hpx::traits::is_forward_iterator_v<iterator_type>,
-                "Requires at least forward iterator.");
-
             return hpx::parallel::detail::find<iterator_type>().call(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                 hpx::util::end(rng), val, HPX_MOVE(proj));
         }
 
-        template <typename Iter, typename Sent, typename Proj = hpx::identity,
-            typename T = typename hpx::parallel::traits::projected<Iter,
+        template <typename InIter, typename Sent, typename Proj = hpx::identity,
+            typename T = typename hpx::parallel::traits::projected<InIter,
                 Proj>::value_type>
         // clang-format off
             requires(
-                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
-                hpx::parallel::traits::is_projected_v<Proj, Iter>
+                hpx::traits::is_sentinel_for_v<Sent, InIter> &&
+                hpx::parallel::traits::is_projected_v<Proj, InIter>
             )
         // clang-format on
-        friend Iter tag_fallback_invoke(
-            find_t, Iter first, Sent last, T const& val, Proj&& proj = Proj())
+        friend InIter tag_fallback_invoke(
+            find_t, InIter first, Sent last, T const& val, Proj&& proj = Proj())
         {
-            static_assert(hpx::traits::is_input_iterator_v<Iter>,
+            static_assert(hpx::traits::is_input_iterator_v<InIter>,
                 "Requires at least input iterator.");
 
-            return hpx::parallel::detail::find<Iter>().call(
+            return hpx::parallel::detail::find<InIter>().call(
                 hpx::execution::seq, first, last, val, HPX_FORWARD(Proj, proj));
         }
 
@@ -2115,27 +2107,25 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<find_if_t>
     {
     private:
-        template <typename ExPolicy, typename Iter, typename Sent,
+        template <typename ExPolicy, typename RaIter, typename Sent,
             typename Pred, typename Proj = hpx::identity>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
-                hpx::parallel::traits::is_projected_v<Proj, Iter> &&
+                hpx::traits::is_random_access_iterator_v<RaIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, RaIter> &&
+                hpx::parallel::traits::is_projected_v<Proj, RaIter> &&
                 hpx::is_invocable_v<Pred,
-                    typename std::iterator_traits<Iter>::value_type
+                    typename std::iterator_traits<RaIter>::value_type
                 >
             )
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            Iter>::type
-        tag_fallback_invoke(find_if_t, ExPolicy&& policy, Iter first, Sent last,
-            Pred&& pred, Proj&& proj = Proj())
+            RaIter>::type
+        tag_fallback_invoke(find_if_t, ExPolicy&& policy, RaIter first,
+            Sent last, Pred&& pred, Proj&& proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<Iter>,
-                "Requires at least forward iterator.");
-
-            return hpx::parallel::detail::find_if<Iter>().call(
+            return hpx::parallel::detail::find_if<RaIter>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last,
                 HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
         }
@@ -2145,7 +2135,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<
@@ -2161,32 +2152,29 @@ namespace hpx::ranges {
         {
             using iterator_type = hpx::traits::range_iterator_t<Rng>;
 
-            static_assert(hpx::traits::is_forward_iterator_v<iterator_type>,
-                "Requires at least forward iterator.");
-
             return hpx::parallel::detail::find_if<iterator_type>().call(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                 hpx::util::end(rng), HPX_MOVE(pred), HPX_MOVE(proj));
         }
 
-        template <typename Iter, typename Sent, typename Pred,
+        template <typename InIter, typename Sent, typename Pred,
             typename Proj = hpx::identity>
         // clang-format off
             requires(
-                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
-                hpx::parallel::traits::is_projected_v<Proj, Iter> &&
+                hpx::traits::is_sentinel_for_v<Sent, InIter> &&
+                hpx::parallel::traits::is_projected_v<Proj, InIter> &&
                 hpx::is_invocable_v<Pred,
-                    typename std::iterator_traits<Iter>::value_type
+                    typename std::iterator_traits<InIter>::value_type
                 >
             )
         // clang-format on
-        friend Iter tag_fallback_invoke(
-            find_if_t, Iter first, Sent last, Pred pred, Proj proj = Proj())
+        friend InIter tag_fallback_invoke(
+            find_if_t, InIter first, Sent last, Pred pred, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_input_iterator_v<Iter>,
+            static_assert(hpx::traits::is_input_iterator_v<InIter>,
                 "Requires at least input iterator.");
 
-            return hpx::parallel::detail::find_if<Iter>().call(
+            return hpx::parallel::detail::find_if<InIter>().call(
                 hpx::execution::seq, first, last, HPX_MOVE(pred),
                 HPX_MOVE(proj));
         }
@@ -2222,26 +2210,24 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<find_if_not_t>
     {
     private:
-        template <typename ExPolicy, typename Iter, typename Sent,
+        template <typename ExPolicy, typename RaIter, typename Sent,
             typename Pred, typename Proj = hpx::identity>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
-                hpx::parallel::traits::is_projected_v<Proj, Iter> &&
+                hpx::traits::is_random_access_iterator_v<RaIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, RaIter> &&
+                hpx::parallel::traits::is_projected_v<Proj, RaIter> &&
                 hpx::is_invocable_v<Pred,
-                    typename std::iterator_traits<Iter>::value_type
+                    typename std::iterator_traits<RaIter>::value_type
                 >
             )
         // clang-format on
-        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, Iter>
-        tag_fallback_invoke(find_if_not_t, ExPolicy&& policy, Iter first,
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, RaIter>
+        tag_fallback_invoke(find_if_not_t, ExPolicy&& policy, RaIter first,
             Sent last, Pred pred, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<Iter>,
-                "Requires at least forward iterator.");
-
-            return hpx::parallel::detail::find_if_not<Iter>().call(
+            return hpx::parallel::detail::find_if_not<RaIter>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(pred),
                 HPX_MOVE(proj));
         }
@@ -2251,7 +2237,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<
@@ -2275,24 +2262,24 @@ namespace hpx::ranges {
                 hpx::util::end(rng), HPX_MOVE(pred), HPX_MOVE(proj));
         }
 
-        template <typename Iter, typename Sent, typename Pred,
+        template <typename InIter, typename Sent, typename Pred,
             typename Proj = hpx::identity>
         // clang-format off
             requires(
-                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
-                hpx::parallel::traits::is_projected_v<Proj, Iter> &&
+                hpx::traits::is_sentinel_for_v<Sent, InIter> &&
+                hpx::parallel::traits::is_projected_v<Proj, InIter> &&
                 hpx::is_invocable_v<Pred,
-                    typename std::iterator_traits<Iter>::value_type
+                    typename std::iterator_traits<InIter>::value_type
                 >
             )
         // clang-format on
-        friend Iter tag_fallback_invoke(
-            find_if_not_t, Iter first, Sent last, Pred pred, Proj proj = Proj())
+        friend InIter tag_fallback_invoke(find_if_not_t, InIter first,
+            Sent last, Pred pred, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_input_iterator_v<Iter>,
+            static_assert(hpx::traits::is_input_iterator_v<InIter>,
                 "Requires at least input iterator.");
 
-            return hpx::parallel::detail::find_if_not<Iter>().call(
+            return hpx::parallel::detail::find_if_not<InIter>().call(
                 hpx::execution::seq, first, last, HPX_MOVE(pred),
                 HPX_MOVE(proj));
         }
@@ -2335,6 +2322,10 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_random_access_range_v<Rng1> &&
+                hpx::traits::is_sized_range_v<Rng1> &&
+                hpx::traits::is_random_access_range_v<Rng2> &&
+                hpx::traits::is_sized_range_v<Rng2> &&
                 hpx::parallel::traits::is_projected_range_v<Proj1, Rng1> &&
                 hpx::parallel::traits::is_projected_range_v<Proj2, Rng2> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy, Pred,
@@ -2351,12 +2342,6 @@ namespace hpx::ranges {
         {
             using iterator_type = hpx::traits::range_iterator_t<Rng1>;
 
-            static_assert(hpx::traits::is_forward_iterator_v<iterator_type>,
-                "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator<
-                              hpx::traits::range_iterator_t<Rng2>>::value,
-                "Requires at least forward iterator.");
-
             return hpx::parallel::detail::find_end<iterator_type>().call(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng1),
                 hpx::util::end(rng1), hpx::util::begin(rng2),
@@ -2364,31 +2349,29 @@ namespace hpx::ranges {
                 HPX_MOVE(proj2));
         }
 
-        template <typename ExPolicy, typename Iter1, typename Sent1,
-            typename Iter2, typename Sent2, typename Pred = equal_to,
+        template <typename ExPolicy, typename RaIter1, typename Sent1,
+            typename RaIter2, typename Sent2, typename Pred = equal_to,
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_sentinel_for_v<Sent1, Iter1> &&
-                hpx::traits::is_sentinel_for_v<Sent2, Iter2> &&
+                hpx::traits::is_random_access_iterator_v<RaIter1> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent1, RaIter1> &&
+                hpx::traits::is_random_access_iterator_v<RaIter2> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent2, RaIter2> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy, Pred,
-                    hpx::parallel::traits::projected<Proj1, Iter1>,
-                    hpx::parallel::traits::projected<Proj2, Iter2>
+                    hpx::parallel::traits::projected<Proj1, RaIter1>,
+                    hpx::parallel::traits::projected<Proj2, RaIter2>
                 >
             )
         // clang-format on
-        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, Iter1>
-        tag_fallback_invoke(find_end_t, ExPolicy&& policy, Iter1 first1,
-            Sent1 last1, Iter2 first2, Sent2 last2, Pred op = Pred(),
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
+            RaIter1>
+        tag_fallback_invoke(find_end_t, ExPolicy&& policy, RaIter1 first1,
+            Sent1 last1, RaIter2 first2, Sent2 last2, Pred op = Pred(),
             Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<Iter1>,
-                "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<Iter2>,
-                "Requires at least forward iterator.");
-
-            return hpx::parallel::detail::find_end<Iter1>().call(
+            return hpx::parallel::detail::find_end<RaIter1>().call(
                 HPX_FORWARD(ExPolicy, policy), first1, last1, first2, last2,
                 HPX_MOVE(op), HPX_MOVE(proj1), HPX_MOVE(proj2));
         }
@@ -2466,6 +2449,10 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_random_access_range_v<Rng1> &&
+                hpx::traits::is_sized_range_v<Rng1> &&
+                hpx::traits::is_random_access_range_v<Rng2> &&
+                hpx::traits::is_sized_range_v<Rng2> &&
                 hpx::parallel::traits::is_projected_range_v<Proj1, Rng1> &&
                 hpx::parallel::traits::is_projected_range_v<Proj2, Rng2> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy, Pred,
@@ -2482,12 +2469,6 @@ namespace hpx::ranges {
         {
             using iterator_type = hpx::traits::range_iterator_t<Rng1>;
 
-            static_assert(hpx::traits::is_forward_iterator_v<iterator_type>,
-                "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator<
-                              hpx::traits::range_iterator_t<Rng2>>::value,
-                "Subsequence requires at least forward iterator.");
-
             return hpx::parallel::detail::find_first_of<iterator_type>().call(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng1),
                 hpx::util::end(rng1), hpx::util::begin(rng2),
@@ -2495,31 +2476,29 @@ namespace hpx::ranges {
                 HPX_MOVE(proj2));
         }
 
-        template <typename ExPolicy, typename Iter1, typename Sent1,
-            typename Iter2, typename Sent2, typename Pred = equal_to,
+        template <typename ExPolicy, typename RaIter1, typename Sent1,
+            typename RaIter2, typename Sent2, typename Pred = equal_to,
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_sentinel_for_v<Sent1, Iter1> &&
-                hpx::traits::is_sentinel_for_v<Sent2, Iter2> &&
+                hpx::traits::is_random_access_iterator_v<RaIter1> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent1, RaIter1> &&
+                hpx::traits::is_random_access_iterator_v<RaIter2> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent2, RaIter2> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy, Pred,
-                    hpx::parallel::traits::projected<Proj1, Iter1>,
-                    hpx::parallel::traits::projected<Proj2, Iter2>
+                    hpx::parallel::traits::projected<Proj1, RaIter1>,
+                    hpx::parallel::traits::projected<Proj2, RaIter2>
                 >
             )
         // clang-format on
-        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, Iter1>
-        tag_fallback_invoke(find_first_of_t, ExPolicy&& policy, Iter1 first1,
-            Sent1 last1, Iter2 first2, Sent2 last2, Pred op = Pred(),
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
+            RaIter1>
+        tag_fallback_invoke(find_first_of_t, ExPolicy&& policy, RaIter1 first1,
+            Sent1 last1, RaIter2 first2, Sent2 last2, Pred op = Pred(),
             Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<Iter1>,
-                "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<Iter2>,
-                "Subsequence requires at least forward iterator.");
-
-            return hpx::parallel::detail::find_first_of<Iter1>().call(
+            return hpx::parallel::detail::find_first_of<RaIter1>().call(
                 HPX_FORWARD(ExPolicy, policy), first1, last1, first2, last2,
                 HPX_MOVE(op), HPX_MOVE(proj1), HPX_MOVE(proj2));
         }

@@ -214,6 +214,12 @@ void test_includes1()
     using namespace hpx::execution;
 
     test_includes1(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_includes_parallel()
+{
+    using namespace hpx::execution;
 
     test_includes1(seq, IteratorTag());
     test_includes1(par, IteratorTag());
@@ -227,6 +233,7 @@ void includes_test1()
 {
     test_includes1<std::random_access_iterator_tag>();
     test_includes1<std::forward_iterator_tag>();
+    test_includes_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -428,6 +435,12 @@ void test_includes2()
     using namespace hpx::execution;
 
     test_includes2(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_includes2_parallel()
+{
+    using namespace hpx::execution;
 
     test_includes2(seq, IteratorTag());
     test_includes2(par, IteratorTag());
@@ -441,6 +454,7 @@ void includes_test2()
 {
     test_includes2<std::random_access_iterator_tag>();
     test_includes2<std::forward_iterator_tag>();
+    test_includes2_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -613,6 +627,12 @@ void test_includes_exception()
     using namespace hpx::execution;
 
     test_includes_exception(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_includes_exception_parallel()
+{
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
@@ -628,6 +648,7 @@ void includes_exception_test()
 {
     test_includes_exception<std::random_access_iterator_tag>();
     test_includes_exception<std::forward_iterator_tag>();
+    test_includes_exception_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -796,6 +817,12 @@ void test_includes_bad_alloc()
     using namespace hpx::execution;
 
     test_includes_bad_alloc(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_includes_bad_alloc_parallel()
+{
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
@@ -811,6 +838,7 @@ void includes_bad_alloc_test()
 {
     test_includes_bad_alloc<std::random_access_iterator_tag>();
     test_includes_bad_alloc<std::forward_iterator_tag>();
+    test_includes_bad_alloc_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

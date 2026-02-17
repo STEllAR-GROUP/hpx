@@ -58,6 +58,18 @@ namespace test {
             return i != s.get();
         }
 
+        friend auto operator-(sentinel_from_iterator<IterType> s, IterType i)
+            requires hpx::traits::is_random_access_iterator_v<IterType>
+        {
+            return s.get() - i;
+        }
+
+        friend auto operator-(IterType i, sentinel_from_iterator<IterType> s)
+            requires hpx::traits::is_random_access_iterator_v<IterType>
+        {
+            return i - s.get();
+        }
+
     private:
         IterType end;
     };

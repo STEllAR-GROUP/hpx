@@ -110,6 +110,12 @@ void test_find_first_of()
     using namespace hpx::execution;
 
     test_find_first_of_proj(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_find_first_of_parallel()
+{
+    using namespace hpx::execution;
 
     test_find_first_of_proj(seq, IteratorTag());
     test_find_first_of_proj(par, IteratorTag());
@@ -123,6 +129,7 @@ void find_first_of_test()
 {
     test_find_first_of<std::random_access_iterator_tag>();
     test_find_first_of<std::forward_iterator_tag>();
+    test_find_first_of_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -258,7 +265,6 @@ void test_find_first_of_exception()
 void find_first_of_exception_test()
 {
     test_find_first_of_exception<std::random_access_iterator_tag>();
-    test_find_first_of_exception<std::forward_iterator_tag>();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -354,7 +360,6 @@ void test_find_first_of_bad_alloc()
 void find_first_of_bad_alloc_test()
 {
     test_find_first_of_bad_alloc<std::random_access_iterator_tag>();
-    test_find_first_of_bad_alloc<std::forward_iterator_tag>();
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)

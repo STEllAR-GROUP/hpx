@@ -28,16 +28,14 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Iter1       The type of the source iterators used for the
-    ///                     first range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    /// \tparam RaIter1     The type of the source iterators used for the
+    ///                     first range (deduced). This iterator type must meet 
+    ///                     the requirements of a random access iterator.
     /// \tparam Sent1       The type of the source iterators used for the end of
     ///                     the first range (deduced).
-    /// \tparam Iter2       The type of the source iterators used for the
-    ///                     second range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    /// \tparam RaIter2     The type of the source iterators used for the
+    ///                     second range (deduced). This iterator type must meet 
+    ///                     the requirements of a random access iterator.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -67,11 +65,11 @@ namespace hpx { namespace ranges {
     ///           \a last and the output iterator to the element in the
     ///           destination range, one past the last element moved.
     ///
-    template <typename ExPolicy, typename Iter1, typename Sent1,
-        typename Iter2>
+    template <typename ExPolicy, typename RaIter1, typename Sent1,
+        typename RaIter2>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-        move_result<Iter1, Iter2>>::type
-    move(ExPolicy&& policy, Iter1 first, Sent1 last, Iter2 dest);
+        move_result<RaIter1, RaIter2>>::type
+    move(ExPolicy&& policy, RaIter1 first, Sent1 last, RaIter2 dest);
 
     /// Moves the elements in the range \a rng to another range beginning
     /// at \a dest. After this operation the elements in the moved-from
@@ -85,13 +83,13 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
-    /// \tparam Iter2       The type of the source iterators used for the
-    ///                     second range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     meet the requirements of a random access iterator.
+    /// \tparam RaIter2     The type of the source iterators used for the
+    ///                     second range (deduced). This iterator type must 
+    ///                     meet the requirements of a random access iterator.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -119,11 +117,11 @@ namespace hpx { namespace ranges {
     ///           \a last and the output iterator to the element in the
     ///           destination range, one past the last element moved.
     ///
-    template <typename ExPolicy, typename Rng, typename Iter2>
+    template <typename ExPolicy, typename Rng, typename RaIter2>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         move_result<hpx::traits::range_iterator_t<Rng>,
-            Iter2>>::type
-    move(ExPolicy&& policy, Rng&& rng, Iter2 dest);
+            RaIter2>>::type
+    move(ExPolicy&& policy, Rng&& rng, RaIter2 dest);
 
     /// Moves the elements in the range \a rng to another range beginning
     /// at \a dest. After this operation the elements in the moved-from
@@ -133,16 +131,14 @@ namespace hpx { namespace ranges {
     /// \note   Complexity: Performs exactly
     ///         std::distance(begin(rng), end(rng)) assignments.
     ///
-    /// \tparam Iter1       The type of the source iterators used for the
-    ///                     first range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    /// \tparam Iter1      The type of the source iterators used for the
+    ///                     first range (deduced). This iterator type must meet 
+    ///                     the requirements of a forward iterator.
     /// \tparam Sent1       The type of the source iterators used for the end of
     ///                     the first range (deduced).
     /// \tparam Iter2       The type of the source iterators used for the
-    ///                     second range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     second range (deduced). This iterator type must meet 
+    ///                     the requirements of a forward iterator.
     ///
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
@@ -185,9 +181,9 @@ namespace hpx { namespace ranges {
     ///           \a last and the output iterator to the element in the
     ///           destination range, one past the last element moved.
     ///
-    template <typename Rng, typename Iter2>
-    move_result<hpx::traits::range_iterator_t<Rng>, Iter2>
-    move(Rng&& rng, Iter2 dest);
+    template <typename Rng, typename RaIter2>
+    move_result<hpx::traits::range_iterator_t<Rng>, RaIter2>
+    move(Rng&& rng, RaIter2 dest);
     // clang-format on
 }}    // namespace hpx::ranges
 
@@ -214,41 +210,43 @@ namespace hpx::ranges {
       : hpx::detail::tag_parallel_algorithm<move_t>
     {
     private:
-        template <typename ExPolicy, typename Iter1, typename Sent1,
-            typename Iter2>
+        template <typename ExPolicy, typename RaIter1, typename Sent1,
+            typename RaIter2>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_sentinel_for_v<Sent1, Iter1> &&
-                hpx::traits::is_iterator_v<Iter2>
+                hpx::traits::is_random_access_iterator_v<RaIter1> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent1, RaIter1> &&
+                hpx::traits::is_random_access_iterator_v<RaIter2>
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            move_result<Iter1, Iter2>>
+            move_result<RaIter1, RaIter2>>
         tag_fallback_invoke(
-            move_t, ExPolicy&& policy, Iter1 first, Sent1 last, Iter2 dest)
+            move_t, ExPolicy&& policy, RaIter1 first, Sent1 last, RaIter2 dest)
         {
             return hpx::parallel::detail::transfer<
-                hpx::parallel::detail::move<Iter1, Iter2>>(
+                hpx::parallel::detail::move<RaIter1, RaIter2>>(
                 HPX_FORWARD(ExPolicy, policy), first, last, dest);
         }
 
-        template <typename ExPolicy, typename Rng, typename Iter2>
+        template <typename ExPolicy, typename Rng, typename RaIter2>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
-                hpx::traits::is_iterator_v<Iter2>
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng> &&
+                hpx::traits::is_random_access_iterator_v<RaIter2>
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            move_result<hpx::traits::range_iterator_t<Rng>, Iter2>>
-        tag_fallback_invoke(move_t, ExPolicy&& policy, Rng&& rng, Iter2 dest)
+            move_result<hpx::traits::range_iterator_t<Rng>, RaIter2>>
+        tag_fallback_invoke(move_t, ExPolicy&& policy, Rng&& rng, RaIter2 dest)
         {
             using iterator_type = hpx::traits::range_iterator_t<Rng>;
 
             return hpx::parallel::detail::transfer<
-                hpx::parallel::detail::move<iterator_type, Iter2>>(
+                hpx::parallel::detail::move<iterator_type, RaIter2>>(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                 hpx::util::end(rng), dest);
         }

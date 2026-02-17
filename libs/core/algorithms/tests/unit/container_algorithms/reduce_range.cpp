@@ -54,7 +54,7 @@ void test_reduce_sent(ExPolicy policy, IteratorTag)
     auto op = [val](std::size_t v1, std::size_t v2) { return v1 + v2 + val; };
 
     std::size_t r1 = hpx::ranges::reduce(policy, std::begin(c),
-        sentinel<std::size_t>{*(std::begin(c) + 100)}, val, op);
+        test::sentinel_from_iterator(std::begin(c) + 100), val, op);
 
     // verify values
     std::size_t r2 =
@@ -72,7 +72,7 @@ void test_reduce_sent_async(ExPolicy p, IteratorTag)
     auto op = [val](std::size_t v1, std::size_t v2) { return v1 + v2 + val; };
 
     hpx::future<std::size_t> f = hpx::ranges::reduce(p, std::begin(c),
-        sentinel<std::size_t>{*(std::begin(c) + 100)}, val, op);
+        test::sentinel_from_iterator(std::begin(c) + 100), val, op);
     f.wait();
 
     // verify values

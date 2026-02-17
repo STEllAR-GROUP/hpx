@@ -79,7 +79,7 @@ namespace hpx { namespace ranges {
     ///
     /// \tparam Rng         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
+    ///                     meet the requirements of a forward iterator.
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a for_each requires \a F to meet the
@@ -133,11 +133,11 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it applies user-provided function objects.
-    /// \tparam FwdIter     The type of the source begin iterator used
+    /// \tparam RaIter      The type of the source begin iterator used
     ///                     (deduced). This iterator type must meet the
-    ///                     requirements of an forward iterator.
+    ///                     requirements of an random access iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
-    ///                     sentinel type must be a sentinel for InIter.
+    ///                     sentinel type must be a sentinel for RaIter.
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a for_each requires \a F to meet the
@@ -180,17 +180,17 @@ namespace hpx { namespace ranges {
     /// threads, and indeterminately sequenced within each thread.
     ///
     /// \returns  The \a for_each algorithm returns a
-    ///           \a hpx::future<FwdIter> if the execution policy is of
+    ///           \a hpx::future<RaIter> if the execution policy is of
     ///           type
     ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and returns \a FwdIter
+    ///           \a parallel_task_policy and returns \a RaIter
     ///           otherwise.
     ///           It returns \a last.
     ///
-    template <typename ExPolicy, typename FwdIter, typename Sent, typename F,
+    template <typename ExPolicy, typename RaIter, typename Sent, typename F,
         typename Proj = hpx::identity>
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
-    for_each(ExPolicy&& policy, FwdIter first, Sent last, F&& f,
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, RaIter>
+    for_each(ExPolicy&& policy, RaIter first, Sent last, F&& f,
         Proj&& proj = Proj());
 
     /// Applies \a f to the result of dereferencing every iterator in the
@@ -213,9 +213,10 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it applies user-provided function objects.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
+    ///                     meet the requirements of a random access iterator.
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a for_each requires \a F to meet the
@@ -256,10 +257,10 @@ namespace hpx { namespace ranges {
     /// threads, and indeterminately sequenced within each thread.
     ///
     /// \returns  The \a for_each algorithm returns a
-    ///           \a hpx::future<FwdIter> if the execution policy is of
+    ///           \a hpx::future<RaIter> if the execution policy is of
     ///           type
     ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and returns \a FwdIter
+    ///           \a parallel_task_policy and returns \a RaIter
     ///           otherwise.
     ///           It returns \a last.
     ///
@@ -347,9 +348,9 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it applies user-provided function objects.
-    /// \tparam FwdIter     The type of the source begin iterator used
+    /// \tparam RaIter      The type of the source begin iterator used
     ///                     (deduced). This iterator type must meet the
-    ///                     requirements of an forward iterator.
+    ///                     requirements of an random access iterator.
     /// \tparam Size        The type of the argument specifying the number of
     ///                     elements to apply \a f to.
     /// \tparam F           The type of the function/function object to use
@@ -394,18 +395,18 @@ namespace hpx { namespace ranges {
     /// threads, and indeterminately sequenced within each thread.
     ///
     /// \returns  The \a for_each algorithm returns a
-    ///           \a hpx::future<FwdIter> if the execution policy is of
+    ///           \a hpx::future<RaIter> if the execution policy is of
     ///           type
     ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and returns \a FwdIter
+    ///           \a parallel_task_policy and returns \a RaIter
     ///           otherwise.
     ///           It returns \a last.
     ///
-    template <typename ExPolicy, typename FwdIter, typename Size, typename F,
+    template <typename ExPolicy, typename RaIter, typename Size, typename F,
         typename Proj = hpx::identity>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-        FwdIter>::type
-    for_each_n(ExPolicy&& policy, FwdIter first, Size count, F&& f,
+        RaIter>::type
+    for_each_n(ExPolicy&& policy, RaIter first, Size count, F&& f,
         Proj&& proj = Proj());
     // clang-format on
 }}    // namespace hpx::ranges
@@ -489,28 +490,24 @@ namespace hpx::ranges {
             return {HPX_MOVE(it), HPX_MOVE(f)};
         }
 
-        template <typename ExPolicy, typename FwdIter, typename Sent,
-            typename F, typename Proj = hpx::identity>
+        template <typename ExPolicy, typename RaIter, typename Sent, typename F,
+            typename Proj = hpx::identity>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<FwdIter> &&
-                hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
-                hpx::parallel::traits::is_projected_v<Proj, FwdIter> &&
+                hpx::traits::is_random_access_iterator_v<RaIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, RaIter> &&
+                hpx::parallel::traits::is_projected_v<Proj, RaIter> &&
                 hpx::parallel::traits::is_indirect_callable_v<
                     ExPolicy, F,
-                    hpx::parallel::traits::projected<Proj, FwdIter>
+                    hpx::parallel::traits::projected<Proj, RaIter>
                 >
             )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::ranges::for_each_t,
-            ExPolicy&& policy, FwdIter first, Sent last, F f,
-            Proj proj = Proj())
+            ExPolicy&& policy, RaIter first, Sent last, F f, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
-                "Requires at least forward iterator.");
-
-            return parallel::detail::for_each<FwdIter>().call(
+            return parallel::detail::for_each<RaIter>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(f),
                 HPX_MOVE(proj));
         }
@@ -520,7 +517,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable_v<
                     ExPolicy, F,
@@ -533,9 +531,6 @@ namespace hpx::ranges {
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
-
-            static_assert(hpx::traits::is_forward_iterator_v<iterator_type>,
-                "Requires at least forward iterator.");
 
             return parallel::detail::for_each<iterator_type>().call(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
@@ -579,36 +574,32 @@ namespace hpx::ranges {
             return {HPX_MOVE(it), HPX_MOVE(f)};
         }
 
-        template <typename ExPolicy, typename FwdIter, typename Size,
-            typename F, typename Proj = hpx::identity>
+        template <typename ExPolicy, typename RaIter, typename Size, typename F,
+            typename Proj = hpx::identity>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<FwdIter> &&
+                hpx::traits::is_random_access_iterator_v<RaIter> &&
                 std::is_integral_v<Size> &&
-                hpx::parallel::traits::is_projected_v<Proj, FwdIter> &&
+                hpx::parallel::traits::is_projected_v<Proj, RaIter> &&
                 hpx::parallel::traits::is_indirect_callable_v<
                     ExPolicy, F,
-                    hpx::parallel::traits::projected<Proj, FwdIter>
+                    hpx::parallel::traits::projected<Proj, RaIter>
                 >
             )
         // clang-format on
-        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            FwdIter>
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, RaIter>
         tag_fallback_invoke(hpx::ranges::for_each_n_t, ExPolicy&& policy,
-            FwdIter first, Size count, F f, Proj proj = Proj())
+            RaIter first, Size count, F f, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
-                "Requires at least forward iterator.");
-
             // if count is representing a negative value, we do nothing
             if (parallel::detail::is_negative(count))
             {
                 return parallel::util::detail::algorithm_result<ExPolicy,
-                    FwdIter>::get(HPX_MOVE(first));
+                    RaIter>::get(HPX_MOVE(first));
             }
 
-            return parallel::detail::for_each_n<FwdIter>().call(
+            return parallel::detail::for_each_n<RaIter>().call(
                 HPX_FORWARD(ExPolicy, policy), first, count, HPX_MOVE(f),
                 HPX_MOVE(proj));
         }

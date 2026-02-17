@@ -94,6 +94,12 @@ void test_contains()
     using namespace hpx::execution;
 
     test_contains(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_contains_parallel()
+{
+    using namespace hpx::execution;
 
     test_contains(seq, IteratorTag());
     test_contains(par, IteratorTag());
@@ -108,6 +114,7 @@ void contains_test()
 {
     test_contains<std::random_access_iterator_tag>();
     test_contains<std::forward_iterator_tag>();
+    test_contains_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -235,6 +242,12 @@ void test_contains_exception()
     using namespace hpx::execution;
 
     test_contains_exception(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_contains_exception_parallel()
+{
+    using namespace hpx::execution;
 
     test_contains_exception(seq, IteratorTag());
     test_contains_exception(par, IteratorTag());
@@ -247,6 +260,7 @@ void contains_exception_test()
 {
     test_contains_exception<std::random_access_iterator_tag>();
     test_contains_exception<std::forward_iterator_tag>();
+    test_contains_exception_parallel<std::random_access_iterator_tag>();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -342,7 +356,6 @@ void test_contains_bad_alloc()
 void contains_bad_alloc_test()
 {
     test_contains_bad_alloc<std::random_access_iterator_tag>();
-    test_contains_bad_alloc<std::forward_iterator_tag>();
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)

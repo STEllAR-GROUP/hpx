@@ -183,14 +183,12 @@ void test_sorted_until1()
 
     test_sorted_until1_async(seq(task), IteratorTag());
     test_sorted_until1_async(par(task), IteratorTag());
-
-    test_sorted_until1_seq(IteratorTag());
 }
 
 void sorted_until_test1()
 {
     test_sorted_until1<std::random_access_iterator_tag>();
-    test_sorted_until1<std::forward_iterator_tag>();
+    test_sorted_until1_seq(std::forward_iterator_tag());
 
     using namespace hpx::execution;
 
@@ -423,14 +421,12 @@ void test_sorted_until2()
 
     test_sorted_until2_async(seq(task), IteratorTag());
     test_sorted_until2_async(par(task), IteratorTag());
-
-    test_sorted_until2_seq(IteratorTag());
 }
 
 void sorted_until_test2()
 {
     test_sorted_until2<std::random_access_iterator_tag>();
-    test_sorted_until2<std::forward_iterator_tag>();
+    test_sorted_until2_seq(std::forward_iterator_tag());
 
     using namespace hpx::execution;
 
@@ -766,14 +762,12 @@ void test_sorted_until3()
 
     test_sorted_until3_async(seq(task), IteratorTag());
     test_sorted_until3_async(par(task), IteratorTag());
-
-    test_sorted_until3_seq(IteratorTag());
 }
 
 void sorted_until_test3()
 {
     test_sorted_until3<std::random_access_iterator_tag>();
-    test_sorted_until3<std::forward_iterator_tag>();
+    test_sorted_until3_seq(std::forward_iterator_tag());
 
     using namespace hpx::execution;
 

@@ -226,7 +226,9 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng
+    ///                     The range itself must meet the requirements of a
+    ///                     sized range.         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an random access iterator.
     /// \tparam Pred        Comparison function object which returns true if
@@ -237,7 +239,7 @@ namespace hpx { namespace ranges {
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
     /// \param rng          Refers to the sequence of elements the algorithm
-    ///                     will be applied to.
+    ///                     will be applied to. Should be a sized range.
     /// \param nth          Refers to the iterator defining the sort partition
     ///                     point
     /// \param pred         Specifies the comparison function object which
@@ -346,7 +348,7 @@ namespace hpx::ranges {
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_random_access_iterator_v<RandomIt> &&
-                hpx::traits::is_sentinel_for_v<Sent, RandomIt> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, RandomIt> &&
                 hpx::parallel::traits::is_projected_v<Proj, RandomIt> &&
                 hpx::parallel::traits::is_indirect_callable_v<
                     ExPolicy, Pred,
@@ -403,7 +405,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable_v<
                     ExPolicy, Pred,

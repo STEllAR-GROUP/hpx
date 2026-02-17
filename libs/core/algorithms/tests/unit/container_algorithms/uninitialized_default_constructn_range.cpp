@@ -136,6 +136,12 @@ void test_uninitialized_default_construct_n()
     using namespace hpx::execution;
 
     test_uninitialized_default_construct_n(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_uninitialized_default_construct_n_parallel()
+{
+    using namespace hpx::execution;
 
     test_uninitialized_default_construct_n(seq, IteratorTag());
     test_uninitialized_default_construct_n(par, IteratorTag());
@@ -149,6 +155,8 @@ void uninitialized_default_construct_n_test()
 {
     test_uninitialized_default_construct_n<std::random_access_iterator_tag>();
     test_uninitialized_default_construct_n<std::forward_iterator_tag>();
+    test_uninitialized_default_construct_n_parallel<
+        std::random_access_iterator_tag>();
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)

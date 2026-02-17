@@ -70,19 +70,18 @@ void test_shift_left_sent(ExPolicy policy, IteratorTag)
     std::iota(std::begin(c), std::end(c), std::rand());
     std::vector<std::size_t> d = c;
 
-    // shift by zero should have no effect
-    hpx::ranges::shift_left(
-        policy, std::begin(c), sentinel<std::size_t>{*std::rbegin(c)}, 0);
+    hpx::ranges::shift_left(policy, std::begin(c),
+        test::sentinel_from_iterator(std::end(c) - 1), 0);
     HPX_TEST(std::equal(std::begin(c), std::end(c) - 1, std::begin(d)));
 
     // shift by a negative number should have no effect
-    hpx::ranges::shift_left(
-        policy, std::begin(c), sentinel<std::size_t>{*std::rbegin(c)}, -4);
+    hpx::ranges::shift_left(policy, std::begin(c),
+        test::sentinel_from_iterator(std::end(c) - 1), -4);
     HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d)));
 
     std::size_t n = (std::rand() % (ARR_SIZE - 1)) + 1;
-    hpx::ranges::shift_left(
-        policy, std::begin(c), sentinel<std::size_t>{*std::rbegin(c)}, n);
+    hpx::ranges::shift_left(policy, std::begin(c),
+        test::sentinel_from_iterator(std::end(c) - 1), n);
 
     std::move(std::begin(d) + static_cast<std::ptrdiff_t>(n), std::end(d) - 1,
         std::begin(d));
@@ -93,7 +92,7 @@ void test_shift_left_sent(ExPolicy policy, IteratorTag)
 
     // ensure shift by more than n does not crash
     hpx::ranges::shift_left(policy, std::begin(c),
-        sentinel<std::size_t>{*std::rbegin(c)}, ARR_SIZE + 1);
+        test::sentinel_from_iterator(std::end(c) - 1), ARR_SIZE + 1);
 }
 
 template <typename IteratorTag>

@@ -73,10 +73,9 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter     The type of the source iterators used for the
+    /// \tparam RaIter      The type of the source iterators used for the
     ///                     range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for InIter.
     /// \tparam Proj        The type of an optional projection function. This
@@ -102,7 +101,7 @@ namespace hpx { namespace ranges {
     ///                     The signature does not need to have const &, but
     ///                     the function must not modify the objects passed to
     ///                     it. The types \a Type1 must be such
-    ///                     that objects of type \a FwdIter
+    ///                     that objects of type \a RaIter
     ///                     can be dereferenced and then implicitly converted
     ///                     to \a Type1 .
     /// \param proj         Specifies the function (or function object) which
@@ -133,12 +132,12 @@ namespace hpx { namespace ranges {
     ///           decides to provide their algorithm their own binary
     ///           predicate \a pred.
     ///
-    template <typename ExPolicy, typename FwdIter, typename Sent,
+    template <typename ExPolicy, typename RaIter, typename Sent,
         typename Proj = hpx::identity,
         typename Pred = detail::equal_to>
     typename parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter>::type
-    adjacent_find(ExPolicy&& policy, FwdIter first, Sent last,
+            RaIter>::type
+    adjacent_find(ExPolicy&& policy, RaIter first, Sent last,
         Pred&& pred = Pred(), Proj&& proj = Proj());
 
     /// Searches the range rng for two consecutive identical elements.
@@ -192,9 +191,10 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an forward iterator.
+    ///                     meet the requirements of an random access iterator.
     /// \tparam Proj        The type of an optional projection function. This
     ///                     defaults to \a hpx::identity
     /// \tparam Pred        The type of an optional function/function object to use.
@@ -216,7 +216,7 @@ namespace hpx { namespace ranges {
     ///                     The signature does not need to have const &, but
     ///                     the function must not modify the objects passed to
     ///                     it. The types \a Type1 must be such
-    ///                     that objects of type \a FwdIter
+    ///                     that objects of type \a RaIter
     ///                     can be dereferenced and then implicitly converted
     ///                     to \a Type1 .
     /// \param proj         Specifies the function (or function object) which
@@ -302,29 +302,29 @@ namespace hpx::ranges {
                     HPX_MOVE(proj));
         }
 
-        template <typename ExPolicy, typename FwdIter, typename Sent,
+        template <typename ExPolicy, typename RaIter, typename Sent,
             typename Proj = hpx::identity,
             typename Pred = hpx::parallel::detail::equal_to>
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_forward_iterator_v<FwdIter> &&
-                hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
-                hpx::parallel::traits::is_projected_v<Proj, FwdIter> &&
+                hpx::traits::is_random_access_iterator_v<RaIter> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, RaIter> &&
+                hpx::parallel::traits::is_projected_v<Proj, RaIter> &&
                 hpx::parallel::traits::is_indirect_callable<
                     ExPolicy, Pred,
-                    hpx::parallel::traits::projected<Proj, FwdIter>,
-                    hpx::parallel::traits::projected<Proj, FwdIter>
+                    hpx::parallel::traits::projected<Proj, RaIter>,
+                    hpx::parallel::traits::projected<Proj, RaIter>
                 >::value
             )
         // clang-format on
-        friend parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
+        friend parallel::util::detail::algorithm_result_t<ExPolicy, RaIter>
         tag_fallback_invoke(hpx::ranges::adjacent_find_t, ExPolicy&& policy,
-            FwdIter first, Sent last, Pred pred = Pred(), Proj proj = Proj())
+            RaIter first, Sent last, Pred pred = Pred(), Proj proj = Proj())
         {
-            return hpx::parallel::detail::adjacent_find<FwdIter, FwdIter>()
-                .call(HPX_FORWARD(ExPolicy, policy), first, last,
-                    HPX_MOVE(pred), HPX_MOVE(proj));
+            return hpx::parallel::detail::adjacent_find<RaIter, RaIter>().call(
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(pred),
+                HPX_MOVE(proj));
         }
 
         template <typename Rng, typename Proj = hpx::identity,
@@ -362,7 +362,8 @@ namespace hpx::ranges {
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable<
                     ExPolicy, Pred,

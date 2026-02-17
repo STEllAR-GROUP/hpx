@@ -98,15 +98,14 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter1    The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    /// \tparam RaIter1     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of 
+    ///                     a random access iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
-    ///                     sentinel type must be a sentinel for InIter.
-    /// \tparam FwdIter2    The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     sentinel type must be a sentinel for RaIter1.
+    /// \tparam RaIter2     The type of the iterator representing the
+    ///                     destination range (deduced). This iterator type 
+    ///                     must meet the requirements of a random access iterator.
     /// \tparam Op          The type of the binary function object used for
     ///                     the reduction operation.
     ///
@@ -144,11 +143,11 @@ namespace hpx { namespace ranges {
     /// within each thread.
     ///
     /// \returns  The \a inclusive_scan algorithm returns a
-    ///           \a hpx::future<util::in_out_result<FwdIter1, FwdIter2>> if
+    ///           \a hpx::future<util::in_out_result<RaIter1, RaIter2>> if
     ///           the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a util::in_out_result<FwdIter1, FwdIter2> otherwise.
+    ///           returns \a util::in_out_result<RaIter1, RaIter2> otherwise.
     ///           The \a inclusive_scan algorithm returns an input iterator to
     ///           the point denoted by the sentinel and an output iterator
     ///           to the element in the destination range, one past the last
@@ -163,13 +162,13 @@ namespace hpx { namespace ranges {
     /// The difference between \a exclusive_scan and \a inclusive_scan is that
     /// \a inclusive_scan includes the ith input element in the ith sum.
     ///
-    template <typename ExPolicy, typename FwdIter1, typename Sent,
-        typename FwdIter2, typename Op = std::plus<typename
-        std::iterator_traits<FwdIter1>::value_type>>
+    template <typename ExPolicy, typename RaIter1, typename Sent,
+        typename RaIter2, typename Op = std::plus<typename
+        std::iterator_traits<RaIter1>::value_type>>
     typename parallel::util::detail::algorithm_result<ExPolicy,
-        inclusive_scan_result<FwdIter1, FwdIter2>>::type
-    inclusive_scan(ExPolicy&& policy, FwdIter1 first, Sent last,
-        FwdIter2 dest, Op&& op);
+        inclusive_scan_result<RaIter1, RaIter2>>::type
+    inclusive_scan(ExPolicy&& policy, RaIter1 first, Sent last,
+        RaIter2 dest, Op&& op);
 
     ///////////////////////////////////////////////////////////////////////////
     /// Assigns through each iterator \a i in [result, result + (last - first))
@@ -247,13 +246,13 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an forward iterator.
+    ///                     meet the requirements of an random access iterator.
     /// \tparam O           The type of the iterator representing the
     ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam Op          The type of the binary function object used for
     ///                     the reduction operation.
     ///
@@ -403,15 +402,14 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam InIter      The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
+    /// \tparam RaIter1     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of 
+    ///                     a random access iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
-    ///                     sentinel type must be a sentinel for InIter.
-    /// \tparam OutIter     The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     output iterator.
+    ///                     sentinel type must be a sentinel for RaIter1.
+    /// \tparam RaIter2     The type of the iterator representing the
+    ///                     destination range (deduced). This iterator type 
+    ///                     must meet the requirements of a random access iterator.
     /// \tparam Op          The type of the binary function object used for
     ///                     the reduction operation.
     /// \tparam T           The type of the value to be used as initial (and
@@ -473,11 +471,11 @@ namespace hpx { namespace ranges {
     /// \a op is not mathematically associative, the behavior of
     /// \a inclusive_scan may be non-deterministic.
     ///
-    template <typename ExPolicy, typename FwdIter1, typename Sent,
-        typename FwdIter2, typename Op,
-        typename T = typename std::iterator_traits<FwdIter1>::value_type>
+    template <typename ExPolicy, typename RaIter1, typename Sent,
+        typename RaIter2, typename Op,
+        typename T = typename std::iterator_traits<RaIter1>::value_type>
     typename parallel::util::detail::algorithm_result<ExPolicy,
-        inclusive_scan_result<FwdIter1, FwdIter2>>::type
+        inclusive_scan_result<RaIter1, RaIter2>>::type
     inclusive_scan(ExPolicy&& policy, InIter first, Sent last, OutIter dest,
         Op&& op, T init);
 
@@ -564,13 +562,13 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an forward iterator.
+    ///                     meet the requirements of an random access iterator.
     /// \tparam O           The type of the iterator representing the
     ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     This iterator type must meet the requirements of an random access iterator.
     /// \tparam Op          The type of the binary function object used for
     ///                     the reduction operation.
     /// \tparam T           The type of the value to be used as initial (and
@@ -697,34 +695,27 @@ namespace hpx::ranges {
                 hpx::execution::seq, first, last, dest, HPX_MOVE(op));
         }
 
-        template <typename ExPolicy, typename FwdIter1, typename Sent,
-            typename FwdIter2, typename Op = std::plus<>>
+        template <typename ExPolicy, typename RaIter1, typename Sent,
+            typename RaIter2, typename BinOp>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<FwdIter1> &&
-                hpx::traits::is_sentinel_for_v<Sent, FwdIter1> &&
-                hpx::traits::is_iterator_v<FwdIter2> &&
-                hpx::is_invocable_v<Op,
-                    typename std::iterator_traits<FwdIter1>::value_type,
-                    typename std::iterator_traits<FwdIter1>::value_type
-                >
+                hpx::traits::is_random_access_iterator_v<RaIter1> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, RaIter1> &&
+                hpx::traits::is_random_access_iterator_v<RaIter2> &&
+                hpx::is_invocable_v<BinOp,
+                    typename std::iterator_traits<RaIter1>::value_type,
+                    typename std::iterator_traits<RaIter1>::value_type>
             )
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            inclusive_scan_result<FwdIter1, FwdIter2>>::type
+        friend parallel::util::detail::algorithm_result_t<ExPolicy, RaIter2>
         tag_fallback_invoke(hpx::ranges::inclusive_scan_t, ExPolicy&& policy,
-            FwdIter1 first, Sent last, FwdIter2 dest, Op op = Op())
+            RaIter1 first, Sent last, RaIter2 dest, BinOp binary_op)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
-                "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
-                "Requires at least forward iterator.");
-
-            using result_type = inclusive_scan_result<FwdIter1, FwdIter2>;
-
-            return hpx::parallel::detail::inclusive_scan<result_type>().call(
-                HPX_FORWARD(ExPolicy, policy), first, last, dest, HPX_MOVE(op));
+            return hpx::parallel::detail::inclusive_scan<RaIter2>().call(
+                HPX_FORWARD(ExPolicy, policy), first, last, dest,
+                HPX_MOVE(binary_op),
+                typename std::iterator_traits<RaIter1>::value_type());
         }
 
         template <typename Rng, typename O, typename Op = std::plus<>>
@@ -760,7 +751,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng> &&
                 hpx::is_invocable_v<Op,
                     typename hpx::traits::range_traits<Rng>::value_type,
                     typename hpx::traits::range_traits<Rng>::value_type
@@ -772,12 +764,6 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::inclusive_scan_t, ExPolicy&& policy,
             Rng&& rng, O dest, Op op = Op())
         {
-            using iterator_type =
-                typename hpx::traits::range_traits<Rng>::iterator_type;
-
-            static_assert(hpx::traits::is_forward_iterator_v<iterator_type>,
-                "Requires at least forward iterator.");
-
             using result_type =
                 inclusive_scan_result<traits::range_iterator_t<Rng>, O>;
 
@@ -815,36 +801,26 @@ namespace hpx::ranges {
                 HPX_MOVE(op));
         }
 
-        template <typename ExPolicy, typename FwdIter1, typename Sent,
-            typename FwdIter2, typename Op,
-            typename T = typename std::iterator_traits<FwdIter1>::value_type>
+        template <typename ExPolicy, typename RaIter1, typename Sent,
+            typename RaIter2, typename BinOp, typename T>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<FwdIter1> &&
-                hpx::traits::is_sentinel_for_v<Sent, FwdIter1> &&
-                hpx::traits::is_iterator_v<FwdIter2> &&
-                hpx::is_invocable_v<Op,
-                    typename std::iterator_traits<FwdIter1>::value_type,
-                    typename std::iterator_traits<FwdIter1>::value_type
-                >
+                hpx::traits::is_random_access_iterator_v<RaIter1> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, RaIter1> &&
+                hpx::traits::is_random_access_iterator_v<RaIter2> &&
+                hpx::is_invocable_v<BinOp,
+                    typename std::iterator_traits<RaIter1>::value_type,
+                    typename std::iterator_traits<RaIter1>::value_type>
             )
         // clang-format on
-        friend parallel::util::detail::algorithm_result_t<ExPolicy,
-            inclusive_scan_result<FwdIter1, FwdIter2>>
+        friend parallel::util::detail::algorithm_result_t<ExPolicy, RaIter2>
         tag_fallback_invoke(hpx::ranges::inclusive_scan_t, ExPolicy&& policy,
-            FwdIter1 first, Sent last, FwdIter2 dest, Op op, T init)
+            RaIter1 first, Sent last, RaIter2 dest, BinOp binary_op, T init)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
-                "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
-                "Requires at least forward iterator.");
-
-            using result_type = inclusive_scan_result<FwdIter1, FwdIter2>;
-
-            return hpx::parallel::detail::inclusive_scan<result_type>().call(
+            return hpx::parallel::detail::inclusive_scan<RaIter2>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, dest,
-                HPX_MOVE(init), HPX_MOVE(op));
+                HPX_MOVE(binary_op), HPX_MOVE(init));
         }
 
         template <typename Rng, typename O, typename Op,
@@ -883,7 +859,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng> &&
                 hpx::is_invocable_v<Op,
                     typename hpx::traits::range_traits<Rng>::value_type,
                     typename hpx::traits::range_traits<Rng>::value_type
@@ -895,12 +872,6 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::inclusive_scan_t, ExPolicy&& policy,
             Rng&& rng, O dest, Op op, T init)
         {
-            using iterator_type =
-                typename hpx::traits::range_traits<Rng>::iterator_type;
-
-            static_assert(hpx::traits::is_forward_iterator_v<iterator_type>,
-                "Requires at least forward iterator.");
-
             using result_type =
                 inclusive_scan_result<traits::range_iterator_t<Rng>, O>;
 

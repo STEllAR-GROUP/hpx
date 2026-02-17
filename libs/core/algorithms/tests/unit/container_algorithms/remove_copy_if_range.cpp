@@ -61,7 +61,7 @@ void test_remove_copy_if_sent(ExPolicy policy)
     auto result_e = std::count_if(std::begin(e), std::end(e), pred2);
 
     hpx::ranges::remove_copy_if(policy, std::begin(c),
-        sentinel<std::int16_t>{50}, std::begin(d), pred1);
+        test::sentinel_from_iterator(std::begin(c) + 49), std::begin(d), pred1);
     auto result_d = std::count_if(std::begin(d), std::end(d), pred2);
 
     HPX_TEST(result_e == 2 && result_d == 1);
@@ -233,6 +233,13 @@ void test_remove_copy_if()
     using namespace hpx::execution;
 
     test_remove_copy_if(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_remove_copy_if_parallel()
+{
+    using namespace hpx::execution;
+
     test_remove_copy_if(seq, IteratorTag());
     test_remove_copy_if(par, IteratorTag());
     test_remove_copy_if(par_unseq, IteratorTag());
@@ -250,6 +257,7 @@ void remove_copy_if_test()
 {
     test_remove_copy_if<std::random_access_iterator_tag>();
     test_remove_copy_if<std::forward_iterator_tag>();
+    test_remove_copy_if_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -342,7 +350,6 @@ void test_remove_copy_if_exception()
 void remove_copy_if_exception_test()
 {
     test_remove_copy_if_exception<std::random_access_iterator_tag>();
-    test_remove_copy_if_exception<std::forward_iterator_tag>();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -430,7 +437,6 @@ void test_remove_copy_if_bad_alloc()
 void remove_copy_if_bad_alloc_test()
 {
     test_remove_copy_if_bad_alloc<std::random_access_iterator_tag>();
-    test_remove_copy_if_bad_alloc<std::forward_iterator_tag>();
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)

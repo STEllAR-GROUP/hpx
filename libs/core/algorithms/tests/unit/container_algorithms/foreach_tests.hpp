@@ -16,9 +16,11 @@
 #include <functional>
 #include <iterator>
 #include <numeric>
+#include <ranges>
 #include <utility>
 #include <vector>
 
+#include "hpx/iterator_support/traits/is_range.hpp"
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////

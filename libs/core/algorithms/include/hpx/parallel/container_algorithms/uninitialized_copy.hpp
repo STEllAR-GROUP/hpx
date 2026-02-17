@@ -66,15 +66,14 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter1    The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
+    /// \tparam RaIter1     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of
+    ///                     a random access iterator.
     /// \tparam Sent1       The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for InIter.
-    /// \tparam FwdIter2    The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of a
-    ///                     forward iterator.
+    /// \tparam RaIter2     The type of the iterator representing the
+    ///                     destination range (deduced). This iterator type must
+    ///                     meet the requirements of a random access iterator.
     /// \tparam Sent2       The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for InIter2.
     ///
@@ -108,12 +107,12 @@ namespace hpx { namespace ranges {
     ///           iterator to the element in the destination range, one past
     ///           the last element copied.
     ///
-    template <typename ExPolicy, typename FwdIter1, typename Sent1,
-        typename FwdIter2, typename Sent2>
+    template <typename ExPolicy, typename RaIter1, typename Sent1,
+        typename RaIter2, typename Sent2>
     typename parallel::util::detail::algorithm_result<ExPolicy,
-        parallel::util::in_out_result<FwdIter1, FwdIter2>>::type
-    uninitialized_copy(ExPolicy&& policy, FwdIter1 first1, Sent1 last1,
-        FwdIter2 first2, Sent2 last2);
+        parallel::util::in_out_result<RaIter1, RaIter2>>::type
+    uninitialized_copy(ExPolicy&& policy, RaIter1 first1, Sent1 last1,
+        RaIter2 first2, Sent2 last2);
 
     /// Copies the elements in the range, defined by [first, last), to an
     /// uninitialized memory area beginning at \a dest. If an exception is
@@ -161,12 +160,14 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng1        The type of the source range used (deduced).
+    /// \tparam Rng1        The type of the source range used (deduced). The
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
-    /// \tparam Rng2        The type of the destination range used (deduced).
+    ///                     meet the requirements of a random access iterator.
+    /// \tparam Rng2        The range itself must meet the requirements of a
+    ///                     sized range. The type of the destination range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an forward iterator.
+    ///                     meet the requirements of an random access iterator.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -257,15 +258,15 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter1    The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
+    /// \tparam RaIter1     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of
+    ///                     a random access iterator.
     /// \tparam Size        The type of the argument specifying the number of
     ///                     elements to apply \a f to.
-    /// \tparam FwdIter2    The type of the iterator representing the
+    /// \tparam RaIter2     The type of the iterator representing the
     ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of a
-    ///                     forward iterator.
+    ///                     This iterator type must meet the requirements of
+    ///                     a random access iterator.
     /// \tparam Sent2       The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for InIter2.
     ///
@@ -292,20 +293,20 @@ namespace hpx { namespace ranges {
     /// within each thread.
     ///
     /// \returns  The \a uninitialized_copy_n algorithm returns a
-    ///           \a hpx::future<in_out_result<FwdIter1, FwdIter2>> if the
+    ///           \a hpx::future<in_out_result<RaIter1, RaIter2>> if the
     ///           execution policy is of type \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a FwdIter2 otherwise.
+    ///           returns \a RaIter2 otherwise.
     ///           The \a uninitialized_copy_n algorithm returns the output
     ///           iterator to the element in the destination range, one past
     ///           the last element copied.
     ///
-    template <typename ExPolicy, typename FwdIter1, typename Size,
-        typename FwdIter2, typename Sent2>
+    template <typename ExPolicy, typename RaIter1, typename Size,
+        typename RaIter2, typename Sent2>
     typename parallel::util::detail::algorithm_result<ExPolicy,
-        parallel::util::in_out_result<FwdIter1, FwdIter2>>::type
-    uninitialized_copy_n(ExPolicy&& policy, FwdIter1 first1, Size count,
-        FwdIter2 first2, Sent2 last2);
+        parallel::util::in_out_result<RaIter1, RaIter2>>::type
+    uninitialized_copy_n(ExPolicy&& policy, RaIter1 first1, Size count,
+        RaIter2 first2, Sent2 last2);
 }}    // namespace hpx::ranges
 #else
 
@@ -353,30 +354,25 @@ namespace hpx::ranges {
                 .call(hpx::execution::seq, first1, last1, first2, last2);
         }
 
-        template <typename ExPolicy, typename FwdIter1, typename Sent1,
-            typename FwdIter2, typename Sent2>
+        template <typename ExPolicy, typename RaIter1, typename Sent1,
+            typename RaIter2, typename Sent2>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_forward_iterator_v<FwdIter1> &&
-                hpx::traits::is_sentinel_for_v<Sent1, FwdIter1> &&
-                hpx::traits::is_forward_iterator_v<FwdIter2> &&
-                hpx::traits::is_sentinel_for_v<Sent2, FwdIter2>
+                hpx::traits::is_random_access_iterator_v<RaIter1> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent1, RaIter1> &&
+                hpx::traits::is_random_access_iterator_v<RaIter2> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent2, RaIter2>
             )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
-            parallel::util::in_out_result<FwdIter1, FwdIter2>>
+            parallel::util::in_out_result<RaIter1, RaIter2>>
         tag_fallback_invoke(hpx::ranges::uninitialized_copy_t,
-            ExPolicy&& policy, FwdIter1 first1, Sent1 last1, FwdIter2 first2,
+            ExPolicy&& policy, RaIter1 first1, Sent1 last1, RaIter2 first2,
             Sent2 last2)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
-                "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
-                "Requires at least forward iterator.");
-
             return hpx::parallel::detail::uninitialized_copy_sent<
-                parallel::util::in_out_result<FwdIter1, FwdIter2>>()
+                parallel::util::in_out_result<RaIter1, RaIter2>>()
                 .call(HPX_FORWARD(ExPolicy, policy), first1, last1, first2,
                     last2);
         }
@@ -415,8 +411,10 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng1> &&
-                hpx::traits::is_range_v<Rng2>
+                hpx::traits::is_random_access_range_v<Rng1> &&
+                hpx::traits::is_sized_range_v<Rng1> &&
+                hpx::traits::is_random_access_range_v<Rng2> &&
+                hpx::traits::is_sized_range_v<Rng2>
             )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
@@ -474,31 +472,26 @@ namespace hpx::ranges {
                     first2);
         }
 
-        template <typename ExPolicy, typename FwdIter1, typename Size,
-            typename FwdIter2, typename Sent2>
+        template <typename ExPolicy, typename RaIter1, typename Size,
+            typename RaIter2, typename Sent2>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_forward_iterator_v<FwdIter1> &&
-                hpx::traits::is_forward_iterator_v<FwdIter2> &&
-                hpx::traits::is_sentinel_for_v<Sent2, FwdIter2> &&
+                hpx::traits::is_random_access_iterator_v<RaIter1> &&
+                hpx::traits::is_random_access_iterator_v<RaIter2> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent2, RaIter2> &&
                 std::is_integral_v<Size>
             )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
-            hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>>
+            hpx::parallel::util::in_out_result<RaIter1, RaIter2>>
         tag_fallback_invoke(hpx::ranges::uninitialized_copy_n_t,
-            ExPolicy&& policy, FwdIter1 first1, Size count, FwdIter2 first2,
+            ExPolicy&& policy, RaIter1 first1, Size count, RaIter2 first2,
             Sent2 last2)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
-                "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
-                "Requires at least forward iterator.");
-
             std::size_t d = parallel::detail::distance(first2, last2);
             return hpx::parallel::detail::uninitialized_copy_n<
-                parallel::util::in_out_result<FwdIter1, FwdIter2>>()
+                parallel::util::in_out_result<RaIter1, RaIter2>>()
                 .call(HPX_FORWARD(ExPolicy, policy), first1,
                     count <= d ? count : d, first2);
         }

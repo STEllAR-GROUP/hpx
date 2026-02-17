@@ -129,9 +129,13 @@ void test_transform_reduce_binary_exception_async(ExPolicy&& p, IteratorTag)
 template <typename IteratorTag>
 void test_transform_reduce_binary_exception()
 {
-    using namespace hpx::execution;
-
     test_transform_reduce_binary_exception(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_transform_reduce_binary_exception_parallel()
+{
+    using namespace hpx::execution;
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
@@ -146,6 +150,8 @@ void transform_reduce_binary_exception_test()
 {
     test_transform_reduce_binary_exception<std::random_access_iterator_tag>();
     test_transform_reduce_binary_exception<std::forward_iterator_tag>();
+    test_transform_reduce_binary_exception_parallel<
+        std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

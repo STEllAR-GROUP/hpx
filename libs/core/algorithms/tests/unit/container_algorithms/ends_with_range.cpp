@@ -163,11 +163,18 @@ void test_ends_with()
     using namespace hpx::execution;
 
     test_ends_with_sent(IteratorTag());
+    test_ends_with(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_ends_with_parallel()
+{
+    using namespace hpx::execution;
+
     test_ends_with_sent(seq, IteratorTag());
     test_ends_with_sent(par, IteratorTag());
     test_ends_with_sent(par_unseq, IteratorTag());
 
-    test_ends_with(IteratorTag());
     test_ends_with(seq, IteratorTag());
     test_ends_with(par, IteratorTag());
     test_ends_with(par_unseq, IteratorTag());
@@ -180,6 +187,7 @@ void ends_with_test()
 {
     test_ends_with<std::random_access_iterator_tag>();
     test_ends_with<std::forward_iterator_tag>();
+    test_ends_with_parallel<std::random_access_iterator_tag>();
 }
 
 ////////////////////////////////////////////////////////////////////////////

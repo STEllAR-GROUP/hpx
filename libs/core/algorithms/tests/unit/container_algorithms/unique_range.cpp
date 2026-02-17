@@ -100,8 +100,8 @@ void test_unique_sent(ExPolicy policy)
     auto end_len = std::rand() % 10006 + 1;
     c[end_len] = 10;
 
-    auto result =
-        hpx::ranges::unique(policy, std::begin(c), sentinel<std::size_t>{10});
+    auto result = hpx::ranges::unique(policy, std::begin(c),
+        test::sentinel_from_iterator(std::begin(c) + end_len));
     auto solution = std::unique(std::begin(d), std::begin(d) + end_len);
 
     bool equality =

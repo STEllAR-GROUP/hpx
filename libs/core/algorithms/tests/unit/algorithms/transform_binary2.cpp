@@ -7,6 +7,7 @@
 #include <hpx/init.hpp>
 
 #include <iostream>
+#include <iterator>
 #include <string>
 #include <vector>
 
@@ -19,6 +20,13 @@ void test_transform_binary2()
     using namespace hpx::execution;
 
     test_transform_binary2(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_transform_binary2_parallel()
+{
+    using namespace hpx::execution;
+
     test_transform_binary2(seq, IteratorTag());
     test_transform_binary2(par, IteratorTag());
 
@@ -30,6 +38,7 @@ void transform_binary2_test()
 {
     test_transform_binary2<std::random_access_iterator_tag>();
     test_transform_binary2<std::forward_iterator_tag>();
+    test_transform_binary2_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -38,10 +47,17 @@ void test_transform_binary2_exception()
 {
     using namespace hpx::execution;
 
+    test_transform_binary2_exception(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_transform_binary2_exception_parallel()
+{
+    using namespace hpx::execution;
+
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_transform_binary2_exception(IteratorTag());
     test_transform_binary2_exception(seq, IteratorTag());
     test_transform_binary2_exception(par, IteratorTag());
 
@@ -53,6 +69,8 @@ void transform_binary2_exception_test()
 {
     test_transform_binary2_exception<std::random_access_iterator_tag>();
     test_transform_binary2_exception<std::forward_iterator_tag>();
+    test_transform_binary2_exception_parallel<
+        std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -74,7 +92,6 @@ void test_transform_binary2_bad_alloc()
 void transform_binary2_bad_alloc_test()
 {
     test_transform_binary2_bad_alloc<std::random_access_iterator_tag>();
-    test_transform_binary2_bad_alloc<std::forward_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

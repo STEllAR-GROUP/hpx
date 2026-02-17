@@ -55,8 +55,8 @@ void test_reverse_copy_sent(ExPolicy policy)
     auto last = c[49];
     HPX_TEST(*first == 0);
 
-    hpx::ranges::reverse_copy(
-        policy, std::begin(c), sentinel<std::int16_t>{50}, std::begin(d));
+    hpx::ranges::reverse_copy(policy, std::begin(c),
+        test::sentinel_from_iterator(std::begin(c) + 50), std::begin(d));
     auto first_reversed = d.begin();
 
     HPX_TEST(*first_reversed == last);
@@ -148,16 +148,17 @@ void test_reverse_copy_async(ExPolicy p, IteratorTag)
 template <typename IteratorTag>
 void test_reverse_copy()
 {
-    using namespace hpx::execution;
     test_reverse_copy(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_reverse_copy_parallel()
+{
+    using namespace hpx::execution;
+
     test_reverse_copy(seq, IteratorTag());
     test_reverse_copy(par, IteratorTag());
     test_reverse_copy(par_unseq, IteratorTag());
-
-    test_reverse_copy_sent();
-    test_reverse_copy_sent(seq);
-    test_reverse_copy_sent(par);
-    test_reverse_copy_sent(par_unseq);
 
     test_reverse_copy_async(seq(task), IteratorTag());
     test_reverse_copy_async(par(task), IteratorTag());
@@ -167,6 +168,7 @@ void reverse_copy_test()
 {
     test_reverse_copy<std::random_access_iterator_tag>();
     test_reverse_copy<std::bidirectional_iterator_tag>();
+    test_reverse_copy_parallel<std::random_access_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -286,10 +288,17 @@ void test_reverse_copy_exception()
 {
     using namespace hpx::execution;
 
+    test_reverse_copy_exception(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_reverse_copy_exception_parallel()
+{
+    using namespace hpx::execution;
+
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_reverse_copy_exception(IteratorTag());
     test_reverse_copy_exception(seq, IteratorTag());
     test_reverse_copy_exception(par, IteratorTag());
 
@@ -301,6 +310,7 @@ void reverse_copy_exception_test()
 {
     test_reverse_copy_exception<std::random_access_iterator_tag>();
     test_reverse_copy_exception<std::bidirectional_iterator_tag>();
+    test_reverse_copy_exception_parallel<std::random_access_iterator_tag>();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -416,10 +426,17 @@ void test_reverse_copy_bad_alloc()
 {
     using namespace hpx::execution;
 
+    test_reverse_copy_bad_alloc(IteratorTag());
+}
+
+template <typename IteratorTag>
+void test_reverse_copy_bad_alloc_parallel()
+{
+    using namespace hpx::execution;
+
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_reverse_copy_bad_alloc(IteratorTag());
     test_reverse_copy_bad_alloc(seq, IteratorTag());
     test_reverse_copy_bad_alloc(par, IteratorTag());
 
@@ -431,6 +448,7 @@ void reverse_copy_bad_alloc_test()
 {
     test_reverse_copy_bad_alloc<std::random_access_iterator_tag>();
     test_reverse_copy_bad_alloc<std::bidirectional_iterator_tag>();
+    test_reverse_copy_bad_alloc_parallel<std::random_access_iterator_tag>();
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)

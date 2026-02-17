@@ -70,7 +70,8 @@ void test_exclusive_scan_sent(ExPolicy policy, IteratorTag)
     auto op = [](std::size_t v1, std::size_t v2) { return v1 + v2; };
 
     auto res = hpx::ranges::exclusive_scan(policy, std::begin(c),
-        sentinel<std::size_t>{2}, std::begin(d), val, op);
+        test::sentinel_from_iterator(std::begin(c) + end_len), std::begin(d),
+        val, op);
 
     HPX_TEST(res.in == std::begin(c) + end_len);
     HPX_TEST(res.out == std::begin(d) + end_len);

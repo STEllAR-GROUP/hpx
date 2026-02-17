@@ -123,15 +123,14 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter1    The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    /// \tparam RaIter1     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     random access iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for FwdIter.
     /// \tparam FwdIter2    The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     destination range (deduced). This iterator type
+    ///                     must meet the requirements of a forward iterator.
     /// \tparam T           The type of the value to be used as initial (and
     ///                     intermediate) values (deduced).
     /// \tparam BinOp       The type of the binary function object used for
@@ -173,7 +172,7 @@ namespace hpx { namespace ranges {
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed to
     ///                     it. The type \a Type must be such that an object of
-    ///                     type \a FwdIter1 can be dereferenced and then
+    ///                     type \a RaIter1 can be dereferenced and then
     ///                     implicitly converted to Type.
     ///                     The type \a R must be such that an object of this
     ///                     type can be implicitly converted to \a T.
@@ -189,12 +188,12 @@ namespace hpx { namespace ranges {
     /// sequenced within each thread.
     ///
     /// \returns  The \a transform_exclusive_scan algorithm returns a
-    ///           \a hpx::future<transform_exclusive_result<FwdIter1,
+    ///           \a hpx::future<transform_exclusive_result<RaIter1,
     ///           FwdIter2>> if
     ///           the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a transform_exclusive_result<FwdIter1,
+    ///           returns \a transform_exclusive_result<RaIter1,
     ///           FwdIter2> otherwise.
     ///           The \a transform_exclusive_scan algorithm returns an input
     ///           iterator to the point denoted by the sentinel and an output
@@ -323,15 +322,13 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
+    /// \tparam Rng         The type of the source range used (deduced). The 
+    ///                     range itself must meet the requirements of a sized range.
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an forward iterator.
+    ///                     meet the requirements of an random access iterator.
     /// \tparam O           The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     destination range (deduced). This iterator type must
+    ///                     meet the requirements of forward iterator.
     /// \tparam T           The type of the value to be used as initial (and
     ///                     intermediate) values (deduced).
     /// \tparam BinOp       The type of the binary function object used for
@@ -371,7 +368,7 @@ namespace hpx { namespace ranges {
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed to
     ///                     it. The type \a Type must be such that an object of
-    ///                     type \a FwdIter1 can be dereferenced and then
+    ///                     type \a RaIter1 can be dereferenced and then
     ///                     implicitly converted to Type.
     ///                     The type \a R must be such that an object of this
     ///                     type can be implicitly converted to \a T.
@@ -487,38 +484,33 @@ namespace hpx::ranges {
                     HPX_MOVE(unary_op), HPX_MOVE(init), HPX_MOVE(binary_op));
         }
 
-        template <typename ExPolicy, typename FwdIter1, typename Sent,
+        template <typename ExPolicy, typename RaIter1, typename Sent,
             typename FwdIter2, typename BinOp, typename UnOp,
-            typename T = typename std::iterator_traits<FwdIter1>::value_type>
+            typename T = typename std::iterator_traits<RaIter1>::value_type>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<FwdIter1> &&
-                hpx::traits::is_sentinel_for_v<Sent, FwdIter1> &&
-                hpx::traits::is_iterator_v<FwdIter2> &&
+                hpx::traits::is_random_access_iterator_v<RaIter1> &&
+                hpx::traits::is_sized_sentinel_for_v<Sent, RaIter1> &&
+                hpx::traits::is_forward_iterator_v<FwdIter2> &&
                 hpx::is_invocable_v<UnOp,
-                    typename std::iterator_traits<FwdIter1>::value_type> &&
+                    typename std::iterator_traits<RaIter1>::value_type> &&
                 hpx::is_invocable_v<BinOp,
                     hpx::util::invoke_result_t<UnOp,
-                        typename std::iterator_traits<FwdIter1>::value_type>,
+                        typename std::iterator_traits<RaIter1>::value_type>,
                     hpx::util::invoke_result_t<UnOp,
-                        typename std::iterator_traits<FwdIter1>::value_type>
+                        typename std::iterator_traits<RaIter1>::value_type>
                 >
             )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
-            transform_exclusive_scan_result<FwdIter1, FwdIter2>>
+            transform_exclusive_scan_result<RaIter1, FwdIter2>>
         tag_fallback_invoke(hpx::ranges::transform_exclusive_scan_t,
-            ExPolicy&& policy, FwdIter1 first, Sent last, FwdIter2 dest, T init,
+            ExPolicy&& policy, RaIter1 first, Sent last, FwdIter2 dest, T init,
             BinOp binary_op, UnOp unary_op)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
-                "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
-                "Requires at least forward iterator.");
-
             using result_type =
-                transform_exclusive_scan_result<FwdIter1, FwdIter2>;
+                transform_exclusive_scan_result<RaIter1, FwdIter2>;
 
             return hpx::parallel::detail::transform_exclusive_scan<
                 result_type>()
@@ -568,7 +560,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                hpx::traits::is_random_access_range_v<Rng> &&
+                hpx::traits::is_sized_range_v<Rng> &&
                 hpx::is_invocable_v<UnOp,
                     typename hpx::traits::range_traits<Rng>::value_type> &&
                 hpx::is_invocable_v<BinOp,

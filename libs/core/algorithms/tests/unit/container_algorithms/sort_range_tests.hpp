@@ -135,9 +135,9 @@ void test_sort1_sent(T)
 
     c[N - 1] = rand_max_val;
     // sort, blocking when seq, par, par_vec
-    hpx::ranges::sort(std::begin(c), sentinel<T>{rand_max_val});
+    hpx::ranges::sort(std::begin(c), test::sentinel_from_iterator(std::end(c)));
 
-    bool is_sorted = std::is_sorted(std::begin(c), std::begin(c) + N - 1);
+    bool is_sorted = std::is_sorted(std::begin(c), std::end(c));
     HPX_TEST(is_sorted);
 }
 
@@ -160,9 +160,10 @@ void test_sort1_sent(ExPolicy&& policy, T)
 
     c[N - 1] = rand_max_val;
     // sort, blocking when seq, par, par_vec
-    hpx::ranges::sort(policy, std::begin(c), sentinel<T>{rand_max_val});
+    hpx::ranges::sort(
+        policy, std::begin(c), test::sentinel_from_iterator(std::end(c)));
 
-    bool is_sorted = std::is_sorted(std::begin(c), std::begin(c) + N - 1);
+    bool is_sorted = std::is_sorted(std::begin(c), std::end(c));
     HPX_TEST(is_sorted);
 }
 
@@ -186,9 +187,10 @@ void test_sort1_comp_sent(ExPolicy&& policy, T, Compare comp = Compare())
 
     c[N - 1] = rand_max_val;
     // sort, blocking when seq, par, par_vec
-    hpx::ranges::sort(policy, std::begin(c), sentinel<T>{rand_max_val}, comp);
+    hpx::ranges::sort(
+        policy, std::begin(c), test::sentinel_from_iterator(std::end(c)), comp);
 
-    bool is_sorted = std::is_sorted(std::begin(c), std::begin(c) + N - 1);
+    bool is_sorted = std::is_sorted(std::begin(c), std::end(c));
     HPX_TEST(is_sorted);
 }
 
