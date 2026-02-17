@@ -1012,6 +1012,8 @@ namespace hpx {
 #include <iterator>
 #include <type_traits>
 #include <utility>
+#include <iterator>
+#include <ranges>
 
 namespace hpx::parallel {
 
@@ -2120,7 +2122,7 @@ namespace hpx {
         friend constexpr InIter tag_fallback_invoke(
             find_last_t, InIter first, InIter last, T const& val)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Requires at least input iterator.");
 
             return hpx::parallel::detail::find_last<InIter>().call(
@@ -2138,7 +2140,7 @@ namespace hpx {
         friend decltype(auto) tag_fallback_invoke(find_last_t,
             ExPolicy&& policy, FwdIter first, FwdIter last, T const& val)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::find_last<FwdIter>().call(
@@ -2164,7 +2166,7 @@ namespace hpx {
         friend decltype(auto) tag_fallback_invoke(
             find_last_if_t, ExPolicy&& policy, FwdIter first, FwdIter last, F f)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::find_last_if<FwdIter>().call(
@@ -2182,7 +2184,7 @@ namespace hpx {
         friend InIter tag_fallback_invoke(
             find_last_if_t, InIter first, InIter last, F f)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Requires at least input iterator.");
 
             return hpx::parallel::detail::find_last_if<InIter>().call(
@@ -2207,7 +2209,7 @@ namespace hpx {
         friend decltype(auto) tag_fallback_invoke(find_last_if_not_t,
             ExPolicy&& policy, FwdIter first, FwdIter last, F f)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::find_last_if_not<FwdIter>().call(
@@ -2225,7 +2227,7 @@ namespace hpx {
         friend FwdIter tag_fallback_invoke(
             find_last_if_not_t, FwdIter first, FwdIter last, F f)
         {
-            static_assert(hpx::traits::is_input_iterator_v<FwdIter>,
+            static_assert(std::input_iterator<FwdIter>,
                 "Requires at least input iterator.");
 
             return hpx::parallel::detail::find_last_if_not<FwdIter>().call(

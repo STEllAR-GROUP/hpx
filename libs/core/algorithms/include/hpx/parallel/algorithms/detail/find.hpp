@@ -17,6 +17,8 @@
 #include <hpx/parallel/util/loop.hpp>
 
 #include <cstddef>
+#include <iterator>
+#include <ranges>
 #include <type_traits>
 #include <utility>
 
@@ -479,7 +481,7 @@ namespace hpx::parallel::detail {
             T const& value, Proj&& proj = Proj())
         {
             auto u_last = detail::advance_to_sentinel(first, last);
-            if constexpr (hpx::traits::is_bidirectional_iterator_v<Iterator>)
+            if constexpr (std::bidirectional_iterator<Iterator>)
             {
                 auto it = u_last;
                 while (it != first)
@@ -562,7 +564,7 @@ namespace hpx::parallel::detail {
             Pred pred, Proj&& proj = Proj())
         {
             auto u_last = detail::advance_to_sentinel(first, last);
-            if constexpr (hpx::traits::is_bidirectional_iterator_v<Iterator>)
+            if constexpr (std::bidirectional_iterator<Iterator>)
             {
                 auto it = u_last;
                 while (it != first)
@@ -644,7 +646,7 @@ namespace hpx::parallel::detail {
             Sentinel last, Pred pred, Proj&& proj = Proj())
         {
             auto u_last = detail::advance_to_sentinel(first, last);
-            if constexpr (hpx::traits::is_bidirectional_iterator_v<Iterator>)
+            if constexpr (std::bidirectional_iterator<Iterator>)
             {
                 auto it = u_last;
                 while (it != first)

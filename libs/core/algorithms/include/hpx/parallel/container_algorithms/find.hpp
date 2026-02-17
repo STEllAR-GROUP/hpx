@@ -1488,11 +1488,11 @@ namespace hpx {
     /// within each thread.
     ///
     /// \returns  The \a find_last algorithm returns a
-    ///           \a hpx::future<hpx::traits::range_iterator_t<Rng>> if the
+    ///           \a hpx::future<std::ranges::iterator_t<Rng>> if the
     ///           execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a hpx::traits::range_iterator_t<Rng> otherwise.
+    ///           returns \a std::ranges::iterator_t<Rng> otherwise.
     ///           The \a find_last algorithm returns the last element in the range
     ///           [first,last) that is equal to \a val.
     ///           If no such element in the range of [first,last) is equal to
@@ -1501,9 +1501,9 @@ namespace hpx {
     template <typename ExPolicy, typename Rng,
         typename Proj = hpx::identity,
         typename T = typename hpx::parallel::traits::projected<
-            typename hpx::traits::range_iterator_t<Rng>, Proj>::value_type>
+            typename std::ranges::iterator_t<Rng>, Proj>::value_type>
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-        typename hpx::traits::range_iterator_t<Rng>>
+        typename std::ranges::iterator_t<Rng>>
     find_last(ExPolicy&& policy, Rng&& rng, T const& val, Proj&& proj = Proj());
 
     /// Returns the last element in the range [first, last) that is equal
@@ -1572,8 +1572,8 @@ namespace hpx {
     template <typename Rng,
         typename Proj = hpx::identity,
         typename T = typename hpx::parallel::traits::projected<
-            typename hpx::traits::range_iterator_t<Rng>, Proj>::value_type>
-    typename hpx::traits::range_iterator_t<Rng>
+            typename std::ranges::iterator_t<Rng>, Proj>::value_type>
+    typename std::ranges::iterator_t<Rng>
     find_last(Rng&& rng, T const& val, Proj&& proj = Proj());
 
     /// Returns the last element in the range [first, last) for which
@@ -1689,11 +1689,11 @@ namespace hpx {
     /// within each thread.
     ///
     /// \returns  The \a find_last_if algorithm returns a
-    ///           \a hpx::future<hpx::traits::range_iterator_t<Rng>> if the
+    ///           \a hpx::future<std::ranges::iterator_t<Rng>> if the
     ///           execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a hpx::traits::range_iterator_t<Rng> otherwise.
+    ///           returns \a std::ranges::iterator_t<Rng> otherwise.
     ///           The \a find_last_if algorithm returns the last element in the range
     ///           [first,last) that satisfies the predicate \a pred.
     ///           If no such element exists, the algorithm returns \a last.
@@ -1701,7 +1701,7 @@ namespace hpx {
     template <typename ExPolicy, typename Rng, typename Pred,
         typename Proj = hpx::identity>
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-        typename hpx::traits::range_iterator_t<Rng>>
+        typename std::ranges::iterator_t<Rng>>
     find_last_if(ExPolicy&& policy, Rng&& rng, Pred&& pred,
         Proj&& proj = Proj());
 
@@ -1783,7 +1783,7 @@ namespace hpx {
     ///           If no such element exists, the algorithm returns \a last.
     ///
     template <typename Rng, typename Pred, typename Proj = hpx::identity>
-    typename hpx::traits::range_iterator_t<Rng>
+    typename std::ranges::iterator_t<Rng>
     find_last_if(Rng&& rng, Pred&& pred, Proj&& proj = Proj());
 
     /// Returns the last element in the range [first, last) for which
@@ -1899,11 +1899,11 @@ namespace hpx {
     /// within each thread.
     ///
     /// \returns  The \a find_last_if_not algorithm returns a
-    ///           \a hpx::future<hpx::traits::range_iterator_t<Rng>> if the
+    ///           \a hpx::future<std::ranges::iterator_t<Rng>> if the
     ///           execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a hpx::traits::range_iterator_t<Rng> otherwise.
+    ///           returns \a std::ranges::iterator_t<Rng> otherwise.
     ///           The \a find_last_if_not algorithm returns the last element in the
     ///           range [first,last) that does not satisfy the predicate \a pred.
     ///           If no such element exists, the algorithm returns \a last.
@@ -1911,7 +1911,7 @@ namespace hpx {
     template <typename ExPolicy, typename Rng, typename Pred,
         typename Proj = hpx::identity>
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-        typename hpx::traits::range_iterator_t<Rng>>
+        typename std::ranges::iterator_t<Rng>>
     find_last_if_not(ExPolicy&& policy, Rng&& rng, Pred&& pred,
         Proj&& proj = Proj());
 
@@ -1993,7 +1993,7 @@ namespace hpx {
     ///           If no such element exists, the algorithm returns \a last.
     ///
     template <typename Rng, typename Pred, typename Proj = hpx::identity>
-    typename hpx::traits::range_iterator_t<Rng>
+    typename std::ranges::iterator_t<Rng>
     find_last_if_not(Rng&& rng, Pred&& pred, Proj&& proj = Proj());
 
 #else    // DOXYGEN
@@ -2010,6 +2010,8 @@ namespace hpx {
 #include <iterator>
 #include <type_traits>
 #include <utility>
+#include <iterator>
+#include <ranges>
 
 namespace hpx::ranges {
 
@@ -2589,7 +2591,7 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
+                std::sentinel_for<Sent, Iter> &&
                 hpx::parallel::traits::is_projected_v<Proj, Iter>
             )
         // clang-format on
@@ -2598,7 +2600,7 @@ namespace hpx::ranges {
         tag_fallback_invoke(find_last_t, ExPolicy&& policy, Iter first,
             Sent last, T const& val, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_bidirectional_iterator_v<Iter>,
+            static_assert(std::bidirectional_iterator<Iter>,
                 "Requires at least bidirectional iterator.");
 
             using result_type =
@@ -2630,19 +2632,18 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                std::ranges::range<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng>
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            hpx::ranges::subrange_t<hpx::traits::range_iterator_t<Rng>>>
+            hpx::ranges::subrange_t<std::ranges::iterator_t<Rng>>>
         tag_fallback_invoke(find_last_t, ExPolicy&& policy, Rng&& rng,
             T const& val, Proj proj = Proj())
         {
-            using iterator_type = hpx::traits::range_iterator_t<Rng>;
+            using iterator_type = std::ranges::iterator_t<Rng>;
 
-            static_assert(
-                hpx::traits::is_bidirectional_iterator_v<iterator_type>,
+            static_assert(std::bidirectional_iterator<iterator_type>,
                 "Requires at least bidirectional iterator.");
 
             return hpx::parallel::util::detail::algorithm_result<ExPolicy,
@@ -2656,7 +2657,7 @@ namespace hpx::ranges {
             typename Proj = hpx::identity>
         // clang-format off
             requires(
-                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
+                std::sentinel_for<Sent, Iter> &&
                 hpx::parallel::traits::is_projected_v<Proj, Iter>
             )
         // clang-format on
@@ -2664,7 +2665,7 @@ namespace hpx::ranges {
             find_last_t, Iter first, Sent last, T const& val,
             Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_bidirectional_iterator_v<Iter>,
+            static_assert(std::bidirectional_iterator<Iter>,
                 "Requires at least bidirectional iterator.");
 
             return hpx::ranges::subrange_t<Iter, Sent>(
@@ -2676,18 +2677,17 @@ namespace hpx::ranges {
         template <typename Rng, typename T, typename Proj = hpx::identity>
         // clang-format off
             requires(
-                hpx::traits::is_range_v<Rng> &&
+                std::ranges::range<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng>
             )
         // clang-format on
-        friend hpx::ranges::subrange_t<hpx::traits::range_iterator_t<Rng>>
+        friend hpx::ranges::subrange_t<std::ranges::iterator_t<Rng>>
         tag_fallback_invoke(
             find_last_t, Rng&& rng, T const& val, Proj proj = Proj())
         {
-            using iterator_type = hpx::traits::range_iterator_t<Rng>;
+            using iterator_type = std::ranges::iterator_t<Rng>;
 
-            static_assert(
-                hpx::traits::is_bidirectional_iterator_v<iterator_type>,
+            static_assert(std::bidirectional_iterator<iterator_type>,
                 "Requires at least bidirectional iterator.");
 
             return hpx::ranges::subrange_t<iterator_type>(
@@ -2709,7 +2709,7 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
+                std::sentinel_for<Sent, Iter> &&
                 hpx::parallel::traits::is_projected_v<Proj, Iter> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<Iter>::value_type
@@ -2721,7 +2721,7 @@ namespace hpx::ranges {
         tag_fallback_invoke(find_last_if_t, ExPolicy&& policy, Iter first,
             Sent last, Pred&& pred, Proj&& proj = Proj())
         {
-            static_assert(hpx::traits::is_bidirectional_iterator_v<Iter>,
+            static_assert(std::bidirectional_iterator<Iter>,
                 "Requires at least bidirectional iterator.");
 
             using result_type =
@@ -2753,24 +2753,23 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                std::ranges::range<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<
-                        hpx::traits::range_iterator_t<Rng>
+                        std::ranges::iterator_t<Rng>
                     >::value_type
                 >
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            hpx::ranges::subrange_t<hpx::traits::range_iterator_t<Rng>>>
+            hpx::ranges::subrange_t<std::ranges::iterator_t<Rng>>>
         tag_fallback_invoke(find_last_if_t, ExPolicy&& policy, Rng&& rng,
             Pred pred, Proj proj = Proj())
         {
-            using iterator_type = hpx::traits::range_iterator_t<Rng>;
+            using iterator_type = std::ranges::iterator_t<Rng>;
 
-            static_assert(
-                hpx::traits::is_bidirectional_iterator_v<iterator_type>,
+            static_assert(std::bidirectional_iterator<iterator_type>,
                 "Requires at least bidirectional iterator.");
 
             return hpx::parallel::util::detail::algorithm_result<ExPolicy,
@@ -2784,7 +2783,7 @@ namespace hpx::ranges {
             typename Proj = hpx::identity>
         // clang-format off
             requires(
-                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
+                std::sentinel_for<Sent, Iter> &&
                 hpx::parallel::traits::is_projected_v<Proj, Iter> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<Iter>::value_type
@@ -2795,7 +2794,7 @@ namespace hpx::ranges {
             find_last_if_t, Iter first, Sent last, Pred pred,
             Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_bidirectional_iterator_v<Iter>,
+            static_assert(std::bidirectional_iterator<Iter>,
                 "Requires at least bidirectional iterator.");
 
             return hpx::ranges::subrange_t<Iter, Sent>(
@@ -2808,21 +2807,20 @@ namespace hpx::ranges {
         template <typename Rng, typename Pred, typename Proj = hpx::identity>
         // clang-format off
             requires(
-                hpx::traits::is_range_v<Rng> &&
+                std::ranges::range<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<
-                        hpx::traits::range_iterator_t<Rng>
+                        std::ranges::iterator_t<Rng>
                     >::value_type>
             )
         // clang-format on
-        friend hpx::traits::range_iterator_t<Rng> tag_fallback_invoke(
+        friend std::ranges::iterator_t<Rng> tag_fallback_invoke(
             find_last_if_t, Rng&& rng, Pred pred, Proj proj = Proj())
         {
-            using iterator_type = hpx::traits::range_iterator_t<Rng>;
+            using iterator_type = std::ranges::iterator_t<Rng>;
 
-            static_assert(
-                hpx::traits::is_bidirectional_iterator_v<iterator_type>,
+            static_assert(std::bidirectional_iterator<iterator_type>,
                 "Requires at least bidirectional iterator.");
 
             return hpx::parallel::detail::find_last_if<iterator_type>().call(
@@ -2842,7 +2840,7 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
+                std::sentinel_for<Sent, Iter> &&
                 hpx::parallel::traits::is_projected_v<Proj, Iter> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<Iter>::value_type
@@ -2854,7 +2852,7 @@ namespace hpx::ranges {
         tag_fallback_invoke(find_last_if_not_t, ExPolicy&& policy, Iter first,
             Sent last, Pred pred, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_bidirectional_iterator_v<Iter>,
+            static_assert(std::bidirectional_iterator<Iter>,
                 "Requires at least bidirectional iterator.");
 
             using result_type =
@@ -2886,24 +2884,23 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                std::ranges::range<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<
-                        hpx::traits::range_iterator_t<Rng>
+                        std::ranges::iterator_t<Rng>
                     >::value_type
                 >
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            hpx::ranges::subrange_t<hpx::traits::range_iterator_t<Rng>>>
+            hpx::ranges::subrange_t<std::ranges::iterator_t<Rng>>>
         tag_fallback_invoke(find_last_if_not_t, ExPolicy&& policy, Rng&& rng,
             Pred pred, Proj proj = Proj())
         {
-            using iterator_type = hpx::traits::range_iterator_t<Rng>;
+            using iterator_type = std::ranges::iterator_t<Rng>;
 
-            static_assert(
-                hpx::traits::is_bidirectional_iterator_v<iterator_type>,
+            static_assert(std::bidirectional_iterator<iterator_type>,
                 "Requires at least bidirectional iterator.");
 
             return hpx::parallel::util::detail::algorithm_result<ExPolicy,
@@ -2918,7 +2915,7 @@ namespace hpx::ranges {
             typename Proj = hpx::identity>
         // clang-format off
             requires(
-                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
+                std::sentinel_for<Sent, Iter> &&
                 hpx::parallel::traits::is_projected_v<Proj, Iter> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<Iter>::value_type
@@ -2929,7 +2926,7 @@ namespace hpx::ranges {
             find_last_if_not_t, Iter first, Sent last, Pred pred,
             Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_bidirectional_iterator_v<Iter>,
+            static_assert(std::bidirectional_iterator<Iter>,
                 "Requires at least bidirectional iterator.");
 
             return hpx::ranges::subrange_t<Iter, Sent>(
@@ -2942,23 +2939,22 @@ namespace hpx::ranges {
         template <typename Rng, typename Pred, typename Proj = hpx::identity>
         // clang-format off
             requires(
-                hpx::traits::is_range_v<Rng> &&
+                std::ranges::range<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<
-                        hpx::traits::range_iterator_t<Rng>
+                        std::ranges::iterator_t<Rng>
                     >::value_type
                 >
             )
         // clang-format on
-        friend hpx::ranges::subrange_t<hpx::traits::range_iterator_t<Rng>>
+        friend hpx::ranges::subrange_t<std::ranges::iterator_t<Rng>>
         tag_fallback_invoke(
             find_last_if_not_t, Rng&& rng, Pred pred, Proj proj = Proj())
         {
-            using iterator_type = hpx::traits::range_iterator_t<Rng>;
+            using iterator_type = std::ranges::iterator_t<Rng>;
 
-            static_assert(
-                hpx::traits::is_bidirectional_iterator_v<iterator_type>,
+            static_assert(std::bidirectional_iterator<iterator_type>,
                 "Requires at least bidirectional iterator.");
 
             return hpx::ranges::subrange_t<iterator_type>(
