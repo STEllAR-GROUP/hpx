@@ -44,6 +44,9 @@ set(tests
     fill
     filln
     find
+    find_last
+    find_last_if
+    find_last_if_not
     findend
     findfirstof
     findfirstof_binary

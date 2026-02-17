@@ -1,0 +1,71 @@
+# Copyright (c) 2026 The STE||AR Group
+#
+# SPDX-License-Identifier: BSL-1.0
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+name: Configure Test Combinations
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - 'release**'
+  workflow_dispatch:
+
+jobs:
+  configure-test-combinations:
+    runs-on: ubuntu-latest
+    container: stellargroup/build_env:17
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+      
+      - name: Create build directory
+        run: mkdir -p build
+
+      - name: Running CMake with tests on and examples off
+        working-directory: build
+        run: |
+          cmake \
+              .. \
+              -G "Ninja" \
+              -DHPX_WITH_MALLOC=system \
+              -DHPX_WITH_FETCH_ASIO=Off \
+              -DHPX_WITH_TESTS=On \
+              -DHPX_WITH_EXAMPLES=Off
+          rm -rf *
+      
+      - name: Running CMake with tests off and examples on
+        working-directory: build
+        run: |
+          cmake \
+              .. \
+              -G "Ninja" \
+              -DHPX_WITH_MALLOC=system \
+              -DHPX_WITH_FETCH_ASIO=Off \
+              -DHPX_WITH_TESTS=Off \
+              -DHPX_WITH_EXAMPLES=On
+          rm -rf *
+      
+      - name: Running CMake with APEX on
+        working-directory: build
+        run: |
+          cmake \
+              .. \
+              -G "Ninja" \
+              -DHPX_WITH_MALLOC=system \
+              -DHPX_WITH_FETCH_ASIO=Off \
+              -DHPX_WITH_APEX=On \
+              -DHPX_WITH_FETCH_APEX=ON \
+              -DHPX_WITH_TESTS=On \
+              -DHPX_WITH_EXAMPLES=On
+          rm -rf *
+      
+      - name: Upload build directory
+        uses: actions/upload-artifact@v6
+        with:
+          name: hpx-build
+          path: build
