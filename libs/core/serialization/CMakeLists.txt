@@ -153,10 +153,13 @@ set(serialization_headers
     hpx/serialization/detail/polymorphic_id_factory.hpp
     hpx/serialization/detail/polymorphic_intrusive_factory.hpp
     hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp
+    hpx/serialization/detail/polymorphic_nonintrusive_factory_impl.hpp
     hpx/serialization/detail/preprocess_container.hpp
     hpx/serialization/detail/raw_ptr.hpp
     hpx/serialization/detail/serialize_collection.hpp
     hpx/serialization/detail/vc.hpp
+    hpx/serialization/detail/refl_qualified_name_of.hpp
+    hpx/serialization/detail/refl_serialize_impl.hpp
     hpx/serialization/array.hpp
     hpx/serialization/bitset.hpp
     hpx/serialization/complex.hpp
