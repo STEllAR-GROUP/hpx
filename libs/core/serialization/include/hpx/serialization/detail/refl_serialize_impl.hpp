@@ -17,21 +17,24 @@
 // This file is only ever included by access.hpp
 // but we will still guard against direct inclusion
 #if defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
+#include <bit>
 #include <cstddef>
+#include <cstdint>
 #include <experimental/meta>
 #include <memory>
 
 namespace hpx::serialization::detail {
     template <typename MemberType, typename T>
-    constexpr decltype(auto) member_from_offset(T& base, std::size_t offset)
+    constexpr decltype(auto) member_from_offset(
+        T& base, std::size_t offset) noexcept
     {
-        using ByteType =
-            std::conditional_t<std::is_const_v<T>, std::byte const, std::byte>;
         using Type = std::conditional_t<std::is_const_v<T>, MemberType const,
             MemberType>;
 
-        return reinterpret_cast<Type&>(
-            *(reinterpret_cast<ByteType*>(std::addressof(base)) + offset));
+        auto base_addr = std::bit_cast<std::uintptr_t>(std::addressof(base));
+        auto member_ptr = std::bit_cast<Type*>(base_addr + offset);
+
+        return *member_ptr;
     }
 
     HPX_CXX_CORE_EXPORT template <typename Archive, typename T>

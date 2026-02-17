@@ -67,7 +67,7 @@ int main()
 
         char const* name = qualified_name_of<deeper_nested_type>::get();
 
-        // Expected: world::continent::country::city<world::continent::country::city<local::person>>
+        // Expected
         std::string expected =
             "world::continent::country::city<"
             "world::continent::country::city<local::person>>";
