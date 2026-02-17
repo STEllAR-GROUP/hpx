@@ -16,6 +16,7 @@ set(concurrency_headers
     hpx/concurrency/concurrent_vector.hpp
     hpx/concurrency/concurrentqueue.hpp
     hpx/concurrency/deque.hpp
+    hpx/concurrency/detail/concurrent_accessor.hpp
     hpx/concurrency/detail/contiguous_index_queue.hpp
     hpx/concurrency/detail/copy_payload.hpp
     hpx/concurrency/detail/freelist.hpp
