@@ -23,8 +23,10 @@ include(HPX_AddModule)
 add_hpx_module(
   core concepts
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${concepts_sources}
   HEADERS ${concepts_headers}
+  MACRO_HEADERS ${concepts_headers}
   COMPAT_HEADERS ${concepts_compat_headers}
   MODULE_DEPENDENCIES hpx_config hpx_preprocessor
   CMAKE_SUBDIRS examples tests
