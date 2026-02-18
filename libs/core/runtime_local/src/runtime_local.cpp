@@ -18,6 +18,7 @@
 #include <hpx/modules/io_service.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/static_reinit.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/threadmanager.hpp>
@@ -34,6 +35,7 @@
 #include <hpx/runtime_local/shutdown_function.hpp>
 #include <hpx/runtime_local/startup_function.hpp>
 #include <hpx/runtime_local/state.hpp>
+#include <hpx/runtime_local/termination_detection.hpp>
 #include <hpx/runtime_local/thread_hooks.hpp>
 #include <hpx/runtime_local/thread_mapper.hpp>
 #include <hpx/version.hpp>
@@ -2215,4 +2217,103 @@ namespace hpx {
             return get_stack_size_enum_name(size_enum);
         }
     }    // namespace threads
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Termination detection API implementation
+    namespace local {
+        void termination_detection()
+        {
+            runtime* rt = get_runtime_ptr();
+            if (rt == nullptr)
+            {
+                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                    "hpx::local::termination_detection",
+                    "the runtime system is not active");
+            }
+
+            hpx::threads::threadmanager& tm = rt->get_thread_manager();
+
+            // Wait for all HPX threads to complete
+            tm.wait();
+
+            // Clean up any terminated threads
+            tm.cleanup_terminated(true);
+        }
+
+        bool termination_detection(hpx::chrono::steady_duration const& timeout)
+        {
+            runtime* rt = get_runtime_ptr();
+            if (rt == nullptr)
+            {
+                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                    "hpx::local::termination_detection",
+                    "the runtime system is not active");
+            }
+
+            hpx::threads::threadmanager& tm = rt->get_thread_manager();
+
+            // Return immediately if timeout is zero or negative
+            if (timeout.value().count() <= 0)
+            {
+                return false;
+            }
+
+            // Wait with timeout using threadmanager's wait_for
+            bool completed = tm.wait_for(timeout);
+
+            // Only cleanup if all threads completed
+            if (completed)
+            {
+                tm.cleanup_terminated(true);
+            }
+
+            return completed;
+        }
+
+        bool termination_detection(
+            hpx::chrono::steady_time_point const& deadline)
+        {
+            // Convert deadline to duration from now
+            auto now = hpx::chrono::steady_clock::now();
+
+            if (deadline.value() <= now)
+            {
+                // Deadline already passed
+                return false;
+            }
+
+            auto duration = deadline.value() - now;
+            return termination_detection(
+                hpx::chrono::steady_duration(duration));
+        }
+
+        bool termination_detection(hpx::stop_token stop_token,
+            hpx::chrono::steady_duration const& timeout)
+        {
+            runtime* rt = get_runtime_ptr();
+            if (rt == nullptr)
+            {
+                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                    "hpx::local::termination_detection",
+                    "the runtime system is not active");
+            }
+
+            hpx::threads::threadmanager& tm = rt->get_thread_manager();
+
+            // Return immediately if timeout is zero or negative
+            if (timeout.value().count() <= 0)
+            {
+                return false;
+            }
+
+            bool completed = tm.wait_for(stop_token, timeout);
+
+            if (completed)
+            {
+                tm.cleanup_terminated(true);
+            }
+
+            return completed;
+        }
+    }    // namespace local
 }    // namespace hpx

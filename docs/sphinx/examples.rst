@@ -31,3 +31,4 @@ can build the examples.
    examples/interest_calculator
    examples/1d_stencil
    examples/serialization
+   examples/termination_detection

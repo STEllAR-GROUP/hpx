@@ -98,7 +98,7 @@ continuous integration service additionally tracks the current build status for
 the master branch: |circleci_status|.
 
 We use `Codacy <https://www.codacy.com/>`_ to assess the code quality of this
-project: |codacy_quality|. For our coverage analysis, we also rely on
+project: |codacy_quality|.
 
 If you can't find what you are looking for in the documentation or you suspect
 you've found a bug in HPX we very much encourage and appreciate any issue

@@ -627,7 +627,9 @@ namespace hpx { namespace components { namespace server {
                         return tm.is_busy();
                     },
                     shutdown_check_count,
-                    std::chrono::duration<double>(timeout),
+                    hpx::chrono::steady_duration(
+                        std::chrono::duration_cast<std::chrono::nanoseconds>(
+                            std::chrono::duration<double>(timeout))),
                     "runtime_support::stop");
 
                 // If it took longer than expected, kill all suspended threads as
@@ -642,7 +644,9 @@ namespace hpx { namespace components { namespace server {
                             return tm.is_busy();
                         },
                         shutdown_check_count,
-                        std::chrono::duration<double>(timeout),
+                        hpx::chrono::steady_duration(std::chrono::duration_cast<
+                            std::chrono::nanoseconds>(
+                            std::chrono::duration<double>(timeout))),
                         "runtime_support::stop");
                 }
 

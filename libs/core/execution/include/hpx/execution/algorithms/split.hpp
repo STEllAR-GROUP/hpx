@@ -127,8 +127,6 @@ namespace hpx::execution::experimental {
                 return sender.scheduler;
             }
 
-            // TODO: add forwarding_sender_query
-
             struct shared_state
             {
                 struct split_receiver;

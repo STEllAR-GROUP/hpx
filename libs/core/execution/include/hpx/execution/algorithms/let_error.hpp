@@ -172,8 +172,6 @@ namespace hpx::execution::experimental {
                 return sender.scheduler;
             }
 
-            // TODO: add forwarding_sender_query
-
             template <typename Receiver>
             struct operation_state
             {

@@ -83,8 +83,6 @@ namespace hpx::execution::experimental {
                 return sender.scheduler;
             }
 
-            // TODO: add forwarding_sender_query
-
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Warray-bounds"

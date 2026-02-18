@@ -5,9 +5,6 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests set_thread_affinity)
-set(set_thread_affinity_LIBRARIES hpx_threading_base hpx_async_base hpx_futures
-                                  hpx_init hpx_testing
-)
 
 foreach(test ${tests})
   set(sources ${test}.cpp)
@@ -17,7 +14,6 @@ foreach(test ${tests})
   add_hpx_executable(
     ${test}_test INTERNAL_FLAGS
     SOURCES ${sources} ${${test}_FLAGS}
-    DEPENDENCIES ${${test}_LIBRARIES}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
     FOLDER "Tests/Unit/Modules/Core/ThreadingBase"
