@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
 #include <hpx/concurrency/spinlock.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/type_support/assert_owns_lock.hpp>
@@ -18,13 +19,13 @@
 namespace hpx::concurrent::detail {
 
     // Generic accessor for thread-safe access to container elements
-    template <typename T, bool IsConst>
+    template <typename T>
     class concurrent_accessor
     {
     public:
-        using value_type = std::conditional_t<IsConst, T const, T>;
-        using reference_type = value_type&;
-        using pointer_type = value_type*;
+        using value_type = T;
+        using reference_type = T&;
+        using pointer_type = T*;
 
     private:
         std::unique_lock<hpx::util::spinlock> lock_;
@@ -56,7 +57,7 @@ namespace hpx::concurrent::detail {
         }
 
         explicit operator bool() const noexcept
-            requires(!std::same_as<T, bool>)
+            requires(!std::same_as<std::remove_const_t<T>, bool>)
         {
             return !empty();
         }
@@ -74,7 +75,7 @@ namespace hpx::concurrent::detail {
 
         // Assignment operator only for non-const accessor
         concurrent_accessor& operator=(T const& v)
-            requires(!IsConst)
+            requires(!std::is_const_v<T>)
         {
             validate();
             *value_ = v;

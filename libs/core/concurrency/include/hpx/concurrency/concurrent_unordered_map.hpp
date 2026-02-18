@@ -43,8 +43,8 @@ namespace hpx::concurrent {
         using key_equal = KeyEqual;
         using allocator_type = Allocator;
 
-        using accessor = detail::concurrent_accessor<T, false>;
-        using const_accessor = detail::concurrent_accessor<T, true>;
+        using accessor = detail::concurrent_accessor<T>;
+        using const_accessor = detail::concurrent_accessor<T const>;
 
         using reference = accessor;
         using const_reference = const_accessor;

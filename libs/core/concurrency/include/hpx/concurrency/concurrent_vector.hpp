@@ -39,8 +39,8 @@ namespace hpx::concurrent {
         using difference_type = std::ptrdiff_t;
 
         // Accessor classes to ensure thread-safe element access
-        using accessor = detail::concurrent_accessor<T, false>;
-        using const_accessor = detail::concurrent_accessor<T, true>;
+        using accessor = detail::concurrent_accessor<T>;
+        using const_accessor = detail::concurrent_accessor<T const>;
 
         using reference = accessor;
         using const_reference = const_accessor;
