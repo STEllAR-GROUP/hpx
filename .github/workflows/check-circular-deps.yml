@@ -7,8 +7,12 @@
 name: Check Circular Dependencies
 
 on:
-  push
-
+  pull_request:
+  push:
+    branches:
+      - master
+      - 'release**'
+  workflow_dispatch:
 
 jobs:
   check-circular-deps:
