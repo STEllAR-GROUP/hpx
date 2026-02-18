@@ -291,6 +291,7 @@ namespace hpx { namespace ranges {
 #include <hpx/parallel/algorithms/starts_with.hpp>
 
 #include <iterator>
+#include <ranges>
 #include <type_traits>
 #include <utility>
 

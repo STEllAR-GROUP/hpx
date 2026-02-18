@@ -36,6 +36,7 @@
 #include <cstdint>
 #include <exception>
 #include <optional>
+#include <ranges>
 #include <string>
 #include <type_traits>
 #include <utility>

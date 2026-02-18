@@ -10,6 +10,7 @@
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/modules/iterator_support.hpp>
 
+#include <ranges>
 #include <type_traits>
 
 namespace hpx::parallel::traits {

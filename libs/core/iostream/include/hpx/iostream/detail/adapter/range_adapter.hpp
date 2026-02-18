@@ -23,6 +23,7 @@
 #include <cstddef>
 #include <iosfwd>
 #include <iterator>
+#include <ranges>
 
 #include <hpx/config/warnings_prefix.hpp>
 

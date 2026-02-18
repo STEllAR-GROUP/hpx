@@ -11,6 +11,7 @@
 #include <hpx/modules/iterator_support.hpp>
 
 #include <functional>
+#include <ranges>
 #include <type_traits>
 
 namespace hpx::traits {

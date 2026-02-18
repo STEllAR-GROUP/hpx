@@ -10,6 +10,7 @@
 
 #include <cstddef>
 #include <iterator>
+#include <ranges>
 #include <type_traits>
 #include <utility>
 
@@ -307,16 +308,6 @@ namespace hpx::util {
         };
 
         template <typename T>
-        struct is_range_generator<T,
-            std::void_t<decltype(detail::iterate_impl(std::declval<T&>(), 0L))>>
-          : std::integral_constant<bool,
-                !std::is_same_v<decltype(detail::iterate_impl(
-                                    std::declval<T&>(), 0L)),
-                    range_impl::fallback>>
-        {
-        };
-
-        template <typename T>
         inline constexpr bool is_range_generator_v =
             is_range_generator<T>::value;
     }    // namespace detail
@@ -397,4 +388,12 @@ namespace hpx::util {
     }    // namespace range_adl
 
     HPX_CXX_CORE_EXPORT using namespace range_adl;
+    namespace detail {
+        HPX_CXX_CORE_EXPORT template <typename T>
+        struct is_range_generator<T,
+            std::enable_if_t<std::ranges::range<decltype(hpx::util::iterate(
+                std::declval<T&>()))>>> : std::true_type
+        {
+        };
+    }    // namespace detail
 }    // namespace hpx::util

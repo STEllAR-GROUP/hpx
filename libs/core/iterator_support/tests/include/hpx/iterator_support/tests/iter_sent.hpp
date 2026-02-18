@@ -30,7 +30,7 @@ struct sentinel
     }
 
 private:
-    ValueType stop;
+    ValueType stop{};
 };
 
 template <typename Iter, typename ValueType,
@@ -190,5 +190,5 @@ struct iterator
     }
 
 protected:
-    Value state;
+    Value state{};
 };
