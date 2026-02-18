@@ -17,27 +17,6 @@
 #include <utility>
 #include <vector>
 
-struct custom_bool
-{
-    custom_bool() = default;
-    custom_bool(bool b)
-      : b_(b)
-    {
-    }
-    operator bool() const
-    {
-        return b_;
-    }
-
-    template <typename Archive>
-    void serialize(Archive& ar, unsigned)
-    {
-        ar & b_;
-    }
-
-    bool b_ = false;
-};
-
 using namespace hpx::collectives;
 
 constexpr char const* add_reduce_bool_basename = "/test/add_reduce_bool/";
@@ -62,11 +41,10 @@ void test_all_reduce_bool()
     // test functionality based on immediate local result value
     for (int i = 0; i != 10; ++i)
     {
-        custom_bool value = i % 2 ? true : false;
+        bool value = i % 2 ? true : false;
 
-        hpx::future<custom_bool> overall_result =
-            all_reduce(all_reduce_bool_client, value, std::logical_or<>{},
-                generation_arg(i + 1));
+        hpx::future<bool> overall_result = all_reduce(all_reduce_bool_client,
+            value, std::logical_or<>{}, generation_arg(i + 1));
 
         HPX_TEST_EQ(
             static_cast<bool>(value), static_cast<bool>(overall_result.get()));
@@ -88,10 +66,10 @@ void test_broadcast_bool()
     // test functionality based on immediate local result value
     for (std::uint32_t i = 0; i != 10; ++i)
     {
-        custom_bool value = i % 2 ? true : false;
+        bool value = i % 2 ? true : false;
         if (here == 0)
         {
-            hpx::future<custom_bool> result = broadcast_to(
+            hpx::future<bool> result = broadcast_to(
                 broadcast_bool_client, value, generation_arg(i + 1));
 
             HPX_TEST_EQ(
@@ -99,9 +77,8 @@ void test_broadcast_bool()
         }
         else
         {
-            hpx::future<custom_bool> result =
-                hpx::collectives::broadcast_from<custom_bool>(
-                    broadcast_bool_client, generation_arg(i + 1));
+            hpx::future<bool> result = hpx::collectives::broadcast_from<bool>(
+                broadcast_bool_client, generation_arg(i + 1));
 
             HPX_TEST_EQ(
                 static_cast<bool>(value), static_cast<bool>(result.get()));
@@ -122,9 +99,9 @@ void test_exclusive_scan_bool()
     // test functionality based on immediate local result value
     for (int i = 0; i != 10; ++i)
     {
-        custom_bool value = i % 2 ? true : false;
+        bool value = i % 2 ? true : false;
 
-        hpx::future<custom_bool> overall_result =
+        hpx::future<bool> overall_result =
             exclusive_scan(exclusive_scan_bool_client, value, value,
                 std::logical_or<>{}, generation_arg(i + 1));
 
@@ -146,11 +123,10 @@ void test_inclusive_scan_bool()
     // test functionality based on immediate local result value
     for (int i = 0; i != 10; ++i)
     {
-        custom_bool value = i % 2 ? true : false;
+        bool value = i % 2 ? true : false;
 
-        hpx::future<custom_bool> overall_result =
-            inclusive_scan(inclusive_scan_client, value, std::logical_or<>{},
-                generation_arg(i + 1));
+        hpx::future<bool> overall_result = inclusive_scan(inclusive_scan_client,
+            value, std::logical_or<>{}, generation_arg(i + 1));
 
         HPX_TEST_EQ(
             static_cast<bool>(value), static_cast<bool>(overall_result.get()));
@@ -169,12 +145,11 @@ void test_reduce_bool()
     // test functionality based on immediate local result value
     for (int i = 0; i != 10; ++i)
     {
-        custom_bool value = i % 2 ? true : false;
+        bool value = i % 2 ? true : false;
         if (this_locality == 0)
         {
-            hpx::future<custom_bool> overall_result =
-                reduce_here(reduce_bool_client, value, std::logical_or<>{},
-                    generation_arg(i + 1));
+            hpx::future<bool> overall_result = reduce_here(reduce_bool_client,
+                value, std::logical_or<>{}, generation_arg(i + 1));
 
             HPX_TEST_EQ(static_cast<bool>(value),
                 static_cast<bool>(overall_result.get()));
@@ -203,16 +178,16 @@ void test_scatter_bool()
     // test functionality based on immediate local result value
     for (int i = 0; i != 10; ++i)
     {
-        custom_bool value = i % 2 ? true : false;
+        bool value = i % 2 ? true : false;
         if (this_locality == 0)
         {
-            std::vector<custom_bool> data(num_localities);
+            std::vector<bool> data(num_localities);
             for (std::size_t j = 0; j != data.size(); ++j)
             {
                 data[j] = value;
             }
 
-            hpx::future<custom_bool> result = scatter_to(
+            hpx::future<bool> result = scatter_to(
                 scatter_bool_client, std::move(data), generation_arg(i + 1));
 
             HPX_TEST_EQ(
@@ -220,8 +195,8 @@ void test_scatter_bool()
         }
         else
         {
-            hpx::future<custom_bool> result = scatter_from<custom_bool>(
-                scatter_bool_client, generation_arg(i + 1));
+            hpx::future<bool> result =
+                scatter_from<bool>(scatter_bool_client, generation_arg(i + 1));
 
             HPX_TEST_EQ(
                 static_cast<bool>(value), static_cast<bool>(result.get()));

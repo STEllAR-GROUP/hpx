@@ -320,7 +320,7 @@ namespace boost { namespace inspect {
         {"(\\bstd\\s*::\\s*random_access_iterator\\b)", "std::random_access_iterator", {"iterator"}},
         {"(\\bstd\\s*::\\s*sentinel_for\\b)", "std::sentinel_for", {"iterator"}},
         {"(\\bstd\\s*::\\s*next\\b)", "std::next", {"iterator"}},
-        {"(\\bstd\\s*::\\sprevt\\b)", "std::prev", {"iterator"}},
+        {"(\\bstd\\s*::\\s*prev\\b)", "std::prev", {"iterator"}},
         // std ranges
         {"(\\bstd\\s*::\\s*ranges\\s*::\\srange\\b)",
             "std::ranges::range", {"ranges"}},

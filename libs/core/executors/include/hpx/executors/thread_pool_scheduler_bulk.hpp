@@ -35,6 +35,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <exception>
+#include <iterator>
 #include <optional>
 #include <ranges>
 #include <string>

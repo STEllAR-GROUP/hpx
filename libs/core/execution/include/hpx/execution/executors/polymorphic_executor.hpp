@@ -86,6 +86,7 @@ namespace hpx::parallel::execution {
             using pointer = std::size_t*;
             using reference = std::size_t&;
 
+            shape_iter() = default;
             template <typename Iterator>
             explicit shape_iter(Iterator it)
               : impl_(new shape_iter_impl<Iterator>(it))
@@ -137,7 +138,7 @@ namespace hpx::parallel::execution {
             }
 
         protected:
-            std::unique_ptr<shape_iter_impl_base> impl_;
+            std::unique_ptr<shape_iter_impl_base> impl_{};
         };
 
         struct range_proxy
