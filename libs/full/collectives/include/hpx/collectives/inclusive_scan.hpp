@@ -234,6 +234,26 @@ namespace hpx { namespace collectives {
 #include <utility>
 #include <vector>
 
+namespace hpx::collectives::detail {
+
+    template <typename T, typename InIter, typename Sent, typename OutIter,
+        typename Op>
+    constexpr void inclusive_scan(
+        InIter first, Sent last, OutIter dest, Op&& op)
+    {
+        if (first != last)
+        {
+            T init = *first++;
+            *dest++ = init;
+            for (/* */; first != last; (void) ++first, ++dest)
+            {
+                init = HPX_INVOKE(op, HPX_MOVE(init), *first);
+                *dest = init;
+            }
+        }
+    }
+}    // namespace hpx::collectives::detail
+
 namespace hpx::traits {
 
     namespace communication {
@@ -270,18 +290,22 @@ namespace hpx::traits {
                     std::size_t which) mutable {
                     if (!data_available)
                     {
-                        std::vector<std::decay_t<T>> dest;
+                        using T_ = std::decay_t<T>;
+
+                        std::vector<T_> dest;
                         dest.resize(data.size());
 
-                        if constexpr (!std::is_same_v<std::decay_t<T>, bool>)
+                        if constexpr (!std::is_same_v<T_, bool>)
                         {
-                            hpx::inclusive_scan(data.begin(), data.end(),
-                                dest.begin(), HPX_FORWARD(F, op));
+                            collectives::detail::inclusive_scan<T_>(
+                                data.begin(), data.end(), dest.begin(),
+                                HPX_FORWARD(F, op));
                         }
                         else
                         {
-                            hpx::inclusive_scan(data.begin(), data.end(),
-                                dest.begin(), [&](auto lhs, auto rhs) {
+                            collectives::detail::inclusive_scan<T_>(
+                                data.begin(), data.end(), dest.begin(),
+                                [&](auto lhs, auto rhs) {
                                     return HPX_FORWARD(F, op)(
                                         static_cast<bool>(lhs),
                                         static_cast<bool>(rhs));
