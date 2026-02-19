@@ -121,7 +121,7 @@ namespace hpx::threads::policies {
           , bound_queues_(num_queues_)
           , queues_(num_queues_)
           , high_priority_queues_(num_queues_)
-          , victim_threads_(num_queues_)
+          , victims_(num_queues_)
         {
             if (!deferred_initialization)
             {
@@ -672,55 +672,60 @@ namespace hpx::threads::policies {
             [[maybe_unused]] thread_queue_type* this_high_priority_queue,
             [[maybe_unused]] thread_queue_type* this_queue)
         {
-            thread_queue_type* q;
-            if (num_thread < num_high_priority_queues_)
-            {
-                for (std::size_t idx : victim_threads_[num_thread].data_)
+            std::size_t const offset =
+                victims_[num_thread].data_.victim_offset_++;
+            std::vector<std::size_t> const& victim_threads =
+                victims_[num_thread].data_.victim_threads_;
+            std::size_t const victim_count = victim_threads.size();
+
+            if (victim_count == 0)
+                return false;
+
+            std::size_t const start_idx = offset % victim_count;
+
+            auto steal = [&](std::size_t idx) -> bool {
+                HPX_ASSERT(idx != num_thread);
+                thread_queue_type* q = nullptr;
+
+                if (num_thread < num_high_priority_queues_ &&
+                    idx < num_high_priority_queues_)
                 {
-                    HPX_ASSERT(idx != num_thread);
-
-                    if (idx < num_high_priority_queues_)
-                    {
-                        q = high_priority_queues_[idx].data_;
-                        if (q->get_next_thread(thrd, true, true))
-                        {
-#ifdef HPX_HAVE_THREAD_STEALING_COUNTS
-                            q->increment_num_stolen_from_pending();
-                            this_high_priority_queue
-                                ->increment_num_stolen_to_pending();
-#endif
-                            return true;
-                        }
-                    }
-
-                    q = queues_[idx].data_;
+                    q = high_priority_queues_[idx].data_;
                     if (q->get_next_thread(thrd, true, true))
                     {
 #ifdef HPX_HAVE_THREAD_STEALING_COUNTS
                         q->increment_num_stolen_from_pending();
-                        this_queue->increment_num_stolen_to_pending();
+                        this_high_priority_queue
+                            ->increment_num_stolen_to_pending();
 #endif
                         return true;
                     }
                 }
-            }
-            else
-            {
-                for (std::size_t idx : victim_threads_[num_thread].data_)
-                {
-                    HPX_ASSERT(idx != num_thread);
 
-                    q = queues_[idx].data_;
-                    if (q->get_next_thread(thrd, true, true))
-                    {
+                q = queues_[idx].data_;
+                if (q->get_next_thread(thrd, true, true))
+                {
 #ifdef HPX_HAVE_THREAD_STEALING_COUNTS
-                        q->increment_num_stolen_from_pending();
-                        this_queue->increment_num_stolen_to_pending();
+                    q->increment_num_stolen_from_pending();
+                    this_queue->increment_num_stolen_to_pending();
 #endif
-                        return true;
-                    }
+                    return true;
                 }
+                return false;
+            };
+
+            for (std::size_t i = start_idx; i < victim_count; ++i)
+            {
+                if (steal(victim_threads[i]))
+                    return true;
             }
+
+            for (std::size_t i = 0; i < start_idx; ++i)
+            {
+                if (steal(victim_threads[i]))
+                    return true;
+            }
+
             return false;
         }
 
@@ -1332,66 +1337,67 @@ namespace hpx::threads::policies {
             thread_queue_type* this_high_priority_queue,
             thread_queue_type* this_queue)
         {
+            std::size_t const offset =
+                victims_[num_thread].data_.victim_offset_++;
+            std::vector<std::size_t> const& victim_threads =
+                victims_[num_thread].data_.victim_threads_;
+            std::size_t const victim_count = victim_threads.size();
+
+            if (victim_count == 0)
+                return false;
+
+            std::size_t const start_idx = offset % victim_count;
             bool result = true;
-            thread_queue_type* q = nullptr;
-            if (num_thread < num_high_priority_queues_)
-            {
-                for (std::size_t idx : victim_threads_[num_thread].data_)
+
+            auto steal = [&](std::size_t idx) -> bool {
+                HPX_ASSERT(idx != num_thread);
+                thread_queue_type* q = nullptr;
+
+                if (num_thread < num_high_priority_queues_ &&
+                    idx < num_high_priority_queues_)
                 {
-                    HPX_ASSERT(idx != num_thread);
-
-                    if (idx < num_high_priority_queues_)
-                    {
-                        q = high_priority_queues_[idx].data_;
-                        result = this_high_priority_queue->wait_or_add_new(
-                                     true, added, q) &&
-                            result;
-
-                        if (0 != added)
-                        {
-#ifdef HPX_HAVE_THREAD_STEALING_COUNTS
-                            q->increment_num_stolen_from_staged(added);
-                            this_high_priority_queue
-                                ->increment_num_stolen_to_staged(added);
-#endif
-                            return result;
-                        }
-                    }
-
-                    q = queues_[idx].data_;
-                    result =
-                        this_queue->wait_or_add_new(true, added, q) && result;
+                    q = high_priority_queues_[idx].data_;
+                    result = this_high_priority_queue->wait_or_add_new(
+                                 true, added, q) &&
+                        result;
 
                     if (0 != added)
                     {
 #ifdef HPX_HAVE_THREAD_STEALING_COUNTS
                         q->increment_num_stolen_from_staged(added);
-                        this_queue->increment_num_stolen_to_staged(added);
+                        this_high_priority_queue
+                            ->increment_num_stolen_to_staged(added);
 #endif
-                        return result;
+                        return true;
                     }
                 }
-            }
-            else
-            {
-                for (std::size_t idx : victim_threads_[num_thread].data_)
+
+                q = queues_[idx].data_;
+                result = this_queue->wait_or_add_new(true, added, q) && result;
+
+                if (0 != added)
                 {
-                    HPX_ASSERT(idx != num_thread);
-
-                    q = queues_[idx].data_;
-                    result =
-                        this_queue->wait_or_add_new(true, added, q) && result;
-
-                    if (0 != added)
-                    {
 #ifdef HPX_HAVE_THREAD_STEALING_COUNTS
-                        q->increment_num_stolen_from_staged(added);
-                        this_queue->increment_num_stolen_to_staged(added);
+                    q->increment_num_stolen_from_staged(added);
+                    this_queue->increment_num_stolen_to_staged(added);
 #endif
-                        return result;
-                    }
+                    return true;
                 }
+                return false;
+            };
+
+            for (std::size_t i = start_idx; i < victim_count; ++i)
+            {
+                if (steal(victim_threads[i]))
+                    return result;
             }
+
+            for (std::size_t i = 0; i < start_idx; ++i)
+            {
+                if (steal(victim_threads[i]))
+                    return result;
+            }
+
             return false;
         }
 
@@ -1561,7 +1567,9 @@ namespace hpx::threads::policies {
             // steal from
             std::ptrdiff_t const radius =
                 std::lround(static_cast<double>(num_threads) / 2.0);
-            victim_threads_[num_thread].data_.reserve(num_threads);
+            std::vector<std::size_t>& victim_threads =
+                victims_[num_thread].data_.victim_threads_;
+            victim_threads.reserve(num_threads);
 
             std::size_t const num_pu = affinity_data_.get_pu_num(num_thread);
             mask_cref_type pu_mask = topo.get_thread_affinity_mask(num_pu);
@@ -1592,14 +1600,14 @@ namespace hpx::threads::policies {
 
                     if (f(static_cast<std::size_t>(left)))
                     {
-                        victim_threads_[num_thread].data_.push_back(
+                        victim_threads.push_back(
                             static_cast<std::size_t>(left));
                     }
 
                     std::size_t const right = (num_thread + i) % num_threads;
                     if (f(right))
                     {
-                        victim_threads_[num_thread].data_.push_back(right);
+                        victim_threads.push_back(right);
                     }
                 }
                 if ((num_threads % 2) == 0)
@@ -1607,7 +1615,7 @@ namespace hpx::threads::policies {
                     std::size_t const right = (num_thread + i) % num_threads;
                     if (f(right))
                     {
-                        victim_threads_[num_thread].data_.push_back(right);
+                        victim_threads.push_back(right);
                     }
                 }
             };
@@ -1699,8 +1707,12 @@ namespace hpx::threads::policies {
         std::vector<util::cache_line_data<thread_queue_type*>> queues_;
         std::vector<util::cache_line_data<thread_queue_type*>>
             high_priority_queues_;
-        std::vector<util::cache_line_data<std::vector<std::size_t>>>
-            victim_threads_;
+        struct victims
+        {
+            std::vector<std::size_t> victim_threads_;
+            std::size_t victim_offset_ = 0;
+        };
+        std::vector<util::cache_line_data<victims>> victims_;
     };    // namespace hpx::threads::policies
 }    // namespace hpx::threads::policies
 
