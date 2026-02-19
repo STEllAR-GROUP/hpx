@@ -65,7 +65,6 @@ if(NOT CTEST_BUILD_ID AND __ctest_build_id)
   set(CTEST_BUILD_ID ${__ctest_build_id})
 endif()
 set(ctest_submission_result ${ctest_submission_result} "Configure: "
-
                             ${__configure_result} "\n"
 )
 
