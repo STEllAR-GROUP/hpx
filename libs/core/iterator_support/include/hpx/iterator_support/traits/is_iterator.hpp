@@ -157,7 +157,7 @@ namespace hpx::traits {
             satisfy_traversal_concept<Iter, TraversalTag>::value;
     }    // namespace detail
 
-    HPX_CXX_CORE_EXPORT template <typename Iter>
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Enable = void>
     struct is_iterator : detail::is_iterator<std::decay_t<Iter>>
     {
     };

@@ -305,13 +305,6 @@ namespace boost { namespace inspect {
             {"concepts"}},
         {"(\\bstd\\s*::\\s*same_as\\b)", "std::same_as", {"concepts"}},
         //
-        // std ranges
-        {"(\\bstd\\s*::\\s*ranges\\s*::\\s*input_range\\b)",
-            "std::ranges::input_range", {"ranges"}},
-        {"(\\bstd\\s*::\\s*ranges\\s*::\\s*bidirectional_range\\b)",
-            "std::ranges::bidirectional_range", {"ranges"}},
-        {"(\\bstd\\s*::\\s*ranges\\s*::\\s*iterator_t\\b)",
-            "std::ranges::iterator_t", {"ranges"}},
         // std iterator
         {"(\\bstd\\s*::\\s*input_iterator\\b)", "std::input_iterator", {"iterator"}},
         {"(\\bstd\\s*::\\s*output_iterator\\b)", "std::output_iterator", {"iterator"}},

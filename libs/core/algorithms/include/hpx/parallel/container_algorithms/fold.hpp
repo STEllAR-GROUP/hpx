@@ -260,6 +260,7 @@ namespace hpx::ranges {
 
 #include <ranges>
 #include <type_traits>
+#include <iterator>
 
 namespace hpx::ranges {
 
@@ -476,7 +477,7 @@ namespace hpx::ranges {
         template <typename BidIter, typename Sent, typename T, typename F>
         // clang-format off
         requires (
-            hpx::traits::is_bidirectional_iterator_v<BidIter> &&
+            std::bidirectional_iterator<BidIter> &&
             std::is_same_v<T, hpx::traits::iter_value_t<BidIter>> &&
             std::sentinel_for<Sent, BidIter> &&
             hpx::is_indirectly_binary_right_foldable<F, T, BidIter>
@@ -531,7 +532,7 @@ namespace hpx::ranges {
         template <typename BidIter, typename Sent, typename F>
         // clang-format off
         requires (
-            hpx::traits::is_bidirectional_iterator_v<BidIter> &&
+            std::bidirectional_iterator<BidIter> &&
             std::sentinel_for<Sent, BidIter> &&
             hpx::is_indirectly_binary_right_foldable<F,
                 hpx::traits::iter_value_t<BidIter>, BidIter>
