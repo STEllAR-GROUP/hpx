@@ -297,7 +297,8 @@ namespace hpx::util {
         {
             using type = std::conditional_t<
                 use_operator_brackets_proxy<Iterator, Value>::value,
-                operator_brackets_proxy<Iterator>, Value>;
+                operator_brackets_proxy<Iterator>,
+                typename Iterator::reference>;
         };
 
         template <typename Iterator>

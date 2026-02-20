@@ -74,7 +74,7 @@ namespace hpx::iostream {
                 typename Chain::traits_type>::stream_type;
 
             filtering_stream_base()
-              : stream_type(nullptr)
+              : stream_type(0)
             {
                 this->set_chain(&chain_);
             }
@@ -82,7 +82,7 @@ namespace hpx::iostream {
         private:
             void notify()
             {
-                this->rdbuf(chain_.empty() ? nullptr : &chain_.front());
+                this->rdbuf(chain_.empty() ? 0 : &chain_.front());
             }
 
             Chain chain_;

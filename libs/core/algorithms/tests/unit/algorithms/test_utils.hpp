@@ -22,10 +22,23 @@
 
 namespace test {
     ///////////////////////////////////////////////////////////////////////////
+    template <typename IteratorTag>
+    struct maybe_disable_proxy
+    {
+    };
+
+    template <>
+    struct maybe_disable_proxy<std::random_access_iterator_tag>
+    {
+        using use_brackets_proxy = std::false_type;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename BaseIterator, typename IteratorTag>
     struct test_iterator
       : hpx::util::iterator_adaptor<test_iterator<BaseIterator, IteratorTag>,
             BaseIterator, void, IteratorTag>
+      , maybe_disable_proxy<IteratorTag>
     {
     private:
         using base_type = hpx::util::iterator_adaptor<
@@ -39,15 +52,6 @@ namespace test {
           : base_type(base)
         {
         }
-
-        template <typename Tag = IteratorTag,
-            typename Enable = std::enable_if_t<
-                std::is_same_v<Tag, std::random_access_iterator_tag>>>
-        HPX_HOST_DEVICE typename base_type::reference operator[](
-            typename base_type::difference_type n) const
-        {
-            return *(this->base() + n);
-        }
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -56,6 +60,7 @@ namespace test {
       : hpx::util::iterator_adaptor<
             decorated_iterator<BaseIterator, IteratorTag>, BaseIterator, void,
             IteratorTag>
+      , maybe_disable_proxy<IteratorTag>
     {
     private:
         using base_type = hpx::util::iterator_adaptor<
@@ -75,17 +80,6 @@ namespace test {
           : base_type(base)
           , m_callback(std::move(f))
         {
-        }
-
-        template <typename Tag = IteratorTag,
-            typename Enable = std::enable_if_t<
-                std::is_same_v<Tag, std::random_access_iterator_tag>>>
-        HPX_HOST_DEVICE typename base_type::reference operator[](
-            typename base_type::difference_type n) const
-        {
-            if (m_callback)
-                m_callback();
-            return *(this->base() + n);
         }
 
     private:

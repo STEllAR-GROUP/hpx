@@ -74,12 +74,8 @@ namespace hpx::iostream::test {
         {
             if ((first == last) != is.eof())
                 return false;
-            if (first != last)
-            {
-                if (*first != is.get())
-                    return false;
-                ++first;
-            }
+            if (first != last && *first++ != is.get())
+                return false;
         } while (first != last);
         return true;
     }
@@ -104,7 +100,7 @@ namespace hpx::iostream::test {
     template <typename Ch, typename Tr>
     void write_data_in_chunks(std::basic_ostream<Ch, Tr>& os)
     {
-        Ch const* buf = detail::data(static_cast<Ch*>(nullptr));
+        Ch const* buf = detail::data((Ch*) 0);
         for (int z = 0; z < data_reps; ++z)
             os.write(buf, data_length());
         os.flush();

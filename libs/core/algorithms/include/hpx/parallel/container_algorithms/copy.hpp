@@ -11,7 +11,6 @@
 
 #pragma once
 
-#include "hpx/iterator_support/traits/is_iterator.hpp"
 #if defined(DOXYGEN)
 
 namespace hpx { namespace ranges {

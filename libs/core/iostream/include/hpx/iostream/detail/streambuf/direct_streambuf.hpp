@@ -70,7 +70,7 @@ namespace hpx::iostream::detail {
         // Declared in linked_streambuf.
         T* component()
         {
-            return &*storage_;    // NOLINT(bugprone-unchecked-optional-access)
+            return &*storage_;
         }
 
     protected:
@@ -188,7 +188,7 @@ namespace hpx::iostream::detail {
         using namespace std;
         if (!ibeg_)
             throw cant_read();
-        if (gptr() != nullptr && gptr() != ibeg_)
+        if (gptr() != 0 && gptr() != ibeg_)
         {
             gbump(-1);
             if (!traits_type::eq_int_type(c, traits_type::eof()))
@@ -246,8 +246,7 @@ namespace hpx::iostream::detail {
             setp(nullptr, nullptr);
             obeg_ = oend_ = nullptr;
         }
-        iostream::close(
-            *storage_, which);    // NOLINT(bugprone-unchecked-optional-access)
+        iostream::close(*storage_, which);
     }
 
     template <typename T, typename Tr>
@@ -262,7 +261,7 @@ namespace hpx::iostream::detail {
 
         stream_offset result = -1;
         bool one = one_head();
-        if (one && (pptr() != nullptr || gptr() == nullptr))
+        if (one && (pptr() != 0 || gptr() == 0))
             init_get_area();    // Switch to input mode, for code reuse.
 
         if (one || ((which & std::ios_base::in) != 0 && ibeg_ != nullptr))
@@ -320,8 +319,7 @@ namespace hpx::iostream::detail {
     template <typename T, typename Tr>
     void direct_streambuf<T, Tr>::init_input(input)
     {
-        auto p = input_sequence(
-            *storage_);    // NOLINT(bugprone-unchecked-optional-access)
+        auto p = input_sequence(*storage_);
         ibeg_ = p.data();
         iend_ = p.data() + p.size();
     }
@@ -341,7 +339,7 @@ namespace hpx::iostream::detail {
         if (one_head() && pptr())
         {
             gbump(static_cast<int>(pptr() - obeg_));
-            setp(nullptr, nullptr);
+            setp(0, 0);
         }
     }
 
@@ -352,7 +350,7 @@ namespace hpx::iostream::detail {
         if (one_head() && gptr())
         {
             pbump(static_cast<int>(gptr() - ibeg_));
-            setg(nullptr, nullptr, nullptr);
+            setg(0, 0, 0);
         }
     }
 

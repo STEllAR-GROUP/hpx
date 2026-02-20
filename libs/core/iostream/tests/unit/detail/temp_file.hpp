@@ -67,6 +67,7 @@ namespace hpx::iostream::test {
             std::ios_base::openmode mode =
                 std::ios_base::out | std::ios_base::binary;
             std::ofstream f(name().c_str(), mode);
+            std::string const n(name());
 
             char const* buf = narrow_data();
             for (int z = 0; z < data_reps; ++z)
