@@ -121,7 +121,7 @@ used CMake options.
 
    Build tests.
 
-.. option:: HPX_DEBUG_POSTFIX
+.. option:: HPX_WITH_DEBUG_POSTFIX
 
    Set the postfix for debug libraries. The default is ``d``. This variable is used to set ``CMAKE_DEBUG_POSTFIX`` and is only relevant for Debug builds or multi-configuration generators. The default rarely needs to be changed. It ensures that generated debug binaries have a different name than release binaries, which is important to avoid ABI problems when both debug and release binaries are installed on the same system.
 
