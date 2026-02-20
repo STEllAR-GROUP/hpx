@@ -306,10 +306,6 @@ namespace boost { namespace inspect {
         {"(\\bstd\\s*::\\s*same_as\\b)", "std::same_as", {"concepts"}},
         //
         // std ranges
-        {"(\\bstd\\s*::\\s*regular_invocable\\b)", "std::regular_invocable",
-            {"concepts"}},
-        {"(\\bstd\\s*::\\s*same_as\\b)", "std::same_as", {"concepts"}},
-        // std ranges
         {"(\\bstd\\s*::\\s*ranges\\s*::\\s*input_range\\b)",
             "std::ranges::input_range", {"ranges"}},
         {"(\\bstd\\s*::\\s*ranges\\s*::\\s*bidirectional_range\\b)",
