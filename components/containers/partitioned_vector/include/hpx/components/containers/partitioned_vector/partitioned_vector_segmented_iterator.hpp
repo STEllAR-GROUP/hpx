@@ -180,7 +180,7 @@ namespace hpx::segmented {
             template <typename T_,
                 typename Enable = std::enable_if_t<!std::is_same_v<
                     std::decay_t<T_>, local_vector_value_proxy>>>
-            local_vector_value_proxy& operator=(T_&& value)
+            local_vector_value_proxy const& operator=(T_&& value) const
             {
                 if (!it_.get_data())
                 {
@@ -268,7 +268,7 @@ namespace hpx::segmented {
             template <typename T_,
                 typename Enable = std::enable_if_t<
                     !std::is_same_v<std::decay_t<T_>, vector_value_proxy>>>
-            vector_value_proxy& operator=(T_&& value)
+            vector_value_proxy const& operator=(T_&& value) const
             {
                 v_->set_value(launch::sync, index_, HPX_FORWARD(T_, value));
                 return *this;

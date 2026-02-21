@@ -14,6 +14,7 @@
 
 #include <cstddef>
 #include <iterator>
+#include <ranges>
 #include <type_traits>
 
 namespace hpx::traits::detail {
@@ -25,8 +26,8 @@ namespace hpx::traits::detail {
 
     HPX_CXX_CORE_EXPORT template <typename Range>
     using is_reservable = std::integral_constant < bool,
-          is_range_v<std::decay_t<Range>>&& has_reserve_v < std::decay_t <
-        Range >>>
+          std::ranges::range<std::decay_t<Range>>&& has_reserve_v <
+        std::decay_t < Range >>>
         ;
 
     HPX_CXX_CORE_EXPORT template <typename Range>
@@ -50,7 +51,7 @@ namespace hpx::traits::detail {
         Container& v, Range const& r)
     {
         using iterator_type = typename range_traits<Range>::iterator_type;
-        if constexpr (is_random_access_iterator_v<iterator_type> &&
+        if constexpr (std::random_access_iterator<iterator_type> &&
             is_reservable_v<Container>)
         {
             v.reserve(hpx::util::size(r));
@@ -61,7 +62,7 @@ namespace hpx::traits::detail {
     HPX_FORCEINLINE void reserve_if_random_access_by_range(
         Container& v, Iterator begin, Iterator end)
     {
-        if constexpr (is_random_access_iterator_v<Iterator> &&
+        if constexpr (std::random_access_iterator<Iterator> &&
             is_reservable_v<Container>)
         {
             v.reserve(std::distance(begin, end));

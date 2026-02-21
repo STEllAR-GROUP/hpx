@@ -15,8 +15,11 @@
 
 #include <atomic>
 #include <cstddef>
+#include <iterator>
 #include <numeric>
 #include <random>
+#include <sys/stat.h>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -28,6 +31,8 @@ namespace test {
         requires(hpx::traits::is_iterator<IterType>::value)
     struct sentinel_from_iterator
     {
+        sentinel_from_iterator() = default;
+
         explicit sentinel_from_iterator(IterType end_iter)
           : end(end_iter)
         {
@@ -63,10 +68,23 @@ namespace test {
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename IteratorTag>
+    struct maybe_disable_proxy
+    {
+    };
+
+    template <>
+    struct maybe_disable_proxy<std::random_access_iterator_tag>
+    {
+        using use_brackets_proxy = std::false_type;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename BaseIterator, typename IteratorTag>
     struct test_iterator
       : hpx::util::iterator_adaptor<test_iterator<BaseIterator, IteratorTag>,
             BaseIterator, void, IteratorTag>
+      , maybe_disable_proxy<IteratorTag>
     {
     private:
         using base_type = hpx::util::iterator_adaptor<
@@ -140,6 +158,7 @@ namespace test {
       : hpx::util::iterator_adaptor<
             decorated_iterator<BaseIterator, IteratorTag>, BaseIterator, void,
             IteratorTag>
+      , maybe_disable_proxy<IteratorTag>
     {
     private:
         typedef hpx::util::iterator_adaptor<

@@ -458,7 +458,7 @@ namespace hpx {
         friend auto tag_fallback_invoke(hpx::reduce_t, ExPolicy&& policy,
             FwdIter first, FwdIter last, T init, F f)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::reduce<T>().call(
@@ -477,7 +477,7 @@ namespace hpx {
         friend auto tag_fallback_invoke(hpx::reduce_t, ExPolicy&& policy,
             FwdIter first, FwdIter last, T init)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::reduce<T>().call(
@@ -495,7 +495,7 @@ namespace hpx {
         friend auto tag_fallback_invoke(
             hpx::reduce_t, ExPolicy&& policy, FwdIter first, FwdIter last)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             using value_type =
@@ -516,7 +516,7 @@ namespace hpx {
         friend T tag_fallback_invoke(
             hpx::reduce_t, InIter first, InIter last, T init, F f)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Requires at least input iterator.");
 
             return hpx::parallel::detail::reduce<T>().call(
@@ -533,7 +533,7 @@ namespace hpx {
         friend T tag_fallback_invoke(
             hpx::reduce_t, InIter first, InIter last, T init)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Requires at least input iterator.");
 
             return hpx::parallel::detail::reduce<T>().call(hpx::execution::seq,
@@ -549,7 +549,7 @@ namespace hpx {
         friend typename std::iterator_traits<InIter>::value_type
         tag_fallback_invoke(hpx::reduce_t, InIter first, InIter last)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Requires at least input iterator.");
 
             using value_type =

@@ -97,9 +97,9 @@ void test1()
     // Two ranges
     D.clear();
     for (std::uint32_t i = 0; i < 10; ++i)
-        A.push_back(i * 2 + 1);
+        A.push_back(static_cast<std::uint64_t>(i) * 2 + 1);
     for (std::uint32_t i = 0; i < 10; ++i)
-        D.push_back(i * 2);
+        D.push_back(static_cast<std::uint64_t>(i) * 2);
     X.resize(20, 0);
     RA = range_t(A.begin(), A.end());
     RD = range_t(D.begin(), D.end());
@@ -119,11 +119,11 @@ void test1()
     A.clear();
     D.clear();
     for (std::uint32_t i = 0; i < 10; ++i)
-        A.push_back(i * 3 + 2);
+        A.push_back(static_cast<std::uint64_t>(i) * 3 + 2);
     for (std::uint32_t i = 0; i < 10; ++i)
-        B.push_back(i * 3 + 1);
+        B.push_back(static_cast<std::uint64_t>(i) * 3 + 1);
     for (std::uint32_t i = 0; i < 10; ++i)
-        D.push_back(i * 3);
+        D.push_back(static_cast<std::uint64_t>(i) * 3);
     X.resize(30, 0);
     RA = range_t(A.begin(), A.end());
     RB = range_t(B.begin(), B.end());
@@ -146,13 +146,13 @@ void test1()
     D.clear();
     X.clear();
     for (std::uint32_t i = 0; i < 10; ++i)
-        A.push_back(i * 4 + 3);
+        A.push_back(static_cast<std::uint64_t>(i) * 4 + 3);
     for (std::uint32_t i = 0; i < 10; ++i)
-        B.push_back(i * 4 + 2);
+        B.push_back(static_cast<std::uint64_t>(i) * 4 + 2);
     for (std::uint32_t i = 0; i < 10; ++i)
-        C.push_back(i * 4 + 1);
+        C.push_back(static_cast<std::uint64_t>(i) * 4 + 1);
     for (std::uint32_t i = 0; i < 10; ++i)
-        D.push_back(i * 4);
+        D.push_back(static_cast<std::uint64_t>(i) * 4);
 
     X.resize(40, 0);
     RA = range_t(A.begin(), A.end());
@@ -316,9 +316,9 @@ void test3()
     // Two ranges
     D.clear();
     for (std::uint32_t i = 0; i < 10; ++i)
-        A.push_back(i * 2 + 1);
+        A.push_back(static_cast<std::uint64_t>(i) * 2 + 1);
     for (std::uint32_t i = 0; i < 10; ++i)
-        D.push_back(i * 2);
+        D.push_back(static_cast<std::uint64_t>(i) * 2);
     //X.resize ( 20, 0);
     RA = range_t(A.begin(), A.end());
     RD = range_t(D.begin(), D.end());
@@ -338,11 +338,11 @@ void test3()
     A.clear();
     D.clear();
     for (std::uint32_t i = 0; i < 10; ++i)
-        A.push_back(i * 3 + 2);
+        A.push_back(static_cast<std::uint64_t>(i) * 3 + 2);
     for (std::uint32_t i = 0; i < 10; ++i)
-        B.push_back(i * 3 + 1);
+        B.push_back(static_cast<std::uint64_t>(i) * 3 + 1);
     for (std::uint32_t i = 0; i < 10; ++i)
-        D.push_back(i * 3);
+        D.push_back(static_cast<std::uint64_t>(i) * 3);
     //X.resize ( 30 , 0);
     RA = range_t(A.begin(), A.end());
     RB = range_t(B.begin(), B.end());
@@ -365,13 +365,13 @@ void test3()
     D.clear();
     //X.clear() ;
     for (std::uint32_t i = 0; i < 10; ++i)
-        A.push_back(i * 4 + 3);
+        A.push_back(static_cast<std::uint64_t>(i) * 4 + 3);
     for (std::uint32_t i = 0; i < 10; ++i)
-        B.push_back(i * 4 + 2);
+        B.push_back(static_cast<std::uint64_t>(i) * 4 + 2);
     for (std::uint32_t i = 0; i < 10; ++i)
-        C.push_back(i * 4 + 1);
+        C.push_back(static_cast<std::uint64_t>(i) * 4 + 1);
     for (std::uint32_t i = 0; i < 10; ++i)
-        D.push_back(i * 4);
+        D.push_back(static_cast<std::uint64_t>(i) * 4);
 
     //X.resize ( 40 , 0);
     RA = range_t(A.begin(), A.end());

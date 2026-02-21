@@ -550,8 +550,8 @@ namespace hpx::parallel {
         sequential_merge(Iter1 start1, Sent1 sent1, Iter2 start2, Sent2 sent2,
             OutIter out, Comp&& comp, Proj1&& proj1, Proj2&& proj2)
         {
-            if constexpr (hpx::traits::is_random_access_iterator_v<Iter1> &&
-                hpx::traits::is_random_access_iterator_v<Iter2>)
+            if constexpr (std::random_access_iterator<Iter1> &&
+                std::random_access_iterator<Iter2>)
             {
                 auto first1 = hpx::util::get_unwrapped(start1);
                 auto first2 = hpx::util::get_unwrapped(start2);
@@ -574,7 +574,7 @@ namespace hpx::parallel {
                 [[maybe_unused]] auto copy_result2 =
                     util::copy(merge_result.in2, last2, copy_result1.out);
 
-                if constexpr (!hpx::traits::is_input_iterator_v<OutIter>)
+                if constexpr (!std::input_iterator<OutIter>)
                 {
                     return {end1, end2, copy_result2.out};
                 }
@@ -605,8 +605,8 @@ namespace hpx::parallel {
         sequential_merge(Iter1 start1, Sent1 sent1, Iter2 start2, Sent2 sent2,
             OutIter out, Comp&& comp, hpx::identity, hpx::identity)
         {
-            if constexpr (hpx::traits::is_random_access_iterator_v<Iter1> &&
-                hpx::traits::is_random_access_iterator_v<Iter2>)
+            if constexpr (std::random_access_iterator<Iter1> &&
+                std::random_access_iterator<Iter2>)
             {
                 auto first1 = hpx::util::get_unwrapped(start1);
                 auto first2 = hpx::util::get_unwrapped(start2);
@@ -628,7 +628,7 @@ namespace hpx::parallel {
                 [[maybe_unused]] auto copy_result2 =
                     util::copy(merge_result.in2, last2, copy_result1.out);
 
-                if constexpr (!hpx::traits::is_input_iterator_v<OutIter>)
+                if constexpr (!std::input_iterator<OutIter>)
                 {
                     return {end1, end2, copy_result2.out};
                 }
@@ -1129,11 +1129,11 @@ namespace hpx {
             RandIter2 last2, RandIter3 dest, Comp comp = Comp())
         // clang-format on
         {
-            static_assert(hpx::traits::is_random_access_iterator_v<RandIter1>,
+            static_assert(std::random_access_iterator<RandIter1>,
                 "Required at least random access iterator.");
-            static_assert(hpx::traits::is_random_access_iterator_v<RandIter2>,
+            static_assert(std::random_access_iterator<RandIter2>,
                 "Requires at least random access iterator.");
-            static_assert(hpx::traits::is_random_access_iterator_v<RandIter3>,
+            static_assert(std::random_access_iterator<RandIter3>,
                 "Requires at least random access iterator.");
 
             using result_type = hpx::parallel::util::in_in_out_result<RandIter1,
@@ -1162,11 +1162,11 @@ namespace hpx {
             RandIter1 last1, RandIter2 first2, RandIter2 last2, RandIter3 dest,
             Comp comp = Comp())
         {
-            static_assert(hpx::traits::is_random_access_iterator_v<RandIter1>,
+            static_assert(std::random_access_iterator<RandIter1>,
                 "Required at least random access iterator.");
-            static_assert(hpx::traits::is_random_access_iterator_v<RandIter2>,
+            static_assert(std::random_access_iterator<RandIter2>,
                 "Requires at least random access iterator.");
-            static_assert(hpx::traits::is_random_access_iterator_v<RandIter3>,
+            static_assert(std::random_access_iterator<RandIter3>,
                 "Requires at least random access iterator.");
 
             using result_type = hpx::parallel::util::in_in_out_result<RandIter1,
@@ -1201,7 +1201,7 @@ namespace hpx {
         tag_fallback_invoke(inplace_merge_t, ExPolicy&& policy, RandIter first,
             RandIter middle, RandIter last, Comp comp = Comp())
         {
-            static_assert(hpx::traits::is_random_access_iterator_v<RandIter>,
+            static_assert(std::random_access_iterator<RandIter>,
                 "Required at least random access iterator.");
 
             return hpx::parallel::detail::get_void_result(
@@ -1224,7 +1224,7 @@ namespace hpx {
         friend void tag_fallback_invoke(inplace_merge_t, RandIter first,
             RandIter middle, RandIter last, Comp comp = Comp())
         {
-            static_assert(hpx::traits::is_random_access_iterator_v<RandIter>,
+            static_assert(std::random_access_iterator<RandIter>,
                 "Required at least random access iterator.");
 
             return hpx::parallel::detail::get_void_result(

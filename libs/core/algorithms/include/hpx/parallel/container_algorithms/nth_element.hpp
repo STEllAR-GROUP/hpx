@@ -201,15 +201,15 @@ namespace hpx { namespace ranges {
     /// sequential order in the calling thread.
     ///
     /// \returns  The \a nth_element algorithm returns returns \a
-    ///           hpx::traits::range_iterator_t<Rng>.
+    ///           std::ranges::iterator_t<Rng>.
     ///           The \a nth_element algorithm returns an iterator equal
     ///           to last.
     ///
     template <typename Rng,
         typename Pred = hpx::parallel::detail::less,
         typename Proj = hpx::identity>
-    hpx::traits::range_iterator_t<Rng> nth_element(Rng&& rng,
-        hpx::traits::range_iterator_t<Rng> nth, Pred&& pred = Pred(),
+    std::ranges::iterator_t<Rng> nth_element(Rng&& rng,
+        std::ranges::iterator_t<Rng> nth, Pred&& pred = Pred(),
         Proj&& proj = Proj());
 
     /// nth_element is a partial sorting algorithm that rearranges elements in
@@ -271,9 +271,9 @@ namespace hpx { namespace ranges {
     /// within each thread.
     ///
     /// \returns  The \a partition algorithm returns a \a
-    ///           hpx::future<hpx::traits::range_iterator_t<Rng>>
+    ///           hpx::future<std::ranges::iterator_t<Rng>>
     ///           if the execution policy is of type \a parallel_task_policy
-    ///           and returns \a hpx::traits::range_iterator_t<Rng> otherwise.
+    ///           and returns \a std::ranges::iterator_t<Rng> otherwise.
     ///           The \a nth_element algorithm returns an iterator equal
     ///           to last.
     ///
@@ -281,9 +281,9 @@ namespace hpx { namespace ranges {
         typename Pred = hpx::parallel::detail::less,
         typename Proj = hpx::identity>
     parallel::util::detail::algorithm_result_t<ExPolicy,
-        hpx::traits::range_iterator_t<Rng>>
+        std::ranges::iterator_t<Rng>>
     nth_element(ExPolicy&& policy, Rng&& rng,
-        hpx::traits::range_iterator_t<Rng> nth,
+        std::ranges::iterator_t<Rng> nth,
         Pred&& pred = Pred(), Proj&& proj = Proj());
 
     // clang-format on
@@ -303,6 +303,7 @@ namespace hpx { namespace ranges {
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
+#include <ranges>
 #include <type_traits>
 #include <utility>
 
@@ -317,8 +318,8 @@ namespace hpx::ranges {
             typename Proj = hpx::identity>
         // clang-format off
             requires(
-                hpx::traits::is_random_access_iterator_v<RandomIt> &&
-                hpx::traits::is_sentinel_for_v<Sent, RandomIt> &&
+                std::random_access_iterator<RandomIt> &&
+                std::sentinel_for<Sent, RandomIt> &&
                 hpx::parallel::traits::is_projected_v<Proj, RandomIt> &&
                 hpx::parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Pred,
@@ -331,7 +332,7 @@ namespace hpx::ranges {
             RandomIt first, RandomIt nth, Sent last, Pred pred = Pred(),
             Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
+            static_assert(std::random_access_iterator<RandomIt>,
                 "Requires at least random access iterator.");
 
             return hpx::parallel::detail::nth_element<RandomIt>().call(
@@ -345,8 +346,8 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_random_access_iterator_v<RandomIt> &&
-                hpx::traits::is_sentinel_for_v<Sent, RandomIt> &&
+                std::random_access_iterator<RandomIt> &&
+                std::sentinel_for<Sent, RandomIt> &&
                 hpx::parallel::traits::is_projected_v<Proj, RandomIt> &&
                 hpx::parallel::traits::is_indirect_callable_v<
                     ExPolicy, Pred,
@@ -360,7 +361,7 @@ namespace hpx::ranges {
             RandomIt first, RandomIt nth, Sent last, Pred pred = Pred(),
             Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
+            static_assert(std::random_access_iterator<RandomIt>,
                 "Requires at least random access iterator.");
 
             return hpx::parallel::detail::nth_element<RandomIt>().call(
@@ -372,7 +373,7 @@ namespace hpx::ranges {
             typename Proj = hpx::identity>
         // clang-format off
             requires(
-                hpx::traits::is_range_v<Rng> &&
+                std::ranges::range<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Pred,
@@ -381,15 +382,14 @@ namespace hpx::ranges {
                 >
             )
         // clang-format on
-        friend hpx::traits::range_iterator_t<Rng> tag_fallback_invoke(
+        friend std::ranges::iterator_t<Rng> tag_fallback_invoke(
             hpx::ranges::nth_element_t, Rng&& rng,
-            hpx::traits::range_iterator_t<Rng> nth, Pred pred = Pred(),
+            std::ranges::iterator_t<Rng> nth, Pred pred = Pred(),
             Proj proj = Proj())
         {
-            using iterator_type = hpx::traits::range_iterator_t<Rng>;
+            using iterator_type = std::ranges::iterator_t<Rng>;
 
-            static_assert(
-                hpx::traits::is_random_access_iterator_v<iterator_type>,
+            static_assert(std::random_access_iterator<iterator_type>,
                 "Requires at least random access iterator.");
 
             return hpx::parallel::detail::nth_element<iterator_type>().call(
@@ -403,7 +403,7 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                std::ranges::range<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable_v<
                     ExPolicy, Pred,
@@ -413,15 +413,14 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
-            hpx::traits::range_iterator_t<Rng>>
+            std::ranges::iterator_t<Rng>>
         tag_fallback_invoke(hpx::ranges::nth_element_t, ExPolicy&& policy,
-            Rng&& rng, hpx::traits::range_iterator_t<Rng> nth,
-            Pred pred = Pred(), Proj proj = Proj())
+            Rng&& rng, std::ranges::iterator_t<Rng> nth, Pred pred = Pred(),
+            Proj proj = Proj())
         {
-            using iterator_type = hpx::traits::range_iterator_t<Rng>;
+            using iterator_type = std::ranges::iterator_t<Rng>;
 
-            static_assert(
-                hpx::traits::is_random_access_iterator_v<iterator_type>,
+            static_assert(std::random_access_iterator<iterator_type>,
                 "Requires at least random access iterator.");
 
             return hpx::parallel::detail::nth_element<iterator_type>().call(

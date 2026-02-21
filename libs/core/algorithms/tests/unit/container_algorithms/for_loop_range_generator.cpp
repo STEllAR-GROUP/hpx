@@ -56,17 +56,19 @@ namespace test {
         auto const lo = p.first;
         auto const hi = p.last;
 
-        if (auto const stride = p.stride; stride > 0)
+        if (p.stride > 0)
         {
-            for (auto i = lo; i < hi; i += stride)
+            for (auto i = lo; i < hi; i += p.stride)
                 co_yield i;
         }
-        else if (stride < 0)
+        else if (p.stride < 0)
         {
-            for (auto i = hi - 1; i >= lo; i += stride)
+            for (auto i = hi - 1; i >= lo; i += p.stride)
                 co_yield i;
         }
     }
+
+    static_assert(hpx::traits::is_range_generator_v<index_pair>);
 
     bool empty(index_pair const& p)
     {
@@ -89,8 +91,6 @@ namespace test {
         return {static_cast<int>(p.first + first),
             static_cast<int>(p.first + first + size), p.stride};
     }
-
-    static_assert(hpx::traits::is_range_generator_v<index_pair>);
 }    // namespace test
 
 ///////////////////////////////////////////////////////////////////////////////
