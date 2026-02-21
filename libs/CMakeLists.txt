@@ -342,7 +342,6 @@ foreach(lib ${HPX_LIBS})
       add_library(hpx_${lib}_module STATIC)
       set_target_properties(
         hpx_${lib}_module PROPERTIES POSITION_INDEPENDENT_CODE ON
-                                     CXX_SCAN_FOR_MODULES ON
       )
       hpx_configure_module_producer(hpx_${lib}_module)
 
@@ -409,7 +408,6 @@ foreach(lib ${HPX_LIBS})
       add_library(hpx_full_module STATIC)
       set_target_properties(
         hpx_full_module PROPERTIES POSITION_INDEPENDENT_CODE ON FOLDER "Core"
-                                   CXX_SCAN_FOR_MODULES ON
       )
 
       # This creates an interface target hpx_full_module_if
