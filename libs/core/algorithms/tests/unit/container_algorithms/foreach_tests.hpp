@@ -213,14 +213,8 @@ void test_for_each_exception_async(ExPolicy&& p, IteratorTag)
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(p, e);
     }
-    catch (std::runtime_error const&)
-    {
-        // Handle direct runtime_error thrown by the lambda
-        caught_exception = true;
-    }
     catch (...)
     {
-        // Catch any other unexpected exceptions
         caught_exception = true;
     }
 
@@ -356,8 +350,6 @@ void test_for_each_sender(
         iterator(std::begin(c)), iterator(std::end(c)));
     auto f = [](std::size_t& v) { v = 42; };
 
-    // using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
-
     // Use stdexec bulk instead of HPX for_each for sender tests
     auto result = hpx::get<0>(
         // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
@@ -404,7 +396,6 @@ void test_for_each_exception_sender(
     bool caught_exception = false;
     try
     {
-        // using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
         auto result = tt::sync_wait(
             ex::just(rng, f) | ex::let_value([](auto&& rng, auto&& f) {
                 auto begin_it = rng.begin();
@@ -431,10 +422,6 @@ void test_for_each_exception_sender(
     {
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(p, e);
-    }
-    catch (std::runtime_error const&)
-    {
-        caught_exception = true;
     }
     catch (...)
     {
@@ -464,7 +451,6 @@ void test_for_each_bad_alloc_sender(
     bool caught_exception = false;
     try
     {
-        // using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
         tt::sync_wait(
             ex::just(rng, f) | ex::let_value([](auto&& rng, auto&& f) {
                 auto begin_it = rng.begin();

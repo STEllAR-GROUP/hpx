@@ -20,14 +20,7 @@
 #include <hpx/functional/detail/invoke.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/modules/memory.hpp>
-#include <hpx/threading_base/annotated_function.hpp>
-#include <hpx/threading_base/register_thread.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/threading_base/thread_pool_base.hpp>
-#include <hpx/topology/cpu_mask.hpp>
-#include <hpx/type_support/detail/with_result_of.hpp>
-#include <hpx/type_support/pack.hpp>
+#include <hpx/modules/topology.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -309,7 +302,7 @@ namespace hpx::execution::experimental {
 
             operation_state(operation_state&&) = default;
             operation_state(operation_state const&) = delete;
-            operation_state& operator=(operation_state&&) = delete;
+            operation_state& operator=(operation_state&&) = default;
             operation_state& operator=(operation_state const&) = delete;
 
             ~operation_state() = default;

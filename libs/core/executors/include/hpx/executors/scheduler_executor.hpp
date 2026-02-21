@@ -256,8 +256,12 @@ namespace hpx::execution::experimental {
                                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)));
         }
 
-        template <typename F, typename S, typename Future, typename... Ts>
-            requires(!std::is_integral_v<S>)
+        // clang-format off
+        template <typename F, typename S, typename Future, typename... Ts,
+            HPX_CONCEPT_REQUIRES_(
+                !std::is_integral_v<S>
+            )>
+        // clang-format on
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::bulk_then_execute_t,
             scheduler_executor const& exec, F&& f, S const& shape,
@@ -274,7 +278,7 @@ namespace hpx::execution::experimental {
                     when_all(keep_future(HPX_FORWARD(Future, predecessor)));
 
                 auto loop = bulk(transfer(HPX_MOVE(pre_req), exec.sched_),
-                    hpx::util::size(shape),
+                    shape,
                     hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
 
                 return make_future(HPX_MOVE(loop));
@@ -287,7 +291,7 @@ namespace hpx::execution::experimental {
                         just(std::vector<result_type>(hpx::util::size(shape))));
 
                 auto loop = bulk(transfer(HPX_MOVE(pre_req), exec.sched_),
-                    hpx::util::size(shape),
+                    shape,
                     detail::captured_args_then(
                         HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
 

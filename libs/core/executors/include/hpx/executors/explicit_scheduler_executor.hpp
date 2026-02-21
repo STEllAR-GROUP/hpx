@@ -9,27 +9,13 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/execution/algorithms/bulk.hpp>
-#include <hpx/execution/algorithms/keep_future.hpp>
-#include <hpx/execution/algorithms/start_detached.hpp>
-#include <hpx/execution/algorithms/sync_wait.hpp>
-#include <hpx/execution/algorithms/then.hpp>
-#include <hpx/execution/algorithms/transfer.hpp>
-#include <hpx/execution/algorithms/transfer_just.hpp>
-#include <hpx/execution/algorithms/when_all.hpp>
-#include <hpx/execution/executors/execution.hpp>
-#include <hpx/execution/executors/execution_parameters.hpp>
-#include <hpx/execution_base/execution.hpp>
-#include <hpx/execution_base/sender.hpp>
-#include <hpx/execution_base/stdexec_forward.hpp>
-#include <hpx/execution_base/traits/is_executor.hpp>
-#include <hpx/functional/deferred_call.hpp>
-#include <hpx/functional/invoke_fused.hpp>
-#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/modules/concepts.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/timing.hpp>
 #include <hpx/modules/topology.hpp>
-#include <hpx/timing/steady_clock.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -96,8 +82,12 @@ namespace hpx::execution::experimental {
             return sched_;
         }
 
-        template <typename Parameters>
-            requires(hpx::traits::is_executor_parameters_v<Parameters>)
+        // clang-format off
+        template <typename Parameters,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_executor_parameters_v<Parameters>
+            )>
+        // clang-format on
         friend auto tag_invoke(
             hpx::execution::experimental::processing_units_count_t tag,
             Parameters&& params, explicit_scheduler_executor const& exec,
@@ -235,10 +225,8 @@ namespace hpx::execution::experimental {
                     bulk(shape_size, HPX_MOVE(f_wrapper)) |
                     then(HPX_MOVE(get_result));
 #else
-                // When stdexec is not available, use HPX's original bulk implementation
-                return just(HPX_MOVE(result_vector), shape, HPX_FORWARD(F, f),
-                           HPX_FORWARD(Ts, ts)...) |
-                    continues_on(exec.sched_) |
+                return transfer_just(exec.sched_, HPX_MOVE(result_vector),
+                           shape, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...) |
                     bulk(shape_size, HPX_MOVE(f_wrapper)) |
                     then(HPX_MOVE(get_result));
 #endif
@@ -246,8 +234,12 @@ namespace hpx::execution::experimental {
         }
 
 #if !defined(HPX_HAVE_STDEXEC)
-        template <typename F, typename S, typename... Ts>
-            requires(!std::is_integral_v<S>)
+        // clang-format off
+        template <typename F, typename S, typename... Ts,
+            HPX_CONCEPT_REQUIRES_(
+                !std::is_integral_v<S>
+            )>
+        // clang-format on
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::bulk_sync_execute_t,
             explicit_scheduler_executor const& exec, F&& f, S const& shape,
@@ -260,8 +252,12 @@ namespace hpx::execution::experimental {
 #endif
 
 #if !defined(HPX_HAVE_STDEXEC)
-        template <typename F, typename S, typename Future, typename... Ts>
-            requires(!std::is_integral_v<S>)
+        // clang-format off
+        template <typename F, typename S, typename Future, typename... Ts,
+            HPX_CONCEPT_REQUIRES_(
+                !std::is_integral_v<S>
+            )>
+        // clang-format on
         friend auto tag_invoke(hpx::parallel::execution::bulk_then_execute_t,
             explicit_scheduler_executor const& exec, F&& f, S const& shape,
             Future&& predecessor, Ts&&... ts)

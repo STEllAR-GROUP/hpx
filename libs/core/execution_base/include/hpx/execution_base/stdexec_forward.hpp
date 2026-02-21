@@ -324,9 +324,9 @@ namespace hpx::execution::experimental {
         HPX_CXX_CORE_EXPORT using stdexec::__connect_awaitable_t;
 
         // Additional stdexec concepts and utilities needed for domain customization
-        using stdexec::__completes_on;
-        using stdexec::__starts_on;
-        using stdexec::sender_expr_for;
+        HPX_CXX_CORE_EXPORT using stdexec::__completes_on;
+        HPX_CXX_CORE_EXPORT using stdexec::__starts_on;
+        HPX_CXX_CORE_EXPORT using stdexec::sender_expr_for;
     }    // namespace stdexec_internal
 }    // namespace hpx::execution::experimental
 

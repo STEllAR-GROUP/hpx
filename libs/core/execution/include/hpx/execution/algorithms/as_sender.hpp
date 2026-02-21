@@ -187,7 +187,11 @@ namespace hpx::execution::experimental {
         struct as_sender_sender<hpx::future<T>>
           : public as_sender_sender_base<hpx::future<T>>
         {
+#if defined(HPX_HAVE_STDEXEC)
+            using sender_concept = hpx::execution::experimental::sender_t;
+#else
             using is_sender = void;
+#endif
             using future_type = hpx::future<T>;
             using base_type = as_sender_sender_base<hpx::future<T>>;
             using base_type::future_;
@@ -217,7 +221,11 @@ namespace hpx::execution::experimental {
         struct as_sender_sender<hpx::shared_future<T>>
           : as_sender_sender_base<hpx::shared_future<T>>
         {
+#if defined(HPX_HAVE_STDEXEC)
+            using sender_concept = hpx::execution::experimental::sender_t;
+#else
             using is_sender = void;
+#endif
             using future_type = hpx::shared_future<T>;
             using base_type = as_sender_sender_base<hpx::shared_future<T>>;
             using base_type::future_;
