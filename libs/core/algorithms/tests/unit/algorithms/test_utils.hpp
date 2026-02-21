@@ -17,6 +17,7 @@
 #include <iterator>
 #include <numeric>
 #include <random>
+#include <type_traits>
 #include <utility>
 #include <vector>
 

@@ -33,7 +33,7 @@ namespace hpx::iostream::detail {
     //------------------Definition of resolve-------------------------------------//
     HPX_CXX_CORE_EXPORT template <typename Mode, typename Ch, typename T>
     struct resolve_traits
-      : std::conditional<std::output_iterator<Ch, T>,
+      : std::conditional<std::output_iterator<T, Ch>,
             output_iterator_adapter<Mode, Ch, T>, T const&>
     {
     };
