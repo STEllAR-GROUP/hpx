@@ -439,7 +439,7 @@ namespace hpx::execution::experimental {
                     std::size_t const num_pus = pool_->get_os_thread_count();
 
                     for (std::size_t pu = 0; t != num_threads_ && pu != num_pus;
-                        ++pu)
+                         ++pu)
                     {
                         std::size_t const pu_num = rp.get_pu_num(pu);
                         if (!main_thread_ok && pu == main_thread_)
@@ -773,7 +773,7 @@ namespace hpx::execution::experimental {
                             // As loop schedule is dynamic, steal from neighboring
                             // threads.
                             for (std::size_t offset = 1; offset < num_threads;
-                                ++offset)
+                                 ++offset)
                             {
                                 std::size_t const neighbor_index =
                                     (thread_index + offset) % num_threads;
