@@ -218,7 +218,11 @@ namespace hpx::execution {
             exec_with_num_cores.num_cores_ = num_cores;
 
             // force recomputing cached pu mask
+#if defined(HPX_MASK_TYPE_IS_CONSTEXPR_CONSTRUCTIBLE)
+            exec_with_num_cores.mask_ = hpx::threads::mask_type();
+#else
             exec_with_num_cores.mask_ = nullptr;
+#endif
             return exec_with_num_cores;
         }
 
@@ -568,7 +572,47 @@ namespace hpx::execution {
             return pu % available_threads;
         }
 
+#if defined(HPX_MASK_TYPE_IS_CONSTEXPR_CONSTRUCTIBLE)
         hpx::threads::mask_type pu_mask() const noexcept
+        {
+            if (hpx::threads::any(mask_))
+            {
+                return mask_;
+            }
+
+            auto const num_threads = get_num_cores();
+            auto const* pool =
+                pool_ ? pool_ : threads::detail::get_self_or_default_pool();
+            auto const available_threads =
+                static_cast<std::uint32_t>(pool->get_os_thread_count());
+            bool const needs_wraparound =
+                num_threads > available_threads || get_first_core() != 0;
+
+            std::uint32_t const overall_threads =    //-V101
+                hpx::threads::hardware_concurrency();
+            auto mask = hpx::threads::mask_type();
+            hpx::threads::resize(mask, overall_threads);
+
+            auto const& rp = hpx::resource::get_partitioner();
+            for (std::uint32_t i = 0; i != num_threads; ++i)
+            {
+                auto const thread_mask = rp.get_pu_mask(wrapped_pu_num(
+                    static_cast<std::uint32_t>(i + get_first_core()),
+                    needs_wraparound, available_threads));
+                for (std::uint32_t j = 0; j != overall_threads; ++j)
+                {
+                    if (threads::test(thread_mask, j))
+                    {
+                        threads::set(mask, j);
+                    }
+                }
+            }
+
+            mask_ = mask;
+            return mask;
+        }
+#else
+        hpx::threads::mask_type pu_mask() const
         {
             if (mask_)
             {
@@ -606,6 +650,7 @@ namespace hpx::execution {
             mask_ = new hpx::threads::mask_type(HPX_MOVE(mask));
             return *mask_;
         }
+#endif
 
         friend class hpx::serialization::access;
 
@@ -627,7 +672,11 @@ namespace hpx::execution {
         std::size_t hierarchical_threshold_ = hierarchical_threshold_default_;
         std::size_t first_core_ = 0;
         std::size_t num_cores_ = 0;
+#if defined(HPX_MASK_TYPE_IS_CONSTEXPR_CONSTRUCTIBLE)
+        mutable hpx::threads::mask_type mask_ = hpx::threads::mask_type();
+#else
         mutable hpx::threads::mask_type* mask_ = nullptr;
+#endif
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
         char const* annotation_ = nullptr;
 #endif
