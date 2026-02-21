@@ -24,10 +24,9 @@
 #include <hpx/modules/timing.hpp>
 #include <hpx/modules/topology.hpp>
 
-#include <algorithm>
 #include <cstddef>
 #include <cstdint>
-#include <string>
+#include <iostream>
 #include <type_traits>
 #include <utility>
 
@@ -599,13 +598,7 @@ namespace hpx::execution {
                 auto const thread_mask = rp.get_pu_mask(wrapped_pu_num(
                     static_cast<std::uint32_t>(i + get_first_core()),
                     needs_wraparound, available_threads));
-                for (std::uint32_t j = 0; j != overall_threads; ++j)
-                {
-                    if (threads::test(thread_mask, j))
-                    {
-                        threads::set(mask, j);
-                    }
-                }
+                mask |= thread_mask;
             }
 
             mask_ = mask;
@@ -638,13 +631,7 @@ namespace hpx::execution {
                 auto const thread_mask = rp.get_pu_mask(wrapped_pu_num(
                     static_cast<std::uint32_t>(i + get_first_core()),
                     needs_wraparound, available_threads));
-                for (std::uint32_t j = 0; j != overall_threads; ++j)
-                {
-                    if (threads::test(thread_mask, j))
-                    {
-                        threads::set(mask, j);
-                    }
-                }
+                mask |= thread_mask;
             }
 
             mask_ = new hpx::threads::mask_type(HPX_MOVE(mask));
