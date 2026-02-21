@@ -16,7 +16,7 @@
 namespace hpx::lcos::local {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT struct conditional_cv
+    HPX_CXX_CORE_EXPORT struct conditional_cv
     {
         conditional_cv() = default;
         ~conditional_cv() = default;

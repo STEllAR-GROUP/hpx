@@ -14,6 +14,6 @@
 
 namespace hpx::cuda::experimental::detail {
 
-    HPX_CXX_EXPORT using print_on = debug::enable_print<false>;
-    HPX_CXX_EXPORT inline constexpr print_on cud_debug("CUDA");
+    HPX_CXX_CORE_EXPORT using print_on = debug::enable_print<false>;
+    HPX_CXX_CORE_EXPORT inline constexpr print_on cud_debug("CUDA");
 }    // namespace hpx::cuda::experimental::detail

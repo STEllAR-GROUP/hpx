@@ -11,8 +11,8 @@
 #include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/threading_base.hpp>
-#include <hpx/naming_base/address.hpp>
 
 #include <type_traits>
 #include <utility>

@@ -19,7 +19,7 @@ namespace hpx::util {
     //  tick_counter - a timer
     //
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT class tick_counter
+    HPX_CXX_CORE_EXPORT class tick_counter
     {
     public:
         explicit tick_counter(std::uint64_t& output)

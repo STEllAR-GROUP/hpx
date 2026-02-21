@@ -28,7 +28,7 @@ namespace hpx {
     ///        \c hpx::call_once allows those calls to coordinate with each other such
     ///        that only one of the calls will actually run to completion.
     ///        \c hpx::once_flag is neither copyable nor movable.
-    HPX_CXX_EXPORT struct once_flag
+    HPX_CXX_CORE_EXPORT struct once_flag
     {
     public:
         once_flag(once_flag const&) = delete;
@@ -99,7 +99,7 @@ namespace hpx {
     ///       be more efficient than the equivalent code using \c
     ///       hpx::call_once. The POSIX equivalent of this function is \a
     ///       pthread_once.
-    HPX_CXX_EXPORT template <typename F, typename... Args>
+    HPX_CXX_CORE_EXPORT template <typename F, typename... Args>
     void call_once(once_flag& flag, F&& f, Args&&... args)
     {
         // Try for a quick win: if the procedure has already been called

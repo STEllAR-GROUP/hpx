@@ -19,17 +19,27 @@ set(numa_allocator_PARAMETERS
     --row-proc=1
 )
 
+set(block_allocator_CONFIG_FLAGS SCAN_FOR_MODULES On)
+set(block_fork_join_executor_CONFIG_FLAGS SCAN_FOR_MODULES On)
+set(numa_allocator_CONFIG_FLAGS SCAN_FOR_MODULES Off)
+
+set(_hpx_prev_scan "${CMAKE_CXX_SCAN_FOR_MODULES}")
+if(HPX_WITH_CXX_MODULES)
+  set(CMAKE_CXX_SCAN_FOR_MODULES Off)
+endif()
+
 foreach(test ${tests})
   set(sources ${test}.cpp)
 
   source_group("Source Files" FILES ${sources})
 
-  # add example executable
+  # add test executable
+  hpx_debug("${test}_CONFIG_FLAGS: ${${test}_CONFIG_FLAGS}")
   add_hpx_executable(
     ${test}_test INTERNAL_FLAGS
     SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
-    HPX_PREFIX ${HPX_BUILD_PREFIX}
+    HPX_PREFIX ${HPX_BUILD_PREFIX} ${${test}_CONFIG_FLAGS}
     FOLDER "Tests/Unit/Modules/Core/ComputeLocal"
   )
 
@@ -37,3 +47,5 @@ foreach(test ${tests})
   add_hpx_unit_test("modules.compute_local" ${test} ${${test}_PARAMETERS})
 
 endforeach()
+
+set(CMAKE_CXX_SCAN_FOR_MODULES "${_hpx_prev_scan}")

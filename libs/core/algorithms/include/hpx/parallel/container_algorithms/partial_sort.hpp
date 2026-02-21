@@ -283,7 +283,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::partial_sort
-    HPX_CXX_EXPORT inline constexpr struct partial_sort_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct partial_sort_t final
       : hpx::detail::tag_parallel_algorithm<partial_sort_t>
     {
     private:

@@ -9,11 +9,9 @@
 #include <hpx/execution.hpp>
 #include <hpx/init.hpp>
 
-#include <hpx/thrust/algorithms.hpp>
-#include <hpx/thrust/policy.hpp>
-
-#include <hpx/async_cuda/cuda_polling_helper.hpp>
+#include <hpx/modules/thrust.hpp>
 #include <hpx/modules/async_cuda.hpp>
+
 #include <thrust/device_vector.h>
 
 int hpx_main(int, char**)

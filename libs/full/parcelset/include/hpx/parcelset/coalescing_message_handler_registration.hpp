@@ -16,11 +16,9 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/preprocessor.hpp>
 
+#include <hpx/modules/parcelset_base.hpp>
 #include <hpx/parcelset/message_handler_fwd.hpp>
 #include <hpx/parcelset/parcelset_fwd.hpp>
-#include <hpx/parcelset_base/locality_interface.hpp>
-#include <hpx/parcelset_base/policies/message_handler.hpp>
-#include <hpx/parcelset_base/traits/action_message_handler.hpp>
 
 #include <cstddef>
 

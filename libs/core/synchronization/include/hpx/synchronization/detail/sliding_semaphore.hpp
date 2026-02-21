@@ -23,7 +23,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 namespace hpx::lcos::local::detail {
 
-    HPX_CXX_EXPORT class sliding_semaphore
+    HPX_CXX_CORE_EXPORT class sliding_semaphore
     {
     private:
         using mutex_type = hpx::spinlock;

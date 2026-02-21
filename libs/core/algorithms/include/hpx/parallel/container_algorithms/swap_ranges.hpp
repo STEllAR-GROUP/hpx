@@ -226,12 +226,12 @@ namespace hpx { namespace ranges {
 namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Iter1, typename Iter2>
+    HPX_CXX_CORE_EXPORT template <typename Iter1, typename Iter2>
     using swap_ranges_result = hpx::parallel::util::in_in_result<Iter1, Iter2>;
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::swap_ranges
-    HPX_CXX_EXPORT inline constexpr struct swap_ranges_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct swap_ranges_t final
       : hpx::detail::tag_parallel_algorithm<swap_ranges_t>
     {
     private:

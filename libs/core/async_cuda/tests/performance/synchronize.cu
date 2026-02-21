@@ -6,9 +6,8 @@
 
 #include <hpx/config.hpp>
 
-// NVCC fails unceremoniously with this test until V12.2
-// Fixed in CUDA 12.3
-#if !defined(HPX_CUDA_VERSION) || (HPX_CUDA_VERSION > 1202)
+// NVCC fails unceremoniously with this test
+#if !defined(HPX_CUDA_VERSION)
 
 #include <hpx/chrono.hpp>
 #include <hpx/execution.hpp>

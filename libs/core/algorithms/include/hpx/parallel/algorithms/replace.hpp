@@ -495,7 +495,7 @@ namespace hpx::parallel {
     namespace detail {
         /// \cond NOINTERNAL
 
-        HPX_CXX_EXPORT template <typename Iter>
+        HPX_CXX_CORE_EXPORT template <typename Iter>
         struct replace : public algorithm<replace<Iter>, Iter>
         {
             constexpr replace() noexcept
@@ -533,7 +533,7 @@ namespace hpx::parallel {
     namespace detail {
         /// \cond NOINTERNAL
 
-        HPX_CXX_EXPORT template <typename Iter>
+        HPX_CXX_CORE_EXPORT template <typename Iter>
         struct replace_if : public algorithm<replace_if<Iter>, Iter>
         {
             constexpr replace_if() noexcept
@@ -570,7 +570,7 @@ namespace hpx::parallel {
     namespace detail {
         /// \cond NOINTERNAL
 
-        HPX_CXX_EXPORT template <typename IterPair>
+        HPX_CXX_CORE_EXPORT template <typename IterPair>
         struct replace_copy : public algorithm<replace_copy<IterPair>, IterPair>
         {
             constexpr replace_copy() noexcept
@@ -610,7 +610,7 @@ namespace hpx::parallel {
     namespace detail {
         /// \cond NOINTERNAL
 
-        HPX_CXX_EXPORT template <typename IterPair>
+        HPX_CXX_CORE_EXPORT template <typename IterPair>
         struct replace_copy_if
           : public algorithm<replace_copy_if<IterPair>, IterPair>
         {
@@ -649,7 +649,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::replace_if
-    HPX_CXX_EXPORT inline constexpr struct replace_if_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct replace_if_t final
       : hpx::detail::tag_parallel_algorithm<replace_if_t>
     {
     private:
@@ -701,7 +701,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::replace
-    HPX_CXX_EXPORT inline constexpr struct replace_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct replace_t final
       : hpx::detail::tag_parallel_algorithm<replace_t>
     {
     private:
@@ -750,7 +750,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::replace_copy_if
-    HPX_CXX_EXPORT inline constexpr struct replace_copy_if_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct replace_copy_if_t final
       : hpx::detail::tag_parallel_algorithm<replace_copy_if_t>
     {
     private:
@@ -814,7 +814,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::replace_copy
-    HPX_CXX_EXPORT inline constexpr struct replace_copy_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct replace_copy_t final
       : hpx::detail::tag_parallel_algorithm<replace_copy_t>
     {
     private:

@@ -700,7 +700,7 @@ namespace hpx { namespace ranges {
 
 namespace hpx::ranges {
 
-    HPX_CXX_EXPORT inline constexpr struct search_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct search_t final
       : hpx::detail::tag_parallel_algorithm<search_t>
     {
     private:
@@ -824,7 +824,7 @@ namespace hpx::ranges {
         }
     } search{};
 
-    HPX_CXX_EXPORT inline constexpr struct search_n_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct search_n_t final
       : hpx::detail::tag_parallel_algorithm<search_n_t>
     {
     private:

@@ -14,15 +14,15 @@
 namespace hpx::parallel::traits {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename V, typename NewT>
+    HPX_CXX_CORE_EXPORT template <typename V, typename NewT>
     struct rebind_pack;
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename V, typename ValueType,
+    HPX_CXX_CORE_EXPORT template <typename V, typename ValueType,
         typename Enable = void>
     struct vector_pack_load;
 
-    HPX_CXX_EXPORT template <typename V, typename ValueType,
+    HPX_CXX_CORE_EXPORT template <typename V, typename ValueType,
         typename Enable = void>
     struct vector_pack_store;
 }    // namespace hpx::parallel::traits

@@ -38,9 +38,7 @@
 #include <hpx/modules/itt_notify.hpp>
 #endif
 
-#include <hpx/parcelset_base/traits/action_get_embedded_parcel.hpp>
-#include <hpx/parcelset_base/traits/action_message_handler.hpp>
-#include <hpx/parcelset_base/traits/action_serialization_filter.hpp>
+#include <hpx/modules/parcelset_base.hpp>
 
 #include <atomic>
 #include <cstddef>

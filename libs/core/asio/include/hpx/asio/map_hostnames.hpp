@@ -18,7 +18,7 @@ namespace hpx::util {
     ///////////////////////////////////////////////////////////////////////////
     // Try to map a given host name based on the list of mappings read from a
     // file
-    HPX_CXX_EXPORT struct HPX_CORE_EXPORT map_hostnames
+    HPX_CXX_CORE_EXPORT struct HPX_CORE_EXPORT map_hostnames
     {
         using transform_function_type =
             hpx::function<std::string(std::string const&)>;

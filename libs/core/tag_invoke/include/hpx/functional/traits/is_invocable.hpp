@@ -74,7 +74,7 @@ namespace hpx {
     ///          indirectly, on an incomplete type, and that instantiation could
     ///          yield a different result if that type were hypothetically
     ///          completed, the behavior is undefined.
-    HPX_CXX_EXPORT template <typename F, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename F, typename... Ts>
     struct is_invocable : hpx::detail::is_invocable_impl<F && (Ts && ...)>
     {
     };
@@ -89,26 +89,26 @@ namespace hpx {
     /// is well-formed when treated as an unevaluated operand, where \a INVOKE
     /// is the operation defined in \a Callable.
     /// \copydetails is_invocable
-    HPX_CXX_EXPORT template <typename R, typename F, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename R, typename F, typename... Ts>
     struct is_invocable_r
       : hpx::detail::is_invocable_r_impl<F && (Ts && ...), R>
     {
     };
 
-    HPX_CXX_EXPORT template <typename F, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename F, typename... Ts>
     inline constexpr bool is_invocable_v = is_invocable<F, Ts...>::value;
 
-    HPX_CXX_EXPORT template <typename R, typename F, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename R, typename F, typename... Ts>
     inline constexpr bool is_invocable_r_v = is_invocable_r<R, F, Ts...>::value;
 
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename Sig, bool Invocable>
+        HPX_CXX_CORE_EXPORT template <typename Sig, bool Invocable>
         struct is_nothrow_invocable_impl : std::false_type
         {
         };
 
-        HPX_CXX_EXPORT template <typename F, typename... Ts>
+        HPX_CXX_CORE_EXPORT template <typename F, typename... Ts>
         struct is_nothrow_invocable_impl<F(Ts...), true>
           : std::integral_constant<bool,
                 noexcept(std::declval<F>()(std::declval<Ts>()...))>
@@ -116,13 +116,13 @@ namespace hpx {
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename F, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename F, typename... Ts>
     struct is_nothrow_invocable
       : detail::is_nothrow_invocable_impl<F(Ts...), is_invocable_v<F, Ts...>>
     {
     };
 
-    HPX_CXX_EXPORT template <typename F, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename F, typename... Ts>
     inline constexpr bool is_nothrow_invocable_v =
         is_nothrow_invocable<F, Ts...>::value;
 }    // namespace hpx

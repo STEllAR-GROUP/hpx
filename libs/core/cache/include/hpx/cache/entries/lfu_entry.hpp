@@ -31,7 +31,7 @@ namespace hpx::util::cache::entries {
     ///                   default constructible, copy constructible and
     ///                   less_than_comparable.
     ///
-    HPX_CXX_EXPORT template <typename Value>
+    HPX_CXX_CORE_EXPORT template <typename Value>
     class lfu_entry : public entry<Value>
     {
     private:

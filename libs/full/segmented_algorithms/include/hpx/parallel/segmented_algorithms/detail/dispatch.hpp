@@ -13,8 +13,8 @@
 #include <hpx/distribution_policies/colocating_distribution_policy.hpp>
 #include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/executors.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/naming_base/id_type.hpp>
 
 #include <exception>
 #include <list>

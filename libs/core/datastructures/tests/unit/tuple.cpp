@@ -24,14 +24,6 @@
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/testing.hpp>
 
-// clang-format off
-#if defined(__clang__)
-#  pragma clang diagnostic pop
-#elif defined (__GNUC__)
-#  pragma GCC diagnostic pop
-#endif
-// clang-format on
-
 #include <array>
 #include <cstddef>
 #include <functional>
@@ -63,14 +55,14 @@ class BB : public AA
 };
 struct CC
 {
-    CC() {}
-    CC(const BB&) {}
+    CC() = default;
+    CC(BB const&) {}
 };
 struct DD
 {
     operator CC() const
     {
-        return CC();
+        return {};
     };
 };
 
@@ -84,7 +76,7 @@ void dummy(T const&)
 class foo
 {
 public:
-    explicit foo(int v)
+    explicit foo(int const v)
       : val(v)
     {
     }
@@ -95,14 +87,14 @@ public:
     }
 
 private:
-    foo() {}
+    foo() = default;
     int val;
 };
 
 // another class without a public default constructor
 class no_def_constructor
 {
-    no_def_constructor() {}
+    no_def_constructor() = default;
 
 public:
     no_def_constructor(std::string) {}
@@ -111,10 +103,10 @@ public:
 // A non-copyable class
 class no_copy
 {
-    no_copy(no_copy const&) {}
+    no_copy(no_copy const&) = default;
 
 public:
-    no_copy() {};
+    no_copy() = default;
 };
 
 // ----------------------------------------------------------------------------
@@ -597,3 +589,11 @@ int main()
 
     return hpx::util::report_errors();
 }
+
+// clang-format off
+#if defined(__clang__)
+#  pragma clang diagnostic pop
+#elif defined (__GNUC__)
+#  pragma GCC diagnostic pop
+#endif
+// clang-format on

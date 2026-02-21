@@ -27,7 +27,7 @@
 
 namespace hpx::string_util {
 
-    HPX_CXX_EXPORT template <typename TokenizerFunc, typename Iterator,
+    HPX_CXX_CORE_EXPORT template <typename TokenizerFunc, typename Iterator,
         typename Type>
     class token_iterator
       : public util::iterator_facade<
@@ -136,7 +136,7 @@ namespace hpx::string_util {
         }
     };
 
-    HPX_CXX_EXPORT template <typename TokenizerFunc = char_separator<char>,
+    HPX_CXX_CORE_EXPORT template <typename TokenizerFunc = char_separator<char>,
         typename Iterator = std::string::const_iterator,
         typename Type = std::string>
     struct token_iterator_generator
@@ -146,7 +146,7 @@ namespace hpx::string_util {
 
     // Type has to be first because it needs to be explicitly specified as there
     // is no way the function can deduce it.
-    HPX_CXX_EXPORT template <typename Type, typename Iterator,
+    HPX_CXX_CORE_EXPORT template <typename Type, typename Iterator,
         typename TokenizerFunc>
     typename token_iterator_generator<std::decay_t<TokenizerFunc>, Iterator,
         Type>::type

@@ -109,7 +109,7 @@ namespace hpx::debug {
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <int N = 2, typename T>
+    HPX_CXX_CORE_EXPORT template <int N = 2, typename T>
     [[nodiscard]] constexpr detail::dec<N, T> dec(T const& v) noexcept
     {
         return detail::dec<N, T>(v);
@@ -118,7 +118,7 @@ namespace hpx::debug {
     // ------------------------------------------------------------------
     // format as pointer
     // ------------------------------------------------------------------
-    HPX_CXX_EXPORT struct ptr
+    HPX_CXX_CORE_EXPORT struct ptr
     {
         HPX_CORE_EXPORT explicit ptr(void const* v) noexcept;
         HPX_CORE_EXPORT explicit ptr(std::uintptr_t v) noexcept;
@@ -179,7 +179,7 @@ namespace hpx::debug {
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <int N = 4, typename T>
+    HPX_CXX_CORE_EXPORT template <int N = 4, typename T>
     [[nodiscard]] constexpr detail::hex<N, T> hex(T const& v) noexcept
     {
         return detail::hex<N, T>(v);
@@ -212,7 +212,7 @@ namespace hpx::debug {
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <int N = 8, typename T>
+    HPX_CXX_CORE_EXPORT template <int N = 8, typename T>
     [[nodiscard]] constexpr detail::bin<N, T> bin(T const& v) noexcept
     {
         return detail::bin<N, T>(v);
@@ -226,7 +226,7 @@ namespace hpx::debug {
         HPX_CORE_EXPORT void print_str(std::ostream& os, char const* v, int n);
     }
 
-    HPX_CXX_EXPORT template <int N = 20>
+    HPX_CXX_CORE_EXPORT template <int N = 20>
     struct str
     {
         explicit constexpr str(char const* v) noexcept
@@ -246,7 +246,7 @@ namespace hpx::debug {
     // ------------------------------------------------------------------
     // format as ip address
     // ------------------------------------------------------------------
-    HPX_CXX_EXPORT struct ipaddr
+    HPX_CXX_CORE_EXPORT struct ipaddr
     {
         HPX_CORE_EXPORT explicit ipaddr(void const* a) noexcept;
         HPX_CORE_EXPORT explicit ipaddr(std::uint32_t a) noexcept;
@@ -273,7 +273,7 @@ namespace hpx::debug {
     // ------------------------------------------------------------------
     // helper function for printing CRC32
     // ------------------------------------------------------------------
-    HPX_CXX_EXPORT [[nodiscard]] constexpr std::uint32_t crc32(
+    HPX_CXX_CORE_EXPORT [[nodiscard]] constexpr std::uint32_t crc32(
         void const*, std::size_t) noexcept
     {
         return 0;
@@ -284,7 +284,7 @@ namespace hpx::debug {
     // useful for debugging corruptions in buffers during
     // rma or other transfers
     // ------------------------------------------------------------------
-    HPX_CXX_EXPORT struct mem_crc32
+    HPX_CXX_CORE_EXPORT struct mem_crc32
     {
         HPX_CORE_EXPORT mem_crc32(
             void const* a, std::size_t len, char const* txt) noexcept;
@@ -384,7 +384,7 @@ namespace hpx::debug {
         }
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename... Args>
+    HPX_CXX_CORE_EXPORT template <typename... Args>
     struct scoped_var
     {
         // capture tuple elements by reference - no temp vars in constructor please
@@ -416,7 +416,7 @@ namespace hpx::debug {
         scoped_var& operator=(scoped_var&&) = delete;
     };
 
-    HPX_CXX_EXPORT template <typename... Args>
+    HPX_CXX_CORE_EXPORT template <typename... Args>
     struct timed_var
     {
         mutable std::chrono::steady_clock::time_point time_start_;
@@ -454,7 +454,7 @@ namespace hpx::debug {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <bool Enable>
+    HPX_CXX_CORE_EXPORT template <bool Enable>
     struct enable_print;
 
     // when false, debug statements should produce no code

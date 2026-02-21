@@ -13,8 +13,6 @@
 #include <hpx/execution.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/parallel/algorithms/reduce.hpp>
-#include <hpx/parallel/algorithms/reduce_deterministic.hpp>
 
 #include <iostream>
 #include <numeric>

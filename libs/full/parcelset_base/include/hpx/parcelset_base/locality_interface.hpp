@@ -1,4 +1,4 @@
-//  Copyright (c) 2021 Hartmut Kaiser
+//  Copyright (c) 2021-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -18,13 +18,13 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::parcelset {
 
-    HPX_EXPORT parcelset::parcel create_parcel();
+    HPX_CXX_EXPORT HPX_EXPORT parcelset::parcel create_parcel();
 
-    HPX_EXPORT locality create_locality(std::string const& name);
+    HPX_CXX_EXPORT HPX_EXPORT locality create_locality(std::string const& name);
 
     ///////////////////////////////////////////////////////////////////////////
     // initialize locality interface function wrappers
-    struct locality_interface_functions& locality_init();
+    HPX_CXX_EXPORT struct locality_interface_functions& locality_init();
 }    // namespace hpx::parcelset
 
 #endif

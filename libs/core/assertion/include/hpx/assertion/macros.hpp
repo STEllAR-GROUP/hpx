@@ -1,5 +1,5 @@
 //  Copyright (c) 2019 Thomas Heller
-//  Copyright (c) 2022-2025 Hartmut Kaiser
+//  Copyright (c) 2022-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,11 +17,11 @@
 
 #include <hpx/config/export_definitions.hpp>
 
-#include <hpx/assertion/current_function.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/preprocessor.hpp>
 
-#if !defined(HPX_COMPILE_WITH_MODULES) || defined(HPX_COMPILE_BMI)
+#if !defined(HPX_HAVE_CXX_MODULES) || defined(HPX_CORE_EXPORTS) ||             \
+    (defined(HPX_COMPILE_BMI) && defined(HPX_COMPILE_CORE_WITH_MODULES))
 #include <hpx/config.hpp>
 #include <hpx/assertion/api.hpp>
 #include <hpx/assertion/evaluate_assert.hpp>
@@ -105,8 +105,7 @@
 #define HPX_CURRENT_SOURCE_LOCATION()                                          \
     ::hpx::source_location                                                     \
     {                                                                          \
-        __FILE__, static_cast<std::uint_least32_t>(__LINE__),                  \
-            HPX_ASSERT_CURRENT_FUNCTION                                        \
+        __FILE__, static_cast<std::uint_least32_t>(__LINE__), __func__         \
     }
 #endif
 #endif

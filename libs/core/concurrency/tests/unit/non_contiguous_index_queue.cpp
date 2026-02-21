@@ -1,14 +1,14 @@
 //  Copyright (C) 2020 ETH Zurich
-//  Copyright (C) 2022-2025 Hartmut Kaiser
+//  Copyright (C) 2022-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/barrier.hpp>
-#include <hpx/concurrency/detail/non_contiguous_index_queue.hpp>
 #include <hpx/future.hpp>
 #include <hpx/init.hpp>
+#include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/optional.hpp>
 #include <hpx/program_options.hpp>

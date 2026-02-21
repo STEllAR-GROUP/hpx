@@ -22,7 +22,7 @@ namespace hpx {
     ///
     /// \note This function can be called before the HPX runtime is initialized.
     ///
-    HPX_CXX_EXPORT HPX_CORE_EXPORT
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT
         threads::policies::callback_notifier::on_startstop_type
         get_thread_on_start_func();
 
@@ -37,7 +37,7 @@ namespace hpx {
     ///
     /// \note This function can be called before the HPX runtime is initialized.
     ///
-    HPX_CXX_EXPORT HPX_CORE_EXPORT
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT
         threads::policies::callback_notifier::on_startstop_type
         get_thread_on_stop_func();
 
@@ -52,7 +52,7 @@ namespace hpx {
     ///
     /// \note This function can be called before the HPX runtime is initialized.
     ///
-    HPX_CXX_EXPORT HPX_CORE_EXPORT
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT
         threads::policies::callback_notifier::on_error_type
         get_thread_on_error_func();
 
@@ -71,7 +71,7 @@ namespace hpx {
     ///
     /// \note This function can be called before the HPX runtime is initialized.
     ///
-    HPX_CXX_EXPORT HPX_CORE_EXPORT
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT
         threads::policies::callback_notifier::on_startstop_type
         register_thread_on_start_func(
             threads::policies::callback_notifier::on_startstop_type&& f);
@@ -91,7 +91,7 @@ namespace hpx {
     ///
     /// \note This function can be called before the HPX runtime is initialized.
     ///
-    HPX_CXX_EXPORT HPX_CORE_EXPORT
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT
         threads::policies::callback_notifier::on_startstop_type
         register_thread_on_stop_func(
             threads::policies::callback_notifier::on_startstop_type&& f);
@@ -111,7 +111,7 @@ namespace hpx {
     ///
     /// \note This function can be called before the HPX runtime is initialized.
     ///
-    HPX_CXX_EXPORT HPX_CORE_EXPORT
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT
         threads::policies::callback_notifier::on_error_type
         register_thread_on_error_func(
             threads::policies::callback_notifier::on_error_type&& f);

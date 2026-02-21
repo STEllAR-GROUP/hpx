@@ -17,11 +17,11 @@ namespace hpx::util::plugin {
 
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename BasePlugin, typename Concrete,
+        HPX_CXX_CORE_EXPORT template <typename BasePlugin, typename Concrete,
             typename Base, typename Parameter>
         struct HPX_PLUGIN_EXPORT_API concrete_factory_item;
 
-        HPX_CXX_EXPORT template <typename BasePlugin, typename Concrete,
+        HPX_CXX_CORE_EXPORT template <typename BasePlugin, typename Concrete,
             typename Base, typename... Parameters>
         struct HPX_PLUGIN_EXPORT_API concrete_factory_item<BasePlugin, Concrete,
             Base, hpx::util::pack<Parameters...>> : public Base
@@ -36,7 +36,7 @@ namespace hpx::util::plugin {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename BasePlugin, typename Concrete>
+    HPX_CXX_CORE_EXPORT template <typename BasePlugin, typename Concrete>
     struct HPX_PLUGIN_EXPORT_API concrete_factory
       : detail::concrete_factory_item<BasePlugin, Concrete,
             abstract_factory<BasePlugin>, virtual_constructor_t<BasePlugin>>

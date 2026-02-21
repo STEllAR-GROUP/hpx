@@ -16,50 +16,50 @@
 namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename R, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename R, typename Enable = void>
     struct is_future_range : std::false_type
     {
     };
 
-    HPX_CXX_EXPORT template <typename R>
+    HPX_CXX_CORE_EXPORT template <typename R>
     struct is_future_range<R, std::enable_if_t<is_range_v<R>>>
       : is_future<typename range_traits<R>::value_type>
     {
     };
 
-    HPX_CXX_EXPORT template <typename R>
+    HPX_CXX_CORE_EXPORT template <typename R>
     using is_future_range_t = typename is_future_range<R>::type;
 
-    HPX_CXX_EXPORT template <typename R>
+    HPX_CXX_CORE_EXPORT template <typename R>
     inline constexpr bool is_future_range_v = is_future_range<R>::value;
 
-    HPX_CXX_EXPORT template <typename R, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename R, typename Enable = void>
     struct is_ref_wrapped_future_range : std::false_type
     {
     };
 
-    HPX_CXX_EXPORT template <typename R>
+    HPX_CXX_CORE_EXPORT template <typename R>
     struct is_ref_wrapped_future_range<::std::reference_wrapper<R>>
       : is_future_range<R>
     {
     };
 
-    HPX_CXX_EXPORT template <typename R>
+    HPX_CXX_CORE_EXPORT template <typename R>
     using is_ref_wrapped_future_range_t =
         typename is_ref_wrapped_future_range<R>::type;
 
-    HPX_CXX_EXPORT template <typename R>
+    HPX_CXX_CORE_EXPORT template <typename R>
     inline constexpr bool is_ref_wrapped_future_range_v =
         is_ref_wrapped_future_range<R>::value;
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename R,
+    HPX_CXX_CORE_EXPORT template <typename R,
         bool IsFutureRange = is_future_range<R>::value>
     struct future_range_traits
     {
     };
 
-    HPX_CXX_EXPORT template <typename R>
+    HPX_CXX_CORE_EXPORT template <typename R>
     struct future_range_traits<R, true>
     {
         using future_type = typename range_traits<R>::value_type;

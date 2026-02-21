@@ -141,11 +141,11 @@ namespace hpx { namespace lcos {
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/futures.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/preprocessor.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/modules/util.hpp>
-#include <hpx/naming_base/id_type.hpp>
 
 #include <cstddef>
 #include <type_traits>

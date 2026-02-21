@@ -13,7 +13,7 @@
 
 namespace hpx::components {
 
-    HPX_CXX_EXPORT struct HPX_CORE_EXPORT component_factory_base;
+    HPX_CXX_CORE_EXPORT struct HPX_CORE_EXPORT component_factory_base;
 }    // namespace hpx::components
 
 #endif

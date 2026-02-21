@@ -14,7 +14,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::parallel::util::detail {
 
-    HPX_CXX_EXPORT template <typename ExPolicy,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy,
         template <typename...> class Partitioner,
         template <typename...> class TaskPartitioner, typename Enable = void>
     struct select_partitioner
@@ -23,7 +23,7 @@ namespace hpx::parallel::util::detail {
         using apply = Partitioner<ExPolicy, Args...>;
     };
 
-    HPX_CXX_EXPORT template <typename ExPolicy,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy,
         template <typename...> class Partitioner,
         template <typename...> class TaskPartitioner>
     struct select_partitioner<ExPolicy, Partitioner, TaskPartitioner,

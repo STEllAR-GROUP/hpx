@@ -34,7 +34,7 @@ namespace hpx::lcos::local {
     /// diffused to each image. The constraint for the function (or lambda)
     /// given to the define_spmd_block function is to accept a spmd_block as
     /// first parameter.
-    HPX_CXX_EXPORT struct spmd_block
+    HPX_CXX_CORE_EXPORT struct spmd_block
     {
     private:
         using barrier_type = hpx::barrier<>;
@@ -140,7 +140,7 @@ namespace hpx::lcos::local {
 
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename F>
+        HPX_CXX_CORE_EXPORT template <typename F>
         struct spmd_block_helper
         {
         private:
@@ -167,7 +167,8 @@ namespace hpx::lcos::local {
     }    // namespace detail
 
     // Asynchronous version
-    HPX_CXX_EXPORT template <typename ExPolicy, typename F, typename... Args,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename F,
+        typename... Args,
         typename = std::enable_if_t<hpx::is_async_execution_policy_v<ExPolicy>>>
     decltype(auto) define_spmd_block(
         ExPolicy&& policy, std::size_t num_images, F&& f, Args&&... args)
@@ -207,7 +208,8 @@ namespace hpx::lcos::local {
     }
 
     // Synchronous version
-    HPX_CXX_EXPORT template <typename ExPolicy, typename F, typename... Args,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename F,
+        typename... Args,
         typename =
             std::enable_if_t<!hpx::is_async_execution_policy_v<ExPolicy>>>
     void define_spmd_block(
@@ -246,7 +248,7 @@ namespace hpx::lcos::local {
             hpx::util::counting_shape(num_images), HPX_FORWARD(Args, args)...);
     }
 
-    HPX_CXX_EXPORT template <typename F, typename... Args>
+    HPX_CXX_CORE_EXPORT template <typename F, typename... Args>
     void define_spmd_block(std::size_t num_images, F&& f, Args&&... args)
     {
         define_spmd_block(hpx::execution::par, num_images, HPX_FORWARD(F, f),
@@ -264,10 +266,11 @@ namespace hpx::parallel {
     /// diffused to each image. The constraint for the function (or lambda)
     /// given to the define_spmd_block function is to accept a spmd_block as
     /// first parameter.
-    HPX_CXX_EXPORT using spmd_block = hpx::lcos::local::spmd_block;
+    HPX_CXX_CORE_EXPORT using spmd_block = hpx::lcos::local::spmd_block;
 
     // Asynchronous version
-    HPX_CXX_EXPORT template <typename ExPolicy, typename F, typename... Args,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename F,
+        typename... Args,
         typename = std::enable_if_t<hpx::is_async_execution_policy_v<ExPolicy>>>
     decltype(auto) define_spmd_block(
         ExPolicy&& policy, std::size_t num_images, F&& f, Args&&... args)
@@ -278,7 +281,8 @@ namespace hpx::parallel {
     }
 
     // Synchronous version
-    HPX_CXX_EXPORT template <typename ExPolicy, typename F, typename... Args,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename F,
+        typename... Args,
         typename =
             std::enable_if_t<!hpx::is_async_execution_policy_v<ExPolicy>>>
     void define_spmd_block(
@@ -288,7 +292,7 @@ namespace hpx::parallel {
             num_images, HPX_FORWARD(F, f), HPX_FORWARD(Args, args)...);
     }
 
-    HPX_CXX_EXPORT template <typename F, typename... Args>
+    HPX_CXX_CORE_EXPORT template <typename F, typename... Args>
     void define_spmd_block(std::size_t num_images, F&& f, Args&&... args)
     {
         hpx::lcos::local::define_spmd_block(hpx::execution::par, num_images,

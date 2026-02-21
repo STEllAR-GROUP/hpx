@@ -275,7 +275,7 @@ namespace hpx { namespace ranges {
 
 namespace hpx::ranges {
 
-    HPX_CXX_EXPORT inline constexpr struct adjacent_find_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct adjacent_find_t final
       : hpx::detail::tag_parallel_algorithm<adjacent_find_t>
     {
     private:

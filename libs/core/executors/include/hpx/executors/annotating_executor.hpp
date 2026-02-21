@@ -24,7 +24,7 @@ namespace hpx::execution::experimental {
     ///////////////////////////////////////////////////////////////////////////
     /// An \a annotating_executor wraps any other executor and adds the
     /// capability to add annotations to the launched threads.
-    HPX_CXX_EXPORT template <executor_any BaseExecutor>
+    HPX_CXX_CORE_EXPORT template <executor_any BaseExecutor>
     struct annotating_executor
     {
         template <executor_any Executor>
@@ -202,7 +202,7 @@ namespace hpx::execution::experimental {
     };
 
     // support all properties exposed by the wrapped executor
-    HPX_CXX_EXPORT template <typename Tag, executor_any BaseExecutor,
+    HPX_CXX_CORE_EXPORT template <typename Tag, executor_any BaseExecutor,
         typename Property>
         requires(hpx::execution::experimental::is_scheduling_property_v<Tag>)
     auto tag_invoke(
@@ -214,7 +214,7 @@ namespace hpx::execution::experimental {
             tag(exec.get_executor(), HPX_FORWARD(Property, prop)));
     }
 
-    HPX_CXX_EXPORT template <typename Tag, typename BaseExecutor>
+    HPX_CXX_CORE_EXPORT template <typename Tag, typename BaseExecutor>
         requires(hpx::execution::experimental::is_scheduling_property_v<Tag>)
     auto tag_invoke(Tag tag, annotating_executor<BaseExecutor> const& exec)
         -> decltype(std::declval<Tag>()(std::declval<BaseExecutor>()))
@@ -224,11 +224,11 @@ namespace hpx::execution::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
 #if !defined(DOXYGEN)    // doxygen gets confused by the deduction guides
-    HPX_CXX_EXPORT template <typename BaseExecutor>
+    HPX_CXX_CORE_EXPORT template <typename BaseExecutor>
     explicit annotating_executor(BaseExecutor&& sched, std::string annotation)
         -> annotating_executor<std::decay_t<BaseExecutor>>;
 
-    HPX_CXX_EXPORT template <typename BaseExecutor>
+    HPX_CXX_CORE_EXPORT template <typename BaseExecutor>
     explicit annotating_executor(
         BaseExecutor&& sched, char const* annotation = nullptr)
         -> annotating_executor<std::decay_t<BaseExecutor>>;
@@ -242,7 +242,7 @@ namespace hpx::execution::experimental {
     // annotations. Those are wrapped into an annotating_executor if passed
     // to `with_annotation`.
     //
-    HPX_CXX_EXPORT template <executor_any Executor>
+    HPX_CXX_CORE_EXPORT template <executor_any Executor>
     constexpr auto tag_fallback_invoke(
         with_annotation_t, Executor&& exec, char const* annotation)
     {
@@ -250,7 +250,7 @@ namespace hpx::execution::experimental {
             HPX_FORWARD(Executor, exec), annotation);
     }
 
-    HPX_CXX_EXPORT template <executor_any Executor>
+    HPX_CXX_CORE_EXPORT template <executor_any Executor>
     auto tag_fallback_invoke(
         with_annotation_t, Executor&& exec, std::string annotation)
     {
@@ -265,42 +265,42 @@ namespace hpx::execution::experimental {
     // underlying (wrapped) executor.
 
     /// \cond NOINTERNAL
-    HPX_CXX_EXPORT template <typename BaseExecutor>
+    HPX_CXX_CORE_EXPORT template <typename BaseExecutor>
     struct is_one_way_executor<
         hpx::execution::experimental::annotating_executor<BaseExecutor>>
       : is_one_way_executor<BaseExecutor>
     {
     };
 
-    HPX_CXX_EXPORT template <typename BaseExecutor>
+    HPX_CXX_CORE_EXPORT template <typename BaseExecutor>
     struct is_never_blocking_one_way_executor<
         hpx::execution::experimental::annotating_executor<BaseExecutor>>
       : is_never_blocking_one_way_executor<BaseExecutor>
     {
     };
 
-    HPX_CXX_EXPORT template <typename BaseExecutor>
+    HPX_CXX_CORE_EXPORT template <typename BaseExecutor>
     struct is_bulk_one_way_executor<
         hpx::execution::experimental::annotating_executor<BaseExecutor>>
       : is_bulk_one_way_executor<BaseExecutor>
     {
     };
 
-    HPX_CXX_EXPORT template <typename BaseExecutor>
+    HPX_CXX_CORE_EXPORT template <typename BaseExecutor>
     struct is_two_way_executor<
         hpx::execution::experimental::annotating_executor<BaseExecutor>>
       : is_two_way_executor<BaseExecutor>
     {
     };
 
-    HPX_CXX_EXPORT template <typename BaseExecutor>
+    HPX_CXX_CORE_EXPORT template <typename BaseExecutor>
     struct is_bulk_two_way_executor<
         hpx::execution::experimental::annotating_executor<BaseExecutor>>
       : is_bulk_two_way_executor<BaseExecutor>
     {
     };
 
-    HPX_CXX_EXPORT template <typename BaseExecutor>
+    HPX_CXX_CORE_EXPORT template <typename BaseExecutor>
     struct is_scheduler_executor<
         hpx::execution::experimental::annotating_executor<BaseExecutor>>
       : is_scheduler_executor<BaseExecutor>

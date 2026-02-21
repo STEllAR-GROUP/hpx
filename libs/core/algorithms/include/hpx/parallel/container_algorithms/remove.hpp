@@ -489,7 +489,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::remove_if
-    HPX_CXX_EXPORT inline constexpr struct remove_if_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct remove_if_t final
       : hpx::detail::tag_parallel_algorithm<remove_if_t>
     {
     private:
@@ -611,7 +611,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::remove
-    HPX_CXX_EXPORT inline constexpr struct remove_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct remove_t final
       : hpx::detail::tag_parallel_algorithm<remove_t>
     {
     private:

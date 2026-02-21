@@ -309,29 +309,29 @@ namespace std {
 
 namespace hpx::variant_ns {
 
-  HPX_CXX_EXPORT struct in_place_t { explicit in_place_t() = default; };
+  HPX_CXX_CORE_EXPORT struct in_place_t { explicit in_place_t() = default; };
 
 #if !defined(HPX_HAVE_CXX17_COPY_ELISION)
-  HPX_CXX_EXPORT struct in_place_f_t { explicit in_place_f_t() = default; };
+  HPX_CXX_CORE_EXPORT struct in_place_f_t { explicit in_place_f_t() = default; };
 #endif
 
-  HPX_CXX_EXPORT template <std::size_t I>
+  HPX_CXX_CORE_EXPORT template <std::size_t I>
   struct in_place_index_t { explicit in_place_index_t() = default; };
 
-  HPX_CXX_EXPORT template <typename T>
+  HPX_CXX_CORE_EXPORT template <typename T>
   struct in_place_type_t { explicit in_place_type_t() = default; };
 
 #ifdef HPX_VARIANT_VARIABLE_TEMPLATES
-  HPX_CXX_EXPORT constexpr in_place_t in_place{};
+  HPX_CXX_CORE_EXPORT constexpr in_place_t in_place{};
 
 #if !defined(HPX_HAVE_CXX17_COPY_ELISION)
-  HPX_CXX_EXPORT constexpr in_place_f_t in_place_f{};
+  HPX_CXX_CORE_EXPORT constexpr in_place_f_t in_place_f{};
 #endif
 
-  HPX_CXX_EXPORT template <std::size_t I>
+  HPX_CXX_CORE_EXPORT template <std::size_t I>
     constexpr in_place_index_t<I> in_place_index{};
 
-  HPX_CXX_EXPORT template <typename T> constexpr in_place_type_t<T> in_place_type{};
+  HPX_CXX_CORE_EXPORT template <typename T> constexpr in_place_type_t<T> in_place_type{};
 #endif
 
 }
@@ -353,11 +353,11 @@ namespace hpx::variant_ns {
   noexcept(noexcept(__VA_ARGS__)) -> decltype(__VA_ARGS__) { return __VA_ARGS__; }
 
 namespace hpx::variant_ns::lib {
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct identity { using type = T; };
 
     inline namespace cpp14 {
-      HPX_CXX_EXPORT template <typename T, std::size_t N>
+      HPX_CXX_CORE_EXPORT template <typename T, std::size_t N>
       struct array {
         constexpr const T &operator[](std::size_t index) const {
           return data[index];
@@ -366,71 +366,71 @@ namespace hpx::variant_ns::lib {
         T data[N == 0 ? 1 : N];
       };
 
-      HPX_CXX_EXPORT template <typename T>
+      HPX_CXX_CORE_EXPORT template <typename T>
       using add_pointer_t = typename std::add_pointer<T>::type;
 
-      HPX_CXX_EXPORT template <typename... Ts>
+      HPX_CXX_CORE_EXPORT template <typename... Ts>
       using common_type_t = typename std::common_type<Ts...>::type;
 
-      HPX_CXX_EXPORT template <typename T>
+      HPX_CXX_CORE_EXPORT template <typename T>
       using decay_t = typename std::decay<T>::type;
 
-      HPX_CXX_EXPORT template <bool B, typename T = void>
+      HPX_CXX_CORE_EXPORT template <bool B, typename T = void>
       using enable_if_t = typename std::enable_if<B, T>::type;
 
-      HPX_CXX_EXPORT template <typename T>
+      HPX_CXX_CORE_EXPORT template <typename T>
       using remove_const_t = typename std::remove_const<T>::type;
 
-      HPX_CXX_EXPORT template <typename T>
+      HPX_CXX_CORE_EXPORT template <typename T>
       using remove_reference_t = typename std::remove_reference<T>::type;
 
-      HPX_CXX_EXPORT template <typename T>
+      HPX_CXX_CORE_EXPORT template <typename T>
       inline constexpr T &&forward(remove_reference_t<T> &t) noexcept {
         return static_cast<T &&>(t);
       }
 
-      HPX_CXX_EXPORT template <typename T>
+      HPX_CXX_CORE_EXPORT template <typename T>
       inline constexpr T &&forward(remove_reference_t<T> &&t) noexcept {
         static_assert(!std::is_lvalue_reference<T>::value,
                       "can not forward an rvalue as an lvalue");
         return static_cast<T &&>(t);
       }
 
-      HPX_CXX_EXPORT template <typename T>
+      HPX_CXX_CORE_EXPORT template <typename T>
       inline constexpr remove_reference_t<T> &&move(T &&t) noexcept {
         return static_cast<remove_reference_t<T> &&>(t);
       }
 
 #ifdef HPX_VARIANT_INTEGER_SEQUENCE
-      HPX_CXX_EXPORT using std::integer_sequence;
-      HPX_CXX_EXPORT using std::index_sequence;
-      HPX_CXX_EXPORT using std::make_index_sequence;
-      HPX_CXX_EXPORT using std::index_sequence_for;
+      HPX_CXX_CORE_EXPORT using std::integer_sequence;
+      HPX_CXX_CORE_EXPORT using std::index_sequence;
+      HPX_CXX_CORE_EXPORT using std::make_index_sequence;
+      HPX_CXX_CORE_EXPORT using std::index_sequence_for;
 #else
-      HPX_CXX_EXPORT template <typename T, T... Is>
+      HPX_CXX_CORE_EXPORT template <typename T, T... Is>
       struct integer_sequence {
         using value_type = T;
         static constexpr std::size_t size() noexcept { return sizeof...(Is); }
       };
 
-      HPX_CXX_EXPORT template <std::size_t... Is>
+      HPX_CXX_CORE_EXPORT template <std::size_t... Is>
       using index_sequence = integer_sequence<std::size_t, Is...>;
 
-      HPX_CXX_EXPORT template <typename Lhs, typename Rhs>
+      HPX_CXX_CORE_EXPORT template <typename Lhs, typename Rhs>
       struct make_index_sequence_concat;
 
-      HPX_CXX_EXPORT template <std::size_t... Lhs, std::size_t... Rhs>
+      HPX_CXX_CORE_EXPORT template <std::size_t... Lhs, std::size_t... Rhs>
       struct make_index_sequence_concat<index_sequence<Lhs...>,
                                         index_sequence<Rhs...>>
           : identity<index_sequence<Lhs..., (sizeof...(Lhs) + Rhs)...>> {};
 
-      HPX_CXX_EXPORT template <std::size_t N>
+      HPX_CXX_CORE_EXPORT template <std::size_t N>
       struct make_index_sequence_impl;
 
-      HPX_CXX_EXPORT template <std::size_t N>
+      HPX_CXX_CORE_EXPORT template <std::size_t N>
       using make_index_sequence = typename make_index_sequence_impl<N>::type;
 
-      HPX_CXX_EXPORT template <std::size_t N>
+      HPX_CXX_CORE_EXPORT template <std::size_t N>
       struct make_index_sequence_impl
           : make_index_sequence_concat<make_index_sequence<N / 2>,
                                        make_index_sequence<N - (N / 2)>> {};
@@ -441,15 +441,15 @@ namespace hpx::variant_ns::lib {
       template <>
       struct make_index_sequence_impl<1> : identity<index_sequence<0>> {};
 
-      HPX_CXX_EXPORT template <typename... Ts>
+      HPX_CXX_CORE_EXPORT template <typename... Ts>
       using index_sequence_for = make_index_sequence<sizeof...(Ts)>;
 #endif
 
       // <functional>
 #ifdef HPX_VARIANT_TRANSPARENT_OPERATORS
-      HPX_CXX_EXPORT using equal_to = std::equal_to<>;
+      HPX_CXX_CORE_EXPORT using equal_to = std::equal_to<>;
 #else
-      HPX_CXX_EXPORT struct equal_to {
+      HPX_CXX_CORE_EXPORT struct equal_to {
         template <typename Lhs, typename Rhs>
         inline constexpr auto operator()(Lhs &&lhs, Rhs &&rhs) const
           HPX_VARIANT_RETURN(lib::forward<Lhs>(lhs) == lib::forward<Rhs>(rhs))
@@ -457,9 +457,9 @@ namespace hpx::variant_ns::lib {
 #endif
 
 #ifdef HPX_VARIANT_TRANSPARENT_OPERATORS
-      HPX_CXX_EXPORT using not_equal_to = std::not_equal_to<>;
+      HPX_CXX_CORE_EXPORT using not_equal_to = std::not_equal_to<>;
 #else
-      HPX_CXX_EXPORT struct not_equal_to {
+      HPX_CXX_CORE_EXPORT struct not_equal_to {
         template <typename Lhs, typename Rhs>
         inline constexpr auto operator()(Lhs &&lhs, Rhs &&rhs) const
           HPX_VARIANT_RETURN(lib::forward<Lhs>(lhs) != lib::forward<Rhs>(rhs))
@@ -467,9 +467,9 @@ namespace hpx::variant_ns::lib {
 #endif
 
 #ifdef HPX_VARIANT_TRANSPARENT_OPERATORS
-      HPX_CXX_EXPORT using less = std::less<>;
+      HPX_CXX_CORE_EXPORT using less = std::less<>;
 #else
-      HPX_CXX_EXPORT struct less {
+      HPX_CXX_CORE_EXPORT struct less {
         template <typename Lhs, typename Rhs>
         inline constexpr auto operator()(Lhs &&lhs, Rhs &&rhs) const
           HPX_VARIANT_RETURN(lib::forward<Lhs>(lhs) < lib::forward<Rhs>(rhs))
@@ -477,9 +477,9 @@ namespace hpx::variant_ns::lib {
 #endif
 
 #ifdef HPX_VARIANT_TRANSPARENT_OPERATORS
-      HPX_CXX_EXPORT using greater = std::greater<>;
+      HPX_CXX_CORE_EXPORT using greater = std::greater<>;
 #else
-      HPX_CXX_EXPORT struct greater {
+      HPX_CXX_CORE_EXPORT struct greater {
         template <typename Lhs, typename Rhs>
         inline constexpr auto operator()(Lhs &&lhs, Rhs &&rhs) const
           HPX_VARIANT_RETURN(lib::forward<Lhs>(lhs) > lib::forward<Rhs>(rhs))
@@ -487,9 +487,9 @@ namespace hpx::variant_ns::lib {
 #endif
 
 #ifdef HPX_VARIANT_TRANSPARENT_OPERATORS
-      HPX_CXX_EXPORT using less_equal = std::less_equal<>;
+      HPX_CXX_CORE_EXPORT using less_equal = std::less_equal<>;
 #else
-      HPX_CXX_EXPORT struct less_equal {
+      HPX_CXX_CORE_EXPORT struct less_equal {
         template <typename Lhs, typename Rhs>
         inline constexpr auto operator()(Lhs &&lhs, Rhs &&rhs) const
           HPX_VARIANT_RETURN(lib::forward<Lhs>(lhs) <= lib::forward<Rhs>(rhs))
@@ -497,9 +497,9 @@ namespace hpx::variant_ns::lib {
 #endif
 
 #ifdef HPX_VARIANT_TRANSPARENT_OPERATORS
-      HPX_CXX_EXPORT using greater_equal = std::greater_equal<>;
+      HPX_CXX_CORE_EXPORT using greater_equal = std::greater_equal<>;
 #else
-      HPX_CXX_EXPORT struct greater_equal {
+      HPX_CXX_CORE_EXPORT struct greater_equal {
         template <typename Lhs, typename Rhs>
         inline constexpr auto operator()(Lhs &&lhs, Rhs &&rhs) const
           HPX_VARIANT_RETURN(lib::forward<Lhs>(lhs) >= lib::forward<Rhs>(rhs))
@@ -510,20 +510,20 @@ namespace hpx::variant_ns::lib {
     inline namespace cpp17 {
 
       // <type_traits>
-      HPX_CXX_EXPORT template <bool B>
+      HPX_CXX_CORE_EXPORT template <bool B>
       using bool_constant = std::integral_constant<bool, B>;
 
-      HPX_CXX_EXPORT template <typename...>
+      HPX_CXX_CORE_EXPORT template <typename...>
       struct voider : identity<void> {};
 
-      HPX_CXX_EXPORT template <typename... Ts>
+      HPX_CXX_CORE_EXPORT template <typename... Ts>
       using void_t = typename voider<Ts...>::type;
 
       namespace detail::swappable {
 
-          HPX_CXX_EXPORT using std::swap;
+          HPX_CXX_CORE_EXPORT using std::swap;
 
-          HPX_CXX_EXPORT template <typename T>
+          HPX_CXX_CORE_EXPORT template <typename T>
           struct is_swappable {
             private:
             template <typename U,
@@ -538,34 +538,34 @@ namespace hpx::variant_ns::lib {
             static constexpr bool value = decltype(test<T>(0))::value;
           };
 
-          HPX_CXX_EXPORT template <bool IsSwappable, typename T>
+          HPX_CXX_CORE_EXPORT template <bool IsSwappable, typename T>
           struct is_nothrow_swappable {
             static constexpr bool value =
                 noexcept(swap(std::declval<T &>(), std::declval<T &>()));
           };
 
-          HPX_CXX_EXPORT template <typename T>
+          HPX_CXX_CORE_EXPORT template <typename T>
           struct is_nothrow_swappable<false, T> : std::false_type {};
 
         }
 
-      HPX_CXX_EXPORT using detail::swappable::is_swappable;
+      HPX_CXX_CORE_EXPORT using detail::swappable::is_swappable;
 
-      HPX_CXX_EXPORT template <typename T>
+      HPX_CXX_CORE_EXPORT template <typename T>
       using is_nothrow_swappable =
           detail::swappable::is_nothrow_swappable<is_swappable<T>::value, T>;
 
       // <functional>
       namespace detail {
 
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         struct is_reference_wrapper : std::false_type {};
 
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         struct is_reference_wrapper<std::reference_wrapper<T>>
             : std::true_type {};
 
-        HPX_CXX_EXPORT template <bool, int>
+        HPX_CXX_CORE_EXPORT template <bool, int>
         struct Invoke;
 
         template <>
@@ -610,7 +610,7 @@ namespace hpx::variant_ns::lib {
               HPX_VARIANT_RETURN((*lib::forward<Arg>(arg)).*pmo)
         };
 
-        HPX_CXX_EXPORT template <typename R, typename T, typename Arg, typename... Args>
+        HPX_CXX_CORE_EXPORT template <typename R, typename T, typename Arg, typename... Args>
         inline constexpr auto invoke(R T::*f, Arg &&arg, Args &&... args)
           HPX_VARIANT_RETURN(
               Invoke<std::is_function<R>::value,
@@ -626,7 +626,7 @@ namespace hpx::variant_ns::lib {
 #pragma warning(push)
 #pragma warning(disable : 4100)
 #endif
-        HPX_CXX_EXPORT template <typename F, typename... Args>
+        HPX_CXX_CORE_EXPORT template <typename F, typename... Args>
         inline constexpr auto invoke(F &&f, Args &&... args)
           HPX_VARIANT_RETURN(lib::forward<F>(f)(lib::forward<Args>(args)...))
 #ifdef _MSC_VER
@@ -634,17 +634,17 @@ namespace hpx::variant_ns::lib {
 #endif
       }  // namespace detail
 
-      HPX_CXX_EXPORT template <typename F, typename... Args>
+      HPX_CXX_CORE_EXPORT template <typename F, typename... Args>
       inline constexpr auto invoke(F &&f, Args &&... args)
         HPX_VARIANT_RETURN(detail::invoke(lib::forward<F>(f),
                                     lib::forward<Args>(args)...))
 
       namespace detail {
 
-        HPX_CXX_EXPORT template <typename Void, typename, typename...>
+        HPX_CXX_CORE_EXPORT template <typename Void, typename, typename...>
         struct invoke_result {};
 
-        HPX_CXX_EXPORT template <typename F, typename... Args>
+        HPX_CXX_CORE_EXPORT template <typename F, typename... Args>
         struct invoke_result<void_t<decltype(lib::invoke(
                                  std::declval<F>(), std::declval<Args>()...))>,
                              F,
@@ -654,25 +654,25 @@ namespace hpx::variant_ns::lib {
 
       }  // namespace detail
 
-      HPX_CXX_EXPORT template <typename F, typename... Args>
+      HPX_CXX_CORE_EXPORT template <typename F, typename... Args>
       using invoke_result = detail::invoke_result<void, F, Args...>;
 
-      HPX_CXX_EXPORT template <typename F, typename... Args>
+      HPX_CXX_CORE_EXPORT template <typename F, typename... Args>
       using invoke_result_t = typename invoke_result<F, Args...>::type;
 
       namespace detail {
 
-        HPX_CXX_EXPORT template <typename Void, typename, typename...>
+        HPX_CXX_CORE_EXPORT template <typename Void, typename, typename...>
         struct is_invocable : std::false_type {};
 
-        HPX_CXX_EXPORT template <typename F, typename... Args>
+        HPX_CXX_CORE_EXPORT template <typename F, typename... Args>
         struct is_invocable<void_t<invoke_result_t<F, Args...>>, F, Args...>
             : std::true_type {};
 
-        HPX_CXX_EXPORT template <typename Void, typename, typename, typename...>
+        HPX_CXX_CORE_EXPORT template <typename Void, typename, typename, typename...>
         struct is_invocable_r : std::false_type {};
 
-        HPX_CXX_EXPORT template <typename R, typename F, typename... Args>
+        HPX_CXX_CORE_EXPORT template <typename R, typename F, typename... Args>
         struct is_invocable_r<void_t<invoke_result_t<F, Args...>>,
                               R,
                               F,
@@ -681,24 +681,24 @@ namespace hpx::variant_ns::lib {
 
       }  // namespace detail
 
-      HPX_CXX_EXPORT template <typename F, typename... Args>
+      HPX_CXX_CORE_EXPORT template <typename F, typename... Args>
       using is_invocable = detail::is_invocable<void, F, Args...>;
 
-      HPX_CXX_EXPORT template <typename R, typename F, typename... Args>
+      HPX_CXX_CORE_EXPORT template <typename R, typename F, typename... Args>
       using is_invocable_r = detail::is_invocable_r<void, R, F, Args...>;
 
       namespace detail {
 
-        HPX_CXX_EXPORT template <bool Invocable, typename F, typename... Args>
+        HPX_CXX_CORE_EXPORT template <bool Invocable, typename F, typename... Args>
         struct is_nothrow_invocable {
           static constexpr bool value =
               noexcept(lib::invoke(std::declval<F>(), std::declval<Args>()...));
         };
 
-        HPX_CXX_EXPORT template <typename F, typename... Args>
+        HPX_CXX_CORE_EXPORT template <typename F, typename... Args>
         struct is_nothrow_invocable<false, F, Args...> : std::false_type {};
 
-        HPX_CXX_EXPORT template <bool Invocable, typename R, typename F, typename... Args>
+        HPX_CXX_CORE_EXPORT template <bool Invocable, typename R, typename F, typename... Args>
         struct is_nothrow_invocable_r {
           private:
           inline static R impl() {
@@ -709,16 +709,16 @@ namespace hpx::variant_ns::lib {
           static constexpr bool value = noexcept(impl());
         };
 
-        HPX_CXX_EXPORT template <typename R, typename F, typename... Args>
+        HPX_CXX_CORE_EXPORT template <typename R, typename F, typename... Args>
         struct is_nothrow_invocable_r<false, R, F, Args...> : std::false_type {};
 
       }  // namespace detail
 
-      HPX_CXX_EXPORT template <typename F, typename... Args>
+      HPX_CXX_CORE_EXPORT template <typename F, typename... Args>
       using is_nothrow_invocable = detail::
           is_nothrow_invocable<is_invocable<F, Args...>::value, F, Args...>;
 
-      HPX_CXX_EXPORT template <typename R, typename F, typename... Args>
+      HPX_CXX_CORE_EXPORT template <typename R, typename F, typename... Args>
       using is_nothrow_invocable_r =
           detail::is_nothrow_invocable_r<is_invocable_r<R, F, Args...>::value,
                                          R,
@@ -727,7 +727,7 @@ namespace hpx::variant_ns::lib {
 
       // <memory>
 #ifdef HPX_VARIANT_BUILTIN_ADDRESSOF
-      HPX_CXX_EXPORT template <typename T>
+      HPX_CXX_CORE_EXPORT template <typename T>
       inline constexpr T *addressof(T &arg) noexcept {
         return __builtin_addressof(arg);
       }
@@ -736,12 +736,12 @@ namespace hpx::variant_ns::lib {
 
         namespace has_addressof_impl {
 
-          HPX_CXX_EXPORT struct fail;
+          HPX_CXX_CORE_EXPORT struct fail;
 
-          HPX_CXX_EXPORT template <typename T>
+          HPX_CXX_CORE_EXPORT template <typename T>
           inline fail operator&(T &&);
 
-          HPX_CXX_EXPORT template <typename T>
+          HPX_CXX_CORE_EXPORT template <typename T>
           inline static constexpr bool impl() {
             return (std::is_class<T>::value || std::is_union<T>::value) &&
                    !std::is_same<decltype(&std::declval<T &>()), fail>::value;
@@ -749,56 +749,56 @@ namespace hpx::variant_ns::lib {
 
         }  // namespace has_addressof_impl
 
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         using has_addressof = bool_constant<has_addressof_impl::impl<T>()>;
 
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         inline constexpr T *addressof(T &arg, std::true_type) noexcept {
           return std::addressof(arg);
         }
 
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         inline constexpr T *addressof(T &arg, std::false_type) noexcept {
           return &arg;
         }
 
       }  // namespace detail
 
-      HPX_CXX_EXPORT template <typename T>
+      HPX_CXX_CORE_EXPORT template <typename T>
       inline constexpr T *addressof(T &arg) noexcept {
         return detail::addressof(arg, detail::has_addressof<T>{});
       }
 #endif
 
-      HPX_CXX_EXPORT template <typename T>
+      HPX_CXX_CORE_EXPORT template <typename T>
       inline constexpr T *addressof(const T &&) = delete;
 
     }  // namespace cpp17
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct remove_all_extents : identity<T> {};
 
-    HPX_CXX_EXPORT template <typename T, std::size_t N>
+    HPX_CXX_CORE_EXPORT template <typename T, std::size_t N>
     struct remove_all_extents<array<T, N>> : remove_all_extents<T> {};
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     using remove_all_extents_t = typename remove_all_extents<T>::type;
 
-    HPX_CXX_EXPORT template <std::size_t N>
+    HPX_CXX_CORE_EXPORT template <std::size_t N>
     using size_constant = std::integral_constant<std::size_t, N>;
 
-    HPX_CXX_EXPORT template <std::size_t I, typename T>
+    HPX_CXX_CORE_EXPORT template <std::size_t I, typename T>
     struct indexed_type : size_constant<I> { using type = T; };
 
-    HPX_CXX_EXPORT template <bool... Bs>
+    HPX_CXX_CORE_EXPORT template <bool... Bs>
     using all = std::is_same<integer_sequence<bool, true, Bs...>,
                              integer_sequence<bool, Bs..., true>>;
 
 #ifdef HPX_VARIANT_TYPE_PACK_ELEMENT
-    HPX_CXX_EXPORT template <std::size_t I, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <std::size_t I, typename... Ts>
     using type_pack_element_t = __type_pack_element<I, Ts...>;
 #else
-    HPX_CXX_EXPORT template <std::size_t I, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <std::size_t I, typename... Ts>
     struct type_pack_element_impl {
       private:
       template <typename>
@@ -816,46 +816,46 @@ namespace hpx::variant_ns::lib {
       using type = decltype(impl(set<index_sequence_for<Ts...>>{}));
     };
 
-    HPX_CXX_EXPORT template <std::size_t I, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <std::size_t I, typename... Ts>
     using type_pack_element = typename type_pack_element_impl<I, Ts...>::type;
 
-    HPX_CXX_EXPORT template <std::size_t I, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <std::size_t I, typename... Ts>
     using type_pack_element_t = typename type_pack_element<I, Ts...>::type;
 #endif
 
 #ifdef HPX_VARIANT_TRIVIALITY_TYPE_TRAITS
-    HPX_CXX_EXPORT using std::is_trivially_copy_constructible;
-    HPX_CXX_EXPORT using std::is_trivially_move_constructible;
-    HPX_CXX_EXPORT using std::is_trivially_copy_assignable;
-    HPX_CXX_EXPORT using std::is_trivially_move_assignable;
+    HPX_CXX_CORE_EXPORT using std::is_trivially_copy_constructible;
+    HPX_CXX_CORE_EXPORT using std::is_trivially_move_constructible;
+    HPX_CXX_CORE_EXPORT using std::is_trivially_copy_assignable;
+    HPX_CXX_CORE_EXPORT using std::is_trivially_move_assignable;
 #else
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct is_trivially_copy_constructible
         : bool_constant<
               std::is_copy_constructible<T>::value && __has_trivial_copy(T)> {};
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct is_trivially_move_constructible : bool_constant<__is_trivial(T)> {};
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct is_trivially_copy_assignable
         : bool_constant<
               std::is_copy_assignable<T>::value && __has_trivial_assign(T)> {};
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct is_trivially_move_assignable : bool_constant<__is_trivial(T)> {};
 #endif
 
-    HPX_CXX_EXPORT template <typename T, bool>
+    HPX_CXX_CORE_EXPORT template <typename T, bool>
     struct dependent_type : T {};
 
-    HPX_CXX_EXPORT template <typename Is, std::size_t J>
+    HPX_CXX_CORE_EXPORT template <typename Is, std::size_t J>
     struct push_back;
 
-    HPX_CXX_EXPORT template <typename Is, std::size_t J>
+    HPX_CXX_CORE_EXPORT template <typename Is, std::size_t J>
     using push_back_t = typename push_back<Is, J>::type;
 
-    HPX_CXX_EXPORT template <std::size_t... Is, std::size_t J>
+    HPX_CXX_CORE_EXPORT template <std::size_t... Is, std::size_t J>
     struct push_back<index_sequence<Is...>, J> {
       using type = index_sequence<Is..., J>;
     };
@@ -897,12 +897,12 @@ namespace hpx::variant_ns {
 
 #endif
 
-  HPX_CXX_EXPORT class bad_variant_access : public std::exception {
+  HPX_CXX_CORE_EXPORT class bad_variant_access : public std::exception {
     public:
     virtual const char *what() const noexcept override { return "bad_variant_access"; }
   };
 
-  HPX_CXX_EXPORT [[noreturn]] inline void throw_bad_variant_access() {
+  HPX_CXX_CORE_EXPORT [[noreturn]] inline void throw_bad_variant_access() {
 #ifdef HPX_VARIANT_EXCEPTIONS
     throw bad_variant_access{};
 #else
@@ -911,63 +911,63 @@ namespace hpx::variant_ns {
 #endif
   }
 
-  HPX_CXX_EXPORT template <typename... Ts>
+  HPX_CXX_CORE_EXPORT template <typename... Ts>
   class variant;
 
-  HPX_CXX_EXPORT template <typename T>
+  HPX_CXX_CORE_EXPORT template <typename T>
   struct variant_size;
 
 #ifdef HPX_VARIANT_VARIABLE_TEMPLATES
-  HPX_CXX_EXPORT template <typename T>
+  HPX_CXX_CORE_EXPORT template <typename T>
   constexpr std::size_t variant_size_v = variant_size<T>::value;
 #endif
 
-  HPX_CXX_EXPORT template <typename T>
+  HPX_CXX_CORE_EXPORT template <typename T>
   struct variant_size<const T> : variant_size<T> {};
 
-  HPX_CXX_EXPORT template <typename T>
+  HPX_CXX_CORE_EXPORT template <typename T>
   struct variant_size<volatile T> : variant_size<T> {};
 
-  HPX_CXX_EXPORT template <typename T>
+  HPX_CXX_CORE_EXPORT template <typename T>
   struct variant_size<const volatile T> : variant_size<T> {};
 
-  HPX_CXX_EXPORT template <typename... Ts>
+  HPX_CXX_CORE_EXPORT template <typename... Ts>
   struct variant_size<variant<Ts...>> : lib::size_constant<sizeof...(Ts)> {};
 
-  HPX_CXX_EXPORT template <std::size_t I, typename T>
+  HPX_CXX_CORE_EXPORT template <std::size_t I, typename T>
   struct variant_alternative;
 
-  HPX_CXX_EXPORT template <std::size_t I, typename T>
+  HPX_CXX_CORE_EXPORT template <std::size_t I, typename T>
   using variant_alternative_t = typename variant_alternative<I, T>::type;
 
-  HPX_CXX_EXPORT template <std::size_t I, typename T>
+  HPX_CXX_CORE_EXPORT template <std::size_t I, typename T>
   struct variant_alternative<I, const T>
       : std::add_const<variant_alternative_t<I, T>> {};
 
-  HPX_CXX_EXPORT template <std::size_t I, typename T>
+  HPX_CXX_CORE_EXPORT template <std::size_t I, typename T>
   struct variant_alternative<I, volatile T>
       : std::add_volatile<variant_alternative_t<I, T>> {};
 
-  HPX_CXX_EXPORT template <std::size_t I, typename T>
+  HPX_CXX_CORE_EXPORT template <std::size_t I, typename T>
   struct variant_alternative<I, const volatile T>
       : std::add_cv<variant_alternative_t<I, T>> {};
 
-  HPX_CXX_EXPORT template <std::size_t I, typename... Ts>
+  HPX_CXX_CORE_EXPORT template <std::size_t I, typename... Ts>
   struct variant_alternative<I, variant<Ts...>> {
     static_assert(I < sizeof...(Ts),
                   "index out of bounds in `std::variant_alternative<>`");
     using type = lib::type_pack_element_t<I, Ts...>;
   };
 
-  HPX_CXX_EXPORT constexpr std::size_t variant_npos = static_cast<std::size_t>(-1);
+  HPX_CXX_CORE_EXPORT constexpr std::size_t variant_npos = static_cast<std::size_t>(-1);
 
   namespace detail {
 
-    HPX_CXX_EXPORT constexpr std::size_t not_found = static_cast<std::size_t>(-1);
-    HPX_CXX_EXPORT constexpr std::size_t ambiguous = static_cast<std::size_t>(-2);
+    HPX_CXX_CORE_EXPORT constexpr std::size_t not_found = static_cast<std::size_t>(-1);
+    HPX_CXX_CORE_EXPORT constexpr std::size_t ambiguous = static_cast<std::size_t>(-2);
 
 #ifdef HPX_VARIANT_CPP14_CONSTEXPR
-    HPX_CXX_EXPORT template <typename T, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename T, typename... Ts>
     inline constexpr std::size_t find_index() {
       constexpr lib::array<bool, sizeof...(Ts)> matches = {
           {std::is_same<T, Ts>::value...}
@@ -984,12 +984,12 @@ namespace hpx::variant_ns {
       return result;
     }
 #else
-    HPX_CXX_EXPORT inline constexpr std::size_t find_index_impl(std::size_t result,
+    HPX_CXX_CORE_EXPORT inline constexpr std::size_t find_index_impl(std::size_t result,
                                                  std::size_t) {
       return result;
     }
 
-    HPX_CXX_EXPORT template <typename... Bs>
+    HPX_CXX_CORE_EXPORT template <typename... Bs>
     inline constexpr std::size_t find_index_impl(std::size_t result,
                                                  std::size_t idx,
                                                  bool b,
@@ -999,34 +999,34 @@ namespace hpx::variant_ns {
                : find_index_impl(result, idx + 1, bs...);
     }
 
-    HPX_CXX_EXPORT template <typename T, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename T, typename... Ts>
     inline constexpr std::size_t find_index() {
       return find_index_impl(not_found, 0, std::is_same<T, Ts>::value...);
     }
 #endif
 
-    HPX_CXX_EXPORT template <std::size_t I>
+    HPX_CXX_CORE_EXPORT template <std::size_t I>
     using find_index_sfinae_impl =
         lib::enable_if_t<I != not_found && I != ambiguous,
                          lib::size_constant<I>>;
 
-    HPX_CXX_EXPORT template <typename T, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename T, typename... Ts>
     using find_index_sfinae = find_index_sfinae_impl<find_index<T, Ts...>()>;
 
-    HPX_CXX_EXPORT template <std::size_t I>
+    HPX_CXX_CORE_EXPORT template <std::size_t I>
     struct find_index_checked_impl : lib::size_constant<I> {
       static_assert(I != not_found, "the specified type is not found.");
       static_assert(I != ambiguous, "the specified type is ambiguous.");
     };
 
-    HPX_CXX_EXPORT template <typename T, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename T, typename... Ts>
     using find_index_checked = find_index_checked_impl<find_index<T, Ts...>()>;
 
-    HPX_CXX_EXPORT struct valueless_t {};
+    HPX_CXX_CORE_EXPORT struct valueless_t {};
 
-    HPX_CXX_EXPORT enum class Trait { TriviallyAvailable, Available, Unavailable };
+    HPX_CXX_CORE_EXPORT enum class Trait { TriviallyAvailable, Available, Unavailable };
 
-    HPX_CXX_EXPORT template <typename T,
+    HPX_CXX_CORE_EXPORT template <typename T,
               template <typename> class IsTriviallyAvailable,
               template <typename> class IsAvailable>
     inline constexpr Trait trait() {
@@ -1037,7 +1037,7 @@ namespace hpx::variant_ns {
     }
 
 #ifdef HPX_VARIANT_CPP14_CONSTEXPR
-    HPX_CXX_EXPORT template <typename... Traits>
+    HPX_CXX_CORE_EXPORT template <typename... Traits>
     inline constexpr Trait common_trait(Traits... traits_) {
       Trait result = Trait::TriviallyAvailable;
       lib::array<Trait, sizeof...(Traits)> traits = {{traits_...}};
@@ -1050,9 +1050,9 @@ namespace hpx::variant_ns {
       return result;
     }
 #else
-    HPX_CXX_EXPORT inline constexpr Trait common_trait_impl(Trait result) { return result; }
+    HPX_CXX_CORE_EXPORT inline constexpr Trait common_trait_impl(Trait result) { return result; }
 
-    HPX_CXX_EXPORT template <typename... Traits>
+    HPX_CXX_CORE_EXPORT template <typename... Traits>
     inline constexpr Trait common_trait_impl(Trait result,
                                              Trait t,
                                              Traits... ts) {
@@ -1061,13 +1061,13 @@ namespace hpx::variant_ns {
                  : common_trait_impl(result, ts...);
     }
 
-    HPX_CXX_EXPORT template <typename... Traits>
+    HPX_CXX_CORE_EXPORT template <typename... Traits>
     inline constexpr Trait common_trait(Traits... ts) {
       return common_trait_impl(Trait::TriviallyAvailable, ts...);
     }
 #endif
 
-    HPX_CXX_EXPORT template <typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename... Ts>
     struct traits {
       static constexpr Trait copy_constructible_trait =
           common_trait(trait<Ts,
@@ -1099,7 +1099,7 @@ namespace hpx::variant_ns {
 
     namespace access {
 
-      HPX_CXX_EXPORT struct recursive_union {
+      HPX_CXX_CORE_EXPORT struct recursive_union {
 #ifdef HPX_VARIANT_RETURN_TYPE_DEDUCTION
         template <typename V>
         inline static constexpr auto &&get_alt(V &&v, in_place_index_t<0>) {
@@ -1131,7 +1131,7 @@ namespace hpx::variant_ns {
 #endif
       };
 
-      HPX_CXX_EXPORT struct base {
+      HPX_CXX_CORE_EXPORT struct base {
         template <std::size_t I, typename V>
         inline static constexpr AUTO_REFREF get_alt(V &&v)
 #ifdef _MSC_VER
@@ -1143,7 +1143,7 @@ namespace hpx::variant_ns {
 #endif
       };
 
-      HPX_CXX_EXPORT struct variant {
+      HPX_CXX_CORE_EXPORT struct variant {
         template <std::size_t I, typename V>
         inline static constexpr AUTO_REFREF get_alt(V &&v)
           AUTO_REFREF_RETURN(base::get_alt<I>(lib::forward<V>(v).impl_))
@@ -1157,7 +1157,7 @@ namespace hpx::variant_ns {
 #define HPX_VARIANT_VARIANT_SWITCH_VISIT
 #endif
 
-      HPX_CXX_EXPORT struct base {
+      HPX_CXX_CORE_EXPORT struct base {
         template <typename Visitor, typename... Vs>
         using dispatch_result_t = decltype(
             lib::invoke(std::declval<Visitor>(),
@@ -1467,32 +1467,32 @@ namespace hpx::variant_ns {
 
 #if !defined(HPX_VARIANT_VARIANT_SWITCH_VISIT) && \
     (!defined(_MSC_VER) || _MSC_VER >= 1910)
-      HPX_CXX_EXPORT template <typename F, typename... Vs>
+      HPX_CXX_CORE_EXPORT template <typename F, typename... Vs>
       using fmatrix_t = decltype(base::make_fmatrix<F, Vs...>());
 
-      HPX_CXX_EXPORT template <typename F, typename... Vs>
+      HPX_CXX_CORE_EXPORT template <typename F, typename... Vs>
       struct fmatrix {
         static constexpr fmatrix_t<F, Vs...> value =
             base::make_fmatrix<F, Vs...>();
       };
 
-      HPX_CXX_EXPORT template <typename F, typename... Vs>
+      HPX_CXX_CORE_EXPORT template <typename F, typename... Vs>
       constexpr fmatrix_t<F, Vs...> fmatrix<F, Vs...>::value;
 
-      HPX_CXX_EXPORT template <typename F, typename... Vs>
+      HPX_CXX_CORE_EXPORT template <typename F, typename... Vs>
       using fdiagonal_t = decltype(base::make_fdiagonal<F, Vs...>());
 
-      HPX_CXX_EXPORT template <typename F, typename... Vs>
+      HPX_CXX_CORE_EXPORT template <typename F, typename... Vs>
       struct fdiagonal {
         static constexpr fdiagonal_t<F, Vs...> value =
             base::make_fdiagonal<F, Vs...>();
       };
 
-      HPX_CXX_EXPORT template <typename F, typename... Vs>
+      HPX_CXX_CORE_EXPORT template <typename F, typename... Vs>
       constexpr fdiagonal_t<F, Vs...> fdiagonal<F, Vs...>::value;
 #endif
 
-      HPX_CXX_EXPORT struct alt {
+      HPX_CXX_CORE_EXPORT struct alt {
         template <typename Visitor, typename... Vs>
         inline static constexpr DECLTYPE_AUTO visit_alt(Visitor &&visitor,
                                                         Vs &&... vs)
@@ -1548,7 +1548,7 @@ namespace hpx::variant_ns {
 #endif
       };
 
-      HPX_CXX_EXPORT struct variant {
+      HPX_CXX_CORE_EXPORT struct variant {
         private:
         template <typename Visitor>
         struct visitor {
@@ -1622,7 +1622,7 @@ namespace hpx::variant_ns {
 
     }  // namespace visitation
 
-    HPX_CXX_EXPORT template <std::size_t Index, typename T>
+    HPX_CXX_CORE_EXPORT template <std::size_t Index, typename T>
     struct alt {
       using value_type = T;
 
@@ -1646,14 +1646,14 @@ namespace hpx::variant_ns {
       T value;
     };
 
-    HPX_CXX_EXPORT template <Trait DestructibleTrait, std::size_t Index, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <Trait DestructibleTrait, std::size_t Index, typename... Ts>
     union recursive_union;
 
-    HPX_CXX_EXPORT template <Trait DestructibleTrait, std::size_t Index>
+    HPX_CXX_CORE_EXPORT template <Trait DestructibleTrait, std::size_t Index>
     union recursive_union<DestructibleTrait, Index> {};
 
 #define HPX_VARIANT_VARIANT_RECURSIVE_UNION(destructible_trait, destructor)      \
-  HPX_CXX_EXPORT template <std::size_t Index, typename T, typename... Ts>        \
+  HPX_CXX_CORE_EXPORT template <std::size_t Index, typename T, typename... Ts>        \
   union recursive_union<destructible_trait, Index, T, Ts...> {             \
     public:                                                                \
     inline explicit constexpr recursive_union(valueless_t) noexcept        \
@@ -1694,9 +1694,9 @@ namespace hpx::variant_ns {
 
 #undef HPX_VARIANT_VARIANT_RECURSIVE_UNION
 
-    HPX_CXX_EXPORT using index_t = unsigned int;
+    HPX_CXX_CORE_EXPORT using index_t = unsigned int;
 
-    HPX_CXX_EXPORT template <Trait DestructibleTrait, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <Trait DestructibleTrait, typename... Ts>
     class base {
       public:
       inline explicit constexpr base(valueless_t tag) noexcept
@@ -1738,7 +1738,7 @@ namespace hpx::variant_ns {
       friend struct visitation::base;
     };
 
-    HPX_CXX_EXPORT struct dtor {
+    HPX_CXX_CORE_EXPORT struct dtor {
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4100)
@@ -1754,16 +1754,16 @@ namespace hpx::variant_ns {
 #define HPX_VARIANT_INHERITING_CTOR(type, base) using base::base;
 #else
 #define HPX_VARIANT_INHERITING_CTOR(type, base)         \
-  HPX_CXX_EXPORT template <typename... Args>            \
+  HPX_CXX_CORE_EXPORT template <typename... Args>            \
   inline explicit constexpr type(Args &&... args) \
       : base(lib::forward<Args>(args)...) {}
 #endif
 
-    HPX_CXX_EXPORT template <typename Traits, Trait = Traits::destructible_trait>
+    HPX_CXX_CORE_EXPORT template <typename Traits, Trait = Traits::destructible_trait>
     class destructor;
 
 #define HPX_VARIANT_VARIANT_DESTRUCTOR(destructible_trait, definition, destroy) \
-  HPX_CXX_EXPORT template <typename... Ts>                                \
+  HPX_CXX_CORE_EXPORT template <typename... Ts>                                \
   class destructor<traits<Ts...>, destructible_trait>                     \
       : public base<destructible_trait, Ts...> {                          \
     using super = base<destructible_trait, Ts...>;                        \
@@ -1806,7 +1806,7 @@ namespace hpx::variant_ns {
 
 #undef HPX_VARIANT_VARIANT_DESTRUCTOR
 
-    HPX_CXX_EXPORT template <typename Traits>
+    HPX_CXX_CORE_EXPORT template <typename Traits>
     class constructor : public destructor<Traits> {
       using super = destructor<Traits>;
 
@@ -1863,11 +1863,11 @@ namespace hpx::variant_ns {
       }
     };
 
-    HPX_CXX_EXPORT template <typename Traits, Trait = Traits::move_constructible_trait>
+    HPX_CXX_CORE_EXPORT template <typename Traits, Trait = Traits::move_constructible_trait>
     class move_constructor;
 
 #define HPX_VARIANT_VARIANT_MOVE_CONSTRUCTOR(move_constructible_trait, definition) \
-  HPX_CXX_EXPORT template <typename... Ts>                                   \
+  HPX_CXX_CORE_EXPORT template <typename... Ts>                                   \
   class move_constructor<traits<Ts...>, move_constructible_trait>            \
       : public constructor<traits<Ts...>> {                                  \
     using super = constructor<traits<Ts...>>;                                \
@@ -1901,11 +1901,11 @@ namespace hpx::variant_ns {
 
 #undef HPX_VARIANT_VARIANT_MOVE_CONSTRUCTOR
 
-    HPX_CXX_EXPORT template <typename Traits, Trait = Traits::copy_constructible_trait>
+    HPX_CXX_CORE_EXPORT template <typename Traits, Trait = Traits::copy_constructible_trait>
     class copy_constructor;
 
 #define HPX_VARIANT_VARIANT_COPY_CONSTRUCTOR(copy_constructible_trait, definition) \
-  HPX_CXX_EXPORT template <typename... Ts>                                   \
+  HPX_CXX_CORE_EXPORT template <typename... Ts>                                   \
   class copy_constructor<traits<Ts...>, copy_constructible_trait>            \
       : public move_constructor<traits<Ts...>> {                             \
     using super = move_constructor<traits<Ts...>>;                           \
@@ -1938,7 +1938,7 @@ namespace hpx::variant_ns {
 
 #undef HPX_VARIANT_VARIANT_COPY_CONSTRUCTOR
 
-    HPX_CXX_EXPORT template <typename Traits>
+    HPX_CXX_CORE_EXPORT template <typename Traits>
     class assignment : public copy_constructor<Traits> {
       using super = copy_constructor<Traits>;
 
@@ -2034,11 +2034,11 @@ namespace hpx::variant_ns {
       }
     };
 
-    HPX_CXX_EXPORT template <typename Traits, Trait = Traits::move_assignable_trait>
+    HPX_CXX_CORE_EXPORT template <typename Traits, Trait = Traits::move_assignable_trait>
     class move_assignment;
 
 #define HPX_VARIANT_VARIANT_MOVE_ASSIGNMENT(move_assignable_trait, definition) \
-  HPX_CXX_EXPORT template <typename... Ts>                               \
+  HPX_CXX_CORE_EXPORT template <typename... Ts>                               \
   class move_assignment<traits<Ts...>, move_assignable_trait>            \
       : public assignment<traits<Ts...>> {                               \
     using super = assignment<traits<Ts...>>;                             \
@@ -2074,11 +2074,11 @@ namespace hpx::variant_ns {
 
 #undef HPX_VARIANT_VARIANT_MOVE_ASSIGNMENT
 
-    HPX_CXX_EXPORT template <typename Traits, Trait = Traits::copy_assignable_trait>
+    HPX_CXX_CORE_EXPORT template <typename Traits, Trait = Traits::copy_assignable_trait>
     class copy_assignment;
 
 #define HPX_VARIANT_VARIANT_COPY_ASSIGNMENT(copy_assignable_trait, definition) \
-  HPX_CXX_EXPORT template <typename... Ts>                               \
+  HPX_CXX_CORE_EXPORT template <typename... Ts>                               \
   class copy_assignment<traits<Ts...>, copy_assignable_trait>            \
       : public move_assignment<traits<Ts...>> {                          \
     using super = move_assignment<traits<Ts...>>;                        \
@@ -2111,7 +2111,7 @@ namespace hpx::variant_ns {
 
 #undef HPX_VARIANT_VARIANT_COPY_ASSIGNMENT
 
-    HPX_CXX_EXPORT template <typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename... Ts>
     class impl : public copy_assignment<traits<Ts...>> {
       using super = copy_assignment<traits<Ts...>>;
 
@@ -2189,13 +2189,13 @@ namespace hpx::variant_ns {
 
 #undef HPX_VARIANT_INHERITING_CTOR
 
-    HPX_CXX_EXPORT template <std::size_t I, typename T>
+    HPX_CXX_CORE_EXPORT template <std::size_t I, typename T>
     struct overload_leaf {
       using F = lib::size_constant<I> (*)(T);
       operator F() const { return nullptr; }
     };
 
-    HPX_CXX_EXPORT template <typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename... Ts>
     struct overload_impl {
       private:
       template <typename>
@@ -2208,27 +2208,27 @@ namespace hpx::variant_ns {
       using type = impl<lib::index_sequence_for<Ts...>>;
     };
 
-    HPX_CXX_EXPORT template <typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename... Ts>
     using overload = typename overload_impl<Ts...>::type;
 
-    HPX_CXX_EXPORT template <typename T, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename T, typename... Ts>
     using best_match = lib::invoke_result_t<overload<Ts...>, T &&>;
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct is_in_place_index : std::false_type {};
 
-    HPX_CXX_EXPORT template <std::size_t I>
+    HPX_CXX_CORE_EXPORT template <std::size_t I>
     struct is_in_place_index<in_place_index_t<I>> : std::true_type {};
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct is_in_place_type : std::false_type {};
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct is_in_place_type<in_place_type_t<T>> : std::true_type {};
 
   }  // detail
 
-  HPX_CXX_EXPORT template <typename... Ts>
+  HPX_CXX_CORE_EXPORT template <typename... Ts>
   class variant {
     static_assert(0 < sizeof...(Ts),
                   "variant must consist of at least one alternative.");
@@ -2430,18 +2430,18 @@ namespace hpx::variant_ns {
     friend struct detail::visitation::variant;
   };
 
-  HPX_CXX_EXPORT template <std::size_t I, typename... Ts>
+  HPX_CXX_CORE_EXPORT template <std::size_t I, typename... Ts>
   inline constexpr bool holds_alternative(const variant<Ts...> &v) noexcept {
     return v.index() == I;
   }
 
-  HPX_CXX_EXPORT template <typename T, typename... Ts>
+  HPX_CXX_CORE_EXPORT template <typename T, typename... Ts>
   inline constexpr bool holds_alternative(const variant<Ts...> &v) noexcept {
     return holds_alternative<detail::find_index_checked<T, Ts...>::value>(v);
   }
 
   namespace detail {
-    HPX_CXX_EXPORT template <std::size_t I, typename V>
+    HPX_CXX_CORE_EXPORT template <std::size_t I, typename V>
     struct generic_get_impl {
       constexpr generic_get_impl(int) noexcept {}
 
@@ -2450,60 +2450,60 @@ namespace hpx::variant_ns {
             access::variant::get_alt<I>(lib::forward<V>(v)).value)
     };
 
-    HPX_CXX_EXPORT template <std::size_t I, typename V>
+    HPX_CXX_CORE_EXPORT template <std::size_t I, typename V>
     inline constexpr AUTO_REFREF generic_get(V &&v)
       AUTO_REFREF_RETURN(generic_get_impl<I, V>(
           holds_alternative<I>(v) ? 0 : (throw_bad_variant_access(), 0))(
           lib::forward<V>(v)))
   }  // namespace detail
 
-  HPX_CXX_EXPORT template <std::size_t I, typename... Ts>
+  HPX_CXX_CORE_EXPORT template <std::size_t I, typename... Ts>
   inline constexpr variant_alternative_t<I, variant<Ts...>> &get(
       variant<Ts...> &v) {
     return detail::generic_get<I>(v);
   }
 
-  HPX_CXX_EXPORT template <std::size_t I, typename... Ts>
+  HPX_CXX_CORE_EXPORT template <std::size_t I, typename... Ts>
   inline constexpr variant_alternative_t<I, variant<Ts...>> &&get(
       variant<Ts...> &&v) {
     return detail::generic_get<I>(lib::move(v));
   }
 
-  HPX_CXX_EXPORT template <std::size_t I, typename... Ts>
+  HPX_CXX_CORE_EXPORT template <std::size_t I, typename... Ts>
   inline constexpr const variant_alternative_t<I, variant<Ts...>> &get(
       const variant<Ts...> &v) {
     return detail::generic_get<I>(v);
   }
 
-  HPX_CXX_EXPORT template <std::size_t I, typename... Ts>
+  HPX_CXX_CORE_EXPORT template <std::size_t I, typename... Ts>
   inline constexpr const variant_alternative_t<I, variant<Ts...>> &&get(
       const variant<Ts...> &&v) {
     return detail::generic_get<I>(lib::move(v));
   }
 
-  HPX_CXX_EXPORT template <typename T, typename... Ts>
+  HPX_CXX_CORE_EXPORT template <typename T, typename... Ts>
   inline constexpr T &get(variant<Ts...> &v) {
     return get<detail::find_index_checked<T, Ts...>::value>(v);
   }
 
-  HPX_CXX_EXPORT template <typename T, typename... Ts>
+  HPX_CXX_CORE_EXPORT template <typename T, typename... Ts>
   inline constexpr T &&get(variant<Ts...> &&v) {
     return get<detail::find_index_checked<T, Ts...>::value>(lib::move(v));
   }
 
-  HPX_CXX_EXPORT template <typename T, typename... Ts>
+  HPX_CXX_CORE_EXPORT template <typename T, typename... Ts>
   inline constexpr const T &get(const variant<Ts...> &v) {
     return get<detail::find_index_checked<T, Ts...>::value>(v);
   }
 
-  HPX_CXX_EXPORT template <typename T, typename... Ts>
+  HPX_CXX_CORE_EXPORT template <typename T, typename... Ts>
   inline constexpr const T &&get(const variant<Ts...> &&v) {
     return get<detail::find_index_checked<T, Ts...>::value>(lib::move(v));
   }
 
   namespace detail {
 
-    HPX_CXX_EXPORT template <std::size_t I, typename V>
+    HPX_CXX_CORE_EXPORT template <std::size_t I, typename V>
     inline constexpr /* auto * */ AUTO generic_get_if(V *v) noexcept
       AUTO_RETURN(v && holds_alternative<I>(*v)
                       ? lib::addressof(access::variant::get_alt<I>(*v).value)
@@ -2511,33 +2511,33 @@ namespace hpx::variant_ns {
 
   }  // namespace detail
 
-  HPX_CXX_EXPORT template <std::size_t I, typename... Ts>
+  HPX_CXX_CORE_EXPORT template <std::size_t I, typename... Ts>
   inline constexpr lib::add_pointer_t<variant_alternative_t<I, variant<Ts...>>>
   get_if(variant<Ts...> *v) noexcept {
     return detail::generic_get_if<I>(v);
   }
 
-  HPX_CXX_EXPORT template <std::size_t I, typename... Ts>
+  HPX_CXX_CORE_EXPORT template <std::size_t I, typename... Ts>
   inline constexpr lib::add_pointer_t<
       const variant_alternative_t<I, variant<Ts...>>>
   get_if(const variant<Ts...> *v) noexcept {
     return detail::generic_get_if<I>(v);
   }
 
-  HPX_CXX_EXPORT template <typename T, typename... Ts>
+  HPX_CXX_CORE_EXPORT template <typename T, typename... Ts>
   inline constexpr lib::add_pointer_t<T>
   get_if(variant<Ts...> *v) noexcept {
     return get_if<detail::find_index_checked<T, Ts...>::value>(v);
   }
 
-  HPX_CXX_EXPORT template <typename T, typename... Ts>
+  HPX_CXX_CORE_EXPORT template <typename T, typename... Ts>
   inline constexpr lib::add_pointer_t<const T>
   get_if(const variant<Ts...> *v) noexcept {
     return get_if<detail::find_index_checked<T, Ts...>::value>(v);
   }
 
   namespace detail {
-    HPX_CXX_EXPORT template <typename RelOp>
+    HPX_CXX_CORE_EXPORT template <typename RelOp>
     struct convert_to_bool {
       template <typename Lhs, typename Rhs>
       inline constexpr bool operator()(Lhs &&lhs, Rhs &&rhs) const {
@@ -2551,7 +2551,7 @@ namespace hpx::variant_ns {
     };
   }  // namespace detail
 
-  HPX_CXX_EXPORT template <typename... Ts>
+  HPX_CXX_CORE_EXPORT template <typename... Ts>
   inline constexpr bool operator==(const variant<Ts...> &lhs,
                                    const variant<Ts...> &rhs) {
     using detail::visitation::variant;
@@ -2567,7 +2567,7 @@ namespace hpx::variant_ns {
 #endif
   }
 
-  HPX_CXX_EXPORT template <typename... Ts>
+  HPX_CXX_CORE_EXPORT template <typename... Ts>
   inline constexpr bool operator!=(const variant<Ts...> &lhs,
                                    const variant<Ts...> &rhs) {
     using detail::visitation::variant;
@@ -2583,7 +2583,7 @@ namespace hpx::variant_ns {
 #endif
   }
 
-  HPX_CXX_EXPORT template <typename... Ts>
+  HPX_CXX_CORE_EXPORT template <typename... Ts>
   inline constexpr bool operator<(const variant<Ts...> &lhs,
                                   const variant<Ts...> &rhs) {
     using detail::visitation::variant;
@@ -2602,7 +2602,7 @@ namespace hpx::variant_ns {
 #endif
   }
 
-  HPX_CXX_EXPORT template <typename... Ts>
+  HPX_CXX_CORE_EXPORT template <typename... Ts>
   inline constexpr bool operator>(const variant<Ts...> &lhs,
                                   const variant<Ts...> &rhs) {
     using detail::visitation::variant;
@@ -2621,7 +2621,7 @@ namespace hpx::variant_ns {
 #endif
   }
 
-  HPX_CXX_EXPORT template <typename... Ts>
+  HPX_CXX_CORE_EXPORT template <typename... Ts>
   inline constexpr bool operator<=(const variant<Ts...> &lhs,
                                    const variant<Ts...> &rhs) {
     using detail::visitation::variant;
@@ -2641,7 +2641,7 @@ namespace hpx::variant_ns {
 #endif
   }
 
-  HPX_CXX_EXPORT template <typename... Ts>
+  HPX_CXX_CORE_EXPORT template <typename... Ts>
   inline constexpr bool operator>=(const variant<Ts...> &lhs,
                                    const variant<Ts...> &rhs) {
     using detail::visitation::variant;
@@ -2662,36 +2662,36 @@ namespace hpx::variant_ns {
 #endif
   }
 
-  HPX_CXX_EXPORT struct monostate {};
+  HPX_CXX_CORE_EXPORT struct monostate {};
 
-  HPX_CXX_EXPORT inline constexpr bool operator<(monostate, monostate) noexcept {
+  HPX_CXX_CORE_EXPORT inline constexpr bool operator<(monostate, monostate) noexcept {
     return false;
   }
 
-  HPX_CXX_EXPORT inline constexpr bool operator>(monostate, monostate) noexcept {
+  HPX_CXX_CORE_EXPORT inline constexpr bool operator>(monostate, monostate) noexcept {
     return false;
   }
 
-  HPX_CXX_EXPORT inline constexpr bool operator<=(monostate, monostate) noexcept {
+  HPX_CXX_CORE_EXPORT inline constexpr bool operator<=(monostate, monostate) noexcept {
     return true;
   }
 
-  HPX_CXX_EXPORT inline constexpr bool operator>=(monostate, monostate) noexcept {
+  HPX_CXX_CORE_EXPORT inline constexpr bool operator>=(monostate, monostate) noexcept {
     return true;
   }
 
-  HPX_CXX_EXPORT inline constexpr bool operator==(monostate, monostate) noexcept {
+  HPX_CXX_CORE_EXPORT inline constexpr bool operator==(monostate, monostate) noexcept {
     return true;
   }
 
-  HPX_CXX_EXPORT inline constexpr bool operator!=(monostate, monostate) noexcept {
+  HPX_CXX_CORE_EXPORT inline constexpr bool operator!=(monostate, monostate) noexcept {
     return false;
   }
 
 #ifdef HPX_VARIANT_CPP14_CONSTEXPR
   namespace detail {
 
-    HPX_CXX_EXPORT inline constexpr bool all(std::initializer_list<bool> bs) {
+    HPX_CXX_CORE_EXPORT inline constexpr bool all(std::initializer_list<bool> bs) {
       for (bool b : bs) {
         if (!b) {
           return false;
@@ -2702,7 +2702,7 @@ namespace hpx::variant_ns {
 
   }  // namespace detail
 
-  HPX_CXX_EXPORT template <typename Visitor, typename... Vs>
+  HPX_CXX_CORE_EXPORT template <typename Visitor, typename... Vs>
   inline constexpr decltype(auto) visit(Visitor &&visitor, Vs &&... vs) {
     return (detail::all({!vs.valueless_by_exception()...})
                 ? (void)0
@@ -2713,20 +2713,20 @@ namespace hpx::variant_ns {
 #else
   namespace detail {
 
-    HPX_CXX_EXPORT template <std::size_t N>
+    HPX_CXX_CORE_EXPORT template <std::size_t N>
     inline constexpr bool all_impl(const lib::array<bool, N> &bs,
                                    std::size_t idx) {
       return idx >= N || (bs[idx] && all_impl(bs, idx + 1));
     }
 
-    HPX_CXX_EXPORT template <std::size_t N>
+    HPX_CXX_CORE_EXPORT template <std::size_t N>
     inline constexpr bool all(const lib::array<bool, N> &bs) {
       return all_impl(bs, 0);
     }
 
   }  // namespace detail
 
-  HPX_CXX_EXPORT template <typename Visitor, typename... Vs>
+  HPX_CXX_CORE_EXPORT template <typename Visitor, typename... Vs>
   inline constexpr DECLTYPE_AUTO visit(Visitor &&visitor, Vs &&... vs)
     DECLTYPE_AUTO_RETURN(
         (detail::all(
@@ -2737,7 +2737,7 @@ namespace hpx::variant_ns {
                                                  lib::forward<Vs>(vs)...))
 #endif
 
-  HPX_CXX_EXPORT template <typename... Ts>
+  HPX_CXX_CORE_EXPORT template <typename... Ts>
   inline auto swap(variant<Ts...> &lhs,
                    variant<Ts...> &rhs) noexcept(noexcept(lhs.swap(rhs)))
       -> decltype(lhs.swap(rhs)) {
@@ -2746,19 +2746,19 @@ namespace hpx::variant_ns {
 
   namespace detail {
 
-    HPX_CXX_EXPORT template <typename T, typename...>
+    HPX_CXX_CORE_EXPORT template <typename T, typename...>
     using enabled_type = T;
 
     namespace hash {
 
-      HPX_CXX_EXPORT template <typename H, typename K>
+      HPX_CXX_CORE_EXPORT template <typename H, typename K>
       constexpr bool meets_requirements() noexcept {
         return std::is_copy_constructible<H>::value &&
                std::is_move_constructible<H>::value &&
                lib::is_invocable_r<std::size_t, H, const K &>::value;
       }
 
-      HPX_CXX_EXPORT template <typename K>
+      HPX_CXX_CORE_EXPORT template <typename K>
       constexpr bool is_enabled() noexcept {
         using H = std::hash<K>;
         return meets_requirements<H, K>() &&

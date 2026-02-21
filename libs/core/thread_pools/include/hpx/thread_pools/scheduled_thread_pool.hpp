@@ -38,7 +38,7 @@ namespace hpx::threads::detail {
     struct init_tss_helper;
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Scheduler>
+    HPX_CXX_CORE_EXPORT template <typename Scheduler>
     class scheduled_thread_pool final : public hpx::threads::thread_pool_base
     {
     public:

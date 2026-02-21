@@ -16,23 +16,23 @@
 
 namespace hpx::local::detail {
 
-    HPX_CXX_EXPORT HPX_CORE_EXPORT int handle_late_commandline_options(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT int handle_late_commandline_options(
         util::runtime_configuration& ini,
         hpx::program_options::options_description const& options,
         void (*handle_print_bind)(std::size_t) = nullptr);
 
-    HPX_CXX_EXPORT HPX_CORE_EXPORT void set_unknown_commandline_options(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void set_unknown_commandline_options(
         util::runtime_configuration& ini,
         std::vector<std::string> const& still_unregistered_options);
 
-    HPX_CXX_EXPORT HPX_CORE_EXPORT bool handle_full_help(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT bool handle_full_help(
         util::runtime_configuration const& ini,
         hpx::program_options::options_description const& options);
-    HPX_CXX_EXPORT HPX_CORE_EXPORT bool handle_late_options(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT bool handle_late_options(
         util::runtime_configuration const& ini,
         hpx::program_options::variables_map const& vm,
         void (*handle_print_bind)(std::size_t) = nullptr);
 
-    HPX_CXX_EXPORT HPX_CORE_EXPORT std::string get_full_commandline(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT std::string get_full_commandline(
         util::runtime_configuration const& ini);
 }    // namespace hpx::local::detail

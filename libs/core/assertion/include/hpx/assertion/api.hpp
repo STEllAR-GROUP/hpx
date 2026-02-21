@@ -15,13 +15,13 @@
 namespace hpx::assertion {
 
     /// The signature for an assertion handler
-    HPX_CXX_EXPORT using assertion_handler =
+    HPX_CXX_CORE_EXPORT using assertion_handler =
         void (*)(hpx::source_location const& loc, char const* expr,
             std::string const& msg);
 
     /// Set the assertion handler to be used within a program. If the handler has been
     /// set already once, the call to this function will be ignored.
     /// \note This function is not thread safe
-    HPX_CXX_EXPORT HPX_CORE_EXPORT void set_assertion_handler(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void set_assertion_handler(
         assertion_handler handler);
 }    // namespace hpx::assertion

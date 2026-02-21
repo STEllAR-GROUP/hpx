@@ -22,7 +22,7 @@
 namespace hpx::threads {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     class thread_specific_ptr
     {
     private:

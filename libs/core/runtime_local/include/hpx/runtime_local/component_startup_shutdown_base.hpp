@@ -17,7 +17,7 @@ namespace hpx::components {
     ///////////////////////////////////////////////////////////////////////////
     /// The \a component_startup_shutdown_base has to be used as a base class
     /// for all component startup/shutdown registries.
-    HPX_CXX_EXPORT struct component_startup_shutdown_base
+    HPX_CXX_CORE_EXPORT struct component_startup_shutdown_base
     {
         virtual ~component_startup_shutdown_base() = default;
 

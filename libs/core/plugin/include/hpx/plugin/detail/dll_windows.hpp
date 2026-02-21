@@ -32,7 +32,7 @@ namespace hpx::util::plugin {
 
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         struct free_dll
         {
             explicit free_dll(HMODULE h) noexcept
@@ -50,7 +50,7 @@ namespace hpx::util::plugin {
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT class dll
+    HPX_CXX_CORE_EXPORT class dll
     {
     public:
         dll() = default;

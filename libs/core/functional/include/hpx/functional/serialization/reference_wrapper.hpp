@@ -12,7 +12,7 @@
 
 namespace hpx::serialization {
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
         requires(traits::needs_reference_semantics_v<T>)
     void serialize(input_archive& ar, hpx::reference_wrapper<T>& ref, unsigned)
     {
@@ -21,7 +21,7 @@ namespace hpx::serialization {
         ref = hpx::ref(HPX_MOVE(val));
     }
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
         requires(traits::needs_reference_semantics_v<T>)
     void serialize(output_archive& ar, hpx::reference_wrapper<T>& ref, unsigned)
     {

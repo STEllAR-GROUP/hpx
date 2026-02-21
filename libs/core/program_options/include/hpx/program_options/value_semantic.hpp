@@ -21,7 +21,7 @@ namespace hpx::program_options {
     /** Class which specifies how the option's value is to be parsed
         and converted into C++ types.
     */
-    HPX_CXX_EXPORT class HPX_CORE_EXPORT value_semantic
+    HPX_CXX_CORE_EXPORT class HPX_CORE_EXPORT value_semantic
     {
     public:
         /** Returns the name of the option. The name is only meaningful
@@ -71,7 +71,7 @@ namespace hpx::program_options {
     /** Helper class which perform necessary character conversions in the
         'parse' method and forwards the data further.
     */
-    HPX_CXX_EXPORT template <typename Char>
+    HPX_CXX_CORE_EXPORT template <typename Char>
     class value_semantic_codecvt_helper
     {
         // Nothing here. Specializations to follow.
@@ -121,7 +121,7 @@ namespace hpx::program_options {
 
     /** Class which specifies a simple handling of a value: the value will
         have string type and only one token is allowed. */
-    HPX_CXX_EXPORT class HPX_CORE_EXPORT untyped_value
+    HPX_CXX_CORE_EXPORT class HPX_CORE_EXPORT untyped_value
       : public value_semantic_codecvt_helper<char>
     {
     public:
@@ -172,7 +172,7 @@ namespace hpx::program_options {
         type can be dynamic_cast-ed to typed_value_base. If conversion
         succeeds, the 'type' method can be called.
     */
-    HPX_CXX_EXPORT class typed_value_base
+    HPX_CXX_CORE_EXPORT class typed_value_base
     {
     public:
         // Returns the type of the value described by this
@@ -184,7 +184,7 @@ namespace hpx::program_options {
     };
 
     /** Class which handles value of a specific type. */
-    HPX_CXX_EXPORT template <typename T, typename Char = char>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Char = char>
     class typed_value
       : public value_semantic_codecvt_helper<Char>
       , public typed_value_base
@@ -396,35 +396,35 @@ namespace hpx::program_options {
         The second overload is used when it's additionally desired to store the
         value of option into program variable.
     */
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     typed_value<T>* value();
 
     /** @overload
     */
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     typed_value<T>* value(T* v);
 
     /** Creates a typed_value<T> instance. This function is the primary
         method to create value_semantic instance for a specific type, which
         can later be passed to 'option_description' constructor.
     */
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     typed_value<T, wchar_t>* wvalue();
 
     /** @overload
     */
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     typed_value<T, wchar_t>* wvalue(T* v);
 
     /** Works the same way as the 'value<bool>' function, but the created
         value_semantic won't accept any explicit value. So, if the option
         is present on the command line, the value will be 'true'.
     */
-    HPX_CXX_EXPORT HPX_CORE_EXPORT typed_value<bool>* bool_switch();
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT typed_value<bool>* bool_switch();
 
     /** @overload
     */
-    HPX_CXX_EXPORT HPX_CORE_EXPORT typed_value<bool>* bool_switch(bool* v);
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT typed_value<bool>* bool_switch(bool* v);
 }    // namespace hpx::program_options
 
 #include <hpx/program_options/detail/value_semantic.hpp>

@@ -26,6 +26,7 @@ set(executors_headers
     hpx/executors/explicit_scheduler_executor.hpp
     hpx/executors/fork_join_executor.hpp
     hpx/executors/limiting_executor.hpp
+    hpx/executors/macros.hpp
     hpx/executors/parallel_executor_aggregated.hpp
     hpx/executors/parallel_executor.hpp
     hpx/executors/post.hpp
@@ -39,6 +40,8 @@ set(executors_headers
     hpx/executors/thread_pool_scheduler.hpp
     hpx/executors/thread_pool_scheduler_bulk.hpp
 )
+
+set(executors_macro_headers hpx/executors/macros.hpp)
 
 if(HPX_WITH_DATAPAR)
   set(executors_headers
@@ -101,6 +104,7 @@ add_hpx_module(
   GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${executors_sources}
   HEADERS ${executors_headers}
+  MACRO_HEADERS ${executors_macro_headers}
   COMPAT_HEADERS ${executors_compat_headers}
   MODULE_DEPENDENCIES
     hpx_allocator_support

@@ -29,7 +29,7 @@
 
 namespace hpx::parallel::execution::detail {
 
-    HPX_CXX_EXPORT class service_executor
+    HPX_CXX_CORE_EXPORT class service_executor
     {
     public:
         // Associate the parallel_execution_tag executor tag type as a default

@@ -14,7 +14,7 @@
 
 namespace hpx::detail {
 
-    HPX_CXX_EXPORT template <typename Block, typename Alloc>
+    HPX_CXX_CORE_EXPORT template <typename Block, typename Alloc>
     void serialize(hpx::serialization::output_archive& ar,
         dynamic_bitset<Block, Alloc> const& bs, unsigned)
     {
@@ -22,7 +22,7 @@ namespace hpx::detail {
         ar << bs.bits_;
     }
 
-    HPX_CXX_EXPORT template <typename Block, typename Alloc>
+    HPX_CXX_CORE_EXPORT template <typename Block, typename Alloc>
     void serialize(hpx::serialization::input_archive& ar,
         dynamic_bitset<Block, Alloc>& bs, unsigned)
     {

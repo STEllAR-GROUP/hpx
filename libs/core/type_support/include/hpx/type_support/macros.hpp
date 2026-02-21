@@ -9,7 +9,8 @@
 
 #include <hpx/config/export_definitions.hpp>
 
-#if !defined(HPX_COMPILE_WITH_MODULES) || defined(HPX_COMPILE_BMI)
+#if !defined(HPX_HAVE_CXX_MODULES) || defined(HPX_CORE_EXPORTS) ||             \
+    (defined(HPX_COMPILE_BMI) && defined(HPX_COMPILE_CORE_WITH_MODULES))
 #include <hpx/config.hpp>
 #include <hpx/type_support/assert_owns_lock.hpp>
 #include <hpx/type_support/is_trivially_relocatable.hpp>

@@ -27,8 +27,8 @@
 #include <hpx/actions_base/detail/action_factory.hpp>
 #include <hpx/actions_base/traits/action_continuation.hpp>
 #include <hpx/components_base/pinned_ptr.hpp>
-#include <hpx/naming_base/id_type.hpp>
-#include <hpx/parcelset_base/parcel_interface.hpp>
+#include <hpx/modules/naming_base.hpp>
+#include <hpx/modules/parcelset_base.hpp>
 
 #include <cstddef>
 #include <cstdint>

@@ -52,7 +52,7 @@ namespace hpx::program_options::detail {
          TODO: maybe, we should just accept a pointer to options_description
          class.
      */
-    class HPX_CORE_EXPORT common_config_file_iterator
+    HPX_CXX_CORE_EXPORT class HPX_CORE_EXPORT common_config_file_iterator
       : public eof_iterator<common_config_file_iterator, option>
     {
     public:
@@ -113,7 +113,7 @@ namespace hpx::program_options::detail {
         bool m_allow_unregistered;
     };
 
-    template <class Char>
+    HPX_CXX_CORE_EXPORT template <class Char>
     class basic_config_file_iterator : public common_config_file_iterator
     {
     public:
@@ -135,10 +135,12 @@ namespace hpx::program_options::detail {
         std::shared_ptr<std::basic_istream<Char>> is;
     };
 
-    using config_file_iterator = basic_config_file_iterator<char>;
-    using wconfig_file_iterator = basic_config_file_iterator<wchar_t>;
+    HPX_CXX_CORE_EXPORT using config_file_iterator =
+        basic_config_file_iterator<char>;
+    HPX_CXX_CORE_EXPORT using wconfig_file_iterator =
+        basic_config_file_iterator<wchar_t>;
 
-    struct null_deleter
+    HPX_CXX_CORE_EXPORT struct null_deleter
     {
         constexpr void operator()(void const*) const noexcept {}
     };

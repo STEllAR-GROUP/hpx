@@ -41,7 +41,7 @@
 
 namespace hpx::threads::coroutines::detail {
 
-    HPX_CXX_EXPORT class coroutine_self
+    HPX_CXX_CORE_EXPORT class coroutine_self
     {
     public:
         using thread_id_type = hpx::threads::thread_id;

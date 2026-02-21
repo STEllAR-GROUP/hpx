@@ -237,7 +237,6 @@ install(
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT runtime
-          ${_optional}
 )
 
 install(
@@ -246,7 +245,6 @@ install(
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT runtime
-          ${_optional}
 )
 # cmake-format: on
 
@@ -331,125 +329,67 @@ foreach(lib ${HPX_LIBS})
     unset(HPX_${uppercase_lib}_ENABLED_CXX_MODULES CACHE)
   endif()
 
+  # capitalize string
+  string(SUBSTRING ${lib} 0 1 first_letter)
+  string(TOUPPER ${first_letter} first_letter)
+  string(REGEX REPLACE "^.(.*)" "${first_letter}\\1" cap_libname "${lib}")
+
   # NOTE: hpx_full (i.e. the target representing libhpx.so) is still created in
   # src/CMakeLists.txt. When all of hpx_full has been modularized the target
   # creation can move here as well.
+  if(HPX_WITH_CXX_MODULES)
+    add_library(hpx_${lib}_module STATIC)
+    set_target_properties(
+      hpx_${lib}_module PROPERTIES POSITION_INDEPENDENT_CODE ON
+    )
+    hpx_configure_module_producer(hpx_${lib}_module)
+
+    target_link_libraries(
+      hpx_${lib}_module
+      PUBLIC hpx_${lib} hpx_public_flags
+      PRIVATE hpx_private_flags
+    )
+    set_target_properties(hpx_${lib}_module PROPERTIES FOLDER "Core")
+
+    add_hpx_source_group(
+      NAME hpx_${lib}_module
+      ROOT ${lib_module_basedir}
+      CLASS "Source Files"
+      TARGETS ${lib_module_file}
+    )
+
+    # prepare generation of module interface unit
+    set(lib_module_basedir ${PROJECT_BINARY_DIR}/libs/${lib})
+    set(lib_module_file
+        "${lib_module_basedir}/hpx_${lib}${HPX_MODULE_INTERFACE_EXTENSION}"
+    )
+    set(modulename_upper "${uppercase_lib}")
+  endif()
+
   if(${lib} STREQUAL "full")
     add_subdirectory(${lib})
+
     if(HPX_WITH_CXX_MODULES)
       hpx_configure_module_consumer(hpx_${lib} hpx_core_module_if)
+      hpx_configure_module_consumer(hpx_${lib}_module hpx_core_module_if)
     endif()
   else()
     add_library(hpx_${lib} ${hpx_library_link_mode} src/empty.cpp)
+
     target_compile_definitions(hpx_${lib} PRIVATE HPX_${uppercase_lib}_EXPORTS)
     set_target_properties(hpx_${lib} PROPERTIES POSITION_INDEPENDENT_CODE ON)
-
-    if(HPX_WITH_CXX_MODULES)
-      add_library(hpx_${lib}_module STATIC)
-      set_target_properties(
-        hpx_${lib}_module PROPERTIES POSITION_INDEPENDENT_CODE ON
-      )
-
-      # This creates an interface target hpx_${lib}_module_if
-      hpx_configure_module_producer(hpx_${lib}_module)
-    endif()
+    set_target_properties(hpx_${lib} PROPERTIES FOLDER "Core")
 
     add_subdirectory(${lib})
 
-    if(HPX_WITH_CXX_MODULES)
-      # generate module interface unit
-      set(cxx_module_headers)
-      foreach(cxx_module ${HPX_${uppercase_lib}_ENABLED_CXX_MODULES})
-        set(cxx_module_headers
-            "${cxx_module_headers}#include <hpx/modules/${cxx_module}.hpp>\n"
-        )
-      endforeach()
-
-      set(cxx_standard_headers)
-      foreach(std_header ${HPX_STANDARD_HEADERS})
-        set(cxx_standard_headers
-            "${cxx_standard_headers}#include ${std_header}\n"
-        )
-      endforeach()
-
-      set(lib_module_basedir ${PROJECT_BINARY_DIR}/libs/${lib})
-      set(lib_module_file
-          "${lib_module_basedir}/hpx_${lib}${HPX_MODULE_INTERFACE_EXTENSION}"
-      )
-      set(modulename_upper "${uppercase_lib}")
-      configure_file(
-        "${HPX_SOURCE_DIR}/cmake/templates/hpx.ixx.in" ${lib_module_file} @ONLY
-      )
-
-      set(std_header_file
-          "${lib_module_basedir}/config/include/hpx/config/std_headers.hpp"
-      )
-      configure_file(
-        "${HPX_SOURCE_DIR}/cmake/templates/std_headers.hpp.in"
-        ${std_header_file} @ONLY
-      )
-
-      target_link_libraries(
-        hpx_${lib}_module
-        PUBLIC hpx_${lib} hpx_public_flags
-        PRIVATE hpx_private_flags
-      )
-      set_target_properties(hpx_${lib}_module PROPERTIES FOLDER "Core")
-
-      add_hpx_source_group(
-        NAME hpx_${lib}_module
-        ROOT ${lib_module_basedir}
-        CLASS "Source Files"
-        TARGETS ${lib_module_file}
-      )
-
-      # cmake-format: off
-      target_sources(
-        hpx_${lib}_module PUBLIC
-            FILE_SET hpx_${lib}_public_sources
-                TYPE CXX_MODULES
-                BASE_DIRS ${lib_module_basedir}
-                FILES ${lib_module_file}
-      )
-
-      target_include_directories(hpx_${lib}_module PUBLIC
-          $<BUILD_INTERFACE:${lib_module_basedir}>
-          $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}/cxx>
-      )
-
-      set(module_install
-        FILE_SET hpx_${lib}_public_sources
-            DESTINATION ${CMAKE_INSTALL_LIBDIR}/cxx
-        CXX_MODULES_BMI
-            DESTINATION ${CMAKE_INSTALL_LIBDIR}/cxx
-            COMPONENT runtime
-      )
-      set(module_install_targets hpx_${lib}_module hpx_${lib}_module_if)
-      # cmake-format: on
-
-      target_link_libraries(hpx INTERFACE hpx_${lib}_module_if)
-    endif()
-
-    set_target_properties(hpx_${lib} PROPERTIES FOLDER "Core")
-
-    # Clang emits DWARF-5 records while compiling the TracyClient library
-    if(HPX_TRACY_WITH_TRACY
-       AND (NOT MSVC)
-       AND (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID
-                                                     MATCHES "AppleClang")
-    )
-      target_link_options(hpx_${lib} PRIVATE "-fuse-ld=lld")
-    endif()
-
     install(
-      TARGETS hpx_${lib} ${module_install_targets}
+      TARGETS hpx_${lib}
       EXPORT HPXInternalTargets
       LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime
       ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime
-      RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-              COMPONENT runtime
-              ${module_install}
+      RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT runtime
     )
+    hpx_export_internal_targets(hpx_${lib})
 
     # install PDB if needed
     if(MSVC AND NOT HPX_WITH_STATIC_LINKING)
@@ -461,15 +401,81 @@ foreach(lib ${HPX_LIBS})
         OPTIONAL
       )
     endif()
-
-    hpx_export_internal_targets(hpx_${lib} ${module_install_targets})
   endif()
+
+  if(HPX_WITH_CXX_MODULES)
+    # generate list of headers to be #included by the module interface unit
+    set(cxx_module_headers)
+    foreach(cxx_module ${HPX_${uppercase_lib}_ENABLED_CXX_MODULES})
+      set(cxx_module_headers
+          "${cxx_module_headers}#include <hpx/modules/${cxx_module}.hpp>\n"
+      )
+    endforeach()
+
+    configure_file(
+      "${HPX_SOURCE_DIR}/cmake/templates/hpx.ixx.in" ${lib_module_file} @ONLY
+    )
+
+    target_link_libraries(hpx INTERFACE hpx_${lib}_module_if)
+
+    # cmake-format: off
+    target_sources(
+      hpx_${lib}_module PUBLIC
+          FILE_SET hpx_${lib}_public_sources
+              TYPE CXX_MODULES
+              BASE_DIRS ${lib_module_basedir}
+              FILES ${lib_module_file}
+    )
+
+    target_include_directories(hpx_${lib}_module PUBLIC
+        $<BUILD_INTERFACE:${lib_module_basedir}>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}/cxx>
+    )
+
+    # Clang emits DWARF-5 records while compiling the TracyClient library
+    if(HPX_TRACY_WITH_TRACY
+       AND (NOT MSVC)
+       AND (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID
+                                                     MATCHES "AppleClang")
+    )
+      target_link_options(hpx_${lib} PRIVATE "-fuse-ld=lld")
+    endif()
+
+    install(
+      TARGETS hpx_${lib}_module hpx_${lib}_module_if
+      EXPORT HPXInternalTargets
+      LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime
+      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime
+      RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT runtime
+      FILE_SET hpx_${lib}_public_sources
+          DESTINATION ${CMAKE_INSTALL_LIBDIR}/cxx
+      CXX_MODULES_BMI
+          DESTINATION ${CMAKE_INSTALL_LIBDIR}/cxx
+          COMPONENT runtime
+    )
+    hpx_export_internal_targets(hpx_${lib}_module hpx_${lib}_module_if)
+    # cmake-format: on
+
+  endif(HPX_WITH_CXX_MODULES)
 
   set(_hpx_${lib}_modules
       ${_hpx_${lib}_modules}
       PARENT_SCOPE
   )
 endforeach()
+
+if(HPX_WITH_CXX_MODULES)
+  # generate header file that #includes all required standard headers
+  set(cxx_standard_headers)
+  foreach(std_header ${HPX_STANDARD_HEADERS})
+    set(cxx_standard_headers "${cxx_standard_headers}#include ${std_header}\n")
+  endforeach()
+
+  configure_file(
+    "${HPX_SOURCE_DIR}/cmake/templates/std_headers.hpp.in"
+    "core/config/include/hpx/config/std_headers.hpp" @ONLY
+  )
+endif()
 
 # add_hpx_module populates HPX_ENABLED_MODULES
 foreach(module ${HPX_ENABLED_MODULES})

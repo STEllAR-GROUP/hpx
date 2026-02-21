@@ -11,9 +11,8 @@
 #include <hpx/actions_base/basic_action.hpp>
 #include <hpx/actions_base/component_action.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/synchronization.hpp>
-#include <hpx/naming_base/address.hpp>
-#include <hpx/naming_base/id_type.hpp>
 
 #include <hpx/components/component_storage/export_definitions.hpp>
 #include <hpx/components/containers/unordered/unordered_map.hpp>

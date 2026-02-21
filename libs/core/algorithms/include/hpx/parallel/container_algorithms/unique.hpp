@@ -612,12 +612,12 @@ namespace hpx { namespace ranges {
 namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename I, typename S>
+    HPX_CXX_CORE_EXPORT template <typename I, typename S>
     using subrange_t = hpx::util::iterator_range<I, S>;
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::unique
-    HPX_CXX_EXPORT inline constexpr struct unique_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct unique_t final
       : hpx::detail::tag_parallel_algorithm<unique_t>
     {
     private:
@@ -748,12 +748,12 @@ namespace hpx::ranges {
         }
     } unique{};
 
-    HPX_CXX_EXPORT template <typename I, typename O>
+    HPX_CXX_CORE_EXPORT template <typename I, typename O>
     using unique_copy_result = parallel::util::in_out_result<I, O>;
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::unique_copy
-    HPX_CXX_EXPORT inline constexpr struct unique_copy_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct unique_copy_t final
       : hpx::detail::tag_parallel_algorithm<unique_copy_t>
     {
     private:

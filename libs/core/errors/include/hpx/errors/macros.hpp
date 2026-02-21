@@ -16,7 +16,8 @@
 #include <hpx/config/export_definitions.hpp>
 #include <hpx/modules/preprocessor.hpp>
 
-#if !defined(HPX_COMPILE_WITH_MODULES) || defined(HPX_COMPILE_BMI)
+#if !defined(HPX_HAVE_CXX_MODULES) || defined(HPX_CORE_EXPORTS) ||             \
+    (defined(HPX_COMPILE_BMI) && defined(HPX_COMPILE_CORE_WITH_MODULES))
 #include <hpx/errors/throw_exception.hpp>
 #endif
 
@@ -168,7 +169,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // From hpx/errors/define_error_info.hpp
 #define HPX_DEFINE_ERROR_INFO(NAME, TYPE)                                      \
-    HPX_CXX_EXPORT struct NAME : ::hpx::error_info<NAME, TYPE>                 \
+    HPX_CXX_CORE_EXPORT struct NAME : ::hpx::error_info<NAME, TYPE>            \
     {                                                                          \
         explicit NAME(TYPE const& value) noexcept(                             \
             std::is_nothrow_copy_constructible_v<TYPE>)                        \

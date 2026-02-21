@@ -18,7 +18,7 @@
 namespace hpx::detail {
 
     // dispatch point used for sync implementations
-    HPX_CXX_EXPORT template <typename Func, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename Func, typename Enable = void>
     struct sync_dispatch;
 }    // namespace hpx::detail
 
@@ -27,7 +27,7 @@ namespace hpx {
     /// The function template \a sync runs the function \a f synchronously and
     /// returns a \a hpx::future that will eventually hold the result of that
     /// function call.
-    HPX_CXX_EXPORT template <typename F, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename F, typename... Ts>
     HPX_FORCEINLINE decltype(auto) sync(F&& f, Ts&&... ts)
     {
         return detail::sync_dispatch<std::decay_t<F>>::call(

@@ -47,7 +47,7 @@
 namespace hpx::threads::coroutines {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT class coroutine
+    HPX_CXX_CORE_EXPORT class coroutine
     {
     private:
         friend struct detail::coroutine_accessor;

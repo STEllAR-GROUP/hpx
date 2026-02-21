@@ -15,7 +15,7 @@
 namespace hpx::parallel::traits {
 
     ///////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T, typename Abi>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Abi>
     HPX_HOST_DEVICE HPX_FORCEINLINE int find_first_of(
         Vc::Mask<T, Abi> const& msk) noexcept
     {

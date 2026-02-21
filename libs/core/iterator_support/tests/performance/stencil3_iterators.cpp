@@ -8,6 +8,7 @@
 #include <hpx/init.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/tuple.hpp>
 
 #include <cstddef>

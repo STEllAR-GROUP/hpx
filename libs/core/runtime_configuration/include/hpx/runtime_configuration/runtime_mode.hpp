@@ -21,7 +21,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     /// A HPX runtime can be executed in two different modes: console mode
     /// and worker mode.
-    HPX_CXX_EXPORT enum class runtime_mode : std::int8_t {
+    HPX_CXX_CORE_EXPORT enum class runtime_mode : std::int8_t {
         invalid = -1,
         console = 0,     ///< The runtime is the console locality
         worker = 1,      ///< The runtime is a worker locality
@@ -35,7 +35,7 @@ namespace hpx {
 
     /// Get the readable string representing the name of the given runtime_mode
     /// constant.
-    HPX_CXX_EXPORT HPX_CORE_EXPORT char const* get_runtime_mode_name(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT char const* get_runtime_mode_name(
         runtime_mode state) noexcept;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -46,6 +46,6 @@ namespace hpx {
     /// representing the name.
     ///
     /// \param mode this represents the runtime mode
-    HPX_CXX_EXPORT HPX_CORE_EXPORT runtime_mode get_runtime_mode_from_name(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT runtime_mode get_runtime_mode_from_name(
         std::string const& mode);
 }    // namespace hpx

@@ -19,7 +19,7 @@
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Enable = void>
     struct reference_wrapper : std::reference_wrapper<T>
     {
         reference_wrapper() = delete;
@@ -27,36 +27,36 @@ namespace hpx {
         using std::reference_wrapper<T>::reference_wrapper;
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     reference_wrapper(T&) -> reference_wrapper<T>;
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     [[nodiscard]] constexpr reference_wrapper<T> ref(T& val) noexcept
     {
         return reference_wrapper<T>(val);
     }
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     void ref(T const&&) = delete;
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     [[nodiscard]] constexpr reference_wrapper<T> ref(
         reference_wrapper<T> val) noexcept
     {
         return val;
     }
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     [[nodiscard]] constexpr reference_wrapper<T const> cref(
         T const& val) noexcept
     {
         return reference_wrapper<T const>(val);
     }
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     void cref(T const&&) = delete;
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     [[nodiscard]] constexpr reference_wrapper<T const> cref(
         reference_wrapper<T> val) noexcept
     {
@@ -66,22 +66,22 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     namespace traits {
 
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         struct needs_reference_semantics : std::false_type
         {
         };
 
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         struct needs_reference_semantics<T const> : needs_reference_semantics<T>
         {
         };
 
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         inline constexpr bool needs_reference_semantics_v =
             needs_reference_semantics<T>::value;
     }    // namespace traits
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct reference_wrapper<T,
         std::enable_if_t<traits::needs_reference_semantics_v<T>>>
     {
@@ -127,7 +127,7 @@ namespace hpx {
         T ptr{};
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
         requires(traits::needs_reference_semantics_v<T>)
     reference_wrapper<T> ref(T&& val) noexcept
     {

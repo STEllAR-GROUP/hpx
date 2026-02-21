@@ -27,7 +27,7 @@ namespace hpx::execution::experimental {
     /// Control number of cores in executors which need a functionality
     /// for setting the number of cores to be used by an algorithm directly
     ///
-    HPX_CXX_EXPORT struct num_cores
+    HPX_CXX_CORE_EXPORT struct num_cores
     {
         /// Construct a \a num_cores executor parameters object
         ///

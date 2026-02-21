@@ -1,4 +1,4 @@
-//  Copyright (c) 2021-2024 Hartmut Kaiser
+//  Copyright (c) 2021-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,11 +14,11 @@
 
 namespace hpx::parcelset {
 
-    class HPX_EXPORT parcelport;
-    class HPX_EXPORT locality;
-    class HPX_EXPORT parcel;
+    HPX_CXX_EXPORT class HPX_EXPORT parcelport;
+    HPX_CXX_EXPORT class HPX_EXPORT locality;
+    HPX_CXX_EXPORT class HPX_EXPORT parcel;
 
-    extern HPX_EXPORT parcel empty_parcel;
+    HPX_CXX_EXPORT extern HPX_EXPORT parcel empty_parcel;
 
     /// The type of the function that can be registered as a parcel write handler
     /// using the function \a hpx::set_parcel_write_handler.
@@ -27,13 +27,12 @@ namespace hpx::parcelset {
     ///       parcel layer whenever a parcel has been sent by the underlying
     ///       networking library and if no explicit parcel handler function was
     ///       specified for the parcel.
-    using parcel_write_handler_type =
+    HPX_CXX_EXPORT using parcel_write_handler_type =
         hpx::function<void(std::error_code const&, parcelset::parcel const&)>;
 
     ////////////////////////////////////////////////////////////////////////
     /// Type of background work to perform
-    enum class parcelport_background_mode : std::uint8_t
-    {
+    HPX_CXX_EXPORT enum class parcelport_background_mode : std::uint8_t {
         /// perform buffer flush operations
         flush_buffers = 0x01,
         /// perform send operations (includes buffer flush)
@@ -44,7 +43,7 @@ namespace hpx::parcelset {
         all = 0x07
     };
 
-    inline bool operator&(
+    HPX_CXX_EXPORT inline bool operator&(
         parcelport_background_mode lhs, parcelport_background_mode rhs)
     {
         return static_cast<std::uint8_t>(lhs) & static_cast<std::uint8_t>(rhs);
@@ -72,6 +71,6 @@ namespace hpx::parcelset {
 
 #undef HPX_PARCELPORT_BACKGROUND_MODE_ENUM_DEPRECATION_MSG
 
-    HPX_EXPORT char const* get_parcelport_background_mode_name(
+    HPX_CXX_EXPORT HPX_EXPORT char const* get_parcelport_background_mode_name(
         parcelport_background_mode mode);
 }    // namespace hpx::parcelset

@@ -4,6 +4,16 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// clang-format off
+#if defined(__clang__)
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wmissing-field-initializers"
+#elif defined (__GNUC__)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+#endif
+// clang-format on
+
 #include <hpx/config.hpp>
 
 #include <hpx/modules/serialization.hpp>
@@ -104,3 +114,11 @@ int main()
 
     return hpx::util::report_errors();
 }
+
+// clang-format off
+#if defined(__clang__)
+#  pragma clang diagnostic pop
+#elif defined (__GNUC__)
+#  pragma GCC diagnostic pop
+#endif
+// clang-format on

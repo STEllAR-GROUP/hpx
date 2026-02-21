@@ -22,15 +22,15 @@ namespace hpx::threads::detail {
 
     /// Set a timer to set the state of the given \a thread to the given
     /// new value after it expired (at the given time)
-    HPX_CXX_EXPORT HPX_CORE_EXPORT thread_id_ref_type set_thread_state_timed(
-        policies::scheduler_base* scheduler,
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT thread_id_ref_type
+    set_thread_state_timed(policies::scheduler_base* scheduler,
         hpx::chrono::steady_time_point const& abs_time,
         thread_id_type const& thrd, thread_schedule_state newstate,
         thread_restart_state newstate_ex, thread_priority priority,
         thread_schedule_hint schedulehint, std::atomic<bool>* started,
         bool retry_on_active, hpx::error_code& ec);
 
-    HPX_CXX_EXPORT inline thread_id_ref_type set_thread_state_timed(
+    HPX_CXX_CORE_EXPORT inline thread_id_ref_type set_thread_state_timed(
         policies::scheduler_base* scheduler,
         hpx::chrono::steady_time_point const& abs_time,
         thread_id_type const& id, std::atomic<bool>* started,
@@ -44,7 +44,7 @@ namespace hpx::threads::detail {
 
     // Set a timer to set the state of the given \a thread to the given
     // new value after it expired (after the given duration)
-    HPX_CXX_EXPORT inline thread_id_ref_type set_thread_state_timed(
+    HPX_CXX_CORE_EXPORT inline thread_id_ref_type set_thread_state_timed(
         policies::scheduler_base* scheduler,
         hpx::chrono::steady_duration const& rel_time,
         thread_id_type const& thrd, thread_schedule_state newstate,
@@ -57,7 +57,7 @@ namespace hpx::threads::detail {
             retry_on_active, ec);
     }
 
-    HPX_CXX_EXPORT inline thread_id_ref_type set_thread_state_timed(
+    HPX_CXX_CORE_EXPORT inline thread_id_ref_type set_thread_state_timed(
         policies::scheduler_base* scheduler,
         hpx::chrono::steady_duration const& rel_time,
         thread_id_type const& thrd, std::atomic<bool>* started,

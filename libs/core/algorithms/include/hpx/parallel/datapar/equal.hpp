@@ -27,7 +27,7 @@
 namespace hpx::parallel::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
     struct datapar_equal
     {
         template <typename ZipIterator, typename Token, typename F>
@@ -57,7 +57,7 @@ namespace hpx::parallel::detail {
         }
     };
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename ZipIterator,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename ZipIterator,
         typename Token, typename F>
         requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE void tag_invoke(
@@ -80,7 +80,7 @@ namespace hpx::parallel::detail {
         }
     }
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename InIter1,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename InIter1,
         typename InIter2, typename F>
         requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE bool tag_invoke(
@@ -106,7 +106,7 @@ namespace hpx::parallel::detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
     struct datapar_equal_binary
     {
         template <typename ZipIterator, typename Token, typename F,
@@ -141,7 +141,7 @@ namespace hpx::parallel::detail {
         }
     };
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename ZipIterator,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename ZipIterator,
         typename Token, typename F, typename Proj1, typename Proj2>
         requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE void tag_invoke(
@@ -166,7 +166,7 @@ namespace hpx::parallel::detail {
         }
     }
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename InIter1,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename InIter1,
         typename Sent1, typename InIter2, typename Sent2, typename F,
         typename Proj1, typename Proj2>
         requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)

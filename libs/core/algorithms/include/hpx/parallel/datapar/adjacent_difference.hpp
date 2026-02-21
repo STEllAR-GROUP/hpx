@@ -26,7 +26,7 @@
 namespace hpx::parallel::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
     struct datapar_adjacent_difference
     {
         template <typename InIter, typename OutIter, typename Op>
@@ -61,7 +61,7 @@ namespace hpx::parallel::detail {
         }
     };
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename InIter,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename InIter,
         typename OutIter, typename Op>
     // clang-format off
         requires (

@@ -24,20 +24,20 @@
 
 namespace hpx::serialization {
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     void load(input_archive& ar, boost::intrusive_ptr<T>& ptr, unsigned)
     {
         detail::serialize_pointer_tracked(ar, ptr);
     }
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     void save(output_archive& ar, boost::intrusive_ptr<T> const& ptr, unsigned)
     {
         detail::serialize_pointer_tracked(ar, ptr);
     }
 
-    HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE(
-        HPX_CXX_EXPORT, (template <typename T>), (boost::intrusive_ptr<T>) )
+    HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE(HPX_CXX_CORE_EXPORT,
+        (template <typename T>), (boost::intrusive_ptr<T>) )
 }    // namespace hpx::serialization
 
 #endif

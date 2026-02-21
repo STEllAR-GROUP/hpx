@@ -354,7 +354,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        HPX_CXX_EXPORT struct none_of : public algorithm<none_of, bool>
+        HPX_CXX_CORE_EXPORT struct none_of : public algorithm<none_of, bool>
         {
             constexpr none_of() noexcept
               : algorithm<none_of, bool>("none_of")
@@ -429,7 +429,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        HPX_CXX_EXPORT struct any_of : public algorithm<any_of, bool>
+        HPX_CXX_CORE_EXPORT struct any_of : public algorithm<any_of, bool>
         {
             constexpr any_of() noexcept
               : algorithm<any_of, bool>("any_of")
@@ -504,7 +504,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        HPX_CXX_EXPORT struct all_of : public algorithm<all_of, bool>
+        HPX_CXX_CORE_EXPORT struct all_of : public algorithm<all_of, bool>
         {
             constexpr all_of() noexcept
               : algorithm("all_of")
@@ -578,7 +578,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::none_of
-    HPX_CXX_EXPORT inline constexpr struct none_of_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct none_of_t final
       : hpx::detail::tag_parallel_algorithm<none_of_t>
     {
     private:
@@ -619,7 +619,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::any_of
-    HPX_CXX_EXPORT inline constexpr struct any_of_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct any_of_t final
       : hpx::detail::tag_parallel_algorithm<any_of_t>
     {
     private:
@@ -660,7 +660,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::all_of
-    HPX_CXX_EXPORT inline constexpr struct all_of_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct all_of_t final
       : hpx::detail::tag_parallel_algorithm<all_of_t>
     {
     private:

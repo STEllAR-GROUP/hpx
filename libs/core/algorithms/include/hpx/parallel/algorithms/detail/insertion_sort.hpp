@@ -19,7 +19,7 @@ namespace hpx::parallel::detail {
     /// \param [in] last : iterator to the next element of the last in the range
     /// \param [in] comp : object for to do the comparison between the elements
     /// \remarks This algorithm is O(N^2)
-    HPX_CXX_EXPORT template <typename Iter,
+    HPX_CXX_CORE_EXPORT template <typename Iter,
         typename Compare =
             std::less<typename std::iterator_traits<Iter>::value_type>>
     void insertion_sort(Iter first, Iter last, Compare comp = Compare())

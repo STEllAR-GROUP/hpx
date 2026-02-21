@@ -22,10 +22,10 @@ namespace hpx::actions::detail {
 #if defined(HPX_HAVE_NETWORKING)
 
 #if !defined(HPX_HAVE_AUTOMATIC_SERIALIZATION_REGISTRATION)
-    HPX_CXX_EXPORT template <typename Action>
+    HPX_CXX_CORE_EXPORT template <typename Action>
     [[nodiscard]] char const* get_action_name() noexcept;
 #else
-    HPX_CXX_EXPORT template <typename Action>
+    HPX_CXX_CORE_EXPORT template <typename Action>
     [[nodiscard]] char const* get_action_name() noexcept
     {
         /// If you encounter this assert while compiling code, that means that
@@ -39,7 +39,7 @@ namespace hpx::actions::detail {
 #endif
 
 #else    // HPX_HAVE_NETWORKING
-    HPX_CXX_EXPORT template <typename Action>
+    HPX_CXX_CORE_EXPORT template <typename Action>
     char const* get_action_name() noexcept
     {
         return util::debug::type_id<Action>();
@@ -51,11 +51,11 @@ namespace hpx::actions::detail {
     !defined(HPX_HAVE_APEX)
 
 #if !defined(HPX_HAVE_AUTOMATIC_SERIALIZATION_REGISTRATION)
-    HPX_CXX_EXPORT template <typename Action>
+    HPX_CXX_CORE_EXPORT template <typename Action>
     [[nodiscard]] util::itt::string_handle const&
     get_action_name_itt() noexcept;
 #else
-    HPX_CXX_EXPORT template <typename Action>
+    HPX_CXX_CORE_EXPORT template <typename Action>
     [[nodiscard]] util::itt::string_handle const& get_action_name_itt() noexcept
     {
         static auto sh = util::itt::string_handle(get_action_name<Action>());

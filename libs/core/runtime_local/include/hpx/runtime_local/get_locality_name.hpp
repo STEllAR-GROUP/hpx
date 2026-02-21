@@ -18,7 +18,7 @@ namespace hpx {
 
     namespace detail {
 
-        HPX_CXX_EXPORT HPX_CORE_EXPORT std::string get_locality_name();
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT std::string get_locality_name();
     }    // namespace detail
 
     /// \fn std::string get_locality_name()
@@ -33,5 +33,5 @@ namespace hpx {
     ///           networking layer and may be different for different parcelports.
     ///
     /// \see      \a future<std::string> get_locality_name(hpx::id_type const& id)
-    HPX_CXX_EXPORT HPX_CORE_EXPORT std::string get_locality_name();
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT std::string get_locality_name();
 }    // namespace hpx

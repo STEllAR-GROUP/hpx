@@ -19,7 +19,7 @@
 
 namespace hpx::serialization {
 
-    HPX_CXX_EXPORT template <typename Key, typename Value, typename Hash,
+    HPX_CXX_CORE_EXPORT template <typename Key, typename Value, typename Hash,
         typename KeyEqual, typename Alloc>
     void serialize(input_archive& ar,
         std::unordered_map<Key, Value, Hash, KeyEqual, Alloc>& t, unsigned)
@@ -30,7 +30,7 @@ namespace hpx::serialization {
         detail::load_collection(ar, t, size);
     }
 
-    HPX_CXX_EXPORT template <typename Key, typename Value, typename Hash,
+    HPX_CXX_CORE_EXPORT template <typename Key, typename Value, typename Hash,
         typename KeyEqual, typename Alloc>
     void serialize(output_archive& ar,
         std::unordered_map<Key, Value, Hash, KeyEqual, Alloc> const& t,

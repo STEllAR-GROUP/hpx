@@ -24,14 +24,15 @@ namespace hpx::parallel::util {
     // \struct range
     // \brief this represent a range between two iterators
     // \tparam Iter type of parameters of the range
-    HPX_CXX_EXPORT template <typename Iterator, typename Sentinel = Iterator>
+    HPX_CXX_CORE_EXPORT template <typename Iterator,
+        typename Sentinel = Iterator>
     using range = hpx::util::iterator_range<Iterator, Sentinel>;
 
     // \brief concatenate two contiguous ranges
     // \param [in] it1 : first range
     // \param [in] it2 : second range
     // \returns  range resulting of the concatenation
-    HPX_CXX_EXPORT template <typename Iter, typename Sent>
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent>
     range<Iter, Sent> concat(
         range<Iter, Sent> const& it1, range<Iter, Sent> const& it2)
     {
@@ -42,8 +43,8 @@ namespace hpx::parallel::util {
     /// \param [in] dest : range where move the objects
     /// \param [in] src : range from where move the objects
     /// \return range with the objects moved and the size adjusted
-    HPX_CXX_EXPORT template <typename Iter1, typename Sent1, typename Iter2,
-        typename Sent2>
+    HPX_CXX_CORE_EXPORT template <typename Iter1, typename Sent1,
+        typename Iter2, typename Sent2>
     range<Iter2, Iter2> init_move(
         range<Iter2, Sent2> const& dest, range<Iter1, Sent1> const& src)
     {
@@ -69,8 +70,8 @@ namespace hpx::parallel::util {
     /// \param [in] src : range from where move the objects
     /// \return range with the objects moved and the size adjusted
     //-----------------------------------------------------------------------------
-    HPX_CXX_EXPORT template <typename Iter1, typename Sent1, typename Iter2,
-        typename Sent2>
+    HPX_CXX_CORE_EXPORT template <typename Iter1, typename Sent1,
+        typename Iter2, typename Sent2>
     range<Iter2, Sent2> uninit_move(
         range<Iter2, Sent2> const& dest, range<Iter1, Sent1> const& src)
     {
@@ -92,7 +93,7 @@ namespace hpx::parallel::util {
     //  function : destroy
     /// \brief destroy a range of objects
     /// \param [in] r : range to destroy
-    HPX_CXX_EXPORT template <typename Iter, typename Sent>
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent>
     void destroy_range(range<Iter, Sent> r)
     {
         destroy(r.begin(), r.end());
@@ -102,7 +103,7 @@ namespace hpx::parallel::util {
     /// \param [in] r : range of elements not initialized
     /// \param [in] val : object used for the initialization
     /// \return range initialized
-    HPX_CXX_EXPORT template <typename Iter, typename Sent>
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent>
     range<Iter, Sent> init(range<Iter, Sent> const& r,
         typename std::iterator_traits<Iter>::value_type& val)
     {
@@ -117,8 +118,8 @@ namespace hpx::parallel::util {
     /// \return true : they can be merged
     ///         false : they can't be merged
     /// \remarks
-    HPX_CXX_EXPORT template <typename Iter1, typename Sent1, typename Iter2,
-        typename Sent2, typename Compare>
+    HPX_CXX_CORE_EXPORT template <typename Iter1, typename Sent1,
+        typename Iter2, typename Sent2, typename Compare>
     bool is_mergeable(range<Iter1, Sent1> const& src1,
         range<Iter2, Sent2> const& src2, Compare comp)
     {
@@ -139,8 +140,9 @@ namespace hpx::parallel::util {
     /// \param [in] src2 : second range to merge
     /// \param [in] comp : comparison object
     /// \return range with the elements merged and the size adjusted
-    HPX_CXX_EXPORT template <typename Iter1, typename Sent1, typename Iter2,
-        typename Sent2, typename Iter3, typename Sent3, typename Compare>
+    HPX_CXX_CORE_EXPORT template <typename Iter1, typename Sent1,
+        typename Iter2, typename Sent2, typename Iter3, typename Sent3,
+        typename Compare>
     range<Iter3, Sent3> full_merge(range<Iter3, Sent3> const& dest,
         range<Iter1, Sent1> const& src1, range<Iter2, Sent2> const& src2,
         Compare comp)
@@ -166,8 +168,8 @@ namespace hpx::parallel::util {
     /// \param [in] src2 : second range to merge
     /// \param [in] comp : comparison object
     /// \return range with the elements merged and the size adjusted
-    HPX_CXX_EXPORT template <typename Iter1, typename Sent1, typename Iter2,
-        typename Sent2, typename Value, typename Compare>
+    HPX_CXX_CORE_EXPORT template <typename Iter1, typename Sent1,
+        typename Iter2, typename Sent2, typename Value, typename Compare>
     range<Value*> uninit_full_merge(range<Value*> const& dest,
         range<Iter1, Sent1> const& src1, range<Iter2, Sent2> const& src2,
         Compare comp)
@@ -191,8 +193,8 @@ namespace hpx::parallel::util {
     /// \param [in] comp : object for compare two elements of the type pointed
     ///                    by the Iter1 and Iter2
     /// \return : range with the two buffers merged
-    HPX_CXX_EXPORT template <typename Iter1, typename Sent1, typename Iter2,
-        typename Sent2, typename Compare>
+    HPX_CXX_CORE_EXPORT template <typename Iter1, typename Sent1,
+        typename Iter2, typename Sent2, typename Compare>
     range<Iter2, Sent2> half_merge(range<Iter2, Sent2> const& dest,
         range<Iter1, Sent1> const& src1, range<Iter2, Sent2> const& src2,
         Compare comp)
@@ -216,8 +218,9 @@ namespace hpx::parallel::util {
     /// \return true : not changes done
     ///         false : changes in the buffers
     /// \remarks
-    HPX_CXX_EXPORT template <typename Iter1, typename Sent1, typename Iter2,
-        typename Sent2, typename Iter3, typename Sent3, typename Compare>
+    HPX_CXX_CORE_EXPORT template <typename Iter1, typename Sent1,
+        typename Iter2, typename Sent2, typename Iter3, typename Sent3,
+        typename Compare>
     bool in_place_merge_uncontiguous(range<Iter1, Sent1> const& src1,
         range<Iter2, Sent2> const& src2, range<Iter3, Sent3>& aux, Compare comp)
     {
@@ -241,8 +244,8 @@ namespace hpx::parallel::util {
     /// \return true : not changes done
     ///         false : changes in the buffers
     /// \remarks
-    HPX_CXX_EXPORT template <typename Iter1, typename Sent1, typename Iter2,
-        typename Sent2, typename Compare>
+    HPX_CXX_CORE_EXPORT template <typename Iter1, typename Sent1,
+        typename Iter2, typename Sent2, typename Compare>
     range<Iter1, Sent1> in_place_merge(range<Iter1, Sent1> const& src1,
         range<Iter1, Sent1> const& src2, range<Iter2, Sent2>& buf, Compare comp)
     {
@@ -264,8 +267,8 @@ namespace hpx::parallel::util {
     // \param [in] comp : object for to compare elements
     // \returns true : not changes done
     //         false : changes in the buffers
-    HPX_CXX_EXPORT template <typename Iter1, typename Sent1, typename Iter2,
-        typename Sent2, typename Compare>
+    HPX_CXX_CORE_EXPORT template <typename Iter1, typename Sent1,
+        typename Iter2, typename Sent2, typename Compare>
     void merge_flow(range<Iter1, Sent1> rng1, range<Iter2, Sent2> rbuf,
         range<Iter1, Sent1> rng2, Compare cmp)
     {

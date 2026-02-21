@@ -16,7 +16,7 @@
 
 namespace hpx::util {
 
-    HPX_CXX_EXPORT template <typename Generator>
+    HPX_CXX_CORE_EXPORT template <typename Generator>
     class generator_iterator
       : public iterator_facade<generator_iterator<Generator>,
             typename Generator::result_type, std::forward_iterator_tag,
@@ -68,7 +68,7 @@ namespace hpx::util {
 
     // clang-format produces inconsistent result between different versions
     // clang-format off
-    HPX_CXX_EXPORT template <typename Generator>
+    HPX_CXX_CORE_EXPORT template <typename Generator>
     generator_iterator(Generator*)->generator_iterator<Generator>;
     // clang-format on
 }    // namespace hpx::util

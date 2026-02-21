@@ -436,12 +436,12 @@ namespace hpx { namespace ranges {
 
 namespace hpx::ranges {
 
-    HPX_CXX_EXPORT template <typename I1, typename I2, typename O>
+    HPX_CXX_CORE_EXPORT template <typename I1, typename I2, typename O>
     using set_union_result = parallel::util::in_in_out_result<I1, I2, O>;
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::set_union
-    HPX_CXX_EXPORT inline constexpr struct set_union_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct set_union_t final
       : hpx::detail::tag_parallel_algorithm<set_union_t>
     {
     private:

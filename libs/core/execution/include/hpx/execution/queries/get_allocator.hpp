@@ -35,7 +35,7 @@ namespace hpx::execution::experimental {
     // 3. execution::get_allocator() (with no arguments) is expression-equivalent
     //    to execution::read(execution::get_allocator).
     //
-    HPX_CXX_EXPORT inline constexpr struct get_allocator_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct get_allocator_t final
       : hpx::functional::detail::tag_fallback<get_allocator_t>
     {
     private:
@@ -44,7 +44,8 @@ namespace hpx::execution::experimental {
 
     } get_allocator{};
 
-    HPX_CXX_EXPORT constexpr auto tag_fallback_invoke(get_allocator_t) noexcept
+    HPX_CXX_CORE_EXPORT constexpr auto tag_fallback_invoke(
+        get_allocator_t) noexcept
     {
         return hpx::execution::experimental::read(get_allocator);
     }

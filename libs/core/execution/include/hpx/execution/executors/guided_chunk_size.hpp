@@ -37,7 +37,7 @@ namespace hpx::execution::experimental {
     /// \note This executor parameters type is equivalent to OpenMP's GUIDED
     ///       scheduling directive.
     ///
-    HPX_CXX_EXPORT struct guided_chunk_size
+    HPX_CXX_CORE_EXPORT struct guided_chunk_size
     {
         /// Construct an \a dynamic_chunk_size executor parameters object
         ///

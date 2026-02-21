@@ -69,7 +69,8 @@ namespace hpx::iostream {
 
     namespace detail {
 
-        template <typename T, template <class, class> typename Base>
+        HPX_CXX_CORE_EXPORT template <typename T,
+            template <class, class> typename Base>
         struct is_iostreams_trait2
         {
         private:
@@ -82,7 +83,8 @@ namespace hpx::iostream {
                 decltype(test(static_cast<T*>(nullptr)))::value;
         };
 
-        template <typename T, template <class, class, class> typename Base>
+        HPX_CXX_CORE_EXPORT template <typename T,
+            template <class, class, class> typename Base>
         struct is_iostreams_trait3
         {
         private:
@@ -95,7 +97,7 @@ namespace hpx::iostream {
                 decltype(test(static_cast<T*>(nullptr)))::value;
         };
 
-        template <typename T,
+        HPX_CXX_CORE_EXPORT template <typename T,
             template <class, class, class, class> typename Base>
         struct is_iostreams_trait4
         {
@@ -109,7 +111,7 @@ namespace hpx::iostream {
                 decltype(test(static_cast<T*>(nullptr)))::value;
         };
 
-        template <typename T,
+        HPX_CXX_CORE_EXPORT template <typename T,
             template <class, class, class, class, class> typename Base>
         struct is_iostreams_trait5
         {

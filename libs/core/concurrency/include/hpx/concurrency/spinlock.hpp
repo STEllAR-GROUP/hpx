@@ -22,7 +22,7 @@
 namespace hpx::util {
 
     // Lockable spinlock class
-    HPX_CXX_EXPORT struct spinlock
+    HPX_CXX_CORE_EXPORT struct spinlock
     {
     public:
         spinlock(spinlock const&) = delete;

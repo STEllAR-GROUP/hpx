@@ -22,6 +22,7 @@
 #include <hpx/modules/io_service.hpp>
 #include <hpx/modules/itt_notify.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/static_reinit.hpp>
@@ -32,7 +33,6 @@
 #include <hpx/modules/timing.hpp>
 #include <hpx/modules/topology.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/naming_base/id_type.hpp>
 #include <hpx/parcelset/parcelhandler.hpp>
 #include <hpx/parcelset/parcelset_fwd.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>

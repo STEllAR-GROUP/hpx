@@ -27,7 +27,7 @@ namespace hpx::string_util {
 
     //===========================================================================
     // A container-view of a tokenized "sequence"
-    HPX_CXX_EXPORT template <typename TokenizerFunc = char_separator<char>,
+    HPX_CXX_CORE_EXPORT template <typename TokenizerFunc = char_separator<char>,
         typename Iterator = std::string::const_iterator,
         typename Type = std::string>
     class tokenizer
@@ -120,11 +120,11 @@ namespace hpx::string_util {
         TokenizerFunc f_;
     };
 
-    HPX_CXX_EXPORT template <typename Iterator, typename F>
+    HPX_CXX_CORE_EXPORT template <typename Iterator, typename F>
     tokenizer(Iterator, Iterator, F&&) -> tokenizer<std::decay_t<F>, Iterator,
         std::basic_string<typename std::iterator_traits<Iterator>::value_type>>;
 
-    HPX_CXX_EXPORT template <typename Container, typename F>
+    HPX_CXX_CORE_EXPORT template <typename Container, typename F>
     tokenizer(Container const&, F&&)
         -> tokenizer<std::decay_t<F>, traits::range_iterator_t<Container const>,
             std::basic_string<typename std::iterator_traits<

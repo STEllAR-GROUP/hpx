@@ -20,7 +20,7 @@ namespace hpx::cuda::experimental {
 
     // -----------------------------------------------------------------
     // This RAII helper class enables polling for a scoped block
-    HPX_CXX_EXPORT struct [[nodiscard]] enable_user_polling
+    HPX_CXX_CORE_EXPORT struct [[nodiscard]] enable_user_polling
     {
         enable_user_polling()
           : pool_name_()

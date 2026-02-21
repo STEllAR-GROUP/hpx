@@ -335,19 +335,19 @@ namespace hpx::util::detail {
 
         /// Deduces to a true type if the given parameter T has a push_back
         /// method that accepts a type of E.
-        template <typename T, typename E, typename = void>
+        HPX_CXX_CORE_EXPORT template <typename T, typename E, typename = void>
         struct has_push_back : std::false_type
         {
         };
 
-        template <typename T, typename E>
+        HPX_CXX_CORE_EXPORT template <typename T, typename E>
         struct has_push_back<T, E,
             std::void_t<decltype(std::declval<T>().push_back(
                 std::declval<E>()))>> : std::true_type
         {
         };
 
-        template <typename T, typename E>
+        HPX_CXX_CORE_EXPORT template <typename T, typename E>
         inline constexpr bool has_push_back_v = has_push_back<T, E>::value;
 
         // clang-format off

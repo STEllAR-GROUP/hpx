@@ -10,10 +10,6 @@
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/testing.hpp>
 
-#if defined(HPX_SERIALIZATION_HAVE_BOOST_TYPES)
-#include <hpx/serialization/boost_multi_array.hpp>
-#endif
-
 #include <array>
 #include <cstddef>
 #include <numeric>

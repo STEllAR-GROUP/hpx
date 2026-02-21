@@ -32,7 +32,7 @@ namespace hpx::experimental {
 
     /// A \c task_group represents concurrent execution of a group of tasks.
     /// Tasks can be dynamically added to the group while it is executing.
-    HPX_CXX_EXPORT class task_group
+    HPX_CXX_CORE_EXPORT class task_group
     {
     public:
         HPX_CORE_EXPORT task_group();

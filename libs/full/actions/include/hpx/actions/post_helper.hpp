@@ -16,9 +16,9 @@
 #include <hpx/actions_base/traits/action_select_direct_execution.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/coroutines.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/threading_base.hpp>
-#include <hpx/naming_base/address.hpp>
 
 #include <chrono>
 #include <exception>

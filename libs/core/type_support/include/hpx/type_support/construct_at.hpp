@@ -16,9 +16,9 @@
 namespace hpx {
 
 #if defined(HPX_HAVE_CXX20_STD_CONSTRUCT_AT)
-    HPX_CXX_EXPORT using std::construct_at;
+    HPX_CXX_CORE_EXPORT using std::construct_at;
 #else
-    HPX_CXX_EXPORT template <typename T, typename... Ts,
+    HPX_CXX_CORE_EXPORT template <typename T, typename... Ts,
         typename Enable = std::void_t<decltype(::new(std::declval<void*>())
                 T(std::declval<Ts>()...))>>
     constexpr T* construct_at(T* addr, Ts&&... ts) noexcept(noexcept(

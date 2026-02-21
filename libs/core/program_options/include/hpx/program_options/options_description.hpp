@@ -33,7 +33,7 @@ namespace hpx::program_options {
         never use second kind of properties \-- they are side effect free.
         @sa options_description
     */
-    HPX_CXX_EXPORT class HPX_CORE_EXPORT option_description
+    HPX_CXX_CORE_EXPORT class HPX_CORE_EXPORT option_description
     {
     public:
         option_description();
@@ -145,11 +145,11 @@ namespace hpx::program_options {
         std::shared_ptr<value_semantic const> m_value_semantic;
     };
 
-    HPX_CXX_EXPORT class options_description;
+    HPX_CXX_CORE_EXPORT class options_description;
 
     /** Class which provides convenient creation syntax to option_description.
      */
-    HPX_CXX_EXPORT class HPX_CORE_EXPORT options_description_easy_init
+    HPX_CXX_CORE_EXPORT class HPX_CORE_EXPORT options_description_easy_init
     {
     public:
         explicit options_description_easy_init(options_description* owner);
@@ -174,7 +174,7 @@ namespace hpx::program_options {
         See @ref a_adding_options "here" for option adding interface discussion.
         @sa option_description
     */
-    HPX_CXX_EXPORT class HPX_CORE_EXPORT options_description
+    HPX_CXX_CORE_EXPORT class HPX_CORE_EXPORT options_description
     {
     public:
         static constexpr unsigned const m_default_line_length = 80;
@@ -262,7 +262,8 @@ namespace hpx::program_options {
     };
 
     /** Class thrown when duplicate option description is found. */
-    HPX_CXX_EXPORT class HPX_ALWAYS_EXPORT duplicate_option_error : public error
+    HPX_CXX_CORE_EXPORT class HPX_ALWAYS_EXPORT duplicate_option_error
+      : public error
     {
     public:
         explicit duplicate_option_error(std::string const& xwhat)

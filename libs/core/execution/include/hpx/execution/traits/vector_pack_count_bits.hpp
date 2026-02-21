@@ -13,7 +13,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::parallel::traits {
 
-    HPX_CXX_EXPORT HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::size_t
+    HPX_CXX_CORE_EXPORT HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::size_t
     count_bits(bool value) noexcept
     {
         return value ? 1 : 0;

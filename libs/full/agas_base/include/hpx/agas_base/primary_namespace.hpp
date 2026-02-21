@@ -14,8 +14,8 @@
 #include <hpx/agas_base/gva.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/futures.hpp>
-#include <hpx/naming_base/address.hpp>
-#include <hpx/parcelset_base/parcel_interface.hpp>
+#include <hpx/modules/naming_base.hpp>
+#include <hpx/modules/parcelset_base.hpp>
 
 #include <cstdint>
 #include <memory>

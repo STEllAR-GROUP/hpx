@@ -15,13 +15,13 @@
 namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Iterator, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename Iterator, typename Enable = void>
     struct segmented_iterator_traits
     {
         using is_segmented_iterator = std::false_type;
     };
 
-    HPX_CXX_EXPORT template <typename Iterator, typename Enable>
+    HPX_CXX_CORE_EXPORT template <typename Iterator, typename Enable>
     struct is_segmented_iterator
       : segmented_iterator_traits<Iterator>::is_segmented_iterator
     {
@@ -30,7 +30,7 @@ namespace hpx::traits {
     ///////////////////////////////////////////////////////////////////////////
     // traits allowing to distinguish iterators which have a purely local
     // representation
-    HPX_CXX_EXPORT template <typename Iterator, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename Iterator, typename Enable = void>
     struct segmented_local_iterator_traits
     {
         using is_segmented_local_iterator = std::false_type;
@@ -70,7 +70,7 @@ namespace hpx::traits {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Iterator, typename Enable>
+    HPX_CXX_CORE_EXPORT template <typename Iterator, typename Enable>
     struct is_segmented_local_iterator
       : segmented_local_iterator_traits<Iterator>::is_segmented_local_iterator
     {

@@ -1,5 +1,5 @@
 //  Copyright (c)      2014 Thomas Heller
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //  Copyright (c) 2007 Richard D. Guidry Jr.
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -29,7 +29,7 @@
 namespace hpx::parcelset {
 
     //////////////////////////////////////////////////////////////////////////
-    class locality
+    HPX_CXX_EXPORT class locality
     {
         template <typename Impl>
         class impl;
@@ -198,9 +198,9 @@ namespace hpx::parcelset {
         };
     };
 
-    using endpoints_type = std::map<std::string, locality>;
+    HPX_CXX_EXPORT using endpoints_type = std::map<std::string, locality>;
 
-    HPX_EXPORT std::ostream& operator<<(
+    HPX_CXX_EXPORT HPX_EXPORT std::ostream& operator<<(
         std::ostream& os, endpoints_type const& endpoints);
 }    // namespace hpx::parcelset
 

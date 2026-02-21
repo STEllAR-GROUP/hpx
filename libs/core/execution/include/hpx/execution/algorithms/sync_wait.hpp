@@ -15,11 +15,13 @@
 
 namespace hpx::this_thread::experimental {
 
-    HPX_CXX_EXPORT using hpx::execution::experimental::sync_wait;
-    HPX_CXX_EXPORT using hpx::execution::experimental::sync_wait_t;
+    HPX_CXX_CORE_EXPORT using hpx::execution::experimental::sync_wait;
+    HPX_CXX_CORE_EXPORT using hpx::execution::experimental::sync_wait_t;
 
-    HPX_CXX_EXPORT using hpx::execution::experimental::sync_wait_with_variant;
-    HPX_CXX_EXPORT using hpx::execution::experimental::sync_wait_with_variant_t;
+    HPX_CXX_CORE_EXPORT using hpx::execution::experimental::
+        sync_wait_with_variant;
+    HPX_CXX_CORE_EXPORT using hpx::execution::experimental::
+        sync_wait_with_variant_t;
 }    // namespace hpx::this_thread::experimental
 
 #else
@@ -46,9 +48,9 @@ namespace hpx::this_thread::experimental {
 
 namespace hpx::execution::experimental::detail {
 
-    HPX_CXX_EXPORT enum class sync_wait_type { single, variant };
+    HPX_CXX_CORE_EXPORT enum class sync_wait_type { single, variant };
 
-    HPX_CXX_EXPORT struct sync_wait_error_visitor
+    HPX_CXX_CORE_EXPORT struct sync_wait_error_visitor
     {
         void operator()(std::exception_ptr ep) const
         {
@@ -62,7 +64,7 @@ namespace hpx::execution::experimental::detail {
         }
     };
 
-    HPX_CXX_EXPORT struct sync_wait_receiver_env
+    HPX_CXX_CORE_EXPORT struct sync_wait_receiver_env
     {
         using type = sync_wait_receiver_env;
         using id = sync_wait_receiver_env;
@@ -86,40 +88,40 @@ namespace hpx::execution::experimental::detail {
         }
     };
 
-    HPX_CXX_EXPORT template <typename Pack>
+    HPX_CXX_CORE_EXPORT template <typename Pack>
     struct make_decayed_pack;
 
-    HPX_CXX_EXPORT template <template <typename...> typename Pack,
+    HPX_CXX_CORE_EXPORT template <template <typename...> typename Pack,
         typename... Ts>
     struct make_decayed_pack<Pack<Ts...>>
     {
         using type = Pack<std::decay_t<Ts>...>;
     };
 
-    HPX_CXX_EXPORT template <typename Pack>
+    HPX_CXX_CORE_EXPORT template <typename Pack>
     using make_decayed_pack_t = typename make_decayed_pack<Pack>::type;
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <sync_wait_type Type, typename T>
+    HPX_CXX_CORE_EXPORT template <sync_wait_type Type, typename T>
     struct select_result;
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct select_result<sync_wait_type::single, T>
     {
         using type = hpx::variant<make_decayed_pack_t<single_variant_t<T>>>;
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct select_result<sync_wait_type::variant, T>
     {
         using type = T;
     };
 
-    HPX_CXX_EXPORT template <sync_wait_type Type, typename T>
+    HPX_CXX_CORE_EXPORT template <sync_wait_type Type, typename T>
     using select_result_t = typename select_result<Type, T>::type;
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Sender, sync_wait_type Type>
+    HPX_CXX_CORE_EXPORT template <typename Sender, sync_wait_type Type>
     struct sync_wait_receiver
     {
         struct type
@@ -372,7 +374,7 @@ namespace hpx::this_thread::experimental {
     //          3. If execution::set_stopped(r) has been called, returns
     //             sync-wait-type<S, sync-wait-env>{}.
     //
-    HPX_CXX_EXPORT inline constexpr struct sync_wait_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct sync_wait_t final
       : hpx::functional::detail::tag_priority<sync_wait_t>
     {
     private:
@@ -483,7 +485,7 @@ namespace hpx::this_thread::experimental {
     // thread of main until the work is completed, and returns an optional
     // of variant of tuples that were sent by the provided sender on its
     // completion of work.
-    HPX_CXX_EXPORT inline constexpr struct sync_wait_with_variant_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct sync_wait_with_variant_t final
       : hpx::functional::detail::tag_priority<sync_wait_with_variant_t>
     {
     private:

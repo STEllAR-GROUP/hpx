@@ -37,7 +37,7 @@ namespace hpx {
     ///     hpx::promise::set_value) that is linked to the creator's hpx::future.
     /// Note that hpx::future references shared state that is not shared with any
     /// other asynchronous return objects (as opposed to hpx::shared_future).
-    HPX_CXX_EXPORT template <typename R>
+    HPX_CXX_CORE_EXPORT template <typename R>
     class future;
 
     /// The class template hpx::shared_future provides a mechanism to access the
@@ -48,9 +48,9 @@ namespace hpx {
     /// shared future objects may refer to the same shared state.
     /// Access to the same shared state from multiple threads is safe if each thread
     /// does it through its own copy of a shared_future object.
-    HPX_CXX_EXPORT template <typename R>
+    HPX_CXX_CORE_EXPORT template <typename R>
     class shared_future;
 
-    HPX_CXX_EXPORT template <typename R>
+    HPX_CXX_CORE_EXPORT template <typename R>
     class promise;
 }    // namespace hpx

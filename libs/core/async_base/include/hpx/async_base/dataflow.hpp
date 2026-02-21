@@ -49,7 +49,7 @@ namespace hpx {
         // real function based API that dispatches to the CPO. Once
         // dataflow<Action>(...) has been removed, this CPO can be moved to
         // namespace hpx.
-        HPX_CXX_EXPORT inline constexpr struct dataflow_t final
+        HPX_CXX_CORE_EXPORT inline constexpr struct dataflow_t final
           : hpx::functional::detail::tag_fallback<dataflow_t>
         {
         private:
@@ -74,7 +74,7 @@ namespace hpx {
         } dataflow{};
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename F, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename F, typename... Ts>
     HPX_FORCEINLINE decltype(auto) dataflow(F&& f, Ts&&... ts)
     {
         return hpx::detail::dataflow(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);

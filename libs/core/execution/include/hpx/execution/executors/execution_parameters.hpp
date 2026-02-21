@@ -929,20 +929,20 @@ namespace hpx::execution::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     // specialize trait for the type-combiner
-    HPX_CXX_EXPORT template <typename... Parameters>
+    HPX_CXX_CORE_EXPORT template <typename... Parameters>
     struct is_executor_parameters<detail::executor_parameters<Parameters...>>
       : hpx::util::all_of<hpx::traits::is_executor_parameters<Parameters>...>
     {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename... Params>
+    HPX_CXX_CORE_EXPORT template <typename... Params>
     struct executor_parameters_join
     {
         using type = detail::executor_parameters<std::decay_t<Params>...>;
     };
 
-    HPX_CXX_EXPORT template <typename... Params>
+    HPX_CXX_CORE_EXPORT template <typename... Params>
     constexpr HPX_FORCEINLINE typename executor_parameters_join<Params...>::type
     join_executor_parameters(Params&&... params)
     {
@@ -952,13 +952,13 @@ namespace hpx::execution::experimental {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Param>
+    HPX_CXX_CORE_EXPORT template <typename Param>
     struct executor_parameters_join<Param>
     {
         using type = Param;
     };
 
-    HPX_CXX_EXPORT template <typename Param>
+    HPX_CXX_CORE_EXPORT template <typename Param>
     constexpr HPX_FORCEINLINE Param&& join_executor_parameters(
         Param&& param) noexcept
     {

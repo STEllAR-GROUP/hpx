@@ -42,10 +42,10 @@ namespace hpx::util::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Sig, bool Copyable = true>
+    HPX_CXX_CORE_EXPORT template <typename Sig, bool Copyable = true>
     struct function_vtable;
 
-    HPX_CXX_EXPORT template <typename Sig>
+    HPX_CXX_CORE_EXPORT template <typename Sig>
     struct function_vtable<Sig, /*Copyable*/ false>
       : function_base_vtable
       , callable_vtable<Sig>
@@ -67,7 +67,7 @@ namespace hpx::util::detail {
         }
     };
 
-    HPX_CXX_EXPORT template <typename Sig>
+    HPX_CXX_CORE_EXPORT template <typename Sig>
     struct function_vtable<Sig, /*Copyable*/ true> : function_vtable<Sig, false>
     {
         using copyable_tag = std::integral_constant<bool, true>;
@@ -79,6 +79,6 @@ namespace hpx::util::detail {
         }
     };
 
-    HPX_CXX_EXPORT template <typename Sig>
+    HPX_CXX_CORE_EXPORT template <typename Sig>
     using unique_function_vtable = function_vtable<Sig, false>;
 }    // namespace hpx::util::detail

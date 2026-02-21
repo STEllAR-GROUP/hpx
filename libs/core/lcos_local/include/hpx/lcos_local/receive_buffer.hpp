@@ -24,7 +24,7 @@
 namespace hpx::lcos::local {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T, typename Mutex = hpx::spinlock>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Mutex = hpx::spinlock>
     struct receive_buffer
     {
     protected:
@@ -243,7 +243,7 @@ namespace hpx::lcos::local {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Mutex>
+    HPX_CXX_CORE_EXPORT template <typename Mutex>
     struct receive_buffer<void, Mutex>
     {
     protected:

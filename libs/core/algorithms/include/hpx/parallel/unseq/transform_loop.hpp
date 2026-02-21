@@ -22,7 +22,7 @@ namespace hpx::parallel::util {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT struct unseq_transform_loop_n
+        HPX_CXX_CORE_EXPORT struct unseq_transform_loop_n
         {
             template <typename InIter, typename OutIter, typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE static std::pair<InIter, OutIter>
@@ -56,8 +56,8 @@ namespace hpx::parallel::util {
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename Iter, typename OutIter,
-        typename F>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter,
+        typename OutIter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::enable_if_t<
         hpx::is_unsequenced_execution_policy_v<ExPolicy>,
         std::pair<Iter, OutIter>>
@@ -72,7 +72,7 @@ namespace hpx::parallel::util {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT struct unseq_transform_loop_n_ind
+        HPX_CXX_CORE_EXPORT struct unseq_transform_loop_n_ind
         {
             template <typename InIter, typename OutIter, typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE static std::pair<InIter, OutIter>
@@ -106,8 +106,8 @@ namespace hpx::parallel::util {
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename Iter, typename OutIter,
-        typename F>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter,
+        typename OutIter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::enable_if_t<
         hpx::is_unsequenced_execution_policy_v<ExPolicy>,
         std::pair<Iter, OutIter>>
@@ -122,7 +122,7 @@ namespace hpx::parallel::util {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT struct unseq_transform_loop
+        HPX_CXX_CORE_EXPORT struct unseq_transform_loop
         {
             template <typename InIter, typename OutIter, typename F>
             HPX_HOST_DEVICE
@@ -154,8 +154,8 @@ namespace hpx::parallel::util {
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename IterB, typename IterE, typename OutIter,
-        typename F>
+    HPX_CXX_CORE_EXPORT template <typename IterB, typename IterE,
+        typename OutIter, typename F>
     HPX_HOST_DEVICE
         HPX_FORCEINLINE constexpr util::in_out_result<IterB, OutIter>
         tag_invoke(hpx::parallel::util::transform_loop_t,
@@ -166,8 +166,8 @@ namespace hpx::parallel::util {
             it, end, dest, HPX_FORWARD(F, f));
     }
 
-    HPX_CXX_EXPORT template <typename IterB, typename IterE, typename OutIter,
-        typename F>
+    HPX_CXX_CORE_EXPORT template <typename IterB, typename IterE,
+        typename OutIter, typename F>
     HPX_HOST_DEVICE
         HPX_FORCEINLINE constexpr util::in_out_result<IterB, OutIter>
         tag_invoke(hpx::parallel::util::transform_loop_t,
@@ -181,7 +181,7 @@ namespace hpx::parallel::util {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT struct unseq_transform_loop_ind
+        HPX_CXX_CORE_EXPORT struct unseq_transform_loop_ind
         {
             template <typename InIter, typename OutIter, typename F>
             HPX_HOST_DEVICE
@@ -213,8 +213,8 @@ namespace hpx::parallel::util {
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename IterB, typename IterE, typename OutIter,
-        typename F>
+    HPX_CXX_CORE_EXPORT template <typename IterB, typename IterE,
+        typename OutIter, typename F>
     HPX_HOST_DEVICE
         HPX_FORCEINLINE constexpr util::in_out_result<IterB, OutIter>
         tag_invoke(hpx::parallel::util::transform_loop_ind_t,
@@ -225,8 +225,8 @@ namespace hpx::parallel::util {
             it, end, dest, HPX_FORWARD(F, f));
     }
 
-    HPX_CXX_EXPORT template <typename IterB, typename IterE, typename OutIter,
-        typename F>
+    HPX_CXX_CORE_EXPORT template <typename IterB, typename IterE,
+        typename OutIter, typename F>
     HPX_HOST_DEVICE
         HPX_FORCEINLINE constexpr util::in_out_result<IterB, OutIter>
         tag_invoke(hpx::parallel::util::transform_loop_ind_t,
@@ -240,7 +240,7 @@ namespace hpx::parallel::util {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT struct unseq_transform_binary_loop_n
+        HPX_CXX_CORE_EXPORT struct unseq_transform_binary_loop_n
         {
             template <typename InIter1, typename InIter2, typename OutIter,
                 typename F>
@@ -279,7 +279,7 @@ namespace hpx::parallel::util {
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename InIter1,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename InIter1,
         typename InIter2, typename OutIter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE
         std::enable_if_t<hpx::is_unsequenced_execution_policy_v<ExPolicy>,
@@ -295,7 +295,7 @@ namespace hpx::parallel::util {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT struct unseq_transform_binary_loop
+        HPX_CXX_CORE_EXPORT struct unseq_transform_binary_loop
         {
             template <typename InIter1, typename InIter2, typename OutIter,
                 typename F>
@@ -372,7 +372,7 @@ namespace hpx::parallel::util {
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename InIter1,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename InIter1,
         typename InIter2, typename OutIter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::enable_if_t<
         hpx::is_unsequenced_execution_policy_v<ExPolicy>,
@@ -385,7 +385,7 @@ namespace hpx::parallel::util {
             first1, last1, first2, dest, HPX_FORWARD(F, f));
     }
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename InIter1,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename InIter1,
         typename InIter2, typename OutIter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::enable_if_t<
         hpx::is_unsequenced_execution_policy_v<ExPolicy>,
@@ -402,7 +402,7 @@ namespace hpx::parallel::util {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT struct unseq_transform_binary_loop_ind_n
+        HPX_CXX_CORE_EXPORT struct unseq_transform_binary_loop_ind_n
         {
             template <typename InIter1, typename InIter2, typename OutIter,
                 typename F>
@@ -441,7 +441,7 @@ namespace hpx::parallel::util {
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename InIter1,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename InIter1,
         typename InIter2, typename OutIter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::enable_if_t<
         hpx::is_unsequenced_execution_policy_v<ExPolicy>,
@@ -457,7 +457,7 @@ namespace hpx::parallel::util {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT struct unseq_transform_binary_loop_ind
+        HPX_CXX_CORE_EXPORT struct unseq_transform_binary_loop_ind
         {
             template <typename InIter1, typename InIter2, typename OutIter,
                 typename F>
@@ -534,7 +534,7 @@ namespace hpx::parallel::util {
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename InIter1,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename InIter1,
         typename InIter2, typename OutIter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::enable_if_t<
         hpx::is_unsequenced_execution_policy_v<ExPolicy>,
@@ -547,7 +547,7 @@ namespace hpx::parallel::util {
             first1, last1, first2, dest, HPX_FORWARD(F, f));
     }
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename InIter1,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename InIter1,
         typename InIter2, typename OutIter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::enable_if_t<
         hpx::is_unsequenced_execution_policy_v<ExPolicy>,

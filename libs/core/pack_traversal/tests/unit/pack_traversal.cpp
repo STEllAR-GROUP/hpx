@@ -5,8 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/modules/futures.hpp>
+#include <hpx/modules/pack_traversal.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/pack_traversal/pack_traversal.hpp>
 
 #include <algorithm>
 #include <array>

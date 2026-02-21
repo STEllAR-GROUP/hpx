@@ -60,7 +60,7 @@ namespace hpx {
     ///          hpx::future objects were resolved through an exception. See
     ///          hpx::future::get() for details.
     ///
-    HPX_CXX_EXPORT template <typename... Args>
+    HPX_CXX_CORE_EXPORT template <typename... Args>
     auto unwrap(Args&&... args) -> decltype(util::detail::unwrap_depth_impl<1U>(
         HPX_FORWARD(Args, args)...))
     {
@@ -71,7 +71,7 @@ namespace hpx {
 
         /// A helper function object for functionally invoking `hpx::unwrap`.
         /// For more information please refer to its documentation.
-        HPX_CXX_EXPORT struct unwrap
+        HPX_CXX_CORE_EXPORT struct unwrap
         {
             /// \cond NOINTERNAL
             template <typename... Args>
@@ -92,7 +92,7 @@ namespace hpx {
     ///
     /// See unwrap for a detailed description.
     ///
-    HPX_CXX_EXPORT template <std::size_t Depth, typename... Args>
+    HPX_CXX_CORE_EXPORT template <std::size_t Depth, typename... Args>
     auto unwrap_n(Args&&... args)
         -> decltype(util::detail::unwrap_depth_impl<Depth>(
             HPX_FORWARD(Args, args)...))
@@ -106,7 +106,7 @@ namespace hpx {
 
         /// A helper function object for functionally invoking `hpx::unwrap_n`.
         /// For more information please refer to its documentation.
-        HPX_CXX_EXPORT template <std::size_t Depth>
+        HPX_CXX_CORE_EXPORT template <std::size_t Depth>
         struct unwrap_n
         {
             /// \cond NOINTERNAL
@@ -126,7 +126,7 @@ namespace hpx {
     ///
     /// See hpx::unwrap() for a detailed description.
     ///
-    HPX_CXX_EXPORT template <typename... Args>
+    HPX_CXX_CORE_EXPORT template <typename... Args>
     auto unwrap_all(Args&&... args)
         -> decltype(util::detail::unwrap_depth_impl<0U>(
             HPX_FORWARD(Args, args)...))
@@ -139,7 +139,7 @@ namespace hpx {
         /// A helper function object for functionally invoking
         /// `hpx::unwrap_all`. For more information please refer to its
         /// documentation.
-        HPX_CXX_EXPORT struct unwrap_all
+        HPX_CXX_CORE_EXPORT struct unwrap_all
         {
             /// \cond NOINTERNAL
             template <typename... Args>
@@ -169,7 +169,7 @@ namespace hpx {
     /// \param callable the callable object which is called with the
     ///        result of the corresponding unwrap function.
     ///
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     auto unwrapping(T&& callable)
         -> decltype(util::detail::functional_unwrap_depth_impl<1U>(
             HPX_FORWARD(T, callable)))
@@ -184,7 +184,7 @@ namespace hpx {
     ///
     /// See hpx::unwrapping() for a detailed description.
     ///
-    HPX_CXX_EXPORT template <std::size_t Depth, typename T>
+    HPX_CXX_CORE_EXPORT template <std::size_t Depth, typename T>
     auto unwrapping_n(T&& callable)
         -> decltype(util::detail::functional_unwrap_depth_impl<Depth>(
             HPX_FORWARD(T, callable)))
@@ -200,7 +200,7 @@ namespace hpx {
     ///
     /// See hpx::unwrapping() for a detailed description.
     ///
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     auto unwrapping_all(T&& callable)
         -> decltype(util::detail::functional_unwrap_depth_impl<0U>(
             HPX_FORWARD(T, callable)))

@@ -24,6 +24,7 @@
 #include <hpx/modules/testing.hpp>
 
 #include <cstddef>
+#include <span>
 
 #include "operation_sequence.hpp"
 

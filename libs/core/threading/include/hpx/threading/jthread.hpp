@@ -47,7 +47,7 @@ namespace hpx {
     /// represent the same thread of execution; \a hpx::jthread is not \a
     /// CopyConstructible or \a CopyAssignable, although it is \a
     /// MoveConstructible and \a MoveAssignable.
-    HPX_CXX_EXPORT class jthread
+    HPX_CXX_CORE_EXPORT class jthread
     {
     private:
         template <typename F, typename... Ts>
@@ -308,7 +308,7 @@ namespace hpx {
     // 32.4.3.4, specialized algorithms
 
     // Effects: Equivalent to: x.swap(y).
-    HPX_CXX_EXPORT inline void swap(jthread& lhs, jthread& rhs) noexcept
+    HPX_CXX_CORE_EXPORT inline void swap(jthread& lhs, jthread& rhs) noexcept
     {
         lhs.swap(rhs);
     }

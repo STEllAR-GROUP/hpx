@@ -8,10 +8,10 @@
 #pragma once
 
 #include <hpx/iterator_support/tests/iter_sent.hpp>
+#include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/parallel/container_algorithms/sort.hpp>
 
 #include <algorithm>
 #include <cstddef>

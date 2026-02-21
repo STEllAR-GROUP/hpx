@@ -433,12 +433,12 @@ namespace hpx { namespace ranges {
 
 namespace hpx::ranges {
 
-    HPX_CXX_EXPORT template <typename I1, typename O>
+    HPX_CXX_CORE_EXPORT template <typename I1, typename O>
     using set_difference_result = parallel::util::in_out_result<I1, O>;
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::set_difference
-    HPX_CXX_EXPORT inline constexpr struct set_difference_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct set_difference_t final
       : hpx::detail::tag_parallel_algorithm<set_difference_t>
     {
     private:

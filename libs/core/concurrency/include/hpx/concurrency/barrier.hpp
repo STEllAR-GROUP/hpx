@@ -19,7 +19,7 @@
 
 namespace hpx::util {
 
-    HPX_CXX_EXPORT class HPX_CORE_EXPORT barrier
+    HPX_CXX_CORE_EXPORT class HPX_CORE_EXPORT barrier
     {
     private:
         using mutex_type = std::mutex;

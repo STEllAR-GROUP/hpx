@@ -25,7 +25,7 @@
 namespace hpx::parallel::detail {
 
     ///////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T, typename Op>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Op>
     struct reduction_helper
     {
         using needs_current_thread_num = void;
@@ -135,7 +135,7 @@ namespace hpx::experimental {
     ///          views are combined by invoking the copy of combiner, passing
     ///          it the two views to be combined.
     ///
-    HPX_CXX_EXPORT template <typename T, typename Op>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Op>
     HPX_FORCEINLINE constexpr hpx::parallel::detail::reduction_helper<T,
         std::decay_t<Op>>
     reduction(T& var, T const& identity, Op&& combiner)
@@ -144,7 +144,7 @@ namespace hpx::experimental {
             var, identity, HPX_FORWARD(Op, combiner));
     }
 
-    HPX_CXX_EXPORT template <typename T, typename Op>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Op>
     HPX_FORCEINLINE constexpr hpx::parallel::detail::reduction_helper<T,
         std::decay_t<Op>>
     reduction(T& var, Op&& combiner)

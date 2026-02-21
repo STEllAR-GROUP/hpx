@@ -248,7 +248,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        HPX_CXX_EXPORT template <typename Iter>
+        HPX_CXX_CORE_EXPORT template <typename Iter>
         struct adjacent_difference
           : public algorithm<adjacent_difference<Iter>, Iter>
         {
@@ -348,7 +348,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::adjacent_difference
-    HPX_CXX_EXPORT inline constexpr struct adjacent_difference_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct adjacent_difference_t final
       : hpx::detail::tag_parallel_algorithm<adjacent_difference_t>
     {
     private:

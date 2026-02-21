@@ -13,7 +13,7 @@
 #include <hpx/modules/ini.hpp>
 #include <hpx/modules/preprocessor.hpp>
 
-#include <hpx/parcelset_base/parcelset_base_fwd.hpp>
+#include <hpx/modules/parcelset_base.hpp>
 #include <hpx/plugin_factories/message_handler_factory_base.hpp>
 #include <hpx/plugin_factories/plugin_registry.hpp>
 #include <hpx/plugin_factories/unique_plugin_name.hpp>

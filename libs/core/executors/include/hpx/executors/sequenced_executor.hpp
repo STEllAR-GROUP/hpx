@@ -36,7 +36,7 @@ namespace hpx::execution {
     /// which execute in the calling thread. The sequential order is given by
     /// the lexicographical order of indices in the index space.
     ///
-    HPX_CXX_EXPORT struct sequenced_executor
+    HPX_CXX_CORE_EXPORT struct sequenced_executor
     {
         /// \cond NOINTERNAL
         bool operator==(sequenced_executor const& /*rhs*/) const noexcept

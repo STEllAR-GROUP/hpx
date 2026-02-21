@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Grant Mercer
-//  Copyright (c) 2020-2025 Hartmut Kaiser
+//  Copyright (c) 2020-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,6 +7,7 @@
 
 #include <hpx/chrono.hpp>
 #include <hpx/init.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/numeric.hpp>
 
 #include "worker_timed.hpp"

@@ -12,7 +12,7 @@
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/modules/serialization.hpp>
 
-#include <hpx/parcelset_base/detail/data_point.hpp>
+#include <hpx/modules/parcelset_base.hpp>
 
 #include <cstdint>
 #include <utility>

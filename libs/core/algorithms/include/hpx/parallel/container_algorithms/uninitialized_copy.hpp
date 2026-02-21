@@ -325,7 +325,7 @@ namespace hpx { namespace ranges {
 
 namespace hpx::ranges {
 
-    HPX_CXX_EXPORT inline constexpr struct uninitialized_copy_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct uninitialized_copy_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_copy_t>
     {
     private:
@@ -444,7 +444,7 @@ namespace hpx::ranges {
         }
     } uninitialized_copy{};
 
-    HPX_CXX_EXPORT inline constexpr struct uninitialized_copy_n_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct uninitialized_copy_n_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_copy_n_t>
     {
     private:

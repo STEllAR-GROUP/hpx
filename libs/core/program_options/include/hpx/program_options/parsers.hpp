@@ -21,15 +21,15 @@
 
 namespace hpx::program_options {
 
-    HPX_CXX_EXPORT class options_description;
-    HPX_CXX_EXPORT class positional_options_description;
+    HPX_CXX_CORE_EXPORT class options_description;
+    HPX_CXX_CORE_EXPORT class positional_options_description;
 
     /** Results of parsing an input source.
         The primary use of this class is passing information from parsers
         component to value storage component. This class does not makes
         much sense itself.
     */
-    HPX_CXX_EXPORT template <typename Char>
+    HPX_CXX_CORE_EXPORT template <typename Char>
     class basic_parsed_options
     {
     public:
@@ -91,13 +91,13 @@ namespace hpx::program_options {
         int m_options_prefix;
     };
 
-    HPX_CXX_EXPORT using parsed_options = basic_parsed_options<char>;
-    HPX_CXX_EXPORT using wparsed_options = basic_parsed_options<wchar_t>;
+    HPX_CXX_CORE_EXPORT using parsed_options = basic_parsed_options<char>;
+    HPX_CXX_CORE_EXPORT using wparsed_options = basic_parsed_options<wchar_t>;
 
     /** Augments basic_parsed_options<wchar_t> with conversion from
         'parsed_options' */
 
-    HPX_CXX_EXPORT using ext_parser =
+    HPX_CXX_CORE_EXPORT using ext_parser =
         std::function<std::pair<std::string, std::string>(std::string const&)>;
 
     /** Command line parser.
@@ -114,7 +114,7 @@ namespace hpx::program_options {
         There are two typedefs \-- command_line_parser and wcommand_line_parser,
         for charT == char and charT == wchar_t cases.
     */
-    HPX_CXX_EXPORT template <typename Char>
+    HPX_CXX_CORE_EXPORT template <typename Char>
     class basic_command_line_parser : private detail::cmdline
     {
     public:
@@ -159,14 +159,15 @@ namespace hpx::program_options {
         basic_command_line_parser& extra_style_parser(style_parser s);
     };
 
-    HPX_CXX_EXPORT using command_line_parser = basic_command_line_parser<char>;
-    HPX_CXX_EXPORT using wcommand_line_parser =
+    HPX_CXX_CORE_EXPORT using command_line_parser =
+        basic_command_line_parser<char>;
+    HPX_CXX_CORE_EXPORT using wcommand_line_parser =
         basic_command_line_parser<wchar_t>;
 
     /** Creates instance of 'command_line_parser', passes parameters to it,
         and returns the result of calling the 'run' method.
      */
-    HPX_CXX_EXPORT template <typename Char>
+    HPX_CXX_CORE_EXPORT template <typename Char>
     [[nodiscard]] basic_parsed_options<Char> parse_command_line(int argc,
         Char const* const argv[], options_description const&, int style = 0,
         std::function<std::pair<std::string, std::string>(std::string const&)>
@@ -176,7 +177,7 @@ namespace hpx::program_options {
 
         Read from given stream.
     */
-    HPX_CXX_EXPORT template <typename Char>
+    HPX_CXX_CORE_EXPORT template <typename Char>
     [[nodiscard]] HPX_CORE_EXPORT basic_parsed_options<Char> parse_config_file(
         std::basic_istream<Char>&, options_description const&,
         bool allow_unregistered = false);
@@ -186,14 +187,14 @@ namespace hpx::program_options {
         Read from file with the given name. The character type is
         passed to the file stream.
     */
-    HPX_CXX_EXPORT template <typename Char = char>
+    HPX_CXX_CORE_EXPORT template <typename Char = char>
     [[nodiscard]] HPX_CORE_EXPORT basic_parsed_options<Char> parse_config_file(
         char const* filename, options_description const&,
         bool allow_unregistered = false);
 
     /** Controls if the 'collect_unregistered' function should
         include positional options, or not. */
-    HPX_CXX_EXPORT enum class collect_unrecognized_mode : std::uint8_t {
+    HPX_CXX_CORE_EXPORT enum class collect_unrecognized_mode : std::uint8_t {
         include_positional,
         exclude_positional
     };
@@ -204,7 +205,7 @@ namespace hpx::program_options {
         Returns the vector of original tokens for all collected
         options.
     */
-    HPX_CXX_EXPORT template <typename Char>
+    HPX_CXX_CORE_EXPORT template <typename Char>
     [[nodiscard]] std::vector<std::basic_string<Char>> collect_unrecognized(
         std::vector<basic_option<Char>> const& options,
         enum collect_unrecognized_mode mode);
@@ -218,7 +219,7 @@ namespace hpx::program_options {
         This is done since naming of environment variables is typically
         different from the naming of command line options.
     */
-    HPX_CXX_EXPORT [[nodiscard]] HPX_CORE_EXPORT parsed_options
+    HPX_CXX_CORE_EXPORT [[nodiscard]] HPX_CORE_EXPORT parsed_options
     parse_environment(options_description const&,
         std::function<std::string(std::string)> const& name_mapper);
 
@@ -228,7 +229,7 @@ namespace hpx::program_options {
         name is obtained from variable name by removing the prefix and
         converting the remaining string into lower case.
     */
-    HPX_CXX_EXPORT [[nodiscard]] HPX_CORE_EXPORT parsed_options
+    HPX_CXX_CORE_EXPORT [[nodiscard]] HPX_CORE_EXPORT parsed_options
     parse_environment(options_description const&, std::string const& prefix);
 
     /** @overload
@@ -236,7 +237,7 @@ namespace hpx::program_options {
         functions when second argument is of 'char*' type. There's implicit
         conversion to both std::function and string.
     */
-    HPX_CXX_EXPORT [[nodiscard]] HPX_CORE_EXPORT parsed_options
+    HPX_CXX_CORE_EXPORT [[nodiscard]] HPX_CORE_EXPORT parsed_options
     parse_environment(options_description const&, char const* prefix);
 
     /** Splits a given string to a collection of single strings which
@@ -246,12 +247,12 @@ namespace hpx::program_options {
         Splitting is done in a unix style way, with respect to quotes '"'
         and escape characters '\'
     */
-    HPX_CXX_EXPORT [[nodiscard]] HPX_CORE_EXPORT std::vector<std::string>
+    HPX_CXX_CORE_EXPORT [[nodiscard]] HPX_CORE_EXPORT std::vector<std::string>
     split_unix(std::string const& cmdline, std::string const& separator = " \t",
         std::string const& quote = "'\"", std::string const& escape = "\\");
 
     /** @overload */
-    HPX_CXX_EXPORT [[nodiscard]] HPX_CORE_EXPORT std::vector<std::wstring>
+    HPX_CXX_CORE_EXPORT [[nodiscard]] HPX_CORE_EXPORT std::vector<std::wstring>
     split_unix(std::wstring const& cmdline,
         std::wstring const& separator = L" \t",
         std::wstring const& quote = L"'\"", std::wstring const& escape = L"\\");
@@ -263,11 +264,11 @@ namespace hpx::program_options {
         runtime library and if it always exists.
         This function is available only on Windows.
     */
-    HPX_CXX_EXPORT [[nodiscard]] HPX_CORE_EXPORT std::vector<std::string>
+    HPX_CXX_CORE_EXPORT [[nodiscard]] HPX_CORE_EXPORT std::vector<std::string>
     split_winmain(std::string const& cmdline);
 
     /** @overload */
-    HPX_CXX_EXPORT [[nodiscard]] HPX_CORE_EXPORT std::vector<std::wstring>
+    HPX_CXX_CORE_EXPORT [[nodiscard]] HPX_CORE_EXPORT std::vector<std::wstring>
     split_winmain(std::wstring const& cmdline);
 #endif
 }    // namespace hpx::program_options

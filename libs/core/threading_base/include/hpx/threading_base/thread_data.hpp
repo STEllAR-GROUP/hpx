@@ -44,11 +44,11 @@ namespace hpx::threads {
 
     namespace detail {
 
-        HPX_CXX_EXPORT using get_locality_id_type =
+        HPX_CXX_CORE_EXPORT using get_locality_id_type =
             std::uint32_t(hpx::error_code&);
-        HPX_CXX_EXPORT HPX_CORE_EXPORT void set_get_locality_id(
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void set_get_locality_id(
             get_locality_id_type* f);
-        HPX_CXX_EXPORT HPX_CORE_EXPORT std::uint32_t get_locality_id(
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT std::uint32_t get_locality_id(
             hpx::error_code&);
     }    // namespace detail
 
@@ -68,7 +68,7 @@ namespace hpx::threads {
     /// Generally, \a threads are not created or executed directly. All
     /// functionality related to the management of \a threads is implemented by
     /// the thread-manager.
-    HPX_CXX_EXPORT class thread_data
+    HPX_CXX_CORE_EXPORT class thread_data
       : public detail::thread_data_reference_counting
     {
     public:
@@ -614,14 +614,14 @@ namespace hpx::threads {
 #endif
     };
 
-    HPX_CXX_EXPORT HPX_FORCEINLINE constexpr thread_data* get_thread_id_data(
-        thread_id_ref_type const& tid) noexcept
+    HPX_CXX_CORE_EXPORT HPX_FORCEINLINE constexpr thread_data*
+    get_thread_id_data(thread_id_ref_type const& tid) noexcept
     {
         return static_cast<thread_data*>(tid.get().get());
     }
 
-    HPX_CXX_EXPORT HPX_FORCEINLINE constexpr thread_data* get_thread_id_data(
-        thread_id_type const& tid) noexcept
+    HPX_CXX_CORE_EXPORT HPX_FORCEINLINE constexpr thread_data*
+    get_thread_id_data(thread_id_type const& tid) noexcept
     {
         return static_cast<thread_data*>(tid.get());
     }

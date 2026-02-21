@@ -9,6 +9,4 @@
 
 #include <hpx/config.hpp>
 #include <hpx/agas/addressing_service.hpp>
-#include <hpx/naming_base/address.hpp>
-#include <hpx/naming_base/id_type.hpp>
-#include <hpx/naming_base/unmanaged.hpp>
+#include <hpx/modules/naming_base.hpp>

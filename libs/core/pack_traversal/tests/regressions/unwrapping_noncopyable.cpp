@@ -7,7 +7,7 @@
 // This test checks that unwrapping does not attempt to make copies of
 // noncopyable lvalues.
 
-#include <hpx/pack_traversal/unwrap.hpp>
+#include <hpx/modules/pack_traversal.hpp>
 
 struct noncopyable
 {

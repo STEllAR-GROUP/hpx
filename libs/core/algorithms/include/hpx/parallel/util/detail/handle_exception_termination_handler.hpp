@@ -11,13 +11,13 @@
 
 namespace hpx::parallel::util::detail {
 
-    HPX_CXX_EXPORT using parallel_exception_termination_handler_type =
+    HPX_CXX_CORE_EXPORT using parallel_exception_termination_handler_type =
         hpx::function<void()>;
 
-    HPX_CXX_EXPORT HPX_CORE_EXPORT void
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void
     set_parallel_exception_termination_handler(
         parallel_exception_termination_handler_type f);
 
-    HPX_CXX_EXPORT [[noreturn]] HPX_CORE_EXPORT void
+    HPX_CXX_CORE_EXPORT [[noreturn]] HPX_CORE_EXPORT void
     parallel_exception_termination_handler();
 }    // namespace hpx::parallel::util::detail

@@ -14,7 +14,7 @@
 
 namespace hpx::util {
 
-    HPX_EXPORT int handle_late_commandline_options(
+    HPX_CXX_EXPORT HPX_EXPORT int handle_late_commandline_options(
         util::runtime_configuration& ini,
         hpx::program_options::options_description const& options,
         void (*handle_print_bind)(std::size_t),

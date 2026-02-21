@@ -20,7 +20,7 @@
 
 namespace hpx::threads::coroutines::detail {
 
-    HPX_CXX_EXPORT class coroutine_stackful_self_direct
+    HPX_CXX_CORE_EXPORT class coroutine_stackful_self_direct
       : public coroutine_stackful_self
     {
     public:

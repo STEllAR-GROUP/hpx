@@ -20,10 +20,10 @@
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/timing.hpp>
 
+#include <hpx/modules/parcelset_base.hpp>
 #include <hpx/parcelport_tcp/connection_handler.hpp>
 #include <hpx/parcelset/decode_parcels.hpp>
 #include <hpx/parcelset/parcelport_connection.hpp>
-#include <hpx/parcelset_base/detail/data_point.hpp>
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
 #include <winsock2.h>

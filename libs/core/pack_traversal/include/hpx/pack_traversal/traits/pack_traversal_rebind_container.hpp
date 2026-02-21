@@ -67,7 +67,7 @@ namespace hpx::traits {
     // Implement a two-level specialization to avoid ambiguities between the
     // specializations for standard containers below and the generic fallback
     // solutions provided above
-    HPX_CXX_EXPORT template <typename NewType, typename OldType,
+    HPX_CXX_CORE_EXPORT template <typename NewType, typename OldType,
         typename Enable = void>
     struct pack_traversal_rebind_container
       : detail::pack_traversal_rebind_container<NewType, OldType>
@@ -77,7 +77,7 @@ namespace hpx::traits {
     // gcc reports an ambiguity for any standard container that has a defaulted
     // allocator template argument as it believes both specializations above are
     // viable. This works around by explicitly specializing the trait.
-    HPX_CXX_EXPORT template <typename NewType, typename OldType,
+    HPX_CXX_CORE_EXPORT template <typename NewType, typename OldType,
         typename OldAllocator>
     struct pack_traversal_rebind_container<NewType,
         std::vector<OldType, OldAllocator>>
@@ -95,7 +95,7 @@ namespace hpx::traits {
         }
     };
 
-    HPX_CXX_EXPORT template <typename NewType, typename OldType,
+    HPX_CXX_CORE_EXPORT template <typename NewType, typename OldType,
         typename OldAllocator>
     struct pack_traversal_rebind_container<NewType,
         std::list<OldType, OldAllocator>>
@@ -113,7 +113,8 @@ namespace hpx::traits {
         }
     };
 
-    HPX_CXX_EXPORT template <typename NewType, typename OldType, std::size_t N>
+    HPX_CXX_CORE_EXPORT template <typename NewType, typename OldType,
+        std::size_t N>
     struct pack_traversal_rebind_container<NewType, std::array<OldType, N>>
     {
         static std::array<NewType, N> call(

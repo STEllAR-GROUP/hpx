@@ -23,7 +23,7 @@ namespace hpx {
     ///
     /// This enumeration lists all possible error conditions which can be
     /// reported from any of the API functions.
-    HPX_CXX_EXPORT enum class error : std::int16_t {
+    HPX_CXX_CORE_EXPORT enum class error : std::int16_t {
         success = 0,
         ///< The operation was successful
         no_success = 1,
@@ -150,47 +150,47 @@ namespace hpx {
         /// \endcond
     };
 
-    HPX_CXX_EXPORT constexpr bool operator==(int lhs, error rhs) noexcept
+    HPX_CXX_CORE_EXPORT constexpr bool operator==(int lhs, error rhs) noexcept
     {
         return lhs == static_cast<int>(rhs);
     }
 
-    HPX_CXX_EXPORT constexpr bool operator==(error lhs, int rhs) noexcept
+    HPX_CXX_CORE_EXPORT constexpr bool operator==(error lhs, int rhs) noexcept
     {
         return static_cast<int>(lhs) == rhs;
     }
 
-    HPX_CXX_EXPORT constexpr bool operator!=(int lhs, error rhs) noexcept
+    HPX_CXX_CORE_EXPORT constexpr bool operator!=(int lhs, error rhs) noexcept
     {
         return !(lhs == rhs);
     }
 
-    HPX_CXX_EXPORT constexpr bool operator!=(error lhs, int rhs) noexcept
+    HPX_CXX_CORE_EXPORT constexpr bool operator!=(error lhs, int rhs) noexcept
     {
         return !(lhs == rhs);
     }
 
-    HPX_CXX_EXPORT constexpr bool operator<(int lhs, error rhs) noexcept
+    HPX_CXX_CORE_EXPORT constexpr bool operator<(int lhs, error rhs) noexcept
     {
         return lhs < static_cast<int>(rhs);
     }
 
-    HPX_CXX_EXPORT constexpr bool operator>=(int lhs, error rhs) noexcept
+    HPX_CXX_CORE_EXPORT constexpr bool operator>=(int lhs, error rhs) noexcept
     {
         return !(lhs < rhs);
     }
 
-    HPX_CXX_EXPORT constexpr int operator&(error lhs, error rhs) noexcept
+    HPX_CXX_CORE_EXPORT constexpr int operator&(error lhs, error rhs) noexcept
     {
         return static_cast<int>(lhs) & static_cast<int>(rhs);
     }
 
-    HPX_CXX_EXPORT constexpr int operator&(int lhs, error rhs) noexcept
+    HPX_CXX_CORE_EXPORT constexpr int operator&(int lhs, error rhs) noexcept
     {
         return lhs & static_cast<int>(rhs);
     }
 
-    HPX_CXX_EXPORT constexpr int operator|=(int& lhs, error rhs) noexcept
+    HPX_CXX_CORE_EXPORT constexpr int operator|=(int& lhs, error rhs) noexcept
     {
         lhs = lhs | static_cast<int>(rhs);
         return lhs;
@@ -328,7 +328,8 @@ namespace hpx {
 #undef HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG
 
     // Return a textual representation of a given error code
-    HPX_CXX_EXPORT HPX_CORE_EXPORT char const* get_error_name(error e) noexcept;
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT char const* get_error_name(
+        error e) noexcept;
 
 }    // namespace hpx
 

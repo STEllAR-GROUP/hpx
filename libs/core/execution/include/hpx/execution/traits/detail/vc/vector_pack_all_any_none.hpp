@@ -17,7 +17,7 @@
 namespace hpx::parallel::traits {
 
     ///////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T, typename Abi>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Abi>
     HPX_HOST_DEVICE HPX_FORCEINLINE std::size_t all_of(
         Vc::Mask<T, Abi> const& msk) noexcept
     {
@@ -25,7 +25,7 @@ namespace hpx::parallel::traits {
     }
 
     ///////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T, typename Abi>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Abi>
     HPX_HOST_DEVICE HPX_FORCEINLINE std::size_t any_of(
         Vc::Mask<T, Abi> const& msk) noexcept
     {
@@ -33,7 +33,7 @@ namespace hpx::parallel::traits {
     }
 
     ///////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T, typename Abi>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Abi>
     HPX_HOST_DEVICE HPX_FORCEINLINE std::size_t none_of(
         Vc::Mask<T, Abi> const& msk) noexcept
     {

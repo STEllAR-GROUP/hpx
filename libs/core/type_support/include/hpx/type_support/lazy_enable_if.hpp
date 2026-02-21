@@ -10,12 +10,12 @@
 
 namespace hpx::util {
 
-    HPX_CXX_EXPORT template <bool Enable, typename T>
+    HPX_CXX_CORE_EXPORT template <bool Enable, typename T>
     struct lazy_enable_if
     {
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct lazy_enable_if<true, T>
     {
         using type = typename T::type;

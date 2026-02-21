@@ -30,35 +30,35 @@ namespace hpx::parallel::util {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename Category, typename Enable = void>
+        HPX_CXX_CORE_EXPORT template <typename Category, typename Enable = void>
         struct copy_helper;
-        HPX_CXX_EXPORT template <typename Category, typename Enable = void>
+        HPX_CXX_CORE_EXPORT template <typename Category, typename Enable = void>
         struct copy_n_helper;
 
-        HPX_CXX_EXPORT template <typename Category, typename Enable = void>
+        HPX_CXX_CORE_EXPORT template <typename Category, typename Enable = void>
         struct copy_synchronize_helper;
 
-        HPX_CXX_EXPORT template <typename Category, typename Enable = void>
+        HPX_CXX_CORE_EXPORT template <typename Category, typename Enable = void>
         struct move_helper;
-        HPX_CXX_EXPORT template <typename Category, typename Enable = void>
+        HPX_CXX_CORE_EXPORT template <typename Category, typename Enable = void>
         struct move_n_helper;
 
-        HPX_CXX_EXPORT template <typename Category, typename Enable = void>
+        HPX_CXX_CORE_EXPORT template <typename Category, typename Enable = void>
         struct uninit_copy_n_helper;
 
-        HPX_CXX_EXPORT template <typename Category, typename Enable = void>
+        HPX_CXX_CORE_EXPORT template <typename Category, typename Enable = void>
         struct uninit_move_n_helper;
 
         ///////////////////////////////////////////////////////////////////////
         // NOLINTBEGIN(bugprone-bitwise-pointer-cast)
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         HPX_FORCEINLINE constexpr std::enable_if_t<std::is_pointer_v<T>, char*>
         to_ptr(T ptr) noexcept
         {
             return const_cast<char*>(hpx::bit_cast<char const volatile*>(ptr));
         }
 
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         HPX_FORCEINLINE constexpr std::enable_if_t<std::is_pointer_v<T>,
             char const*>
         to_const_ptr(T ptr) noexcept
@@ -67,7 +67,7 @@ namespace hpx::parallel::util {
                 hpx::bit_cast<char const volatile*>(ptr));
         }
 
-        HPX_CXX_EXPORT template <typename Iter>
+        HPX_CXX_CORE_EXPORT template <typename Iter>
         HPX_FORCEINLINE constexpr std::enable_if_t<!std::is_pointer_v<Iter>,
             char*>
         to_ptr(Iter ptr) noexcept
@@ -80,7 +80,7 @@ namespace hpx::parallel::util {
                 hpx::bit_cast<char const volatile*>(&*ptr));
         }
 
-        HPX_CXX_EXPORT template <typename Iter>
+        HPX_CXX_CORE_EXPORT template <typename Iter>
         HPX_FORCEINLINE constexpr std::enable_if_t<!std::is_pointer_v<Iter>,
             char const*>
         to_const_ptr(Iter ptr) noexcept
@@ -95,7 +95,7 @@ namespace hpx::parallel::util {
         // NOLINTEND(bugprone-bitwise-pointer-cast)
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename InIter, typename OutIter>
+        HPX_CXX_CORE_EXPORT template <typename InIter, typename OutIter>
         HPX_FORCEINLINE constexpr in_out_result<InIter, OutIter> copy_memmove(
             InIter first, std::size_t count, OutIter dest) noexcept
         {
@@ -124,7 +124,7 @@ namespace hpx::parallel::util {
 
         ///////////////////////////////////////////////////////////////////////
         // Customization point for optimizing copy operations
-        HPX_CXX_EXPORT template <typename Category, typename Enable>
+        HPX_CXX_CORE_EXPORT template <typename Category, typename Enable>
         struct copy_helper
         {
             template <typename InIter, typename Sent, typename OutIter>
@@ -138,7 +138,7 @@ namespace hpx::parallel::util {
             }
         };
 
-        HPX_CXX_EXPORT template <typename Dummy>
+        HPX_CXX_CORE_EXPORT template <typename Dummy>
         struct copy_helper<hpx::traits::trivially_copyable_pointer_tag, Dummy>
         {
             template <typename InIter, typename Sent, typename OutIter>
@@ -150,14 +150,15 @@ namespace hpx::parallel::util {
             }
         };
 
-        HPX_CXX_EXPORT template <typename InIter, typename OutIter>
+        HPX_CXX_CORE_EXPORT template <typename InIter, typename OutIter>
         using pointer_category_t = hpx::traits::pointer_copy_category_t<
             std::decay_t<
                 hpx::traits::remove_const_iterator_value_type_t<InIter>>,
             std::decay_t<OutIter>>;
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename InIter, typename Sent, typename OutIter>
+    HPX_CXX_CORE_EXPORT template <typename InIter, typename Sent,
+        typename OutIter>
     HPX_FORCEINLINE constexpr in_out_result<InIter, OutIter>
     copy(InIter first, Sent last, OutIter dest) noexcept(noexcept(
         detail::copy_helper<detail::pointer_category_t<InIter, OutIter>>::call(
@@ -171,7 +172,7 @@ namespace hpx::parallel::util {
     namespace detail {
 
         // Customization point for optimizing copy_n operations
-        HPX_CXX_EXPORT template <typename Category, typename Enable>
+        HPX_CXX_CORE_EXPORT template <typename Category, typename Enable>
         struct copy_n_helper
         {
             template <typename InIter, typename OutIter>
@@ -200,7 +201,7 @@ namespace hpx::parallel::util {
             }
         };
 
-        HPX_CXX_EXPORT template <typename Dummy>
+        HPX_CXX_CORE_EXPORT template <typename Dummy>
         struct copy_n_helper<hpx::traits::trivially_copyable_pointer_tag, Dummy>
         {
             template <typename InIter, typename OutIter>
@@ -212,7 +213,7 @@ namespace hpx::parallel::util {
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
     struct copy_n_t final
       : hpx::functional::detail::tag_fallback<copy_n_t<ExPolicy>>
     {
@@ -232,10 +233,10 @@ namespace hpx::parallel::util {
     };
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-    HPX_CXX_EXPORT template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
     inline constexpr copy_n_t<ExPolicy> copy_n = copy_n_t<ExPolicy>{};
 #else
-    HPX_CXX_EXPORT template <typename ExPolicy, typename InIter,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename InIter,
         typename OutIter>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr in_out_result<InIter, OutIter>
     copy_n(InIter first, std::size_t count, OutIter dest)
@@ -248,7 +249,7 @@ namespace hpx::parallel::util {
     namespace detail {
 
         // Customization point for copy-synchronize operations
-        HPX_CXX_EXPORT template <typename Category, typename Enable>
+        HPX_CXX_CORE_EXPORT template <typename Category, typename Enable>
         struct copy_synchronize_helper
         {
             template <typename InIter, typename OutIter>
@@ -260,7 +261,7 @@ namespace hpx::parallel::util {
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename InIter, typename OutIter>
+    HPX_CXX_CORE_EXPORT template <typename InIter, typename OutIter>
     HPX_FORCEINLINE constexpr void copy_synchronize(
         InIter const& first, OutIter const& dest)
     {
@@ -274,7 +275,7 @@ namespace hpx::parallel::util {
     namespace detail {
 
         // Customization point for optimizing copy_n operations
-        HPX_CXX_EXPORT template <typename Category, typename Enable>
+        HPX_CXX_CORE_EXPORT template <typename Category, typename Enable>
         struct move_helper
         {
             template <typename InIter, typename Sent, typename OutIter>
@@ -292,7 +293,7 @@ namespace hpx::parallel::util {
             }
         };
 
-        HPX_CXX_EXPORT template <typename Dummy>
+        HPX_CXX_CORE_EXPORT template <typename Dummy>
         struct move_helper<hpx::traits::trivially_copyable_pointer_tag, Dummy>
         {
             template <typename InIter, typename Sent, typename OutIter>
@@ -305,7 +306,8 @@ namespace hpx::parallel::util {
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename InIter, typename Sent, typename OutIter>
+    HPX_CXX_CORE_EXPORT template <typename InIter, typename Sent,
+        typename OutIter>
     HPX_FORCEINLINE constexpr in_out_result<InIter, OutIter> move(
         InIter first, Sent last, OutIter dest)
     {
@@ -319,7 +321,7 @@ namespace hpx::parallel::util {
     namespace detail {
 
         // Customization point for optimizing copy_n operations
-        HPX_CXX_EXPORT template <typename Category, typename Enable>
+        HPX_CXX_CORE_EXPORT template <typename Category, typename Enable>
         struct move_n_helper
         {
             template <typename InIter, typename OutIter>
@@ -350,7 +352,7 @@ namespace hpx::parallel::util {
             }
         };
 
-        HPX_CXX_EXPORT template <typename Dummy>
+        HPX_CXX_CORE_EXPORT template <typename Dummy>
         struct move_n_helper<hpx::traits::trivially_copyable_pointer_tag, Dummy>
         {
             template <typename InIter, typename OutIter>
@@ -362,7 +364,7 @@ namespace hpx::parallel::util {
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename InIter, typename OutIter>
+    HPX_CXX_CORE_EXPORT template <typename InIter, typename OutIter>
     HPX_FORCEINLINE constexpr in_out_result<InIter, OutIter> move_n(
         InIter first, std::size_t count, OutIter dest)
     {
@@ -376,7 +378,7 @@ namespace hpx::parallel::util {
     namespace detail {
 
         // Customization point for optimizing copy_n operations
-        HPX_CXX_EXPORT template <typename Category, typename Dummy>
+        HPX_CXX_CORE_EXPORT template <typename Category, typename Dummy>
         struct uninit_copy_n_helper
         {
             template <typename ExPolicy, typename InIter, typename OutIter>
@@ -395,7 +397,7 @@ namespace hpx::parallel::util {
             }
         };
 
-        HPX_CXX_EXPORT template <typename Dummy>
+        HPX_CXX_CORE_EXPORT template <typename Dummy>
         struct uninit_copy_n_helper<hpx::traits::trivially_copyable_pointer_tag,
             Dummy>
         {
@@ -408,7 +410,7 @@ namespace hpx::parallel::util {
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename InIter, typename OutIter>
+    HPX_CXX_CORE_EXPORT template <typename InIter, typename OutIter>
     HPX_FORCEINLINE constexpr in_out_result<InIter, OutIter> uninit_copy_n(
         InIter first, std::size_t count, OutIter dest)
     {
@@ -419,7 +421,7 @@ namespace hpx::parallel::util {
             hpx::execution::seq, first, count, dest);
     }
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename InIter,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename InIter,
         typename OutIter>
     HPX_FORCEINLINE constexpr in_out_result<InIter, OutIter> uninit_copy_n(
         ExPolicy&& policy, InIter first, std::size_t count, OutIter dest)
@@ -435,7 +437,7 @@ namespace hpx::parallel::util {
     namespace detail {
 
         // Customization point for optimizing move_n operations
-        HPX_CXX_EXPORT template <typename Category, typename Enable>
+        HPX_CXX_CORE_EXPORT template <typename Category, typename Enable>
         struct uninit_move_n_helper
         {
             template <typename ExPolicy, typename InIter, typename OutIter>
@@ -455,7 +457,7 @@ namespace hpx::parallel::util {
             }
         };
 
-        HPX_CXX_EXPORT template <typename Dummy>
+        HPX_CXX_CORE_EXPORT template <typename Dummy>
         struct uninit_move_n_helper<hpx::traits::trivially_copyable_pointer_tag,
             Dummy>
         {
@@ -468,7 +470,7 @@ namespace hpx::parallel::util {
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename InIter, typename OutIter>
+    HPX_CXX_CORE_EXPORT template <typename InIter, typename OutIter>
     HPX_FORCEINLINE constexpr in_out_result<InIter, OutIter> uninit_move_n(
         InIter first, std::size_t count, OutIter dest)
     {
@@ -479,7 +481,7 @@ namespace hpx::parallel::util {
             hpx::execution::seq, first, count, dest);
     }
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename InIter,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename InIter,
         typename OutIter>
     HPX_FORCEINLINE constexpr in_out_result<InIter, OutIter> uninit_move_n(
         ExPolicy&& policy, InIter first, std::size_t count, OutIter dest)

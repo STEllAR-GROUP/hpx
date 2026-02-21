@@ -37,7 +37,7 @@ namespace hpx::detail {
     // under the [line] tag.
     HPX_DEFINE_ERROR_INFO(throw_line, long);    //-V835
 
-    HPX_CXX_EXPORT struct std_exception : std::exception
+    HPX_CXX_CORE_EXPORT struct std_exception : std::exception
     {
     private:
         std::string what_;
@@ -54,7 +54,7 @@ namespace hpx::detail {
         }
     };
 
-    HPX_CXX_EXPORT struct bad_alloc : std::bad_alloc
+    HPX_CXX_CORE_EXPORT struct bad_alloc : std::bad_alloc
     {
     private:
         std::string what_;
@@ -71,7 +71,7 @@ namespace hpx::detail {
         }
     };
 
-    HPX_CXX_EXPORT struct bad_exception : std::bad_exception
+    HPX_CXX_CORE_EXPORT struct bad_exception : std::bad_exception
     {
     private:
         std::string what_;
@@ -88,7 +88,7 @@ namespace hpx::detail {
         }
     };
 
-    HPX_CXX_EXPORT struct bad_cast : std::bad_cast
+    HPX_CXX_CORE_EXPORT struct bad_cast : std::bad_cast
     {
     private:
         std::string what_;
@@ -105,7 +105,7 @@ namespace hpx::detail {
         }
     };
 
-    HPX_CXX_EXPORT struct bad_typeid : std::bad_typeid
+    HPX_CXX_CORE_EXPORT struct bad_typeid : std::bad_typeid
     {
     private:
         std::string what_;

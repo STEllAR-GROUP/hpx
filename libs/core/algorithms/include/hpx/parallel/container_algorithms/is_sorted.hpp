@@ -510,7 +510,7 @@ namespace hpx { namespace ranges {
 
 namespace hpx::ranges {
 
-    HPX_CXX_EXPORT inline constexpr struct is_sorted_t
+    HPX_CXX_CORE_EXPORT inline constexpr struct is_sorted_t
       : hpx::detail::tag_parallel_algorithm<is_sorted_t>
     {
     private:
@@ -612,7 +612,7 @@ namespace hpx::ranges {
         }
     } is_sorted{};
 
-    HPX_CXX_EXPORT inline constexpr struct is_sorted_until_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct is_sorted_until_t final
       : hpx::detail::tag_parallel_algorithm<is_sorted_until_t>
     {
     private:

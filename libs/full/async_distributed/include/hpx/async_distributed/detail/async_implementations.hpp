@@ -22,11 +22,10 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/threading.hpp>
 #include <hpx/modules/threading_base.hpp>
-#include <hpx/naming_base/address.hpp>
-#include <hpx/naming_base/id_type.hpp>
 
 #include <cstddef>
 #include <utility>

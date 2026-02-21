@@ -692,7 +692,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::reduce
-    HPX_CXX_EXPORT inline constexpr struct reduce_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct reduce_t final
       : hpx::detail::tag_parallel_algorithm<reduce_t>
     {
         template <typename ExPolicy, typename FwdIter, typename Sent,

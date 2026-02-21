@@ -35,7 +35,7 @@ namespace hpx::util::cache {
     ///                       the type \a statistics#no_statistics which does
     ///                       not collect any numbers, but provides empty stubs
     ///                       allowing the code to compile.
-    HPX_CXX_EXPORT template <typename Key, typename Entry,
+    HPX_CXX_CORE_EXPORT template <typename Key, typename Entry,
         typename Statistics = statistics::no_statistics>
     class lru_cache
     {

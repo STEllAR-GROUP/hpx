@@ -84,7 +84,7 @@ namespace hpx::threads::policies {
     //         typedef ... type;
     //     };
     // };
-    HPX_CXX_EXPORT template <typename Mutex, typename PendingQueuing,
+    HPX_CXX_CORE_EXPORT template <typename Mutex, typename PendingQueuing,
         typename StagedQueuing, typename TerminatedQueuing>
     class thread_queue
     {

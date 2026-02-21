@@ -19,7 +19,7 @@ namespace hpx::chrono {
 
     /// \brief high_resolution_timer is a timer object which measures
     ///        the elapsed time
-    HPX_CXX_EXPORT class high_resolution_timer
+    HPX_CXX_CORE_EXPORT class high_resolution_timer
     {
     public:
         high_resolution_timer() noexcept

@@ -46,8 +46,7 @@ Synchronous Device Execution
 
 .. code-block:: c++
 
-    #include <hpx/thrust/policy.hpp>
-    #include <hpx/thrust/algorithms.hpp>
+    #include <hpx/modules/thrust.hpp>
     #include <thrust/device_vector.h>
 
     hpx::thrust::thrust_device_policy device{};
@@ -61,8 +60,8 @@ Asynchronous Execution with Futures
 
 .. code-block:: c++
 
-    #include <hpx/thrust/policy.hpp>
-    #include <hpx/async_cuda/cuda_polling_helper.hpp>
+    #include <hpx/modules/async_cuda.hpp>
+    #include <hpx/modules/thrust.hpp>
 
     int hpx_main() {
         // Required for async operations

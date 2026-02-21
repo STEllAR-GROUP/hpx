@@ -111,7 +111,7 @@ namespace hpx::util {
     //   Difference - the difference_type of the resulting iterator. If not
     //      supplied, iterator_traits<Base>::difference_type is used.
     //
-    HPX_CXX_EXPORT template <typename Derived, typename Base,
+    HPX_CXX_CORE_EXPORT template <typename Derived, typename Base,
         typename Value = void, typename Category = void,
         typename Reference = void, typename Difference = void,
         typename Pointer = void>

@@ -24,16 +24,16 @@
 
 namespace hpx::threads {
 
-    HPX_CXX_EXPORT using thread_id_ref_type = thread_id_ref;
-    HPX_CXX_EXPORT using thread_self = coroutines::detail::coroutine_self;
+    HPX_CXX_CORE_EXPORT using thread_id_ref_type = thread_id_ref;
+    HPX_CXX_CORE_EXPORT using thread_self = coroutines::detail::coroutine_self;
 
     /// The function \a get_self_id returns the HPX thread id of the current
     /// thread (or zero if the current thread is not a HPX thread).
-    HPX_CXX_EXPORT HPX_CORE_EXPORT thread_id get_self_id() noexcept;
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT thread_id get_self_id() noexcept;
 
     /// The function \a get_self_ptr returns a pointer to the (OS thread
     /// specific) self reference to the current HPX thread.
-    HPX_CXX_EXPORT HPX_CORE_EXPORT thread_self* get_self_ptr() noexcept;
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT thread_self* get_self_ptr() noexcept;
 }    // namespace hpx::threads
 
 namespace hpx {
@@ -62,7 +62,7 @@ namespace hpx {
     ///
     ///        \a hpx::mutex is neither copyable nor movable.
     ///
-    HPX_CXX_EXPORT class mutex
+    HPX_CXX_CORE_EXPORT class mutex
     {
     public:
         /// \brief \a hpx::mutex is neither copyable nor movable
@@ -266,7 +266,7 @@ namespace hpx {
     ///
     ///        \a hpx::timed_mutex is neither copyable nor movable.
     ///
-    HPX_CXX_EXPORT class timed_mutex : private mutex
+    HPX_CXX_CORE_EXPORT class timed_mutex : private mutex
     {
     public:
         /// \brief \a hpx::timed_mutex is neither copyable nor movable

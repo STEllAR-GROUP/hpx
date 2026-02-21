@@ -12,9 +12,8 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
-#include <hpx/naming_base/id_type.hpp>
-#include <hpx/parcelset_base/locality.hpp>
-#include <hpx/parcelset_base/parcel_interface.hpp>
+#include <hpx/modules/naming_base.hpp>
+#include <hpx/modules/parcelset_base.hpp>
 
 #include <cstddef>
 #include <cstdint>

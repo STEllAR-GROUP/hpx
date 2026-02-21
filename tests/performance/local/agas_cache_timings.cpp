@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2025 Hartmut Kaiser
+//  Copyright (c) 2016-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,8 +16,8 @@
 
 #include <hpx/modules/cache.hpp>
 #include <hpx/modules/preprocessor.hpp>
+#include <hpx/modules/statistics.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/statistics/histogram.hpp>
 
 #include <hpx/modules/program_options.hpp>
 #include <boost/accumulators/accumulators.hpp>

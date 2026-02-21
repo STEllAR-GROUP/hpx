@@ -18,7 +18,7 @@
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename F, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename F, typename... Ts>
     hpx::future<util::invoke_result_t<F, Ts...>> run_as_os_thread(
         F&& f, Ts&&... vs)
     {

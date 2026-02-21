@@ -33,7 +33,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::parallel::util::detail {
 
-    HPX_CXX_EXPORT template <typename Result, typename ExPolicy,
+    HPX_CXX_CORE_EXPORT template <typename Result, typename ExPolicy,
         typename FwdIter, typename F, typename ReShape>
     auto foreach_partition(ExPolicy policy, FwdIter first, std::size_t count,
         F&& f, ReShape&& reshape)
@@ -134,7 +134,7 @@ namespace hpx::parallel::util::detail {
     ///////////////////////////////////////////////////////////////////////
     // The static partitioner simply spawns one chunk of iterations for
     // each available core.
-    HPX_CXX_EXPORT struct default_reshape
+    HPX_CXX_CORE_EXPORT struct default_reshape
     {
         using is_transparent = std::true_type;
 
@@ -145,7 +145,7 @@ namespace hpx::parallel::util::detail {
         }
     };
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename Result>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Result>
     struct foreach_static_partitioner
     {
         using parameters_type = typename ExPolicy::executor_parameters_type;
@@ -258,7 +258,7 @@ namespace hpx::parallel::util::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename ExPolicy, typename Result>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Result>
     struct foreach_task_static_partitioner
     {
         using parameters_type = typename ExPolicy::executor_parameters_type;
@@ -411,7 +411,7 @@ namespace hpx::parallel::util {
     ///////////////////////////////////////////////////////////////////////////
     // ExPolicy: execution policy
     // Result:   intermediate result type of first step (default: void)
-    HPX_CXX_EXPORT template <typename ExPolicy, typename Result = void>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Result = void>
     struct foreach_partitioner
       : detail::select_partitioner<std::decay_t<ExPolicy>,
             detail::foreach_static_partitioner,

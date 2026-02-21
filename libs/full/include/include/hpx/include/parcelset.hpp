@@ -7,6 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/modules/parcelset_base.hpp>
 #include <hpx/parcelset/parcel.hpp>
 #include <hpx/parcelset/parcelhandler.hpp>
-#include <hpx/parcelset_base/parcelport.hpp>

@@ -6,6 +6,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+
+#include <hpx/components/iostreams/ostream.hpp>
+#include <hpx/components/iostreams/standard_streams.hpp>
+
 #include <hpx/actions_base/plain_action.hpp>
 #include <hpx/async_distributed/base_lco_with_value.hpp>
 #include <hpx/components_base/agas_interface.hpp>
@@ -16,9 +20,6 @@
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/runtime_distributed/runtime_fwd.hpp>
-
-#include <hpx/components/iostreams/ostream.hpp>
-#include <hpx/components/iostreams/standard_streams.hpp>
 
 #include <functional>
 #include <iostream>

@@ -16,7 +16,8 @@
 namespace hpx::execution::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT inline constexpr struct get_processing_units_mask_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct get_processing_units_mask_t
+        final
       : hpx::functional::detail::tag_fallback<get_processing_units_mask_t>
     {
     private:
@@ -36,7 +37,7 @@ namespace hpx::execution::experimental {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT inline constexpr struct get_cores_mask_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct get_cores_mask_t final
       : hpx::functional::detail::tag_fallback<get_cores_mask_t>
     {
     private:

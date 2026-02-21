@@ -16,7 +16,7 @@
 namespace hpx::parallel::detail {
 
     // provide implementation of std::distance supporting iterators/sentinels
-    HPX_CXX_EXPORT template <typename InIterB, typename InIterE>
+    HPX_CXX_CORE_EXPORT template <typename InIterB, typename InIterE>
     constexpr typename std::iterator_traits<InIterB>::difference_type distance(
         InIterB first, InIterE last)
     {

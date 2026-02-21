@@ -60,6 +60,9 @@ target_include_directories(
 )
 if(HPX_WITH_CXX_MODULES)
   hpx_configure_module_consumer(hpx_init hpx_core_module_if)
+  if(TARGET hpx_full_module_if)
+    hpx_configure_module_consumer(hpx_init hpx_full_module_if)
+  endif()
 endif()
 
 set_property(TARGET hpx_init PROPERTY FOLDER "Core")

@@ -167,16 +167,16 @@ namespace hpx::traits {
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename Iter>
+    HPX_CXX_CORE_EXPORT template <typename Iter>
     struct is_contiguous_iterator : detail::is_known_contiguous_iterator<Iter>
     {
     };
 
-    HPX_CXX_EXPORT template <typename Iter>
+    HPX_CXX_CORE_EXPORT template <typename Iter>
     using is_contiguous_iterator_t =
         typename is_contiguous_iterator<Iter>::type;
 
-    HPX_CXX_EXPORT template <typename Iter>
+    HPX_CXX_CORE_EXPORT template <typename Iter>
     inline constexpr bool is_contiguous_iterator_v =
         is_contiguous_iterator<Iter>::value;
 }    // namespace hpx::traits

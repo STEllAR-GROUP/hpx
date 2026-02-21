@@ -32,8 +32,8 @@ namespace hpx::parallel::detail {
     ///                         algorithm if not make a recursive call swapping
     ///                         the ranges
     /// \return range with all the elements sorted and moved
-    HPX_CXX_EXPORT template <typename Iter1, typename Sent1, typename Iter2,
-        typename Sent2, typename Compare>
+    HPX_CXX_CORE_EXPORT template <typename Iter1, typename Sent1,
+        typename Iter2, typename Sent2, typename Compare>
     void range_sort(util::range<Iter1, Sent1> const& rng_a,
         util::range<Iter2, Sent2> const& rng_b, Compare comp,
         std::uint32_t level)
@@ -69,7 +69,8 @@ namespace hpx::parallel::detail {
     /// \tparam Iter : iterator to the elements
     /// \tparam Compare : object for to Compare the elements pointed by Iter
     /// \remarks
-    HPX_CXX_EXPORT template <typename Iter, typename Sent, typename Compare>
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent,
+        typename Compare>
     class spin_sort_helper
     {
         using value_type = typename std::iterator_traits<Iter>::value_type;
@@ -218,7 +219,7 @@ namespace hpx::parallel::detail {
         }
     }
 
-    HPX_CXX_EXPORT template <typename Iter, typename Sent>
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent>
     void spin_sort(Iter first, Sent last)
     {
         using compare =
@@ -227,14 +228,16 @@ namespace hpx::parallel::detail {
         spin_sort_helper<Iter, Sent, compare> sorter(first, last, compare{});
     }
 
-    HPX_CXX_EXPORT template <typename Iter, typename Sent, typename Compare>
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent,
+        typename Compare>
     void spin_sort(Iter first, Sent last, Compare&& comp)
     {
         spin_sort_helper<Iter, Sent, std::decay_t<Compare>> sorter(
             first, last, HPX_FORWARD(Compare, comp));
     }
 
-    HPX_CXX_EXPORT template <typename Iter, typename Sent, typename Compare>
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent,
+        typename Compare>
     void spin_sort(Iter first, Sent last, Compare&& comp,
         util::range<typename std::iterator_traits<Iter>::value_type*> range_aux)
     {
@@ -242,7 +245,8 @@ namespace hpx::parallel::detail {
             first, last, HPX_FORWARD(Compare, comp), range_aux);
     }
 
-    HPX_CXX_EXPORT template <typename Iter, typename Sent, typename Compare>
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent,
+        typename Compare>
     void spin_sort(Iter first, Sent last, Compare comp,
         typename std::iterator_traits<Iter>::value_type* paux, std::size_t naux)
     {

@@ -17,7 +17,7 @@
 
 namespace hpx::local::detail {
 
-    HPX_CXX_EXPORT HPX_CORE_EXPORT std::vector<std::string>
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT std::vector<std::string>
     read_json_config_file_options(
         std::string const& filename, util::commandline_error_mode error_mode);
 

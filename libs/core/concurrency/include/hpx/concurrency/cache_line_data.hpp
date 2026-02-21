@@ -20,15 +20,15 @@ namespace hpx::util {
 
         // Computes the padding required to fill up a full cache line after
         // data_size bytes.
-        constexpr std::size_t get_cache_line_padding_size(
-            std::size_t data_size) noexcept
+        HPX_CXX_CORE_EXPORT constexpr std::size_t get_cache_line_padding_size(
+            std::size_t const data_size) noexcept
         {
             return (threads::get_cache_line_size() -
                        (data_size % threads::get_cache_line_size())) %
                 threads::get_cache_line_size();
         }
 
-        template <typename Data>
+        HPX_CXX_CORE_EXPORT template <typename Data>
         struct needs_padding
           : std::integral_constant<bool,
                 // NOLINTNEXTLINE(bugprone-sizeof-expression)
@@ -54,7 +54,7 @@ namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
     // special struct to ensure cache line alignment of a data type
-    HPX_CXX_EXPORT template <typename Data,
+    HPX_CXX_CORE_EXPORT template <typename Data,
         bool NeedsPadding = detail::needs_padding<Data>::value>
     struct cache_aligned_data
     {
@@ -84,7 +84,7 @@ namespace hpx::util {
             sizeof(Data))];
     };
 
-    HPX_CXX_EXPORT template <typename Data>
+    HPX_CXX_CORE_EXPORT template <typename Data>
     struct cache_aligned_data<Data, false>
     {
         constexpr cache_aligned_data() noexcept(
@@ -107,7 +107,7 @@ namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
     // special struct to ensure cache line alignment of a data type
-    HPX_CXX_EXPORT template <typename Data,
+    HPX_CXX_CORE_EXPORT template <typename Data,
         bool NeedsPadding = detail::needs_padding<Data>::value>
     struct cache_aligned_data_derived : Data
     {
@@ -133,7 +133,7 @@ namespace hpx::util {
             sizeof(Data))];
     };
 
-    HPX_CXX_EXPORT template <typename Data>
+    HPX_CXX_CORE_EXPORT template <typename Data>
     struct cache_aligned_data_derived<Data, false> : Data
     {
         constexpr cache_aligned_data_derived() noexcept(
@@ -160,11 +160,11 @@ namespace hpx::util {
     ///////////////////////////////////////////////////////////////////////////
     // special struct to data type is cache line aligned and fully occupies a
     // cache line
-    HPX_CXX_EXPORT template <typename Data>
+    HPX_CXX_CORE_EXPORT template <typename Data>
     using cache_line_data = cache_aligned_data<Data>;
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     constexpr auto align_up(T value, std::size_t alignment) noexcept
     {
         return T(hpx::bit_cast<std::size_t>(value + (alignment - 1)) &

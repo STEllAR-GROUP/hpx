@@ -111,15 +111,15 @@ namespace hpx::functional {
 
 namespace hpx::functional {
 
-    HPX_CXX_EXPORT template <auto& Tag>
+    HPX_CXX_CORE_EXPORT template <auto& Tag>
     using tag_t = std::decay_t<decltype(Tag)>;
 
     namespace tag_invoke_t_ns {
 
         // poison pill
-        HPX_CXX_EXPORT void tag_invoke();
+        HPX_CXX_CORE_EXPORT void tag_invoke();
 
-        HPX_CXX_EXPORT struct tag_invoke_t
+        HPX_CXX_CORE_EXPORT struct tag_invoke_t
         {
             // different versions of clang-format disagree
             // clang-format off
@@ -151,7 +151,7 @@ namespace hpx::functional {
 
     namespace tag_invoke_ns {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-        HPX_CXX_EXPORT inline constexpr tag_invoke_t_ns::tag_invoke_t
+        HPX_CXX_CORE_EXPORT inline constexpr tag_invoke_t_ns::tag_invoke_t
             tag_invoke = {};
 #else
         HPX_DEVICE static tag_invoke_t_ns::tag_invoke_t const tag_invoke = {};
@@ -159,25 +159,25 @@ namespace hpx::functional {
     }    // namespace tag_invoke_ns
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Tag, typename... Args>
+    HPX_CXX_CORE_EXPORT template <typename Tag, typename... Args>
     using is_tag_invocable =
         hpx::is_invocable<decltype(tag_invoke_ns::tag_invoke), Tag, Args...>;
 
-    HPX_CXX_EXPORT template <typename Tag, typename... Args>
+    HPX_CXX_CORE_EXPORT template <typename Tag, typename... Args>
     inline constexpr bool is_tag_invocable_v =
         is_tag_invocable<Tag, Args...>::value;
 
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename Sig, bool Invocable>
+        HPX_CXX_CORE_EXPORT template <typename Sig, bool Invocable>
         struct is_nothrow_tag_invocable_impl;
 
-        HPX_CXX_EXPORT template <typename Sig>
+        HPX_CXX_CORE_EXPORT template <typename Sig>
         struct is_nothrow_tag_invocable_impl<Sig, false> : std::false_type
         {
         };
 
-        HPX_CXX_EXPORT template <typename Tag, typename... Args>
+        HPX_CXX_CORE_EXPORT template <typename Tag, typename... Args>
         struct is_nothrow_tag_invocable_impl<
             decltype(tag_invoke_ns::tag_invoke)(Tag, Args...), true>
           : std::integral_constant<bool,
@@ -193,7 +193,7 @@ namespace hpx::functional {
     // noexcept(true) to not falsely exclude correct overloads. However, this
     // may lead to noexcept(false) overloads falsely being candidates.
 #if !defined(HPX_CUDA_VERSION) || (HPX_CUDA_VERSION >= 1102)
-    HPX_CXX_EXPORT template <typename Tag, typename... Args>
+    HPX_CXX_CORE_EXPORT template <typename Tag, typename... Args>
     struct is_nothrow_tag_invocable
       : detail::is_nothrow_tag_invocable_impl<
             decltype(tag_invoke_ns::tag_invoke)(Tag, Args...),
@@ -201,36 +201,36 @@ namespace hpx::functional {
     {
     };
 #else
-    HPX_CXX_EXPORT template <typename Tag, typename... Args>
+    HPX_CXX_CORE_EXPORT template <typename Tag, typename... Args>
     struct is_nothrow_tag_invocable : std::true_type
     {
     };
 #endif
 
-    HPX_CXX_EXPORT template <typename Tag, typename... Args>
+    HPX_CXX_CORE_EXPORT template <typename Tag, typename... Args>
     inline constexpr bool is_nothrow_tag_invocable_v =
         is_nothrow_tag_invocable<Tag, Args...>::value;
 
-    HPX_CXX_EXPORT template <typename Tag, typename... Args>
+    HPX_CXX_CORE_EXPORT template <typename Tag, typename... Args>
     using tag_invoke_result =
         hpx::util::invoke_result<decltype(tag_invoke_ns::tag_invoke), Tag,
             Args...>;
 
-    HPX_CXX_EXPORT template <typename Tag, typename... Args>
+    HPX_CXX_CORE_EXPORT template <typename Tag, typename... Args>
     using tag_invoke_result_t = typename tag_invoke_result<Tag, Args...>::type;
 
     ///////////////////////////////////////////////////////////////////////////////
     namespace tag_base_ns {
 
         // poison pill
-        HPX_CXX_EXPORT void tag_invoke();
+        HPX_CXX_CORE_EXPORT void tag_invoke();
 
         // use this tag type to enable the tag_invoke function overloads
-        HPX_CXX_EXPORT struct enable_tag_invoke_t;
+        HPX_CXX_CORE_EXPORT struct enable_tag_invoke_t;
 
         ///////////////////////////////////////////////////////////////////////////
         // helper base class implementing the tag_invoke logic for CPOs
-        HPX_CXX_EXPORT template <typename Tag, typename Enable>
+        HPX_CXX_CORE_EXPORT template <typename Tag, typename Enable>
         struct tag    // NOLINT(bugprone-crtp-constructor-accessibility)
         {
             template <typename... Args,
@@ -246,7 +246,7 @@ namespace hpx::functional {
             }
         };
 
-        HPX_CXX_EXPORT template <typename Tag, typename Enable>
+        HPX_CXX_CORE_EXPORT template <typename Tag, typename Enable>
         // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
         struct tag_noexcept
         {
@@ -267,21 +267,21 @@ namespace hpx::functional {
 
     inline namespace tag_invoke_base_ns {
 
-        HPX_CXX_EXPORT template <typename Tag,
+        HPX_CXX_CORE_EXPORT template <typename Tag,
             typename Enable = meta::constant<meta::bool_<true>>>
         using tag = tag_base_ns::tag<Tag, Enable>;
 
-        HPX_CXX_EXPORT template <typename Tag,
+        HPX_CXX_CORE_EXPORT template <typename Tag,
             typename Enable = meta::constant<meta::bool_<true>>>
         using tag_noexcept = tag_base_ns::tag_noexcept<Tag, Enable>;
 
-        HPX_CXX_EXPORT using enable_tag_invoke_t =
+        HPX_CXX_CORE_EXPORT using enable_tag_invoke_t =
             tag_base_ns::enable_tag_invoke_t;
     }    // namespace tag_invoke_base_ns
 
     inline namespace tag_invoke_f_ns {
 
-        HPX_CXX_EXPORT using tag_invoke_ns::tag_invoke;
+        HPX_CXX_CORE_EXPORT using tag_invoke_ns::tag_invoke;
     }    // namespace tag_invoke_f_ns
 }    // namespace hpx::functional
 

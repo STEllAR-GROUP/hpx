@@ -57,7 +57,7 @@ namespace hpx::util {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
         requires(hpx::is_bind_expression_v<std::decay_t<T>>)
     HPX_HOST_DEVICE detail::protected_bind<std::decay_t<T>> protect(T&& f)
     {
@@ -65,7 +65,7 @@ namespace hpx::util {
     }
 
     // leave everything that is not a bind expression as is
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
         requires(!hpx::is_bind_expression_v<std::decay_t<T>>)
     HPX_HOST_DEVICE T&& protect(T&& v)    //-V659
     {

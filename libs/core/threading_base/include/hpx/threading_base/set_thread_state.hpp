@@ -12,7 +12,7 @@
 
 namespace hpx::threads::detail {
 
-    HPX_CXX_EXPORT HPX_CORE_EXPORT thread_state set_thread_state(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT thread_state set_thread_state(
         thread_id_type const& id, thread_schedule_state new_state,
         thread_restart_state new_state_ex, thread_priority priority,
         thread_schedule_hint schedulehint = thread_schedule_hint(),

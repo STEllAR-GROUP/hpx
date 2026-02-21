@@ -12,6 +12,7 @@ set(schedulers_headers
     hpx/schedulers/local_priority_queue_scheduler.hpp
     hpx/schedulers/local_queue_scheduler.hpp
     hpx/schedulers/lockfree_queue_backends.hpp
+    hpx/schedulers/macros.hpp
     hpx/schedulers/maintain_queue_wait_times.hpp
     hpx/schedulers/queue_helpers.hpp
     hpx/schedulers/queue_holder_numa.hpp
@@ -28,6 +29,8 @@ if(HPX_WITH_WORK_REQUESTING_SCHEDULERS)
                          hpx/schedulers/local_workrequesting_scheduler.hpp
   )
 endif()
+
+set(schedulers_macro_headers hpx/schedulers/macros.hpp)
 
 # cmake-format: off
 set(schedulers_compat_headers
@@ -55,6 +58,7 @@ add_hpx_module(
   GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${schedulers_sources}
   HEADERS ${schedulers_headers}
+  MACRO_HEADERS ${schedulers_macro_headers}
   COMPAT_HEADERS ${schedulers_compat_headers}
   SOURCES ${schedulers_sources}
   MODULE_DEPENDENCIES

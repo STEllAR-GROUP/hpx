@@ -24,7 +24,7 @@ namespace hpx::threads {
 
     ///////////////////////////////////////////////////////////////////////////
     // same as below, just not holding a reference count
-    HPX_CXX_EXPORT struct thread_id
+    HPX_CXX_CORE_EXPORT struct thread_id
     {
     private:
         using thread_id_repr = void*;
@@ -147,11 +147,11 @@ namespace hpx::threads {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT enum class thread_id_addref : std::uint8_t { yes, no };
+    HPX_CXX_CORE_EXPORT enum class thread_id_addref : std::uint8_t { yes, no };
 
     namespace detail {
 
-        HPX_CXX_EXPORT struct thread_data_reference_counting;
+        HPX_CXX_CORE_EXPORT struct thread_data_reference_counting;
 
         HPX_CORE_EXPORT void intrusive_ptr_add_ref(
             thread_data_reference_counting* p) noexcept;
@@ -192,7 +192,7 @@ namespace hpx::threads {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT struct thread_id_ref
+    HPX_CXX_CORE_EXPORT struct thread_id_ref
     {
     private:
         using thread_id_repr =
@@ -382,7 +382,7 @@ namespace hpx::threads {
     // the compiler.
     extern HPX_DEVICE thread_id invalid_thread_id;
 #else
-    HPX_CXX_EXPORT inline constexpr thread_id const invalid_thread_id;
+    HPX_CXX_CORE_EXPORT inline constexpr thread_id const invalid_thread_id;
 #endif
 }    // namespace hpx::threads
 

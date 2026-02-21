@@ -27,7 +27,7 @@
 namespace hpx::serialization {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T, typename Abi>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Abi>
     void serialize(input_archive& ar, Vc::Vector<T, Abi>& v, unsigned)
     {
         // clang-format off
@@ -35,7 +35,7 @@ namespace hpx::serialization {
         // clang-format on
     }
 
-    HPX_CXX_EXPORT template <typename T, std::size_t N, typename V,
+    HPX_CXX_CORE_EXPORT template <typename T, std::size_t N, typename V,
         std::size_t W>
     void serialize(input_archive& ar, Vc::SimdArray<T, N, V, W>& v, unsigned)
     {
@@ -51,7 +51,7 @@ namespace hpx::serialization {
         // clang-format on
     }
 
-    HPX_CXX_EXPORT template <typename T, std::size_t N, typename V>
+    HPX_CXX_CORE_EXPORT template <typename T, std::size_t N, typename V>
     void serialize(input_archive& ar, Vc::SimdArray<T, N, V, N>& v, unsigned)
     {
         // clang-format off
@@ -60,7 +60,7 @@ namespace hpx::serialization {
         // clang-format on
     }
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     void serialize(input_archive& ar, Vc::Scalar::Vector<T>& v, unsigned)
     {
         // clang-format off
@@ -69,7 +69,7 @@ namespace hpx::serialization {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T, typename Abi>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Abi>
     void serialize(output_archive& ar, Vc::Vector<T, Abi> const& v, unsigned)
     {
         // clang-format off
@@ -77,7 +77,7 @@ namespace hpx::serialization {
         // clang-format on
     }
 
-    HPX_CXX_EXPORT template <typename T, std::size_t N, typename V,
+    HPX_CXX_CORE_EXPORT template <typename T, std::size_t N, typename V,
         std::size_t W>
     void serialize(
         output_archive& ar, Vc::SimdArray<T, N, V, W> const& v, unsigned)
@@ -94,7 +94,7 @@ namespace hpx::serialization {
         // clang-format on
     }
 
-    HPX_CXX_EXPORT template <typename T, std::size_t N, typename V>
+    HPX_CXX_CORE_EXPORT template <typename T, std::size_t N, typename V>
     void serialize(
         output_archive& ar, Vc::SimdArray<T, N, V, N> const& v, unsigned)
     {
@@ -104,7 +104,7 @@ namespace hpx::serialization {
         // clang-format on
     }
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     void serialize(output_archive& ar, Vc::Scalar::Vector<T> const& v, unsigned)
     {
         // clang-format off
@@ -115,40 +115,40 @@ namespace hpx::serialization {
 
 namespace hpx::traits {
 
-    HPX_CXX_EXPORT template <typename T, typename Abi>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Abi>
     struct is_bitwise_serializable<Vc::Vector<T, Abi>>
       : is_bitwise_serializable<std::remove_const_t<T>>
     {
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct is_bitwise_serializable<Vc::Scalar::Vector<T>>
       : is_bitwise_serializable<std::remove_const_t<T>>
     {
     };
 
-    HPX_CXX_EXPORT template <typename T, std::size_t N, typename V,
+    HPX_CXX_CORE_EXPORT template <typename T, std::size_t N, typename V,
         std::size_t W>
     struct is_bitwise_serializable<Vc::SimdArray<T, N, V, W>>
       : is_bitwise_serializable<std::remove_const_t<T>>
     {
     };
 
-    HPX_CXX_EXPORT template <typename T, typename Abi>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Abi>
     struct is_not_bitwise_serializable<Vc::Vector<T, Abi>>
       : std::integral_constant<bool,
             !is_bitwise_serializable_v<Vc::Vector<T, Abi>>>
     {
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct is_not_bitwise_serializable<Vc::Scalar::Vector<T>>
       : std::integral_constant<bool,
             !is_bitwise_serializable_v<Vc::Scalar::Vector<T>>>
     {
     };
 
-    HPX_CXX_EXPORT template <typename T, std::size_t N, typename V,
+    HPX_CXX_CORE_EXPORT template <typename T, std::size_t N, typename V,
         std::size_t W>
     struct is_not_bitwise_serializable<Vc::SimdArray<T, N, V, W>>
       : std::integral_constant<bool,

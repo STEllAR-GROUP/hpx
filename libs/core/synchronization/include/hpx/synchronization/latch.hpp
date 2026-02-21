@@ -30,7 +30,7 @@ namespace hpx {
     /// threads to block until an operation is completed. An individual latch is
     /// a single-use object; once the operation has been completed, the latch
     /// cannot be reused.
-    HPX_CXX_EXPORT class latch
+    HPX_CXX_CORE_EXPORT class latch
     {
     public:
         latch(latch const&) = delete;
@@ -239,7 +239,7 @@ namespace hpx::lcos::local {
     /// hpx::distributed::latch instead if this is required. It is just a low
     /// level synchronization primitive allowing to synchronize a given number
     /// of \a threads.
-    HPX_CXX_EXPORT class latch : public hpx::latch
+    HPX_CXX_CORE_EXPORT class latch : public hpx::latch
     {
     public:
         latch(latch const&) = delete;

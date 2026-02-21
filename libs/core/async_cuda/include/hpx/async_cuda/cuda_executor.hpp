@@ -31,11 +31,11 @@ namespace hpx::cuda::experimental {
         // -------------------------------------------------------------------------
         // A helper object to call a cuda function returning a cudaError type
         // or a plain kernel definition (or cublas function in cublas executor)
-        HPX_CXX_EXPORT template <typename R, typename... Args>
+        HPX_CXX_CORE_EXPORT template <typename R, typename... Args>
         struct dispatch_helper;
 
         // default implementation - call the function
-        HPX_CXX_EXPORT template <typename R, typename... Args>
+        HPX_CXX_CORE_EXPORT template <typename R, typename... Args>
         struct dispatch_helper
         {
             inline R operator()(R (*f)(Args...), Args... args) const
@@ -45,7 +45,7 @@ namespace hpx::cuda::experimental {
         };
 
         // specialization for return type void
-        HPX_CXX_EXPORT template <typename... Args>
+        HPX_CXX_CORE_EXPORT template <typename... Args>
         struct dispatch_helper<void, Args...>
         {
             inline void operator()(void (*f)(Args...), Args... args) const
@@ -55,7 +55,7 @@ namespace hpx::cuda::experimental {
         };
 
         // specialization for return type of cudaError_t
-        HPX_CXX_EXPORT template <typename... Args>
+        HPX_CXX_CORE_EXPORT template <typename... Args>
         struct dispatch_helper<cudaError_t, Args...>
         {
             inline void operator()(
@@ -70,7 +70,7 @@ namespace hpx::cuda::experimental {
     // Allows the launching of cuda functions and kernels on a stream with futures
     // returned that are set when the async functions/kernels are ready
     // -------------------------------------------------------------------------
-    HPX_CXX_EXPORT struct cuda_executor_base
+    HPX_CXX_CORE_EXPORT struct cuda_executor_base
     {
         using future_type = hpx::future<void>;
 
@@ -107,7 +107,7 @@ namespace hpx::cuda::experimental {
     // Allows you to launch kernels on a stream and get
     // futures back when they are ready
     // -------------------------------------------------------------------------
-    HPX_CXX_EXPORT struct cuda_executor : cuda_executor_base
+    HPX_CXX_CORE_EXPORT struct cuda_executor : cuda_executor_base
     {
         // -------------------------------------------------------------------------
         // construct - create a cuda stream that all tasks invoked by

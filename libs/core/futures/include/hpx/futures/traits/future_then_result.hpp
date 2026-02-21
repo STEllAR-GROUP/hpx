@@ -57,11 +57,11 @@ namespace hpx::traits {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Future, typename F>
+    HPX_CXX_CORE_EXPORT template <typename Future, typename F>
     struct future_then_result : detail::future_then_result<Future, F>
     {
     };
 
-    HPX_CXX_EXPORT template <typename Future, typename F>
+    HPX_CXX_CORE_EXPORT template <typename Future, typename F>
     using future_then_result_t = typename future_then_result<Future, F>::type;
 }    // namespace hpx::traits

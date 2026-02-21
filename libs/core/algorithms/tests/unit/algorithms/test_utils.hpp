@@ -208,6 +208,19 @@ namespace test {
         std::shuffle(std::begin(c), std::end(c), g);
         return c;
     }
+    template <typename T>
+    inline std::vector<T> random_repeat(std::size_t size, T max_value)
+    {
+        std::vector<T> c(size);
+        std::random_device rd;
+        std::mt19937 g(rd());
+        std::uniform_int_distribution<T> dist(0, max_value);
+        for (std::size_t i = 0; i < size; ++i)
+        {
+            c[i] = dist(g);
+        }
+        return c;
+    }
 
     inline std::vector<std::size_t> random_fill(std::size_t size)
     {

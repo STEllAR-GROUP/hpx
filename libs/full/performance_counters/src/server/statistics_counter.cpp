@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2025 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -27,9 +27,6 @@
 #include <boost/accumulators/statistics/stats.hpp>
 #include <boost/accumulators/statistics/variance.hpp>
 
-#include <hpx/statistics/rolling_max.hpp>
-#include <hpx/statistics/rolling_min.hpp>
-
 #if defined(HPX_MSVC)
 #pragma warning(push)
 #pragma warning(disable : 4244)
@@ -38,6 +35,8 @@
 #if defined(HPX_MSVC)
 #pragma warning(pop)
 #endif
+
+#include <hpx/modules/statistics.hpp>
 
 #include <boost/spirit/home/x3/char.hpp>
 #include <boost/spirit/home/x3/core.hpp>

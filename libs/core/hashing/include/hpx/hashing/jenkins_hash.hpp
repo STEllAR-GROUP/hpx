@@ -88,7 +88,7 @@ namespace hpx::util {
     /////////////////////////////////////////////////////////////////////////////
     /// The jenkins_hash class encapsulates a hash calculation function published
     /// by Bob Jenkins here: http://burtleburtle.net/bob/hash
-    HPX_CXX_EXPORT class jenkins_hash
+    HPX_CXX_CORE_EXPORT class jenkins_hash
     {
     public:
         /// this is the type representing the result of this hash

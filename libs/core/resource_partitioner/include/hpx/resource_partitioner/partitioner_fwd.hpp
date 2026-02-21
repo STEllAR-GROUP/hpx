@@ -16,11 +16,11 @@
 
 namespace hpx::resource {
 
-    HPX_CXX_EXPORT class numa_domain;
-    HPX_CXX_EXPORT class core;
-    HPX_CXX_EXPORT class pu;
+    HPX_CXX_CORE_EXPORT class numa_domain;
+    HPX_CXX_CORE_EXPORT class core;
+    HPX_CXX_CORE_EXPORT class pu;
 
-    HPX_CXX_EXPORT class partitioner;
+    HPX_CXX_CORE_EXPORT class partitioner;
 
     namespace detail {
 
@@ -30,15 +30,15 @@ namespace hpx::resource {
 
     /// May be used anywhere in code and returns a reference to the single,
     /// global resource partitioner.
-    HPX_CXX_EXPORT HPX_CORE_EXPORT detail::partitioner& get_partitioner();
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT detail::partitioner& get_partitioner();
 
     /// Returns true if the resource partitioner has been initialized.
     /// Returns false otherwise.
-    HPX_CXX_EXPORT HPX_CORE_EXPORT bool is_partitioner_valid();
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT bool is_partitioner_valid();
 
     /// This enumeration describes the modes available when creating a
     /// resource partitioner.
-    HPX_CXX_EXPORT enum class partitioner_mode : std::int8_t {
+    HPX_CXX_CORE_EXPORT enum class partitioner_mode : std::int8_t {
         /// Default mode.
         default_ = 0,
 
@@ -65,24 +65,24 @@ namespace hpx::resource {
 
 #undef HPX_PARTITIONER_MODE_UNSCOPED_ENUM_DEPRECATION_MSG
 
-    HPX_CXX_EXPORT constexpr partitioner_mode operator&(
+    HPX_CXX_CORE_EXPORT constexpr partitioner_mode operator&(
         partitioner_mode lhs, partitioner_mode rhs) noexcept
     {
         return static_cast<partitioner_mode>(
             static_cast<int>(lhs) & static_cast<int>(rhs));
     }
 
-    HPX_CXX_EXPORT constexpr bool as_bool(partitioner_mode val) noexcept
+    HPX_CXX_CORE_EXPORT constexpr bool as_bool(partitioner_mode val) noexcept
     {
         return static_cast<int>(val) != 0;
     }
 
-    HPX_CXX_EXPORT using scheduler_function =
+    HPX_CXX_CORE_EXPORT using scheduler_function =
         hpx::function<std::unique_ptr<hpx::threads::thread_pool_base>(
             hpx::threads::thread_pool_init_parameters,
             hpx::threads::policies::thread_queue_init_parameters)>;
 
-    HPX_CXX_EXPORT using background_work_function =
+    HPX_CXX_CORE_EXPORT using background_work_function =
         hpx::function<bool(std::size_t)>;
 
     // Choose same names as in command-line options except with _ instead of
@@ -90,7 +90,7 @@ namespace hpx::resource {
 
     /// This enumeration lists the available scheduling policies (or
     /// schedulers) when creating thread pools.
-    HPX_CXX_EXPORT enum class scheduling_policy : std::int8_t {
+    HPX_CXX_CORE_EXPORT enum class scheduling_policy : std::int8_t {
         user_defined = -2,
         unspecified = -1,
         local = 0,

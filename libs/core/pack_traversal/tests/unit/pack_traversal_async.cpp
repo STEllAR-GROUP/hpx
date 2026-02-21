@@ -7,10 +7,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/pack_traversal.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/pack_traversal/pack_traversal_async.hpp>
 
 #include <array>
 #include <cstddef>

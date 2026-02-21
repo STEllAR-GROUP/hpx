@@ -18,37 +18,39 @@ namespace hpx::parallel::traits {
 
     ///////////////////////////////////////////////////////////////////////////
     // exposition only
-    HPX_CXX_EXPORT template <typename T, std::size_t N = 0, typename Abi = void>
+    HPX_CXX_CORE_EXPORT template <typename T, std::size_t N = 0,
+        typename Abi = void>
     struct vector_pack_type;
 
-    HPX_CXX_EXPORT template <typename T, std::size_t N = 0, typename Abi = void>
+    HPX_CXX_CORE_EXPORT template <typename T, std::size_t N = 0,
+        typename Abi = void>
     using vector_pack_type_t = typename vector_pack_type<T, N, Abi>::type;
 
     // handle tuple<> transformations
-    HPX_CXX_EXPORT template <typename... T, std::size_t N, typename Abi>
+    HPX_CXX_CORE_EXPORT template <typename... T, std::size_t N, typename Abi>
     struct vector_pack_type<hpx::tuple<T...>, N, Abi>
     {
         using type = hpx::tuple<vector_pack_type_t<T, N, Abi>...>;
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T, typename NewT>
+    HPX_CXX_CORE_EXPORT template <typename T, typename NewT>
     struct rebind_pack
     {
         using type = vector_pack_type_t<T>;
     };
 
-    HPX_CXX_EXPORT template <typename T, typename NewT>
+    HPX_CXX_CORE_EXPORT template <typename T, typename NewT>
     using rebind_pack_t = typename rebind_pack<T, NewT>::type;
 
     ////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Enable = void>
     struct vector_pack_mask_type
     {
         using type = bool;
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     using vector_pack_mask_type_t = typename vector_pack_mask_type<T>::type;
 }    // namespace hpx::parallel::traits
 

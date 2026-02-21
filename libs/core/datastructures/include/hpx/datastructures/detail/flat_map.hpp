@@ -52,7 +52,7 @@ namespace hpx::detail {
     using namespace std::experimental;
 #endif
 
-    HPX_CXX_EXPORT template <typename T1, typename T2>
+    HPX_CXX_CORE_EXPORT template <typename T1, typename T2>
     struct ref_pair
     {
         static_assert(std::is_reference<T1>{} && std::is_reference<T2>{});
@@ -139,7 +139,7 @@ namespace hpx::detail {
         T2 second;
     };
 
-    HPX_CXX_EXPORT template <typename T1, typename T2>
+    HPX_CXX_CORE_EXPORT template <typename T1, typename T2>
     void swap(ref_pair<T1, T2> const& lhs, ref_pair<T1, T2> const& rhs)
     {
         using std::swap;
@@ -147,8 +147,8 @@ namespace hpx::detail {
         swap(lhs.second, rhs.second);
     }
 
-    HPX_CXX_EXPORT template <typename KeyRef, typename TRef, typename KeyIter,
-        typename MappedIter>
+    HPX_CXX_CORE_EXPORT template <typename KeyRef, typename TRef,
+        typename KeyIter, typename MappedIter>
     struct flat_map_iterator
     {
         static_assert(std::is_reference<KeyRef>{} && std::is_reference<TRef>{});
@@ -319,7 +319,7 @@ namespace hpx::detail {
     // NOTE: This overload was necessary, since iter_swap(it1, it2) calls
     // swap(*it1, *it2).  All std::swap() overloads expect lvalues, and
     // flat_map's iterators produce proxy rvalues when dereferenced.
-    HPX_CXX_EXPORT template <typename KeyRef, class TRef>
+    HPX_CXX_CORE_EXPORT template <typename KeyRef, class TRef>
     inline void swap(
         std::pair<KeyRef, TRef>&& lhs, std::pair<KeyRef, TRef>&& rhs)
     {
@@ -328,7 +328,7 @@ namespace hpx::detail {
         swap(lhs.second, rhs.second);
     }
 
-    HPX_CXX_EXPORT template <typename Key, typename T,
+    HPX_CXX_CORE_EXPORT template <typename Key, typename T,
         typename Compare = std::less<Key>,
         typename KeyContainer = std::vector<Key>,
         typename MappedContainer = std::vector<T>>

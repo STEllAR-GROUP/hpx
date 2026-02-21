@@ -35,7 +35,7 @@ namespace hpx::util {
     /// returns the resulting string.
     ///
     /// \note Currently, only supports search and replace syntax (s/search/replace/)
-    HPX_CXX_EXPORT struct HPX_CORE_EXPORT sed_transform
+    HPX_CXX_CORE_EXPORT struct HPX_CORE_EXPORT sed_transform
     {
     private:
         struct command;

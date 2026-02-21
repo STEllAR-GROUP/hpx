@@ -23,14 +23,15 @@ namespace hpx::traits {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename Executor, typename Future, typename F,
-            typename Enable = void>
+        HPX_CXX_CORE_EXPORT template <typename Executor, typename Future,
+            typename F, typename Enable = void>
         struct future_then_executor_result
         {
             using type = typename continuation_not_callable<Future, F>::type;
         };
 
-        HPX_CXX_EXPORT template <typename Executor, typename Future, typename F>
+        HPX_CXX_CORE_EXPORT template <typename Executor, typename Future,
+            typename F>
         struct future_then_executor_result<Executor, Future, F,
             std::void_t<hpx::util::invoke_result_t<F&, Future>>>
         {
@@ -49,13 +50,15 @@ namespace hpx::traits {
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename Executor, typename Future, typename F>
+    HPX_CXX_CORE_EXPORT template <typename Executor, typename Future,
+        typename F>
     struct future_then_executor_result
       : detail::future_then_executor_result<std::decay_t<Executor>, Future, F>
     {
     };
 
-    HPX_CXX_EXPORT template <typename Executor, typename Future, typename F>
+    HPX_CXX_CORE_EXPORT template <typename Executor, typename Future,
+        typename F>
     using future_then_executor_result_t =
         typename future_then_executor_result<Executor, Future, F>::type;
 }    // namespace hpx::traits

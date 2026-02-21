@@ -16,7 +16,7 @@
 
 namespace hpx::lockfree::detail {
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     class HPX_LOCKFREE_DCAS_ALIGNMENT tagged_ptr
     {
     public:

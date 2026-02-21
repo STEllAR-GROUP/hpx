@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/actions_base/actions_base_support.hpp>
 #include <hpx/actions_base/traits/is_continuation.hpp>
-#include <hpx/naming_base/id_type.hpp>
+#include <hpx/modules/naming_base.hpp>
 
 #include <type_traits>
 

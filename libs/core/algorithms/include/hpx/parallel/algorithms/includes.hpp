@@ -181,9 +181,9 @@ namespace hpx::parallel {
     // includes
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename Iter1, typename Sent1, typename Iter2,
-            typename Sent2, typename F, typename Proj1, typename Proj2,
-            typename CancelToken>
+        HPX_CXX_CORE_EXPORT template <typename Iter1, typename Sent1,
+            typename Iter2, typename Sent2, typename F, typename Proj1,
+            typename Proj2, typename CancelToken>
         constexpr bool sequential_includes(Iter1 first1, Sent1 last1,
             Iter2 first2, Sent2 last2, F&& f, Proj1&& proj1, Proj2&& proj2,
             CancelToken& tok)
@@ -218,8 +218,9 @@ namespace hpx::parallel {
             return true;
         }
 
-        HPX_CXX_EXPORT template <typename Iter1, typename Sent1, typename Iter2,
-            typename Sent2, typename F, typename Proj1, typename Proj2>
+        HPX_CXX_CORE_EXPORT template <typename Iter1, typename Sent1,
+            typename Iter2, typename Sent2, typename F, typename Proj1,
+            typename Proj2>
         constexpr bool sequential_includes(Iter1 first1, Sent1 last1,
             Iter2 first2, Sent2 last2, F&& f, Proj1&& proj1, Proj2&& proj2)
         {
@@ -249,7 +250,7 @@ namespace hpx::parallel {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT struct includes : public algorithm<includes, bool>
+        HPX_CXX_CORE_EXPORT struct includes : public algorithm<includes, bool>
         {
             constexpr includes() noexcept
               : algorithm("includes")
@@ -377,7 +378,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::includes
-    HPX_CXX_EXPORT inline constexpr struct includes_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct includes_t final
       : hpx::detail::tag_parallel_algorithm<includes_t>
     {
     private:

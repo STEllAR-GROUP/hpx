@@ -38,7 +38,7 @@ namespace hpx {
     /// functions of \a hpx::condition_variable and
     /// \a hpx::condition_variable_any.
     ///
-    HPX_CXX_EXPORT enum class cv_status {
+    HPX_CXX_CORE_EXPORT enum class cv_status {
         /// The condition variable was awakened with \a notify_all,
         /// \a notify_one, or spuriously
         no_timeout,
@@ -100,7 +100,7 @@ namespace hpx {
     /// \namedrequirement{CopyAssignable}, or
     /// \namedrequirement{MoveAssignable}.
     ///
-    HPX_CXX_EXPORT class condition_variable
+    HPX_CXX_CORE_EXPORT class condition_variable
     {
     private:
         using mutex_type =
@@ -519,7 +519,7 @@ namespace hpx {
     /// \namedrequirement{CopyAssignable}, or
     /// \namedrequirement{MoveAssignable}.
     ///
-    HPX_CXX_EXPORT class condition_variable_any
+    HPX_CXX_CORE_EXPORT class condition_variable_any
     {
     private:
         using mutex_type =

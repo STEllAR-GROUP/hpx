@@ -224,7 +224,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::destroy
-    HPX_CXX_EXPORT inline constexpr struct destroy_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct destroy_t final
       : hpx::detail::tag_parallel_algorithm<destroy_t>
     {
     private:
@@ -295,7 +295,7 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::destroy_n
-    HPX_CXX_EXPORT inline constexpr struct destroy_n_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct destroy_n_t final
       : hpx::detail::tag_parallel_algorithm<destroy_n_t>
     {
     private:

@@ -13,10 +13,10 @@
 #include <hpx/agas_base/server/locality_namespace.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/modules/async_distributed.hpp>
+#include <hpx/modules/naming_base.hpp>
+#include <hpx/modules/parcelset_base.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/naming_base/id_type.hpp>
-#include <hpx/parcelset_base/locality.hpp>
 
 #include <cstdint>
 #include <map>

@@ -15,7 +15,7 @@
 
 namespace hpx::util {
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct scoped_timer
     {
         explicit scoped_timer(T& t, bool enabled = true) noexcept

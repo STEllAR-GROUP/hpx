@@ -22,34 +22,34 @@
 namespace hpx::parallel::traits {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T, typename Abi, typename NewT>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Abi, typename NewT>
     struct rebind_pack<Vc::Vector<T, Abi>, NewT>
     {
         using type = Vc::Vector<NewT, Abi>;
     };
 
-    HPX_CXX_EXPORT template <typename T, std::size_t N, typename V,
+    HPX_CXX_CORE_EXPORT template <typename T, std::size_t N, typename V,
         std::size_t W, typename NewT>
     struct rebind_pack<Vc::SimdArray<T, N, V, W>, NewT>
     {
         using type = Vc::SimdArray<NewT, N, V, W>;
     };
 
-    HPX_CXX_EXPORT template <typename T, typename NewT>
+    HPX_CXX_CORE_EXPORT template <typename T, typename NewT>
     struct rebind_pack<Vc::Scalar::Vector<T>, NewT>
     {
         using type = Vc::Scalar::Vector<NewT>;
     };
 
     // don't wrap types twice
-    HPX_CXX_EXPORT template <typename T, typename Abi1, typename NewT,
+    HPX_CXX_CORE_EXPORT template <typename T, typename Abi1, typename NewT,
         typename Abi2>
     struct rebind_pack<Vc::Vector<T, Abi1>, Vc::Vector<NewT, Abi2>>
     {
         using type = Vc::Vector<NewT, Abi2>;
     };
 
-    HPX_CXX_EXPORT template <typename T, std::size_t N1, typename V1,
+    HPX_CXX_CORE_EXPORT template <typename T, std::size_t N1, typename V1,
         std::size_t W1, typename NewT, std::size_t N2, typename V2,
         std::size_t W2>
     struct rebind_pack<Vc::SimdArray<T, N1, V1, W1>,
@@ -58,14 +58,15 @@ namespace hpx::parallel::traits {
         using type = Vc::SimdArray<NewT, N2, V2, W2>;
     };
 
-    HPX_CXX_EXPORT template <typename T, typename NewT>
+    HPX_CXX_CORE_EXPORT template <typename T, typename NewT>
     struct rebind_pack<Vc::Scalar::Vector<T>, Vc::Scalar::Vector<NewT>>
     {
         using type = Vc::Scalar::Vector<NewT>;
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename V, typename ValueType, typename Enable>
+    HPX_CXX_CORE_EXPORT template <typename V, typename ValueType,
+        typename Enable>
     struct vector_pack_load
     {
         using value_type = typename rebind_pack<V, ValueType>::type;
@@ -83,7 +84,7 @@ namespace hpx::parallel::traits {
         }
     };
 
-    HPX_CXX_EXPORT template <typename V, typename T, typename Abi>
+    HPX_CXX_CORE_EXPORT template <typename V, typename T, typename Abi>
     struct vector_pack_load<V, Vc::Vector<T, Abi>>
     {
         using value_type = typename rebind_pack<V, Vc::Vector<T, Abi>>::type;
@@ -101,7 +102,7 @@ namespace hpx::parallel::traits {
         }
     };
 
-    HPX_CXX_EXPORT template <typename Value, typename T, std::size_t N,
+    HPX_CXX_CORE_EXPORT template <typename Value, typename T, std::size_t N,
         typename V, std::size_t W>
     struct vector_pack_load<Value, Vc::SimdArray<T, N, V, W>>
     {
@@ -122,7 +123,8 @@ namespace hpx::parallel::traits {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename V, typename ValueType, typename Enable>
+    HPX_CXX_CORE_EXPORT template <typename V, typename ValueType,
+        typename Enable>
     struct vector_pack_store
     {
         template <typename Iter>
@@ -138,7 +140,7 @@ namespace hpx::parallel::traits {
         }
     };
 
-    HPX_CXX_EXPORT template <typename V, typename T, typename Abi>
+    HPX_CXX_CORE_EXPORT template <typename V, typename T, typename Abi>
     struct vector_pack_store<V, Vc::Vector<T, Abi>>
     {
         template <typename Iter>
@@ -154,7 +156,7 @@ namespace hpx::parallel::traits {
         }
     };
 
-    HPX_CXX_EXPORT template <typename Value, typename T, std::size_t N,
+    HPX_CXX_CORE_EXPORT template <typename Value, typename T, std::size_t N,
         typename V, std::size_t W>
     struct vector_pack_store<Value, Vc::SimdArray<T, N, V, W>>
     {

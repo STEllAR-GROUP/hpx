@@ -24,14 +24,14 @@ namespace hpx {
     // tuple.hpp
     namespace adl_barrier {
 
-        HPX_CXX_EXPORT template <std::size_t I, typename... Ts>
+        HPX_CXX_CORE_EXPORT template <std::size_t I, typename... Ts>
         constexpr HPX_HOST_DEVICE HPX_FORCEINLINE util::at_index_t<I, Ts...>&
         get(std::variant<Ts...>& var) noexcept
         {
             return std::get<I>(var);
         }
 
-        HPX_CXX_EXPORT template <std::size_t I, typename... Ts>
+        HPX_CXX_CORE_EXPORT template <std::size_t I, typename... Ts>
         constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
             util::at_index_t<I, Ts...> const&
             get(std::variant<Ts...> const& var) noexcept
@@ -39,14 +39,14 @@ namespace hpx {
             return std::get<I>(var);
         }
 
-        HPX_CXX_EXPORT template <std::size_t I, typename... Ts>
+        HPX_CXX_CORE_EXPORT template <std::size_t I, typename... Ts>
         constexpr HPX_HOST_DEVICE HPX_FORCEINLINE util::at_index_t<I, Ts...>&&
         get(std::variant<Ts...>&& var) noexcept
         {
             return std::get<I>(HPX_MOVE(var));
         }
 
-        HPX_CXX_EXPORT template <std::size_t I, typename... Ts>
+        HPX_CXX_CORE_EXPORT template <std::size_t I, typename... Ts>
         constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
             util::at_index_t<I, Ts...> const&&
             get(std::variant<Ts...> const&& var) noexcept

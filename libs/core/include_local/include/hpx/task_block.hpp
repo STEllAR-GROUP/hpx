@@ -10,9 +10,10 @@
 
 namespace hpx {
 
-    HPX_CXX_EXPORT using task_cancelled_exception =
+    HPX_CXX_CORE_EXPORT using task_cancelled_exception =
         hpx::experimental::task_canceled_exception;
-    HPX_CXX_EXPORT using hpx::experimental::define_task_block;
-    HPX_CXX_EXPORT using hpx::experimental::define_task_block_restore_thread;
-    HPX_CXX_EXPORT using hpx::experimental::task_block;
+    HPX_CXX_CORE_EXPORT using hpx::experimental::define_task_block;
+    HPX_CXX_CORE_EXPORT using hpx::experimental::
+        define_task_block_restore_thread;
+    HPX_CXX_CORE_EXPORT using hpx::experimental::task_block;
 }    // namespace hpx

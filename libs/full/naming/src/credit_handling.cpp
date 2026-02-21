@@ -17,14 +17,13 @@
 #include <hpx/modules/lcos_local.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/memory.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/naming/credit_handling.hpp>
 #include <hpx/naming/detail/preprocess_gid_types.hpp>
 #include <hpx/naming/split_gid.hpp>
-#include <hpx/naming_base/address.hpp>
-#include <hpx/naming_base/id_type.hpp>
 
 #include <cstdint>
 #include <mutex>

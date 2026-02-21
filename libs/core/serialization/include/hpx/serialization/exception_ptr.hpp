@@ -15,7 +15,7 @@
 
 namespace hpx::util {
 
-    HPX_CXX_EXPORT enum class exception_type {
+    HPX_CXX_CORE_EXPORT enum class exception_type {
         // unknown exception
         unknown_exception = 0,
 
@@ -51,27 +51,27 @@ namespace hpx::serialization {
 
     namespace detail {
 
-        HPX_CXX_EXPORT using save_custom_exception_handler_type =
+        HPX_CXX_CORE_EXPORT using save_custom_exception_handler_type =
             std::function<void(hpx::serialization::output_archive&,
                 std::exception_ptr const&, unsigned int)>;
-        HPX_CXX_EXPORT using load_custom_exception_handler_type =
+        HPX_CXX_CORE_EXPORT using load_custom_exception_handler_type =
             std::function<void(hpx::serialization::input_archive&,
                 std::exception_ptr&, unsigned int)>;
 
-        HPX_CXX_EXPORT HPX_CORE_EXPORT void set_save_custom_exception_handler(
-            save_custom_exception_handler_type f);
-        HPX_CXX_EXPORT HPX_CORE_EXPORT void set_load_custom_exception_handler(
-            load_custom_exception_handler_type f);
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void
+        set_save_custom_exception_handler(save_custom_exception_handler_type f);
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void
+        set_load_custom_exception_handler(load_custom_exception_handler_type f);
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Archive>
+    HPX_CXX_CORE_EXPORT template <typename Archive>
     HPX_CORE_EXPORT void save(
         Archive& ar, std::exception_ptr const& e, unsigned int);
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Archive>
+    HPX_CXX_CORE_EXPORT template <typename Archive>
     HPX_CORE_EXPORT void load(Archive& ar, std::exception_ptr& e, unsigned int);
 
-    HPX_SERIALIZATION_SPLIT_FREE(HPX_CXX_EXPORT, std::exception_ptr)
+    HPX_SERIALIZATION_SPLIT_FREE(HPX_CXX_CORE_EXPORT, std::exception_ptr)
 }    // namespace hpx::serialization

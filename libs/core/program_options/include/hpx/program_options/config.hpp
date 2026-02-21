@@ -12,9 +12,9 @@
 
 namespace hpx::program_options {
 
-    HPX_CXX_EXPORT using any = hpx::any_nonser;
-    HPX_CXX_EXPORT using hpx::any_cast;
+    HPX_CXX_CORE_EXPORT using any = hpx::any_nonser;
+    HPX_CXX_CORE_EXPORT using hpx::any_cast;
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     using optional = hpx::optional<T>;
 }    // namespace hpx::program_options

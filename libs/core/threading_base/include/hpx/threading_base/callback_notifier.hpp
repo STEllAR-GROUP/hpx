@@ -18,7 +18,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::threads::policies {
 
-    HPX_CXX_EXPORT class HPX_CORE_EXPORT callback_notifier
+    HPX_CXX_CORE_EXPORT class HPX_CORE_EXPORT callback_notifier
     {
     public:
         using on_startstop_type = hpx::function<void(

@@ -27,7 +27,7 @@ namespace hpx::serialization {
     namespace detail {
 
         ////////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT struct boost_variant_save_visitor
+        HPX_CXX_CORE_EXPORT struct boost_variant_save_visitor
           : boost::static_visitor<>
         {
             explicit constexpr boost_variant_save_visitor(
@@ -47,10 +47,10 @@ namespace hpx::serialization {
         };
 
         ////////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename... Ts>
+        HPX_CXX_CORE_EXPORT template <typename... Ts>
         struct boost_variant_impl;
 
-        HPX_CXX_EXPORT template <typename T, typename... Ts>
+        HPX_CXX_CORE_EXPORT template <typename T, typename... Ts>
         struct boost_variant_impl<T, Ts...>
         {
             template <typename V>
@@ -77,7 +77,7 @@ namespace hpx::serialization {
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename... T>
+    HPX_CXX_CORE_EXPORT template <typename... T>
     void save(output_archive& ar, boost::variant<T...> const& v, unsigned)
     {
         int const which = v.which();
@@ -86,7 +86,7 @@ namespace hpx::serialization {
         v.apply_visitor(visitor);
     }
 
-    HPX_CXX_EXPORT template <typename... T>
+    HPX_CXX_CORE_EXPORT template <typename... T>
     void load(input_archive& ar, boost::variant<T...>& v, unsigned)
     {
         int which;
@@ -102,8 +102,8 @@ namespace hpx::serialization {
         detail::boost_variant_impl<T...>::load(ar, which, v);
     }
 
-    HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE(
-        HPX_CXX_EXPORT, (template <typename... T>), (boost::variant<T...>) )
+    HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE(HPX_CXX_CORE_EXPORT,
+        (template <typename... T>), (boost::variant<T...>) )
 }    // namespace hpx::serialization
 
 #endif    // HPX_SERIALIZATION_HAVE_BOOST_TYPES

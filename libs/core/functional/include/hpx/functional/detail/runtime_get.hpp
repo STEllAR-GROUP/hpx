@@ -56,7 +56,7 @@ namespace hpx::detail {
     using first_tuple_element_t =
         hpx::tuple_element_t<0, std::remove_reference_t<Tuple>>;
 
-    HPX_CXX_EXPORT template <typename Tuple>
+    HPX_CXX_CORE_EXPORT template <typename Tuple>
     [[nodiscard]] constexpr decltype(auto) homogenous_runtime_get(
         Tuple& t, std::size_t i) noexcept
     {
@@ -83,7 +83,7 @@ namespace hpx::detail {
     using variant_from_tuple_t = typename variant_from_tuple<Tuple>::type;
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Tuple>
+    HPX_CXX_CORE_EXPORT template <typename Tuple>
     [[nodiscard]] constexpr decltype(auto) runtime_get(
         Tuple& t, std::size_t i) noexcept
     {

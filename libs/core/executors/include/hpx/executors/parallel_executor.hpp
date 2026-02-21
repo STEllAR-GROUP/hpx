@@ -33,7 +33,7 @@
 
 namespace hpx::parallel::execution::detail {
 
-    HPX_CXX_EXPORT template <typename Policy>
+    HPX_CXX_CORE_EXPORT template <typename Policy>
     struct get_default_policy
     {
         static constexpr Policy call() noexcept
@@ -52,15 +52,15 @@ namespace hpx::parallel::execution::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename F, typename Shape, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename F, typename Shape, typename... Ts>
     struct bulk_function_result;
 
     ///////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename F, typename Shape, typename Future,
+    HPX_CXX_CORE_EXPORT template <typename F, typename Shape, typename Future,
         typename... Ts>
     struct bulk_then_execute_result;
 
-    HPX_CXX_EXPORT template <typename F, typename Shape, typename Future,
+    HPX_CXX_CORE_EXPORT template <typename F, typename Shape, typename Future,
         typename... Ts>
     struct then_bulk_function_result;
 }    // namespace hpx::parallel::execution::detail
@@ -80,7 +80,7 @@ namespace hpx::execution {
     ///
     /// This executor conforms to the concepts of a TwoWayExecutor,
     /// and a BulkTwoWayExecutor
-    HPX_CXX_EXPORT template <typename Policy>
+    HPX_CXX_CORE_EXPORT template <typename Policy>
     struct parallel_policy_executor
     {
         /// Associate the parallel_execution_tag executor tag type as a default
@@ -642,7 +642,8 @@ namespace hpx::execution {
     };
 
     // support all properties exposed by the embedded policy
-    HPX_CXX_EXPORT template <typename Tag, typename Policy, typename Property,
+    HPX_CXX_CORE_EXPORT template <typename Tag, typename Policy,
+        typename Property,
         HPX_CONCEPT_REQUIRES_(
             hpx::execution::experimental::is_scheduling_property_v<Tag>)>
     auto tag_invoke(
@@ -657,7 +658,7 @@ namespace hpx::execution {
         return exec_with_prop;
     }
 
-    HPX_CXX_EXPORT template <typename Tag, typename Policy,
+    HPX_CXX_CORE_EXPORT template <typename Tag, typename Policy,
         HPX_CONCEPT_REQUIRES_(
             hpx::execution::experimental::is_scheduling_property_v<Tag>)>
     auto tag_invoke(Tag tag, parallel_policy_executor<Policy> const& exec)
@@ -666,7 +667,7 @@ namespace hpx::execution {
         return tag(exec.policy());
     }
 
-    HPX_CXX_EXPORT using parallel_executor =
+    HPX_CXX_CORE_EXPORT using parallel_executor =
         parallel_policy_executor<hpx::launch>;
 }    // namespace hpx::execution
 
@@ -675,31 +676,31 @@ namespace hpx::execution {
 namespace hpx::execution::experimental {
 
     /// \cond NOINTERNAL
-    HPX_CXX_EXPORT template <typename Policy>
+    HPX_CXX_CORE_EXPORT template <typename Policy>
     struct is_one_way_executor<hpx::execution::parallel_policy_executor<Policy>>
       : std::true_type
     {
     };
 
-    HPX_CXX_EXPORT template <typename Policy>
+    HPX_CXX_CORE_EXPORT template <typename Policy>
     struct is_never_blocking_one_way_executor<
         hpx::execution::parallel_policy_executor<Policy>> : std::true_type
     {
     };
 
-    HPX_CXX_EXPORT template <typename Policy>
+    HPX_CXX_CORE_EXPORT template <typename Policy>
     struct is_two_way_executor<hpx::execution::parallel_policy_executor<Policy>>
       : std::true_type
     {
     };
 
-    HPX_CXX_EXPORT template <typename Policy>
+    HPX_CXX_CORE_EXPORT template <typename Policy>
     struct is_bulk_one_way_executor<
         hpx::execution::parallel_policy_executor<Policy>> : std::true_type
     {
     };
 
-    HPX_CXX_EXPORT template <typename Policy>
+    HPX_CXX_CORE_EXPORT template <typename Policy>
     struct is_bulk_two_way_executor<
         hpx::execution::parallel_policy_executor<Policy>> : std::true_type
     {

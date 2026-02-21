@@ -13,5 +13,5 @@ namespace hpx::util {
 
     /// Tries to break an attached debugger, if not supported a loop is
     /// invoked which gives enough time to attach a debugger manually.
-    HPX_CXX_EXPORT HPX_CORE_EXPORT void attach_debugger();
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void attach_debugger();
 }    // namespace hpx::util

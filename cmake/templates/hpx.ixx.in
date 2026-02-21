@@ -11,14 +11,14 @@ module;
 
 // Define module-specific macros before including config
 #define HPX_COMPILE_BMI
-#define HPX_COMPILE_@modulename_upper@_WITH_MODULES
+#define HPX_COMPILE_@uppercase_lib@_WITH_MODULES
 #include <hpx/config.hpp>
 
 // Include all standard library headers in global module fragment to prevent ODR
 // violations.
 #include <hpx/config/std_headers.hpp>
 
-export module HPX.Core@cxx_sub_module@;
+export module HPX.@cap_libname@;
 
 // Make sure the exported symbols are name-mangled using standard C++ rules.
 // This is necessary as otherwise the symbols exported from the shared libraries
@@ -27,16 +27,15 @@ extern "C++" {
 
 #if defined(HPX_MSVC)
 // disable warning C5244: '#include <filename>' in the purview of module
-// 'HPX.Core' appears erroneous.  Consider moving that directive before
-// the module declaration, or replace the textual inclusion with
-// 'import <filename>;'.
+// 'HPX.@cap_libname@' appears erroneous.  Consider moving that directive before the
+// module declaration, or replace the textual inclusion 'import <filename>;'.
 #pragma warning(push)
 #pragma warning(disable : 5244)
 #endif
 
 #if defined(HPX_CLANG_VERSION)
 // disable clang warning: '#include <filename>' attaches the declarations
-// to the named module 'HPX.Core', which is not usually intended; consider
+// to the named module 'HPX.@cap_libname@', which is not usually intended; consider
 // moving that directive before the module declaration
 // [-Winclude-angled-in-module-purview]
 #pragma clang diagnostic push

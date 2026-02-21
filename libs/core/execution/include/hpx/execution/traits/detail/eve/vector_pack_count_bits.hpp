@@ -16,7 +16,7 @@
 namespace hpx::parallel::traits {
 
     ///////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Mask>
+    HPX_CXX_CORE_EXPORT template <typename Mask>
     HPX_HOST_DEVICE HPX_FORCEINLINE std::size_t count_bits(
         Mask const& msk) noexcept
     {

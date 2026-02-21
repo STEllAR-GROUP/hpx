@@ -23,11 +23,10 @@ namespace hpx::program_options::command_line_style {
         It's possible to introduce long options by the same character as
         short options, see allow_long_disguise.
 
-        Finally, guessing (specifying only prefix of option) and case
-        insensitive processing are supported.
+        Finally, guessing (specifying only prefix of option) and
+        case-insensitive processing are supported.
     */
-    enum style_t
-    {
+    HPX_CXX_CORE_EXPORT enum style_t {
         /// Allow "--long_name" style
         allow_long = 1,
         /// Allow "-<single character" style
@@ -53,7 +52,7 @@ namespace hpx::program_options::command_line_style {
             short options. */
         short_allow_next = short_allow_adjacent << 1,
         /** Allow to merge several short options together,
-            so that "-s -k" become "-sk". All of the options
+            so that "-s -k" become "-sk". All the   options
             but last should accept no parameter. For example, if
             "-s" accept a parameter, then "k" will be taken as
             parameter, not another short option.
@@ -62,7 +61,7 @@ namespace hpx::program_options::command_line_style {
         allow_sticky = short_allow_next << 1,
         /** Allow abbreviated spellings for long options,
             if they unambiguously identify long option.
-            No long option name should be prefix of other
+            No long option name should be the prefix of other
             long option name if guessing is in effect.
         */
         allow_guessing = allow_sticky << 1,

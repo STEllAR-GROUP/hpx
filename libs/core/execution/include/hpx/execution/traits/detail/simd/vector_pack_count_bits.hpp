@@ -17,7 +17,7 @@
 namespace hpx::parallel::traits {
 
     ///////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T, typename Abi>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Abi>
     HPX_HOST_DEVICE HPX_FORCEINLINE std::size_t count_bits(
         datapar::experimental::simd_mask<T, Abi> const& mask) noexcept
     {

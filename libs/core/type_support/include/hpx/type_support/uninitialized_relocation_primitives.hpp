@@ -25,19 +25,19 @@ namespace hpx::experimental::util {
 
     namespace detail {    // Utility metafunctions
 
-        HPX_CXX_EXPORT struct buffer_memcpy_tag
+        HPX_CXX_CORE_EXPORT struct buffer_memcpy_tag
         {
         };
 
-        HPX_CXX_EXPORT struct for_loop_nothrow_tag
+        HPX_CXX_CORE_EXPORT struct for_loop_nothrow_tag
         {
         };
 
-        HPX_CXX_EXPORT struct for_loop_try_catch_tag
+        HPX_CXX_CORE_EXPORT struct for_loop_try_catch_tag
         {
         };
 
-        HPX_CXX_EXPORT template <typename InIter, typename OutIter,
+        HPX_CXX_CORE_EXPORT template <typename InIter, typename OutIter,
             bool iterators_are_contiguous_v = false>
         struct relocation_traits
         {
@@ -85,7 +85,8 @@ namespace hpx::experimental::util {
     //////////////////////////////
     // uninitialized_relocate_n //
     //////////////////////////////
-    HPX_CXX_EXPORT template <typename InIter, typename FwdIter, typename Size,
+    HPX_CXX_CORE_EXPORT template <typename InIter, typename FwdIter,
+        typename Size,
         typename Dummy>    // Dummy is used retain the same signature
                            // as the implementation before P1144
     // clang-format off
@@ -101,7 +102,8 @@ namespace hpx::experimental::util {
         return std::uninitialized_relocate_n(first, n, dst);
     }
 
-    HPX_CXX_EXPORT template <typename InIter, typename Size, typename FwdIter>
+    HPX_CXX_CORE_EXPORT template <typename InIter, typename Size,
+        typename FwdIter>
     std::tuple<InIter, FwdIter> uninitialized_relocate_n_primitive(InIter first,
         Size n, FwdIter dst) noexcept(detail::relocation_traits<InIter,
         FwdIter>::is_noexcept_relocatable_v)
@@ -112,7 +114,8 @@ namespace hpx::experimental::util {
     ////////////////////////////
     // uninitialized_relocate //
     ////////////////////////////
-    HPX_CXX_EXPORT template <typename InIter, typename Sent, typename FwdIter,
+    HPX_CXX_CORE_EXPORT template <typename InIter, typename Sent,
+        typename FwdIter,
         typename Dummy>    // Dummy is used retain the same signature
                            // as the implementation before P1144
     // clang-format off
@@ -129,7 +132,8 @@ namespace hpx::experimental::util {
         return std::uninitialized_relocate(first, last, dst);
     }
 
-    HPX_CXX_EXPORT template <typename InIter, typename Sent, typename FwdIter>
+    HPX_CXX_CORE_EXPORT template <typename InIter, typename Sent,
+        typename FwdIter>
     std::tuple<InIter, FwdIter> uninitialized_relocate_primitive(InIter first,
         Sent last, FwdIter dst) noexcept(detail::relocation_traits<InIter,
         FwdIter>::is_noexcept_relocatable_v)
@@ -140,7 +144,7 @@ namespace hpx::experimental::util {
     /////////////////////////////////////
     // uninitialized_relocate_backward //
     /////////////////////////////////////
-    HPX_CXX_EXPORT template <typename BiIter1, typename BiIter2,
+    HPX_CXX_CORE_EXPORT template <typename BiIter1, typename BiIter2,
         typename Dummy>    // Dummy is used retain the same signature
                            // as the implementation before P1144
     // clang-format off
@@ -157,7 +161,7 @@ namespace hpx::experimental::util {
         return std::uninitialized_relocate_backward(first, last, dst_last);
     }
 
-    HPX_CXX_EXPORT template <typename BiIter1, typename BiIter2>
+    HPX_CXX_CORE_EXPORT template <typename BiIter1, typename BiIter2>
     std::tuple<BiIter1, BiIter2> uninitialized_relocate_backward_primitive(
         BiIter1 first, BiIter1 last,
         BiIter2 dst_last) noexcept(detail::relocation_traits<BiIter1,
@@ -173,7 +177,7 @@ namespace hpx::experimental::util {
         //////////////////////////////
         // uninitialized_relocate_n //
         //////////////////////////////
-        HPX_CXX_EXPORT template <typename InIter, typename Size,
+        HPX_CXX_CORE_EXPORT template <typename InIter, typename Size,
             typename FwdIter>
         std::tuple<InIter, FwdIter> uninitialized_relocate_n_primitive_helper(
             InIter first, Size n, FwdIter dst, buffer_memcpy_tag) noexcept
@@ -200,7 +204,7 @@ namespace hpx::experimental::util {
             return {first, dst};
         }
 
-        HPX_CXX_EXPORT template <typename InIter, typename Size,
+        HPX_CXX_CORE_EXPORT template <typename InIter, typename Size,
             typename FwdIter>
         // Either the buffer is not contiguous or the types are no-throw
         // move constructible but not trivially relocatable
@@ -218,7 +222,7 @@ namespace hpx::experimental::util {
             return {first, dst};
         }
 
-        HPX_CXX_EXPORT template <typename InIter, typename Size,
+        HPX_CXX_CORE_EXPORT template <typename InIter, typename Size,
             typename FwdIter>
         std::tuple<InIter, FwdIter> uninitialized_relocate_n_primitive_helper(
             InIter first, Size n, FwdIter dst, for_loop_try_catch_tag)
@@ -257,7 +261,7 @@ namespace hpx::experimental::util {
         ////////////////////////////
         // uninitialized_relocate //
         ////////////////////////////
-        HPX_CXX_EXPORT template <typename InIter, typename Sent,
+        HPX_CXX_CORE_EXPORT template <typename InIter, typename Sent,
             typename FwdIter>
         std::tuple<InIter, FwdIter> uninitialized_relocate_primitive_helper(
             InIter first, Sent last, FwdIter dst, buffer_memcpy_tag) noexcept
@@ -266,7 +270,7 @@ namespace hpx::experimental::util {
                 first, std::distance(first, last), dst, buffer_memcpy_tag{});
         }
 
-        HPX_CXX_EXPORT template <typename InIter, typename Sent,
+        HPX_CXX_CORE_EXPORT template <typename InIter, typename Sent,
             typename FwdIter>
         // Either the buffer is not contiguous or the types are no-throw
         // move constructible but not trivially relocatable
@@ -284,7 +288,7 @@ namespace hpx::experimental::util {
             return {first, dst};
         }
 
-        HPX_CXX_EXPORT template <typename InIter, typename Sent,
+        HPX_CXX_CORE_EXPORT template <typename InIter, typename Sent,
             typename FwdIter>
         std::tuple<InIter, FwdIter> uninitialized_relocate_primitive_helper(
             InIter first, Sent last, FwdIter dst, for_loop_try_catch_tag)
@@ -320,7 +324,7 @@ namespace hpx::experimental::util {
         /////////////////////////////////////
         // uninitialized_relocate_backward //
         /////////////////////////////////////
-        HPX_CXX_EXPORT template <typename BiIter1, typename BiIter2>
+        HPX_CXX_CORE_EXPORT template <typename BiIter1, typename BiIter2>
         std::tuple<BiIter1, BiIter2>
         uninitialized_relocate_backward_primitive_helper(BiIter1 first,
             BiIter1 last, BiIter2 dst_last, buffer_memcpy_tag) noexcept
@@ -335,7 +339,7 @@ namespace hpx::experimental::util {
                 first, n_objects, dst_first, buffer_memcpy_tag{});
         }
 
-        HPX_CXX_EXPORT template <typename BiIter1, typename BiIter2>
+        HPX_CXX_CORE_EXPORT template <typename BiIter1, typename BiIter2>
         // Either the buffer is not contiguous or the types are no-throw
         // move constructible but not trivially relocatable
         // dst_last is one past the last element of the destination
@@ -356,7 +360,7 @@ namespace hpx::experimental::util {
             return {last, dst_last};
         }
 
-        HPX_CXX_EXPORT template <typename BiIter1, typename BiIter2>
+        HPX_CXX_CORE_EXPORT template <typename BiIter1, typename BiIter2>
         std::tuple<BiIter1, BiIter2>
         uninitialized_relocate_backward_primitive_helper(BiIter1 first,
             BiIter1 last, BiIter2 dst_last, for_loop_try_catch_tag)
@@ -395,8 +399,8 @@ namespace hpx::experimental::util {
     //////////////////////////////
     // uninitialized_relocate_n //
     //////////////////////////////
-    HPX_CXX_EXPORT template <typename InIter, typename FwdIter, typename Size,
-        typename iterators_are_contiguous_t>
+    HPX_CXX_CORE_EXPORT template <typename InIter, typename FwdIter,
+        typename Size, typename iterators_are_contiguous_t>
     // clang-format off
     std::tuple<InIter, FwdIter> uninitialized_relocate_n_primitive(InIter first, Size n,
         FwdIter dst, iterators_are_contiguous_t) noexcept(
@@ -414,7 +418,8 @@ namespace hpx::experimental::util {
             first, n, dst, implementation_tag{});
     }
 
-    HPX_CXX_EXPORT template <typename InIter, typename Size, typename FwdIter>
+    HPX_CXX_CORE_EXPORT template <typename InIter, typename Size,
+        typename FwdIter>
     std::tuple<InIter, FwdIter> uninitialized_relocate_n_primitive(InIter first,
         Size n, FwdIter dst) noexcept(detail::relocation_traits<InIter,
         FwdIter>::is_noexcept_relocatable_v)
@@ -430,8 +435,8 @@ namespace hpx::experimental::util {
     ////////////////////////////
     // uninitialized_relocate //
     ////////////////////////////
-    HPX_CXX_EXPORT template <typename InIter, typename Sent, typename FwdIter,
-        typename iterators_are_contiguous_t>
+    HPX_CXX_CORE_EXPORT template <typename InIter, typename Sent,
+        typename FwdIter, typename iterators_are_contiguous_t>
     // clang-format off
     std::tuple<InIter, FwdIter> uninitialized_relocate_primitive(InIter first, Sent last,
         FwdIter dst, iterators_are_contiguous_t) noexcept(
@@ -450,7 +455,8 @@ namespace hpx::experimental::util {
             first, last, dst, implementation_tag{});
     }
 
-    HPX_CXX_EXPORT template <typename InIter, typename Sent, typename FwdIter>
+    HPX_CXX_CORE_EXPORT template <typename InIter, typename Sent,
+        typename FwdIter>
     std::tuple<InIter, FwdIter> uninitialized_relocate_primitive(InIter first,
         Sent last, FwdIter dst) noexcept(detail::relocation_traits<InIter,
         FwdIter>::is_noexcept_relocatable_v)
@@ -466,7 +472,7 @@ namespace hpx::experimental::util {
     /////////////////////////////////////
     // uninitialized_relocate_backward //
     /////////////////////////////////////
-    HPX_CXX_EXPORT template <typename BiIter1, typename BiIter2,
+    HPX_CXX_CORE_EXPORT template <typename BiIter1, typename BiIter2,
         typename iterators_are_contiguous_t>
     std::tuple<BiIter1, BiIter2> uninitialized_relocate_backward_primitive(
         BiIter1 first, BiIter1 last, BiIter2 dst_last,
@@ -485,7 +491,7 @@ namespace hpx::experimental::util {
             first, last, dst_last, implementation_tag{});
     }
 
-    HPX_CXX_EXPORT template <typename BiIter1, typename BiIter2>
+    HPX_CXX_CORE_EXPORT template <typename BiIter1, typename BiIter2>
     std::tuple<BiIter1, BiIter2> uninitialized_relocate_backward_primitive(
         BiIter1 first, BiIter1 last,
         BiIter2 dst_last) noexcept(detail::relocation_traits<BiIter1,

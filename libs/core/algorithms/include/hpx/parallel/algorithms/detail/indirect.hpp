@@ -24,7 +24,7 @@ namespace hpx::parallel::detail {
     /// \remarks this is the comparison object for pointers. Receive an object
     ///          for to compare the objects pointed. The pointers can't be
     ///          nullptr
-    HPX_CXX_EXPORT template <typename Iter, typename Sent,
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent,
         typename Comp =
             std::less<typename std::iterator_traits<Iter>::value_type>>
     struct less_ptr_no_null
@@ -47,7 +47,7 @@ namespace hpx::parallel::detail {
     /// \param [in] first : iterator to the first element of the range
     /// \param [in] last : iterator to the element after the last of the range
     /// \param [in/out] v_iter : vector where store the iterators of the index
-    HPX_CXX_EXPORT template <typename Iter, typename Sent>
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent>
     void create_index(Iter first, Sent last, std::vector<Iter>& v_iter)
     {
         auto const nelem = detail::distance(first, last);
@@ -65,7 +65,7 @@ namespace hpx::parallel::detail {
     /// \tparam Iter : iterators of the index
     /// \param [in] first : iterator to the first element of the data
     /// \param [in] v_iter : vector sorted of the iterators
-    HPX_CXX_EXPORT template <typename Iter>
+    HPX_CXX_CORE_EXPORT template <typename Iter>
     void sort_index(Iter first, std::vector<Iter>& v_iter)
     {
         using value_type = typename std::iterator_traits<Iter>::value_type;

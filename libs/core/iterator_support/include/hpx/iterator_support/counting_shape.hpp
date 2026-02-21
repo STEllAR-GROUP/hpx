@@ -13,7 +13,7 @@
 namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Incrementable>
+    HPX_CXX_CORE_EXPORT template <typename Incrementable>
     struct counting_shape
       : hpx::util::iterator_range<hpx::util::counting_iterator<Incrementable>>
     {
@@ -35,10 +35,10 @@ namespace hpx::util {
         }
     };
 
-    HPX_CXX_EXPORT template <typename Incrementable>
+    HPX_CXX_CORE_EXPORT template <typename Incrementable>
     counting_shape(Incrementable) -> counting_shape<Incrementable>;
 
-    HPX_CXX_EXPORT template <typename Incrementable>
+    HPX_CXX_CORE_EXPORT template <typename Incrementable>
     counting_shape(Incrementable, Incrementable)
         -> counting_shape<Incrementable>;
 
