@@ -14,9 +14,6 @@
 
 using hpx::naming::gid_type;
 
-// TODO: Subtraction tests.
-// TODO: Comparison tests.
-
 int main()
 {
     {    // constructor and retrieval (get_msb/get_lsb) tests
@@ -637,6 +634,70 @@ int main()
         gid.set_msb(std::uint64_t(0x0ULL));
         HPX_TEST_EQ_MSG(
             bool(gid), true, "'lsb == true' and 'msb == false' case failed");
+    }
+
+    {                                         // subtraction tests (operator-)
+        gid_type gid0(0x100ULL, 0x200ULL);    // simple case
+        gid_type gid1(0x50ULL, 0x100ULL);     // subtract smaller from larger
+        gid_type gid2(0x10ULL, 0x50ULL);      // another simple case
+
+        gid_type gid3(0x1ULL, 0x0ULL);    // boundary case: borrowing required
+        gid_type gid4(0x0ULL, 0x1ULL);    // value to subtract
+
+        std::uint64_t const special_bits_mask =
+            hpx::naming::gid_type::locality_id_mask |
+            hpx::naming::gid_type::internal_bits_mask;
+
+        // sanity checks
+        HPX_SANITY_EQ(gid0.get_msb(), 0x100ULL);
+        HPX_SANITY_EQ(gid0.get_lsb(), 0x200ULL);
+        HPX_SANITY_EQ(gid1.get_msb(), 0x50ULL);
+        HPX_SANITY_EQ(gid1.get_lsb(), 0x100ULL);
+
+        // Basic subtraction: 0x100'0000'0000'0200 - 0x50'0000'0000'0100
+        //                  = 0xB0'0000'0000'0100
+        gid_type result1 = gid0 - gid1;
+        HPX_TEST_EQ(result1.get_msb(), 0xB0ULL);
+        HPX_TEST_EQ(result1.get_lsb(), 0x100ULL);
+
+        // Another subtraction: 0x50'0000'0000'0100 - 0x10'0000'0000'0050
+        //                     = 0x40'0000'0000'00B0
+        gid_type result2 = gid1 - gid2;
+        HPX_TEST_EQ(result2.get_msb(), 0x40ULL);
+        HPX_TEST_EQ(result2.get_lsb(), 0xB0ULL);
+
+        // Boundary case with borrowing:
+        //   0x00000000000000010000000000000000
+        // - 0x00000000000000000000000000000001
+        // ------------------------------------
+        //   0x0000000000000000ffffffffffffffff
+        gid_type result3 = gid3 - gid4;
+        HPX_TEST_EQ(result3.get_msb(), 0x0ULL);
+        HPX_TEST_EQ(result3.get_lsb(), ~0x0ULL);
+
+        // Subtract from self (should give 0)
+        gid_type result4 = gid0 - gid0;
+        HPX_TEST_EQ(result4.get_msb(), 0x0ULL);
+        HPX_TEST_EQ(result4.get_lsb(), 0x0ULL);
+
+        // Large values subtraction (with special bits masked)
+        gid_type gid5(~0x0ULL & ~special_bits_mask,
+            ~0x0ULL);    // max value without special bits
+        gid_type gid6(0x1ULL, 0x1ULL);
+        //   0x00000000000000000ffffffffffffffff (without special bits in MSB)
+        // - 0x00000000000000010000000000000001
+        // ------------------------------------
+        //   0xfffffffffffffffefffffffffffffffe (result masked to exclude special bits)
+        gid_type result5 = gid5 - gid6;
+        HPX_TEST_EQ(result5.get_msb() & ~special_bits_mask,
+            (~0x0ULL - 0x1ULL) & ~special_bits_mask);
+        HPX_TEST_EQ(result5.get_lsb(), 0xFFFFFFFFFFFFFFFEULL);
+
+        // Verify subtraction doesn't mutate the originals
+        HPX_TEST_EQ(gid0.get_msb(), 0x100ULL);
+        HPX_TEST_EQ(gid0.get_lsb(), 0x200ULL);
+        HPX_TEST_EQ(gid1.get_msb(), 0x50ULL);
+        HPX_TEST_EQ(gid1.get_lsb(), 0x100ULL);
     }
 
     return hpx::util::report_errors();
