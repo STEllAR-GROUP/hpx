@@ -493,7 +493,7 @@ namespace hpx::ranges {
                 return U(HPX_MOVE(init));
             }
 
-            auto it = hpx::ranges::next(first, last);
+            auto it = hpx::parallel::detail::advance_to_sentinel(first, last);
             U result = HPX_MOVE(init);
 
             while (it != first)
@@ -548,7 +548,7 @@ namespace hpx::ranges {
                 return result_type();
             }
 
-            auto it = hpx::ranges::next(first, last);
+            auto it = hpx::parallel::detail::advance_to_sentinel(first, last);
             U result = *--it;
 
             while (it != first)
