@@ -28,6 +28,10 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
+#if defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
+#include <hpx/serialization/detail/refl_qualified_name_of.hpp>
+#endif
+
 namespace hpx::serialization::detail {
 
     ///////////////////////////////////////////////////////////////////////////
@@ -37,6 +41,17 @@ namespace hpx::serialization::detail {
         ;
 #else
     {
+
+#if defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
+        [[nodiscard]] constexpr char const* operator()() const noexcept
+        {
+            // Unless the user specifically creates a specialization of this
+            // we should be able to auto generate a full string description
+            // for the type T using reflection and display_string_of()
+
+            return qualified_name_of<T>::get();
+        }
+#else
         [[nodiscard]] char const* operator()() const noexcept
         {
             // If you encounter this assert while compiling code, that means
@@ -47,6 +62,7 @@ namespace hpx::serialization::detail {
                 "HPX_REGISTER_ACTION_DECLARATION missing");
             return util::debug::type_id<T>();
         }
+#endif
     };
 #endif
 
@@ -65,36 +81,7 @@ namespace hpx::serialization::detail {
     class constructor_selector_ptr
     {
     public:
-        [[nodiscard]] static T* create(input_archive& ar)
-        {
-            std::unique_ptr<T> t;
-
-            // create new object
-            if constexpr (std::is_default_constructible_v<T>)
-            {
-                t.reset(new T);
-            }
-            else
-            {
-                using storage_type =
-                    hpx::aligned_storage_t<sizeof(T), alignof(T)>;
-
-                t.reset(reinterpret_cast<T*>(new storage_type));    //-V572
-                load_construct_data(ar, t.get(), 0);
-            }
-
-            // de-serialize new object
-            if constexpr (hpx::traits::is_nonintrusive_polymorphic_v<T>)
-            {
-                serialize(ar, *t, 0);
-            }
-            else
-            {
-                ar >> *t;
-            }
-
-            return t.release();
-        }
+        [[nodiscard]] static T* create(input_archive& ar);
     };
 
     class polymorphic_nonintrusive_factory
@@ -162,15 +149,8 @@ namespace hpx::serialization::detail {
     template <typename Derived>
     struct register_class
     {
-        static void save(output_archive& ar, void const* base)
-        {
-            serialize(ar, *static_cast<Derived*>(const_cast<void*>(base)), 0);
-        }
-
-        static void load(input_archive& ar, void* base)
-        {
-            serialize(ar, *static_cast<Derived*>(base), 0);
-        }
+        static void save(output_archive& ar, void const* base);
+        static void load(input_archive& ar, void* base);
 
         // this function is needed for pointer type serialization
         [[nodiscard]] static void* create(input_archive& ar)
