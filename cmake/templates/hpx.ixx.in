@@ -20,6 +20,11 @@ module;
 
 export module HPX.@cap_libname@;
 
+// For sub-modules (e.g. HPX.Full), import HPX.Core to reuse its declarations.
+#if defined(HPX_COMPILE_FULL_WITH_MODULES)
+import HPX.Core;
+#endif
+
 // Make sure the exported symbols are name-mangled using standard C++ rules.
 // This is necessary as otherwise the symbols exported from the shared libraries
 // will be exported from the module using a differently encoded name.

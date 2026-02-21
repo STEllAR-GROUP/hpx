@@ -38,6 +38,7 @@ include(HPX_AddModule)
 add_hpx_module(
   full plugin_factories
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${plugin_factories_sources}
   HEADERS ${plugin_factories_headers}
   COMPAT_HEADERS ${plugin_factories_compat_headers}

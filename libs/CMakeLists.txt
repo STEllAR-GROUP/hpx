@@ -370,8 +370,100 @@ foreach(lib ${HPX_LIBS})
     add_subdirectory(${lib})
 
     if(HPX_WITH_CXX_MODULES)
-      hpx_configure_module_consumer(hpx_${lib} hpx_core_module_if)
-      hpx_configure_module_consumer(hpx_${lib}_module hpx_core_module_if)
+      # Generate HPX.Full module interface unit
+      set(cxx_sub_module ".Full")
+      set(cxx_module_headers)
+      foreach(cxx_module ${HPX_FULL_ENABLED_CXX_MODULES})
+        set(cxx_module_headers
+            "${cxx_module_headers}#include <hpx/modules/${cxx_module}.hpp>\n"
+        )
+      endforeach()
+
+      set(cxx_standard_headers)
+      foreach(std_header ${HPX_STANDARD_HEADERS})
+        set(cxx_standard_headers
+            "${cxx_standard_headers}#include ${std_header}\n"
+        )
+      endforeach()
+
+      set(lib_module_basedir ${PROJECT_BINARY_DIR}/libs/${lib})
+      set(lib_module_file
+          "${lib_module_basedir}/hpx_${lib}${HPX_MODULE_INTERFACE_EXTENSION}"
+      )
+      set(modulename_upper "FULL")
+      configure_file(
+        "${HPX_SOURCE_DIR}/cmake/templates/hpx.ixx.in" ${lib_module_file} @ONLY
+      )
+
+      set(std_header_file
+          "${lib_module_basedir}/config/include/hpx/config/std_headers.hpp"
+      )
+      configure_file(
+        "${HPX_SOURCE_DIR}/cmake/templates/std_headers.hpp.in"
+        ${std_header_file} @ONLY
+      )
+
+      add_library(hpx_full_module STATIC)
+      set_target_properties(
+        hpx_full_module PROPERTIES POSITION_INDEPENDENT_CODE ON FOLDER "Core"
+      )
+
+      # This creates an interface target hpx_full_module_if
+      hpx_configure_module_producer(hpx_full_module)
+
+      add_hpx_source_group(
+        NAME hpx_full_module
+        ROOT ${lib_module_basedir}
+        CLASS "Source Files"
+        TARGETS ${lib_module_file}
+      )
+
+      # cmake-format: off
+      target_sources(
+        hpx_full_module PUBLIC
+            FILE_SET hpx_full_public_sources
+                TYPE CXX_MODULES
+                BASE_DIRS ${lib_module_basedir}
+                FILES ${lib_module_file}
+      )
+
+      target_include_directories(hpx_full_module PUBLIC
+          $<BUILD_INTERFACE:${lib_module_basedir}>
+          $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}/cxx>
+      )
+      # cmake-format: on
+
+      target_link_libraries(
+        hpx_full_module
+        PUBLIC hpx_full hpx_public_flags hpx_core_module_if
+        PRIVATE hpx_private_flags
+      )
+
+      hpx_configure_module_consumer(hpx_full hpx_core_module_if)
+      hpx_configure_module_consumer(hpx_full_module hpx_core_module_if)
+
+      set(full_module_install
+        FILE_SET hpx_full_public_sources
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}/cxx
+        CXX_MODULES_BMI
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}/cxx
+            COMPONENT runtime
+      )
+      set(full_module_install_targets hpx_full_module hpx_full_module_if)
+
+      target_link_libraries(hpx INTERFACE hpx_full_module_if)
+
+      install(
+        TARGETS ${full_module_install_targets}
+        EXPORT HPXInternalTargets
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+                COMPONENT runtime
+                ${full_module_install}
+      )
+
+      hpx_export_internal_targets(${full_module_install_targets})
     endif()
   else()
     add_library(hpx_${lib} ${hpx_library_link_mode} src/empty.cpp)

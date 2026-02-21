@@ -30,6 +30,7 @@ include(HPX_AddModule)
 add_hpx_module(
   core gasnet_base
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${gasnet_base_sources}
   HEADERS ${gasnet_base_headers}
   DEPENDENCIES PkgConfig::GASNET ${gasnet_additional_dependencies}

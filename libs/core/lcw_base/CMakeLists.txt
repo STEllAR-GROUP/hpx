@@ -23,6 +23,7 @@ include(HPX_AddModule)
 add_hpx_module(
   core lcw_base
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${lcw_base_sources}
   HEADERS ${lcw_base_headers}
   MODULE_DEPENDENCIES hpx_logging hpx_runtime_configuration hpx_string_util

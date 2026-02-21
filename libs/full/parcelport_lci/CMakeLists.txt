@@ -58,6 +58,7 @@ include(HPX_AddModule)
 add_hpx_module(
   full parcelport_lci
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${parcelport_lci_sources}
   HEADERS ${parcelport_lci_headers}
   COMPAT_HEADERS ${parcelport_lci_compat_headers}
