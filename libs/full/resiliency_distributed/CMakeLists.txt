@@ -20,7 +20,6 @@ include(HPX_AddModule)
 add_hpx_module(
   full resiliency_distributed
   GLOBAL_HEADER_GEN ON
-  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${resiliency_distributed_sources}
   HEADERS ${resiliency_distributed_headers}
   DEPENDENCIES hpx_core

@@ -74,8 +74,6 @@ set(collectives_sources
 include(HPX_AddModule)
 add_hpx_module(
   full collectives
-  GLOBAL_HEADER_GEN ON
-  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${collectives_sources}
   HEADERS ${collectives_headers}
   COMPAT_HEADERS ${collectives_compat_headers}

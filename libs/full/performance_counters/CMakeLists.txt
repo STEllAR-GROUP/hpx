@@ -87,7 +87,6 @@ include(HPX_AddModule)
 add_hpx_module(
   full performance_counters
   GLOBAL_HEADER_GEN ON
-  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${performance_counters_sources}
   HEADERS ${performance_counters_headers}
   DEPENDENCIES hpx_core

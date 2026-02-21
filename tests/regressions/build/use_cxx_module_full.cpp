@@ -10,9 +10,9 @@
 
 import HPX.Core.Full;
 
-// hpx_init.hpp cannot be part of the module (it contains macros for main()
-// wrapping), so it is included textually.
-#include <hpx/hpx_init.hpp>
+// To maintain ABI compatibility and expose necessary macros defined by HPX,
+// users still need to #include HPX headers in addition to the BMI.
+#include <hpx/hpx.hpp>
 
 int hpx_main()
 {

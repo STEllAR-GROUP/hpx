@@ -29,7 +29,6 @@ include(HPX_AddModule)
 add_hpx_module(
   full agas
   GLOBAL_HEADER_GEN ON
-  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${agas_sources}
   HEADERS ${agas_headers}
   COMPAT_HEADERS ${agas_compat_headers}
