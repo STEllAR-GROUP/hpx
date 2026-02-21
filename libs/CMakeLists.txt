@@ -445,11 +445,15 @@ foreach(lib ${HPX_LIBS})
       hpx_configure_module_consumer(hpx_full_module hpx_core_module_if)
 
       set(full_module_install
-        FILE_SET hpx_full_public_sources
-            DESTINATION ${CMAKE_INSTALL_LIBDIR}/cxx
-        CXX_MODULES_BMI
-            DESTINATION ${CMAKE_INSTALL_LIBDIR}/cxx
-            COMPONENT runtime
+          FILE_SET
+          hpx_full_public_sources
+          DESTINATION
+          ${CMAKE_INSTALL_LIBDIR}/cxx
+          CXX_MODULES_BMI
+          DESTINATION
+          ${CMAKE_INSTALL_LIBDIR}/cxx
+          COMPONENT
+          runtime
       )
       set(full_module_install_targets hpx_full_module hpx_full_module_if)
 
