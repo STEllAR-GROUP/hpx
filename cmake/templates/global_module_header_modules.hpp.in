@@ -21,12 +21,11 @@
 //   - The current translation unit is not forcing to disable using C++ modules
 //
 #if !defined(HPX_COMPILE_WITH_MODULES) ||                                      \
-    defined(HPX_ @libname_upper @_EXPORTS) ||                                  \
     (defined(HPX_COMPILE_BMI) &&                                               \
         (defined(HPX_COMPILE_CORE_WITH_MODULES) ||                             \
-            defined(HPX_COMPILE_FULL_WITH_MODULES))) ||                        \
-    defined(HPX_HAVE_FORCE_NO_CXX_MODULES)
+            defined(HPX_COMPILE_FULL_WITH_MODULES)))
 @module_headers @
+
 #else
 
 // Include all standard library headers before importing module to prevent ODR

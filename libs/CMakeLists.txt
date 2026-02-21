@@ -337,33 +337,36 @@ foreach(lib ${HPX_LIBS})
   # NOTE: hpx_full (i.e. the target representing libhpx.so) is still created in
   # src/CMakeLists.txt. When all of hpx_full has been modularized the target
   # creation can move here as well.
-  if(HPX_WITH_CXX_MODULES)
-    add_library(hpx_${lib}_module STATIC)
-    set_target_properties(
-      hpx_${lib}_module PROPERTIES POSITION_INDEPENDENT_CODE ON
-    )
-    hpx_configure_module_producer(hpx_${lib}_module)
+  if(NOT ${lib} STREQUAL "full")
+    if(HPX_WITH_CXX_MODULES)
+      add_library(hpx_${lib}_module STATIC)
+      set_target_properties(
+        hpx_${lib}_module PROPERTIES POSITION_INDEPENDENT_CODE ON
+                                     CXX_SCAN_FOR_MODULES ON
+      )
+      hpx_configure_module_producer(hpx_${lib}_module)
 
-    target_link_libraries(
-      hpx_${lib}_module
-      PUBLIC hpx_${lib} hpx_public_flags
-      PRIVATE hpx_private_flags
-    )
-    set_target_properties(hpx_${lib}_module PROPERTIES FOLDER "Core")
+      target_link_libraries(
+        hpx_${lib}_module
+        PUBLIC hpx_${lib} hpx_public_flags
+        PRIVATE hpx_private_flags
+      )
+      set_target_properties(hpx_${lib}_module PROPERTIES FOLDER "Core")
 
-    add_hpx_source_group(
-      NAME hpx_${lib}_module
-      ROOT ${lib_module_basedir}
-      CLASS "Source Files"
-      TARGETS ${lib_module_file}
-    )
+      add_hpx_source_group(
+        NAME hpx_${lib}_module
+        ROOT ${lib_module_basedir}
+        CLASS "Source Files"
+        TARGETS ${lib_module_file}
+      )
 
-    # prepare generation of module interface unit
-    set(lib_module_basedir ${PROJECT_BINARY_DIR}/libs/${lib})
-    set(lib_module_file
-        "${lib_module_basedir}/hpx_${lib}${HPX_MODULE_INTERFACE_EXTENSION}"
-    )
-    set(modulename_upper "${uppercase_lib}")
+      # prepare generation of module interface unit
+      set(lib_module_basedir ${PROJECT_BINARY_DIR}/libs/${lib})
+      set(lib_module_file
+          "${lib_module_basedir}/hpx_${lib}${HPX_MODULE_INTERFACE_EXTENSION}"
+      )
+      set(modulename_upper "${uppercase_lib}")
+    endif()
   endif()
 
   if(${lib} STREQUAL "full")
@@ -406,6 +409,7 @@ foreach(lib ${HPX_LIBS})
       add_library(hpx_full_module STATIC)
       set_target_properties(
         hpx_full_module PROPERTIES POSITION_INDEPENDENT_CODE ON FOLDER "Core"
+                                   CXX_SCAN_FOR_MODULES ON
       )
 
       # This creates an interface target hpx_full_module_if
