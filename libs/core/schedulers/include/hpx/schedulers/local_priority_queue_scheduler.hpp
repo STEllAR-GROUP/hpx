@@ -560,6 +560,10 @@ namespace hpx::threads::policies {
                     data.priority = thread_priority::normal;
                 }
             }
+            else
+            {
+                data.schedulehint.mode = thread_schedule_hint_mode::thread;
+            }
 
             if (static_cast<std::size_t>(-1) == num_thread)
             {
@@ -569,10 +573,8 @@ namespace hpx::threads::policies {
             {
                 num_thread %= num_queues_;
             }
-
             num_thread = select_active_pu(num_thread);
 
-            data.schedulehint.mode = thread_schedule_hint_mode::thread;
             data.schedulehint.hint = static_cast<std::int16_t>(num_thread);
 
             // now create the thread
@@ -1042,7 +1044,7 @@ namespace hpx::threads::policies {
         // Queries the current thread count of the queues.
         std::int64_t get_thread_count(
             thread_schedule_state state = thread_schedule_state::unknown,
-            thread_priority priority = thread_priority::default_,
+            thread_priority const priority = thread_priority::default_,
             std::size_t num_thread = static_cast<std::size_t>(-1),
             bool /* reset */ = false) const override
         {

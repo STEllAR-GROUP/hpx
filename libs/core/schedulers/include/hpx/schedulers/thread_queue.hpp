@@ -105,7 +105,7 @@ namespace hpx::threads::policies {
         {
             thread_init_data data;
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-            std::uint64_t waittime;
+            std::uint64_t wait_time;
 #endif
         };
 
@@ -113,7 +113,7 @@ namespace hpx::threads::policies {
         struct thread_description
         {
             thread_id_ref_type data;
-            std::uint64_t waittime;
+            std::uint64_t wait_time;
         };
         using thread_description_ptr = thread_description*;
 #else
@@ -339,9 +339,10 @@ namespace hpx::threads::policies {
                 }
             }
 
-            std::size_t const addednew = add_new(add_count, addfrom, lk, steal);
-            added += addednew;
-            return addednew != 0;
+            std::size_t const added_new =
+                add_new(add_count, addfrom, lk, steal);
+            added += added_new;
+            return added_new != 0;
         }
 
         void recycle_thread(thread_id_type const& thrd)
@@ -394,10 +395,10 @@ namespace hpx::threads::policies {
             if (delete_all)
             {
                 // delete all threads
-                thread_data* todelete;
-                while (terminated_items_.pop(todelete))
+                thread_data* to_delete;
+                while (terminated_items_.pop(to_delete))
                 {
-                    thread_id_type tid(todelete);
+                    thread_id_type tid(to_delete);
                     --terminated_items_count_;
 
                     // this thread has to be managed by this queue, it may have
@@ -428,10 +429,10 @@ namespace hpx::threads::policies {
                 delete_count = (std::max) (delete_count,
                     static_cast<std::int64_t>(parameters_.min_delete_count_));
 
-                thread_data* todelete;
-                while (delete_count && terminated_items_.pop(todelete))
+                thread_data* to_delete;
+                while (delete_count && terminated_items_.pop(to_delete))
                 {
-                    thread_id_type tid(todelete);
+                    thread_id_type tid(to_delete);
                     --terminated_items_count_;
 
                     // this thread has to be managed by this queue, it may have
@@ -862,8 +863,8 @@ namespace hpx::threads::policies {
             }
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-            thread_description_ptr tdesc;
-            if (work_items_.pop(tdesc, steal))
+            thread_description_ptr task_desc;
+            if (work_items_.pop(task_desc, steal))
             {
                 --work_items_count_.data_;
 
@@ -871,12 +872,12 @@ namespace hpx::threads::policies {
                 {
                     work_items_wait_ +=
                         hpx::chrono::high_resolution_clock::now() -
-                        tdesc->waittime;
+                        task_desc->waittime;
                     ++work_items_wait_count_;
                 }
 
-                thrd = HPX_MOVE(tdesc->data);
-                delete tdesc;
+                thrd = HPX_MOVE(task_desc->data);
+                delete task_desc;
 
                 return true;
             }
@@ -917,19 +918,19 @@ namespace hpx::threads::policies {
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
             std::size_t const max_items_requested = max_items;
 
-            thread_description_ptr tdesc;
-            while (work_items_.pop(tdesc, steal))
+            thread_description_ptr task_desc;
+            while (work_items_.pop(task_desc, steal))
             {
                 if (get_maintain_queue_wait_times_enabled())
                 {
                     work_items_wait_ +=
                         hpx::chrono::high_resolution_clock::now() -
-                        tdesc->waittime;
+                        task_desc->waittime;
                     ++work_items_wait_count_;
                 }
 
-                *it++ = HPX_MOVE(tdesc->data);
-                delete tdesc;
+                *it++ = HPX_MOVE(task_desc->data);
+                delete task_desc;
 
                 --max_items;
                 if (--work_items_count_.data_ == 0)
@@ -1190,8 +1191,8 @@ namespace hpx::threads::policies {
                     // Before exiting each of the OS threads deletes the
                     // remaining terminated HPX threads
                     // REVIEW: Should we be doing this if we are stealing?
-                    bool const canexit = cleanup_terminated_locked(true);
-                    if (!running && canexit)
+                    bool const can_exit = cleanup_terminated_locked(true);
+                    if (!running && can_exit)
                     {
                         // we don't have any registered work items anymore
                         //do_some_work();       // notify possibly waiting threads

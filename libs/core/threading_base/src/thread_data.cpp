@@ -177,42 +177,6 @@ namespace hpx::threads {
         exit_funcs_.clear();
     }
 
-    bool thread_data::interruption_requested() const noexcept
-    {
-        std::scoped_lock<hpx::util::detail::spinlock> l(
-            spinlock_pool::spinlock_for(this));
-        return requested_interrupt_;
-    }
-
-    bool thread_data::interruption_enabled() const noexcept
-    {
-        std::scoped_lock<hpx::util::detail::spinlock> l(
-            spinlock_pool::spinlock_for(this));
-        return enabled_interrupt_;
-    }
-
-    bool thread_data::set_interruption_enabled(bool enable) noexcept
-    {
-        std::scoped_lock<hpx::util::detail::spinlock> l(
-            spinlock_pool::spinlock_for(this));
-        std::swap(enabled_interrupt_, enable);
-        return enable;
-    }
-
-    void thread_data::interrupt(bool const flag)
-    {
-        std::unique_lock<hpx::util::detail::spinlock> l(
-            spinlock_pool::spinlock_for(this));
-        if (flag && !enabled_interrupt_)
-        {
-            l.unlock();
-            HPX_THROW_EXCEPTION(hpx::error::thread_not_interruptable,
-                "thread_data::interrupt",
-                "interrupts are disabled for this thread");
-        }
-        requested_interrupt_ = flag;
-    }
-
     bool thread_data::interruption_point(bool const throw_on_interrupt)
     {
         // We do not protect enabled_interrupt_ and requested_interrupt_ from
