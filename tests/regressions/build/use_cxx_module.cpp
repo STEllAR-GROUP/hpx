@@ -7,8 +7,6 @@
 // Smoke-test: verify that HPX can be used via C++ Modules (local runtime only).
 // This file is only compiled when HPX_WITH_CXX_MODULES=ON.
 
-import HPX.Core;
-
 // To maintain ABI compatibility and expose necessary macros defined by HPX,
 // users still need to #include HPX headers in addition to the BMI.
 #include <hpx/hpx.hpp>

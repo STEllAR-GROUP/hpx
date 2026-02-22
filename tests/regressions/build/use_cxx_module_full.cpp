@@ -8,8 +8,6 @@
 // This file is only compiled when HPX_WITH_CXX_MODULES=ON and
 // HPX_WITH_DISTRIBUTED_RUNTIME=ON.
 
-import HPX.Core.Full;
-
 // To maintain ABI compatibility and expose necessary macros defined by HPX,
 // users still need to #include HPX headers in addition to the BMI.
 #include <hpx/hpx.hpp>
