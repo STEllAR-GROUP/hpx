@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2018 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -259,28 +259,28 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-#if defined(HPX_DEBUG) && defined(HPX_DEBUG_POSTFIX)
-#  define HPX_DEBUG_POSTFIX_STR HPX_PP_STRINGIZE(HPX_DEBUG_POSTFIX)
+#if defined(HPX_DEBUG) && defined(HPX_HAVE_DEBUG_POSTFIX)
+#  define HPX_DEBUG_POSTFIX_STR HPX_PP_STRINGIZE(HPX_HAVE_DEBUG_POSTFIX)
 #else
 #  define HPX_DEBUG_POSTFIX_STR ""
 #endif
 
 #if !defined(HPX_WINDOWS)
-#  if defined(HPX_DEBUG) && defined(HPX_DEBUG_POSTFIX)
+#  if defined(HPX_DEBUG) && defined(HPX_HAVE_DEBUG_POSTFIX)
 #    define HPX_MAKE_DLL_STRING(n)                                             \
         "lib" + (n) + HPX_DEBUG_POSTFIX_STR + HPX_SHARED_LIB_EXTENSION
 #  else
 #    define HPX_MAKE_DLL_STRING(n)  "lib" + (n) + HPX_SHARED_LIB_EXTENSION
 #  endif
-#elif defined(HPX_DEBUG) && defined(HPX_DEBUG_POSTFIX)
+#elif defined(HPX_DEBUG) && defined(HPX_HAVE_DEBUG_POSTFIX)
 #  define HPX_MAKE_DLL_STRING(n)                                               \
       ((n) + HPX_DEBUG_POSTFIX_STR + HPX_SHARED_LIB_EXTENSION)
 #else
 #  define HPX_MAKE_DLL_STRING(n)   ((n) + HPX_SHARED_LIB_EXTENSION)
 #endif
 
-#if defined(HPX_DEBUG) && defined(HPX_DEBUG_POSTFIX)
-#  define HPX_MANGLE_NAME(n)     HPX_PP_CAT(n, HPX_DEBUG_POSTFIX)
+#if defined(HPX_DEBUG) && defined(HPX_HAVE_DEBUG_POSTFIX)
+#  define HPX_MANGLE_NAME(n)     HPX_PP_CAT(n, HPX_HAVE_DEBUG_POSTFIX)
 #  define HPX_MANGLE_STRING(n)   ((n) + HPX_DEBUG_POSTFIX_STR)
 #else
 #  define HPX_MANGLE_NAME(n)     n
