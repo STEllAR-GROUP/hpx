@@ -2601,15 +2601,14 @@ endif()
 # Only set debug postfix for Debug builds to maintain ABI separation
 get_property(is_multi_config GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 if(is_multi_config OR CMAKE_BUILD_TYPE STREQUAL "Debug")
-  if(NOT DEFINED HPX_DEBUG_POSTFIX)
-    set(HPX_DEBUG_POSTFIX
-        "d"
-        CACHE STRING "Postfix for debug libraries"
-    )
-  endif()
-  set(CMAKE_DEBUG_POSTFIX "${HPX_DEBUG_POSTFIX}")
-  if(NOT "${HPX_DEBUG_POSTFIX}" STREQUAL "")
-    hpx_add_config_define(HPX_DEBUG_POSTFIX "${HPX_DEBUG_POSTFIX}")
+  hpx_option(
+    HPX_WITH_DEBUG_POSTFIX STRING
+    "Postfix for debug libraries. (default: \"d\")" "d" ADVANCED
+    CATEGORY "Build Targets"
+  )
+  set(CMAKE_DEBUG_POSTFIX "${HPX_WITH_DEBUG_POSTFIX}")
+  if(NOT "${HPX_WITH_DEBUG_POSTFIX}" STREQUAL "")
+    hpx_add_config_define(HPX_HAVE_DEBUG_POSTFIX "${HPX_WITH_DEBUG_POSTFIX}")
   endif()
 endif()
 

@@ -158,7 +158,11 @@ namespace hpx::detail {
                         if (set_state(s1, s, lk))
                         {
                             HPX_ASSERT_OWNS_LOCK(lk);
-                            upgrade_cond.notify_one_no_unlock(lk);
+                            {
+                                [[maybe_unused]] hpx::util::
+                                    ignore_while_checking il(&lk);
+                                upgrade_cond.notify_one_no_unlock(lk);
+                            }
                             release_waiters(lk);
                             break;
                         }

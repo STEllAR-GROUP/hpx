@@ -35,3 +35,6 @@ tests.unit.modules.algorithms.algorithms.findfirstof
 tests.unit.modules.algorithms.algorithms.findfirstof_binary
 tests.unit.modules.algorithms.algorithms.findif
 tests.unit.modules.algorithms.algorithms.findifnot
+tests.unit.modules.algorithms.algorithms.find_last
+tests.unit.modules.algorithms.algorithms.find_last_if
+tests.unit.modules.algorithms.algorithms.find_last_if_not
