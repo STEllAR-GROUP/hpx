@@ -66,28 +66,28 @@ namespace hpx::debug {
         HPX_CXX_CORE_EXPORT template <typename Int>
         HPX_CORE_EXPORT void print_dec(std::ostream& os, Int const& v, int n);
 
-        extern template HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void print_dec(
+        extern template HPX_CORE_EXPORT void print_dec(
             std::ostream&, std::int16_t const&, int);
-        extern template HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void print_dec(
+        extern template HPX_CORE_EXPORT void print_dec(
             std::ostream&, std::uint16_t const&, int);
-        extern template HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void print_dec(
+        extern template HPX_CORE_EXPORT void print_dec(
             std::ostream&, std::int32_t const&, int);
-        extern template HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void print_dec(
+        extern template HPX_CORE_EXPORT void print_dec(
             std::ostream&, std::uint32_t const&, int);
-        extern template HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void print_dec(
+        extern template HPX_CORE_EXPORT void print_dec(
             std::ostream&, std::int64_t const&, int);
-        extern template HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void print_dec(
+        extern template HPX_CORE_EXPORT void print_dec(
             std::ostream&, std::uint64_t const&, int);
 #if defined(__APPLE__)
-        extern template HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void print_dec(
+        extern template HPX_CORE_EXPORT void print_dec(
             std::ostream&, long const&, int);
-        extern template HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void print_dec(
+        extern template HPX_CORE_EXPORT void print_dec(
             std::ostream&, unsigned long const&, int);
 #endif
 
-        extern template HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void print_dec(
+        extern template HPX_CORE_EXPORT void print_dec(
             std::ostream&, std::atomic<int> const&, int);
-        extern template HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void print_dec(
+        extern template HPX_CORE_EXPORT void print_dec(
             std::ostream&, std::atomic<unsigned int> const&, int);
 
         template <int N, typename T>
@@ -120,14 +120,12 @@ namespace hpx::debug {
     // ------------------------------------------------------------------
     HPX_CXX_CORE_EXPORT struct ptr
     {
-        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT explicit ptr(
-            void const* v) noexcept;
-        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT explicit ptr(
-            std::uintptr_t v) noexcept;
+        HPX_CORE_EXPORT explicit ptr(void const* v) noexcept;
+        HPX_CORE_EXPORT explicit ptr(std::uintptr_t v) noexcept;
 
         void const* data_;
 
-        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT friend std::ostream& operator<<(
+        HPX_CORE_EXPORT friend std::ostream& operator<<(
             std::ostream& os, ptr const& d);
     };
 
@@ -136,9 +134,8 @@ namespace hpx::debug {
     // ------------------------------------------------------------------
     namespace detail {
 
-        template <typename Int>
-        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void print_hex(
-            std::ostream& os, Int v, int n);
+        HPX_CXX_CORE_EXPORT template <typename Int>
+        HPX_CORE_EXPORT void print_hex(std::ostream& os, Int v, int n);
 
         template <int N = 4, typename T = int, typename Enable = void>
         struct hex;
@@ -194,9 +191,8 @@ namespace hpx::debug {
     // ------------------------------------------------------------------
     namespace detail {
 
-        template <typename Int>
-        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void print_bin(
-            std::ostream& os, Int v, int n);
+        HPX_CXX_CORE_EXPORT template <typename Int>
+        HPX_CORE_EXPORT void print_bin(std::ostream& os, Int v, int n);
 
         template <int N = 8, typename T = int>
         struct bin
@@ -254,16 +250,14 @@ namespace hpx::debug {
     // ------------------------------------------------------------------
     HPX_CXX_CORE_EXPORT struct ipaddr
     {
-        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT explicit ipaddr(
-            void const* a) noexcept;
-        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT explicit ipaddr(
-            std::uint32_t a) noexcept;
+        HPX_CORE_EXPORT explicit ipaddr(void const* a) noexcept;
+        HPX_CORE_EXPORT explicit ipaddr(std::uint32_t a) noexcept;
 
         std::uint8_t const* data_;
         std::uint32_t const ipdata_;
 
-        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT friend std::ostream& operator<<(
-            std::ostream& os, ipaddr const& p);
+        HPX_CORE_EXPORT friend std::ostream& operator<<(
+            std::ostream& os, ipaddr const& a);
     };
 
     // ------------------------------------------------------------------
@@ -273,8 +267,8 @@ namespace hpx::debug {
 
         HPX_CXX_CORE_EXPORT struct current_time_print_helper
         {
-            HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT friend std::ostream& operator<<(
-                std::ostream& os, current_time_print_helper);
+            HPX_CORE_EXPORT friend std::ostream& operator<<(
+                std::ostream& os, current_time_print_helper const&);
         };
     }    // namespace detail
 
@@ -294,15 +288,15 @@ namespace hpx::debug {
     // ------------------------------------------------------------------
     HPX_CXX_CORE_EXPORT struct mem_crc32
     {
-        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT mem_crc32(
+        HPX_CORE_EXPORT mem_crc32(
             void const* a, std::size_t len, char const* txt) noexcept;
 
-        std::uint64_t const* addr_;
+        void const* addr_;
         std::size_t const len_;
         char const* txt_;
 
-        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT friend std::ostream& operator<<(
-            std::ostream& os, mem_crc32 const& p);
+        HPX_CORE_EXPORT friend std::ostream& operator<<(
+            std::ostream& os, mem_crc32 const& a);
     };
 
     namespace detail {
@@ -328,12 +322,10 @@ namespace hpx::debug {
         // ------------------------------------------------------------------
         HPX_CXX_CORE_EXPORT struct hostname_print_helper
         {
-            [[nodiscard]] HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT char const*
-            get_hostname() const;
-            [[nodiscard]] HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT int guess_rank()
-                const;
+            [[nodiscard]] HPX_CORE_EXPORT char const* get_hostname() const;
+            [[nodiscard]] HPX_CORE_EXPORT int guess_rank() const;
 
-            HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT friend std::ostream& operator<<(
+            HPX_CORE_EXPORT friend std::ostream& operator<<(
                 std::ostream& os, hostname_print_helper h);
         };
 
@@ -559,8 +551,8 @@ namespace hpx::debug {
 
     namespace detail {
 
-        template <typename T>
-        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void print_array(
+        HPX_CXX_CORE_EXPORT template <typename T>
+        HPX_CORE_EXPORT void print_array(
             std::string const& name, T const* data, std::size_t size);
     }
 
