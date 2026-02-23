@@ -19,8 +19,7 @@
 
 namespace hpx::util::hardware {
 
-    HPX_CXX_CORE_EXPORT [[nodiscard]] HPX_HOST_DEVICE inline std::uint64_t
-    timestamp()
+    [[nodiscard]] HPX_HOST_DEVICE inline std::uint64_t timestamp()
     {
         return timestamp_cuda();
     }
@@ -32,9 +31,8 @@ namespace hpx::util::hardware {
 
 namespace hpx::util::hardware {
 
-    HPX_CXX_CORE_EXPORT
-        [[nodiscard]] HPX_HOST_DEVICE HPX_FORCEINLINE std::uint64_t
-        timestamp() noexcept
+    [[nodiscard]] HPX_HOST_DEVICE HPX_FORCEINLINE std::uint64_t
+    timestamp() noexcept
     {
         LARGE_INTEGER now;
         QueryPerformanceCounter(&now);

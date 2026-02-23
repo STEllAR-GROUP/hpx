@@ -15,7 +15,7 @@
 namespace hpx::util::hardware {
 
     // clang-format off
-    [[nodiscard]] HPX_HOST_DEVICE HPX_CXX_CORE_EXPORT inline std::uint64_t timestamp()
+    [[nodiscard]] HPX_HOST_DEVICE inline std::uint64_t timestamp()
     {
         std::uint64_t val = 0;
         __asm__ __volatile__(

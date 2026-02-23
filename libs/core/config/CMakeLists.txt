@@ -34,7 +34,7 @@ set(config_macro_headers
     hpx/config/weak_symbol.hpp
 )
 
-set(config_headers)
+set(config_headers ${config_macro_headers})
 
 # Default location is $HPX_ROOT/libs/config/src
 set(config_sources version.cpp)

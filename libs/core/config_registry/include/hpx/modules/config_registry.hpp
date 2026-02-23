@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
 #include <string>
 #include <vector>
 
@@ -32,21 +31,19 @@
 
 namespace hpx::config_registry {
 
-    HPX_CXX_CORE_EXPORT struct module_config
+    struct module_config
     {
         std::string module_name;
         std::vector<std::string> config_entries;
     };
 
-    HPX_CXX_CORE_EXPORT [[nodiscard]] HPX_CONFIG_REGISTRY_EXPORT
-        std::vector<module_config> const&
-        get_module_configs();
+    [[nodiscard]] HPX_CONFIG_REGISTRY_EXPORT std::vector<module_config> const&
+    get_module_configs();
 
-    HPX_CXX_CORE_EXPORT HPX_CONFIG_REGISTRY_EXPORT void add_module_config(
+    HPX_CONFIG_REGISTRY_EXPORT void add_module_config(
         module_config const& config);
 
-    HPX_CXX_CORE_EXPORT struct HPX_CONFIG_REGISTRY_EXPORT
-        add_module_config_helper
+    struct HPX_CONFIG_REGISTRY_EXPORT add_module_config_helper
     {
         explicit add_module_config_helper(module_config const& config);
     };
