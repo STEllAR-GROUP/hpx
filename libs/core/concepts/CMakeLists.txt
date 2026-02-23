@@ -23,7 +23,7 @@ include(HPX_AddModule)
 add_hpx_module(
   core concepts
   GLOBAL_HEADER_GEN ON
-  GLOBAL_HEADER_MODULE_GEN ON
+  GLOBAL_HEADER_MODULE_GEN OFF
   SOURCES ${concepts_sources}
   HEADERS ${concepts_headers}
   MACRO_HEADERS ${concepts_headers}

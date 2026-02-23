@@ -43,10 +43,9 @@ include(HPX_AddModule)
 add_hpx_module(
   core config CONFIG_FILES
   GLOBAL_HEADER_GEN OFF
-  GLOBAL_HEADER_MODULE_GEN ON
+  GLOBAL_HEADER_MODULE_GEN OFF
   SOURCES ${config_sources}
   HEADERS ${config_headers}
-  MACRO_HEADERS ${config_macro_headers}
   EXCLUDE_FROM_GLOBAL_HEADER hpx/modules/config.hpp
   MODULE_DEPENDENCIES hpx_preprocessor
   DEPENDENCIES hpx_dependencies_boost

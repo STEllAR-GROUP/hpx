@@ -14,7 +14,7 @@
 
 namespace hpx::util::hardware {
 
-    HPX_DEVICE inline std::uint64_t timestamp_cuda()
+    HPX_DEVICE HPX_CXX_CORE_EXPORT inline std::uint64_t timestamp_cuda()
     {
         std::uint64_t cur;
         asm volatile("mov.u64 %0, %%globaltimer;" : "=l"(cur));

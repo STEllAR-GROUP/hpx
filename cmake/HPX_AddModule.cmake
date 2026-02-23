@@ -15,7 +15,7 @@ include(HPX_CXXModules)
 function(add_hpx_module libname modulename)
   # Retrieve arguments
   set(options CUDA CONFIG_FILES NO_CONFIG_IN_GENERATED_HEADERS)
-  set(one_value_args GLOBAL_HEADER_GEN GLOBAL_HEADER_MODULE_GEN MODULE_SOURCE)
+  set(one_value_args GLOBAL_HEADER_GEN GLOBAL_HEADER_MODULE_GEN)
   set(multi_value_args
       SOURCES
       HEADERS
@@ -72,9 +72,7 @@ function(add_hpx_module libname modulename)
             FORCE
   )
 
-  if(HPX_WITH_CXX_MODULES AND (${modulename}_GLOBAL_HEADER_MODULE_GEN
-                               OR ${modulename}_MODULE_SOURCE)
-  )
+  if(HPX_WITH_CXX_MODULES AND ${modulename}_GLOBAL_HEADER_MODULE_GEN)
     # Mark the module as exposing C++ modules
     set(cxx_modules ${HPX_ENABLED_CXX_MODULES})
     list(APPEND cxx_modules ${modulename})
@@ -436,9 +434,9 @@ function(add_hpx_module libname modulename)
   endif()
 
   # All core modules depend on the config registry
-  if("${libname}" STREQUAL "core" AND NOT "${modulename}" STREQUAL
-                                      "config_registry"
-  )
+  if("${libname}" STREQUAL "core" AND NOT ("${modulename}" STREQUAL "config_registry"
+                                          OR "${modulename}" STREQUAL "config"
+                                          OR "${modulename}" STREQUAL "preprocessor"))
     target_link_libraries(hpx_${modulename} PUBLIC hpx_config_registry)
   endif()
 
@@ -464,77 +462,6 @@ function(add_hpx_module libname modulename)
     endif()
   endif()
 
-  # Handle C++20 module interface files if MODULE_SOURCE is specified
-  if(HPX_WITH_CXX_MODULES AND ${modulename}_MODULE_SOURCE)
-    # Create a separate target for the C++20 module interface
-    set(module_target hpx_${modulename}_module)
-
-    # Resolve the module source file path
-    set(module_source_file
-        "${CMAKE_CURRENT_SOURCE_DIR}/${${modulename}_MODULE_SOURCE}"
-    )
-
-    if(NOT EXISTS "${module_source_file}")
-      hpx_error("Module source file not found: ${module_source_file}")
-    endif()
-
-    # Create a library target for the module
-    add_library(${module_target} STATIC)
-
-    # Add the module source using FILE_SET for C++ modules
-    target_sources(
-      ${module_target}
-      PUBLIC FILE_SET
-             hpx_${modulename}_cxx_modules
-             TYPE
-             CXX_MODULES
-             BASE_DIRS
-             ${CMAKE_CURRENT_SOURCE_DIR}
-             FILES
-             ${module_source_file}
-    )
-
-    # Link the module target to the main module library
-    target_link_libraries(${module_target} PUBLIC hpx_${modulename})
-    target_link_libraries(${module_target} PUBLIC hpx_public_flags)
-    target_link_libraries(${module_target} PRIVATE hpx_private_flags)
-
-    # Set module properties
-    set_target_properties(
-      ${module_target}
-      PROPERTIES FOLDER "Core/Modules/${libname_cap}/CXX_Modules"
-                 POSITION_INDEPENDENT_CODE ON
-                 CXX_SCAN_FOR_MODULES ON
-    )
-
-    # Configure as module producer
-    hpx_configure_module_producer(${module_target})
-
-    # Install the module target
-    install(
-      TARGETS ${module_target} ${module_target}_if
-      EXPORT HPXInternalTargets
-      LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ${modulename}
-      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ${modulename}
-      RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-              COMPONENT ${modulename}
-              FILE_SET hpx_${modulename}_cxx_modules
-              DESTINATION ${CMAKE_INSTALL_LIBDIR}/cxx
-              CXX_MODULES_BMI
-              DESTINATION ${CMAKE_INSTALL_LIBDIR}/cxx
-              COMPONENT ${modulename}
-    )
-
-    hpx_export_internal_targets(${module_target} ${module_target}_if)
-
-    # Add source group for the module file
-    add_hpx_source_group(
-      NAME ${module_target}
-      ROOT ${CMAKE_CURRENT_SOURCE_DIR}
-      CLASS "C++ Module Files"
-      TARGETS ${module_source_file}
-    )
-  endif()
 
   add_hpx_source_group(
     NAME hpx_${modulename}

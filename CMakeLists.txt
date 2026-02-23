@@ -321,53 +321,8 @@ hpx_option(
   ADVANCED
 )
 if(HPX_WITH_CXX_MODULES)
-  if(NOT (CMAKE_VERSION VERSION_GREATER_EQUAL "3.29"))
-    hpx_fatal(
-      "Please use a version of CMake newer than V3.28 in order to enable C++ module support for HPX"
-    )
-  endif()
-
-  # Check for supported generators
-  if(NOT (CMAKE_GENERATOR MATCHES "Ninja" OR CMAKE_GENERATOR MATCHES
-                                             "Visual Studio")
-  )
-    hpx_error(
-      "C++20 modules require Ninja or Visual Studio generator. Current generator: ${CMAKE_GENERATOR}\n"
-      "Please reconfigure with: cmake -G Ninja ..."
-    )
-  endif()
-
-  # Check for supported compilers and versions
-  if(CMAKE_CXX_COMPILER_ID MATCHES "AppleClang")
-    hpx_error(
-      "AppleClang does not support C++20 module dependency scanning.\n"
-      "Please install and use LLVM Clang 16+ instead:\n"
-      "  macOS: brew install llvm\n"
-      "  Then: cmake -DCMAKE_CXX_COMPILER=/opt/homebrew/opt/llvm/bin/clang++ ..."
-    )
-  elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "16.0")
-      hpx_error(
-        "Clang 16+ is required for C++20 modules support. Current version: ${CMAKE_CXX_COMPILER_VERSION}"
-      )
-    endif()
-  elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "14.0")
-      hpx_error(
-        "GCC 14+ is required for C++20 modules support (experimental). Current version: ${CMAKE_CXX_COMPILER_VERSION}"
-      )
-    endif()
-  elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    if(MSVC_VERSION LESS 1934) # VS 17.4
-      hpx_error(
-        "Visual Studio 17.4+ is required for C++20 modules support. Current version: ${MSVC_VERSION}"
-      )
-    endif()
-  else()
-    hpx_warn(
-      "C++20 modules support for compiler '${CMAKE_CXX_COMPILER_ID}' is unknown. Proceed with caution."
-    )
-  endif()
+  include(HPX_CXXModules)
+  hpx_check_cxx_modules_support()
 
   hpx_info(
     "HPX will build and install C++20 module interface units for downstream users."
