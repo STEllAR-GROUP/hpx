@@ -21,7 +21,7 @@
 namespace hpx::util::hardware {
 
     HPX_CXX_CORE_EXPORT [[nodiscard]] HPX_HOST_DEVICE inline std::uint64_t
-        timestamp()
+    timestamp()
     {
 #if defined(HPX_HAVE_CUDA) && defined(HPX_COMPUTE_DEVICE_CODE)
         return timestamp_cuda();

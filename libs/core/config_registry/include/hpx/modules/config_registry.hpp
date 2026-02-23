@@ -45,7 +45,8 @@ namespace hpx::config_registry {
     HPX_CXX_CORE_EXPORT HPX_CONFIG_REGISTRY_EXPORT void add_module_config(
         module_config const& config);
 
-    HPX_CXX_CORE_EXPORT struct HPX_CONFIG_REGISTRY_EXPORT add_module_config_helper
+    HPX_CXX_CORE_EXPORT struct HPX_CONFIG_REGISTRY_EXPORT
+        add_module_config_helper
     {
         explicit add_module_config_helper(module_config const& config);
     };

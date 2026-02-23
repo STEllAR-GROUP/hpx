@@ -434,9 +434,12 @@ function(add_hpx_module libname modulename)
   endif()
 
   # All core modules depend on the config registry
-  if("${libname}" STREQUAL "core" AND NOT ("${modulename}" STREQUAL "config_registry"
-                                          OR "${modulename}" STREQUAL "config"
-                                          OR "${modulename}" STREQUAL "preprocessor"))
+  if("${libname}" STREQUAL "core"
+     AND NOT
+         ("${modulename}" STREQUAL "config_registry"
+          OR "${modulename}" STREQUAL "config"
+          OR "${modulename}" STREQUAL "preprocessor")
+  )
     target_link_libraries(hpx_${modulename} PUBLIC hpx_config_registry)
   endif()
 
@@ -461,7 +464,6 @@ function(add_hpx_module libname modulename)
       hpx_configure_module_consumer(hpx_${modulename} hpx_core_module_if)
     endif()
   endif()
-
 
   add_hpx_source_group(
     NAME hpx_${modulename}

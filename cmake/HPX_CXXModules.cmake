@@ -61,7 +61,6 @@ macro(hpx_check_cxx_modules_support)
   endif()
 endmacro()
 
-
 if(NOT HPX_WITH_CXX_MODULES)
   return()
 endif()
