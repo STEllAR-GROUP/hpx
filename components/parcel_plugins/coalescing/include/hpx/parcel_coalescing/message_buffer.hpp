@@ -17,6 +17,7 @@
 #include <hpx/parcelset/parcelset_fwd.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <utility>
 #include <vector>
 
@@ -33,24 +34,24 @@ namespace hpx::plugins::parcel::detail {
             singleton_buffer = 3
         };
 
-#define HPX_MESSAGE_BUFFER_APPEND_STATE_UNSCOPED_ENUM_DEPRECATION_MSG         \
-    "The unscoped message_buffer_append_state names are deprecated. "        \
+#define HPX_MESSAGE_BUFFER_APPEND_STATE_UNSCOPED_ENUM_DEPRECATION_MSG          \
+    "The unscoped message_buffer_append_state names are deprecated. "          \
     "Please use message_buffer_append_state::<value> instead."
 
-        HPX_DEPRECATED_V(
-            2, 0, HPX_MESSAGE_BUFFER_APPEND_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
+        HPX_DEPRECATED_V(1, 10,
+            HPX_MESSAGE_BUFFER_APPEND_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
         static constexpr message_buffer_append_state normal =
             message_buffer_append_state::normal;
-        HPX_DEPRECATED_V(
-            1, 10, HPX_MESSAGE_BUFFER_APPEND_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
+        HPX_DEPRECATED_V(1, 10,
+            HPX_MESSAGE_BUFFER_APPEND_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
         static constexpr message_buffer_append_state first_message =
             message_buffer_append_state::first_message;
-        HPX_DEPRECATED_V(
-            1, 10, HPX_MESSAGE_BUFFER_APPEND_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
+        HPX_DEPRECATED_V(1, 10,
+            HPX_MESSAGE_BUFFER_APPEND_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
         static constexpr message_buffer_append_state buffer_now_full =
             message_buffer_append_state::buffer_now_full;
-        HPX_DEPRECATED_V(
-            1, 10, HPX_MESSAGE_BUFFER_APPEND_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
+        HPX_DEPRECATED_V(1, 10,
+            HPX_MESSAGE_BUFFER_APPEND_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
         static constexpr message_buffer_append_state singleton_buffer =
             message_buffer_append_state::singleton_buffer;
 
