@@ -381,7 +381,7 @@ namespace hpx {
         friend FwdIter tag_fallback_invoke(
             hpx::remove_if_t, FwdIter first, FwdIter last, Pred pred)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::remove_if<FwdIter>().call(
@@ -402,7 +402,7 @@ namespace hpx {
         friend decltype(auto) tag_fallback_invoke(hpx::remove_if_t,
             ExPolicy&& policy, FwdIter first, FwdIter last, Pred pred)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::remove_if<FwdIter>().call(

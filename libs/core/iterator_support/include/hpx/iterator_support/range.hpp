@@ -7,10 +7,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/iterator_support/traits/is_sentinel_for.hpp>
 
 #include <cstddef>
 #include <iterator>
+#include <ranges>
 #include <type_traits>
 #include <utility>
 
@@ -300,15 +300,6 @@ namespace hpx::util {
         };
 
         ///////////////////////////////////////////////////////////////////////////
-        HPX_CXX_CORE_EXPORT template <typename T, typename Enable = void>
-        struct is_range : std::false_type
-        {
-        };
-
-        HPX_CXX_CORE_EXPORT template <typename T>
-        inline constexpr bool is_range_v = is_range<T>::value;
-
-        ///////////////////////////////////////////////////////////////////////////
         // return whether a given type is a range generator (i.e. exposes supports
         // an iterate function that returns a range
         HPX_CXX_CORE_EXPORT template <typename T, typename Enable = void>
@@ -357,7 +348,7 @@ namespace hpx::util {
         }
 
         HPX_CXX_CORE_EXPORT template <typename C,
-            typename Enable = std::enable_if_t < detail::is_range_v<C> ||
+            typename Enable = std::enable_if_t < std::ranges::range<C> ||
                 detail::is_range_generator_v<C> >>
                     [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE
                         std::size_t
@@ -368,7 +359,7 @@ namespace hpx::util {
         }
 
         HPX_CXX_CORE_EXPORT template <typename C,
-            typename Enable = std::enable_if_t < detail::is_range_v<C> ||
+            typename Enable = std::enable_if_t < std::ranges::range<C> ||
                 detail::is_range_generator_v<C> >>
                     [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE bool
                     empty(C const& c) noexcept(
@@ -397,22 +388,11 @@ namespace hpx::util {
     }    // namespace range_adl
 
     HPX_CXX_CORE_EXPORT using namespace range_adl;
-
     namespace detail {
-
-        HPX_CXX_CORE_EXPORT template <typename T>
-        struct is_range<T,
-            std::enable_if_t<hpx::traits::is_sentinel_for_v<
-                typename util::detail::sentinel<T>::type,
-                typename util::detail::iterator<T>::type>>> : std::true_type
-        {
-        };
-
         HPX_CXX_CORE_EXPORT template <typename T>
         struct is_range_generator<T,
-            std::enable_if_t<
-                is_range_v<decltype(hpx::util::iterate(std::declval<T&>()))>>>
-          : std::true_type
+            std::enable_if_t<std::ranges::range<decltype(hpx::util::iterate(
+                std::declval<T&>()))>>> : std::true_type
         {
         };
     }    // namespace detail

@@ -10,7 +10,6 @@ set(iterator_support_headers
     hpx/iterator_support/traits/is_iterator.hpp
     hpx/iterator_support/traits/is_range.hpp
     hpx/iterator_support/traits/is_segmented_iterator.hpp
-    hpx/iterator_support/traits/is_sentinel_for.hpp
     hpx/iterator_support/boost_iterator_categories.hpp
     hpx/iterator_support/counting_iterator.hpp
     hpx/iterator_support/counting_shape.hpp

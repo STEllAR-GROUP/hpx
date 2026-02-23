@@ -251,7 +251,7 @@ namespace hpx {
         template <typename FwdIter, typename Pred>
         // clang-format off
             requires (
-                hpx::traits::is_forward_iterator_v<FwdIter>
+                std::forward_iterator<FwdIter>
             )
         // clang-format on
         friend bool tag_fallback_invoke(
@@ -266,7 +266,7 @@ namespace hpx {
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_forward_iterator_v<FwdIter>
+                std::forward_iterator<FwdIter>
             )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::is_partitioned_t,

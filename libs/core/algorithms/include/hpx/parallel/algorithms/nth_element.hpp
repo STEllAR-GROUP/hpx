@@ -368,7 +368,7 @@ namespace hpx {
         friend void tag_fallback_invoke(hpx::nth_element_t, RandomIt first,
             RandomIt nth, RandomIt last, Pred pred = Pred())
         {
-            static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
+            static_assert(std::random_access_iterator<RandomIt>,
                 "Requires at least random iterator.");
 
             hpx::parallel::detail::nth_element<RandomIt>().call(
@@ -392,7 +392,7 @@ namespace hpx {
         tag_fallback_invoke(hpx::nth_element_t, ExPolicy&& policy,
             RandomIt first, RandomIt nth, RandomIt last, Pred pred = Pred())
         {
-            static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
+            static_assert(std::random_access_iterator<RandomIt>,
                 "Requires at least random iterator.");
 
             using result_type =

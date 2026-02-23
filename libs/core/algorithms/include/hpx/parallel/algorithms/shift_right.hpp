@@ -285,7 +285,7 @@ namespace hpx {
         friend FwdIter tag_fallback_invoke(
             shift_right_t, FwdIter first, FwdIter last, Size n)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::shift_right<FwdIter>().call(
@@ -305,7 +305,7 @@ namespace hpx {
         tag_fallback_invoke(shift_right_t, ExPolicy&& policy, FwdIter first,
             FwdIter last, Size n)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::shift_right<FwdIter>().call(

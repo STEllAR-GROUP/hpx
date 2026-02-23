@@ -571,7 +571,7 @@ namespace hpx {
         tag_fallback_invoke(make_heap_t, ExPolicy&& policy, RndIter first,
             RndIter last, Comp comp)
         {
-            static_assert(hpx::traits::is_random_access_iterator_v<RndIter>,
+            static_assert(std::random_access_iterator<RndIter>,
                 "Requires random access iterator.");
 
             return hpx::parallel::util::detail::algorithm_result<ExPolicy>::get(
@@ -591,7 +591,7 @@ namespace hpx {
         tag_fallback_invoke(
             make_heap_t, ExPolicy&& policy, RndIter first, RndIter last)
         {
-            static_assert(hpx::traits::is_random_access_iterator_v<RndIter>,
+            static_assert(std::random_access_iterator<RndIter>,
                 "Requires random access iterator.");
 
             using value_type =
@@ -616,7 +616,7 @@ namespace hpx {
         friend void tag_fallback_invoke(
             make_heap_t, RndIter first, RndIter last, Comp comp)
         {
-            static_assert(hpx::traits::is_random_access_iterator_v<RndIter>,
+            static_assert(std::random_access_iterator<RndIter>,
                 "Requires random access iterator.");
 
             hpx::parallel::detail::make_heap<RndIter>().call(
@@ -629,7 +629,7 @@ namespace hpx {
         friend void tag_fallback_invoke(
             make_heap_t, RndIter first, RndIter last)
         {
-            static_assert(hpx::traits::is_random_access_iterator_v<RndIter>,
+            static_assert(std::random_access_iterator<RndIter>,
                 "Requires random access iterator.");
 
             using value_type =

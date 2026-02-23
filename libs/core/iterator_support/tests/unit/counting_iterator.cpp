@@ -229,7 +229,7 @@ private:
 class my_int2
 {
 public:
-    using value_type = void;
+    using value_type = int;
     using pointer = void;
     using reference = void;
     using difference_type = std::ptrdiff_t;
@@ -246,14 +246,30 @@ public:
         ++m_int;
         return *this;
     }
+    my_int2 operator++(int)
+    {
+        my_int2 tmp = *this;
+        ++m_int;
+        return tmp;
+    }
     my_int2& operator--()
     {
         --m_int;
         return *this;
     }
+    my_int2 operator--(int)
+    {
+        my_int2 tmp = *this;
+        --m_int;
+        return tmp;
+    }
     bool operator==(my_int2 const& x) const
     {
         return m_int == x.m_int;
+    }
+    int operator*() const
+    {
+        return m_int;
     }
 
 private:
@@ -263,7 +279,7 @@ private:
 class my_int3
 {
 public:
-    using value_type = void;
+    using value_type = int;
     using pointer = void;
     using reference = void;
     using difference_type = std::ptrdiff_t;
@@ -279,6 +295,12 @@ public:
         ++m_int;
         return *this;
     }
+    my_int3 operator++(int)
+    {
+        my_int3 tmp = *this;
+        ++m_int;
+        return tmp;
+    }
     my_int3& operator+=(std::ptrdiff_t n)
     {
         m_int += static_cast<int>(n);
@@ -293,6 +315,12 @@ public:
         --m_int;
         return *this;
     }
+    my_int3 operator--(int)
+    {
+        my_int3 tmp = *this;
+        --m_int;
+        return tmp;
+    }
     bool operator==(my_int3 const& x) const
     {
         return m_int == x.m_int;
@@ -304,6 +332,10 @@ public:
     bool operator<(my_int3 const& x) const
     {
         return m_int < x.m_int;
+    }
+    int operator*() const
+    {
+        return m_int;
     }
 
 private:

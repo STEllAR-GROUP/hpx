@@ -339,7 +339,7 @@ namespace hpx {
         friend void tag_fallback_invoke(
             hpx::reverse_t, BidirIter first, BidirIter last)
         {
-            static_assert(hpx::traits::is_bidirectional_iterator_v<BidirIter>,
+            static_assert(std::bidirectional_iterator<BidirIter>,
                 "Requires at least bidirectional iterator.");
 
             hpx::parallel::detail::reverse<BidirIter>().call(
@@ -356,7 +356,7 @@ namespace hpx {
         friend decltype(auto) tag_fallback_invoke(
             hpx::reverse_t, ExPolicy&& policy, BidirIter first, BidirIter last)
         {
-            static_assert(hpx::traits::is_bidirectional_iterator_v<BidirIter>,
+            static_assert(std::bidirectional_iterator<BidirIter>,
                 "Requires at least bidirectional iterator.");
 
             return parallel::util::detail::algorithm_result<ExPolicy>::get(
@@ -381,11 +381,12 @@ namespace hpx {
         friend OutIter tag_fallback_invoke(
             hpx::reverse_copy_t, BidirIter first, BidirIter last, OutIter dest)
         {
-            static_assert(hpx::traits::is_bidirectional_iterator_v<BidirIter>,
+            static_assert(std::bidirectional_iterator<BidirIter>,
                 "Requires at least bidirectional iterator.");
 
-            static_assert(hpx::traits::is_output_iterator_v<OutIter>,
-                "Requires at least output iterator.");
+            static_assert(std::output_iterator<OutIter,
+                              hpx::traits::iter_value_t<BidirIter>>,
+                "Required at least output iterator.");
 
             return parallel::util::get_second_element(
                 parallel::detail::reverse_copy<
@@ -406,10 +407,10 @@ namespace hpx {
         friend decltype(auto) tag_fallback_invoke(hpx::reverse_copy_t,
             ExPolicy&& policy, BidirIter first, BidirIter last, FwdIter dest)
         {
-            static_assert(hpx::traits::is_bidirectional_iterator_v<BidirIter>,
+            static_assert(std::bidirectional_iterator<BidirIter>,
                 "Requires at least bidirectional iterator.");
 
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             return parallel::util::get_second_element(
