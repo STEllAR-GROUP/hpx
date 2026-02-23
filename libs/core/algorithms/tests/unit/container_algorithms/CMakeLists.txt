@@ -40,6 +40,7 @@ set(tests
     find_end_range2
     find_first_of_range
     find_first_of_range2
+    fold_range
     for_loop_exception_range
     for_loop_induction_range
     for_loop_induction_async_range
