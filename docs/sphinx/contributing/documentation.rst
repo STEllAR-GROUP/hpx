@@ -97,3 +97,47 @@ The source code is documented using Doxygen. If you add new API documentation
 either to existing or new source files, make sure that you add the documented
 source files to the ``doxygen_dependencies`` variable in
 ``docs/CMakeLists.txt``.
+
+Adding new API documentation
+============================
+
+When you add new public APIs to |hpx|, follow these guidelines to ensure the
+documentation is correctly generated and easy to use.
+
+Documenting headers
+-------------------
+
+At the top of a new header file, include the standard Doxygen documentation block.
+For example, if the new feature is called `my_new_feature`, you should:
+
+* List the name of the new file under ``\file``.
+* Specify the page name with ``\page`` (e.g., ``hpx::my_new_feature``).
+* Reference the existing header that will include your new file under ``\headerfile``.
+
+.. code-block:: cpp
+
+   /// \file my_new_feature.hpp
+   /// \page hpx::my_new_feature
+   /// \headerfile hpx/existing_header_of_new_feature.hpp
+
+Adding to the public API reference
+----------------------------------
+
+For the documentation to appear in the generated API reference, add your new API to
+``docs/sphinx/api/public_api.rst`` under the appropriate table (usually "Functions") for
+the relevant header (for example, ``hpx/existing_header_of_new_feature.hpp``).
+
+Including examples
+------------------
+
+Do **not** inline examples in the API reference. If you want to provide an example
+of how to use the new API, there are two recommended options:
+
+1. **Documentation page option**
+   Edit an existing relevant manual page to explain the new functionality and include a code example.
+   Use this option if you want to provide additional context about how the API works.
+
+2. **Standalone examples option**
+   Create a separate example under ``docs/sphinx/examples/``. Examples in this directory are
+   typically more comprehensive and executable, making them suitable for richer or more
+   complex scenarios.
