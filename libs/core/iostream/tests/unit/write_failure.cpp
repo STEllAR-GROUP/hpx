@@ -18,7 +18,8 @@ struct limit_device
     using char_type = char;
     using category = sink_tag;
 
-    int written, overflow_count, limit;
+    std::streamsize written;
+    int overflow_count, limit;
 
     explicit limit_device(int limit = 20)
       : written(0)
