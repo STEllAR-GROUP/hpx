@@ -256,12 +256,8 @@ namespace hpx::execution::experimental {
                                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)));
         }
 
-        // clang-format off
-        template <typename F, typename S, typename Future, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
-                !std::is_integral_v<S>
-            )>
-        // clang-format on
+        template <typename F, typename S, typename Future, typename... Ts>
+            requires(!std::is_integral_v<S>)
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::bulk_then_execute_t,
             scheduler_executor const& exec, F&& f, S const& shape,

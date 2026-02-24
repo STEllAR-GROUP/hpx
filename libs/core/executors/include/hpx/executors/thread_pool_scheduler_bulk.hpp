@@ -48,7 +48,9 @@
 #include <cstddef>
 #include <cstdint>
 #include <exception>
+#include <iterator>
 #include <optional>
+#include <ranges>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -467,7 +469,8 @@ namespace hpx::execution::experimental::detail {
             }
         }
 
-        using range_value_type = std::ranges::range_value_t<Shape>;
+        using range_value_type =
+            hpx::traits::iter_value_t<std::ranges::iterator_t<Shape>>;
 
         template <typename... Ts>
         void execute(Ts&&... ts)
@@ -483,13 +486,19 @@ namespace hpx::execution::experimental::detail {
             }
 
             // Calculate chunk size based on execution mode
-            std::uint32_t chunk_size = op_state->is_chunked ?
-                get_bulk_scheduler_chunk_size(
-                    op_state->num_worker_threads, size) :
-                1;
-            std::uint32_t num_chunks = op_state->is_chunked ?
-                (size + chunk_size - 1) / chunk_size :
-                size;
+            std::uint32_t chunk_size;
+            std::uint32_t num_chunks;
+            if constexpr (OperationState::is_chunked)
+            {
+                chunk_size = get_bulk_scheduler_chunk_size(
+                    op_state->num_worker_threads, size);
+                num_chunks = (size + chunk_size - 1) / chunk_size;
+            }
+            else
+            {
+                chunk_size = 1;
+                num_chunks = size;
+            }
 
             // launch only as many tasks as we have chunks
             std::size_t const num_pus = op_state->num_worker_threads;

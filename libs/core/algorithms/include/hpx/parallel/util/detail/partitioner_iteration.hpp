@@ -39,12 +39,24 @@ namespace hpx::parallel::util::detail {
     {
         std::decay_t<F> f_;
 
-        // Overload for tuple-like types
+        // Overload for tuple-like types - unpack using index_pack
         template <typename T>
             requires(is_tuple_like_v<T>)
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Result operator()(T&& t)
         {
-            return hpx::invoke_fused_r<Result>(f_, HPX_FORWARD(T, t));
+            using embedded_index_pack_type =
+                hpx::util::make_index_pack<hpx::tuple_size<std::decay_t<T>>::value>;
+
+            // NOLINTBEGIN(bugprone-use-after-move)
+            if constexpr (std::is_invocable_v<F, embedded_index_pack_type, T&&>)
+            {
+                return HPX_INVOKE_R(Result, f_, embedded_index_pack_type{}, HPX_FORWARD(T, t));
+            }
+            else
+            {
+                return (*this)(embedded_index_pack_type{}, HPX_FORWARD(T, t));
+            }
+            // NOLINTEND(bugprone-use-after-move)
         }
 
         // Overload for non-tuple types (std::size_t from stdexec bulk)
@@ -59,7 +71,7 @@ namespace hpx::parallel::util::detail {
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Result operator()(
             hpx::util::index_pack<Is...>, hpx::tuple<Ts...>& t)
         {
-            return HPX_INVOKE(f_, hpx::get<Is>(t)...);
+            return HPX_INVOKE_R(Result, f_, hpx::get<Is>(t)...);
         }
 
         template <std::size_t... Is, typename... Ts>
@@ -67,7 +79,7 @@ namespace hpx::parallel::util::detail {
             hpx::util::index_pack<Is...>, hpx::tuple<Ts...>&& t)
         {
             // NOLINTBEGIN(bugprone-use-after-move)
-            return HPX_INVOKE(f_, hpx::get<Is>(HPX_MOVE(t))...);
+            return HPX_INVOKE_R(Result, f_, hpx::get<Is>(HPX_MOVE(t))...);
             // NOLINTEND(bugprone-use-after-move)
         }
 

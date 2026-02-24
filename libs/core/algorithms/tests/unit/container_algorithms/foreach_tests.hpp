@@ -213,6 +213,10 @@ void test_for_each_exception_async(ExPolicy&& p, IteratorTag)
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(p, e);
     }
+    catch (std::runtime_error const&)
+    {
+        caught_exception = true;
+    }
     catch (...)
     {
         caught_exception = true;
@@ -350,7 +354,41 @@ void test_for_each_sender(
         iterator(std::begin(c)), iterator(std::end(c)));
     auto f = [](std::size_t& v) { v = 42; };
 
-    // Use stdexec bulk instead of HPX for_each for sender tests
+    using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
+    auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
+
+    auto result = hpx::get<0>(
+        // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
+        *tt::sync_wait(ex::just(rng, f) | hpx::ranges::for_each(p.on(exec))));
+    HPX_TEST(result == iterator(std::end(c)));
+
+    // verify values
+    std::size_t count = 0;
+    std::for_each(std::begin(c), std::end(c), [&count](std::size_t v) -> void {
+        HPX_TEST_EQ(v, static_cast<std::size_t>(42));
+        ++count;
+    });
+    HPX_TEST_EQ(count, c.size());
+}
+
+template <typename Policy, typename ExPolicy, typename IteratorTag>
+void test_for_each_sender_bulk(
+    [[maybe_unused]] Policy l, [[maybe_unused]] ExPolicy&& p, IteratorTag)
+{
+    using base_iterator = std::vector<std::size_t>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
+
+    std::vector<std::size_t> c(10007);
+    std::iota(std::begin(c), std::end(c), std::rand());
+
+    namespace ex = hpx::execution::experimental;
+    namespace tt = hpx::this_thread::experimental;
+
+    auto rng = hpx::util::iterator_range(
+        iterator(std::begin(c)), iterator(std::end(c)));
+    auto f = [](std::size_t& v) { v = 42; };
+
+    // Test stdexec bulk sender directly (not using HPX for_each algorithm)
     auto result = hpx::get<0>(
         // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
         *tt::sync_wait(
@@ -422,6 +460,10 @@ void test_for_each_exception_sender(
     {
         caught_exception = true;
         test::test_num_exceptions<ExPolicy, IteratorTag>::call(p, e);
+    }
+    catch (std::runtime_error const&)
+    {
+        caught_exception = true;
     }
     catch (...)
     {

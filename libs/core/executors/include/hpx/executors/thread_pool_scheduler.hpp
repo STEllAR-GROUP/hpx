@@ -66,9 +66,6 @@ namespace hpx::execution::experimental {
     template <typename Policy>
     struct thread_pool_policy_scheduler;
 
-    namespace detail {
-    }
-
     // Forward declarations for domain system
 
     // Concept to match bulk sender types
@@ -106,7 +103,7 @@ namespace hpx::execution::experimental {
             auto&& [tag, data, child] = sndr;
             auto&& [pol, shape, f] = data;
 
-            auto iota_shape = std::views::iota(decltype(shape){0}, shape);
+            auto iota_shape = hpx::util::counting_shape(decltype(shape){0}, shape);
 
             constexpr bool is_chunked =
                 !hpx::execution::experimental::stdexec_internal::

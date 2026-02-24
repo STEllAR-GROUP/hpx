@@ -624,7 +624,7 @@ namespace hpx::parallel {
             }
 
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void operator()(
-                std::size_t) const
+                std::size_t) const noexcept
             {
                 HPX_ASSERT(false);
             }
@@ -687,7 +687,7 @@ namespace hpx::parallel {
             }
 
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void operator()(
-                std::size_t) const
+                std::size_t) const noexcept
             {
                 HPX_ASSERT(false);
             }
