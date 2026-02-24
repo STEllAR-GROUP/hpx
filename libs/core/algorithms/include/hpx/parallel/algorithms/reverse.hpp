@@ -182,6 +182,7 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/executors.hpp>
 #include <hpx/modules/iterator_support.hpp>
@@ -247,12 +248,9 @@ namespace hpx::parallel {
                 BidirIter last2 = first;
                 auto const size = detail::advance_and_get_distance(last2, last);
 
-                // Use local alias with explicit qualification to resolve
-                // trait resolution issues in Clang 20 and MSVC
-                using is_random_access =
-                    ::hpx::traits::is_random_access_iterator<BidirIter>;
-
-                if constexpr (is_random_access::value)
+                // Use standard trait usage to resolve Clang 20 issues
+                if constexpr (hpx::traits::is_random_access_iterator_v<
+                                  BidirIter>)
                 {
                     return util::detail::convert_to_result(
                         for_each_n<hpx::util::counting_iterator<std::size_t>>()
