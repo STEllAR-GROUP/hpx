@@ -281,16 +281,16 @@ namespace hpx::lcos::local {
     protected:
         template <typename Lock>
         void synchronize(std::size_t generation_value, Lock& l,
-            char const* function_name = "base_and_gate<>::synchronize",
+            [[maybe_unused]] char const* function_name =
+                "base_and_gate<>::synchronize",
             error_code& ec = throws)
         {
             HPX_ASSERT_OWNS_LOCK(l);
 
             if (generation_value < generation_)
             {
-                l.unlock();
-                HPX_THROWS_IF(ec, hpx::error::invalid_status, function_name,
-                    "sequencing error, generational counter too small");
+                if (&ec != &throws)
+                    ec = make_success_code();
                 return;
             }
 
