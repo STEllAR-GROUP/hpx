@@ -105,7 +105,7 @@ namespace hpx::iostream {
             using streambuf_type = linked_streambuf<Ch, Tr>;
             using list_type = std::list<streambuf_type*>;
 
-        protected:
+        private:
             chain_base()
               : pimpl_(std::make_shared<chain_impl>())
             {
@@ -118,6 +118,8 @@ namespace hpx::iostream {
             chain_base& operator=(chain_base&&) noexcept = default;
 
             ~chain_base() = default;
+
+            friend Self;
 
         public:
             // dual_use is a pseudo-mode to facilitate filter writing, not a
