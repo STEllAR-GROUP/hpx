@@ -12,6 +12,7 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/modules/iostream.hpp>
 #include <hpx/modules/testing.hpp>
+#include <cstddef>
 
 #include <iosfwd>
 #include <vector>
@@ -28,7 +29,8 @@ using namespace hpx::iostream::test;
 void seekable_filter_test()
 {
     {
-        vector<char> test(data_reps * data_length(), '0');
+        vector<char> test(
+            static_cast<std::size_t>(data_reps * data_length()), '0');
         filtering_stream<seekable> io;
         io.push(identity_seekable_filter());
         io.push(container_device<vector<char>>(test));
@@ -38,7 +40,8 @@ void seekable_filter_test()
     }
 
     {
-        vector<char> test(data_reps * data_length(), '0');
+        vector<char> test(
+            static_cast<std::size_t>(data_reps * data_length()), '0');
         filtering_stream<seekable> io;
         io.push(identity_seekable_filter());
         io.push(container_device<vector<char>>(test));
@@ -48,7 +51,8 @@ void seekable_filter_test()
     }
 
     {
-        vector<char> test(data_reps * data_length(), '0');
+        vector<char> test(
+            static_cast<std::size_t>(data_reps * data_length()), '0');
         filtering_stream<seekable> io;
         io.push(identity_seekable_multichar_filter());
         io.push(container_device<vector<char>>(test));
@@ -58,7 +62,8 @@ void seekable_filter_test()
     }
 
     {
-        vector<char> test(data_reps * data_length(), '0');
+        vector<char> test(
+            static_cast<std::size_t>(data_reps * data_length()), '0');
         filtering_stream<seekable> io;
         io.push(identity_seekable_multichar_filter());
         io.push(container_device<vector<char>>(test));

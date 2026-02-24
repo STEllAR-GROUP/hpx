@@ -338,7 +338,7 @@ namespace hpx::iostream {
                 {
                     pimpl_->flags_ |= flags::complete | flags::open;
                     for (iterator first = list().begin(), last = list().end();
-                         first != last; ++first)
+                        first != last; ++first)
                     {
                         (*first)->set_needs_close();
                     }
@@ -505,7 +505,7 @@ namespace hpx::iostream {
                 void reset()
                 {
                     for (auto first = links_.begin(), last = links_.end();
-                         first != last; ++first)
+                        first != last; ++first)
                     {
                         if ((flags_ & flags::complete) == 0 ||
                             (flags_ & flags::auto_close) == 0)
@@ -839,7 +839,7 @@ namespace hpx::iostream {
         {
             bool result = true;
             for (auto first = list().begin(), last = list().end();
-                 first != last; ++first)
+                first != last; ++first)
             {
                 bool const s = (*first)->strict_sync();
                 result = result && s;
