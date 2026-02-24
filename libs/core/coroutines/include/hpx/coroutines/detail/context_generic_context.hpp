@@ -198,6 +198,7 @@ namespace hpx::threads::coroutines {
 
             // Create a context that on restore invokes Functor on
             // a new stack. The stack size can be optionally specified.
+            // NOLINT(bugprone-crtp-constructor-accessibility)
             explicit fcontext_context_impl(std::ptrdiff_t stack_size = -1)
               : cb_(std::make_pair(static_cast<void*>(this), nullptr))
               , funp_(&trampoline<CoroutineImpl>)
