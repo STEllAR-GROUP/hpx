@@ -34,6 +34,7 @@
 #include <cstdint>
 #include <exception>
 #include <iosfwd>
+#include <iterator>
 #include <memory>
 #include <string>
 #include <type_traits>

@@ -146,9 +146,9 @@ namespace hpx::experimental {
             "sort_by_key is not supported unless HPX_HAVE_TUPLE_RVALUE_SWAP "
             "is defined");
 #else
-        static_assert(hpx::traits::is_random_access_iterator_v<KeyIter>,
+        static_assert(std::random_access_iterator<KeyIter>,
             "Requires a random access iterator.");
-        static_assert(hpx::traits::is_random_access_iterator_v<ValueIter>,
+        static_assert(std::random_access_iterator<ValueIter>,
             "Requires a random access iterator.");
 
         ValueIter value_last = value_first;

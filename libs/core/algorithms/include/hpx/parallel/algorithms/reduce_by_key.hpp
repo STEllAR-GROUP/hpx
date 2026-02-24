@@ -139,6 +139,7 @@ namespace hpx { namespace experimental {
 /// \cond NOINTERNAL
 #ifdef EXTRA_DEBUG
 #include <iostream>
+#include <iterator>
 #define DEBUG_REDUCE_BY_KEY(a) std::cout << a
 #else
 #define DEBUG_REDUCE_BY_KEY(a)
@@ -528,10 +529,10 @@ namespace hpx::experimental {
         using result = hpx::parallel::util::detail::algorithm_result<ExPolicy,
             hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>>;
 
-        static_assert(hpx::traits::is_random_access_iterator_v<RanIter> &&
-                hpx::traits::is_random_access_iterator_v<RanIter2> &&
-                hpx::traits::is_forward_iterator_v<FwdIter1> &&
-                hpx::traits::is_forward_iterator_v<FwdIter2>,
+        static_assert(std::random_access_iterator<RanIter> &&
+                std::random_access_iterator<RanIter2> &&
+                std::forward_iterator<FwdIter1> &&
+                std::forward_iterator<FwdIter2>,
             "iterators : Random_access for inputs and forward for outputs.");
 
         std::uint64_t const number_of_keys = std::distance(key_first, key_last);

@@ -457,7 +457,7 @@ namespace hpx {
         template <typename FwdIter, typename Pred = hpx::parallel::detail::less>
         // clang-format off
             requires (
-                hpx::traits::is_forward_iterator_v<FwdIter> &&
+                std::forward_iterator<FwdIter> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<FwdIter>::value_type,
                     typename std::iterator_traits<FwdIter>::value_type
@@ -477,7 +477,7 @@ namespace hpx {
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_forward_iterator_v<FwdIter> &&
+                std::forward_iterator<FwdIter> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<FwdIter>::value_type,
                     typename std::iterator_traits<FwdIter>::value_type
@@ -500,7 +500,7 @@ namespace hpx {
         template <typename FwdIter, typename Pred = hpx::parallel::detail::less>
         // clang-format off
             requires (
-                hpx::traits::is_forward_iterator_v<FwdIter> &&
+                std::forward_iterator<FwdIter> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<FwdIter>::value_type,
                     typename std::iterator_traits<FwdIter>::value_type
@@ -520,7 +520,7 @@ namespace hpx {
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_forward_iterator_v<FwdIter> &&
+                std::forward_iterator<FwdIter> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<FwdIter>::value_type,
                     typename std::iterator_traits<FwdIter>::value_type

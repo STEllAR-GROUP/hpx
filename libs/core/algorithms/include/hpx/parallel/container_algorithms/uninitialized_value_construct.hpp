@@ -262,6 +262,7 @@ namespace hpx { namespace ranges {
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
+#include <ranges>
 #include <type_traits>
 #include <utility>
 
@@ -275,15 +276,15 @@ namespace hpx::ranges {
         template <typename FwdIter, typename Sent>
         // clang-format off
             requires(
-                hpx::traits::is_forward_iterator_v<FwdIter> &&
-                hpx::traits::is_sentinel_for_v<Sent, FwdIter>
+                std::forward_iterator<FwdIter> &&
+                std::sentinel_for<Sent, FwdIter>
             )
         // clang-format on
         friend FwdIter tag_fallback_invoke(
             hpx::ranges::uninitialized_value_construct_t, FwdIter first,
             Sent last)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::uninitialized_value_construct<
@@ -295,15 +296,15 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_forward_iterator_v<FwdIter> &&
-                hpx::traits::is_sentinel_for_v<Sent, FwdIter>
+                std::forward_iterator<FwdIter> &&
+                std::sentinel_for<Sent, FwdIter>
             )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
         tag_fallback_invoke(hpx::ranges::uninitialized_value_construct_t,
             ExPolicy&& policy, FwdIter first, Sent last)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::uninitialized_value_construct<
@@ -312,7 +313,7 @@ namespace hpx::ranges {
         }
 
         template <typename Rng>
-            requires(hpx::traits::is_range_v<Rng>)
+            requires(std::ranges::range<Rng>)
         friend typename hpx::traits::range_traits<Rng>::iterator_type
         tag_fallback_invoke(
             hpx::ranges::uninitialized_value_construct_t, Rng&& rng)
@@ -320,7 +321,7 @@ namespace hpx::ranges {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
 
-            static_assert(hpx::traits::is_forward_iterator_v<iterator_type>,
+            static_assert(std::forward_iterator<iterator_type>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::uninitialized_value_construct<
@@ -332,7 +333,7 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng>
+                std::ranges::range<Rng>
             )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
@@ -343,7 +344,7 @@ namespace hpx::ranges {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
 
-            static_assert(hpx::traits::is_forward_iterator_v<iterator_type>,
+            static_assert(std::forward_iterator<iterator_type>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::uninitialized_value_construct<
@@ -361,7 +362,7 @@ namespace hpx::ranges {
         template <typename FwdIter, typename Size>
         // clang-format off
             requires(
-                hpx::traits::is_forward_iterator_v<FwdIter> &&
+                std::forward_iterator<FwdIter> &&
                 std::is_integral_v<Size>
             )
         // clang-format on
@@ -369,7 +370,7 @@ namespace hpx::ranges {
             hpx::ranges::uninitialized_value_construct_n_t, FwdIter first,
             Size count)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::uninitialized_value_construct_n<
@@ -381,7 +382,7 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_forward_iterator_v<FwdIter> &&
+                std::forward_iterator<FwdIter> &&
                 std::is_integral_v<Size>
             )
         // clang-format on
@@ -389,7 +390,7 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::uninitialized_value_construct_n_t,
             ExPolicy&& policy, FwdIter first, Size count)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::uninitialized_value_construct_n<

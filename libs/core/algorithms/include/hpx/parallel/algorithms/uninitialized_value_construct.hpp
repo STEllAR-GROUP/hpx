@@ -350,13 +350,13 @@ namespace hpx {
         template <typename FwdIter>
         // clang-format off
             requires (
-                hpx::traits::is_forward_iterator_v<FwdIter>
+                std::forward_iterator<FwdIter>
             )
         // clang-format on
         friend void tag_fallback_invoke(
             hpx::uninitialized_value_construct_t, FwdIter first, FwdIter last)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             hpx::parallel::detail::uninitialized_value_construct<FwdIter>()
@@ -367,14 +367,14 @@ namespace hpx {
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_forward_iterator_v<FwdIter>
+                std::forward_iterator<FwdIter>
             )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(
             hpx::uninitialized_value_construct_t, ExPolicy&& policy,
             FwdIter first, FwdIter last)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             using result_type =
@@ -397,14 +397,14 @@ namespace hpx {
         template <typename FwdIter, typename Size>
         // clang-format off
             requires (
-                hpx::traits::is_forward_iterator_v<FwdIter> &&
+                std::forward_iterator<FwdIter> &&
                 std::is_integral_v<Size>
             )
         // clang-format on
         friend FwdIter tag_fallback_invoke(
             hpx::uninitialized_value_construct_n_t, FwdIter first, Size count)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             // if count is representing a negative value, we do nothing
@@ -423,7 +423,7 @@ namespace hpx {
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_forward_iterator_v<FwdIter> &&
+                std::forward_iterator<FwdIter> &&
                 std::is_integral_v<Size>
             )
         // clang-format on
@@ -431,7 +431,7 @@ namespace hpx {
             hpx::uninitialized_value_construct_n_t, ExPolicy&& policy,
             FwdIter first, Size count)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             constexpr bool has_scheduler_executor =
