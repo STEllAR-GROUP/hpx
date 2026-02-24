@@ -233,7 +233,6 @@ namespace hpx::execution::experimental {
             }
         }
 
-#if !defined(HPX_HAVE_STDEXEC)
         template <typename F, typename S, typename... Ts>
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::bulk_sync_execute_t,
@@ -244,9 +243,7 @@ namespace hpx::execution::experimental {
                 hpx::parallel::execution::bulk_async_execute(
                     exec, HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...));
         }
-#endif
 
-#if !defined(HPX_HAVE_STDEXEC)
         template <typename F, typename S, typename Future, typename... Ts>
         friend auto tag_invoke(hpx::parallel::execution::bulk_then_execute_t,
             explicit_scheduler_executor const& exec, F&& f, S const& shape,
@@ -266,7 +263,6 @@ namespace hpx::execution::experimental {
                 bulk(shape,
                     hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
         }
-#endif
 
     private:
         std::decay_t<BaseScheduler> sched_;
