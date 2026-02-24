@@ -39,7 +39,8 @@ void test_for_each()
     test_for_each_sender_bulk(hpx::launch::sync, seq(task), IteratorTag());
     test_for_each_sender_bulk(hpx::launch::async, par(task), IteratorTag());
     test_for_each_sender_bulk(hpx::launch::sync, unseq(task), IteratorTag());
-    test_for_each_sender_bulk(hpx::launch::async, par_unseq(task), IteratorTag());
+    test_for_each_sender_bulk(
+        hpx::launch::async, par_unseq(task), IteratorTag());
 }
 
 void for_each_test()

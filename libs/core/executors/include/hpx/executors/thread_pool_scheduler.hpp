@@ -103,7 +103,8 @@ namespace hpx::execution::experimental {
             auto&& [tag, data, child] = sndr;
             auto&& [pol, shape, f] = data;
 
-            auto iota_shape = hpx::util::counting_shape(decltype(shape){0}, shape);
+            auto iota_shape =
+                hpx::util::counting_shape(decltype(shape){0}, shape);
 
             constexpr bool is_chunked =
                 !hpx::execution::experimental::stdexec_internal::
