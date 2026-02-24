@@ -164,7 +164,8 @@ namespace hpx::serialization::detail {
     {
         static void save(output_archive& ar, void const* base)
         {
-            serialize(ar, *static_cast<Derived*>(const_cast<void*>(base)), 0);
+            serialize(ar,
+                *const_cast<Derived*>(static_cast<Derived const*>(base)), 0);
         }
 
         static void load(input_archive& ar, void* base)
