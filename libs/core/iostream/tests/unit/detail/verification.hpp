@@ -100,7 +100,7 @@ namespace hpx::iostream::test {
     template <typename Ch, typename Tr>
     void write_data_in_chunks(std::basic_ostream<Ch, Tr>& os)
     {
-        Ch const* buf = detail::data((Ch*) 0);
+        Ch const* buf = detail::data((Ch*) nullptr);
         for (int z = 0; z < data_reps; ++z)
             os.write(buf, data_length());
         os.flush();

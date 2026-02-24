@@ -188,7 +188,7 @@ namespace hpx::iostream::detail {
         using namespace std;
         if (!ibeg_)
             throw cant_read();
-        if (gptr() != 0 && gptr() != ibeg_)
+        if (gptr() != nullptr && gptr() != ibeg_)
         {
             gbump(-1);
             if (!traits_type::eq_int_type(c, traits_type::eof()))
@@ -261,7 +261,7 @@ namespace hpx::iostream::detail {
 
         stream_offset result = -1;
         bool one = one_head();
-        if (one && (pptr() != 0 || gptr() == 0))
+        if (one && (pptr() != nullptr || gptr() == nullptr))
             init_get_area();    // Switch to input mode, for code reuse.
 
         if (one || ((which & std::ios_base::in) != 0 && ibeg_ != nullptr))
@@ -339,7 +339,7 @@ namespace hpx::iostream::detail {
         if (one_head() && pptr())
         {
             gbump(static_cast<int>(pptr() - obeg_));
-            setp(0, 0);
+            setp(nullptr, nullptr);
         }
     }
 
@@ -350,7 +350,7 @@ namespace hpx::iostream::detail {
         if (one_head() && gptr())
         {
             pbump(static_cast<int>(gptr() - ibeg_));
-            setg(0, 0, 0);
+            setg(nullptr, nullptr, nullptr);
         }
     }
 
