@@ -48,7 +48,7 @@ namespace hpx::actions {
         // construct an empty transfer_action to avoid serialization overhead
         transfer_action() = default;
 
-        ~transfer_action() noexcept ;
+        ~transfer_action() noexcept;
 
         // construct an action from its arguments
         template <typename... Ts>
@@ -57,7 +57,7 @@ namespace hpx::actions {
         template <typename... Ts>
         explicit transfer_action(hpx::launch policy, Ts&&... vs);
 
-        bool has_continuation() const ;
+        bool has_continuation() const;
 
         /// The \a get_thread_function constructs a proper thread function for
         /// a \a thread, encapsulating the functionality and the arguments
@@ -82,7 +82,7 @@ namespace hpx::actions {
 
         threads::thread_function_type get_thread_function(hpx::id_type&& target,
             naming::address::address_type lva,
-            naming::address::component_type comptype) ;
+            naming::address::component_type comptype);
 
         template <std::size_t... Is>
         void schedule_thread(util::index_pack<Is...>,
@@ -93,20 +93,19 @@ namespace hpx::actions {
         // schedule a new thread
         void schedule_thread(naming::gid_type const& target_gid,
             naming::address::address_type lva,
-            naming::address::component_type comptype,
-            std::size_t num_thread) ;
+            naming::address::component_type comptype, std::size_t num_thread);
 
         // serialization support
         // loading ...
-        void load(hpx::serialization::input_archive& ar) ;
+        void load(hpx::serialization::input_archive& ar);
 
         // saving ...
-        void save(hpx::serialization::output_archive& ar) ;
+        void save(hpx::serialization::output_archive& ar);
 
         void load_schedule(serialization::input_archive& ar,
             naming::gid_type&& target, naming::address_type lva,
             naming::component_type comptype, std::size_t num_thread,
-            bool& deferred_schedule) ;
+            bool& deferred_schedule);
     };
     /// \endcond
 
