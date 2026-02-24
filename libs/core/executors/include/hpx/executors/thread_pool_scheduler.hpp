@@ -8,23 +8,19 @@
 #pragma once
 
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/errors/try_catch_exception_ptr.hpp>
-#include <hpx/execution_base/completion_scheduler.hpp>
-#include <hpx/execution_base/completion_signatures.hpp>
-#include <hpx/execution_base/receiver.hpp>
-#include <hpx/execution_base/sender.hpp>
-#include <hpx/executors/current_executor.hpp>
-#include <hpx/executors/exception_list.hpp>
-#include <hpx/functional/detail/invoke.hpp>
-#include <hpx/functional/invoke_result.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/threading_base.hpp>
+#include <hpx/modules/timing.hpp>
 #include <hpx/modules/topology.hpp>
 
 #include <cstddef>
 #include <exception>
 #include <string>
+#include <type_traits>
 #include <utility>
 
 #if defined(HPX_HAVE_STDEXEC)
