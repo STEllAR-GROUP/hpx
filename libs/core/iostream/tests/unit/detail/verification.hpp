@@ -74,8 +74,10 @@ namespace hpx::iostream::test {
         {
             if ((first == last) != is.eof())
                 return false;
-            if (first != last && *first++ != is.get())
+            if (first != last && *first != is.get())
                 return false;
+            if (first != last)
+                ++first;
         } while (first != last);
         return true;
     }
