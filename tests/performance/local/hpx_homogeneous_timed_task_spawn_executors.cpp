@@ -51,7 +51,8 @@ void print_results(std::uint64_t cores, double walltime)
     std::string const delay_str = hpx::util::format("{},", delay);
 
     hpx::util::format_to(cout, "{:-21} {:-21} {:-21} {:10.12}, {:10.12}\n",
-        cores_str, tasks_str, delay_str, walltime, walltime / tasks)
+        cores_str, tasks_str, delay_str, walltime,
+        walltime / static_cast<double>(tasks))
         << std::flush;
 }
 
