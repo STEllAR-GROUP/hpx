@@ -322,7 +322,7 @@ namespace hpx::iostream {
                 if (is_complete())
                     throw std::logic_error("chain complete");
 
-                streambuf_type* prev = !empty() ? list().back() : 0;
+                streambuf_type* prev = !empty() ? list().back() : nullptr;
                 buffer_size =
                     buffer_size != -1 ? buffer_size : optimal_buffer_size(t);
                 pback_size =
@@ -858,7 +858,7 @@ namespace hpx::iostream {
             streambuf_type* buf = nullptr;
             std::swap(buf, list().back());
             buf->set_auto_close(false);
-            buf->set_next(0);
+            buf->set_next(nullptr);
             delete buf;
 
             list().pop_back();
