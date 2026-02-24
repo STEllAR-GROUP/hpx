@@ -70,7 +70,9 @@ namespace hpx::iostream::detail {
         // Declared in linked_streambuf.
         T* component()
         {
-            return &*storage_;
+            if (storage_.has_value())
+                return &*storage_;
+            return nullptr;
         }
 
     protected:
@@ -246,7 +248,10 @@ namespace hpx::iostream::detail {
             setp(nullptr, nullptr);
             obeg_ = oend_ = nullptr;
         }
-        iostream::close(*storage_, which);
+        if (storage_.has_value())
+        {
+            iostream::close(*storage_, which);
+        }
     }
 
     template <typename T, typename Tr>
@@ -319,17 +324,23 @@ namespace hpx::iostream::detail {
     template <typename T, typename Tr>
     void direct_streambuf<T, Tr>::init_input(input)
     {
-        auto p = input_sequence(*storage_);
-        ibeg_ = p.data();
-        iend_ = p.data() + p.size();
+        if (storage_.has_value())
+        {
+            auto p = input_sequence(*storage_);
+            ibeg_ = p.data();
+            iend_ = p.data() + p.size();
+        }
     }
 
     template <typename T, typename Tr>
     void direct_streambuf<T, Tr>::init_output(output)
     {
-        auto p = output_sequence(*storage_);
-        obeg_ = p.data();
-        oend_ = p.data() + p.size();
+        if (storage_.has_value())
+        {
+            auto p = output_sequence(*storage_);
+            obeg_ = p.data();
+            oend_ = p.data() + p.size();
+        }
     }
 
     template <typename T, typename Tr>
