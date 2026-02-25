@@ -9,7 +9,6 @@ set(boost_library_dependencies ${Boost_LIBRARIES})
 
 set(benchmarks
     async_overheads
-    coroutines_call_overhead
     delay_baseline
     delay_baseline_threaded
     function_object_wrapper_overhead
@@ -95,7 +94,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
     APPEND
     benchmarks
     agas_cache_timings
-    hpx_homogeneous_timed_task_spawn_executors
     partitioned_vector_foreach
     sizeof
     spinlock_overhead1
@@ -118,9 +116,6 @@ set(resume_suspend_FLAGS DEPENDENCIES hpx_timing)
 
 set(native_tls_overhead_LIBRARIES hpx_dependencies_boost)
 
-set(hpx_homogeneous_timed_task_spawn_executors_FLAGS DEPENDENCIES
-                                                     iostreams_component
-)
 set(skynet_FLAGS DEPENDENCIES iostreams_component)
 set(sizeof_FLAGS DEPENDENCIES iostreams_component)
 set(spinlock_overhead1_FLAGS DEPENDENCIES iostreams_component)
@@ -143,12 +138,10 @@ set(print_heterogeneous_payloads_PARAMETERS NO_HPX_MAIN)
 
 # These tests fail, so I am marking them as non HPX tests until they are fixed
 set(print_heterogeneous_payloads_PARAMETERS NO_HPX_MAIN)
-set(hpx_homogeneous_timed_task_spawn_executors_PARAMETERS NO_HPX_MAIN)
 set(skynet_PARAMETERS NO_HPX_MAIN)
 set(timed_task_spawn_PARAMETERS NO_HPX_MAIN)
 set(hpx_tls_overhead_PARAMETERS NO_HPX_MAIN)
 set(native_tls_overhead_PARAMETERS NO_HPX_MAIN)
-set(coroutines_call_overhead_PARAMETERS NO_HPX_MAIN)
 
 foreach(benchmark ${benchmarks})
   set(sources ${benchmark}.cpp ${${benchmark}_SOURCES})
