@@ -281,8 +281,7 @@ namespace hpx::util {
         struct use_operator_brackets_proxy
           : std::integral_constant<bool,
                 !(std::is_copy_constructible_v<Value> &&
-                    std::is_const_v<Value>) ||
-                    std::is_lvalue_reference_v<typename Iterator::reference>>
+                    std::is_const_v<Value>)>
         {
         };
 
@@ -292,29 +291,6 @@ namespace hpx::util {
           : Iterator::use_brackets_proxy
         {
         };
-
-        template <typename Iterator, typename Value>
-        struct operator_brackets_result
-        {
-            using type = std::conditional_t<
-                use_operator_brackets_proxy<Iterator, Value>::value,
-                operator_brackets_proxy<Iterator>,
-                typename Iterator::reference>;
-        };
-
-        template <typename Iterator>
-        HPX_HOST_DEVICE operator_brackets_proxy<Iterator>
-        make_operator_brackets_result(Iterator const& iter, std::true_type)
-        {
-            return operator_brackets_proxy<Iterator>(iter);
-        }
-
-        template <typename Iterator>
-        HPX_HOST_DEVICE typename Iterator::reference
-        make_operator_brackets_result(Iterator const& iter, std::false_type)
-        {
-            return *iter;
-        }
 
         template <typename Derived, typename T, typename Reference,
             typename Distance, typename Pointer>
@@ -340,9 +316,15 @@ namespace hpx::util {
                 difference_type n) const
             {
                 using use_proxy = use_operator_brackets_proxy<Derived, T>;
-
-                return make_operator_brackets_result<Derived>(
-                    this->derived() + n, use_proxy{});
+                if constexpr (use_proxy::value)
+                {
+                    return operator_brackets_proxy<Derived>(
+                        this->derived() + n);
+                }
+                else
+                {
+                    return *(this->derived() + n);
+                }
             }
 
             HPX_HOST_DEVICE Derived& operator+=(difference_type n) noexcept(

@@ -54,6 +54,7 @@ public:
     }
 
     std::int64_t val = 42;
+    using use_brackets_proxy = std::true_type;
 };
 
 int main()
