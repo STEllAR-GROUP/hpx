@@ -393,6 +393,8 @@ namespace hpx::parallel::util::detail {
             }
         }
 
+        using use_brackets_proxy = std::true_type;
+
     private:
         HPX_HOST_DEVICE IterOrR& target() noexcept
         {
