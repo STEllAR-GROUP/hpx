@@ -10,6 +10,7 @@
 
 #include <cstdint>
 #include <iterator>
+#include <type_traits>
 
 // Try to instantiate iterator_facade with a custom iterator_tag
 struct test_iterator_tag : std::random_access_iterator_tag
