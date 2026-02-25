@@ -27,7 +27,7 @@ void seek_test()
     using namespace hpx::iostream::test;
 
     {
-        string test(static_cast<std::size_t>(data_reps * data_length()), '\0');
+        string test(static_cast<std::size_t>(data_reps) * data_length(), '\0');
         filtering_stream<seekable> io;
         io.push(container_device<string>(test));
         HPX_TEST_MSG(test_seekable_in_chars(io),
@@ -35,7 +35,7 @@ void seek_test()
     }
 
     {
-        string test(static_cast<std::size_t>(data_reps * data_length()), '\0');
+        string test(static_cast<std::size_t>(data_reps) * data_length(), '\0');
         filtering_stream<seekable> io;
         io.push(container_device<string>(test));
         HPX_TEST_MSG(test_seekable_in_chunks(io),
