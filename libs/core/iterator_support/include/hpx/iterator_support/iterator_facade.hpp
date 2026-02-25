@@ -281,7 +281,8 @@ namespace hpx::util {
         struct use_operator_brackets_proxy
           : std::integral_constant<bool,
                 !(std::is_copy_constructible_v<Value> &&
-                    std::is_const_v<Value>)>
+                    std::is_const_v<Value>) ||
+                    std::is_lvalue_reference_v<typename Iterator::reference>>
         {
         };
 

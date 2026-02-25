@@ -18,7 +18,7 @@ struct test_iterator_tag : std::random_access_iterator_tag
 
 class test_iterator
   : public hpx::util::iterator_facade<test_iterator, std::int64_t const,
-        test_iterator_tag, std::int64_t const>
+        test_iterator_tag>
 {
 public:
     test_iterator() = default;
@@ -38,7 +38,7 @@ public:
         val += n;
     }
 
-    [[nodiscard]] std::int64_t dereference() const
+    [[nodiscard]] std::int64_t const& dereference() const
     {
         return val;
     }
