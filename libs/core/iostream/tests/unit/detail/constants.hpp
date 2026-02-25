@@ -13,6 +13,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include <cstring>
 #include <iosfwd>
 
@@ -68,9 +69,9 @@ namespace hpx::iostream::test {
 #endif
 
     // Length of string returned by data().
-    int data_length() noexcept
+    std::size_t data_length() noexcept
     {
-        static int len = (int) std::strlen(narrow_data());
+        static std::size_t len = std::strlen(narrow_data());
         return len;
     }
 }    // namespace hpx::iostream::test
