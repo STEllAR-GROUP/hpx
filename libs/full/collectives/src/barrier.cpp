@@ -13,6 +13,7 @@
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/type_support.hpp>
 
@@ -210,7 +211,10 @@ namespace hpx { namespace distributed {
         if (hpx::get_runtime_ptr() == nullptr ||
             hpx::is_stopped_or_shutting_down() || !b[0].node_ || !b[1].node_)
         {
-            return;
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                "barrier::synchronize",
+                "the distributed barrier can be used only while the runtime is "
+                "active");
         }
 
         b[++gen % 2].wait();
