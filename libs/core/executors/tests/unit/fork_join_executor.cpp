@@ -11,6 +11,7 @@
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/thread.hpp>
+#include <hpx/parallel/algorithm.hpp>
 
 #include <algorithm>
 #include <atomic>
@@ -471,10 +472,29 @@ void test_executor(hpx::threads::thread_priority priority,
     test_processing_mask(priority, stacksize, schedule);
 }
 
+void test_fork_join_static_large_range()
+{
+    // Regression test for #6922- static path partition truncation
+    fork_join_executor exec;
+    std::size_t const count = 100000;
+    std::vector<int> v(count, 0);
+
+    hpx::for_each(hpx::execution::par.on(exec),
+        hpx::util::counting_iterator<std::size_t>(0),
+        hpx::util::counting_iterator<std::size_t>(count),
+        [&v](std::size_t i) { ++v[i]; });
+
+    for (std::size_t i = 0; i != count; ++i)
+        HPX_TEST_EQ(v[i], 1);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
     static_check_executor();
+
+    // Call regression test for #6922
+    test_fork_join_static_large_range();
 
     // thread_stacksize::nostack cannot be used with the fork_join_executor
     // because it prevents other work from running when yielding. Using
