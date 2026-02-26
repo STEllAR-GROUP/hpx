@@ -10,6 +10,7 @@
 
 #include <cstdint>
 #include <iterator>
+#include <type_traits>
 
 // Try to instantiate iterator_facade with a custom iterator_tag
 struct test_iterator_tag : std::random_access_iterator_tag
@@ -54,6 +55,7 @@ public:
     }
 
     std::int64_t val = 42;
+    using use_brackets_proxy = std::true_type;
 };
 
 int main()
