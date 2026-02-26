@@ -207,7 +207,8 @@ namespace hpx { namespace distributed {
         static std::atomic<std::size_t> gen = 0;
         std::array<barrier, 2>& b = get_global_barrier();
 
-        if (!b[0].node_ || !b[1].node_)
+        if (hpx::get_runtime_ptr() == nullptr ||
+            hpx::is_stopped_or_shutting_down() || !b[0].node_ || !b[1].node_)
         {
             return;
         }

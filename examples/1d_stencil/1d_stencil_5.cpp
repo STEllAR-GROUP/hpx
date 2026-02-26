@@ -64,13 +64,13 @@ public:
     }
 
     explicit partition_data(std::size_t size)
-      : data_(new double[size])
+      : data_(std::make_shared<double[]>(size))
       , size_(size)
     {
     }
 
     partition_data(std::size_t size, double initial_value)
-      : data_(new double[size])
+      : data_(std::make_shared<double[]>(size))
       , size_(size)
     {
         double base_value = initial_value * double(size);
@@ -109,7 +109,7 @@ private:
     void load(Archive& ar, unsigned int const)
     {
         ar & size_;
-        data_.reset(new double[size_]);
+        data_ = std::make_shared<double[]>(size_);
         ar& hpx::serialization::make_array(data_.get(), size_);
     }
 
