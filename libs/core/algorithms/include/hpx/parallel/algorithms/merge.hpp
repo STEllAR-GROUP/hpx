@@ -651,7 +651,28 @@ namespace hpx::parallel {
             }
         }
 
-        HPX_CXX_CORE_EXPORT template <typename Iter1, typename Iter2,
+        HPX_CXX_CORE_EXPORT template<typename T>
+        auto get_diagonal_index(T const n)
+        {
+            auto diagonal_index = [n](
+                auto&& shape, std::size_t cores) 
+                {
+                    auto seg = cores;
+                    std::vector<hpx::tuple<std::size_t, std::size_t>> d_idx;
+
+                    if(seg == 0) seg = 1;
+                    if (seg > n) seg = n;   // don't create more partitions than output elements
+
+                    d_idx.reserve(seg);
+
+                    const std::size_t chunk = (n + seg - 1)/ seg;
+                    for(std::size_t i=0; i<seg; ++i) d_idx.emplace_back(i, chunk);
+
+                    return d_idx;
+                };
+            return diagonal_index;
+        }
+        /*HPX_CXX_CORE_EXPORT template <typename Iter1, typename Iter2,
             typename Comp, typename Proj1, typename Proj2,
             typename BinarySearchHelper>
         auto get_reshape_chunks(std::size_t len1, Iter2 first2, Iter2 last2,
@@ -765,7 +786,51 @@ namespace hpx::parallel {
             };
 
             return reshape;
+        }*/
+
+        HPX_CXX_CORE_EXPORT template <typename Iter1, typename Iter2, typename Comp>
+        std::pair<std::size_t, std::size_t>
+        diagonal_intersection(Iter1 first1, std::size_t len1, Iter2 first2, std::size_t len2, std::size_t k, Comp comp)
+        {
+            //helper: x<=y
+            auto leq = [&](auto const& x, auto const& y){ return !comp(y, x); };
+
+            std::size_t a_low  = (k > len2) ? (k - len2) : 0;
+            std::size_t a_high = (k < len1) ? k : len1;
+
+            while (a_low <= a_high)
+            {
+                std::size_t a = (a_low + a_high)/2;
+                std::size_t b = k - a;
+
+                // cond1: a==0 || b==len2 || A[a-1] <= B[b]
+                bool cond1 = (a == 0) || (b == len2) || leq(*(first1 + static_cast<std::ptrdiff_t>(a-1)), *(first2 + static_cast<ptrdiff_t>(b)));
+
+                // cond2: b==0 || a==len1 || B[b-1] < A[a]
+                bool cond2 = (b == 0) || (a == len1) || comp(*(first2 + static_cast<ptrdiff_t>(b - 1)), *(first1 + static_cast<ptrdiff_t>(a)));
+
+                if (cond1 && cond2 ) return {a, b};
+
+                if (a > 0 && b < len2 && comp(*(first2 + static_cast<ptrdiff_t>(b)), *(first1 + static_cast<ptrdiff_t>(a - 1))))
+                {
+                    if (a == 0) break;
+                    a_high = a - 1;
+                }
+                else
+                {
+                    a_low = a + 1;
+                }
+            }
+            return {a_high, k - a_high};
         }
+
+        template <typename... Ts>
+        struct overloaded : Ts... {
+            using Ts::operator()...;
+        };
+
+        template <typename... Ts>
+        overloaded(Ts...) -> overloaded<Ts...>;
 
         ///////////////////////////////////////////////////////////////////////
         HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter1,
@@ -783,13 +848,39 @@ namespace hpx::parallel {
 
             using result_type = util::in_in_out_result<Iter1, Iter2, Iter3>;
 
-            auto f1 = [dest, comp, proj1, proj2](Iter1 it1, std::size_t size1,
+            auto f1 = overloaded
+            {
+                [dest, comp, proj1, proj2](Iter1 it1, std::size_t size1,
                           Iter2 it2, std::size_t size2, std::size_t dest_base) {
                 if (size1 != 0 || size2 != 0)
                 {
                     sequential_merge(it1, std::next(it1, size1), it2,
                         std::next(it2, size2), std::next(dest, dest_base), comp,
                         proj1, proj2);
+                }
+                },
+                [dest, comp, proj1, proj2, first1, first2, len1, len2](std::size_t idx, std::size_t chunk) {
+                    
+                if(len1 !=0 || len2 !=0)
+                {
+                    std::size_t N = len1 + len2;
+                    std::size_t k0 = std::min(idx*chunk, N);
+                    std::size_t k1 = std::min((idx+1)*chunk, N);
+
+                    auto [a0, b0] = diagonal_intersection(first1, len1, first2, len2, k0, comp);
+                    auto [a1, b1] = diagonal_intersection(first1, len1, first2, len2, k1, comp);
+
+                    auto itr1   = first1 + static_cast<std::ptrdiff_t>(a0);
+                    auto itr1_e = first1 + static_cast<std::ptrdiff_t>(a1);
+                    auto itr2   = first2 + static_cast<std::ptrdiff_t>(b0);
+                    auto itr2_e = first2 + static_cast<std::ptrdiff_t>(b1);
+
+                    auto itr_o = dest + static_cast<std::ptrdiff_t>(k0);
+
+                    sequential_merge(itr1, itr1_e, itr2,
+                        itr2_e, itr_o, comp,
+                        proj1, proj2);
+                }
                 }
             };
 
@@ -800,8 +891,9 @@ namespace hpx::parallel {
                         std::next(dest, len1 + len2)};
                 };
 
-                auto reshape = get_reshape_chunks<Iter1>(len1, first2, end2,
-                    comp, proj1, proj2, lower_bound_helper{});
+                auto reshape = get_diagonal_index(len1+len2);
+                /*auto reshape = get_reshape_chunks<Iter1>(len1, first2, end2,
+                    comp, proj1, proj2, lower_bound_helper{});*/
 
                 return util::foreach_partitioner<std::decay_t<ExPolicy>>::call(
                     HPX_FORWARD(ExPolicy, policy), first1, len1, HPX_MOVE(f1),
@@ -813,8 +905,9 @@ namespace hpx::parallel {
                     std::next(first1, len1), l2, std::next(dest, len1 + len2)};
             };
 
-            auto reshape = get_reshape_chunks<Iter2>(
-                len2, first1, end1, comp, proj2, proj1, upper_bound_helper{});
+            auto reshape = get_diagonal_index(len1+len2);
+            /*auto reshape = get_reshape_chunks<Iter2>(
+                len2, first1, end1, comp, proj2, proj1, upper_bound_helper{});*/
 
             return util::foreach_partitioner<std::decay_t<ExPolicy>>::call(
                 HPX_FORWARD(ExPolicy, policy), first2, len2, HPX_MOVE(f1),
