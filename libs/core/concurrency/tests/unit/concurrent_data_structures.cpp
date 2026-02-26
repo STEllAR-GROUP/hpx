@@ -398,6 +398,44 @@ void test_concurrent_unordered_set_for_each_break()
     HPX_TEST_EQ(count.load(), 50);
 }
 
+void test_concurrent_accessor_data_race()
+{
+    hpx::concurrent::concurrent_vector<int> v;
+    v.push_back(0);
+
+    // This demonstrates the danger of the current API:
+    // Obtaining a raw reference from a temporary accessor.
+    // The accessor returned by v[0] is destroyed at the semicolon,
+    // releasing the internal lock. 'ref' is now a "dangling" reference
+    // in terms of thread-safety.
+    int& ref = v[0];
+
+    std::vector<hpx::thread> threads;
+    for (int i = 0; i < 10; ++i)
+    {
+        threads.emplace_back([&ref] {
+            for (int j = 0; j < 1000; ++j)
+            {
+                // DATA RACE!
+                // This increment is NOT protected by the vector's lock.
+                ++ref;
+            }
+        });
+    }
+
+    for (auto& t : threads)
+        t.join();
+
+    // We expect this to potentially be less than 10000 due to lost updates.
+    // This test is meant to be run with ThreadSanitizer or to show
+    // non-deterministic results.
+    if (ref != 10000)
+    {
+        std::cout << "Data race confirmed: Final value is " << ref
+                  << " (Expected 10000 if thread-safe)" << std::endl;
+    }
+}
+
 int hpx_main(hpx::program_options::variables_map&)
 {
     test_concurrent_vector();
@@ -414,6 +452,7 @@ int hpx_main(hpx::program_options::variables_map&)
     test_concurrent_unordered_set_for_each_break();
 
     test_concurrent_queue();
+    test_concurrent_accessor_data_race();
 
     std::cout << "All concurrent data structure tests PASSED!" << std::endl;
 
