@@ -91,7 +91,7 @@ namespace hpx::parallel::util::detail {
 
     HPX_CXX_CORE_EXPORT template <typename Iter>
     struct iterator_datapar_compatible<Iter,
-        std::enable_if_t<hpx::traits::is_random_access_iterator_v<Iter>>>
+        std::enable_if_t<std::random_access_iterator<Iter>>>
       : iterator_datapar_compatible_impl<std::decay_t<Iter>>::type
     {
     };

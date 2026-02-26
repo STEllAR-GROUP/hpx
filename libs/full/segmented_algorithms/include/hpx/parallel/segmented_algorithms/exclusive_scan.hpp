@@ -17,6 +17,7 @@
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/scan.hpp>
 
+#include <iterator>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -245,10 +246,11 @@ namespace hpx { namespace segmented {
     OutIter tag_invoke(hpx::exclusive_scan_t, InIter first, InIter last,
         OutIter dest, T init, Op&& op = Op())
     {
-        static_assert(hpx::traits::is_input_iterator_v<InIter>,
-            "Requires at least input iterator.");
+        static_assert(
+            std::input_iterator<InIter>, "Requires at least input iterator.");
 
-        static_assert(hpx::traits::is_output_iterator_v<OutIter>,
+        static_assert(
+            std::output_iterator<OutIter, hpx::traits::iter_value_t<InIter>>,
             "Requires at least output iterator.");
 
         if (first == last)
@@ -273,10 +275,10 @@ namespace hpx { namespace segmented {
     tag_invoke(hpx::exclusive_scan_t, ExPolicy&& policy, FwdIter1 first,
         FwdIter1 last, FwdIter2 dest, T init, Op&& op = Op())
     {
-        static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+        static_assert(std::forward_iterator<FwdIter1>,
             "Requires at least forward iterator.");
 
-        static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+        static_assert(std::forward_iterator<FwdIter2>,
             "Requires at least forward iterator.");
 
         if (first == last)

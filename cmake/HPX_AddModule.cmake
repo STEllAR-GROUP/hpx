@@ -15,7 +15,7 @@ include(HPX_CXXModules)
 function(add_hpx_module libname modulename)
   # Retrieve arguments
   set(options CUDA CONFIG_FILES NO_CONFIG_IN_GENERATED_HEADERS)
-  set(one_value_args GLOBAL_HEADER_GEN GLOBAL_HEADER_MODULE_GEN MODULE_SOURCE)
+  set(one_value_args GLOBAL_HEADER_GEN GLOBAL_HEADER_MODULE_GEN)
   set(multi_value_args
       SOURCES
       HEADERS
@@ -72,9 +72,7 @@ function(add_hpx_module libname modulename)
             FORCE
   )
 
-  if(HPX_WITH_CXX_MODULES AND (${modulename}_GLOBAL_HEADER_MODULE_GEN
-                               OR ${modulename}_MODULE_SOURCE)
-  )
+  if(HPX_WITH_CXX_MODULES AND ${modulename}_GLOBAL_HEADER_MODULE_GEN)
     # Mark the module as exposing C++ modules
     set(cxx_modules ${HPX_ENABLED_CXX_MODULES})
     list(APPEND cxx_modules ${modulename})
@@ -435,9 +433,16 @@ function(add_hpx_module libname modulename)
     )
   endif()
 
-  # All core modules depend on the config registry
-  if("${libname}" STREQUAL "core" AND NOT "${modulename}" STREQUAL
-                                      "config_registry"
+  # All core modules depend on the config registry. We exclude the base modules
+  # (config, preprocessor, config_registry) to avoid circular dependencies. The
+  # registry is the sink for module-specific configurations; fundamental modules
+  # must not depend on it to ensure they remain at the bottom of the dependency
+  # graph.
+  if("${libname}" STREQUAL "core"
+     AND NOT
+         ("${modulename}" STREQUAL "config_registry"
+          OR "${modulename}" STREQUAL "config"
+          OR "${modulename}" STREQUAL "preprocessor")
   )
     target_link_libraries(hpx_${modulename} PUBLIC hpx_config_registry)
   endif()

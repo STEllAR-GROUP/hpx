@@ -305,7 +305,18 @@ namespace boost { namespace inspect {
             {"concepts"}},
         {"(\\bstd\\s*::\\s*same_as\\b)", "std::same_as", {"concepts"}},
         //
+        // std iterator
+        {"(\\bstd\\s*::\\s*input_iterator\\b)", "std::input_iterator", {"iterator"}},
+        {"(\\bstd\\s*::\\s*output_iterator\\b)", "std::output_iterator", {"iterator"}},
+        {"(\\bstd\\s*::\\s*forward_iterator\\b)", "std::forward_iterator", {"iterator"}},
+        {"(\\bstd\\s*::\\s*bidirectional_iterator\\b)", "std::bidirectional_iterator", {"iterator"}},
+        {"(\\bstd\\s*::\\s*random_access_iterator\\b)", "std::random_access_iterator", {"iterator"}},
+        {"(\\bstd\\s*::\\s*sentinel_for\\b)", "std::sentinel_for", {"iterator"}},
+        {"(\\bstd\\s*::\\s*next\\b)", "std::next", {"iterator"}},
+        {"(\\bstd\\s*::\\s*prev\\b)", "std::prev", {"iterator"}},
         // std ranges
+        {"(\\bstd\\s*::\\s*ranges\\s*::\\srange\\b)",
+            "std::ranges::range", {"ranges"}},
         {"(\\bstd\\s*::\\s*ranges\\s*::\\s*input_range\\b)",
             "std::ranges::input_range", {"ranges"}},
         {"(\\bstd\\s*::\\s*ranges\\s*::\\s*bidirectional_range\\b)",

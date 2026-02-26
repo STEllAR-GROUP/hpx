@@ -454,7 +454,7 @@ namespace hpx {
         friend FwdIter tag_fallback_invoke(
             hpx::rotate_t, FwdIter first, FwdIter new_first, FwdIter last)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             return parallel::util::get_second_element(
@@ -473,12 +473,12 @@ namespace hpx {
         friend decltype(auto) tag_fallback_invoke(hpx::rotate_t,
             ExPolicy&& policy, FwdIter first, FwdIter new_first, FwdIter last)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             using is_seq = std::integral_constant<bool,
                 hpx::is_sequenced_execution_policy_v<ExPolicy> ||
-                    !hpx::traits::is_bidirectional_iterator_v<FwdIter>>;
+                    !std::bidirectional_iterator<FwdIter>>;
 
             return parallel::util::get_second_element(
                 hpx::parallel::detail::rotate<
@@ -503,9 +503,10 @@ namespace hpx {
         friend OutIter tag_fallback_invoke(hpx::rotate_copy_t, FwdIter first,
             FwdIter new_first, FwdIter last, OutIter dest_first)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_output_iterator_v<OutIter>,
+            static_assert(std::output_iterator<OutIter,
+                              hpx::traits::iter_value_t<FwdIter>>,
                 "Requires at least output iterator.");
 
             return parallel::util::get_second_element(
@@ -527,14 +528,14 @@ namespace hpx {
             ExPolicy&& policy, FwdIter1 first, FwdIter1 new_first,
             FwdIter1 last, FwdIter2 dest_first)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Requires at least forward iterator.");
 
             using is_seq = std::integral_constant<bool,
                 hpx::is_sequenced_execution_policy_v<ExPolicy> ||
-                    !hpx::traits::is_forward_iterator_v<FwdIter1>>;
+                    !std::forward_iterator<FwdIter1>>;
 
             return parallel::util::get_second_element(
                 hpx::parallel::detail::rotate_copy<

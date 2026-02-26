@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/concepts.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
@@ -159,6 +160,14 @@ namespace hpx::execution::experimental {
           , upper_threshold_(upper)
           , block_(block_on_destruction)
         {
+            if (lower > upper)
+            {
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                    "limiting_executor::limiting_executor",
+                    "lower threshold ({}) must not exceed upper "
+                    "threshold ({})",
+                    lower, upper);
+            }
         }
 
         limiting_executor(std::size_t lower, std::size_t upper,
@@ -169,6 +178,14 @@ namespace hpx::execution::experimental {
           , upper_threshold_(upper)
           , block_(block_on_destruction)
         {
+            if (lower > upper)
+            {
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                    "limiting_executor::limiting_executor",
+                    "lower threshold ({}) must not exceed upper "
+                    "threshold ({})",
+                    lower, upper);
+            }
         }
 
         // --------------------------------------------------------------------
@@ -279,8 +296,16 @@ namespace hpx::execution::experimental {
             hpx::util::yield_while([&]() { return (count_ > 0); });
         }
 
-        void set_threshold(std::size_t lower, std::size_t upper) noexcept
+        void set_threshold(std::size_t lower, std::size_t upper)
         {
+            if (lower > upper)
+            {
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                    "limiting_executor::set_threshold",
+                    "lower threshold ({}) must not exceed upper "
+                    "threshold ({})",
+                    lower, upper);
+            }
             lower_threshold_ = lower;
             upper_threshold_ = upper;
         }

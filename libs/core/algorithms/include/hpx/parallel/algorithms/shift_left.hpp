@@ -167,7 +167,7 @@ namespace hpx::parallel {
         {
             auto mid = std::next(first, n);
 
-            if constexpr (hpx::traits::is_random_access_iterator_v<FwdIter>)
+            if constexpr (std::random_access_iterator<FwdIter>)
             {
                 return parallel::util::get_second_element(
                     util::move_n(mid, dist - n, HPX_MOVE(first)));
@@ -242,7 +242,7 @@ namespace hpx {
         friend FwdIter tag_fallback_invoke(
             shift_left_t, FwdIter first, FwdIter last, Size n)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::shift_left<FwdIter>().call(
@@ -262,7 +262,7 @@ namespace hpx {
         tag_fallback_invoke(shift_left_t, ExPolicy&& policy, FwdIter first,
             FwdIter last, Size n)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::shift_left<FwdIter>().call(

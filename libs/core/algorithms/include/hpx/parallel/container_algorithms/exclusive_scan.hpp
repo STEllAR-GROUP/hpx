@@ -230,9 +230,9 @@ namespace hpx { namespace ranges {
     ///
     template <typename Rng, typename O,
         typename T = typename std::iterator_traits<
-            hpx::traits::range_iterator_t<Rng>>::value_type,
+            std::ranges::iterator_t<Rng>>::value_type,
         typename Op = std::plus<T>>
-    exclusive_scan_result<traits::range_iterator_t<Rng>, O>
+    exclusive_scan_result<std::ranges::iterator_t<Rng>, O>
     exclusive_scan(Rng&& rng, O dest, T init, Op&& op = Op());
 
     /// Assigns through each iterator \a i in [result, result + (last - first))
@@ -293,12 +293,12 @@ namespace hpx { namespace ranges {
     ///
     /// \returns  The \a exclusive_scan algorithm returns a
     ///           \a hpx::future<util::in_out_result
-    ///           <traits::range_iterator_t<Rng>, O>>
+    ///           <std::ranges::iterator_t<Rng>, O>>
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
     ///           returns \a util::in_out_result
-    ///           <traits::range_iterator_t<Rng>, O>
+    ///           <std::ranges::iterator_t<Rng>, O>
     ///           otherwise.
     ///           The \a exclusive_scan algorithm returns an input iterator to
     ///           the point denoted by the sentinel and an output iterator
@@ -316,10 +316,10 @@ namespace hpx { namespace ranges {
     ///
     template <typename ExPolicy, typename Rng,  typename O,
         typename T = typename std::iterator_traits<
-            hpx::traits::range_iterator_t<Rng>>::value_type,
+            std::ranges::iterator_t<Rng>>::value_type,
         typename Op = std::plus<T>>
     typename parallel::util::detail::algorithm_result<ExPolicy,
-        exclusive_scan_result<traits::range_iterator_t<Rng>, O>>
+        exclusive_scan_result<std::ranges::iterator_t<Rng>, O>>
     exclusive_scan(ExPolicy&& policy, Rng&& rng, O dest, T init, Op&& op = Op());
     // clang-format on
 }}    // namespace hpx::ranges
@@ -338,6 +338,7 @@ namespace hpx { namespace ranges {
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
+#include <ranges>
 #include <type_traits>
 #include <utility>
 
@@ -356,7 +357,7 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::traits::is_iterator_v<InIter> &&
-                hpx::traits::is_sentinel_for_v<Sent, InIter> &&
+                std::sentinel_for<Sent, InIter> &&
                 hpx::traits::is_iterator_v<OutIter> &&
                 hpx::is_invocable_v<Op,
                     typename std::iterator_traits<InIter>::value_type,
@@ -367,9 +368,10 @@ namespace hpx::ranges {
             hpx::ranges::exclusive_scan_t, InIter first, Sent last,
             OutIter dest, T init, Op op = Op())
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Requires at least input iterator.");
-            static_assert(hpx::traits::is_output_iterator_v<OutIter>,
+            static_assert(std::output_iterator<OutIter,
+                              hpx::traits::iter_value_t<InIter>>,
                 "Requires at least output iterator.");
 
             using result_type = exclusive_scan_result<InIter, OutIter>;
@@ -387,7 +389,7 @@ namespace hpx::ranges {
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
-                hpx::traits::is_sentinel_for_v<Sent, FwdIter1> &&
+                std::sentinel_for<Sent, FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
                 hpx::is_invocable_v<Op,
                     typename std::iterator_traits<FwdIter1>::value_type,
@@ -400,9 +402,9 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::exclusive_scan_t, ExPolicy&& policy,
             FwdIter1 first, Sent last, FwdIter2 dest, T init, Op op = Op())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Requires at least forward iterator.");
 
             using result_type = exclusive_scan_result<FwdIter1, FwdIter2>;
@@ -414,27 +416,26 @@ namespace hpx::ranges {
 
         template <typename Rng, typename O,
             typename T = typename std::iterator_traits<
-                hpx::traits::range_iterator_t<Rng>>::value_type,
+                std::ranges::iterator_t<Rng>>::value_type,
             typename Op = std::plus<>>
         // clang-format off
             requires(
-                hpx::traits::is_range_v<Rng> &&
+                std::ranges::range<Rng> &&
                 hpx::is_invocable_v<Op,
                     typename hpx::traits::range_traits<Rng>::value_type,
                     typename hpx::traits::range_traits<Rng>::value_type
                 >
             )
         // clang-format on
-        friend exclusive_scan_result<traits::range_iterator_t<Rng>, O>
+        friend exclusive_scan_result<std::ranges::iterator_t<Rng>, O>
         tag_fallback_invoke(hpx::ranges::exclusive_scan_t, Rng&& rng, O dest,
             T init, Op op = Op())
         {
-            static_assert(hpx::traits::is_input_iterator<
-                              traits::range_iterator_t<Rng>>::value,
+            static_assert(std::input_iterator<std::ranges::iterator_t<Rng>>,
                 "Requires at least input iterator.");
 
             using result_type =
-                exclusive_scan_result<traits::range_iterator_t<Rng>, O>;
+                exclusive_scan_result<std::ranges::iterator_t<Rng>, O>;
 
             return hpx::parallel::detail::exclusive_scan<result_type>().call(
                 hpx::execution::seq, std::begin(rng), std::end(rng), dest,
@@ -443,12 +444,12 @@ namespace hpx::ranges {
 
         template <typename ExPolicy, typename Rng, typename O,
             typename T = typename std::iterator_traits<
-                hpx::traits::range_iterator_t<Rng>>::value_type,
+                std::ranges::iterator_t<Rng>>::value_type,
             typename Op = std::plus<>>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                std::ranges::range<Rng> &&
                 hpx::is_invocable_v<Op,
                     typename hpx::traits::range_traits<Rng>::value_type,
                     typename hpx::traits::range_traits<Rng>::value_type
@@ -456,16 +457,15 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
-            exclusive_scan_result<traits::range_iterator_t<Rng>, O>>
+            exclusive_scan_result<std::ranges::iterator_t<Rng>, O>>
         tag_fallback_invoke(hpx::ranges::exclusive_scan_t, ExPolicy&& policy,
             Rng&& rng, O dest, T init, Op op = Op())
         {
-            static_assert(hpx::traits::is_forward_iterator<
-                              traits::range_iterator_t<Rng>>::value,
+            static_assert(std::forward_iterator<std::ranges::iterator_t<Rng>>,
                 "Requires at least forward iterator.");
 
             using result_type =
-                exclusive_scan_result<traits::range_iterator_t<Rng>, O>;
+                exclusive_scan_result<std::ranges::iterator_t<Rng>, O>;
 
             return hpx::parallel::detail::exclusive_scan<result_type>().call(
                 HPX_FORWARD(ExPolicy, policy), std::begin(rng), std::end(rng),

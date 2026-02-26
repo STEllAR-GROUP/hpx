@@ -402,7 +402,7 @@ namespace hpx {
         friend void tag_fallback_invoke(
             hpx::sort_t, RandomIt first, RandomIt last, Comp comp = Comp())
         {
-            static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
+            static_assert(std::random_access_iterator<RandomIt>,
                 "Requires a random access iterator.");
 
             hpx::parallel::detail::sort<RandomIt>().call(hpx::execution::seq,
@@ -425,7 +425,7 @@ namespace hpx {
         tag_fallback_invoke(hpx::sort_t, ExPolicy&& policy, RandomIt first,
             RandomIt last, Comp comp = Comp())
         {
-            static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
+            static_assert(std::random_access_iterator<RandomIt>,
                 "Requires a random access iterator.");
 
             using result_type =
