@@ -31,7 +31,7 @@ namespace hpx::iostream::test {
         std::basic_istream<Ch, Tr>& first, std::basic_istream<Ch, Tr>& second)
     {
         for (int z = 0; z < data_reps; ++z)
-            for (int w = 0; w < data_length(); ++w)
+            for (int w = 0; w < static_cast<int>(data_length()); ++w)
                 if (first.eof() != second.eof() || first.get() != second.get())
                     return false;
         return true;
@@ -94,7 +94,7 @@ namespace hpx::iostream::test {
     void write_data_in_chars(std::basic_ostream<Ch, Tr>& os)
     {
         for (int z = 0; z < data_reps; ++z)
-            for (int w = 0; w < data_length(); ++w)
+            for (int w = 0; w < static_cast<int>(data_length()); ++w)
                 os.put(detail::data((Ch*) nullptr)[w]);
         os.flush();
     }
