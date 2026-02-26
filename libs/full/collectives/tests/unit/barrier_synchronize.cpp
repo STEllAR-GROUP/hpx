@@ -9,7 +9,6 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/modules/testing.hpp>
-#include <iostream>
 #include <vector>
 
 void run_test();
@@ -41,12 +40,6 @@ int main(int argc, char* argv[])
     init_args.desc_cmdline = description;
 
     HPX_TEST_EQ(hpx::init(argc, argv, init_args), 0);
-
-    std::cout
-        << "Runtime shut down. Attempting to call barrier::synchronize()..."
-        << std::endl;
-    hpx::distributed::barrier::synchronize();
-    std::cout << "barrier::synchronize() returned successfully." << std::endl;
 
     return hpx::util::report_errors();
 }
