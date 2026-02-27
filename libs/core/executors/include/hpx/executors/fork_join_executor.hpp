@@ -434,7 +434,7 @@ namespace hpx::execution::experimental {
                     std::size_t const num_pus = pool_->get_os_thread_count();
 
                     for (std::size_t pu = 0; t != num_threads_ && pu != num_pus;
-                        ++pu)
+                         ++pu)
                     {
                         std::size_t const pu_num = rp.get_pu_num(pu);
                         if (!main_thread_ok && pu == main_thread_)
@@ -503,19 +503,19 @@ namespace hpx::execution::experimental {
                 std::size_t const thread_index, std::size_t const num_threads,
                 std::size_t const size) noexcept
             {
-                auto const part_begin = static_cast<std::size_t>(
-                    (thread_index * size) / num_threads);
-                auto const part_end = static_cast<std::size_t>(
-                    ((thread_index + 1) * size) / num_threads);
+                auto const part_begin = (thread_index * size) / num_threads;
+                auto const part_end = ((thread_index + 1) * size) / num_threads;
 
-                    // Guard:the static scheduling also uses contiguous_index_queue internally.
-                    // Ranges > UINT32_MAX are not yet supported.
-                    HPX_ASSERT_MSG(size <= static_cast<std::size_t>(
-                        (std::numeric_limits<std::uint32_t>::max)()),
-                        "fork_join_executor: static scheduling via contiguous_index_queue "
-                        "does not support ranges larger than UINT32_MAX");
+                // Guard:the static scheduling also uses contiguous_index_queue internally.
 
-                queue.reset(part_begin, part_end);
+                HPX_ASSERT_MSG(
+                    size <= static_cast<std::size_t>(
+                                (std::numeric_limits<std::uint32_t>::max)()),
+                    "fork_join_executor: static scheduling does not support "
+                    "ranges larger than UINT32_MAX");
+
+                queue.reset(static_cast<std::uint32_t>(part_begin),
+                    static_cast<std::uint32_t>(part_end));
             }
 
             static hpx::threads::mask_type full_mask(
@@ -681,10 +681,10 @@ namespace hpx::execution::experimental {
                             // Set up the local queues and state.
                             std::size_t const size = hpx::util::size(shape);
 
-                            auto part_begin = static_cast<std::size_t>(
-                                (thread_index * size) / num_threads);
-                            auto const part_end = static_cast<std::size_t>(
-                                ((thread_index + 1) * size) / num_threads);
+                            auto part_begin =
+                                (thread_index * size) / num_threads;
+                            auto const part_end =
+                                ((thread_index + 1) * size) / num_threads;
 
                             set_state(data.state_, thread_state::active);
 
@@ -776,7 +776,7 @@ namespace hpx::execution::experimental {
                             // As loop schedule is dynamic, steal from neighboring
                             // threads.
                             for (std::size_t offset = 1; offset < num_threads;
-                                ++offset)
+                                 ++offset)
                             {
                                 std::size_t const neighbor_index =
                                     (thread_index + offset) % num_threads;

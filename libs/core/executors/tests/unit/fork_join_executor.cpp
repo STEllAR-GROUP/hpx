@@ -5,13 +5,13 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/algorithm.hpp>
 #include <hpx/chrono.hpp>
 #include <hpx/execution.hpp>
 #include <hpx/future.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/thread.hpp>
-#include <hpx/parallel/algorithm.hpp>
 
 #include <algorithm>
 #include <atomic>
@@ -474,18 +474,30 @@ void test_executor(hpx::threads::thread_priority priority,
 
 void test_fork_join_static_large_range()
 {
-    // Regression test for #6922- static path partition truncation
+    // Regression test for #6922
+    // Strategy- Sums indices straddling UINT32_MAX and compares against closed-form expected arithmetic sum.
+
     fork_join_executor exec;
-    std::size_t const count = 100000;
-    std::vector<int> v(count, 0);
+
+    std::size_t const low =
+        static_cast<std::size_t>((std::numeric_limits<std::uint32_t>::max)()) -
+        500;
+    std::size_t const high =
+        static_cast<std::size_t>((std::numeric_limits<std::uint32_t>::max)()) +
+        500;
+
+    // sum of integers [lo, hi) = n*(lo + hi - 1)/2
+    std::size_t const n = high - low;
+    std::size_t const expected_sum = n * (low + high - 1) / 2;
+
+    std::atomic<std::size_t> sum{0};
 
     hpx::for_each(hpx::execution::par.on(exec),
-        hpx::util::counting_iterator<std::size_t>(0),
-        hpx::util::counting_iterator<std::size_t>(count),
-        [&v](std::size_t i) { ++v[i]; });
+        hpx::util::counting_iterator<std::size_t>(low),
+        hpx::util::counting_iterator<std::size_t>(high),
+        [&sum](std::size_t i) { sum.fetch_add(i, std::memory_order_relaxed); });
 
-    for (std::size_t i = 0; i != count; ++i)
-        HPX_TEST_EQ(v[i], 1);
+    HPX_TEST_EQ(sum.load(), expected_sum);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
