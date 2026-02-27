@@ -37,6 +37,8 @@ include(HPX_AddModule)
 
 add_hpx_module(
   core hardware
+  GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN OFF
   EXCLUDE_FROM_GLOBAL_HEADER
     "hpx/hardware/timestamp/bgq.hpp"
     "hpx/hardware/timestamp/cuda.hpp"

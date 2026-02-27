@@ -255,7 +255,7 @@ namespace hpx::debug {
         std::uint32_t const ipdata_;
 
         HPX_CORE_EXPORT friend std::ostream& operator<<(
-            std::ostream& os, ipaddr const& p);
+            std::ostream& os, ipaddr const& a);
     };
 
     // ------------------------------------------------------------------
@@ -289,12 +289,12 @@ namespace hpx::debug {
         HPX_CORE_EXPORT mem_crc32(
             void const* a, std::size_t len, char const* txt) noexcept;
 
-        std::uint64_t const* addr_;
+        void const* addr_;
         std::size_t const len_;
         char const* txt_;
 
         HPX_CORE_EXPORT friend std::ostream& operator<<(
-            std::ostream& os, mem_crc32 const& p);
+            std::ostream& os, mem_crc32 const& a);
     };
 
     namespace detail {
