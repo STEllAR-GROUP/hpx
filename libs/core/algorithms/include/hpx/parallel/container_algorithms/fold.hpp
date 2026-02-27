@@ -330,9 +330,8 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::fold_left_first_with_iter
-    HPX_CXX_CORE_EXPORT inline constexpr struct
-        fold_left_first_with_iter_t final
-      : hpx::detail::tag_parallel_algorithm<fold_left_first_with_iter_t>
+    HPX_CXX_CORE_EXPORT inline constexpr struct fold_left_first_with_iter_t
+        final : hpx::detail::tag_parallel_algorithm<fold_left_first_with_iter_t>
     {
     private:
         template <typename InIter, typename Sent, typename F>
