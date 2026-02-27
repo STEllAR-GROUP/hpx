@@ -71,10 +71,6 @@ namespace hpx::concurrent::detail {
             return *value_;
         }
 
-        operator reference_type() const
-        {
-            return get();
-        }
 
         // Sets the value of the contained element (non-const accessor only).
         void set(T const& v)
@@ -91,13 +87,8 @@ namespace hpx::concurrent::detail {
             *value_ = HPX_MOVE(v);
         }
 
-        concurrent_accessor& operator=(T const& v)
-            requires(!std::is_const_v<T>)
-        {
-            validate();
-            *value_ = v;
-            return *this;
-        }
+        concurrent_accessor& operator=(T const& v) = delete;
+        concurrent_accessor& operator=(T&& v) = delete;
     };
 
 }    // namespace hpx::concurrent::detail
