@@ -20,6 +20,7 @@ set(benchmarks
     benchmark_reduce_deterministic
     benchmark_remove
     benchmark_remove_if
+    benchmark_reverse
     benchmark_scan_algorithms
     benchmark_unique
     benchmark_unique_copy
