@@ -651,27 +651,32 @@ namespace hpx::parallel {
             }
         }
 
-        HPX_CXX_CORE_EXPORT template<typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         auto get_diagonal_index(T const n)
         {
-            auto diagonal_index = [n](
-                auto&& shape, std::size_t cores) 
-                {
-                    auto seg = cores;
-                    std::vector<hpx::tuple<std::size_t, std::size_t>> d_idx;
+            auto diagonal_index = [n](auto&& /*shape*/, std::size_t cores)
+            {
+                std::vector<hpx::tuple<std::size_t, std::size_t>> d_idx;
 
-                    if(seg == 0) seg = 1;
-                    if (seg > n) seg = n;   // don't create more partitions than output elements
-
-                    d_idx.reserve(seg);
-
-                    const std::size_t chunk = (n + seg - 1)/ seg;
-                    for(std::size_t i=0; i<seg; ++i) d_idx.emplace_back(i, chunk);
-
+                if (n <= 0)
                     return d_idx;
-                };
+
+                std::size_t const nn = static_cast<std::size_t>(n);
+                std::size_t seg = (cores == 0 ? 1 : cores);
+                seg = (std::min)(seg, nn);
+
+                d_idx.reserve(seg);
+
+                std::size_t const chunk = (nn + seg - 1) / seg;
+                for (std::size_t i = 0; i < seg; ++i)
+                    d_idx.emplace_back(i, chunk);
+
+                return d_idx;
+            };
+
             return diagonal_index;
         }
+
         /*HPX_CXX_CORE_EXPORT template <typename Iter1, typename Iter2,
             typename Comp, typename Proj1, typename Proj2,
             typename BinarySearchHelper>
@@ -804,14 +809,14 @@ namespace hpx::parallel {
                 std::size_t b = k - a;
 
                 // cond1: a==0 || b==len2 || A[a-1] <= B[b]
-                bool cond1 = (a == 0) || (b == len2) || leq(*(first1 + static_cast<std::ptrdiff_t>(a-1)), *(first2 + static_cast<ptrdiff_t>(b)));
+                bool cond1 = (a == 0) || (b == len2) || leq(*(first1 + static_cast<std::ptrdiff_t>(a-1)), *(first2 + static_cast<std::ptrdiff_t>(b)));
 
                 // cond2: b==0 || a==len1 || B[b-1] < A[a]
-                bool cond2 = (b == 0) || (a == len1) || comp(*(first2 + static_cast<ptrdiff_t>(b - 1)), *(first1 + static_cast<ptrdiff_t>(a)));
+                bool cond2 = (b == 0) || (a == len1) || comp(*(first2 + static_cast<std::ptrdiff_t>(b - 1)), *(first1 + static_cast<std::ptrdiff_t>(a)));
 
                 if (cond1 && cond2 ) return {a, b};
 
-                if (a > 0 && b < len2 && comp(*(first2 + static_cast<ptrdiff_t>(b)), *(first1 + static_cast<ptrdiff_t>(a - 1))))
+                if (a > 0 && b < len2 && comp(*(first2 + static_cast<std::ptrdiff_t>(b)), *(first1 + static_cast<std::ptrdiff_t>(a - 1))))
                 {
                     if (a == 0) break;
                     a_high = a - 1;
