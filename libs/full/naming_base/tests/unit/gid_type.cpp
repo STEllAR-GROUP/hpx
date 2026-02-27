@@ -636,13 +636,15 @@ int main()
             bool(gid), true, "'lsb == true' and 'msb == false' case failed");
     }
 
-    {                                         // subtraction tests (operator-)
-        gid_type gid0(0x100ULL, 0x200ULL);    // simple case
-        gid_type gid1(0x50ULL, 0x100ULL);     // subtract smaller from larger
-        gid_type gid2(0x10ULL, 0x50ULL);      // another simple case
+    {    // subtraction tests (operator-)
+        gid_type gid0(0x100ULL, (void*) 0x200ULL);    // simple case
+        gid_type gid1(
+            0x50ULL, (void*) 0x100ULL);    // subtract smaller from larger
+        gid_type gid2(0x10ULL, (void*) 0x50ULL);    // another simple case
 
-        gid_type gid3(0x1ULL, 0x0ULL);    // boundary case: borrowing required
-        gid_type gid4(0x0ULL, 0x1ULL);    // value to subtract
+        gid_type gid3(
+            0x1ULL, (void*) 0x0ULL);    // boundary case: borrowing required
+        gid_type gid4(0x0ULL, (void*) 0x1ULL);    // value to subtract
 
         std::uint64_t const special_bits_mask =
             hpx::naming::gid_type::locality_id_mask |
