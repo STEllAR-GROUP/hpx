@@ -105,6 +105,7 @@ include(HPX_AddModule)
 add_hpx_module(
   full components_base
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${components_base_sources}
   HEADERS ${components_base_headers}
   COMPAT_HEADERS ${components_base_compat_headers}

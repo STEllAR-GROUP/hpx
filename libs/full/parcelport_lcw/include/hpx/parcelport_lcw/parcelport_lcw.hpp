@@ -31,7 +31,7 @@
 
 namespace hpx::parcelset {
     namespace policies::lcw {
-        class HPX_EXPORT parcelport;
+        HPX_CXX_EXPORT class HPX_EXPORT parcelport;
     }    // namespace policies::lcw
 
     template <>
@@ -60,7 +60,8 @@ namespace hpx::parcelset {
     };
 
     namespace policies::lcw {
-        class HPX_EXPORT parcelport : public parcelport_impl<parcelport>
+        HPX_CXX_EXPORT class HPX_EXPORT parcelport
+          : public parcelport_impl<parcelport>
         {
             using base_type = parcelport_impl<parcelport>;
             static parcelset::locality here();

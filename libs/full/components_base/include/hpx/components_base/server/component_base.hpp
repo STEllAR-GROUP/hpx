@@ -28,7 +28,7 @@ namespace hpx::components {
         struct base_component : traits::detail::component_tag
         {
             constexpr base_component() = default;
-            HPX_EXPORT ~base_component();
+            HPX_CXX_EXPORT HPX_EXPORT ~base_component();
 
             // do not copy the gid_
             base_component(base_component const&) noexcept {}
@@ -46,8 +46,9 @@ namespace hpx::components {
             // destructed
             static constexpr void finalize() noexcept {}
 
-            HPX_EXPORT static hpx::id_type get_id(naming::gid_type gid);
-            HPX_EXPORT static hpx::id_type get_unmanaged_id(
+            HPX_CXX_EXPORT HPX_EXPORT static hpx::id_type get_id(
+                naming::gid_type gid);
+            HPX_CXX_EXPORT HPX_EXPORT static hpx::id_type get_unmanaged_id(
                 naming::gid_type const& gid);
 
             static void mark_as_migrated() noexcept
@@ -73,11 +74,11 @@ namespace hpx::components {
             //
             // Returns the global id (GID) assigned to this instance of a
             // component
-            HPX_EXPORT naming::gid_type get_base_gid_dynamic(
+            HPX_CXX_EXPORT HPX_EXPORT naming::gid_type get_base_gid_dynamic(
                 naming::gid_type const& assign_gid, naming::address const& addr,
                 naming::gid_type (*f)(naming::gid_type) = nullptr) const;
 
-            HPX_EXPORT naming::gid_type get_base_gid(
+            HPX_CXX_EXPORT HPX_EXPORT naming::gid_type get_base_gid(
                 naming::address const& addr,
                 naming::gid_type (*f)(naming::gid_type) = nullptr) const;
 

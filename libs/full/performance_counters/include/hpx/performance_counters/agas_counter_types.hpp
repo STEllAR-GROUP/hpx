@@ -14,6 +14,6 @@ namespace hpx { namespace performance_counters {
 
     /// Install performance counter types exposing properties from the local
     /// cache.
-    void HPX_EXPORT register_agas_counter_types(
+    void HPX_CXX_EXPORT HPX_EXPORT register_agas_counter_types(
         agas::addressing_service& client);
 }}    // namespace hpx::performance_counters

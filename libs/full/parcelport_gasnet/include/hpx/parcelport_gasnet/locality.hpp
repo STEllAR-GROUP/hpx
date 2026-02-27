@@ -46,8 +46,9 @@ namespace hpx::parcelset::policies::gasnet {
             return rank_ != ((unsigned int) -1);
         }
 
-        HPX_EXPORT void save(serialization::output_archive& ar) const;
-        HPX_EXPORT void load(serialization::input_archive& ar);
+        HPX_CXX_EXPORT HPX_EXPORT void save(
+            serialization::output_archive& ar) const;
+        HPX_CXX_EXPORT HPX_EXPORT void load(serialization::input_archive& ar);
 
     private:
         friend bool operator==(
@@ -61,7 +62,7 @@ namespace hpx::parcelset::policies::gasnet {
             return lhs.rank_ < rhs.rank_;
         }
 
-        friend HPX_EXPORT std::ostream& operator<<(
+        friend HPX_CXX_EXPORT HPX_EXPORT std::ostream& operator<<(
             std::ostream& os, locality const& loc) noexcept;
 
         gasnet_node_t rank_;

@@ -36,7 +36,7 @@ namespace hpx { namespace agas {
 
     struct notification_header;
 
-    struct HPX_EXPORT big_boot_barrier
+    HPX_CXX_EXPORT struct HPX_EXPORT big_boot_barrier
     {
     public:
         HPX_NON_COPYABLE(big_boot_barrier);
@@ -130,13 +130,13 @@ namespace hpx { namespace agas {
             parcelset::endpoints_type const& endpoints);
     };
 
-    HPX_EXPORT void create_big_boot_barrier(parcelset::parcelport* pp_,
-        parcelset::endpoints_type const& endpoints_,
+    HPX_CXX_EXPORT HPX_EXPORT void create_big_boot_barrier(
+        parcelset::parcelport* pp_, parcelset::endpoints_type const& endpoints_,
         util::runtime_configuration const& ini_);
 
-    HPX_EXPORT void destroy_big_boot_barrier();
+    HPX_CXX_EXPORT HPX_EXPORT void destroy_big_boot_barrier();
 
-    HPX_EXPORT big_boot_barrier& get_big_boot_barrier();
+    HPX_CXX_EXPORT HPX_EXPORT big_boot_barrier& get_big_boot_barrier();
 
 }}    // namespace hpx::agas
 

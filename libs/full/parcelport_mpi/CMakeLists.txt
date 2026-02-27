@@ -33,6 +33,7 @@ include(HPX_AddModule)
 add_hpx_module(
   full parcelport_mpi
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${parcelport_mpi_sources}
   HEADERS ${parcelport_mpi_headers}
   COMPAT_HEADERS ${parcelport_mpi_compat_headers}

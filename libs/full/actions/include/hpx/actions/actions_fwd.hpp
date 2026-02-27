@@ -16,7 +16,7 @@ namespace hpx::actions {
     /// \cond NOINTERNAL
 
     struct base_action;
-    struct HPX_EXPORT base_action_data;
+    HPX_CXX_EXPORT struct HPX_EXPORT base_action_data;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action>

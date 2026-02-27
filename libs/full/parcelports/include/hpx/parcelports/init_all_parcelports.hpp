@@ -13,7 +13,7 @@
 namespace hpx::parcelset {
 
     // force linking with this module
-    HPX_EXPORT void init_all_parcelports();
+    HPX_CXX_EXPORT HPX_EXPORT void init_all_parcelports();
 }    // namespace hpx::parcelset
 
 #endif

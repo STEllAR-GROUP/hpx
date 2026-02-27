@@ -70,8 +70,8 @@ namespace hpx {
     ///
     /// Using this function is an alternative to \a hpx::disconnect, these
     /// functions do not need to be called both.
-    HPX_EXPORT int finalize(double shutdown_timeout, double localwait = -1.0,
-        hpx::error_code& ec = throws);
+    HPX_CXX_EXPORT HPX_EXPORT int finalize(double shutdown_timeout,
+        double localwait = -1.0, hpx::error_code& ec = throws);
 
     /// \brief Main function to gracefully terminate the HPX runtime system.
     ///
@@ -117,7 +117,7 @@ namespace hpx {
     ///          all localities associated with this application. If the function
     ///          is called not from an HPX thread it will fail and return an error
     ///          using the argument \a ec.
-    [[noreturn]] HPX_EXPORT void terminate();
+    [[noreturn]] HPX_CXX_EXPORT HPX_EXPORT void terminate();
 
     /// \brief Disconnect this locality from the application.
     ///
@@ -166,8 +166,8 @@ namespace hpx {
     /// before returning to the caller. It should be the last HPX-function
     /// called by any locality being disconnected.
     ///
-    HPX_EXPORT int disconnect(double shutdown_timeout, double localwait = -1.0,
-        hpx::error_code& ec = throws);
+    HPX_CXX_EXPORT HPX_EXPORT int disconnect(double shutdown_timeout,
+        double localwait = -1.0, hpx::error_code& ec = throws);
 
     /// \brief Disconnect this locality from the application.
     ///
@@ -208,7 +208,7 @@ namespace hpx {
     /// called on every locality. This function should be used only if the
     /// runtime system was started using `hpx::start`.
     ///
-    HPX_EXPORT int stop(hpx::error_code& ec = throws);
+    HPX_CXX_EXPORT HPX_EXPORT int stop(hpx::error_code& ec = throws);
 }    // namespace hpx
 
 #include <hpx/config/warnings_suffix.hpp>

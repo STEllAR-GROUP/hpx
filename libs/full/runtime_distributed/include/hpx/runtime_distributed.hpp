@@ -42,7 +42,7 @@ namespace hpx {
     /// The \a runtime class encapsulates the HPX runtime system in a simple to
     /// use way. It makes sure all required parts of the HPX runtime system are
     /// properly initialized.
-    class HPX_EXPORT runtime_distributed : public runtime
+    HPX_CXX_EXPORT class HPX_EXPORT runtime_distributed : public runtime
     {
     public:
         /// Construct a new HPX runtime instance

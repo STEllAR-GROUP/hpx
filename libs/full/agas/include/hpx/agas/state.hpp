@@ -12,5 +12,5 @@
 namespace hpx { namespace agas {
 
     // return whether resolver client is in state described by 'mask'
-    HPX_EXPORT bool router_is(state st);
+    HPX_CXX_EXPORT HPX_EXPORT bool router_is(state st);
 }}    // namespace hpx::agas

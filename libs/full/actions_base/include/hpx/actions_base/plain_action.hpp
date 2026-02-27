@@ -113,7 +113,8 @@ namespace hpx::traits {
 
     /// \cond NOINTERNAL
     template <>
-    HPX_ALWAYS_EXPORT inline components::component_type component_type_database<
+    HPX_CXX_EXPORT HPX_ALWAYS_EXPORT inline components::component_type
+    component_type_database<
         hpx::actions::detail::plain_function>::get() noexcept
     {
         return to_int(hpx::components::component_enum_type::plain_function);
@@ -121,7 +122,7 @@ namespace hpx::traits {
 
     // clang-format off
     template <>
-    HPX_ALWAYS_EXPORT inline void
+    HPX_CXX_EXPORT HPX_ALWAYS_EXPORT inline void
         component_type_database<hpx::actions::detail::plain_function>::set(
             components::component_type)
     {

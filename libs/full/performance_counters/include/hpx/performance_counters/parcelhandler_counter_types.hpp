@@ -13,7 +13,7 @@
 
 namespace hpx::performance_counters {
 
-    HPX_EXPORT void register_parcelhandler_counter_types(
+    HPX_CXX_EXPORT HPX_EXPORT void register_parcelhandler_counter_types(
         parcelset::parcelhandler& ph);
 }    // namespace hpx::performance_counters
 

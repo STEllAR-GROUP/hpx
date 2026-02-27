@@ -153,18 +153,21 @@ namespace hpx::components {
 #undef HPX_FACTORY_STATE_ENUM_DEPRECATION_MSG
 
     // access data related to component instance counts
-    HPX_EXPORT bool& enabled(component_type type);
-    HPX_EXPORT util::atomic_count& instance_count(component_type type);
+    HPX_CXX_EXPORT HPX_EXPORT bool& enabled(component_type type);
+    HPX_CXX_EXPORT HPX_EXPORT util::atomic_count& instance_count(
+        component_type type);
 
     using component_deleter_type = void (*)(
         hpx::naming::gid_type const&, hpx::naming::address const&);
-    HPX_EXPORT component_deleter_type& deleter(component_type type);
+    HPX_CXX_EXPORT HPX_EXPORT component_deleter_type& deleter(
+        component_type type);
 
-    HPX_EXPORT bool enumerate_instance_counts(
+    HPX_CXX_EXPORT HPX_EXPORT bool enumerate_instance_counts(
         hpx::move_only_function<bool(component_type)> const& f);
 
     /// \brief Return the string representation for a given component type id
-    HPX_EXPORT std::string get_component_type_name(component_type type);
+    HPX_CXX_EXPORT HPX_EXPORT std::string get_component_type_name(
+        component_type type);
 
     /// The lower short word of the component type is the type of the component
     /// exposing the actions.
@@ -252,18 +255,19 @@ namespace hpx::components {
     namespace detail {
 
         // Resolve the type from AGAS
-        HPX_EXPORT component_type get_agas_component_type(
+        HPX_CXX_EXPORT HPX_EXPORT component_type get_agas_component_type(
             char const* name, char const* base_name, component_type, bool);
     }    // namespace detail
 
     // Returns the (unique) name for a given component
     template <typename Component, typename Enable = void>
-    HPX_ALWAYS_EXPORT char const* get_component_name() noexcept;
+    HPX_CXX_EXPORT HPX_ALWAYS_EXPORT char const* get_component_name() noexcept;
 
     // Returns the (unique) name of the base component. If there is none,
     // nullptr is returned
     template <typename Component, typename Enable = void>
-    HPX_ALWAYS_EXPORT char const* get_component_base_name() noexcept;
+    HPX_CXX_EXPORT HPX_ALWAYS_EXPORT char const*
+    get_component_base_name() noexcept;
 
     template <typename Component>
     component_type get_component_type() noexcept
@@ -282,14 +286,14 @@ namespace hpx::components {
 #define HPX_DEFINE_GET_COMPONENT_TYPE(component)                               \
     namespace hpx::traits {                                                    \
         template <>                                                            \
-        HPX_ALWAYS_EXPORT components::component_type                           \
+        HPX_CXX_EXPORT HPX_ALWAYS_EXPORT components::component_type            \
         component_type_database<component>::get() noexcept                     \
         {                                                                      \
             return value;                                                      \
         }                                                                      \
         template <>                                                            \
-        HPX_ALWAYS_EXPORT void component_type_database<component>::set(        \
-            components::component_type t)                                      \
+        HPX_CXX_EXPORT HPX_ALWAYS_EXPORT void                                  \
+        component_type_database<component>::set(components::component_type t)  \
         {                                                                      \
             value = t;                                                         \
         }                                                                      \
@@ -303,11 +307,13 @@ namespace hpx::components {
         {                                                                      \
             static components::component_type value;                           \
                                                                                \
-            HPX_ALWAYS_EXPORT static components::component_type get() noexcept \
+            HPX_CXX_EXPORT HPX_ALWAYS_EXPORT static components::component_type \
+            get() noexcept                                                     \
             {                                                                  \
                 return value;                                                  \
             }                                                                  \
-            HPX_ALWAYS_EXPORT static void set(components::component_type t)    \
+            HPX_CXX_EXPORT HPX_ALWAYS_EXPORT static void set(                  \
+                components::component_type t)                                  \
             {                                                                  \
                 value = t;                                                     \
             }                                                                  \
@@ -324,14 +330,14 @@ namespace hpx::components {
 #define HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(component, type)                  \
     namespace hpx::traits {                                                    \
         template <>                                                            \
-        HPX_ALWAYS_EXPORT components::component_type                           \
+        HPX_CXX_EXPORT HPX_ALWAYS_EXPORT components::component_type            \
         component_type_database<component>::get() noexcept                     \
         {                                                                      \
             return type;                                                       \
         }                                                                      \
         template <>                                                            \
-        HPX_ALWAYS_EXPORT void component_type_database<component>::set(        \
-            components::component_type)                                        \
+        HPX_CXX_EXPORT HPX_ALWAYS_EXPORT void                                  \
+        component_type_database<component>::set(components::component_type)    \
         {                                                                      \
             HPX_ASSERT(false);                                                 \
         }                                                                      \
@@ -348,13 +354,13 @@ namespace hpx::components {
 #define HPX_DEFINE_COMPONENT_NAME_2(Component, name)                           \
     namespace hpx::components {                                                \
         template <>                                                            \
-        HPX_ALWAYS_EXPORT char const*                                          \
+        HPX_CXX_EXPORT HPX_ALWAYS_EXPORT char const*                           \
         get_component_name<Component, void>() noexcept                         \
         {                                                                      \
             return HPX_PP_STRINGIZE(name);                                     \
         }                                                                      \
         template <>                                                            \
-        HPX_ALWAYS_EXPORT char const*                                          \
+        HPX_CXX_EXPORT HPX_ALWAYS_EXPORT char const*                           \
         get_component_base_name<Component, void>() noexcept                    \
         {                                                                      \
             return nullptr;                                                    \
@@ -365,13 +371,13 @@ namespace hpx::components {
 #define HPX_DEFINE_COMPONENT_NAME_3(Component, name, base_name)                \
     namespace hpx::components {                                                \
         template <>                                                            \
-        HPX_ALWAYS_EXPORT char const*                                          \
+        HPX_CXX_EXPORT HPX_ALWAYS_EXPORT char const*                           \
         get_component_name<Component, void>() noexcept                         \
         {                                                                      \
             return HPX_PP_STRINGIZE(name);                                     \
         }                                                                      \
         template <>                                                            \
-        HPX_ALWAYS_EXPORT char const*                                          \
+        HPX_CXX_EXPORT HPX_ALWAYS_EXPORT char const*                           \
         get_component_base_name<Component, void>() noexcept                    \
         {                                                                      \
             return base_name;                                                  \

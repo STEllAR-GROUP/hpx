@@ -45,8 +45,9 @@ namespace hpx::parcelset::policies::lcw {
             return rank_ != -1;
         }
 
-        HPX_EXPORT void save(serialization::output_archive& ar) const;
-        HPX_EXPORT void load(serialization::input_archive& ar);
+        HPX_CXX_EXPORT HPX_EXPORT void save(
+            serialization::output_archive& ar) const;
+        HPX_CXX_EXPORT HPX_EXPORT void load(serialization::input_archive& ar);
 
     private:
         friend bool operator==(
@@ -60,7 +61,7 @@ namespace hpx::parcelset::policies::lcw {
             return lhs.rank_ < rhs.rank_;
         }
 
-        friend HPX_EXPORT std::ostream& operator<<(
+        friend HPX_CXX_EXPORT HPX_EXPORT std::ostream& operator<<(
             std::ostream& os, locality const& loc) noexcept;
 
         std::int32_t rank_;

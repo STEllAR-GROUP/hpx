@@ -28,6 +28,7 @@ include(HPX_AddModule)
 add_hpx_module(
   full naming
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${naming_sources}
   HEADERS ${naming_headers}
   COMPAT_HEADERS ${naming_compat_headers}

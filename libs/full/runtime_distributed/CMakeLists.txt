@@ -59,6 +59,7 @@ include(HPX_AddModule)
 add_hpx_module(
   full runtime_distributed
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${runtime_distributed_sources}
   HEADERS ${runtime_distributed_headers}
   COMPAT_HEADERS ${runtime_distributed_compat_headers}

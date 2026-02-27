@@ -23,8 +23,10 @@ namespace hpx::traits {
     {
         static components::component_type value;
 
-        HPX_ALWAYS_EXPORT static components::component_type get() noexcept;
-        HPX_ALWAYS_EXPORT static void set(components::component_type);
+        HPX_CXX_EXPORT HPX_ALWAYS_EXPORT static components::component_type
+        get() noexcept;
+        HPX_CXX_EXPORT HPX_ALWAYS_EXPORT static void set(
+            components::component_type);
     };
 
     // components::component_invalid;

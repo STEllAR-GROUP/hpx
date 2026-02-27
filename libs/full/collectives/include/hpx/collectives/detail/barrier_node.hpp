@@ -29,7 +29,7 @@
 
 namespace hpx { namespace distributed { namespace detail {
 
-    struct HPX_EXPORT barrier_node;
+    HPX_CXX_EXPORT struct HPX_EXPORT barrier_node;
 }}}    // namespace hpx::distributed::detail
 
 ///////////////////////////////////////////////////////////////////////////////

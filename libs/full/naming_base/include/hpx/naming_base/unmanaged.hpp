@@ -38,5 +38,5 @@ namespace hpx::naming {
 
     HPX_DEPRECATED_V(1, 9,
         "hpx::naming::unmanaged is deprecated, use hpx::unmanaged instead")
-    HPX_EXPORT hpx::id_type unmanaged(hpx::id_type const& id);
+    HPX_CXX_EXPORT HPX_EXPORT hpx::id_type unmanaged(hpx::id_type const& id);
 }    // namespace hpx::naming

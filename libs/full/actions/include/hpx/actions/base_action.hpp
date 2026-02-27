@@ -208,7 +208,8 @@ namespace hpx::serialization {
     HPX_DEFINE_GET_ACTION_NAME_ITT(action, actionname)                         \
     namespace hpx::actions::detail {                                           \
         template <>                                                            \
-        HPX_ALWAYS_EXPORT char const* get_action_name</**/ action>() noexcept  \
+        HPX_CXX_EXPORT HPX_ALWAYS_EXPORT char const*                           \
+        get_action_name</**/ action>() noexcept                                \
         {                                                                      \
             return HPX_PP_STRINGIZE(actionname);                               \
         }                                                                      \
@@ -222,7 +223,7 @@ namespace hpx::serialization {
 #define HPX_DEFINE_GET_ACTION_NAME_ITT(action, actionname)                     \
     namespace hpx::actions::detail {                                           \
         template <>                                                            \
-        HPX_ALWAYS_EXPORT util::itt::string_handle const&                      \
+        HPX_CXX_EXPORT HPX_ALWAYS_EXPORT util::itt::string_handle const&       \
         get_action_name_itt</**/ action>() noexcept                            \
         {                                                                      \
             static util::itt::string_handle sh(HPX_PP_STRINGIZE(actionname));  \
@@ -234,7 +235,7 @@ namespace hpx::serialization {
 #define HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID_ITT(action)            \
     namespace hpx::actions::detail {                                           \
         template <>                                                            \
-        HPX_ALWAYS_EXPORT util::itt::string_handle const&                      \
+        HPX_CXX_EXPORT HPX_ALWAYS_EXPORT util::itt::string_handle const&       \
         get_action_name_itt</**/ action>() noexcept;                           \
     }                                                                          \
 /**/
@@ -247,7 +248,8 @@ namespace hpx::serialization {
     HPX_REGISTER_ACTION_DECLARATION_NO_DEFAULT_GUID_ITT(action)                \
     namespace hpx::actions::detail {                                           \
         template <>                                                            \
-        HPX_ALWAYS_EXPORT char const* get_action_name<action>() noexcept;      \
+        HPX_CXX_EXPORT HPX_ALWAYS_EXPORT char const*                           \
+        get_action_name<action>() noexcept;                                    \
     }                                                                          \
     HPX_REGISTER_ACTION_EXTERN_DECLARATION(action)                             \
                                                                                \
@@ -273,8 +275,9 @@ namespace hpx::serialization {
     HPX_REGISTER_ACTION_INVOCATION_COUNT(action)                               \
     HPX_REGISTER_PER_ACTION_DATA_COUNTER_TYPES(action)                         \
     namespace hpx::actions {                                                   \
-        template struct HPX_ALWAYS_EXPORT transfer_action</**/ action>;        \
-        template struct HPX_ALWAYS_EXPORT                                      \
+        template HPX_CXX_EXPORT struct HPX_ALWAYS_EXPORT                       \
+            transfer_action</**/ action>;                                      \
+        template HPX_CXX_EXPORT struct HPX_ALWAYS_EXPORT                       \
             transfer_continuation_action</**/ action>;                         \
     }                                                                          \
 /**/

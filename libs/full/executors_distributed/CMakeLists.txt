@@ -24,6 +24,7 @@ include(HPX_AddModule)
 add_hpx_module(
   full executors_distributed
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN OFF
   HEADERS ${executors_distributed_headers}
   COMPAT_HEADERS ${executors_distributed_compat_headers}
   DEPENDENCIES hpx_core

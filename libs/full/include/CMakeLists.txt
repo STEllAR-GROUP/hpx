@@ -121,6 +121,7 @@ include(HPX_AddModule)
 add_hpx_module(
   full include
   GLOBAL_HEADER_GEN OFF
+  GLOBAL_HEADER_MODULE_GEN OFF
   HEADERS ${include_headers}
   DEPENDENCIES hpx_core
   MODULE_DEPENDENCIES hpx_command_line_handling hpx_compute hpx_naming_base

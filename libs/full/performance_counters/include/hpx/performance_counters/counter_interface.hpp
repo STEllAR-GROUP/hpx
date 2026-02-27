@@ -15,7 +15,8 @@
 namespace hpx { namespace performance_counters {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT hpx::future<id_type> create_performance_counter_async(
+    HPX_CXX_EXPORT HPX_EXPORT hpx::future<id_type>
+    create_performance_counter_async(
         id_type target_id, counter_info const& info);
 
     inline id_type create_performance_counter(

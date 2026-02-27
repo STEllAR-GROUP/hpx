@@ -27,7 +27,7 @@ foreach(parcelport ${HPX_STATIC_PARCELPORT_PLUGINS})
 
   # generate header defining initialization functions for parcelports
   set(parcelport_export_declarations
-      "${parcelport_export_declarations}HPX_EXPORT hpx::plugins::parcelport_factory_base *\n"
+      "${parcelport_export_declarations}HPX_CXX_EXPORT HPX_EXPORT hpx::plugins::parcelport_factory_base *\n"
   )
   set(parcelport_export_declarations
       "${parcelport_export_declarations}    ${parcelport}_factory_init(\n"
@@ -50,6 +50,7 @@ include(HPX_AddModule)
 add_hpx_module(
   full parcelports
   GLOBAL_HEADER_GEN OFF
+  GLOBAL_HEADER_MODULE_GEN ON
   GENERATED_HEADERS ${parcelports_generated_headers}
   SOURCES ${parcelports_sources}
   HEADERS ${parcelports_headers}

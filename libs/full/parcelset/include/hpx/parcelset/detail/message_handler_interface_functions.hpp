@@ -19,14 +19,15 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::parcelset::detail {
 
-    extern HPX_EXPORT policies::message_handler* (*get_message_handler)(
-        char const* action, char const* type, std::size_t num,
-        std::size_t interval, locality const& loc, error_code& ec);
+    HPX_CXX_EXPORT extern HPX_EXPORT policies::message_handler* (
+        *get_message_handler)(char const* action, char const* type,
+        std::size_t num, std::size_t interval, locality const& loc,
+        error_code& ec);
 
-    extern HPX_EXPORT void (*register_message_handler)(
+    HPX_CXX_EXPORT extern HPX_EXPORT void (*register_message_handler)(
         char const* message_handler_type, char const* action, error_code& ec);
 
-    extern HPX_EXPORT parcelset::policies::message_handler* (
+    HPX_CXX_EXPORT extern HPX_EXPORT parcelset::policies::message_handler* (
         *create_message_handler)(char const* message_handler_type,
         char const* action, parcelset::parcelport* pp, std::size_t num_messages,
         std::size_t interval, error_code& ec);

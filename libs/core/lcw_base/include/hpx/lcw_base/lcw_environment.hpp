@@ -26,7 +26,7 @@
 #include "lcw.hpp"
 
 namespace hpx { namespace util {
-    struct HPX_EXPORT lcw_environment
+    HPX_CXX_CORE_EXPORT struct HPX_EXPORT lcw_environment
     {
         static bool check_lcw_environment(runtime_configuration& cfg);
 
@@ -105,7 +105,7 @@ namespace hpx { namespace util {
 #include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace util {
-    struct HPX_EXPORT lcw_environment
+    HPX_CXX_CORE_EXPORT struct HPX_EXPORT lcw_environment
     {
         static bool check_lcw_environment(runtime_configuration& cfg);
     };
