@@ -34,6 +34,7 @@
 #include <cstdint>
 #include <exception>
 #include <iosfwd>
+#include <iterator>
 #include <memory>
 #include <string>
 #include <type_traits>
@@ -572,11 +573,11 @@ namespace hpx::execution::experimental {
               , region_data_(get_region_data_size(num_threads_, pool_))
             {
                 HPX_ASSERT(pool_);
-                if (pool_ == nullptr ||
+                if (pool_ == nullptr || num_threads_ == 0 ||
                     num_threads_ > pool_->get_os_thread_count())
                 {
                     HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
-                        "for_join_executor::shared_data::shared_data",
+                        "fork_join_executor::shared_data::shared_data",
                         "unexpected number of PUs in given mask: {}, available "
                         "threads: {}",
                         pu_mask, pool_ ? pool_->get_os_thread_count() : -1);

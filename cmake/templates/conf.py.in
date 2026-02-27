@@ -378,6 +378,9 @@ rst_prolog += '''
 .. |hpxcl| replace:: HPXCL
 .. _hpxcl: https://github.com/STEllAR-GROUP/hpxcl/
 
+.. |hpsf| replace:: HPSF
+.. _hpsf: https://hpsf.io/
+
 .. |lsu| replace:: Louisiana State University (LSU)
 .. _lsu: https://www.lsu.edu
 .. |cct| replace:: Center for Computation and Technology (CCT)

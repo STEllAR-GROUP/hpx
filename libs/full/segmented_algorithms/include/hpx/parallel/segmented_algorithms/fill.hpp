@@ -62,7 +62,7 @@ namespace hpx { namespace segmented {
             hpx::traits::is_segmented_iterator_v<SegIter>)
     SegIter tag_invoke(hpx::fill_t, SegIter first, SegIter last, T const& value)
     {
-        static_assert(hpx::traits::is_forward_iterator_v<SegIter>,
+        static_assert(std::forward_iterator<SegIter>,
             "Requires at least forward iterator.");
 
         if (first == last)
@@ -90,7 +90,7 @@ namespace hpx { namespace segmented {
     tag_invoke(hpx::fill_t, ExPolicy&& policy, SegIter first, SegIter last,
         T const& value)
     {
-        static_assert(hpx::traits::is_forward_iterator_v<SegIter>,
+        static_assert(std::forward_iterator<SegIter>,
             "Requires at least forward iterator.");
 
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;

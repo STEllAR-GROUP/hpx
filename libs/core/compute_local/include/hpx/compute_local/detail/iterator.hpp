@@ -15,6 +15,7 @@
 
 #include <cstddef>
 #include <iterator>
+#include <type_traits>
 
 namespace hpx::compute::detail {
 
@@ -38,6 +39,9 @@ namespace hpx::compute::detail {
             typename traits::allocator_traits<Allocator>::const_reference;
         using target_type =
             typename traits::allocator_traits<Allocator>::target_type;
+
+        // disable use of brackets_proxy in iterator_facade
+        using use_brackets_proxy = std::false_type;
 
         HPX_HOST_DEVICE iterator() noexcept
           : base_type(nullptr)

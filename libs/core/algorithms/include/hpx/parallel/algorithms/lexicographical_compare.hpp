@@ -343,9 +343,9 @@ namespace hpx {
             InIter1 first1, InIter1 last1, InIter2 first2, InIter2 last2,
             Pred pred = Pred())
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter1>,
+            static_assert(std::input_iterator<InIter1>,
                 "Requires at least input iterator.");
-            static_assert(hpx::traits::is_input_iterator_v<InIter2>,
+            static_assert(std::input_iterator<InIter2>,
                 "Requires at least input iterator.");
 
             return hpx::parallel::detail::lexicographical_compare().call(
@@ -370,9 +370,9 @@ namespace hpx {
             hpx::lexicographical_compare_t, ExPolicy&& policy, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, Pred pred = Pred())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::lexicographical_compare().call(

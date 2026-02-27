@@ -293,7 +293,7 @@ namespace hpx::collectives::detail {
 
     template <typename T, typename InIter, typename Sent, typename OutIter,
         typename Op>
-    static constexpr void exclusive_scan(
+    constexpr void exclusive_scan(
         InIter first, Sent last, OutIter dest, Op&& op)
     {
         // the first value given goes to the second destination
@@ -302,8 +302,22 @@ namespace hpx::collectives::detail {
         for (/* */; first != last; (void) ++first, ++dest)
         {
             T next = HPX_INVOKE(op, temp, *first);
-            *dest = temp;
-            temp = next;
+            *dest = HPX_MOVE(temp);
+            temp = HPX_MOVE(next);
+        }
+    }
+
+    template <typename InIter, typename Sent, typename OutIter, typename T,
+        typename Op>
+    constexpr void exclusive_scan_init(
+        InIter first, Sent last, OutIter dest, T init, Op&& op)
+    {
+        T temp = init;
+        for (/* */; first != last; (void) ++first, ++dest)
+        {
+            init = HPX_INVOKE(op, HPX_MOVE(init), *first);
+            *dest = HPX_MOVE(temp);
+            temp = init;
         }
     }
 }    // namespace hpx::collectives::detail
@@ -412,14 +426,15 @@ namespace hpx::traits {
 
                         if constexpr (!std::same_as<T_, bool>)
                         {
-                            hpx::exclusive_scan(data.begin(), data.end(),
-                                dest.begin(), HPX_FORWARD(Init, init),
-                                HPX_FORWARD(F, op));
+                            collectives::detail::exclusive_scan_init(
+                                data.begin(), data.end(), dest.begin(),
+                                HPX_FORWARD(Init, init), HPX_FORWARD(F, op));
                         }
                         else
                         {
-                            hpx::exclusive_scan(data.begin(), data.end(),
-                                dest.begin(), static_cast<bool>(init),
+                            collectives::detail::exclusive_scan_init(
+                                data.begin(), data.end(), dest.begin(),
+                                static_cast<bool>(init),
                                 [&](auto lhs, auto rhs) {
                                     return HPX_FORWARD(F, op)(
                                         static_cast<bool>(lhs),
