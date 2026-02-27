@@ -65,7 +65,8 @@ namespace hpx { namespace performance_counters {
     /// \note The counter type registry is a locality based service. You will
     ///       have to register each counter type on every locality where a
     ///       corresponding performance counter will be created.
-    HPX_EXPORT counter_status install_counter_type(std::string const& name,
+    HPX_CXX_EXPORT HPX_EXPORT counter_status install_counter_type(
+        std::string const& name,
         hpx::function<std::int64_t(bool)> const& counter_value,
         std::string const& helptext = "", std::string const& uom = "",
         counter_type type = counter_type::raw, error_code& ec = throws);
@@ -113,7 +114,8 @@ namespace hpx { namespace performance_counters {
     /// \note The counter type registry is a locality based service. You will
     ///       have to register each counter type on every locality where a
     ///       corresponding performance counter will be created.
-    HPX_EXPORT counter_status install_counter_type(std::string const& name,
+    HPX_CXX_EXPORT HPX_EXPORT counter_status install_counter_type(
+        std::string const& name,
         hpx::function<std::vector<std::int64_t>(bool)> const& counter_value,
         std::string const& helptext = "", std::string const& uom = "",
         error_code& ec = throws);
@@ -144,7 +146,7 @@ namespace hpx { namespace performance_counters {
     /// \note As long as \a ec is not pre-initialized to \a hpx#throws this
     ///       function doesn't throw but returns the result code using the
     ///       parameter \a ec. Otherwise it throws an instance of hpx#exception.
-    HPX_EXPORT void install_counter_type(
+    HPX_CXX_EXPORT HPX_EXPORT void install_counter_type(
         std::string const& name, counter_type type, error_code& ec = throws);
 
     /// \brief Install a new performance counter type in a way, which will
@@ -180,8 +182,8 @@ namespace hpx { namespace performance_counters {
     /// \note As long as \a ec is not pre-initialized to \a hpx#throws this
     ///       function doesn't throw but returns the result code using the
     ///       parameter \a ec. Otherwise it throws an instance of hpx#exception.
-    HPX_EXPORT counter_status install_counter_type(std::string const& name,
-        counter_type type, std::string const& helptext,
+    HPX_CXX_EXPORT HPX_EXPORT counter_status install_counter_type(
+        std::string const& name, counter_type type, std::string const& helptext,
         std::string const& uom = "",
         std::uint32_t version = HPX_PERFORMANCE_COUNTER_V1,
         error_code& ec = throws);
@@ -222,8 +224,8 @@ namespace hpx { namespace performance_counters {
     /// \note The counter type registry is a locality based service. You will
     ///       have to register each counter type on every locality where a
     ///       corresponding performance counter will be created.
-    HPX_EXPORT counter_status install_counter_type(std::string const& name,
-        counter_type type, std::string const& helptext,
+    HPX_CXX_EXPORT HPX_EXPORT counter_status install_counter_type(
+        std::string const& name, counter_type type, std::string const& helptext,
         create_counter_func const& create_counter,
         discover_counters_func const& discover_counters,
         std::uint32_t version = HPX_PERFORMANCE_COUNTER_V1,
@@ -253,8 +255,9 @@ namespace hpx { namespace performance_counters {
 
     /// Install several new performance counter types in a way, which will
     /// uninstall them automatically during shutdown.
-    HPX_EXPORT void install_counter_types(generic_counter_type_data const* data,
-        std::size_t count, error_code& ec = throws);
+    HPX_CXX_EXPORT HPX_EXPORT void install_counter_types(
+        generic_counter_type_data const* data, std::size_t count,
+        error_code& ec = throws);
 
     /// \endcond
 }}    // namespace hpx::performance_counters

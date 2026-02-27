@@ -20,15 +20,15 @@
 //   - The module interface file is being compiled
 //   - The current translation unit is not forcing to disable using C++ modules
 //
-#if !defined(HPX_HAVE_CXX_MODULES) || defined(HPX_@libname_upper@_EXPORTS) ||             \
-    defined(HPX_COMPILE_BMI) || defined(HPX_HAVE_FORCE_NO_CXX_MODULES)
+#if !defined(HPX_HAVE_CXX_MODULES) ||                                          \
+    defined(HPX_@libname_upper@_EXPORTS) || defined(HPX_COMPILE_BMI) ||      \
+    defined(HPX_HAVE_FORCE_NO_CXX_MODULES)
 @module_headers@
 #else
 
 // Include all standard library headers before importing module to prevent ODR
 // violations.
 #include <hpx/config/std_headers.hpp>
-@module_macro_headers@
-import HPX.@libname_cap@;
+@module_macro_headers@import HPX.@libname_cap@;
 
 #endif

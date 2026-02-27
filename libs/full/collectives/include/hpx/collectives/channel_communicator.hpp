@@ -138,13 +138,14 @@ namespace hpx::collectives {
     class channel_communicator
     {
     private:
-        friend HPX_EXPORT hpx::future<channel_communicator>
+        friend HPX_CXX_EXPORT HPX_EXPORT hpx::future<channel_communicator>
         create_channel_communicator(char const* basename,
             num_sites_arg num_sites, this_site_arg this_site);
 
-        friend HPX_EXPORT channel_communicator create_channel_communicator(
-            hpx::launch::sync_policy, char const* basename,
-            num_sites_arg num_sites, this_site_arg this_site);
+        friend HPX_CXX_EXPORT HPX_EXPORT channel_communicator
+        create_channel_communicator(hpx::launch::sync_policy,
+            char const* basename, num_sites_arg num_sites,
+            this_site_arg this_site);
 
         template <typename T>
         friend hpx::future<T> get(channel_communicator, that_site_arg, tag_arg);
@@ -162,18 +163,18 @@ namespace hpx::collectives {
             that_site_arg, T&&, tag_arg);
 
     private:
-        HPX_EXPORT channel_communicator(char const* basename,
+        HPX_CXX_EXPORT HPX_EXPORT channel_communicator(char const* basename,
             num_sites_arg num_sites, this_site_arg this_site,
             components::client<detail::channel_communicator_server>&& here);
 
-        HPX_EXPORT channel_communicator(hpx::launch::sync_policy,
+        HPX_CXX_EXPORT HPX_EXPORT channel_communicator(hpx::launch::sync_policy,
             char const* basename, num_sites_arg num_sites,
             this_site_arg this_site,
             components::client<detail::channel_communicator_server>&& here);
 
     public:
-        HPX_EXPORT channel_communicator();
-        HPX_EXPORT ~channel_communicator();
+        HPX_CXX_EXPORT HPX_EXPORT channel_communicator();
+        HPX_CXX_EXPORT HPX_EXPORT ~channel_communicator();
 
         channel_communicator(channel_communicator const& rhs) = default;
         channel_communicator& operator=(
@@ -183,26 +184,27 @@ namespace hpx::collectives {
         channel_communicator& operator=(
             channel_communicator&& rhs) noexcept = default;
 
-        HPX_EXPORT void free();
+        HPX_CXX_EXPORT HPX_EXPORT void free();
 
         explicit operator bool() const noexcept
         {
             return !!comm_;
         }
 
-        HPX_EXPORT std::pair<num_sites_arg, this_site_arg> get_info()
-            const noexcept;
+        HPX_CXX_EXPORT HPX_EXPORT std::pair<num_sites_arg, this_site_arg>
+        get_info() const noexcept;
 
     private:
         std::shared_ptr<detail::channel_communicator> comm_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT hpx::future<channel_communicator> create_channel_communicator(
-        char const* basename, num_sites_arg num_sites = num_sites_arg(),
+    HPX_CXX_EXPORT HPX_EXPORT hpx::future<channel_communicator>
+    create_channel_communicator(char const* basename,
+        num_sites_arg num_sites = num_sites_arg(),
         this_site_arg this_site = this_site_arg());
 
-    HPX_EXPORT channel_communicator create_channel_communicator(
+    HPX_CXX_EXPORT HPX_EXPORT channel_communicator create_channel_communicator(
         hpx::launch::sync_policy, char const* basename,
         num_sites_arg num_sites = num_sites_arg(),
         this_site_arg this_site = this_site_arg());
@@ -242,12 +244,13 @@ namespace hpx::collectives {
 
     ///////////////////////////////////////////////////////////////////////////
     // Predefined p2p communicator (refers to all localities)
-    HPX_EXPORT channel_communicator get_world_channel_communicator();
+    HPX_CXX_EXPORT HPX_EXPORT channel_communicator
+    get_world_channel_communicator();
 
     namespace detail {
 
-        HPX_EXPORT void create_world_channel_communicator();
-        HPX_EXPORT void reset_world_channel_communicator();
+        HPX_CXX_EXPORT HPX_EXPORT void create_world_channel_communicator();
+        HPX_CXX_EXPORT HPX_EXPORT void reset_world_channel_communicator();
     }    // namespace detail
 }    // namespace hpx::collectives
 

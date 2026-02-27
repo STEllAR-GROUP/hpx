@@ -18,7 +18,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::performance_counters::server {
 
-    class HPX_EXPORT raw_counter
+    HPX_CXX_EXPORT class HPX_EXPORT raw_counter
       : public base_performance_counter
       , public components::component_base<raw_counter>
     {

@@ -20,6 +20,7 @@ set(components_base_headers
     hpx/components_base/component_startup_shutdown.hpp
     hpx/components_base/detail/agas_interface_functions.hpp
     hpx/components_base/generate_unique_ids.hpp
+    hpx/components_base/macros.hpp
     hpx/components_base/pinned_ptr.hpp
     hpx/components_base/server/abstract_component_base.hpp
     hpx/components_base/server/abstract_migration_support.hpp
@@ -105,8 +106,10 @@ include(HPX_AddModule)
 add_hpx_module(
   full components_base
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${components_base_sources}
   HEADERS ${components_base_headers}
+  MACRO_HEADERS hpx/components_base/macros.hpp
   COMPAT_HEADERS ${components_base_compat_headers}
   DEPENDENCIES hpx_core
   MODULE_DEPENDENCIES hpx_naming_base hpx_parcelset_base

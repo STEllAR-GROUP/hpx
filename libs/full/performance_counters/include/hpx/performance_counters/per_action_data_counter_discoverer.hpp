@@ -16,7 +16,7 @@
 
 namespace hpx { namespace performance_counters {
 
-    HPX_EXPORT bool per_action_counter_counter_discoverer(
+    HPX_CXX_EXPORT HPX_EXPORT bool per_action_counter_counter_discoverer(
         hpx::actions::detail::per_action_data_counter_registry const& registry,
         performance_counters::counter_info const& info,
         performance_counters::counter_path_elements& p,
