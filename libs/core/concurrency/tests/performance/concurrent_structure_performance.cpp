@@ -168,7 +168,6 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     // Test Vector
     {
-
         auto run_vector_test = [&](auto& vec, std::string name) {
             std::vector<hpx::thread> threads;
             hpx::mutex mtx;
@@ -344,8 +343,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
                             ++j)
                         {
                             // Access via operator[]
-                            [[maybe_unused]] auto val =
-                                access_value(m[(int) (i * (num_ops / num_threads) + j)]);
+                            [[maybe_unused]] auto val = access_value(
+                                m[(int) (i * (num_ops / num_threads) + j)]);
                         }
                     });
                 }
