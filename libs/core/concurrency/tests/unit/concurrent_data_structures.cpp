@@ -125,7 +125,7 @@ void test_concurrent_unordered_map()
         threads.emplace_back([&m, i] {
             for (int j = 0; j < 100; ++j)
             {
-                m[i * 100 + j].set(j + 1);    // Update
+                m[i * 100 + j].set(j + 1);         // Update
                 int val = m[i * 100 + j].get();    // Read
                 HPX_TEST_EQ(val, j + 1);
             }
@@ -391,7 +391,6 @@ void test_concurrent_unordered_set_for_each_break()
 
     HPX_TEST_EQ(count.load(), 50);
 }
-
 
 int hpx_main(hpx::program_options::variables_map&)
 {

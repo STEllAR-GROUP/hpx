@@ -71,7 +71,6 @@ namespace hpx::concurrent::detail {
             return *value_;
         }
 
-
         // Sets the value of the contained element (non-const accessor only).
         void set(T const& v)
             requires(!std::is_const_v<T>)
