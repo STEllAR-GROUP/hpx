@@ -1030,11 +1030,11 @@ namespace hpx::parallel {
 
             template <typename ExPolicy, typename Iter, typename Sent,
                 typename T, typename Proj = hpx::identity>
-            static constexpr Iter sequential(ExPolicy, Iter first, Sent last,
+            static constexpr Iter sequential(ExPolicy policy, Iter first, Sent last,
                 T const& val, Proj&& proj = Proj())
             {
-                return sequential_find<ExPolicy>(
-                    first, last, val, HPX_FORWARD(Proj, proj));
+                return sequential_find(
+                    policy, first, last, val, HPX_FORWARD(Proj, proj));
             }
 
             template <typename ExPolicy, typename Iter, typename Sent,
@@ -1070,7 +1070,7 @@ namespace hpx::parallel {
                 auto f1 = [val, proj = HPX_FORWARD(Proj, proj), tok](Iter it,
                               std::size_t part_size,
                               std::size_t base_idx) mutable -> void {
-                    sequential_find<policy_type>(base_idx, it, part_size, tok,
+                    sequential_find(policy_type{}, base_idx, it, part_size, tok,
                         val, HPX_FORWARD(Proj, proj));
                 };
 
@@ -1121,10 +1121,10 @@ namespace hpx::parallel {
             template <typename ExPolicy, typename Iter, typename Sent,
                 typename F, typename Proj = hpx::identity>
             static constexpr Iter sequential(
-                ExPolicy, Iter first, Sent last, F&& f, Proj&& proj = Proj())
+                ExPolicy policy, Iter first, Sent last, F&& f, Proj&& proj = Proj())
             {
-                return sequential_find_if<ExPolicy>(
-                    first, last, HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
+                return sequential_find_if(
+                    policy, first, last, HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
             }
 
             template <typename ExPolicy, typename Iter, typename Sent,
@@ -1161,7 +1161,7 @@ namespace hpx::parallel {
                               proj = HPX_FORWARD(Proj, proj),
                               tok](Iter it, std::size_t part_size,
                               std::size_t base_idx) mutable -> void {
-                    sequential_find_if<policy_type>(base_idx, it, part_size,
+                    sequential_find_if(policy_type{}, base_idx, it, part_size,
                         tok, HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
                 };
 
@@ -1211,10 +1211,10 @@ namespace hpx::parallel {
             template <typename ExPolicy, typename Iter, typename Sent,
                 typename F, typename Proj = hpx::identity>
             static constexpr Iter sequential(
-                ExPolicy, Iter first, Sent last, F&& f, Proj&& proj = Proj())
+                ExPolicy policy, Iter first, Sent last, F&& f, Proj&& proj = Proj())
             {
-                return sequential_find_if_not<ExPolicy>(
-                    first, last, HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
+                return sequential_find_if_not(
+                    policy, first, last, HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
             }
 
             template <typename ExPolicy, typename Iter, typename Sent,
@@ -1251,7 +1251,7 @@ namespace hpx::parallel {
                               proj = HPX_FORWARD(Proj, proj),
                               tok](Iter it, std::size_t part_size,
                               std::size_t base_idx) mutable -> void {
-                    sequential_find_if_not<policy_type>(base_idx, it, part_size,
+                    sequential_find_if_not(policy_type{}, base_idx, it, part_size,
                         tok, HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
                 };
 
@@ -1301,11 +1301,11 @@ namespace hpx::parallel {
             template <typename ExPolicy, typename Iter1, typename Sent1,
                 typename Iter2, typename Sent2, typename Pred, typename Proj1,
                 typename Proj2>
-            static constexpr Iter1 sequential(ExPolicy, Iter1 first1,
+            static constexpr Iter1 sequential(ExPolicy policy, Iter1 first1,
                 Sent1 last1, Iter2 first2, Sent2 last2, Pred&& op,
                 Proj1&& proj1, Proj2&& proj2)
             {
-                return sequential_find_end<std::decay_t<ExPolicy>>(first1,
+                return sequential_find_end(policy, first1,
                     last1, first2, last2, HPX_FORWARD(Pred, op),
                     HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
             }
@@ -1367,7 +1367,7 @@ namespace hpx::parallel {
                               proj2 = HPX_FORWARD(Proj2, proj2)](Iter1 it,
                               std::size_t part_size,
                               std::size_t base_idx) mutable -> void {
-                    sequential_find_end<policy_type>(it, first2, base_idx,
+                    sequential_find_end(policy_type{}, it, first2, base_idx,
                         part_size, diff, tok, HPX_FORWARD(Pred, op),
                         HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
                 };
@@ -1472,7 +1472,7 @@ namespace hpx::parallel {
                               proj2 = HPX_FORWARD(Proj2, proj2)](FwdIter it,
                               std::size_t part_size,
                               std::size_t base_idx) mutable -> void {
-                    sequential_find_first_of<policy_type>(it, s_first, s_last,
+                    sequential_find_first_of(policy_type{}, it, s_first, s_last,
                         base_idx, part_size, tok, HPX_FORWARD(Pred, op),
                         HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
                 };
@@ -1854,10 +1854,10 @@ namespace hpx::parallel::detail {
         template <typename ExPolicy, typename Iter, typename Sent, typename T,
             typename Proj = hpx::identity>
         static constexpr Iter sequential(
-            ExPolicy, Iter first, Sent last, T const& val, Proj&& proj = Proj())
+            ExPolicy policy, Iter first, Sent last, T const& val, Proj&& proj = Proj())
         {
-            return sequential_find_last<ExPolicy>(
-                first, last, val, HPX_FORWARD(Proj, proj));
+            return sequential_find_last(
+                policy, first, last, val, HPX_FORWARD(Proj, proj));
         }
 
         template <typename ExPolicy, typename Iter, typename Sent, typename T,
@@ -1895,7 +1895,7 @@ namespace hpx::parallel::detail {
             auto f1 = [val, proj = HPX_FORWARD(Proj, proj), tok](Iter it,
                           std::size_t part_size,
                           std::size_t base_idx) mutable -> void {
-                sequential_find_last<policy_type>(
+                sequential_find_last(policy_type{},
                     base_idx, it, part_size, tok, val, HPX_FORWARD(Proj, proj));
             };
 
@@ -1941,10 +1941,10 @@ namespace hpx::parallel::detail {
         template <typename ExPolicy, typename Iter, typename Sent, typename F,
             typename Proj = hpx::identity>
         static constexpr Iter sequential(
-            ExPolicy, Iter first, Sent last, F&& f, Proj&& proj = Proj())
+            ExPolicy policy, Iter first, Sent last, F&& f, Proj&& proj = Proj())
         {
-            return sequential_find_last_if<ExPolicy>(
-                first, last, HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
+            return sequential_find_last_if(
+                policy, first, last, HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
         }
 
         template <typename ExPolicy, typename Iter, typename Sent, typename F,
@@ -1982,7 +1982,7 @@ namespace hpx::parallel::detail {
             auto f1 = [f = HPX_FORWARD(F, f), proj = HPX_FORWARD(Proj, proj),
                           tok](Iter it, std::size_t part_size,
                           std::size_t base_idx) mutable -> void {
-                sequential_find_last_if<policy_type>(base_idx, it, part_size,
+                sequential_find_last_if(policy_type{}, base_idx, it, part_size,
                     tok, HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
             };
 
@@ -2029,10 +2029,10 @@ namespace hpx::parallel::detail {
         template <typename ExPolicy, typename Iter, typename Sent, typename F,
             typename Proj = hpx::identity>
         static constexpr Iter sequential(
-            ExPolicy, Iter first, Sent last, F&& f, Proj&& proj = Proj())
+            ExPolicy policy, Iter first, Sent last, F&& f, Proj&& proj = Proj())
         {
-            return sequential_find_last_if_not<ExPolicy>(
-                first, last, HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
+            return sequential_find_last_if_not(
+                policy, first, last, HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
         }
 
         template <typename ExPolicy, typename Iter, typename Sent, typename F,
@@ -2070,7 +2070,7 @@ namespace hpx::parallel::detail {
             auto f1 = [f = HPX_FORWARD(F, f), proj = HPX_FORWARD(Proj, proj),
                           tok](Iter it, std::size_t part_size,
                           std::size_t base_idx) mutable -> void {
-                sequential_find_last_if_not<policy_type>(base_idx, it,
+                sequential_find_last_if_not(policy_type{}, base_idx, it,
                     part_size, tok, HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
             };
 

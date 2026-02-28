@@ -211,6 +211,7 @@ namespace hpx::parallel::util {
                                     }
                                     catch (...)
                                     {
+                                        // NOLINT(bugprone-empty-catch)
                                         HPX_UNUSED(ex_list);
                                     }
                                 }
