@@ -702,7 +702,7 @@ namespace hpx::parallel {
 
                 // cond2: b==0 || a==len1 || B[b-1] < A[a]
                 bool cond2 = (b == 0) || (a == len1) ||
-                    comp(*(first2 + static_cast<std::ptrdiff_t>(b - 1)),
+                    HPX_INVOKE(comp, *(first2 + static_cast<std::ptrdiff_t>(b - 1)),
                         *(first1 + static_cast<std::ptrdiff_t>(a)));
 
                 if (cond1 && cond2)
