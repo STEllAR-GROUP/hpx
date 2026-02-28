@@ -692,25 +692,26 @@ namespace hpx::parallel {
 
             while (a_low <= a_high)
             {
-                std::ptrdiff_t a =  static_cast<std::ptrdiff_t>((a_low + a_high) / 2);
+                std::ptrdiff_t a =
+                    static_cast<std::ptrdiff_t>((a_low + a_high) / 2);
                 std::ptrdiff_t b = static_cast<std::ptrdiff_t>(k - a);
 
                 // cond1: a==0 || b==len2 || A[a-1] <= B[b]
-                bool cond1 = (a == 0) || (b == len2) ||
-                    leq(*(first1 + static_cast<std::ptrdiff_t>(a - 1)),
-                        *(first2 + static_cast<std::ptrdiff_t>(b)));
+                bool cond1 = (a == 0) ||
+                    (b == static_cast<std::ptrdiff_t>(len2)) ||
+                    leq(*(std::next(first1, a - 1)), *(std::next(first2, b)));
 
                 // cond2: b==0 || a==len1 || B[b-1] < A[a]
-                bool cond2 = (b == 0) || (a == len1) ||
-                    HPX_INVOKE(comp, *(first2 + static_cast<std::ptrdiff_t>(b - 1)),
-                        *(first1 + static_cast<std::ptrdiff_t>(a)));
+                bool cond2 = (b == 0) ||
+                    (a == static_cast<std::ptrdiff_t>(len1)) ||
+                    HPX_INVOKE(comp, *(std::next(first2, b - 1)),
+                        *(std::next(first1, a)));
 
                 if (cond1 && cond2)
                     return {a, b};
 
-                if (a > 0 && b < len2 &&
-                    comp(*(first2 + static_cast<std::ptrdiff_t>(b)),
-                        *(first1 + static_cast<std::ptrdiff_t>(a - 1))))
+                if (a > 0 && b < static_cast<std::ptrdiff_t>(len2) &&
+                    comp(*(std::next(first2, b)), *(std::next(first1, a - 1))))
                 {
                     if (a == 0)
                         break;
@@ -721,17 +722,9 @@ namespace hpx::parallel {
                     a_low = a + 1;
                 }
             }
-            return {a_high, k - a_high};
+            return {static_cast<std::ptrdiff_t>(a_high),
+                static_cast<std::ptrdiff_t>(k - a_high)};
         }
-
-        template <typename... Ts>
-        struct overloaded : Ts...
-        {
-            using Ts::operator()...;
-        };
-
-        template <typename... Ts>
-        overloaded(Ts...) -> overloaded<Ts...>;
 
         ///////////////////////////////////////////////////////////////////////
         HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter1,
@@ -749,40 +742,31 @@ namespace hpx::parallel {
 
             using result_type = util::in_in_out_result<Iter1, Iter2, Iter3>;
 
-            auto f1 = overloaded{
-                [dest, comp, proj1, proj2](Iter1 it1, std::size_t size1,
-                    Iter2 it2, std::size_t size2, std::size_t dest_base) {
-                    if (size1 != 0 || size2 != 0)
-                    {
-                        sequential_merge(it1, std::next(it1, size1), it2,
-                            std::next(it2, size2), std::next(dest, dest_base),
-                            comp, proj1, proj2);
-                    }
-                },
-                [dest, comp, proj1, proj2, first1, first2, len1, len2](
-                    std::size_t idx, std::size_t chunk) {
-                    if (len1 != 0 || len2 != 0)
-                    {
-                        std::size_t N = len1 + len2;
-                        std::size_t k0 = (std::min)(idx * chunk, N);
-                        std::size_t k1 = std::min((idx + 1) * chunk, N);
+            auto f1 = [dest, comp, proj1, proj2, first1, first2, len1, len2](
+                          std::size_t idx, std::size_t chunk) {
+                if (len1 != 0 || len2 != 0)
+                {
+                    std::size_t N = len1 + len2;
+                    std::size_t k0 = (std::min) (idx * chunk, N);
+                    std::size_t k1 = (std::min) ((idx + 1) * chunk, N);
 
-                        auto [a0, b0] = diagonal_intersection(
-                            first1, len1, first2, len2, k0, comp);
-                        auto [a1, b1] = diagonal_intersection(
-                            first1, len1, first2, len2, k1, comp);
+                    auto [a0, b0] = diagonal_intersection(
+                        first1, len1, first2, len2, k0, comp);
+                    auto [a1, b1] = diagonal_intersection(
+                        first1, len1, first2, len2, k1, comp);
 
-                        auto itr1 = first1 + static_cast<std::ptrdiff_t>(a0);
-                        auto itr1_e = first1 + static_cast<std::ptrdiff_t>(a1);
-                        auto itr2 = first2 + static_cast<std::ptrdiff_t>(b0);
-                        auto itr2_e = first2 + static_cast<std::ptrdiff_t>(b1);
+                    auto itr1 = std::next(first1, a0);
+                    auto itr1_e = std::next(first1, a1);
+                    auto itr2 = std::next(first2, b0);
+                    auto itr2_e = std::next(first2, b1);
 
-                        auto itr_o = dest + static_cast<std::ptrdiff_t>(k0);
+                    auto itr_o =
+                        std::next(dest, static_cast<std::ptrdiff_t>(k0));
 
-                        sequential_merge(itr1, itr1_e, itr2, itr2_e, itr_o,
-                            comp, proj1, proj2);
-                    }
-                }};
+                    sequential_merge(
+                        itr1, itr1_e, itr2, itr2_e, itr_o, comp, proj1, proj2);
+                }
+            };
 
             if (len1 > len2)
             {
