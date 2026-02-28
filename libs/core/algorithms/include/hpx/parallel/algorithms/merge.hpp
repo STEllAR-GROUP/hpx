@@ -694,19 +694,21 @@ namespace hpx::parallel {
                 // cond1: a==0 || b==len2 || A[a-1] <= B[b]
                 bool cond1 = (a == 0) ||
                     (b == static_cast<std::ptrdiff_t>(len2)) ||
-                    !HPX_INVOKE(comp, *std::next(first2, b), *std::next(first1, a-1));
+                    !HPX_INVOKE(
+                        comp, *std::next(first2, b), *std::next(first1, a - 1));
 
                 // cond2: b==0 || a==len1 || B[b-1] < A[a]
                 bool cond2 = (b == 0) ||
                     (a == static_cast<std::ptrdiff_t>(len1)) ||
-                    HPX_INVOKE(comp, *std::next(first2, b - 1),
-                        *std::next(first1, a));
+                    HPX_INVOKE(
+                        comp, *std::next(first2, b - 1), *std::next(first1, a));
 
                 if (cond1 && cond2)
                     return {a, b};
 
                 if (a > 0 && b < static_cast<std::ptrdiff_t>(len2) &&
-                    HPX_INVOKE(comp, *std::next(first2, b), *std::next(first1, a - 1)) )
+                    HPX_INVOKE(
+                        comp, *std::next(first2, b), *std::next(first1, a - 1)))
                 {
                     if (a == 0)
                         break;
