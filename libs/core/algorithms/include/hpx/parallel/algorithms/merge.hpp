@@ -682,11 +682,6 @@ namespace hpx::parallel {
             std::size_t len1, Iter2 first2, std::size_t len2, std::size_t k,
             Comp comp)
         {
-            //helper: x<=y
-            auto leq = [&](auto const& x, auto const& y) {
-                return !comp(y, x);
-            };
-
             std::size_t a_low = (k > len2) ? (k - len2) : 0;
             std::size_t a_high = (k < len1) ? k : len1;
 
@@ -699,19 +694,19 @@ namespace hpx::parallel {
                 // cond1: a==0 || b==len2 || A[a-1] <= B[b]
                 bool cond1 = (a == 0) ||
                     (b == static_cast<std::ptrdiff_t>(len2)) ||
-                    leq(*(std::next(first1, a - 1)), *(std::next(first2, b)));
+                    !HPX_INVOKE(comp, *std::next(first2, b), *std::next(first1, a-1));
 
                 // cond2: b==0 || a==len1 || B[b-1] < A[a]
                 bool cond2 = (b == 0) ||
                     (a == static_cast<std::ptrdiff_t>(len1)) ||
-                    HPX_INVOKE(comp, *(std::next(first2, b - 1)),
-                        *(std::next(first1, a)));
+                    HPX_INVOKE(comp, *std::next(first2, b - 1),
+                        *std::next(first1, a));
 
                 if (cond1 && cond2)
                     return {a, b};
 
                 if (a > 0 && b < static_cast<std::ptrdiff_t>(len2) &&
-                    comp(*(std::next(first2, b)), *(std::next(first1, a - 1))))
+                    HPX_INVOKE(comp, *std::next(first2, b), *std::next(first1, a - 1)) )
                 {
                     if (a == 0)
                         break;
