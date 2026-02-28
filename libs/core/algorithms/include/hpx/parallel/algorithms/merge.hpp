@@ -677,10 +677,10 @@ namespace hpx::parallel {
         }
 
         HPX_CXX_CORE_EXPORT template <typename Iter1, typename Iter2,
-            typename Comp>
+            typename Comp, typename Proj1, typename Proj2>
         std::pair<std::size_t, std::size_t> diagonal_intersection(Iter1 first1,
             std::size_t len1, Iter2 first2, std::size_t len2, std::size_t k,
-            Comp comp)
+            Comp comp, Proj1&& proj1, Proj2&& proj2)
         {
             std::size_t a_low = (k > len2) ? (k - len2) : 0;
             std::size_t a_high = (k < len1) ? k : len1;
@@ -694,21 +694,22 @@ namespace hpx::parallel {
                 // cond1: a==0 || b==len2 || A[a-1] <= B[b]
                 bool cond1 = (a == 0) ||
                     (b == static_cast<std::ptrdiff_t>(len2)) ||
-                    !HPX_INVOKE(
-                        comp, *std::next(first2, b), *std::next(first1, a - 1));
+                    !HPX_INVOKE(comp, HPX_INVOKE(proj2, *std::next(first2, b)),
+                        HPX_INVOKE(proj1, *std::next(first1, a - 1)));
 
                 // cond2: b==0 || a==len1 || B[b-1] < A[a]
                 bool cond2 = (b == 0) ||
                     (a == static_cast<std::ptrdiff_t>(len1)) ||
-                    HPX_INVOKE(
-                        comp, *std::next(first2, b - 1), *std::next(first1, a));
+                    HPX_INVOKE(comp,
+                        HPX_INVOKE(proj2, *std::next(first2, b - 1)),
+                        HPX_INVOKE(proj1, *std::next(first1, a)));
 
                 if (cond1 && cond2)
                     return {a, b};
 
                 if (a > 0 && b < static_cast<std::ptrdiff_t>(len2) &&
-                    HPX_INVOKE(
-                        comp, *std::next(first2, b), *std::next(first1, a - 1)))
+                    HPX_INVOKE(comp, HPX_INVOKE(proj2, *std::next(first2, b)),
+                        HPX_INVOKE(proj1, *std::next(first1, a - 1))))
                 {
                     if (a == 0)
                         break;
@@ -748,9 +749,9 @@ namespace hpx::parallel {
                     std::size_t k1 = (std::min) ((idx + 1) * chunk, N);
 
                     auto [a0, b0] = diagonal_intersection(
-                        first1, len1, first2, len2, k0, comp);
+                        first1, len1, first2, len2, k0, comp, proj1, proj2);
                     auto [a1, b1] = diagonal_intersection(
-                        first1, len1, first2, len2, k1, comp);
+                        first1, len1, first2, len2, k1, comp, proj1, proj2);
 
                     auto itr1 = std::next(first1, a0);
                     auto itr1_e = std::next(first1, a1);
