@@ -363,7 +363,7 @@ namespace hpx::parallel::execution::detail {
             HPX_ASSERT_MSG(size <=
              static_cast<std::size_t>(
              (std::numeric_limits<std::uint32_t>::max)()),
-                 "fork_join_executor: ranges larger than "
+                 "init_queue_depth_first: ranges larger than "
                  "UINT32_MAX are not supported");
 
             queue.reset(static_cast<std::uint32_t>(part_begin),
@@ -389,7 +389,7 @@ namespace hpx::parallel::execution::detail {
             HPX_ASSERT_MSG(size <=
              static_cast<std::size_t>(
              (std::numeric_limits<std::uint32_t>::max)()),
-                 "fork_join_executor: ranges larger than "
+                 "init_queue_breadth_first: ranges larger than "
                  "UINT32_MAX are not supported");
 
             queue.reset(static_cast<std::uint32_t>(part_begin),
