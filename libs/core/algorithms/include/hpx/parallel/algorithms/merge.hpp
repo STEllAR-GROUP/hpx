@@ -764,7 +764,7 @@ namespace hpx::parallel {
                     if (len1 != 0 || len2 != 0)
                     {
                         std::size_t N = len1 + len2;
-                        std::size_t k0 = std::min(idx * chunk, N);
+                        std::size_t k0 = (std::min)(idx * chunk, N);
                         std::size_t k1 = std::min((idx + 1) * chunk, N);
 
                         auto [a0, b0] = diagonal_intersection(
