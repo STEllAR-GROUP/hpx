@@ -711,8 +711,6 @@ namespace hpx::parallel {
                     HPX_INVOKE(comp, HPX_INVOKE(proj2, *std::next(first2, b)),
                         HPX_INVOKE(proj1, *std::next(first1, a - 1))))
                 {
-                    if (a == 0)
-                        break;
                     a_high = a - 1;
                 }
                 else
