@@ -692,8 +692,8 @@ namespace hpx::parallel {
 
             while (a_low <= a_high)
             {
-                std::size_t a = (a_low + a_high) / 2;
-                std::size_t b = k - a;
+                std::ptrdiff_t a =  static_cast<std::ptrdiff_t>((a_low + a_high) / 2);
+                std::ptrdiff_t b = static_cast<std::ptrdiff_t>(k - a);
 
                 // cond1: a==0 || b==len2 || A[a-1] <= B[b]
                 bool cond1 = (a == 0) || (b == len2) ||
