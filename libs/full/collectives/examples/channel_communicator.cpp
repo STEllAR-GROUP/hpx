@@ -34,6 +34,10 @@ int hpx_main()
     std::uint32_t this_locality = hpx::get_locality_id();
 
     // allocate channel communicator
+    // NOTE: The communicator object must be kept alive until all
+    // participating sites have successfully connected. Destroying it
+    // prematurely may cause other sites to hang. Consider using a barrier
+    // after creation if the communicator would otherwise go out of scope.
     auto comm = create_channel_communicator(hpx::launch::sync,
         channel_communicator_name, num_sites_arg(num_localities),
         this_site_arg(this_locality));
