@@ -411,9 +411,8 @@ namespace hpx::parallel {
                 typename T_, typename Reduce>
             static util::detail::algorithm_result_t<ExPolicy, T> parallel(
                 ExPolicy&& policy, FwdIterB first, FwdIterE last, T_&& init,
-                Reduce&& r)
+                [[maybe_unused]] Reduce&& r)
             {
-                (void) r;
                 if (first == last)
                 {
                     return util::detail::algorithm_result<ExPolicy, T>::get(
