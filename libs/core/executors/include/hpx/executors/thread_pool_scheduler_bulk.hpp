@@ -13,6 +13,7 @@
 #endif
 
 #include <hpx/assert.hpp>
+#include <hpx/executors/detail/bulk_invoke_helper.hpp>
 #include <hpx/executors/thread_pool_scheduler.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/concurrency.hpp>
@@ -58,14 +59,6 @@ namespace hpx::execution::experimental::detail {
             chunk_size *= 2;
         }
         return static_cast<std::uint32_t>(chunk_size);
-    }
-
-    HPX_CXX_CORE_EXPORT template <std::size_t... Is, typename F, typename T,
-        typename Ts>
-    constexpr void bulk_scheduler_invoke_helper(
-        hpx::util::index_pack<Is...>, F&& f, T&& t, Ts& ts)
-    {
-        HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(T, t), hpx::get<Is>(ts)...);
     }
 
     HPX_CXX_CORE_EXPORT inline hpx::threads::mask_type full_mask(
@@ -145,8 +138,7 @@ namespace hpx::execution::experimental::detail {
             auto it = std::next(hpx::util::begin(op_state->shape), i_begin);
             for (auto i = i_begin; i != i_end; (void) ++it, ++i)
             {
-                bulk_scheduler_invoke_helper(
-                    index_pack_type{}, op_state->f, *it, ts);
+                bulk_invoke_helper(index_pack_type{}, op_state->f, *it, ts);
             }
         }
 

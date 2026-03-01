@@ -59,7 +59,7 @@ namespace hpx::threads::detail {
         {
             if (self)
             {
-                data.parent_id = get_thread_id_data(threads::get_self_id());
+                data.parent_id = get_thread_id_data(self->get_thread_id());
                 data.parent_phase = self->get_thread_phase();
             }
         }
@@ -76,7 +76,7 @@ namespace hpx::threads::detail {
         {
             if (data.priority == thread_priority::default_ &&
                 thread_priority::high_recursive ==
-                    get_thread_id_data(threads::get_self_id())->get_priority())
+                    get_thread_id_data(self->get_thread_id())->get_priority())
             {
                 data.priority = thread_priority::high_recursive;
             }

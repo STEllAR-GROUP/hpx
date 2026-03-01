@@ -13,6 +13,7 @@ set(executors_headers
     hpx/executors/guided_pool_executor.hpp
     hpx/executors/async.hpp
     hpx/executors/dataflow.hpp
+    hpx/executors/detail/bulk_invoke_helper.hpp
     hpx/executors/detail/hierarchical_spawning.hpp
     hpx/executors/detail/index_queue_spawning.hpp
     hpx/executors/execute_on.hpp

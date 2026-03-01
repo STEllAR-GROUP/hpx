@@ -55,7 +55,10 @@ def run(command, log_output=None, **kwargs):
     log.info('Invoking', ' '.join(f'"{c}"' for c in command))
     start = time.time()
 
-    loop = asyncio.get_event_loop()
+    try:
+        loop = asyncio.get_event_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
     output = loop.run_until_complete(_run_async(command, log_output, **kwargs))
 
     end = time.time()

@@ -1,4 +1,4 @@
-//  Copyright (c) 2025 Hartmut Kaiser
+//  Copyright (c) 2025-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,7 +14,7 @@
 namespace hpx::util {
 
     HPX_CXX_CORE_EXPORT template <typename Iter>
-    HPX_FORCEINLINE auto get_unwrapped(Iter it)
+    HPX_FORCEINLINE constexpr auto get_unwrapped(Iter it) noexcept
     {
         // is_contiguous_iterator_v is true for pointers
         if constexpr (hpx::traits::is_contiguous_iterator_v<Iter>)

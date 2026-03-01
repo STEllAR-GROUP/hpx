@@ -35,12 +35,7 @@ namespace hpx::detail {
         {
             // run_as_child doesn't make sense if we _post_ a task
             auto hint = policy.hint();
-            if (hint.runs_as_child_mode() ==
-                hpx::threads::thread_execution_hint::run_as_child)
-            {
-                hint.runs_as_child_mode(
-                    hpx::threads::thread_execution_hint::none);
-            }
+            hint.runs_as_child_mode(hpx::threads::thread_execution_hint::none);
 
             threads::thread_init_data data(
                 threads::make_thread_function_nullary(
@@ -76,7 +71,6 @@ namespace hpx::detail {
             hpx::threads::thread_description const& desc,
             threads::thread_pool_base* pool, F&& f, Ts&&... ts)
         {
-            // run_as_child doesn't make sense if we _post_ a task
             auto hint = policy.hint();
             threads::thread_init_data data(
                 threads::make_thread_function_nullary(
@@ -173,7 +167,6 @@ namespace hpx::detail {
         {
             HPX_ASSERT(pool != nullptr);
 
-            // run_as_child doesn't make sense if we _post_ a tasks
             if (policy == launch::async)
             {
                 post_policy_dispatch<launch::async_policy>::call(

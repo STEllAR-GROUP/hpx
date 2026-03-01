@@ -1,5 +1,5 @@
 //  Copyright (c) 2019-2020 ETH Zurich
-//  Copyright (c) 2007-2025 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //  Copyright (c) 2019 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/executors/detail/bulk_invoke_helper.hpp>
 #include <hpx/executors/detail/hierarchical_spawning.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/concurrency.hpp>
@@ -43,62 +44,6 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx::parallel::execution::detail {
-
-    template <std::size_t... Is, typename F, typename T, typename Args>
-    HPX_FORCEINLINE constexpr void bulk_invoke_helper(
-        hpx::util::index_pack<Is...>, F&& f, T&& t, Args&& args)
-    {
-        // NOLINTBEGIN(bugprone-use-after-move)
-        HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(T, t),
-            hpx::get<Is>(HPX_FORWARD(Args, args))...);
-        // NOLINTEND(bugprone-use-after-move)
-    }
-
-    template <std::size_t... Is, typename F, typename... Ts, typename Args>
-    HPX_FORCEINLINE constexpr void bulk_invoke_helper(
-        hpx::util::index_pack<Is...>, F&& f, hpx::tuple<Ts...>& t, Args&& args)
-    {
-        using embedded_index_pack_type =
-            hpx::util::make_index_pack<sizeof...(Ts)>;
-
-        // NOLINTBEGIN(bugprone-use-after-move)
-        if constexpr (std::is_invocable_v<F, embedded_index_pack_type,
-                          hpx::tuple<Ts...>,
-                          decltype(hpx::get<Is>(HPX_FORWARD(Args, args)))...>)
-        {
-            HPX_INVOKE(HPX_FORWARD(F, f), embedded_index_pack_type{}, t,
-                hpx::get<Is>(HPX_FORWARD(Args, args))...);
-        }
-        else
-        {
-            HPX_INVOKE(
-                HPX_FORWARD(F, f), t, hpx::get<Is>(HPX_FORWARD(Args, args))...);
-        }
-        // NOLINTEND(bugprone-use-after-move)
-    }
-
-    template <std::size_t... Is, typename F, typename... Ts, typename Args>
-    HPX_FORCEINLINE constexpr void bulk_invoke_helper(
-        hpx::util::index_pack<Is...>, F&& f, hpx::tuple<Ts...>&& t, Args&& args)
-    {
-        using embedded_index_pack_type =
-            hpx::util::make_index_pack<sizeof...(Ts)>;
-
-        // NOLINTBEGIN(bugprone-use-after-move)
-        if constexpr (std::is_invocable_v<F, embedded_index_pack_type,
-                          hpx::tuple<Ts...>&&,
-                          decltype(hpx::get<Is>(HPX_FORWARD(Args, args)))...>)
-        {
-            HPX_INVOKE(HPX_FORWARD(F, f), embedded_index_pack_type{},
-                HPX_MOVE(t), hpx::get<Is>(HPX_FORWARD(Args, args))...);
-        }
-        else
-        {
-            HPX_INVOKE(HPX_FORWARD(F, f), HPX_MOVE(t),
-                hpx::get<Is>(HPX_FORWARD(Args, args))...);
-        }
-        // NOLINTEND(bugprone-use-after-move)
-    }
 
     ///////////////////////////////////////////////////////////////////////////
     // This struct encapsulates the work done by one worker thread.
@@ -145,7 +90,8 @@ namespace hpx::parallel::execution::detail {
                 auto it = std::next(hpx::util::begin(state->shape), i_begin);
                 for (std::uint32_t i = i_begin; i != i_end; (void) ++it, ++i)
                 {
-                    bulk_invoke_helper(index_pack_type{}, f, *it, ts);
+                    hpx::execution::experimental::detail::bulk_invoke_helper(
+                        index_pack_type{}, f, *it, ts);
                 }
             }
 
@@ -184,7 +130,9 @@ namespace hpx::parallel::execution::detail {
                         for (std::uint32_t i = i_begin; i != i_end;
                             (void) ++it, ++i)
                         {
-                            bulk_invoke_helper(index_pack_type{}, f, *it, ts);
+                            hpx::execution::experimental::detail::
+                                bulk_invoke_helper(
+                                    index_pack_type{}, f, *it, ts);
                         }
                     }
                 }
@@ -301,21 +249,28 @@ namespace hpx::parallel::execution::detail {
             std::uint32_t const n) const noexcept
         {
             std::uint32_t chunk_size = 1;
-            while (chunk_size * num_threads * 64 < n)
+            std::uint32_t upper_bound = num_threads << 5;
+            while (upper_bound < n)
             {
-                chunk_size *= 2;
+                chunk_size <<= 1;
+                upper_bound <<= 1;
             }
             return chunk_size;
         }
 
         HPX_FORCEINLINE constexpr std::uint32_t wrapped_pu_num(
-            std::uint32_t const pu, bool const needs_wraparound) const noexcept
+            std::uint32_t pu, bool const needs_wraparound) const noexcept
         {
             if (!needs_wraparound || pu < available_threads)
             {
                 return pu;
             }
-            return pu % available_threads;
+
+            while (pu >= available_threads)
+            {
+                pu -= available_threads;
+            }
+            return pu;
         }
 
         static hpx::threads::mask_type limit_mask(
@@ -337,17 +292,6 @@ namespace hpx::parallel::execution::detail {
                 }
             }
             return mask;
-        }
-
-        static std::uint32_t get_first_core(hpx::threads::mask_cref_type mask)
-        {
-            auto const size = hpx::threads::mask_size(mask);
-            for (std::uint32_t i = 0; i != size; ++i)
-            {
-                if (hpx::threads::test(mask, i))
-                    return i;
-            }
-            return 0;
         }
 
         // Initialize a queue for a worker thread.
@@ -521,11 +465,13 @@ namespace hpx::parallel::execution::detail {
             // Initialize the queues for all worker threads so that worker
             // threads can start stealing immediately when they start.
 
+            bool const breadth_first_placement =
+                hint.placement_mode() == placement::breadth_first ||
+                hint.placement_mode() == placement::breadth_first_reverse;
             for (std::uint32_t worker_thread = 0; worker_thread != num_threads;
                 ++worker_thread)
             {
-                if (hint.placement_mode() == placement::breadth_first ||
-                    hint.placement_mode() == placement::breadth_first_reverse)
+                if (breadth_first_placement)
                 {
                     init_queue_breadth_first(worker_thread, num_chunks);
                 }
@@ -554,7 +500,7 @@ namespace hpx::parallel::execution::detail {
             }
             else
             {
-                main_pu_num = get_first_core(pu_mask);
+                main_pu_num = hpx::threads::find_first(pu_mask);
             }
 
             if (num_threads == 1 || !hpx::threads::test(pu_mask, main_pu_num))

@@ -65,10 +65,6 @@ namespace hpx::execution_base {
             sleep_for(hpx::chrono::steady_duration{sleep_duration}, desc);
         }
 
-        void sleep_for(hpx::chrono::steady_duration const& sleep_duration,
-            char const* desc =
-                "hpx::execution_base::agent_ref::sleep_for") const;
-
         template <typename Clock, typename Duration>
         void sleep_until(
             std::chrono::time_point<Clock, Duration> const& sleep_time,
@@ -77,10 +73,6 @@ namespace hpx::execution_base {
         {
             sleep_until(hpx::chrono::steady_time_point{sleep_time}, desc);
         }
-
-        void sleep_until(hpx::chrono::steady_time_point const& sleep_time,
-            char const* desc =
-                "hpx::execution_base::agent_ref::sleep_until") const;
 
         [[nodiscard]] agent_base& ref() const noexcept
         {
@@ -94,6 +86,11 @@ namespace hpx::execution_base {
 
     private:
         agent_base* impl_ = nullptr;
+
+        void sleep_for(hpx::chrono::steady_duration const& sleep_duration,
+            char const* desc) const;
+        void sleep_until(hpx::chrono::steady_time_point const& sleep_time,
+            char const* desc) const;
 
         friend constexpr bool operator==(
             agent_ref const& lhs, agent_ref const& rhs) noexcept

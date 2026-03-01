@@ -22,6 +22,12 @@ else
     # Cancel currently running builds on the same branch, but only for pull
     # requests
     scancel  --verbose --verbose --verbose --verbose --jobname="${job_name}"
+
+    # Wait for the job to be cancelled before launching a new job with the
+    # same name
+    while squeue --name="${job_name}" --noheader | grep -q .; do
+        sleep 1                  # adjust the interval as needed
+    done
 fi
 
 # delay things for a random amount of time
