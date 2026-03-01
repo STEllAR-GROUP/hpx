@@ -96,5 +96,20 @@ namespace hpx::execution::experimental {
             return rebound_type(HPX_FORWARD(Executor, exec),
                 HPX_FORWARD(Parameters, parameters));
         }
+
+        template <typename ExPolicy, typename Parameters>
+            requires(
+                hpx::traits::is_executor_parameters_v<std::decay_t<Parameters>>)
+        constexpr decltype(auto) operator()(
+            ExPolicy&& policy, Parameters&& parameters) const
+        {
+            using executor_type =
+                typename std::decay_t<ExPolicy>::executor_type;
+            using rebound_type =
+                rebind_executor_t<ExPolicy, executor_type, Parameters>;
+
+            return rebound_type(
+                policy.executor(), HPX_FORWARD(Parameters, parameters));
+        }
     } create_rebound_policy{};
 }    // namespace hpx::execution::experimental
