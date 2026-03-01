@@ -31,14 +31,14 @@ jobs:
 
         - name: Upload Missing Files Artifacts
           if: success() || failure()
-          uses: actions/upload-artifact@v6
+          uses: actions/upload-artifact@v7
           with:
             name: missing_files.txt
             path: /tmp/missing_files.txt
 
         - name: Upload Missing Deps Artifacts
           if: success() || failure()
-          uses: actions/upload-artifact@v6
+          uses: actions/upload-artifact@v7
           with:
             name: missing_deps.txt
             path: /tmp/missing_deps.txt
