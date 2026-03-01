@@ -18,6 +18,8 @@
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution/algorithms/detail/single_result.hpp>
 #include <hpx/execution/algorithms/run_loop.hpp>
+#include <hpx/execution/algorithms/start_detached.hpp>
+#include <hpx/execution/algorithms/then.hpp>
 #include <hpx/modules/allocator_support.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/datastructures.hpp>
@@ -336,22 +338,168 @@ namespace hpx::execution::experimental {
 
                 template <typename Receiver>
                 void add_continuation(Receiver& receiver) = delete;
-
                 template <typename Receiver>
                 void add_continuation(Receiver&& receiver)
                 {
+                    auto replay = [this](auto&& rcv) mutable {
+                        using receiver_type = std::decay_t<decltype(rcv)>;
+
+                        auto invoke_inline = [this, r = HPX_FORWARD(decltype(rcv), rcv)]()
+                                                 mutable {
+                            hpx::visit(
+                                done_error_value_visitor<receiver_type>{
+                                    HPX_MOVE(r)},
+                                v);
+                        };
+
+                        // Try to preserve completion scheduler semantics for the
+                        // actual completion that will be delivered.
+                        hpx::visit(
+                            [&](auto const& stored) mutable {
+                                using stored_type = std::decay_t<decltype(stored)>;
+
+                                // Determine which completion signal we are about to emit.
+                                if constexpr (std::is_same_v<
+                                                  stored_type,
+                                                  error_type>)
+                                {
+                                    if constexpr (requires {
+                                                      hpx::execution::experimental::get_env(rcv);
+                                                      hpx::execution::experimental::
+                                                          get_completion_scheduler<
+                                                              hpx::execution::experimental::
+                                                                  set_error_t>(
+                                                              hpx::execution::experimental::
+                                                                  get_env(rcv));
+                                                  })
+                                    {
+                                        auto scheduler =
+                                            hpx::execution::experimental::
+                                                get_completion_scheduler<
+                                                    hpx::execution::experimental::
+                                                        set_error_t>(
+                                                    hpx::execution::experimental::get_env(
+                                                        rcv));
+
+                                        if constexpr (
+                                            hpx::execution::experimental::
+                                                is_scheduler_v<std::decay_t<
+                                                    decltype(scheduler)>> &&
+                                            requires {
+                                                hpx::execution::experimental::schedule(
+                                                    scheduler);
+                                            })
+                                        {
+                                            hpx::execution::experimental::start_detached(
+                                                hpx::execution::experimental::then(
+                                                    hpx::execution::experimental::schedule(
+                                                        scheduler),
+                                                    [invoke_inline =
+                                                         HPX_MOVE(invoke_inline)]() mutable {
+                                                        HPX_INVOKE(
+                                                            HPX_MOVE(invoke_inline));
+                                                    }));
+                                            return;
+                                        }
+                                    }
+                                }
+                                else if constexpr (std::is_same_v<
+                                                       stored_type,
+                                                       stopped_type>)
+                                {
+                                    if constexpr (requires {
+                                                      hpx::execution::experimental::get_env(rcv);
+                                                      hpx::execution::experimental::
+                                                          get_completion_scheduler<
+                                                              hpx::execution::experimental::
+                                                                  set_stopped_t>(
+                                                              hpx::execution::experimental::
+                                                                  get_env(rcv));
+                                                  })
+                                    {
+                                        auto scheduler =
+                                            hpx::execution::experimental::
+                                                get_completion_scheduler<
+                                                    hpx::execution::experimental::
+                                                        set_stopped_t>(
+                                                    hpx::execution::experimental::get_env(
+                                                        rcv));
+
+                                        if constexpr (
+                                            hpx::execution::experimental::
+                                                is_scheduler_v<std::decay_t<
+                                                    decltype(scheduler)>> &&
+                                            requires {
+                                                hpx::execution::experimental::schedule(
+                                                    scheduler);
+                                            })
+                                        {
+                                            hpx::execution::experimental::start_detached(
+                                                hpx::execution::experimental::then(
+                                                    hpx::execution::experimental::schedule(
+                                                        scheduler),
+                                                    [invoke_inline =
+                                                         HPX_MOVE(invoke_inline)]() mutable {
+                                                        HPX_INVOKE(
+                                                            HPX_MOVE(invoke_inline));
+                                                    }));
+                                            return;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    // set_value case
+                                    if constexpr (requires {
+                                                      hpx::execution::experimental::get_env(rcv);
+                                                      hpx::execution::experimental::
+                                                          get_completion_scheduler<
+                                                              hpx::execution::experimental::
+                                                                  set_value_t>(
+                                                              hpx::execution::experimental::
+                                                                  get_env(rcv));
+                                                  })
+                                    {
+                                        auto scheduler =
+                                            hpx::execution::experimental::
+                                                get_completion_scheduler<
+                                                    hpx::execution::experimental::
+                                                        set_value_t>(
+                                                    hpx::execution::experimental::get_env(
+                                                        rcv));
+
+                                        if constexpr (
+                                            hpx::execution::experimental::
+                                                is_scheduler_v<std::decay_t<
+                                                    decltype(scheduler)>> &&
+                                            requires {
+                                                hpx::execution::experimental::schedule(
+                                                    scheduler);
+                                            })
+                                        {
+                                            hpx::execution::experimental::start_detached(
+                                                hpx::execution::experimental::then(
+                                                    hpx::execution::experimental::schedule(
+                                                        scheduler),
+                                                    [invoke_inline =
+                                                         HPX_MOVE(invoke_inline)]() mutable {
+                                                        HPX_INVOKE(
+                                                            HPX_MOVE(invoke_inline));
+                                                    }));
+                                            return;
+                                        }
+                                    }
+                                }
+
+                                // Fallback: inline replay
+                                invoke_inline();
+                            },
+                            v);
+                    };
+
                     if (predecessor_done)
                     {
-                        // If we read predecessor_done here it means that one of
-                        // set_error/set_stopped/set_value has been called and
-                        // values/errors have been stored into the shared state.
-                        // We can trigger the continuation directly.
-                        // TODO: Should this preserve the scheduler? It does not
-                        // if we call set_* inline.
-                        hpx::visit(
-                            done_error_value_visitor<Receiver>{
-                                HPX_FORWARD(Receiver, receiver)},
-                            v);
+                        replay(HPX_FORWARD(Receiver, receiver));
                     }
                     else
                     {
@@ -367,10 +515,7 @@ namespace hpx::execution::experimental {
                             // release the lock early and call the continuation
                             // directly again.
                             l.unlock();
-                            hpx::visit(
-                                done_error_value_visitor<Receiver>{
-                                    HPX_FORWARD(Receiver, receiver)},
-                                v);
+                            replay(HPX_FORWARD(Receiver, receiver));
                         }
                         else
                         {
@@ -382,13 +527,10 @@ namespace hpx::execution::experimental {
                             // itself. The continuation will be called later
                             // when set_error/set_stopped/set_value is called.
                             continuations.emplace_back(
-                                [this,
+                                [this, replay,
                                     receiver = HPX_FORWARD(
                                         Receiver, receiver)]() mutable {
-                                    hpx::visit(
-                                        done_error_value_visitor<Receiver>{
-                                            HPX_MOVE(receiver)},
-                                        v);
+                                    replay(HPX_MOVE(receiver));
                                 });
                         }
                     }
