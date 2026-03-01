@@ -27,7 +27,7 @@
 
 namespace hpx { namespace agas {
 
-    struct HPX_EXPORT primary_namespace
+    HPX_CXX_EXPORT struct HPX_EXPORT primary_namespace
     {
         typedef hpx::tuple<naming::gid_type, gva, naming::gid_type>
             resolved_type;

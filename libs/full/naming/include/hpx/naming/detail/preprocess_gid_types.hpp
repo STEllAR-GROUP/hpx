@@ -134,7 +134,7 @@ template <>
 struct hpx::util::extra_data_helper<
     hpx::serialization::detail::preprocess_gid_types>
 {
-    HPX_EXPORT static extra_data_id_type id() noexcept;
+    HPX_CXX_EXPORT HPX_EXPORT static extra_data_id_type id() noexcept;
     static constexpr void reset(
         serialization::detail::preprocess_gid_types*) noexcept
     {

@@ -18,19 +18,21 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::parcelset::detail {
 
-    extern HPX_EXPORT parcelset::parcel (*create_parcel)();
+    HPX_CXX_EXPORT extern HPX_EXPORT parcelset::parcel (*create_parcel)();
 
-    extern HPX_EXPORT locality (*create_locality)(std::string const& name);
+    HPX_CXX_EXPORT extern HPX_EXPORT locality (*create_locality)(
+        std::string const& name);
 
-    extern HPX_EXPORT parcel_write_handler_type (*set_parcel_write_handler)(
-        parcel_write_handler_type const& f);
+    HPX_CXX_EXPORT extern HPX_EXPORT parcel_write_handler_type (
+        *set_parcel_write_handler)(parcel_write_handler_type const& f);
 
-    extern HPX_EXPORT void (*put_parcel)(
+    HPX_CXX_EXPORT extern HPX_EXPORT void (*put_parcel)(
         parcelset::parcel&& p, parcel_write_handler_type&& f);
 
-    extern HPX_EXPORT void (*sync_put_parcel)(parcelset::parcel&& p);
+    HPX_CXX_EXPORT extern HPX_EXPORT void (*sync_put_parcel)(
+        parcelset::parcel&& p);
 
-    extern HPX_EXPORT void (*parcel_route_handler_func)(
+    HPX_CXX_EXPORT extern HPX_EXPORT void (*parcel_route_handler_func)(
         std::error_code const& ec, parcelset::parcel const& p);
 }    // namespace hpx::parcelset::detail
 

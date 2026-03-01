@@ -98,11 +98,11 @@ namespace hpx {
         explicit operator bool() const noexcept;
 
         // comparison is required as well
-        friend HPX_EXPORT bool operator==(
+        friend HPX_CXX_EXPORT HPX_EXPORT bool operator==(
             id_type const& lhs, id_type const& rhs) noexcept;
         friend bool operator!=(id_type const& lhs, id_type const& rhs) noexcept;
 
-        friend HPX_EXPORT bool operator<(
+        friend HPX_CXX_EXPORT HPX_EXPORT bool operator<(
             id_type const& lhs, id_type const& rhs) noexcept;
         friend bool operator<=(id_type const& lhs, id_type const& rhs) noexcept;
         friend bool operator>(id_type const& lhs, id_type const& rhs) noexcept;
@@ -132,7 +132,7 @@ namespace hpx {
         }
 
     private:
-        friend HPX_EXPORT std::ostream& operator<<(
+        friend HPX_CXX_EXPORT HPX_EXPORT std::ostream& operator<<(
             std::ostream& os, id_type const& id);
 
         hpx::intrusive_ptr<naming::detail::id_type_impl> gid_;
@@ -281,9 +281,9 @@ namespace hpx {
 
         private:
             // reference counting
-            friend HPX_EXPORT void intrusive_ptr_add_ref(
+            friend HPX_CXX_EXPORT HPX_EXPORT void intrusive_ptr_add_ref(
                 id_type_impl* p) noexcept;
-            friend HPX_EXPORT void intrusive_ptr_release(
+            friend HPX_CXX_EXPORT HPX_EXPORT void intrusive_ptr_release(
                 id_type_impl* p) noexcept;
 
             util::atomic_count count_;
@@ -420,7 +420,8 @@ namespace hpx::traits {
     template <>
     struct get_remote_result<hpx::id_type, naming::gid_type>
     {
-        HPX_EXPORT static hpx::id_type call(naming::gid_type const& rhs);
+        HPX_CXX_EXPORT HPX_EXPORT static hpx::id_type call(
+            naming::gid_type const& rhs);
     };
 
     template <>
@@ -435,7 +436,7 @@ namespace hpx::traits {
     struct get_remote_result<std::vector<hpx::id_type>,
         std::vector<naming::gid_type>>
     {
-        HPX_EXPORT static std::vector<hpx::id_type> call(
+        HPX_CXX_EXPORT HPX_EXPORT static std::vector<hpx::id_type> call(
             std::vector<naming::gid_type> const& rhs);
     };
 

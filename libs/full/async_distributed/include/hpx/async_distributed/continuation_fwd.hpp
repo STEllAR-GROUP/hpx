@@ -11,7 +11,7 @@
 
 namespace hpx { namespace actions {
 
-    class HPX_EXPORT continuation;
+    HPX_CXX_EXPORT class HPX_EXPORT continuation;
 
     template <typename Result, typename RemoteResult, typename F,
         typename... Ts>

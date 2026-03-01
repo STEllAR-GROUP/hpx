@@ -183,15 +183,15 @@ namespace hpx::lcos::detail {
 template <>
 struct hpx::util::extra_data_helper<hpx::lcos::detail::registered_name_tracker>
 {
-    HPX_EXPORT static extra_data_id_type id() noexcept;
-    HPX_EXPORT static void reset(
+    HPX_CXX_EXPORT HPX_EXPORT static extra_data_id_type id() noexcept;
+    HPX_CXX_EXPORT HPX_EXPORT static void reset(
         lcos::detail::registered_name_tracker*) noexcept;
 };    // namespace hpx::util
 
 // Specialization for shared state of id_type, additionally (optionally) holds a
 // registered name for the object it refers to.
 template <>
-struct HPX_EXPORT hpx::lcos::detail::future_data<hpx::id_type>
+HPX_CXX_EXPORT struct HPX_EXPORT hpx::lcos::detail::future_data<hpx::id_type>
   : future_data_base<id_type>
 {
     using init_no_addref = future_data_base<hpx::id_type>::init_no_addref;

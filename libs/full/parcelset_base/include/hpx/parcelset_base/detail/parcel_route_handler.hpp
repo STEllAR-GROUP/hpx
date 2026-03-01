@@ -19,7 +19,7 @@ namespace hpx::parcelset::detail {
     // The original parcel-sent handler is wrapped to keep the parcel alive
     // until after the data has been reliably sent (which is needed for zero
     // copy serialization).
-    void HPX_EXPORT parcel_route_handler(
+    void HPX_CXX_EXPORT HPX_EXPORT parcel_route_handler(
         std::error_code const& ec, parcelset::parcel const& p);
 }    // namespace hpx::parcelset::detail
 

@@ -27,6 +27,7 @@ include(HPX_AddModule)
 add_hpx_module(
   full lcos_distributed
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN OFF
   SOURCES ${lcos_distributed_sources}
   HEADERS ${lcos_distributed_headers}
   COMPAT_HEADERS ${lcos_distributed_compat_headers}

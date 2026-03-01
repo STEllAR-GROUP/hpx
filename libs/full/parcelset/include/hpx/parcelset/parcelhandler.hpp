@@ -46,7 +46,7 @@ namespace hpx::parcelset {
     /// The \a parcelhandler is the representation of the parcelset inside a
     /// locality. It is built on top of a single parcelport. Several
     /// parcel-handlers may be connected to a single parcelport.
-    class HPX_EXPORT parcelhandler
+    HPX_CXX_EXPORT class HPX_EXPORT parcelhandler
     {
     public:
         parcelhandler(parcelhandler const&) = delete;

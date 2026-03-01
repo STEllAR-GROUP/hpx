@@ -40,7 +40,7 @@
 namespace hpx { namespace agas {
 
 #if defined(HPX_HAVE_NETWORKING)
-    HPX_EXPORT void destroy_big_boot_barrier();
+    HPX_CXX_EXPORT HPX_EXPORT void destroy_big_boot_barrier();
 #endif
 
     struct addressing_service

@@ -26,7 +26,7 @@
 namespace hpx::performance_counters {
 
     ///////////////////////////////////////////////////////////////////////////
-    struct HPX_EXPORT performance_counter
+    HPX_CXX_EXPORT struct HPX_EXPORT performance_counter
       : components::client_base<performance_counter,
             server::base_performance_counter>
     {
@@ -130,8 +130,8 @@ namespace hpx::performance_counters {
     };
 
     // Return all counters matching the given name (with optional wild cards).
-    HPX_EXPORT std::vector<performance_counter> discover_counters(
-        std::string const& name, error_code& ec = throws);
+    HPX_CXX_EXPORT HPX_EXPORT std::vector<performance_counter>
+    discover_counters(std::string const& name, error_code& ec = throws);
 }    // namespace hpx::performance_counters
 
 #include <hpx/config/warnings_suffix.hpp>

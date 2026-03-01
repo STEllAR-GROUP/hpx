@@ -13,6 +13,6 @@
 
 namespace hpx { namespace performance_counters {
 
-    HPX_EXPORT void register_threadmanager_counter_types(
+    HPX_CXX_EXPORT HPX_EXPORT void register_threadmanager_counter_types(
         threads::threadmanager& tm);
 }}    // namespace hpx::performance_counters

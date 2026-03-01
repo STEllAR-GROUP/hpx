@@ -14,8 +14,8 @@
 namespace hpx_startup {
 
     // Allow applications to add configuration settings if HPX_MAIN is set
-    HPX_EXPORT extern std::vector<std::string> (*user_main_config_function)(
-        std::vector<std::string> const&);
+    HPX_CXX_EXPORT HPX_EXPORT extern std::vector<std::string> (
+        *user_main_config_function)(std::vector<std::string> const&);
 
     inline std::vector<std::string> user_main_config(
         std::vector<std::string> const& cfg)

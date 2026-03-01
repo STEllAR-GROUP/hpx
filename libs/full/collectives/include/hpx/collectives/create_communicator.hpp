@@ -174,7 +174,7 @@ namespace hpx::collectives::detail {
 template <>
 struct hpx::util::extra_data_helper<hpx::collectives::detail::communicator_data>
 {
-    HPX_EXPORT static extra_data_id_type id() noexcept;
+    HPX_CXX_EXPORT HPX_EXPORT static extra_data_id_type id() noexcept;
     static constexpr void reset(
         collectives::detail::communicator_data*) noexcept
     {
@@ -216,16 +216,17 @@ namespace hpx::collectives {
         {
         }
 
-        HPX_EXPORT void set_info(num_sites_arg num_sites,
+        HPX_CXX_EXPORT HPX_EXPORT void set_info(num_sites_arg num_sites,
             this_site_arg this_site,
             root_site_arg root_site = root_site_arg()) noexcept;
 
-        [[nodiscard]] HPX_EXPORT
+        [[nodiscard]] HPX_CXX_EXPORT HPX_EXPORT
             std::tuple<num_sites_arg, this_site_arg, root_site_arg>
             get_info_ex() const noexcept;
 
-        [[nodiscard]] HPX_EXPORT std::pair<num_sites_arg, this_site_arg>
-        get_info() const noexcept;
+        [[nodiscard]] HPX_CXX_EXPORT HPX_EXPORT
+            std::pair<num_sites_arg, this_site_arg>
+            get_info() const noexcept;
 
         [[nodiscard]] bool is_root() const
         {
@@ -235,53 +236,55 @@ namespace hpx::collectives {
 
     ///////////////////////////////////////////////////////////////////////////
     // Predefined global communicator (refers to all localities)
-    HPX_EXPORT communicator get_world_communicator();
+    HPX_CXX_EXPORT HPX_EXPORT communicator get_world_communicator();
 
     namespace detail {
 
-        HPX_EXPORT void create_global_communicator();
-        HPX_EXPORT void reset_global_communicator();
+        HPX_CXX_EXPORT HPX_EXPORT void create_global_communicator();
+        HPX_CXX_EXPORT HPX_EXPORT void reset_global_communicator();
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     // Predefined local communicator (refers to all threads on the calling
     // locality)
-    HPX_EXPORT communicator get_local_communicator();
+    HPX_CXX_EXPORT HPX_EXPORT communicator get_local_communicator();
 
     namespace detail {
 
-        HPX_EXPORT void create_local_communicator();
-        HPX_EXPORT void reset_local_communicator();
+        HPX_CXX_EXPORT HPX_EXPORT void create_local_communicator();
+        HPX_CXX_EXPORT HPX_EXPORT void reset_local_communicator();
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT communicator create_communicator(char const* basename,
+    HPX_CXX_EXPORT HPX_EXPORT communicator create_communicator(
+        char const* basename, num_sites_arg num_sites = num_sites_arg(),
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg(),
+        root_site_arg root_site = root_site_arg());
+
+    HPX_CXX_EXPORT HPX_EXPORT communicator create_communicator(
+        hpx::launch::sync_policy, char const* basename,
         num_sites_arg num_sites = num_sites_arg(),
         this_site_arg this_site = this_site_arg(),
         generation_arg generation = generation_arg(),
         root_site_arg root_site = root_site_arg());
 
-    HPX_EXPORT communicator create_communicator(hpx::launch::sync_policy,
-        char const* basename, num_sites_arg num_sites = num_sites_arg(),
-        this_site_arg this_site = this_site_arg(),
-        generation_arg generation = generation_arg(),
-        root_site_arg root_site = root_site_arg());
-
-    HPX_EXPORT communicator create_local_communicator(char const* basename,
-        num_sites_arg num_sites, this_site_arg this_site,
-        generation_arg generation = generation_arg(),
-        root_site_arg root_site = root_site_arg());
-
-    HPX_EXPORT communicator create_local_communicator(hpx::launch::sync_policy,
+    HPX_CXX_EXPORT HPX_EXPORT communicator create_local_communicator(
         char const* basename, num_sites_arg num_sites, this_site_arg this_site,
         generation_arg generation = generation_arg(),
+        root_site_arg root_site = root_site_arg());
+
+    HPX_CXX_EXPORT HPX_EXPORT communicator create_local_communicator(
+        hpx::launch::sync_policy, char const* basename, num_sites_arg num_sites,
+        this_site_arg this_site, generation_arg generation = generation_arg(),
         root_site_arg root_site = root_site_arg());
 
     ///////////////////////////////////////////////////////////////////////////
     struct hierarchical_communicator;
 
-    HPX_EXPORT hierarchical_communicator create_hierarchical_communicator(
-        char const* basename, num_sites_arg num_sites = num_sites_arg(),
+    HPX_CXX_EXPORT HPX_EXPORT hierarchical_communicator
+    create_hierarchical_communicator(char const* basename,
+        num_sites_arg num_sites = num_sites_arg(),
         this_site_arg this_site = this_site_arg(),
         arity_arg arity = arity_arg(),
         generation_arg generation = generation_arg(),
@@ -302,7 +305,7 @@ namespace hpx::collectives {
         {
         }
 
-        friend HPX_EXPORT hierarchical_communicator
+        friend HPX_CXX_EXPORT HPX_EXPORT hierarchical_communicator
         create_hierarchical_communicator(char const* basename,
             num_sites_arg num_sites, this_site_arg this_site, arity_arg arity,
             generation_arg generation, root_site_arg root_site);
@@ -352,12 +355,13 @@ namespace hpx::collectives {
             return arity;
         }
 
-        [[nodiscard]] HPX_EXPORT
+        [[nodiscard]] HPX_CXX_EXPORT HPX_EXPORT
             hpx::tuple<num_sites_arg, this_site_arg, root_site_arg>
             get_info_ex() const noexcept;
 
-        [[nodiscard]] HPX_EXPORT hpx::tuple<num_sites_arg, this_site_arg>
-        get_info() const noexcept;
+        [[nodiscard]] HPX_CXX_EXPORT HPX_EXPORT
+            hpx::tuple<num_sites_arg, this_site_arg>
+            get_info() const noexcept;
 
     private:
         std::vector<hpx::tuple<communicator, this_site_arg>> communicators;

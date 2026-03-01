@@ -178,7 +178,8 @@ namespace hpx { namespace performance_counters {
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the readable name of a given counter type
-    HPX_EXPORT char const* get_counter_type_name(counter_type state);
+    HPX_CXX_EXPORT HPX_EXPORT char const* get_counter_type_name(
+        counter_type state);
 
 #if defined(DOXYGEN)
     ///////////////////////////////////////////////////////////////////////////
@@ -232,9 +233,9 @@ namespace hpx { namespace performance_counters {
         // serialization support
         friend class hpx::serialization::access;
 
-        HPX_EXPORT void serialize(
+        HPX_CXX_EXPORT HPX_EXPORT void serialize(
             serialization::output_archive& ar, unsigned int) const;
-        HPX_EXPORT void serialize(
+        HPX_CXX_EXPORT HPX_EXPORT void serialize(
             serialization::input_archive& ar, unsigned int);
     };
 
@@ -308,9 +309,9 @@ namespace hpx { namespace performance_counters {
         // serialization support
         friend class hpx::serialization::access;
 
-        HPX_EXPORT void serialize(
+        HPX_CXX_EXPORT HPX_EXPORT void serialize(
             serialization::output_archive& ar, unsigned int);
-        HPX_EXPORT void serialize(
+        HPX_CXX_EXPORT HPX_EXPORT void serialize(
             serialization::input_archive& ar, unsigned int);
     };
 
@@ -359,9 +360,9 @@ namespace hpx { namespace performance_counters {
         // serialization support
         friend class hpx::serialization::access;
 
-        HPX_EXPORT void serialize(
+        HPX_CXX_EXPORT HPX_EXPORT void serialize(
             serialization::output_archive& ar, unsigned int) const;
-        HPX_EXPORT void serialize(
+        HPX_CXX_EXPORT HPX_EXPORT void serialize(
             serialization::input_archive& ar, unsigned int);
     };
 

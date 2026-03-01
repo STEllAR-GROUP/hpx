@@ -39,7 +39,7 @@ namespace hpx::parcelset {
     namespace policies::tcp {
 
         class receiver;
-        class HPX_EXPORT connection_handler;
+        HPX_CXX_EXPORT class HPX_EXPORT connection_handler;
     }    // namespace policies::tcp
 
     template <>
@@ -72,7 +72,7 @@ namespace hpx::parcelset {
         parcelset::locality parcelport_address(
             util::runtime_configuration const& ini);
 
-        class HPX_EXPORT connection_handler
+        HPX_CXX_EXPORT class HPX_EXPORT connection_handler
           : public parcelport_impl<connection_handler>
         {
             using base_type = parcelport_impl<connection_handler>;

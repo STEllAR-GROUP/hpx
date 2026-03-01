@@ -54,8 +54,9 @@ namespace hpx::parcelset::policies::tcp {
             return port_ != static_cast<std::uint16_t>(-1);
         }
 
-        HPX_EXPORT void save(serialization::output_archive& ar) const;
-        HPX_EXPORT void load(serialization::input_archive& ar);
+        HPX_CXX_EXPORT HPX_EXPORT void save(
+            serialization::output_archive& ar) const;
+        HPX_CXX_EXPORT HPX_EXPORT void load(serialization::input_archive& ar);
 
     private:
         friend bool operator==(
@@ -70,7 +71,7 @@ namespace hpx::parcelset::policies::tcp {
                 (lhs.address_ == rhs.address_ && lhs.port_ < rhs.port_);
         }
 
-        friend HPX_EXPORT std::ostream& operator<<(
+        friend HPX_CXX_EXPORT HPX_EXPORT std::ostream& operator<<(
             std::ostream& os, locality const& loc) noexcept;
 
         std::string address_;

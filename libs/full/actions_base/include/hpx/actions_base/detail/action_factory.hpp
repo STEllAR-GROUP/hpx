@@ -36,22 +36,25 @@ namespace hpx::actions::detail {
 
         static constexpr std::uint32_t invalid_id = ~0;
 
-        HPX_EXPORT action_registry();
-        HPX_EXPORT ~action_registry();
+        HPX_CXX_EXPORT HPX_EXPORT action_registry();
+        HPX_CXX_EXPORT HPX_EXPORT ~action_registry();
 
-        HPX_EXPORT void register_factory(
+        HPX_CXX_EXPORT HPX_EXPORT void register_factory(
             std::string const& type_name, ctor_t ctor, ctor_t ctor_cont);
-        HPX_EXPORT void register_typename(
+        HPX_CXX_EXPORT HPX_EXPORT void register_typename(
             std::string const& type_name, std::uint32_t id);
-        HPX_EXPORT void fill_missing_typenames();
-        HPX_EXPORT std::uint32_t try_get_id(std::string const& type_name) const;
-        HPX_EXPORT std::vector<std::string> get_unassigned_typenames() const;
+        HPX_CXX_EXPORT HPX_EXPORT void fill_missing_typenames();
+        HPX_CXX_EXPORT HPX_EXPORT std::uint32_t try_get_id(
+            std::string const& type_name) const;
+        HPX_CXX_EXPORT HPX_EXPORT std::vector<std::string>
+        get_unassigned_typenames() const;
 
-        HPX_EXPORT static std::uint32_t get_id(std::string const& type_name);
-        HPX_EXPORT static base_action* create(
+        HPX_CXX_EXPORT HPX_EXPORT static std::uint32_t get_id(
+            std::string const& type_name);
+        HPX_CXX_EXPORT HPX_EXPORT static base_action* create(
             std::uint32_t id, bool, std::string const* name = nullptr);
 
-        HPX_EXPORT static action_registry& instance();
+        HPX_CXX_EXPORT HPX_EXPORT static action_registry& instance();
 
         void cache_id(std::uint32_t id, ctor_t ctor, ctor_t ctor_cont);
         std::string collect_registered_typenames() const;
@@ -63,7 +66,7 @@ namespace hpx::actions::detail {
     };
 
     template <std::uint32_t Id>
-    HPX_ALWAYS_EXPORT std::string get_action_name_id();
+    HPX_CXX_EXPORT HPX_ALWAYS_EXPORT std::string get_action_name_id();
 
     template <std::uint32_t Id>
     struct add_constant_entry
@@ -93,7 +96,7 @@ namespace hpx::actions::detail {
 #define HPX_REGISTER_ACTION_FACTORY_ID(Name, Id)                               \
     namespace hpx::actions::detail {                                           \
         template <>                                                            \
-        HPX_ALWAYS_EXPORT std::string get_action_name_id<Id>()                 \
+        HPX_CXX_EXPORT HPX_ALWAYS_EXPORT std::string get_action_name_id<Id>()  \
         {                                                                      \
             return HPX_PP_STRINGIZE(Name);                                     \
         }                                                                      \

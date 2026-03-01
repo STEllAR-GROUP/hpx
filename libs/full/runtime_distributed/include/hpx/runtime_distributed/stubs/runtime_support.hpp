@@ -30,7 +30,7 @@ namespace hpx { namespace components { namespace stubs {
     ///////////////////////////////////////////////////////////////////////////
     // The \a runtime_support class is the client side representation of a
     // \a server#runtime_support component
-    struct HPX_EXPORT runtime_support
+    HPX_CXX_EXPORT struct HPX_EXPORT runtime_support
     {
         ///////////////////////////////////////////////////////////////////////
         /// Create a new component \a type using the runtime_support with the

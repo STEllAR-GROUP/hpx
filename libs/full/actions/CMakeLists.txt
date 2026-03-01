@@ -43,6 +43,7 @@ include(HPX_AddModule)
 add_hpx_module(
   full actions
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${actions_sources}
   HEADERS ${actions_headers}
   COMPAT_HEADERS ${actions_compat_headers}

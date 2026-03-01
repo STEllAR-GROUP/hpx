@@ -15,7 +15,7 @@
 
 namespace hpx::parcelset {
 
-    extern HPX_EXPORT void (*init_static_parcelport_factories)(
+    HPX_CXX_EXPORT extern HPX_EXPORT void (*init_static_parcelport_factories)(
         std::vector<plugins::parcelport_factory_base*>& factories);
 }
 
