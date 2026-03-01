@@ -37,6 +37,7 @@ if(HPX_SERIALIZATION_WITH_BOOST_TYPES)
 endif()
 
 add_subdirectory(polymorphic)
+add_subdirectory(refl)
 
 # tests that can run without HPX
 foreach(test ${tests})
