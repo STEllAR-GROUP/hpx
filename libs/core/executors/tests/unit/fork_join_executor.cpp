@@ -16,6 +16,7 @@
 #include <algorithm>
 #include <atomic>
 #include <cstddef>
+#include <cstdint>
 #include <cstdlib>
 #include <iostream>
 #include <iterator>
@@ -475,16 +476,16 @@ void test_executor(hpx::threads::thread_priority priority,
 void test_fork_join_static_large_range()
 {
     // Regression test for #6922
-    // Strategy- Sums indices straddling UINT32_MAX and compares against closed-form expected arithmetic sum.
+    // Strategy- Sums indices straddling UINT32_MAX and compare
+    // against closed-form expected arithmetic sum.
 
     fork_join_executor exec;
 
-    std::size_t const low =
-        static_cast<std::size_t>((std::numeric_limits<std::uint32_t>::max)()) -
-        500;
-    std::size_t const high =
-        static_cast<std::size_t>((std::numeric_limits<std::uint32_t>::max)()) +
-        500;
+    auto const uint32_max =
+        static_cast<std::size_t>((std::numeric_limits<std::uint32_t>::max)());
+
+    std::size_t const low = uint32_max - 500;
+    std::size_t const high = uint32_max + 500;
 
     // sum of integers [lo, hi) = n*(lo + hi - 1)/2
     std::size_t const n = high - low;

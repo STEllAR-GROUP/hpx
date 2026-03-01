@@ -434,7 +434,7 @@ namespace hpx::execution::experimental {
                     std::size_t const num_pus = pool_->get_os_thread_count();
 
                     for (std::size_t pu = 0; t != num_threads_ && pu != num_pus;
-                         ++pu)
+                        ++pu)
                     {
                         std::size_t const pu_num = rp.get_pu_num(pu);
                         if (!main_thread_ok && pu == main_thread_)
@@ -506,13 +506,14 @@ namespace hpx::execution::experimental {
                 auto const part_begin = (thread_index * size) / num_threads;
                 auto const part_end = ((thread_index + 1) * size) / num_threads;
 
-                // Guard:the static scheduling also uses contiguous_index_queue internally.
+                // Guard:the static scheduling also uses
+                //  contiguous_index_queue internally.
 
                 HPX_ASSERT_MSG(
                     size <= static_cast<std::size_t>(
                                 (std::numeric_limits<std::uint32_t>::max)()),
-                    "fork_join_executor: static scheduling does not support "
-                    "ranges larger than UINT32_MAX");
+                    "fork_join_executor: ranges larger than"
+                    " UINT32_MAX are not supported");
 
                 queue.reset(static_cast<std::uint32_t>(part_begin),
                     static_cast<std::uint32_t>(part_end));
@@ -776,7 +777,7 @@ namespace hpx::execution::experimental {
                             // As loop schedule is dynamic, steal from neighboring
                             // threads.
                             for (std::size_t offset = 1; offset < num_threads;
-                                 ++offset)
+                                ++offset)
                             {
                                 std::size_t const neighbor_index =
                                     (thread_index + offset) % num_threads;
