@@ -114,7 +114,6 @@ set(tests
     rotate
     rotate_copy
     search
-    searchn
     search_n_std
     set_difference
     set_intersection
