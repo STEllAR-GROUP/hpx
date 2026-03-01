@@ -20,6 +20,7 @@ set(subdirs
     performance_counters
     pipeline
     quickstart
+    task_bench
     qt
     random_mem_access
     spell_check
