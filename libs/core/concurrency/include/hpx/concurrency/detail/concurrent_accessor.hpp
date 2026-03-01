@@ -62,25 +62,40 @@ namespace hpx::concurrent::detail {
             return !empty();
         }
 
+        // Returns a reference to the element while the lock is held.
+        // This is safe as long as the reference is not stored beyond the
+        // accessor's lifetime.
         operator reference_type() const
         {
             return get();
         }
 
+        // Returns a reference to the element while the lock is held.
+        // IMPORTANT: Do NOT store this reference beyond the accessor's
+        // lifetime, as the lock is released when the accessor is destroyed.
         reference_type get() const
         {
             validate();
             return *value_;
         }
 
-        // Assignment operator only for non-const accessor
-        concurrent_accessor& operator=(T const& v)
+        // Sets the value of the contained element (non-const accessor only).
+        void set(T const& v)
             requires(!std::is_const_v<T>)
         {
             validate();
             *value_ = v;
-            return *this;
         }
+
+        void set(T&& v)
+            requires(!std::is_const_v<T>)
+        {
+            validate();
+            *value_ = HPX_MOVE(v);
+        }
+
+        concurrent_accessor& operator=(T const& v) = delete;
+        concurrent_accessor& operator=(T&& v) = delete;
     };
 
 }    // namespace hpx::concurrent::detail

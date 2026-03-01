@@ -43,19 +43,18 @@ void test_concurrent_vector()
     // Test accessor
     if (v.size() > 0)
     {
-        v[0] = 999;
-        HPX_TEST_EQ(static_cast<int>(v[0]), 999);
-        HPX_TEST(v[0] == 999);
+        v[0].set(999);
+        HPX_TEST_EQ(static_cast<int>(v[0].get()), 999);
+        HPX_TEST(v[0].get() == 999);
 
-        // Test operator T&
+        // Test implicit conversion to reference
         int& ref = v[0];
-        HPX_TEST_EQ(ref, 999);
-        ref = 888;
-        HPX_TEST_EQ(static_cast<int>(v[0]), 888);
+        ref = 123;
+        HPX_TEST_EQ(static_cast<int>(v[0].get()), 123);
     }
 
     // Test at()
-    HPX_TEST_EQ(static_cast<int>(v.at(0)), 888);
+    HPX_TEST_EQ(static_cast<int>(v.at(0).get()), 999);
 }
 
 void test_concurrent_vector_reserve()
@@ -79,7 +78,7 @@ void test_concurrent_vector_grow_by()
     old_size = v.grow_by(5, 42);
     HPX_TEST_EQ(old_size, 10u);
     HPX_TEST_EQ(v.size(), 15u);
-    HPX_TEST_EQ(static_cast<int>(v[10]), 42);
+    HPX_TEST_EQ(static_cast<int>(v[10].get()), 42);
 }
 
 void test_concurrent_vector_for_each()
@@ -131,9 +130,14 @@ void test_concurrent_unordered_map()
         threads.emplace_back([&m, i] {
             for (int j = 0; j < 100; ++j)
             {
-                m[i * 100 + j] = j + 1;      // Update
-                int val = m[i * 100 + j];    // Read
+                m[i * 100 + j].set(j + 1);         // Update
+                int val = m[i * 100 + j].get();    // Read
                 HPX_TEST_EQ(val, j + 1);
+
+                // Test implicit conversion to reference
+                int& ref = m[i * 100 + j];
+                ref = j + 2;
+                HPX_TEST_EQ(static_cast<int>(m[i * 100 + j].get()), j + 2);
             }
         });
     }
@@ -173,7 +177,7 @@ void test_concurrent_unordered_map_extra()
 
     HPX_TEST(m_str.contains(key));
 
-    m_str[key] = 43;
+    m_str[key].set(43);
     HPX_TEST_EQ(m_str[key].get(), 43);
 
     {

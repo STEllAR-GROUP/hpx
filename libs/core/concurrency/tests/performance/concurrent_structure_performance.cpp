@@ -157,9 +157,6 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     // Test Vector
     {
-        std::cout << "\n--- Vector Benchmark (Total Ops: " << num_ops
-                  << ", Threads: " << num_threads << ") ---\n";
-
         auto run_vector_test = [&](auto& vec, std::string name) {
             std::vector<hpx::thread> threads;
             hpx::mutex mtx;
@@ -222,9 +219,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
                         for (std::uint64_t j = 0; j < num_ops / num_threads;
                             ++j)
                         {
-                            [[maybe_unused]] auto volatile val =
+                            [[maybe_unused]] auto&& _ =
                                 vec[j % vec.size()];    // Read
-                            (void) val;
                         }
                     });
                 }
@@ -335,7 +331,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
                             ++j)
                         {
                             // Access via operator[]
-                            [[maybe_unused]] int volatile val =
+                            [[maybe_unused]] auto&& _ =
                                 m[(int) (i * (num_ops / num_threads) + j)];
                         }
                     });

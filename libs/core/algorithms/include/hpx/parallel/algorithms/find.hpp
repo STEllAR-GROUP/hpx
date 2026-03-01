@@ -1853,8 +1853,8 @@ namespace hpx::parallel::detail {
 
         template <typename ExPolicy, typename Iter, typename Sent, typename T,
             typename Proj = hpx::identity>
-        static constexpr Iter sequential(
-            ExPolicy, Iter first, Sent last, T const& val, Proj&& proj = Proj())
+        static constexpr Iter sequential(ExPolicy, Iter first, Sent last,
+            T const& val, Proj&& proj = Proj())
         {
             return sequential_find_last<ExPolicy>(
                 first, last, val, HPX_FORWARD(Proj, proj));
@@ -1895,8 +1895,8 @@ namespace hpx::parallel::detail {
             auto f1 = [val, proj = HPX_FORWARD(Proj, proj), tok](Iter it,
                           std::size_t part_size,
                           std::size_t base_idx) mutable -> void {
-                sequential_find_last<policy_type>(
-                    base_idx, it, part_size, tok, val, HPX_FORWARD(Proj, proj));
+                sequential_find_last<policy_type>(base_idx, it, part_size,
+                    tok, val, HPX_FORWARD(Proj, proj));
             };
 
             auto f2 = [tok, first, last](auto&&... data) mutable -> Iter {
@@ -1943,8 +1943,8 @@ namespace hpx::parallel::detail {
         static constexpr Iter sequential(
             ExPolicy, Iter first, Sent last, F&& f, Proj&& proj = Proj())
         {
-            return sequential_find_last_if<ExPolicy>(
-                first, last, HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
+            return sequential_find_last_if<ExPolicy>(first, last,
+                HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
         }
 
         template <typename ExPolicy, typename Iter, typename Sent, typename F,
@@ -2031,8 +2031,8 @@ namespace hpx::parallel::detail {
         static constexpr Iter sequential(
             ExPolicy, Iter first, Sent last, F&& f, Proj&& proj = Proj())
         {
-            return sequential_find_last_if_not<ExPolicy>(
-                first, last, HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
+            return sequential_find_last_if_not<ExPolicy>(first, last,
+                HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
         }
 
         template <typename ExPolicy, typename Iter, typename Sent, typename F,

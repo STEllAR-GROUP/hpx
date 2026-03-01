@@ -50,7 +50,7 @@ namespace hpx::parallel::detail {
             for (;; ++first)
             {
                 FwdIter it1 = first;
-                for (FwdIter2 it2 = s_first;; (void) ++it1, ++it2)
+                for (FwdIter2 it2 = s_first;; ++it1, ++it2)
                 {
                     if (it2 == s_last)
                         return first;
