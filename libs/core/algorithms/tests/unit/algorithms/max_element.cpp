@@ -7,6 +7,7 @@
 #include <hpx/algorithm.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/parallel/algorithms/minmax.hpp>
 
 #include <cstddef>
 #include <ctime>
@@ -125,6 +126,8 @@ void max_element_test()
 {
     test_max_element<std::random_access_iterator_tag>();
     test_max_element<std::forward_iterator_tag>();
+    test_max_element_semantics<std::random_access_iterator_tag>();
+    test_max_element_semantics<std::forward_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
