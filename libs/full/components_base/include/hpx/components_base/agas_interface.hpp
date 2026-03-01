@@ -156,9 +156,11 @@ namespace hpx::agas {
         std::uint64_t offset = 0, error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT bool is_local_lva_encoded_address(naming::gid_type const& gid);
+    HPX_CXX_EXPORT HPX_EXPORT bool is_local_lva_encoded_address(
+        naming::gid_type const& gid);
 
-    inline bool is_local_lva_encoded_address(hpx::id_type const& id)
+    HPX_CXX_EXPORT inline bool is_local_lva_encoded_address(
+        hpx::id_type const& id)
     {
         return is_local_lva_encoded_address(id.get_gid());
     }

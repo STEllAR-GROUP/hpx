@@ -32,7 +32,7 @@
 namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
-    class HPX_EXPORT query_counters
+    HPX_CXX_EXPORT class HPX_EXPORT query_counters
     {
         // avoid warning about using this in member initializer list
         query_counters* this_()

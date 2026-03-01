@@ -43,3 +43,35 @@ if(NOT HPX_WITH_STATIC_LINKING)
     PSEUDO_DEPS_NAME test_client_1950
   )
 endif()
+
+# Smoke-test: 'import HPX.Core;' (local runtime)
+if(HPX_WITH_CXX_MODULES)
+  add_executable(use_cxx_module_test EXCLUDE_FROM_ALL use_cxx_module.cpp)
+  target_link_libraries(use_cxx_module_test PRIVATE hpx)
+  hpx_configure_module_consumer(use_cxx_module_test hpx_core_module_if)
+  set_target_properties(
+    use_cxx_module_test PROPERTIES FOLDER "Tests/Regressions/Build/"
+  )
+  add_hpx_regression_test(
+    "build" use_cxx_module
+    EXECUTABLE "$<TARGET_FILE:use_cxx_module_test>"
+    PSEUDO_DEPS_NAME use_cxx_module
+  )
+
+  # Smoke-test: 'import HPX.Core.Full;' (distributed runtime)
+  if(HPX_WITH_DISTRIBUTED_RUNTIME AND TARGET hpx_full_module_if)
+    add_executable(
+      use_cxx_module_full_test EXCLUDE_FROM_ALL use_cxx_module_full.cpp
+    )
+    target_link_libraries(use_cxx_module_full_test PRIVATE hpx)
+    hpx_configure_module_consumer(use_cxx_module_full_test hpx_full_module_if)
+    set_target_properties(
+      use_cxx_module_full_test PROPERTIES FOLDER "Tests/Regressions/Build/"
+    )
+    add_hpx_regression_test(
+      "build" use_cxx_module_full
+      EXECUTABLE "$<TARGET_FILE:use_cxx_module_full_test>"
+      PSEUDO_DEPS_NAME use_cxx_module_full
+    )
+  endif()
+endif()

@@ -23,7 +23,8 @@ namespace hpx::plugins {
     ///////////////////////////////////////////////////////////////////////////
     /// The \a plugin_factory_base has to be used as a base class for all
     /// plugin factories.
-    struct HPX_EXPORT message_handler_factory_base : plugin_factory_base
+    HPX_CXX_EXPORT struct HPX_EXPORT message_handler_factory_base
+      : plugin_factory_base
     {
         ~message_handler_factory_base() override = default;
 

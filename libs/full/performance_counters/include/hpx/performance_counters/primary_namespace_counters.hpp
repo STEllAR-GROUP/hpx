@@ -15,6 +15,6 @@
 namespace hpx { namespace agas {
 
     // Register all performance counter types exposed by the primary_namespace
-    HPX_EXPORT void primary_namespace_register_counter_types(
+    HPX_CXX_EXPORT HPX_EXPORT void primary_namespace_register_counter_types(
         error_code& ec = throws);
 }}    // namespace hpx::agas

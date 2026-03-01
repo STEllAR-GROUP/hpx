@@ -263,7 +263,7 @@ namespace hpx::traits {
         template <>
         struct communicator_data<inclusive_scan_tag>
         {
-            HPX_EXPORT static char const* name() noexcept;
+            HPX_CXX_EXPORT HPX_EXPORT static char const* name() noexcept;
         };
     }    // namespace communication
 
