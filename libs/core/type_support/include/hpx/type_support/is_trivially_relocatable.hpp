@@ -12,6 +12,13 @@
 
 namespace hpx::experimental {
 
+#if defined(__cpp_lib_trivially_relocatable)
+    template <typename T>
+    struct is_trivially_relocatable : std::is_trivially_relocatable<T>
+    {
+    };
+#else
+
     // All trivially copyable types are trivially relocatable
     // Other types should default to false.
     HPX_CXX_CORE_EXPORT template <typename T>
@@ -73,6 +80,8 @@ namespace hpx::experimental {
       : is_trivially_relocatable<T>
     {
     };
+
+#endif
 
     HPX_CXX_CORE_EXPORT template <typename T>
     inline constexpr bool is_trivially_relocatable_v =

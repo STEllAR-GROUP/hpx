@@ -15,7 +15,8 @@
 #include <cstring>
 #include <type_traits>
 
-#if defined(HPX_HAVE_P1144_STD_RELOCATE_AT)
+#if defined(HPX_HAVE_P1144_STD_RELOCATE_AT) ||                                 \
+    defined(__cpp_lib_trivially_relocatable)
 #include <memory>
 #endif
 
@@ -118,8 +119,8 @@ namespace hpx::experimental {
         // noexcept if the memmove path is taken or if the move path is noexcept
         noexcept(detail::relocate_at_helper(src, dst)))
     {
-        static_assert(is_relocatable_v<T>,
-            "new (dst) T(std::move(*src)) must be well-formed");
+        static_assert(
+            is_relocatable_v<T>, "T(std::move(*src)) must be well-formed");
 
         return detail::relocate_at_helper(src, dst);
     }
