@@ -75,7 +75,7 @@ namespace hpx::parallel::detail {
             using base_policy_type =
                 decltype((hpx::execution::experimental::to_non_simd(
                     std::declval<ExPolicy>())));
-            return sequential_find(base_policy_type{}, first, last, val, proj);
+            return sequential_find<base_policy_type>(first, last, val, proj);
         }
     }
 
@@ -153,8 +153,8 @@ namespace hpx::parallel::detail {
             using base_policy_type =
                 decltype((hpx::execution::experimental::to_non_simd(
                     std::declval<ExPolicy>())));
-            return sequential_find_if(
-                base_policy_type{}, first, last, pred, proj);
+            return sequential_find_if<base_policy_type>(
+                first, last, pred, proj);
         }
     }
 
@@ -244,8 +244,8 @@ namespace hpx::parallel::detail {
             using base_policy_type =
                 decltype((hpx::execution::experimental::to_non_simd(
                     std::declval<ExPolicy>())));
-            return sequential_find_if_not(
-                base_policy_type{}, first, last, pred, proj);
+            return sequential_find_if_not<base_policy_type>(
+                first, last, pred, proj);
         }
     }
 
@@ -355,7 +355,7 @@ namespace hpx::parallel::detail {
             using base_policy_type =
                 decltype((hpx::execution::experimental::to_non_simd(
                     std::declval<ExPolicy>())));
-            return sequential_find_end(base_policy_type{}, first1, last1,
+            return sequential_find_end<base_policy_type>(first1, last1,
                 first2, last2, HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
                 HPX_FORWARD(Proj2, proj2));
         }
@@ -384,7 +384,7 @@ namespace hpx::parallel::detail {
             using base_policy_type =
                 decltype((hpx::execution::experimental::to_non_simd(
                     std::declval<ExPolicy>())));
-            return sequential_find_end(base_policy_type{}, it, first2, base_idx,
+            return sequential_find_end<base_policy_type>(it, first2, base_idx,
                 part_size, diff, tok, HPX_FORWARD(Pred, op),
                 HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }
@@ -472,7 +472,7 @@ namespace hpx::parallel::detail {
             using base_policy_type =
                 decltype((hpx::execution::experimental::to_non_simd(
                     std::declval<ExPolicy>())));
-            return sequential_find_first_of(base_policy_type{}, first, last,
+            return sequential_find_first_of<base_policy_type>(first, last,
                 s_first, s_last, HPX_FORWARD(Pred, op),
                 HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }
@@ -501,7 +501,7 @@ namespace hpx::parallel::detail {
             using base_policy_type =
                 decltype((hpx::execution::experimental::to_non_simd(
                     std::declval<ExPolicy>())));
-            return sequential_find_first_of(base_policy_type{}, it, s_first,
+            return sequential_find_first_of<base_policy_type>(it, s_first,
                 s_last, base_idx, part_size, tok, HPX_FORWARD(Pred, op),
                 HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }

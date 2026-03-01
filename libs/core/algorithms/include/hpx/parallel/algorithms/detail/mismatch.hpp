@@ -90,7 +90,7 @@ namespace hpx::parallel::detail {
                 HPX_INVOKE(
                     f, HPX_INVOKE(proj1, *first1), HPX_INVOKE(proj2, *first2)))
             {
-                (void) ++first1, ++first2;
+                ++first1, ++first2;
             }
             return {first1, first2};
         }
