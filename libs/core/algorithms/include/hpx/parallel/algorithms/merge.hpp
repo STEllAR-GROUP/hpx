@@ -651,120 +651,75 @@ namespace hpx::parallel {
             }
         }
 
-        HPX_CXX_CORE_EXPORT template <typename Iter1, typename Iter2,
-            typename Comp, typename Proj1, typename Proj2,
-            typename BinarySearchHelper>
-        auto get_reshape_chunks(std::size_t len1, Iter2 first2, Iter2 last2,
-            Comp&& comp, Proj1&& proj1, Proj2&& proj2, BinarySearchHelper)
+        HPX_CXX_CORE_EXPORT template <typename T>
+        auto get_diagonal_index(T const n)
         {
-            using merge_region =
-                hpx::tuple<Iter1, std::size_t, Iter2, std::size_t, std::size_t>;
+            auto diagonal_index = [n](auto&& /*shape*/, std::size_t cores) {
+                std::vector<hpx::tuple<std::size_t, std::size_t>> d_idx;
 
-            auto reshape = [len1, first2, last2, comp, proj1, proj2](
-                               auto&& shape, std::size_t cores) {
-#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-                static hpx::util::itt::event notify_event("reshape");
-                hpx::util::itt::mark_event e(notify_event);
-#endif
-#if defined(HPX_HAVE_MODULE_TRACY)
-                hpx::tracy::mark_event evt("reshape");
-#endif
+                if (n <= 0)
+                    return d_idx;
 
-                auto shape_size = std::size(shape);
-                if (shape_size == 1 && cores == 1)
-                {
-                    // special case: one core, one chunk - the partitioner will
-                    // switch to sequential execution in this case
-                    auto [it1, size1, _] = *std::begin(shape);
-                    auto size2 = detail::distance(first2, last2);
-                    return std::vector<merge_region>(
-                        1, merge_region{it1, size1, first2, size2, 0});
-                }
+                std::size_t const nn = static_cast<std::size_t>(n);
+                std::size_t seg = (cores == 0 ? 1 : cores);
+                seg = (std::min) (seg, nn);
 
-                std::vector<merge_region> reshaped;
-                reshaped.reserve(2 * shape_size);
+                d_idx.reserve(seg);
 
-                Iter2 it2 = first2;
-                std::size_t dest_start = 0;
-                for (auto [it1, size1, base] : shape)
-                {
-                    Iter2 l2 = last2;
-                    if (base + size1 != len1)
-                    {
-                        // gcc complains about using HPX_INVOKE here
-                        l2 = BinarySearchHelper::call(it2, last2,
-                            std::invoke(proj1, *std::next(it1, size1)), comp,
-                            proj2);
-                    }
+                std::size_t const chunk = (nn + seg - 1) / seg;
+                for (std::size_t i = 0; i < seg; ++i)
+                    d_idx.emplace_back(i, chunk);
 
-                    std::size_t size2 = detail::distance(it2, l2);
-
-                    // prevent chunks from growing too large
-                    if (size2 <= static_cast<std::size_t>(
-                                     1.2 * static_cast<double>(size1)))
-                    {
-                        reshaped.emplace_back(
-                            it1, size1, it2, size2, dest_start);
-
-                        it2 = l2;
-                        dest_start += size1 + size2;
-                    }
-                    else
-                    {
-                        // split first sequence into smaller pieces based
-                        // on chunks of the second (sub-)sequence
-                        Iter1 begin1 = it1;
-                        std::size_t remainder1 = size1;
-
-                        std::size_t chunk_size2 = size1;
-                        std::size_t remainder2 = size2 - chunk_size2;
-
-                        Iter2 begin2 = it2;
-                        Iter2 end2 = std::next(begin2, chunk_size2);
-
-                        while (chunk_size2 != 0)
-                        {
-                            Iter1 end_chunk1;
-                            if (end2 != l2)
-                            {
-                                using binary_search =
-                                    typename BinarySearchHelper::another_type;
-
-                                // gcc complains about using HPX_INVOKE here
-                                end_chunk1 =
-                                    binary_search::call_n(begin1, remainder1,
-                                        std::invoke(proj2, *end2), comp, proj1);
-                            }
-                            else
-                            {
-                                end_chunk1 = std::next(it1, size1);
-                            }
-
-                            auto chunk_size1 =
-                                detail::distance(begin1, end_chunk1);
-
-                            reshaped.emplace_back(begin1, chunk_size1, begin2,
-                                chunk_size2, dest_start);
-
-                            dest_start += chunk_size1 + chunk_size2;
-
-                            chunk_size2 = (std::min) (size1, remainder2);
-                            remainder2 -= chunk_size2;
-
-                            begin1 = end_chunk1;
-                            remainder1 -= chunk_size1;
-
-                            begin2 = end2;
-                            end2 = std::next(begin2, chunk_size2);
-                        }
-
-                        it2 = l2;
-                    }
-                }
-                return reshaped;
+                return d_idx;
             };
 
-            return reshape;
+            return diagonal_index;
+        }
+
+        HPX_CXX_CORE_EXPORT template <typename Iter1, typename Iter2,
+            typename Comp, typename Proj1, typename Proj2>
+        std::pair<std::size_t, std::size_t> diagonal_intersection(Iter1 first1,
+            std::size_t len1, Iter2 first2, std::size_t len2, std::size_t k,
+            Comp comp, Proj1&& proj1, Proj2&& proj2)
+        {
+            std::size_t a_low = (k > len2) ? (k - len2) : 0;
+            std::size_t a_high = (k < len1) ? k : len1;
+
+            while (a_low <= a_high)
+            {
+                std::ptrdiff_t a =
+                    static_cast<std::ptrdiff_t>((a_low + a_high) / 2);
+                std::ptrdiff_t b = static_cast<std::ptrdiff_t>(k - a);
+
+                // cond1: a==0 || b==len2 || A[a-1] <= B[b]
+                bool cond1 = (a == 0) ||
+                    (b == static_cast<std::ptrdiff_t>(len2)) ||
+                    !HPX_INVOKE(comp, HPX_INVOKE(proj2, *std::next(first2, b)),
+                        HPX_INVOKE(proj1, *std::next(first1, a - 1)));
+
+                // cond2: b==0 || a==len1 || B[b-1] < A[a]
+                bool cond2 = (b == 0) ||
+                    (a == static_cast<std::ptrdiff_t>(len1)) ||
+                    HPX_INVOKE(comp,
+                        HPX_INVOKE(proj2, *std::next(first2, b - 1)),
+                        HPX_INVOKE(proj1, *std::next(first1, a)));
+
+                if (cond1 && cond2)
+                    return {a, b};
+
+                if (a > 0 && b < static_cast<std::ptrdiff_t>(len2) &&
+                    HPX_INVOKE(comp, HPX_INVOKE(proj2, *std::next(first2, b)),
+                        HPX_INVOKE(proj1, *std::next(first1, a - 1))))
+                {
+                    a_high = a - 1;
+                }
+                else
+                {
+                    a_low = a + 1;
+                }
+            }
+            return {static_cast<std::ptrdiff_t>(a_high),
+                static_cast<std::ptrdiff_t>(k - a_high)};
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -783,13 +738,29 @@ namespace hpx::parallel {
 
             using result_type = util::in_in_out_result<Iter1, Iter2, Iter3>;
 
-            auto f1 = [dest, comp, proj1, proj2](Iter1 it1, std::size_t size1,
-                          Iter2 it2, std::size_t size2, std::size_t dest_base) {
-                if (size1 != 0 || size2 != 0)
+            auto f1 = [dest, comp, proj1, proj2, first1, first2, len1, len2](
+                          std::size_t idx, std::size_t chunk) {
+                if (len1 != 0 || len2 != 0)
                 {
-                    sequential_merge(it1, std::next(it1, size1), it2,
-                        std::next(it2, size2), std::next(dest, dest_base), comp,
-                        proj1, proj2);
+                    std::size_t N = len1 + len2;
+                    std::size_t k0 = (std::min) (idx * chunk, N);
+                    std::size_t k1 = (std::min) ((idx + 1) * chunk, N);
+
+                    auto [a0, b0] = diagonal_intersection(
+                        first1, len1, first2, len2, k0, comp, proj1, proj2);
+                    auto [a1, b1] = diagonal_intersection(
+                        first1, len1, first2, len2, k1, comp, proj1, proj2);
+
+                    auto itr1 = std::next(first1, a0);
+                    auto itr1_e = std::next(first1, a1);
+                    auto itr2 = std::next(first2, b0);
+                    auto itr2_e = std::next(first2, b1);
+
+                    auto itr_o =
+                        std::next(dest, static_cast<std::ptrdiff_t>(k0));
+
+                    sequential_merge(
+                        itr1, itr1_e, itr2, itr2_e, itr_o, comp, proj1, proj2);
                 }
             };
 
@@ -800,8 +771,7 @@ namespace hpx::parallel {
                         std::next(dest, len1 + len2)};
                 };
 
-                auto reshape = get_reshape_chunks<Iter1>(len1, first2, end2,
-                    comp, proj1, proj2, lower_bound_helper{});
+                auto reshape = get_diagonal_index(len1 + len2);
 
                 return util::foreach_partitioner<std::decay_t<ExPolicy>>::call(
                     HPX_FORWARD(ExPolicy, policy), first1, len1, HPX_MOVE(f1),
@@ -813,8 +783,7 @@ namespace hpx::parallel {
                     std::next(first1, len1), l2, std::next(dest, len1 + len2)};
             };
 
-            auto reshape = get_reshape_chunks<Iter2>(
-                len2, first1, end1, comp, proj2, proj1, upper_bound_helper{});
+            auto reshape = get_diagonal_index(len1 + len2);
 
             return util::foreach_partitioner<std::decay_t<ExPolicy>>::call(
                 HPX_FORWARD(ExPolicy, policy), first2, len2, HPX_MOVE(f1),
