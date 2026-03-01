@@ -806,6 +806,7 @@ void test_future_sender()
         bool exception_thrown = false;
         try
         {
+            // NOLINTNEXTLINE(bugprone-use-after-move)
             tt::sync_wait(sfs);
             HPX_TEST(false);
         }
@@ -835,6 +836,7 @@ void test_future_sender()
         bool exception_thrown = false;
         try
         {
+            // NOLINTNEXTLINE(bugprone-use-after-move)
             tt::sync_wait(sfs);
             HPX_TEST(false);
         }
