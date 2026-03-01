@@ -36,7 +36,11 @@ namespace hpx::execution::experimental {
         HPX_CXX_CORE_EXPORT template <typename Data>
         struct future_receiver_base
         {
+#if defined(HPX_HAVE_STDEXEC)
+            using receiver_concept = hpx::execution::experimental::receiver_t;
+#else
             using is_receiver = void;
+#endif
             hpx::intrusive_ptr<Data> data;
 
         protected:
@@ -167,8 +171,9 @@ namespace hpx::execution::experimental {
               //TODO: Keep an eye on this, it is based on the internal impl of
               // stdexec, so it is subect to change. This is currently relying
               // on the env struct to expose __loop_ as a public member.
-              , loop(*hpx::execution::experimental::get_env(schedule(sched))
-                        .__loop_)
+              , loop(static_cast<hpx::execution::experimental::run_loop&>(
+                    *hpx::execution::experimental::get_env(schedule(sched))
+                        .__loop_))
 #else
               , loop(sched.get_run_loop())
 #endif
@@ -201,9 +206,15 @@ namespace hpx::execution::experimental {
 
             using result_type =
                 std::decay_t<detail::single_result_t<value_types>>;
+#if defined(HPX_HAVE_STDEXEC)
+            using operation_state_type =
+                hpx::execution::experimental::connect_result_t<Sender,
+                    detail::future_receiver<result_type>>;
+#else
             using operation_state_type = hpx::util::invoke_result_t<
                 hpx::execution::experimental::connect_t, Sender,
                 detail::future_receiver<result_type>>;
+#endif
 
             using shared_state =
                 future_data<result_type, allocator_type, operation_state_type>;
@@ -247,9 +258,15 @@ namespace hpx::execution::experimental {
 
             using result_type =
                 std::decay_t<detail::single_result_t<value_types>>;
+#if defined(HPX_HAVE_STDEXEC)
+            using operation_state_type =
+                hpx::execution::experimental::connect_result_t<Sender,
+                    detail::future_receiver<result_type>>;
+#else
             using operation_state_type = hpx::util::invoke_result_t<
                 hpx::execution::experimental::connect_t, Sender,
                 detail::future_receiver<result_type>>;
+#endif
 
             using shared_state = future_data_with_run_loop<result_type,
                 allocator_type, operation_state_type>;

@@ -32,6 +32,10 @@
 #pragma clang diagnostic ignored "-Weverything"
 #endif
 
+#include <exec/ensure_started.hpp>
+#include <exec/execute.hpp>
+#include <exec/split.hpp>
+#include <exec/start_detached.hpp>
 #include <stdexec/execution.hpp>
 
 #if defined(HPX_GCC_VERSION)
@@ -60,11 +64,11 @@ namespace hpx::execution::experimental {
     HPX_CXX_CORE_EXPORT using stdexec::get_env;
     HPX_CXX_CORE_EXPORT using stdexec::get_env_t;
 
-    HPX_CXX_CORE_EXPORT using stdexec::empty_env;
-    HPX_CXX_CORE_EXPORT using stdexec::env_of_t;
-
     HPX_CXX_CORE_EXPORT using stdexec::env;
     HPX_CXX_CORE_EXPORT using stdexec::prop;
+
+    HPX_CXX_CORE_EXPORT using empty_env = env<>;
+    HPX_CXX_CORE_EXPORT using stdexec::env_of_t;
 
     // Queries
     HPX_CXX_CORE_EXPORT using stdexec::forward_progress_guarantee;
@@ -130,25 +134,37 @@ namespace hpx::execution::experimental {
     HPX_CXX_CORE_EXPORT using stdexec::on;
     HPX_CXX_CORE_EXPORT using stdexec::on_t;
 
-    // Continue on
-    HPX_CXX_CORE_EXPORT using stdexec::continue_on;
-    HPX_CXX_CORE_EXPORT using stdexec::continue_on_t;
+    // Continues on
+    HPX_CXX_CORE_EXPORT using stdexec::continues_on;
+    HPX_CXX_CORE_EXPORT using stdexec::continues_on_t;
 
     // Transfer just
     HPX_CXX_CORE_EXPORT using stdexec::transfer_just;
     HPX_CXX_CORE_EXPORT using stdexec::transfer_just_t;
 
-    // Bulk (NOT FORWARDED)
-    // HPX_CXX_CORE_EXPORT using stdexec::bulk_t;
-    // HPX_CXX_CORE_EXPORT using stdexec::bulk;
+    // Bulk operations
+    using stdexec::bulk;
+    using stdexec::bulk_chunked;
+    using stdexec::bulk_chunked_t;
+    using stdexec::bulk_t;
+    using stdexec::bulk_unchunked;
+    using stdexec::bulk_unchunked_t;
 
-    // Split
-    HPX_CXX_CORE_EXPORT using stdexec::split;
-    HPX_CXX_CORE_EXPORT using stdexec::split_t;
+    // Execution policies
+    using stdexec::is_execution_policy;
+    using stdexec::is_execution_policy_v;
+    using stdexec::par;
+    using stdexec::par_unseq;
+    using stdexec::seq;
+    using stdexec::unseq;
 
-    // Ensure started
-    HPX_CXX_CORE_EXPORT using stdexec::ensure_started;
-    HPX_CXX_CORE_EXPORT using stdexec::ensure_started_t;
+    // Split (moved to exec:: namespace in newer stdexec)
+    HPX_CXX_CORE_EXPORT using exec::split;
+    HPX_CXX_CORE_EXPORT using exec::split_t;
+
+    // Ensure started (moved to exec:: namespace in newer stdexec)
+    HPX_CXX_CORE_EXPORT using exec::ensure_started;
+    HPX_CXX_CORE_EXPORT using exec::ensure_started_t;
 
     // Transfer
     HPX_CXX_CORE_EXPORT using stdexec::transfer;
@@ -163,9 +179,9 @@ namespace hpx::execution::experimental {
     // Domain
     HPX_CXX_CORE_EXPORT using stdexec::default_domain;
 
-    // Execute
-    HPX_CXX_CORE_EXPORT using stdexec::execute;
-    HPX_CXX_CORE_EXPORT using stdexec::execute_t;
+    // Execute (moved to exec:: namespace in newer stdexec)
+    HPX_CXX_CORE_EXPORT using exec::execute;
+    HPX_CXX_CORE_EXPORT using exec::execute_t;
 
     // Into Variant
     HPX_CXX_CORE_EXPORT using stdexec::into_variant;
@@ -196,14 +212,13 @@ namespace hpx::execution::experimental {
     HPX_CXX_CORE_EXPORT using stdexec::schedule_from;
     HPX_CXX_CORE_EXPORT using stdexec::schedule_from_t;
 
-    // Start detached
-    HPX_CXX_CORE_EXPORT using stdexec::start_detached;
-    HPX_CXX_CORE_EXPORT using stdexec::start_detached_t;
+    // Start detached (moved to exec:: namespace in newer stdexec)
+    HPX_CXX_CORE_EXPORT using exec::start_detached;
+    HPX_CXX_CORE_EXPORT using exec::start_detached_t;
 
     // Stop token
     HPX_CXX_CORE_EXPORT using stdexec::stop_callback_for_t;
     HPX_CXX_CORE_EXPORT using stdexec::stoppable_token;
-    HPX_CXX_CORE_EXPORT using stdexec::stoppable_token_for;
     HPX_CXX_CORE_EXPORT using stdexec::unstoppable_token;
 
     // Stopped as error
@@ -302,11 +317,16 @@ namespace hpx::execution::experimental {
 
         HPX_CXX_CORE_EXPORT using stdexec::__single_sender_value_t;
 
-        namespace __connect_awaitable_ {
-            HPX_CXX_CORE_EXPORT using namespace stdexec::__connect_awaitable_;
+        namespace __connect_await {
+            HPX_CXX_CORE_EXPORT using namespace stdexec::__connect_await;
         }
 
         HPX_CXX_CORE_EXPORT using stdexec::__connect_awaitable_t;
+
+        // Additional stdexec concepts and utilities needed for domain customization
+        HPX_CXX_CORE_EXPORT using stdexec::__completes_on;
+        HPX_CXX_CORE_EXPORT using stdexec::__starts_on;
+        HPX_CXX_CORE_EXPORT using stdexec::sender_expr_for;
     }    // namespace stdexec_internal
 }    // namespace hpx::execution::experimental
 

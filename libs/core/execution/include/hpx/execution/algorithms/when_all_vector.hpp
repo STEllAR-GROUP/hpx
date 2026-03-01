@@ -328,7 +328,7 @@ namespace hpx::when_all_vector_detail {
                 typename hpx::execution::experimental::error_types_of_t<
                     when_all_vector_sender_impl<
                         Sender>::when_all_vector_sender_type,
-                    hpx::execution::experimental::empty_env, hpx::variant>;
+                    hpx::execution::experimental::env<>, hpx::variant>;
 #else
             using error_types = typename generate_completion_signatures<
                 hpx::execution::experimental::empty_env>::

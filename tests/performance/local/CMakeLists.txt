@@ -131,6 +131,7 @@ set(partitioned_vector_foreach_FLAGS DEPENDENCIES iostreams_component
 
 set(future_overhead_PARAMETERS THREADS_PER_LOCALITY 4)
 set(future_overhead_report_PARAMETERS THREADS_PER_LOCALITY 4)
+set(stream_report_PARAMETERS THREADS_PER_LOCALITY 2)
 
 # These tests do not run on hpx threads, so we don't want to pass hpx params
 # into them
