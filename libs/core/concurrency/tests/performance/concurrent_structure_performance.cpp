@@ -155,17 +155,6 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::uint64_t num_ops =
         vm["ops"].as<std::uint64_t>();    // Total ops per test
 
-    auto access_value = [](auto&& accessor) -> decltype(auto) {
-        if constexpr (requires { accessor.get(); })
-        {
-            return accessor.get();
-        }
-        else
-        {
-            return HPX_FORWARD(decltype(accessor), accessor);
-        }
-    };
-
     // Test Vector
     {
         auto run_vector_test = [&](auto& vec, std::string name) {
@@ -230,9 +219,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
                         for (std::uint64_t j = 0; j < num_ops / num_threads;
                             ++j)
                         {
-                            [[maybe_unused]] auto val =
-                                access_value(vec[j % vec.size()]);    // Read
-                            (void) val;
+                            (void) vec[j % vec.size()];    // Read
                         }
                     });
                 }
@@ -343,8 +330,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
                             ++j)
                         {
                             // Access via operator[]
-                            [[maybe_unused]] auto val = access_value(
-                                m[(int) (i * (num_ops / num_threads) + j)]);
+                            (void) m[(int) (i * (num_ops / num_threads) + j)];
                         }
                     });
                 }

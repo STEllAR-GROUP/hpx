@@ -63,6 +63,14 @@ namespace hpx::concurrent::detail {
         }
 
         // Returns a reference to the element while the lock is held.
+        // This is safe as long as the reference is not stored beyond the
+        // accessor's lifetime.
+        operator reference_type() const
+        {
+            return get();
+        }
+
+        // Returns a reference to the element while the lock is held.
         // IMPORTANT: Do NOT store this reference beyond the accessor's
         // lifetime, as the lock is released when the accessor is destroyed.
         reference_type get() const
