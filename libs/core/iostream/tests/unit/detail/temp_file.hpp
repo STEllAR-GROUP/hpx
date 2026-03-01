@@ -67,11 +67,10 @@ namespace hpx::iostream::test {
             std::ios_base::openmode mode =
                 std::ios_base::out | std::ios_base::binary;
             std::ofstream f(name().c_str(), mode);
-            std::string const n(name());
 
             char const* buf = narrow_data();
             for (int z = 0; z < data_reps; ++z)
-                f.write(buf, data_length());
+                f.write(buf, static_cast<long>(data_length()));
         }
     };
 
@@ -84,7 +83,7 @@ namespace hpx::iostream::test {
             std::ofstream f(name().c_str(), mode);
             char const* buf = narrow_data();
             for (int z = 0; z < data_reps; ++z)
-                for (int w = 0; w < data_length(); ++w)
+                for (int w = 0; w < static_cast<int>(data_length()); ++w)
                     f.put((char) std::toupper(buf[w]));
         }
     };
@@ -98,7 +97,7 @@ namespace hpx::iostream::test {
             std::ofstream f(name().c_str(), mode);
             char const* buf = narrow_data();
             for (int z = 0; z < data_reps; ++z)
-                for (int w = 0; w < data_length(); ++w)
+                for (int w = 0; w < static_cast<int>(data_length()); ++w)
                     f.put((char) std::tolower(buf[w]));
         }
     };

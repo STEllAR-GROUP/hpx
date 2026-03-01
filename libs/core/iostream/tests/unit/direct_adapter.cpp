@@ -14,6 +14,7 @@
 #include <hpx/modules/testing.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <fstream>
 
 #include "detail/sequence.hpp"
@@ -56,7 +57,8 @@ void direct_adapter_test()
 
     //--------------indirect_array_ostream------------------------------------//
     {
-        vector<char> dest(data_reps * data_length(), '?');
+        vector<char> dest(
+            static_cast<std::size_t>(data_reps * data_length()), '?');
         indirect_array_ostream out(&dest[0], &dest[0] + dest.size());
         write_data_in_chars(out);
         HPX_TEST_MSG(std::equal(seq.begin(), seq.end(), dest.begin()),
@@ -64,7 +66,8 @@ void direct_adapter_test()
     }
 
     {
-        vector<char> dest(data_reps * data_length(), '?');
+        vector<char> dest(
+            static_cast<std::size_t>(data_reps * data_length()), '?');
         indirect_array_ostream out(&dest[0], &dest[0] + dest.size());
         write_data_in_chunks(out);
         HPX_TEST_MSG(std::equal(seq.begin(), seq.end(), dest.begin()),
@@ -73,14 +76,16 @@ void direct_adapter_test()
 
     //--------------indirect_array_stream-------------------------------------//
     {
-        vector<char> test(data_reps * data_length(), '?');
+        vector<char> test(
+            static_cast<std::size_t>(data_reps * data_length()), '?');
         indirect_array_stream io(&test[0], &test[0] + test.size());
         HPX_TEST_MSG(test_seekable_in_chars(io),
             "failed seeking within indirect_array_stream, in chars");
     }
 
     {
-        vector<char> test(data_reps * data_length(), '?');
+        vector<char> test(
+            static_cast<std::size_t>(data_reps * data_length()), '?');
         indirect_array_stream io(&test[0], &test[0] + test.size());
         HPX_TEST_MSG(test_seekable_in_chunks(io),
             "failed seeking within indirect_array_stream, in chunks");
