@@ -351,34 +351,46 @@ namespace hpx::parallel::execution::detail {
         }
 
         // Initialize a queue for a worker thread.
-        void init_queue_depth_first(std::uint32_t const worker_thread,
-            std::uint32_t const size) noexcept
+        void init_queue_depth_first(
+            std::size_t const worker_thread, std::size_t const size) noexcept
         {
             auto& queue = queues[worker_thread].data_;
-            auto const part_begin = static_cast<std::uint32_t>(
-                (worker_thread * size) / num_threads);
-            auto const part_end = static_cast<std::uint32_t>(
-                (worker_thread * size + size) / num_threads);
-            queue.reset(part_begin, part_end);
+            auto const part_begin = (worker_thread * size) / num_threads;
+            auto const part_end = (worker_thread * size + size) / num_threads;
+
+            HPX_ASSERT_MSG(
+                size <= static_cast<std::size_t>(
+                            (std::numeric_limits<std::uint32_t>::max)()),
+                "init_queue_depth_first: ranges larger than "
+                "UINT32_MAX are not supported");
+
+            queue.reset(static_cast<std::uint32_t>(part_begin),
+                static_cast<std::uint32_t>(part_end));
         }
 
-        void init_queue_breadth_first(std::uint32_t const worker_thread,
-            std::uint32_t const size) noexcept
+        void init_queue_breadth_first(
+            std::size_t const worker_thread, std::size_t const size) noexcept
         {
             auto& queue = queues[worker_thread].data_;
             auto const num_steps = size / num_threads + 1;
             auto const part_begin = worker_thread;
-            auto part_end =
-                static_cast<std::uint32_t>((std::min) (size + num_threads - 1,
-                    part_begin + num_steps * num_threads));
-            auto const remainder = static_cast<std::uint32_t>(
-                (part_end - part_begin) % num_threads);
+            auto part_end = (std::min) (size + num_threads - 1,
+                part_begin + num_steps * num_threads);
+            auto const remainder = (part_end - part_begin) % num_threads;
             if (remainder != 0)
             {
                 part_end -= remainder;
             }
-            queue.reset(
-                part_begin, part_end, static_cast<std::uint32_t>(num_threads));
+
+            HPX_ASSERT_MSG(
+                size <= static_cast<std::size_t>(
+                            (std::numeric_limits<std::uint32_t>::max)()),
+                "init_queue_breadth_first: ranges larger than "
+                "UINT32_MAX are not supported");
+
+            queue.reset(static_cast<std::uint32_t>(part_begin),
+                static_cast<std::uint32_t>(part_end),
+                static_cast<std::uint32_t>(num_threads));
         }
 
         // Prepare policy to be used for spawning new HPX threads
