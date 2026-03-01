@@ -11,6 +11,7 @@
 #include <hpx/modules/type_support.hpp>
 
 #include <atomic>
+#include <cstddef>
 #include <random>
 #include <set>
 #include <utility>
@@ -26,6 +27,132 @@ using hpx::experimental::is_trivially_relocatable_v;
 using hpx::experimental::uninitialized_relocate;
 
 std::mutex m;
+
+struct relocate_tracker
+{
+    int value;
+    bool* alive;
+
+    relocate_tracker(int v, bool* a) noexcept
+      : value(v)
+      , alive(a)
+    {
+        *alive = true;
+    }
+
+    relocate_tracker(relocate_tracker&& other) noexcept
+      : value(other.value)
+      , alive(other.alive)
+    {
+        // moved-from object becomes dead
+        if (other.alive)
+            *other.alive = false;
+        if (alive)
+            *alive = true;
+    }
+
+    relocate_tracker(relocate_tracker const&) = delete;
+    relocate_tracker& operator=(relocate_tracker const&) = delete;
+    relocate_tracker& operator=(relocate_tracker&&) = delete;
+
+    ~relocate_tracker()
+    {
+        if (alive)
+            *alive = false;
+    }
+};
+
+void test_uninitialized_relocate_overlap_forward_semantics()
+{
+    using T = relocate_tracker;
+
+    constexpr std::size_t N = 8;
+    constexpr std::size_t Nsrc = 6;
+    constexpr std::size_t offset = 2;
+
+    alignas(T) unsigned char storage[N * sizeof(T)];
+    bool alive[N] = {false};
+
+    T* base = reinterpret_cast<T*>(storage);
+
+    for (std::size_t i = 0; i < Nsrc; ++i)
+    {
+        ::new (static_cast<void*>(base + i)) T(static_cast<int>(i), &alive[i]);
+    }
+
+    hpx::experimental::uninitialized_relocate(
+        hpx::execution::seq, base, base + Nsrc, base + offset);
+
+    std::size_t alive_count = 0;
+    for (std::size_t i = 0; i < N; ++i)
+    {
+        if (alive[i])
+            ++alive_count;
+    }
+
+    // Forward overlapping relocate leaves Nsrc - offset live objects
+    HPX_TEST(alive_count == Nsrc - offset);
+
+    for (std::size_t i = 0; i < N; ++i)
+    {
+        if (alive[i])
+            base[i].~T();
+    }
+}
+
+template <typename ExPolicy>
+void test_uninitialized_relocate_overlap_forward_matches_seq(ExPolicy&& policy)
+{
+    using T = relocate_tracker;
+
+    constexpr std::size_t N = 8;
+    constexpr std::size_t Nsrc = 6;
+    constexpr std::size_t offset = 2;
+
+    alignas(T) unsigned char storage_seq[sizeof(T) * N];
+    alignas(T) unsigned char storage_par[sizeof(T) * N];
+
+    bool alive_seq[N] = {false};
+    bool alive_par[N] = {false};
+
+    T* base_seq = reinterpret_cast<T*>(storage_seq);
+    T* base_par = reinterpret_cast<T*>(storage_par);
+
+    for (std::size_t i = 0; i < Nsrc; ++i)
+    {
+        ::new (static_cast<void*>(base_seq + i))
+            T(static_cast<int>(i), &alive_seq[i]);
+
+        ::new (static_cast<void*>(base_par + i))
+            T(static_cast<int>(i), &alive_par[i]);
+    }
+
+    // run sequential
+    hpx::experimental::uninitialized_relocate(
+        hpx::execution::seq, base_seq, base_seq + Nsrc, base_seq + offset);
+
+    // run tested policy
+    hpx::experimental::uninitialized_relocate(HPX_FORWARD(ExPolicy, policy),
+        base_par, base_par + Nsrc, base_par + offset);
+
+    for (std::size_t i = 0; i < N; ++i)
+    {
+        HPX_TEST(alive_seq[i] == alive_par[i]);
+
+        if (alive_seq[i])
+        {
+            HPX_TEST(base_seq[i].value == base_par[i].value);
+        }
+    }
+
+    for (std::size_t i = 0; i < N; ++i)
+    {
+        if (alive_seq[i])
+            base_seq[i].~T();
+        if (alive_par[i])
+            base_par[i].~T();
+    }
+}
 
 template <typename F>
 void simple_mutex_operation(F&& f)
@@ -518,6 +645,20 @@ int hpx_main()
 
     test_overlapping<hpx::execution::sequenced_policy>();
     test_overlapping<hpx::execution::parallel_policy>();
+
+    test_uninitialized_relocate_overlap_forward_semantics();
+
+    test_uninitialized_relocate_overlap_forward_matches_seq(
+        hpx::execution::par);
+
+#if defined(HPX_HAVE_CXX17_STD_EXECUTION_POLICIES)
+    test_uninitialized_relocate_overlap_forward_matches_seq(
+        hpx::execution::par_unseq);
+#endif
+
+    // TODO(par(task)):
+    // Add a dedicated async test once the overlap behavior is extended to
+    // properly support parallel task policies and sender-based return types.
 
     return hpx::local::finalize();
 }
