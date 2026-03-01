@@ -25,7 +25,7 @@ status_computation_and_artifacts_storage() {
 trap "status_computation_and_artifacts_storage" EXIT
 
 src_dir="$(pwd)"
-build_dir="${src_dir}/build/${configuration_name}"
+build_dir="/tmp/jenkins-perf/build/${configuration_name}"
 
 mkdir -p ${build_dir}/tools
 cp -r ${src_dir}/tools/perftests_ci ${build_dir}/tools
