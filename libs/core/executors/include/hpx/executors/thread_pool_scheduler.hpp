@@ -96,17 +96,16 @@ namespace hpx::execution::experimental {
         template <typename Executor_>
             requires(
                 std::is_convertible_v<Executor_, thread_pool_policy_scheduler>)
-        friend constexpr auto tag_invoke(
+        friend auto tag_invoke(
             hpx::execution::experimental::with_processing_units_count_t,
             Executor_ const& scheduler, std::size_t num_cores)
         {
             if (num_cores == 0)
             {
-                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
-                    "thread_pool_policy_scheduler::"
-                    "with_processing_units_count",
-                    "number of processing units must be greater than "
-                    "zero");
+                auto pool = scheduler.pool_ ?
+                    scheduler.pool_ :
+                    threads::detail::get_self_or_default_pool();
+                num_cores = pool->get_active_os_thread_count();
             }
             auto scheduler_with_num_cores = scheduler;
             scheduler_with_num_cores.num_cores_ = num_cores;
