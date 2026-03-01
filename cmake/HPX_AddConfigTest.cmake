@@ -553,15 +553,6 @@ function(hpx_check_for_cxx20_paren_initialization_of_aggregates)
 endfunction()
 
 # ##############################################################################
-function(hpx_check_for_cxx20_std_endian)
-  add_hpx_config_test(
-    HPX_WITH_CXX20_STD_ENDIAN
-    SOURCE cmake/tests/cxx20_std_endian.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
 function(hpx_check_for_cxx20_std_execution_policies)
   add_hpx_config_test(
     HPX_WITH_CXX20_STD_EXECUTION_POLICES
