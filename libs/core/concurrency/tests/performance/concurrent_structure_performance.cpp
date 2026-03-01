@@ -219,7 +219,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
                         for (std::uint64_t j = 0; j < num_ops / num_threads;
                             ++j)
                         {
-                            (void) vec[j % vec.size()];    // Read
+                            [[maybe_unused]] auto&& _ =
+                                vec[j % vec.size()];    // Read
                         }
                     });
                 }
@@ -330,7 +331,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
                             ++j)
                         {
                             // Access via operator[]
-                            (void) m[(int) (i * (num_ops / num_threads) + j)];
+                            [[maybe_unused]] auto&& _ =
+                                m[(int) (i * (num_ops / num_threads) + j)];
                         }
                     });
                 }
