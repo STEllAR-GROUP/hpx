@@ -46,6 +46,11 @@ void test_concurrent_vector()
         v[0].set(999);
         HPX_TEST_EQ(static_cast<int>(v[0].get()), 999);
         HPX_TEST(v[0].get() == 999);
+
+        // Test implicit conversion to reference
+        int& ref = v[0];
+        ref = 123;
+        HPX_TEST_EQ(static_cast<int>(v[0].get()), 123);
     }
 
     // Test at()
@@ -128,6 +133,11 @@ void test_concurrent_unordered_map()
                 m[i * 100 + j].set(j + 1);         // Update
                 int val = m[i * 100 + j].get();    // Read
                 HPX_TEST_EQ(val, j + 1);
+
+                // Test implicit conversion to reference
+                int& ref = m[i * 100 + j];
+                ref = j + 2;
+                HPX_TEST_EQ(static_cast<int>(m[i * 100 + j].get()), j + 2);
             }
         });
     }
