@@ -1,5 +1,4 @@
-# Copyright (c) 2020 ETH Zurich
-# Copyright (c) 2023 The STE||AR Group
+# Copyright (c) 2026 Ujjwal Shekhar
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,6 +19,7 @@ jobs:
       shell: bash
       run: |
         cmake \
+          . \
           -Bbuild \
           -GNinja \
           -DHPX_WITH_MALLOC=system \
@@ -37,11 +37,16 @@ jobs:
           -DHPX_WITH_TESTS=ON \
           -DHPX_WITH_TESTS_MAX_THREADS_PER_LOCALITY=2 \
           -DHPX_SERIALIZATION_WITH_ALLOW_AUTO_GENERATE=ON \
-          -DHPX_WITH_CHECK_MODULE_DEPENDENCIES=On \
-          ..
+          -DHPX_WITH_CHECK_MODULE_DEPENDENCIES=On
     - name: Build
       shell: bash
       run: |
           cmake --build build --target all
           cmake --build build --target examples
-    
+    - name: Test
+      shell: bash
+      run: |
+          cd build
+          ctest \
+            --output-on-failure \
+            --tests-regex "tests.unit.modules.serialization"
