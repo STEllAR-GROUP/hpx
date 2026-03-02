@@ -51,7 +51,7 @@ void verification_function_seekable_test()
         fstream io(f.name().c_str(),
             std::ios_base::in | std::ios_base::out | std::ios_base::binary |
                 std::ios_base::trunc);
-        for (int i = 0; i < data_reps; ++i)
+        for (std::size_t i = 0; i < data_reps; ++i)
             io.write(narrow_data(), chunk_size);
         io.seekg(0, std::ios_base::beg);
         HPX_TEST_MSG(
@@ -86,7 +86,7 @@ void verification_function_dual_seekable_test()
 
     {
         string s;
-        for (int i = 0; i < data_reps; ++i)
+        for (std::size_t i = 0; i < data_reps; ++i)
             s.append(narrow_data(), chunk_size);
         stringstream ss(s, std::ios_base::in | std::ios_base::out);
         HPX_TEST_MSG(
@@ -125,7 +125,7 @@ void dual_seekable_test()
 
     {
         string s;
-        for (int i = 0; i < data_reps; ++i)
+        for (std::size_t i = 0; i < data_reps; ++i)
             s.append(narrow_data(), chunk_size);
         stringstream ss(s, std::ios_base::in | std::ios_base::out);
         filtering_stream<dual_seekable> io(ss);

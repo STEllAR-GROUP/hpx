@@ -27,7 +27,7 @@ namespace hpx::iostream::test {
         {
             Ch const* buf = test::detail::data((Ch*) nullptr);
             this->reserve(data_reps * data_length());
-            for (int z = 0; z < data_reps; ++z)
+            for (std::size_t z = 0; z < data_reps; ++z)
                 std::copy(buf, buf + data_length(), std::back_inserter(*this));
         }
     };

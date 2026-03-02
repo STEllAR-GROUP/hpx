@@ -32,8 +32,7 @@ void write_output_sequence_test()
     test_file test;
 
     {
-        vector<char> first(
-            static_cast<std::size_t>(data_reps * data_length()), '?');
+        vector<char> first(data_reps * data_length(), '?');
         filtering_ostream out(
             hpx::util::iterator_range(first.begin(), first.end()), 0);
         write_data_in_chars(out);
@@ -44,8 +43,7 @@ void write_output_sequence_test()
     }
 
     {
-        vector<char> first(
-            static_cast<std::size_t>(data_reps * data_length()), '?');
+        vector<char> first(data_reps * data_length(), '?');
         filtering_ostream out(
             hpx::util::iterator_range(first.begin(), first.end()), 0);
         write_data_in_chunks(out);
@@ -56,8 +54,7 @@ void write_output_sequence_test()
     }
 
     {
-        vector<char> first(
-            static_cast<std::size_t>(data_reps * data_length()), '?');
+        vector<char> first(data_reps * data_length(), '?');
         filtering_ostream out(
             hpx::util::iterator_range(first.begin(), first.end()));
         write_data_in_chars(out);
@@ -68,8 +65,7 @@ void write_output_sequence_test()
     }
 
     {
-        vector<char> first(
-            static_cast<std::size_t>(data_reps * data_length()), '?');
+        vector<char> first(data_reps * data_length(), '?');
         filtering_ostream out(
             hpx::util::iterator_range(first.begin(), first.end()));
         write_data_in_chunks(out);

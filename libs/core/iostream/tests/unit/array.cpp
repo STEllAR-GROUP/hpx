@@ -48,8 +48,7 @@ void array_test()
 
     //--------------stream<array_sink>---------------------------------//
     {
-        vector<char> first(
-            static_cast<std::size_t>(data_reps * data_length()), '?');
+        vector<char> first(data_reps * data_length(), '?');
         stream<array_sink<char>> out(&first[0], &first[0] + first.size());
         write_data_in_chars(out);
         ifstream second(
@@ -59,8 +58,7 @@ void array_test()
     }
 
     {
-        vector<char> first(
-            static_cast<std::size_t>(data_reps * data_length()), '?');
+        vector<char> first(data_reps * data_length(), '?');
         stream<array_sink<char>> out(&first[0], &first[0] + first.size());
         write_data_in_chunks(out);
         ifstream second(
@@ -71,8 +69,7 @@ void array_test()
 
     //--------------random access---------------------------------------------//
     {
-        vector<char> first(
-            static_cast<std::size_t>(data_reps * data_length()), '?');
+        vector<char> first(data_reps * data_length(), '?');
         stream<hpx::iostream::array<char>> io(
             &first[0], &first[0] + first.size());
         HPX_TEST_MSG(test_seekable_in_chars(io),
@@ -80,8 +77,7 @@ void array_test()
     }
 
     {
-        vector<char> first(
-            static_cast<std::size_t>(data_reps * data_length()), '?');
+        vector<char> first(data_reps * data_length(), '?');
         stream<hpx::iostream::array<char>> io(
             &first[0], &first[0] + first.size());
         HPX_TEST_MSG(test_seekable_in_chars(io),
