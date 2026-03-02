@@ -170,7 +170,7 @@ namespace hpx::parallel {
             if constexpr (hpx::traits::is_random_access_iterator_v<FwdIter>)
             {
                 return parallel::util::get_second_element(
-                    util::move_n(mid, dist - n, HPX_MOVE(first)));
+                    util::move_n_helper_call(mid, dist - n, HPX_MOVE(first)));
             }
             else
             {

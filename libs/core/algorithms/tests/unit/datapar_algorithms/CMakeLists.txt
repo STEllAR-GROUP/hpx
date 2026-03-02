@@ -34,6 +34,7 @@ if(HPX_WITH_DATAPAR)
       generaten_datapar
       mismatch_binary_datapar
       mismatch_datapar
+      move_datapar
       none_of_datapar
       reduce_datapar
       replace_copy_if_datapar

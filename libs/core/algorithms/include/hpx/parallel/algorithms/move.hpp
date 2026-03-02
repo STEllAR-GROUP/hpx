@@ -127,6 +127,22 @@ namespace hpx::parallel {
     namespace detail {
         /// \cond NOINTERNAL
 
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy>
+        struct move_iteration
+        {
+            using execution_policy_type = std::decay_t<ExPolicy>;
+
+            template <typename Iter>
+            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void operator()(
+                Iter part_begin, std::size_t part_size, std::size_t) const
+            {
+                using hpx::get;
+                auto iters = part_begin.get_iterator_tuple();
+                util::move_n<execution_policy_type>(
+                    get<0>(iters), part_size, get<1>(iters));
+            }
+        };
+
         HPX_CXX_CORE_EXPORT template <typename IterPair>
         struct move_pair : public algorithm<move_pair<IterPair>, IterPair>
         {
@@ -152,7 +168,8 @@ namespace hpx::parallel {
                 util::in_out_result<InIter, OutIter>>
             sequential(ExPolicy, InIter first, Sent last, OutIter dest)
             {
-                return util::move_n(first, detail::distance(first, last), dest);
+                return util::move_n<ExPolicy>(
+                    first, detail::distance(first, last), dest);
             }
 
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
@@ -167,12 +184,7 @@ namespace hpx::parallel {
                         HPX_FORWARD(ExPolicy, policy),
                         zip_iterator(first, dest),
                         detail::distance(first, last),
-                        [](zip_iterator part_begin, std::size_t part_size,
-                            std::size_t) {
-                            auto iters = part_begin.get_iterator_tuple();
-                            util::move_n(hpx::get<0>(iters), part_size,
-                                hpx::get<1>(iters));
-                        },
+                        move_iteration<ExPolicy>(),
                         [](zip_iterator&& last) -> zip_iterator {
                             return HPX_MOVE(last);
                         }));

@@ -364,8 +364,41 @@ namespace hpx::parallel::util {
         };
     }    // namespace detail
 
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
+    struct move_n_t final
+      : hpx::functional::detail::tag_fallback<move_n_t<ExPolicy>>
+    {
+    private:
+        template <typename InIter, typename OutIter>
+        friend HPX_HOST_DEVICE
+            HPX_FORCEINLINE constexpr in_out_result<InIter, OutIter>
+            tag_fallback_invoke(hpx::parallel::util::move_n_t<ExPolicy>,
+                InIter first, std::size_t count, OutIter dest)
+        {
+            using category = hpx::traits::pointer_move_category_t<
+                std::decay_t<
+                    hpx::traits::remove_const_iterator_value_type_t<InIter>>,
+                std::decay_t<OutIter>>;
+            return detail::move_n_helper<category>::call(first, count, dest);
+        }
+    };
+
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
+    inline constexpr move_n_t<ExPolicy> move_n = move_n_t<ExPolicy>{};
+#else
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename InIter,
+        typename OutIter>
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr in_out_result<InIter, OutIter>
+    move_n(InIter first, std::size_t count, OutIter dest)
+    {
+        return hpx::parallel::util::move_n_t<ExPolicy>{}(first, count, dest);
+    }
+#endif
+
+    // non-policy version
     HPX_CXX_CORE_EXPORT template <typename InIter, typename OutIter>
-    HPX_FORCEINLINE constexpr in_out_result<InIter, OutIter> move_n(
+    HPX_FORCEINLINE constexpr in_out_result<InIter, OutIter> move_n_helper_call(
         InIter first, std::size_t count, OutIter dest)
     {
         using category =

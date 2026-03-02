@@ -68,6 +68,54 @@ namespace hpx::parallel::util {
     {
         return detail::datapar_copy_n<InIter>::call(first, count, dest);
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail {
+
+        HPX_CXX_CORE_EXPORT template <typename Iterator>
+        struct datapar_move_n
+        {
+            template <typename InIter, typename OutIter>
+            HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
+                iterators_datapar_compatible_v<InIter, OutIter> &&
+                    iterator_datapar_compatible_v<InIter> &&
+                    iterator_datapar_compatible_v<OutIter>,
+                in_out_result<InIter, OutIter>>::type
+            call(InIter first, std::size_t count, OutIter dest)
+            {
+                auto ret =
+                    util::transform_loop_n_ind<hpx::execution::simd_policy>(
+                        first, count, dest,
+                        [](auto&& v) { return HPX_MOVE(v); });
+
+                return util::in_out_result<InIter, OutIter>{
+                    HPX_MOVE(ret.first), HPX_MOVE(ret.second)};
+            }
+
+            template <typename InIter, typename OutIter>
+            HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
+                !iterators_datapar_compatible_v<InIter, OutIter> ||
+                    !iterator_datapar_compatible_v<InIter> ||
+                    !iterator_datapar_compatible_v<OutIter>,
+                in_out_result<InIter, OutIter>>::type
+            call(InIter first, std::size_t count, OutIter dest)
+            {
+                return util::move_n<hpx::execution::sequenced_policy>(
+                    first, count, dest);
+            }
+        };
+    }    // namespace detail
+
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename InIter,
+        typename OutIter>
+    HPX_HOST_DEVICE HPX_FORCEINLINE
+        typename std::enable_if<hpx::is_vectorpack_execution_policy_v<ExPolicy>,
+            in_out_result<InIter, OutIter>>::type
+        tag_invoke(hpx::parallel::util::move_n_t<ExPolicy>, InIter first,
+            std::size_t count, OutIter dest)
+    {
+        return detail::datapar_move_n<InIter>::call(first, count, dest);
+    }
 }    // namespace hpx::parallel::util
 
 #endif
