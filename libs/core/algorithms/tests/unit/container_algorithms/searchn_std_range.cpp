@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <iostream>
+#include <string>
 #include <vector>
 
 struct user_defined_type
