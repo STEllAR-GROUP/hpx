@@ -31,7 +31,7 @@ namespace hpx::iostream::test {
     inline constexpr int small_buffer_size = 23;
 
     // Number of times data is repeated in test files.
-    inline constexpr int data_reps = 300;
+    inline constexpr std::size_t data_reps = 300;
 
     namespace detail {
 
