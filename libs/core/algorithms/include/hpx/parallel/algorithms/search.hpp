@@ -389,7 +389,7 @@ namespace hpx {
         template <typename FwdIter, typename Searcher>
         // clang-format off
         requires (
-            traits::is_forward_iterator<FwdIter>::value &&
+            std::forward_iterator<FwdIter> &&
             std::is_invocable_v<Searcher&, FwdIter, FwdIter>)
         // clang-format on
         friend FwdIter tag_fallback_invoke(
@@ -403,7 +403,7 @@ namespace hpx {
         // clang-format off
         requires (
             is_execution_policy<ExPolicy>::value &&
-            traits::is_forward_iterator<FwdIter>::value &&
+            std::forward_iterator<FwdIter> &&
             std::is_invocable_v<Searcher&, FwdIter, FwdIter>)
         // clang-format on
         friend FwdIter tag_fallback_invoke(hpx::search_t, ExPolicy&&,

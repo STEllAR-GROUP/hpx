@@ -308,8 +308,8 @@ namespace hpx::parallel::detail {
             };
 
             auto f2 = [first, last, max_start, &tok](
-                          auto&& data) mutable -> FwdIter {
-                util::detail::clear_container(data);
+                          auto&&... data) mutable -> FwdIter {
+                util::detail::clear_container(data...);
 
                 difference_type idx = tok.get_data();
                 if (idx == max_start)
