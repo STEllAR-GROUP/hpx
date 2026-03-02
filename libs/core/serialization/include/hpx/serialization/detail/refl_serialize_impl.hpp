@@ -31,7 +31,7 @@ namespace hpx::serialization::detail {
         using Type = std::conditional_t<std::is_const_v<T>, MemberType const,
             MemberType>;
 
-        auto base_addr = std::bit_cast<std::uintptr_t>(std::addressof(base));
+        auto base_addr = std::bit_cast<std::byte*>(std::addressof(base));
         auto member_ptr = std::bit_cast<Type*>(base_addr + offset);
 
         return *member_ptr;
