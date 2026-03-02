@@ -15,8 +15,8 @@
 #include <hpx/modules/statistics.hpp>
 #include <hpx/modules/synchronization.hpp>
 
+#include <hpx/modules/parcelset_base.hpp>
 #include <hpx/parcel_coalescing/message_buffer.hpp>
-#include <hpx/parcelset_base/policies/message_handler.hpp>
 
 #include <cstddef>
 #include <cstdint>

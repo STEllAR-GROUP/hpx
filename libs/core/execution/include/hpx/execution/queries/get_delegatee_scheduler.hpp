@@ -36,7 +36,7 @@ namespace hpx::execution::experimental {
     //    expression-equivalent to
     //    execution::read(execution::get_delegatee_scheduler).
     //
-    HPX_CXX_EXPORT inline constexpr struct get_delegatee_scheduler_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct get_delegatee_scheduler_t final
       : hpx::functional::detail::tag_fallback<get_delegatee_scheduler_t>
     {
     private:
@@ -45,7 +45,7 @@ namespace hpx::execution::experimental {
 
     } get_delegatee_scheduler{};
 
-    HPX_CXX_EXPORT constexpr auto tag_fallback_invoke(
+    HPX_CXX_CORE_EXPORT constexpr auto tag_fallback_invoke(
         get_delegatee_scheduler_t) noexcept
     {
         return hpx::execution::experimental::read(get_delegatee_scheduler);

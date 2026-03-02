@@ -756,6 +756,8 @@ namespace hpx { namespace experimental {
 
 #include <cstddef>
 #include <cstdint>
+#include <iterator>
+#include <ranges>
 #include <type_traits>
 #include <utility>
 
@@ -770,7 +772,7 @@ namespace hpx::parallel {
         HPX_HAS_XXX_TRAIT_DEF(needs_current_thread_num);
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename... Ts, std::size_t... Is>
+        HPX_CXX_CORE_EXPORT template <typename... Ts, std::size_t... Is>
         HPX_HOST_DEVICE constexpr void init_iteration(hpx::tuple<Ts...>& args,
             hpx::util::index_pack<Is...>, std::size_t part_index,
             std::size_t current_thread) noexcept
@@ -779,8 +781,8 @@ namespace hpx::parallel {
                 ...);
         }
 
-        HPX_CXX_EXPORT template <typename... Ts, std::size_t... Is, typename F,
-            typename B>
+        HPX_CXX_CORE_EXPORT template <typename... Ts, std::size_t... Is,
+            typename F, typename B>
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void invoke_iteration(
             hpx::tuple<Ts...>& args, hpx::util::index_pack<Is...>, F&& f,
             B part_begin, std::size_t current_thread)
@@ -789,7 +791,7 @@ namespace hpx::parallel {
                 hpx::get<Is>(args).iteration_value(current_thread)...);
         }
 
-        HPX_CXX_EXPORT template <typename... Ts, std::size_t... Is>
+        HPX_CXX_CORE_EXPORT template <typename... Ts, std::size_t... Is>
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void next_iteration(
             hpx::tuple<Ts...>& args, hpx::util::index_pack<Is...>,
             std::size_t current_thread) noexcept
@@ -797,7 +799,7 @@ namespace hpx::parallel {
             (hpx::get<Is>(args).next_iteration(current_thread), ...);
         }
 
-        HPX_CXX_EXPORT template <typename... Ts, std::size_t... Is>
+        HPX_CXX_CORE_EXPORT template <typename... Ts, std::size_t... Is>
         HPX_HOST_DEVICE constexpr void exit_iteration(hpx::tuple<Ts...>& args,
             hpx::util::index_pack<Is...>, std::size_t size) noexcept
         {
@@ -805,11 +807,11 @@ namespace hpx::parallel {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename ExPolicy, typename F,
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename F,
             typename S = void, typename Tuple = hpx::tuple<>>
         struct part_iterations;
 
-        HPX_CXX_EXPORT template <typename ExPolicy, typename F, typename S,
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename F, typename S,
             typename... Ts>
         struct part_iterations<ExPolicy, F, S, hpx::tuple<Ts...>>
         {
@@ -913,7 +915,7 @@ namespace hpx::parallel {
             }
         };
 
-        HPX_CXX_EXPORT template <typename ExPolicy, typename F, typename S>
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename F, typename S>
         struct part_iterations<ExPolicy, F, S, hpx::tuple<>>
         {
             using fun_type = std::decay_t<F>;
@@ -1014,7 +1016,8 @@ namespace hpx::parallel {
             }
         };
 
-        HPX_CXX_EXPORT template <typename ExPolicy, typename F, typename... Ts>
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename F,
+            typename... Ts>
         struct part_iterations<ExPolicy, F, void, hpx::tuple<Ts...>>
         {
             using fun_type = std::decay_t<F>;
@@ -1065,7 +1068,7 @@ namespace hpx::parallel {
                     loop_iter(hpx::util::begin(g), hpx::util::end(g),
                         part_index, current_thread);
                 }
-                else if constexpr (hpx::traits::is_range_v<B>)
+                else if constexpr (std::ranges::range<B>)
                 {
                     loop_iter(hpx::util::begin(part_begin),
                         hpx::util::end(part_begin), part_index, current_thread);
@@ -1094,7 +1097,7 @@ namespace hpx::parallel {
             }
         };
 
-        HPX_CXX_EXPORT template <typename ExPolicy, typename F>
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename F>
         struct part_iterations<ExPolicy, F, void, hpx::tuple<>>
         {
             using fun_type = std::decay_t<F>;
@@ -1127,7 +1130,7 @@ namespace hpx::parallel {
                     parallel::util::loop_ind<std::decay_t<ExPolicy>>(
                         hpx::util::begin(g), hpx::util::end(g), f_);
                 }
-                else if constexpr (hpx::traits::is_range_v<IterOrR>)
+                else if constexpr (std::ranges::range<IterOrR>)
                 {
                     parallel::util::loop(hpx::util::begin(part_begin),
                         hpx::util::end(part_begin), f_);
@@ -1151,7 +1154,7 @@ namespace hpx::parallel {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT struct for_loop_algo
+        HPX_CXX_CORE_EXPORT struct for_loop_algo
           : public detail::algorithm<for_loop_algo>
         {
             constexpr for_loop_algo() noexcept
@@ -1267,7 +1270,7 @@ namespace hpx::parallel {
         };    // namespace detail
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT struct for_loop_strided_algo
+        HPX_CXX_CORE_EXPORT struct for_loop_strided_algo
           : public detail::algorithm<for_loop_strided_algo>
         {
             constexpr for_loop_strided_algo() noexcept
@@ -1471,7 +1474,7 @@ namespace hpx::parallel {
         };
 
         // reshuffle arguments, last argument is function object, will go first
-        HPX_CXX_EXPORT template <typename ExPolicy, typename B, typename E,
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename B, typename E,
             std::size_t... Is, typename... Args>
         auto for_loop(ExPolicy&& policy, B first, E last,
             hpx::util::index_pack<Is...>, Args&&... args)
@@ -1486,8 +1489,7 @@ namespace hpx::parallel {
                 }
             }
 
-            static_assert(
-                std::is_integral_v<B> || hpx::traits::is_forward_iterator_v<B>,
+            static_assert(std::is_integral_v<B> || std::forward_iterator<B>,
                 "Requires at least forward iterator or integral loop "
                 "boundaries.");
 
@@ -1499,7 +1501,7 @@ namespace hpx::parallel {
                 size, HPX_MOVE(f), hpx::get<Is>(t)...);
         }
 
-        HPX_CXX_EXPORT template <typename ExPolicy, typename R,
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename R,
             std::size_t... Is, typename... Args>
         auto for_loop_range(ExPolicy&& policy, R r,
             hpx::util::index_pack<Is...>, Args&&... args)
@@ -1515,14 +1517,18 @@ namespace hpx::parallel {
                 }
             }
 
-            using iterator = hpx::traits::range_iterator_t<R>;
-            static_assert((hpx::traits::is_range_v<R> &&
-                              hpx::traits::is_forward_iterator_v<iterator>) ||
-                    (hpx::traits::is_range_generator_v<R> &&
-                        hpx::traits::is_input_iterator_v<iterator>),
-                "For ranges, requires at least forward iterator boundaries, "
-                "for range generators requires at least input iterator "
-                "boundaries.");
+            if constexpr (std::ranges::range<R>)
+            {
+                using iterator = std::ranges::iterator_t<R>;
+                static_assert(std::forward_iterator<iterator>,
+                    "For ranges, requires at least forward iterator "
+                    "boundaries.");
+            }
+            else
+            {
+                static_assert(hpx::traits::is_range_generator_v<R>,
+                    "Requires a range or a range generator.");
+            }
 
             std::size_t size = hpx::util::size(r);
             auto&& t = hpx::forward_as_tuple(HPX_FORWARD(Args, args)...);
@@ -1533,7 +1539,7 @@ namespace hpx::parallel {
         }
 
         // reshuffle arguments, last argument is function object, will go first
-        HPX_CXX_EXPORT template <typename ExPolicy, typename B, typename E,
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename B, typename E,
             typename S, std::size_t... Is, typename... Args>
         auto for_loop_strided(ExPolicy&& policy, B first, E last, S stride,
             hpx::util::index_pack<Is...>, Args&&... args)
@@ -1555,12 +1561,11 @@ namespace hpx::parallel {
             // least a bidirectional iterator
             if (stride < 0)
             {
-                HPX_ASSERT(std::is_integral_v<E> ||
-                    hpx::traits::is_bidirectional_iterator_v<E>);
+                HPX_ASSERT(
+                    std::is_integral_v<E> || std::bidirectional_iterator<E>);
             }
 
-            static_assert(
-                std::is_integral_v<B> || hpx::traits::is_forward_iterator_v<B>,
+            static_assert(std::is_integral_v<B> || std::forward_iterator<B>,
                 "Requires at least forward iterator or integral loop "
                 "boundaries.");
 
@@ -1572,7 +1577,7 @@ namespace hpx::parallel {
                 first, size, stride, HPX_MOVE(f), hpx::get<Is>(t)...);
         }
 
-        HPX_CXX_EXPORT template <typename ExPolicy, typename R, typename S,
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename R, typename S,
             std::size_t... Is, typename... Args>
         auto for_loop_strided_range(ExPolicy&& policy, R r, S stride,
             hpx::util::index_pack<Is...>, Args&&... args)
@@ -1595,12 +1600,12 @@ namespace hpx::parallel {
             // bidirectional iterator
             if (stride < 0)
             {
-                HPX_ASSERT(hpx::traits::is_bidirectional_iterator_v<
+                HPX_ASSERT(std::bidirectional_iterator<
                     hpx::traits::range_category_t<R>>);
             }
 
-            static_assert(hpx::traits::is_forward_iterator_v<
-                              hpx::traits::range_category_t<R>>,
+            static_assert(
+                std::forward_iterator<hpx::traits::range_category_t<R>>,
                 "Requires at least forward iterator or integral loop "
                 "boundaries.");
 
@@ -1613,8 +1618,8 @@ namespace hpx::parallel {
         }
 
         // reshuffle arguments, last argument is function object, will go first
-        HPX_CXX_EXPORT template <typename ExPolicy, typename B, typename Size,
-            typename S, std::size_t... Is, typename... Args>
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename B,
+            typename Size, typename S, std::size_t... Is, typename... Args>
         util::detail::algorithm_result_t<ExPolicy> for_loop_n(ExPolicy&& policy,
             B first, Size size, S stride, hpx::util::index_pack<Is...>,
             Args&&... args)
@@ -1626,12 +1631,11 @@ namespace hpx::parallel {
             // least a bidirectional iterator
             if (stride < 0)
             {
-                HPX_ASSERT(std::is_integral_v<B> ||
-                    hpx::traits::is_bidirectional_iterator_v<B>);
+                HPX_ASSERT(
+                    std::is_integral_v<B> || std::bidirectional_iterator<B>);
             }
 
-            static_assert(
-                std::is_integral_v<B> || hpx::traits::is_forward_iterator_v<B>,
+            static_assert(std::is_integral_v<B> || std::forward_iterator<B>,
                 "Requires at least forward iterator or integral loop "
                 "boundaries.");
 
@@ -1648,7 +1652,7 @@ namespace hpx::parallel {
 namespace hpx::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT inline constexpr struct for_loop_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct for_loop_t final
       : hpx::detail::tag_parallel_algorithm<for_loop_t>
     {
     private:
@@ -1688,7 +1692,7 @@ namespace hpx::experimental {
     } for_loop{};
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT inline constexpr struct for_loop_strided_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct for_loop_strided_t final
       : hpx::detail::tag_parallel_algorithm<for_loop_strided_t>
     {
     private:
@@ -1738,7 +1742,7 @@ namespace hpx::experimental {
     } for_loop_strided{};
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT inline constexpr struct for_loop_n_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct for_loop_n_t final
       : hpx::detail::tag_parallel_algorithm<for_loop_n_t>
     {
     private:
@@ -1786,7 +1790,7 @@ namespace hpx::experimental {
     } for_loop_n{};
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT inline constexpr struct for_loop_n_strided_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct for_loop_n_strided_t final
       : hpx::detail::tag_parallel_algorithm<for_loop_n_strided_t>
     {
     private:
@@ -1841,7 +1845,7 @@ namespace hpx::experimental {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 namespace hpx::traits {
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename F, typename S,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename F, typename S,
         typename Tuple>
     struct get_function_address<
         hpx::parallel::detail::part_iterations<ExPolicy, F, S, Tuple>>
@@ -1854,7 +1858,7 @@ namespace hpx::traits {
         }
     };
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename F, typename S,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename F, typename S,
         typename Tuple>
     struct get_function_annotation<
         hpx::parallel::detail::part_iterations<ExPolicy, F, S, Tuple>>
@@ -1868,7 +1872,7 @@ namespace hpx::traits {
     };
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-    HPX_CXX_EXPORT template <typename ExPolicy, typename F, typename S,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename F, typename S,
         typename Tuple>
     struct get_function_annotation_itt<
         hpx::parallel::detail::part_iterations<ExPolicy, F, S, Tuple>>

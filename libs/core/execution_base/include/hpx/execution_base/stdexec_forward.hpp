@@ -42,248 +42,248 @@
 
 namespace hpx::execution::experimental {
     // Domain
-    HPX_CXX_EXPORT using stdexec::default_domain;
+    HPX_CXX_CORE_EXPORT using stdexec::default_domain;
 
     // Receiver
-    HPX_CXX_EXPORT using stdexec::set_error_t;
-    HPX_CXX_EXPORT using stdexec::set_stopped_t;
-    HPX_CXX_EXPORT using stdexec::set_value_t;
+    HPX_CXX_CORE_EXPORT using stdexec::set_error_t;
+    HPX_CXX_CORE_EXPORT using stdexec::set_stopped_t;
+    HPX_CXX_CORE_EXPORT using stdexec::set_value_t;
 
-    HPX_CXX_EXPORT using stdexec::set_error;
-    HPX_CXX_EXPORT using stdexec::set_stopped;
-    HPX_CXX_EXPORT using stdexec::set_value;
+    HPX_CXX_CORE_EXPORT using stdexec::set_error;
+    HPX_CXX_CORE_EXPORT using stdexec::set_stopped;
+    HPX_CXX_CORE_EXPORT using stdexec::set_value;
 
-    HPX_CXX_EXPORT using stdexec::enable_receiver;
-    HPX_CXX_EXPORT using stdexec::receiver_t;
+    HPX_CXX_CORE_EXPORT using stdexec::enable_receiver;
+    HPX_CXX_CORE_EXPORT using stdexec::receiver_t;
 
     // Environment
-    HPX_CXX_EXPORT using stdexec::get_env;
-    HPX_CXX_EXPORT using stdexec::get_env_t;
+    HPX_CXX_CORE_EXPORT using stdexec::get_env;
+    HPX_CXX_CORE_EXPORT using stdexec::get_env_t;
 
-    HPX_CXX_EXPORT using stdexec::empty_env;
-    HPX_CXX_EXPORT using stdexec::env_of_t;
+    HPX_CXX_CORE_EXPORT using stdexec::empty_env;
+    HPX_CXX_CORE_EXPORT using stdexec::env_of_t;
 
-    HPX_CXX_EXPORT using stdexec::env;
-    HPX_CXX_EXPORT using stdexec::prop;
+    HPX_CXX_CORE_EXPORT using stdexec::env;
+    HPX_CXX_CORE_EXPORT using stdexec::prop;
 
     // Queries
-    HPX_CXX_EXPORT using stdexec::forward_progress_guarantee;
+    HPX_CXX_CORE_EXPORT using stdexec::forward_progress_guarantee;
 
-    HPX_CXX_EXPORT using stdexec::execute_may_block_caller_t;
-    HPX_CXX_EXPORT using stdexec::forwarding_query_t;
-    HPX_CXX_EXPORT using stdexec::get_allocator_t;
-    HPX_CXX_EXPORT using stdexec::get_completion_scheduler_t;
-    HPX_CXX_EXPORT using stdexec::get_delegatee_scheduler_t;
-    HPX_CXX_EXPORT using stdexec::get_forward_progress_guarantee_t;
-    HPX_CXX_EXPORT using stdexec::get_scheduler_t;
-    HPX_CXX_EXPORT using stdexec::get_stop_token_t;
+    HPX_CXX_CORE_EXPORT using stdexec::execute_may_block_caller_t;
+    HPX_CXX_CORE_EXPORT using stdexec::forwarding_query_t;
+    HPX_CXX_CORE_EXPORT using stdexec::get_allocator_t;
+    HPX_CXX_CORE_EXPORT using stdexec::get_completion_scheduler_t;
+    HPX_CXX_CORE_EXPORT using stdexec::get_delegatee_scheduler_t;
+    HPX_CXX_CORE_EXPORT using stdexec::get_forward_progress_guarantee_t;
+    HPX_CXX_CORE_EXPORT using stdexec::get_scheduler_t;
+    HPX_CXX_CORE_EXPORT using stdexec::get_stop_token_t;
 
-    HPX_CXX_EXPORT using stdexec::execute_may_block_caller;
-    HPX_CXX_EXPORT using stdexec::forwarding_query;
-    HPX_CXX_EXPORT using stdexec::get_allocator;
-    HPX_CXX_EXPORT using stdexec::get_completion_scheduler;
-    HPX_CXX_EXPORT using stdexec::get_delegatee_scheduler;
-    HPX_CXX_EXPORT using stdexec::get_forward_progress_guarantee;
-    HPX_CXX_EXPORT using stdexec::get_scheduler;
-    HPX_CXX_EXPORT using stdexec::get_stop_token;
+    HPX_CXX_CORE_EXPORT using stdexec::execute_may_block_caller;
+    HPX_CXX_CORE_EXPORT using stdexec::forwarding_query;
+    HPX_CXX_CORE_EXPORT using stdexec::get_allocator;
+    HPX_CXX_CORE_EXPORT using stdexec::get_completion_scheduler;
+    HPX_CXX_CORE_EXPORT using stdexec::get_delegatee_scheduler;
+    HPX_CXX_CORE_EXPORT using stdexec::get_forward_progress_guarantee;
+    HPX_CXX_CORE_EXPORT using stdexec::get_scheduler;
+    HPX_CXX_CORE_EXPORT using stdexec::get_stop_token;
 
-    HPX_CXX_EXPORT using stdexec::in_place_stop_callback;
-    HPX_CXX_EXPORT using stdexec::inplace_stop_source;
-    HPX_CXX_EXPORT using stdexec::inplace_stop_token;
-    HPX_CXX_EXPORT using stdexec::never_stop_token;
+    HPX_CXX_CORE_EXPORT using stdexec::in_place_stop_callback;
+    HPX_CXX_CORE_EXPORT using stdexec::inplace_stop_source;
+    HPX_CXX_CORE_EXPORT using stdexec::inplace_stop_token;
+    HPX_CXX_CORE_EXPORT using stdexec::never_stop_token;
 
-    HPX_CXX_EXPORT using stdexec::stop_token_of_t;
+    HPX_CXX_CORE_EXPORT using stdexec::stop_token_of_t;
 
-    HPX_CXX_EXPORT using stdexec::completion_signatures;
-    HPX_CXX_EXPORT using stdexec::get_completion_signatures;
-    HPX_CXX_EXPORT using stdexec::get_completion_signatures_t;
+    HPX_CXX_CORE_EXPORT using stdexec::completion_signatures;
+    HPX_CXX_CORE_EXPORT using stdexec::get_completion_signatures;
+    HPX_CXX_CORE_EXPORT using stdexec::get_completion_signatures_t;
 
     // Operation State
-    HPX_CXX_EXPORT using stdexec::operation_state_t;
+    HPX_CXX_CORE_EXPORT using stdexec::operation_state_t;
 
     // Sender
-    HPX_CXX_EXPORT using stdexec::connect;
-    HPX_CXX_EXPORT using stdexec::connect_result_t;
-    HPX_CXX_EXPORT using stdexec::connect_t;
+    HPX_CXX_CORE_EXPORT using stdexec::connect;
+    HPX_CXX_CORE_EXPORT using stdexec::connect_result_t;
+    HPX_CXX_CORE_EXPORT using stdexec::connect_t;
 
-    HPX_CXX_EXPORT using stdexec::enable_sender;
-    HPX_CXX_EXPORT using stdexec::sender_t;
+    HPX_CXX_CORE_EXPORT using stdexec::enable_sender;
+    HPX_CXX_CORE_EXPORT using stdexec::sender_t;
 
     // Start
-    HPX_CXX_EXPORT using stdexec::start;
-    HPX_CXX_EXPORT using stdexec::start_t;
+    HPX_CXX_CORE_EXPORT using stdexec::start;
+    HPX_CXX_CORE_EXPORT using stdexec::start_t;
 
     // Schedule
-    HPX_CXX_EXPORT using stdexec::schedule;
-    HPX_CXX_EXPORT using stdexec::schedule_t;
+    HPX_CXX_CORE_EXPORT using stdexec::schedule;
+    HPX_CXX_CORE_EXPORT using stdexec::schedule_t;
 
-    HPX_CXX_EXPORT using stdexec::schedule_result_t;
+    HPX_CXX_CORE_EXPORT using stdexec::schedule_result_t;
 
     // As awaitable
-    HPX_CXX_EXPORT using stdexec::as_awaitable;
-    HPX_CXX_EXPORT using stdexec::as_awaitable_t;
+    HPX_CXX_CORE_EXPORT using stdexec::as_awaitable;
+    HPX_CXX_CORE_EXPORT using stdexec::as_awaitable_t;
 
     // Start on
-    HPX_CXX_EXPORT using stdexec::start_on;
-    HPX_CXX_EXPORT using stdexec::start_on_t;
+    HPX_CXX_CORE_EXPORT using stdexec::start_on;
+    HPX_CXX_CORE_EXPORT using stdexec::start_on_t;
 
-    HPX_CXX_EXPORT using stdexec::on;
-    HPX_CXX_EXPORT using stdexec::on_t;
+    HPX_CXX_CORE_EXPORT using stdexec::on;
+    HPX_CXX_CORE_EXPORT using stdexec::on_t;
 
     // Continue on
-    HPX_CXX_EXPORT using stdexec::continue_on;
-    HPX_CXX_EXPORT using stdexec::continue_on_t;
+    HPX_CXX_CORE_EXPORT using stdexec::continue_on;
+    HPX_CXX_CORE_EXPORT using stdexec::continue_on_t;
 
     // Transfer just
-    HPX_CXX_EXPORT using stdexec::transfer_just;
-    HPX_CXX_EXPORT using stdexec::transfer_just_t;
+    HPX_CXX_CORE_EXPORT using stdexec::transfer_just;
+    HPX_CXX_CORE_EXPORT using stdexec::transfer_just_t;
 
     // Bulk (NOT FORWARDED)
-    // HPX_CXX_EXPORT using stdexec::bulk_t;
-    // HPX_CXX_EXPORT using stdexec::bulk;
+    // HPX_CXX_CORE_EXPORT using stdexec::bulk_t;
+    // HPX_CXX_CORE_EXPORT using stdexec::bulk;
 
     // Split
-    HPX_CXX_EXPORT using stdexec::split;
-    HPX_CXX_EXPORT using stdexec::split_t;
+    HPX_CXX_CORE_EXPORT using stdexec::split;
+    HPX_CXX_CORE_EXPORT using stdexec::split_t;
 
     // Ensure started
-    HPX_CXX_EXPORT using stdexec::ensure_started;
-    HPX_CXX_EXPORT using stdexec::ensure_started_t;
+    HPX_CXX_CORE_EXPORT using stdexec::ensure_started;
+    HPX_CXX_CORE_EXPORT using stdexec::ensure_started_t;
 
     // Transfer
-    HPX_CXX_EXPORT using stdexec::transfer;
-    HPX_CXX_EXPORT using stdexec::transfer_t;
+    HPX_CXX_CORE_EXPORT using stdexec::transfer;
+    HPX_CXX_CORE_EXPORT using stdexec::transfer_t;
 
     // Tags
     namespace tags {
 
-        HPX_CXX_EXPORT using namespace stdexec::tags;
+        HPX_CXX_CORE_EXPORT using namespace stdexec::tags;
     }
 
     // Domain
-    HPX_CXX_EXPORT using stdexec::default_domain;
+    HPX_CXX_CORE_EXPORT using stdexec::default_domain;
 
     // Execute
-    HPX_CXX_EXPORT using stdexec::execute;
-    HPX_CXX_EXPORT using stdexec::execute_t;
+    HPX_CXX_CORE_EXPORT using stdexec::execute;
+    HPX_CXX_CORE_EXPORT using stdexec::execute_t;
 
     // Into Variant
-    HPX_CXX_EXPORT using stdexec::into_variant;
-    HPX_CXX_EXPORT using stdexec::into_variant_t;
+    HPX_CXX_CORE_EXPORT using stdexec::into_variant;
+    HPX_CXX_CORE_EXPORT using stdexec::into_variant_t;
 
     // Just
-    HPX_CXX_EXPORT using stdexec::just_error_t;
-    HPX_CXX_EXPORT using stdexec::just_stopped_t;
-    HPX_CXX_EXPORT using stdexec::just_t;
+    HPX_CXX_CORE_EXPORT using stdexec::just_error_t;
+    HPX_CXX_CORE_EXPORT using stdexec::just_stopped_t;
+    HPX_CXX_CORE_EXPORT using stdexec::just_t;
 
-    HPX_CXX_EXPORT using stdexec::just;
-    HPX_CXX_EXPORT using stdexec::just_error;
-    HPX_CXX_EXPORT using stdexec::just_stopped;
+    HPX_CXX_CORE_EXPORT using stdexec::just;
+    HPX_CXX_CORE_EXPORT using stdexec::just_error;
+    HPX_CXX_CORE_EXPORT using stdexec::just_stopped;
 
     // Let
-    HPX_CXX_EXPORT using stdexec::let_error_t;
-    HPX_CXX_EXPORT using stdexec::let_stopped_t;
-    HPX_CXX_EXPORT using stdexec::let_value_t;
+    HPX_CXX_CORE_EXPORT using stdexec::let_error_t;
+    HPX_CXX_CORE_EXPORT using stdexec::let_stopped_t;
+    HPX_CXX_CORE_EXPORT using stdexec::let_value_t;
 
-    HPX_CXX_EXPORT using stdexec::let_error;
-    HPX_CXX_EXPORT using stdexec::let_stopped;
-    HPX_CXX_EXPORT using stdexec::let_value;
+    HPX_CXX_CORE_EXPORT using stdexec::let_error;
+    HPX_CXX_CORE_EXPORT using stdexec::let_stopped;
+    HPX_CXX_CORE_EXPORT using stdexec::let_value;
 
     // Run loop
-    HPX_CXX_EXPORT using stdexec::run_loop;
+    HPX_CXX_CORE_EXPORT using stdexec::run_loop;
 
     // Schedule from
-    HPX_CXX_EXPORT using stdexec::schedule_from;
-    HPX_CXX_EXPORT using stdexec::schedule_from_t;
+    HPX_CXX_CORE_EXPORT using stdexec::schedule_from;
+    HPX_CXX_CORE_EXPORT using stdexec::schedule_from_t;
 
     // Start detached
-    HPX_CXX_EXPORT using stdexec::start_detached;
-    HPX_CXX_EXPORT using stdexec::start_detached_t;
+    HPX_CXX_CORE_EXPORT using stdexec::start_detached;
+    HPX_CXX_CORE_EXPORT using stdexec::start_detached_t;
 
     // Stop token
-    HPX_CXX_EXPORT using stdexec::stop_callback_for_t;
-    HPX_CXX_EXPORT using stdexec::stoppable_token;
-    HPX_CXX_EXPORT using stdexec::stoppable_token_for;
-    HPX_CXX_EXPORT using stdexec::unstoppable_token;
+    HPX_CXX_CORE_EXPORT using stdexec::stop_callback_for_t;
+    HPX_CXX_CORE_EXPORT using stdexec::stoppable_token;
+    HPX_CXX_CORE_EXPORT using stdexec::stoppable_token_for;
+    HPX_CXX_CORE_EXPORT using stdexec::unstoppable_token;
 
     // Stopped as error
-    HPX_CXX_EXPORT using stdexec::stopped_as_error;
-    HPX_CXX_EXPORT using stdexec::stopped_as_error_t;
+    HPX_CXX_CORE_EXPORT using stdexec::stopped_as_error;
+    HPX_CXX_CORE_EXPORT using stdexec::stopped_as_error_t;
 
     // Stopped as optional
-    HPX_CXX_EXPORT using stdexec::stopped_as_optional;
-    HPX_CXX_EXPORT using stdexec::stopped_as_optional_t;
+    HPX_CXX_CORE_EXPORT using stdexec::stopped_as_optional;
+    HPX_CXX_CORE_EXPORT using stdexec::stopped_as_optional_t;
 
     // Sync wait
-    HPX_CXX_EXPORT using stdexec::sync_wait;
-    HPX_CXX_EXPORT using stdexec::sync_wait_t;
+    HPX_CXX_CORE_EXPORT using stdexec::sync_wait;
+    HPX_CXX_CORE_EXPORT using stdexec::sync_wait_t;
 
     // Sync wait with variant
-    HPX_CXX_EXPORT using stdexec::sync_wait_with_variant;
-    HPX_CXX_EXPORT using stdexec::sync_wait_with_variant_t;
+    HPX_CXX_CORE_EXPORT using stdexec::sync_wait_with_variant;
+    HPX_CXX_CORE_EXPORT using stdexec::sync_wait_with_variant_t;
 
     // Then
-    HPX_CXX_EXPORT using stdexec::then;
-    HPX_CXX_EXPORT using stdexec::then_t;
+    HPX_CXX_CORE_EXPORT using stdexec::then;
+    HPX_CXX_CORE_EXPORT using stdexec::then_t;
 
     // Transfer just
-    HPX_CXX_EXPORT using stdexec::transfer_just;
-    HPX_CXX_EXPORT using stdexec::transfer_just_t;
+    HPX_CXX_CORE_EXPORT using stdexec::transfer_just;
+    HPX_CXX_CORE_EXPORT using stdexec::transfer_just_t;
 
     // Completion signature manipulators
-    HPX_CXX_EXPORT using stdexec::completion_signatures_of_t;
-    HPX_CXX_EXPORT using stdexec::error_types_of_t;
-    HPX_CXX_EXPORT using stdexec::sends_stopped;
-    HPX_CXX_EXPORT using stdexec::value_types_of_t;
+    HPX_CXX_CORE_EXPORT using stdexec::completion_signatures_of_t;
+    HPX_CXX_CORE_EXPORT using stdexec::error_types_of_t;
+    HPX_CXX_CORE_EXPORT using stdexec::sends_stopped;
+    HPX_CXX_CORE_EXPORT using stdexec::value_types_of_t;
 
-    HPX_CXX_EXPORT using stdexec::transform_completion_signatures;
-    HPX_CXX_EXPORT using stdexec::transform_completion_signatures_of;
+    HPX_CXX_CORE_EXPORT using stdexec::transform_completion_signatures;
+    HPX_CXX_CORE_EXPORT using stdexec::transform_completion_signatures_of;
 
     // Transform sender
-    HPX_CXX_EXPORT using stdexec::transform_sender;
-    HPX_CXX_EXPORT using stdexec::transform_sender_result_t;
-    HPX_CXX_EXPORT using stdexec::transform_sender_t;
+    HPX_CXX_CORE_EXPORT using stdexec::transform_sender;
+    HPX_CXX_CORE_EXPORT using stdexec::transform_sender_result_t;
+    HPX_CXX_CORE_EXPORT using stdexec::transform_sender_t;
 
-    HPX_CXX_EXPORT using stdexec::apply_sender;
-    HPX_CXX_EXPORT using stdexec::apply_sender_result_t;
-    HPX_CXX_EXPORT using stdexec::apply_sender_t;
+    HPX_CXX_CORE_EXPORT using stdexec::apply_sender;
+    HPX_CXX_CORE_EXPORT using stdexec::apply_sender_result_t;
+    HPX_CXX_CORE_EXPORT using stdexec::apply_sender_t;
 
     // Upon error
-    HPX_CXX_EXPORT using stdexec::upon_error;
-    HPX_CXX_EXPORT using stdexec::upon_error_t;
+    HPX_CXX_CORE_EXPORT using stdexec::upon_error;
+    HPX_CXX_CORE_EXPORT using stdexec::upon_error_t;
 
     // Upon stopped
-    HPX_CXX_EXPORT using stdexec::upon_stopped;
-    HPX_CXX_EXPORT using stdexec::upon_stopped_t;
+    HPX_CXX_CORE_EXPORT using stdexec::upon_stopped;
+    HPX_CXX_CORE_EXPORT using stdexec::upon_stopped_t;
 
     // When all
-    HPX_CXX_EXPORT using stdexec::when_all;
-    HPX_CXX_EXPORT using stdexec::when_all_t;
+    HPX_CXX_CORE_EXPORT using stdexec::when_all;
+    HPX_CXX_CORE_EXPORT using stdexec::when_all_t;
 
-    HPX_CXX_EXPORT using stdexec::when_all_with_variant;
-    HPX_CXX_EXPORT using stdexec::when_all_with_variant_t;
+    HPX_CXX_CORE_EXPORT using stdexec::when_all_with_variant;
+    HPX_CXX_CORE_EXPORT using stdexec::when_all_with_variant_t;
 
-    HPX_CXX_EXPORT using stdexec::transfer_when_all;
-    HPX_CXX_EXPORT using stdexec::transfer_when_all_t;
+    HPX_CXX_CORE_EXPORT using stdexec::transfer_when_all;
+    HPX_CXX_CORE_EXPORT using stdexec::transfer_when_all_t;
 
-    HPX_CXX_EXPORT using stdexec::transfer_when_all_with_variant;
-    HPX_CXX_EXPORT using stdexec::transfer_when_all_with_variant_t;
+    HPX_CXX_CORE_EXPORT using stdexec::transfer_when_all_with_variant;
+    HPX_CXX_CORE_EXPORT using stdexec::transfer_when_all_with_variant_t;
 
     // With awaitable senders
-    HPX_CXX_EXPORT using stdexec::with_awaitable_senders;
+    HPX_CXX_CORE_EXPORT using stdexec::with_awaitable_senders;
 
     // Concepts
-    HPX_CXX_EXPORT using stdexec::sender;
-    HPX_CXX_EXPORT using stdexec::sender_in;
-    HPX_CXX_EXPORT using stdexec::sender_of;
-    HPX_CXX_EXPORT using stdexec::sender_to;
+    HPX_CXX_CORE_EXPORT using stdexec::sender;
+    HPX_CXX_CORE_EXPORT using stdexec::sender_in;
+    HPX_CXX_CORE_EXPORT using stdexec::sender_of;
+    HPX_CXX_CORE_EXPORT using stdexec::sender_to;
 
-    HPX_CXX_EXPORT using stdexec::receiver;
-    HPX_CXX_EXPORT using stdexec::receiver_of;
+    HPX_CXX_CORE_EXPORT using stdexec::receiver;
+    HPX_CXX_CORE_EXPORT using stdexec::receiver_of;
 
-    HPX_CXX_EXPORT using stdexec::scheduler;
+    HPX_CXX_CORE_EXPORT using stdexec::scheduler;
 
-    HPX_CXX_EXPORT using stdexec::operation_state;
+    HPX_CXX_CORE_EXPORT using stdexec::operation_state;
 
     namespace stdexec_non_standard_tag_invoke {
 
@@ -291,22 +291,22 @@ namespace hpx::execution::experimental {
         // however it includes a non-standard (in the sense of unexpected) extension.
         // tag invoke first checks for the existence of a .query member function or
         // a ::query static function.
-        HPX_CXX_EXPORT using stdexec::tag_invoke;
-        HPX_CXX_EXPORT using stdexec::tag_invoke_result;
+        HPX_CXX_CORE_EXPORT using stdexec::tag_invoke;
+        HPX_CXX_CORE_EXPORT using stdexec::tag_invoke_result;
 
-        HPX_CXX_EXPORT using stdexec::nothrow_tag_invocable;
-        HPX_CXX_EXPORT using stdexec::tag_invocable;
+        HPX_CXX_CORE_EXPORT using stdexec::nothrow_tag_invocable;
+        HPX_CXX_CORE_EXPORT using stdexec::tag_invocable;
     }    // namespace stdexec_non_standard_tag_invoke
 
     namespace stdexec_internal {
 
-        HPX_CXX_EXPORT using stdexec::__single_sender_value_t;
+        HPX_CXX_CORE_EXPORT using stdexec::__single_sender_value_t;
 
         namespace __connect_awaitable_ {
-            HPX_CXX_EXPORT using namespace stdexec::__connect_awaitable_;
+            HPX_CXX_CORE_EXPORT using namespace stdexec::__connect_awaitable_;
         }
 
-        HPX_CXX_EXPORT using stdexec::__connect_awaitable_t;
+        HPX_CXX_CORE_EXPORT using stdexec::__connect_awaitable_t;
     }    // namespace stdexec_internal
 }    // namespace hpx::execution::experimental
 

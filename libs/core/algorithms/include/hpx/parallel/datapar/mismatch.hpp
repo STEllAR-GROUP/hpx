@@ -29,7 +29,7 @@
 namespace hpx::parallel::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
     struct datapar_mismatch
     {
         template <typename ZipIterator, typename Token, typename F>
@@ -67,7 +67,7 @@ namespace hpx::parallel::detail {
         }
     };
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename ZipIterator,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename ZipIterator,
         typename Token, typename F>
         requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE void tag_invoke(
@@ -90,8 +90,8 @@ namespace hpx::parallel::detail {
         }
     }
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename Iter1, typename Sent,
-        typename Iter2, typename F>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter1,
+        typename Sent, typename Iter2, typename F>
         requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE auto tag_invoke(
         sequential_mismatch_t<ExPolicy>, Iter1 first1, Sent last1, Iter2 first2,
@@ -116,7 +116,7 @@ namespace hpx::parallel::detail {
     }
 
     /////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
     struct datapar_mismatch_binary
     {
         template <typename ZipIterator, typename Token, typename F,
@@ -167,7 +167,7 @@ namespace hpx::parallel::detail {
         }
     };
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename ZipIterator,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename ZipIterator,
         typename Token, typename F, typename Proj1, typename Proj2>
         requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE void tag_invoke(
@@ -193,9 +193,9 @@ namespace hpx::parallel::detail {
         }
     }
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename Iter1, typename Sent1,
-        typename Iter2, typename Sent2, typename F, typename Proj1,
-        typename Proj2>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter1,
+        typename Sent1, typename Iter2, typename Sent2, typename F,
+        typename Proj1, typename Proj2>
         requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE util::in_in_result<Iter1, Iter2> tag_invoke(
         sequential_mismatch_binary_t<ExPolicy>, Iter1 first1, Sent1 last1,

@@ -231,7 +231,8 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        HPX_CXX_EXPORT template <typename ExPolicy, typename Op, typename Proj>
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Op,
+            typename Proj>
         struct count_iteration
         {
             using execution_policy_type = std::decay_t<ExPolicy>;
@@ -291,7 +292,7 @@ namespace hpx::parallel {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename Value>
+        HPX_CXX_CORE_EXPORT template <typename Value>
         struct count : public algorithm<count<Value>, Value>
         {
             typedef Value difference_type;
@@ -358,7 +359,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        HPX_CXX_EXPORT template <typename Value>
+        HPX_CXX_CORE_EXPORT template <typename Value>
         struct count_if : public algorithm<count_if<Value>, Value>
         {
             using difference_type = Value;
@@ -423,7 +424,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::count
-    HPX_CXX_EXPORT inline constexpr struct count_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct count_t final
       : hpx::detail::tag_parallel_algorithm<count_t>
     {
     private:
@@ -438,7 +439,7 @@ namespace hpx {
         friend decltype(auto) tag_fallback_invoke(count_t, ExPolicy&& policy,
             FwdIter first, FwdIter last, T const& value)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Required at least forward iterator.");
 
             using difference_type =
@@ -459,7 +460,7 @@ namespace hpx {
         friend typename std::iterator_traits<InIter>::difference_type
         tag_fallback_invoke(count_t, InIter first, InIter last, T const& value)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Required at least input iterator.");
 
             using difference_type =
@@ -472,7 +473,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::count_if
-    HPX_CXX_EXPORT inline constexpr struct count_if_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct count_if_t final
       : hpx::detail::tag_parallel_algorithm<count_if_t>
     {
     private:
@@ -489,7 +490,7 @@ namespace hpx {
         friend decltype(auto) tag_fallback_invoke(
             count_if_t, ExPolicy&& policy, FwdIter first, FwdIter last, F f)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Required at least forward iterator.");
 
             using difference_type =
@@ -512,7 +513,7 @@ namespace hpx {
         friend typename std::iterator_traits<InIter>::difference_type
         tag_fallback_invoke(count_if_t, InIter first, InIter last, F f)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Required at least input iterator.");
 
             using difference_type =

@@ -321,11 +321,8 @@ hpx_option(
   ADVANCED
 )
 if(HPX_WITH_CXX_MODULES)
-  if(NOT (CMAKE_VERSION VERSION_GREATER_EQUAL "3.29"))
-    hpx_fatal(
-      "Please use a version of CMake newer than V3.28 in order to enable C++ module support for HPX"
-    )
-  endif()
+  include(HPX_CXXModules)
+  hpx_check_cxx_modules_support()
 
   hpx_info(
     "HPX will build and install C++20 module interface units for downstream users."
@@ -2158,6 +2155,16 @@ if(HPX_WITH_COMPILER_WARNINGS)
       hpx_add_compile_flag(-wd4244)
     endif()
 
+    # when compiling with modules enabled, the following warning can't be
+    # disabled inline
+    if(HPX_WITH_CXX_MODULES)
+      # 'symbol' needs to have dll-interface to be used by clients of 'symbol'
+      hpx_add_compile_flag(-wd4251)
+      # non dll-interface struct 'symbol' used as base for dll-interface class
+      # 'symbol'
+      hpx_add_compile_flag(-wd4275)
+    endif()
+
   else() # Trial and error approach for any other compiler ...
     hpx_add_compile_flag_if_available(-Wall)
     hpx_add_compile_flag_if_available(-Wno-strict-aliasing)
@@ -2588,8 +2595,19 @@ endif()
 # ##############################################################################
 # Debug library postfix
 # ##############################################################################
-set(CMAKE_DEBUG_POSTFIX "d")
-set(HPX_DEBUG_POSTFIX "d")
+# Only set debug postfix for Debug builds to maintain ABI separation
+get_property(is_multi_config GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+if(is_multi_config OR CMAKE_BUILD_TYPE STREQUAL "Debug")
+  hpx_option(
+    HPX_WITH_DEBUG_POSTFIX STRING
+    "Postfix for debug libraries. (default: \"d\")" "d" ADVANCED
+    CATEGORY "Build Targets"
+  )
+  set(CMAKE_DEBUG_POSTFIX "${HPX_WITH_DEBUG_POSTFIX}")
+  if(NOT "${HPX_WITH_DEBUG_POSTFIX}" STREQUAL "")
+    hpx_add_config_define(HPX_HAVE_DEBUG_POSTFIX "${HPX_WITH_DEBUG_POSTFIX}")
+  endif()
+endif()
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
   if(HPX_WITH_COMPRESSION_BZIP2)

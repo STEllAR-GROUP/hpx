@@ -17,50 +17,51 @@
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
+#include <ranges>
 #include <type_traits>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::parallel::util::detail {
 
-    HPX_CXX_EXPORT template <typename IterOrR, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename IterOrR, typename Enable = void>
     struct chunk_size_iterator_category;
 
-    HPX_CXX_EXPORT template <typename IterOrR>
+    HPX_CXX_CORE_EXPORT template <typename IterOrR>
     struct chunk_size_iterator_category<IterOrR,
         std::enable_if_t<std::is_integral_v<IterOrR>>>
     {
         using type = std::random_access_iterator_tag;
     };
 
-    HPX_CXX_EXPORT template <typename Iterator>
+    HPX_CXX_CORE_EXPORT template <typename Iterator>
     struct chunk_size_iterator_category<Iterator,
         std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
     {
         using type = hpx::traits::iter_category_t<Iterator>;
     };
 
-    HPX_CXX_EXPORT template <typename Range>
+    HPX_CXX_CORE_EXPORT template <typename Range>
     struct chunk_size_iterator_category<Range,
-        std::enable_if_t<hpx::traits::is_range_v<Range>>>
+        std::enable_if_t<std::ranges::range<Range>>>
     {
         using type = hpx::traits::range_category_t<Range>;
     };
 
-    HPX_CXX_EXPORT template <typename Range>
+    HPX_CXX_CORE_EXPORT template <typename Range>
     struct chunk_size_iterator_category<Range,
         std::enable_if_t<hpx::traits::is_range_generator_v<Range>>>
     {
         using type = std::random_access_iterator_tag;
     };
 
-    HPX_CXX_EXPORT template <typename IterOrR>
+    HPX_CXX_CORE_EXPORT template <typename IterOrR>
     using chunk_size_iterator_category_t =
         typename chunk_size_iterator_category<IterOrR>::type;
 
-    HPX_CXX_EXPORT template <typename IterOrR, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename IterOrR, typename Enable = void>
     struct iterator_type;
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct iterator_type<T,
         std::enable_if_t<std::is_integral_v<T> ||
             hpx::traits::is_range_generator_v<T>>>
@@ -68,25 +69,24 @@ namespace hpx::parallel::util::detail {
         using type = T;
     };
 
-    HPX_CXX_EXPORT template <typename Iterator>
+    HPX_CXX_CORE_EXPORT template <typename Iterator>
     struct iterator_type<Iterator,
         std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
     {
         using type = Iterator;
     };
 
-    HPX_CXX_EXPORT template <typename Range>
-    struct iterator_type<Range,
-        std::enable_if_t<hpx::traits::is_range_v<Range>>>
+    HPX_CXX_CORE_EXPORT template <typename Range>
+    struct iterator_type<Range, std::enable_if_t<std::ranges::range<Range>>>
     {
-        using type = hpx::traits::range_iterator_t<Range>;
+        using type = std::ranges::iterator_t<Range>;
     };
 
-    HPX_CXX_EXPORT template <typename IterOrR>
+    HPX_CXX_CORE_EXPORT template <typename IterOrR>
     using iterator_type_t = typename iterator_type<IterOrR>::type;
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename IterOrR>
+    HPX_CXX_CORE_EXPORT template <typename IterOrR>
     struct chunk_size_iterator
       : hpx::util::iterator_facade<chunk_size_iterator<IterOrR>,
             hpx::tuple<IterOrR, std::size_t> const,
@@ -99,7 +99,7 @@ namespace hpx::parallel::util::detail {
 
         static_assert(std::is_integral_v<IterOrR> ||
             hpx::traits::is_iterator_v<IterOrR> ||
-            hpx::traits::is_range_v<IterOrR> ||
+            std::ranges::range<IterOrR> ||
             hpx::traits::is_range_generator_v<IterOrR>);
 
         static constexpr bool is_iterator = hpx::traits::is_iterator_v<IterOrR>;
@@ -153,6 +153,8 @@ namespace hpx::parallel::util::detail {
                 chunk() = chunk_size_;
             }
         }
+
+        using use_brackets_proxy = std::true_type;
 
     private:
         HPX_HOST_DEVICE IterOrR& target() noexcept
@@ -261,8 +263,10 @@ namespace hpx::parallel::util::detail {
 
         template <typename Iter = IterOrR>
         // clang-format off
-            requires (hpx::traits::is_bidirectional_iterator_v<
+            requires (std::bidirectional_iterator<
                                       iterator_type_t<Iter>> ||
+                hpx::traits::belongs_to_iterator_category_v<
+                    iterator_type_t<Iter>, std::bidirectional_iterator_tag> ||
                 hpx::traits::is_range_generator_v<Iter> ||
                 std::is_integral_v<Iter>
             )
@@ -274,8 +278,10 @@ namespace hpx::parallel::util::detail {
 
         template <typename Iter = IterOrR>
         // clang-format off
-            requires (hpx::traits::is_random_access_iterator_v<
+            requires (std::random_access_iterator<
                                       iterator_type_t<Iter>> ||
+                hpx::traits::belongs_to_iterator_category_v<
+                    iterator_type_t<Iter>, std::random_access_iterator_tag> ||
                 hpx::traits::is_range_generator_v<Iter> ||
                 std::is_integral_v<Iter>
             )
@@ -295,8 +301,10 @@ namespace hpx::parallel::util::detail {
 
         template <typename Iter = IterOrR>
         // clang-format off
-            requires (hpx::traits::is_random_access_iterator_v<
+            requires (std::random_access_iterator<
                                       iterator_type_t<Iter>> ||
+                hpx::traits::belongs_to_iterator_category_v<
+                    iterator_type_t<Iter>, std::random_access_iterator_tag> ||
                 hpx::traits::is_range_generator_v<Iter> ||
                 std::is_integral_v<Iter>
             )
@@ -317,7 +325,7 @@ namespace hpx::parallel::util::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename IterOrR>
+    HPX_CXX_CORE_EXPORT template <typename IterOrR>
     struct chunk_size_idx_iterator
       : hpx::util::iterator_facade<chunk_size_idx_iterator<IterOrR>,
             hpx::tuple<IterOrR, std::size_t, std::size_t> const,
@@ -330,7 +338,7 @@ namespace hpx::parallel::util::detail {
 
         static_assert(std::is_integral_v<IterOrR> ||
             hpx::traits::is_iterator_v<IterOrR> ||
-            hpx::traits::is_range_v<IterOrR> ||
+            std::ranges::range<IterOrR> ||
             hpx::traits::is_range_generator_v<IterOrR>);
 
         static constexpr bool is_iterator = hpx::traits::is_iterator_v<IterOrR>;
@@ -386,6 +394,8 @@ namespace hpx::parallel::util::detail {
                 chunk() = chunk_size_;
             }
         }
+
+        using use_brackets_proxy = std::true_type;
 
     private:
         HPX_HOST_DEVICE IterOrR& target() noexcept
@@ -507,8 +517,10 @@ namespace hpx::parallel::util::detail {
 
         template <typename Iter = IterOrR>
         // clang-format off
-            requires (hpx::traits::is_bidirectional_iterator_v<
+            requires (std::bidirectional_iterator<
                                       iterator_type_t<Iter>> ||
+                hpx::traits::belongs_to_iterator_category_v<
+                    iterator_type_t<Iter>, std::bidirectional_iterator_tag> ||
                 hpx::traits::is_range_generator_v<Iter> ||
                 std::is_integral_v<Iter>
             )
@@ -520,8 +532,10 @@ namespace hpx::parallel::util::detail {
 
         template <typename Iter = IterOrR>
         // clang-format off
-            requires (hpx::traits::is_random_access_iterator_v<
+            requires (std::random_access_iterator<
                                       iterator_type_t<Iter>> ||
+                hpx::traits::belongs_to_iterator_category_v<
+                    iterator_type_t<Iter>, std::random_access_iterator_tag> ||
                 hpx::traits::is_range_generator_v<Iter> ||
                 std::is_integral_v<Iter>
             )
@@ -541,8 +555,10 @@ namespace hpx::parallel::util::detail {
 
         template <typename Iter = IterOrR>
         // clang-format off
-            requires (hpx::traits::is_random_access_iterator_v<
+            requires (std::random_access_iterator<
                                       iterator_type_t<Iter>> ||
+                hpx::traits::belongs_to_iterator_category_v<
+                    iterator_type_t<Iter>, std::random_access_iterator_tag> ||
                 hpx::traits::is_range_generator_v<Iter> ||
                 std::is_integral_v<Iter>
             )

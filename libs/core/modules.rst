@@ -27,6 +27,7 @@ Core modules
    /libs/core/async_sycl/docs/index.rst
    /libs/core/batch_environments/docs/index.rst
    /libs/core/cache/docs/index.rst
+   /libs/core/checkpoint_base/docs/index.rst
    /libs/core/command_line_handling_local/docs/index.rst
    /libs/core/compute_local/docs/index.rst
    /libs/core/concepts/docs/index.rst

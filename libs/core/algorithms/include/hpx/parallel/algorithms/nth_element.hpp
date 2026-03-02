@@ -175,7 +175,7 @@ namespace hpx::parallel {
         /// \param comp : object for to Compare elements
         /// \param proj : projection
         ///
-        HPX_CXX_EXPORT template <class RandomIt, typename Compare,
+        HPX_CXX_CORE_EXPORT template <class RandomIt, typename Compare,
             typename Proj>
         constexpr void nth_element_seq(RandomIt first, RandomIt nth,
             RandomIt end, std::uint32_t level, Compare&& comp, Proj&& proj)
@@ -233,7 +233,7 @@ namespace hpx::parallel {
             }
         }
 
-        HPX_CXX_EXPORT template <typename Iter>
+        HPX_CXX_CORE_EXPORT template <typename Iter>
         struct nth_element : public algorithm<nth_element<Iter>, Iter>
         {
             constexpr nth_element() noexcept
@@ -351,7 +351,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::nth_element
-    HPX_CXX_EXPORT inline constexpr struct nth_element_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct nth_element_t final
       : hpx::detail::tag_parallel_algorithm<nth_element_t>
     {
         template <typename RandomIt,
@@ -368,7 +368,7 @@ namespace hpx {
         friend void tag_fallback_invoke(hpx::nth_element_t, RandomIt first,
             RandomIt nth, RandomIt last, Pred pred = Pred())
         {
-            static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
+            static_assert(std::random_access_iterator<RandomIt>,
                 "Requires at least random iterator.");
 
             hpx::parallel::detail::nth_element<RandomIt>().call(
@@ -392,7 +392,7 @@ namespace hpx {
         tag_fallback_invoke(hpx::nth_element_t, ExPolicy&& policy,
             RandomIt first, RandomIt nth, RandomIt last, Pred pred = Pred())
         {
-            static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
+            static_assert(std::random_access_iterator<RandomIt>,
                 "Requires at least random iterator.");
 
             using result_type =

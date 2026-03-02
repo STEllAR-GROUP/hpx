@@ -243,8 +243,8 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        HPX_CXX_EXPORT template <typename Iter, typename Sent, typename Pred,
-            typename Proj>
+        HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent,
+            typename Pred, typename Proj>
         constexpr Iter sequential_remove_if(
             Iter first, Sent last, Pred pred, Proj proj)
         {
@@ -262,7 +262,7 @@ namespace hpx::parallel {
             return first;
         }
 
-        HPX_CXX_EXPORT template <typename FwdIter>
+        HPX_CXX_CORE_EXPORT template <typename FwdIter>
         struct remove_if : public algorithm<remove_if<FwdIter>, FwdIter>
         {
             constexpr remove_if() noexcept
@@ -366,7 +366,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::remove_if
-    HPX_CXX_EXPORT inline constexpr struct remove_if_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct remove_if_t final
       : hpx::detail::tag_parallel_algorithm<remove_if_t>
     {
         template <typename FwdIter, typename Pred>
@@ -381,7 +381,7 @@ namespace hpx {
         friend FwdIter tag_fallback_invoke(
             hpx::remove_if_t, FwdIter first, FwdIter last, Pred pred)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::remove_if<FwdIter>().call(
@@ -402,7 +402,7 @@ namespace hpx {
         friend decltype(auto) tag_fallback_invoke(hpx::remove_if_t,
             ExPolicy&& policy, FwdIter first, FwdIter last, Pred pred)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::remove_if<FwdIter>().call(
@@ -413,7 +413,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::remove
-    HPX_CXX_EXPORT inline constexpr struct remove_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct remove_t final
       : hpx::detail::tag_parallel_algorithm<remove_t>
     {
     private:

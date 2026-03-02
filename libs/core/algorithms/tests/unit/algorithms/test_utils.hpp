@@ -17,15 +17,29 @@
 #include <iterator>
 #include <numeric>
 #include <random>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
 namespace test {
     ///////////////////////////////////////////////////////////////////////////
+    template <typename IteratorTag>
+    struct maybe_disable_proxy
+    {
+    };
+
+    template <>
+    struct maybe_disable_proxy<std::random_access_iterator_tag>
+    {
+        using use_brackets_proxy = std::false_type;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename BaseIterator, typename IteratorTag>
     struct test_iterator
       : hpx::util::iterator_adaptor<test_iterator<BaseIterator, IteratorTag>,
             BaseIterator, void, IteratorTag>
+      , maybe_disable_proxy<IteratorTag>
     {
     private:
         using base_type = hpx::util::iterator_adaptor<
@@ -47,6 +61,7 @@ namespace test {
       : hpx::util::iterator_adaptor<
             decorated_iterator<BaseIterator, IteratorTag>, BaseIterator, void,
             IteratorTag>
+      , maybe_disable_proxy<IteratorTag>
     {
     private:
         using base_type = hpx::util::iterator_adaptor<
@@ -206,6 +221,19 @@ namespace test {
         std::random_device rd;
         std::mt19937 g(rd());
         std::shuffle(std::begin(c), std::end(c), g);
+        return c;
+    }
+    template <typename T>
+    inline std::vector<T> random_repeat(std::size_t size, T max_value)
+    {
+        std::vector<T> c(size);
+        std::random_device rd;
+        std::mt19937 g(rd());
+        std::uniform_int_distribution<T> dist(0, max_value);
+        for (std::size_t i = 0; i < size; ++i)
+        {
+            c[i] = dist(g);
+        }
         return c;
     }
 

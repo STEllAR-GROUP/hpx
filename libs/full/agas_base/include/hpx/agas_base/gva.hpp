@@ -13,7 +13,7 @@
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/naming.hpp>
-#include <hpx/naming_base/gid_type.hpp>
+#include <hpx/modules/naming_base.hpp>
 
 #include <cstdint>
 #include <iosfwd>

@@ -132,7 +132,7 @@ the two includes and ``hpx::cout``.
 .. caution::
 
    Ensure that |hpx| is installed with ``HPX_WITH_DISTRIBUTED_RUNTIME=ON`` to
-   prevent encountering an error indicating that the ``hpx::iostreams_component``
+   prevent encountering an error indicating that the ``HPX::iostreams_component``
    target is not found.
 
    When including ``hpx_main.hpp`` the user-defined ``main`` gets renamed and

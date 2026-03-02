@@ -12,7 +12,7 @@
 
 namespace hpx {
 
-    HPX_CXX_EXPORT enum class logging_destination {
+    HPX_CXX_CORE_EXPORT enum class logging_destination {
         hpx = 0,
         timing = 1,
         agas = 2,
@@ -70,53 +70,53 @@ namespace hpx::util {
     ////////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        HPX_CXX_EXPORT [[nodiscard]] HPX_CORE_EXPORT
+        HPX_CXX_CORE_EXPORT [[nodiscard]] HPX_CORE_EXPORT
         hpx::util::logging::level get_log_level(std::string const& env,
             bool allow_always = false);
     }
 
     ////////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT HPX_CORE_EXPORT HPX_DECLARE_LOG(hpx)
-    HPX_CXX_EXPORT HPX_CORE_EXPORT HPX_DECLARE_LOG(hpx_console)
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT HPX_DECLARE_LOG(hpx)
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT HPX_DECLARE_LOG(hpx_console)
 
     ////////////////////////////////////////////////////////////////////////////
     // errors are logged in a special manner (always to cerr and additionally,
     // if enabled to 'normal' logging destination as well)
-    HPX_CXX_EXPORT HPX_CORE_EXPORT HPX_DECLARE_LOG(hpx_error)
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT HPX_DECLARE_LOG(hpx_error)
 
 #if defined(HPX_LOGGING_HAVE_SEPARATE_DESTINATIONS)
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT HPX_CORE_EXPORT HPX_DECLARE_LOG(agas)
-    HPX_CXX_EXPORT HPX_CORE_EXPORT HPX_DECLARE_LOG(agas_console)
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT HPX_DECLARE_LOG(agas)
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT HPX_DECLARE_LOG(agas_console)
 
     ////////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT HPX_CORE_EXPORT HPX_DECLARE_LOG(parcel)
-    HPX_CXX_EXPORT HPX_CORE_EXPORT HPX_DECLARE_LOG(parcel_console)
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT HPX_DECLARE_LOG(parcel)
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT HPX_DECLARE_LOG(parcel_console)
 
     ////////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT HPX_CORE_EXPORT HPX_DECLARE_LOG(timing)
-    HPX_CXX_EXPORT HPX_CORE_EXPORT HPX_DECLARE_LOG(timing_console)
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT HPX_DECLARE_LOG(timing)
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT HPX_DECLARE_LOG(timing_console)
 #endif
 
     ////////////////////////////////////////////////////////////////////////////
     // Application specific logging
-    HPX_CXX_EXPORT HPX_CORE_EXPORT HPX_DECLARE_LOG(app)
-    HPX_CXX_EXPORT HPX_CORE_EXPORT HPX_DECLARE_LOG(app_console)
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT HPX_DECLARE_LOG(app)
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT HPX_DECLARE_LOG(app_console)
 
     ////////////////////////////////////////////////////////////////////////////
     // special debug logging channel
-    HPX_CXX_EXPORT HPX_CORE_EXPORT HPX_DECLARE_LOG(debuglog)
-    HPX_CXX_EXPORT HPX_CORE_EXPORT HPX_DECLARE_LOG(debuglog_console)
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT HPX_DECLARE_LOG(debuglog)
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT HPX_DECLARE_LOG(debuglog_console)
 }    // namespace hpx::util
 // clang-format on
 
 // helper type to forward logging during bootstrap to two destinations
-HPX_CXX_EXPORT struct bootstrap_logging
+HPX_CXX_CORE_EXPORT struct bootstrap_logging
 {
     constexpr bootstrap_logging() noexcept = default;
 };
 
-HPX_CXX_EXPORT template <typename T>
+HPX_CXX_CORE_EXPORT template <typename T>
 bootstrap_logging const& operator<<(
     bootstrap_logging const& l, T const& t)    //-V835
 {
@@ -125,14 +125,14 @@ bootstrap_logging const& operator<<(
     return l;    // NOLINT(bugprone-return-const-ref-from-parameter)
 }
 
-HPX_CXX_EXPORT inline constexpr bootstrap_logging lbt_{};
+HPX_CXX_CORE_EXPORT inline constexpr bootstrap_logging lbt_{};
 
 #else
 
 // logging is disabled all together
 namespace hpx::util::detail {
 
-    HPX_CXX_EXPORT struct dummy_log_impl
+    HPX_CXX_CORE_EXPORT struct dummy_log_impl
     {
         constexpr dummy_log_impl() noexcept = default;
 
@@ -149,17 +149,17 @@ namespace hpx::util::detail {
         }
     };
 
-    HPX_CXX_EXPORT inline constexpr dummy_log_impl dummy_log;
+    HPX_CXX_CORE_EXPORT inline constexpr dummy_log_impl dummy_log;
 }    // namespace hpx::util::detail
 
-HPX_CXX_EXPORT struct bootstrap_logging
+HPX_CXX_CORE_EXPORT struct bootstrap_logging
 {
     constexpr bootstrap_logging() noexcept = default;
 };
 
-HPX_CXX_EXPORT inline constexpr bootstrap_logging lbt_{};
+HPX_CXX_CORE_EXPORT inline constexpr bootstrap_logging lbt_{};
 
-HPX_CXX_EXPORT template <typename T>
+HPX_CXX_CORE_EXPORT template <typename T>
 constexpr bootstrap_logging const& operator<<(
     bootstrap_logging const& l, T&&) noexcept
 {

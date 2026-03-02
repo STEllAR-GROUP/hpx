@@ -116,10 +116,6 @@ function(hpx_perform_cxx_feature_tests)
       DEFINITIONS HPX_HAVE_CXX20_PAREN_INITIALIZATION_OF_AGGREGATES
     )
 
-    hpx_check_for_cxx20_std_disable_sized_sentinel_for(
-      DEFINITIONS HPX_HAVE_CXX20_STD_DISABLE_SIZED_SENTINEL_FOR
-    )
-
     hpx_check_for_cxx20_std_endian(DEFINITIONS HPX_HAVE_CXX20_STD_ENDIAN)
 
     hpx_check_for_cxx20_std_execution_policies(
@@ -169,6 +165,14 @@ function(hpx_perform_cxx_feature_tests)
 
   hpx_check_for_cxx_lambda_capture_decltype(
     DEFINITIONS HPX_HAVE_CXX_LAMBDA_CAPTURE_DECLTYPE
+  )
+
+  hpx_check_for_cxx23_std_unordered_transparent_erase(
+    DEFINITIONS HPX_HAVE_CXX23_STD_UNORDERED_TRANSPARENT_ERASE
+  )
+
+  hpx_check_for_cxx26_std_unordered_transparent_lookup(
+    DEFINITIONS HPX_HAVE_CXX26_STD_UNORDERED_TRANSPARENT_LOOKUP
   )
 
   hpx_check_for_builtin_forward_move(DEFINITIONS HPX_HAVE_BUILTIN_FORWARD_MOVE)

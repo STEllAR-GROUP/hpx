@@ -20,15 +20,16 @@
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/hashing.hpp>
 #include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/naming_base/id_type.hpp>
 
 #include <array>
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
+#include <iterator>
 #include <map>
 #include <memory>
 #include <set>
@@ -172,8 +173,7 @@ namespace hpx { namespace lcos {
         }
 
         template <typename Iterator>
-        typename std::enable_if<
-            traits::is_input_iterator<Iterator>::value>::type
+        typename std::enable_if<std::input_iterator<Iterator>>::type
         sync_images(Iterator begin, Iterator end) const
         {
             std::set<std::size_t> images(begin, end);
@@ -235,7 +235,7 @@ namespace hpx { namespace lcos {
         }
 
         template <typename Iterator>
-        typename std::enable_if<traits::is_input_iterator<Iterator>::value,
+        typename std::enable_if<std::input_iterator<Iterator>,
             hpx::future<void>>::type
         sync_images(hpx::launch::async_policy const& policy, Iterator begin,
             Iterator end) const

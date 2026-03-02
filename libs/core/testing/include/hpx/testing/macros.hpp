@@ -24,7 +24,7 @@
     HPX_TEST_IMPL(::hpx::util::detail::fixture{strm}, expr)
 
 #define HPX_TEST_IMPL(fixture, expr)                                           \
-    fixture.check_(__FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION,            \
+    fixture.check_(__FILE__, __LINE__, __func__,                               \
         ::hpx::util::counter_type::test, expr,                                 \
         "test '" HPX_PP_STRINGIZE(expr) "'")
 
@@ -43,7 +43,7 @@
     HPX_TEST_MSG_IMPL(::hpx::util::detail::fixture{strm}, expr, msg)
 
 #define HPX_TEST_MSG_IMPL(fixture, expr, msg)                                  \
-    fixture.check_(__FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION,            \
+    fixture.check_(__FILE__, __LINE__, __func__,                               \
         ::hpx::util::counter_type::test, expr, msg)
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -61,7 +61,7 @@
     HPX_TEST_EQ_IMPL(::hpx::util::detail::fixture{strm}, expr1, expr2)
 
 #define HPX_TEST_EQ_IMPL(fixture, expr1, expr2)                                \
-    fixture.check_equal(__FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION,       \
+    fixture.check_equal(__FILE__, __LINE__, __func__,                          \
         ::hpx::util::counter_type::test, expr1, expr2,                         \
         "test '" HPX_PP_STRINGIZE(expr1) " == " HPX_PP_STRINGIZE(expr2) "'")
 
@@ -80,7 +80,7 @@
     HPX_TEST_NEQ_IMPL(::hpx::util::detail::fixture{strm}, expr1, expr2)
 
 #define HPX_TEST_NEQ_IMPL(fixture, expr1, expr2)                               \
-    fixture.check_not_equal(__FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION,   \
+    fixture.check_not_equal(__FILE__, __LINE__, __func__,                      \
         ::hpx::util::counter_type::test, expr1, expr2,                         \
         "test '" HPX_PP_STRINGIZE(expr1) " != " HPX_PP_STRINGIZE(expr2) "'")
 
@@ -99,7 +99,7 @@
     HPX_TEST_LT_IMPL(::hpx::util::detail::fixture{strm}, expr1, expr2)
 
 #define HPX_TEST_LT_IMPL(fixture, expr1, expr2)                                \
-    fixture.check_less(__FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION,        \
+    fixture.check_less(__FILE__, __LINE__, __func__,                           \
         ::hpx::util::counter_type::test, expr1, expr2,                         \
         "test '" HPX_PP_STRINGIZE(expr1) " < " HPX_PP_STRINGIZE(expr2) "'")
 
@@ -118,7 +118,7 @@
     HPX_TEST_LTE_IMPL(::hpx::util::detail::fixture{strm}, expr1, expr2)
 
 #define HPX_TEST_LTE_IMPL(fixture, expr1, expr2)                               \
-    fixture.check_less_equal(__FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION,  \
+    fixture.check_less_equal(__FILE__, __LINE__, __func__,                     \
         ::hpx::util::counter_type::test, expr1, expr2,                         \
         "test '" HPX_PP_STRINGIZE(expr1) " <= " HPX_PP_STRINGIZE(expr2) "'")
 
@@ -138,7 +138,7 @@
     HPX_TEST_RANGE_IMPL(::hpx::util::detail::fixture{strm}, expr1, expr2, expr3)
 
 #define HPX_TEST_RANGE_IMPL(fixture, expr1, expr2, expr3)                      \
-    fixture.check_range(__FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION,       \
+    fixture.check_range(__FILE__, __LINE__, __func__,                          \
         ::hpx::util::counter_type::test, expr1, expr2, expr3,                  \
         "test '" HPX_PP_STRINGIZE(expr2) " <= " HPX_PP_STRINGIZE(              \
             expr1) " <= " HPX_PP_STRINGIZE(expr3) "'")
@@ -159,7 +159,7 @@
     HPX_TEST_EQ_MSG_IMPL(::hpx::util::detail::fixture{strm}, expr1, expr2, msg)
 
 #define HPX_TEST_EQ_MSG_IMPL(fixture, expr1, expr2, msg)                       \
-    fixture.check_equal(__FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION,       \
+    fixture.check_equal(__FILE__, __LINE__, __func__,                          \
         ::hpx::util::counter_type::test, expr1, expr2, msg)
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -178,7 +178,7 @@
     HPX_TEST_NEQ_MSG_IMPL(::hpx::util::detail::fixture{strm}, expr1, expr2, msg)
 
 #define HPX_TEST_NEQ_MSG_IMPL(fixture, expr1, expr2, msg)                      \
-    fixture.check_not_equal(__FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION,   \
+    fixture.check_not_equal(__FILE__, __LINE__, __func__,                      \
         ::hpx::util::counter_type::test, expr1, expr2, msg)
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -197,7 +197,7 @@
     HPX_TEST_LT_MSG_IMPL(::hpx::util::detail::fixture{strm}, expr1, expr2, msg)
 
 #define HPX_TEST_LT_MSG_IMPL(fixture, expr1, expr2, msg)                       \
-    fixture.check_less(__FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION,        \
+    fixture.check_less(__FILE__, __LINE__, __func__,                           \
         ::hpx::util::counter_type::test, expr1, expr2, msg)
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -216,7 +216,7 @@
     HPX_TEST_LTE_MSG_IMPL(::hpx::util::detail::fixture{strm}, expr1, expr2, msg)
 
 #define HPX_TEST_LTE_MSG_IMPL(fixture, expr1, expr2, msg)                      \
-    fixture.check_less_equal(__FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION,  \
+    fixture.check_less_equal(__FILE__, __LINE__, __func__,                     \
         ::hpx::util::counter_type::test, expr1, expr2, msg)
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -236,7 +236,7 @@
         ::hpx::util::detail::fixture{strm}, expr1, expr2, expr3, msg)
 
 #define HPX_TEST_RANGE_MSG_IMPL(fixture, expr1, expr2, expr3, msg)             \
-    fixture.check_range(__FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION,       \
+    fixture.check_range(__FILE__, __LINE__, __func__,                          \
         ::hpx::util::counter_type::test, expr1, expr2, expr3, msg)
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -254,7 +254,7 @@
     HPX_SANITY_IMPL(::hpx::util::detail::fixture{strm}, expr)
 
 #define HPX_SANITY_IMPL(fixture, expr)                                         \
-    fixture.check_(__FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION,            \
+    fixture.check_(__FILE__, __LINE__, __func__,                               \
         ::hpx::util::counter_type::sanity, expr,                               \
         "sanity check '" HPX_PP_STRINGIZE(expr) "'")
 
@@ -273,7 +273,7 @@
     HPX_SANITY_MSG_IMPL(::hpx::util::detail::fixture{strm}, expr, msg)
 
 #define HPX_SANITY_MSG_IMPL(fixture, expr, msg)                                \
-    fixture.check_(__FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION,            \
+    fixture.check_(__FILE__, __LINE__, __func__,                               \
         ::hpx::util::counter_type::sanity, expr, msg)
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -291,7 +291,7 @@
     HPX_SANITY_EQ_IMPL(::hpx::util::detail::fixture{strm}, expr1, expr2)
 
 #define HPX_SANITY_EQ_IMPL(fixture, expr1, expr2)                              \
-    fixture.check_equal(__FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION,       \
+    fixture.check_equal(__FILE__, __LINE__, __func__,                          \
         ::hpx::util::counter_type::sanity, expr1, expr2,                       \
         "sanity check '" HPX_PP_STRINGIZE(expr1) " == " HPX_PP_STRINGIZE(      \
             expr2) "'")
@@ -311,7 +311,7 @@
     HPX_SANITY_NEQ_IMPL(::hpx::util::detail::fixture{strm}, expr1, expr2)
 
 #define HPX_SANITY_NEQ_IMPL(fixture, expr1, expr2)                             \
-    fixture.check_not_equal(__FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION,   \
+    fixture.check_not_equal(__FILE__, __LINE__, __func__,                      \
         ::hpx::util::counter_type::sanity, expr1, expr2,                       \
         "sanity check '" HPX_PP_STRINGIZE(expr1) " != " HPX_PP_STRINGIZE(      \
             expr2) "'")
@@ -331,7 +331,7 @@
     HPX_SANITY_LT_IMPL(::hpx::util::detail::fixture{strm}, expr1, expr2)
 
 #define HPX_SANITY_LT_IMPL(fixture, expr1, expr2)                              \
-    fixture.check_less(__FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION,        \
+    fixture.check_less(__FILE__, __LINE__, __func__,                           \
         ::hpx::util::counter_type::sanity, expr1, expr2,                       \
         "sanity check '" HPX_PP_STRINGIZE(expr1) " < " HPX_PP_STRINGIZE(       \
             expr2) "'")
@@ -351,7 +351,7 @@
     HPX_SANITY_LTE_IMPL(::hpx::util::detail::fixture{strm}, expr1, expr2)
 
 #define HPX_SANITY_LTE_IMPL(fixture, expr1, expr2)                             \
-    fixture.check_less_equal(__FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION,  \
+    fixture.check_less_equal(__FILE__, __LINE__, __func__,                     \
         ::hpx::util::counter_type::sanity, expr1, expr2,                       \
         "sanity check '" HPX_PP_STRINGIZE(expr1) " <= " HPX_PP_STRINGIZE(      \
             expr2) "'")
@@ -373,7 +373,7 @@
         ::hpx::util::detail::fixture{strm}, expr1, expr2, expr3)
 
 #define HPX_SANITY_RANGE_IMPL(fixture, expr1, expr2, expr3)                    \
-    fixture.check_range(__FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION,       \
+    fixture.check_range(__FILE__, __LINE__, __func__,                          \
         ::hpx::util::counter_type::sanity, expr1, expr2, expr3,                \
         "sanity check '" HPX_PP_STRINGIZE(expr2) " <= " HPX_PP_STRINGIZE(      \
             expr1) " <= " HPX_PP_STRINGIZE(expr3) "'")
@@ -395,7 +395,7 @@
         ::hpx::util::detail::fixture{strm}, expr1, expr2, msg)
 
 #define HPX_SANITY_EQ_MSG_IMPL(fixture, expr1, expr2, msg)                     \
-    fixture.check_equal(__FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION,       \
+    fixture.check_equal(__FILE__, __LINE__, __func__,                          \
         ::hpx::util::counter_type::sanity, expr1, expr2, msg)
 
 ////////////////////////////////////////////////////////////////////////////////

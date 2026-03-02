@@ -33,7 +33,7 @@ namespace hpx::execution::experimental {
 
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename PredecessorSender, typename F,
+        HPX_CXX_CORE_EXPORT template <typename PredecessorSender, typename F,
             typename Scheduler = no_scheduler>
         struct let_stopped_sender
         {
@@ -138,8 +138,6 @@ namespace hpx::execution::experimental {
             {
                 return sender.scheduler;
             }
-
-            // TODO: add forwarding_sender_query
 
             template <typename Receiver>
             struct operation_state
@@ -284,7 +282,7 @@ namespace hpx::execution::experimental {
     //
     // let_stopped is guaranteed to not begin executing function until the
     // returned sender is started.
-    HPX_CXX_EXPORT inline constexpr struct let_stopped_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct let_stopped_t final
       : hpx::functional::detail::tag_priority<let_stopped_t>
     {
     private:

@@ -492,7 +492,7 @@ namespace hpx {
 
 namespace hpx::parallel {
 
-    HPX_CXX_EXPORT template <typename Tuple>
+    HPX_CXX_CORE_EXPORT template <typename Tuple>
     constexpr HPX_FORCEINLINE
         std::pair<typename hpx::tuple_element<1, Tuple>::type,
             typename hpx::tuple_element<2, Tuple>::type>
@@ -504,7 +504,7 @@ namespace hpx::parallel {
         // NOLINTEND(bugprone-use-after-move)
     }
 
-    HPX_CXX_EXPORT template <typename Tuple>
+    HPX_CXX_CORE_EXPORT template <typename Tuple>
     hpx::future<std::pair<typename hpx::tuple_element<1, Tuple>::type,
         typename hpx::tuple_element<2, Tuple>::type>>
     tuple_to_pair(hpx::future<Tuple>&& f)
@@ -524,7 +524,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        HPX_CXX_EXPORT struct stable_partition_helper
+        HPX_CXX_CORE_EXPORT struct stable_partition_helper
         {
             template <typename ExPolicy, typename RandIter, typename F,
                 typename Proj>
@@ -594,8 +594,8 @@ namespace hpx::parallel {
             }
         };
 
-        HPX_CXX_EXPORT template <typename BidirIter, typename Sent, typename F,
-            typename Proj>
+        HPX_CXX_CORE_EXPORT template <typename BidirIter, typename Sent,
+            typename F, typename Proj>
         constexpr BidirIter stable_partition_seq(
             BidirIter first, Sent last, F&& f, Proj&& proj)
         {
@@ -623,7 +623,7 @@ namespace hpx::parallel {
             return next;
         }
 
-        HPX_CXX_EXPORT template <typename Iter>
+        HPX_CXX_CORE_EXPORT template <typename Iter>
         struct stable_partition : public algorithm<stable_partition<Iter>, Iter>
         {
             constexpr stable_partition() noexcept
@@ -714,9 +714,9 @@ namespace hpx::parallel {
         /// \cond NOINTERNAL
 
         // sequential partition with projection function for bidirectional iterator.
-        HPX_CXX_EXPORT template <typename BidirIter, typename Pred,
+        HPX_CXX_CORE_EXPORT template <typename BidirIter, typename Pred,
             typename Proj>
-            requires(hpx::traits::is_bidirectional_iterator_v<BidirIter>)
+            requires(std::bidirectional_iterator<BidirIter>)
         constexpr BidirIter sequential_partition(
             BidirIter first, BidirIter last, Pred&& pred, Proj&& proj)
         {
@@ -748,9 +748,10 @@ namespace hpx::parallel {
         }
 
         // sequential partition with projection function for forward iterator.
-        HPX_CXX_EXPORT template <typename FwdIter, typename Pred, typename Proj>
-            requires(hpx::traits::is_forward_iterator_v<FwdIter> &&
-                !hpx::traits::is_bidirectional_iterator_v<FwdIter>)
+        HPX_CXX_CORE_EXPORT template <typename FwdIter, typename Pred,
+            typename Proj>
+            requires(std::forward_iterator<FwdIter> &&
+                !std::bidirectional_iterator<FwdIter>)
         constexpr FwdIter sequential_partition(
             FwdIter first, FwdIter last, Pred&& pred, Proj&& proj)
         {
@@ -775,7 +776,7 @@ namespace hpx::parallel {
             return first;
         }
 
-        HPX_CXX_EXPORT struct partition_helper
+        HPX_CXX_CORE_EXPORT struct partition_helper
         {
             template <typename FwdIter>
             struct block
@@ -828,8 +829,7 @@ namespace hpx::parallel {
             // block manager for random access iterator.
             template <typename RandIter>
             class block_manager<RandIter,
-                std::enable_if_t<
-                    hpx::traits::is_random_access_iterator_v<RandIter>>>
+                std::enable_if_t<std::random_access_iterator<RandIter>>>
             {
             public:
                 block_manager(
@@ -909,8 +909,8 @@ namespace hpx::parallel {
             // block manager for forward access iterator.
             template <typename FwdIter>
             class block_manager<FwdIter,
-                std::enable_if_t<hpx::traits::is_forward_iterator_v<FwdIter> &&
-                    !hpx::traits::is_random_access_iterator_v<FwdIter>>>
+                std::enable_if_t<std::forward_iterator<FwdIter> &&
+                    !std::random_access_iterator<FwdIter>>>
             {
             public:
                 // In constructor, prepare all blocks for fast acquirement of blocks.
@@ -1143,7 +1143,7 @@ namespace hpx::parallel {
             // remaining blocks are merged into one block which is adjacent to
             // the left of boundary.
             template <typename BidirIter>
-                requires(hpx::traits::is_bidirectional_iterator_v<BidirIter>)
+                requires(std::bidirectional_iterator<BidirIter>)
             static block<BidirIter> merge_leftside_remaining_blocks(
                 std::vector<block<BidirIter>>& remaining_blocks,
                 BidirIter boundary, BidirIter first)
@@ -1179,8 +1179,8 @@ namespace hpx::parallel {
             // the left of boundary.
 
             template <typename FwdIter>
-                requires(hpx::traits::is_forward_iterator_v<FwdIter> &&
-                    !hpx::traits::is_bidirectional_iterator_v<FwdIter>)
+                requires(std::forward_iterator<FwdIter> &&
+                    !std::bidirectional_iterator<FwdIter>)
             static block<FwdIter> merge_leftside_remaining_blocks(
                 std::vector<block<FwdIter>>& remaining_blocks, FwdIter boundary,
                 FwdIter first)
@@ -1364,7 +1364,7 @@ namespace hpx::parallel {
             }
         };
 
-        HPX_CXX_EXPORT template <typename ExPolicy, typename FwdIter,
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename FwdIter,
             typename Pred, typename Proj>
         hpx::future<FwdIter> parallel_partition(ExPolicy&& policy,
             FwdIter first, FwdIter last, Pred&& pred, Proj&& proj)
@@ -1386,7 +1386,7 @@ namespace hpx::parallel {
                 });
         }
 
-        HPX_CXX_EXPORT template <typename FwdIter>
+        HPX_CXX_CORE_EXPORT template <typename FwdIter>
         struct partition : public algorithm<partition<FwdIter>, FwdIter>
         {
             constexpr partition() noexcept
@@ -1437,7 +1437,7 @@ namespace hpx::parallel {
         /// \cond NOINTERNAL
 
         // sequential partition_copy with projection function
-        HPX_CXX_EXPORT template <typename InIter, typename OutIter1,
+        HPX_CXX_CORE_EXPORT template <typename InIter, typename OutIter1,
             typename OutIter2, typename Pred, typename Proj>
         constexpr hpx::tuple<InIter, OutIter1, OutIter2>
         sequential_partition_copy(InIter first, InIter last, OutIter1 dest_true,
@@ -1459,7 +1459,7 @@ namespace hpx::parallel {
                 HPX_MOVE(last), HPX_MOVE(dest_true), HPX_MOVE(dest_false));
         }
 
-        HPX_CXX_EXPORT template <typename IterTuple>
+        HPX_CXX_CORE_EXPORT template <typename IterTuple>
         struct partition_copy
           : public algorithm<partition_copy<IterTuple>, IterTuple>
         {
@@ -1597,7 +1597,7 @@ namespace hpx::parallel {
         /// \endcond
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename FwdIter1,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename FwdIter1,
         typename FwdIter2, typename FwdIter3, typename Pred,
         typename Proj = hpx::identity>
     // clang-format off
@@ -1616,11 +1616,11 @@ namespace hpx::parallel {
         FwdIter2 dest_true, FwdIter3 dest_false, Pred&& pred,
         Proj&& proj = Proj())
     {
-        static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+        static_assert(std::forward_iterator<FwdIter1>,
             "Required at least forward iterator.");
-        static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+        static_assert(std::forward_iterator<FwdIter2>,
             "Requires at least forward iterator.");
-        static_assert(hpx::traits::is_forward_iterator_v<FwdIter3>,
+        static_assert(std::forward_iterator<FwdIter3>,
             "Requires at least forward iterator.");
 
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
@@ -1643,7 +1643,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::stable_partition
-    HPX_CXX_EXPORT inline constexpr struct stable_partition_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct stable_partition_t final
       : hpx::detail::tag_parallel_algorithm<stable_partition_t>
     {
         template <typename BidirIter, typename F>
@@ -1656,7 +1656,7 @@ namespace hpx {
         friend BidirIter tag_fallback_invoke(
             hpx::stable_partition_t, BidirIter first, BidirIter last, F f)
         {
-            static_assert(hpx::traits::is_bidirectional_iterator_v<BidirIter>,
+            static_assert(std::bidirectional_iterator<BidirIter>,
                 "Requires at least bidirectional iterator.");
 
             return hpx::parallel::detail::stable_partition<BidirIter>().call2(
@@ -1676,12 +1676,12 @@ namespace hpx {
         tag_fallback_invoke(hpx::stable_partition_t, ExPolicy&& policy,
             BidirIter first, BidirIter last, F f)
         {
-            static_assert(hpx::traits::is_bidirectional_iterator_v<BidirIter>,
+            static_assert(std::bidirectional_iterator<BidirIter>,
                 "Requires at least bidirectional iterator.");
 
             using is_seq = std::integral_constant<bool,
                 hpx::is_sequenced_execution_policy_v<ExPolicy> ||
-                    !hpx::traits::is_random_access_iterator_v<BidirIter>>;
+                    !std::random_access_iterator<BidirIter>>;
 
             return hpx::parallel::detail::stable_partition<BidirIter>().call2(
                 HPX_FORWARD(ExPolicy, policy), is_seq(), first, last,
@@ -1691,7 +1691,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::partition
-    HPX_CXX_EXPORT inline constexpr struct partition_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct partition_t final
       : hpx::detail::tag_parallel_algorithm<partition_t>
     {
         template <typename FwdIter, typename Pred>
@@ -1704,7 +1704,7 @@ namespace hpx {
         friend FwdIter tag_fallback_invoke(
             hpx::partition_t, FwdIter first, FwdIter last, Pred pred)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::partition<FwdIter>().call(
@@ -1724,7 +1724,7 @@ namespace hpx {
         tag_fallback_invoke(hpx::partition_t, ExPolicy&& policy, FwdIter first,
             FwdIter last, Pred pred)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::partition<FwdIter>().call(
@@ -1735,7 +1735,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::partition_copy
-    HPX_CXX_EXPORT inline constexpr struct partition_copy_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct partition_copy_t final
       : hpx::detail::tag_parallel_algorithm<partition_copy_t>
     {
         template <typename FwdIter1, typename FwdIter2, typename FwdIter3,
@@ -1752,11 +1752,11 @@ namespace hpx {
             hpx::partition_copy_t, FwdIter1 first, FwdIter1 last,
             FwdIter2 dest_true, FwdIter3 dest_false, Pred pred)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Required at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter3>,
+            static_assert(std::forward_iterator<FwdIter3>,
                 "Requires at least forward iterator.");
 
             using result_type = hpx::tuple<FwdIter1, FwdIter2, FwdIter3>;
@@ -1784,11 +1784,11 @@ namespace hpx {
             FwdIter1 first, FwdIter1 last, FwdIter2 dest_true,
             FwdIter3 dest_false, Pred pred)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Required at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter3>,
+            static_assert(std::forward_iterator<FwdIter3>,
                 "Requires at least forward iterator.");
 
             using result_type = hpx::tuple<FwdIter1, FwdIter2, FwdIter3>;

@@ -17,12 +17,11 @@
 #include <hpx/modules/timing.hpp>
 
 #include <hpx/gasnet_base/gasnet_environment.hpp>
+#include <hpx/modules/parcelset_base.hpp>
 #include <hpx/parcelport_gasnet/header.hpp>
 #include <hpx/parcelport_gasnet/locality.hpp>
 #include <hpx/parcelset/parcelport_connection.hpp>
 #include <hpx/parcelset/parcelset_fwd.hpp>
-#include <hpx/parcelset_base/detail/gatherer.hpp>
-#include <hpx/parcelset_base/parcelport.hpp>
 
 #include <cstddef>
 #include <cstdint>

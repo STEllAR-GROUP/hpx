@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/modules/async_base.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/naming_base/naming_base.hpp>
 
 namespace hpx::traits {
 

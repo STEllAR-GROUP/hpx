@@ -553,15 +553,6 @@ function(hpx_check_for_cxx20_paren_initialization_of_aggregates)
 endfunction()
 
 # ##############################################################################
-function(hpx_check_for_cxx20_std_disable_sized_sentinel_for)
-  add_hpx_config_test(
-    HPX_WITH_CXX20_STD_DISABLE_SIZED_SENTINEL_FOR
-    SOURCE cmake/tests/cxx20_std_disable_sized_sentinel_for.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
 function(hpx_check_for_cxx20_std_endian)
   add_hpx_config_test(
     HPX_WITH_CXX20_STD_ENDIAN
@@ -691,6 +682,24 @@ function(hpx_check_for_mm_prefetch)
   add_hpx_config_test(
     HPX_WITH_MM_PREFETCH
     SOURCE cmake/tests/mm_prefetch.cpp
+    FILE ${ARGN}
+  )
+endfunction()
+
+# ##############################################################################
+function(hpx_check_for_cxx23_std_unordered_transparent_erase)
+  add_hpx_config_test(
+    HPX_WITH_CXX23_STD_UNORDERED_TRANSPARENT_ERASE
+    SOURCE cmake/tests/cxx23_std_unordered_transparent_erase.cpp
+    FILE ${ARGN}
+  )
+endfunction()
+
+# ##############################################################################
+function(hpx_check_for_cxx26_std_unordered_transparent_lookup)
+  add_hpx_config_test(
+    HPX_WITH_CXX26_STD_UNORDERED_TRANSPARENT_LOOKUP
+    SOURCE cmake/tests/cxx26_std_unordered_transparent_lookup.cpp
     FILE ${ARGN}
   )
 endfunction()

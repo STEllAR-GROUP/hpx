@@ -140,7 +140,6 @@ set(HPX_VERSION_MINOR @HPX_VERSION_MINOR@)
 set(HPX_VERSION_SUBMINOR @HPX_VERSION_SUBMINOR@)
 
 set(HPX_PREFIX "${_hpx_root_dir}")
-set(HPX_DEBUG_POSTFIX "@HPX_DEBUG_POSTFIX@")
 set(HPX_BUILD_TYPE "@CMAKE_BUILD_TYPE@")
 set(HPX_CXX_STANDARD "@HPX_CXX_STANDARD@")
 # We explicitly set the default to 98 to force CMake to emit a -std=c++XX flag.

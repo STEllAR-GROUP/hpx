@@ -18,8 +18,8 @@ namespace hpx::string_util {
 
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename It, typename Char, typename Traits,
-            typename Allocator>
+        HPX_CXX_CORE_EXPORT template <typename It, typename Char,
+            typename Traits, typename Allocator>
         std::basic_string<Char, Traits, Allocator> substr(
             std::basic_string<Char, Traits, Allocator> const& s,
             It const& first, It const& last)
@@ -30,9 +30,9 @@ namespace hpx::string_util {
         }
     }    // namespace detail
 
-    HPX_CXX_EXPORT enum class token_compress_mode { off, on };
+    HPX_CXX_CORE_EXPORT enum class token_compress_mode { off, on };
 
-    HPX_CXX_EXPORT template <typename Container, typename Predicate,
+    HPX_CXX_CORE_EXPORT template <typename Container, typename Predicate,
         typename Char, typename Traits, typename Allocator>
     void split(Container& container,
         std::basic_string<Char, Traits, Allocator> const& str, Predicate&& pred,
@@ -66,7 +66,7 @@ namespace hpx::string_util {
         } while (token_end != std::end(str));
     }
 
-    HPX_CXX_EXPORT template <typename Container, typename Predicate>
+    HPX_CXX_CORE_EXPORT template <typename Container, typename Predicate>
     void split(Container& container, char const* str, Predicate&& pred,
         token_compress_mode compress_mode = token_compress_mode::off)
     {

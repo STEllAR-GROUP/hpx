@@ -215,9 +215,9 @@ namespace hpx::parallel {
     // set_symmetric_difference
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename Iter1, typename Sent1, typename Iter2,
-            typename Sent2, typename Iter3, typename Comp, typename Proj1,
-            typename Proj2>
+        HPX_CXX_CORE_EXPORT template <typename Iter1, typename Sent1,
+            typename Iter2, typename Sent2, typename Iter3, typename Comp,
+            typename Proj1, typename Proj2>
         constexpr util::in_in_out_result<Iter1, Iter2, Iter3>
         sequential_set_symmetric_difference(Iter1 first1, Sent1 last1,
             Iter2 first2, Sent2 last2, Iter3 dest, Comp&& comp, Proj1&& proj1,
@@ -257,7 +257,7 @@ namespace hpx::parallel {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename Result>
+        HPX_CXX_CORE_EXPORT template <typename Result>
         struct set_symmetric_difference
           : public algorithm<set_symmetric_difference<Result>, Result>
         {
@@ -343,7 +343,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::set_symmetric_difference
-    HPX_CXX_EXPORT inline constexpr struct set_symmetric_difference_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct set_symmetric_difference_t final
       : hpx::detail::tag_parallel_algorithm<set_symmetric_difference_t>
     {
     private:
@@ -367,19 +367,20 @@ namespace hpx {
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2,
             FwdIter3 dest, Pred op = Pred())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter3> ||
+            static_assert(std::forward_iterator<FwdIter3> ||
                     (hpx::is_sequenced_execution_policy_v<ExPolicy> &&
-                        hpx::traits::is_output_iterator_v<FwdIter3>),
+                        std::output_iterator<FwdIter3,
+                            hpx::traits::iter_value_t<FwdIter2>>),
                 "Requires at least forward iterator or sequential execution.");
 
             using is_seq = std::integral_constant<bool,
                 hpx::is_sequenced_execution_policy_v<ExPolicy> ||
-                    !hpx::traits::is_random_access_iterator_v<FwdIter1> ||
-                    !hpx::traits::is_random_access_iterator_v<FwdIter2>>;
+                    !std::random_access_iterator<FwdIter1> ||
+                    !std::random_access_iterator<FwdIter2>>;
 
             using result_type = hpx::parallel::util::in_in_out_result<FwdIter1,
                 FwdIter2, FwdIter3>;
@@ -405,11 +406,12 @@ namespace hpx {
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2,
             FwdIter3 dest, Pred op = Pred())
         {
-            static_assert(hpx::traits::is_input_iterator_v<FwdIter1>,
+            static_assert(std::input_iterator<FwdIter1>,
                 "Requires at least input iterator.");
-            static_assert(hpx::traits::is_input_iterator_v<FwdIter2>,
+            static_assert(std::input_iterator<FwdIter2>,
                 "Requires at least input iterator.");
-            static_assert(hpx::traits::is_output_iterator_v<FwdIter3>,
+            static_assert(std::output_iterator<FwdIter3,
+                              hpx::traits::iter_value_t<FwdIter2>>,
                 "Requires at least output iterator.");
 
             using result_type = hpx::parallel::util::in_in_out_result<FwdIter1,

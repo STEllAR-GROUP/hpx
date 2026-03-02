@@ -26,12 +26,11 @@
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/async_local.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/naming_base.hpp>
+#include <hpx/modules/parcelset_base.hpp>
 #include <hpx/modules/threading_base.hpp>
-#include <hpx/naming_base/address.hpp>
-#include <hpx/naming_base/id_type.hpp>
 #include <hpx/parcelset/detail/parcel_await.hpp>
 #include <hpx/parcelset/parcelset_fwd.hpp>
-#include <hpx/parcelset_base/parcel_interface.hpp>
 #if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
 #include <hpx/modules/runtime_local.hpp>
 #endif

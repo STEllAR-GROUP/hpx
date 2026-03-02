@@ -15,7 +15,7 @@
 
 namespace hpx::lockfree::detail {
 
-    HPX_CXX_EXPORT template <typename T, typename U>
+    HPX_CXX_CORE_EXPORT template <typename T, typename U>
     HPX_FORCEINLINE constexpr void copy_payload(T& t, U& u)
     {
         if constexpr (std::is_convertible_v<T, U>)
@@ -28,7 +28,7 @@ namespace hpx::lockfree::detail {
         }
     }
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct consume_via_copy
     {
         explicit constexpr consume_via_copy(T& out) noexcept
@@ -45,7 +45,7 @@ namespace hpx::lockfree::detail {
         T& out_;
     };
 
-    HPX_CXX_EXPORT struct consume_noop
+    HPX_CXX_CORE_EXPORT struct consume_noop
     {
         template <typename U>
         constexpr void operator()(U&&) const noexcept

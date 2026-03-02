@@ -27,7 +27,7 @@ namespace hpx::execution::experimental {
 
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename Policy>
+        HPX_CXX_CORE_EXPORT template <typename Policy>
         struct get_default_scheduler_policy
         {
             static constexpr Policy call() noexcept
@@ -46,7 +46,7 @@ namespace hpx::execution::experimental {
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename Policy>
+    HPX_CXX_CORE_EXPORT template <typename Policy>
     struct thread_pool_policy_scheduler
     {
         // Associate the parallel_execution_tag tag type as a default with this
@@ -96,10 +96,17 @@ namespace hpx::execution::experimental {
         template <typename Executor_>
             requires(
                 std::is_convertible_v<Executor_, thread_pool_policy_scheduler>)
-        friend constexpr auto tag_invoke(
+        friend auto tag_invoke(
             hpx::execution::experimental::with_processing_units_count_t,
-            Executor_ const& scheduler, std::size_t num_cores) noexcept
+            Executor_ const& scheduler, std::size_t num_cores)
         {
+            if (num_cores == 0)
+            {
+                auto pool = scheduler.pool_ ?
+                    scheduler.pool_ :
+                    threads::detail::get_self_or_default_pool();
+                num_cores = pool->get_active_os_thread_count();
+            }
             auto scheduler_with_num_cores = scheduler;
             scheduler_with_num_cores.num_cores_ = num_cores;
             return scheduler_with_num_cores;
@@ -431,7 +438,8 @@ namespace hpx::execution::experimental {
     };
 
     // support all properties exposed by the embedded policy
-    HPX_CXX_EXPORT template <typename Tag, typename Policy, typename Property,
+    HPX_CXX_CORE_EXPORT template <typename Tag, typename Policy,
+        typename Property,
         HPX_CONCEPT_REQUIRES_(
             hpx::execution::experimental::is_scheduling_property_v<Tag>)>
     auto tag_invoke(Tag tag,
@@ -447,7 +455,7 @@ namespace hpx::execution::experimental {
         return scheduler_with_prop;
     }
 
-    HPX_CXX_EXPORT template <typename Tag, typename Policy,
+    HPX_CXX_CORE_EXPORT template <typename Tag, typename Policy,
         HPX_CONCEPT_REQUIRES_(
             hpx::execution::experimental::is_scheduling_property_v<Tag>)>
     auto tag_invoke(
@@ -457,6 +465,6 @@ namespace hpx::execution::experimental {
         return tag(scheduler.policy());
     }
 
-    HPX_CXX_EXPORT using thread_pool_scheduler =
+    HPX_CXX_CORE_EXPORT using thread_pool_scheduler =
         thread_pool_policy_scheduler<hpx::launch>;
 }    // namespace hpx::execution::experimental

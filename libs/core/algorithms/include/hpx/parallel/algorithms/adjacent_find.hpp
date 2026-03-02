@@ -153,7 +153,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        HPX_CXX_EXPORT template <typename Iter, typename Sent>
+        HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent>
         struct adjacent_find : public algorithm<adjacent_find<Iter, Sent>, Iter>
         {
             constexpr adjacent_find() noexcept
@@ -256,17 +256,17 @@ namespace hpx::parallel {
 
 namespace hpx {
 
-    HPX_CXX_EXPORT inline constexpr struct adjacent_find_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct adjacent_find_t final
       : hpx::detail::tag_parallel_algorithm<adjacent_find_t>
     {
     private:
         template <typename InIter,
             typename Pred = hpx::parallel::detail::equal_to>
-            requires(hpx::traits::is_input_iterator_v<InIter>)
+            requires(std::input_iterator<InIter>)
         friend InIter tag_fallback_invoke(
             hpx::adjacent_find_t, InIter first, InIter last, Pred pred = Pred())
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Requires at least input iterator.");
 
             return parallel::detail::adjacent_find<InIter, InIter>().call(
@@ -279,13 +279,13 @@ namespace hpx {
         // clang-format off
         requires (
             hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::traits::is_forward_iterator_v<FwdIter>
+            std::forward_iterator<FwdIter>
         )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::adjacent_find_t,
             ExPolicy&& policy, FwdIter first, FwdIter last, Pred pred = Pred())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least a forward iterator");
 
             return parallel::detail::adjacent_find<FwdIter, FwdIter>().call(

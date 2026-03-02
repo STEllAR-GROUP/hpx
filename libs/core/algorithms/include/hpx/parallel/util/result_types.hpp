@@ -17,30 +17,30 @@
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/futures.hpp>
 
+#include <concepts>
 #include <type_traits>
 #include <utility>
 
 namespace hpx::parallel::util {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename I1, typename I2>
+    HPX_CXX_CORE_EXPORT template <typename I1, typename I2>
     struct in_in_result
     {
         HPX_NO_UNIQUE_ADDRESS I1 in1;
         HPX_NO_UNIQUE_ADDRESS I2 in2;
 
-        template <typename II1, typename II2,
-            typename Enable =
-                std::enable_if_t<std::is_convertible_v<I1 const&, II1> &&
-                    std::is_convertible_v<I2 const&, II2>>>
+        template <typename II1, typename II2>
+            requires(std::convertible_to<I1 const&, II1> &&
+                std::convertible_to<I2 const&, II2>)
         constexpr operator in_in_result<II1, II2>() const&
         {
             return {in1, in2};
         }
 
-        template <typename II1, typename II2,
-            typename Enable = std::enable_if_t<std::is_convertible_v<I1, II1> &&
-                std::is_convertible_v<I2, II2>>>
+        template <typename II1, typename II2>
+            requires(
+                std::convertible_to<I1, II1> && std::convertible_to<I2, II2>)
         constexpr operator in_in_result<II1, II2>() &&
         {
             return {HPX_MOVE(in1), HPX_MOVE(in2)};
@@ -55,20 +55,20 @@ namespace hpx::parallel::util {
         }
     };
 
-    HPX_CXX_EXPORT template <typename I1, typename I2>
+    HPX_CXX_CORE_EXPORT template <typename I1, typename I2>
     I2 get_in2_element(util::in_in_result<I1, I2>&& p)
     {
         return p.in2;
     }
 
-    HPX_CXX_EXPORT template <typename I1, typename I2>
+    HPX_CXX_CORE_EXPORT template <typename I1, typename I2>
     hpx::future<I2> get_in2_element(hpx::future<util::in_in_result<I1, I2>>&& f)
     {
         return hpx::make_future<I2>(
             HPX_MOVE(f), [](util::in_in_result<I1, I2>&& p) { return p.in2; });
     }
 
-    HPX_CXX_EXPORT template <typename InInResultSender>
+    HPX_CXX_CORE_EXPORT template <typename InInResultSender>
         requires(hpx::execution::experimental::is_sender_v<InInResultSender>)
     decltype(auto) get_in2_element(InInResultSender&& result_sender)
     {
@@ -80,24 +80,22 @@ namespace hpx::parallel::util {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename I, typename O>
+    HPX_CXX_CORE_EXPORT template <typename I, typename O>
     struct in_out_result
     {
         HPX_NO_UNIQUE_ADDRESS I in;
         HPX_NO_UNIQUE_ADDRESS O out;
 
-        template <typename I2, typename O2,
-            typename Enable =
-                std::enable_if_t<std::is_convertible_v<I const&, I2> &&
-                    std::is_convertible_v<O const&, O2>>>
+        template <typename I2, typename O2>
+            requires(std::convertible_to<I const&, I2> &&
+                std::convertible_to<O const&, O2>)
         constexpr operator in_out_result<I2, O2>() const&
         {
             return {in, out};
         }
 
-        template <typename I2, typename O2,
-            typename Enable = std::enable_if_t<std::is_convertible_v<I, I2> &&
-                std::is_convertible_v<O, O2>>>
+        template <typename I2, typename O2>
+            requires(std::convertible_to<I, I2> && std::convertible_to<O, O2>)
         constexpr operator in_out_result<I2, O2>() &&
         {
             return {HPX_MOVE(in), HPX_MOVE(out)};
@@ -113,13 +111,13 @@ namespace hpx::parallel::util {
     };
 
     ///////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename I, typename O>
+    HPX_CXX_CORE_EXPORT template <typename I, typename O>
     std::pair<I, O> get_pair(util::in_out_result<I, O>&& p)
     {
         return std::pair<I, O>{p.in, p.out};
     }
 
-    HPX_CXX_EXPORT template <typename I, typename O>
+    HPX_CXX_CORE_EXPORT template <typename I, typename O>
     hpx::future<std::pair<I, O>> get_pair(
         hpx::future<util::in_out_result<I, O>>&& f)
     {
@@ -129,7 +127,7 @@ namespace hpx::parallel::util {
             });
     }
 
-    HPX_CXX_EXPORT template <typename Sender>
+    HPX_CXX_CORE_EXPORT template <typename Sender>
         requires(hpx::execution::experimental::is_sender_v<Sender>)
     decltype(auto) get_pair(Sender&& sender)
     {
@@ -141,13 +139,13 @@ namespace hpx::parallel::util {
     }
 
     ///////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename I, typename O>
+    HPX_CXX_CORE_EXPORT template <typename I, typename O>
     O get_second_element(util::in_out_result<I, O>&& p)
     {
         return p.out;
     }
 
-    HPX_CXX_EXPORT template <typename I, typename O>
+    HPX_CXX_CORE_EXPORT template <typename I, typename O>
     hpx::future<O> get_second_element(
         hpx::future<util::in_out_result<I, O>>&& f)
     {
@@ -157,7 +155,7 @@ namespace hpx::parallel::util {
 
     namespace functional {
 
-        HPX_CXX_EXPORT struct get_second_element
+        HPX_CXX_CORE_EXPORT struct get_second_element
         {
             template <typename T>
             decltype(auto) operator()(T&& val) const
@@ -168,7 +166,7 @@ namespace hpx::parallel::util {
         };
     }    // namespace functional
 
-    HPX_CXX_EXPORT template <typename Sender>
+    HPX_CXX_CORE_EXPORT template <typename Sender>
         requires(hpx::execution::experimental::is_sender_v<Sender>)
     decltype(auto) get_second_element(Sender&& sender)
     {
@@ -177,13 +175,13 @@ namespace hpx::parallel::util {
     }
 
     // converts a in_out_result into a iterator_range
-    HPX_CXX_EXPORT template <typename I, typename O>
+    HPX_CXX_CORE_EXPORT template <typename I, typename O>
     hpx::util::iterator_range<I, O> get_subrange(in_out_result<I, O> const& ior)
     {
         return hpx::util::iterator_range<I, O>(ior.in, ior.out);
     }
 
-    HPX_CXX_EXPORT template <typename I, typename O>
+    HPX_CXX_CORE_EXPORT template <typename I, typename O>
     hpx::future<hpx::util::iterator_range<I, O>> get_subrange(
         hpx::future<in_out_result<I, O>>&& ior)
     {
@@ -194,22 +192,21 @@ namespace hpx::parallel::util {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct min_max_result
     {
         HPX_NO_UNIQUE_ADDRESS T min;
         HPX_NO_UNIQUE_ADDRESS T max;
 
-        template <typename T2,
-            typename Enable =
-                std::enable_if_t<std::is_convertible_v<T const&, T>>>
+        template <typename T2>
+            requires(std::convertible_to<T const&, T2>)
         constexpr operator min_max_result<T2>() const&
         {
             return {min, max};
         }
 
-        template <typename T2,
-            typename Enable = std::enable_if_t<std::is_convertible_v<T, T2>>>
+        template <typename T2>
+            requires(std::is_convertible_v<T, T2>)
         constexpr operator min_max_result<T2>() &&
         {
             return {HPX_MOVE(min), HPX_MOVE(max)};
@@ -225,26 +222,25 @@ namespace hpx::parallel::util {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename I1, typename I2, typename O>
+    HPX_CXX_CORE_EXPORT template <typename I1, typename I2, typename O>
     struct in_in_out_result
     {
         HPX_NO_UNIQUE_ADDRESS I1 in1;
         HPX_NO_UNIQUE_ADDRESS I2 in2;
         HPX_NO_UNIQUE_ADDRESS O out;
 
-        template <typename II1, typename II2, typename O1,
-            typename Enable =
-                std::enable_if_t<std::is_convertible_v<I1 const&, II1> &&
-                    std::is_convertible_v<I2 const&, II2> &&
-                    std::is_convertible_v<O const&, O1>>>
+        template <typename II1, typename II2, typename O1>
+            requires(std::convertible_to<I1 const&, II1> &&
+                std::convertible_to<I2 const&, II2> &&
+                std::convertible_to<O const&, O1>)
         constexpr operator in_in_out_result<II1, II2, O1>() const&
         {
             return {in1, in2, out};
         }
 
-        template <typename II2, typename II1, typename O1,
-            typename Enable = std::enable_if_t<std::is_convertible_v<I1, II1> &&
-                std::is_convertible_v<I2, II2> && std::is_convertible_v<O, O1>>>
+        template <typename II2, typename II1, typename O1>
+            requires(std::convertible_to<I1, II1> &&
+                std::convertible_to<I2, II2> && std::convertible_to<O, O1>)
         constexpr operator in_in_out_result<II1, II2, O1>() &&
         {
             return {HPX_MOVE(in1), HPX_MOVE(in2), HPX_MOVE(out)};
@@ -260,13 +256,13 @@ namespace hpx::parallel::util {
     };
 
     ///////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename I1, typename I2, typename O>
+    HPX_CXX_CORE_EXPORT template <typename I1, typename I2, typename O>
     O get_third_element(util::in_in_out_result<I1, I2, O>&& p)
     {
         return p.out;
     }
 
-    HPX_CXX_EXPORT template <typename I1, typename I2, typename O>
+    HPX_CXX_CORE_EXPORT template <typename I1, typename I2, typename O>
     hpx::future<O> get_third_element(
         hpx::future<util::in_in_out_result<I1, I2, O>>&& f)
     {
@@ -274,7 +270,7 @@ namespace hpx::parallel::util {
             HPX_MOVE(f), [](in_in_out_result<I1, I2, O>&& p) { return p.out; });
     }
 
-    HPX_CXX_EXPORT template <typename InInOutResultSender>
+    HPX_CXX_CORE_EXPORT template <typename InInOutResultSender>
         requires(hpx::execution::experimental::is_sender_v<InInOutResultSender>)
     decltype(auto) get_third_element(InInOutResultSender&& result_sender)
     {
@@ -286,27 +282,25 @@ namespace hpx::parallel::util {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename I, typename O1, typename O2>
+    HPX_CXX_CORE_EXPORT template <typename I, typename O1, typename O2>
     struct in_out_out_result
     {
         HPX_NO_UNIQUE_ADDRESS I in;
         HPX_NO_UNIQUE_ADDRESS O1 out1;
         HPX_NO_UNIQUE_ADDRESS O2 out2;
 
-        template <typename II, typename OO1, typename OO2,
-            typename Enable =
-                std::enable_if_t<std::is_convertible_v<I const&, II> &&
-                    std::is_convertible_v<O1 const&, OO1> &&
-                    std::is_convertible_v<O2 const&, OO2>>>
+        template <typename II, typename OO1, typename OO2>
+            requires(std::convertible_to<I const&, II> &&
+                std::convertible_to<O1 const&, OO1> &&
+                std::convertible_to<O2 const&, OO2>)
         constexpr operator in_out_out_result<II, OO1, OO2>() const&
         {
             return {in, out1, out2};
         }
 
-        template <typename II, typename OO1, typename OO2,
-            typename Enable = std::enable_if_t<std::is_convertible_v<I, II> &&
-                std::is_convertible_v<O1, OO1> &&
-                std::is_convertible_v<O2, OO2>>>
+        template <typename II, typename OO1, typename OO2>
+            requires(std::convertible_to<I, II> &&
+                std::convertible_to<O1, OO1> && std::convertible_to<O2, OO2>)
         constexpr operator in_out_out_result<II, OO1, OO2>() &&
         {
             return {HPX_MOVE(in), HPX_MOVE(out1), HPX_MOVE(out2)};
@@ -321,7 +315,7 @@ namespace hpx::parallel::util {
         }
     };
 
-    HPX_CXX_EXPORT template <typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename... Ts>
     constexpr HPX_FORCEINLINE in_out_out_result<Ts...> make_in_out_out_result(
         hpx::tuple<Ts...>&& t)
     {
@@ -333,7 +327,7 @@ namespace hpx::parallel::util {
         return result_type{hpx::get<0>(t), hpx::get<1>(t), hpx::get<2>(t)};
     }
 
-    HPX_CXX_EXPORT template <typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename... Ts>
     hpx::future<in_out_out_result<Ts...>> make_in_out_out_result(
         hpx::future<hpx::tuple<Ts...>>&& f)
     {
@@ -349,24 +343,23 @@ namespace hpx::parallel::util {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename I, typename F>
+    HPX_CXX_CORE_EXPORT template <typename I, typename F>
     struct in_fun_result
     {
         HPX_NO_UNIQUE_ADDRESS I in;
         HPX_NO_UNIQUE_ADDRESS F fun;
 
-        template <typename I2, typename F2,
-            typename Enable =
-                std::enable_if_t<std::is_convertible_v<I const&, I2> &&
-                    std::is_convertible_v<F const&, F2>>>
+        template <typename I2, typename F2>
+            requires(std::convertible_to<I const&, I2> &&
+                std::convertible_to<F const&, F2>)
         constexpr operator in_fun_result<I2, F2>() const&
         {
             return {in, fun};
         }
 
-        template <typename I2, typename F2,
-            typename Enable = std::enable_if_t<std::is_convertible_v<I, I2> &&
-                std::is_convertible_v<F, F2>>>
+        template <typename I2, typename F2>
+            requires(
+                std::is_convertible_v<I, I2> && std::is_convertible_v<F, F2>)
         constexpr operator in_fun_result<I2, F2>() &&
         {
             return {HPX_MOVE(in), HPX_MOVE(fun)};
@@ -381,14 +374,16 @@ namespace hpx::parallel::util {
         }
     };
 
-    HPX_CXX_EXPORT template <typename Iterator, typename Sentinel = Iterator>
+    HPX_CXX_CORE_EXPORT template <typename Iterator,
+        typename Sentinel = Iterator>
     hpx::util::iterator_range<Iterator, Sentinel> make_subrange(
         Iterator iterator, Sentinel sentinel)
     {
         return hpx::util::iterator_range(iterator, sentinel);
     }
 
-    HPX_CXX_EXPORT template <typename Iterator, typename Sentinel = Iterator>
+    HPX_CXX_CORE_EXPORT template <typename Iterator,
+        typename Sentinel = Iterator>
     hpx::future<hpx::util::iterator_range<Iterator, Sentinel>> make_subrange(
         hpx::future<Iterator>&& iterator, Sentinel sentinel)
     {
@@ -399,9 +394,32 @@ namespace hpx::parallel::util {
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    HPX_CXX_EXPORT template <typename I, typename T>
+    struct in_value_result
+    {
+        HPX_NO_UNIQUE_ADDRESS I in;
+        HPX_NO_UNIQUE_ADDRESS T value;
+
+        template <typename I2, typename T2>
+            requires(std::convertible_to<I const&, I2> &&
+                std::convertible_to<T const&, T2>)
+        constexpr operator in_value_result<I2, T2>() const&
+        {
+            return {in, value};
+        }
+
+        template <typename I2, typename T2>
+            requires(std::convertible_to<I, I2> && std::convertible_to<T, T2>)
+        constexpr operator in_value_result<I2, T2>() &&
+        {
+            return {HPX_MOVE(in), HPX_MOVE(value)};
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename ZipIter>
+        HPX_CXX_CORE_EXPORT template <typename ZipIter>
         in_out_result<
             typename hpx::tuple_element<0,
                 typename std::decay_t<ZipIter>::iterator_tuple_type>::type,
@@ -420,7 +438,7 @@ namespace hpx::parallel::util {
             return result_type{hpx::get<0>(t), hpx::get<1>(t)};
         }
 
-        HPX_CXX_EXPORT template <typename ZipIterSender>
+        HPX_CXX_CORE_EXPORT template <typename ZipIterSender>
             requires(hpx::execution::experimental::is_sender_v<ZipIterSender>)
         decltype(auto) get_in_out_result(ZipIterSender&& zipiter_sender)
         {
@@ -431,7 +449,7 @@ namespace hpx::parallel::util {
                 });
         }
 
-        HPX_CXX_EXPORT template <typename ZipIter>
+        HPX_CXX_CORE_EXPORT template <typename ZipIter>
         hpx::future<
             in_out_result<typename hpx::tuple_element<0,
                               typename ZipIter::iterator_tuple_type>::type,
@@ -451,7 +469,7 @@ namespace hpx::parallel::util {
                 });
         }
 
-        HPX_CXX_EXPORT template <typename ZipIter>
+        HPX_CXX_CORE_EXPORT template <typename ZipIter>
         min_max_result<typename hpx::tuple_element<0,
             typename ZipIter::iterator_tuple_type>::type>
         get_min_max_result(ZipIter&& zipiter)
@@ -465,7 +483,7 @@ namespace hpx::parallel::util {
             return result_type{hpx::get<0>(t), hpx::get<1>(t)};
         }
 
-        HPX_CXX_EXPORT template <typename ZipIter>
+        HPX_CXX_CORE_EXPORT template <typename ZipIter>
         hpx::future<min_max_result<typename hpx::tuple_element<0,
             typename ZipIter::iterator_tuple_type>::type>>
         get_min_max_result(hpx::future<ZipIter>&& zipiter)
@@ -481,7 +499,7 @@ namespace hpx::parallel::util {
                 });
         }
 
-        HPX_CXX_EXPORT template <typename ZipIter>
+        HPX_CXX_CORE_EXPORT template <typename ZipIter>
         in_in_out_result<
             typename hpx::tuple_element<0,
                 typename std::decay_t<ZipIter>::iterator_tuple_type>::type,
@@ -503,7 +521,7 @@ namespace hpx::parallel::util {
             return result_type{hpx::get<0>(t), hpx::get<1>(t), hpx::get<2>(t)};
         }
 
-        HPX_CXX_EXPORT template <typename ZipIterSender>
+        HPX_CXX_CORE_EXPORT template <typename ZipIterSender>
             requires(hpx::execution::experimental::is_sender_v<ZipIterSender>)
         decltype(auto) get_in_in_out_result(ZipIterSender&& zipiter_sender)
         {
@@ -514,7 +532,7 @@ namespace hpx::parallel::util {
                 });
         }
 
-        HPX_CXX_EXPORT template <typename ZipIter>
+        HPX_CXX_CORE_EXPORT template <typename ZipIter>
         hpx::future<
             in_in_out_result<typename hpx::tuple_element<0,
                                  typename ZipIter::iterator_tuple_type>::type,
@@ -541,11 +559,12 @@ namespace hpx::parallel::util {
 
 namespace hpx::ranges {
 
-    HPX_CXX_EXPORT using hpx::parallel::util::in_fun_result;
-    HPX_CXX_EXPORT using hpx::parallel::util::in_in_out_result;
-    HPX_CXX_EXPORT using hpx::parallel::util::in_in_result;
-    HPX_CXX_EXPORT using hpx::parallel::util::in_out_out_result;
-    HPX_CXX_EXPORT using hpx::parallel::util::in_out_result;
-    HPX_CXX_EXPORT using hpx::parallel::util::min_max_result;
+    HPX_CXX_CORE_EXPORT using hpx::parallel::util::in_fun_result;
+    HPX_CXX_CORE_EXPORT using hpx::parallel::util::in_in_out_result;
+    HPX_CXX_CORE_EXPORT using hpx::parallel::util::in_in_result;
+    HPX_CXX_CORE_EXPORT using hpx::parallel::util::in_out_out_result;
+    HPX_CXX_CORE_EXPORT using hpx::parallel::util::in_out_result;
+    HPX_CXX_CORE_EXPORT using hpx::parallel::util::min_max_result;
+    HPX_CXX_CORE_EXPORT using hpx::parallel::util::in_value_result;
 }    // namespace hpx::ranges
 // namespace hpx::ranges

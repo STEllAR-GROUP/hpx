@@ -31,13 +31,13 @@ namespace hpx::experimental {
 
     namespace detail {
 
-        HPX_CXX_EXPORT struct define_task_block_impl;
+        HPX_CXX_CORE_EXPORT struct define_task_block_impl;
     }    // namespace detail
 
     /// The class \a task_canceled_exception defines the type of objects thrown
     /// by task_block::run or task_block::wait if they detect that an exception
     /// is pending within the current parallel region.
-    HPX_CXX_EXPORT class HPX_ALWAYS_EXPORT task_canceled_exception
+    HPX_CXX_CORE_EXPORT class HPX_ALWAYS_EXPORT task_canceled_exception
       : public hpx::exception
     {
     public:
@@ -89,8 +89,8 @@ namespace hpx::experimental {
     /// \tparam ExPolicy The execution policy an instance of a \a task_block was
     ///         created with. This defaults to \a parallel_policy.
     ///
-    HPX_CXX_EXPORT template <typename ExPolicy =
-                                 hpx::execution::parallel_policy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy =
+                                      hpx::execution::parallel_policy>
     class task_block
     {
     private:
@@ -304,7 +304,7 @@ namespace hpx::experimental {
     namespace detail {
 
         /// \cond NOINTERNAL
-        HPX_CXX_EXPORT struct define_task_block_impl
+        HPX_CXX_CORE_EXPORT struct define_task_block_impl
         {
             template <typename ExPolicy, typename F>
             void operator()(ExPolicy&& policy, F&& f) const
@@ -327,7 +327,7 @@ namespace hpx::experimental {
             }
         };
 
-        HPX_CXX_EXPORT inline constexpr define_task_block_impl
+        HPX_CXX_CORE_EXPORT inline constexpr define_task_block_impl
             define_task_block{};
         /// \endcond
     }    // namespace detail
@@ -357,7 +357,7 @@ namespace hpx::experimental {
     /// \note It is expected (but not mandated) that f will (directly or
     ///       indirectly) call tr.run(_callable_object_).
     ///
-    HPX_CXX_EXPORT template <typename ExPolicy, typename F>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename F>
         requires(hpx::is_execution_policy_v<std::decay_t<ExPolicy>>)
     decltype(auto) define_task_block(ExPolicy&& policy, F&& f)
     {
@@ -394,7 +394,7 @@ namespace hpx::experimental {
     /// \note It is expected (but not mandated) that f will (directly or
     ///       indirectly) call tr.run(_callable_object_).
     ///
-    HPX_CXX_EXPORT template <typename F>
+    HPX_CXX_CORE_EXPORT template <typename F>
     void define_task_block(F&& f)
     {
         detail::define_task_block(hpx::execution::par, HPX_FORWARD(F, f));
@@ -425,7 +425,7 @@ namespace hpx::experimental {
     /// \note It is expected (but not mandated) that f will (directly or
     ///       indirectly) call tr.run(_callable_object_).
     ///
-    HPX_CXX_EXPORT template <typename ExPolicy, typename F>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename F>
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy>
     define_task_block_restore_thread(ExPolicy&& policy, F&& f)
     {
@@ -461,7 +461,7 @@ namespace hpx::experimental {
     /// \note It is expected (but not mandated) that f will (directly or
     ///       indirectly) call tr.run(_callable_object_).
     ///
-    HPX_CXX_EXPORT template <typename F>
+    HPX_CXX_CORE_EXPORT template <typename F>
     void define_task_block_restore_thread(F&& f)
     {
         // By design, we always return on the same (HPX-) thread as we started
@@ -474,7 +474,7 @@ namespace hpx::experimental {
 /// \cond NOINTERNAL
 namespace std {
 
-    HPX_CXX_EXPORT template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
     hpx::experimental::task_block<ExPolicy>* addressof(
         hpx::experimental::task_block<ExPolicy>&) = delete;
 }

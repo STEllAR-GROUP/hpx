@@ -170,7 +170,7 @@ namespace hpx::util {
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename T, typename Char>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Char>
     [[nodiscard]] T from_string(std::basic_string<Char> const& v)
     {
         try
@@ -185,7 +185,7 @@ namespace hpx::util {
         }
     }
 
-    HPX_CXX_EXPORT template <typename T, typename U, typename Char>
+    HPX_CXX_CORE_EXPORT template <typename T, typename U, typename Char>
     [[nodiscard]] T from_string(
         std::basic_string<Char> const& v, U&& default_value)
     {
@@ -201,7 +201,7 @@ namespace hpx::util {
         }
     }
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     [[nodiscard]] T from_string(std::string const& v)
     {
         try
@@ -216,7 +216,7 @@ namespace hpx::util {
         }
     }
 
-    HPX_CXX_EXPORT template <typename T, typename U>
+    HPX_CXX_CORE_EXPORT template <typename T, typename U>
     [[nodiscard]] T from_string(std::string const& v, U&& default_value)
     {
         try

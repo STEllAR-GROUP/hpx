@@ -432,7 +432,7 @@ namespace hpx::detail {
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT inline constexpr struct wait_all_nothrow_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct wait_all_nothrow_t final
       : hpx::functional::tag<wait_all_nothrow_t>
     {
     private:
@@ -566,7 +566,7 @@ namespace hpx {
     } wait_all_nothrow{};
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT inline constexpr struct wait_all_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct wait_all_t final
       : hpx::functional::tag<wait_all_t>
     {
     private:
@@ -683,7 +683,7 @@ namespace hpx {
     } wait_all{};
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT inline constexpr struct wait_all_n_nothrow_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct wait_all_n_nothrow_t final
       : hpx::functional::tag<wait_all_n_nothrow_t>
     {
     private:
@@ -705,7 +705,7 @@ namespace hpx {
     } wait_all_n_nothrow{};
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT inline constexpr struct wait_all_n_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct wait_all_n_t final
       : hpx::functional::tag<wait_all_n_t>
     {
     private:

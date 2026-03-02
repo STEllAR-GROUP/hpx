@@ -14,11 +14,11 @@
 
 namespace hpx::execution::experimental {
 
-    HPX_CXX_EXPORT template <typename OperationState>
+    HPX_CXX_CORE_EXPORT template <typename OperationState>
     inline constexpr bool is_operation_state_v =
         operation_state<OperationState>;
 
-    HPX_CXX_EXPORT template <typename OperationState>
+    HPX_CXX_CORE_EXPORT template <typename OperationState>
     struct is_operation_state
       : std::bool_constant<operation_state<OperationState>>
     {
@@ -70,7 +70,7 @@ namespace hpx::execution::experimental {
     namespace detail {
 
         // start should not be callable for operation states that are rvalues
-        HPX_CXX_EXPORT struct enable_start
+        HPX_CXX_CORE_EXPORT struct enable_start
         {
             template <typename EnableTag, typename... Ts>
             struct apply : std::false_type
@@ -84,29 +84,29 @@ namespace hpx::execution::experimental {
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct start_t
+    HPX_CXX_CORE_EXPORT HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct start_t
       : hpx::functional::tag_noexcept<start_t, detail::enable_start>
     {
     } start{};
 
     namespace detail {
 
-        HPX_CXX_EXPORT template <bool IsOperationState, typename O>
+        HPX_CXX_CORE_EXPORT template <bool IsOperationState, typename O>
         struct is_operation_state_impl;
 
-        HPX_CXX_EXPORT template <typename O>
+        HPX_CXX_CORE_EXPORT template <typename O>
         struct is_operation_state_impl<false, O> : std::false_type
         {
         };
 
-        HPX_CXX_EXPORT template <typename O>
+        HPX_CXX_CORE_EXPORT template <typename O>
         struct is_operation_state_impl<true, O>
           : std::integral_constant<bool, noexcept(start(std::declval<O&>()))>
         {
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename O>
+    HPX_CXX_CORE_EXPORT template <typename O>
     struct is_operation_state
       : detail::is_operation_state_impl<std::is_destructible_v<O> &&
                 std::is_object_v<O> &&
@@ -115,7 +115,7 @@ namespace hpx::execution::experimental {
     {
     };
 
-    HPX_CXX_EXPORT template <typename O>
+    HPX_CXX_CORE_EXPORT template <typename O>
     inline constexpr bool is_operation_state_v =
         meta::value<is_operation_state<O>>;
 }    // namespace hpx::execution::experimental

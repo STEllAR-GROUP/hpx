@@ -348,7 +348,7 @@ namespace hpx {
 
 namespace hpx {
 
-    HPX_CXX_EXPORT inline constexpr struct search_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct search_t final
       : hpx::detail::tag_parallel_algorithm<search_t>
     {
     private:
@@ -356,8 +356,8 @@ namespace hpx {
             typename Pred = parallel::detail::equal_to>
         // clang-format off
             requires (
-                traits::is_forward_iterator<FwdIter>::value &&
-                traits::is_forward_iterator<FwdIter2>::value &&
+                std::forward_iterator<FwdIter> &&
+                std::forward_iterator<FwdIter2> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits <FwdIter>::value_type,
                     typename std::iterator_traits <FwdIter2>::value_type
@@ -377,8 +377,8 @@ namespace hpx {
         // clang-format off
             requires (
                 is_execution_policy<ExPolicy>::value &&
-                traits::is_forward_iterator<FwdIter>::value &&
-                traits::is_forward_iterator<FwdIter2>::value &&
+                std::forward_iterator<FwdIter> &&
+                std::forward_iterator<FwdIter2> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits <FwdIter>::value_type,
                     typename std::iterator_traits <FwdIter2>::value_type
@@ -422,7 +422,7 @@ namespace hpx {
         }
     } search{};
 
-    HPX_CXX_EXPORT inline constexpr struct search_n_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct search_n_t final
       : hpx::detail::tag_parallel_algorithm<search_n_t>
     {
     private:

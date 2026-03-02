@@ -27,7 +27,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::util {
 
-    HPX_CXX_EXPORT struct register_lock_data
+    HPX_CXX_CORE_EXPORT struct register_lock_data
     {
     };
 
@@ -38,7 +38,7 @@ namespace hpx::util {
 
     namespace detail {
 
-        HPX_CXX_EXPORT struct HPX_CORE_EXPORT lock_data
+        HPX_CXX_CORE_EXPORT struct HPX_CORE_EXPORT lock_data
         {
             explicit lock_data(std::size_t trace_depth);
             lock_data(register_lock_data* data, std::size_t trace_depth);
@@ -58,7 +58,7 @@ namespace hpx::util {
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT struct held_locks_data
+    HPX_CXX_CORE_EXPORT struct held_locks_data
     {
         using held_locks_map = std::map<void const*, detail::lock_data>;
 
@@ -79,32 +79,34 @@ namespace hpx::util {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT HPX_CORE_EXPORT bool register_lock(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT bool register_lock(
         void const* lock, register_lock_data* data = nullptr) noexcept;
-    HPX_CXX_EXPORT HPX_CORE_EXPORT bool unregister_lock(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT bool unregister_lock(
         void const* lock) noexcept;
-    HPX_CXX_EXPORT HPX_CORE_EXPORT void verify_no_locks();
-    HPX_CXX_EXPORT HPX_CORE_EXPORT void force_error_on_lock();
-    HPX_CXX_EXPORT HPX_CORE_EXPORT void enable_lock_detection() noexcept;
-    HPX_CXX_EXPORT HPX_CORE_EXPORT void disable_lock_detection() noexcept;
-    HPX_CXX_EXPORT HPX_CORE_EXPORT void trace_depth_lock_detection(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void verify_no_locks();
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void force_error_on_lock();
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void enable_lock_detection() noexcept;
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void disable_lock_detection() noexcept;
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void trace_depth_lock_detection(
         std::size_t value) noexcept;
-    HPX_CXX_EXPORT HPX_CORE_EXPORT bool ignore_lock(void const* lock) noexcept;
-    HPX_CXX_EXPORT HPX_CORE_EXPORT bool reset_ignored(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT bool ignore_lock(
         void const* lock) noexcept;
-    HPX_CXX_EXPORT HPX_CORE_EXPORT bool ignore_all_locks() noexcept;
-    HPX_CXX_EXPORT HPX_CORE_EXPORT bool reset_ignored_all() noexcept;
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT bool reset_ignored(
+        void const* lock) noexcept;
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT bool ignore_all_locks() noexcept;
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT bool reset_ignored_all() noexcept;
 
-    HPX_CXX_EXPORT using registered_locks_error_handler_type =
+    HPX_CXX_CORE_EXPORT using registered_locks_error_handler_type =
         hpx::function<void()>;
 
     /// Sets a handler which gets called when verifying that no locks are held
     /// fails. Can be used to print information at the point of failure such as
     /// a backtrace.
-    HPX_CXX_EXPORT HPX_CORE_EXPORT void set_registered_locks_error_handler(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void set_registered_locks_error_handler(
         registered_locks_error_handler_type) noexcept;
 
-    HPX_CXX_EXPORT using register_locks_predicate_type = hpx::function<bool()>;
+    HPX_CXX_CORE_EXPORT using register_locks_predicate_type =
+        hpx::function<bool()>;
 
     /// Sets a predicate which gets called each time a lock is registered,
     /// unregistered, or when locks are verified. If the predicate returns
@@ -113,11 +115,11 @@ namespace hpx::util {
     /// register, unregister, or verify locks, depending on other factors (such
     /// as if lock detection is enabled globally). The predicate may return
     /// different values depending on context.
-    HPX_CXX_EXPORT HPX_CORE_EXPORT void set_register_locks_predicate(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void set_register_locks_predicate(
         register_locks_predicate_type) noexcept;
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT struct ignore_all_while_checking
+    HPX_CXX_CORE_EXPORT struct ignore_all_while_checking
     {
         ignore_all_while_checking() noexcept
           : owns_registration_(ignore_all_locks())
@@ -148,7 +150,7 @@ namespace hpx::util {
         HPX_HAS_MEMBER_XXX_TRAIT_DEF(mutex)
     }
 
-    HPX_CXX_EXPORT template <typename Lock,
+    HPX_CXX_CORE_EXPORT template <typename Lock,
         typename Enable = std::enable_if_t < detail::has_mutex_v<Lock> &&
             detail::has_owns_lock_v<Lock> >> struct ignore_while_checking
     {
@@ -185,7 +187,7 @@ namespace hpx::util {
         bool owns_registration_;
     };
 
-    HPX_CXX_EXPORT template <typename Lock>
+    HPX_CXX_CORE_EXPORT template <typename Lock>
     struct ignore_while_checking<Lock,
         std::enable_if_t<detail::has_mutex_v<Lock> &&
             !detail::has_owns_lock_v<Lock>>>
@@ -225,16 +227,16 @@ namespace hpx::util {
     // after suspension even if the thread is being resumed on a different core.
 
     // retrieve the current thread_local data about held locks
-    HPX_CXX_EXPORT HPX_CORE_EXPORT std::unique_ptr<held_locks_data>
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT std::unique_ptr<held_locks_data>
     get_held_locks_data();
 
     // set the current thread_local data about held locks
-    HPX_CXX_EXPORT HPX_CORE_EXPORT void set_held_locks_data(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void set_held_locks_data(
         std::unique_ptr<held_locks_data>&& data);
 
 #else
 
-    HPX_CXX_EXPORT template <typename Lock, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename Lock, typename Enable = void>
     struct ignore_while_checking
     {
         explicit constexpr ignore_while_checking(Lock const* /*lock*/) noexcept
@@ -244,59 +246,64 @@ namespace hpx::util {
         constexpr void reset_owns_registration() noexcept {}
     };
 
-    HPX_CXX_EXPORT struct ignore_all_while_checking
+    HPX_CXX_CORE_EXPORT struct ignore_all_while_checking
     {
         constexpr ignore_all_while_checking() noexcept {}
     };
 
-    HPX_CXX_EXPORT constexpr inline bool register_lock(
+    HPX_CXX_CORE_EXPORT constexpr inline bool register_lock(
         void const*, util::register_lock_data* = nullptr) noexcept
     {
         return true;
     }
-    HPX_CXX_EXPORT constexpr inline bool unregister_lock(void const*) noexcept
+    HPX_CXX_CORE_EXPORT constexpr inline bool unregister_lock(
+        void const*) noexcept
     {
         return true;
     }
-    HPX_CXX_EXPORT constexpr inline void verify_no_locks() noexcept {}
-    HPX_CXX_EXPORT constexpr inline void force_error_on_lock() noexcept {}
-    HPX_CXX_EXPORT constexpr inline void enable_lock_detection() noexcept {}
-    HPX_CXX_EXPORT constexpr inline void disable_lock_detection() noexcept {}
-    HPX_CXX_EXPORT constexpr inline void trace_depth_lock_detection(
+    HPX_CXX_CORE_EXPORT constexpr inline void verify_no_locks() noexcept {}
+    HPX_CXX_CORE_EXPORT constexpr inline void force_error_on_lock() noexcept {}
+    HPX_CXX_CORE_EXPORT constexpr inline void enable_lock_detection() noexcept
+    {
+    }
+    HPX_CXX_CORE_EXPORT constexpr inline void disable_lock_detection() noexcept
+    {
+    }
+    HPX_CXX_CORE_EXPORT constexpr inline void trace_depth_lock_detection(
         std::size_t /*value*/) noexcept
     {
     }
-    HPX_CXX_EXPORT constexpr inline bool ignore_lock(
+    HPX_CXX_CORE_EXPORT constexpr inline bool ignore_lock(
         void const* /*lock*/) noexcept
     {
         return true;
     }
-    HPX_CXX_EXPORT constexpr inline bool reset_ignored(
+    HPX_CXX_CORE_EXPORT constexpr inline bool reset_ignored(
         void const* /*lock*/) noexcept
     {
         return true;
     }
 
-    HPX_CXX_EXPORT constexpr inline bool ignore_all_locks() noexcept
+    HPX_CXX_CORE_EXPORT constexpr inline bool ignore_all_locks() noexcept
     {
         return true;
     }
-    HPX_CXX_EXPORT constexpr inline bool reset_ignored_all() noexcept
+    HPX_CXX_CORE_EXPORT constexpr inline bool reset_ignored_all() noexcept
     {
         return true;
     }
 
-    HPX_CXX_EXPORT struct held_locks_data
+    HPX_CXX_CORE_EXPORT struct held_locks_data
     {
     };
 
-    HPX_CXX_EXPORT constexpr inline held_locks_data*
+    HPX_CXX_CORE_EXPORT constexpr inline held_locks_data*
     get_held_locks_data() noexcept
     {
         return nullptr;
     }
 
-    HPX_CXX_EXPORT constexpr inline void set_held_locks_data(
+    HPX_CXX_CORE_EXPORT constexpr inline void set_held_locks_data(
         held_locks_data*) noexcept
     {
     }

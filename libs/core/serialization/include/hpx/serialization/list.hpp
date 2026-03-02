@@ -16,7 +16,7 @@
 
 namespace hpx::serialization {
 
-    HPX_CXX_EXPORT template <typename T, typename Allocator>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Allocator>
     void serialize(input_archive& ar, std::list<T, Allocator>& ls, unsigned)
     {
         // normal load ...
@@ -28,7 +28,7 @@ namespace hpx::serialization {
         detail::load_collection(ar, ls, size);
     }
 
-    HPX_CXX_EXPORT template <typename T, typename Allocator>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Allocator>
     void serialize(output_archive& ar,
         std::list<T, Allocator> const& ls,    //-V826
         unsigned)

@@ -279,7 +279,7 @@ namespace details {
 // since the traits are used as a template type parameter, the
 // shadowed declarations will be used where defined, and the defaults
 // otherwise.
-HPX_CXX_EXPORT struct ConcurrentQueueDefaultTraits
+HPX_CXX_CORE_EXPORT struct ConcurrentQueueDefaultTraits
 {
     // General-purpose size type. std::size_t is strongly recommended.
     typedef std::size_t size_t;
@@ -366,11 +366,11 @@ HPX_CXX_EXPORT struct ConcurrentQueueDefaultTraits
 //    4) Failing that, use the single-parameter methods of the queue
 // Having said that, don't create tokens willy-nilly -- ideally there should be
 // a maximum of one token per thread (of each kind).
-HPX_CXX_EXPORT struct ProducerToken;
-HPX_CXX_EXPORT struct ConsumerToken;
+HPX_CXX_CORE_EXPORT struct ProducerToken;
+HPX_CXX_CORE_EXPORT struct ConsumerToken;
 
-HPX_CXX_EXPORT template<typename T, typename Traits> class ConcurrentQueue;
-HPX_CXX_EXPORT template<typename T, typename Traits> class BlockingConcurrentQueue;
+HPX_CXX_CORE_EXPORT template<typename T, typename Traits> class ConcurrentQueue;
+HPX_CXX_CORE_EXPORT template<typename T, typename Traits> class BlockingConcurrentQueue;
 class ConcurrentQueueTests;
 
 
@@ -414,7 +414,7 @@ namespace details
     };
     template<std::size_t size> struct hash_32_or_64 : public _hash_32_or_64<(size > 4)> {  };
 
-    HPX_CXX_EXPORT inline size_t hash_thread_id(thread_id_t id)
+    HPX_CXX_CORE_EXPORT inline size_t hash_thread_id(thread_id_t id)
     {
         static_assert(sizeof(thread_id_t) <= 8, "Expected a platform where thread IDs are at most 64-bit values");
         return static_cast<size_t>(hash_32_or_64<sizeof(thread_id_converter<thread_id_t>::thread_id_hash_t)>::hash(
@@ -583,7 +583,7 @@ namespace details
 }
 
 
-HPX_CXX_EXPORT struct ProducerToken
+HPX_CXX_CORE_EXPORT struct ProducerToken
 {
     template<typename T, typename Traits>
     explicit ProducerToken(ConcurrentQueue<T, Traits>& queue);
@@ -648,7 +648,7 @@ protected:
 };
 
 
-HPX_CXX_EXPORT struct ConsumerToken
+HPX_CXX_CORE_EXPORT struct ConsumerToken
 {
     template<typename T, typename Traits>
     explicit ConsumerToken(ConcurrentQueue<T, Traits>& q);
@@ -694,11 +694,11 @@ private: // but shared with ConcurrentQueue
 
 // Need to forward-declare this swap because it's in a namespace.
 // See http://stackoverflow.com/questions/4492062/why-does-a-c-friend-class-need-a-forward-declaration-only-in-other-namespaces
-HPX_CXX_EXPORT template<typename T, typename Traits>
+HPX_CXX_CORE_EXPORT template<typename T, typename Traits>
 inline void swap(typename ConcurrentQueue<T, Traits>::ImplicitProducerKVP& a, typename ConcurrentQueue<T, Traits>::ImplicitProducerKVP& b) MOODYCAMEL_NOEXCEPT;
 
 
-HPX_CXX_EXPORT template<typename T, typename Traits = ConcurrentQueueDefaultTraits>
+HPX_CXX_CORE_EXPORT template<typename T, typename Traits = ConcurrentQueueDefaultTraits>
 class ConcurrentQueue
 {
 public:
@@ -3637,23 +3637,23 @@ ConsumerToken::ConsumerToken(BlockingConcurrentQueue<T, Traits>& queue)
     lastKnownGlobalOffset = -1;
 }
 
-HPX_CXX_EXPORT template<typename T, typename Traits>
+HPX_CXX_CORE_EXPORT template<typename T, typename Traits>
 inline void swap(ConcurrentQueue<T, Traits>& a, ConcurrentQueue<T, Traits>& b) MOODYCAMEL_NOEXCEPT
 {
     a.swap(b);
 }
 
-HPX_CXX_EXPORT inline void swap(ProducerToken& a, ProducerToken& b) MOODYCAMEL_NOEXCEPT
+HPX_CXX_CORE_EXPORT inline void swap(ProducerToken& a, ProducerToken& b) MOODYCAMEL_NOEXCEPT
 {
     a.swap(b);
 }
 
-HPX_CXX_EXPORT inline void swap(ConsumerToken& a, ConsumerToken& b) MOODYCAMEL_NOEXCEPT
+HPX_CXX_CORE_EXPORT inline void swap(ConsumerToken& a, ConsumerToken& b) MOODYCAMEL_NOEXCEPT
 {
     a.swap(b);
 }
 
-HPX_CXX_EXPORT template<typename T, typename Traits>
+HPX_CXX_CORE_EXPORT template<typename T, typename Traits>
 inline void swap(typename ConcurrentQueue<T, Traits>::ImplicitProducerKVP& a, typename ConcurrentQueue<T, Traits>::ImplicitProducerKVP& b) MOODYCAMEL_NOEXCEPT
 {
     a.swap(b);

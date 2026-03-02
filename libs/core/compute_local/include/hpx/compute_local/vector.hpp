@@ -20,13 +20,15 @@
 
 #include <cstddef>
 #include <initializer_list>
+#include <iterator>
 #include <memory>
 #include <type_traits>
 #include <utility>
 
 namespace hpx::compute {
 
-    HPX_CXX_EXPORT template <typename T, typename Allocator = std::allocator<T>>
+    HPX_CXX_CORE_EXPORT template <typename T,
+        typename Allocator = std::allocator<T>>
     class vector
     {
         using alloc_traits = traits::allocator_traits<Allocator>;
@@ -83,8 +85,8 @@ namespace hpx::compute {
         }
 
         template <typename InIter,
-            typename Enable = typename std::enable_if<
-                hpx::traits::is_input_iterator<InIter>::value>::type>
+            typename Enable =
+                typename std::enable_if<std::input_iterator<InIter>>::type>
         vector(InIter first, InIter last, Allocator const& alloc)
           : size_(std::distance(first, last))
           , capacity_(size_)
@@ -381,7 +383,7 @@ namespace hpx::compute {
     };
 
     /// Effects: x.swap(y);
-    HPX_CXX_EXPORT template <typename T, typename Allocator>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Allocator>
     HPX_FORCEINLINE void swap(
         vector<T, Allocator>& x, vector<T, Allocator>& y) noexcept
     {
@@ -389,7 +391,7 @@ namespace hpx::compute {
     }
 }    // namespace hpx::compute
 
-HPX_CXX_EXPORT template <typename T, typename Allocator>
+HPX_CXX_CORE_EXPORT template <typename T, typename Allocator>
 struct hpx::traits::is_contiguous_iterator<
     hpx::compute::detail::iterator<T, Allocator>> : std::true_type
 {

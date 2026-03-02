@@ -31,18 +31,18 @@
 #endif
 
 namespace hpx::execution::experimental {
-    HPX_CXX_EXPORT using exec::with_t;
+    HPX_CXX_CORE_EXPORT using exec::with_t;
 
-    HPX_CXX_EXPORT using exec::with;
-    HPX_CXX_EXPORT using exec::without;
+    HPX_CXX_CORE_EXPORT using exec::with;
+    HPX_CXX_CORE_EXPORT using exec::without;
 
-    HPX_CXX_EXPORT using exec::make_env;
-    HPX_CXX_EXPORT using exec::make_env_t;
+    HPX_CXX_CORE_EXPORT using exec::make_env;
+    HPX_CXX_CORE_EXPORT using exec::make_env_t;
 
-    HPX_CXX_EXPORT using exec::write;
-    HPX_CXX_EXPORT using exec::write_env;
+    HPX_CXX_CORE_EXPORT using exec::write;
+    HPX_CXX_CORE_EXPORT using exec::write_env;
 
-    HPX_CXX_EXPORT using exec::read_with_default;
+    HPX_CXX_CORE_EXPORT using exec::read_with_default;
 }    // namespace hpx::execution::experimental
 #else
 
@@ -67,14 +67,14 @@ namespace hpx::execution::experimental {
     //
     // Reference implementation avoids using libstdc++'s object concepts
     // because they instantiate a lot of templates.
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     inline constexpr bool is_queryable_v = std::is_destructible_v<T>;
 
     namespace detail {
 
         // checks whether tag_invoke(CPO, Args...) is contextually convertible
         // to bool, apply this meta function only for tag_invoke overloads
-        HPX_CXX_EXPORT template <typename CPO>
+        HPX_CXX_CORE_EXPORT template <typename CPO>
         struct contextually_convertible_to_bool
         {
             template <typename EnableTag, typename... Args>
@@ -114,7 +114,7 @@ namespace hpx::execution::experimental {
         //         to see if a sender knows its completion signatures
         //         independent of any particular execution environment.
         //  -- end note]
-        HPX_CXX_EXPORT struct no_env
+        HPX_CXX_CORE_EXPORT struct no_env
         {
             using type = no_env;
             using id = no_env;
@@ -124,13 +124,13 @@ namespace hpx::execution::experimental {
                 tag_invoke(Tag, Env) = delete;
         };
 
-        HPX_CXX_EXPORT struct empty_env
+        HPX_CXX_CORE_EXPORT struct empty_env
         {
             using type = empty_env;
             using id = empty_env;
         };
 
-        HPX_CXX_EXPORT template <typename Tag, typename Value,
+        HPX_CXX_CORE_EXPORT template <typename Tag, typename Value,
             typename BaseEnv = empty_env>
         struct env
         {
@@ -166,11 +166,11 @@ namespace hpx::execution::experimental {
             };
         };
 
-        HPX_CXX_EXPORT template <typename Tag, typename Value,
+        HPX_CXX_CORE_EXPORT template <typename Tag, typename Value,
             typename BaseEnv = empty_env>
         using env_t = std::decay_t<hpx::meta::type<env<Tag, Value, BaseEnv>>>;
 
-        HPX_CXX_EXPORT template <typename Tag>
+        HPX_CXX_CORE_EXPORT template <typename Tag>
         struct make_env_t
         {
             template <typename Value>
@@ -193,22 +193,22 @@ namespace hpx::execution::experimental {
 
         // For making an evaluation environment from a key/value pair, and
         // optionally another environment.
-        HPX_CXX_EXPORT template <typename Tag>
+        HPX_CXX_CORE_EXPORT template <typename Tag>
         inline constexpr exec_envs::make_env_t<Tag> make_env{};
 
     }    // namespace exec_envs
 
-    HPX_CXX_EXPORT using exec_envs::empty_env;
-    HPX_CXX_EXPORT using exec_envs::env;
-    HPX_CXX_EXPORT using exec_envs::make_env;
-    HPX_CXX_EXPORT using exec_envs::no_env;
+    HPX_CXX_CORE_EXPORT using exec_envs::empty_env;
+    HPX_CXX_CORE_EXPORT using exec_envs::env;
+    HPX_CXX_CORE_EXPORT using exec_envs::make_env;
+    HPX_CXX_CORE_EXPORT using exec_envs::no_env;
 
-    HPX_CXX_EXPORT template <typename Env>
+    HPX_CXX_CORE_EXPORT template <typename Env>
     struct is_no_env : std::is_same<std::decay_t<Env>, no_env>
     {
     };
 
-    HPX_CXX_EXPORT template <typename Env>
+    HPX_CXX_CORE_EXPORT template <typename Env>
     inline constexpr bool is_no_env_v = is_no_env<Env>::value;
 
     // get_env is a customization point object. For some subexpression r,
@@ -217,8 +217,9 @@ namespace hpx::execution::experimental {
     // 1. tag_invoke(execution::get_env, r) if that expression is well-formed.
     // 2. Otherwise, empty_env{}.
     //
-    HPX_CXX_EXPORT HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct get_env_t
-        final : hpx::functional::detail::tag_fallback<get_env_t>
+    HPX_CXX_CORE_EXPORT
+    HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct get_env_t final
+      : hpx::functional::detail::tag_fallback<get_env_t>
     {
     private:
         template <typename EnvProvider>
@@ -229,10 +230,10 @@ namespace hpx::execution::experimental {
         }
     } get_env{};
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     using env_of_t = decltype(get_env(std::declval<T>()));
 
-    HPX_CXX_EXPORT template <typename Tag, typename Value,
+    HPX_CXX_CORE_EXPORT template <typename Tag, typename Value,
         typename BaseEnv = empty_env>
     using make_env_t = decltype(make_env<Tag>(
         std::declval<Value&&>(), std::declval<BaseEnv&&>()));
@@ -255,7 +256,7 @@ namespace hpx::execution::experimental {
     //
     // 2. Otherwise, false.
     //
-    HPX_CXX_EXPORT
+    HPX_CXX_CORE_EXPORT
     HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct forwarding_env_query_t
         final
       : hpx::functional::detail::tag_fallback_noexcept<forwarding_env_query_t,
@@ -270,7 +271,7 @@ namespace hpx::execution::experimental {
         }
     } forwarding_env_query{};
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     inline constexpr bool is_environment_provider_v =
         std::is_same_v<T, hpx::util::invoke_result_t<get_env_t, T>>;
 }    // namespace hpx::execution::experimental

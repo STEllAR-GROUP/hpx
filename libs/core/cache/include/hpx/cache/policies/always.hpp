@@ -12,7 +12,7 @@
 namespace hpx::util::cache::policies {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Entry>
+    HPX_CXX_CORE_EXPORT template <typename Entry>
     struct always
     {
         constexpr bool operator()(Entry const&) noexcept

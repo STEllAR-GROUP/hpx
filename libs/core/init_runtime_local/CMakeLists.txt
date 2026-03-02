@@ -13,10 +13,6 @@ set(init_runtime_local_headers
 )
 set(init_runtime_local_macros_headers hpx/init_runtime_local/macros.hpp)
 
-if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(generated_init_runtime_local_headers hpx/init.hpp)
-endif()
-
 set(init_runtime_local_sources init_logging.cpp init_runtime_local.cpp)
 
 # The headers in hpx/local/ were deprecated in HPX V1.9.1
@@ -35,7 +31,6 @@ add_hpx_module(
   HEADERS ${init_runtime_local_headers}
   MACRO_HEADERS ${init_runtime_local_macros_headers}
   COMPAT_HEADERS ${init_runtime_local_compat_headers}
-  GENERATED_HEADERS ${generated_init_runtime_local_headers}
   MODULE_DEPENDENCIES
     hpx_algorithms
     hpx_command_line_handling_local

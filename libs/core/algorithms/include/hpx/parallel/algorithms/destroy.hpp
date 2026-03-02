@@ -165,6 +165,7 @@ namespace hpx {
 
 #include <algorithm>
 #include <cstddef>
+#include <iterator>
 #include <memory>
 #include <type_traits>
 #include <utility>
@@ -178,7 +179,7 @@ namespace hpx::parallel {
 
         // provide our own implementation of std::destroy as some versions of
         // MSVC horribly fail at compiling it for some types T
-        HPX_CXX_EXPORT template <typename Iter, typename Sent>
+        HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent>
         Iter sequential_destroy(Iter first, Sent last)
         {
             for (/* */; first != last; ++first)
@@ -189,7 +190,7 @@ namespace hpx::parallel {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename ExPolicy, typename Iter>
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter>
         decltype(auto) parallel_sequential_destroy_n(
             ExPolicy&& policy, Iter first, std::size_t count)
         {
@@ -217,7 +218,7 @@ namespace hpx::parallel {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename FwdIter>
+        HPX_CXX_CORE_EXPORT template <typename FwdIter>
         struct destroy : public algorithm<destroy<FwdIter>, FwdIter>
         {
             constexpr destroy() noexcept
@@ -250,7 +251,7 @@ namespace hpx::parallel {
 
         // provide our own implementation of std::destroy as some versions of
         // MSVC horribly fail at compiling it for some types T
-        HPX_CXX_EXPORT template <typename Iter>
+        HPX_CXX_CORE_EXPORT template <typename Iter>
         Iter sequential_destroy_n(Iter first, std::size_t count)
         {
             for (/* */; count != 0; (void) ++first, --count)
@@ -260,7 +261,7 @@ namespace hpx::parallel {
             return first;
         }
 
-        HPX_CXX_EXPORT template <typename FwdIter>
+        HPX_CXX_CORE_EXPORT template <typename FwdIter>
         struct destroy_n : public algorithm<destroy_n<FwdIter>, FwdIter>
         {
             constexpr destroy_n() noexcept
@@ -290,7 +291,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::destroy
-    HPX_CXX_EXPORT inline constexpr struct destroy_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct destroy_t final
       : hpx::detail::tag_parallel_algorithm<destroy_t>
     {
     private:
@@ -304,7 +305,7 @@ namespace hpx {
         friend decltype(auto) tag_fallback_invoke(
             destroy_t, ExPolicy&& policy, FwdIter first, FwdIter last)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::util::detail::algorithm_result<ExPolicy>::get(
@@ -320,7 +321,7 @@ namespace hpx {
         // clang-format on
         friend void tag_fallback_invoke(destroy_t, FwdIter first, FwdIter last)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Required at least forward iterator.");
 
             hpx::parallel::detail::destroy<FwdIter>().call(
@@ -330,7 +331,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::destroy_n
-    HPX_CXX_EXPORT inline constexpr struct destroy_n_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct destroy_n_t final
       : hpx::detail::tag_parallel_algorithm<destroy_n_t>
     {
     private:
@@ -344,7 +345,7 @@ namespace hpx {
         friend decltype(auto) tag_fallback_invoke(
             destroy_n_t, ExPolicy&& policy, FwdIter first, Size count)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
             constexpr bool has_scheduler_executor =
                 hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
@@ -377,7 +378,7 @@ namespace hpx {
         friend FwdIter tag_fallback_invoke(
             destroy_n_t, FwdIter first, Size count)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             // if count is representing a negative value, we do nothing

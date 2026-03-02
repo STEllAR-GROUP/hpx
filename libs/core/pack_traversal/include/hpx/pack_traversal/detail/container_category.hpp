@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/iterator_support.hpp>
+#include <ranges>
 
 namespace hpx::util::detail {
 
@@ -22,6 +23,6 @@ namespace hpx::util::detail {
     /// Deduces to the container_category_tag of the given type T.
     template <typename T>
     using container_category_of_t =
-        container_category_tag<traits::is_range_v<T>,
+        container_category_tag<std::ranges::range<T>,
             traits::is_tuple_like_v<T>>;
 }    // namespace hpx::util::detail

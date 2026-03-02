@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,7 +17,7 @@ namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
     // Customization point for retrieving embedded parcel from action
-    template <typename Action, typename Enable = void>
+    HPX_CXX_EXPORT template <typename Action, typename Enable = void>
     struct action_get_embedded_parcel
     {
         // return a new instance of a serialization filter

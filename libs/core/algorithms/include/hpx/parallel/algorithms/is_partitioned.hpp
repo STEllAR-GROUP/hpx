@@ -136,7 +136,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         inline bool sequential_is_partitioned(std::vector<T>&& res)
         {
             auto first = res.begin();
@@ -158,7 +158,7 @@ namespace hpx::parallel {
             return true;
         }
 
-        HPX_CXX_EXPORT template <typename Iter, typename Sent>
+        HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent>
         struct is_partitioned
           : public algorithm<is_partitioned<Iter, Sent>, bool>
         {
@@ -244,14 +244,14 @@ namespace hpx::parallel {
 
 namespace hpx {
 
-    HPX_CXX_EXPORT inline constexpr struct is_partitioned_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct is_partitioned_t final
       : hpx::detail::tag_parallel_algorithm<is_partitioned_t>
     {
     private:
         template <typename FwdIter, typename Pred>
         // clang-format off
             requires (
-                hpx::traits::is_forward_iterator_v<FwdIter>
+                std::forward_iterator<FwdIter>
             )
         // clang-format on
         friend bool tag_fallback_invoke(
@@ -266,7 +266,7 @@ namespace hpx {
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_forward_iterator_v<FwdIter>
+                std::forward_iterator<FwdIter>
             )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::is_partitioned_t,
