@@ -7,7 +7,6 @@
 set(tests
     not_bitwise_serializable
     serialization_array
-    serialization_brace_initializable
     serialization_valarray
     serialization_builtins
     serialization_complex
@@ -34,6 +33,10 @@ set(full_tests serialization_raw_pointer)
 
 if(HPX_SERIALIZATION_WITH_BOOST_TYPES)
   set(tests ${tests} serialization_boost_variant)
+endif()
+
+if(!HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
+  set(tests ${tests} serialization_brace_initializable)
 endif()
 
 add_subdirectory(polymorphic)
