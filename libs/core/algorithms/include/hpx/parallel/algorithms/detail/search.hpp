@@ -12,6 +12,7 @@
 #include <hpx/config.hpp>
 #include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/execution.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
@@ -30,6 +31,56 @@
 
 namespace hpx::parallel::detail {
     /// \cond NOINTERNAL
+
+    ///////////////////////////////////////////////////////////////////////////
+    // sequential_search dispatch tag
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
+    struct sequential_search_t final
+      : hpx::functional::detail::tag_fallback<sequential_search_t<ExPolicy>>
+    {
+    private:
+        // Partitioned path: called from search::parallel() f1 for each chunk.
+        // Checks each starting position in [base_idx, base_idx+part_size) for a
+        // needle match; cancels tok at the first match position found.
+        template <typename Iter1, typename Iter2, typename Token, typename Pred,
+            typename Proj1, typename Proj2>
+        friend inline constexpr void tag_fallback_invoke(
+            sequential_search_t<ExPolicy>, Iter1 it, Iter2 s_first,
+            std::size_t base_idx, std::size_t part_size, std::size_t diff,
+            std::size_t count, Token& tok, Pred&& op, Proj1&& proj1,
+            Proj2&& proj2)
+        {
+            using reference = typename std::iterator_traits<Iter1>::reference;
+            Iter1 curr = it;
+            util::loop_idx_n<ExPolicy>(base_idx, it, part_size, tok,
+                [diff, count, s_first, &tok, &curr,
+                    op = HPX_FORWARD(Pred, op),
+                    proj1 = HPX_FORWARD(Proj1, proj1),
+                    proj2 = HPX_FORWARD(Proj2, proj2)](
+                    reference v, std::size_t i) mutable -> void {
+                    ++curr;
+                    if (HPX_INVOKE(op, HPX_INVOKE(proj1, v),
+                            HPX_INVOKE(proj2, *s_first)))
+                    {
+                        std::size_t local_count = 1;
+                        Iter2 needle = s_first;
+                        Iter1 mid = curr;
+                        // clang-format off
+                        for (std::size_t len = 0;
+                            local_count != diff && len != count;
+                            ++local_count, ++len, ++mid)
+                        // clang-format on
+                        {
+                            if (!HPX_INVOKE(op, HPX_INVOKE(proj1, *mid),
+                                    HPX_INVOKE(proj2, *++needle)))
+                                break;
+                        }
+                        if (local_count == diff)
+                            tok.cancel(i);
+                    }
+                });
+        }
+    };
 
     ///////////////////////////////////////////////////////////////////////////
     // search
