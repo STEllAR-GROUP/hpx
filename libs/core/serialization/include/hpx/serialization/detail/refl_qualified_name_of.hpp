@@ -32,6 +32,16 @@ namespace hpx::serialization::detail {
         {
             for (std::size_t i = 0; i < sv.size(); ++i)
                 data[i] = sv[i];
+
+            data[sv.size()] = '\0';
+        }
+
+        constexpr fixed_string(char const (&s)[N + 1]) noexcept
+        {
+            for (std::size_t i = 0; i < N; ++i)
+                data[i] = s[i];
+
+            data[N] = '\0';
         }
 
         template <std::size_t M>
@@ -42,9 +52,15 @@ namespace hpx::serialization::detail {
                 res.data[i] = data[i];
             for (std::size_t i = 0; i < M; ++i)
                 res.data[N + i] = other.data[i];
+
+            res.data[N + M] = '\0';
             return res;
         }
     };
+
+    // Deduction guide for fixed_string
+    template <std::size_t N>
+    fixed_string(char const (&)[N]) -> fixed_string<N - 1>;
 
     // Helper to recursively build the enclosing namespaces of a type
     template <std::meta::info Scope>
@@ -54,7 +70,7 @@ namespace hpx::serialization::detail {
         {
             if constexpr (Scope == ^^::)
             {
-                return fixed_string<0>("");
+                return fixed_string("");
             }
             else if constexpr (!std::meta::has_identifier(Scope))
             {
@@ -75,7 +91,7 @@ namespace hpx::serialization::detail {
 
                 if constexpr (prefix.size > 0)
                 {
-                    return prefix + fixed_string<2>("::") + name;
+                    return prefix + fixed_string("::") + name;
                 }
                 else
                 {
@@ -122,13 +138,13 @@ namespace hpx::serialization::detail {
         {
             if constexpr (sizeof...(Args) == 0)
             {
-                return fixed_string<0>("");
+                return fixed_string("");
             }
             else
             {
                 // The lambda templ param trick allows this computation
                 // to be done at compile time.
-                // TODO: Is there a more elegant way to do this?
+                // TODO: Is there a more elegant way to do this
                 return []<std::size_t... Is>(std::index_sequence<Is...>) {
                     return (... +
                         (fixed_string<(Is == 0 ? 0 : 1)>(Is == 0 ? "" : ",") +
@@ -138,8 +154,8 @@ namespace hpx::serialization::detail {
         }
 
         // Final string
-        static constexpr auto storage = scoped_name + fixed_string<1>("<") +
-            get_args_name() + fixed_string<1>(">");
+        static constexpr auto storage = scoped_name + fixed_string("<") +
+            get_args_name() + fixed_string(">");
 
     public:
         [[nodiscard]] static constexpr char const* get() noexcept
