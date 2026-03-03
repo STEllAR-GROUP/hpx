@@ -1,3 +1,7 @@
+//  Copyright (c) 2014 Thomas Heller
+//  Copyright (c) 2015 Anton Bikineev
+//  Copyright (c) 2015 Andreas Schaefer
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //  Copyright (c) 2026 Ujjwal Shekhar
 //
 //  SPDX-License-Identifier: BSL-1.0
