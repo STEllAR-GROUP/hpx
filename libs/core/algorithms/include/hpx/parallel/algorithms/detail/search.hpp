@@ -346,33 +346,14 @@ namespace hpx::parallel::detail {
             hpx::parallel::util::cancellation_token<difference_type> tok(
                 max_start);
 
-            auto f1 = [first, max_start, count, value_proj,
+            auto f1 = [max_start, count, value_proj,
                           pred = HPX_FORWARD(Pred, pred),
                           proj = HPX_FORWARD(Proj, proj),
                           tok](FwdIter it, std::size_t part_size,
                           std::size_t base_idx) mutable -> void {
-                util::loop_idx_n<policy_type>(base_idx, it, part_size, tok,
-                    [=, &tok](auto&&, std::size_t idx) mutable -> void {
-                        difference_type start_idx =
-                            static_cast<difference_type>(idx);
-                        if (start_idx >= max_start)
-                            return;
-
-                        FwdIter start = first;
-                        std::advance(start, start_idx);
-
-                        FwdIter curr = start;
-                        Size matched = 0;
-
-                        while (matched < count && pred(proj(*curr), value_proj))
-                        {
-                            ++curr;
-                            ++matched;
-                        }
-
-                        if (matched == count)
-                            tok.cancel(start_idx);
-                    });
+                sequential_search_n_t<policy_type>{}(it, base_idx, part_size,
+                    static_cast<std::ptrdiff_t>(max_start), count, value_proj,
+                    tok, HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
             };
 
             auto f2 = [first, last, max_start, tok](
