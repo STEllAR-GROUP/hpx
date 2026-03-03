@@ -8,13 +8,14 @@
 
 #include <hpx/config.hpp>
 
+#include <cstddef>
 #include <type_traits>
 
 #include <hpx/type_support/is_trivially_relocatable.hpp>
 
 namespace hpx::experimental {
 
-#if defined(__cpp_lib_trivially_relocatable)
+#if defined(__cpp_lib_is_replaceable)
     HPX_CXX_CORE_EXPORT template <typename T>
     struct is_replaceable : std::is_replaceable<T>
     {

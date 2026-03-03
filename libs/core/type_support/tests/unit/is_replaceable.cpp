@@ -1,4 +1,4 @@
-//  Copyright (c) 2025 Pratyksh Gupta
+//  Copyright (c) 2026 Pratyksh Gupta
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -19,11 +19,14 @@ static_assert(is_replaceable_v<int>);
 // Const types are not assignable (thus not replaceable)
 static_assert(!is_replaceable_v<int const>);
 
-// Pointer types are replaceable
+// Pointer types are replaceable if they are not const-qualified themselves.
 static_assert(is_replaceable_v<int*>);
-static_assert(is_replaceable_v<int const*>);    // pointer itself is mutable
-static_assert(
-    !is_replaceable_v<int* const>);    // const pointer is not replaceable
+static_assert(is_replaceable_v<int const*>);
+
+// Pointers follow the same rules as other objects. A pointer is replaceable only
+// if it is not const-qualified itself, as replacement requires assignment.
+// P2786R13 Section 3.2: "const-qualified objects are never replaceable."
+static_assert(!is_replaceable_v<int* const>);
 
 // Function pointers are replaceable
 static_assert(is_replaceable_v<int (*)()>);
@@ -48,6 +51,10 @@ struct trivial_class
 };
 static_assert(is_replaceable_v<trivial_class>);
 
+// Replaceability implies a type can be destroyed and reconstructed.
+// Consequently, a type must be destructible to be replaceable.
+// Per P2786R13, implicit replaceability also requires trivial relocatability,
+// which in turn requires trivial destructibility.
 struct not_destructible
 {
     not_destructible(not_destructible&&);
