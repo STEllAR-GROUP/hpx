@@ -165,7 +165,6 @@ namespace hpx::parallel::detail {
             Sent last, FwdIter2 s_first, Sent2 s_last, Pred&& op, Proj1&& proj1,
             Proj2&& proj2)
         {
-            using reference = typename std::iterator_traits<FwdIter>::reference;
             using difference_type =
                 typename std::iterator_traits<FwdIter>::difference_type;
             using s_difference_type =
@@ -226,38 +225,11 @@ namespace hpx::parallel::detail {
                           proj2 = HPX_FORWARD(Proj2, proj2)](FwdIter it,
                           std::size_t part_size,
                           std::size_t base_idx) mutable -> void {
-                FwdIter curr = it;
-
-                hpx::parallel::util::loop_idx_n<policy_type>(base_idx, it,
-                    part_size, tok,
-                    [diff, count, s_first, &tok, &curr,
-                        op = HPX_FORWARD(Pred, op),
-                        proj1 = HPX_FORWARD(Proj1, proj1),
-                        proj2 = HPX_FORWARD(Proj2, proj2)](
-                        reference v, std::size_t i) -> void {
-                        ++curr;
-                        if (HPX_INVOKE(op, HPX_INVOKE(proj1, v),
-                                HPX_INVOKE(proj2, *s_first)))
-                        {
-                            difference_type local_count = 1;
-                            FwdIter2 needle = s_first;
-                            FwdIter mid = curr;
-
-                            // clang-format off
-                            for (difference_type len = 0;
-                                local_count != diff && len != count;
-                                ++local_count, ++len, ++mid)
-                            // clang-format on
-                            {
-                                if (!HPX_INVOKE(op, HPX_INVOKE(proj1, *mid),
-                                        HPX_INVOKE(proj2, *++needle)))
-                                    break;
-                            }
-
-                            if (local_count == diff)
-                                tok.cancel(i);
-                        }
-                    });
+                sequential_search_t<policy_type>{}(it, s_first, base_idx,
+                    part_size, static_cast<std::size_t>(diff),
+                    static_cast<std::size_t>(count), tok,
+                    HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
+                    HPX_FORWARD(Proj2, proj2));
             };
 
             auto f2 = [=](auto&&... data) mutable -> FwdIter {
