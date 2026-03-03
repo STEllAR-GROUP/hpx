@@ -579,14 +579,7 @@ function(hpx_check_for_cxx20_std_ranges_iter_swap)
   )
 endfunction()
 
-# ##############################################################################
-function(hpx_check_for_cxx20_trivial_virtual_destructor)
-  add_hpx_config_test(
-    HPX_WITH_CXX20_TRIVIAL_VIRTUAL_DESTRUCTOR
-    SOURCE cmake/tests/cxx20_trivial_virtual_destructor.cpp
-    FILE ${ARGN}
-  )
-endfunction()
+# "hpx_check_for_cxx20_trivial_virtual_destructor" was deleted here
 
 # ##############################################################################
 function(hpx_check_for_cxx20_std_construct_at)
