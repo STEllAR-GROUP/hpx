@@ -28,7 +28,7 @@ namespace hpx::serialization::detail {
         char data[N + 1]{};    // +1 for null terminator
         static constexpr std::size_t size = N;
 
-        constexpr fixed_string(std::string_view sv) noexcept
+        consteval fixed_string(std::string_view sv) noexcept
         {
             for (std::size_t i = 0; i < sv.size(); ++i)
                 data[i] = sv[i];
@@ -36,7 +36,7 @@ namespace hpx::serialization::detail {
             data[sv.size()] = '\0';
         }
 
-        constexpr fixed_string(char const (&s)[N + 1]) noexcept
+        consteval fixed_string(char const (&s)[N + 1]) noexcept
         {
             for (std::size_t i = 0; i < N; ++i)
                 data[i] = s[i];
@@ -45,7 +45,7 @@ namespace hpx::serialization::detail {
         }
 
         template <std::size_t M>
-        constexpr auto operator+(fixed_string<M> const& other) const noexcept
+        consteval auto operator+(fixed_string<M> const& other) const noexcept
         {
             fixed_string<N + M> res("");
             for (std::size_t i = 0; i < N; ++i)
@@ -66,7 +66,7 @@ namespace hpx::serialization::detail {
     template <std::meta::info Scope>
     struct scope_builder
     {
-        static constexpr auto get_value() noexcept
+        static consteval auto get_value() noexcept
         {
             if constexpr (Scope == ^^::)
             {
@@ -103,7 +103,7 @@ namespace hpx::serialization::detail {
     };
 
     template <auto StringGetter>
-    static constexpr auto make_fixed() noexcept
+    static consteval auto make_fixed() noexcept
     {
         constexpr std::string_view sv = StringGetter();
         return fixed_string<sv.size()>(sv);
@@ -134,7 +134,7 @@ namespace hpx::serialization::detail {
         static constexpr auto scoped_name = scope_builder<dT>::value;
 
         // Recursively call qualified_name_of for each arg
-        static constexpr auto get_args_name() noexcept
+        static consteval auto get_args_name() noexcept
         {
             if constexpr (sizeof...(Args) == 0)
             {
