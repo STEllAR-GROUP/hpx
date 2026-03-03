@@ -83,6 +83,51 @@ namespace hpx::parallel::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    // sequential_search_n dispatch tag
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
+    struct sequential_search_n_t final
+      : hpx::functional::detail::tag_fallback<sequential_search_n_t<ExPolicy>>
+    {
+    private:
+        // Partitioned path: called from search_n::parallel() f1 for each chunk.
+        // Checks each starting position in [base_idx, base_idx+part_size) for
+        // count consecutive elements equal to value_proj.
+        template <typename Iter, typename Size, typename V, typename Token,
+            typename Pred, typename Proj>
+        friend inline constexpr void tag_fallback_invoke(
+            sequential_search_n_t<ExPolicy>, Iter it, std::size_t base_idx,
+            std::size_t part_size, std::ptrdiff_t max_start, Size count,
+            V const& value_proj, Token& tok, Pred&& pred, Proj&& proj)
+        {
+            using difference_type =
+                typename std::iterator_traits<Iter>::difference_type;
+            std::size_t idx = 0;
+            util::loop_idx_n<ExPolicy>(base_idx, it, part_size, tok,
+                [max_start, count, it, &value_proj, &tok, &idx,
+                    pred = HPX_FORWARD(Pred, pred),
+                    proj = HPX_FORWARD(Proj, proj)](
+                    auto&&, std::size_t abs_idx) mutable -> void {
+                    if (static_cast<difference_type>(abs_idx) >= max_start)
+                        return;
+                    Iter start = it;
+                    std::advance(start,
+                        static_cast<difference_type>(idx));
+                    ++idx;
+                    Iter curr = start;
+                    Size matched = 0;
+                    while (matched < count &&
+                        pred(proj(*curr), value_proj))
+                    {
+                        ++curr;
+                        ++matched;
+                    }
+                    if (matched == count)
+                        tok.cancel(abs_idx);
+                });
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     // search
     HPX_CXX_CORE_EXPORT template <typename FwdIter, typename Sent>
     struct search final : public algorithm<search<FwdIter, Sent>, FwdIter>
