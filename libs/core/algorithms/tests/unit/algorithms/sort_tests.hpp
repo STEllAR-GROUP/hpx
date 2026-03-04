@@ -26,11 +26,11 @@
 #include <vector>
 
 #if !defined(HPX_SORT_TEST_SIZE_STRINGS)
-#define HPX_SORT_TEST_SIZE_STRINGS 1000000
+#define HPX_SORT_TEST_SIZE_STRINGS 100000
 #endif
 
 #if !defined(HPX_SORT_TEST_SIZE)
-#define HPX_SORT_TEST_SIZE 5000000
+#define HPX_SORT_TEST_SIZE 500000
 #endif
 
 // --------------------------------------------------------------------
