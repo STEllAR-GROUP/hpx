@@ -78,6 +78,55 @@ namespace hpx::parallel::detail {
         }
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter,
+        typename Size, typename V, typename Token, typename Pred, typename Proj>
+        requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
+    HPX_HOST_DEVICE HPX_FORCEINLINE void tag_invoke(
+        sequential_search_n_t<ExPolicy>, Iter it, std::size_t base_idx,
+        std::size_t part_size, std::ptrdiff_t max_start, Size count,
+        V const& value_proj, Token& tok, Pred&& pred, Proj&& proj)
+    {
+        if constexpr (hpx::parallel::util::detail::iterator_datapar_compatible<
+                          Iter>::value)
+        {
+            using difference_type =
+                typename std::iterator_traits<Iter>::difference_type;
+            std::size_t idx = 0;
+            util::loop_idx_n<hpx::execution::parallel_policy>(base_idx, it,
+                part_size, tok,
+                [=, &tok, &pred, &proj, &idx](
+                    auto, std::size_t abs_idx) -> void {
+                    if (static_cast<difference_type>(abs_idx) >= max_start)
+                        return;
+                    auto start = it + static_cast<difference_type>(idx);
+                    ++idx;
+                    util::cancellation_token<> local_tok;
+                    util::loop_n<hpx::execution::simd_policy>(start, count,
+                        local_tok,
+                        [&pred, &proj, &value_proj,
+                            &local_tok](auto curr) -> void {
+                            if (!hpx::parallel::traits::all_of(
+                                    pred(proj(*curr), value_proj)))
+                            {
+                                local_tok.cancel();
+                            }
+                        });
+                    if (!local_tok.was_cancelled())
+                        tok.cancel(abs_idx);
+                });
+        }
+        else
+        {
+            using base_policy_type =
+                decltype((hpx::execution::experimental::to_non_simd(
+                    std::declval<ExPolicy>())));
+            return sequential_search_n_t<base_policy_type>{}(it, base_idx,
+                part_size, max_start, count, value_proj, tok,
+                HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
+        }
+    }
+
 }    // namespace hpx::parallel::detail
 
 #endif
