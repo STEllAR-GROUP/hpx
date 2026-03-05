@@ -121,10 +121,9 @@ namespace hpx::parallel::detail {
     HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter1,
         typename Sent1, typename Iter2, typename Sent2, typename F,
         typename Proj1, typename Proj2>
-    HPX_HOST_DEVICE HPX_FORCEINLINE
-        util::in_in_result<Iter1, Iter2> sequential_mismatch_binary(
-            Iter1 first1, Sent1 last1, Iter2 first2, Sent2 last2, F&& f,
-            Proj1&& proj1, Proj2&& proj2)
+    HPX_HOST_DEVICE HPX_FORCEINLINE util::in_in_result<Iter1, Iter2>
+    sequential_mismatch_binary(Iter1 first1, Sent1 last1, Iter2 first2,
+        Sent2 last2, F&& f, Proj1&& proj1, Proj2&& proj2)
     {
         return sequential_mismatch_binary_t<ExPolicy>{}(first1, last1, first2,
             last2, HPX_FORWARD(F, f), HPX_FORWARD(Proj1, proj1),
