@@ -83,7 +83,10 @@ namespace hpx::experimental {
                     auto _(HPX_MOVE(on_exit));
 
                     hpx::detail::try_catch_exception_ptr(
-                        [&]() { HPX_INVOKE(HPX_MOVE(f), HPX_MOVE(ts)...); },
+                        [&]() {
+                            HPX_INVOKE(
+                                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+                        },
                         [this](std::exception_ptr e) {
                             add_exception(HPX_MOVE(e));
                         });
