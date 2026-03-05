@@ -379,6 +379,7 @@ namespace hpx {
 
 #else    // DOXYGEN
 
+#include <hpx/assert.hpp>
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/pointer_category.hpp>
 #include <hpx/modules/concepts.hpp>
@@ -744,7 +745,7 @@ namespace hpx::experimental {
             }
 
             // If running in non-sequenced execution policy, we must check
-            // that the ranges do not overlap at all for safe parallelization
+            // that the ranges are not overlapping in the left direction
             if constexpr (!hpx::is_sequenced_execution_policy_v<ExPolicy>)
             {
                 // if we can check for overlapping ranges
@@ -754,13 +755,18 @@ namespace hpx::experimental {
                     auto last = std::next(first, count);
                     auto dest_last = std::next(dest, count);
 
-                    // generic overlap check:
-                    // [first, last) and [dest, dest_last) overlap iff
-                    // dest < last && first < dest_last
-                    bool overlap = (dest < last) && (first < dest_last);
+                    // Left-directional overlap check: dest_last falls inside
+                    // [first, last). This detects the overlap direction that is
+                    // safe for forward sequential execution (dest < first).
+                    // Right overlaps (dest >= first) are a bug in both
+                    // sequential and parallel code.
+                    bool overlap = (first < dest_last) && (dest_last < last);
 
                     if (!overlap)
                     {
+                        // Assert that there is no overlap in any direction
+                        // when going parallel.
+                        HPX_ASSERT(!((dest < last) && (first < dest_last)));
                         // use parallel version
                         if constexpr (has_scheduler_executor)
                         {
@@ -897,7 +903,7 @@ namespace hpx::experimental {
             }
 
             // If running in non-sequenced execution policy, we must check
-            // that the ranges do not overlap at all for safe parallelization
+            // that the ranges are not overlapping in the left direction
             if constexpr (!hpx::is_sequenced_execution_policy_v<ExPolicy>)
             {
                 // if we can check for overlapping ranges
@@ -908,13 +914,18 @@ namespace hpx::experimental {
                     auto last = std::next(first, count);
                     auto dest_last = std::next(dest, count);
 
-                    // generic overlap check:
-                    // [first, last) and [dest, dest_last) overlap iff
-                    // dest < last && first < dest_last
-                    bool overlap = (dest < last) && (first < dest_last);
+                    // Left-directional overlap check: dest_last falls inside
+                    // [first, last). This detects the overlap direction that is
+                    // safe for forward sequential execution (dest < first).
+                    // Right overlaps (dest >= first) are a bug in both
+                    // sequential and parallel code.
+                    bool overlap = (first < dest_last) && (dest_last < last);
 
                     if (!overlap)
                     {
+                        // Assert that there is no overlap in any direction
+                        // when going parallel.
+                        HPX_ASSERT(!((dest < last) && (first < dest_last)));
                         // use parallel version
                         if constexpr (has_scheduler_executor)
                         {
@@ -1047,7 +1058,7 @@ namespace hpx::experimental {
             }
 
             // If running in non-sequenced execution policy, we must check
-            // that the ranges do not overlap at all for safe parallelization
+            // that the ranges are not overlapping in the right direction
             if constexpr (!hpx::is_sequenced_execution_policy_v<ExPolicy>)
             {
                 // if we can check for overlapping ranges
@@ -1056,13 +1067,19 @@ namespace hpx::experimental {
                 {
                     auto dest_first = std::prev(dest_last, count);
 
-                    // generic overlap check:
-                    // [first, last) and [dest_first, dest_last) overlap iff
-                    // dest_first < last && first < dest_last
-                    bool overlap = (dest_first < last) && (first < dest_last);
+                    // Right-directional overlap check: dest_first falls inside
+                    // (first, last). This detects the overlap direction that is
+                    // safe for backward sequential execution (dest_first > first).
+                    // Left overlaps (dest_first <= first) are a bug in both
+                    // sequential and parallel code.
+                    bool overlap = (first < dest_first) && (dest_first < last);
 
                     if (!overlap)
                     {
+                        // Assert that there is no overlap in any direction
+                        // when going parallel.
+                        HPX_ASSERT(
+                            !((dest_first < last) && (first < dest_last)));
                         // use parallel version
                         if constexpr (has_scheduler_executor)
                         {
