@@ -48,13 +48,16 @@ void test_concurrent_vector()
         HPX_TEST(v[0].get() == 999);
 
         // Test implicit conversion to reference
-        int& ref = v[0];
-        ref = 123;
+        {
+            auto&& acc = v[0];
+            int& ref = acc;
+            ref = 123;
+        }
         HPX_TEST_EQ(static_cast<int>(v[0].get()), 123);
     }
 
     // Test at()
-    HPX_TEST_EQ(static_cast<int>(v.at(0).get()), 999);
+    HPX_TEST_EQ(static_cast<int>(v.at(0).get()), 123);
 }
 
 void test_concurrent_vector_reserve()
@@ -135,8 +138,11 @@ void test_concurrent_unordered_map()
                 HPX_TEST_EQ(val, j + 1);
 
                 // Test implicit conversion to reference
-                int& ref = m[i * 100 + j];
-                ref = j + 2;
+                {
+                    auto&& acc = m[i * 100 + j];
+                    int& ref = acc;
+                    ref = j + 2;
+                }
                 HPX_TEST_EQ(static_cast<int>(m[i * 100 + j].get()), j + 2);
             }
         });
@@ -147,8 +153,8 @@ void test_concurrent_unordered_map()
 
     std::atomic<int> sum{0};
     m.for_each([&sum](auto const& kv) { sum += kv.second; });
-    // 10 threads * sum(1..100) = 10 * 5050 = 50500
-    HPX_TEST_EQ(sum.load(), 50500);
+    // 10 threads * sum(2..101) = 10 * 5150 = 51500
+    HPX_TEST_EQ(sum.load(), 51500);
 
     // Test erase
     HPX_TEST_EQ(m.erase(0), 1u);

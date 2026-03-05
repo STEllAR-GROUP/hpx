@@ -98,7 +98,7 @@ namespace hpx::concurrent {
         {
             if (this != &other)
             {
-                std::scoped_lock lock(mutex_, other.mutex_);
+                std::lock_guard<hpx::util::spinlock> lock(mutex_);
                 set_ = HPX_MOVE(other.set_);
             }
             return *this;

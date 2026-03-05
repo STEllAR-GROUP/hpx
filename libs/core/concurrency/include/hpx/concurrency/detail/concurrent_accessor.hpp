@@ -87,8 +87,7 @@ namespace hpx::concurrent::detail {
             *value_ = v;
         }
 
-        void set(T&& v)
-            requires(!std::is_const_v<T>)
+        void set(std::remove_const_t<T>&& v)
         {
             validate();
             *value_ = HPX_MOVE(v);
