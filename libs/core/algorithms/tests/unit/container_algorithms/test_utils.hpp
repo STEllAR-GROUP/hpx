@@ -18,7 +18,6 @@
 #include <iterator>
 #include <numeric>
 #include <random>
-#include <sys/stat.h>
 #include <type_traits>
 #include <utility>
 #include <vector>

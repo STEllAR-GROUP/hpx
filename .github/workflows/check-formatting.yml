@@ -48,7 +48,7 @@ jobs:
 
     - name: Upload Clang Format Artifacts
       if: success() || failure()
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: modified-clang-format-files
         path: /tmp/modified_clang_format_files.txt
@@ -79,7 +79,7 @@ jobs:
 
     - name: Upload CMake Format Artifacts
       if: success() || failure()
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: modified-cmake-format-files
         path: /tmp/modified_cmake_format_files.txt
@@ -134,7 +134,7 @@ jobs:
 
     - name: Upload Spell Check Artifacts
       if: success() || failure()
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: spelling-suggestions
         path: /tmp/spelling_suggestions.txt
