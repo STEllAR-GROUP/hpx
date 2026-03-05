@@ -508,15 +508,6 @@ function(hpx_check_for_cxx20_source_location)
 endfunction()
 
 # ##############################################################################
-function(hpx_check_for_cxx20_perfect_pack_capture)
-  add_hpx_config_test(
-    HPX_WITH_CXX20_PERFECT_PACK_CAPTURE
-    SOURCE cmake/tests/cxx20_perfect_pack_capture.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
 function(hpx_check_for_pthread_setname_np)
   add_hpx_config_test(
     HPX_WITH_PTHREAD_SETNAME_NP
