@@ -116,8 +116,6 @@ function(hpx_perform_cxx_feature_tests)
       DEFINITIONS HPX_HAVE_CXX20_PAREN_INITIALIZATION_OF_AGGREGATES
     )
 
-
-
     hpx_check_for_cxx20_std_execution_policies(
       DEFINITIONS HPX_HAVE_CXX20_STD_EXECUTION_POLICES
     )

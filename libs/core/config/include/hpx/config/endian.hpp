@@ -6,22 +6,12 @@
 
 #pragma once
 
-
-
-
 #include <bit>
-
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \cond NODETAIL
 namespace hpx {
 
-
     using std::endian;
-
-
-
-
-
 
 }    // namespace hpx
