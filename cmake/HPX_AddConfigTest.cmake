@@ -579,8 +579,6 @@ function(hpx_check_for_cxx20_std_ranges_iter_swap)
   )
 endfunction()
 
-# "hpx_check_for_cxx20_trivial_virtual_destructor" was deleted here
-
 # ##############################################################################
 function(hpx_check_for_cxx20_std_construct_at)
   add_hpx_config_test(
