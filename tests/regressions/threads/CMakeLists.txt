@@ -8,6 +8,7 @@
 set(tests
     block_os_threads_1036
     main_thread_exit_callbacks
+    numa_scheduler_suspended_pu_6963
     run_as_hpx_thread_exceptions_3304
     run_as_os_thread_lockup_2991
     stackless_self_4155
@@ -23,6 +24,7 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
 endif()
 
 set(block_os_threads_1036_PARAMETERS THREADS_PER_LOCALITY 4 RUN_SERIAL)
+set(numa_scheduler_suspended_pu_6963_PARAMETERS THREADS_PER_LOCALITY 4)
 set(thread_rescheduling_PARAMETERS THREADS_PER_LOCALITY 4)
 set(thread_suspend_pending_PARAMETERS THREADS_PER_LOCALITY 1)
 set(thread_suspend_duration_PARAMETERS THREADS_PER_LOCALITY 1)
