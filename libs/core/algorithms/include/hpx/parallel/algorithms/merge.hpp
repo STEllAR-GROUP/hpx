@@ -750,9 +750,9 @@ namespace hpx::parallel {
                     std::size_t k1 = (std::min) ((idx + 1) * chunk, N);
 
                     auto [a0, b0] = diagonal_intersection(
-                        first1, len1, first2, len2, k0, comp);
+                        first1, len1, first2, len2, k0, comp, proj1, proj2);
                     auto [a1, b1] = diagonal_intersection(
-                        first1, len1, first2, len2, k1, comp);
+                        first1, len1, first2, len2, k1, comp, proj1, proj2);
 
                     sequential_merge(std::next(first1, a0),
                         std::next(first1, a1), std::next(first2, b0),
