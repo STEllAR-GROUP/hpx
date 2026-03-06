@@ -5,7 +5,6 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests chunk_size_iterator chunk_size_idx_iterator
-          chunk_size_variable_regression
           test_insertion_sort
           test_parallel_stable_sort test_sample_sort test_spin_sort
 )

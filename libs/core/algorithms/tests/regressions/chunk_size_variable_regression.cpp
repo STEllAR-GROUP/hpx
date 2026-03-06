@@ -19,7 +19,6 @@
 #include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/parallel/util/detail/chunk_size.hpp>
 
 #include <cstddef>
 #include <numeric>
