@@ -679,18 +679,28 @@ namespace hpx::parallel {
 
         HPX_CXX_CORE_EXPORT template <typename Iter1, typename Iter2,
             typename Comp, typename Proj1, typename Proj2>
-        std::pair<std::size_t, std::size_t> diagonal_intersection(Iter1 first1,
-            std::size_t len1, Iter2 first2, std::size_t len2, std::size_t k,
-            Comp comp, Proj1&& proj1, Proj2&& proj2)
+        std::pair<std::ptrdiff_t, std::ptrdiff_t> diagonal_intersection(
+            Iter1 first1, std::size_t len1, Iter2 first2, std::size_t len2,
+            std::size_t k, Comp comp, Proj1&& proj1, Proj2&& proj2)
         {
-            std::size_t a_low = (k > len2) ? (k - len2) : 0;
-            std::size_t a_high = (k < len1) ? k : len1;
+            if (len1 == 0)
+                return {0, std::min(k, len2)};
+            if (len2 == 0)
+                return {std::min(k, len1), 0};
+            std::ptrdiff_t a_low = (k > len2) ? (k - len2) : 0;
+            std::ptrdiff_t a_high = (k < len1) ? k : len1;
+            if (a_low == a_high)
+            {
+                std::ptrdiff_t a = a_low;
+                return {a,
+                    static_cast<std::ptrdiff_t>(k) -
+                        a};    // Only one valid position
+            }
 
             while (a_low <= a_high)
             {
-                std::ptrdiff_t a =
-                    static_cast<std::ptrdiff_t>((a_low + a_high) / 2);
-                std::ptrdiff_t b = static_cast<std::ptrdiff_t>(k - a);
+                std::ptrdiff_t a = (a_low + a_high) / 2;
+                std::ptrdiff_t b = static_cast<std::ptrdiff_t>(k) - a;
 
                 // cond1: a==0 || b==len2 || A[a-1] <= B[b]
                 bool cond1 = (a == 0) ||
@@ -708,9 +718,7 @@ namespace hpx::parallel {
                 if (cond1 && cond2)
                     return {a, b};
 
-                if (a > 0 && b < static_cast<std::ptrdiff_t>(len2) &&
-                    HPX_INVOKE(comp, HPX_INVOKE(proj2, *std::next(first2, b)),
-                        HPX_INVOKE(proj1, *std::next(first1, a - 1))))
+                if (!cond1)
                 {
                     a_high = a - 1;
                 }
@@ -719,8 +727,17 @@ namespace hpx::parallel {
                     a_low = a + 1;
                 }
             }
-            return {static_cast<std::ptrdiff_t>(a_high),
-                static_cast<std::ptrdiff_t>(k - a_high)};
+            return {a_high, k - a_high};
+        }
+
+        HPX_CXX_CORE_EXPORT template <typename Iter1, typename Iter2,
+            typename Comp, typename Proj1, typename Proj2>
+        std::pair<std::ptrdiff_t, std::ptrdiff_t> diagonal_intersection(
+            Iter1 first1, std::size_t len1, Iter2 first2, std::size_t len2,
+            std::size_t k, Comp comp, hpx::identity, hpx::identity)
+        {
+            return diagonal_intersection(first1, len1, first2, len2, k,
+                HPX_MOVE(comp), hpx::identity_v, hpx::identity_v);
         }
 
         ///////////////////////////////////////////////////////////////////////
