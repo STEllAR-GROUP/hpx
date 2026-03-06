@@ -503,11 +503,20 @@ namespace hpx::execution::experimental {
                 std::size_t const thread_index, std::size_t const num_threads,
                 std::size_t const size) noexcept
             {
-                auto const part_begin = static_cast<std::uint32_t>(
-                    (thread_index * size) / num_threads);
-                auto const part_end = static_cast<std::uint32_t>(
-                    ((thread_index + 1) * size) / num_threads);
-                queue.reset(part_begin, part_end);
+                auto const part_begin = (thread_index * size) / num_threads;
+                auto const part_end = ((thread_index + 1) * size) / num_threads;
+
+                // Guard:the static scheduling also uses
+                //  contiguous_index_queue internally.
+
+                HPX_ASSERT_MSG(
+                    size <= static_cast<std::size_t>(
+                                (std::numeric_limits<std::uint32_t>::max)()),
+                    "fork_join_executor: ranges larger than"
+                    " UINT32_MAX are not supported");
+
+                queue.reset(static_cast<std::uint32_t>(part_begin),
+                    static_cast<std::uint32_t>(part_end));
             }
 
             static hpx::threads::mask_type full_mask(
@@ -573,11 +582,11 @@ namespace hpx::execution::experimental {
               , region_data_(get_region_data_size(num_threads_, pool_))
             {
                 HPX_ASSERT(pool_);
-                if (pool_ == nullptr ||
+                if (pool_ == nullptr || num_threads_ == 0 ||
                     num_threads_ > pool_->get_os_thread_count())
                 {
                     HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
-                        "for_join_executor::shared_data::shared_data",
+                        "fork_join_executor::shared_data::shared_data",
                         "unexpected number of PUs in given mask: {}, available "
                         "threads: {}",
                         pu_mask, pool_ ? pool_->get_os_thread_count() : -1);
@@ -673,10 +682,10 @@ namespace hpx::execution::experimental {
                             // Set up the local queues and state.
                             std::size_t const size = hpx::util::size(shape);
 
-                            auto part_begin = static_cast<std::uint32_t>(
-                                (thread_index * size) / num_threads);
-                            auto const part_end = static_cast<std::uint32_t>(
-                                ((thread_index + 1) * size) / num_threads);
+                            auto part_begin =
+                                (thread_index * size) / num_threads;
+                            auto const part_end =
+                                ((thread_index + 1) * size) / num_threads;
 
                             set_state(data.state_, thread_state::active);
 
