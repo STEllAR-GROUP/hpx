@@ -424,11 +424,37 @@ namespace hpx::threads {
         }
 
         // handle thread interruption
-        bool interruption_requested() const noexcept;
-        bool interruption_enabled() const noexcept;
-        bool set_interruption_enabled(bool enable) noexcept;
+        constexpr bool interruption_requested() const noexcept
+        {
+            return requested_interrupt_;
+        }
 
-        void interrupt(bool flag = true);
+        constexpr bool interruption_enabled() const noexcept
+        {
+            return enabled_interrupt_;
+        }
+
+        bool set_interruption_enabled(bool enable) noexcept
+        {
+            using std::swap;
+            swap(enabled_interrupt_, enable);
+            return enable;
+        }
+
+        void interrupt(bool const flag = true)
+        {
+            std::unique_lock<hpx::util::detail::spinlock> l(
+                spinlock_pool::spinlock_for(this));
+            if (flag && !enabled_interrupt_)
+            {
+                l.unlock();
+
+                HPX_THROW_EXCEPTION(hpx::error::thread_not_interruptable,
+                    "thread_data::interrupt",
+                    "interrupts are disabled for this thread");
+            }
+            requested_interrupt_ = flag;
+        }
 
         bool interruption_point(bool throw_on_interrupt = true);
 
