@@ -23,7 +23,7 @@
 
 namespace hpx::actions::detail {
 
-    class HPX_EXPORT per_action_data_counter_registry
+    HPX_CXX_EXPORT class HPX_EXPORT per_action_data_counter_registry
     {
     public:
         using counter_function_type = hpx::function<std::int64_t(bool)>;

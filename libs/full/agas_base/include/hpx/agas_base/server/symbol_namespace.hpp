@@ -30,8 +30,8 @@
 
 namespace hpx::agas {
 
-    HPX_EXPORT naming::gid_type bootstrap_symbol_namespace_gid();
-    HPX_EXPORT hpx::id_type bootstrap_symbol_namespace_id();
+    HPX_CXX_EXPORT HPX_EXPORT naming::gid_type bootstrap_symbol_namespace_gid();
+    HPX_CXX_EXPORT HPX_EXPORT hpx::id_type bootstrap_symbol_namespace_id();
 }    // namespace hpx::agas
 
 namespace hpx::agas::server {
@@ -40,7 +40,7 @@ namespace hpx::agas::server {
     inline constexpr char const* const symbol_namespace_service_name =
         "symbol/";
 
-    struct HPX_EXPORT symbol_namespace
+    HPX_CXX_EXPORT struct HPX_EXPORT symbol_namespace
       : components::fixed_component_base<symbol_namespace>
     {
         using mutex_type = hpx::spinlock;

@@ -24,13 +24,14 @@
 
 namespace hpx {
 
-    class HPX_EXPORT runtime_distributed;
+    HPX_CXX_EXPORT class HPX_EXPORT runtime_distributed;
 
-    HPX_EXPORT runtime_distributed& get_runtime_distributed();
-    HPX_EXPORT runtime_distributed*& get_runtime_distributed_ptr();
+    HPX_CXX_EXPORT HPX_EXPORT runtime_distributed& get_runtime_distributed();
+    HPX_CXX_EXPORT HPX_EXPORT runtime_distributed*&
+    get_runtime_distributed_ptr();
 
     /// The function \a get_locality returns a reference to the locality prefix
-    HPX_EXPORT naming::gid_type const& get_locality();
+    HPX_CXX_EXPORT HPX_EXPORT naming::gid_type const& get_locality();
 
     /// \cond NOINTERNAL
     namespace util {
@@ -54,7 +55,8 @@ namespace hpx {
     /// \note     The active counters are those which have been specified on
     ///           the command line while executing the application (see command
     ///           line option \--hpx:print-counter)
-    HPX_EXPORT void start_active_counters(error_code& ec = throws);
+    HPX_CXX_EXPORT HPX_EXPORT void start_active_counters(
+        error_code& ec = throws);
 
     /// \brief Resets all active performance counters.
     ///
@@ -70,7 +72,8 @@ namespace hpx {
     /// \note     The active counters are those which have been specified on
     ///           the command line while executing the application (see command
     ///           line option \--hpx:print-counter)
-    HPX_EXPORT void reset_active_counters(error_code& ec = throws);
+    HPX_CXX_EXPORT HPX_EXPORT void reset_active_counters(
+        error_code& ec = throws);
 
     /// \brief Re-initialize all active performance counters.
     ///
@@ -88,7 +91,7 @@ namespace hpx {
     /// \note     The active counters are those which have been specified on
     ///           the command line while executing the application (see command
     ///           line option \--hpx:print-counter)
-    HPX_EXPORT void reinit_active_counters(
+    HPX_CXX_EXPORT HPX_EXPORT void reinit_active_counters(
         bool reset = true, error_code& ec = throws);
 
     /// \brief Stop all active performance counters.
@@ -105,7 +108,8 @@ namespace hpx {
     /// \note     The active counters are those which have been specified on
     ///           the command line while executing the application (see command
     ///           line option \--hpx:print-counter)
-    HPX_EXPORT void stop_active_counters(error_code& ec = throws);
+    HPX_CXX_EXPORT HPX_EXPORT void stop_active_counters(
+        error_code& ec = throws);
 
     /// \brief Evaluate and output all active performance counters, optionally
     ///        naming the point in code marked by this function.
@@ -130,7 +134,7 @@ namespace hpx {
     /// \note     The active counters are those which have been specified on
     ///           the command line while executing the application (see command
     ///           line option \--hpx:print-counter)
-    HPX_EXPORT void evaluate_active_counters(bool reset = false,
+    HPX_CXX_EXPORT HPX_EXPORT void evaluate_active_counters(bool reset = false,
         char const* description = nullptr, error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -148,8 +152,8 @@ namespace hpx {
     ///           function doesn't throw but returns the result code using the
     ///           parameter \a ec. Otherwise it throws an instance of
     ///           hpx::exception.
-    HPX_EXPORT serialization::binary_filter* create_binary_filter(
-        char const* binary_filter_type, bool compress,
+    HPX_CXX_EXPORT HPX_EXPORT serialization::binary_filter*
+    create_binary_filter(char const* binary_filter_type, bool compress,
         serialization::binary_filter* next_filter = nullptr,
         error_code& ec = throws);
 }    // namespace hpx

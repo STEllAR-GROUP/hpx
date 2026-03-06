@@ -23,12 +23,12 @@ namespace hpx::components {
 
     namespace detail {
 
-        HPX_EXPORT void get_component_info(std::vector<std::string>& fillini,
-            std::string const& filepath, bool is_static, char const* name,
-            char const* component_string, factory_state state,
-            char const* more);
+        HPX_CXX_EXPORT HPX_EXPORT void get_component_info(
+            std::vector<std::string>& fillini, std::string const& filepath,
+            bool is_static, char const* name, char const* component_string,
+            factory_state state, char const* more);
 
-        HPX_EXPORT bool is_component_enabled(char const* name);
+        HPX_CXX_EXPORT HPX_EXPORT bool is_component_enabled(char const* name);
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////

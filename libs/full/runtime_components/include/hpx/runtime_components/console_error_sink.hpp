@@ -17,9 +17,10 @@
 namespace hpx { namespace components {
 
     // Stub function which applies the console_error_sink action.
-    HPX_EXPORT void console_error_sink(
+    HPX_CXX_EXPORT HPX_EXPORT void console_error_sink(
         hpx::id_type const& dst, std::exception_ptr const& e);
 
     // Stub function which applies the console_error_sink action.
-    HPX_EXPORT void console_error_sink(std::exception_ptr const& e);
+    HPX_CXX_EXPORT HPX_EXPORT void console_error_sink(
+        std::exception_ptr const& e);
 }}    // namespace hpx::components

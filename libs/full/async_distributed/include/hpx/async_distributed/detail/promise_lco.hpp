@@ -172,7 +172,7 @@ namespace hpx::lcos::detail {
 namespace hpx {
     namespace traits {
         namespace detail {
-            HPX_EXPORT extern util::atomic_count unique_type;
+            HPX_CXX_EXPORT HPX_EXPORT extern util::atomic_count unique_type;
         }
 
         template <typename Result, typename RemoteResult>
@@ -214,7 +214,7 @@ namespace hpx {
 
         // Forward declare promise_lco<void> to avoid duplicate instantiations
         template <>
-        HPX_ALWAYS_EXPORT hpx::components::managed_component<
+        HPX_CXX_EXPORT HPX_ALWAYS_EXPORT hpx::components::managed_component<
             lcos::detail::promise_lco<void, hpx::util::unused_type>>::heap_type&
         component_heap_helper<hpx::components::managed_component<
             lcos::detail::promise_lco<void, hpx::util::unused_type>>>(...);
@@ -225,7 +225,7 @@ namespace hpx {
         {
             using valid = void;
 
-            HPX_ALWAYS_EXPORT static
+            HPX_CXX_EXPORT HPX_ALWAYS_EXPORT static
                 typename hpx::components::managed_component<
                     lcos::detail::promise_lco<Result, RemoteResult>>::heap_type&
                 call()

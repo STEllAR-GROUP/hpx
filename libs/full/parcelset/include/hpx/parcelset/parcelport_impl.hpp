@@ -56,7 +56,7 @@ namespace hpx::parcelset {
     struct connection_handler_traits;
 
     template <typename ConnectionHandler>
-    class HPX_EXPORT parcelport_impl : public parcelport
+    HPX_CXX_EXPORT class HPX_EXPORT parcelport_impl : public parcelport
     {
         using connection = typename connection_handler_traits<
             ConnectionHandler>::connection_type;

@@ -36,7 +36,7 @@ namespace hpx::actions {
     ///////////////////////////////////////////////////////////////////////////
     // Continuations are polymorphic objects encapsulating the
     // id_type of the destination where the result has to be sent.
-    class HPX_EXPORT continuation
+    HPX_CXX_EXPORT class HPX_EXPORT continuation
     {
     public:
         using continuation_tag = void;
@@ -300,7 +300,8 @@ namespace hpx::actions {
 
     ///////////////////////////////////////////////////////////////////////////
     template <>
-    struct HPX_EXPORT typed_continuation<void, util::unused_type> : continuation
+    HPX_CXX_EXPORT struct HPX_EXPORT
+        typed_continuation<void, util::unused_type> : continuation
     {
     private:
         using function_type =

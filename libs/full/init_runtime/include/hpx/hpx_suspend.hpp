@@ -32,7 +32,7 @@ namespace hpx {
     ///           function doesn't throw but returns the result code using the
     ///           parameter \a ec. Otherwise it throws an instance of
     ///           hpx::exception.
-    HPX_EXPORT int suspend(error_code& ec = throws);
+    HPX_CXX_EXPORT HPX_EXPORT int suspend(error_code& ec = throws);
 
     /// \brief Resume the HPX runtime system.
     ///
@@ -52,5 +52,5 @@ namespace hpx {
     ///           function doesn't throw but returns the result code using the
     ///           parameter \a ec. Otherwise it throws an instance of
     ///           hpx::exception.
-    HPX_EXPORT int resume(error_code& ec = throws);
+    HPX_CXX_EXPORT HPX_EXPORT int resume(error_code& ec = throws);
 }    // namespace hpx

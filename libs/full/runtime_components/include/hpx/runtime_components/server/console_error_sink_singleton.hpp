@@ -55,5 +55,5 @@ namespace hpx { namespace components { namespace server {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT console_error_dispatcher& get_error_dispatcher();
+    HPX_CXX_EXPORT HPX_EXPORT console_error_dispatcher& get_error_dispatcher();
 }}}    // namespace hpx::components::server

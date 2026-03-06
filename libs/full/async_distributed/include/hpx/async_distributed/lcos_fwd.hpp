@@ -20,7 +20,7 @@ namespace hpx {
 
     /// \namespace lcos
     namespace lcos {
-        class HPX_EXPORT base_lco;
+        HPX_CXX_EXPORT class HPX_EXPORT base_lco;
 
         template <typename Result,
             typename RemoteResult =

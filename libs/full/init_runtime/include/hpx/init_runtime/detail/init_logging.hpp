@@ -16,7 +16,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::util::detail {
 
-    HPX_EXPORT void init_logging_full(runtime_configuration&);
+    HPX_CXX_EXPORT HPX_EXPORT void init_logging_full(runtime_configuration&);
 }    // namespace hpx::util::detail
 
 #endif

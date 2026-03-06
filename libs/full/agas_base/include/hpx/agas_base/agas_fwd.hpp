@@ -39,16 +39,16 @@ namespace hpx::agas {
         hpx::function<void(std::string const&, components::component_type),
             true>;
 
-    struct HPX_EXPORT component_namespace;
-    struct HPX_EXPORT locality_namespace;
-    struct HPX_EXPORT primary_namespace;
-    struct HPX_EXPORT symbol_namespace;
+    HPX_CXX_EXPORT struct HPX_EXPORT component_namespace;
+    HPX_CXX_EXPORT struct HPX_EXPORT locality_namespace;
+    HPX_CXX_EXPORT struct HPX_EXPORT primary_namespace;
+    HPX_CXX_EXPORT struct HPX_EXPORT symbol_namespace;
 
     namespace server {
 
-        struct HPX_EXPORT component_namespace;
-        struct HPX_EXPORT locality_namespace;
-        struct HPX_EXPORT primary_namespace;
-        struct HPX_EXPORT symbol_namespace;
+        HPX_CXX_EXPORT struct HPX_EXPORT component_namespace;
+        HPX_CXX_EXPORT struct HPX_EXPORT locality_namespace;
+        HPX_CXX_EXPORT struct HPX_EXPORT primary_namespace;
+        HPX_CXX_EXPORT struct HPX_EXPORT symbol_namespace;
     }    // namespace server
 }    // namespace hpx::agas

@@ -51,7 +51,7 @@ namespace hpx::parcelset {
 #define HPX_REGISTER_COALESCING_COUNTERS(Action, coalescing_name)              \
     namespace hpx::parcelset {                                                 \
         template <>                                                            \
-        HPX_ALWAYS_EXPORT constexpr char const*                                \
+        HPX_CXX_EXPORT HPX_ALWAYS_EXPORT constexpr char const*                 \
         get_action_coalescing_name<Action>() noexcept                          \
         {                                                                      \
             return coalescing_name;                                            \

@@ -120,6 +120,7 @@ include(HPX_AddModule)
 add_hpx_module(
   full async_distributed
   GLOBAL_HEADER_GEN OFF
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${async_sources}
   HEADERS ${async_headers}
   COMPAT_HEADERS ${async_compat_headers}

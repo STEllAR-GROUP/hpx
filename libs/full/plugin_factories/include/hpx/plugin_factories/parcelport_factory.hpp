@@ -177,8 +177,8 @@ namespace hpx::plugins {
     HPX_DEF_UNIQUE_PLUGIN_NAME(                                                \
         HPX_PP_CAT(pluginname, _plugin_factory_type), pp)                      \
     template struct hpx::plugins::parcelport_factory<Parcelport>;              \
-    HPX_EXPORT hpx::plugins::parcelport_factory_base* HPX_PP_CAT(              \
-        pluginname, _factory_init)(                                            \
+    HPX_CXX_EXPORT HPX_EXPORT hpx::plugins::parcelport_factory_base*           \
+    HPX_PP_CAT(pluginname, _factory_init)(                                     \
         std::vector<hpx::plugins::parcelport_factory_base*> & factories)       \
     {                                                                          \
         static HPX_PP_CAT(pluginname, _plugin_factory_type)                    \

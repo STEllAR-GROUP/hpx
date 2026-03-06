@@ -16,8 +16,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components {
 
-    HPX_EXPORT void console_logging(
+    HPX_CXX_EXPORT HPX_EXPORT void console_logging(
         logging_destination dest, std::size_t level, std::string const& msg);
-    HPX_EXPORT void cleanup_logging();
-    HPX_EXPORT void activate_logging();
+    HPX_CXX_EXPORT HPX_EXPORT void cleanup_logging();
+    HPX_CXX_EXPORT HPX_EXPORT void activate_logging();
 }}    // namespace hpx::components

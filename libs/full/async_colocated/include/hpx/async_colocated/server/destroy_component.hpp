@@ -19,7 +19,7 @@
 namespace hpx::components::server {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT void destroy_component(
+    HPX_CXX_EXPORT HPX_EXPORT void destroy_component(
         naming::gid_type const& gid, naming::address const& addr);
 
     ///////////////////////////////////////////////////////////////////////////

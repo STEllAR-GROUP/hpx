@@ -28,7 +28,7 @@
 
 namespace hpx::parcelset::detail {
 
-    struct HPX_EXPORT parcel_data
+    HPX_CXX_EXPORT struct HPX_EXPORT parcel_data
     {
     public:
         inline parcel_data();
@@ -55,7 +55,7 @@ namespace hpx::parcelset::detail {
     };
 
     // actual parcel implementation
-    class HPX_EXPORT parcel final : public parcel_base
+    HPX_CXX_EXPORT class HPX_EXPORT parcel final : public parcel_base
     {
     private:
         parcel(parcel const&) = delete;
@@ -157,7 +157,8 @@ namespace hpx::parcelset::detail {
         std::size_t num_chunks_;
     };
 
-    HPX_EXPORT std::ostream& operator<<(std::ostream& os, parcel const& p);
+    HPX_CXX_EXPORT HPX_EXPORT std::ostream& operator<<(
+        std::ostream& os, parcel const& p);
 }    // namespace hpx::parcelset::detail
 
 #include <hpx/config/warnings_suffix.hpp>

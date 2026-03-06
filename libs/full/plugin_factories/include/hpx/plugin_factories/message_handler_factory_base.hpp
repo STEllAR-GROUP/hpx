@@ -23,7 +23,8 @@ namespace hpx::plugins {
     ///////////////////////////////////////////////////////////////////////////
     /// The \a plugin_factory_base has to be used as a base class for all
     /// plugin factories.
-    struct HPX_EXPORT message_handler_factory_base : plugin_factory_base
+    HPX_CXX_EXPORT struct HPX_EXPORT message_handler_factory_base
+      : plugin_factory_base
     {
         ~message_handler_factory_base() override = default;
 
@@ -44,8 +45,8 @@ namespace hpx::plugins {
 /// This macro is used to register the given component factory with
 /// Hpx.Plugin. This macro has to be used for each of the component factories.
 #define HPX_REGISTER_MESSAGE_HANDLER_FACTORY_BASE(FactoryType, pluginname)     \
-    HPX_PLUGIN_EXPORT(HPX_PLUGIN_PLUGIN_PREFIX,                                \
-        hpx::plugins::plugin_factory_base, FactoryType, pluginname, factory)   \
-    /**/
+    HPX_CXX_EXPORT HPX_PLUGIN_EXPORT(HPX_PLUGIN_PLUGIN_PREFIX,                 \
+        hpx::plugins::plugin_factory_base, FactoryType, pluginname,            \
+        factory) /**/
 
 #endif

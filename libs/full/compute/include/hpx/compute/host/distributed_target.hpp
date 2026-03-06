@@ -26,7 +26,7 @@
 
 namespace hpx::compute::host::distributed {
 
-    struct HPX_EXPORT target : hpx::compute::host::target
+    HPX_CXX_EXPORT struct HPX_EXPORT target : hpx::compute::host::target
     {
     public:
         // Constructs default target

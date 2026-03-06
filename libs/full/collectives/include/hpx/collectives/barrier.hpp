@@ -19,7 +19,7 @@ namespace hpx { namespace distributed {
     /// same locality. This barrier can be invoked in a distributed application.
     ///
     /// For a local only barrier \see hpx::barrier.
-    class HPX_EXPORT barrier;
+    HPX_CXX_EXPORT class HPX_EXPORT barrier;
 
     /// Creates a barrier, rank is locality id, size is number of localities
     ///
@@ -110,7 +110,7 @@ namespace hpx::distributed {
         struct barrier_node;
     }
 
-    class HPX_EXPORT barrier
+    HPX_CXX_EXPORT class HPX_EXPORT barrier
     {
         typedef detail::barrier_node wrapped_type;
         typedef components::managed_component<wrapped_type> wrapping_type;

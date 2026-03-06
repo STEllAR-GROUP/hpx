@@ -28,7 +28,7 @@ namespace hpx::distributed {
     /// This latch can be invoked in a distributed application.
     ///
     /// For a local only latch \see hpx::latch.
-    class HPX_EXPORT latch
+    HPX_CXX_EXPORT class HPX_EXPORT latch
       : public components::client_base<latch, hpx::lcos::server::latch>
     {
         typedef components::client_base<latch, hpx::lcos::server::latch>

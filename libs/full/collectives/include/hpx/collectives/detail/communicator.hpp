@@ -57,9 +57,9 @@ namespace hpx::collectives::detail {
         using mutex_type = hpx::spinlock;
 
     public:
-        HPX_EXPORT communicator_server() noexcept;
+        HPX_CXX_EXPORT HPX_EXPORT communicator_server() noexcept;
 
-        HPX_EXPORT explicit communicator_server(
+        HPX_CXX_EXPORT HPX_EXPORT explicit communicator_server(
             std::size_t num_sites, char const* basename) noexcept;
 
         communicator_server(communicator_server const&) = delete;
@@ -67,7 +67,7 @@ namespace hpx::collectives::detail {
         communicator_server& operator=(communicator_server const&) = delete;
         communicator_server& operator=(communicator_server&&) = delete;
 
-        HPX_EXPORT ~communicator_server();
+        HPX_CXX_EXPORT HPX_EXPORT ~communicator_server();
 
     private:
         template <typename Operation>

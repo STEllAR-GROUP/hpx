@@ -32,8 +32,9 @@
 
 namespace hpx::agas {
 
-    HPX_EXPORT naming::gid_type bootstrap_component_namespace_gid();
-    HPX_EXPORT hpx::id_type bootstrap_component_namespace_id();
+    HPX_CXX_EXPORT HPX_EXPORT naming::gid_type
+    bootstrap_component_namespace_gid();
+    HPX_CXX_EXPORT HPX_EXPORT hpx::id_type bootstrap_component_namespace_id();
 }    // namespace hpx::agas
 
 namespace hpx::agas::server {
@@ -42,7 +43,7 @@ namespace hpx::agas::server {
     static constexpr char const* const component_namespace_service_name =
         "component/";
 
-    struct HPX_EXPORT component_namespace
+    HPX_CXX_EXPORT struct HPX_EXPORT component_namespace
       : components::fixed_component_base<component_namespace>
     {
         using mutex_type = hpx::spinlock;

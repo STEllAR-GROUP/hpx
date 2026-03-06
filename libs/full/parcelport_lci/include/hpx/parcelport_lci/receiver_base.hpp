@@ -29,7 +29,7 @@
 #include <vector>
 
 namespace hpx::parcelset::policies::lci {
-    class HPX_EXPORT parcelport;
+    HPX_CXX_EXPORT class HPX_EXPORT parcelport;
     struct buffer_wrapper
     {
         struct fake_allocator

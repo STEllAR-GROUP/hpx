@@ -19,8 +19,8 @@
 namespace hpx { namespace agas {
 
     // Create statistics counter for primary namespace on this locality
-    HPX_EXPORT naming::gid_type primary_namespace_statistics_counter(
-        std::string const& name);
+    HPX_CXX_EXPORT HPX_EXPORT naming::gid_type
+    primary_namespace_statistics_counter(std::string const& name);
 
     HPX_DEFINE_PLAIN_ACTION(primary_namespace_statistics_counter,
         primary_namespace_statistics_counter_action);

@@ -17,7 +17,7 @@ namespace hpx {
 
         namespace detail {
 
-            struct HPX_EXPORT id_type_impl;
+            HPX_CXX_EXPORT struct HPX_EXPORT id_type_impl;
         }    // namespace detail
 
         HPX_CXX_EXPORT using component_type = std::int32_t;

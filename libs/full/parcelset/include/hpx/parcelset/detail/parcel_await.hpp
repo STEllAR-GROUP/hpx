@@ -22,16 +22,16 @@ namespace hpx::parcelset::detail {
     using put_parcel_type = hpx::move_only_function<void(
         parcelset::parcel&&, write_handler_type&&)>;
 
-    void HPX_EXPORT parcel_await_apply(parcelset::parcel&& p,
+    void HPX_CXX_EXPORT HPX_EXPORT parcel_await_apply(parcelset::parcel&& p,
         write_handler_type&& f, std::uint32_t archive_flags,
         put_parcel_type pp);
 
     using put_parcels_type = hpx::move_only_function<void(
         std::vector<parcelset::parcel>&&, std::vector<write_handler_type>&&)>;
 
-    void HPX_EXPORT parcels_await_apply(std::vector<parcelset::parcel>&& p,
-        std::vector<write_handler_type>&& f, std::uint32_t archive_flags,
-        put_parcels_type pp);
+    void HPX_CXX_EXPORT HPX_EXPORT parcels_await_apply(
+        std::vector<parcelset::parcel>&& p, std::vector<write_handler_type>&& f,
+        std::uint32_t archive_flags, put_parcels_type pp);
 }    // namespace hpx::parcelset::detail
 
 #endif

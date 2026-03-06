@@ -29,7 +29,7 @@ namespace hpx { namespace applier {
     /// has to be issued on a local or a remote resource. If the target
     /// component is local a new \a thread will be created, if the target is
     /// remote a parcel will be sent.
-    class HPX_EXPORT applier
+    HPX_CXX_EXPORT class HPX_EXPORT applier
     {
     public:
         HPX_NON_COPYABLE(applier);

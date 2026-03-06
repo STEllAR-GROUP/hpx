@@ -34,6 +34,6 @@ namespace hpx { namespace performance_counters {
         std::string parameters_;
     };
 
-    HPX_EXPORT bool parse_counter_name(
+    HPX_CXX_EXPORT HPX_EXPORT bool parse_counter_name(
         std::string const& name, path_elements& elements);
 }}    // namespace hpx::performance_counters

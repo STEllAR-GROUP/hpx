@@ -32,5 +32,6 @@ namespace hpx {
     ///           and may be different for different parcel ports.
     ///
     /// \see      \a std::string get_locality_name()
-    HPX_EXPORT future<std::string> get_locality_name(hpx::id_type const& id);
+    HPX_CXX_EXPORT HPX_EXPORT future<std::string> get_locality_name(
+        hpx::id_type const& id);
 }    // namespace hpx

@@ -30,8 +30,8 @@ namespace hpx::components {
         }
 
         template <typename Component>
-        HPX_ALWAYS_EXPORT typename Component::heap_type& component_heap_helper(
-            ...);
+        HPX_CXX_EXPORT HPX_ALWAYS_EXPORT typename Component::heap_type&
+        component_heap_helper(...);
     }    // namespace detail
 
     template <typename Component>
@@ -44,7 +44,7 @@ namespace hpx::components {
 #define HPX_REGISTER_COMPONENT_HEAP(Component)                                 \
     namespace hpx::components::detail {                                        \
         template <>                                                            \
-        HPX_ALWAYS_EXPORT Component::heap_type&                                \
+        HPX_CXX_EXPORT HPX_ALWAYS_EXPORT Component::heap_type&                 \
         component_heap_helper<Component>(...)                                  \
         {                                                                      \
             util::reinitializable_static<Component::heap_type> heap;           \

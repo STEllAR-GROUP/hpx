@@ -27,6 +27,7 @@ include(HPX_AddModule)
 add_hpx_module(
   full checkpoint
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN OFF
   SOURCES ${checkpoint_sources}
   HEADERS ${checkpoint_headers}
   COMPAT_HEADERS ${checkpoint_compat_headers}

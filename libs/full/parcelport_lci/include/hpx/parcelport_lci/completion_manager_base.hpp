@@ -14,7 +14,7 @@
 #include <hpx/modules/lci_base.hpp>
 
 namespace hpx::parcelset::policies::lci {
-    class HPX_EXPORT parcelport;
+    HPX_CXX_EXPORT class HPX_EXPORT parcelport;
     struct completion_manager_base
     {
         completion_manager_base(parcelport* pp) noexcept

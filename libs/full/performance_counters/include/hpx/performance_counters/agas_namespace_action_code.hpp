@@ -246,10 +246,11 @@ namespace hpx::agas::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     // get action code from counter type
-    HPX_EXPORT namespace_action_code retrieve_action_code(
+    HPX_CXX_EXPORT HPX_EXPORT namespace_action_code retrieve_action_code(
         std::string const& name, error_code& ec = throws);
 
     // get service action code from counter type
-    HPX_EXPORT namespace_action_code retrieve_action_service_code(
+    HPX_CXX_EXPORT HPX_EXPORT namespace_action_code
+    retrieve_action_service_code(
         std::string const& name, error_code& ec = throws);
 }    // namespace hpx::agas::detail

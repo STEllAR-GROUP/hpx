@@ -112,10 +112,10 @@ namespace hpx::collectives::detail {
         using client_type = components::client<channel_communicator_server>;
 
     public:
-        HPX_EXPORT channel_communicator(char const* basename,
+        HPX_CXX_EXPORT HPX_EXPORT channel_communicator(char const* basename,
             std::size_t num_sites, std::size_t this_site, client_type here);
 
-        HPX_EXPORT channel_communicator(hpx::launch::sync_policy,
+        HPX_CXX_EXPORT HPX_EXPORT channel_communicator(hpx::launch::sync_policy,
             char const* basename, std::size_t num_sites, std::size_t this_site,
             client_type here);
 
@@ -127,7 +127,7 @@ namespace hpx::collectives::detail {
         channel_communicator& operator=(
             channel_communicator&& rhs) noexcept = delete;
 
-        HPX_EXPORT ~channel_communicator();
+        HPX_CXX_EXPORT HPX_EXPORT ~channel_communicator();
 
         template <typename T>
         hpx::future<T> get(std::size_t site, std::size_t tag) const

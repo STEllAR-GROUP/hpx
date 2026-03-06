@@ -40,6 +40,7 @@ include(HPX_AddModule)
 add_hpx_module(
   full init_runtime
   GLOBAL_HEADER_GEN OFF
+  GLOBAL_HEADER_MODULE_GEN ON
   HEADERS ${init_runtime_headers}
   SOURCES ${init_runtime_sources}
   DEPENDENCIES hpx_core

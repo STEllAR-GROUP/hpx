@@ -39,18 +39,19 @@ namespace hpx::components {
     namespace detail {
 
         /// \cond NOINTERNAL
-        HPX_EXPORT std::vector<std::size_t> get_items_count(
+        HPX_CXX_EXPORT HPX_EXPORT std::vector<std::size_t> get_items_count(
             std::size_t count, std::vector<std::uint64_t> const& values);
 
-        HPX_EXPORT hpx::future<std::vector<std::uint64_t>>
+        HPX_CXX_EXPORT HPX_EXPORT hpx::future<std::vector<std::uint64_t>>
         retrieve_counter_values(
             std::vector<performance_counters::performance_counter>&& counters);
 
-        HPX_EXPORT hpx::future<std::vector<std::uint64_t>> get_counter_values(
-            std::string const& component_name, std::string const& counter_name,
+        HPX_CXX_EXPORT HPX_EXPORT hpx::future<std::vector<std::uint64_t>>
+        get_counter_values(std::string const& component_name,
+            std::string const& counter_name,
             std::vector<hpx::id_type> const& localities);
 
-        HPX_EXPORT hpx::id_type const& get_best_locality(
+        HPX_CXX_EXPORT HPX_EXPORT hpx::id_type const& get_best_locality(
             hpx::future<std::vector<std::uint64_t>>&& f,
             std::vector<hpx::id_type> const& localities);
 

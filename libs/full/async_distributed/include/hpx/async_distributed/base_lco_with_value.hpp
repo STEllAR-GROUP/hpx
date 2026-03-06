@@ -266,7 +266,9 @@ namespace hpx::components::detail {
             hpx::components::managed_component<hpx::lcos::base_lco_with_value<
                 Result, RemoteResult, traits::detail::managed_component_tag>>;
 
-        HPX_ALWAYS_EXPORT static typename component_type::heap_type& call()
+        HPX_CXX_EXPORT HPX_ALWAYS_EXPORT static
+            typename component_type::heap_type&
+            call()
         {
             util::reinitializable_static<typename component_type::heap_type>
                 heap;
@@ -284,7 +286,9 @@ namespace hpx::components::detail {
             hpx::components::managed_component<hpx::lcos::base_lco_with_value<
                 Result, RemoteResult, traits::detail::component_tag>>;
 
-        HPX_ALWAYS_EXPORT static typename component_type::heap_type& call()
+        HPX_CXX_EXPORT HPX_ALWAYS_EXPORT static
+            typename component_type::heap_type&
+            call()
         {
             util::reinitializable_static<typename component_type::heap_type>
                 heap;

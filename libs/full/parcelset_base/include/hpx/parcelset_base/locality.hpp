@@ -108,16 +108,16 @@ namespace hpx::parcelset {
         }
 
     private:
-        friend HPX_EXPORT bool operator==(
+        friend HPX_CXX_EXPORT HPX_EXPORT bool operator==(
             locality const& lhs, locality const& rhs);
-        friend HPX_EXPORT bool operator!=(
+        friend HPX_CXX_EXPORT HPX_EXPORT bool operator!=(
             locality const& lhs, locality const& rhs);
-        friend HPX_EXPORT bool operator<(
+        friend HPX_CXX_EXPORT HPX_EXPORT bool operator<(
             locality const& lhs, locality const& rhs);
-        friend HPX_EXPORT bool operator>(
+        friend HPX_CXX_EXPORT HPX_EXPORT bool operator>(
             locality const& lhs, locality const& rhs);
 
-        friend HPX_EXPORT std::ostream& operator<<(
+        friend HPX_CXX_EXPORT HPX_EXPORT std::ostream& operator<<(
             std::ostream& os, locality const& l);
 
         // serialization support

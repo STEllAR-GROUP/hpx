@@ -29,7 +29,7 @@ namespace hpx {
     /// \param move_credits [in] If this is set to \a true then it is ok to
     ///                     send all credits in \a id along with the generated
     ///                     message. The default value is \a true.
-    HPX_EXPORT void trigger_lco_event(
+    HPX_CXX_EXPORT HPX_EXPORT void trigger_lco_event(
         hpx::id_type id, naming::address&& addr, bool move_credits = true);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -56,8 +56,9 @@ namespace hpx {
     /// \param move_credits [in] If this is set to \a true then it is ok to
     ///                     send all credits in \a id along with the generated
     ///                     message. The default value is \a true.
-    HPX_EXPORT void trigger_lco_event(hpx::id_type id, naming::address&& addr,
-        hpx::id_type const& cont, bool move_credits = true);
+    HPX_CXX_EXPORT HPX_EXPORT void trigger_lco_event(hpx::id_type id,
+        naming::address&& addr, hpx::id_type const& cont,
+        bool move_credits = true);
 
     /// \brief Trigger the LCO referenced by the given id
     ///
@@ -190,8 +191,9 @@ namespace hpx {
     /// \param move_credits [in] If this is set to \a true then it is ok to
     ///                     send all credits in \a id along with the generated
     ///                     message. The default value is \a true.
-    HPX_EXPORT void set_lco_error(hpx::id_type id, naming::address&& addr,
-        std::exception_ptr const& e, bool move_credits = true);
+    HPX_CXX_EXPORT HPX_EXPORT void set_lco_error(hpx::id_type id,
+        naming::address&& addr, std::exception_ptr const& e,
+        bool move_credits = true);
 
     /// \brief Set the error state for the LCO referenced by the given id
     ///
@@ -204,8 +206,9 @@ namespace hpx {
     /// \param move_credits [in] If this is set to \a true then it is ok to
     ///                     send all credits in \a id along with the generated
     ///                     message. The default value is \a true.
-    HPX_EXPORT void set_lco_error(hpx::id_type id, naming::address&& addr,
-        std::exception_ptr&& e, bool move_credits = true);
+    HPX_CXX_EXPORT HPX_EXPORT void set_lco_error(hpx::id_type id,
+        naming::address&& addr, std::exception_ptr&& e,
+        bool move_credits = true);
 
     /// \brief Set the error state for the LCO referenced by the given id
     ///
@@ -249,9 +252,9 @@ namespace hpx {
     /// \param move_credits [in] If this is set to \a true then it is ok to
     ///                     send all credits in \a id along with the generated
     ///                     message. The default value is \a true.
-    HPX_EXPORT void set_lco_error(hpx::id_type id, naming::address&& addr,
-        std::exception_ptr const& e, hpx::id_type const& cont,
-        bool move_credits = true);
+    HPX_CXX_EXPORT HPX_EXPORT void set_lco_error(hpx::id_type id,
+        naming::address&& addr, std::exception_ptr const& e,
+        hpx::id_type const& cont, bool move_credits = true);
 
     /// \brief Set the error state for the LCO referenced by the given id
     ///
@@ -265,9 +268,9 @@ namespace hpx {
     /// \param move_credits [in] If this is set to \a true then it is ok to
     ///                     send all credits in \a id along with the generated
     ///                     message. The default value is \a true.
-    HPX_EXPORT void set_lco_error(hpx::id_type id, naming::address&& addr,
-        std::exception_ptr&& e, hpx::id_type const& cont,
-        bool move_credits = true);
+    HPX_CXX_EXPORT HPX_EXPORT void set_lco_error(hpx::id_type id,
+        naming::address&& addr, std::exception_ptr&& e,
+        hpx::id_type const& cont, bool move_credits = true);
 
     /// \brief Set the error state for the LCO referenced by the given id
     ///

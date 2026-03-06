@@ -21,7 +21,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace server {
 
-    class HPX_EXPORT base_performance_counter
+    HPX_CXX_EXPORT class HPX_EXPORT base_performance_counter
       : public hpx::performance_counters::performance_counter_base
       , public hpx::traits::detail::component_tag
     {

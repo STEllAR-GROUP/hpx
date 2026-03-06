@@ -25,9 +25,9 @@ namespace hpx {
     /// \cond NOINTERNAL
     namespace detail {
 
-        HPX_EXPORT std::string name_from_basename(
+        HPX_CXX_EXPORT HPX_EXPORT std::string name_from_basename(
             std::string const& basename, std::size_t idx);
-        HPX_EXPORT std::string name_from_basename(
+        HPX_CXX_EXPORT HPX_EXPORT std::string name_from_basename(
             std::string&& basename, std::size_t idx);
     }    // namespace detail
     /// \endcond
@@ -51,10 +51,11 @@ namespace hpx {
     ///         This is important in order to reliably retrieve ids from a
     ///         name, even if the name was already registered.
     ///
-    HPX_EXPORT std::vector<hpx::future<hpx::id_type>> find_all_from_basename(
-        std::string base_name, std::size_t num_ids);
+    HPX_CXX_EXPORT HPX_EXPORT std::vector<hpx::future<hpx::id_type>>
+    find_all_from_basename(std::string base_name, std::size_t num_ids);
 
-    HPX_EXPORT std::vector<hpx::future<hpx::id_type>> find_all_from_basename(
+    HPX_CXX_EXPORT HPX_EXPORT std::vector<hpx::future<hpx::id_type>>
+    find_all_from_basename(
         hpx::launch::sync_policy, std::string base_name, std::size_t num_ids);
 
     /// Return registered ids from the given base name and sequence numbers.
@@ -75,11 +76,12 @@ namespace hpx {
     ///         This is important in order to reliably retrieve ids from a
     ///         name, even if the name was already registered.
     ///
-    HPX_EXPORT std::vector<hpx::future<hpx::id_type>> find_from_basename(
+    HPX_CXX_EXPORT HPX_EXPORT std::vector<hpx::future<hpx::id_type>>
+    find_from_basename(
         std::string base_name, std::vector<std::size_t> const& ids);
 
-    HPX_EXPORT std::vector<hpx::future<hpx::id_type>> find_from_basename(
-        hpx::launch::sync_policy, std::string base_name,
+    HPX_CXX_EXPORT HPX_EXPORT std::vector<hpx::future<hpx::id_type>>
+    find_from_basename(hpx::launch::sync_policy, std::string base_name,
         std::vector<std::size_t> const& ids);
 
     /// \brief Return registered id from the given base name and sequence number.
@@ -100,12 +102,12 @@ namespace hpx {
     ///         This is important in order to reliably retrieve ids from a
     ///         name, even if the name was already registered.
     ///
-    HPX_EXPORT hpx::future<hpx::id_type> find_from_basename(
+    HPX_CXX_EXPORT HPX_EXPORT hpx::future<hpx::id_type> find_from_basename(
         std::string base_name,
         std::size_t sequence_nr = ~static_cast<std::size_t>(0));
 
-    HPX_EXPORT hpx::id_type find_from_basename(hpx::launch::sync_policy,
-        std::string base_name,
+    HPX_CXX_EXPORT HPX_EXPORT hpx::id_type find_from_basename(
+        hpx::launch::sync_policy, std::string base_name,
         std::size_t sequence_nr = ~static_cast<std::size_t>(0));
 
     ///////////////////////////////////////////////////////////////////////////
@@ -129,12 +131,12 @@ namespace hpx {
     /// \note    The operation will fail if the given sequence number is not
     ///          unique.
     ///
-    HPX_EXPORT hpx::future<bool> register_with_basename(std::string base_name,
-        hpx::id_type const& id,
+    HPX_CXX_EXPORT HPX_EXPORT hpx::future<bool> register_with_basename(
+        std::string base_name, hpx::id_type const& id,
         std::size_t sequence_nr = ~static_cast<std::size_t>(0));
 
-    HPX_EXPORT bool register_with_basename(hpx::launch::sync_policy,
-        std::string base_name, hpx::id_type const& id,
+    HPX_CXX_EXPORT HPX_EXPORT bool register_with_basename(
+        hpx::launch::sync_policy, std::string base_name, hpx::id_type const& id,
         std::size_t sequence_nr = ~static_cast<std::size_t>(0),
         error_code& ec = throws);
 
@@ -160,8 +162,8 @@ namespace hpx {
     /// \note    The operation will fail if the given sequence number is not
     ///          unique.
     ///
-    HPX_EXPORT hpx::future<bool> register_with_basename(std::string base_name,
-        hpx::future<hpx::id_type> f,
+    HPX_CXX_EXPORT HPX_EXPORT hpx::future<bool> register_with_basename(
+        std::string base_name, hpx::future<hpx::id_type> f,
         std::size_t sequence_nr = ~static_cast<std::size_t>(0));
 
     /// \brief Unregister the given id using the given base name.
@@ -178,8 +180,8 @@ namespace hpx {
     /// \returns A future representing the result of the un-registration
     ///          operation itself.
     ///
-    HPX_EXPORT hpx::future<hpx::id_type> unregister_with_basename(
-        std::string base_name,
+    HPX_CXX_EXPORT HPX_EXPORT hpx::future<hpx::id_type>
+    unregister_with_basename(std::string base_name,
         std::size_t sequence_nr = ~static_cast<std::size_t>(0));
 
     ///////////////////////////////////////////////////////////////////////////

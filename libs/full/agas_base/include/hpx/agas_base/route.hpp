@@ -14,7 +14,7 @@
 
 namespace hpx::agas::server {
 
-    extern HPX_EXPORT void (*route)(
+    HPX_CXX_EXPORT extern HPX_EXPORT void (*route)(
         primary_namespace& server, parcelset::parcel&& p);
 }    // namespace hpx::agas::server
 

@@ -37,6 +37,7 @@ include(HPX_AddModule)
 add_hpx_module(
   full distribution_policies
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${distribution_policies_sources}
   HEADERS ${distribution_policies_headers}
   COMPAT_HEADERS ${distribution_policies_compat_headers}

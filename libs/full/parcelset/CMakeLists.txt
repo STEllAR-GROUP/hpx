@@ -56,6 +56,7 @@ include(HPX_AddModule)
 add_hpx_module(
   full parcelset
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${parcelset_sources}
   HEADERS ${parcelset_headers}
   COMPAT_HEADERS ${parcelset_compat_headers}

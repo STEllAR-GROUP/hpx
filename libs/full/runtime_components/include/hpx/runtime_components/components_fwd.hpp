@@ -32,10 +32,11 @@ namespace hpx {
 
         namespace server {
 
-            class HPX_EXPORT runtime_support;
+            HPX_CXX_EXPORT class HPX_EXPORT runtime_support;
         }    // namespace server
 
     }    // namespace components
 
-    HPX_EXPORT components::server::runtime_support* get_runtime_support_ptr();
+    HPX_CXX_EXPORT HPX_EXPORT components::server::runtime_support*
+    get_runtime_support_ptr();
 }    // namespace hpx

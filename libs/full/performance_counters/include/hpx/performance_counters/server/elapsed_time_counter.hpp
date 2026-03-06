@@ -15,7 +15,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::performance_counters::server {
 
-    class HPX_EXPORT elapsed_time_counter
+    HPX_CXX_EXPORT class HPX_EXPORT elapsed_time_counter
       : public base_performance_counter
       , public components::component_base<elapsed_time_counter>
     {

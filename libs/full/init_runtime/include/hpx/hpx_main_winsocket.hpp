@@ -11,7 +11,7 @@
 #if defined(HPX_WINDOWS)
 
 namespace hpx { namespace detail {
-    HPX_EXPORT void init_winsocket();
+    HPX_CXX_EXPORT HPX_EXPORT void init_winsocket();
 }}    // namespace hpx::detail
 
 #endif

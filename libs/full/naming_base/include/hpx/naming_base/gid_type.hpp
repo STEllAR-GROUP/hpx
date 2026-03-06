@@ -156,7 +156,7 @@ namespace hpx::naming {
         }
 
         // GID + GID
-        friend HPX_EXPORT gid_type operator+(
+        friend HPX_CXX_EXPORT HPX_EXPORT gid_type operator+(
             gid_type const& lhs, gid_type const& rhs) noexcept;
         gid_type operator+=(gid_type const& rhs) noexcept
         {
@@ -175,7 +175,7 @@ namespace hpx::naming {
         }
 
         // GID - GID
-        friend HPX_EXPORT gid_type operator-(
+        friend HPX_CXX_EXPORT HPX_EXPORT gid_type operator-(
             gid_type const& lhs, gid_type const& rhs) noexcept;
         gid_type operator-=(gid_type const& rhs) noexcept
         {
@@ -217,7 +217,7 @@ namespace hpx::naming {
             return !(lhs == rhs);
         }
 
-        friend HPX_EXPORT bool operator<(
+        friend HPX_CXX_EXPORT HPX_EXPORT bool operator<(
             gid_type const& lhs, gid_type const& rhs) noexcept;
         friend bool operator>=(
             gid_type const& lhs, gid_type const& rhs) noexcept
@@ -225,7 +225,7 @@ namespace hpx::naming {
             return !(lhs < rhs);
         }
 
-        friend HPX_EXPORT bool operator<=(
+        friend HPX_CXX_EXPORT HPX_EXPORT bool operator<=(
             gid_type const& lhs, gid_type const& rhs) noexcept;
         friend bool operator>(gid_type const& lhs, gid_type const& rhs) noexcept
         {
@@ -304,12 +304,12 @@ namespace hpx::naming {
         }
 
     private:
-        friend HPX_EXPORT std::ostream& operator<<(
+        friend HPX_CXX_EXPORT HPX_EXPORT std::ostream& operator<<(
             std::ostream& os, gid_type const& id);
 
-        friend HPX_EXPORT void save(
+        friend HPX_CXX_EXPORT HPX_EXPORT void save(
             serialization::output_archive& ar, gid_type const&, unsigned int);
-        friend HPX_EXPORT void load(
+        friend HPX_CXX_EXPORT HPX_EXPORT void load(
             serialization::input_archive& ar, gid_type&, unsigned int);
 
         // lock implementation

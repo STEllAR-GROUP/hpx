@@ -12,7 +12,7 @@
 
 namespace hpx { namespace performance_counters {
 
-    HPX_EXPORT bool action_invocation_counter_discoverer(
+    HPX_CXX_EXPORT HPX_EXPORT bool action_invocation_counter_discoverer(
         hpx::actions::detail::invocation_count_registry const& registry,
         counter_info const& info, counter_path_elements& p,
         discover_counter_func const& f, discover_counters_mode mode,

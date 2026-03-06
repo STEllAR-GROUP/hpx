@@ -19,8 +19,8 @@
 namespace hpx { namespace agas {
 
     // Create statistics counter for component namespace on this component
-    HPX_EXPORT naming::gid_type component_namespace_statistics_counter(
-        std::string const& name);
+    HPX_CXX_EXPORT HPX_EXPORT naming::gid_type
+    component_namespace_statistics_counter(std::string const& name);
 
     HPX_DEFINE_PLAIN_ACTION(component_namespace_statistics_counter,
         component_namespace_statistics_counter_action);

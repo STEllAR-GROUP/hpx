@@ -18,7 +18,7 @@
 
 namespace hpx::actions::detail {
 
-    class HPX_EXPORT invocation_count_registry
+    HPX_CXX_EXPORT class HPX_EXPORT invocation_count_registry
     {
     public:
         using get_invocation_count_type = std::int64_t (*)(bool);
