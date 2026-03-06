@@ -164,21 +164,34 @@ namespace hpx::execution::experimental {
         }
 
         // BulkTwoWayExecutor interface
-        template <typename F, typename S, typename... Ts>
+        // Integral shape overload - passes integral directly to bulk
+        // clang-format off
+        template <typename F, typename S, typename... Ts,
+            HPX_CONCEPT_REQUIRES_(
+                std::is_integral_v<S>
+            )>
+        // clang-format on
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::bulk_async_execute_t,
             explicit_scheduler_executor const& exec, F&& f, S const& shape,
             Ts&&... ts)
         {
-#if defined(HPX_HAVE_STDEXEC)
-//            We are using HPX's bulk implementation for now, so this works for
-//            other types too.
-//            static_assert(
-//                std::is_integral_v<S>,
-//                "P2300 expects bulk to be called only with integral types"
-//            );
-#endif
+            return bulk(schedule(exec.sched_), shape,
+                hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
+        }
 
+        // Range shape overload
+        // clang-format off
+        template <typename F, typename S, typename... Ts,
+            HPX_CONCEPT_REQUIRES_(
+                !std::is_integral_v<S>
+            )>
+        // clang-format on
+        friend decltype(auto) tag_invoke(
+            hpx::parallel::execution::bulk_async_execute_t,
+            explicit_scheduler_executor const& exec, F&& f, S const& shape,
+            Ts&&... ts)
+        {
             using shape_element =
                 typename hpx::traits::range_traits<S>::value_type;
             using result_type = hpx::util::detail::invoke_deferred_result_t<F,
@@ -233,7 +246,13 @@ namespace hpx::execution::experimental {
             }
         }
 
-        template <typename F, typename S, typename... Ts>
+        // Integral shape overload - passes integral directly
+        // clang-format off
+        template <typename F, typename S, typename... Ts,
+            HPX_CONCEPT_REQUIRES_(
+                std::is_integral_v<S>
+            )>
+        // clang-format on
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::bulk_sync_execute_t,
             explicit_scheduler_executor const& exec, F&& f, S const& shape,
@@ -244,7 +263,48 @@ namespace hpx::execution::experimental {
                     exec, HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...));
         }
 
-        template <typename F, typename S, typename Future, typename... Ts>
+        // Range shape overload
+        // clang-format off
+        template <typename F, typename S, typename... Ts,
+            HPX_CONCEPT_REQUIRES_(
+                !std::is_integral_v<S>
+            )>
+        // clang-format on
+        friend decltype(auto) tag_invoke(
+            hpx::parallel::execution::bulk_sync_execute_t,
+            explicit_scheduler_executor const& exec, F&& f, S const& shape,
+            Ts&&... ts)
+        {
+            hpx::this_thread::experimental::sync_wait(
+                hpx::parallel::execution::bulk_async_execute(
+                    exec, HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...));
+        }
+
+        // Integral shape overload - passes integral directly to bulk
+        // clang-format off
+        template <typename F, typename S, typename Future, typename... Ts,
+            HPX_CONCEPT_REQUIRES_(
+                std::is_integral_v<S>
+            )>
+        // clang-format on
+        friend auto tag_invoke(hpx::parallel::execution::bulk_then_execute_t,
+            explicit_scheduler_executor const& exec, F&& f, S const& shape,
+            Future&& predecessor, Ts&&... ts)
+        {
+            auto pre_req =
+                when_all(keep_future(HPX_FORWARD(Future, predecessor)));
+
+            return transfer(HPX_MOVE(pre_req), exec.sched_) |
+                bulk(shape, hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
+        }
+
+        // Range shape overload
+        // clang-format off
+        template <typename F, typename S, typename Future, typename... Ts,
+            HPX_CONCEPT_REQUIRES_(
+                !std::is_integral_v<S>
+            )>
+        // clang-format on
         friend auto tag_invoke(hpx::parallel::execution::bulk_then_execute_t,
             explicit_scheduler_executor const& exec, F&& f, S const& shape,
             Future&& predecessor, Ts&&... ts)
