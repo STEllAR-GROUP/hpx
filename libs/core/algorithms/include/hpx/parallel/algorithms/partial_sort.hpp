@@ -577,7 +577,7 @@ namespace hpx {
         friend RandIter tag_fallback_invoke(hpx::partial_sort_t, RandIter first,
             RandIter middle, RandIter last, Comp comp = Comp())
         {
-            static_assert(hpx::traits::is_random_access_iterator_v<RandIter>,
+            static_assert(std::random_access_iterator<RandIter>,
                 "Requires at least random access iterator.");
 
             return parallel::partial_sort<RandIter>().call(hpx::execution::seq,
@@ -600,7 +600,7 @@ namespace hpx {
         tag_fallback_invoke(hpx::partial_sort_t, ExPolicy&& policy,
             RandIter first, RandIter middle, RandIter last, Comp comp = Comp())
         {
-            static_assert(hpx::traits::is_random_access_iterator_v<RandIter>,
+            static_assert(std::random_access_iterator<RandIter>,
                 "Requires at least random access iterator.");
 
             using algorithm_result =

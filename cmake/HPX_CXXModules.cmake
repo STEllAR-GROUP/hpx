@@ -7,24 +7,62 @@
 include(HPX_AddCompileFlag)
 include(HPX_Message)
 
+macro(hpx_check_cxx_modules_support)
+  if(HPX_WITH_CXX_MODULES)
+    if(NOT (CMAKE_VERSION VERSION_GREATER_EQUAL "3.29"))
+      hpx_fatal(
+        "Please use a version of CMake newer than V3.28 in order to enable C++ module support for HPX"
+      )
+    endif()
+
+    if(NOT (CMAKE_GENERATOR MATCHES "Ninja" OR CMAKE_GENERATOR MATCHES
+                                               "Visual Studio")
+    )
+      hpx_error(
+        "C++20 modules require Ninja or Visual Studio generator. Current generator: ${CMAKE_GENERATOR}\n"
+        "Please reconfigure with: cmake -G Ninja ..."
+      )
+    endif()
+
+    if(CMAKE_CXX_COMPILER_ID MATCHES "AppleClang")
+      hpx_error(
+        "AppleClang does not support C++20 module dependency scanning.\n"
+        "Please install and use LLVM Clang 16+ instead:\n"
+        "  macOS: brew install llvm\n"
+        "  Then: cmake -DCMAKE_CXX_COMPILER=/opt/homebrew/opt/llvm/bin/clang++ ..."
+      )
+    elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+      if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "16.0")
+        hpx_error(
+          "Clang 16+ is required for C++20 modules support. Current version: ${CMAKE_CXX_COMPILER_VERSION}"
+        )
+      endif()
+      set(HPX_MODULE_INTERFACE_EXTENSION ".cppm")
+    elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+      if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "14.0")
+        hpx_error(
+          "GCC 14+ is required for C++20 modules support (experimental). Current version: ${CMAKE_CXX_COMPILER_VERSION}"
+        )
+      endif()
+      set(HPX_MODULE_INTERFACE_EXTENSION ".cxx")
+    elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+      if(MSVC_VERSION LESS 1934)
+        hpx_error(
+          "Visual Studio 17.4+ is required for C++20 modules support. Current version: ${MSVC_VERSION}"
+        )
+      endif()
+      set(HPX_MODULE_INTERFACE_EXTENSION ".ixx")
+    else()
+      hpx_warn(
+        "C++20 modules support for compiler '${CMAKE_CXX_COMPILER_ID}' is unknown. Proceed with caution."
+      )
+      set(HPX_MODULE_INTERFACE_EXTENSION ".cppm")
+    endif()
+  endif()
+endmacro()
+
 if(NOT HPX_WITH_CXX_MODULES)
   return()
-endif()
-
-# Unfortunately, different compilers expect different file extensions for the
-# C++ module definition files.
-if(MSVC)
-  set(HPX_MODULE_INTERFACE_EXTENSION ".ixx")
-elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES
-                                                "AppleClang"
-)
-  set(HPX_MODULE_INTERFACE_EXTENSION ".cppm")
-elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-  set(HPX_MODULE_INTERFACE_EXTENSION ".cxx")
-else()
-  hpx_error(
-    "C++ modules are not supported for the used compiler ('${CMAKE_CXX_COMPILER_ID}')"
-  )
 endif()
 
 # hpx_configure_module_producer(<producer> [MODULE_OUT_DIR <dir>])
@@ -135,7 +173,7 @@ function(hpx_configure_module_consumer consumer producer)
       )
       if(NOT ok)
         hpx_error(
-          "hpx_configure_module_consumer: the used version of clang does not "
+          "hpx_configure_module_consumer: the used version of gcc does not "
           "support '-fprebuilt-module-path='"
         )
       endif()

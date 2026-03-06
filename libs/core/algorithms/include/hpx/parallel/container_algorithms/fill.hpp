@@ -54,7 +54,7 @@ namespace hpx { namespace ranges {
     ///
     template <typename ExPolicy, typename Rng,
         typename T = typename std::iterator_traits<
-            hpx::traits::range_iterator_t<Rng>>::value_type>
+            std::ranges::iterator_t<Rng>>::value_type>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         typename hpx::traits::range_traits<Rng>::iterator_type>::type
     fill(ExPolicy&& policy, Rng&& rng, T const& value);
@@ -120,8 +120,8 @@ namespace hpx { namespace ranges {
     /// \returns  The \a fill algorithm returns \a void.
     ///
     template <typename Rng, typename T = typename std::iterator_traits<
-        hpx::traits::range_iterator_t<Rng>>::value_type>
-    hpx::traits::range_iterator_t<Rng> fill(Rng&& rng, T const& value);
+        std::ranges::iterator_t<Rng>>::value_type>
+    std::ranges::iterator_t<Rng> fill(Rng&& rng, T const& value);
 
     /// Assigns the given value to the elements in the range [first, last).
     ///
@@ -182,9 +182,9 @@ namespace hpx { namespace ranges {
     ///
     template <typename ExPolicy, typename Rng,
         typename T = typename std::iterator_traits<
-            hpx::traits::range_iterator_t<Rng>>::value_type>
+            std::ranges::iterator_t<Rng>>::value_type>
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-        hpx::traits::range_iterator_t<Rng>>
+        std::ranges::iterator_t<Rng>>
     fill_n(ExPolicy&& policy, Rng&& rng, T const& value);
 
     /// Assigns the given value value to the first count elements in the range
@@ -253,7 +253,7 @@ namespace hpx { namespace ranges {
     ///
     template <typename Rng,
         typename T = typename std::iterator_traits<
-            hpx::traits::range_iterator_t<Rng>>::value_type>
+            std::ranges::iterator_t<Rng>>::value_type>
     typename hpx::traits::range_traits<Rng>::iterator_type
     fill_n(Rng&& rng, T const& value);
 
@@ -295,6 +295,8 @@ namespace hpx { namespace ranges {
 #include <hpx/parallel/algorithms/fill.hpp>
 
 #include <cstddef>
+#include <iterator>
+#include <ranges>
 #include <type_traits>
 #include <utility>
 
@@ -308,11 +310,11 @@ namespace hpx::ranges {
     private:
         template <typename ExPolicy, typename Rng,
             typename T = typename std::iterator_traits<
-                hpx::traits::range_iterator_t<Rng>>::value_type>
+                std::ranges::iterator_t<Rng>>::value_type>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng>
+                std::ranges::range<Rng>
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
@@ -323,7 +325,7 @@ namespace hpx::ranges {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
 
-            static_assert(hpx::traits::is_forward_iterator_v<iterator_type>,
+            static_assert(std::forward_iterator<iterator_type>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::fill<iterator_type>().call(
@@ -336,14 +338,14 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_sentinel_for_v<Sent, Iter>
+                std::sentinel_for<Sent, Iter>
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, Iter>
         tag_fallback_invoke(
             fill_t, ExPolicy&& policy, Iter first, Sent last, T const& value)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<Iter>,
+            static_assert(std::forward_iterator<Iter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::fill<Iter>().call(
@@ -352,15 +354,15 @@ namespace hpx::ranges {
 
         template <typename Rng,
             typename T = typename std::iterator_traits<
-                hpx::traits::range_iterator_t<Rng>>::value_type>
-            requires(hpx::traits::is_range_v<Rng>)
-        friend hpx::traits::range_iterator_t<Rng> tag_fallback_invoke(
+                std::ranges::iterator_t<Rng>>::value_type>
+            requires(std::ranges::range<Rng>)
+        friend std::ranges::iterator_t<Rng> tag_fallback_invoke(
             fill_t, Rng&& rng, T const& value)
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
 
-            static_assert(hpx::traits::is_forward_iterator_v<iterator_type>,
+            static_assert(std::forward_iterator<iterator_type>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::fill<iterator_type>().call(
@@ -370,11 +372,11 @@ namespace hpx::ranges {
 
         template <typename Iter, typename Sent,
             typename T = typename std::iterator_traits<Iter>::value_type>
-            requires(hpx::traits::is_sentinel_for_v<Sent, Iter>)
+            requires(std::sentinel_for<Sent, Iter>)
         friend Iter tag_fallback_invoke(
             fill_t, Iter first, Sent last, T const& value)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<Iter>,
+            static_assert(std::forward_iterator<Iter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::fill<Iter>().call(
@@ -390,22 +392,22 @@ namespace hpx::ranges {
     private:
         template <typename ExPolicy, typename Rng,
             typename T = typename std::iterator_traits<
-                hpx::traits::range_iterator_t<Rng>>::value_type>
+                std::ranges::iterator_t<Rng>>::value_type>
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng>
+                std::ranges::range<Rng>
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            hpx::traits::range_iterator_t<Rng>>
+            std::ranges::iterator_t<Rng>>
         tag_fallback_invoke(
             fill_n_t, ExPolicy&& policy, Rng&& rng, T const& value)
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
 
-            static_assert(hpx::traits::is_forward_iterator_v<iterator_type>,
+            static_assert(std::forward_iterator<iterator_type>,
                 "Requires at least forward iterator.");
 
             // if count is representing a negative value, we do nothing
@@ -435,7 +437,7 @@ namespace hpx::ranges {
         tag_fallback_invoke(fill_n_t, ExPolicy&& policy, FwdIter first,
             Size count, T const& value)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             // if count is representing a negative value, we do nothing
@@ -452,15 +454,15 @@ namespace hpx::ranges {
 
         template <typename Rng,
             typename T = typename std::iterator_traits<
-                hpx::traits::range_iterator_t<Rng>>::value_type>
-            requires(hpx::traits::is_range_v<Rng>)
+                std::ranges::iterator_t<Rng>>::value_type>
+            requires(std::ranges::range<Rng>)
         friend typename hpx::traits::range_traits<Rng>::iterator_type
         tag_fallback_invoke(fill_n_t, Rng&& rng, T const& value)
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
 
-            static_assert(hpx::traits::is_forward_iterator_v<iterator_type>,
+            static_assert(std::forward_iterator<iterator_type>,
                 "Requires at least forward iterator.");
 
             // if count is representing a negative value, we do nothing
@@ -481,7 +483,7 @@ namespace hpx::ranges {
         friend FwdIter tag_fallback_invoke(
             fill_n_t, FwdIter first, Size count, T const& value)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             // if count is representing a negative value, we do nothing

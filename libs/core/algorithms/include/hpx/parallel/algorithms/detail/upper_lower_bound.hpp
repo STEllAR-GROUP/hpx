@@ -83,7 +83,7 @@ namespace hpx::parallel::detail {
         using difference_type =
             typename std::iterator_traits<Iter>::difference_type;
 
-        if constexpr (hpx::traits::is_random_access_iterator_v<Iter>)
+        if constexpr (std::random_access_iterator<Iter>)
         {
             // This code enables the compiler to generate conditional mov
             // operations instead of branches
@@ -210,7 +210,7 @@ namespace hpx::parallel::detail {
         using difference_type =
             typename std::iterator_traits<Iter>::difference_type;
 
-        if constexpr (hpx::traits::is_random_access_iterator_v<Iter>)
+        if constexpr (std::random_access_iterator<Iter>)
         {
             // This code enables the compiler to generate conditional mov
             // operations instead of branches

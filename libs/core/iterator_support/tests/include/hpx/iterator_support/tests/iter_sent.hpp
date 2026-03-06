@@ -17,6 +17,8 @@
 template <typename ValueType>
 struct sentinel
 {
+    sentinel() = default;
+
     explicit sentinel(ValueType stop_value)
       : stop(stop_value)
     {
@@ -28,36 +30,32 @@ struct sentinel
     }
 
 private:
-    ValueType stop;
+    ValueType stop{};
 };
 
 template <typename Iter, typename ValueType,
-    typename Enable =
-        std::enable_if_t<hpx::traits::is_forward_iterator<Iter>::value>>
+    typename Enable = std::enable_if_t<std::forward_iterator<Iter>>>
 bool operator==(Iter it, sentinel<ValueType> s)
 {
     return *it == s.get_stop();
 }
 
 template <typename Iter, typename ValueType,
-    typename Enable =
-        std::enable_if_t<hpx::traits::is_forward_iterator<Iter>::value>>
+    typename Enable = std::enable_if_t<std::forward_iterator<Iter>>>
 bool operator==(sentinel<ValueType> s, Iter it)
 {
     return *it == s.get_stop();
 }
 
 template <typename Iter, typename ValueType,
-    typename Enable =
-        std::enable_if_t<hpx::traits::is_forward_iterator<Iter>::value>>
+    typename Enable = std::enable_if_t<std::forward_iterator<Iter>>>
 bool operator!=(Iter it, sentinel<ValueType> s)
 {
     return *it != s.get_stop();
 }
 
 template <typename Iter, typename ValueType,
-    typename Enable =
-        std::enable_if_t<hpx::traits::is_forward_iterator<Iter>::value>>
+    typename Enable = std::enable_if_t<std::forward_iterator<Iter>>>
 bool operator!=(sentinel<ValueType> s, Iter it)
 {
     return *it != s.get_stop();
@@ -72,12 +70,14 @@ struct iterator
     using pointer = Value const*;
     using reference = Value const&;
 
+    iterator() = default;
+
     explicit iterator(Value initialState)
       : state(initialState)
     {
     }
 
-    virtual Value operator*() const
+    virtual reference operator*() const
     {
         return this->state;
     }
@@ -169,6 +169,26 @@ struct iterator
         return this->state >= that.state;
     }
 
+    friend bool operator==(iterator const& it, sentinel<Value> s)
+    {
+        return it.state == s.get_stop();
+    }
+
+    friend bool operator==(sentinel<Value> s, iterator const& it)
+    {
+        return it.state == s.get_stop();
+    }
+
+    friend bool operator!=(iterator const& it, sentinel<Value> s)
+    {
+        return !(it == s);
+    }
+
+    friend bool operator!=(sentinel<Value> s, iterator const& it)
+    {
+        return !(s == it);
+    }
+
 protected:
-    Value state;
+    Value state{};
 };

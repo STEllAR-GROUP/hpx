@@ -104,8 +104,8 @@ namespace hpx::parallel {
             using local_iterator_type = typename traits::local_iterator;
             using result = util::detail::algorithm_result<ExPolicy, bool>;
 
-            using forced_seq = std::integral_constant<bool,
-                !hpx::traits::is_forward_iterator_v<FwdIter>>;
+            using forced_seq =
+                std::integral_constant<bool, !std::forward_iterator<FwdIter>>;
 
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);
@@ -253,8 +253,8 @@ namespace hpx::parallel {
             using local_iterator_type = typename traits::local_iterator;
             using result = util::detail::algorithm_result<ExPolicy, bool>;
 
-            using forced_seq = std::integral_constant<bool,
-                !hpx::traits::is_forward_iterator_v<FwdIter>>;
+            using forced_seq =
+                std::integral_constant<bool, !std::forward_iterator<FwdIter>>;
 
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);
@@ -402,8 +402,8 @@ namespace hpx::parallel {
             using local_iterator_type = typename traits::local_iterator;
             using result = util::detail::algorithm_result<ExPolicy, bool>;
 
-            using forced_seq = std::integral_constant<bool,
-                !hpx::traits::is_forward_iterator_v<FwdIter>>;
+            using forced_seq =
+                std::integral_constant<bool, !std::forward_iterator<FwdIter>>;
 
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);
@@ -485,8 +485,8 @@ namespace hpx::segmented {
             hpx::traits::is_segmented_iterator_v<InIter>)
     bool tag_invoke(hpx::none_of_t, InIter first, InIter last, F&& f)
     {
-        static_assert(hpx::traits::is_input_iterator_v<InIter>,
-            "Requires at least input iterator.");
+        static_assert(
+            std::input_iterator<InIter>, "Requires at least input iterator.");
 
         return hpx::parallel::detail::segmented_none_of(
             hpx::parallel::detail::none_of(), hpx::execution::seq, first, last,
@@ -500,7 +500,7 @@ namespace hpx::segmented {
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool> tag_invoke(
         hpx::none_of_t, ExPolicy&& policy, SegIter first, SegIter last, F&& f)
     {
-        static_assert(hpx::traits::is_forward_iterator_v<SegIter>,
+        static_assert(std::forward_iterator<SegIter>,
             "Requires at least forward iterator.");
 
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
@@ -515,8 +515,8 @@ namespace hpx::segmented {
             hpx::traits::is_segmented_iterator_v<InIter>)
     bool tag_invoke(hpx::any_of_t, InIter first, InIter last, F&& f)
     {
-        static_assert(hpx::traits::is_input_iterator_v<InIter>,
-            "Requires at least input iterator.");
+        static_assert(
+            std::input_iterator<InIter>, "Requires at least input iterator.");
 
         return hpx::parallel::detail::segmented_any_of(
             hpx::parallel::detail::any_of(), hpx::execution::seq, first, last,
@@ -530,7 +530,7 @@ namespace hpx::segmented {
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool> tag_invoke(
         hpx::any_of_t, ExPolicy&& policy, SegIter first, SegIter last, F&& f)
     {
-        static_assert(hpx::traits::is_forward_iterator_v<SegIter>,
+        static_assert(std::forward_iterator<SegIter>,
             "Requires at least forward iterator.");
 
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
@@ -545,8 +545,8 @@ namespace hpx::segmented {
             hpx::traits::is_segmented_iterator_v<InIter>)
     bool tag_invoke(hpx::all_of_t, InIter first, InIter last, F&& f)
     {
-        static_assert(hpx::traits::is_input_iterator_v<InIter>,
-            "Requires at least input iterator.");
+        static_assert(
+            std::input_iterator<InIter>, "Requires at least input iterator.");
 
         return hpx::parallel::detail::segmented_all_of(
             hpx::parallel::detail::all_of(), hpx::execution::seq, first, last,
@@ -560,7 +560,7 @@ namespace hpx::segmented {
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool> tag_invoke(
         hpx::all_of_t, ExPolicy&& policy, SegIter first, SegIter last, F&& f)
     {
-        static_assert(hpx::traits::is_forward_iterator_v<SegIter>,
+        static_assert(std::forward_iterator<SegIter>,
             "Requires at least forward iterator.");
 
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;

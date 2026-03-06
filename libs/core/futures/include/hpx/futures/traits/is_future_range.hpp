@@ -11,6 +11,7 @@
 #include <hpx/modules/iterator_support.hpp>
 
 #include <functional>
+#include <ranges>
 #include <type_traits>
 
 namespace hpx::traits {
@@ -22,7 +23,7 @@ namespace hpx::traits {
     };
 
     HPX_CXX_CORE_EXPORT template <typename R>
-    struct is_future_range<R, std::enable_if_t<is_range_v<R>>>
+    struct is_future_range<R, std::enable_if_t<std::ranges::range<R>>>
       : is_future<typename range_traits<R>::value_type>
     {
     };

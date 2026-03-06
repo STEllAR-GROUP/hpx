@@ -616,7 +616,7 @@ namespace hpx {
             ExPolicy&& policy, FwdIter first, FwdIter last, T init,
             Reduce red_op, Convert conv_op)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::transform_reduce<T>().call(
@@ -642,7 +642,7 @@ namespace hpx {
         friend T tag_fallback_invoke(transform_reduce_t, InIter first,
             InIter last, T init, Reduce red_op, Convert conv_op)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Requires at least input iterator.");
 
             return hpx::parallel::detail::transform_reduce<T>().call(
@@ -663,9 +663,9 @@ namespace hpx {
             ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2,
             T init)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::transform_reduce_binary<T>().call(
@@ -684,9 +684,9 @@ namespace hpx {
         friend T tag_fallback_invoke(transform_reduce_t, InIter1 first1,
             InIter1 last1, InIter2 first2, T init)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter1>,
+            static_assert(std::input_iterator<InIter1>,
                 "Requires at least input iterator.");
-            static_assert(hpx::traits::is_input_iterator_v<InIter2>,
+            static_assert(std::input_iterator<InIter2>,
                 "Requires at least input iterator.");
 
             return hpx::parallel::detail::transform_reduce_binary<T>().call(
@@ -719,9 +719,9 @@ namespace hpx {
             ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2,
             T init, Reduce red_op, Convert conv_op)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::transform_reduce_binary<T>().call(
@@ -752,9 +752,9 @@ namespace hpx {
             InIter1 last1, InIter2 first2, T init, Reduce red_op,
             Convert conv_op)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter1>,
+            static_assert(std::input_iterator<InIter1>,
                 "Requires at least input iterator.");
-            static_assert(hpx::traits::is_input_iterator_v<InIter2>,
+            static_assert(std::input_iterator<InIter2>,
                 "Requires at least input iterator.");
 
             return hpx::parallel::detail::transform_reduce_binary<T>().call(

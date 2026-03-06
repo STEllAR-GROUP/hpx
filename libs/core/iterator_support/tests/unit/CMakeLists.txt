@@ -8,7 +8,6 @@ set(tests
     boost_iterator_categories
     counting_iterator
     is_iterator
-    is_range
     iterator_adaptor
     iterator_facade
     range
@@ -16,8 +15,6 @@ set(tests
     transform_iterator
     transform_iterator2
     zip_iterator
-    is_sentinel_for
-    is_sized_sentinel_for
 )
 
 set(is_range_FLAGS NOLIBS)

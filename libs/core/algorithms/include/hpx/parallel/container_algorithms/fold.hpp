@@ -258,6 +258,7 @@ namespace hpx::ranges {
 #include <hpx/parallel/util/ranges_facilities.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 
+#include <iterator>
 #include <ranges>
 #include <type_traits>
 
@@ -476,7 +477,7 @@ namespace hpx::ranges {
         template <typename BidIter, typename Sent, typename T, typename F>
         // clang-format off
         requires (
-            hpx::traits::is_bidirectional_iterator_v<BidIter> &&
+            std::bidirectional_iterator<BidIter> &&
             std::is_same_v<T, hpx::traits::iter_value_t<BidIter>> &&
             std::sentinel_for<Sent, BidIter> &&
             hpx::is_indirectly_binary_right_foldable<F, T, BidIter>
@@ -493,7 +494,7 @@ namespace hpx::ranges {
                 return U(HPX_MOVE(init));
             }
 
-            auto it = hpx::ranges::next(first, last);
+            auto it = hpx::parallel::detail::advance_to_sentinel(first, last);
             U result = HPX_MOVE(init);
 
             while (it != first)
@@ -531,7 +532,7 @@ namespace hpx::ranges {
         template <typename BidIter, typename Sent, typename F>
         // clang-format off
         requires (
-            hpx::traits::is_bidirectional_iterator_v<BidIter> &&
+            std::bidirectional_iterator<BidIter> &&
             std::sentinel_for<Sent, BidIter> &&
             hpx::is_indirectly_binary_right_foldable<F,
                 hpx::traits::iter_value_t<BidIter>, BidIter>
@@ -548,7 +549,7 @@ namespace hpx::ranges {
                 return result_type();
             }
 
-            auto it = hpx::ranges::next(first, last);
+            auto it = hpx::parallel::detail::advance_to_sentinel(first, last);
             U result = *--it;
 
             while (it != first)

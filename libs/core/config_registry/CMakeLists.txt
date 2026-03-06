@@ -14,6 +14,7 @@ include(HPX_AddModule)
 add_hpx_module(
   core config_registry
   GLOBAL_HEADER_GEN OFF
+  GLOBAL_HEADER_MODULE_GEN OFF
   SOURCES ${config_registry_sources}
   HEADERS ${config_registry_headers}
   CMAKE_SUBDIRS examples tests
