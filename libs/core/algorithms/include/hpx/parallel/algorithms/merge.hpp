@@ -731,7 +731,7 @@ namespace hpx::parallel {
         }
 
         HPX_CXX_CORE_EXPORT template <typename Iter1, typename Iter2,
-            typename Comp, typename Proj1, typename Proj2>
+            typename Comp>
         std::pair<std::ptrdiff_t, std::ptrdiff_t> diagonal_intersection(
             Iter1 first1, std::size_t len1, Iter2 first2, std::size_t len2,
             std::size_t k, Comp comp, hpx::identity, hpx::identity)
