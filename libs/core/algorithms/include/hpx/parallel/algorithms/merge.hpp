@@ -681,7 +681,7 @@ namespace hpx::parallel {
             typename Comp>
         std::pair<std::size_t, std::size_t> diagonal_intersection(Iter1 first1,
             std::size_t len1, Iter2 first2, std::size_t len2, std::size_t k,
-            Comp comp, hpx::identity, hpx::identity)
+            Comp&& comp, hpx::identity, hpx::identity)
         {
             if (len1 == 0)
                 return {0, (std::min) (k, len2)};
@@ -749,18 +749,15 @@ namespace hpx::parallel {
                     std::size_t k0 = (std::min) (idx * chunk, N);
                     std::size_t k1 = (std::min) ((idx + 1) * chunk, N);
 
-                    auto [a0, b0] = diagonal_intersection(first1, len1, first2,
-                        len2, k0, HPX_FORWARD(Comp, comp),
-                        HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
-                    auto [a1, b1] = diagonal_intersection(first1, len1, first2,
-                        len2, k1, HPX_FORWARD(Comp, comp),
-                        HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
+                    auto [a0, b0] = diagonal_intersection(
+                        first1, len1, first2, len2, k0, comp);
+                    auto [a1, b1] = diagonal_intersection(
+                        first1, len1, first2, len2, k1, comp);
 
                     sequential_merge(std::next(first1, a0),
                         std::next(first1, a1), std::next(first2, b0),
-                        std::next(first2, b1), std::next(dest, k0),
-                        HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj1, proj1),
-                        HPX_FORWARD(Proj2, proj2));
+                        std::next(first2, b1), std::next(dest, k0), comp, proj1,
+                        proj2);
                 }
             };
 
