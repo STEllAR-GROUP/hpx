@@ -13,6 +13,8 @@
 #include <hpx/modules/iostream.hpp>
 #include <hpx/modules/testing.hpp>
 
+#include <cstddef>
+
 #include "detail/sequence.hpp"
 #include "detail/temp_file.hpp"
 #include "detail/verification.hpp"
