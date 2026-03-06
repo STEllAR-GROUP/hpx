@@ -684,11 +684,15 @@ namespace hpx::parallel {
             std::size_t k, Comp comp, Proj1&& proj1, Proj2&& proj2)
         {
             if (len1 == 0)
-                return {0, std::min(k, len2)};
+                return {static_cast<std::ptrdiff_t>(0),
+                    static_cast<std::ptrdiff_t>(std::min(k, len2))};
             if (len2 == 0)
-                return {std::min(k, len1), 0};
-            std::ptrdiff_t a_low = (k > len2) ? (k - len2) : 0;
-            std::ptrdiff_t a_high = (k < len1) ? k : len1;
+                return {static_cast<std::ptrdiff_t>(std::min(k, len1)),
+                    static_cast<std::ptrdiff_t>(0)};
+            std::ptrdiff_t a_low =
+                static_cast<std::ptrdiff_t>((k > len2) ? (k - len2) : 0);
+            std::ptrdiff_t a_high =
+                static_cast<std::ptrdiff_t>((k < len1) ? k : len1);
             if (a_low == a_high)
             {
                 std::ptrdiff_t a = a_low;
@@ -727,7 +731,7 @@ namespace hpx::parallel {
                     a_low = a + 1;
                 }
             }
-            return {a_high, k - a_high};
+            return {a_high, static_cast<std::diff_t>(k) - a_high};
         }
 
         HPX_CXX_CORE_EXPORT template <typename Iter1, typename Iter2,
