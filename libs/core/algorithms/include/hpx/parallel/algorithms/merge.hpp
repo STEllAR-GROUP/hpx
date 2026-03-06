@@ -654,14 +654,15 @@ namespace hpx::parallel {
         HPX_CXX_CORE_EXPORT template <typename T>
         auto get_diagonal_index(T const n)
         {
-            auto diagonal_index = [n](auto&& /*shape*/, std::size_t cores) {
+            auto diagonal_index = [n](auto&& shape, std::size_t cores) {
                 std::vector<hpx::tuple<std::size_t, std::size_t>> d_idx;
 
+                auto const shape_size = std::size(shape);
                 if (n <= 0)
                     return d_idx;
 
                 std::size_t const nn = static_cast<std::size_t>(n);
-                std::size_t seg = (cores == 0 ? 1 : cores);
+                std::size_t seg = (cores == 0 ? 1 : shape_size);
                 seg = (std::min) (seg, nn);
 
                 d_idx.reserve(seg);
