@@ -731,7 +731,7 @@ namespace hpx::parallel {
                     a_low = a + 1;
                 }
             }
-            return {a_high, static_cast<std::diff_t>(k) - a_high};
+            return {a_high, (static_cast<std::diff_t>(k) - a_high)};
         }
 
         HPX_CXX_CORE_EXPORT template <typename Iter1, typename Iter2,
