@@ -10,11 +10,11 @@
 // which all other hint modes call. A direct runtime reproduction via public
 // API is not possible since suspend_processing_unit is internal. This test
 // verifies the NUMA hint scheduling path completes without hanging or
-// crashing.
+// crashing by explicitly scheduling tasks with thread_schedule_hint_mode::numa.
 
+#include <hpx/execution.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/runtime.hpp>
 #include <hpx/thread.hpp>
 
 #include <atomic>
@@ -31,7 +31,12 @@ int hpx_main()
 
     for (std::size_t i = 0; i != num_tasks; ++i)
     {
-        futures.push_back(hpx::async([&count]() { ++count; }));
+        hpx::execution::parallel_policy_executor<hpx::launch> exec{
+            hpx::threads::thread_schedule_hint(
+                hpx::threads::thread_schedule_hint_mode::numa,
+                static_cast<std::int16_t>(i % 2))};
+
+        futures.push_back(hpx::async(exec, [&count]() { ++count; }));
     }
 
     hpx::wait_all(futures);
@@ -42,10 +47,8 @@ int hpx_main()
 
 int main(int argc, char* argv[])
 {
-    hpx::init_params iparams;
-    iparams.mode = hpx::runtime_mode::local;
-    HPX_TEST_EQ_MSG(hpx::init(argc, argv, iparams), 0,
-        "HPX main exited with non-zero status");
+    HPX_TEST_EQ_MSG(
+        hpx::init(argc, argv), 0, "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
 }
