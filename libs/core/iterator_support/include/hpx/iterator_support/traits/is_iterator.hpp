@@ -19,21 +19,19 @@ namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_CXX_CORE_EXPORT template <typename Iter>
-    using iter_value_t = typename std::iterator_traits<Iter>::value_type;
+    using iter_value_t = std::iterator_traits<Iter>::value_type;
 
     HPX_CXX_CORE_EXPORT template <typename Iter>
-    using iter_difference_t =
-        typename std::iterator_traits<Iter>::difference_type;
+    using iter_difference_t = std::iterator_traits<Iter>::difference_type;
 
     HPX_CXX_CORE_EXPORT template <typename Iter>
-    using iter_pointer_t = typename std::iterator_traits<Iter>::pointer;
+    using iter_pointer_t = std::iterator_traits<Iter>::pointer;
 
     HPX_CXX_CORE_EXPORT template <typename Iter>
-    using iter_reference_t = typename std::iterator_traits<Iter>::reference;
+    using iter_reference_t = std::iterator_traits<Iter>::reference;
 
     HPX_CXX_CORE_EXPORT template <typename Iter>
-    using iter_category_t =
-        typename std::iterator_traits<Iter>::iterator_category;
+    using iter_category_t = std::iterator_traits<Iter>::iterator_category;
 
     ////////////////////////////////////////////////////////////////////////////
     namespace detail {
@@ -163,7 +161,7 @@ namespace hpx::traits {
     };
 
     HPX_CXX_CORE_EXPORT template <typename Iter>
-    using is_iterator_t = typename is_iterator<Iter>::type;
+    using is_iterator_t = is_iterator<Iter>::type;
 
     HPX_CXX_CORE_EXPORT template <typename Iter>
     inline constexpr bool is_iterator_v = is_iterator<Iter>::value;
@@ -295,12 +293,98 @@ namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_CXX_CORE_EXPORT template <typename Iter, typename Enable = void>
+    struct is_output_iterator
+      : std::integral_constant<bool,
+            belongs_to_iterator_category_v<Iter, std::output_iterator_tag> ||
+                (belongs_to_iterator_traversal_v<Iter,
+                     hpx::incrementable_traversal_tag> &&
+                    !std::is_same_v<iter_category_t<Iter>,
+                        std::input_iterator_tag>)>
+    {
+    };
+
+    HPX_CXX_CORE_EXPORT template <typename Iter>
+    using is_output_iterator_t = is_output_iterator<Iter>::type;
+
+    HPX_CXX_CORE_EXPORT template <typename Iter>
+    inline constexpr bool is_output_iterator_v =
+        is_output_iterator<Iter>::value;
+
+    ///////////////////////////////////////////////////////////////////////////
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Enable = void>
+    struct is_input_iterator
+      : std::integral_constant<bool,
+            belongs_to_iterator_category_v<Iter, std::input_iterator_tag> ||
+                belongs_to_iterator_traversal_v<Iter,
+                    hpx::single_pass_traversal_tag>>
+    {
+    };
+
+    HPX_CXX_CORE_EXPORT template <typename Iter>
+    using is_input_iterator_t = is_input_iterator<Iter>::type;
+
+    HPX_CXX_CORE_EXPORT template <typename Iter>
+    inline constexpr bool is_input_iterator_v = is_input_iterator<Iter>::value;
+
+    ///////////////////////////////////////////////////////////////////////////
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Enable = void>
+    struct is_forward_iterator
+      : std::integral_constant<bool,
+            belongs_to_iterator_category_v<Iter, std::forward_iterator_tag> ||
+                belongs_to_iterator_traversal_v<Iter,
+                    hpx::forward_traversal_tag>>
+    {
+    };
+
+    HPX_CXX_CORE_EXPORT template <typename Iter>
+    using is_forward_iterator_t = is_forward_iterator<Iter>::type;
+
+    HPX_CXX_CORE_EXPORT template <typename Iter>
+    inline constexpr bool is_forward_iterator_v =
+        is_forward_iterator<Iter>::value;
+
+    ///////////////////////////////////////////////////////////////////////////
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Enable = void>
+    struct is_bidirectional_iterator
+      : std::integral_constant<bool,
+            belongs_to_iterator_category_v<Iter,
+                std::bidirectional_iterator_tag> ||
+                belongs_to_iterator_traversal_v<Iter,
+                    hpx::bidirectional_traversal_tag>>
+    {
+    };
+
+    HPX_CXX_CORE_EXPORT template <typename Iter>
+    using is_bidirectional_iterator_t = is_bidirectional_iterator<Iter>::type;
+
+    HPX_CXX_CORE_EXPORT template <typename Iter>
+    inline constexpr bool is_bidirectional_iterator_v =
+        is_bidirectional_iterator<Iter>::value;
+
+    ///////////////////////////////////////////////////////////////////////////
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Enable = void>
+    struct is_random_access_iterator
+      : std::integral_constant<bool,
+            has_category_v<Iter, std::random_access_iterator_tag> ||
+                has_traversal_v<Iter, hpx::random_access_traversal_tag>>
+    {
+    };
+
+    HPX_CXX_CORE_EXPORT template <typename Iter>
+    using is_random_access_iterator_t = is_random_access_iterator<Iter>::type;
+
+    HPX_CXX_CORE_EXPORT template <typename Iter>
+    inline constexpr bool is_random_access_iterator_v =
+        is_random_access_iterator<Iter>::value;
+
+    ///////////////////////////////////////////////////////////////////////////
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Enable = void>
     struct is_zip_iterator : std::false_type
     {
     };
 
     HPX_CXX_CORE_EXPORT template <typename Iter>
-    using is_zip_iterator_t = typename is_zip_iterator<Iter>::type;
+    using is_zip_iterator_t = is_zip_iterator<Iter>::type;
 
     HPX_CXX_CORE_EXPORT template <typename Iter>
     inline constexpr bool is_zip_iterator_v = is_zip_iterator<Iter>::value;
