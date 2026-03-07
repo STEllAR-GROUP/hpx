@@ -598,15 +598,6 @@ function(hpx_check_for_cxx20_std_construct_at)
 endfunction()
 
 # ##############################################################################
-function(hpx_check_for_cxx20_std_default_sentinel)
-  add_hpx_config_test(
-    HPX_WITH_CXX20_STD_DEFAULT_SENTINEL
-    SOURCE cmake/tests/cxx20_std_default_sentinel.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
 function(hpx_check_for_cxx20_std_bit_cast)
   add_hpx_config_test(
     HPX_WITH_CXX20_STD_BIT_CAST
