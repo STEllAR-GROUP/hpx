@@ -4,9 +4,6 @@
 #  Distributed under the Boost Software License, Version 1.0. (See accompanying
 #  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(HPX_WITH_STDEXEC AND NOT HPX_WITH_CXX20_STD_IDENTITY)
-  hpx_error("HPX_WITH_STDEXEC Requires std::identity.")
-endif()
 
 if(STDEXEC_ROOT AND NOT Stdexec_ROOT)
   set(Stdexec_ROOT ${STDEXEC_ROOT})
