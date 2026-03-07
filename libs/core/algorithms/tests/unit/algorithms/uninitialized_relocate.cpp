@@ -27,6 +27,7 @@ using hpx::experimental::uninitialized_relocate;
 
 std::mutex m;
 
+
 template <typename F>
 void simple_mutex_operation(F&& f)
 {
@@ -518,6 +519,7 @@ int hpx_main()
 
     test_overlapping<hpx::execution::sequenced_policy>();
     test_overlapping<hpx::execution::parallel_policy>();
+
 
     return hpx::local::finalize();
 }
