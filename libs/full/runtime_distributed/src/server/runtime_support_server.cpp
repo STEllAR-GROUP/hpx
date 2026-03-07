@@ -617,6 +617,10 @@ namespace hpx { namespace components { namespace server {
             {
                 unlock_guard<std::mutex> ul(mtx_);
 
+                auto duration_timeout = hpx::chrono::steady_duration(
+                    std::chrono::duration_cast<std::chrono::nanoseconds>(
+                        std::chrono::duration<double>(timeout)));
+
                 util::runtime_configuration& cfg = get_runtime().get_config();
                 std::size_t const shutdown_check_count =
                     util::get_entry_as<std::size_t>(
@@ -626,10 +630,7 @@ namespace hpx { namespace components { namespace server {
                         tm.cleanup_terminated(true);
                         return tm.is_busy();
                     },
-                    shutdown_check_count,
-                    hpx::chrono::steady_duration(
-                        std::chrono::duration_cast<std::chrono::nanoseconds>(
-                            std::chrono::duration<double>(timeout))),
+                    shutdown_check_count, duration_timeout,
                     "runtime_support::stop");
 
                 // If it took longer than expected, kill all suspended threads as
@@ -643,10 +644,7 @@ namespace hpx { namespace components { namespace server {
                             tm.cleanup_terminated(true);
                             return tm.is_busy();
                         },
-                        shutdown_check_count,
-                        hpx::chrono::steady_duration(std::chrono::duration_cast<
-                            std::chrono::nanoseconds>(
-                            std::chrono::duration<double>(timeout))),
+                        shutdown_check_count, duration_timeout,
                         "runtime_support::stop");
                 }
 
