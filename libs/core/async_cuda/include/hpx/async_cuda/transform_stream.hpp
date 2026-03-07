@@ -53,7 +53,7 @@ namespace hpx::cuda::experimental {
             if constexpr (sizeof...(Ts) > 0)
             {
                 detail::add_event_callback(
-                    [keep_alive = hpx::make_tuple(HPX_FORWARD(Ts, ts)...)](
+                    [... keep_alive = HPX_FORWARD(Ts, ts)](
                         cudaError_t const status) {
                         HPX_ASSERT(status != cudaErrorNotReady);
                         HPX_UNUSED(status);
@@ -78,8 +78,7 @@ namespace hpx::cuda::experimental {
             cudaStream_t stream, R&& r, Ts&&... ts)
         {
             detail::add_event_callback(
-                [r = HPX_FORWARD(R, r),
-                    keep_alive = hpx::make_tuple(HPX_FORWARD(Ts, ts)...)](
+                [r = HPX_FORWARD(R, r), ... keep_alive = HPX_FORWARD(Ts, ts)](
                     cudaError_t status) mutable {
                     set_value_event_callback_helper(status, HPX_MOVE(r));
                 },
@@ -105,7 +104,7 @@ namespace hpx::cuda::experimental {
         {
             detail::add_event_callback(
                 [t = HPX_FORWARD(T, t), r = HPX_FORWARD(R, r),
-                    keep_alive = hpx::make_tuple(HPX_FORWARD(Ts, ts)...)](
+                    ... keep_alive = HPX_FORWARD(Ts, ts)](
                     cudaError_t status) mutable {
                     set_value_event_callback_helper(
                         status, HPX_MOVE(r), HPX_MOVE(t));

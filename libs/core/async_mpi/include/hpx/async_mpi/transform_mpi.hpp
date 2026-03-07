@@ -48,8 +48,7 @@ namespace hpx::mpi::experimental {
             MPI_Request request, R&& r, Ts&&... ts)
         {
             detail::add_request_callback(
-                [r = HPX_FORWARD(R, r),
-                    keep_alive = hpx::make_tuple(HPX_FORWARD(Ts, ts)...)](
+                [r = HPX_FORWARD(R, r), ... keep_alive = HPX_FORWARD(Ts, ts)](
                     int status) mutable {
                     set_value_request_callback_helper(status, HPX_MOVE(r));
                 },
@@ -62,8 +61,7 @@ namespace hpx::mpi::experimental {
         {
             detail::add_request_callback(
                 [r = HPX_FORWARD(R, r), res = HPX_FORWARD(InvokeResult, res),
-                    keep_alive = hpx::make_tuple(HPX_FORWARD(Ts, ts)...)](
-                    int status) mutable {
+                    ... keep_alive = HPX_FORWARD(Ts, ts)](int status) mutable {
                     set_value_request_callback_helper(
                         status, HPX_MOVE(r), HPX_MOVE(res));
                 },
