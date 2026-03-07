@@ -55,6 +55,7 @@ set(execution_headers
     hpx/execution/executors/persistent_auto_chunk_size.hpp
     hpx/execution/executors/polymorphic_executor.hpp
     hpx/execution/executors/rebind_executor.hpp
+    hpx/execution/executors/rebind_executor_parameters.hpp
     hpx/execution/executors/static_chunk_size.hpp
     hpx/execution/queries/get_allocator.hpp
     hpx/execution/queries/get_scheduler.hpp
