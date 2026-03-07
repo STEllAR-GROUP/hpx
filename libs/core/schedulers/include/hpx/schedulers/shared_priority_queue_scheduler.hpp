@@ -386,7 +386,6 @@ namespace hpx::threads::policies {
                     d_lookup_[local_num] == domain_num)
                 {
                     thread_num = local_num;    //-V1048
-                    q_index = q_lookup_[thread_num];
                 }
                 else
                 {
@@ -396,7 +395,6 @@ namespace hpx::threads::policies {
                     thread_num +=
                         numa_holder_[domain_num].thread_queue(0)->worker_next(
                             q_counts_[domain_num]);
-                    q_index = q_lookup_[thread_num];
                 }
                 // Ensure the selected PU is active, consistent with the
                 // handling of thread and none scheduling hint modes.
@@ -791,17 +789,12 @@ namespace hpx::threads::policies {
                 domain_num = fast_mod(schedulehint.hint, num_domains_);
                 // if the current thread is on the requested domain, reuse it;
                 // otherwise fall back to the first queue on that domain
-                if (d_lookup_[thread_num] == domain_num)
-                {
-                    q_index = q_lookup_[thread_num];
-                }
-                else
+                if (d_lookup_[thread_num] != domain_num)
                 {
                     thread_num = q_offset_[domain_num];
                     thread_num +=
                         numa_holder_[domain_num].thread_queue(0)->worker_next(
                             q_counts_[domain_num]);
-                    q_index = q_lookup_[thread_num];
                 }
                 // Ensure the selected PU is active, consistent with the
                 // handling of thread and none scheduling hint modes.
