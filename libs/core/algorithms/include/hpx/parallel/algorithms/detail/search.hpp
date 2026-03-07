@@ -307,7 +307,7 @@ namespace hpx::parallel::detail {
                     });
             };
 
-            auto f2 = [first, last, max_start, &tok](
+            auto f2 = [first, last, max_start, tok](
                           auto&&... data) mutable -> FwdIter {
                 util::detail::clear_container(data...);
 

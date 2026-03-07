@@ -96,7 +96,7 @@ set(tests
     rotate_range
     rotate_copy_range
     search_range
-    searchn_std_range
+    search_n_range
     set_difference_range
     set_intersection_range
     set_symmetric_difference_range
