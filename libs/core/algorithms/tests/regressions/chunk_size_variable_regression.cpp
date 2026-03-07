@@ -48,9 +48,8 @@ void test_variable_chunk_multi_chunk_traversal()
     // selects get_bulk_iteration_shape_variable inside partitioner::partition.
     // We call get_bulk_iteration_shape_variable directly so we can inspect the
     // returned shape without actually dispatching work.
-    auto policy =
-        hpx::execution::par.with(
-            hpx::execution::experimental::guided_chunk_size(min_chunk));
+    auto policy = hpx::execution::par.with(
+        hpx::execution::experimental::guided_chunk_size(min_chunk));
 
     // Use integer iterators (simpler than a real container for this test).
     int it = 0;
@@ -111,20 +110,20 @@ void test_shared_future_base_idx_propagation()
     using FwdIter = std::vector<int>::iterator;
 
     // Recorded values: what the functor actually saw.
-    FwdIter   seen_first{};
+    FwdIter seen_first{};
     std::size_t seen_base_idx = static_cast<std::size_t>(-1);
-    std::size_t seen_count    = 0;
+    std::size_t seen_count = 0;
 
     auto functor = [&](FwdIter first, std::size_t count, std::size_t base_idx)
     {
-        seen_first    = first;
+        seen_first = first;
         seen_base_idx = base_idx;
-        seen_count    = count;
+        seen_count = count;
     };
 
     constexpr std::size_t expected_base_idx = 5;
-    constexpr std::size_t expected_count    = 3;
-    FwdIter               expected_first    = data.begin() + 2;
+    constexpr std::size_t expected_count = 3;
+    FwdIter expected_first = data.begin() + 2;
 
     std::vector<hpx::shared_future<void>> workitems;
 
@@ -137,9 +136,9 @@ void test_shared_future_base_idx_propagation()
     // The functor must have been called with the correct arguments.
     // With the old buggy signature the raw address of expected_first would
     // have been cast to size_t and placed in seen_base_idx instead.
-    HPX_TEST_EQ(seen_first,    expected_first);
+    HPX_TEST_EQ(seen_first, expected_first);
     HPX_TEST_EQ(seen_base_idx, expected_base_idx);
-    HPX_TEST_EQ(seen_count,    expected_count);
+    HPX_TEST_EQ(seen_count, expected_count);
 }
 
 // ---------------------------------------------------------------------------
@@ -166,9 +165,8 @@ void test_parallel_for_each_variable_chunk()
     std::vector<std::size_t> indices(total);
     std::iota(indices.begin(), indices.end(), 0u);
 
-    auto policy =
-        hpx::execution::par.with(
-            hpx::execution::experimental::guided_chunk_size(min_chunk));
+    auto policy = hpx::execution::par.with(
+        hpx::execution::experimental::guided_chunk_size(min_chunk));
 
     hpx::for_each(policy, indices.begin(), indices.end(),
         [&](std::size_t idx) { visited[idx].fetch_add(1); });
