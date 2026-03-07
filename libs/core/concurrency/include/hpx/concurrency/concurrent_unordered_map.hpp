@@ -81,8 +81,9 @@ namespace hpx::concurrent {
         }
 
         concurrent_unordered_map(concurrent_unordered_map&& other) noexcept
-          : map_(HPX_MOVE(other.map_))
         {
+            std::lock_guard<hpx::util::spinlock> lock(other.mutex_);
+            map_ = HPX_MOVE(other.map_);
         }
 
         concurrent_unordered_map& operator=(
