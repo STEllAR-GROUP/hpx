@@ -101,6 +101,48 @@ if(HPX_SERIALIZATION_WITH_ALLOW_CONST_TUPLE_MEMBERS)
   )
 endif()
 
+# HPX_SERIALIZATION_WITH_ALLOW_AUTO_GENERATE flag can be used to enable
+# automatic generation of serialization functions using C++26 reflection
+# capabilities. It is ON by default if HPX is built with C++26 reflection
+# support.
+
+# Default value is determined by the feature test
+set(HPX_SERIALIZATION_WITH_ALLOW_AUTO_GENERATE_DEFAULT OFF)
+if(HPX_WITH_CXX26_EXPERIMENTAL_META)
+  set(HPX_SERIALIZATION_WITH_ALLOW_AUTO_GENERATE_DEFAULT ON)
+endif()
+
+hpx_option(
+  HPX_SERIALIZATION_WITH_ALLOW_AUTO_GENERATE
+  BOOL
+  "Enable automatic generation of serialization functions using C++26 \
+  reflection capabilities. (default: ${HPX_SERIALIZATION_WITH_ALLOW_AUTO_GENERATE_DEFAULT})"
+  ${HPX_SERIALIZATION_WITH_ALLOW_AUTO_GENERATE_DEFAULT}
+  ADVANCED
+  CATEGORY "Modules"
+  MODULE SERIALIZATION
+)
+
+# Force the option to OFF if the compiler lacks support, even if a user tries to
+# force it ON via CLI.
+if(NOT HPX_WITH_CXX26_EXPERIMENTAL_META
+   AND HPX_SERIALIZATION_WITH_ALLOW_AUTO_GENERATE
+)
+  hpx_info(
+    "Disabling HPX_SERIALIZATION_WITH_ALLOW_AUTO_GENERATE: compiler support not detected."
+  )
+  set(HPX_SERIALIZATION_WITH_ALLOW_AUTO_GENERATE
+      OFF
+      CACHE BOOL "" FORCE
+  )
+endif()
+
+if(HPX_SERIALIZATION_WITH_ALLOW_AUTO_GENERATE)
+  hpx_add_config_define_namespace(
+    DEFINE HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE NAMESPACE SERIALIZATION
+  )
+endif()
+
 # Default location is $HPX_ROOT/libs/serialization/include
 set(serialization_headers
     hpx/serialization.hpp
@@ -111,10 +153,13 @@ set(serialization_headers
     hpx/serialization/detail/polymorphic_id_factory.hpp
     hpx/serialization/detail/polymorphic_intrusive_factory.hpp
     hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp
+    hpx/serialization/detail/polymorphic_nonintrusive_factory_impl.hpp
     hpx/serialization/detail/preprocess_container.hpp
     hpx/serialization/detail/raw_ptr.hpp
     hpx/serialization/detail/serialize_collection.hpp
     hpx/serialization/detail/vc.hpp
+    hpx/serialization/detail/refl_qualified_name_of.hpp
+    hpx/serialization/detail/refl_serialize_impl.hpp
     hpx/serialization/array.hpp
     hpx/serialization/bitset.hpp
     hpx/serialization/complex.hpp
