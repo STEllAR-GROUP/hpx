@@ -398,6 +398,80 @@ void test_concurrent_unordered_set_for_each_break()
     HPX_TEST_EQ(count.load(), 50);
 }
 
+// Regression test: move operations must lock other.mutex_ because
+// std::move() on an lvalue doesn't prevent concurrent access from other
+// threads that still hold references to the source object.
+void test_concurrent_vector_move_data_race()
+{
+    constexpr int num_iterations = 1000;
+
+    for (int iter = 0; iter < num_iterations; ++iter)
+    {
+        hpx::concurrent::concurrent_vector<int> src;
+        for (int i = 0; i < 50; ++i)
+            src.push_back(i);
+
+        std::atomic<bool> start{false};
+
+        // Thread A: keeps pushing to src while Thread B moves from it
+        hpx::thread writer([&src, &start] {
+            while (!start.load(std::memory_order_acquire))
+            {
+            }
+            for (int i = 0; i < 10; ++i)
+                src.push_back(i + 100);
+        });
+
+        // Thread B: move-constructs from src
+        hpx::thread mover([&src, &start] {
+            while (!start.load(std::memory_order_acquire))
+            {
+            }
+            hpx::concurrent::concurrent_vector<int> dst(std::move(src));
+            // dst should have received some elements
+            (void) dst.size();
+        });
+
+        start.store(true, std::memory_order_release);
+        writer.join();
+        mover.join();
+    }
+}
+
+void test_concurrent_vector_move_assign_data_race()
+{
+    constexpr int num_iterations = 1000;
+
+    for (int iter = 0; iter < num_iterations; ++iter)
+    {
+        hpx::concurrent::concurrent_vector<int> src;
+        for (int i = 0; i < 50; ++i)
+            src.push_back(i);
+
+        std::atomic<bool> start{false};
+
+        hpx::thread writer([&src, &start] {
+            while (!start.load(std::memory_order_acquire))
+            {
+            }
+            for (int i = 0; i < 10; ++i)
+                src.push_back(i + 100);
+        });
+
+        hpx::concurrent::concurrent_vector<int> dst;
+        hpx::thread mover([&src, &dst, &start] {
+            while (!start.load(std::memory_order_acquire))
+            {
+            }
+            dst = std::move(src);
+        });
+
+        start.store(true, std::memory_order_release);
+        writer.join();
+        mover.join();
+    }
+}
+
 int hpx_main(hpx::program_options::variables_map&)
 {
     test_concurrent_vector();
@@ -414,6 +488,9 @@ int hpx_main(hpx::program_options::variables_map&)
     test_concurrent_unordered_set_for_each_break();
 
     test_concurrent_queue();
+
+    test_concurrent_vector_move_data_race();
+    test_concurrent_vector_move_assign_data_race();
 
     std::cout << "All concurrent data structure tests PASSED!" << std::endl;
 
