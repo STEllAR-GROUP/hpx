@@ -16,10 +16,12 @@
 //     raw iterator value was misinterpreted as base_idx, corrupting every index
 //     passed to the user functor.
 
+#include <hpx/init.hpp>
 #include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/testing.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <numeric>
 #include <vector>
@@ -140,10 +142,57 @@ void test_shared_future_base_idx_propagation()
     HPX_TEST_EQ(seen_count,    expected_count);
 }
 
-int main(int, char*[])
+// ---------------------------------------------------------------------------
+// Test 3: end-to-end parallel algorithm with variable chunk size
+//
+// Run hpx::for_each under par with guided_chunk_size (the canonical executor-
+// parameters type that sets has_variable_chunk_size = true_type).  The
+// partitioner dispatches through the std::true_type overload of
+// get_bulk_iteration_shape, which internally calls
+// get_bulk_iteration_shape_variable.  Every element must be visited exactly
+// once; with the old iterator-advance bug some elements would be visited
+// multiple times or not at all.
+// ---------------------------------------------------------------------------
+void test_parallel_for_each_variable_chunk()
+{
+    constexpr std::size_t total = 100;
+    constexpr std::size_t min_chunk = 3;
+
+    std::vector<std::atomic<int>> visited(total);
+    for (auto& a : visited)
+        a.store(0);
+
+    // Build an index range that we iterate over.
+    std::vector<std::size_t> indices(total);
+    std::iota(indices.begin(), indices.end(), 0u);
+
+    auto policy =
+        hpx::execution::par.with(
+            hpx::execution::experimental::guided_chunk_size(min_chunk));
+
+    hpx::for_each(policy, indices.begin(), indices.end(),
+        [&](std::size_t idx) { visited[idx].fetch_add(1); });
+
+    // Every element must have been visited exactly once.
+    for (std::size_t i = 0; i != total; ++i)
+    {
+        HPX_TEST_EQ(visited[i].load(), 1);
+    }
+}
+
+int hpx_main()
 {
     test_variable_chunk_multi_chunk_traversal();
     test_shared_future_base_idx_propagation();
+    test_parallel_for_each_variable_chunk();
+
+    return hpx::local::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    HPX_TEST_EQ_MSG(hpx::local::init(hpx_main, argc, argv), 0,
+        "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
 }
