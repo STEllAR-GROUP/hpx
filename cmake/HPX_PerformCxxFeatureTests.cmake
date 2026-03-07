@@ -132,10 +132,6 @@ function(hpx_perform_cxx_feature_tests)
       DEFINITIONS HPX_HAVE_CXX20_STD_CONSTRUCT_AT
     )
 
-    hpx_check_for_cxx20_std_default_sentinel(
-      DEFINITIONS HPX_HAVE_CXX20_STD_DEFAULT_SENTINEL
-    )
-
     hpx_check_for_cxx20_std_bit_cast(DEFINITIONS HPX_HAVE_CXX20_STD_BIT_CAST)
 
     hpx_check_for_cxx20_constexpr_destructor(
