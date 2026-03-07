@@ -254,22 +254,27 @@ set(algorithms_compat_headers
 )
 # cmake-format: on
 
-set(algorithms_sources handle_exception_termination_handler.cpp task_group.cpp)
+set(algorithms_sources
+  handle_exception_termination_handler.cpp
+  task_group.cpp
+)
 
 if(HPX_TRACY_WITH_TRACY)
   set(additional_dependencies hpx_tracy)
 endif()
 
 include(HPX_AddModule)
+
 add_hpx_module(
   core algorithms
   GLOBAL_HEADER_GEN ON
   GLOBAL_HEADER_MODULE_GEN ON
   HEADERS ${algorithms_headers}
   COMPAT_HEADERS ${algorithms_compat_headers}
-  ADD_TO_GLOBAL_HEADER "hpx/parallel/util/detail/chunk_size.hpp"
-                       "hpx/parallel/util/detail/chunk_size_iterator.hpp"
-                       "hpx/parallel/util/detail/handle_remote_exceptions.hpp"
+  ADD_TO_GLOBAL_HEADER
+    "hpx/parallel/util/detail/chunk_size.hpp"
+    "hpx/parallel/util/detail/chunk_size_iterator.hpp"
+    "hpx/parallel/util/detail/handle_remote_exceptions.hpp"
   SOURCES ${algorithms_sources}
   MODULE_DEPENDENCIES
     hpx_async_base
@@ -299,5 +304,7 @@ add_hpx_module(
     hpx_type_support
     hpx_util
     ${additional_dependencies}
-  CMAKE_SUBDIRS examples tests
+  CMAKE_SUBDIRS
+    examples
+    tests
 )

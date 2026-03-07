@@ -6,12 +6,12 @@
 
 // Regression tests for two argument-order bugs fixed in chunk_size.hpp:
 //
-//  1. get_bulk_iteration_shape_variable:  next_or_subrange was called with
+//  1. get_bulk_iteration_shape_variable: next_or_subrange was called with
 //     (it_or_r, count, chunk) instead of (it_or_r, chunk, count), causing the
-//     iterator to advance by the *remaining* count rather than the consumed
+//     iterator to advance by the remaining count rather than the consumed
 //     chunk on every iteration after the first.
 //
-//  2. add_ready_future_idx (shared_future<void> overload):  the parameter list
+//  2. add_ready_future_idx (shared_future<void> overload): the parameter list
 //     had (base_idx, first, count) instead of (first, base_idx, count), so the
 //     raw iterator value was misinterpreted as base_idx, corrupting every index
 //     passed to the user functor.
@@ -34,8 +34,8 @@
 // get_bulk_iteration_shape_variable.
 //
 // With the old (buggy) code the iterator stored in shape[i] would point to
-// the wrong position for every chunk after the first, because `count`
-// (remaining elements) was used as the advance offset instead of `chunk`
+// the wrong position for every chunk after the first, because count
+// (remaining elements) was used as the advance offset instead of chunk
 // (elements just consumed).
 // ---------------------------------------------------------------------------
 void test_variable_chunk_multi_chunk_traversal()
@@ -45,9 +45,9 @@ void test_variable_chunk_multi_chunk_traversal()
     constexpr std::size_t min_chunk = 3;    // guided_chunk_size minimum
 
     // guided_chunk_size exposes has_variable_chunk_size = true_type, which
-    // selects get_bulk_iteration_shape_variable inside partitioner::partition.
-    // We call get_bulk_iteration_shape_variable directly so we can inspect the
-    // returned shape without actually dispatching work.
+    // selects get_bulk_iteration_shape_variable inside
+    // partitioner::partition. We call get_bulk_iteration_shape_variable
+    // directly so we can inspect the returned shape without dispatching work.
     auto policy = hpx::execution::par.with(
         hpx::execution::experimental::guided_chunk_size(min_chunk));
 
@@ -72,8 +72,7 @@ void test_variable_chunk_multi_chunk_traversal()
     HPX_TEST_EQ(sum, total);
 
     // Invariant 2: each chunk's starting iterator must equal the cumulative
-    // offset of all previous chunks.  With the old bug, hpx::get<0>(shape[i])
-    // would be wrong for i >= 1.
+    // offset of all previous chunks.
     std::size_t offset = 0;
     for (auto const& s : shape)
     {
@@ -85,8 +84,8 @@ void test_variable_chunk_multi_chunk_traversal()
 }
 
 // ---------------------------------------------------------------------------
-// Test 2: base_idx propagation through add_ready_future_idx (shared_future
-//         overload)
+// Test 2: base_idx propagation through add_ready_future_idx
+//         (shared_future overload)
 //
 // Before the fix, the shared_future<void> overload of add_ready_future_idx
 // had its parameters in the wrong order:
@@ -114,7 +113,8 @@ void test_shared_future_base_idx_propagation()
     std::size_t seen_base_idx = static_cast<std::size_t>(-1);
     std::size_t seen_count = 0;
 
-    auto functor = [&](FwdIter first, std::size_t count, std::size_t base_idx)
+    auto functor =
+        [&](FwdIter first, std::size_t count, std::size_t base_idx)
     {
         seen_first = first;
         seen_base_idx = base_idx;
@@ -127,15 +127,13 @@ void test_shared_future_base_idx_propagation()
 
     std::vector<hpx::shared_future<void>> workitems;
 
-    hpx::parallel::util::detail::add_ready_future_idx(
-        workitems, functor, expected_first, expected_base_idx, expected_count);
+    hpx::parallel::util::detail::add_ready_future_idx(workitems, functor,
+        expected_first, expected_base_idx, expected_count);
 
     // The workitems vector should have received one ready future.
     HPX_TEST_EQ(workitems.size(), 1u);
 
     // The functor must have been called with the correct arguments.
-    // With the old buggy signature the raw address of expected_first would
-    // have been cast to size_t and placed in seen_base_idx instead.
     HPX_TEST_EQ(seen_first, expected_first);
     HPX_TEST_EQ(seen_base_idx, expected_base_idx);
     HPX_TEST_EQ(seen_count, expected_count);
@@ -144,13 +142,12 @@ void test_shared_future_base_idx_propagation()
 // ---------------------------------------------------------------------------
 // Test 3: end-to-end parallel algorithm with variable chunk size
 //
-// Run hpx::for_each under par with guided_chunk_size (the canonical executor-
-// parameters type that sets has_variable_chunk_size = true_type).  The
-// partitioner dispatches through the std::true_type overload of
+// Run hpx::for_each under par with guided_chunk_size (the canonical
+// executor-parameters type that sets has_variable_chunk_size = true_type).
+// The partitioner dispatches through the std::true_type overload of
 // get_bulk_iteration_shape, which internally calls
-// get_bulk_iteration_shape_variable.  Every element must be visited exactly
-// once; with the old iterator-advance bug some elements would be visited
-// multiple times or not at all.
+// get_bulk_iteration_shape_variable. Every element must be visited exactly
+// once.
 // ---------------------------------------------------------------------------
 void test_parallel_for_each_variable_chunk()
 {
@@ -159,7 +156,9 @@ void test_parallel_for_each_variable_chunk()
 
     std::vector<std::atomic<int>> visited(total);
     for (auto& a : visited)
+    {
         a.store(0);
+    }
 
     // Build an index range that we iterate over.
     std::vector<std::size_t> indices(total);
@@ -169,7 +168,10 @@ void test_parallel_for_each_variable_chunk()
         hpx::execution::experimental::guided_chunk_size(min_chunk));
 
     hpx::for_each(policy, indices.begin(), indices.end(),
-        [&](std::size_t idx) { visited[idx].fetch_add(1); });
+        [&](std::size_t idx)
+        {
+            visited[idx].fetch_add(1);
+        });
 
     // Every element must have been visited exactly once.
     for (std::size_t i = 0; i != total; ++i)
