@@ -27,7 +27,7 @@
 namespace hpx::execution::experimental {
 
     namespace detail {
-#if defined(HPX_HAVE_CXX20_PERFECT_PACK_CAPTURE)
+
         HPX_CXX_CORE_EXPORT template <typename F, typename... Ts>
         auto captured_args_then(F&& f, Ts&&... ts)
         {
@@ -38,20 +38,6 @@ namespace hpx::execution::experimental {
                     HPX_FORWARD(Ts, ts)...);
             };
         }
-#else
-        HPX_CXX_CORE_EXPORT template <typename F, typename... Ts>
-        auto captured_args_then(F&& f, Ts&&... ts)
-        {
-            return [f = HPX_FORWARD(F, f),
-                       t = hpx::make_tuple(HPX_FORWARD(Ts, ts)...)](
-                       auto i, auto&& predecessor, auto& v) mutable {
-                v[i] = hpx::invoke_fused(
-                    hpx::bind_front(HPX_FORWARD(F, f), i,
-                        HPX_FORWARD(decltype(predecessor), predecessor)),
-                    HPX_MOVE(t));
-            };
-        }
-#endif
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
