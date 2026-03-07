@@ -12,6 +12,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/config/export_definitions.hpp>
+#include <hpx/config/move.hpp>
+#include <hpx/execution/algorithms/detail/predicates.hpp>
+#include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/executors.hpp>
 #include <hpx/modules/iterator_support.hpp>
@@ -19,18 +23,10 @@
 #include <hpx/parallel/algorithms/detail/search.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
+#include <hpx/type_support/identity.hpp>
 
-#include <cstddef>
 #include <iterator>
 #include <type_traits>
-#include <utility>
-#include <vector>
-#include "hpx/config/export_definitions.hpp"
-#include "hpx/config/move.hpp"
-#include "hpx/execution/algorithms/detail/predicates.hpp"
-#include "hpx/execution/traits/is_execution_policy.hpp"
-#include "hpx/iterator_support/traits/is_iterator.hpp"
-#include "hpx/type_support/identity.hpp"
 
 #if defined(DOXYGEN)
 
@@ -455,9 +451,10 @@ namespace hpx {
                     typename std::iterator_traits<FwdIter>::value_type, T>)
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter>::type tag_fallback_invoke(hpx::search_n_t,
-            ExPolicy&& policy, FwdIter first, FwdIter last, Size count,
-            T const& value, Pred pred = Pred(), Proj proj = Proj())
+            FwdIter>::type
+        tag_fallback_invoke(hpx::search_n_t, ExPolicy&& policy, FwdIter first,
+            FwdIter last, Size count, T const& value, Pred pred = Pred(),
+            Proj proj = Proj())
         {
             return hpx::parallel::detail::search_n<FwdIter, FwdIter>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, count, value,
