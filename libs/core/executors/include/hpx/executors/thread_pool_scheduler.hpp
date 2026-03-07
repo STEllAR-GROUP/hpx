@@ -233,14 +233,12 @@ namespace hpx::execution::experimental {
             {
                 hpx::detail::try_catch_exception_ptr(
                     [&]() {
-                        os.scheduler.execute(
-                            [receiver = HPX_MOVE(os.receiver)]() mutable {
-                                hpx::execution::experimental::set_value(
-                                    HPX_MOVE(receiver));
-                            });
+                        os.scheduler.execute([&os]() mutable {
+                            hpx::execution::experimental::set_value(
+                                HPX_MOVE(os.receiver));
+                        });
                     },
                     [&](std::exception_ptr ep) {
-                        // FIXME: set_error is called on a moved-from object
                         hpx::execution::experimental::set_error(
                             HPX_MOVE(os.receiver), HPX_MOVE(ep));
                     });
