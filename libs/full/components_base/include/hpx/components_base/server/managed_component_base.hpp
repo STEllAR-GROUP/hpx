@@ -182,8 +182,8 @@ namespace hpx::components {
         };
     }    // namespace detail
 
-    template <typename Component, typename Wrapper, typename CtorPolicy,
-        typename DtorPolicy>
+    HPX_CXX_EXPORT template <typename Component, typename Wrapper,
+        typename CtorPolicy, typename DtorPolicy>
     // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
     class managed_component_base : public detail::base_managed_component
     {
@@ -302,7 +302,7 @@ namespace hpx::components {
     /// \tparam Component Component type
     /// \tparam Derived Most derived component type
     ///
-    template <typename Component, typename Derived>
+    HPX_CXX_EXPORT template <typename Component, typename Derived>
     class managed_component
     {
     public:

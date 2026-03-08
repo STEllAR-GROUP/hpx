@@ -28,7 +28,7 @@ namespace hpx {
     ///
     /// \tparam Component  This is the type of the component implementing the
     ///                    action to execute.
-    template <typename Component, typename Enable = void>
+    HPX_CXX_EXPORT template <typename Component, typename Enable = void>
     struct get_lva
     {
         constexpr static Component* call(naming::address_type lva) noexcept

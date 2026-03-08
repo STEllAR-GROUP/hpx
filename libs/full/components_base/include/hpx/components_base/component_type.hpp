@@ -26,7 +26,7 @@ namespace hpx::components {
     // declared in hpx/modules/naming.hpp
     // using component_type = std::int32_t;
 
-    enum class component_enum_type : naming::component_type
+    enum class HPX_CXX_EXPORT component_enum_type : naming::component_type
     {
         invalid = naming::address::component_invalid,
 
