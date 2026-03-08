@@ -4,8 +4,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests chunk_size_iterator chunk_size_idx_iterator
-          test_insertion_sort
+set(tests chunk_size_iterator chunk_size_idx_iterator test_insertion_sort
           test_parallel_stable_sort test_sample_sort test_spin_sort
 )
 
