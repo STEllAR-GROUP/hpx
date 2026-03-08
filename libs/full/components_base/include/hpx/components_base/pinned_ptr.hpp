@@ -69,7 +69,7 @@ namespace hpx::components {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    class pinned_ptr
+    class HPX_CXX_EXPORT pinned_ptr
     {
         template <typename T>
         struct id

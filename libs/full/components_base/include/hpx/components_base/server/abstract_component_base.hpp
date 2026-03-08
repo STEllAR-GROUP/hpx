@@ -16,7 +16,7 @@
 namespace hpx::components {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Component>
+    HPX_CXX_EXPORT template <typename Component>
     // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
     class abstract_component_base : traits::detail::component_tag
     {
@@ -47,7 +47,7 @@ namespace hpx::components {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, typename Wrapper>
+    HPX_CXX_EXPORT template <typename Component, typename Wrapper>
     // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
     class abstract_managed_component_base
       : private traits::detail::managed_component_tag
@@ -79,7 +79,7 @@ namespace hpx::components {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Component>
+    HPX_CXX_EXPORT template <typename Component>
     // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
     class abstract_fixed_component_base
       : private traits::detail::fixed_component_tag

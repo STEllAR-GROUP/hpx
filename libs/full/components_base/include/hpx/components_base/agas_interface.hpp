@@ -36,16 +36,18 @@ namespace hpx::detail {
 namespace hpx::agas {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT bool is_console();
+    HPX_CXX_EXPORT HPX_EXPORT bool is_console();
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT bool register_name(launch::sync_policy, std::string const& name,
-        naming::gid_type const& gid, error_code& ec = throws);
+    HPX_CXX_EXPORT HPX_EXPORT bool register_name(launch::sync_policy,
+        std::string const& name, naming::gid_type const& gid,
+        error_code& ec = throws);
 
-    HPX_EXPORT bool register_name(launch::sync_policy, std::string const& name,
-        hpx::id_type const& id, error_code& ec = throws);
+    HPX_CXX_EXPORT HPX_EXPORT bool register_name(launch::sync_policy,
+        std::string const& name, hpx::id_type const& id,
+        error_code& ec = throws);
 
-    HPX_EXPORT hpx::future<bool> register_name(
+    HPX_CXX_EXPORT HPX_EXPORT hpx::future<bool> register_name(
         std::string const& name, hpx::id_type const& id);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -56,13 +58,13 @@ namespace hpx::agas {
         std::string const& name);
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT hpx::id_type resolve_name(
+    HPX_CXX_EXPORT HPX_EXPORT hpx::id_type resolve_name(
         launch::sync_policy, std::string const& name, error_code& ec = throws);
 
     HPX_EXPORT hpx::future<hpx::id_type> resolve_name(std::string const& name);
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT hpx::future<std::uint32_t> get_num_localities(
+    HPX_CXX_EXPORT HPX_EXPORT hpx::future<std::uint32_t> get_num_localities(
         naming::component_type type = naming::component_invalid);
 
     HPX_EXPORT std::uint32_t get_num_localities(launch::sync_policy,
@@ -92,7 +94,8 @@ namespace hpx::agas {
         launch::sync_policy, error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT std::uint32_t get_locality_id(error_code& ec = throws);
+    HPX_CXX_EXPORT HPX_EXPORT std::uint32_t get_locality_id(
+        error_code& ec = throws);
 
     inline hpx::naming::gid_type get_locality()
     {
