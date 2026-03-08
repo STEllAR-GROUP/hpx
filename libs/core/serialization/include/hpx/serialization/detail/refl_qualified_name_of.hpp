@@ -133,6 +133,23 @@ namespace hpx::serialization::detail {
         static constexpr auto dT = dealias(^^T);
         static constexpr auto scoped_name = scope_builder<dT>::value;
 
+        template <std::size_t I, typename Arg>
+        static consteval auto fragment() noexcept
+        {
+            if constexpr (I == 0)
+                return make_fixed<qualified_name_of<Arg>::get>();
+            else
+                return fixed_string(",") +
+                    make_fixed<qualified_name_of<Arg>::get>();
+        }
+
+        static consteval auto make_args_list() noexcept
+        {
+            return ([]<std::size_t... Is>(std::index_sequence<Is...>) {
+                return (fragment<Is, Args>() + ...);
+            })(std::make_index_sequence<sizeof...(Args)>{});
+        }
+
         // Recursively call qualified_name_of for each arg
         static consteval auto get_args_name() noexcept
         {
@@ -144,12 +161,7 @@ namespace hpx::serialization::detail {
             {
                 // The lambda templ param trick allows this computation
                 // to be done at compile time.
-                // TODO: Is there a more elegant way to do this
-                return []<std::size_t... Is>(std::index_sequence<Is...>) {
-                    return (... +
-                        (fixed_string<(Is == 0 ? 0 : 1)>(Is == 0 ? "" : ",") +
-                            make_fixed<qualified_name_of<Args>::get>()));
-                }(std::make_index_sequence<sizeof...(Args)>{});
+                return make_args_list();
             }
         }
 
