@@ -45,10 +45,10 @@ namespace hpx::resiliency::experimental {
 
                 // launch given function n times
                 auto func = [f = HPX_FORWARD(F, f),
-                                t = hpx::make_tuple(HPX_FORWARD(Ts, ts)...)](
+                                ... ts = HPX_FORWARD(Ts, ts)](
                                 std::size_t) mutable -> result_type {
                     // ignore argument (invocation count of bulk_execute)
-                    return hpx::invoke_fused(f, t);
+                    return HPX_INVOKE(f, ts...);
                 };
 
                 auto&& results = hpx::parallel::execution::bulk_async_execute(
@@ -144,10 +144,10 @@ namespace hpx::resiliency::experimental {
             {
                 // launch given function n times
                 auto func = [f = HPX_FORWARD(F, f),
-                                t = hpx::make_tuple(HPX_FORWARD(Ts, ts)...)](
+                                ... ts = HPX_FORWARD(Ts, ts)](
                                 std::size_t) mutable {
                     // ignore argument (invocation count of bulk_execute)
-                    hpx::invoke_fused(f, t);
+                    HPX_INVOKE(f, ts...);
 
                     // return non-void result to force executor into providing a
                     // future for each invocation (returning void might optimize
