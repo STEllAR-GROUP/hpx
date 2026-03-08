@@ -210,10 +210,17 @@ namespace hpx::execution {
 
         template <typename Executor_>
             requires(std::is_convertible_v<Executor_, parallel_policy_executor>)
-        friend constexpr auto tag_invoke(
+        friend auto tag_invoke(
             hpx::execution::experimental::with_processing_units_count_t,
-            Executor_ const& exec, std::size_t num_cores) noexcept
+            Executor_ const& exec, std::size_t num_cores)
         {
+            if (num_cores == 0)
+            {
+                auto pool = exec.pool_ ?
+                    exec.pool_ :
+                    threads::detail::get_self_or_default_pool();
+                num_cores = pool->get_active_os_thread_count();
+            }
             auto exec_with_num_cores = exec;
             exec_with_num_cores.num_cores_ = num_cores;
 

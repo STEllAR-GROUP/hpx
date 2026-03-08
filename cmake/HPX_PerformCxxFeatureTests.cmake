@@ -116,8 +116,6 @@ function(hpx_perform_cxx_feature_tests)
       DEFINITIONS HPX_HAVE_CXX20_PAREN_INITIALIZATION_OF_AGGREGATES
     )
 
-    hpx_check_for_cxx20_std_endian(DEFINITIONS HPX_HAVE_CXX20_STD_ENDIAN)
-
     hpx_check_for_cxx20_std_execution_policies(
       DEFINITIONS HPX_HAVE_CXX20_STD_EXECUTION_POLICES
     )
@@ -139,8 +137,6 @@ function(hpx_perform_cxx_feature_tests)
     )
 
     hpx_check_for_cxx20_std_bit_cast(DEFINITIONS HPX_HAVE_CXX20_STD_BIT_CAST)
-
-    hpx_check_for_cxx20_std_identity(DEFINITIONS HPX_HAVE_CXX20_STD_IDENTITY)
 
     hpx_check_for_cxx20_constexpr_destructor(
       DEFINITIONS HPX_HAVE_CXX20_CONSTEXPR_DESTRUCTOR
