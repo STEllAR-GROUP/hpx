@@ -56,9 +56,8 @@ void test_variable_chunk_multi_chunk_traversal()
     std::size_t count = total;
     std::size_t cores = 1;
 
-    auto shape =
-        hpx::parallel::util::detail::get_bulk_iteration_shape_variable(
-            policy, it, count, cores);
+    auto shape = hpx::parallel::util::detail::get_bulk_iteration_shape_variable(
+        policy, it, count, cores);
 
     // There must be at least 2 chunks to exercise the multi-chunk path.
     HPX_TEST(shape.size() >= 2u);
@@ -114,8 +113,7 @@ void test_shared_future_base_idx_propagation()
     std::size_t seen_base_idx = static_cast<std::size_t>(-1);
     std::size_t seen_count = 0;
 
-    auto functor = [&](FwdIter first, std::size_t count, std::size_t base_idx)
-    {
+    auto functor = [&](FwdIter first, std::size_t count, std::size_t base_idx) {
         seen_first = first;
         seen_base_idx = base_idx;
         seen_count = count;
