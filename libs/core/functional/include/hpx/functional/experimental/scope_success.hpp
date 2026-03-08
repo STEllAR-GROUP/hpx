@@ -54,8 +54,7 @@ namespace hpx::experimental {
             scope_success& operator=(scope_success const&) = delete;
             scope_success& operator=(scope_success&& rhs) = delete;
 
-            constexpr ~scope_success() noexcept(
-                noexcept(this->f()))
+            constexpr ~scope_success() noexcept(noexcept(this->f()))
             {
                 if (active >= std::uncaught_exceptions())
                 {
