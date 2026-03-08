@@ -36,11 +36,11 @@ void test_search_n1(ExPolicy&& policy, IteratorTag)
     c[mid + 1] = 1;
     c[mid + 2] = 1;
 
-    iterator index = hpx::search_n(policy, iterator(std::begin(c)),
-        iterator(std::end(c)), 3, 1);
+    iterator index = hpx::search_n(
+        policy, iterator(std::begin(c)), iterator(std::end(c)), 3, 1);
 
-    iterator expected = std::search_n(iterator(std::begin(c)),
-        iterator(std::end(c)), 3, 1);
+    iterator expected =
+        std::search_n(iterator(std::begin(c)), iterator(std::end(c)), 3, 1);
 
     HPX_TEST(index == expected);
 }
@@ -57,11 +57,11 @@ void test_search_n1_async(ExPolicy&& p, IteratorTag)
     c[mid + 1] = 1;
     c[mid + 2] = 1;
 
-    hpx::future<iterator> f = hpx::search_n(p, iterator(std::begin(c)),
-        iterator(std::end(c)), 3, 1);
+    hpx::future<iterator> f =
+        hpx::search_n(p, iterator(std::begin(c)), iterator(std::end(c)), 3, 1);
 
-    iterator expected = std::search_n(iterator(std::begin(c)),
-        iterator(std::end(c)), 3, 1);
+    iterator expected =
+        std::search_n(iterator(std::begin(c)), iterator(std::end(c)), 3, 1);
 
     HPX_TEST(f.get() == expected);
 }
@@ -77,8 +77,8 @@ void test_search_n2(ExPolicy&& policy, IteratorTag)
 
     std::vector<int> c(10007, 2);
 
-    iterator index = hpx::search_n(policy, iterator(std::begin(c)),
-        iterator(std::end(c)), 3, 99);
+    iterator index = hpx::search_n(
+        policy, iterator(std::begin(c)), iterator(std::end(c)), 3, 99);
 
     HPX_TEST(index == iterator(std::end(c)));
 }
@@ -91,8 +91,8 @@ void test_search_n2_async(ExPolicy&& p, IteratorTag)
 
     std::vector<int> c(10007, 2);
 
-    hpx::future<iterator> f = hpx::search_n(p, iterator(std::begin(c)),
-        iterator(std::end(c)), 3, 99);
+    hpx::future<iterator> f =
+        hpx::search_n(p, iterator(std::begin(c)), iterator(std::end(c)), 3, 99);
 
     HPX_TEST(f.get() == iterator(std::end(c)));
 }
@@ -111,11 +111,11 @@ void test_search_n3(ExPolicy&& policy, IteratorTag)
     c[1] = 1;
     c[2] = 1;
 
-    iterator index = hpx::search_n(policy, iterator(std::begin(c)),
-        iterator(std::end(c)), 3, 1);
+    iterator index = hpx::search_n(
+        policy, iterator(std::begin(c)), iterator(std::end(c)), 3, 1);
 
-    iterator expected = std::search_n(iterator(std::begin(c)),
-        iterator(std::end(c)), 3, 1);
+    iterator expected =
+        std::search_n(iterator(std::begin(c)), iterator(std::end(c)), 3, 1);
 
     HPX_TEST(index == expected);
 }
@@ -131,11 +131,11 @@ void test_search_n3_async(ExPolicy&& p, IteratorTag)
     c[1] = 1;
     c[2] = 1;
 
-    hpx::future<iterator> f = hpx::search_n(p, iterator(std::begin(c)),
-        iterator(std::end(c)), 3, 1);
+    hpx::future<iterator> f =
+        hpx::search_n(p, iterator(std::begin(c)), iterator(std::end(c)), 3, 1);
 
-    iterator expected = std::search_n(iterator(std::begin(c)),
-        iterator(std::end(c)), 3, 1);
+    iterator expected =
+        std::search_n(iterator(std::begin(c)), iterator(std::end(c)), 3, 1);
 
     HPX_TEST(f.get() == expected);
 }

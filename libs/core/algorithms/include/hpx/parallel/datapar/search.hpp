@@ -23,6 +23,7 @@
 #include <cstddef>
 #include <iterator>
 #include <type_traits>
+#include <utility>
 
 namespace hpx::parallel::detail {
 
@@ -46,19 +47,16 @@ namespace hpx::parallel::detail {
                 part_size, tok,
                 [=, &tok, &op, &proj1, &proj2, &idx](
                     auto, std::size_t i) -> void {
-                    auto begin =
-                        hpx::util::zip_iterator(it + idx, s_first);
+                    auto begin = hpx::util::zip_iterator(it + idx, s_first);
                     ++idx;
                     util::cancellation_token<> local_tok;
                     util::loop_n<hpx::execution::simd_policy>(begin, diff,
                         local_tok,
-                        [&op, &proj1, &proj2,
-                            &local_tok](auto t) -> void {
+                        [&op, &proj1, &proj2, &local_tok](auto t) -> void {
                             using hpx::get;
-                            if (!hpx::parallel::traits::all_of(
-                                    HPX_INVOKE(op,
-                                        HPX_INVOKE(proj1, get<0>(*t)),
-                                        HPX_INVOKE(proj2, get<1>(*t)))))
+                            if (!hpx::parallel::traits::all_of(HPX_INVOKE(op,
+                                    HPX_INVOKE(proj1, get<0>(*t)),
+                                    HPX_INVOKE(proj2, get<1>(*t)))))
                             {
                                 local_tok.cancel();
                             }
@@ -104,8 +102,8 @@ namespace hpx::parallel::detail {
                     util::cancellation_token<> local_tok;
                     util::loop_n<hpx::execution::simd_policy>(start, count,
                         local_tok,
-                        [&pred, &proj, &value_proj,
-                            &local_tok](auto curr) -> void {
+                        [&pred, &proj, &value_proj, &local_tok](
+                            auto curr) -> void {
                             if (!hpx::parallel::traits::all_of(
                                     pred(proj(*curr), value_proj)))
                             {

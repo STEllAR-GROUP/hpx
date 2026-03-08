@@ -53,8 +53,7 @@ namespace hpx::parallel::detail {
             using reference = typename std::iterator_traits<Iter1>::reference;
             Iter1 curr = it;
             util::loop_idx_n<ExPolicy>(base_idx, it, part_size, tok,
-                [diff, count, s_first, &tok, &curr,
-                    op = HPX_FORWARD(Pred, op),
+                [diff, count, s_first, &tok, &curr, op = HPX_FORWARD(Pred, op),
                     proj1 = HPX_FORWARD(Proj1, proj1),
                     proj2 = HPX_FORWARD(Proj2, proj2)](
                     reference v, std::size_t i) mutable -> void {
@@ -110,13 +109,11 @@ namespace hpx::parallel::detail {
                     if (static_cast<difference_type>(abs_idx) >= max_start)
                         return;
                     Iter start = it;
-                    std::advance(start,
-                        static_cast<difference_type>(idx));
+                    std::advance(start, static_cast<difference_type>(idx));
                     ++idx;
                     Iter curr = start;
                     Size matched = 0;
-                    while (matched < count &&
-                        pred(proj(*curr), value_proj))
+                    while (matched < count && pred(proj(*curr), value_proj))
                     {
                         ++curr;
                         ++matched;
@@ -227,9 +224,8 @@ namespace hpx::parallel::detail {
                           std::size_t base_idx) mutable -> void {
                 sequential_search_t<policy_type>{}(it, s_first, base_idx,
                     part_size, static_cast<std::size_t>(diff),
-                    static_cast<std::size_t>(count), tok,
-                    HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
-                    HPX_FORWARD(Proj2, proj2));
+                    static_cast<std::size_t>(count), tok, HPX_FORWARD(Pred, op),
+                    HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
             };
 
             auto f2 = [=](auto&&... data) mutable -> FwdIter {
