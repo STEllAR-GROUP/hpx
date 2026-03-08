@@ -35,9 +35,8 @@ namespace hpx::detail {
     HPX_CXX_CORE_EXPORT template <typename T>
     using empty_vtable_t = typename empty_vtable_type<T>::type;
 
-#if !defined(HPX_MSVC) &&                                                      \
-    defined(HPX_HAVE_CXX20_TRIVIAL_VIRTUAL_DESTRUCTOR) &&                      \
-    !defined(__CUDACC__) && !defined(HPX_COMPUTE_DEVICE_CODE)
+#if !defined(HPX_MSVC) && !defined(__CUDACC__) &&                              \
+    !defined(HPX_COMPUTE_DEVICE_CODE)
     HPX_CXX_CORE_EXPORT template <typename T>
     inline constexpr empty_vtable_t<T> empty_vtable{};
 
@@ -713,7 +712,7 @@ namespace hpx::execution::experimental::detail {
 
 namespace hpx::execution::experimental {
 
-#if defined(HPX_MSVC) || !defined(HPX_HAVE_CXX20_TRIVIAL_VIRTUAL_DESTRUCTOR)
+#if defined(HPX_MSVC)
     namespace detail {
         // This helper only exists to make it possible to use
         // any_(unique_)sender in global variables or in general static that may
@@ -740,7 +739,7 @@ namespace hpx::execution::experimental {
 
     HPX_CXX_CORE_EXPORT template <typename... Ts>
     class unique_any_sender
-#if defined(HPX_MSVC) || !defined(HPX_HAVE_CXX20_TRIVIAL_VIRTUAL_DESTRUCTOR)
+#if defined(HPX_MSVC)
       : private detail::any_sender_static_empty_vtable_helper<Ts...>
 #endif
     {
@@ -817,7 +816,7 @@ namespace hpx::execution::experimental {
 
     HPX_CXX_CORE_EXPORT template <typename... Ts>
     class any_sender
-#if defined(HPX_MSVC) || !defined(HPX_HAVE_CXX20_TRIVIAL_VIRTUAL_DESTRUCTOR)
+#if defined(HPX_MSVC)
       : private detail::any_sender_static_empty_vtable_helper<Ts...>
 #endif
     {
