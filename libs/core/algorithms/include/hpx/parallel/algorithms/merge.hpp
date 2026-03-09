@@ -724,9 +724,7 @@ namespace hpx::parallel {
                 auto const shape_size = std::size(shape);
 
                 if (n <= 0)
-                    return hpx::util::iterator_range{
-                        const_index_value_iterator(0, 0),
-                        const_index_value_iterator(0, 0)};
+                    return hpx::util::iterator_range<const_index_value_iterator>();
 
                 if (cores == 1)
                     return hpx::util::iterator_range{
