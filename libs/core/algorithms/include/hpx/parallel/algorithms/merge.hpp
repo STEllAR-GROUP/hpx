@@ -651,10 +651,68 @@ namespace hpx::parallel {
             }
         }
 
+        class const_index_value_iterator
+          : public hpx::util::iterator_facade<
+                const_index_value_iterator,                    // Derived
+                hpx::tuple<std::size_t, std::size_t> const,    // Value type
+                std::random_access_iterator_tag>
+        {
+        private:
+            // current index and current value to be returned
+            hpx::tuple<std::size_t, std::size_t> data_ = hpx::make_tuple(0, 0);
+
+        public:
+            const_index_value_iterator() = default;
+            explicit constexpr const_index_value_iterator(
+                std::size_t value, std::size_t start = 0) noexcept
+              : data_(start, value)
+            {
+            }
+
+        private:
+            friend class hpx::util::iterator_core_access;
+
+            hpx::tuple<std::size_t, std::size_t> const& dereference()
+                const noexcept
+            {
+                return data_;
+            }
+
+            void increment() noexcept
+            {
+                ++hpx::get<0>(data_);
+            }
+            void decrement() noexcept
+            {
+                --hpx::get<0>(data_);
+            }
+
+            void advance(std::ptrdiff_t n) noexcept
+            {
+                hpx::get<0>(data_) = static_cast<std::size_t>(
+                    static_cast<std::ptrdiff_t>(hpx::get<0>(data_)) + n);
+            }
+
+            std::ptrdiff_t distance_to(
+                const_index_value_iterator const& other) const noexcept
+            {
+                return static_cast<std::ptrdiff_t>(hpx::get<0>(other.data_)) -
+                    static_cast<std::ptrdiff_t>(hpx::get<0>(data_));
+            }
+
+            bool equal(const_index_value_iterator const& other) const noexcept
+            {
+                // Two iterators are equal when indices match and they share
+                // the same value.
+                return data_ == other.data_;
+            }
+        };
+
         HPX_CXX_CORE_EXPORT template <typename T>
         auto get_diagonal_index(T const n)
         {
-            auto diagonal_index = [n](auto&& shape, std::size_t cores) {
+            auto diagonal_index = [n = static_cast<std::size_t>(n)](
+                                      auto&& shape, std::size_t cores) {
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
                 static hpx::util::itt::event notify_event("get diagonal index");
@@ -663,23 +721,27 @@ namespace hpx::parallel {
 #if defined(HPX_HAVE_MODULE_TRACY)
                 hpx::tracy::mark_event evt("get diagonal index");
 #endif
-                std::vector<hpx::tuple<std::size_t, std::size_t>> d_idx;
-
                 auto const shape_size = std::size(shape);
+
                 if (n <= 0)
-                    return d_idx;
+                    return hpx::util::iterator_range{
+                        const_index_value_iterator(0, 0),
+                        const_index_value_iterator(0, 0)};
 
-                std::size_t const nn = static_cast<std::size_t>(n);
+                if (cores == 1)
+                    return hpx::util::iterator_range{
+                        const_index_value_iterator(n),
+                        const_index_value_iterator(n, 0)};
+
                 std::size_t seg = (cores == 0 ? 1 : shape_size);
-                seg = (std::min) (seg, nn);
+                seg = (std::min) (seg, n);
 
-                d_idx.reserve(seg);
+                std::size_t const chunk = (n + seg - 1) / seg;
 
-                std::size_t const chunk = (nn + seg - 1) / seg;
-                for (std::size_t i = 0; i < seg; ++i)
-                    d_idx.emplace_back(i, chunk);
+                auto begin = const_index_value_iterator(chunk);
+                auto end = const_index_value_iterator(chunk, seg);
 
-                return d_idx;
+                return hpx::util::iterator_range{begin, end};
             };
 
             return diagonal_index;
@@ -822,7 +884,7 @@ namespace hpx::parallel {
                 {
                     std::size_t N = len1 + len2;
                     std::size_t k0 = (std::min) (idx * chunk, N);
-                    std::size_t k1 = (std::min) ((idx + 1) * chunk, N);
+                    std::size_t k1 = (std::min) (k0 + chunk, N);
 
                     auto [a0, b0] = diagonal_intersection(
                         first1, len1, first2, len2, k0, comp, proj1, proj2);
