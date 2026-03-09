@@ -729,7 +729,7 @@ namespace hpx::parallel {
                 if (cores == 1)
                     return hpx::util::iterator_range{
                         const_index_value_iterator(n),
-                        const_index_value_iterator(n, 0)};
+                        const_index_value_iterator(n, 1)};
 
                 std::size_t seg = (cores == 0 ? 1 : shape_size);
                 seg = (std::min) (seg, n);
