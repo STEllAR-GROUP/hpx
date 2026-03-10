@@ -27,7 +27,7 @@ namespace hpx::parallel::util::detail {
 
         // Overload for tuple-like types - unpack using index_pack
         template <typename T>
-            requires(hpx::traits::is_tuple_like_v<T>)
+            requires(hpx::traits::is_tuple_like_v<std::decay_t<T>>)
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Result operator()(T&& t)
         {
             using embedded_index_pack_type = hpx::util::make_index_pack<
@@ -48,7 +48,7 @@ namespace hpx::parallel::util::detail {
 
         // Overload for non-tuple types (std::size_t from stdexec bulk)
         template <typename T>
-            requires(!hpx::traits::is_tuple_like_v<T>)
+            requires(!hpx::traits::is_tuple_like_v<std::decay_t<T>>)
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Result operator()(T&& t)
         {
             return HPX_INVOKE_R(Result, f_, HPX_FORWARD(T, t));
