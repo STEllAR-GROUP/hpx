@@ -28,6 +28,7 @@ include(HPX_AddModule)
 add_hpx_module(
   full naming
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${naming_sources}
   HEADERS ${naming_headers}
   COMPAT_HEADERS ${naming_compat_headers}
@@ -35,3 +36,10 @@ add_hpx_module(
   MODULE_DEPENDENCIES hpx_components_base hpx_naming_base
   CMAKE_SUBDIRS examples tests
 )
+
+if(HPX_WITH_CXX_MODULES)
+  set(HPX_NAMING_ENABLED_CXX_MODULES
+      naming
+      CACHE INTERNAL "List of enabled C++ modules for HPX naming" FORCE
+  )
+endif()

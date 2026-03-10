@@ -26,8 +26,7 @@ namespace hpx::components {
     // declared in hpx/modules/naming.hpp
     // using component_type = std::int32_t;
 
-    enum class component_enum_type : naming::component_type
-    {
+    HPX_CXX_EXPORT enum class component_enum_type : naming::component_type {
         invalid = naming::address::component_invalid,
 
         // Runtime support component (provides system services such as
@@ -127,8 +126,7 @@ namespace hpx::components {
 
 #undef HPX_COMPONENT_ENUM_TYPE_ENUM_DEPRECATION_MSG
 
-    enum class factory_state : std::uint8_t
-    {
+    HPX_CXX_EXPORT enum class factory_state : std::uint8_t {
         enabled = 0,
         disabled = 1,
         check = 2

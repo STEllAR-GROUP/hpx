@@ -68,3 +68,10 @@ add_hpx_module(
   MODULE_DEPENDENCIES ${parcelset_base_optional_module_dependencies}
   CMAKE_SUBDIRS examples tests
 )
+
+if(HPX_WITH_CXX_MODULES)
+  set(HPX_PARCELSET_BASE_ENABLED_CXX_MODULES
+      parcelset_base
+      CACHE INTERNAL "List of enabled C++ modules for HPX parcelset_base" FORCE
+  )
+endif()

@@ -105,6 +105,7 @@ include(HPX_AddModule)
 add_hpx_module(
   full components_base
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${components_base_sources}
   HEADERS ${components_base_headers}
   COMPAT_HEADERS ${components_base_compat_headers}
@@ -112,3 +113,11 @@ add_hpx_module(
   MODULE_DEPENDENCIES hpx_naming_base hpx_parcelset_base
   CMAKE_SUBDIRS examples tests
 )
+
+if(HPX_WITH_CXX_MODULES)
+  set(HPX_COMPONENTS_BASE_ENABLED_CXX_MODULES
+      components_base
+      CACHE INTERNAL "List of enabled C++ modules for HPX components_base"
+            FORCE
+  )
+endif()

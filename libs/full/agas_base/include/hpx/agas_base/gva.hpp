@@ -14,6 +14,7 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/naming.hpp>
 #include <hpx/modules/naming_base.hpp>
+#include <hpx/serialization/serialization_fwd.hpp>
 
 #include <cstdint>
 #include <iosfwd>
