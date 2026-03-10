@@ -7,7 +7,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/datastructures/traits/is_tuple_like.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -15,22 +17,6 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::parallel::util::detail {
-
-    // Helper to detect if a type is tuple-like
-    template <typename T, typename = void>
-    struct is_tuple_like : std::false_type
-    {
-    };
-
-    template <typename T>
-    struct is_tuple_like<T,
-        std::void_t<decltype(hpx::tuple_size<std::decay_t<T>>::value)>>
-      : std::true_type
-    {
-    };
-
-    template <typename T>
-    inline constexpr bool is_tuple_like_v = is_tuple_like<T>::value;
 
     // Hand-crafted function object allowing to replace a more complex
     // bind(hpx::functional::invoke_fused(), f1, _1)
@@ -41,7 +27,7 @@ namespace hpx::parallel::util::detail {
 
         // Overload for tuple-like types - unpack using index_pack
         template <typename T>
-            requires(is_tuple_like_v<T>)
+            requires(hpx::traits::is_tuple_like_v<T>)
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Result operator()(T&& t)
         {
             using embedded_index_pack_type = hpx::util::make_index_pack<
@@ -62,7 +48,7 @@ namespace hpx::parallel::util::detail {
 
         // Overload for non-tuple types (std::size_t from stdexec bulk)
         template <typename T>
-            requires(!is_tuple_like_v<T>)
+            requires(!hpx::traits::is_tuple_like_v<T>)
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Result operator()(T&& t)
         {
             return HPX_INVOKE_R(Result, f_, HPX_FORWARD(T, t));
@@ -72,14 +58,16 @@ namespace hpx::parallel::util::detail {
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Result operator()(
             hpx::util::index_pack<Is...>, hpx::tuple<Ts...>& t)
         {
-            return HPX_INVOKE_R(Result, f_, hpx::get<Is>(t)...);
+            return hpx::util::void_guard<Result>(),
+                   HPX_INVOKE(f_, hpx::get<Is>(t)...);
         }
 
         template <std::size_t... Is, typename... Ts>
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Result operator()(
             hpx::util::index_pack<Is...>, hpx::tuple<Ts...> const& t)
         {
-            return HPX_INVOKE_R(Result, f_, hpx::get<Is>(t)...);
+            return hpx::util::void_guard<Result>(),
+                   HPX_INVOKE(f_, hpx::get<Is>(t)...);
         }
 
         template <std::size_t... Is, typename... Ts>
@@ -87,7 +75,8 @@ namespace hpx::parallel::util::detail {
             hpx::util::index_pack<Is...>, hpx::tuple<Ts...>&& t)
         {
             // NOLINTBEGIN(bugprone-use-after-move)
-            return HPX_INVOKE_R(Result, f_, hpx::get<Is>(HPX_MOVE(t))...);
+            return hpx::util::void_guard<Result>(),
+                   HPX_INVOKE(f_, hpx::get<Is>(HPX_MOVE(t))...);
             // NOLINTEND(bugprone-use-after-move)
         }
 

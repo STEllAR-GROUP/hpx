@@ -86,8 +86,8 @@ namespace hpx::execution::experimental::detail {
     }
 
     // For bulk_chunked: f(start, end, ...)
-    template <std::size_t... Is, typename F, typename Start, typename End,
-        typename Ts>
+    HPX_CXX_CORE_EXPORT template <std::size_t... Is, typename F, typename Start,
+        typename End, typename Ts>
     constexpr void bulk_scheduler_invoke_helper_chunked(
         hpx::util::index_pack<Is...>, F&& f, Start&& start, End&& end, Ts& ts)
     {
