@@ -134,7 +134,14 @@ void test_shared_future_base_idx_propagation()
     // The functor must have been called with the correct arguments.
     // With the old buggy signature the raw address of expected_first would
     // have been cast to size_t and placed in seen_base_idx instead.
-    HPX_TEST_EQ(seen_first, expected_first);
+    //
+    // Note: iterators do not support operator<<, so we cannot use
+    // HPX_TEST_EQ directly for seen_first.  Use HPX_TEST (boolean form)
+    // for the iterator comparison and verify the offset separately so
+    // that any failure still produces a meaningful diagnostic.
+    HPX_TEST(seen_first == expected_first);
+    HPX_TEST_EQ(static_cast<std::size_t>(seen_first - data.begin()),
+        static_cast<std::size_t>(expected_first - data.begin()));
     HPX_TEST_EQ(seen_base_idx, expected_base_idx);
     HPX_TEST_EQ(seen_count, expected_count);
 }
