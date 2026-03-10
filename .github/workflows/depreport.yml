@@ -4,7 +4,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-name: Inspect
+name: Depreport
 
 on:
   pull_request:
@@ -15,7 +15,7 @@ on:
   workflow_dispatch:
 
 jobs:
-    inspect:
+    depreport:
         runs-on: ubuntu-latest
         container: stellargroup/build_env:17
 
@@ -79,37 +79,21 @@ jobs:
                     -DHPX_WITH_TESTS_COMMAND_LINE=--hpx:queuing=local-workrequesting-fifo \
                     -DHPX_WITH_TESTS_MAX_THREADS_PER_LOCALITY=2
 
-            - name: Building Inspect Tool
+            - name: Building HPX Dependency Report Tool
               shell: bash
               working-directory: /hpx/build
               run: |
-                ninja -j2 tools.inspect
+                ninja -j2 tools.hpxdep
 
-            - name: Running Inspect Tool
+            - name: Building HPX Dependency Report Documentation
               shell: bash
+              timeout-minutes: 10
               working-directory: /hpx/build
               run: |
-                ./bin/inspect --all --output=./hpx_inspect_report.html /hpx/source
+                ninja -j1 depreport
 
-            - name: Convert inspect HTML output to XML
-              if: always()
-              shell: bash
-              working-directory: /hpx/build
-              run: |
-                mkdir -p /report
-                /hpx/source/tools/inspect/inspect_to_junit.py \
-                    ./hpx_inspect_report.html \
-                    /report/hpx_inspect.xml
-            
-            - name: Upload inspect report
-              if: always()
-              uses: actions/upload-artifact@v7
+            - name: Upload Dependency Report Artifact
+              uses: actions/upload-artifact@v6
               with:
-                name: hpx-inspect-report
-                path: /hpx/build/hpx_inspect_report.html
-
-            - name: Upload inspect binary
-              uses: actions/upload-artifact@v7
-              with:
-                name: inspect-binary
-                path: /hpx/build/bin/inspect
+                name: hpx-depreport
+                path: /hpx/build/share/hpx/docs/report
