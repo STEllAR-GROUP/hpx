@@ -12,25 +12,31 @@
 #pragma once
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_CXX_MODULES) && !defined(HPX_FULL_EXPORTS) &&             \
+    !defined(HPX_COMPILE_BMI)
+import HPX.Full;
+#else
+
 #include <hpx/components_base/traits/managed_component_policies.hpp>
 
 namespace hpx::components {
 
     ///////////////////////////////////////////////////////////////////////
-    class pinned_ptr;
+    HPX_CXX_EXPORT class pinned_ptr;
 
     ///////////////////////////////////////////////////////////////////////
     template <typename Component>
-    class fixed_component;
+    HPX_CXX_EXPORT class fixed_component;
 
     /// The \a component class wraps around a given component type, adding
     /// additional type aliases and constructors. It inherits from the
     /// specified component type.
     template <typename Component>
-    class component;
+    HPX_CXX_EXPORT class component;
 
     template <typename Component, typename Derived = void>
-    class managed_component;
+    HPX_CXX_EXPORT class managed_component;
 
     ///////////////////////////////////////////////////////////////////////
     /// \a component_base serves as a base class for components. It provides
@@ -38,19 +44,21 @@ namespace hpx::components {
     /// retrieval. The template parameter \a Component specifies the
     /// derived component type.
     template <typename Component = void>
-    class component_base;
+    HPX_CXX_EXPORT class component_base;
 
     template <typename Component = void>
-    class fixed_component_base;
+    HPX_CXX_EXPORT class fixed_component_base;
 
     template <typename Component = void>
-    class abstract_component_base;
+    HPX_CXX_EXPORT class abstract_component_base;
 
     template <typename Component, typename Derived = void>
-    class abstract_managed_component_base;
+    HPX_CXX_EXPORT class abstract_managed_component_base;
 
     template <typename Component, typename Wrapper = void,
         typename CtorPolicy = traits::construct_without_back_ptr,
         typename DtorPolicy = traits::managed_object_controls_lifetime>
-    class managed_component_base;
+    HPX_CXX_EXPORT class managed_component_base;
 }    // namespace hpx::components
+
+#endif

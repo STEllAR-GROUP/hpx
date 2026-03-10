@@ -7,6 +7,12 @@
 #pragma once
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_CXX_MODULES) && !defined(HPX_FULL_EXPORTS) &&             \
+    !defined(HPX_COMPILE_BMI)
+import HPX.Full;
+#else
+
 #include <hpx/modules/functional.hpp>
 
 #include <cstdint>
