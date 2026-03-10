@@ -72,6 +72,7 @@ set(tests
     generaten
     is_heap
     is_heap_until
+    iota
     includes
     inclusive_scan
     inclusive_scan_exception
