@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2022 Hartmut Kaiser
+# Copyright (c) 2014-2026 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -34,11 +34,12 @@ set(tests
     forwarding_env_query
     forwarding_scheduler_query
     forwarding_sender_query
+    forward_progress_guarantee
     future_then_executor
     minimal_async_executor
     minimal_sync_executor
     persistent_executor_parameters
-    forward_progress_guarantee
+    rebind_executor_parameters
 )
 
 set(future_then_executor_PARAMETERS THREADS_PER_LOCALITY 4)

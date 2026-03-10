@@ -535,15 +535,6 @@ function(hpx_check_for_cxx20_no_unique_address_attribute)
 endfunction()
 
 # ##############################################################################
-function(hpx_check_for_cxx20_paren_initialization_of_aggregates)
-  add_hpx_config_test(
-    HPX_WITH_CXX20_PAREN_INITIALIZATION_OF_AGGREGATES
-    SOURCE cmake/tests/cxx20_paren_initialization_of_aggregates.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
 function(hpx_check_for_cxx20_std_endian)
   add_hpx_config_test(
     HPX_WITH_CXX20_STD_ENDIAN
@@ -584,15 +575,6 @@ function(hpx_check_for_cxx20_std_bit_cast)
   add_hpx_config_test(
     HPX_WITH_CXX20_STD_BIT_CAST
     SOURCE cmake/tests/cxx20_std_bit_cast.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
-function(hpx_check_for_cxx20_constexpr_destructor)
-  add_hpx_config_test(
-    HPX_WITH_CXX20_CONSTEXPR_DESTRUCTOR
-    SOURCE cmake/tests/cxx20_constexpr_destructor.cpp
     FILE ${ARGN}
   )
 endfunction()

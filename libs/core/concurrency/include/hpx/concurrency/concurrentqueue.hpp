@@ -1881,8 +1881,8 @@ private:
                     }
                 }
                 else {
-                    (void)startBlock;
-                    (void)originalBlockIndexSlotsUsed;
+                    [[maybe_unused]] auto&& _1 = startBlock;
+                    [[maybe_unused]] auto&& _2 = originalBlockIndexSlotsUsed;
                 }
 
                 // Add block to block index

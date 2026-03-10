@@ -87,7 +87,7 @@ class manage_global_runtime
         ~init()
         {
             // Something went wrong while stopping the runtime. Ignore.
-            (void) rts.stop();
+            [[maybe_unused]] auto result = rts.stop();
         }
     };
 

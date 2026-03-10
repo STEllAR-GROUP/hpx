@@ -132,9 +132,9 @@ namespace hpx::threads {
     std::size_t thread_pool_base::get_active_os_thread_count() const
     {
         std::size_t active_os_thread_count = 0;
+        std::size_t const max_cores = get_os_thread_count();
 
-        for (std::size_t thread_num = 0; thread_num < get_os_thread_count();
-            ++thread_num)
+        for (std::size_t thread_num = 0; thread_num < max_cores; ++thread_num)
         {
             if (get_scheduler()->get_state(thread_num).load() <=
                 hpx::state::suspended)

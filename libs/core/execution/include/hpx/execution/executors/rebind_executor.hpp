@@ -87,6 +87,8 @@ namespace hpx::execution::experimental {
     HPX_CXX_CORE_EXPORT inline constexpr struct create_rebound_policy_t final
     {
         template <typename ExPolicy, typename Executor, typename Parameters>
+            requires(hpx::executor_any<Executor> &&
+                hpx::executor_parameters<Parameters>)
         constexpr decltype(auto) operator()(
             ExPolicy&&, Executor&& exec, Parameters&& parameters) const
         {
@@ -95,6 +97,32 @@ namespace hpx::execution::experimental {
 
             return rebound_type(HPX_FORWARD(Executor, exec),
                 HPX_FORWARD(Parameters, parameters));
+        }
+
+        template <typename ExPolicy, typename Executor>
+            requires(hpx::executor_any<Executor>)
+        constexpr decltype(auto) operator()(
+            ExPolicy&& policy, Executor&& exec) const
+        {
+            using parameters_type = std::decay_t<ExPolicy>::parameters_type;
+            using rebound_type =
+                rebind_executor_t<ExPolicy, Executor, parameters_type>;
+
+            return rebound_type(
+                HPX_FORWARD(Executor, exec), policy.parameters());
+        }
+
+        template <typename ExPolicy, typename Parameters>
+            requires(hpx::executor_parameters<Parameters>)
+        constexpr decltype(auto) operator()(
+            ExPolicy&& policy, Parameters&& parameters) const
+        {
+            using executor_type = std::decay_t<ExPolicy>::executor_type;
+            using rebound_type =
+                rebind_executor_t<ExPolicy, executor_type, Parameters>;
+
+            return rebound_type(
+                policy.executor(), HPX_FORWARD(Parameters, parameters));
         }
     } create_rebound_policy{};
 }    // namespace hpx::execution::experimental
