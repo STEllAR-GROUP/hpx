@@ -14,8 +14,10 @@
 #include <hpx/parallel/util/partitioner.hpp>
 
 #include <concepts>
+#include <cstddef>
 #include <iterator>
 #include <type_traits>
+#include <utility>
 
 namespace hpx::parallel::detail {
 
@@ -30,29 +32,29 @@ namespace hpx::parallel::detail {
         return first;
     }
 
-    HPX_CXX_CORE_EXPORT struct sequential_iota_fn
-      : hpx::functional::detail::tag_fallback<sequential_iota_fn>
+    HPX_CXX_CORE_EXPORT struct sequential_iota_t
+      : hpx::functional::detail::tag_fallback<sequential_iota_t>
     {
     private:
         template <typename ExPolicy, typename FwdIter, typename Sent,
             typename T>
         friend constexpr FwdIter tag_fallback_invoke(
-            sequential_iota_fn, ExPolicy&&, FwdIter first, Sent last, T& value)
+            sequential_iota_t, ExPolicy&&, FwdIter first, Sent last, T& value)
         {
             return sequential_iota_helper(first, last, value);
         }
     };
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-    HPX_CXX_CORE_EXPORT inline constexpr sequential_iota_fn sequential_iota =
-        sequential_iota_fn{};
+    HPX_CXX_CORE_EXPORT inline constexpr sequential_iota_t sequential_iota =
+        sequential_iota_t{};
 #else
     HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename FwdIter,
         typename Sent, typename T>
     HPX_HOST_DEVICE HPX_FORCEINLINE FwdIter sequential_iota(
         ExPolicy&& policy, FwdIter first, Sent last, T& value)
     {
-        return sequential_iota_fn{}(
+        return sequential_iota_t{}(
             HPX_FORWARD(ExPolicy, policy), first, last, value);
     }
 #endif
@@ -70,11 +72,7 @@ namespace hpx::parallel::detail {
         // sequential
         template <typename Expolicy, std::input_or_output_iterator FwdIter,
             std::sentinel_for<FwdIter> Sent, std::weakly_incrementable T>
-        // clang-format off
-            requires(
-                std::indirectly_writable<FwdIter, T const&>
-            )
-        // clang-format on
+            requires(std::indirectly_writable<FwdIter, T const&>)
         static FwdIter sequential(
             Expolicy&& policy, FwdIter first, Sent last, T value)
         {
@@ -115,9 +113,9 @@ namespace hpx::parallel::detail {
                 };
 
                 return util::partitioner<Expolicy, FwdIter, FwdIter>::call_with_index(
-                    HPX_FORWARD(Expolicy, policy), 
-                    first, 
-                    dist, 1, 
+                    HPX_FORWARD(Expolicy, policy),
+                    first,
+                    dist, 1,
                     std::move(f),
                     [last = first + dist](auto&&) { return last; });
                 // clang-format on

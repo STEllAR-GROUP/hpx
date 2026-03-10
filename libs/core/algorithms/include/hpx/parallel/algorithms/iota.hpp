@@ -95,14 +95,15 @@ namespace hpx {
 #include <hpx/parallel/util/detail/sender_util.hpp>
 
 #include <concepts>
+#include <iterator>
 #include <type_traits>
 
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::iota
-    HPX_CXX_CORE_EXPORT inline constexpr struct iota_fn final
-      : hpx::detail::tag_parallel_algorithm<iota_fn>
+    HPX_CXX_CORE_EXPORT inline constexpr struct iota_t final
+      : hpx::detail::tag_parallel_algorithm<iota_t>
     {
     private:
         // parallel
@@ -116,7 +117,7 @@ namespace hpx {
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<Expolicy>
         tag_fallback_invoke(
-            iota_fn, Expolicy&& policy, FwdIter first, Sent last, T value)
+            iota_t, Expolicy&& policy, FwdIter first, Sent last, T value)
         {
             using result_type =
                 hpx::parallel::util::detail::algorithm_result<Expolicy>::type;
@@ -129,13 +130,9 @@ namespace hpx {
         // sequential
         template <std::input_or_output_iterator FwdIter,
             std::sentinel_for<FwdIter> Sent, std::weakly_incrementable T>
-        // clang-format off
-            requires(
-                std::indirectly_writable<FwdIter, T const&>
-            )
-        // clang-format on
+            requires(std::indirectly_writable<FwdIter, T const&>)
         friend void tag_fallback_invoke(
-            iota_fn, FwdIter first, Sent last, T value)
+            iota_t, FwdIter first, Sent last, T value)
         {
             hpx::parallel::detail::iota<FwdIter>().call(
                 hpx::execution::seq, first, last, value);
