@@ -767,6 +767,10 @@ namespace hpx::threads::policies {
                         debug::threadinfo<threads::thread_id_ref_type*>(&thrd));
                 }
                 thread_num = select_active_pu(thread_num, allow_fallback);
+                // cppcheck-suppress redundantAssignment
+                domain_num = d_lookup_[thread_num];    //-V519
+                // cppcheck-suppress redundantAssignment
+                q_index = q_lookup_[thread_num];    //-V519
                 break;
             }
             case thread_schedule_hint_mode::thread:
