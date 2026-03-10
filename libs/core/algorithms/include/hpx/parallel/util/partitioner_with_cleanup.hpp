@@ -71,6 +71,12 @@ namespace hpx::parallel::util {
                         hpx::execution_policy_has_scheduler_executor_v<
                             ExPolicy_>;
 
+                    auto p =
+                        hpx::execution::experimental::create_rebound_policy(
+                            policy,
+                            hpx::execution::to_hierarchical_spawning(
+                                policy.executor()));
+
                     if constexpr (has_scheduler_executor)
                     {
                         // Wrap f1 in a variant type to handle exceptions
@@ -113,10 +119,10 @@ namespace hpx::parallel::util {
                                 std::monostate, Result>;
                         using variant_result_type =
                             std::variant<nonvoid_result, std::exception_ptr>;
+
                         auto&& items =
                             detail::partition<variant_result_type, false>(
-                                HPX_FORWARD(ExPolicy_, policy), first, count,
-                                wrapped_f1);
+                                HPX_MOVE(p), first, count, wrapped_f1);
 
                         scoped_params.mark_end_of_scheduling();
 
@@ -126,8 +132,7 @@ namespace hpx::parallel::util {
                     else
                     {
                         auto&& items = detail::partition<Result, false>(
-                            HPX_FORWARD(ExPolicy_, policy), first, count,
-                            HPX_FORWARD(F1, f1));
+                            HPX_MOVE(p), first, count, HPX_FORWARD(F1, f1));
 
                         scoped_params.mark_end_of_scheduling();
 
@@ -304,9 +309,14 @@ namespace hpx::parallel::util {
 
                 try
                 {
+                    auto p =
+                        hpx::execution::experimental::create_rebound_policy(
+                            policy,
+                            hpx::execution::to_hierarchical_spawning(
+                                policy.executor()));
+
                     auto&& items = detail::partition<Result, false>(
-                        HPX_FORWARD(ExPolicy_, policy), first, count,
-                        HPX_FORWARD(F1, f1));
+                        HPX_MOVE(p), first, count, HPX_FORWARD(F1, f1));
 
                     scoped_params->mark_end_of_scheduling();
 
