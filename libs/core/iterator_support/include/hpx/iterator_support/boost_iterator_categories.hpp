@@ -55,27 +55,26 @@ namespace hpx::iterators {
         // This is broken out into a separate meta-function to reduce
         // the cost of instantiating iterator_category_to_traversal, below,
         // for new-style types.
+
+        // clang-format off
         template <typename Cat>
         struct std_category_to_traversal
-          : hpx::util::lazy_conditional<
-                std::is_convertible_v<Cat, std::random_access_iterator_tag>,
-                hpx::type_identity<random_access_traversal_tag>,
-                hpx::util::lazy_conditional<
-                    std::is_convertible_v<Cat, std::bidirectional_iterator_tag>,
-                    hpx::type_identity<bidirectional_traversal_tag>,
-                    hpx::util::lazy_conditional<
-                        std::is_convertible_v<Cat, std::forward_iterator_tag>,
-                        hpx::type_identity<forward_traversal_tag>,
-                        hpx::util::lazy_conditional<
-                            std::is_convertible_v<Cat, std::input_iterator_tag>,
-                            hpx::type_identity<single_pass_traversal_tag>,
-                            hpx::util::lazy_conditional<
-                                std::is_convertible_v<Cat,
-                                    std::output_iterator_tag>,
-                                hpx::type_identity<incrementable_traversal_tag>,
-                                hpx::type_identity<no_traversal_tag>>>>>>
+          : hpx::util::select<
+                std::is_convertible<Cat, std::random_access_iterator_tag>,
+                    random_access_traversal_tag,
+                std::is_convertible<Cat, std::bidirectional_iterator_tag>,
+                    bidirectional_traversal_tag,
+                std::is_convertible<Cat, std::forward_iterator_tag>,
+                    forward_traversal_tag,
+                std::is_convertible<Cat, std::input_iterator_tag>,
+                    single_pass_traversal_tag,
+                std::is_convertible<Cat, std::output_iterator_tag>,
+                    incrementable_traversal_tag,
+                hpx::util::else_t,
+                    no_traversal_tag>
         {
         };
+        // clang-format on
     }    // namespace detail
 
     // Convert an iterator category into a traversal tag
@@ -96,27 +95,26 @@ namespace hpx::iterators {
     };
 
     // Convert an iterator traversal to one of the traversal tags.
+
+    // clang-format off
     HPX_CXX_CORE_EXPORT template <typename Traversal>
     struct pure_traversal_tag
-      : hpx::util::lazy_conditional<
-            std::is_convertible_v<Traversal, random_access_traversal_tag>,
-            hpx::type_identity<random_access_traversal_tag>,
-            hpx::util::lazy_conditional<
-                std::is_convertible_v<Traversal, bidirectional_traversal_tag>,
-                hpx::type_identity<bidirectional_traversal_tag>,
-                hpx::util::lazy_conditional<
-                    std::is_convertible_v<Traversal, forward_traversal_tag>,
-                    hpx::type_identity<forward_traversal_tag>,
-                    hpx::util::lazy_conditional<std::is_convertible_v<Traversal,
-                                                    single_pass_traversal_tag>,
-                        hpx::type_identity<single_pass_traversal_tag>,
-                        hpx::util::lazy_conditional<
-                            std::is_convertible_v<Traversal,
-                                incrementable_traversal_tag>,
-                            hpx::type_identity<incrementable_traversal_tag>,
-                            hpx::type_identity<no_traversal_tag>>>>>>
+      : hpx::util::select<
+            std::is_convertible<Traversal, random_access_traversal_tag>,
+                random_access_traversal_tag,
+            std::is_convertible<Traversal, bidirectional_traversal_tag>,
+                bidirectional_traversal_tag,
+            std::is_convertible<Traversal, forward_traversal_tag>,
+                forward_traversal_tag,
+            std::is_convertible<Traversal, single_pass_traversal_tag>,
+                single_pass_traversal_tag,
+            std::is_convertible<Traversal, incrementable_traversal_tag>,
+                incrementable_traversal_tag,
+            hpx::util::else_t,
+                no_traversal_tag>
     {
     };
+    // clang-format on
 
     // Trait to retrieve one of the iterator traversal tags from the
     // iterator category or traversal.
@@ -161,8 +159,7 @@ namespace hpx {
                 Traversal>;
 
         HPX_CXX_CORE_EXPORT template <typename Traversal>
-        using pure_traversal_tag_t =
-            typename pure_traversal_tag<Traversal>::type;
+        using pure_traversal_tag_t = pure_traversal_tag<Traversal>::type;
 
         HPX_CXX_CORE_EXPORT template <typename Iterator>
         using pure_iterator_traversal =
@@ -171,7 +168,7 @@ namespace hpx {
 
         HPX_CXX_CORE_EXPORT template <typename Iterator>
         using pure_iterator_traversal_t =
-            typename pure_iterator_traversal<Iterator>::type;
+            pure_iterator_traversal<Iterator>::type;
 
         ///////////////////////////////////////////////////////////////////////
         HPX_CXX_CORE_EXPORT template <typename Cat>
@@ -180,7 +177,7 @@ namespace hpx {
 
         HPX_CXX_CORE_EXPORT template <typename Cat>
         using iterator_category_to_traversal_t =
-            typename iterator_category_to_traversal<Cat>::type;
+            iterator_category_to_traversal<Cat>::type;
 
         HPX_CXX_CORE_EXPORT template <typename Iterator>
         using iterator_traversal =
@@ -188,8 +185,7 @@ namespace hpx {
                 Iterator>;
 
         HPX_CXX_CORE_EXPORT template <typename Iterator>
-        using iterator_traversal_t =
-            typename iterator_traversal<Iterator>::type;
+        using iterator_traversal_t = iterator_traversal<Iterator>::type;
     }    // namespace traits
 }    // namespace hpx
 

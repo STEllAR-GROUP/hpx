@@ -39,6 +39,7 @@ tests.unit.modules.algorithms.container_algorithms.find_end_range
 tests.unit.modules.algorithms.container_algorithms.find_end_range2
 tests.unit.modules.algorithms.container_algorithms.find_first_of_range
 tests.unit.modules.algorithms.container_algorithms.find_first_of_range2
+tests.unit.modules.algorithms.container_algorithms.fold_range
 tests.unit.modules.algorithms.container_algorithms.for_loop_exception_range
 tests.unit.modules.algorithms.container_algorithms.for_loop_induction_range
 tests.unit.modules.algorithms.container_algorithms.for_loop_induction_async_range

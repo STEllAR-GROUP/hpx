@@ -466,7 +466,7 @@ namespace hpx::parallel {
                 [[maybe_unused]] ExPolicy&& policy, InIterB first, InIterE last,
                 F&& f, Proj&& proj)
             {
-                if constexpr (hpx::traits::is_random_access_iterator_v<InIterB>)
+                if constexpr (std::random_access_iterator<InIterB>)
                 {
                     return util::loop_n<std::decay_t<ExPolicy>>(first,
                         static_cast<std::size_t>(detail::distance(first, last)),
@@ -487,7 +487,7 @@ namespace hpx::parallel {
             static constexpr InIterB sequential(
                 ExPolicy&&, InIterB first, InIterE last, F&& f, hpx::identity)
             {
-                if constexpr (hpx::traits::is_random_access_iterator_v<InIterB>)
+                if constexpr (std::random_access_iterator<InIterB>)
                 {
                     return util::loop_n_ind<std::decay_t<ExPolicy>>(first,
                         static_cast<std::size_t>(detail::distance(first, last)),
@@ -555,7 +555,7 @@ namespace hpx {
         friend F tag_fallback_invoke(
             hpx::for_each_t, InIter first, InIter last, F f)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Requires at least input iterator.");
 
             if (first != last)
@@ -577,7 +577,7 @@ namespace hpx {
         friend decltype(auto) tag_fallback_invoke(hpx::for_each_t,
             ExPolicy&& policy, FwdIter first, FwdIter last, F f)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::util::detail::algorithm_result<ExPolicy,
@@ -595,14 +595,14 @@ namespace hpx {
         template <typename InIter, typename Size, typename F>
         // clang-format off
             requires (
-                hpx::traits::is_input_iterator_v<InIter> &&
+                std::input_iterator<InIter> &&
                 std::is_integral_v<Size>
             )
         // clang-format on
         friend InIter tag_fallback_invoke(
             hpx::for_each_n_t, InIter first, Size count, F f)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Requires at least input iterator.");
 
             // if count is representing a negative value, we do nothing
@@ -621,14 +621,14 @@ namespace hpx {
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_forward_iterator_v<FwdIter> &&
+                std::forward_iterator<FwdIter> &&
                 std::is_integral_v<Size>
             )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::for_each_n_t,
             ExPolicy&& policy, FwdIter first, Size count, F f)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             constexpr bool has_scheduler_executor =

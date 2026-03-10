@@ -36,7 +36,7 @@ jobs:
                       [ "${{ github.ref_type }}" == "tag" ] ); then
                     DOCUMENTATION_OUTPUT_FORMATS="html;singlehtml;latexpdf"
                   else
-                    DOCUMENTATION_OUTPUT_FORMATS="html"  # ← FIX INDENTATION
+                    DOCUMENTATION_OUTPUT_FORMATS="html"
                   fi
 
                   # Disable Vc for now as otherwise we need to reconfigure during the
@@ -116,7 +116,7 @@ jobs:
               with:
                 path: build
                 key: ${{ runner.os }}-hpx-build-${{ github.sha }}
-                fail-on-cache-miss: true
+                fail-on-cache-miss: false
             
             - name: Building Examples (1)
               shell: bash
@@ -146,7 +146,7 @@ jobs:
 
             - name: Upload test artifacts
               if: always()
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               with:
                   name: tests-example1-artifacts
                   path: build/tests-example1/
@@ -168,7 +168,7 @@ jobs:
               with:
                 path: build
                 key: ${{ runner.os }}-hpx-build-${{ github.sha }}
-                fail-on-cache-miss: true
+                fail-on-cache-miss: false
             
             - name: Building Examples (2)
               shell: bash
@@ -200,7 +200,7 @@ jobs:
 
             - name: Upload test artifacts
               if: always()
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               with:
                   name: tests-example2-artifacts
                   path: build/tests-example2/
@@ -222,7 +222,7 @@ jobs:
               with:
                 path: build
                 key: ${{ runner.os }}-hpx-build-${{ github.sha }}
-                fail-on-cache-miss: true
+                fail-on-cache-miss: false
             
             - name: Building Unit Tests (Algorithms, 1)
               shell: bash
@@ -252,7 +252,7 @@ jobs:
 
             - name: Upload test artifacts
               if: always()
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               with:
                   name: tests-unit1-algorithms-artifacts
                   path: build/tests-unit1-algorithms/
@@ -274,7 +274,7 @@ jobs:
               with:
                 path: build
                 key: ${{ runner.os }}-hpx-build-${{ github.sha }}
-                fail-on-cache-miss: true
+                fail-on-cache-miss: false
             
             - name: Building Unit Tests (Algorithms, 2)
               shell: bash
@@ -304,7 +304,7 @@ jobs:
 
             - name: Upload test artifacts
               if: always()
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               with:
                   name: tests-unit2-algorithms-artifacts
                   path: build/tests-unit2-algorithms/
@@ -326,7 +326,7 @@ jobs:
               with:
                 path: build
                 key: ${{ runner.os }}-hpx-build-${{ github.sha }}
-                fail-on-cache-miss: true
+                fail-on-cache-miss: false
             
             - name: Building Unit Tests (Algorithms, 3)
               shell: bash
@@ -358,7 +358,7 @@ jobs:
 
             - name: Upload test artifacts
               if: always()
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               with:
                   name: tests-unit3-algorithms-artifacts
                   path: build/tests-unit3-algorithms/
@@ -380,7 +380,7 @@ jobs:
               with:
                 path: build
                 key: ${{ runner.os }}-hpx-build-${{ github.sha }}
-                fail-on-cache-miss: true
+                fail-on-cache-miss: false
             
             - name: Building Unit Tests (Algorithms, 4)
               shell: bash
@@ -410,7 +410,7 @@ jobs:
 
             - name: Upload test artifacts
               if: always()
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               with:
                   name: tests-unit4-algorithms-artifacts
                   path: build/tests-unit4-algorithms/
@@ -432,7 +432,7 @@ jobs:
               with:
                 path: build
                 key: ${{ runner.os }}-hpx-build-${{ github.sha }}
-                fail-on-cache-miss: true
+                fail-on-cache-miss: false
             
             - name: Building Unit Tests (Containers Algorithms, 1)
               shell: bash
@@ -464,7 +464,7 @@ jobs:
 
             - name: Upload test artifacts
               if: always()
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               with:
                   name: tests-unit1-container-algorithms-artifacts
                   path: build/tests-unit1-container-algorithms/
@@ -486,7 +486,7 @@ jobs:
               with:
                 path: build
                 key: ${{ runner.os }}-hpx-build-${{ github.sha }}
-                fail-on-cache-miss: true
+                fail-on-cache-miss: false
             
             - name: Building Unit Tests (Containers Algorithms, 2)
               shell: bash
@@ -516,7 +516,7 @@ jobs:
 
             - name: Upload test artifacts
               if: always()
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               with:
                   name: tests-unit2-container-algorithms-artifacts
                   path: build/tests-unit2-container-algorithms/
@@ -538,7 +538,7 @@ jobs:
               with:
                 path: build
                 key: ${{ runner.os }}-hpx-build-${{ github.sha }}
-                fail-on-cache-miss: true
+                fail-on-cache-miss: false
             
             - name: Building Unit Tests (Segmented Algorithms, 1)
               shell: bash
@@ -551,14 +551,16 @@ jobs:
               shell: bash
               working-directory: build
               run: |
-                  ulimit -c unlimited
-                  ctest \
-                    --timeout 180 \
-                    -T test \
-                    --no-compress-output \
-                    --output-on-failure \
-                    --tests-regex \
-                      `grep -v -e ^# -e ^$ $GITHUB_WORKSPACE/.github/test-targets/tests.unit1.segmented_algorithms | sed ':b;N;$!bb;s/\n/|/g'`
+                ulimit -c unlimited
+                ctest \
+                --timeout 180 \
+                -T test \
+                --no-compress-output \
+                --output-on-failure \
+                --tests-regex \
+                  `grep -v -e ^# -e ^$ $GITHUB_WORKSPACE/.github/test-targets/tests.unit1.segmented_algorithms \
+                  | sed 's/tests\.unit\.modules\.segmented_algorithms\./tests.unit.modules.segmented_algorithms.distributed.tcp./g' \
+                  | sed ':b;N;$!bb;s/\n/|/g'`
 
             - name: Collect test artifacts
               if: always()
@@ -568,7 +570,7 @@ jobs:
 
             - name: Upload test artifacts
               if: always()
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               with:
                   name: tests-unit1-segmented-algorithms-artifacts
                   path: build/tests-unit1-segmented-algorithms/
@@ -590,7 +592,7 @@ jobs:
               with:
                 path: build
                 key: ${{ runner.os }}-hpx-build-${{ github.sha }}
-                fail-on-cache-miss: true
+                fail-on-cache-miss: false
             
             - name: Building Unit Tests (Segmented Algorithms, 2)
               shell: bash
@@ -603,15 +605,17 @@ jobs:
               shell: bash
               working-directory: build
               run: |
-                  ulimit -c unlimited
-                  ctest \
-                    --timeout 180 \
-                    -T test \
-                    --no-compress-output \
-                    --output-on-failure \
-                    --tests-regex \
-                      `grep -v -e ^# -e ^$ $GITHUB_WORKSPACE/.github/test-targets/tests.unit2.segmented_algorithms | sed ':b;N;$!bb;s/\n/|/g'`
-
+                ulimit -c unlimited
+                ctest \
+                --timeout 180 \
+                -T test \
+                --no-compress-output \
+                --output-on-failure \
+                --tests-regex \
+                  `grep -v -e ^# -e ^$ $GITHUB_WORKSPACE/.github/test-targets/tests.unit2.segmented_algorithms \
+                  | sed 's/tests\.unit\.modules\.segmented_algorithms\./tests.unit.modules.segmented_algorithms.distributed.tcp./g' \
+                  | sed ':b;N;$!bb;s/\n/|/g'`
+                  
             - name: Collect test artifacts
               if: always()
               uses: ./.github/actions/collect-artifacts
@@ -620,7 +624,7 @@ jobs:
 
             - name: Upload test artifacts
               if: always()
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               with:
                   name: tests-unit2-segmented-algorithms-artifacts
                   path: build/tests-unit2-segmented-algorithms/
@@ -642,7 +646,7 @@ jobs:
               with:
                 path: build
                 key: ${{ runner.os }}-hpx-build-${{ github.sha }}
-                fail-on-cache-miss: true
+                fail-on-cache-miss: false
             
             - name: Building Unit Tests (1)
               shell: bash
@@ -672,7 +676,7 @@ jobs:
 
             - name: Upload test artifacts
               if: always()
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               with:
                   name: tests-unit1-artifacts
                   path: build/tests-unit1/
@@ -694,7 +698,7 @@ jobs:
               with:
                 path: build
                 key: ${{ runner.os }}-hpx-build-${{ github.sha }}
-                fail-on-cache-miss: true
+                fail-on-cache-miss: false
             
             - name: Building Unit Tests (2)
               shell: bash
@@ -726,7 +730,7 @@ jobs:
 
             - name: Upload test artifacts
               if: always()
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               with:
                   name: tests-unit2-artifacts
                   path: build/tests-unit2/
@@ -748,7 +752,7 @@ jobs:
               with:
                 path: build
                 key: ${{ runner.os }}-hpx-build-${{ github.sha }}
-                fail-on-cache-miss: true
+                fail-on-cache-miss: false
             
             - name: Building Unit Tests (3)
               shell: bash
@@ -778,7 +782,7 @@ jobs:
 
             - name: Upload test artifacts
               if: always()
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               with:
                   name: tests-unit3-artifacts
                   path: build/tests-unit3/
@@ -800,7 +804,7 @@ jobs:
               with:
                 path: build
                 key: ${{ runner.os }}-hpx-build-${{ github.sha }}
-                fail-on-cache-miss: true
+                fail-on-cache-miss: false
             
             - name: Building Unit Tests (4)
               shell: bash
@@ -832,7 +836,7 @@ jobs:
 
             - name: Upload test artifacts
               if: always()
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               with:
                   name: tests-unit4-artifacts
                   path: build/tests-unit4/
@@ -854,7 +858,7 @@ jobs:
               with:
                 path: build
                 key: ${{ runner.os }}-hpx-build-${{ github.sha }}
-                fail-on-cache-miss: true
+                fail-on-cache-miss: false
             
             - name: Building Unit Tests (5)
               shell: bash
@@ -884,7 +888,7 @@ jobs:
 
             - name: Upload test artifacts
               if: always()
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               with:
                   name: tests-unit5-artifacts
                   path: build/tests-unit5/
@@ -906,7 +910,7 @@ jobs:
               with:
                 path: build
                 key: ${{ runner.os }}-hpx-build-${{ github.sha }}
-                fail-on-cache-miss: true
+                fail-on-cache-miss: false
             
             - name: Building Regression Tests (1)
               shell: bash
@@ -938,7 +942,7 @@ jobs:
 
             - name: Upload test artifacts
               if: always()
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               with:
                   name: tests-regressions1-artifacts
                   path: build/tests-regressions1/
@@ -960,7 +964,7 @@ jobs:
               with:
                 path: build
                 key: ${{ runner.os }}-hpx-build-${{ github.sha }}
-                fail-on-cache-miss: true
+                fail-on-cache-miss: false
             
             - name: Building Regression Tests (2)
               shell: bash
@@ -996,7 +1000,7 @@ jobs:
 
             - name: Upload test artifacts
               if: always()
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               with:
                   name: tests-regressions2-artifacts
                   path: build/tests-regressions2/
@@ -1018,7 +1022,7 @@ jobs:
               with:
                 path: build
                 key: ${{ runner.os }}-hpx-build-${{ github.sha }}
-                fail-on-cache-miss: true
+                fail-on-cache-miss: false
             
             - name: Building Header Tests (part 1/1)
               shell: bash
@@ -1035,7 +1039,7 @@ jobs:
 
             - name: Upload test artifacts
               if: always()
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               with:
                   name: tests-headers1_1-artifacts
                   path: build/tests-headers1_1/
@@ -1057,7 +1061,7 @@ jobs:
               with:
                 path: build
                 key: ${{ runner.os }}-hpx-build-${{ github.sha }}
-                fail-on-cache-miss: true
+                fail-on-cache-miss: false
 
             - name: Building Header Tests (part 1/2)
               shell: bash
@@ -1074,7 +1078,7 @@ jobs:
 
             - name: Upload test artifacts
               if: always()
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               with:
                   name: tests-headers1_2-artifacts
                   path: build/tests-headers1_2/
@@ -1096,7 +1100,7 @@ jobs:
               with:
                 path: build
                 key: ${{ runner.os }}-hpx-build-${{ github.sha }}
-                fail-on-cache-miss: true
+                fail-on-cache-miss: false
 
             - name: Building Header Tests (part 2/1)
               shell: bash
@@ -1113,7 +1117,7 @@ jobs:
 
             - name: Upload test artifacts
               if: always()
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               with:
                   name: tests-headers2_1-artifacts
                   path: build/tests-headers2_1/
@@ -1135,7 +1139,7 @@ jobs:
               with:
                 path: build
                 key: ${{ runner.os }}-hpx-build-${{ github.sha }}
-                fail-on-cache-miss: true
+                fail-on-cache-miss: false
 
             - name: Building Header Tests (part 2/2)
               shell: bash
@@ -1152,7 +1156,7 @@ jobs:
 
             - name: Upload test artifacts
               if: always()
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               with:
                   name: tests-headers2_2-artifacts
                   path: build/tests-headers2_2/
@@ -1174,7 +1178,7 @@ jobs:
               with:
                 path: build
                 key: ${{ runner.os }}-hpx-build-${{ github.sha }}
-                fail-on-cache-miss: true
+                fail-on-cache-miss: false
 
             - name: Building Header Tests (part 2/3)
               shell: bash
@@ -1191,7 +1195,7 @@ jobs:
 
             - name: Upload test artifacts
               if: always()
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               with:
                   name: tests-headers2_3-artifacts
                   path: build/tests-headers2_3/
@@ -1213,7 +1217,7 @@ jobs:
               with:
                 path: build
                 key: ${{ runner.os }}-hpx-build-${{ github.sha }}
-                fail-on-cache-miss: true
+                fail-on-cache-miss: false
 
             - name: Building Header Tests (part 3/1)
               shell: bash
@@ -1230,7 +1234,7 @@ jobs:
 
             - name: Upload test artifacts
               if: always()
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               with:
                   name: tests-headers3_1-artifacts
                   path: build/tests-headers3_1/
@@ -1252,7 +1256,7 @@ jobs:
               with:
                 path: build
                 key: ${{ runner.os }}-hpx-build-${{ github.sha }}
-                fail-on-cache-miss: true
+                fail-on-cache-miss: false
 
             - name: Building Header Tests (part 3/2)
               shell: bash
@@ -1269,7 +1273,7 @@ jobs:
 
             - name: Upload test artifacts
               if: always()
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               with:
                   name: tests-headers3_2-artifacts
                   path: build/tests-headers3_2/
@@ -1291,7 +1295,7 @@ jobs:
               with:
                 path: build
                 key: ${{ runner.os }}-hpx-build-${{ github.sha }}
-                fail-on-cache-miss: true
+                fail-on-cache-miss: false
 
             - name: Building Header Tests (part 4/1)
               shell: bash
@@ -1308,7 +1312,7 @@ jobs:
 
             - name: Upload test artifacts
               if: always()
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               with:
                   name: tests-headers4_1-artifacts
                   path: build/tests-headers4_1/
@@ -1330,7 +1334,7 @@ jobs:
               with:
                 path: build
                 key: ${{ runner.os }}-hpx-build-${{ github.sha }}
-                fail-on-cache-miss: true
+                fail-on-cache-miss: false
 
             - name: Building Header Tests (part 4/2)
               shell: bash
@@ -1347,7 +1351,7 @@ jobs:
 
             - name: Upload test artifacts
               if: always()
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               with:
                   name: tests-headers4_2-artifacts
                   path: build/tests-headers4_2/
@@ -1369,7 +1373,7 @@ jobs:
               with:
                 path: build
                 key: ${{ runner.os }}-hpx-build-${{ github.sha }}
-                fail-on-cache-miss: true
+                fail-on-cache-miss: false
 
             - name: Building Performance Tests
               shell: bash

@@ -35,7 +35,9 @@
 #include <cstddef>
 #include <cstdint>
 #include <exception>
+#include <iterator>
 #include <optional>
+#include <ranges>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -344,19 +346,25 @@ namespace hpx::execution::experimental::detail {
         }
 
         // Initialize a queue for a worker thread.
-        void init_queue_depth_first(std::uint32_t const worker_thread,
-            std::uint32_t const size, std::uint32_t num_threads) noexcept
+        void init_queue_depth_first(std::size_t const worker_thread,
+            std::size_t const size, std::size_t num_threads) noexcept
         {
             auto& queue = op_state->queues[worker_thread].data_;
-            auto const part_begin = static_cast<std::uint32_t>(
-                (worker_thread * size) / num_threads);
-            auto const part_end = static_cast<std::uint32_t>(
-                ((worker_thread + 1) * size) / num_threads);
-            queue.reset(part_begin, part_end);
+            auto const part_begin = (worker_thread * size) / num_threads;
+            auto const part_end = ((worker_thread + 1) * size) / num_threads;
+
+            HPX_ASSERT_MSG(
+                size <= static_cast<std::size_t>(
+                            (std::numeric_limits<std::uint32_t>::max)()),
+                "init_queue_depth_first: ranges larger than "
+                "UINT32_MAX are not supported");
+
+            queue.reset(static_cast<std::uint32_t>(part_begin),
+                static_cast<std::uint32_t>(part_end));
         }
 
-        void init_queue_breadth_first(std::uint32_t const worker_thread,
-            std::uint32_t const size, std::uint32_t num_threads) noexcept
+        void init_queue_breadth_first(std::size_t const worker_thread,
+            std::size_t const size, std::size_t num_threads) noexcept
         {
             auto& queue = op_state->queues[worker_thread].data_;
             auto const num_steps = size / num_threads + 1;
@@ -368,7 +376,16 @@ namespace hpx::execution::experimental::detail {
             {
                 part_end -= remainder;
             }
-            queue.reset(part_begin, part_end, num_threads);
+
+            HPX_ASSERT_MSG(
+                size <= static_cast<std::size_t>(
+                            (std::numeric_limits<std::uint32_t>::max)()),
+                "init_queue_breadth_first: ranges larger than "
+                "UINT32_MAX are not supported");
+
+            queue.reset(static_cast<std::uint32_t>(part_begin),
+                static_cast<std::uint32_t>(part_end),
+                static_cast<std::uint32_t>(num_threads));
         }
 
         // Spawn a task which will process a number of chunks. If the queue
@@ -430,7 +447,7 @@ namespace hpx::execution::experimental::detail {
         }
 
         using range_value_type =
-            hpx::traits::iter_value_t<hpx::traits::range_iterator_t<Shape>>;
+            hpx::traits::iter_value_t<std::ranges::iterator_t<Shape>>;
 
         template <typename... Ts>
         void execute(Ts&&... ts)

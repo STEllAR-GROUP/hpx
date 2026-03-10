@@ -321,11 +321,8 @@ hpx_option(
   ADVANCED
 )
 if(HPX_WITH_CXX_MODULES)
-  if(NOT (CMAKE_VERSION VERSION_GREATER_EQUAL "3.29"))
-    hpx_fatal(
-      "Please use a version of CMake newer than V3.28 in order to enable C++ module support for HPX"
-    )
-  endif()
+  include(HPX_CXXModules)
+  hpx_check_cxx_modules_support()
 
   hpx_info(
     "HPX will build and install C++20 module interface units for downstream users."
@@ -2601,15 +2598,14 @@ endif()
 # Only set debug postfix for Debug builds to maintain ABI separation
 get_property(is_multi_config GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 if(is_multi_config OR CMAKE_BUILD_TYPE STREQUAL "Debug")
-  if(NOT DEFINED HPX_DEBUG_POSTFIX)
-    set(HPX_DEBUG_POSTFIX
-        "d"
-        CACHE STRING "Postfix for debug libraries"
-    )
-  endif()
-  set(CMAKE_DEBUG_POSTFIX "${HPX_DEBUG_POSTFIX}")
-  if(NOT "${HPX_DEBUG_POSTFIX}" STREQUAL "")
-    hpx_add_config_define(HPX_DEBUG_POSTFIX "${HPX_DEBUG_POSTFIX}")
+  hpx_option(
+    HPX_WITH_DEBUG_POSTFIX STRING
+    "Postfix for debug libraries. (default: \"d\")" "d" ADVANCED
+    CATEGORY "Build Targets"
+  )
+  set(CMAKE_DEBUG_POSTFIX "${HPX_WITH_DEBUG_POSTFIX}")
+  if(NOT "${HPX_WITH_DEBUG_POSTFIX}" STREQUAL "")
+    hpx_add_config_define(HPX_HAVE_DEBUG_POSTFIX "${HPX_WITH_DEBUG_POSTFIX}")
   endif()
 endif()
 

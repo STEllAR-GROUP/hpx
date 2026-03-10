@@ -39,6 +39,7 @@ namespace hpx::config_registry {
 
     [[nodiscard]] HPX_CONFIG_REGISTRY_EXPORT std::vector<module_config> const&
     get_module_configs();
+
     HPX_CONFIG_REGISTRY_EXPORT void add_module_config(
         module_config const& config);
 

@@ -128,16 +128,16 @@ namespace hpx { namespace ranges {
     /// invoked without an execution policy object will execute in sequential
     /// order in the calling thread.
     ///
-    /// \note The type of dereferenced \a hpx::traits::range_iterator_t<Rng>
+    /// \note The type of dereferenced \a std::ranges::iterator_t<Rng>
     ///       must meet the requirements of \a MoveAssignable.
     ///
     /// \returns  The \a shift_left algorithm returns \a
-    ///           hpx::traits::range_iterator_t<Rng>.
+    ///           std::ranges::iterator_t<Rng>.
     ///           The \a shift_left algorithm returns an iterator to the
     ///           end of the resulting range.
     ///
     template <typename Rng, typename Size>
-    hpx::traits::range_iterator_t<Rng> shift_left(Rng&& rng, Size n);
+    std::ranges::iterator_t<Rng> shift_left(Rng&& rng, Size n);
 
     ///////////////////////////////////////////////////////////////////////////
     /// Shifts the elements in the range [first, last) by n positions towards
@@ -173,21 +173,21 @@ namespace hpx { namespace ranges {
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \note The type of dereferenced \a hpx::traits::range_iterator_t<Rng>
+    /// \note The type of dereferenced \a std::ranges::iterator_t<Rng>
     ///       must meet the requirements of \a MoveAssignable.
     ///
     /// \returns  The \a shift_left algorithm returns a
-    ///           \a hpx::future<hpx::traits::range_iterator_t<Rng>> if
+    ///           \a hpx::future<std::ranges::iterator_t<Rng>> if
     ///           the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a hpx::traits::range_iterator_t<Rng> otherwise.
+    ///           returns \a std::ranges::iterator_t<Rng> otherwise.
     ///           The \a shift_left algorithm returns an iterator to the
     ///           end of the resulting range.
     ///
     template <typename ExPolicy, typename Rng, typename Size>
     typename parallel::util::detail::algorithm_result<ExPolicy,
-        hpx::traits::range_iterator_t<Rng>>
+        std::ranges::iterator_t<Rng>>
     shift_left(ExPolicy&& policy, Rng&& rng, Size n);
 
     // clang-format on
@@ -200,6 +200,8 @@ namespace hpx { namespace ranges {
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/parallel/algorithms/shift_left.hpp>
 
+#include <iterator>
+#include <ranges>
 #include <type_traits>
 #include <utility>
 
@@ -213,14 +215,14 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::traits::is_iterator_v<FwdIter> &&
-                hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
+                std::sentinel_for<Sent, FwdIter> &&
                 std::is_integral_v<Size>
             )
         // clang-format on
         friend FwdIter tag_fallback_invoke(
             hpx::ranges::shift_left_t, FwdIter first, Sent last, Size n)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::shift_left<FwdIter>().call(
@@ -233,7 +235,7 @@ namespace hpx::ranges {
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
-                hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
+                std::sentinel_for<Sent, FwdIter> &&
                 std::is_integral_v<Size>
             )
         // clang-format on
@@ -242,7 +244,7 @@ namespace hpx::ranges {
         tag_fallback_invoke(hpx::ranges::shift_left_t, ExPolicy&& policy,
             FwdIter first, Sent last, Size n)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::shift_left<FwdIter>().call(
@@ -252,19 +254,18 @@ namespace hpx::ranges {
         template <typename Rng, typename Size>
         // clang-format off
             requires(
-                hpx::traits::is_range_v<Rng> &&
+                std::ranges::range<Rng> &&
                 std::is_integral_v<Size>
             )
         // clang-format on
-        friend hpx::traits::range_iterator_t<Rng> tag_fallback_invoke(
+        friend std::ranges::iterator_t<Rng> tag_fallback_invoke(
             hpx::ranges::shift_left_t, Rng&& rng, Size n)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<
-                              hpx::traits::range_iterator_t<Rng>>,
+            static_assert(std::forward_iterator<std::ranges::iterator_t<Rng>>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::shift_left<
-                hpx::traits::range_iterator_t<Rng>>()
+                std::ranges::iterator_t<Rng>>()
                 .call(hpx::execution::seq, std::begin(rng), std::end(rng), n);
         }
 
@@ -272,21 +273,20 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                std::ranges::range<Rng> &&
                 std::is_integral_v<Size>
             )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
-            hpx::traits::range_iterator_t<Rng>>
+            std::ranges::iterator_t<Rng>>
         tag_fallback_invoke(
             hpx::ranges::shift_left_t, ExPolicy&& policy, Rng&& rng, Size n)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<
-                              hpx::traits::range_iterator_t<Rng>>,
+            static_assert(std::forward_iterator<std::ranges::iterator_t<Rng>>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::shift_left<
-                hpx::traits::range_iterator_t<Rng>>()
+                std::ranges::iterator_t<Rng>>()
                 .call(HPX_FORWARD(ExPolicy, policy), std::begin(rng),
                     std::end(rng), n);
         }

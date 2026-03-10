@@ -292,28 +292,6 @@ namespace hpx::util {
         {
         };
 
-        template <typename Iterator, typename Value>
-        struct operator_brackets_result
-        {
-            using type = std::conditional_t<
-                use_operator_brackets_proxy<Iterator, Value>::value,
-                operator_brackets_proxy<Iterator>, Value>;
-        };
-
-        template <typename Iterator>
-        HPX_HOST_DEVICE operator_brackets_proxy<Iterator>
-        make_operator_brackets_result(Iterator const& iter, std::true_type)
-        {
-            return operator_brackets_proxy<Iterator>(iter);
-        }
-
-        template <typename Iterator>
-        HPX_HOST_DEVICE typename Iterator::value_type
-        make_operator_brackets_result(Iterator const& iter, std::false_type)
-        {
-            return *iter;
-        }
-
         template <typename Derived, typename T, typename Reference,
             typename Distance, typename Pointer>
         class iterator_facade_base<Derived, T, std::random_access_iterator_tag,
@@ -334,12 +312,19 @@ namespace hpx::util {
 
             HPX_HOST_DEVICE iterator_facade_base() = default;
 
-            HPX_HOST_DEVICE constexpr auto operator[](difference_type n) const
+            HPX_HOST_DEVICE constexpr decltype(auto) operator[](
+                difference_type n) const
             {
                 using use_proxy = use_operator_brackets_proxy<Derived, T>;
-
-                return make_operator_brackets_result<Derived>(
-                    this->derived() + n, use_proxy{});
+                if constexpr (use_proxy::value)
+                {
+                    return operator_brackets_proxy<Derived>(
+                        this->derived() + n);
+                }
+                else
+                {
+                    return *(this->derived() + n);
+                }
             }
 
             HPX_HOST_DEVICE Derived& operator+=(difference_type n) noexcept(

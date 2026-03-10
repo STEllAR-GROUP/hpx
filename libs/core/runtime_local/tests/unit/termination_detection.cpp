@@ -1,4 +1,4 @@
-// Copyright (c) 2025 Arpit Khandelwal
+// Copyright (c) 2026 Arpit Khandelwal
 //
 // SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,8 +6,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/async.hpp>
-#include <hpx/include/post.hpp>
+#include <hpx/modules/async_local.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/testing.hpp>

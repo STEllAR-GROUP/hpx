@@ -648,7 +648,7 @@ namespace hpx::threads::policies {
         {
             auto& d = data_[num_thread].data_;
             bool empty = d.queue_->cleanup_terminated(delete_all);
-            empty = d.queue_->cleanup_terminated(delete_all) && empty;
+            empty = d.bound_queue_->cleanup_terminated(delete_all) && empty;
             if (!delete_all)
                 return empty;
 

@@ -508,15 +508,6 @@ function(hpx_check_for_cxx20_source_location)
 endfunction()
 
 # ##############################################################################
-function(hpx_check_for_cxx20_perfect_pack_capture)
-  add_hpx_config_test(
-    HPX_WITH_CXX20_PERFECT_PACK_CAPTURE
-    SOURCE cmake/tests/cxx20_perfect_pack_capture.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
 function(hpx_check_for_pthread_setname_np)
   add_hpx_config_test(
     HPX_WITH_PTHREAD_SETNAME_NP
@@ -539,24 +530,6 @@ function(hpx_check_for_cxx20_no_unique_address_attribute)
   add_hpx_config_test(
     HPX_WITH_CXX20_NO_UNIQUE_ADDRESS_ATTRIBUTE
     SOURCE cmake/tests/cxx20_no_unique_address_attribute.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
-function(hpx_check_for_cxx20_paren_initialization_of_aggregates)
-  add_hpx_config_test(
-    HPX_WITH_CXX20_PAREN_INITIALIZATION_OF_AGGREGATES
-    SOURCE cmake/tests/cxx20_paren_initialization_of_aggregates.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
-function(hpx_check_for_cxx20_std_disable_sized_sentinel_for)
-  add_hpx_config_test(
-    HPX_WITH_CXX20_STD_DISABLE_SIZED_SENTINEL_FOR
-    SOURCE cmake/tests/cxx20_std_disable_sized_sentinel_for.cpp
     FILE ${ARGN}
   )
 endfunction()
@@ -589,15 +562,6 @@ function(hpx_check_for_cxx20_std_ranges_iter_swap)
 endfunction()
 
 # ##############################################################################
-function(hpx_check_for_cxx20_trivial_virtual_destructor)
-  add_hpx_config_test(
-    HPX_WITH_CXX20_TRIVIAL_VIRTUAL_DESTRUCTOR
-    SOURCE cmake/tests/cxx20_trivial_virtual_destructor.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
 function(hpx_check_for_cxx20_std_construct_at)
   add_hpx_config_test(
     HPX_WITH_CXX20_STD_CONSTRUCT_AT
@@ -607,37 +571,10 @@ function(hpx_check_for_cxx20_std_construct_at)
 endfunction()
 
 # ##############################################################################
-function(hpx_check_for_cxx20_std_default_sentinel)
-  add_hpx_config_test(
-    HPX_WITH_CXX20_STD_DEFAULT_SENTINEL
-    SOURCE cmake/tests/cxx20_std_default_sentinel.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
 function(hpx_check_for_cxx20_std_bit_cast)
   add_hpx_config_test(
     HPX_WITH_CXX20_STD_BIT_CAST
     SOURCE cmake/tests/cxx20_std_bit_cast.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
-function(hpx_check_for_cxx20_std_identity)
-  add_hpx_config_test(
-    HPX_WITH_CXX20_STD_IDENTITY
-    SOURCE cmake/tests/cxx20_std_identity.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
-function(hpx_check_for_cxx20_constexpr_destructor)
-  add_hpx_config_test(
-    HPX_WITH_CXX20_CONSTEXPR_DESTRUCTOR
-    SOURCE cmake/tests/cxx20_constexpr_destructor.cpp
     FILE ${ARGN}
   )
 endfunction()
@@ -691,6 +628,24 @@ function(hpx_check_for_mm_prefetch)
   add_hpx_config_test(
     HPX_WITH_MM_PREFETCH
     SOURCE cmake/tests/mm_prefetch.cpp
+    FILE ${ARGN}
+  )
+endfunction()
+
+# ##############################################################################
+function(hpx_check_for_cxx23_std_unordered_transparent_erase)
+  add_hpx_config_test(
+    HPX_WITH_CXX23_STD_UNORDERED_TRANSPARENT_ERASE
+    SOURCE cmake/tests/cxx23_std_unordered_transparent_erase.cpp
+    FILE ${ARGN}
+  )
+endfunction()
+
+# ##############################################################################
+function(hpx_check_for_cxx26_std_unordered_transparent_lookup)
+  add_hpx_config_test(
+    HPX_WITH_CXX26_STD_UNORDERED_TRANSPARENT_LOOKUP
+    SOURCE cmake/tests/cxx26_std_unordered_transparent_lookup.cpp
     FILE ${ARGN}
   )
 endfunction()

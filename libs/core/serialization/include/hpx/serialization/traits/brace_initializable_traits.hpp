@@ -122,18 +122,6 @@ namespace hpx::traits {
             return {};
         }
 
-#if !defined(HPX_HAVE_CXX20_PAREN_INITIALIZATION_OF_AGGREGATES)
-#define MAKE_ARITY_FUNC(count)                                                 \
-    HPX_CXX_CORE_EXPORT template <typename T,                                  \
-        typename Enable =                                                      \
-            std::enable_if_t < traits::is_brace_constructible<T, count>() &&   \
-            !traits::is_brace_constructible<T, count + 1>() &&                 \
-            !traits::is_paren_constructible<T, count>() >>                     \
-                constexpr size<count> arity() noexcept                         \
-    {                                                                          \
-        return {};                                                             \
-    }
-#else
 #define MAKE_ARITY_FUNC(count)                                                 \
     HPX_CXX_CORE_EXPORT template <typename T,                                  \
         typename Enable =                                                      \
@@ -144,7 +132,6 @@ namespace hpx::traits {
     {                                                                          \
         return {};                                                             \
     }
-#endif
 
         MAKE_ARITY_FUNC(1)
         MAKE_ARITY_FUNC(2)

@@ -51,7 +51,7 @@ namespace hpx::experimental {
             scope_exit& operator=(scope_exit const&) = delete;
             scope_exit& operator=(scope_exit&& rhs) = delete;
 
-            HPX_CONSTEXPR_DESTRUCTOR ~scope_exit() noexcept
+            constexpr ~scope_exit() noexcept
             {
                 if (active)
                 {
