@@ -17,6 +17,11 @@
 #include <iterator>
 #include <type_traits>
 
+namespace hpx::compute {
+    template <typename T, typename Allocator>
+    class vector;
+}
+
 namespace hpx::compute::detail {
 
     HPX_CXX_CORE_EXPORT template <typename T, typename Allocator>
@@ -49,7 +54,10 @@ namespace hpx::compute::detail {
         {
         }
 
-        // FIXME: should be private
+    private:
+        template <typename U, typename AllocatorU>
+        friend class hpx::compute::vector;
+
         HPX_HOST_DEVICE
         iterator(typename traits::allocator_traits<Allocator>::pointer p,
             std::size_t pos, target_type const& target) noexcept
@@ -57,6 +65,8 @@ namespace hpx::compute::detail {
           , target_(&target)
         {
         }
+
+    public:
 
         HPX_HOST_DEVICE iterator(iterator const& other) noexcept
           : base_type(other)

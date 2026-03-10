@@ -240,8 +240,47 @@ namespace hpx::compute {
             return *(data_ + pos);
         }
 
-        // TODO: implement front()
-        // TODO: implement back()
+        /// Returns a reference to the first element in the container.
+        /// Calling front on an empty container is undefined.
+        HPX_HOST_DEVICE
+        reference front()
+        {
+#if !defined(__CUDA_ARCH__)
+            HPX_ASSERT(!empty());
+#endif
+            return *data_;
+        }
+
+        /// \copydoc front()
+        HPX_HOST_DEVICE
+        const_reference front() const
+        {
+#if !defined(__CUDA_ARCH__)
+            HPX_ASSERT(!empty());
+#endif
+            return *data_;
+        }
+
+        /// Returns a reference to the last element in the container.
+        /// Calling back on an empty container is undefined.
+        HPX_HOST_DEVICE
+        reference back()
+        {
+#if !defined(__CUDA_ARCH__)
+            HPX_ASSERT(!empty());
+#endif
+            return *(data_ + size_ - 1);
+        }
+
+        /// \copydoc back()
+        HPX_HOST_DEVICE
+        const_reference back() const
+        {
+#if !defined(__CUDA_ARCH__)
+            HPX_ASSERT(!empty());
+#endif
+            return *(data_ + size_ - 1);
+        }
 
         /// Returns pointer to the underlying array serving as element storage.
         /// The pointer is such that range [data(); data() + size()) is always a
