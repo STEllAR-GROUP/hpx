@@ -55,6 +55,7 @@ namespace hpx::cuda::experimental {
                 detail::add_event_callback(
                     [... keep_alive = HPX_FORWARD(Ts, ts)](
                         cudaError_t const status) {
+                        (..., (void) keep_alive);
                         HPX_ASSERT(status != cudaErrorNotReady);
                         HPX_UNUSED(status);
                     },
@@ -80,6 +81,7 @@ namespace hpx::cuda::experimental {
             detail::add_event_callback(
                 [r = HPX_FORWARD(R, r), ... keep_alive = HPX_FORWARD(Ts, ts)](
                     cudaError_t status) mutable {
+                    (..., (void) keep_alive);
                     set_value_event_callback_helper(status, HPX_MOVE(r));
                 },
                 stream);
@@ -106,6 +108,7 @@ namespace hpx::cuda::experimental {
                 [t = HPX_FORWARD(T, t), r = HPX_FORWARD(R, r),
                     ... keep_alive = HPX_FORWARD(Ts, ts)](
                     cudaError_t status) mutable {
+                    (..., (void) keep_alive);
                     set_value_event_callback_helper(
                         status, HPX_MOVE(r), HPX_MOVE(t));
                 },
