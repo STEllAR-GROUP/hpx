@@ -206,7 +206,7 @@ namespace hpx::parallel {
             {
                 // clang-format off
                 for (; first1 != last1 && first2 != last2;
-                    (void) ++first1, ++first2)
+                    ++first1, ++first2)
                 // clang-format on
                 {
                     if (HPX_INVOKE(pred, HPX_INVOKE(proj1, *first1),

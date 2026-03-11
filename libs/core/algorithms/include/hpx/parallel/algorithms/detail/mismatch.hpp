@@ -28,7 +28,7 @@ namespace hpx::parallel::detail {
         {
             while (first1 != last1 && HPX_INVOKE(f, *first1, *first2))
             {
-                ++first1, ++first2;
+                (void) ++first1, ++first2;
             }
             return std::make_pair(first1, first2);
         }

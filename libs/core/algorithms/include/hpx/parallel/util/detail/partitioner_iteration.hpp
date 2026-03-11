@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -33,7 +34,16 @@ namespace hpx::parallel::util::detail {
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Result operator()(
             hpx::util::index_pack<Is...>, hpx::tuple<Ts...>& t)
         {
-            return HPX_INVOKE(f_, hpx::get<Is>(t)...);
+            return hpx::util::void_guard<Result>(),
+                   HPX_INVOKE(f_, hpx::get<Is>(t)...);
+        }
+
+        template <std::size_t... Is, typename... Ts>
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Result operator()(
+            hpx::util::index_pack<Is...>, hpx::tuple<Ts...> const& t)
+        {
+            return hpx::util::void_guard<Result>(),
+                   HPX_INVOKE(f_, hpx::get<Is>(t)...);
         }
 
         template <std::size_t... Is, typename... Ts>
@@ -41,7 +51,8 @@ namespace hpx::parallel::util::detail {
             hpx::util::index_pack<Is...>, hpx::tuple<Ts...>&& t)
         {
             // NOLINTBEGIN(bugprone-use-after-move)
-            return HPX_INVOKE(f_, hpx::get<Is>(HPX_MOVE(t))...);
+            return hpx::util::void_guard<Result>(),
+                   HPX_INVOKE(f_, hpx::get<Is>(HPX_MOVE(t))...);
             // NOLINTEND(bugprone-use-after-move)
         }
 

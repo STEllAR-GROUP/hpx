@@ -55,7 +55,7 @@ namespace hpx::experimental {
             scope_fail& operator=(scope_fail const&) = delete;
             scope_fail& operator=(scope_fail&& rhs) = delete;
 
-            HPX_CONSTEXPR_DESTRUCTOR ~scope_fail() noexcept
+            constexpr ~scope_fail() noexcept
             {
                 if (active < std::uncaught_exceptions())
                 {

@@ -102,21 +102,11 @@ function(hpx_perform_cxx_feature_tests)
       DEFINITIONS HPX_HAVE_CXX20_SOURCE_LOCATION
     )
 
-    hpx_check_for_cxx20_perfect_pack_capture(
-      DEFINITIONS HPX_HAVE_CXX20_PERFECT_PACK_CAPTURE
-    )
-
     if(HPX_WITH_SUPPORT_NO_UNIQUE_ADDRESS_ATTRIBUTE AND NOT MSVC) # see above
       hpx_check_for_cxx20_no_unique_address_attribute(
         DEFINITIONS HPX_HAVE_CXX20_NO_UNIQUE_ADDRESS_ATTRIBUTE
       )
     endif()
-
-    hpx_check_for_cxx20_paren_initialization_of_aggregates(
-      DEFINITIONS HPX_HAVE_CXX20_PAREN_INITIALIZATION_OF_AGGREGATES
-    )
-
-    hpx_check_for_cxx20_std_endian(DEFINITIONS HPX_HAVE_CXX20_STD_ENDIAN)
 
     hpx_check_for_cxx20_std_execution_policies(
       DEFINITIONS HPX_HAVE_CXX20_STD_EXECUTION_POLICES
@@ -126,25 +116,12 @@ function(hpx_perform_cxx_feature_tests)
       DEFINITIONS HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP
     )
 
-    hpx_check_for_cxx20_trivial_virtual_destructor(
-      DEFINITIONS HPX_HAVE_CXX20_TRIVIAL_VIRTUAL_DESTRUCTOR
-    )
+    # hpx_check_for_cxx20_trivial_virtual_destructor was deleted
 
     hpx_check_for_cxx20_std_construct_at(
       DEFINITIONS HPX_HAVE_CXX20_STD_CONSTRUCT_AT
     )
 
-    hpx_check_for_cxx20_std_default_sentinel(
-      DEFINITIONS HPX_HAVE_CXX20_STD_DEFAULT_SENTINEL
-    )
-
-    hpx_check_for_cxx20_std_bit_cast(DEFINITIONS HPX_HAVE_CXX20_STD_BIT_CAST)
-
-    hpx_check_for_cxx20_std_identity(DEFINITIONS HPX_HAVE_CXX20_STD_IDENTITY)
-
-    hpx_check_for_cxx20_constexpr_destructor(
-      DEFINITIONS HPX_HAVE_CXX20_CONSTEXPR_DESTRUCTOR
-    )
   endif()
 
   if(HPX_WITH_CXX20_COROUTINES)

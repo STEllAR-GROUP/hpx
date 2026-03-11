@@ -27,9 +27,3 @@
 #else
 #define HPX_HOST_DEVICE_CONSTEXPR constexpr
 #endif
-
-#if defined(HPX_HAVE_CXX20_CONSTEXPR_DESTRUCTOR)
-#define HPX_CONSTEXPR_DESTRUCTOR constexpr
-#else
-#define HPX_CONSTEXPR_DESTRUCTOR
-#endif

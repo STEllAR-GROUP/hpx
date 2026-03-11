@@ -13,6 +13,7 @@
 #endif
 
 #include <hpx/assert.hpp>
+#include <hpx/executors/detail/bulk_invoke_helper.hpp>
 #include <hpx/executors/thread_pool_scheduler.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/concurrency.hpp>
@@ -58,14 +59,6 @@ namespace hpx::execution::experimental::detail {
             chunk_size *= 2;
         }
         return static_cast<std::uint32_t>(chunk_size);
-    }
-
-    HPX_CXX_CORE_EXPORT template <std::size_t... Is, typename F, typename T,
-        typename Ts>
-    constexpr void bulk_scheduler_invoke_helper(
-        hpx::util::index_pack<Is...>, F&& f, T&& t, Ts& ts)
-    {
-        HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(T, t), hpx::get<Is>(ts)...);
     }
 
     HPX_CXX_CORE_EXPORT inline hpx::threads::mask_type full_mask(
@@ -145,8 +138,7 @@ namespace hpx::execution::experimental::detail {
             auto it = std::next(hpx::util::begin(op_state->shape), i_begin);
             for (auto i = i_begin; i != i_end; (void) ++it, ++i)
             {
-                bulk_scheduler_invoke_helper(
-                    index_pack_type{}, op_state->f, *it, ts);
+                bulk_invoke_helper(index_pack_type{}, op_state->f, *it, ts);
             }
         }
 
@@ -346,19 +338,25 @@ namespace hpx::execution::experimental::detail {
         }
 
         // Initialize a queue for a worker thread.
-        void init_queue_depth_first(std::uint32_t const worker_thread,
-            std::uint32_t const size, std::uint32_t num_threads) noexcept
+        void init_queue_depth_first(std::size_t const worker_thread,
+            std::size_t const size, std::size_t num_threads) noexcept
         {
             auto& queue = op_state->queues[worker_thread].data_;
-            auto const part_begin = static_cast<std::uint32_t>(
-                (worker_thread * size) / num_threads);
-            auto const part_end = static_cast<std::uint32_t>(
-                ((worker_thread + 1) * size) / num_threads);
-            queue.reset(part_begin, part_end);
+            auto const part_begin = (worker_thread * size) / num_threads;
+            auto const part_end = ((worker_thread + 1) * size) / num_threads;
+
+            HPX_ASSERT_MSG(
+                size <= static_cast<std::size_t>(
+                            (std::numeric_limits<std::uint32_t>::max)()),
+                "init_queue_depth_first: ranges larger than "
+                "UINT32_MAX are not supported");
+
+            queue.reset(static_cast<std::uint32_t>(part_begin),
+                static_cast<std::uint32_t>(part_end));
         }
 
-        void init_queue_breadth_first(std::uint32_t const worker_thread,
-            std::uint32_t const size, std::uint32_t num_threads) noexcept
+        void init_queue_breadth_first(std::size_t const worker_thread,
+            std::size_t const size, std::size_t num_threads) noexcept
         {
             auto& queue = op_state->queues[worker_thread].data_;
             auto const num_steps = size / num_threads + 1;
@@ -370,7 +368,16 @@ namespace hpx::execution::experimental::detail {
             {
                 part_end -= remainder;
             }
-            queue.reset(part_begin, part_end, num_threads);
+
+            HPX_ASSERT_MSG(
+                size <= static_cast<std::size_t>(
+                            (std::numeric_limits<std::uint32_t>::max)()),
+                "init_queue_breadth_first: ranges larger than "
+                "UINT32_MAX are not supported");
+
+            queue.reset(static_cast<std::uint32_t>(part_begin),
+                static_cast<std::uint32_t>(part_end),
+                static_cast<std::uint32_t>(num_threads));
         }
 
         // Spawn a task which will process a number of chunks. If the queue

@@ -33,7 +33,7 @@ tests.unit.modules.algorithms.container_algorithms.reverse_copy_range
 tests.unit.modules.algorithms.container_algorithms.rotate_range
 tests.unit.modules.algorithms.container_algorithms.rotate_copy_range
 tests.unit.modules.algorithms.container_algorithms.search_range
-tests.unit.modules.algorithms.container_algorithms.searchn_range
+tests.unit.modules.algorithms.container_algorithms.search_n_range
 tests.unit.modules.algorithms.container_algorithms.set_difference_range
 tests.unit.modules.algorithms.container_algorithms.set_intersection_range
 tests.unit.modules.algorithms.container_algorithms.set_symmetric_difference_range

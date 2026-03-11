@@ -62,7 +62,8 @@ namespace hpx::parallel::util {
 
                     for (std::int64_t len_v =
                              static_cast<std::int64_t>(len - (size + 1));
-                        len_v > 0; len_v -= size, len -= size)
+                        len_v > 0;
+                        len_v -= static_cast<std::int64_t>(size), len -= size)
                     {
                         datapar_transform_loop_step::callv(f, first, dest);
                     }
@@ -133,7 +134,8 @@ namespace hpx::parallel::util {
 
                     for (std::int64_t len_v =
                              static_cast<std::int64_t>(len - (size + 1));
-                        len_v > 0; len_v -= size, len -= size)
+                        len_v > 0;
+                        len_v -= static_cast<std::int64_t>(size), len -= size)
                     {
                         datapar_transform_loop_step_ind::callv(f, first, dest);
                     }
