@@ -294,7 +294,9 @@ namespace hpx::agas {
 
                 HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                     "addressing_service::resolve_locality", str);
-                return resolved_localities_[naming::invalid_gid];
+
+                static parcelset::endpoints_type const empty_endpoints;
+                return empty_endpoints;
             }
         }
 
@@ -312,7 +314,9 @@ namespace hpx::agas {
                     "addressing_service::resolve_locality",
                     "resolved locality insertion failed "
                     "due to a locking error or memory corruption");
-                return resolved_localities_[naming::invalid_gid];
+
+                static parcelset::endpoints_type const empty_endpoints;
+                return empty_endpoints;
             }
         }
         else if (it->second.empty() && !endpoints.empty())
