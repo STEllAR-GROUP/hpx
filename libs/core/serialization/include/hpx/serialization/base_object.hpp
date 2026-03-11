@@ -27,6 +27,8 @@
 #endif
 
 namespace hpx::serialization {
+
+#if defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
     namespace detail {
         template <typename MemberType, typename T>
         constexpr decltype(auto) at_offset(T& base, std::size_t offset) noexcept
@@ -40,6 +42,7 @@ namespace hpx::serialization {
             return *member_ptr;
         }
     }    // namespace detail
+#endif
 
     HPX_CXX_CORE_EXPORT template <typename Derived, typename Base,
         typename Enable = void>
