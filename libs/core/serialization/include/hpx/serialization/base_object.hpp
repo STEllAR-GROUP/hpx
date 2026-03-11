@@ -19,6 +19,7 @@
 #include <type_traits>
 
 #if defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
+#include <bit>
 #include <cstddef>
 #include <experimental/meta>
 #include <memory>
@@ -26,6 +27,19 @@
 #endif
 
 namespace hpx::serialization {
+    namespace detail {
+        template <typename MemberType, typename T>
+        constexpr decltype(auto) at_offset(T& base, std::size_t offset) noexcept
+        {
+            using Type = std::conditional_t<std::is_const_v<T>,
+                MemberType const, MemberType>;
+
+            auto base_addr = std::bit_cast<std::byte*>(std::addressof(base));
+            auto member_ptr = std::bit_cast<Type*>(base_addr + offset);
+
+            return *member_ptr;
+        }
+    }    // namespace detail
 
     HPX_CXX_CORE_EXPORT template <typename Derived, typename Base,
         typename Enable = void>
@@ -59,10 +73,8 @@ namespace hpx::serialization {
             static_assert(offset.has_value(),
                 "Base class not found in derived class's base list");
 
-            auto base_addr = std::bit_cast<std::byte*>(std::addressof(d_));
-            auto* base_ptr = std::bit_cast<Base*>(base_addr + offset.value());
-
-            access::serialize(ar, *base_ptr, 0);
+            access::serialize(
+                ar, detail::at_offset<Base>(d_, offset.value()), 0);
 #else
             // legacy path
             access::serialize(ar,

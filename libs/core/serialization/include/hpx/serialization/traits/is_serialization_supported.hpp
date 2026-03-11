@@ -42,6 +42,8 @@ namespace hpx::traits {
             hpx::traits::is_nonintrusive_polymorphic_v<T> ||
             hpx::traits::has_struct_serialization_v<T> || has_serialize ||
             has_optimized || has_refl_serialize;
+
+        using type = std::bool_constant<value>;
     };
 
     HPX_CXX_CORE_EXPORT template <typename T>
