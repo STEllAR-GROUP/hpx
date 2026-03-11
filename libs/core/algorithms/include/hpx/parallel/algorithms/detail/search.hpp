@@ -113,7 +113,8 @@ namespace hpx::parallel::detail {
                     ++idx;
                     Iter curr = start;
                     Size matched = 0;
-                    while (matched < count && pred(proj(*curr), value_proj))
+                    while (matched < count &&
+                        HPX_INVOKE(pred, HPX_INVOKE(proj, *curr), value_proj))
                     {
                         ++curr;
                         ++matched;
