@@ -100,12 +100,13 @@ namespace hpx::parallel::detail {
         {
             using difference_type =
                 typename std::iterator_traits<Iter>::difference_type;
+            using reference = typename std::iterator_traits<Iter>::reference;
             std::size_t idx = 0;
             util::loop_idx_n<ExPolicy>(base_idx, it, part_size, tok,
                 [max_start, count, it, &value_proj, &tok, &idx,
                     pred = HPX_FORWARD(Pred, pred),
                     proj = HPX_FORWARD(Proj, proj)](
-                    auto&&, std::size_t abs_idx) mutable -> void {
+                    reference, std::size_t abs_idx) mutable -> void {
                     if (static_cast<difference_type>(abs_idx) >= max_start)
                         return;
                     Iter start = it;
