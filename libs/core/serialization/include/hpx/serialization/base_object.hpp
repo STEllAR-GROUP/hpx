@@ -18,8 +18,8 @@
 #include <type_traits>
 
 #if defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
-#include <optional>
 #include <experimental/meta>
+#include <optional>
 #endif
 
 namespace hpx::serialization {
