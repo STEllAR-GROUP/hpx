@@ -17,6 +17,11 @@
 
 #include <type_traits>
 
+#if defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
+#include <optional>
+#include <experimental/meta>
+#endif
+
 namespace hpx::serialization {
 
     HPX_CXX_CORE_EXPORT template <typename Derived, typename Base,
@@ -32,8 +37,34 @@ namespace hpx::serialization {
         template <typename Archive>
         void serialize(Archive& ar, unsigned)
         {
+#if defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
+            static constexpr std::optional<std::size_t> offset =
+                []() consteval -> std::optional<std::size_t> {
+                constexpr auto ctx = std::meta::access_context::unchecked();
+
+                for (auto b : std::meta::bases_of(^^Derived, ctx))
+                {
+                    if (std::meta::type_of(b) == ^^Base)
+                    {
+                        return static_cast<std::size_t>(
+                            std::meta::offset_of(b).bytes);
+                    }
+                }
+                return std::nullopt;
+            }();
+
+            static_assert(offset.has_value(),
+                "Base class not found in derived class's base list");
+
+            auto base_addr = std::bit_cast<std::byte*>(std::addressof(d_));
+            auto* base_ptr = std::bit_cast<Base*>(base_addr + offset.value());
+
+            access::serialize(ar, *base_ptr, 0);
+#else
+            // legacy path
             access::serialize(ar,
                 static_cast<Base&>(const_cast<std::decay_t<Derived>&>(d_)), 0);
+#endif
         }
     };
 

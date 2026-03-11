@@ -117,35 +117,107 @@ namespace Templates {
 HPX_POLYMORPHIC_AUTO_REGISTER(Templates::Derived3_2_1<std::vector<int>>)
 HPX_POLYMORPHIC_AUTO_REGISTER(Templates::Derived3_2_2)
 
+namespace MixedAccess {
+    struct BasePublic
+    {
+        virtual ~BasePublic() = default;
+        int b_val = 1;
+    };
+    struct BasePrivate
+    {
+        virtual ~BasePrivate() = default;
+        int c_val = 2;
+    };
+    struct BaseProtected
+    {
+        virtual ~BaseProtected() = default;
+        int d_val = 3;
+    };
+
+    // A derives from all three with different access levels
+    struct DerivedA
+      : public BasePublic
+      , protected BaseProtected
+      , private BasePrivate
+    {
+        int a_val = 4;
+
+        // for testing
+        template <typename Base, typename Derived>
+        static Base* cast_to_base(Derived* d)
+        {
+            return static_cast<Base*>(d);
+        }
+    };
+}    // namespace MixedAccess
+
+HPX_POLYMORPHIC_AUTO_REGISTER(MixedAccess::BasePublic)
+HPX_POLYMORPHIC_AUTO_REGISTER(MixedAccess::BaseProtected)
+HPX_POLYMORPHIC_AUTO_REGISTER(MixedAccess::BasePrivate)
+HPX_POLYMORPHIC_AUTO_REGISTER(MixedAccess::DerivedA)
+
 int main()
 {
-    std::vector<char> buffer;
-
-    using TargetType = Templates::Derived3_2_1<std::vector<int>>;
-    std::unique_ptr<Deeply::Nested::Base3> input_ptr =
-        std::make_unique<TargetType>();
-
-    auto* raw = static_cast<TargetType*>(input_ptr.get());
-    raw->fixed_points[0] = {5.5, 6.6};
-    raw->template_member = {1, 2, 3};
-
     {
-        hpx::serialization::output_archive oarchive(buffer);
-        oarchive << input_ptr;
+        std::vector<char> buffer;
+
+        using TargetType = Templates::Derived3_2_1<std::vector<int>>;
+        std::unique_ptr<Deeply::Nested::Base3> input_ptr =
+            std::make_unique<TargetType>();
+
+        auto* raw = static_cast<TargetType*>(input_ptr.get());
+        raw->fixed_points[0] = {5.5, 6.6};
+        raw->template_member = {1, 2, 3};
+
+        {
+            hpx::serialization::output_archive oarchive(buffer);
+            oarchive << input_ptr;
+        }
+
+        std::unique_ptr<Deeply::Nested::Base3> output_ptr;
+        {
+            hpx::serialization::input_archive iarchive(buffer);
+            iarchive >> output_ptr;
+        }
+
+        HPX_TEST(output_ptr != nullptr);
+
+        auto* final_check = dynamic_cast<TargetType*>(output_ptr.get());
+        HPX_TEST(final_check != nullptr);
+        HPX_TEST(final_check->fixed_points[0].y == 6.6);
+        HPX_TEST(final_check->template_member.size() == 3);
     }
 
-    std::unique_ptr<Deeply::Nested::Base3> output_ptr;
     {
-        hpx::serialization::input_archive iarchive(buffer);
-        iarchive >> output_ptr;
+        std::vector<char> buffer;
+        std::unique_ptr<MixedAccess::BasePublic> input =
+            std::make_unique<MixedAccess::DerivedA>();
+
+        {
+            hpx::serialization::output_archive oarch(buffer);
+            oarch << input;
+        }
+
+        std::unique_ptr<MixedAccess::BasePublic> output;
+        {
+            hpx::serialization::input_archive iarch(buffer);
+            iarch >> output;
+        }
+
+        auto* final_a = reinterpret_cast<MixedAccess::DerivedA*>(output.get());
+        HPX_TEST_EQ(final_a->b_val, 1);
+        HPX_TEST_EQ(final_a->a_val, 4);
+
+        auto* c_ptr =
+            MixedAccess::DerivedA::cast_to_base<MixedAccess::BasePrivate>(
+                final_a);
+        auto* d_ptr =
+            MixedAccess::DerivedA::cast_to_base<MixedAccess::BaseProtected>(
+                final_a);
+
+        HPX_TEST_EQ(c_ptr->c_val, 2);
+        HPX_TEST_EQ(d_ptr->d_val, 3);
     }
-
-    HPX_TEST(output_ptr != nullptr);
-
-    auto* final_check = dynamic_cast<TargetType*>(output_ptr.get());
-    HPX_TEST(final_check != nullptr);
-    HPX_TEST(final_check->fixed_points[0].y == 6.6);
-    HPX_TEST(final_check->template_member.size() == 3);
 
     return hpx::util::report_errors();
 }

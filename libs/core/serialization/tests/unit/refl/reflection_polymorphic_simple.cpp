@@ -34,6 +34,10 @@ public:
     {
         return private_a;
     }
+    std::string get_msg() const
+    {
+        return secret_msg;
+    }
 };
 HPX_POLYMORPHIC_AUTO_REGISTER(DerivedA)
 
@@ -58,7 +62,6 @@ int main()
 {
     std::vector<char> buffer;
 
-    // Test Case: DerivedA
     {
         std::unique_ptr<Base> input = std::make_unique<DerivedA>();
         static_cast<DerivedA*>(input.get())->set_data(99, "reflection_works");
@@ -80,6 +83,7 @@ int main()
         if (check)
         {
             HPX_TEST_EQ(check->get_a(), 99);
+            HPX_TEST_EQ(check->get_msg(), "reflection_works");
         }
     }
 

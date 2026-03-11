@@ -14,8 +14,6 @@
 #include <hpx/serialization/base_object.hpp>
 // clang-format on
 
-// This file is only ever included by access.hpp
-// but we will still guard against direct inclusion
 #if defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
 #include <bit>
 #include <cstddef>
@@ -37,27 +35,32 @@ namespace hpx::serialization::detail {
         return *member_ptr;
     }
 
+    template <typename Base, typename Derived>
+    constexpr Base& base_from_offset(
+        Derived& derived, std::size_t offset) noexcept
+    {
+        auto base_addr = std::bit_cast<std::byte*>(std::addressof(derived));
+        return *std::bit_cast<Base*>(base_addr + offset);
+    }
+
     HPX_CXX_CORE_EXPORT template <typename Archive, typename T>
     void refl_serialize(Archive& ar, T& t, unsigned /*version*/)
     {
         constexpr auto ctx = std::meta::access_context::unchecked();
 
-        // Serialize all bases
+        // serialize all bases
         template for (constexpr auto base_info :
             std::define_static_array(std::meta::bases_of(^^T, ctx)))
         {
-            if constexpr (std::meta::is_public(base_info))
-            {
-                using BaseType = typename[:std::meta::type_of(base_info):];
-                ar& hpx::serialization::base_object<BaseType>(t);
-            }
+            using BaseType = typename[:std::meta::type_of(base_info):];
+            ar& hpx::serialization::base_object<BaseType>(t);
         }
 
-        // Serialize all members
+        // serialize all members
         template for (constexpr auto member : std::define_static_array(
                           std::meta::nonstatic_data_members_of(^^T, ctx)))
         {
-            // Since we are using an unchecked context, this might
+            // since we are using an unchecked context, this might
             // be a private/protected member, we will have to do manual
             // pointer arithmetic to get the member and codegen the
             // archive handling logic
