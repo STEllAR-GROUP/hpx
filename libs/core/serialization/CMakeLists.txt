@@ -241,6 +241,7 @@ set(serialization_compat_headers
     hpx/runtime/serialization/serialize.hpp => hpx/serialization.hpp
     hpx/traits/brace_initializable_traits.hpp => hpx/serialization.hpp
     hpx/traits/is_bitwise_serializable.hpp => hpx/serialization.hpp
+    hpx/serialization/traits/is_serialization_supported.hpp => hpx/serialization.hpp
     hpx/traits/needs_automatic_registration.hpp => hpx/serialization.hpp
     hpx/traits/polymorphic_traits.hpp => hpx/serialization.hpp
     hpx/traits/serialization_access_data.hpp => hpx/serialization.hpp
