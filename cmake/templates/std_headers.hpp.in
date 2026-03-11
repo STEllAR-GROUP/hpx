@@ -47,9 +47,7 @@
 #if defined(HPX_HAVE_CXX20_STD_BIT_CAST) || defined(HPX_HAVE_CXX20_STD_ENDIAN)
 # include <bit>
 #endif
-#if defined(HPX_HAVE_CXX20_SOURCE_LOCATION)
-# include <source_location>
-#endif
+#include <source_location>
 
 #if defined(HPX_HAVE_CXX23_STD_GENERATOR)
 # include <generator>
