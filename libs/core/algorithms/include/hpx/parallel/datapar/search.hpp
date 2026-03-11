@@ -50,8 +50,9 @@ namespace hpx::parallel::detail {
                     auto begin = hpx::util::zip_iterator(it + idx, s_first);
                     ++idx;
                     util::cancellation_token<> local_tok;
-                    util::loop_n<hpx::execution::simd_policy>(begin, diff,
-                        local_tok,
+                    util::loop_n<
+                        decltype(hpx::execution::experimental::to_non_task(
+                            std::declval<ExPolicy>()))>(begin, diff, local_tok,
                         [&op, &proj1, &proj2, &local_tok](auto t) -> void {
                             using hpx::get;
                             if (!hpx::parallel::traits::all_of(HPX_INVOKE(op,
@@ -100,12 +101,13 @@ namespace hpx::parallel::detail {
                     auto start = it + static_cast<difference_type>(idx);
                     ++idx;
                     util::cancellation_token<> local_tok;
-                    util::loop_n<hpx::execution::simd_policy>(start, count,
-                        local_tok,
+                    util::loop_n<
+                        decltype(hpx::execution::experimental::to_non_task(
+                            std::declval<ExPolicy>()))>(start, count, local_tok,
                         [&pred, &proj, &value_proj, &local_tok](
                             auto curr) -> void {
-                            if (!hpx::parallel::traits::all_of(
-                                    pred(proj(*curr), value_proj)))
+                            if (!hpx::parallel::traits::all_of(HPX_INVOKE(
+                                    pred, HPX_INVOKE(proj, *curr), value_proj)))
                             {
                                 local_tok.cancel();
                             }
