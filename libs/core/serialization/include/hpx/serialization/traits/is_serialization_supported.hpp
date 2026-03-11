@@ -24,8 +24,8 @@ namespace hpx::traits {
     {
     public:
         static constexpr bool has_serialize =
-            hpx::traits::is_intrusive_polymorphic_v<T> ||
-            std::is_empty_v<T> || hpx::traits::has_serialize_adl_v<T>;
+            hpx::traits::is_intrusive_polymorphic_v<T> || std::is_empty_v<T> ||
+            hpx::traits::has_serialize_adl_v<T>;
 
         static constexpr bool has_optimized =
             hpx::traits::is_bitwise_serializable_v<T> ||
