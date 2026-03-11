@@ -118,7 +118,8 @@ namespace hpx::serialization {
                         *this, t);
                 }
                 else if constexpr (hpx::traits::is_serialization_supported<
-                                       T>::has_serialize || access::has_serialize_v<T> )
+                                       T>::has_serialize ||
+                    access::has_serialize_v<T>)
                 {
                     // non-bitwise normal serialization
                     access::serialize(*this, t, 0);
