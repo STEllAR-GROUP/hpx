@@ -29,7 +29,7 @@ tests.unit.modules.algorithms.algorithms.reverse_copy
 tests.unit.modules.algorithms.algorithms.rotate
 tests.unit.modules.algorithms.algorithms.rotate_copy
 tests.unit.modules.algorithms.algorithms.search
-tests.unit.modules.algorithms.algorithms.searchn
+tests.unit.modules.algorithms.algorithms.search_n
 tests.unit.modules.algorithms.algorithms.set_difference
 tests.unit.modules.algorithms.algorithms.set_intersection
 tests.unit.modules.algorithms.algorithms.set_symmetric_difference
