@@ -55,6 +55,7 @@ tests.unit.modules.algorithms.container_algorithms.generate_range
 tests.unit.modules.algorithms.container_algorithms.includes_range
 tests.unit.modules.algorithms.container_algorithms.inclusive_scan_range
 tests.unit.modules.algorithms.container_algorithms.inplace_merge_range
+tests.unit.modules.algorithms.container_algorithms.iota_range
 tests.unit.modules.algorithms.container_algorithms.is_heap_range
 tests.unit.modules.algorithms.container_algorithms.is_heap_until_range
 tests.unit.modules.algorithms.container_algorithms.is_partitioned_async_range

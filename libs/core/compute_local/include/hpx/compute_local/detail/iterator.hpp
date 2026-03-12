@@ -58,6 +58,7 @@ namespace hpx::compute::detail {
         {
         }
 
+    public:
         HPX_HOST_DEVICE iterator(iterator const& other) noexcept
           : base_type(other)
           , target_(other.target_)

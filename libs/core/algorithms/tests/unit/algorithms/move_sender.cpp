@@ -46,8 +46,8 @@ void test_move_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
                       std::begin(d)) |
         hpx::move(ex_policy.on(exec)));
 
-    //copy contents of d back into c for testing
-    std::copy(std::begin(d), std::end(d), std::begin(d));
+    // copy contents of d back into c for testing
+    std::copy(std::begin(d), std::end(d), std::begin(c));
 
     std::size_t count = 0;
     HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d),
