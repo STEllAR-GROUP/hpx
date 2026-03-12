@@ -282,7 +282,10 @@ namespace hpx::parallel::util::detail {
         std::size_t max_chunks =
             hpx::execution::experimental::maximal_number_of_chunks(
                 policy.parameters(), policy.executor(), cores, count);
-        HPX_ASSERT(0 != max_chunks);
+        if (max_chunks == 0)
+        {
+            max_chunks = 1;
+        }
 
         Stride stride = parallel::detail::abs(s);
 
@@ -553,6 +556,10 @@ namespace hpx::parallel::util::detail {
         std::size_t max_chunks =
             hpx::execution::experimental::maximal_number_of_chunks(
                 policy.parameters(), policy.executor(), cores, count);
+        if (max_chunks == 0)
+        {
+            max_chunks = 1;
+        }
 
         Stride stride = parallel::detail::abs(s);
 
