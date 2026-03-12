@@ -44,9 +44,7 @@
 # endif
 #endif
 
-#if defined(HPX_HAVE_CXX20_STD_BIT_CAST) || defined(HPX_HAVE_CXX20_STD_ENDIAN)
-# include <bit>
-#endif
+#include <bit>
 #if defined(HPX_HAVE_CXX20_SOURCE_LOCATION)
 # include <source_location>
 #endif
