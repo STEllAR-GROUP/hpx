@@ -50,6 +50,7 @@ set(tests
     partitioned_vector_transform_scan
     partitioned_vector_transform_scan2
     partitioned_vector_reduce
+    partitioned_vector_replace
 )
 
 set(partitioned_vector_inclusive_scan_PARAMETERS RUN_SERIAL)
