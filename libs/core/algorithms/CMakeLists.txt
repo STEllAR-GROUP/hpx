@@ -32,6 +32,7 @@ set(algorithms_headers
     hpx/parallel/algorithms/detail/generate.hpp
     hpx/parallel/algorithms/detail/indirect.hpp
     hpx/parallel/algorithms/detail/insertion_sort.hpp
+    hpx/parallel/algorithms/detail/iota.hpp
     hpx/parallel/algorithms/detail/is_sorted.hpp
     hpx/parallel/algorithms/detail/mismatch.hpp
     hpx/parallel/algorithms/detail/parallel_stable_sort.hpp
@@ -67,6 +68,7 @@ set(algorithms_headers
     hpx/parallel/algorithms/generate.hpp
     hpx/parallel/algorithms/includes.hpp
     hpx/parallel/algorithms/inclusive_scan.hpp
+    hpx/parallel/algorithms/iota.hpp
     hpx/parallel/algorithms/is_heap.hpp
     hpx/parallel/algorithms/is_partitioned.hpp
     hpx/parallel/algorithms/is_sorted.hpp
@@ -131,6 +133,7 @@ set(algorithms_headers
     hpx/parallel/container_algorithms.hpp
     hpx/parallel/container_algorithms/includes.hpp
     hpx/parallel/container_algorithms/inclusive_scan.hpp
+    hpx/parallel/container_algorithms/iota.hpp
     hpx/parallel/container_algorithms/is_heap.hpp
     hpx/parallel/container_algorithms/is_partitioned.hpp
     hpx/parallel/container_algorithms/is_sorted.hpp
