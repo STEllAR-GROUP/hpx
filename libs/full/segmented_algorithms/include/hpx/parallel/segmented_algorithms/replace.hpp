@@ -12,6 +12,14 @@
 #include <hpx/modules/functional.hpp>
 #include <hpx/parallel/segmented_algorithms/for_each.hpp>
 
+#include <algorithm>
+#include <exception>
+#include <iterator>
+#include <list>
+#include <type_traits>
+#include <utility>
+#include <vector>
+
 namespace hpx::parallel {
 
     ///////////////////////////////////////////////////////////////////////////

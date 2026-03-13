@@ -12,6 +12,16 @@
 #include <hpx/modules/executors.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
 
+#include <algorithm>
+#include <cstddef>
+#include <exception>
+#include <iterator>
+#include <list>
+#include <numeric>
+#include <type_traits>
+#include <utility>
+#include <vector>
+
 namespace hpx::parallel {
 
     ///////////////////////////////////////////////////////////////////////////
