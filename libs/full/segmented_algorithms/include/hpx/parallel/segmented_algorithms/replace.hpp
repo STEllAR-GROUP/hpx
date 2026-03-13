@@ -32,8 +32,8 @@ namespace hpx::parallel {
             {
             }
 
-            T old_value_;
-            T new_value_;
+            T old_value_ = T();
+            T new_value_ = T();
 
             void operator()(T& val) const
             {
@@ -44,9 +44,9 @@ namespace hpx::parallel {
             }
         };
 
-        template <typename T1, typename T2>
-        replace_function(T1&&, T2&&) -> replace_function<std::decay_t<T1>>;
-
+        template <typename T>
+        replace_function(T, T) -> replace_function<std::decay_t<T>>;
+        
         template <typename T, typename F>
         struct replace_if_function
         {
@@ -59,8 +59,8 @@ namespace hpx::parallel {
             {
             }
 
-            F pred_;
-            T new_value_;
+            F pred_ = F();
+            T new_value_ = T();
 
             void operator()(T& val) const
             {
