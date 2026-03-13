@@ -479,19 +479,23 @@ void test_overlapping()
         {
         }
 
-        // Because we know the execution is sequenced:
+        // TODO: verify with isidoros
+        // exact counts are only deterministic for sequential execution
+        if constexpr (std::is_same_v<Ex, hpx::execution::sequenced_policy>)
+        {
+            // K move constructors were called, and then the last one throws
+            HPX_TEST(
+                non_trivially_relocatable_struct_throwing_overlapping::moved ==
+                K);
 
-        // K move constructors were called, and then the last one throws
-        HPX_TEST(
-            non_trivially_relocatable_struct_throwing_overlapping::moved == K);
-
-        // K - 1 objects where destroyed after being moved-from
-        // and then M destructors were called: K on the new range and
-        // M - K on the old range
-        // + offset from prior the relocation
-        HPX_TEST(
-            non_trivially_relocatable_struct_throwing_overlapping::destroyed ==
-            K - 1 + M + offset);
+            // K - 1 objects where destroyed after being moved-from
+            // and then M destructors were called: K on the new range and
+            // M - K on the old range
+            // + offset from prior the relocation
+            HPX_TEST(
+                non_trivially_relocatable_struct_throwing_overlapping::
+                    destroyed == K - 1 + M + offset);
+        }
 
         // The objects in the end of ptr1 are still valid
         for (int i = M + offset; i < N; i++)
