@@ -46,7 +46,7 @@ namespace hpx::parallel {
 
         template <typename T>
         replace_function(T, T) -> replace_function<std::decay_t<T>>;
-        
+
         template <typename T, typename F>
         struct replace_if_function
         {

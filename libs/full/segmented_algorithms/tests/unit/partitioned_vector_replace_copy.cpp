@@ -224,16 +224,28 @@ void replace_copy_empty_tests()
     using namespace hpx::execution;
 
     // replace_copy
-    hpx::replace_copy(seq, src.begin(), src.end(), dest.begin(), initial, replacement);
-    hpx::replace_copy(par, src.begin(), src.end(), dest.begin(), initial, replacement);
-    hpx::replace_copy(seq(task), src.begin(), src.end(), dest.begin(), initial, replacement).wait();
-    hpx::replace_copy(par(task), src.begin(), src.end(), dest.begin(), initial, replacement).wait();
+    hpx::replace_copy(
+        seq, src.begin(), src.end(), dest.begin(), initial, replacement);
+    hpx::replace_copy(
+        par, src.begin(), src.end(), dest.begin(), initial, replacement);
+    hpx::replace_copy(
+        seq(task), src.begin(), src.end(), dest.begin(), initial, replacement)
+        .wait();
+    hpx::replace_copy(
+        par(task), src.begin(), src.end(), dest.begin(), initial, replacement)
+        .wait();
 
     // replace_copy_if
-    hpx::replace_copy_if(seq, src.begin(), src.end(), dest.begin(), is_even<T>{}, replacement);
-    hpx::replace_copy_if(par, src.begin(), src.end(), dest.begin(), is_even<T>{}, replacement);
-    hpx::replace_copy_if(seq(task), src.begin(), src.end(), dest.begin(), is_even<T>{}, replacement).wait();
-    hpx::replace_copy_if(par(task), src.begin(), src.end(), dest.begin(), is_even<T>{}, replacement).wait();
+    hpx::replace_copy_if(
+        seq, src.begin(), src.end(), dest.begin(), is_even<T>{}, replacement);
+    hpx::replace_copy_if(
+        par, src.begin(), src.end(), dest.begin(), is_even<T>{}, replacement);
+    hpx::replace_copy_if(seq(task), src.begin(), src.end(), dest.begin(),
+        is_even<T>{}, replacement)
+        .wait();
+    hpx::replace_copy_if(par(task), src.begin(), src.end(), dest.begin(),
+        is_even<T>{}, replacement)
+        .wait();
 
     HPX_TEST_EQ(src.size(), std::size_t(0));
     HPX_TEST_EQ(dest.size(), std::size_t(0));

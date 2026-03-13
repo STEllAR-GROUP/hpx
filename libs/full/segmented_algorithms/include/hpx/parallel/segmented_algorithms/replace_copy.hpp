@@ -132,8 +132,9 @@ namespace hpx::parallel {
             segment_iterator1 send = traits1::segment(last);
             segment_iterator2 sdest = traits2::segment(dest);
 
-            using segment_type = std::vector<future<util::in_out_result<local_iterator_type1,
-                local_iterator_type2>>>;
+            using segment_type =
+                std::vector<future<util::in_out_result<local_iterator_type1,
+                    local_iterator_type2>>>;
             segment_type segments;
             segments.reserve(std::distance(sit, send));
 
@@ -171,10 +172,10 @@ namespace hpx::parallel {
                     ldest = traits2::begin(sdest);
                     if (beg != end)
                     {
-                        segments.push_back(dispatch_async(
-                            traits2::get_id(sdest), algo, policy, forced_seq(),
-                            beg, end, ldest, old_value, new_value,
-                            HPX_FORWARD(Proj, proj)));
+                        segments.push_back(
+                            dispatch_async(traits2::get_id(sdest), algo, policy,
+                                forced_seq(), beg, end, ldest, old_value,
+                                new_value, HPX_FORWARD(Proj, proj)));
                     }
                 }
 
@@ -319,8 +320,9 @@ namespace hpx::parallel {
             segment_iterator1 send = traits1::segment(last);
             segment_iterator2 sdest = traits2::segment(dest);
 
-            using segment_type = std::vector<future<util::in_out_result<local_iterator_type1,
-                local_iterator_type2>>>;
+            using segment_type =
+                std::vector<future<util::in_out_result<local_iterator_type1,
+                    local_iterator_type2>>>;
             segment_type segments;
             segments.reserve(std::distance(sit, send));
 
@@ -332,10 +334,9 @@ namespace hpx::parallel {
                 local_iterator_type2 ldest = traits2::begin(sdest);
                 if (beg != end)
                 {
-                    segments.push_back(
-                        dispatch_async(traits2::get_id(sdest), algo, policy,
-                            forced_seq(), beg, end, ldest, f, new_value,
-                            HPX_FORWARD(Proj, proj)));
+                    segments.push_back(dispatch_async(traits2::get_id(sdest),
+                        algo, policy, forced_seq(), beg, end, ldest, f,
+                        new_value, HPX_FORWARD(Proj, proj)));
                 }
             }
             else
@@ -346,10 +347,9 @@ namespace hpx::parallel {
                 local_iterator_type2 ldest = traits2::begin(sdest);
                 if (beg != end)
                 {
-                    segments.push_back(
-                        dispatch_async(traits2::get_id(sdest), algo, policy,
-                            forced_seq(), beg, end, ldest, f, new_value,
-                            HPX_FORWARD(Proj, proj)));
+                    segments.push_back(dispatch_async(traits2::get_id(sdest),
+                        algo, policy, forced_seq(), beg, end, ldest, f,
+                        new_value, HPX_FORWARD(Proj, proj)));
                 }
 
                 // handle all of the full partitions
@@ -360,10 +360,10 @@ namespace hpx::parallel {
                     ldest = traits2::begin(sdest);
                     if (beg != end)
                     {
-                        segments.push_back(dispatch_async(
-                            traits2::get_id(sdest), algo, policy, forced_seq(),
-                            beg, end, ldest, f, new_value,
-                            HPX_FORWARD(Proj, proj)));
+                        segments.push_back(
+                            dispatch_async(traits2::get_id(sdest), algo, policy,
+                                forced_seq(), beg, end, ldest, f, new_value,
+                                HPX_FORWARD(Proj, proj)));
                     }
                 }
 
@@ -373,10 +373,9 @@ namespace hpx::parallel {
                 ldest = traits2::begin(sdest);
                 if (beg != end)
                 {
-                    segments.push_back(
-                        dispatch_async(traits2::get_id(sdest), algo, policy,
-                            forced_seq(), beg, end, ldest, f, new_value,
-                            HPX_FORWARD(Proj, proj)));
+                    segments.push_back(dispatch_async(traits2::get_id(sdest),
+                        algo, policy, forced_seq(), beg, end, ldest, f,
+                        new_value, HPX_FORWARD(Proj, proj)));
                 }
             }
 
@@ -481,7 +480,6 @@ namespace hpx::segmented {
     {
         static_assert(hpx::traits::is_input_iterator_v<SegIter>,
             "Requires at least input iterator.");
-
 
         if (first == last)
         {
