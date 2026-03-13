@@ -1,5 +1,6 @@
 //  Copyright (c) 2014-2023 Hartmut Kaiser
 //  Copyright (c) 2023 Isidoros Tsaousis-Seiras
+//  Copyright (c) 2026 Arivoli Ramamoorthy
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -482,6 +483,255 @@ namespace hpx::parallel {
         }
 
         ///////////////////////////////////////////////////////////////////////
+        // parallel_uninitialized_relocate_n_overlapping
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename InIter,
+            typename FwdIter>
+            requires(hpx::traits::is_contiguous_iterator_v<InIter> &&
+                hpx::traits::is_contiguous_iterator_v<FwdIter>)
+        decltype(auto) parallel_uninitialized_relocate_n_overlapping(
+            ExPolicy&& policy, InIter first, std::size_t n, FwdIter dest,
+            std::size_t d)
+        {
+            using value_type = std::iter_value_t<InIter>;
+            value_type* const first_ptr = std::to_address(first);
+            value_type* const dest_ptr = std::to_address(dest);
+
+            struct chain_group_result
+            {
+                std::size_t chain_start;
+                std::size_t chains_done;
+            };
+
+            using counting_iter = hpx::util::counting_iterator<std::size_t>;
+
+            constexpr bool has_scheduler_executor =
+                hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
+
+            if constexpr (!has_scheduler_executor)
+            {
+                if (n == 0)
+                {
+                    return util::detail::algorithm_result<ExPolicy,
+                        util::in_out_result<InIter, FwdIter>>::
+                        get(util::in_out_result<InIter, FwdIter>{first, dest});
+                }
+            }
+
+            return util::partitioner_with_cleanup<ExPolicy,
+                util::in_out_result<InIter, FwdIter>, chain_group_result>::
+                call(
+                    HPX_FORWARD(ExPolicy, policy), counting_iter(0), d,
+                    [first_ptr, dest_ptr, n, d](counting_iter it,
+                        std::size_t num_chains) mutable -> chain_group_result {
+                        std::size_t chain_start = *it;
+                        std::size_t chains_done = 0;
+
+                        for (std::size_t ci = 0; ci < num_chains; ++ci)
+                        {
+                            std::size_t c = chain_start + ci;
+                            std::size_t partial = 0;
+
+                            try
+                            {
+                                for (std::size_t j = c; j < n;
+                                     j += d, ++partial)
+                                {
+                                    hpx::experimental::detail::
+                                        relocate_at_helper(
+                                            first_ptr + j, dest_ptr + j);
+                                }
+                            }
+                            catch (...)
+                            {
+                                for (std::size_t k = 0; k < partial; ++k)
+                                {
+                                    std::destroy_at(dest_ptr + c + k * d);
+                                }
+                                for (std::size_t j = c + (partial + 1) * d;
+                                     j < n; j += d)
+                                {
+                                    std::destroy_at(first_ptr + j);
+                                }
+                                for (std::size_t done_ci = 0;
+                                     done_ci < chains_done; ++done_ci)
+                                {
+                                    std::size_t done_c =
+                                        chain_start + done_ci;
+                                    for (std::size_t j = done_c; j < n;
+                                         j += d)
+                                    {
+                                        std::destroy_at(dest_ptr + j);
+                                    }
+                                }
+                                for (std::size_t todo_ci = ci + 1;
+                                     todo_ci < num_chains; ++todo_ci)
+                                {
+                                    std::size_t todo_c =
+                                        chain_start + todo_ci;
+                                    for (std::size_t j = todo_c; j < n;
+                                         j += d)
+                                    {
+                                        std::destroy_at(first_ptr + j);
+                                    }
+                                }
+                                throw;
+                            }
+
+                            ++chains_done;
+                        }
+
+                        return {chain_start, chains_done};
+                    },
+                    [first, dest, n](auto&&... data) mutable
+                        -> util::in_out_result<InIter, FwdIter> {
+                        static_assert(sizeof...(data) < 2);
+                        util::detail::clear_container(data...);
+                        return util::in_out_result<InIter, FwdIter>{
+                            std::next(first, n), std::next(dest, n)};
+                    },
+                    [dest_ptr, n, d](chain_group_result&& r) -> void {
+                        for (std::size_t ci = 0; ci < r.chains_done; ++ci)
+                        {
+                            std::size_t c = r.chain_start + ci;
+                            for (std::size_t j = c; j < n; j += d)
+                            {
+                                std::destroy_at(dest_ptr + j);
+                            }
+                        }
+                    });
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        // parallel_uninitialized_relocate_n_overlapping_backward
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename BiIter1,
+            typename BiIter2>
+            requires(hpx::traits::is_contiguous_iterator_v<BiIter1> &&
+                hpx::traits::is_contiguous_iterator_v<BiIter2>)
+        decltype(auto) parallel_uninitialized_relocate_n_overlapping_backward(
+            ExPolicy&& policy, BiIter1 first, std::size_t n, BiIter2 dest_last,
+            std::size_t d)
+        {
+            using value_type = std::iter_value_t<BiIter1>;
+            value_type* const first_ptr = std::to_address(first);
+            value_type* const dest_first_ptr =
+                std::to_address(dest_last) - static_cast<std::ptrdiff_t>(n);
+
+            struct chain_group_result
+            {
+                std::size_t chain_start;
+                std::size_t chains_done;
+            };
+
+            using counting_iter = hpx::util::counting_iterator<std::size_t>;
+
+            constexpr bool has_scheduler_executor =
+                hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
+
+            if constexpr (!has_scheduler_executor)
+            {
+                if (n == 0)
+                {
+                    auto dest_first = std::prev(dest_last, n);
+                    return util::detail::algorithm_result<ExPolicy,
+                        util::in_out_result<BiIter1, BiIter2>>::
+                        get(util::in_out_result<BiIter1, BiIter2>{
+                            first, dest_first});
+                }
+            }
+
+            return util::partitioner_with_cleanup<ExPolicy,
+                util::in_out_result<BiIter1, BiIter2>, chain_group_result>::
+                call(
+                    HPX_FORWARD(ExPolicy, policy), counting_iter(0), d,
+                    [first_ptr, dest_first_ptr, n, d](counting_iter it,
+                        std::size_t num_chains) mutable -> chain_group_result {
+                        std::size_t chain_start = *it;
+                        std::size_t chains_done = 0;
+
+                        for (std::size_t ci = 0; ci < num_chains; ++ci)
+                        {
+                            std::size_t c = chain_start + ci;
+
+                            std::size_t k_max = (n - 1 - c) / d;
+                            std::size_t partial = 0;
+
+                            try
+                            {
+                                for (std::size_t k = k_max + 1; k-- > 0;
+                                     ++partial)
+                                {
+                                    std::size_t j = c + k * d;
+                                    hpx::experimental::detail::
+                                        relocate_at_helper(
+                                            first_ptr + j, dest_first_ptr + j);
+                                }
+                            }
+                            catch (...)
+                            {
+                                for (std::size_t k = 0; k < partial; ++k)
+                                {
+                                    std::size_t j = c + (k_max - k) * d;
+                                    std::destroy_at(dest_first_ptr + j);
+                                }
+                                if (partial < k_max + 1)
+                                {
+                                    for (std::size_t k = 0;
+                                         k < k_max - partial; ++k)
+                                    {
+                                        std::size_t j = c + k * d;
+                                        std::destroy_at(first_ptr + j);
+                                    }
+                                }
+                                for (std::size_t done_ci = 0;
+                                     done_ci < chains_done; ++done_ci)
+                                {
+                                    std::size_t done_c =
+                                        chain_start + done_ci;
+                                    for (std::size_t j = done_c; j < n;
+                                         j += d)
+                                    {
+                                        std::destroy_at(dest_first_ptr + j);
+                                    }
+                                }
+                                for (std::size_t todo_ci = ci + 1;
+                                     todo_ci < num_chains; ++todo_ci)
+                                {
+                                    std::size_t todo_c =
+                                        chain_start + todo_ci;
+                                    for (std::size_t j = todo_c; j < n;
+                                         j += d)
+                                    {
+                                        std::destroy_at(first_ptr + j);
+                                    }
+                                }
+                                throw;
+                            }
+
+                            ++chains_done;
+                        }
+
+                        return {chain_start, chains_done};
+                    },
+                    [first, dest_last, n](auto&&... data) mutable
+                        -> util::in_out_result<BiIter1, BiIter2> {
+                        static_assert(sizeof...(data) < 2);
+                        util::detail::clear_container(data...);
+                        return util::in_out_result<BiIter1, BiIter2>{
+                            first, std::prev(dest_last, n)};
+                    },
+                    [dest_first_ptr, n, d](chain_group_result&& r) -> void {
+                        for (std::size_t ci = 0; ci < r.chains_done; ++ci)
+                        {
+                            std::size_t c = r.chain_start + ci;
+                            for (std::size_t j = c; j < n; j += d)
+                            {
+                                std::destroy_at(dest_first_ptr + j);
+                            }
+                        }
+                    });
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         // parallel_uninitialized_relocate_n_backward
         HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename BiIter,
             typename FwdIter, typename Size>
@@ -540,8 +790,6 @@ namespace hpx::parallel {
                         return util::in_out_result<BiIter, FwdIter>{
                             first, dest_first};
                     },
-                    // cleanup function, called for each partition which
-                    // didn't fail, but only if at least one failed
                     [](partition_result_type&& r) -> void {
                         std::destroy(r.first, r.second);
                     });
@@ -809,11 +1057,6 @@ namespace hpx::experimental {
                 }
             }
 
-            // For non-sequenced execution policies, use parallel execution
-            // unless a left-shift overlap is detected (only detectable for
-            // contiguous iterators). For non-contiguous iterators, the
-            // algorithm contract requires the user to ensure non-overlapping
-            // ranges (same as std::copy).
             if constexpr (!hpx::is_sequenced_execution_policy_v<ExPolicy>)
             {
                 bool has_overlap = false;
@@ -822,15 +1065,43 @@ namespace hpx::experimental {
                 {
                     auto last = std::next(first, count);
                     auto dest_last = std::next(dest, count);
-                    // Detect left-shift overlap: dest_last falls within
-                    // the source range [first, last)
                     has_overlap =
                         (first < dest_last) && (dest_last < last);
+
+                    if (has_overlap)
+                    {
+                        constexpr bool is_trivially_relocatable =
+                            hpx::experimental::util::detail::relocation_traits<
+                                InIter, FwdIter>::is_memcpyable;
+                        if constexpr (!is_trivially_relocatable)
+                        {
+                            auto d = static_cast<std::size_t>(
+                                std::distance(dest, first));
+                            if constexpr (has_scheduler_executor)
+                            {
+                                namespace ex =
+                                    hpx::execution::experimental;
+                                return ex::unique_any_sender<FwdIter>(
+                                    parallel::util::get_second_element(
+                                        hpx::parallel::detail::
+                                            parallel_uninitialized_relocate_n_overlapping(
+                                                HPX_FORWARD(ExPolicy, policy),
+                                                first, count, dest, d)));
+                            }
+                            else
+                            {
+                                return parallel::util::get_second_element(
+                                    hpx::parallel::detail::
+                                        parallel_uninitialized_relocate_n_overlapping(
+                                            HPX_FORWARD(ExPolicy, policy),
+                                            first, count, dest, d));
+                            }
+                        }
+                    }
                 }
 
                 if (!has_overlap)
                 {
-                    // use parallel version
                     if constexpr (has_scheduler_executor)
                     {
                         namespace ex = hpx::execution::experimental;
@@ -961,11 +1232,6 @@ namespace hpx::experimental {
                 }
             }
 
-            // For non-sequenced execution policies, use parallel execution
-            // unless a left-shift overlap is detected (only detectable for
-            // contiguous iterators). For non-contiguous iterators, the
-            // algorithm contract requires the user to ensure non-overlapping
-            // ranges (same as std::copy).
             if constexpr (!hpx::is_sequenced_execution_policy_v<ExPolicy>)
             {
                 bool has_overlap = false;
@@ -975,15 +1241,43 @@ namespace hpx::experimental {
                 {
                     auto last = std::next(first, count);
                     auto dest_last = std::next(dest, count);
-                    // Detect left-shift overlap: dest_last falls within
-                    // the source range [first, last)
                     has_overlap =
                         (first < dest_last) && (dest_last < last);
+
+                    if (has_overlap)
+                    {
+                        constexpr bool is_trivially_relocatable =
+                            hpx::experimental::util::detail::relocation_traits<
+                                InIter1, FwdIter>::is_memcpyable;
+                        if constexpr (!is_trivially_relocatable)
+                        {
+                            auto d = static_cast<std::size_t>(
+                                std::distance(dest, first));
+                            if constexpr (has_scheduler_executor)
+                            {
+                                namespace ex =
+                                    hpx::execution::experimental;
+                                return ex::unique_any_sender<FwdIter>(
+                                    parallel::util::get_second_element(
+                                        hpx::parallel::detail::
+                                            parallel_uninitialized_relocate_n_overlapping(
+                                                HPX_FORWARD(ExPolicy, policy),
+                                                first, count, dest, d)));
+                            }
+                            else
+                            {
+                                return parallel::util::get_second_element(
+                                    hpx::parallel::detail::
+                                        parallel_uninitialized_relocate_n_overlapping(
+                                            HPX_FORWARD(ExPolicy, policy),
+                                            first, count, dest, d));
+                            }
+                        }
+                    }
                 }
 
                 if (!has_overlap)
                 {
-                    // use parallel version
                     if constexpr (has_scheduler_executor)
                     {
                         namespace ex = hpx::execution::experimental;
@@ -1109,11 +1403,6 @@ namespace hpx::experimental {
                 }
             }
 
-            // For non-sequenced execution policies, use parallel execution
-            // unless a right-shift overlap is detected (only detectable for
-            // contiguous iterators). For non-contiguous iterators, the
-            // algorithm contract requires the user to ensure non-overlapping
-            // ranges (same as std::copy_backward).
             if constexpr (!hpx::is_sequenced_execution_policy_v<ExPolicy>)
             {
                 bool has_overlap = false;
@@ -1121,15 +1410,43 @@ namespace hpx::experimental {
                     hpx::traits::is_contiguous_iterator_v<BiIter2>)
                 {
                     auto dest_first = std::prev(dest_last, count);
-                    // Detect right-shift overlap: dest_first falls within
-                    // the source range (first, last)
                     has_overlap =
                         (first < dest_first) && (dest_first < last);
+
+                    if (has_overlap)
+                    {
+                        constexpr bool is_trivially_relocatable =
+                            hpx::experimental::util::detail::relocation_traits<
+                                BiIter1, BiIter2>::is_memcpyable;
+                        if constexpr (!is_trivially_relocatable)
+                        {
+                            auto d = static_cast<std::size_t>(
+                                std::distance(first, dest_first));
+                            if constexpr (has_scheduler_executor)
+                            {
+                                namespace ex =
+                                    hpx::execution::experimental;
+                                return ex::unique_any_sender<BiIter2>(
+                                    parallel::util::get_second_element(
+                                        hpx::parallel::detail::
+                                            parallel_uninitialized_relocate_n_overlapping_backward(
+                                                HPX_FORWARD(ExPolicy, policy),
+                                                first, count, dest_last, d)));
+                            }
+                            else
+                            {
+                                return parallel::util::get_second_element(
+                                    hpx::parallel::detail::
+                                        parallel_uninitialized_relocate_n_overlapping_backward(
+                                            HPX_FORWARD(ExPolicy, policy),
+                                            first, count, dest_last, d));
+                            }
+                        }
+                    }
                 }
 
                 if (!has_overlap)
                 {
-                    // use parallel version
                     if constexpr (has_scheduler_executor)
                     {
                         namespace ex = hpx::execution::experimental;
@@ -1155,7 +1472,6 @@ namespace hpx::experimental {
                 }
             }
 
-            // sequential execution policy
             if constexpr (has_scheduler_executor)
             {
                 namespace ex = hpx::execution::experimental;
