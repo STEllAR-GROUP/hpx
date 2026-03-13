@@ -11,6 +11,8 @@
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/testing.hpp>
 
+#include <ios>
+
 using namespace hpx::iostream;
 
 struct limit_device

@@ -14,7 +14,6 @@
 #include <hpx/modules/testing.hpp>
 
 #include <algorithm>
-#include <cstddef>
 #include <fstream>
 
 #include "detail/sequence.hpp"

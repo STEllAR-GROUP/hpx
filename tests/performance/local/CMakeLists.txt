@@ -9,6 +9,7 @@ set(boost_library_dependencies ${Boost_LIBRARIES})
 
 set(benchmarks
     async_overheads
+    coroutines_call_overhead
     delay_baseline
     delay_baseline_threaded
     function_object_wrapper_overhead
@@ -145,6 +146,7 @@ set(timed_task_spawn_PARAMETERS NO_HPX_MAIN)
 set(benchmark_stealing_PARAMETERS NO_HPX_MAIN)
 set(hpx_tls_overhead_PARAMETERS NO_HPX_MAIN)
 set(native_tls_overhead_PARAMETERS NO_HPX_MAIN)
+set(coroutines_call_overhead_PARAMETERS NO_HPX_MAIN)
 
 foreach(benchmark ${benchmarks})
   set(sources ${benchmark}.cpp ${${benchmark}_SOURCES})

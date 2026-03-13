@@ -14,6 +14,7 @@
 #include <hpx/modules/iostream.hpp>
 #include <hpx/modules/testing.hpp>
 
+#include <cstddef>
 #include <iosfwd>
 #include <sstream>
 
