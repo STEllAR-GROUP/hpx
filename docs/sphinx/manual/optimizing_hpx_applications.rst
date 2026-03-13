@@ -297,6 +297,12 @@ While the options ``--hpx:list-counters`` and ``--hpx:list-counter-infos`` give
 a short list of all available counters, the full documentation for those can
 be found in the section :ref:`counters`.
 
+For real-time visualization of these counters, |hpx| provides a terminal-based
+dashboard called :ref:`hpx_top`. This tool acts as a wrapper around |hpx|
+applications, automatically injecting the necessary command-line flags to enable
+high-frequency counter output and visualizing the data in a modern, interactive
+interface.
+
 A simple example
 ----------------
 
