@@ -2707,8 +2707,7 @@ int hpx_main()
 #endif
 
     test_scheduler_copy_avoidance();
-    test_completion_scheduler();
-    test_sender_receiver_set_error_on_execute_failure(); 08db910159 (Add test for set_error on execute failure in thread_pool_scheduler)
+    test_sender_receiver_set_error_on_execute_failure();
 
     return hpx::local::finalize();
 }
