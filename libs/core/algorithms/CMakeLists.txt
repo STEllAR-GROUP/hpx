@@ -240,6 +240,7 @@ if(HPX_WITH_DATAPAR)
       hpx/parallel/datapar/mismatch.hpp
       hpx/parallel/datapar/reduce.hpp
       hpx/parallel/datapar/replace.hpp
+      hpx/parallel/datapar/search.hpp
       hpx/parallel/datapar/transfer.hpp
       hpx/parallel/datapar/transform_loop.hpp
       hpx/parallel/datapar/zip_iterator.hpp
