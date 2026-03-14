@@ -24,7 +24,7 @@ set(benchmarks
     timed_task_spawn
     skynet
     wait_all_timings
-    benchmark_stealing
+    shared_mutex_overhead
 )
 
 set(timed_task_spawn_SOURCES activate_counters.cpp)
