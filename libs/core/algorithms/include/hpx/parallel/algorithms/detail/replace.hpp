@@ -12,6 +12,7 @@
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
+#include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
@@ -49,7 +50,7 @@ namespace hpx::parallel::detail {
 
                 return for_each_n<InIter>().call(
                     HPX_FORWARD(ExPolicy, policy), first,
-                    std::distance(first, last),
+                    detail::distance(first, last),
                     [old_value, new_value, proj = HPX_FORWARD(Proj, proj)](
                         type& t) -> void {
                         if (HPX_INVOKE(proj, t) == old_value)
