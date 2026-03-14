@@ -6,13 +6,7 @@
 
 // test for availability of std::experimental::meta_xxx
 
-#include <experimental/meta>
-
-#if !defined(__cpp_lib_experimental_meta)
-#error "__cpp_lib_experimental_meta not defined, " \
-    "assume meta programming features are not supported"
-#endif
-
+#include <meta>
 int main()
 {
     constexpr auto r = ^^int;

@@ -21,8 +21,8 @@
 #if defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
 #include <bit>
 #include <cstddef>
-#include <experimental/meta>
 #include <memory>
+#include <meta>
 #include <optional>
 #endif
 

@@ -1,17 +1,17 @@
-# Copyright (c) 2026 Ujjwal Shekhar
+# Copyright (c) 2026 Surya Teja
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-name: Linux CI (Release, Clang P2996 Reflection)
+name: Linux CI (Release, GCC Trunk Reflection)
 
 on: [pull_request]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: ujjwalshekhar2503/hpx-clang-ci:latest
+    container: sleepingeight/gcc-cpp-refl:latest
 
     steps:
     - uses: actions/checkout@v6
@@ -25,11 +25,11 @@ jobs:
           -DHPX_WITH_MALLOC=system \
           -DCMAKE_BUILD_TYPE=Debug \
           -DHPX_WITH_CXX_STANDARD=26 \
-          -DCMAKE_C_COMPILER=clang \
-          -DCMAKE_CXX_COMPILER=clang++ \
-          -DCMAKE_CXX_FLAGS="-freflection-latest -stdlib=libc++ -D__cpp_lib_experimental_meta=202403L" \
-          -DCMAKE_EXE_LINKER_FLAGS="-stdlib=libc++ -latomic" \
-          -DCMAKE_SHARED_LINKER_FLAGS="-stdlib=libc++ -latomic" \
+          -DCMAKE_C_COMPILER=gcc \
+          -DCMAKE_CXX_COMPILER=g++ \
+          -DCMAKE_CXX_FLAGS="-freflection -std=c++26 -latomic" \
+          -DCMAKE_EXE_LINKER_FLAGS="-latomic" \
+          -DCMAKE_SHARED_LINKER_FLAGS="-latomic" \
           -DCMAKE_REQUIRED_LIBRARIES="atomic" \
           -DHPX_INTERNAL_CACHE_LINE_SIZE_DETECT=64 \
           -DHPX_WITH_FETCH_ASIO=ON \
