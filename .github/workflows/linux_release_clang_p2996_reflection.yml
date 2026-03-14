@@ -29,7 +29,8 @@ jobs:
           -DCMAKE_CXX_COMPILER=clang++ \
           -DCMAKE_CXX_FLAGS="-freflection-latest -stdlib=libc++ -D__cpp_lib_experimental_meta=202403L" \
           -DCMAKE_EXE_LINKER_FLAGS="-stdlib=libc++ -L${CLANG_P2996_LIBS} -Wl,-rpath,${CLANG_P2996_LIBS} -L${SYSTEM_LINKER_PATH} -latomic" \
-          -DCMAKE_SHARED_LINKER_FLAGS="-stdlib=libc++ -L${CLANG_P2996_LIBS} -Wl,-rpath,${CLANG_P2996_LIBS} -L${SYSTEM_LINKER_PATH} -latomic" \          -DCMAKE_REQUIRED_LIBRARIES="atomic" \
+          -DCMAKE_SHARED_LINKER_FLAGS="-stdlib=libc++ -L${CLANG_P2996_LIBS} -Wl,-rpath,${CLANG_P2996_LIBS} -L${SYSTEM_LINKER_PATH} -latomic" \
+          -DCMAKE_REQUIRED_LIBRARIES="atomic" \
           -DHPX_INTERNAL_CACHE_LINE_SIZE_DETECT=64 \
           -DHPX_WITH_FETCH_ASIO=ON \
           -DHPX_WITH_EXAMPLES=OFF \
@@ -49,3 +50,4 @@ jobs:
           ctest \
             --output-on-failure \
             --tests-regex "tests.unit.modules.serialization"
+           
