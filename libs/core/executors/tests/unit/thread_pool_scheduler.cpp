@@ -2602,6 +2602,65 @@ void test_scheduler_copy_avoidance()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// Test that set_error receives a valid (non-moved-from) receiver when
+// execute() throws. This verifies the fix where the receiver was previously
+// captured by move into the execute lambda, making it unavailable for the
+// error path in operation_state::start().
+void test_sender_receiver_set_error_on_execute_failure()
+{
+    ex::thread_pool_scheduler sched{};
+
+    // Schedule work that throws, then verify the error is properly propagated
+    // through set_error (not called on a moved-from receiver).
+    {
+        std::atomic<bool> error_called{false};
+#if defined(HPX_HAVE_STDEXEC)
+        tt::sync_wait(ex::schedule(sched) | ex::then([]() {
+            throw std::runtime_error("execute failed");
+        }) | ex::let_error([&error_called](std::exception_ptr& ep) {
+            error_called = true;
+            check_exception_ptr_message(ep, "execute failed");
+            return ex::just();
+        }));
+#else
+        ex::schedule(sched) | ex::then([]() {
+            throw std::runtime_error("execute failed");
+        }) | ex::let_error([&error_called](std::exception_ptr& ep) {
+            error_called = true;
+            check_exception_ptr_message(ep, "execute failed");
+            return ex::just();
+        }) | tt::sync_wait();
+#endif
+        HPX_TEST(error_called);
+    }
+
+    // Verify error propagation with a value-returning sender
+    {
+        std::atomic<bool> error_called{false};
+#if defined(HPX_HAVE_STDEXEC)
+        tt::sync_wait(ex::schedule(sched) | ex::then([]() {
+            throw std::runtime_error("execute failed");
+            return 0;
+        }) | ex::let_error([&error_called](std::exception_ptr& ep) {
+            error_called = true;
+            check_exception_ptr_message(ep, "execute failed");
+            return ex::just(0);
+        }));
+#else
+        ex::schedule(sched) | ex::then([]() {
+            throw std::runtime_error("execute failed");
+            return 0;
+        }) | ex::let_error([&error_called](std::exception_ptr& ep) {
+            error_called = true;
+            check_exception_ptr_message(ep, "execute failed");
+            return ex::just(0);
+        }) | tt::sync_wait();
+#endif
+        HPX_TEST(error_called);
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
     test_execute();
@@ -2648,6 +2707,7 @@ int hpx_main()
 #endif
 
     test_scheduler_copy_avoidance();
+    test_sender_receiver_set_error_on_execute_failure();
 
     return hpx::local::finalize();
 }
