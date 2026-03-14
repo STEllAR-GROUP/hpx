@@ -18,7 +18,7 @@ namespace hpx::components {
 namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, typename Enable = void>
+    HPX_CXX_EXPORT template <typename Component, typename Enable = void>
     struct component_type_database
     {
         static components::component_type value;

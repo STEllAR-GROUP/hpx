@@ -60,13 +60,6 @@
 # endif
 #endif
 
-#if !defined(HPX_CXX_CORE_EXPORT)
-# define HPX_CXX_CORE_EXPORT                    /* empty */
-#endif
-#if !defined(HPX_CXX_EXPORT)
-# define HPX_CXX_EXPORT                         /* empty */
-#endif
-
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(HPX_EXPORTS) || defined(HPX_FULL_EXPORTS)
 # define  HPX_EXPORT             HPX_SYMBOL_EXPORT
@@ -102,6 +95,13 @@
 # define HPX_ALWAYS_EXPORT       HPX_SYMBOL_IMPORT
 # define HPX_ALWAYS_IMPORT       HPX_SYMBOL_IMPORT
 #endif
+#endif
+
+#if !defined(HPX_CXX_CORE_EXPORT)
+# define HPX_CXX_CORE_EXPORT                    /* empty */
+#endif
+#if !defined(HPX_CXX_EXPORT)
+# define HPX_CXX_EXPORT                         /* empty */
 #endif
 
 // clang-format on

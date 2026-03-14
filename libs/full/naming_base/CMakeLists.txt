@@ -36,10 +36,3 @@ add_hpx_module(
   DEPENDENCIES hpx_core
   CMAKE_SUBDIRS examples tests
 )
-
-if(HPX_WITH_CXX_MODULES)
-  set(HPX_NAMING_BASE_ENABLED_CXX_MODULES
-      naming_base
-      CACHE INTERNAL "List of enabled C++ modules for HPX naming_base" FORCE
-  )
-endif()

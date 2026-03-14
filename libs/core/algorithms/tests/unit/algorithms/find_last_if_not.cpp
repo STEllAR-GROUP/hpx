@@ -1,4 +1,3 @@
-//  Copyright (c) 2024 Arpit Khandelwal
 //  Copyright (c) 2021 Srinivas Yadav
 //  Copyright (c) 2014 Grant Mercer
 //

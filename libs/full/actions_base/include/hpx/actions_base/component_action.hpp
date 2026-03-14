@@ -13,7 +13,6 @@
 #include <hpx/config.hpp>
 #include <hpx/actions_base/basic_action.hpp>
 #include <hpx/actions_base/traits/is_client.hpp>
-#include <hpx/components_base/get_lva.hpp>
 #include <hpx/modules/components_base.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/futures.hpp>

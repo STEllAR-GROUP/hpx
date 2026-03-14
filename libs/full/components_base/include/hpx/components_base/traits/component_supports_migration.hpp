@@ -40,7 +40,7 @@ namespace hpx::traits {
         }
     }    // namespace detail
 
-    template <typename Component, typename Enable = void>
+    HPX_CXX_EXPORT template <typename Component, typename Enable = void>
     struct component_supports_migration
     {
         // returns whether target supports migration

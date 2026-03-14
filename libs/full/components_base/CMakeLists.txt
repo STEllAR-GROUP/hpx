@@ -13,13 +13,14 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 # Default location is $HPX_ROOT/libs/components_base/include
 set(components_base_headers
     hpx/components_base/agas_interface.hpp
-    hpx/components_base/get_lva.hpp
-    hpx/components_base/components_base_fwd.hpp
-    hpx/components_base/component_type.hpp
     hpx/components_base/component_commandline.hpp
     hpx/components_base/component_startup_shutdown.hpp
+    hpx/components_base/component_type.hpp
+    hpx/components_base/components_base_fwd.hpp
     hpx/components_base/detail/agas_interface_functions.hpp
     hpx/components_base/generate_unique_ids.hpp
+    hpx/components_base/get_lva.hpp
+    hpx/components_base/macros.hpp
     hpx/components_base/pinned_ptr.hpp
     hpx/components_base/server/abstract_component_base.hpp
     hpx/components_base/server/abstract_migration_support.hpp
@@ -42,8 +43,8 @@ set(components_base_headers
     hpx/components_base/traits/component_heap_type.hpp
     hpx/components_base/traits/component_pin_support.hpp
     hpx/components_base/traits/component_supports_migration.hpp
-    hpx/components_base/traits/component_type_is_compatible.hpp
     hpx/components_base/traits/component_type_database.hpp
+    hpx/components_base/traits/component_type_is_compatible.hpp
     hpx/components_base/traits/is_component.hpp
     hpx/components_base/traits/managed_component_policies.hpp
 )
@@ -75,7 +76,7 @@ set(components_base_compat_headers
     hpx/runtime/components/server/wrapper_heap.hpp => hpx/modules/components_base.hpp
     hpx/runtime/components/server/wrapper_heap_base.hpp => hpx/modules/components_base.hpp
     hpx/runtime/components/server/wrapper_heap_list.hpp => hpx/modules/components_base.hpp
-    hpx/runtime/components/stubs/stub_base.hpp => hpx/modules/components.hpp
+    hpx/runtime/components/stubs/stub_base.hpp => hpx/modules/components_base.hpp
     hpx/traits/action_decorate_function.hpp => hpx/modules/components_base.hpp
     hpx/traits/component_config_data.hpp => hpx/modules/components_base.hpp
     hpx/traits/component_heap_type.hpp => hpx/modules/components_base.hpp
@@ -108,16 +109,34 @@ add_hpx_module(
   GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${components_base_sources}
   HEADERS ${components_base_headers}
+  MACRO_HEADERS hpx/components_base/macros.hpp
+  ADD_TO_GLOBAL_HEADER "hpx/components_base/detail/agas_interface_functions.hpp"
   COMPAT_HEADERS ${components_base_compat_headers}
-  DEPENDENCIES hpx_core
+  DEPENDENCIES
+    hpx_core
+    hpx_allocator_support
+    hpx_async_base
+    hpx_concepts
+    hpx_concurrency
+    hpx_coroutines
+    hpx_datastructures
+    hpx_errors
+    hpx_format
+    hpx_functional
+    hpx_futures
+    hpx_itt_notify
+    hpx_lock_registration
+    hpx_logging
+    hpx_memory
+    hpx_preprocessor
+    hpx_program_options
+    hpx_runtime_configuration
+    hpx_runtime_local
+    hpx_static_reinit
+    hpx_synchronization
+    hpx_thread_support
+    hpx_threading_base
+    hpx_type_support
   MODULE_DEPENDENCIES hpx_naming_base hpx_parcelset_base
   CMAKE_SUBDIRS examples tests
 )
-
-if(HPX_WITH_CXX_MODULES)
-  set(HPX_COMPONENTS_BASE_ENABLED_CXX_MODULES
-      components_base
-      CACHE INTERNAL "List of enabled C++ modules for HPX components_base"
-            FORCE
-  )
-endif()

@@ -9,6 +9,6 @@
 namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, typename Enable = void>
+    HPX_CXX_EXPORT template <typename Component, typename Enable = void>
     struct component_heap_type;
 }    // namespace hpx::traits

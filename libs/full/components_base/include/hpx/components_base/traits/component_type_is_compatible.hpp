@@ -12,7 +12,7 @@
 namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, typename Enable = void>
+    HPX_CXX_EXPORT template <typename Component, typename Enable = void>
     struct component_type_is_compatible
     {
         static bool call(naming::address const& addr) noexcept

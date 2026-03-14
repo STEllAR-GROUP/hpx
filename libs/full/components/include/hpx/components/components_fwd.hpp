@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/components_base/components_base_fwd.hpp>
+#include <hpx/modules/components_base.hpp>
 
 namespace hpx::components {
 

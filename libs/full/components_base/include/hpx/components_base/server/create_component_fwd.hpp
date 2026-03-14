@@ -20,17 +20,17 @@ namespace hpx::components::server {
 
     ///////////////////////////////////////////////////////////////////////////
     /// Create arrays of components using their default constructor
-    template <typename Component, typename... Ts>
+    HPX_CXX_EXPORT template <typename Component, typename... Ts>
     naming::gid_type create(Ts&&... ts);
 
-    template <typename Component, typename... Ts>
+    HPX_CXX_EXPORT template <typename Component, typename... Ts>
     naming::gid_type create_migrated(
         naming::gid_type const& gid, void** p, Ts&&... ts);
 
-    template <typename Component, typename... Ts>
+    HPX_CXX_EXPORT template <typename Component, typename... Ts>
     std::vector<naming::gid_type> bulk_create(std::size_t count, Ts&&... ts);
 
-    template <typename Component, typename... Ts>
+    HPX_CXX_EXPORT template <typename Component, typename... Ts>
     naming::gid_type construct(Ts&&... ts)
     {
         return create<Component>(HPX_FORWARD(Ts, ts)...);

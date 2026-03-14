@@ -12,7 +12,7 @@
 #include <hpx/collectives/channel_communicator.hpp>
 #include <hpx/collectives/detail/channel_communicator.hpp>
 #include <hpx/components/basename_registration.hpp>
-#include <hpx/components_base/server/component.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/runtime_components/component_factory.hpp>
 
 #include <cstddef>

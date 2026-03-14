@@ -10,9 +10,9 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_colocated/post_colocated.hpp>
 #include <hpx/async_distributed/post.hpp>
-#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/async_distributed.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/ini.hpp>
 #include <hpx/modules/naming_base.hpp>

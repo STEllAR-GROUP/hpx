@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2015-2017 Thomas Heller
 //  Copyright (c)      2011 Bryce Lelbach
-//
+
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -56,7 +56,7 @@ namespace hpx::traits {
 namespace hpx::components {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Component>
+    HPX_CXX_EXPORT template <typename Component>
     class component : public Component
     {
     public:

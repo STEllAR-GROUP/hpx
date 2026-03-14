@@ -14,7 +14,7 @@
 namespace hpx::components {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename ServerComponent>
+    HPX_CXX_EXPORT template <typename ServerComponent>
     struct stub_base
     {
         using server_component_type = ServerComponent;

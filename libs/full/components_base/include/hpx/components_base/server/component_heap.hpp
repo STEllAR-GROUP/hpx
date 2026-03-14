@@ -8,6 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/components_base/macros.hpp>
 #include <hpx/modules/static_reinit.hpp>
 
 namespace hpx::components {
@@ -34,21 +35,9 @@ namespace hpx::components {
             ...);
     }    // namespace detail
 
-    template <typename Component>
+    HPX_CXX_EXPORT template <typename Component>
     typename Component::heap_type& component_heap()
     {
         return detail::component_heap_helper<Component>(nullptr);
     }
 }    // namespace hpx::components
-
-#define HPX_REGISTER_COMPONENT_HEAP(Component)                                 \
-    namespace hpx::components::detail {                                        \
-        template <>                                                            \
-        HPX_ALWAYS_EXPORT Component::heap_type&                                \
-        component_heap_helper<Component>(...)                                  \
-        {                                                                      \
-            util::reinitializable_static<Component::heap_type> heap;           \
-            return heap.get();                                                 \
-        }                                                                      \
-    }                                                                          \
-    /**/

@@ -15,7 +15,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/continuation.hpp>
 #include <hpx/async_distributed/detail/post.hpp>
-#include <hpx/components_base/agas_interface.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/parcelset_base.hpp>
 #include <hpx/modules/runtime_local.hpp>
