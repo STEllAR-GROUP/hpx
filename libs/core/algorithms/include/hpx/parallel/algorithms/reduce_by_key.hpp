@@ -324,7 +324,8 @@ namespace hpx::parallel::detail {
         using zip_ref = typename zip_iterator<reducebykey_iter,
             keystate_iter_type>::reference;
         //
-        std::uint64_t const number_of_keys = std::distance(key_first, key_last);
+        std::uint64_t const number_of_keys =
+            hpx::parallel::detail::distance(key_first, key_last);
         //
         key_state.assign(number_of_keys, reduce_key_series_states());
         {
@@ -333,9 +334,6 @@ namespace hpx::parallel::detail {
                 make_reduce_stencil_iterator(key_first, r_s_t);
             reducebykey_iter reduce_end =
                 make_reduce_stencil_iterator(key_last, r_s_t);
-
-            // FIXME: handle cases number_of_keys == 0 and
-            //        number_of_keys == 1
 
             if (number_of_keys == 2)
             {
@@ -535,16 +533,24 @@ namespace hpx::experimental {
                 std::forward_iterator<FwdIter2>,
             "iterators : Random_access for inputs and forward for outputs.");
 
-        std::uint64_t const number_of_keys = std::distance(key_first, key_last);
+        std::uint64_t const number_of_keys =
+            hpx::parallel::detail::distance(key_first, key_last);
 
-        if (number_of_keys <= 1)
+        if (number_of_keys == 0)
+        {
+            return result::get(
+                hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>{
+                    keys_output, values_output});
+        }
+
+        if (number_of_keys == 1)
         {
             // we only have a single key/value so that is our output
             *keys_output = *key_first;
             *values_output = *values_first;
             return result::get(
                 hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>{
-                    keys_output, values_output});
+                    ++keys_output, ++values_output});
         }
 
         return hpx::parallel::detail::reduce_by_key<FwdIter1, FwdIter2>().call(
