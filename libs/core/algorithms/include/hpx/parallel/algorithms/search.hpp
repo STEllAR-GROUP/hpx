@@ -252,7 +252,7 @@ namespace hpx {
     ///
     /// \returns  The \a search_n algorithm returns \a FwdIter.
     ///           The \a search_n algorithm returns an iterator to the beginning of
-    ///           the last subsequence [s_first, s_last) in range [first, first+count).
+    ///           the first subsequence [s_first, s_last) in range [first, first+count).
     ///           If the length of the subsequence [s_first, s_last) is greater
     ///           than the length of the range [first, first+count),
     ///           \a first is returned.
@@ -327,7 +327,7 @@ namespace hpx {
     ///           execution policy is of type \a task_execution_policy and
     ///           returns \a FwdIter otherwise.
     ///           The \a search_n algorithm returns an iterator to the beginning of
-    ///           the last subsequence [s_first, s_last) in range [first, first+count).
+    ///           the first subsequence [s_first, s_last) in range [first, first+count).
     ///           If the length of the subsequence [s_first, s_last) is greater
     ///           than the length of the range [first, first+count),
     ///           \a first is returned.
