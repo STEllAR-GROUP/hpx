@@ -98,7 +98,7 @@ namespace hpx { namespace experimental {
 #else
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/tuple.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/parallel/algorithms/sort.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 
@@ -108,7 +108,7 @@ namespace hpx { namespace experimental {
 
 namespace hpx::parallel {
 
-    template <typename KeyIter, typename ValueIter>
+    HPX_CXX_CORE_EXPORT template <typename KeyIter, typename ValueIter>
     using sort_by_key_result = std::pair<KeyIter, ValueIter>;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -116,7 +116,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        struct extract_key
+        HPX_CXX_CORE_EXPORT struct extract_key
         {
             template <typename Tuple>
             auto operator()(Tuple&& t) const
@@ -131,11 +131,11 @@ namespace hpx::parallel {
 
 namespace hpx::experimental {
 
-    template <typename KeyIter, typename ValueIter>
+    HPX_CXX_CORE_EXPORT template <typename KeyIter, typename ValueIter>
     using sort_by_key_result = std::pair<KeyIter, ValueIter>;
 
-    template <typename ExPolicy, typename KeyIter, typename ValueIter,
-        typename Compare = hpx::parallel::detail::less>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename KeyIter,
+        typename ValueIter, typename Compare = hpx::parallel::detail::less>
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
         sort_by_key_result<KeyIter, ValueIter>>
     sort_by_key(ExPolicy&& policy, KeyIter key_first, KeyIter key_last,
@@ -146,9 +146,9 @@ namespace hpx::experimental {
             "sort_by_key is not supported unless HPX_HAVE_TUPLE_RVALUE_SWAP "
             "is defined");
 #else
-        static_assert(hpx::traits::is_random_access_iterator_v<KeyIter>,
+        static_assert(std::random_access_iterator<KeyIter>,
             "Requires a random access iterator.");
-        static_assert(hpx::traits::is_random_access_iterator_v<ValueIter>,
+        static_assert(std::random_access_iterator<ValueIter>,
             "Requires a random access iterator.");
 
         ValueIter value_last = value_first;

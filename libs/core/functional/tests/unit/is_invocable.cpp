@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/functional/traits/is_invocable.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/testing.hpp>
 
 struct X
@@ -160,7 +160,7 @@ void member_function_pointers()
 
 void member_object_pointers()
 {
-    typedef int(X::*f);
+    typedef int(X::* f);
     HPX_TEST_MSG((hpx::is_invocable_v<f, X*> == true), "mem-obj-ptr/ptr");
     HPX_TEST_MSG(
         (hpx::is_invocable_v<f, X const*> == true), "mem-obj-ptr/const-ptr");

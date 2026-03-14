@@ -6,14 +6,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/components/basename_registration.hpp>
+#include <hpx/components_base/agas_interface.hpp>
+#include <hpx/modules/async_combinators.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/futures.hpp>
-
-#include <hpx/async_combinators/wait_all.hpp>
-#include <hpx/components/basename_registration.hpp>
-#include <hpx/components_base/agas_interface.hpp>
-#include <hpx/naming_base/id_type.hpp>
+#include <hpx/modules/naming_base.hpp>
 
 #include <cstddef>
 #include <string>
@@ -86,9 +85,14 @@ namespace hpx {
         {
             std::string name;
             if (i == num_ids - 1)
+            {
+                // NOLINTNEXTLINE(bugprone-use-after-move)
                 name = detail::name_from_basename(HPX_MOVE(basename), i);
+            }
             else
+            {
                 name = detail::name_from_basename(basename, i);
+            }
 
             results.push_back(
                 agas::on_symbol_namespace_event(HPX_MOVE(name), true));
@@ -124,9 +128,14 @@ namespace hpx {
         {
             std::string name;
             if (i == ids.size() - 1)
+            {
+                // NOLINTNEXTLINE(bugprone-use-after-move)
                 name = detail::name_from_basename(HPX_MOVE(basename), i);
+            }
             else
+            {
                 name = detail::name_from_basename(basename, i);
+            }
 
             results.emplace_back(
                 agas::on_symbol_namespace_event(HPX_MOVE(name), true));

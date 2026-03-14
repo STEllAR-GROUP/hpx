@@ -13,19 +13,22 @@
 #include <hpx/compute_local/detail/iterator.hpp>
 #include <hpx/compute_local/traits/access_target.hpp>
 #include <hpx/compute_local/traits/allocator_traits.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/parallel/util/transfer.hpp>
-#include <hpx/runtime_local/report_error.hpp>
+#include <hpx/modules/algorithms.hpp>
+#include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/runtime_local.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <initializer_list>
+#include <iterator>
 #include <memory>
 #include <type_traits>
 #include <utility>
 
 namespace hpx::compute {
 
-    template <typename T, typename Allocator = std::allocator<T>>
+    HPX_CXX_CORE_EXPORT template <typename T,
+        typename Allocator = std::allocator<T>>
     class vector
     {
         using alloc_traits = traits::allocator_traits<Allocator>;
@@ -82,8 +85,8 @@ namespace hpx::compute {
         }
 
         template <typename InIter,
-            typename Enable = typename std::enable_if<
-                hpx::traits::is_input_iterator<InIter>::value>::type>
+            typename Enable =
+                typename std::enable_if<std::input_iterator<InIter>>::type>
         vector(InIter first, InIter last, Allocator const& alloc)
           : size_(std::distance(first, last))
           , capacity_(size_)
@@ -237,8 +240,47 @@ namespace hpx::compute {
             return *(data_ + pos);
         }
 
-        // TODO: implement front()
-        // TODO: implement back()
+        /// Returns a reference to the first element in the container.
+        /// Calling front on an empty container is undefined.
+        HPX_HOST_DEVICE
+        reference front()
+        {
+#if !defined(__CUDA_ARCH__)
+            HPX_ASSERT(!empty());
+#endif
+            return *data_;
+        }
+
+        /// \copydoc front()
+        HPX_HOST_DEVICE
+        const_reference front() const
+        {
+#if !defined(__CUDA_ARCH__)
+            HPX_ASSERT(!empty());
+#endif
+            return *data_;
+        }
+
+        /// Returns a reference to the last element in the container.
+        /// Calling back on an empty container is undefined.
+        HPX_HOST_DEVICE
+        reference back()
+        {
+#if !defined(__CUDA_ARCH__)
+            HPX_ASSERT(!empty());
+#endif
+            return *(data_ + size_ - 1);
+        }
+
+        /// \copydoc back()
+        HPX_HOST_DEVICE
+        const_reference back() const
+        {
+#if !defined(__CUDA_ARCH__)
+            HPX_ASSERT(!empty());
+#endif
+            return *(data_ + size_ - 1);
+        }
 
         /// Returns pointer to the underlying array serving as element storage.
         /// The pointer is such that range [data(); data() + size()) is always a
@@ -380,10 +422,16 @@ namespace hpx::compute {
     };
 
     /// Effects: x.swap(y);
-    template <typename T, typename Allocator>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Allocator>
     HPX_FORCEINLINE void swap(
         vector<T, Allocator>& x, vector<T, Allocator>& y) noexcept
     {
         x.swap(y);
     }
 }    // namespace hpx::compute
+
+HPX_CXX_CORE_EXPORT template <typename T, typename Allocator>
+struct hpx::traits::is_contiguous_iterator<
+    hpx::compute::detail::iterator<T, Allocator>> : std::true_type
+{
+};

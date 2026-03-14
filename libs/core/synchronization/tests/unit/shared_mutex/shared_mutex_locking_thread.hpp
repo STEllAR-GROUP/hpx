@@ -9,9 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/synchronization/condition_variable.hpp>
-#include <hpx/synchronization/mutex.hpp>
-#include <hpx/synchronization/shared_mutex.hpp>
+#include <hpx/modules/synchronization.hpp>
 
 #include <mutex>
 #include <shared_mutex>

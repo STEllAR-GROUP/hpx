@@ -1,4 +1,4 @@
-//  Copyright (c) 2021-2023 Hartmut Kaiser
+//  Copyright (c) 2021-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -22,12 +22,13 @@ namespace hpx::collectives {
         struct argument_type
         {
             explicit constexpr argument_type(
-                std::size_t argument = Default) noexcept
+                std::size_t const argument = Default) noexcept
               : argument_(argument)
             {
             }
 
-            constexpr argument_type& operator=(std::size_t argument) noexcept
+            constexpr argument_type& operator=(
+                std::size_t const argument) noexcept
             {
                 argument_ = argument;
                 return *this;
@@ -36,6 +37,11 @@ namespace hpx::collectives {
             constexpr operator std::size_t() const noexcept
             {
                 return argument_;
+            }
+
+            [[nodiscard]] constexpr bool is_default() const noexcept
+            {
+                return argument_ == Default;
             }
 
             std::size_t argument_;
@@ -74,5 +80,5 @@ namespace hpx::collectives {
 
     /// The number of children each of the communication nodes is connected
     /// to (default: picked based on num_sites).
-    using arity_arg = detail::argument_type<detail::arity_tag>;
+    using arity_arg = detail::argument_type<detail::arity_tag, 2>;
 }    // namespace hpx::collectives

@@ -32,7 +32,7 @@ using atype = std::atomic<std::int64_t>;
 static atype task_1_counter(0);
 static atype task_1_total(0);
 static atype task_1_max(0);
-static const std::int64_t max1 = 110;
+static std::int64_t const max1 = 110;
 
 ///////////////////////////////////////////////////////////////////////////////
 //  simple task that can yield at random and increments counters
@@ -64,7 +64,7 @@ void test_limit()
     auto exec1 = hpx::execution::parallel_executor(
         hpx::threads::thread_stacksize::small_);
     //
-    const bool block_on_exit = true;
+    bool const block_on_exit = true;
     std::vector<hpx::future<void>> futures;
     // scope block for executor lifetime (block on destruction)
     {

@@ -110,8 +110,9 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/executors/execution_policy.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/executors.hpp>
+#include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
@@ -119,23 +120,23 @@ namespace hpx {
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
-#include <hpx/type_support/identity.hpp>
 
 #include <algorithm>
+#include <iterator>
 #include <type_traits>
 #include <utility>
 
 namespace hpx::parallel {
 
-    template <typename Iter1, typename Iter2>
+    HPX_CXX_CORE_EXPORT template <typename Iter1, typename Iter2>
     using swap_ranges_result = hpx::parallel::util::in_in_result<Iter1, Iter2>;
 
     ///////////////////////////////////////////////////////////////////////////
     // swap ranges
     namespace detail {
 
-        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename Size>
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename FwdIter1,
+            typename FwdIter2, typename Size>
         decltype(auto) parallel_swap_ranges(
             ExPolicy&& policy, FwdIter1 first1, FwdIter2 first2, Size n)
         {
@@ -211,7 +212,7 @@ namespace hpx::parallel {
                 auto dist2 = detail::distance(first2, last2);
 
                 return parallel_swap_ranges(HPX_FORWARD(ExPolicy, policy),
-                    first1, first2, (std::min)(dist1, dist2));
+                    first1, first2, (std::min) (dist1, dist2));
             }
         };
         /// \endcond
@@ -222,42 +223,42 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::swap_ranges
-    inline constexpr struct swap_ranges_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct swap_ranges_t final
       : hpx::detail::tag_parallel_algorithm<swap_ranges_t>
     {
+        template <typename FwdIter1, typename FwdIter2>
         // clang-format off
-        template <typename FwdIter1, typename FwdIter2,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2>
-            )>
+            )
         // clang-format on
         friend FwdIter2 tag_fallback_invoke(hpx::swap_ranges_t, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::swap_ranges<FwdIter2>().call(
                 hpx::execution::seq, first1, last1, first2);
         }
 
+        template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
         // clang-format off
-        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::swap_ranges_t,
             ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::swap_ranges<FwdIter2>().call(

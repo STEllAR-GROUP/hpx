@@ -37,6 +37,16 @@ namespace hpx { namespace collectives {
     /// \returns    This function returns a future to a new communicator object
     ///             usable with the collective operation.
     ///
+    /// \note       The caller must ensure that the communicator object
+    ///             returned by this function is kept alive (i.e., does not go
+    ///             out of scope) until all participating sites have
+    ///             successfully connected. Destroying the communicator before
+    ///             all sites have reached the creation point may cause the
+    ///             remaining sites to hang indefinitely. Consider using a
+    ///             barrier or similar synchronization mechanism after creating
+    ///             the communicator to ensure all sites are connected before
+    ///             allowing it to be destroyed.
+    ///
     hpx::future<channel_communicator> create_channel_communicator(
         char const* basename,
         num_sites_arg num_sites = num_sites_arg(),
@@ -58,6 +68,16 @@ namespace hpx { namespace collectives {
     ///
     /// \returns    This function returns a new communicator object usable
     ///             with the collective operation.
+    ///
+    /// \note       The caller must ensure that the communicator object
+    ///             returned by this function is kept alive (i.e., does not go
+    ///             out of scope) until all participating sites have
+    ///             successfully connected. Destroying the communicator before
+    ///             all sites have reached the creation point may cause the
+    ///             remaining sites to hang indefinitely. Consider using a
+    ///             barrier or similar synchronization mechanism after creating
+    ///             the communicator to ensure all sites are connected before
+    ///             allowing it to be destroyed.
     ///
     channel_communicator create_channel_communicator(
         hpx::launch::sync_policy, char const* basename,
@@ -103,12 +123,12 @@ namespace hpx { namespace collectives {
 #else
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/async.hpp>
 #include <hpx/collectives/argument_types.hpp>
 #include <hpx/collectives/detail/channel_communicator.hpp>
 #include <hpx/components/client.hpp>
-#include <hpx/futures/future.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/futures.hpp>
 
 #include <cstddef>
 #include <memory>

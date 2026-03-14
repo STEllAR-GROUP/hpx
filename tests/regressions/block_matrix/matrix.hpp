@@ -11,9 +11,7 @@
 #include "defs.hpp"
 
 #include <hpx/assert.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/shared_ptr.hpp>
-#include <hpx/serialization/vector.hpp>
+#include <hpx/modules/serialization.hpp>
 
 #include <cassert>
 #include <cstddef>
@@ -46,14 +44,14 @@ struct vector_t
     {
     }
     explicit vector_t(std::initializer_list<double> x)
-      : N(x.size())
+      : N(static_cast<std::ptrdiff_t>(x.size()))
       , elts(x)
     {
     }
     // We don't really want these
     vector_t() = default;
-    vector_t(const vector_t&) = default;
-    vector_t& operator=(const vector_t&)
+    vector_t(vector_t const&) = default;
+    vector_t& operator=(vector_t const&)
     {
         HPX_ASSERT(0);
         return *this;
@@ -63,7 +61,7 @@ struct vector_t
     {
         return mkstr(*this);
     }
-    const double& operator()(std::ptrdiff_t i) const
+    double const& operator()(std::ptrdiff_t i) const
     {
         HPX_ASSERT(i >= 0 && i < N);
         return elts[i];
@@ -75,7 +73,7 @@ struct vector_t
     }
 };
 
-std::ostream& operator<<(std::ostream& os, const vector_t& x);
+std::ostream& operator<<(std::ostream& os, vector_t const& x);
 
 struct matrix_t
 {
@@ -101,13 +99,13 @@ struct matrix_t
     explicit matrix_t(std::initializer_list<std::initializer_list<double>> a);
     // We don't really want these
     matrix_t() = default;
-    matrix_t(const matrix_t&) = default;
+    matrix_t(matrix_t const&) = default;
 
     operator std::string() const
     {
         return mkstr(*this);
     }
-    const double& operator()(std::ptrdiff_t i, std::ptrdiff_t j) const
+    double const& operator()(std::ptrdiff_t i, std::ptrdiff_t j) const
     {
         HPX_ASSERT(i >= 0 && i < NI && j >= 0 && j < NJ);
         return elts[i + NI * j];
@@ -119,6 +117,6 @@ struct matrix_t
     }
 };
 
-std::ostream& operator<<(std::ostream& os, const matrix_t& a);
+std::ostream& operator<<(std::ostream& os, matrix_t const& a);
 
 #endif

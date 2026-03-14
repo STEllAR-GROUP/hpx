@@ -15,7 +15,7 @@ module load papi
 module load otf2
 
 export HPXRUN_RUNWRAPPER=srun
-export CXX_STD="20"
+export CXX_STD="23"
 export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH
 
 configure_extra_options+=" -DHPX_WITH_MAX_CPU_COUNT=128"

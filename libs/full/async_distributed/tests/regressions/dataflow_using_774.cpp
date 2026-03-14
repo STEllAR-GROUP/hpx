@@ -9,10 +9,10 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/async_local/dataflow.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
-#include <hpx/pack_traversal/unwrap.hpp>
+#include <hpx/modules/async_local.hpp>
+#include <hpx/modules/pack_traversal.hpp>
 
 #include <iostream>
 
@@ -24,9 +24,9 @@ typedef hpx::shared_future<double> future_type;
 template <typename Value>
 struct mul
 {
-    const Value a;
+    Value const a;
 
-    mul(const Value alpha)
+    mul(Value const alpha)
       : a(alpha)
     {
     }

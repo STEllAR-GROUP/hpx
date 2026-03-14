@@ -87,7 +87,7 @@ void widget::run_clicked(bool)
     hpx::post(callback_, this, no_threads);
 }
 
-void widget::add_label(const QString& text)
+void widget::add_label(QString const& text)
 {
     list->addItem(text);
 }

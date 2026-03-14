@@ -5,11 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/serialization/input_archive.hpp>
-#include <hpx/serialization/output_archive.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/set.hpp>
-
+#include <hpx/modules/serialization.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <set>
@@ -28,10 +24,10 @@ struct DummyContainer
     template <typename Archive>
     void serialize(Archive& archive, unsigned)
     {
-        archive& cargo;
+        archive & cargo;
     }
 
-    bool operator<(const DummyContainer<Cargo> other) const
+    bool operator<(DummyContainer<Cargo> const other) const
     {
         return cargo < other.cargo;
     }
@@ -105,7 +101,7 @@ void test(T min, T max)
 
         typename std::set<DummyContainer<T>>::iterator j = is.begin();
         for (typename std::set<DummyContainer<T>>::iterator i = os.begin();
-             i != os.end(); ++i)
+            i != os.end(); ++i)
         {
             HPX_TEST_EQ(i->cargo, j->cargo);
             ++j;
@@ -153,7 +149,7 @@ void test_fp(T min, T max)
 
         typename std::set<DummyContainer<T>>::iterator j = is.begin();
         for (typename std::set<DummyContainer<T>>::iterator i = os.begin();
-             i != os.end(); ++i)
+            i != os.end(); ++i)
         {
             HPX_TEST_EQ(i->cargo, j->cargo);
             ++j;

@@ -38,9 +38,9 @@ struct user_defined_type
             return this->val < t.val;
     }
 
-    const user_defined_type& operator++()
+    user_defined_type const& operator++()
     {
-        static const std::vector<std::string> name_list = {
+        static std::vector<std::string> const name_list = {
             "ABB", "ABC", "ACB", "BCA", "CAA", "CAAA", "CAAB"};
         name = name_list[std::rand() % name_list.size()];
         ++val;

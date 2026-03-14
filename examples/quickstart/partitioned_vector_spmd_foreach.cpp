@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2022 Hartmut Kaiser
+//  Copyright (c) 2016-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -146,7 +146,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
                 size, hpx::container_layout(localities));
             v.register_as(example_vector_name);
 
-            l = hpx::distributed::latch(localities.size());
+            l = hpx::distributed::latch(
+                static_cast<std::ptrdiff_t>(localities.size()));
             l.register_as(example_latch_name);
         }
         else

@@ -6,7 +6,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/runtime_local/config_entry.hpp>
+#include <hpx/modules/runtime_local.hpp>
 
 #include <iostream>
 #include <string>

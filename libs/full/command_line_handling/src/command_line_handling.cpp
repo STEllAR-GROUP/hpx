@@ -5,21 +5,23 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/logging/config/defines.hpp>
-
 #include <hpx/assert.hpp>
 #include <hpx/command_line_handling/command_line_handling.hpp>
 #include <hpx/command_line_handling/parse_command_line.hpp>
-#include <hpx/functional/detail/reset_function.hpp>
 #include <hpx/modules/asio.hpp>
 #include <hpx/modules/batch_environments.hpp>
 #include <hpx/modules/debugging.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/logging.hpp>
 #if defined(HPX_HAVE_MODULE_MPI_BASE)
 #include <hpx/modules/mpi_base.hpp>
 #endif
 #if defined(HPX_HAVE_MODULE_LCI_BASE)
 #include <hpx/modules/lci_base.hpp>
+#endif
+#if defined(HPX_HAVE_MODULE_LCW_BASE)
+#include <hpx/modules/lcw_base.hpp>
 #endif
 #if defined(HPX_HAVE_MODULE_GASNET_BASE)
 #include <hpx/modules/gasnet_base.hpp>
@@ -29,9 +31,8 @@
 #include <hpx/modules/topology.hpp>
 #include <hpx/modules/util.hpp>
 #if defined(HPX_HAVE_MAX_CPU_COUNT)
-#include <hpx/preprocessor/stringize.hpp>
+#include <hpx/modules/preprocessor.hpp>
 #endif
-#include <hpx/util/from_string.hpp>
 #include <hpx/version.hpp>
 
 #include <algorithm>
@@ -44,6 +45,8 @@
 #include <string>
 #include <utility>
 #include <vector>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx::util {
 
@@ -312,7 +315,7 @@ namespace hpx::util {
             }
 #endif
 
-            threads = (std::max)(threads, min_os_threads);
+            threads = (std::max) (threads, min_os_threads);
 
             if (!initial && env.found_batch_environment() && using_nodelist &&
                 (threads > batch_threads))
@@ -1002,14 +1005,22 @@ namespace hpx::util {
 #endif
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_LCI)) ||      \
     defined(HPX_HAVE_MODULE_LCI_BASE)
-        // better to put LCI init after MPI init, since LCI will also
-        // initialize MPI if MPI is not already initialized.
         if (util::lci_environment::check_lci_environment(rtcfg_))
         {
             util::lci_environment::init(&argc, &argv, rtcfg_);
             num_localities_ =
                 static_cast<std::size_t>(util::lci_environment::size());
             node_ = static_cast<std::size_t>(util::lci_environment::rank());
+        }
+#endif
+#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_LCW)) ||      \
+    defined(HPX_HAVE_MODULE_LCW_BASE)
+        if (util::lcw_environment::check_lcw_environment(rtcfg_))
+        {
+            util::lcw_environment::init(&argc, &argv, rtcfg_);
+            num_localities_ =
+                static_cast<std::size_t>(util::lcw_environment::size());
+            node_ = static_cast<std::size_t>(util::lcw_environment::rank());
         }
 #endif
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_GASNET)) ||   \

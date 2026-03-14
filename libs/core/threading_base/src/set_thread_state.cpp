@@ -6,9 +6,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/functional/bind.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/threading_base/create_work.hpp>
 #include <hpx/threading_base/register_thread.hpp>
@@ -100,8 +100,7 @@ namespace hpx::threads::detail {
     thread_state set_thread_state(thread_id_type const& thrd,
         thread_schedule_state const new_state,
         thread_restart_state const new_state_ex, thread_priority const priority,
-        thread_schedule_hint schedulehint, bool const retry_on_active,
-        error_code& ec)
+        thread_schedule_hint schedulehint, bool retry_on_active, error_code& ec)
     {
         if (HPX_UNLIKELY(!thrd))
         {
@@ -158,8 +157,11 @@ namespace hpx::threads::detail {
                         priority, previous_state, schedulehint, ec);
                 }
 
-                hpx::execution_base::this_thread::yield_k(
-                    k, "hpx::threads::detail::set_thread_state");
+                if (hpx::execution_base::this_thread::yield_k(
+                        k, "hpx::threads::detail::set_thread_state"))
+                {
+                    retry_on_active = true;    // don't wait too long
+                }
                 ++k;
 
                 LTM_(warning).format(
@@ -267,8 +269,20 @@ namespace hpx::threads::detail {
         {
             auto* thrd_data = get_thread_id_data(thrd);
             auto* scheduler = thrd_data->get_scheduler_base();
-            if (auto const current_priority = thrd_data->get_priority();
-                current_priority == thread_priority::bound)
+            auto const current_priority = thrd_data->get_priority();
+            if (priority == thread_priority::bound)
+            {
+                if (schedulehint.mode == thread_schedule_hint_mode::thread &&
+                    schedulehint.hint != -1)
+                {
+                    thrd_data->set_last_worker_thread_num(
+                        static_cast<std::uint16_t>(schedulehint.hint));
+                }
+                thrd_data->set_priority(thread_priority::bound);
+                scheduler->schedule_thread(
+                    thrd, schedulehint, false, thread_priority::bound);
+            }
+            else if (current_priority == thread_priority::bound)
             {
                 schedulehint.mode = thread_schedule_hint_mode::thread;
                 schedulehint.hint = static_cast<std::int16_t>(
@@ -276,21 +290,21 @@ namespace hpx::threads::detail {
                 scheduler->schedule_thread(
                     thrd, schedulehint, false, thread_priority::bound);
             }
-            else if (priority == thread_priority::bound)
-            {
-                thrd_data->set_priority(thread_priority::bound);
-                scheduler->schedule_thread(
-                    thrd, schedulehint, false, thread_priority::bound);
-            }
             else
             {
-                scheduler->schedule_thread(
-                    thrd, schedulehint, false, current_priority);
+                threads::thread_priority p =
+                    (priority == thread_priority::default_ ||
+                        priority == thread_priority::unknown) ?
+                    current_priority :
+                    priority;
+
+                scheduler->schedule_thread(thrd, schedulehint, false, p);
             }
 
-            // NOTE: Don't care if the hint is a NUMA hint, just want to wake up
-            // a thread.
-            scheduler->do_some_work(schedulehint.hint);
+            scheduler->do_some_work(schedulehint.mode ==
+                        hpx::threads::thread_schedule_hint_mode::numa ?
+                    static_cast<std::size_t>(-1) :
+                    schedulehint.hint);
         }
 
         if (&ec != &throws)

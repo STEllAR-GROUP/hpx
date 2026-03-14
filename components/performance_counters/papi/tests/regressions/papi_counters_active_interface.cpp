@@ -13,12 +13,12 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx_start.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/modules/program_options.hpp>
-#include <hpx/util/from_string.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-const char* counter_name = "/papi{locality#0/worker-thread#0}/PAPI_SR_INS";
-const size_t nstores = 1000000;
+char const* counter_name = "/papi{locality#0/worker-thread#0}/PAPI_SR_INS";
+size_t const nstores = 1000000;
 
 ///////////////////////////////////////////////////////////////////////////////
 inline bool close_enough(double m, double ex, double perc)
@@ -32,7 +32,7 @@ int hpx_main(hpx::program_options::variables_map&)
     hpx::start_active_counters();
 
     // perform n stores, active counter
-    volatile size_t i;
+    size_t volatile i;
     for (i = 0; i < nstores; i = i + 1)
         ;
 

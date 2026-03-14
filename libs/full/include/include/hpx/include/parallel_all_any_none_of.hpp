@@ -8,7 +8,5 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/parallel/algorithms/all_any_none.hpp>
-#include <hpx/parallel/container_algorithms/all_any_none.hpp>
-
+#include <hpx/modules/algorithms.hpp>
 #include <hpx/parallel/segmented_algorithms/all_any_none.hpp>

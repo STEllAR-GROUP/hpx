@@ -10,9 +10,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/compute_local/host/get_targets.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/serialization/serialization_fwd.hpp>
-#include <hpx/topology/topology.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/serialization.hpp>
+#include <hpx/modules/topology.hpp>
 
 #include <cstddef>
 #include <utility>
@@ -22,7 +22,7 @@
 
 namespace hpx::compute::host {
 
-    struct HPX_CORE_EXPORT target
+    HPX_CXX_CORE_EXPORT struct HPX_CORE_EXPORT target
     {
         struct native_handle_type
         {

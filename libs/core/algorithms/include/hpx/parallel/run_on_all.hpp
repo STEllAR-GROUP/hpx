@@ -12,14 +12,12 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/execution/executors/execution.hpp>
-#include <hpx/execution/executors/execution_parameters.hpp>
-#include <hpx/execution_base/execution.hpp>
-#include <hpx/executors/execution_policy.hpp>
-#include <hpx/executors/parallel_executor.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/executors.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/for_loop_reduction.hpp>
-#include <hpx/type_support/pack.hpp>
 
 #include <cstddef>
 #include <memory>
@@ -32,7 +30,8 @@ namespace hpx::experimental {
     /// \cond NOINTERNAL
     namespace detail {
 
-        template <typename ExPolicy, typename F, typename... Reductions>
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename F,
+            typename... Reductions>
         decltype(auto) run_on_all(
             ExPolicy&& policy, F&& f, Reductions&&... reductions)
         {
@@ -108,7 +107,8 @@ namespace hpx::experimental {
             }
         }
 
-        template <typename ExPolicy, std::size_t... Is, typename... Ts>
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, std::size_t... Is,
+            typename... Ts>
         decltype(auto) run_on_all(
             ExPolicy&& policy, hpx::util::index_pack<Is...>, Ts&&... ts)
         {
@@ -134,8 +134,8 @@ namespace hpx::experimental {
     ///                  invoke (last argument)
     /// \param ts        The list of reductions and the function to invoke (last
     ///                  argument)
-    template <typename ExPolicy, typename T, typename... Ts,
-        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy_v<ExPolicy>)>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename T, typename... Ts>
+        requires(hpx::is_execution_policy_v<ExPolicy>)
     decltype(auto) run_on_all(ExPolicy&& policy, T&& t, Ts&&... ts)
     {
         return detail::run_on_all(HPX_FORWARD(ExPolicy, policy),
@@ -154,8 +154,8 @@ namespace hpx::experimental {
     ///                  invoke (last argument)
     /// \param ts        The list of reductions and the function to invoke (last
     ///                  argument)
-    template <typename T, typename... Ts,
-        HPX_CONCEPT_REQUIRES_(!hpx::is_execution_policy_v<T>)>
+    HPX_CXX_CORE_EXPORT template <typename T, typename... Ts>
+        requires(!hpx::is_execution_policy_v<T>)
     decltype(auto) run_on_all(T&& t, Ts&&... ts)
     {
         return detail::run_on_all(hpx::execution::par,

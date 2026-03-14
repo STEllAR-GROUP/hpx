@@ -12,8 +12,8 @@
 #if defined(HPX_HAVE_PAPI)
 
 #include <hpx/components_base/server/component_base.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/performance_counters/server/base_performance_counter.hpp>
-#include <hpx/runtime_local/interval_timer.hpp>
 
 #include <cstdint>
 #include <map>
@@ -152,7 +152,7 @@ namespace hpx { namespace performance_counters { namespace papi {
             static ttable_type thread_state_;
 
         public:
-            papi_counter_base(){};
+            papi_counter_base() {};
 
             // lookup or create thread_counters instance for thread tix
             thread_counters* get_thread_counters(std::uint32_t tix);

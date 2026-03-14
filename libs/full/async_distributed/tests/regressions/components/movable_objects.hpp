@@ -7,8 +7,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
+
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/serialization/access.hpp>
+#include <hpx/modules/serialization.hpp>
 
 #include <cstddef>
 
@@ -46,7 +47,7 @@ namespace hpx { namespace test {
         void reset_count();
 
         template <typename Archive>
-        void serialize(Archive& ar, const unsigned int);
+        void serialize(Archive& ar, unsigned int const);
 
     private:
     };
@@ -71,10 +72,10 @@ namespace hpx { namespace test {
         void reset_count();
 
         template <typename Archive>
-        void load(Archive& ar, const unsigned int);
+        void load(Archive& ar, unsigned int const);
 
         template <typename Archive>
-        void save(Archive& ar, const unsigned int) const;
+        void save(Archive& ar, unsigned int const) const;
 
         HPX_SERIALIZATION_SPLIT_MEMBER()
     };

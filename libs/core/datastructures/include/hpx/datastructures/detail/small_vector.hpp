@@ -1,4 +1,4 @@
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -33,7 +33,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/type_support/construct_at.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <algorithm>
 #include <array>
@@ -58,7 +58,7 @@ namespace hpx::detail {
     // This implementation of is_iterator seems to work fine even for VS2013
     // which has an implementation of std::iterator_traits that is
     // SFINAE-unfriendly.
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct is_argument_iterator
     {
 #if defined(HPX_MSVC) && defined(__CUDACC__)
@@ -81,29 +81,29 @@ namespace hpx::detail {
         };
     };
 
-    template <typename Iter>
+    HPX_CXX_CORE_EXPORT template <typename Iter>
     inline constexpr bool is_argument_iterator_v =
         is_argument_iterator<Iter>::value;
 
-    constexpr auto round_up(std::size_t n, std::size_t multiple) noexcept
-        -> std::size_t
+    HPX_CXX_CORE_EXPORT constexpr auto round_up(
+        std::size_t n, std::size_t multiple) noexcept -> std::size_t
     {
         return ((n + (multiple - 1)) / multiple) * multiple;
     }
 
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     constexpr auto cx_min(T a, T b) noexcept -> T
     {
         return a < b ? a : b;
     }
 
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     constexpr auto cx_max(T a, T b) noexcept -> T
     {
         return a > b ? a : b;
     }
 
-    class header
+    HPX_CXX_CORE_EXPORT class header
     {
         std::size_t m_size{};
         std::size_t const m_capacity;
@@ -131,12 +131,12 @@ namespace hpx::detail {
         }
     };
 
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct storage : public header
     {
         static constexpr auto alignment_of_t = std::alignment_of_v<T>;
         static constexpr auto max_Alignment =
-            (std::max)(std::alignment_of_v<header>, std::alignment_of_v<T>);
+            (std::max) (std::alignment_of_v<header>, std::alignment_of_v<T>);
         static constexpr auto offset_to_data =
             round_up(sizeof(header), alignment_of_t);
         static_assert(max_Alignment <= __STDCPP_DEFAULT_NEW_ALIGNMENT__);
@@ -192,13 +192,13 @@ namespace hpx::detail {
         }
     };
 
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     constexpr auto alignment_of_small_vector() noexcept -> std::size_t
     {
         return cx_max(sizeof(void*), std::alignment_of_v<T>);
     }
 
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     constexpr auto size_of_small_vector(
         std::size_t min_inline_capacity) noexcept -> std::size_t
     {
@@ -207,7 +207,7 @@ namespace hpx::detail {
             alignment_of_small_vector<T>());
     }
 
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     constexpr auto automatic_capacity(std::size_t min_inline_capacity) noexcept
         -> std::size_t
     {
@@ -217,7 +217,7 @@ namespace hpx::detail {
     }
 
     // note: Allocator is currently unused
-    template <typename T, std::size_t MinInlineCapacity,
+    HPX_CXX_CORE_EXPORT template <typename T, std::size_t MinInlineCapacity,
         typename Allocator = std::allocator<T>>
     class small_vector
     {
@@ -257,8 +257,10 @@ namespace hpx::detail {
             // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
             storage<T>* ptr;
 
+            // NOLINTBEGIN(bugprone-multi-level-implicit-pointer-conversion)
             // NOLINTNEXTLINE(bugprone-sizeof-expression)
             std::memcpy(&ptr, m_data.data(), sizeof(ptr));
+            // NOLINTEND(bugprone-multi-level-implicit-pointer-conversion)
             return ptr;
         }
 
@@ -270,8 +272,10 @@ namespace hpx::detail {
 
         void set_indirect(storage<T>* ptr) noexcept
         {
+            // NOLINTBEGIN(bugprone-multi-level-implicit-pointer-conversion)
             // NOLINTNEXTLINE(bugprone-sizeof-expression)
             std::memcpy(m_data.data(), &ptr, sizeof(ptr));
+            // NOLINTEND(bugprone-multi-level-implicit-pointer-conversion)
 
             // safety check to guarantee the lowest bit is 0
             HPX_ASSERT(!is_direct());
@@ -388,7 +392,7 @@ namespace hpx::detail {
                 // got an overflow, set capacity to max
                 new_capacity = max_size();
             }
-            return (std::min)(new_capacity, max_size());
+            return (std::min) (new_capacity, max_size());
         }
 
         template <direction D>
@@ -495,9 +499,10 @@ namespace hpx::detail {
             {
                 auto* d = data<D>();
                 for (auto ptr = d + current_size, end = d + count; ptr != end;
-                     ++ptr)
+                    ++ptr)
                 {
                     hpx::construct_at(
+                        // NOLINTNEXTLINE(bugprone-use-after-move)
                         static_cast<T*>(ptr), HPX_FORWARD(Args, args)...);
                 }
             }
@@ -513,7 +518,7 @@ namespace hpx::detail {
             auto* const container_end = data<D>() + size<D>();
             // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
             auto* const erase_end =
-                (std::min)(const_cast<T*>(to), container_end);
+                (std::min) (const_cast<T*>(to), container_end);
 
             std::move(erase_end, container_end, erase_begin);
             auto const num_erased = std::distance(erase_begin, erase_end);
@@ -585,13 +590,13 @@ namespace hpx::detail {
             auto const num_moves = std::distance(source_begin, source_end);
             auto const target_end = target_begin + num_moves;
             auto const num_uninitialized_move =
-                (std::min)(num_moves, std::distance(source_end, target_end));
+                (std::min) (num_moves, std::distance(source_end, target_end));
             std::uninitialized_move(source_end - num_uninitialized_move,
                 source_end, target_end - num_uninitialized_move);
             std::move_backward(source_begin,
                 source_end - num_uninitialized_move,
                 target_end - num_uninitialized_move);
-            std::destroy(source_begin, (std::min)(source_end, target_begin));
+            std::destroy(source_begin, (std::min) (source_end, target_begin));
         }
 
         // makes space for uninitialized data of cout elements. Also updates
@@ -683,7 +688,7 @@ namespace hpx::detail {
             // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
             auto* ptr = const_cast<T*>(data<D>() + idx);
             return *ptr;
-        }    // LCOV_EXCL_LINE why is this single } marked as not covered? gcov bug?
+        }    // LCOV_EXCL_LINE why is this single '}' marked as not covered? gcov bug?
 
     public:
         using value_type = T;
@@ -1219,21 +1224,21 @@ namespace hpx::detail {
         }
     };
 
-    template <typename T, std::size_t NA, std::size_t NB>
+    HPX_CXX_CORE_EXPORT template <typename T, std::size_t NA, std::size_t NB>
     [[nodiscard]] constexpr auto operator==(small_vector<T, NA> const& a,
         small_vector<T, NB> const& b) noexcept -> bool
     {
         return std::equal(a.begin(), a.end(), b.begin(), b.end());
     }
 
-    template <typename T, std::size_t NA, std::size_t NB>
+    HPX_CXX_CORE_EXPORT template <typename T, std::size_t NA, std::size_t NB>
     [[nodiscard]] constexpr auto operator!=(small_vector<T, NA> const& a,
         small_vector<T, NB> const& b) noexcept -> bool
     {
         return !(a == b);
     }
 
-    template <typename T, std::size_t NA, std::size_t NB>
+    HPX_CXX_CORE_EXPORT template <typename T, std::size_t NA, std::size_t NB>
     [[nodiscard]] constexpr auto operator<(small_vector<T, NA> const& a,
         small_vector<T, NB> const& b) noexcept -> bool
     {
@@ -1241,14 +1246,14 @@ namespace hpx::detail {
             a.begin(), a.end(), b.begin(), b.end());
     }
 
-    template <typename T, std::size_t NA, std::size_t NB>
+    HPX_CXX_CORE_EXPORT template <typename T, std::size_t NA, std::size_t NB>
     [[nodiscard]] constexpr auto operator>=(small_vector<T, NA> const& a,
         small_vector<T, NB> const& b) noexcept -> bool
     {
         return !(a < b);
     }
 
-    template <typename T, std::size_t NA, std::size_t NB>
+    HPX_CXX_CORE_EXPORT template <typename T, std::size_t NA, std::size_t NB>
     [[nodiscard]] constexpr auto operator>(small_vector<T, NA> const& a,
         small_vector<T, NB> const& b) noexcept -> bool
     {
@@ -1256,7 +1261,7 @@ namespace hpx::detail {
             b.begin(), b.end(), a.begin(), a.end());
     }
 
-    template <typename T, std::size_t NA, std::size_t NB>
+    HPX_CXX_CORE_EXPORT template <typename T, std::size_t NA, std::size_t NB>
     [[nodiscard]] constexpr auto operator<=(small_vector<T, NA> const& a,
         small_vector<T, NB> const& b) noexcept -> bool
     {
@@ -1267,7 +1272,7 @@ namespace hpx::detail {
 // NOLINTNEXTLINE(cert-dcl58-cpp)
 namespace std {    //-V1061
 
-    template <typename T, std::size_t N, typename U>
+    HPX_CXX_CORE_EXPORT template <typename T, std::size_t N, typename U>
     constexpr auto erase(hpx::detail::small_vector<T, N>& sv, U const& value) ->
         typename hpx::detail::small_vector<T, N>::size_type
     {
@@ -1277,7 +1282,7 @@ namespace std {    //-V1061
         return num_removed;
     }
 
-    template <typename T, std::size_t N, typename Pred>
+    HPX_CXX_CORE_EXPORT template <typename T, std::size_t N, typename Pred>
     constexpr auto erase_if(hpx::detail::small_vector<T, N>& sv, Pred pred) ->
         typename hpx::detail::small_vector<T, N>::size_type
     {

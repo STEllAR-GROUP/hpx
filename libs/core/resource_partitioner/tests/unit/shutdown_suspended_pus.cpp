@@ -23,8 +23,8 @@
 #include <utility>
 #include <vector>
 
-std::size_t const max_threads = (std::min)(
-    std::size_t(4), std::size_t(hpx::threads::hardware_concurrency()));
+std::size_t const max_threads = (std::min) (std::size_t(4),
+    std::size_t(hpx::threads::hardware_concurrency()));
 
 int hpx_main()
 {

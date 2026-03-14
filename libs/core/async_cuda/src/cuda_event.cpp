@@ -1,4 +1,4 @@
-//  Copyright (c) 2023 Gregor Dai√ü
+//  Copyright (c) 2023 Gregor Daiﬂ
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,10 +10,11 @@
 #include <hpx/async_cuda/cuda_event.hpp>
 #include <hpx/async_cuda/custom_gpu_api.hpp>
 
-namespace hpx { namespace cuda { namespace experimental {
+namespace hpx::cuda::experimental {
+
     cuda_event_pool& cuda_event_pool::get_event_pool()
     {
-        static cuda_event_pool event_pool_;
-        return event_pool_;
+        static cuda_event_pool event_pool;
+        return event_pool;
     }
-}}}    // namespace hpx::cuda::experimental
+}    // namespace hpx::cuda::experimental

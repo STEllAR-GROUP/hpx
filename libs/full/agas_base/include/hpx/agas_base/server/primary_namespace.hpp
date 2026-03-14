@@ -15,14 +15,14 @@
 #include <hpx/actions_base/component_action.hpp>
 #include <hpx/agas_base/agas_fwd.hpp>
 #include <hpx/agas_base/gva.hpp>
-#include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/async_distributed/base_lco_with_value.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
 #include <hpx/components_base/server/fixed_component_base.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/naming_base/id_type.hpp>
-#include <hpx/parcelset_base/traits/action_get_embedded_parcel.hpp>
-#include <hpx/synchronization/condition_variable.hpp>
+#include <hpx/modules/allocator_support.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/naming_base.hpp>
+#include <hpx/modules/parcelset_base.hpp>
+#include <hpx/modules/synchronization.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -134,8 +134,7 @@ namespace hpx::agas::server {
     private:
         // REVIEW: Separate mutexes might reduce contention here. This has to be
         // investigated carefully.
-        mutex_type mutex_;
-
+        mutex_type mutex_ = mutex_type("primary_namespace");
         gva_table_type gvas_;
         refcnt_table_type refcnts_;
 

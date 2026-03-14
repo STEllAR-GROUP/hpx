@@ -22,21 +22,19 @@
 #include <hpx/actions_base/component_action.hpp>
 #include <hpx/actions_base/plain_action.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
 #include <hpx/components/client_base.hpp>
 #include <hpx/components/get_ptr.hpp>
 #include <hpx/components_base/server/component.hpp>
 #include <hpx/components_base/server/component_base.hpp>
 #include <hpx/components_base/server/locking_hook.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/collectives.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/preprocessor/expand.hpp>
-#include <hpx/preprocessor/nargs.hpp>
+#include <hpx/modules/preprocessor.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/runtime_components/component_factory.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
 #include <memory>

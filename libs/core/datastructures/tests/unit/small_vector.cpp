@@ -12,7 +12,7 @@
 #include <hpx/config.hpp>
 
 #if !defined(HPX_HAVE_HIP)
-#include <hpx/datastructures/detail/small_vector.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <algorithm>
@@ -126,38 +126,38 @@ namespace test {
             return *this;
         }
 
-        friend bool operator==(const movable_and_copyable_int& l,
-            const movable_and_copyable_int& r) noexcept
+        friend bool operator==(movable_and_copyable_int const& l,
+            movable_and_copyable_int const& r) noexcept
         {
             return l.int_ == r.int_;
         }
 
-        friend bool operator!=(const movable_and_copyable_int& l,
-            const movable_and_copyable_int& r) noexcept
+        friend bool operator!=(movable_and_copyable_int const& l,
+            movable_and_copyable_int const& r) noexcept
         {
             return l.int_ != r.int_;
         }
 
-        friend bool operator<(const movable_and_copyable_int& l,
-            const movable_and_copyable_int& r) noexcept
+        friend bool operator<(movable_and_copyable_int const& l,
+            movable_and_copyable_int const& r) noexcept
         {
             return l.int_ < r.int_;
         }
 
-        friend bool operator<=(const movable_and_copyable_int& l,
-            const movable_and_copyable_int& r) noexcept
+        friend bool operator<=(movable_and_copyable_int const& l,
+            movable_and_copyable_int const& r) noexcept
         {
             return l.int_ <= r.int_;
         }
 
-        friend bool operator>=(const movable_and_copyable_int& l,
-            const movable_and_copyable_int& r) noexcept
+        friend bool operator>=(movable_and_copyable_int const& l,
+            movable_and_copyable_int const& r) noexcept
         {
             return l.int_ >= r.int_;
         }
 
-        friend bool operator>(const movable_and_copyable_int& l,
-            const movable_and_copyable_int& r) noexcept
+        friend bool operator>(movable_and_copyable_int const& l,
+            movable_and_copyable_int const& r) noexcept
         {
             return l.int_ > r.int_;
         }
@@ -168,13 +168,13 @@ namespace test {
         }
 
         friend bool operator==(
-            const movable_and_copyable_int& l, int r) noexcept
+            movable_and_copyable_int const& l, int r) noexcept
         {
             return l.get_int() == r;
         }
 
         friend bool operator==(
-            int l, const movable_and_copyable_int& r) noexcept
+            int l, movable_and_copyable_int const& r) noexcept
         {
             return l == r.get_int();
         }
@@ -399,7 +399,7 @@ namespace test {
         HPX_TEST_EQ(dist2, cont_b.size());
 
         for (std::size_t i = 0; itcont_a != itcont_a_end;
-             ++itcont_a, ++itcont_b, ++i)
+            ++itcont_a, ++itcont_b, ++i)
         {
             HPX_TEST_EQ(*itcont_a, *itcont_b);
         }
@@ -412,10 +412,11 @@ namespace test {
     {
         check_equal_containers(std_deque, seq_container);
 
-        std_deque.insert(
-            std_deque.begin() + index, input_deque.begin(), input_deque.end());
-        seq_container.insert(seq_container.begin() + index, input_deque.begin(),
-            input_deque.end());
+        std_deque.insert(std_deque.begin() + static_cast<std::ptrdiff_t>(index),
+            input_deque.begin(), input_deque.end());
+        seq_container.insert(
+            seq_container.begin() + static_cast<std::ptrdiff_t>(index),
+            input_deque.begin(), input_deque.end());
 
         check_equal_containers(std_deque, seq_container);
     }

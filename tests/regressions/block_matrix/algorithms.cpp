@@ -28,7 +28,7 @@
 
 // axpy: y = alpha x + y
 
-void axpy(double alpha, const vector_t& x, vector_t& y)
+void axpy(double alpha, vector_t const& x, vector_t& y)
 {
     HPX_ASSERT(x.N == y.N);
     if (alpha == 0.0)
@@ -49,7 +49,7 @@ void axpy(double alpha, const vector_t& x, vector_t& y)
     }
 }
 
-void axpy(double alpha, const block_vector_t& x, block_vector_t& y)
+void axpy(double alpha, block_vector_t const& x, block_vector_t& y)
 {
     HPX_ASSERT(x.str == y.str);
     std::vector<hpx::future<void>> fs;
@@ -62,7 +62,7 @@ void axpy(double alpha, const block_vector_t& x, block_vector_t& y)
 
 // copy: y = x
 
-void copy(const vector_t& x, vector_t& y)
+void copy(vector_t const& x, vector_t& y)
 {
     HPX_ASSERT(x.N == y.N);
     for (std::ptrdiff_t i = 0; i < y.N; ++i)
@@ -71,7 +71,7 @@ void copy(const vector_t& x, vector_t& y)
     }
 }
 
-void copy(const block_vector_t& x, block_vector_t& y)
+void copy(block_vector_t const& x, block_vector_t& y)
 {
     HPX_ASSERT(x.str == y.str);
     std::vector<hpx::future<void>> fs;
@@ -99,7 +99,7 @@ namespace {
     }
 }    // namespace
 
-double nrm2_process(const vector_t& x)
+double nrm2_process(vector_t const& x)
 {
     double val = nrm2_init();
     for (std::ptrdiff_t i = 0; i < x.N; ++i)
@@ -109,13 +109,13 @@ double nrm2_process(const vector_t& x)
     return val;
 }
 
-double nrm2(const vector_t& x)
+double nrm2(vector_t const& x)
 {
     double val = nrm2_process(x);
     return nrm2_finalize(val);
 }
 
-double nrm2(const block_vector_t& x)
+double nrm2(block_vector_t const& x)
 {
     std::vector<hpx::future<double>> fs;
     for (std::ptrdiff_t ib = 0; ib < x.str->B; ++ib)
@@ -168,7 +168,7 @@ void scal(double alpha, block_vector_t& x)
 
 // axpy: b = alpha a + b
 
-void axpy(bool trans, double alpha, const matrix_t& a, matrix_t& b)
+void axpy(bool trans, double alpha, matrix_t const& a, matrix_t& b)
 {
     if (alpha == 0.0)
         return;
@@ -224,7 +224,7 @@ void axpy(bool trans, double alpha, const matrix_t& a, matrix_t& b)
     }
 }
 
-void axpy(bool trans, double alpha, const block_matrix_t& a, block_matrix_t& b)
+void axpy(bool trans, double alpha, block_matrix_t const& a, block_matrix_t& b)
 {
     if (alpha == 0.0)
         return;
@@ -260,7 +260,7 @@ void axpy(bool trans, double alpha, const block_matrix_t& a, block_matrix_t& b)
 
 // copy: y = x
 
-void copy(bool transa, const matrix_t& a, matrix_t& b)
+void copy(bool transa, matrix_t const& a, matrix_t& b)
 {
     if (!transa)
     {
@@ -288,7 +288,7 @@ void copy(bool transa, const matrix_t& a, matrix_t& b)
     }
 }
 
-void copy(bool transa, const block_matrix_t& a, block_matrix_t& b)
+void copy(bool transa, block_matrix_t const& a, block_matrix_t& b)
 {
     std::vector<hpx::future<void>> fs;
     if (!transa)
@@ -320,7 +320,7 @@ void copy(bool transa, const block_matrix_t& a, block_matrix_t& b)
 
 // gemv: y = alpha T[a] x + beta y
 
-void gemv(bool trans, double alpha, const matrix_t& a, const vector_t& x,
+void gemv(bool trans, double alpha, matrix_t const& a, vector_t const& x,
     double beta, vector_t& y)
 {
     scal(beta, y);
@@ -355,8 +355,8 @@ void gemv(bool trans, double alpha, const matrix_t& a, const vector_t& x,
     }
 }
 
-void gemv(bool trans, double alpha, const block_matrix_t& a,
-    const block_vector_t& x, double beta, block_vector_t& y)
+void gemv(bool trans, double alpha, block_matrix_t const& a,
+    block_vector_t const& x, double beta, block_vector_t& y)
 {
     scal(beta, y);
     if (alpha == 0.0)
@@ -400,7 +400,7 @@ void gemv(bool trans, double alpha, const block_matrix_t& a,
 
 // nrm2: sqrt(trace a^T a)
 
-double nrm2_process(const matrix_t& a)
+double nrm2_process(matrix_t const& a)
 {
     double val = nrm2_init();
     for (std::ptrdiff_t j = 0; j < a.NJ; ++j)
@@ -413,13 +413,13 @@ double nrm2_process(const matrix_t& a)
     return val;
 }
 
-double nrm2(const matrix_t& a)
+double nrm2(matrix_t const& a)
 {
     double val = nrm2_process(a);
     return nrm2_finalize(val);
 }
 
-double nrm2(const block_matrix_t& a)
+double nrm2(block_matrix_t const& a)
 {
     std::vector<hpx::future<double>> fs;
     for (std::ptrdiff_t jb = 0; jb < a.jstr->B; ++jb)
@@ -484,8 +484,8 @@ void scal(double alpha, block_matrix_t& a)
 
 // gemm: c = alpha T[a] T[b] + beta c
 
-void gemm(bool transa, bool transb, double alpha, const matrix_t& a,
-    const matrix_t& b, double beta, matrix_t& c)
+void gemm(bool transa, bool transb, double alpha, matrix_t const& a,
+    matrix_t const& b, double beta, matrix_t& c)
 {
     if (alpha == 0.0)
     {
@@ -622,8 +622,8 @@ void gemm(bool transa, bool transb, double alpha, const matrix_t& a,
     }
 }
 
-void gemm(bool transa, bool transb, double alpha, const block_matrix_t& a,
-    const block_matrix_t& b, double beta, block_matrix_t& c)
+void gemm(bool transa, bool transb, double alpha, block_matrix_t const& a,
+    block_matrix_t const& b, double beta, block_matrix_t& c)
 {
     scal(beta, c);
     if (alpha == 0.0)

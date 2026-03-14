@@ -5,10 +5,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/synchronization/detail/condition_variable.hpp>
 #include <hpx/synchronization/detail/sliding_semaphore.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/type_support/assert_owns_lock.hpp>
 
 #include <algorithm>
 #include <cstdint>
@@ -68,7 +68,7 @@ namespace hpx::lcos::local::detail {
 
         mutex_type* mtx = l.mutex();
 
-        lower_limit_ = (std::max)(lower_limit, lower_limit_);
+        lower_limit_ = (std::max) (lower_limit, lower_limit_);
 
         // touch upon all threads
         std::int64_t count = static_cast<std::int64_t>(cond_.size(l));

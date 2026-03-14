@@ -13,7 +13,7 @@
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/naming.hpp>
-#include <hpx/naming_base/gid_type.hpp>
+#include <hpx/modules/naming_base.hpp>
 
 #include <cstdint>
 #include <iosfwd>
@@ -121,10 +121,10 @@ namespace hpx::agas {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        HPX_EXPORT void save(Archive& ar, const unsigned int /*version*/) const;
+        HPX_EXPORT void save(Archive& ar, unsigned int const /*version*/) const;
 
         template <typename Archive>
-        HPX_EXPORT void load(Archive& ar, const unsigned int version);
+        HPX_EXPORT void load(Archive& ar, unsigned int const version);
 
         HPX_SERIALIZATION_SPLIT_MEMBER()
     };

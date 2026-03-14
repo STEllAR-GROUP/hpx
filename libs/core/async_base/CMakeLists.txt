@@ -30,10 +30,17 @@ include(HPX_AddModule)
 add_hpx_module(
   core async_base
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   HEADERS ${async_base_headers}
   COMPAT_HEADERS ${async_base_compat_headers}
   SOURCES ${async_base_sources}
-  MODULE_DEPENDENCIES hpx_allocator_support hpx_concepts hpx_config
-                      hpx_concurrency hpx_coroutines hpx_tag_invoke
+  MODULE_DEPENDENCIES
+    hpx_allocator_support
+    hpx_concepts
+    hpx_config
+    hpx_concurrency
+    hpx_coroutines
+    hpx_serialization
+    hpx_tag_invoke
   CMAKE_SUBDIRS examples tests
 )

@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2022 The STE||AR-Group
+# Copyright (c) 2019-2025 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -101,6 +101,48 @@ if(HPX_SERIALIZATION_WITH_ALLOW_CONST_TUPLE_MEMBERS)
   )
 endif()
 
+# HPX_SERIALIZATION_WITH_ALLOW_AUTO_GENERATE flag can be used to enable
+# automatic generation of serialization functions using C++26 reflection
+# capabilities. It is ON by default if HPX is built with C++26 reflection
+# support.
+
+# Default value is determined by the feature test
+set(HPX_SERIALIZATION_WITH_ALLOW_AUTO_GENERATE_DEFAULT OFF)
+if(HPX_WITH_CXX26_EXPERIMENTAL_META)
+  set(HPX_SERIALIZATION_WITH_ALLOW_AUTO_GENERATE_DEFAULT ON)
+endif()
+
+hpx_option(
+  HPX_SERIALIZATION_WITH_ALLOW_AUTO_GENERATE
+  BOOL
+  "Enable automatic generation of serialization functions using C++26 \
+  reflection capabilities. (default: ${HPX_SERIALIZATION_WITH_ALLOW_AUTO_GENERATE_DEFAULT})"
+  ${HPX_SERIALIZATION_WITH_ALLOW_AUTO_GENERATE_DEFAULT}
+  ADVANCED
+  CATEGORY "Modules"
+  MODULE SERIALIZATION
+)
+
+# Force the option to OFF if the compiler lacks support, even if a user tries to
+# force it ON via CLI.
+if(NOT HPX_WITH_CXX26_EXPERIMENTAL_META
+   AND HPX_SERIALIZATION_WITH_ALLOW_AUTO_GENERATE
+)
+  hpx_info(
+    "Disabling HPX_SERIALIZATION_WITH_ALLOW_AUTO_GENERATE: compiler support not detected."
+  )
+  set(HPX_SERIALIZATION_WITH_ALLOW_AUTO_GENERATE
+      OFF
+      CACHE BOOL "" FORCE
+  )
+endif()
+
+if(HPX_SERIALIZATION_WITH_ALLOW_AUTO_GENERATE)
+  hpx_add_config_define_namespace(
+    DEFINE HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE NAMESPACE SERIALIZATION
+  )
+endif()
+
 # Default location is $HPX_ROOT/libs/serialization/include
 set(serialization_headers
     hpx/serialization.hpp
@@ -116,6 +158,8 @@ set(serialization_headers
     hpx/serialization/detail/raw_ptr.hpp
     hpx/serialization/detail/serialize_collection.hpp
     hpx/serialization/detail/vc.hpp
+    hpx/serialization/detail/refl_qualified_name_of.hpp
+    hpx/serialization/detail/refl_serialize_impl.hpp
     hpx/serialization/array.hpp
     hpx/serialization/bitset.hpp
     hpx/serialization/complex.hpp
@@ -123,12 +167,14 @@ set(serialization_headers
     hpx/serialization/deque.hpp
     hpx/serialization/exception_ptr.hpp
     hpx/serialization/list.hpp
+    hpx/serialization/macros.hpp
     hpx/serialization/map.hpp
     hpx/serialization/set.hpp
     hpx/serialization/serialize_buffer_fwd.hpp
     hpx/serialization/serialize_buffer.hpp
     hpx/serialization/string.hpp
     hpx/serialization/std_tuple.hpp
+    hpx/serialization/unordered_set.hpp
     hpx/serialization/unordered_map.hpp
     hpx/serialization/vector.hpp
     hpx/serialization/variant.hpp
@@ -153,10 +199,12 @@ set(serialization_headers
     hpx/serialization/traits/is_bitwise_serializable.hpp
     hpx/serialization/traits/is_not_bitwise_serializable.hpp
     hpx/serialization/traits/is_serializable.hpp
+    hpx/serialization/traits/is_serialization_supported.hpp
     hpx/serialization/traits/needs_automatic_registration.hpp
     hpx/serialization/traits/polymorphic_traits.hpp
     hpx/serialization/traits/serialization_access_data.hpp
 )
+set(serialization_macro_headers hpx/serialization/macros.hpp)
 
 # Default location is $HPX_ROOT/libs/serialization/include_compatibility
 # cmake-format: off
@@ -194,6 +242,7 @@ set(serialization_compat_headers
     hpx/runtime/serialization/serialize.hpp => hpx/serialization.hpp
     hpx/traits/brace_initializable_traits.hpp => hpx/serialization.hpp
     hpx/traits/is_bitwise_serializable.hpp => hpx/serialization.hpp
+    hpx/serialization/traits/is_serialization_supported.hpp => hpx/serialization.hpp
     hpx/traits/needs_automatic_registration.hpp => hpx/serialization.hpp
     hpx/traits/polymorphic_traits.hpp => hpx/serialization.hpp
     hpx/traits/serialization_access_data.hpp => hpx/serialization.hpp
@@ -236,11 +285,14 @@ include(HPX_AddModule)
 add_hpx_module(
   core serialization
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${serialization_sources}
   HEADERS ${serialization_headers}
+  MACRO_HEADERS ${serialization_macro_headers}
   COMPAT_HEADERS ${serialization_compat_headers}
   MODULE_DEPENDENCIES
     hpx_assertion
+    hpx_concepts
     hpx_config
     hpx_debugging
     hpx_errors
@@ -248,7 +300,11 @@ add_hpx_module(
     hpx_preprocessor
     hpx_type_support
   DEPENDENCIES ${serialization_optional_dependencies}
-  ADD_TO_GLOBAL_HEADER hpx/serialization/detail/allow_zero_copy_receive.hpp
-  EXCLUDE_FROM_GLOBAL_HEADER ${boost_serialization_headers}
+  ADD_TO_GLOBAL_HEADER
+    hpx/serialization/detail/allow_zero_copy_receive.hpp
+    hpx/serialization/detail/polymorphic_id_factory.hpp
+    hpx/serialization/detail/polymorphic_intrusive_factory.hpp
+    hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp
+    hpx/serialization/detail/preprocess_container.hpp
   CMAKE_SUBDIRS examples tests
 )

@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/type_support/detail/wrap_int.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstdint>
 
@@ -20,8 +20,9 @@ namespace hpx::traits {
         struct pin_helper
         {
             template <typename Component>
-            static constexpr void call(wrap_int, Component*) noexcept
+            static constexpr bool call(wrap_int, Component*) noexcept
             {
+                return true;
             }
 
             // forward the call if the component implements the function
@@ -71,9 +72,9 @@ namespace hpx::traits {
     template <typename Component, typename Enable = void>
     struct component_pin_support
     {
-        static constexpr void pin(Component* p) noexcept
+        static constexpr bool pin(Component* p) noexcept
         {
-            detail::pin_helper::call(0, p);
+            return detail::pin_helper::call(0, p);
         }
 
         static constexpr bool unpin(Component* p) noexcept

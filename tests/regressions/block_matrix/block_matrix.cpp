@@ -80,7 +80,7 @@ std::ptrdiff_t structure_t::find(std::ptrdiff_t i) const
     return -1;
 }
 
-std::ostream& operator<<(std::ostream& os, const structure_t& str)
+std::ostream& operator<<(std::ostream& os, structure_t const& str)
 {
     os << "{";
     for (std::ptrdiff_t b = 0; b < str.B; ++b)
@@ -124,7 +124,7 @@ block_vector_t::block_vector_t(
     }
 }
 
-std::ostream& operator<<(std::ostream& os, const block_vector_t& x)
+std::ostream& operator<<(std::ostream& os, block_vector_t const& x)
 {
     os << "{";
     for (std::ptrdiff_t b = 0; b < x.str->B; ++b)
@@ -185,7 +185,7 @@ block_matrix_t::block_matrix_t(std::shared_ptr<structure_t> istr,
     }
 }
 
-std::ostream& operator<<(std::ostream& os, const block_matrix_t& a)
+std::ostream& operator<<(std::ostream& os, block_matrix_t const& a)
 {
     os << "{";
     for (std::ptrdiff_t ib = 0; ib < a.istr->B; ++ib)

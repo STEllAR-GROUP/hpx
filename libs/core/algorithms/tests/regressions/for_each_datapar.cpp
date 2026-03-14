@@ -22,7 +22,8 @@ void test_for_each(ExPolicy&& policy)
     std::vector<int> c(1027);
     // this test ensures that aligned is working properly for various inputs
     for (size_t first = 0; first < c.size(); ++first)
-        hpx::for_each(policy, std::begin(c) + first, std::end(c),
+        hpx::for_each(policy,
+            std::begin(c) + static_cast<std::ptrdiff_t>(first), std::end(c),
             [](auto& val) { ++val; });
 
     std::size_t count = 0;

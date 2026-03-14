@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2023 The STE||AR-Group
+# Copyright (c) 2019-2026 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -54,9 +54,16 @@ include(HPX_AddModule)
 add_hpx_module(
   full parcelset_base
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${parcelset_base_sources}
   HEADERS ${parcelset_base_headers}
   COMPAT_HEADERS ${parcelset_base_compat_headers}
+  ADD_TO_GLOBAL_HEADER
+    "hpx/parcelset_base/detail/data_point.hpp"
+    "hpx/parcelset_base/detail/gatherer.hpp"
+    "hpx/parcelset_base/detail/locality_interface_functions.hpp"
+    "hpx/parcelset_base/detail/parcel_route_handler.hpp"
+    "hpx/parcelset_base/detail/per_action_data_counter.hpp"
   DEPENDENCIES hpx_core
   MODULE_DEPENDENCIES ${parcelset_base_optional_module_dependencies}
   CMAKE_SUBDIRS examples tests

@@ -6,7 +6,7 @@
 
 #include <hpx/program_options/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/datastructures/any.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/program_options/options_description.hpp>
 #include <hpx/program_options/parsers.hpp>
 #include <hpx/program_options/value_semantic.hpp>
@@ -218,7 +218,7 @@ namespace hpx::program_options {
     void variables_map::notify()
     {
         // This checks if all required options occur
-        for (const auto& r : m_required)
+        for (auto const& r : m_required)
         {
             std::string const& opt = r.first;
             std::string const& display_opt = r.second;

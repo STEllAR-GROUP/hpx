@@ -29,7 +29,8 @@ namespace hpx::lcos::local {
     // This channel is bounded to a size given at construction time and supports
     // a multiple producers and a single consumer. The data is stored in a
     // ring-buffer.
-    template <typename T, typename Mutex = hpx::util::spinlock,
+    HPX_CXX_CORE_EXPORT template <typename T,
+        typename Mutex = hpx::util::spinlock,
         channel_mode = channel_mode::normal>
     class base_channel_mpsc
     {
@@ -38,19 +39,19 @@ namespace hpx::lcos::local {
 
         [[nodiscard]] bool is_full(std::size_t tail) const noexcept
         {
-            std::size_t const numitems =
+            std::size_t const num_items =
                 size_ + tail - head_.data_.load(std::memory_order_acquire);
 
-            if (numitems < size_)
+            if (num_items < size_)
             {
-                return numitems == size_ - 1;
+                return num_items == size_ - 1;
             }
-            return (numitems - size_ == size_ - 1);
+            return (num_items - size_ == size_ - 1);
         }
 
         [[nodiscard]] bool is_empty(std::size_t head) const noexcept
         {
-            return head == tail_.data_.tail_.load(std::memory_order_relaxed);
+            return head == tail_.data_.tail_.load(std::memory_order_acquire);
         }
 
     public:
@@ -173,7 +174,7 @@ namespace hpx::lcos::local {
             {
                 tail = 0;
             }
-            tail_.data_.tail_.store(tail, std::memory_order_relaxed);
+            tail_.data_.tail_.store(tail, std::memory_order_release);
 
             return true;
         }
@@ -217,7 +218,7 @@ namespace hpx::lcos::local {
         std::atomic<bool> closed_;
     };
 
-    template <typename T, typename Mutex>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Mutex>
     class base_channel_mpsc<T, Mutex, channel_mode::dont_support_close>
     {
     private:
@@ -237,7 +238,7 @@ namespace hpx::lcos::local {
 
         [[nodiscard]] bool is_empty(std::size_t head) const noexcept
         {
-            return head == tail_.data_.tail_.load(std::memory_order_relaxed);
+            return head == tail_.data_.tail_.load(std::memory_order_acquire);
         }
 
     public:
@@ -331,7 +332,7 @@ namespace hpx::lcos::local {
             {
                 tail = 0;
             }
-            tail_.data_.tail_.store(tail, std::memory_order_relaxed);
+            tail_.data_.tail_.store(tail, std::memory_order_release);
 
             return true;
         }
@@ -363,6 +364,7 @@ namespace hpx::lcos::local {
     ////////////////////////////////////////////////////////////////////////////
     // Using hpx::util::spinlock as the means of synchronization enables the use
     // of this channel with non-HPX threads.
-    template <typename T, channel_mode Mode = channel_mode::normal>
+    HPX_CXX_CORE_EXPORT template <typename T,
+        channel_mode Mode = channel_mode::normal>
     using channel_mpsc = base_channel_mpsc<T, hpx::spinlock, Mode>;
 }    // namespace hpx::lcos::local

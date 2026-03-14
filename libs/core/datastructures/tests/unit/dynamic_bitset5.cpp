@@ -12,8 +12,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/datastructures/detail/dynamic_bitset.hpp>
-#include <hpx/datastructures/serialization/dynamic_bitset.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/testing.hpp>
 
@@ -29,7 +28,7 @@ private:
     friend class hpx::serialization::access;
 
     template <class Archive>
-    void serialize(Archive& ar, unsigned const int)
+    void serialize(Archive& ar, unsigned int const)
     {
         // clang-format off
         ar & x;

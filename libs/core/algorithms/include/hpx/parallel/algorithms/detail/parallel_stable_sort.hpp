@@ -8,7 +8,7 @@
 #pragma once
 
 #include <hpx/assert.hpp>
-#include <hpx/executors/exception_list.hpp>
+#include <hpx/modules/executors.hpp>
 #include <hpx/parallel/algorithms/detail/sample_sort.hpp>
 
 #include <cstddef>
@@ -21,12 +21,14 @@
 
 namespace hpx::parallel::detail {
 
-    inline constexpr std::size_t stable_sort_limit_per_task = 1 << 16;
+    HPX_CXX_CORE_EXPORT inline constexpr std::size_t
+        stable_sort_limit_per_task = 1 << 16;
 
     /// \struct parallel_stable_sort
     ///
     /// This a structure for to implement a parallel stable sort exception safe
-    template <typename Iter, typename Sent, typename Compare>
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent,
+        typename Compare>
     struct parallel_stable_sort_helper
     {
         using value_type = typename std::iterator_traits<Iter>::value_type;
@@ -136,7 +138,8 @@ namespace hpx::parallel::detail {
         }
     }
 
-    template <typename Exec, typename Iter, typename Sent, typename Compare>
+    HPX_CXX_CORE_EXPORT template <typename Exec, typename Iter, typename Sent,
+        typename Compare>
     Iter parallel_stable_sort(Exec&& exec, Iter first, Sent last,
         std::size_t cores, std::size_t chunk_size, Compare&& comp)
     {
@@ -149,7 +152,7 @@ namespace hpx::parallel::detail {
         return sorter(HPX_FORWARD(Exec, exec), cores, chunk_size);
     }
 
-    template <typename Exec, typename Iter, typename Sent>
+    HPX_CXX_CORE_EXPORT template <typename Exec, typename Iter, typename Sent>
     Iter parallel_stable_sort(Exec&& exec, Iter first, Sent last)
     {
         using compare =

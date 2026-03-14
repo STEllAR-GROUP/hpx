@@ -10,13 +10,9 @@
 
 #if defined(HPX_HAVE_DATAPAR)
 #include <hpx/assert.hpp>
-#include <hpx/execution/traits/vector_pack_alignment_size.hpp>
-#include <hpx/execution/traits/vector_pack_get_set.hpp>
-#include <hpx/execution/traits/vector_pack_load_store.hpp>
-#include <hpx/execution/traits/vector_pack_type.hpp>
-#include <hpx/functional/detail/invoke.hpp>
-#include <hpx/functional/invoke_result.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 
 #include <cstddef>
 #include <iterator>
@@ -28,7 +24,7 @@
 namespace hpx::parallel::util::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Iter>
+    HPX_CXX_CORE_EXPORT template <typename Iter>
     struct is_data_aligned_impl
     {
         static HPX_FORCEINLINE bool call(Iter& it) noexcept
@@ -43,14 +39,14 @@ namespace hpx::parallel::util::detail {
         }
     };
 
-    template <typename Iter>
+    HPX_CXX_CORE_EXPORT template <typename Iter>
     HPX_FORCEINLINE bool is_data_aligned(Iter& it) noexcept
     {
         return is_data_aligned_impl<Iter>::call(it);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Iter1, typename Iter2>
+    HPX_CXX_CORE_EXPORT template <typename Iter1, typename Iter2>
     struct iterators_datapar_compatible_impl
     {
         using iterator1_type = std::decay_t<Iter1>;
@@ -71,41 +67,41 @@ namespace hpx::parallel::util::detail {
                     traits::vector_pack_alignment_v<pack2_type>>;
     };
 
-    template <typename Iter1, typename Iter2>
+    HPX_CXX_CORE_EXPORT template <typename Iter1, typename Iter2>
     struct iterators_datapar_compatible
       : iterators_datapar_compatible_impl<Iter1, Iter2>::type
     {
     };
 
-    template <typename Iter1, typename Iter2>
+    HPX_CXX_CORE_EXPORT template <typename Iter1, typename Iter2>
     inline constexpr bool iterators_datapar_compatible_v =
         iterators_datapar_compatible<Iter1, Iter2>::value;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Iter, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Enable = void>
     struct iterator_datapar_compatible_impl
       : std::is_arithmetic<typename std::iterator_traits<Iter>::value_type>
     {
     };
 
-    template <typename Iter, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Enable = void>
     struct iterator_datapar_compatible : std::false_type
     {
     };
 
-    template <typename Iter>
+    HPX_CXX_CORE_EXPORT template <typename Iter>
     struct iterator_datapar_compatible<Iter,
-        std::enable_if_t<hpx::traits::is_random_access_iterator_v<Iter>>>
+        std::enable_if_t<std::random_access_iterator<Iter>>>
       : iterator_datapar_compatible_impl<std::decay_t<Iter>>::type
     {
     };
 
-    template <typename Iter>
+    HPX_CXX_CORE_EXPORT template <typename Iter>
     inline constexpr bool iterator_datapar_compatible_v =
         iterator_datapar_compatible<Iter>::value;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Iter, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Enable = void>
     struct datapar_loop_step
     {
         using value_type = typename std::iterator_traits<Iter>::value_type;
@@ -134,7 +130,7 @@ namespace hpx::parallel::util::detail {
         }
     };
 
-    template <typename I>
+    HPX_CXX_CORE_EXPORT template <typename I>
     struct datapar_loop_step<I, std::enable_if_t<std::is_integral_v<I>>>
     {
         using V1 = traits::vector_pack_type_t<I, 1>;
@@ -160,7 +156,7 @@ namespace hpx::parallel::util::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Iter, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Enable = void>
     struct datapar_loop_pred_step
     {
         using value_type = typename std::iterator_traits<Iter>::value_type;
@@ -196,7 +192,7 @@ namespace hpx::parallel::util::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Iter, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Enable = void>
     struct datapar_loop_step_ind
     {
         using value_type = typename std::iterator_traits<Iter>::value_type;
@@ -226,7 +222,7 @@ namespace hpx::parallel::util::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Iter>
+    HPX_CXX_CORE_EXPORT template <typename Iter>
     struct datapar_loop_idx_step
     {
         using value_type = typename std::iterator_traits<Iter>::value_type;
@@ -254,7 +250,7 @@ namespace hpx::parallel::util::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Iter, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Enable = void>
     struct datapar_loop_step_tok
     {
         using value_type = typename std::iterator_traits<Iter>::value_type;
@@ -283,7 +279,7 @@ namespace hpx::parallel::util::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename V1, typename V2>
+    HPX_CXX_CORE_EXPORT template <typename V1, typename V2>
     struct invoke_vectorized_in2
     {
         template <typename F, typename Iter1, typename Iter2>
@@ -332,7 +328,7 @@ namespace hpx::parallel::util::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename V1, typename V2>
+    HPX_CXX_CORE_EXPORT template <typename V1, typename V2>
     struct invoke_vectorized_in2_ind
     {
         template <typename F, typename Iter1, typename Iter2>
@@ -378,7 +374,7 @@ namespace hpx::parallel::util::detail {
         }
     };
 
-    template <typename Iter1, typename Iter2>
+    HPX_CXX_CORE_EXPORT template <typename Iter1, typename Iter2>
     struct datapar_loop_step2
     {
         using value1_type = typename std::iterator_traits<Iter1>::value_type;
@@ -412,7 +408,7 @@ namespace hpx::parallel::util::detail {
         }
     };
 
-    template <typename Iter1, typename Iter2>
+    HPX_CXX_CORE_EXPORT template <typename Iter1, typename Iter2>
     struct datapar_loop_step2_ind
     {
         using value1_type = typename std::iterator_traits<Iter1>::value_type;
@@ -442,7 +438,7 @@ namespace hpx::parallel::util::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////
-    template <typename V>
+    HPX_CXX_CORE_EXPORT template <typename V>
     struct invoke_vectorized_inout1
     {
         template <typename F, typename InIter, typename OutIter>
@@ -480,7 +476,7 @@ namespace hpx::parallel::util::detail {
         }
     };
 
-    template <typename V>
+    HPX_CXX_CORE_EXPORT template <typename V>
     struct invoke_vectorized_inout1_ind
     {
         template <typename F, typename InIter, typename OutIter>
@@ -518,7 +514,7 @@ namespace hpx::parallel::util::detail {
         }
     };
 
-    template <typename V1, typename V2>
+    HPX_CXX_CORE_EXPORT template <typename V1, typename V2>
     struct invoke_vectorized_inout2
     {
         template <typename F, typename InIter1, typename InIter2,
@@ -574,7 +570,7 @@ namespace hpx::parallel::util::detail {
         }
     };
 
-    template <typename V1, typename V2>
+    HPX_CXX_CORE_EXPORT template <typename V1, typename V2>
     struct invoke_vectorized_inout2_ind
     {
         template <typename F, typename InIter1, typename InIter2,
@@ -630,7 +626,7 @@ namespace hpx::parallel::util::detail {
         }
     };
 
-    struct datapar_transform_loop_step
+    HPX_CXX_CORE_EXPORT struct datapar_transform_loop_step
     {
         template <typename F, typename InIter, typename OutIter>
         HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr void call1(
@@ -697,7 +693,7 @@ namespace hpx::parallel::util::detail {
         }
     };
 
-    struct datapar_transform_loop_step_ind
+    HPX_CXX_CORE_EXPORT struct datapar_transform_loop_step_ind
     {
         template <typename F, typename InIter, typename OutIter>
         HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr void call1(

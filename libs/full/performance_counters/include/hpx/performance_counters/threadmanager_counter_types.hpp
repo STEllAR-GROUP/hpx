@@ -9,7 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/threadmanager/threadmanager_fwd.hpp>
+#include <hpx/modules/threadmanager.hpp>
 
 namespace hpx { namespace performance_counters {
 

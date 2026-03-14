@@ -9,11 +9,9 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DATAPAR)
-#include <hpx/execution/traits/is_execution_policy.hpp>
-#include <hpx/execution/traits/vector_pack_all_any_none.hpp>
-#include <hpx/execution/traits/vector_pack_find.hpp>
-#include <hpx/executors/datapar/execution_policy.hpp>
-#include <hpx/functional/tag_invoke.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/executors.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/parallel/algorithms/detail/find.hpp>
 #include <hpx/parallel/datapar/handle_local_exceptions.hpp>
 #include <hpx/parallel/datapar/iterator_helpers.hpp>
@@ -26,9 +24,10 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { namespace detail {
+namespace hpx::parallel::detail {
+
     ///////////////////////////////////////////////////////////////////////////
-    template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
     struct datapar_find
     {
         template <typename Iterator, typename Sentinel, typename T,
@@ -50,7 +49,7 @@ namespace hpx { namespace parallel { namespace detail {
         {
             util::loop_idx_n<std::decay_t<ExPolicy>>(base_idx, part_begin,
                 part_count, tok,
-                [&val, &proj, &tok](auto& v, std::size_t i) -> void {
+                [&val, &proj, &tok](auto&& v, std::size_t i) -> void {
                     auto msk = HPX_INVOKE(proj, v) == val;
                     int offset = hpx::parallel::traits::find_first_of(msk);
                     if (offset != -1)
@@ -59,9 +58,9 @@ namespace hpx { namespace parallel { namespace detail {
         }
     };
 
-    template <typename ExPolicy, typename Iterator, typename Sentinel,
-        typename T, typename Proj = hpx::identity,
-        HPX_CONCEPT_REQUIRES_(hpx::is_vectorpack_execution_policy_v<ExPolicy>)>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iterator,
+        typename Sentinel, typename T, typename Proj = hpx::identity>
+        requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE Iterator tag_invoke(
         sequential_find_t<ExPolicy>, Iterator first, Sentinel last,
         T const& val, Proj proj = Proj())
@@ -80,9 +79,9 @@ namespace hpx { namespace parallel { namespace detail {
         }
     }
 
-    template <typename ExPolicy, typename FwdIter, typename Token, typename T,
-        typename Proj,
-        HPX_CONCEPT_REQUIRES_(hpx::is_vectorpack_execution_policy_v<ExPolicy>)>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename FwdIter,
+        typename Token, typename T, typename Proj>
+        requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE void tag_invoke(sequential_find_t<ExPolicy>,
         std::size_t base_idx, FwdIter part_begin, std::size_t part_count,
         Token& tok, T const& val, Proj&& proj)
@@ -92,7 +91,7 @@ namespace hpx { namespace parallel { namespace detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
     struct datapar_find_if
     {
         template <typename Iterator, typename Sentinel, typename Pred,
@@ -128,7 +127,7 @@ namespace hpx { namespace parallel { namespace detail {
         {
             util::loop_idx_n<std::decay_t<ExPolicy>>(base_idx, part_begin,
                 part_count, tok,
-                [&f, &proj, &tok](auto& v, std::size_t i) -> void {
+                [&f, &proj, &tok](auto&& v, std::size_t i) -> void {
                     auto msk = HPX_INVOKE(f, HPX_INVOKE(proj, v));
                     int offset = hpx::parallel::traits::find_first_of(msk);
                     if (offset != -1)
@@ -137,9 +136,9 @@ namespace hpx { namespace parallel { namespace detail {
         }
     };
 
-    template <typename ExPolicy, typename Iterator, typename Sentinel,
-        typename Pred, typename Proj = hpx::identity,
-        HPX_CONCEPT_REQUIRES_(hpx::is_vectorpack_execution_policy_v<ExPolicy>)>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iterator,
+        typename Sentinel, typename Pred, typename Proj = hpx::identity>
+        requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE Iterator tag_invoke(
         sequential_find_if_t<ExPolicy>, Iterator first, Sentinel last,
         Pred pred, Proj proj = Proj())
@@ -159,9 +158,9 @@ namespace hpx { namespace parallel { namespace detail {
         }
     }
 
-    template <typename ExPolicy, typename FwdIter, typename Token, typename F,
-        typename Proj,
-        HPX_CONCEPT_REQUIRES_(hpx::is_vectorpack_execution_policy_v<ExPolicy>)>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename FwdIter,
+        typename Token, typename F, typename Proj>
+        requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE void tag_invoke(
         sequential_find_if_t<ExPolicy>, FwdIter part_begin,
         std::size_t part_count, Token& tok, F&& op, Proj&& proj)
@@ -170,9 +169,9 @@ namespace hpx { namespace parallel { namespace detail {
             HPX_FORWARD(F, op), HPX_FORWARD(Proj, proj));
     }
 
-    template <typename ExPolicy, typename FwdIter, typename Token, typename F,
-        typename Proj,
-        HPX_CONCEPT_REQUIRES_(hpx::is_vectorpack_execution_policy_v<ExPolicy>)>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename FwdIter,
+        typename Token, typename F, typename Proj>
+        requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE void tag_invoke(
         sequential_find_if_t<ExPolicy>, std::size_t base_idx,
         FwdIter part_begin, std::size_t part_count, Token& tok, F&& op,
@@ -183,7 +182,7 @@ namespace hpx { namespace parallel { namespace detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
     struct datapar_find_if_not
     {
         template <typename Iterator, typename Sentinel, typename Pred,
@@ -219,7 +218,7 @@ namespace hpx { namespace parallel { namespace detail {
         {
             util::loop_idx_n<std::decay_t<ExPolicy>>(base_idx, part_begin,
                 part_count, tok,
-                [&f, &proj, &tok](auto& v, std::size_t i) -> void {
+                [&f, &proj, &tok](auto&& v, std::size_t i) -> void {
                     auto msk = !HPX_INVOKE(f, HPX_INVOKE(proj, v));
                     int offset = hpx::parallel::traits::find_first_of(msk);
                     if (offset != -1)
@@ -228,9 +227,9 @@ namespace hpx { namespace parallel { namespace detail {
         }
     };
 
-    template <typename ExPolicy, typename Iterator, typename Sentinel,
-        typename Pred, typename Proj = hpx::identity,
-        HPX_CONCEPT_REQUIRES_(hpx::is_vectorpack_execution_policy_v<ExPolicy>)>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iterator,
+        typename Sentinel, typename Pred, typename Proj = hpx::identity>
+        requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE Iterator tag_invoke(
         sequential_find_if_not_t<ExPolicy>, Iterator first, Sentinel last,
         Pred pred, Proj proj = Proj())
@@ -250,9 +249,9 @@ namespace hpx { namespace parallel { namespace detail {
         }
     }
 
-    template <typename ExPolicy, typename FwdIter, typename Token, typename F,
-        typename Proj,
-        HPX_CONCEPT_REQUIRES_(hpx::is_vectorpack_execution_policy_v<ExPolicy>)>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename FwdIter,
+        typename Token, typename F, typename Proj>
+        requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE void tag_invoke(
         sequential_find_if_not_t<ExPolicy>, FwdIter part_begin,
         std::size_t part_count, Token& tok, F&& op, Proj&& proj)
@@ -261,9 +260,9 @@ namespace hpx { namespace parallel { namespace detail {
             HPX_FORWARD(F, op), HPX_FORWARD(Proj, proj));
     }
 
-    template <typename ExPolicy, typename FwdIter, typename Token, typename F,
-        typename Proj,
-        HPX_CONCEPT_REQUIRES_(hpx::is_vectorpack_execution_policy_v<ExPolicy>)>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename FwdIter,
+        typename Token, typename F, typename Proj>
+        requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE void tag_invoke(
         sequential_find_if_not_t<ExPolicy>, std::size_t base_idx,
         FwdIter part_begin, std::size_t part_count, Token& tok, F&& op,
@@ -274,7 +273,7 @@ namespace hpx { namespace parallel { namespace detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
     struct datapar_find_end_t
     {
         template <typename Iter1, typename Sent1, typename Iter2,
@@ -334,9 +333,10 @@ namespace hpx { namespace parallel { namespace detail {
         }
     };
 
-    template <typename ExPolicy, typename Iter1, typename Sent1, typename Iter2,
-        typename Sent2, typename Pred, typename Proj1, typename Proj2,
-        HPX_CONCEPT_REQUIRES_(hpx::is_vectorpack_execution_policy_v<ExPolicy>)>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter1,
+        typename Sent1, typename Iter2, typename Sent2, typename Pred,
+        typename Proj1, typename Proj2>
+        requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE Iter1 tag_invoke(
         sequential_find_end_t<ExPolicy>, Iter1 first1, Sent1 last1,
         Iter2 first2, Sent2 last2, Pred&& op, Proj1&& proj1, Proj2&& proj2)
@@ -361,9 +361,10 @@ namespace hpx { namespace parallel { namespace detail {
         }
     }
 
-    template <typename ExPolicy, typename Iter1, typename Iter2, typename Token,
-        typename Pred, typename Proj1, typename Proj2,
-        HPX_CONCEPT_REQUIRES_(hpx::is_vectorpack_execution_policy_v<ExPolicy>)>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter1,
+        typename Iter2, typename Token, typename Pred, typename Proj1,
+        typename Proj2>
+        requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE void tag_invoke(
         sequential_find_end_t<ExPolicy>, Iter1 it, Iter2 first2,
         std::size_t base_idx, std::size_t part_size, std::size_t diff,
@@ -390,7 +391,7 @@ namespace hpx { namespace parallel { namespace detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
     struct datapar_find_first_of
     {
         template <typename InIter1, typename InIter2, typename Pred,
@@ -449,9 +450,9 @@ namespace hpx { namespace parallel { namespace detail {
         }
     };
 
-    template <typename ExPolicy, typename InIter1, typename InIter2,
-        typename Pred, typename Proj1, typename Proj2,
-        HPX_CONCEPT_REQUIRES_(hpx::is_vectorpack_execution_policy_v<ExPolicy>)>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename InIter1,
+        typename InIter2, typename Pred, typename Proj1, typename Proj2>
+        requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE InIter1 tag_invoke(
         sequential_find_first_of_t<ExPolicy>, InIter1 first, InIter1 last,
         InIter2 s_first, InIter2 s_last, Pred&& op, Proj1&& proj1,
@@ -477,9 +478,10 @@ namespace hpx { namespace parallel { namespace detail {
         }
     }
 
-    template <typename ExPolicy, typename FwdIter, typename FwdIter2,
-        typename Token, typename Pred, typename Proj1, typename Proj2,
-        HPX_CONCEPT_REQUIRES_(hpx::is_vectorpack_execution_policy_v<ExPolicy>)>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename FwdIter,
+        typename FwdIter2, typename Token, typename Pred, typename Proj1,
+        typename Proj2>
+        requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE void tag_invoke(
         sequential_find_first_of_t<ExPolicy>, FwdIter it, FwdIter2 s_first,
         FwdIter2 s_last, std::size_t base_idx, std::size_t part_size,
@@ -504,5 +506,6 @@ namespace hpx { namespace parallel { namespace detail {
                 HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }
     }
-}}}    // namespace hpx::parallel::detail
+}    // namespace hpx::parallel::detail
+
 #endif

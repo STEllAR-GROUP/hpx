@@ -4,6 +4,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config.hpp>
+
+// The checked MSVC std library breaks compilation of this test
+#if !(defined(HPX_MSVC) && defined(HPX_DEBUG))
+
 #define SHARED_PRIORITY_SCHEDULER_DEBUG true
 #define THREAD_QUEUE_MC_DEBUG true
 #define GUIDED_POOL_EXECUTOR_DEBUG true
@@ -31,12 +36,13 @@
 #include <vector>
 
 // The allocator that binds pages to numa domains
-#include <hpx/compute_local/host/numa_binding_allocator.hpp>
+#include <hpx/modules/compute_local.hpp>
+// Scheduler that honours numa placement hints for tasks
+#include <hpx/modules/schedulers.hpp>
+
 // Example binder functions for different page binding mappings
 #include "allocator_binder_linear.hpp"
 #include "allocator_binder_matrix.hpp"
-// Scheduler that honours numa placement hints for tasks
-#include <hpx/schedulers/shared_priority_queue_scheduler.hpp>
 
 // ------------------------------------------------------------------------
 // allocator maker for this test
@@ -66,8 +72,8 @@ template <template <typename> class Binder, typename T, typename Allocator>
 void test_binding(std::shared_ptr<Binder<T>> numa_binder, Allocator& allocator)
 {
     // num_numa_domains is only correct when using the default pool
-    int num_numa_domains =
-        hpx::resource::get_partitioner().numa_domains().size();
+    int num_numa_domains = static_cast<int>(
+        hpx::resource::get_partitioner().numa_domains().size());
 
     // create a container
     std::vector<T, Allocator> data(allocator);
@@ -105,9 +111,9 @@ void test_binding(std::shared_ptr<Binder<T>> numa_binder, Allocator& allocator)
     std::cout << "============================\n";
     std::cout << "get_numa_domain() " << num_numa_domains
               << " Domain Numa pattern\n";
-    for (unsigned int j = 0; j < ysize; j += ystep)
+    for (std::size_t j = 0; j < ysize; j += ystep)
     {
-        for (unsigned int i = 0; i < xsize; i += xstep)
+        for (std::size_t i = 0; i < xsize; i += xstep)
         {
             T* page_ptr = &M[i * numa_binder->memory_step(0) +
                 j * numa_binder->memory_step(1)];
@@ -126,9 +132,9 @@ void test_binding(std::shared_ptr<Binder<T>> numa_binder, Allocator& allocator)
 #ifdef NUMA_BINDING_ALLOCATOR_INIT_MEMORY
     std::cout << "============================\n";
     std::cout << "Contents of memory locations\n";
-    for (unsigned int j = 0; j < ysize; j += ystep)
+    for (std::size_t j = 0; j < ysize; j += ystep)
     {
-        for (unsigned int i = 0; i < xsize; i += xstep)
+        for (std::size_t i = 0; i < xsize; i += xstep)
         {
             T* page_ptr = &M[i * numa_binder->memory_step(0) +
                 j * numa_binder->memory_step(1)];
@@ -141,13 +147,13 @@ void test_binding(std::shared_ptr<Binder<T>> numa_binder, Allocator& allocator)
 
     std::cout << "============================\n";
     std::cout << "Expected " << num_numa_domains << " Domain Numa pattern\n";
-    for (unsigned int j = 0; j < ysize; j += ystep)
+    for (std::size_t j = 0; j < ysize; j += ystep)
     {
-        for (unsigned int i = 0; i < xsize; i += xstep)
+        for (std::size_t i = 0; i < xsize; i += xstep)
         {
             T* page_ptr = &M[i * numa_binder->memory_step(0) +
                 j * numa_binder->memory_step(1)];
-            int d = numa_binder->operator()(
+            std::size_t d = numa_binder->operator()(
                 M, page_ptr, pagesize, num_numa_domains);
             std::cout << std::hex << d;
         }
@@ -161,7 +167,7 @@ void test_binding(std::shared_ptr<Binder<T>> numa_binder, Allocator& allocator)
 }
 
 // ------------------------------------------------------------------------
-// this is called on an hpx thread after the runtime starts up
+// this is called on a hpx thread after the runtime starts up
 // ------------------------------------------------------------------------
 int hpx_main(hpx::program_options::variables_map& vm)
 {
@@ -207,17 +213,14 @@ int hpx_main(hpx::program_options::variables_map& vm)
 // ------------------------------------------------------------------------
 // scheduler type needed for numa bound tasks
 // ------------------------------------------------------------------------
-using high_priority_sched =
-    hpx::threads::policies::shared_priority_queue_scheduler<>;
-using hpx::threads::policies::scheduler_mode;
-
 void init_resource_partitioner_handler(
     hpx::resource::partitioner& rp, hpx::program_options::variables_map const&)
 {
     using numa_scheduler =
         hpx::threads::policies::shared_priority_queue_scheduler<>;
     using hpx::threads::policies::scheduler_mode;
-    // setup the default pool with a numa aware scheduler
+
+    // set up the default pool with a numa aware scheduler
     rp.create_thread_pool("default",
         [](hpx::threads::thread_pool_init_parameters init,
             hpx::threads::policies::thread_queue_init_parameters
@@ -226,24 +229,22 @@ void init_resource_partitioner_handler(
             numa_scheduler::init_parameter_type scheduler_init(
                 init.num_threads_, {1, 1, 64}, init.affinity_data_,
                 thread_queue_init, "shared-priority-scheduler");
-            std::unique_ptr<numa_scheduler> scheduler(
-                new numa_scheduler(scheduler_init));
 
-            scheduler_mode mode =
-                scheduler_mode(scheduler_mode::do_background_work |
-                    scheduler_mode::delay_exit);
-            init.mode_ = mode;
+            auto scheduler = std::make_unique<numa_scheduler>(scheduler_init);
 
-            std::unique_ptr<hpx::threads::thread_pool_base> pool(
-                new hpx::threads::detail::scheduled_thread_pool<
-                    high_priority_sched>(std::move(scheduler), init));
+            init.mode_ =
+                scheduler_mode::do_background_work | scheduler_mode::delay_exit;
+
+            auto pool = std::make_unique<
+                hpx::threads::detail::scheduled_thread_pool<numa_scheduler>>(
+                std::move(scheduler), init);
             return pool;
         });
 }
 
 // the normal int main function that is called at startup and runs on an OS thread
 // the user must call hpx::init to start the hpx runtime which will execute hpx_main
-// on an hpx thread
+// on a hpx thread
 int main(int argc, char* argv[])
 {
     hpx::program_options::options_description desc_cmdline("Test options");
@@ -279,7 +280,7 @@ int main(int argc, char* argv[])
             .run(),
         vm);
 
-    // Setup the init parameters
+    // Set up the init parameters
     hpx::local::init_params init_args;
     init_args.desc_cmdline = desc_cmdline;
     // Set the callback to init the thread_pools
@@ -288,3 +289,12 @@ int main(int argc, char* argv[])
     hpx::local::init(hpx_main, argc, argv, init_args);
     return hpx::util::report_errors();
 }
+
+#else
+
+int main(int, char*[])
+{
+    return 0;
+}
+
+#endif

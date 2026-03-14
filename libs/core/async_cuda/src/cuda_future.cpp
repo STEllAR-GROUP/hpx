@@ -1,4 +1,4 @@
-//  Copyright (c) 2023 Gregor Dai√ü
+//  Copyright (c) 2023 Gregor Daiﬂ
 //  Copyright (c) 2020 John Biddiscombe
 //  Copyright (c) 2016 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
@@ -9,12 +9,13 @@
 //
 // hpxinspect:noascii
 
-#include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_cuda/cuda_future.hpp>
 #include <hpx/async_cuda/custom_gpu_api.hpp>
+#include <hpx/modules/allocator_support.hpp>
 
-namespace hpx { namespace cuda { namespace experimental { namespace detail {
+namespace hpx::cuda::experimental::detail {
+
     hpx::future<void> get_future_with_callback(cudaStream_t stream)
     {
         return get_future_with_callback(
@@ -26,4 +27,4 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
         return get_future_with_event(
             hpx::util::internal_allocator<>{}, stream, device);
     }
-}}}}    // namespace hpx::cuda::experimental::detail
+}    // namespace hpx::cuda::experimental::detail

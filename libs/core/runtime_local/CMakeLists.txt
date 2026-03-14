@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2023 The STE||AR-Group
+# Copyright (c) 2019-2025 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,6 +20,7 @@ set(runtime_local_headers
     hpx/runtime_local/get_thread_name.hpp
     hpx/runtime_local/get_worker_thread_num.hpp
     hpx/runtime_local/interval_timer.hpp
+    hpx/runtime_local/macros.hpp
     hpx/runtime_local/os_thread_type.hpp
     hpx/runtime_local/pool_timer.hpp
     hpx/runtime_local/report_error.hpp
@@ -32,11 +33,14 @@ set(runtime_local_headers
     hpx/runtime_local/state.hpp
     hpx/runtime_local/shutdown_function.hpp
     hpx/runtime_local/startup_function.hpp
+    hpx/runtime_local/termination_detection.hpp
     hpx/runtime_local/thread_hooks.hpp
     hpx/runtime_local/thread_mapper.hpp
     hpx/runtime_local/thread_pool_helpers.hpp
     hpx/runtime_local/thread_stacktrace.hpp
 )
+
+set(runtime_local_macro_headers hpx/runtime_local/macros.hpp)
 
 # cmake-format: off
 set(runtime_local_compat_headers
@@ -83,32 +87,55 @@ set(runtime_local_sources
     thread_stacktrace.cpp
 )
 
+set(additional_dependencies)
+if(HPX_LIKWID_WITH_LIKWID)
+  set(additional_dependencies ${additional_dependencies} hpx_likwid)
+  set(runtime_local_sources ${runtime_local_sources} likwid_init.cpp)
+endif()
+
 include(HPX_AddModule)
 add_hpx_module(
   core runtime_local
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${runtime_local_sources}
   HEADERS ${runtime_local_headers}
+  MACRO_HEADERS ${runtime_local_macro_headers}
   COMPAT_HEADERS ${runtime_local_compat_headers}
+  ADD_TO_GLOBAL_HEADER "hpx/runtime_local/detail/runtime_local_fwd.hpp"
+                       "hpx/runtime_local/detail/serialize_exception.hpp"
   MODULE_DEPENDENCIES
+    hpx_async_base
     hpx_command_line_handling_local
+    hpx_coroutines
     hpx_debugging
     hpx_errors
+    hpx_datastructures
     hpx_execution
+    hpx_execution_base
+    hpx_executors
     hpx_format
+    hpx_functional
     hpx_futures
     hpx_io_service
+    hpx_lock_registration
     hpx_logging
     hpx_plugin
     hpx_program_options
     hpx_resource_partitioner
     hpx_runtime_configuration
+    hpx_serialization
     hpx_static_reinit
+    hpx_synchronization
+    hpx_tag_invoke
     hpx_threading
     hpx_threading_base
     hpx_threadmanager
+    hpx_thread_support
     hpx_timing
     hpx_topology
     hpx_type_support
+    hpx_util
+    ${additional_dependencies}
   CMAKE_SUBDIRS examples tests
 )

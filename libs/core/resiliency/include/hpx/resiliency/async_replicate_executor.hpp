@@ -1,6 +1,6 @@
 //  Copyright (c) 2019 National Technology & Engineering Solutions of Sandia,
 //                     LLC (NTESS).
-//  Copyright (c) 2018-2024 Hartmut Kaiser
+//  Copyright (c) 2018-2025 Hartmut Kaiser
 //  Copyright (c) 2018-2019 Adrian Serio
 //  Copyright (c) 2019 Nikunj Gupta
 //
@@ -14,12 +14,11 @@
 #include <hpx/resiliency/async_replicate.hpp>
 #include <hpx/resiliency/resiliency_cpos.hpp>
 
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/functional/detail/invoke.hpp>
-#include <hpx/functional/invoke_fused.hpp>
 #include <hpx/modules/async_local.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -31,7 +30,7 @@ namespace hpx::resiliency::experimental {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Result>
+        HPX_CXX_CORE_EXPORT template <typename Result>
         struct async_replicate_vote_validate_executor
         {
             template <typename Executor, typename Vote, typename Pred,
@@ -46,10 +45,10 @@ namespace hpx::resiliency::experimental {
 
                 // launch given function n times
                 auto func = [f = HPX_FORWARD(F, f),
-                                t = hpx::make_tuple(HPX_FORWARD(Ts, ts)...)](
+                                ... ts = HPX_FORWARD(Ts, ts)](
                                 std::size_t) mutable -> result_type {
                     // ignore argument (invocation count of bulk_execute)
-                    return hpx::invoke_fused(f, t);
+                    return HPX_INVOKE(f, ts...);
                 };
 
                 auto&& results = hpx::parallel::execution::bulk_async_execute(
@@ -92,17 +91,19 @@ namespace hpx::resiliency::experimental {
                         }
                         else
                         {
-                            for (auto&& f : HPX_MOVE(results))
+                            for (auto&& fut :
+                                HPX_FORWARD(decltype(results), results))
                             {
-                                if (f.has_exception())
+                                if (fut.has_exception())
                                 {
                                     // rethrow abort_replicate_exception, if
                                     // caught
-                                    ex = detail::rethrow_on_abort_replicate(f);
+                                    ex =
+                                        detail::rethrow_on_abort_replicate(fut);
                                 }
                                 else
                                 {
-                                    auto&& result = f.get();
+                                    auto&& result = fut.get();
                                     if (HPX_INVOKE(pred, result))
                                     {
                                         valid_results.emplace_back(
@@ -143,10 +144,10 @@ namespace hpx::resiliency::experimental {
             {
                 // launch given function n times
                 auto func = [f = HPX_FORWARD(F, f),
-                                t = hpx::make_tuple(HPX_FORWARD(Ts, ts)...)](
+                                ... ts = HPX_FORWARD(Ts, ts)](
                                 std::size_t) mutable {
                     // ignore argument (invocation count of bulk_execute)
-                    hpx::invoke_fused(f, t);
+                    HPX_INVOKE(f, ts...);
 
                     // return non-void result to force executor into providing a
                     // future for each invocation (returning void might optimize
@@ -184,7 +185,8 @@ namespace hpx::resiliency::experimental {
                         }
                         else
                         {
-                            for (auto&& f : HPX_MOVE(results))
+                            for (auto&& f :
+                                HPX_FORWARD(decltype(results), results))
                             {
                                 if (f.has_exception())
                                 {
@@ -222,14 +224,9 @@ namespace hpx::resiliency::experimental {
     // Asynchronously launch given function f exactly n times. Verify the result
     // of those invocations using the given predicate pred. Run all the valid
     // results against a user provided voting function. Return the valid output.
-    // clang-format off
-    template <typename Executor, typename Vote, typename Pred, typename F,
-        typename... Ts,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::traits::is_one_way_executor_v<Executor> ||
-            hpx::traits::is_two_way_executor_v<Executor>
-        )>
-    // clang-format on
+    HPX_CXX_CORE_EXPORT template <typename Executor, typename Vote,
+        typename Pred, typename F, typename... Ts>
+        requires(one_way_executor<Executor> || two_way_executor<Executor>)
     decltype(auto) tag_invoke(async_replicate_vote_validate_t, Executor&& exec,
         std::size_t n, Vote&& vote, Pred&& pred, F&& f, Ts&&... ts)
     {
@@ -246,13 +243,9 @@ namespace hpx::resiliency::experimental {
     // Asynchronously launch given function f exactly n times. Verify the result
     // of those invocations using the given predicate pred. Run all the valid
     // results against a user provided voting function. Return the valid output.
-    // clang-format off
-    template <typename Executor, typename Vote, typename F, typename... Ts,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::traits::is_one_way_executor_v<Executor> ||
-            hpx::traits::is_two_way_executor_v<Executor>
-        )>
-    // clang-format on
+    HPX_CXX_CORE_EXPORT template <typename Executor, typename Vote, typename F,
+        typename... Ts>
+        requires(one_way_executor<Executor> || two_way_executor<Executor>)
     decltype(auto) tag_invoke(async_replicate_vote_t, Executor&& exec,
         std::size_t n, Vote&& vote, F&& f, Ts&&... ts)
     {
@@ -268,11 +261,10 @@ namespace hpx::resiliency::experimental {
     ///////////////////////////////////////////////////////////////////////////
     // Asynchronously launch given function f exactly n times. Verify the result
     // of those invocations using the given predicate pred. Return the first
-    // valid result. clang-format off
-    template <typename Executor, typename Pred, typename F, typename... Ts,
-        HPX_CONCEPT_REQUIRES_(hpx::traits::is_one_way_executor_v<Executor> ||
-            hpx::traits::is_two_way_executor_v<Executor>)>
-    // clang-format on
+    // valid result.
+    HPX_CXX_CORE_EXPORT template <typename Executor, typename Pred, typename F,
+        typename... Ts>
+        requires(one_way_executor<Executor> || two_way_executor<Executor>)
     decltype(auto) tag_invoke(async_replicate_validate_t, Executor&& exec,
         std::size_t n, Pred&& pred, F&& f, Ts&&... ts)
     {
@@ -289,13 +281,8 @@ namespace hpx::resiliency::experimental {
     // Asynchronously launch given function f exactly n times. Verify
     // the result of those invocations by checking for exception.
     // Return the first valid result.
-    // clang-format off
-    template <typename Executor, typename F, typename... Ts,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::traits::is_one_way_executor_v<Executor> ||
-            hpx::traits::is_two_way_executor_v<Executor>
-        )>
-    // clang-format on
+    HPX_CXX_CORE_EXPORT template <typename Executor, typename F, typename... Ts>
+        requires(one_way_executor<Executor> || two_way_executor<Executor>)
     decltype(auto) tag_invoke(
         async_replicate_t, Executor&& exec, std::size_t n, F&& f, Ts&&... ts)
     {

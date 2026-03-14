@@ -11,7 +11,7 @@
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/server/component_heap.hpp>
-#include <hpx/naming_base/id_type.hpp>
+#include <hpx/modules/naming_base.hpp>
 
 #include <cstddef>
 #include <exception>

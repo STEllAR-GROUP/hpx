@@ -42,7 +42,7 @@ double delay()
 {
     double d = 0.;
     for (std::uint64_t i = 0; i < num_iterations; ++i)
-        d += 1 / (2. * i + 1);
+        d += 1 / (2. * static_cast<double>(i + 1));
     return d;
 }
 
@@ -67,9 +67,9 @@ int hpx_main(variables_map& vm)
     {
         num_iterations = vm["delay-iterations"].as<std::uint64_t>();
 
-        const bool csv = vm.count("csv");
+        bool const csv = vm.count("csv");
 
-        const std::size_t pxthreads = vm["pxthreads"].as<std::size_t>();
+        std::size_t const pxthreads = vm["pxthreads"].as<std::size_t>();
 
         result_map results;
 

@@ -1,5 +1,5 @@
 //  Copyright (c) 2021 ETH Zurich
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,11 +7,10 @@
 
 #pragma once
 
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
-#include <hpx/execution_base/receiver.hpp>
-#include <hpx/execution_base/sender.hpp>
-#include <hpx/type_support/pack.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -21,7 +20,8 @@ namespace hpx::execution::experimental::detail {
 
     // This is a partial s/r algorithm that injects a given scheduler as the
     // first argument while tag-invoking the bound algorithm.
-    template <typename Tag, typename Scheduler, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename Tag, typename Scheduler,
+        typename... Ts>
     struct inject_scheduler
       : partial_algorithm_base<Tag, hpx::util::make_index_pack_t<sizeof...(Ts)>,
             Ts...>
@@ -54,6 +54,7 @@ namespace hpx::execution::experimental::detail {
         friend constexpr HPX_FORCEINLINE auto operator|(
             U&& u, inject_scheduler p)
         {
+            // NOLINTNEXTLINE(bugprone-use-after-move)
             return HPX_MOVE(p).invoke(HPX_MOVE(p.scheduler), HPX_FORWARD(U, u));
         }
     };

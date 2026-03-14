@@ -4,11 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/serialization/input_archive.hpp>
-#include <hpx/serialization/output_archive.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/vector.hpp>
-
+#include <hpx/modules/serialization.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <cstddef>
@@ -36,14 +32,14 @@ struct A
     template <typename Archive>
     void serialize(Archive& ar, unsigned)
     {
-        ar& t_;
+        ar & t_;
     }
 };
 
 // non-default constructible
 struct B
 {
-    const int a;
+    int const a;
     short b;
 
 public:
@@ -57,7 +53,7 @@ public:
     template <class Archive>
     void serialize(Archive& ar, unsigned)
     {
-        ar& b;
+        ar & b;
     }
 
     int get_a() const
@@ -77,7 +73,7 @@ public:
 };
 
 template <class Archive>
-void save_construct_data(Archive& ar, const B* b, unsigned)
+void save_construct_data(Archive& ar, B const* b, unsigned)
 {
     ar << b->get_a();
 }

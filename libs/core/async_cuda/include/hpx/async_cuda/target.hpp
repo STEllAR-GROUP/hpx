@@ -11,14 +11,13 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/allocator_support/allocator_deleter.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_cuda/cuda_future.hpp>
 #include <hpx/async_cuda/get_targets.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/futures/traits/future_access.hpp>
-#include <hpx/synchronization/spinlock.hpp>
-#include <hpx/type_support/unused.hpp>
+#include <hpx/modules/allocator_support.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/synchronization.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <hpx/async_cuda/custom_gpu_api.hpp>
 
@@ -31,10 +30,10 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace cuda { namespace experimental {
+namespace hpx::cuda::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
-    struct target
+    HPX_CXX_CORE_EXPORT struct target
     {
     public:
         struct HPX_CORE_EXPORT native_handle_type
@@ -42,7 +41,6 @@ namespace hpx { namespace cuda { namespace experimental {
             typedef hpx::spinlock mutex_type;
 
             native_handle_type(int device = 0);
-
             ~native_handle_type();
 
             native_handle_type(native_handle_type const& rhs) noexcept;
@@ -74,7 +72,7 @@ namespace hpx { namespace cuda { namespace experimental {
                 return processor_name_;
             }
 
-            void reset() noexcept;
+            void reset() const noexcept;
 
         private:
             void init_processing_units();
@@ -171,8 +169,8 @@ namespace hpx { namespace cuda { namespace experimental {
         native_handle_type handle_;
     };
 
-    using detail::get_future_with_callback;
-    HPX_CORE_EXPORT target& get_default_target();
-}}}    // namespace hpx::cuda::experimental
+    HPX_CXX_CORE_EXPORT using detail::get_future_with_callback;
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT target& get_default_target();
+}    // namespace hpx::cuda::experimental
 
 #include <hpx/config/warnings_suffix.hpp>

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -15,10 +15,10 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/modules/memory.hpp>
+#include <hpx/modules/thread_support.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/synchronization/detail/condition_variable.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/thread_support/atomic_count.hpp>
-#include <hpx/type_support/assert_owns_lock.hpp>
 
 #include <climits>
 #include <cstddef>
@@ -34,7 +34,7 @@ namespace hpx {
     /// \cond NOINTERN
     namespace detail {
 
-        struct empty_oncompletion
+        HPX_CXX_CORE_EXPORT struct empty_oncompletion
         {
             constexpr void operator()() const noexcept {}
         };
@@ -44,7 +44,7 @@ namespace hpx {
         HPX_CORE_EXPORT void intrusive_ptr_add_ref(barrier_data* p) noexcept;
         HPX_CORE_EXPORT void intrusive_ptr_release(barrier_data* p) noexcept;
 
-        struct barrier_data
+        HPX_CXX_CORE_EXPORT struct barrier_data
         {
             using mutex_type = hpx::spinlock;
 
@@ -131,7 +131,8 @@ namespace hpx {
     /// Cpp17MoveConstructible (Table 28), Cpp17MoveAssignable (Table 30), and
     /// Cpp17Destructible (Table 32) requirements.
     ///
-    template <typename OnCompletion = detail::empty_oncompletion>
+    HPX_CXX_CORE_EXPORT template <typename OnCompletion =
+                                      detail::empty_oncompletion>
     class barrier
     {
     public:
@@ -311,14 +312,14 @@ namespace hpx {
 
         //////////////////////////////////////////////////////////////////////////
         // A barrier can be used to synchronize a specific number of threads,
-        // blocking all of the entering threads until all of the threads have
+        // blocking all the entering threads until all the threads have
         // entered the barrier.
         //
         // \note   A \a barrier is not a LCO in the sense that it has no global
-        //         id and it can't be triggered using the action (parcel)
+        //         id, and it can't be triggered using the action (parcel)
         //         mechanism. It is just a low level synchronization primitive
         //         allowing to synchronize a given number of \a threads.
-        class HPX_CORE_EXPORT barrier
+        HPX_CXX_CORE_EXPORT class HPX_CORE_EXPORT barrier
         {
             using mutex_type = hpx::spinlock;
 

@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/compute_local/host/numa_binding_allocator.hpp>
+#include <hpx/modules/compute_local.hpp>
 //
 #include <cstddef>
 #include <sstream>
@@ -32,9 +32,10 @@ struct matrix_numa_binder : hpx::compute::host::numa_binding_helper<T>
       , colprocs_(Ncolprocs)
       , rowprocs_(Nrowprocs)
     {
-        int const cache_line_size = hpx::threads::get_cache_line_size();
-        int const page_size = hpx::threads::get_memory_page_size();
-        int const alignment = (std::max)(page_size, cache_line_size);
+        std::size_t const cache_line_size = hpx::threads::get_cache_line_size();
+        std::size_t const page_size = hpx::threads::get_memory_page_size();
+        int const alignment =
+            static_cast<int>((std::max) (page_size, cache_line_size));
         int const elems_align = (alignment / sizeof(T));
         rows_page_ = elems_align;
         leading_dim_ =
@@ -43,8 +44,8 @@ struct matrix_numa_binder : hpx::compute::host::numa_binding_helper<T>
     }
 
     // return the domain that a given page should be bound to
-    virtual std::size_t operator()(const T* const base_ptr,
-        const T* const page_ptr, std::size_t const /* pagesize */,
+    virtual std::size_t operator()(T const* const base_ptr,
+        T const* const page_ptr, std::size_t const /* pagesize */,
         std::size_t const domains) const override
     {
         std::intptr_t offset = page_ptr - base_ptr;

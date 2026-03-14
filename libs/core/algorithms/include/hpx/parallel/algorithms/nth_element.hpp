@@ -134,11 +134,11 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/execution/algorithms/detail/predicates.hpp>
-#include <hpx/executors/execution_policy.hpp>
-#include <hpx/functional/invoke.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/executors.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/pivot.hpp>
 #include <hpx/parallel/algorithms/minmax.hpp>
@@ -164,7 +164,7 @@ namespace hpx::parallel {
         ///
         /// \brief : The element placed in the nth position is exactly the
         ///          element that would occur in this position if the range
-        ///          was fully sorted. All of the elements before this new nth
+        ///          was fully sorted. All the elements before this new nth
         ///          element are less than or equal to the elements after the
         ///          new nth element.
         ///
@@ -175,8 +175,9 @@ namespace hpx::parallel {
         /// \param comp : object for to Compare elements
         /// \param proj : projection
         ///
-        template <class RandomIt, typename Compare, typename Proj>
-        static constexpr void nth_element_seq(RandomIt first, RandomIt nth,
+        HPX_CXX_CORE_EXPORT template <class RandomIt, typename Compare,
+            typename Proj>
+        constexpr void nth_element_seq(RandomIt first, RandomIt nth,
             RandomIt end, std::uint32_t level, Compare&& comp, Proj&& proj)
         {
             constexpr std::uint32_t nmin_sort = 24;
@@ -232,7 +233,7 @@ namespace hpx::parallel {
             }
         }
 
-        template <typename Iter>
+        HPX_CXX_CORE_EXPORT template <typename Iter>
         struct nth_element : public algorithm<nth_element<Iter>, Iter>
         {
             constexpr nth_element() noexcept
@@ -350,24 +351,24 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::nth_element
-    inline constexpr struct nth_element_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct nth_element_t final
       : hpx::detail::tag_parallel_algorithm<nth_element_t>
     {
-        // clang-format off
         template <typename RandomIt,
-            typename Pred = hpx::parallel::detail::less,
-            HPX_CONCEPT_REQUIRES_(
+            typename Pred = hpx::parallel::detail::less>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<RandomIt> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<RandomIt>::value_type,
                     typename std::iterator_traits<RandomIt>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend void tag_fallback_invoke(hpx::nth_element_t, RandomIt first,
             RandomIt nth, RandomIt last, Pred pred = Pred())
         {
-            static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
+            static_assert(std::random_access_iterator<RandomIt>,
                 "Requires at least random iterator.");
 
             hpx::parallel::detail::nth_element<RandomIt>().call(
@@ -375,23 +376,23 @@ namespace hpx {
                 hpx::identity_v);
         }
 
-        // clang-format off
         template <typename ExPolicy, typename RandomIt,
-            typename Pred = hpx::parallel::detail::less,
-            HPX_CONCEPT_REQUIRES_(
+            typename Pred = hpx::parallel::detail::less>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<RandomIt> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<RandomIt>::value_type,
                     typename std::iterator_traits<RandomIt>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy>
         tag_fallback_invoke(hpx::nth_element_t, ExPolicy&& policy,
             RandomIt first, RandomIt nth, RandomIt last, Pred pred = Pred())
         {
-            static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
+            static_assert(std::random_access_iterator<RandomIt>,
                 "Requires at least random iterator.");
 
             using result_type =

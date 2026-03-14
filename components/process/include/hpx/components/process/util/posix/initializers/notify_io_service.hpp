@@ -17,45 +17,45 @@
 
 namespace hpx { namespace components { namespace process { namespace posix {
 
-namespace initializers {
+    namespace initializers {
 
-template <class IOService>
-class notify_io_service_ : public initializer_base
-{
-public:
-    explicit notify_io_service_(IOService &io_service) :
-        io_service_(io_service) {}
+        template <class IOService>
+        class notify_io_service_ : public initializer_base
+        {
+        public:
+            explicit notify_io_service_(IOService& io_service)
+              : io_service_(io_service)
+            {
+            }
 
-    template <class PosixExecutor>
-    void on_fork_setup(PosixExecutor&) const
-    {
-        io_service_.notify_fork(IOService::fork_prepare);
-    }
+            template <class PosixExecutor>
+            void on_fork_setup(PosixExecutor&) const
+            {
+                io_service_.notify_fork(IOService::fork_prepare);
+            }
 
-    template <class PosixExecutor>
-    void on_fork_success(PosixExecutor&) const
-    {
-        io_service_.notify_fork(IOService::fork_parent);
-    }
+            template <class PosixExecutor>
+            void on_fork_success(PosixExecutor&) const
+            {
+                io_service_.notify_fork(IOService::fork_parent);
+            }
 
-    template <class PosixExecutor>
-    void on_exec_setup(PosixExecutor&) const
-    {
-        io_service_.notify_fork(IOService::fork_child);
-    }
+            template <class PosixExecutor>
+            void on_exec_setup(PosixExecutor&) const
+            {
+                io_service_.notify_fork(IOService::fork_child);
+            }
 
-private:
-    IOService &io_service_;
-};
+        private:
+            IOService& io_service_;
+        };
 
-template <class IOService>
-notify_io_service_<IOService> notify_io_service(IOService &io_service)
-{
-    return notify_io_service_<IOService>(io_service);
-}
+        template <class IOService>
+        notify_io_service_<IOService> notify_io_service(IOService& io_service)
+        {
+            return notify_io_service_<IOService>(io_service);
+        }
 
-}
-
-}}}}
+}}}}}    // namespace hpx::components::process::posix::initializers
 
 #endif

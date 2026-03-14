@@ -1,5 +1,5 @@
 // Copyright (c) 2018 Adrian Serio
-// Copyright (c) 2018-2023 Hartmut Kaiser
+// Copyright (c) 2018-2025 Hartmut Kaiser
 //
 // SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,16 +17,15 @@
 
 #include <hpx/actions_base/traits/is_client.hpp>
 #include <hpx/async_distributed/dataflow.hpp>
-#include <hpx/checkpoint_base/checkpoint_data.hpp>
 #include <hpx/components/client_base.hpp>
 #include <hpx/components/get_ptr.hpp>
 #include <hpx/components_base/agas_interface.hpp>
-#include <hpx/futures/future.hpp>
+#include <hpx/modules/checkpoint_base.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/naming.hpp>
+#include <hpx/modules/serialization.hpp>
 #include <hpx/runtime_components/new.hpp>
 #include <hpx/runtime_distributed/find_here.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/vector.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -73,7 +72,7 @@ namespace hpx { namespace util {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& arch, const unsigned int /* version */)
+        void serialize(Archive& arch, unsigned int const /* version */)
         {
             // clang-format off
             arch & data_;
@@ -173,7 +172,7 @@ namespace hpx { namespace util {
         ost.write(reinterpret_cast<char const*>(&size), sizeof(std::int64_t));
 
         // Write the file to the stream
-        ost.write(ckp.data(), ckp.size());
+        ost.write(ckp.data(), static_cast<std::streamsize>(ckp.size()));
         return ost;
     }
 

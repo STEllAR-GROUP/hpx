@@ -58,8 +58,7 @@ namespace hpx::threads::coroutines::detail {
         auto status = context_exit_status::not_exited;
 
         // yield value once the thread function has finished executing
-        result_type result_last(
-            thread_schedule_state::unknown, invalid_thread_id);
+        result_type result_last;
 
         // loop as long this coroutine has been rebound
         do

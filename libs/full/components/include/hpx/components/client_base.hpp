@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,25 +13,22 @@
 #include <hpx/config.hpp>
 #include <hpx/actions_base/traits/is_client.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/components/basename_registration.hpp>
 #include <hpx/components/components_fwd.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/stub_base.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/futures/traits/acquire_future.hpp>
-#include <hpx/futures/traits/future_access.hpp>
-#include <hpx/futures/traits/future_traits.hpp>
-#include <hpx/futures/traits/is_future.hpp>
-#include <hpx/memory/intrusive_ptr.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/serialization/serialize.hpp>
+#include <hpx/modules/serialization.hpp>
 
 #include <exception>
 #include <string>
 #include <type_traits>
 #include <utility>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Client objects are equivalent to futures
@@ -307,6 +304,7 @@ namespace hpx::components {
         using future_type = shared_future<hpx::id_type>;
         using extra_data_type = Data;
 
+        // NOLINTBEGIN(bugprone-crtp-constructor-accessibility)
         client_base(hpx::intrusive_ptr<base_shared_state_type> const& state)
           : shared_state_(state)
         {
@@ -387,6 +385,7 @@ namespace hpx::components {
                 d.valid() ? lcos::detail::unwrap(HPX_MOVE(d)) : nullptr)
         {
         }
+        // NOLINTEND(bugprone-crtp-constructor-accessibility)
 
         ~client_base() = default;
 
@@ -728,3 +727,5 @@ namespace hpx::serialization {
         hpx::lcos::detail::serialize_future(ar, f, version);
     }
 }    // namespace hpx::serialization
+
+#include <hpx/config/warnings_suffix.hpp>

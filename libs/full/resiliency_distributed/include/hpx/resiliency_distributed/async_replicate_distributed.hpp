@@ -13,13 +13,12 @@
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 
-#include <hpx/resiliency/resiliency_cpos.hpp>
-#include <hpx/resiliency/util.hpp>
+#include <hpx/modules/resiliency.hpp>
 
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/async.hpp>
-#include <hpx/futures/future.hpp>
 #include <hpx/modules/async_local.hpp>
+#include <hpx/modules/futures.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -36,7 +35,7 @@ namespace hpx { namespace resiliency { namespace experimental {
         template <typename Vote, typename Pred, typename Action, typename... Ts>
         hpx::future<typename hpx::util::detail::invoke_deferred_result<Action,
             hpx::id_type, Ts...>::type>
-        async_replicate_vote_validate(const std::vector<hpx::id_type>& ids,
+        async_replicate_vote_validate(std::vector<hpx::id_type> const& ids,
             Vote&& vote, Pred&& pred, Action&& action, Ts&&... ts)
         {
             using result_type =
@@ -60,7 +59,7 @@ namespace hpx { namespace resiliency { namespace experimental {
                 [pred = HPX_FORWARD(Pred, pred), vote = HPX_FORWARD(Vote, vote),
                     ids](
                     std::vector<hpx::future<result_type>>&& results) mutable
-                -> result_type {
+                    -> result_type {
                     // Store all valid results
                     std::vector<result_type> valid_results;
                     valid_results.reserve(ids.size());
@@ -110,7 +109,7 @@ namespace hpx { namespace resiliency { namespace experimental {
     hpx::future<typename hpx::util::detail::invoke_deferred_result<Action,
         hpx::id_type, Ts...>::type>
     tag_invoke(async_replicate_vote_validate_t,
-        const std::vector<hpx::id_type>& ids, Vote&& vote, Pred&& pred,
+        std::vector<hpx::id_type> const& ids, Vote&& vote, Pred&& pred,
         Action&& action, Ts&&... ts)
     {
         HPX_ASSERT(ids.size() > 0);
@@ -129,7 +128,7 @@ namespace hpx { namespace resiliency { namespace experimental {
     template <typename Vote, typename Action, typename... Ts>
     hpx::future<typename hpx::util::detail::invoke_deferred_result<Action,
         hpx::id_type, Ts...>::type>
-    tag_invoke(async_replicate_vote_t, const std::vector<hpx::id_type>& ids,
+    tag_invoke(async_replicate_vote_t, std::vector<hpx::id_type> const& ids,
         Vote&& vote, Action&& action, Ts&&... ts)
     {
         HPX_ASSERT(ids.size() > 0);
@@ -148,7 +147,7 @@ namespace hpx { namespace resiliency { namespace experimental {
     template <typename Pred, typename Action, typename... Ts>
     hpx::future<typename hpx::util::detail::invoke_deferred_result<Action,
         hpx::id_type, Ts...>::type>
-    tag_invoke(async_replicate_validate_t, const std::vector<hpx::id_type>& ids,
+    tag_invoke(async_replicate_validate_t, std::vector<hpx::id_type> const& ids,
         Pred&& pred, Action&& action, Ts&&... ts)
     {
         HPX_ASSERT(ids.size() > 0);
@@ -167,7 +166,7 @@ namespace hpx { namespace resiliency { namespace experimental {
     template <typename Action, typename... Ts>
     hpx::future<typename hpx::util::detail::invoke_deferred_result<Action,
         hpx::id_type, Ts...>::type>
-    tag_invoke(async_replicate_t, const std::vector<hpx::id_type>& ids,
+    tag_invoke(async_replicate_t, std::vector<hpx::id_type> const& ids,
         Action&& action, Ts&&... ts)
     {
         HPX_ASSERT(ids.size() > 0);

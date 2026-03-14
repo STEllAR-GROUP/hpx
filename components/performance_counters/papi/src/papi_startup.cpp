@@ -14,16 +14,14 @@
 #include <hpx/components_base/component_commandline.hpp>
 #include <hpx/components_base/component_startup_shutdown.hpp>
 #include <hpx/components_base/server/create_component.hpp>
-#include <hpx/functional/bind_back.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/program_options.hpp>
+#include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
-#include <hpx/runtime_configuration/component_factory_base.hpp>
-#include <hpx/runtime_local/thread_mapper.hpp>
-
-#include <hpx/modules/program_options.hpp>
 
 #include <cctype>
 #include <cstdint>
@@ -137,7 +135,7 @@ namespace hpx { namespace performance_counters { namespace papi {
         hpx::error_code& ec)
     {
         for (auto gi = hpx::util::generator_iterator<T>(&gen); *gi != nullptr;
-             ++gi)
+            ++gi)
         {
             std::set<std::string>::const_iterator it;
             // iterate over known thread names

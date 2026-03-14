@@ -1,4 +1,4 @@
-//  Copyright (c) 2015 Hartmut Kaiser
+//  Copyright (c) 2015-2025 Hartmut Kaiser
 //  Copyright (c) 2011 Thomas Heller
 //  Copyright (c) 2013 Agustin Berge
 //
@@ -12,16 +12,11 @@
 #include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/actions_base/traits/is_continuation.hpp>
 #include <hpx/async_distributed/detail/post.hpp>
-#include <hpx/async_local/async_fwd.hpp>
-#include <hpx/datastructures/member_pack.hpp>
-#include <hpx/functional/bind.hpp>
-#include <hpx/functional/traits/is_action.hpp>
-#include <hpx/functional/traits/is_bind_expression.hpp>
-#include <hpx/functional/traits/is_placeholder.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/futures/traits/promise_local_result.hpp>
-#include <hpx/type_support/decay.hpp>
-#include <hpx/type_support/pack.hpp>
+#include <hpx/modules/async_local.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -80,6 +75,7 @@ namespace hpx {
             {
                 return hpx::post<Action>(
                     detail::bind_eval<Ts const&, sizeof...(Us)>::call(
+                        // NOLINTNEXTLINE(bugprone-use-after-move)
                         _args.template get<Is>(), HPX_FORWARD(Us, vs)...)...);
             }
 
@@ -89,6 +85,7 @@ namespace hpx {
             {
                 return hpx::post_c<Action>(cont,
                     detail::bind_eval<Ts const&, sizeof...(Us)>::call(
+                        // NOLINTNEXTLINE(bugprone-use-after-move)
                         _args.template get<Is>(), HPX_FORWARD(Us, vs)...)...);
             }
 
@@ -99,6 +96,7 @@ namespace hpx {
             {
                 return hpx::post<Action>(HPX_FORWARD(Continuation, cont),
                     detail::bind_eval<Ts const&, sizeof...(Us)>::call(
+                        // NOLINTNEXTLINE(bugprone-use-after-move)
                         _args.template get<Is>(), HPX_FORWARD(Us, vs)...)...);
             }
 
@@ -107,6 +105,7 @@ namespace hpx {
             {
                 return hpx::async<Action>(
                     detail::bind_eval<Ts const&, sizeof...(Us)>::call(
+                        // NOLINTNEXTLINE(bugprone-use-after-move)
                         _args.template get<Is>(), HPX_FORWARD(Us, vs)...)...);
             }
 

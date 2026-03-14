@@ -5,9 +5,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/modules/string_util.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/string_util/classification.hpp>
-#include <hpx/string_util/split.hpp>
 
 #include <cstddef>
 #include <iostream>
@@ -20,7 +19,7 @@ int main()
     std::string str2("Xx-abc--xX-abb-xx");
     std::string str3("xx");
     std::string strempty("");
-    const char* pch1 = "xx-abc--xx-abb";
+    char const* pch1 = "xx-abc--xx-abb";
     std::vector<std::string> tokens;
 
     // split tests

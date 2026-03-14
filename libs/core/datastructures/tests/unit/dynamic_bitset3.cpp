@@ -13,7 +13,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/datastructures/detail/dynamic_bitset.hpp>
+#include <hpx/modules/datastructures.hpp>
 
 #include <climits>
 #include <cstddef>
@@ -388,7 +388,7 @@ void run_test_cases()
         }
 
         // check
-        const typename bitset_type::size_type larger_than_size = 5 + b.size();
+        typename bitset_type::size_type const larger_than_size = 5 + b.size();
         for (i = 0; i <= larger_than_size; ++i)
         {
             Tests::find_next(b, i);
@@ -397,7 +397,7 @@ void run_test_cases()
     }
     {
         // bitset with alternate 1s and 0s
-        const typename bitset_type::size_type sz = 1000;
+        typename bitset_type::size_type const sz = 1000;
         bitset_type b(sz);
 
         typename bitset_type::size_type i = 0;
@@ -407,7 +407,7 @@ void run_test_cases()
         }
 
         // check
-        const typename bitset_type::size_type larger_than_size = 5 + b.size();
+        typename bitset_type::size_type const larger_than_size = 5 + b.size();
         for (i = 0; i <= larger_than_size; ++i)
         {
             Tests::find_next(b, i);

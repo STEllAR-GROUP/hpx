@@ -38,18 +38,18 @@ namespace hpx::program_options::detail {
         - option value(s), if any
 
         Sometimes the registered option name is not equal to the encountered
-        one, for example, because name abbreviation is supported.  Therefore
+        one, for example, because name abbreviation is supported.  Therefore,
         two option names can be obtained:
         - the registered one
         - the one found at the command line
 
-        There are lot of style options, which can be used to tune the command
+        There are lots of style options, which can be used to tune the command
         line parsing. In addition, it's possible to install additional parser
         which will process custom option styles.
 
         @todo minimal match length for guessing?
     */
-    class HPX_CORE_EXPORT cmdline
+    HPX_CXX_CORE_EXPORT class HPX_CORE_EXPORT cmdline
     {
     public:
         using style_t = ::hpx::program_options::command_line_style::style_t;

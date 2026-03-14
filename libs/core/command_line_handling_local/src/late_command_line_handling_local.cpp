@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,9 +7,9 @@
 #include <hpx/assert.hpp>
 #include <hpx/command_line_handling_local/late_command_line_handling_local.hpp>
 #include <hpx/command_line_handling_local/parse_command_line_local.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
-#include <hpx/util/from_string.hpp>
 
 #include <cstddef>
 #include <iostream>

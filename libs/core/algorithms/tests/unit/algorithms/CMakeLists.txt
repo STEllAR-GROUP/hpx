@@ -44,6 +44,9 @@ set(tests
     fill
     filln
     find
+    find_last
+    find_last_if
+    find_last_if_not
     findend
     findfirstof
     findfirstof_binary
@@ -69,6 +72,7 @@ set(tests
     generaten
     is_heap
     is_heap_until
+    iota
     includes
     inclusive_scan
     inclusive_scan_exception
@@ -111,7 +115,7 @@ set(tests
     rotate
     rotate_copy
     search
-    searchn
+    search_n
     set_difference
     set_intersection
     set_symmetric_difference
@@ -216,6 +220,19 @@ if(HPX_WITH_STDEXEC)
       transform_binary2_sender
       transform_reduce_sender
       transform_reduce_binary_sender
+      uninitialized_copy_sender
+      uninitialized_copyn_sender
+      uninitialized_default_construct_sender
+      uninitialized_default_constructn_sender
+      uninitialized_fill_sender
+      uninitialized_filln_sender
+      uninitialized_move_sender
+      uninitialized_moven_sender
+      uninitialized_relocate_sender
+      uninitialized_relocate_backward_sender
+      uninitialized_relocaten_sender
+      uninitialized_value_construct_sender
+      uninitialized_value_constructn_sender
       unique_sender
   )
 endif()

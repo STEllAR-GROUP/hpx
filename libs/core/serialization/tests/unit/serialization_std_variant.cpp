@@ -5,13 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-
-#include <hpx/serialization/input_archive.hpp>
-#include <hpx/serialization/output_archive.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/string.hpp>
-#include <hpx/serialization/variant.hpp>
-
+#include <hpx/modules/serialization.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <string>
@@ -49,7 +43,7 @@ struct A
     template <typename Archive>
     void serialize(Archive& ar, unsigned)
     {
-        ar& t_;
+        ar & t_;
     }
 };
 
@@ -88,7 +82,7 @@ int main()
     HPX_TEST_EQ(ivar.index(), ovar.index());
     HPX_TEST(ivar == ovar);
 
-    const std::variant<std::string> sovar = std::string("string");
+    std::variant<std::string> const sovar = std::string("string");
     std::variant<std::string> sivar;
     oar << sovar;
     iar >> sivar;

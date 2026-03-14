@@ -8,14 +8,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/async_local/dataflow.hpp>
-
-#include <hpx/lcos_local/channel.hpp>
-
-#include <hpx/modules/synchronization.hpp>
-
-#include <hpx/lcos_local/and_gate.hpp>
-#include <hpx/lcos_local/receive_buffer.hpp>
-#include <hpx/lcos_local/trigger.hpp>
+#include <hpx/modules/async_local.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/futures.hpp>
+#include <hpx/modules/lcos_local.hpp>
+#include <hpx/modules/synchronization.hpp>

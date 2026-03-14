@@ -18,7 +18,7 @@
 #include <hpx/include/threadmanager.hpp>
 #include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/format.hpp>
-#include <hpx/runtime_local/state.hpp>
+#include <hpx/modules/runtime_local.hpp>
 
 #include <cstdint>
 #include <iostream>
@@ -86,7 +86,7 @@ int monitor(double runfor, std::string const& name, std::uint64_t pause)
         if (status_is_valid(value.status_))
         {
             if (!zero_time)
-                zero_time = value.time_;
+                zero_time = static_cast<std::int64_t>(value.time_);
 
             hpx::util::format_to(std::cout, "  {},{},{}[s],{}\n", name,
                 value.count_,

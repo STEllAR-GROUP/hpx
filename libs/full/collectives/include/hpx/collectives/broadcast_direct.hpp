@@ -1,5 +1,5 @@
 //  Copyright (c) 2013-2014 Thomas Heller
-//  Copyright (c) 2013-2017 Hartmut Kaiser
+//  Copyright (c) 2013-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -134,21 +134,18 @@ namespace hpx { namespace lcos {
 #include <hpx/assert.hpp>
 #include <hpx/async_colocated/async_colocated.hpp>
 #include <hpx/async_colocated/post_colocated.hpp>
-#include <hpx/async_combinators/when_all.hpp>
 #include <hpx/async_distributed/post.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/futures/traits/promise_local_result.hpp>
+#include <hpx/modules/async_combinators.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
-#include <hpx/naming_base/id_type.hpp>
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/preprocessor/expand.hpp>
-#include <hpx/preprocessor/nargs.hpp>
-#include <hpx/serialization/vector.hpp>
-#include <hpx/type_support/pack.hpp>
-#include <hpx/util/calculate_fanout.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/naming_base.hpp>
+#include <hpx/modules/preprocessor.hpp>
+#include <hpx/modules/serialization.hpp>
+#include <hpx/modules/type_support.hpp>
+#include <hpx/modules/util.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -235,7 +232,7 @@ namespace hpx { namespace lcos {
             Ts const&... vs)
         {
             futures.push_back(hpx::async(Action(), id, vs..., global_idx)
-                                  .then(HPX_FORWARD(Cont, cont)));
+                    .then(HPX_FORWARD(Cont, cont)));
         }
 
         template <typename Action, typename... Ts>
@@ -384,7 +381,7 @@ namespace hpx { namespace lcos {
                 return;    // hpx::make_ready_future();
 
             std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
-            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            std::size_t local_size = (std::min) (ids.size(), local_fanout);
             std::size_t fanout =
                 util::calculate_fanout(ids.size(), local_fanout);
 
@@ -410,8 +407,9 @@ namespace hpx { namespace lcos {
                     HPX_ASSERT(ids.size() >= applied);
 
                     std::size_t next_fan =
-                        (std::min)(fanout, ids.size() - applied);
-                    std::vector<hpx::id_type> ids_next(it, it + next_fan);
+                        (std::min) (fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(
+                        it, it + static_cast<std::ptrdiff_t>(next_fan));
 
                     hpx::id_type id(ids_next[0]);
                     broadcast_futures.push_back(
@@ -420,7 +418,7 @@ namespace hpx { namespace lcos {
                             std::true_type(), vs...));
 
                     applied += next_fan;
-                    it += next_fan;
+                    it += static_cast<std::ptrdiff_t>(next_fan);
                 }
             }
 
@@ -443,7 +441,7 @@ namespace hpx { namespace lcos {
                 return result_type();
 
             std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
-            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            std::size_t local_size = (std::min) (ids.size(), local_fanout);
             std::size_t fanout =
                 util::calculate_fanout(ids.size(), local_fanout);
 
@@ -470,8 +468,9 @@ namespace hpx { namespace lcos {
                     HPX_ASSERT(ids.size() >= applied);
 
                     std::size_t next_fan =
-                        (std::min)(fanout, ids.size() - applied);
-                    std::vector<hpx::id_type> ids_next(it, it + next_fan);
+                        (std::min) (fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(
+                        it, it + static_cast<std::ptrdiff_t>(next_fan));
 
                     hpx::id_type id(ids_next[0]);
                     broadcast_futures.push_back(
@@ -480,7 +479,7 @@ namespace hpx { namespace lcos {
                             std::false_type(), vs...));
 
                     applied += next_fan;
-                    it += next_fan;
+                    it += static_cast<std::ptrdiff_t>(next_fan);
                 }
             }
 
@@ -499,7 +498,7 @@ namespace hpx { namespace lcos {
                 return;
 
             std::size_t const local_fanout = HPX_BROADCAST_FANOUT;
-            std::size_t local_size = (std::min)(ids.size(), local_fanout);
+            std::size_t local_size = (std::min) (ids.size(), local_fanout);
 
             for (std::size_t i = 0; i != local_size; ++i)
             {
@@ -523,15 +522,16 @@ namespace hpx { namespace lcos {
                     HPX_ASSERT(ids.size() >= applied);
 
                     std::size_t next_fan =
-                        (std::min)(fanout, ids.size() - applied);
-                    std::vector<hpx::id_type> ids_next(it, it + next_fan);
+                        (std::min) (fanout, ids.size() - applied);
+                    std::vector<hpx::id_type> ids_next(
+                        it, it + static_cast<std::ptrdiff_t>(next_fan));
 
                     hpx::id_type id(ids_next[0]);
                     hpx::detail::post_colocated<broadcast_impl_action>(id, act,
                         HPX_MOVE(ids_next), global_idx + applied, vs...);
 
                     applied += next_fan;
-                    it += next_fan;
+                    it += static_cast<std::ptrdiff_t>(next_fan);
                 }
             }
         }

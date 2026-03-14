@@ -203,21 +203,19 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/execution/traits/vector_pack_count_bits.hpp>
-#include <hpx/executors/execution_policy.hpp>
-#include <hpx/functional/bind_back.hpp>
-#include <hpx/functional/invoke.hpp>
-#include <hpx/iterator_support/range.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/pack_traversal/unwrap.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/executors.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/pack_traversal.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
-#include <hpx/type_support/identity.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -233,7 +231,8 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        template <typename ExPolicy, typename Op, typename Proj>
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Op,
+            typename Proj>
         struct count_iteration
         {
             using execution_policy_type = std::decay_t<ExPolicy>;
@@ -293,7 +292,7 @@ namespace hpx::parallel {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Value>
+        HPX_CXX_CORE_EXPORT template <typename Value>
         struct count : public algorithm<count<Value>, Value>
         {
             typedef Value difference_type;
@@ -345,7 +344,7 @@ namespace hpx::parallel {
                 return util::partitioner<ExPolicy, difference_type>::call(
                     HPX_FORWARD(ExPolicy, policy), first,
                     detail::distance(first, last), HPX_MOVE(f1),
-                    hpx::unwrapping([](auto&& results) {
+                    hpx::unwrapping([](auto&& results, auto&&...) {
                         return util::accumulate_n(hpx::util::begin(results),
                             hpx::util::size(results), difference_type(0),
                             std::plus<difference_type>());
@@ -360,7 +359,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        template <typename Value>
+        HPX_CXX_CORE_EXPORT template <typename Value>
         struct count_if : public algorithm<count_if<Value>, Value>
         {
             using difference_type = Value;
@@ -410,7 +409,7 @@ namespace hpx::parallel {
                 return util::partitioner<ExPolicy, difference_type>::call(
                     HPX_FORWARD(ExPolicy, policy), first,
                     detail::distance(first, last), HPX_MOVE(f1),
-                    hpx::unwrapping([](auto&& results) {
+                    hpx::unwrapping([](auto&& results, auto&&...) {
                         return util::accumulate_n(hpx::util::begin(results),
                             hpx::util::size(results), difference_type(0),
                             std::plus<difference_type>());
@@ -425,22 +424,22 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::count
-    inline constexpr struct count_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct count_t final
       : hpx::detail::tag_parallel_algorithm<count_t>
     {
     private:
-        // clang-format off
         template <typename ExPolicy, typename FwdIter,
-            typename T = typename std::iterator_traits<FwdIter>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+            typename T = typename std::iterator_traits<FwdIter>::value_type>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(count_t, ExPolicy&& policy,
             FwdIter first, FwdIter last, T const& value)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Required at least forward iterator.");
 
             using difference_type =
@@ -451,17 +450,17 @@ namespace hpx {
                 hpx::identity_v);
         }
 
-        // clang-format off
         template <typename InIter,
-            typename T  = typename std::iterator_traits<InIter>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+            typename T = typename std::iterator_traits<InIter>::value_type>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<InIter>
-            )>
+            )
         // clang-format on
         friend typename std::iterator_traits<InIter>::difference_type
         tag_fallback_invoke(count_t, InIter first, InIter last, T const& value)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Required at least input iterator.");
 
             using difference_type =
@@ -474,24 +473,24 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::count_if
-    inline constexpr struct count_if_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct count_if_t final
       : hpx::detail::tag_parallel_algorithm<count_if_t>
     {
     private:
+        template <typename ExPolicy, typename FwdIter, typename F>
         // clang-format off
-        template <typename ExPolicy, typename FwdIter, typename F,
-            HPX_CONCEPT_REQUIRES_(
+        requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::is_invocable_v<F,
                     typename std::iterator_traits<FwdIter>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(
             count_if_t, ExPolicy&& policy, FwdIter first, FwdIter last, F f)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Required at least forward iterator.");
 
             using difference_type =
@@ -502,19 +501,19 @@ namespace hpx {
                 hpx::identity_v);
         }
 
+        template <typename InIter, typename F>
         // clang-format off
-        template <typename InIter, typename F,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::is_invocable_v<F,
                     typename std::iterator_traits<InIter>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend typename std::iterator_traits<InIter>::difference_type
         tag_fallback_invoke(count_if_t, InIter first, InIter last, F f)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Required at least input iterator.");
 
             using difference_type =

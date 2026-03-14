@@ -7,17 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/bind_back.hpp>
-#include <hpx/functional/function.hpp>
-#include <hpx/ini/ini.hpp>
-#include <hpx/prefix/find_prefix.hpp>
+#include <hpx/modules/ini.hpp>
 #include <hpx/resource_partitioner/partitioner_fwd.hpp>
-
-#include <cstddef>
-#include <memory>
-#include <string>
-#include <utility>
-#include <vector>
 
 namespace hpx::resource::detail {
 

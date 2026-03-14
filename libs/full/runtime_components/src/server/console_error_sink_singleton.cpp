@@ -1,15 +1,15 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/modules/static_reinit.hpp>
 #include <hpx/runtime_components/server/console_error_sink_singleton.hpp>
-#include <hpx/static_reinit/reinitializable_static.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace server {
+namespace hpx::components::server {
 
     struct error_dispatcher_tag
     {
@@ -22,4 +22,4 @@ namespace hpx { namespace components { namespace server {
             disp;
         return disp.get();
     }
-}}}    // namespace hpx::components::server
+}    // namespace hpx::components::server

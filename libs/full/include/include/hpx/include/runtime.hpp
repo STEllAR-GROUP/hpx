@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/include/resource_partitioner.hpp>
 #include <hpx/include/threadmanager.hpp>
-#include <hpx/runtime_local/runtime_local.hpp>
+#include <hpx/modules/runtime_local.hpp>
 
 #include <hpx/include/actions.hpp>
 #include <hpx/include/applier.hpp>

@@ -7,18 +7,20 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/function.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
-#include <hpx/naming_base/id_type.hpp>
+#include <hpx/modules/naming_base.hpp>
+#include <hpx/modules/serialization.hpp>
 #include <hpx/performance_counters/counters_fwd.hpp>
-#include <hpx/serialization/serialization_fwd.hpp>
 
 #include <cstddef>
 #include <cstdint>
 #include <string>
 #include <utility>
 #include <vector>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters {
@@ -300,7 +302,7 @@ namespace hpx { namespace performance_counters {
         std::int64_t instanceindex_;          ///< the instance index
         std::int64_t subinstanceindex_;       ///< the sub-instance index
         bool parentinstance_is_basename_;     ///< the parentinstancename_
-            ///member holds a base counter name
+        ///member holds a base counter name
 
     private:
         // serialization support
@@ -409,3 +411,5 @@ namespace hpx { namespace performance_counters {
         return f.get(ec);
     }
 }}    // namespace hpx::performance_counters
+
+#include <hpx/config/warnings_suffix.hpp>

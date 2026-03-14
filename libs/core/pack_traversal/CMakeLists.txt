@@ -30,8 +30,18 @@ include(HPX_AddModule)
 add_hpx_module(
   core pack_traversal
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   HEADERS ${pack_traversal_headers}
   COMPAT_HEADERS ${pack_traversal_compat_headers}
-  MODULE_DEPENDENCIES hpx_futures hpx_memory
+  MODULE_DEPENDENCIES
+    hpx_allocator_support
+    hpx_datastructures
+    hpx_functional
+    hpx_futures
+    hpx_iterator_support
+    hpx_memory
+    hpx_tag_invoke
+    hpx_type_support
+    hpx_util
   CMAKE_SUBDIRS examples tests
 )

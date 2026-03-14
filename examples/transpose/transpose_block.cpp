@@ -163,7 +163,7 @@ struct block : hpx::components::client_base<block, block_component>
     }
 
     block(
-        std::uint64_t /* id */, std::uint64_t size, const char* /* base_name */)
+        std::uint64_t /* id */, std::uint64_t size, char const* /* base_name */)
       : base_type(hpx::new_<block_component>(hpx::find_here(), size))
     {
     }
@@ -215,7 +215,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         verbose = vm.count("verbose") ? true : false;
 
         std::uint64_t bytes =
-            static_cast<std::uint64_t>(2.0 * sizeof(double) * order * order);
+            static_cast<std::uint64_t>(2 * sizeof(double) * order * order);
 
         std::uint64_t num_blocks = num_localities * num_local_blocks;
 
@@ -275,7 +275,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
                 {
                     double col_val =
                         COL_SHIFT * static_cast<double>(b * block_order + j);
-                    A_ptr->data_[i * block_order + j] = col_val + ROW_SHIFT * i;
+                    A_ptr->data_[i * block_order + j] =
+                        col_val + ROW_SHIFT * static_cast<double>(i);
                     B_ptr->data_[i * block_order + j] = -1.0;
                 }
             }
@@ -320,11 +321,11 @@ int hpx_main(hpx::program_options::variables_map& vm)
                     static_cast<std::uint64_t>(0), num_blocks);
                 for (std::uint64_t phase : phase_range)
                 {
-                    const std::uint64_t block_size = block_order * block_order;
-                    const std::uint64_t from_block = phase;
-                    const std::uint64_t from_phase = b;
-                    const std::uint64_t A_offset = from_phase * block_size;
-                    const std::uint64_t B_offset = phase * block_size;
+                    std::uint64_t const block_size = block_order * block_order;
+                    std::uint64_t const from_block = phase;
+                    std::uint64_t const from_phase = b;
+                    std::uint64_t const A_offset = from_phase * block_size;
+                    std::uint64_t const B_offset = phase * block_size;
 
                     phase_futures.push_back(hpx::dataflow(&transpose,
                         A[from_block].get_sub_block(A_offset, block_size),
@@ -342,8 +343,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
             if (iter > 0 || iterations == 1)    // Skip the first iteration
             {
                 avgtime = avgtime + elapsed;
-                maxtime = (std::max)(maxtime, elapsed);
-                mintime = (std::min)(mintime, elapsed);
+                maxtime = (std::max) (maxtime, elapsed);
+                mintime = (std::min) (mintime, elapsed);
             }
 
             if (root)
@@ -360,9 +361,11 @@ int hpx_main(hpx::program_options::variables_map& vm)
             {
                 std::cout << "Solution validates\n";
                 avgtime = avgtime /
-                    static_cast<double>((std::max)(
-                        iterations - 1, static_cast<std::uint64_t>(1)));
-                std::cout << "Rate (MB/s): " << 1.e-6 * bytes / mintime << ", "
+                    static_cast<double>((std::max) (iterations - 1,
+                        static_cast<std::uint64_t>(1)));
+                std::cout << "Rate (MB/s): "
+                          << 1.e-6 * static_cast<double>(bytes) / mintime
+                          << ", "
                           << "Avg time (s): " << avgtime << ", "
                           << "Min time (s): " << mintime << ", "
                           << "Max time (s): " << maxtime << "\n";
@@ -426,7 +429,7 @@ int main(int argc, char* argv[])
 void transpose(hpx::future<sub_block> Af, hpx::future<sub_block> Bf,
     std::uint64_t block_order, std::uint64_t tile_size)
 {
-    const sub_block A(Af.get());
+    sub_block const A(Af.get());
     sub_block B(Bf.get());
 
     if (tile_size < block_order)
@@ -435,8 +438,8 @@ void transpose(hpx::future<sub_block> Af, hpx::future<sub_block> Bf,
         {
             for (std::uint64_t j = 0; j < block_order; j += tile_size)
             {
-                std::uint64_t max_i = (std::min)(block_order, i + tile_size);
-                std::uint64_t max_j = (std::min)(block_order, j + tile_size);
+                std::uint64_t max_i = (std::min) (block_order, i + tile_size);
+                std::uint64_t max_j = (std::min) (block_order, j + tile_size);
 
                 for (std::uint64_t it = i; it != max_i; ++it)
                 {
@@ -478,7 +481,7 @@ double test_results(std::uint64_t order, std::uint64_t block_order,
             double errsq = 0.0;
             for (std::uint64_t i = 0; i < order; ++i)
             {
-                double col_val = COL_SHIFT * i;
+                double col_val = COL_SHIFT * static_cast<double>(i);
                 for (std::uint64_t j = 0; j < block_order; ++j)
                 {
                     double diff = trans_block[i * block_order + j] -

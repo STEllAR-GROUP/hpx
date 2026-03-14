@@ -1,6 +1,6 @@
 //  Copyright (c) 2017 Ajai V George
 //  Copyright (c) 2021 Karame M.Shokooh
-//  Copyright (c) 2024 Hartmut Kaiser
+//  Copyright (c) 2024-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,14 +9,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
-#include <hpx/functional/invoke.hpp>
-
-#include <hpx/executors/execution_policy.hpp>
-#include <hpx/parallel/algorithms/adjacent_difference.hpp>
+#include <hpx/modules/algorithms.hpp>
+#include <hpx/modules/executors.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/util/detail/algorithm_result.hpp>
-#include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -155,8 +151,8 @@ namespace hpx::parallel {
                 hpx::parallel::util::detail::algorithm_result<ExPolicy,
                     FwdIter2>;
 
-            using forced_seq = std::integral_constant<bool,
-                !hpx::traits::is_forward_iterator_v<FwdIter1>>;
+            using forced_seq =
+                std::integral_constant<bool, !std::forward_iterator<FwdIter1>>;
 
             segment_iterator1 sit = traits1::segment(first);
             segment_iterator1 send = traits1::segment(last);
@@ -250,24 +246,20 @@ namespace hpx::parallel {
 // The segmented iterators we support all live in namespace hpx::segmented
 namespace hpx::segmented {
 
-    // clang-format off
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename Op,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy> &&
+        typename Op>
+        requires(hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<FwdIter1> &&
             hpx::traits::is_segmented_iterator_v<FwdIter1> &&
             hpx::traits::is_iterator_v<FwdIter2> &&
-            hpx::traits::is_segmented_iterator_v<FwdIter2>
-        )>
-    // clang-format on
+            hpx::traits::is_segmented_iterator_v<FwdIter2>)
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter2>
     tag_invoke(hpx::adjacent_difference_t, ExPolicy&& policy, FwdIter1 first,
         FwdIter1 last, FwdIter2 dest, Op&& op)
     {
-        static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+        static_assert(std::forward_iterator<FwdIter1>,
             "Requires at least forward iterator.");
-        static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+        static_assert(std::forward_iterator<FwdIter2>,
             "Requires at least forward iterator.");
 
         if (first == last)
@@ -288,22 +280,18 @@ namespace hpx::segmented {
             HPX_FORWARD(Op, op), is_seq());
     }
 
-    // clang-format off
-    template <typename InIter1, typename InIter2, typename Op,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::traits::is_iterator_v<InIter1> &&
+    template <typename InIter1, typename InIter2, typename Op>
+        requires(hpx::traits::is_iterator_v<InIter1> &&
             hpx::traits::is_segmented_iterator_v<InIter1> &&
             hpx::traits::is_iterator_v<InIter2> &&
-            hpx::traits::is_segmented_iterator_v<InIter2>
-        )>
-    // clang-format on
+            hpx::traits::is_segmented_iterator_v<InIter2>)
     InIter2 tag_invoke(hpx::adjacent_difference_t, InIter1 first, InIter1 last,
         InIter2 dest, Op&& op)
     {
-        static_assert(hpx::traits::is_input_iterator_v<InIter1>,
-            "Requires at least input iterator.");
-        static_assert(hpx::traits::is_input_iterator_v<InIter2>,
-            "Requires at least input iterator.");
+        static_assert(
+            std::input_iterator<InIter1>, "Requires at least input iterator.");
+        static_assert(
+            std::input_iterator<InIter2>, "Requires at least input iterator.");
 
         if (first == last)
         {

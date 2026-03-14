@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Thomas Heller
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2007 Richard D Guidry Jr
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2011 Katelyn Kufahl
@@ -16,6 +16,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/io_service.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
@@ -24,13 +25,12 @@
 #include <hpx/modules/threading.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/modules/util.hpp>
-#include <hpx/util/from_string.hpp>
 
+#include <hpx/modules/parcelset_base.hpp>
 #include <hpx/parcelset/connection_cache.hpp>
 #include <hpx/parcelset/detail/call_for_each.hpp>
 #include <hpx/parcelset/detail/parcel_await.hpp>
 #include <hpx/parcelset/encode_parcels.hpp>
-#include <hpx/parcelset_base/parcelport.hpp>
 
 #include <atomic>
 #include <chrono>
@@ -46,6 +46,8 @@
 #include <utility>
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::parcelset {
 
@@ -60,7 +62,7 @@ namespace hpx::parcelset {
             ConnectionHandler>::connection_type;
 
     public:
-        static const char* connection_handler_type()
+        static char const* connection_handler_type()
         {
             return connection_handler_traits<ConnectionHandler>::type();
         }
@@ -75,12 +77,12 @@ namespace hpx::parcelset {
                 ini, key + ".io_pool_size", 2);
         }
 
-        static const char* pool_name()
+        static char const* pool_name()
         {
             return connection_handler_traits<ConnectionHandler>::pool_name();
         }
 
-        static const char* pool_name_postfix()
+        static char const* pool_name_postfix()
         {
             return connection_handler_traits<
                 ConnectionHandler>::pool_name_postfix();
@@ -130,6 +132,8 @@ namespace hpx::parcelset {
         }
 
     public:
+        // NOLINTBEGIN(bugprone-crtp-constructor-accessibility)
+
         /// Construct the parcelport on the given locality.
         parcelport_impl(util::runtime_configuration const& ini,
             locality const& here,
@@ -188,6 +192,8 @@ namespace hpx::parcelset {
 
         parcelport_impl(parcelport_impl const&) = delete;
         parcelport_impl(parcelport_impl&&) = delete;
+        // NOLINTEND(bugprone-crtp-constructor-accessibility)
+
         parcelport_impl& operator=(parcelport_impl const&) = delete;
         parcelport_impl& operator=(parcelport_impl&&) = delete;
 
@@ -1047,5 +1053,7 @@ namespace hpx::parcelset {
         std::size_t const max_background_thread_;
     };
 }    // namespace hpx::parcelset
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif

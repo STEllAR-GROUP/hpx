@@ -4,7 +4,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/memory/serialization/intrusive_ptr.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/testing.hpp>
@@ -27,19 +26,19 @@ struct D
     }
     virtual ~D() {}
 
-    virtual const char* foo() = 0;
+    virtual char const* foo() = 0;
 };
 HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(D)
 
 template <class Archive>
 void load(Archive& ar, D& d, unsigned)
 {
-    ar& d.a;
+    ar & d.a;
 }
 template <class Archive>
-void save(Archive& ar, const D& d, unsigned)
+void save(Archive& ar, D const& d, unsigned)
 {
-    ar& d.a;
+    ar & d.a;
 }
 HPX_SERIALIZATION_SPLIT_FREE(D)
 
@@ -65,7 +64,7 @@ struct E : D
     {
     }
 
-    const char* foo() override
+    char const* foo() override
     {
         return "E::foo";
     }
@@ -75,13 +74,13 @@ template <class Archive>
 void load(Archive& ar, E& e, unsigned)
 {
     ar& hpx::serialization::base_object<D>(e);
-    ar& e.b;
+    ar & e.b;
 }
 template <class Archive>
-void save(Archive& ar, const E& e, unsigned)
+void save(Archive& ar, E const& e, unsigned)
 {
     ar& hpx::serialization::base_object<D>(e);
-    ar& e.b;
+    ar & e.b;
 }
 HPX_SERIALIZATION_SPLIT_FREE(E)
 HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(E)
@@ -95,7 +94,7 @@ struct F : public E
     {
     }
 
-    virtual const char* foo()
+    virtual char const* foo()
     {
         return "F::foo";
     }
@@ -110,7 +109,7 @@ template <class Archive>
 void serialize(Archive& ar, F& f, unsigned)
 {
     ar& hpx::serialization::base_object<E>(f);
-    ar& f.c;
+    ar & f.c;
 }
 HPX_SERIALIZATION_REGISTER_CLASS(F)
 

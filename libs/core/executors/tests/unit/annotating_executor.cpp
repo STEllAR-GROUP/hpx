@@ -151,14 +151,14 @@ void test_f(hpx::future<void> f, int passed_through)
 template <typename Executor>
 void test_then(Executor&& executor)
 {
-    hpx::future<void> f = hpx::make_ready_future();
-
     std::string desc("test_then");
     {
+        hpx::future<void> f = hpx::make_ready_future();
         auto exec = hpx::experimental::prefer(
             hpx::execution::experimental::with_annotation, executor, desc);
 
-        hpx::parallel::execution::then_execute(exec, &test_f, f, 42).get();
+        hpx::parallel::execution::then_execute(exec, &test_f, std::move(f), 42)
+            .get();
 
         HPX_TEST_EQ(annotation, desc);
         HPX_TEST_EQ(annotation,
@@ -166,11 +166,13 @@ void test_then(Executor&& executor)
     }
 
     {
+        hpx::future<void> f = hpx::make_ready_future();
         annotation.clear();
         auto exec =
             hpx::execution::experimental::with_annotation(executor, desc);
 
-        hpx::parallel::execution::then_execute(exec, &test_f, f, 42).get();
+        hpx::parallel::execution::then_execute(exec, &test_f, std::move(f), 42)
+            .get();
 
         HPX_TEST_EQ(annotation, desc);
         HPX_TEST_EQ(annotation,
@@ -197,10 +199,17 @@ void test_bulk_sync(Executor&& executor)
     using hpx::placeholders::_1;
     using hpx::placeholders::_2;
 
+    auto hint = hpx::execution::experimental::get_hint(executor);
+    hint.sharing_mode(hpx::threads::thread_sharing_hint::do_not_share_function |
+        hpx::threads::thread_sharing_hint::do_not_combine_tasks);
+    auto no_sharing_exec = hpx::experimental::prefer(
+        hpx::execution::experimental::with_hint, executor, hint);
+
     std::string desc("test_bulk_sync");
     {
         auto exec = hpx::experimental::prefer(
-            hpx::execution::experimental::with_annotation, executor, desc);
+            hpx::execution::experimental::with_annotation, no_sharing_exec,
+            desc);
 
         hpx::parallel::execution::bulk_sync_execute(
             exec, hpx::bind(&bulk_test, _1, _2), 107, 42);
@@ -218,8 +227,8 @@ void test_bulk_sync(Executor&& executor)
     }
 
     {
-        auto exec =
-            hpx::execution::experimental::with_annotation(executor, desc);
+        auto exec = hpx::execution::experimental::with_annotation(
+            no_sharing_exec, desc);
 
         annotation.clear();
         hpx::parallel::execution::bulk_sync_execute(

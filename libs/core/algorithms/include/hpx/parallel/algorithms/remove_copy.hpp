@@ -260,16 +260,16 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/executors/execution_policy.hpp>
-#include <hpx/functional/invoke.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/executors.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/copy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/result_types.hpp>
-#include <hpx/type_support/identity.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -285,8 +285,8 @@ namespace hpx::parallel {
         /// \cond NOINTERNAL
 
         // sequential remove_copy
-        template <typename InIter, typename Sent, typename OutIter, typename T,
-            typename Proj>
+        HPX_CXX_CORE_EXPORT template <typename InIter, typename Sent,
+            typename OutIter, typename T, typename Proj>
         constexpr util::in_out_result<InIter, OutIter> sequential_remove_copy(
             InIter first, Sent last, OutIter dest, T const& value, Proj&& proj)
         {
@@ -300,7 +300,7 @@ namespace hpx::parallel {
             return util::in_out_result<InIter, OutIter>{first, dest};
         }
 
-        template <typename IterPair>
+        HPX_CXX_CORE_EXPORT template <typename IterPair>
         struct remove_copy : public algorithm<remove_copy<IterPair>, IterPair>
         {
             constexpr remove_copy() noexcept
@@ -340,8 +340,8 @@ namespace hpx::parallel {
         /// \cond NOINTERNAL
 
         // sequential remove_copy_if
-        template <typename InIter, typename Sent, typename OutIter, typename F,
-            typename Proj>
+        HPX_CXX_CORE_EXPORT template <typename InIter, typename Sent,
+            typename OutIter, typename F, typename Proj>
         constexpr util::in_out_result<InIter, OutIter>
         sequential_remove_copy_if(
             InIter first, Sent last, OutIter dest, F p, Proj&& proj)
@@ -356,7 +356,7 @@ namespace hpx::parallel {
             return util::in_out_result<InIter, OutIter>{first, dest};
         }
 
-        template <typename IterPair>
+        HPX_CXX_CORE_EXPORT template <typename IterPair>
         struct remove_copy_if
           : public algorithm<remove_copy_if<IterPair>, IterPair>
         {
@@ -401,26 +401,27 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::remove_copy_if
-    inline constexpr struct remove_copy_if_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct remove_copy_if_t final
       : hpx::detail::tag_parallel_algorithm<remove_copy_if_t>
     {
+        template <typename InIter, typename OutIter, typename Pred>
         // clang-format off
-        template <typename InIter, typename OutIter,
-            typename Pred, HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::traits::is_iterator_v<OutIter> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<InIter>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend OutIter tag_fallback_invoke(hpx::remove_copy_if_t, InIter first,
             InIter last, OutIter dest, Pred pred)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
-                "Required input iterator.");
+            static_assert(
+                std::input_iterator<InIter>, "Required input iterator.");
 
-            static_assert(hpx::traits::is_output_iterator_v<InIter>,
+            static_assert(std::output_iterator<OutIter,
+                              hpx::traits::iter_value_t<InIter>>,
                 "Required output iterator.");
 
             auto&& res = hpx::parallel::detail::remove_copy_if<
@@ -431,26 +432,27 @@ namespace hpx {
             return hpx::parallel::util::get_second_element(HPX_MOVE(res));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename Pred, HPX_CONCEPT_REQUIRES_(
+            typename Pred>
+        // clang-format off
+             requires (
                 hpx::is_execution_policy_v<ExPolicy>&&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<FwdIter1>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
         tag_fallback_invoke(hpx::remove_copy_if_t, ExPolicy&& policy,
             FwdIter1 first, FwdIter1 last, FwdIter2 dest, Pred pred)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Required at least forward iterator.");
 
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Required at least forward iterator.");
 
             auto&& res = hpx::parallel::detail::remove_copy_if<
@@ -464,25 +466,26 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::remove_copy
-    inline constexpr struct remove_copy_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct remove_copy_t final
       : hpx::detail::tag_parallel_algorithm<remove_copy_t>
     {
     private:
-        // clang-format off
         template <typename InIter, typename OutIter,
-            typename T = typename std::iterator_traits<InIter>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+            typename T = typename std::iterator_traits<InIter>::value_type>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::traits::is_iterator_v<OutIter>
-            )>
+            )
         // clang-format on
         friend OutIter tag_fallback_invoke(hpx::remove_copy_t, InIter first,
             InIter last, OutIter dest, T const& value)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Requires at least input iterator.");
 
-            static_assert(hpx::traits::is_output_iterator_v<InIter>,
+            static_assert(std::output_iterator<OutIter,
+                              hpx::traits::iter_value_t<InIter>>,
                 "Requires at least output iterator.");
 
             using type = typename std::iterator_traits<InIter>::value_type;
@@ -491,24 +494,24 @@ namespace hpx {
                 [value](type const& a) -> bool { return value == a; });
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename T = typename std::iterator_traits<FwdIter1>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+            typename T = typename std::iterator_traits<FwdIter1>::value_type>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy>&&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2>
-            )>
+            )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
         tag_fallback_invoke(hpx::remove_copy_t, ExPolicy&& policy,
             FwdIter1 first, FwdIter1 last, FwdIter2 dest, T const& value)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Required at least forward iterator.");
 
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Required at least forward iterator.");
 
             using type = typename std::iterator_traits<FwdIter1>::value_type;

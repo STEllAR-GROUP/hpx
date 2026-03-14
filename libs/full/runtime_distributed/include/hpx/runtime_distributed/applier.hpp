@@ -13,9 +13,8 @@
 
 #include <hpx/assert.hpp>
 #include <hpx/components_base/component_type.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/threadmanager.hpp>
-#include <hpx/naming_base/address.hpp>
-#include <hpx/naming_base/id_type.hpp>
 #include <hpx/parcelset/parcel.hpp>
 #include <hpx/parcelset/parcelset_fwd.hpp>
 

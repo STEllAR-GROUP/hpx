@@ -8,9 +8,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions_base/traits/action_select_direct_execution.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/naming_base/address.hpp>
-#include <hpx/threading_base/thread_init_data.hpp>
+#include <hpx/modules/coroutines.hpp>
+#include <hpx/modules/naming_base.hpp>
+#include <hpx/modules/threading_base.hpp>
 
 namespace hpx::detail {
 

@@ -12,10 +12,8 @@
 #include <hpx/async_colocated/server/destroy_component.hpp>
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/traits/component_config_data.hpp>
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/preprocessor/expand.hpp>
-#include <hpx/preprocessor/nargs.hpp>
-#include <hpx/runtime_configuration/component_registry_base.hpp>
+#include <hpx/modules/preprocessor.hpp>
+#include <hpx/modules/runtime_configuration.hpp>
 
 #include <string>
 #include <vector>

@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2020 ETH Zurich
 //  Copyright (c) 2016 Thomas Heller
-//  Copyright (c) 2016-2024 Hartmut Kaiser
+//  Copyright (c) 2016-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,20 +12,15 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/allocator_support/detail/new.hpp>
 #include <hpx/compute_local/host/block_executor.hpp>
 #include <hpx/compute_local/host/target.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/executors/execution_policy.hpp>
-#include <hpx/executors/restricted_thread_pool_executor.hpp>
-#include <hpx/functional/invoke_fused.hpp>
-#include <hpx/iterator_support/counting_shape.hpp>
-#include <hpx/iterator_support/range.hpp>
-#include <hpx/parallel/container_algorithms/for_each.hpp>
-#include <hpx/parallel/util/adapt_sharing_mode.hpp>
-#include <hpx/parallel/util/cancellation_token.hpp>
-#include <hpx/parallel/util/partitioner_with_cleanup.hpp>
-#include <hpx/topology/topology.hpp>
+#include <hpx/modules/algorithms.hpp>
+#include <hpx/modules/allocator_support.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/executors.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/topology.hpp>
 
 #include <cstddef>
 #include <limits>
@@ -39,7 +34,7 @@ namespace hpx::compute::host {
 
         /// The policy_allocator allocates blocks of memory touched according to
         /// the distribution policy of the given executor.
-        template <typename T, typename Policy,
+        HPX_CXX_CORE_EXPORT template <typename T, typename Policy,
             typename Enable =
                 std::enable_if_t<hpx::is_execution_policy_v<Policy>>>
         struct policy_allocator
@@ -112,6 +107,7 @@ namespace hpx::compute::host {
                 {
                     hpx::threads::create_topology().deallocate(p, n);
                 }
+                // NOLINTNEXTLINE(bugprone-empty-catch)
                 catch (...)
                 {
                     // just ignore errors from create_topology
@@ -257,7 +253,7 @@ namespace hpx::compute::host {
     /// std::size_t N = 2048;
     /// vector_type v(N, allocator_type(numa_nodes));
     ///
-    template <typename T,
+    HPX_CXX_CORE_EXPORT template <typename T,
         typename Executor =
             hpx::execution::experimental::restricted_thread_pool_executor>
     struct block_allocator

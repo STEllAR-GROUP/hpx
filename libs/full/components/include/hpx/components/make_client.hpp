@@ -8,8 +8,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions_base/traits/is_client.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/naming_base/id_type.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/naming_base.hpp>
 
 #include <type_traits>
 #include <utility>

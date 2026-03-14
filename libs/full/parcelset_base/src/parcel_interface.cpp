@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -9,14 +9,11 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/threading_base.hpp>
-#include <hpx/util/to_string.hpp>
 
-#include <hpx/naming_base/address.hpp>
-#include <hpx/naming_base/gid_type.hpp>
-#include <hpx/naming_base/id_type.hpp>
 #include <hpx/parcelset_base/locality.hpp>
 #include <hpx/parcelset_base/locality_interface.hpp>
 #include <hpx/parcelset_base/parcel_interface.hpp>

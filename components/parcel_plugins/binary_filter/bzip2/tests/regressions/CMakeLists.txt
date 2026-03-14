@@ -17,7 +17,7 @@ foreach(test ${tests})
   add_hpx_executable(
     ${test}_test INTERNAL_FLAGS
     SOURCES ${sources} ${${test}_FLAGS}
-    EXCLUDE_FROM_ALL
+    EXCLUDE_FROM_ALL ${HPX_WITH_CXX_MODULES_OPTION}
     HPX_PREFIX ${HPX_BUILD_PREFIX}
     FOLDER "Tests/Regressions/Full/Plugins/Compression"
   )

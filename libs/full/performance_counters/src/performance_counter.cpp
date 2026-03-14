@@ -17,6 +17,8 @@
 #include <string>
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::performance_counters {
 

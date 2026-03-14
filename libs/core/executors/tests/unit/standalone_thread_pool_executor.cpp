@@ -67,8 +67,8 @@ void test_then(Executor& exec)
     hpx::future<void> f = hpx::make_ready_future();
 
     HPX_TEST(
-        hpx::parallel::execution::then_execute(exec, &test_f, f, 42).get() !=
-        hpx::this_thread::get_id());
+        hpx::parallel::execution::then_execute(exec, &test_f, std::move(f), 42)
+            .get() != hpx::this_thread::get_id());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -89,9 +89,15 @@ void test_bulk_sync(Executor& exec)
     using hpx::placeholders::_1;
     using hpx::placeholders::_2;
 
+    auto hint = hpx::execution::experimental::get_hint(exec);
+    hint.sharing_mode(hpx::threads::thread_sharing_hint::do_not_share_function |
+        hpx::threads::thread_sharing_hint::do_not_combine_tasks);
+    auto no_sharing_exec = hpx::execution::experimental::with_hint(exec, hint);
+
     hpx::parallel::execution::bulk_sync_execute(
-        exec, hpx::bind(&bulk_test, _1, tid, _2), v, 42);
-    hpx::parallel::execution::bulk_sync_execute(exec, &bulk_test, v, tid, 42);
+        no_sharing_exec, hpx::bind(&bulk_test, _1, tid, _2), v, 42);
+    hpx::parallel::execution::bulk_sync_execute(
+        no_sharing_exec, &bulk_test, v, tid, 42);
 }
 
 template <typename Executor>
@@ -166,8 +172,8 @@ int main()
             hpx::threads::policies::local_priority_queue_scheduler<>;
 
         // Choose all the parameters for the thread pool and scheduler.
-        std::size_t const num_threads = (std::min)(
-            std::size_t(4), std::size_t(hpx::threads::hardware_concurrency()));
+        std::size_t const num_threads = (std::min) (std::size_t(4),
+            std::size_t(hpx::threads::hardware_concurrency()));
         std::size_t const max_cores = num_threads;
         hpx::threads::policies::detail::affinity_data ad{};
         ad.init(num_threads, max_cores, 0, 1, 0, "core", "balanced", true);

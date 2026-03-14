@@ -4,12 +4,18 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests partitioned_vector_2201 partitioned_vector_constructor_6650)
+set(tests partitioned_vector_2201 partitioned_vector_constructor_6650
+          partitioned_vector_fewer_partitions_than_localities
+)
 
 set(partitioned_vector_2201_FLAGS COMPONENT_DEPENDENCIES partitioned_vector)
 set(partitioned_vector_constructor_6650_FLAGS COMPONENT_DEPENDENCIES
                                               partitioned_vector
 )
+set(partitioned_vector_fewer_partitions_than_localities_FLAGS
+    COMPONENT_DEPENDENCIES partitioned_vector
+)
+set(partitioned_vector_fewer_partitions_than_localities_PARAMETERS LOCALITIES 3)
 
 foreach(test ${tests})
   set(sources ${test}.cpp)
@@ -20,7 +26,7 @@ foreach(test ${tests})
   add_hpx_executable(
     ${test}_test INTERNAL_FLAGS
     SOURCES ${sources} ${${test}_FLAGS}
-    EXCLUDE_FROM_ALL
+    EXCLUDE_FROM_ALL ${HPX_WITH_CXX_MODULES_OPTION}
     HPX_PREFIX ${HPX_BUILD_PREFIX}
     FOLDER "Tests/Regressions/Components/Containers/PartitionedVector"
   )

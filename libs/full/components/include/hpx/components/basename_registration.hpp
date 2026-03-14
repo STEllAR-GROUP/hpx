@@ -9,8 +9,8 @@
 #include <hpx/config.hpp>
 #include <hpx/components/basename_registration_fwd.hpp>
 #include <hpx/components/make_client.hpp>
-#include <hpx/futures/future.hpp>
 #include <hpx/modules/async_base.hpp>
+#include <hpx/modules/futures.hpp>
 
 #include <cstddef>
 #include <string>

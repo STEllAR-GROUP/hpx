@@ -1,4 +1,4 @@
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,9 +16,11 @@
 
 #pragma once
 
-#include <hpx/iterator_support/traits/is_range.hpp>
+#include <hpx/config.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/string_util/token_iterator.hpp>
 
+#include <ranges>
 #include <string>
 #include <type_traits>
 
@@ -26,7 +28,7 @@ namespace hpx::string_util {
 
     //===========================================================================
     // A container-view of a tokenized "sequence"
-    template <typename TokenizerFunc = char_separator<char>,
+    HPX_CXX_CORE_EXPORT template <typename TokenizerFunc = char_separator<char>,
         typename Iterator = std::string::const_iterator,
         typename Type = std::string>
     class tokenizer
@@ -59,7 +61,7 @@ namespace hpx::string_util {
         }
 
         template <typename Container,
-            typename = std::enable_if_t<traits::is_range_v<Container>>>
+            typename = std::enable_if_t<std::ranges::range<Container>>>
         explicit tokenizer(Container const& c)
           : first_(c.begin())
           , last_(c.end())
@@ -68,7 +70,7 @@ namespace hpx::string_util {
         }
 
         template <typename F, typename Container,
-            typename = std::enable_if_t<traits::is_range_v<Container>>>
+            typename = std::enable_if_t<std::ranges::range<Container>>>
         tokenizer(Container const& c, F&& f)
           : first_(c.begin())
           , last_(c.end())
@@ -90,14 +92,14 @@ namespace hpx::string_util {
         }
 
         template <typename Container,
-            typename = std::enable_if_t<traits::is_range_v<Container>>>
+            typename = std::enable_if_t<std::ranges::range<Container>>>
         void assign(Container const& c)
         {
             assign(c.begin(), c.end());
         }
 
         template <typename F, typename Container,
-            typename = std::enable_if_t<traits::is_range_v<Container>>>
+            typename = std::enable_if_t<std::ranges::range<Container>>>
         void assign(Container const& c, F&& f)
         {
             assign(c.begin(), c.end(), HPX_FORWARD(F, f));
@@ -119,16 +121,13 @@ namespace hpx::string_util {
         TokenizerFunc f_;
     };
 
-    // different clang-format versions disagree
-    // clang-format off
-    template <typename Iterator, typename F>
+    HPX_CXX_CORE_EXPORT template <typename Iterator, typename F>
     tokenizer(Iterator, Iterator, F&&) -> tokenizer<std::decay_t<F>, Iterator,
         std::basic_string<typename std::iterator_traits<Iterator>::value_type>>;
 
-    template <typename Container, typename F>
+    HPX_CXX_CORE_EXPORT template <typename Container, typename F>
     tokenizer(Container const&, F&&)
-        -> tokenizer<std::decay_t<F>, traits::range_iterator_t<Container const>,
+        -> tokenizer<std::decay_t<F>, std::ranges::iterator_t<Container const>,
             std::basic_string<typename std::iterator_traits<
-                traits::range_iterator_t<Container>>::value_type>>;
-    // clang-format on
+                std::ranges::iterator_t<Container>>::value_type>>;
 }    // namespace hpx::string_util

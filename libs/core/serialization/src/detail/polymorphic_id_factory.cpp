@@ -8,8 +8,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/serialization/detail/polymorphic_id_factory.hpp>
 
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <map>
@@ -22,11 +24,35 @@ namespace hpx::serialization::detail {
     ///////////////////////////////////////////////////////////////////////////
     id_registry& id_registry::instance()
     {
-        util::static_<id_registry> inst;
-        return inst.get();
+        static id_registry inst;
+        return inst;
     }
 
-    void id_registry::cache_id(std::uint32_t id, ctor_t ctor)
+    polymorphic_id_factory::ctor_t polymorphic_id_factory::get_ctor_function(
+        std::uint32_t const id, [[maybe_unused]] std::string const* name)
+    {
+        cache_t const& vec = id_registry::instance().cache;
+
+        if (id >= vec.size())    //-V104
+        {
+            std::string msg("Unknown type descriptor " + std::to_string(id));
+#if defined(HPX_DEBUG)
+            if (name != nullptr)
+            {
+                msg += ", for typename " + *name + "\n";
+                msg += collect_registered_typenames();
+            }
+#endif
+            HPX_THROW_EXCEPTION(hpx::error::serialization_error,
+                "polymorphic_id_factory::create", msg);
+        }
+
+        ctor_t const ctor = vec[static_cast<std::size_t>(id)];
+        HPX_ASSERT(ctor != nullptr);    //-V108
+        return ctor;
+    }
+
+    void id_registry::cache_id(std::uint32_t const id, ctor_t const ctor)
     {
         if (id >= cache.size())    //-V104
         {
@@ -74,8 +100,7 @@ namespace hpx::serialization::detail {
         if (it != typename_to_ctor.end())
             cache_id(id, it->second);
 
-        if (id > max_id)
-            max_id = id;
+        max_id = (std::max) (id, max_id);
     }
 
     // This makes sure that the registries are consistent.

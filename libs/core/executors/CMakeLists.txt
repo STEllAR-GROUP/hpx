@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2024 The STE||AR-Group
+# Copyright (c) 2020-2025 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,6 +13,7 @@ set(executors_headers
     hpx/executors/guided_pool_executor.hpp
     hpx/executors/async.hpp
     hpx/executors/dataflow.hpp
+    hpx/executors/detail/bulk_invoke_helper.hpp
     hpx/executors/detail/hierarchical_spawning.hpp
     hpx/executors/detail/index_queue_spawning.hpp
     hpx/executors/execute_on.hpp
@@ -26,6 +27,7 @@ set(executors_headers
     hpx/executors/explicit_scheduler_executor.hpp
     hpx/executors/fork_join_executor.hpp
     hpx/executors/limiting_executor.hpp
+    hpx/executors/macros.hpp
     hpx/executors/parallel_executor_aggregated.hpp
     hpx/executors/parallel_executor.hpp
     hpx/executors/post.hpp
@@ -40,12 +42,22 @@ set(executors_headers
     hpx/executors/thread_pool_scheduler_bulk.hpp
 )
 
+set(executors_macro_headers hpx/executors/macros.hpp)
+
 if(HPX_WITH_DATAPAR)
   set(executors_headers
       ${executors_headers} hpx/executors/datapar/execution_policy_fwd.hpp
       hpx/executors/datapar/execution_policy_mappings.hpp
       hpx/executors/datapar/execution_policy.hpp
   )
+endif()
+
+if(HPX_LIKWID_WITH_LIKWID)
+  set(executors_headers ${executors_headers} hpx/executors/likwid_executor.hpp)
+  set(additional_dependencies hpx_likwid)
+endif()
+if(HPX_TRACY_WITH_TRACY)
+  set(additional_dependencies hpx_tracy)
 endif()
 
 # Default location is $HPX_ROOT/libs/executors/include_compatibility
@@ -90,8 +102,10 @@ include(HPX_AddModule)
 add_hpx_module(
   core executors
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${executors_sources}
   HEADERS ${executors_headers}
+  MACRO_HEADERS ${executors_macro_headers}
   COMPAT_HEADERS ${executors_compat_headers}
   MODULE_DEPENDENCIES
     hpx_allocator_support
@@ -99,18 +113,31 @@ add_hpx_module(
     hpx_concepts
     hpx_concurrency
     hpx_config
+    hpx_coroutines
+    hpx_datastructures
+    hpx_debugging
     hpx_errors
     hpx_execution
+    hpx_execution_base
     hpx_format
     hpx_functional
     hpx_futures
     hpx_hardware
     hpx_io_service
+    hpx_iterator_support
     hpx_itt_notify
     hpx_memory
+    hpx_pack_traversal
     hpx_properties
     hpx_resource_partitioner
+    hpx_serialization
+    hpx_synchronization
+    hpx_tag_invoke
+    hpx_timing
     hpx_threading
+    hpx_threading_base
     hpx_topology
+    hpx_type_support
+    ${additional_dependencies}
   CMAKE_SUBDIRS examples tests
 )

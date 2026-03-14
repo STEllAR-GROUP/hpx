@@ -7,17 +7,10 @@
 // hpxinspect:nodeprecatedinclude:boost/intrusive_ptr.hpp
 // hpxinspect:nodeprecatedname:boost::intrusive_ptr
 
-#include <hpx/serialization/base_object.hpp>
-#include <hpx/serialization/input_archive.hpp>
-#include <hpx/serialization/output_archive.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/shared_ptr.hpp>
-
+#include <hpx/modules/serialization.hpp>
 #include <hpx/modules/testing.hpp>
 
 #if defined(HPX_SERIALIZATION_HAVE_BOOST_TYPES)
-#include <hpx/serialization/boost_intrusive_ptr.hpp>
-
 #include <boost/intrusive_ptr.hpp>
 #endif
 
@@ -37,12 +30,12 @@ struct A
     }
     virtual ~A() {}
 
-    virtual const char* foo() = 0;
+    virtual char const* foo() = 0;
 
     template <class Archive>
     void serialize(Archive& ar, unsigned)
     {
-        ar& a;
+        ar & a;
     }
     HPX_SERIALIZATION_POLYMORPHIC_ABSTRACT(A);
 };
@@ -56,7 +49,7 @@ struct B : A
     {
     }
 
-    const char* foo() override
+    char const* foo() override
     {
         return "B::foo";
     }
@@ -65,13 +58,13 @@ struct B : A
     void load(Archive& ar, unsigned)
     {
         ar& hpx::serialization::base_object<A>(*this);
-        ar& b;
+        ar & b;
     }
     template <class Archive>
     void save(Archive& ar, unsigned) const
     {
         ar& hpx::serialization::base_object<A>(*this);
-        ar& b;
+        ar & b;
     }
     HPX_SERIALIZATION_SPLIT_MEMBER();
     HPX_SERIALIZATION_POLYMORPHIC_SPLITTED(B, override);
@@ -86,7 +79,7 @@ class C : public B
     void serialize(Archive& ar, unsigned)
     {
         ar& hpx::serialization::base_object<B>(*this);
-        ar& c;
+        ar & c;
     }
     HPX_SERIALIZATION_POLYMORPHIC(C, override)
 
@@ -96,7 +89,7 @@ public:
     {
     }
 
-    const char* foo() override
+    char const* foo() override
     {
         return "C::foo";
     }
@@ -150,7 +143,7 @@ struct D
     }
     virtual ~D() {}
 
-    virtual const char* foo() = 0;
+    virtual char const* foo() = 0;
 
 private:
     friend class hpx::serialization::access;
@@ -158,12 +151,12 @@ private:
     template <class Archive>
     void load(Archive& ar, unsigned)
     {
-        ar& a;
+        ar & a;
     }
     template <class Archive>
     void save(Archive& ar, unsigned) const
     {
-        ar& a;
+        ar & a;
     }
     HPX_SERIALIZATION_SPLIT_MEMBER();
     HPX_SERIALIZATION_POLYMORPHIC_ABSTRACT_SPLITTED(D);
@@ -191,7 +184,7 @@ struct E : D
     {
     }
 
-    const char* foo() override
+    char const* foo() override
     {
         return "E::foo";
     }
@@ -200,13 +193,13 @@ struct E : D
     void load(Archive& ar, unsigned)
     {
         ar& hpx::serialization::base_object<D>(*this);
-        ar& b;
+        ar & b;
     }
     template <class Archive>
     void save(Archive& ar, unsigned) const
     {
         ar& hpx::serialization::base_object<D>(*this);
-        ar& b;
+        ar & b;
     }
     HPX_SERIALIZATION_SPLIT_MEMBER();
     HPX_SERIALIZATION_POLYMORPHIC_SPLITTED(E, override);
@@ -221,7 +214,7 @@ class F : public E
     void serialize(Archive& ar, unsigned)
     {
         ar& hpx::serialization::base_object<E>(*this);
-        ar& c;
+        ar & c;
     }
     HPX_SERIALIZATION_POLYMORPHIC(F, override)
 
@@ -231,7 +224,7 @@ public:
     {
     }
 
-    const char* foo() override
+    char const* foo() override
     {
         return "F::foo";
     }

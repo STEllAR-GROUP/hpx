@@ -9,7 +9,7 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/util/to_string.hpp>
+#include <hpx/modules/format.hpp>
 
 #include <algorithm>
 
@@ -251,13 +251,24 @@ namespace boost { namespace inspect {
             {"system_error"}},
         {"(\\bstd\\s*::\\s*system_error\\b)", "std::system_error",
             {"system_error"}},
+        // c++20
+        {"(\\bstd\\s*::\\s*cmp_equal\\b)", "std::cmp_equal", {"utility"}},
+        {"(\\bstd\\s*::\\s*cmp_less\\b)", "std::cmp_less", {"utility"}},
+        {"(\\bstd\\s*::\\s*cmp_less_equal\\b)", "std::cmp_less_equal",
+            {"utility"}},
+        {"(\\bstd\\s*::\\s*cmp_greater\\b)", "std::cmp_greater", {"utility"}},
+        {"(\\bstd\\s*::\\s*cmp_greater_equal\\b)", "std::cmp_greater_equal",
+            {"utility"}},
+        {"(\\bstd\\s*::\\s*cmp_not_equal\\b)", "std::cmp_not_equal",
+            {"utility"}},
+        {"(\\bstd\\s*::\\s*in_range\\b)", "std::in_range", {"utility"}},
         // boost
         {"(\\bhpx\\s*::\\s*intrusive_ptr\\b)", "hpx::intrusive_ptr",
             {"hpx/modules/memory.hpp"}},
         {"(\\bhpx\\s*::\\s*util\\s*::\\s*from_string\\b)",
-            "hpx::util::from_string", {"hpx/util/from_string.hpp"}},
+            "hpx::util::from_string", {"hpx/modules/format.hpp"}},
         {"(\\bhpx\\s*::\\s*util\\s*::\\s*to_string\\b)", "hpx::util::to_string",
-            {"hpx/util/to_string.hpp"}},
+            {"hpx/modules/format.hpp"}},
         // macros
         {"(\\bHPX_PP_CAT\\b)", "HPX_PP_CAT",
             {"hpx/modules/preprocessor.hpp", "hpx/preprocessor/cat.hpp"}},
@@ -273,6 +284,45 @@ namespace boost { namespace inspect {
         //
         {"(\\HPX_ASSERT\\b)", "HPX_ASSERT", {"hpx/assert.hpp"}},
         {"(\\HPX_ASSERT_MSG\\b)", "HPX_ASSERT_MSG", {"hpx/assert.hpp"}},
+        {"(\\HPX_THROW_EXCEPTION\\b)", "HPX_THROW_EXCEPTION",
+            {"hpx/modules/errors.hpp"}},
+        {"(\\HPX_THROWS_IF\\b)", "HPX_THROWS_IF", {"hpx/modules/errors.hpp"}},
+        {"(\\HPX_THROW_BAD_ALLOC\\b)", "HPX_THROW_BAD_ALLOC",
+            {"hpx/modules/errors.hpp"}},
+        {"(\\HPX_THROWS_BAD_ALLOC_IF\\b)", "HPX_THROWS_BAD_ALLOC_IF",
+            {"hpx/modules/errors.hpp"}},
+        //
+        // std concepts
+        {"(\\bstd\\s*::\\s*convertible_to\\b)", "std::convertible_to",
+            {"concepts"}},
+        {"(\\bstd\\s*::\\s*destructible\\b)", "std::destructible",
+            {"concepts"}},
+        {"(\\bstd\\s*::\\s*derived_from\\b)", "std::derived_from",
+            {"concepts"}},
+        {"(\\bstd\\s*::\\s*integral\\b)", "std::integral", {"concepts"}},
+        {"(\\bstd\\s*::\\s*invocable\\b)", "std::invocable", {"concepts"}},
+        {"(\\bstd\\s*::\\s*regular_invocable\\b)", "std::regular_invocable",
+            {"concepts"}},
+        {"(\\bstd\\s*::\\s*same_as\\b)", "std::same_as", {"concepts"}},
+        //
+        // std iterator
+        {"(\\bstd\\s*::\\s*input_iterator\\b)", "std::input_iterator", {"iterator"}},
+        {"(\\bstd\\s*::\\s*output_iterator\\b)", "std::output_iterator", {"iterator"}},
+        {"(\\bstd\\s*::\\s*forward_iterator\\b)", "std::forward_iterator", {"iterator"}},
+        {"(\\bstd\\s*::\\s*bidirectional_iterator\\b)", "std::bidirectional_iterator", {"iterator"}},
+        {"(\\bstd\\s*::\\s*random_access_iterator\\b)", "std::random_access_iterator", {"iterator"}},
+        {"(\\bstd\\s*::\\s*sentinel_for\\b)", "std::sentinel_for", {"iterator"}},
+        {"(\\bstd\\s*::\\s*next\\b)", "std::next", {"iterator"}},
+        {"(\\bstd\\s*::\\s*prev\\b)", "std::prev", {"iterator"}},
+        // std ranges
+        {"(\\bstd\\s*::\\s*ranges\\s*::\\srange\\b)",
+            "std::ranges::range", {"ranges"}},
+        {"(\\bstd\\s*::\\s*ranges\\s*::\\s*input_range\\b)",
+            "std::ranges::input_range", {"ranges"}},
+        {"(\\bstd\\s*::\\s*ranges\\s*::\\s*bidirectional_range\\b)",
+            "std::ranges::bidirectional_range", {"ranges"}},
+        {"(\\bstd\\s*::\\s*ranges\\s*::\\s*iterator_t\\b)",
+            "std::ranges::iterator_t", {"ranges"}},
         {nullptr, nullptr, {nullptr}}};
 
     //  include_check constructor  -------------------------------------------//
@@ -290,9 +340,11 @@ namespace boost { namespace inspect {
         register_signature(".hxx");
         register_signature(".inc");
         register_signature(".ipp");
+        register_signature(".ixx");
+        register_signature(".cppm");
 
         for (names_includes const* names_it = &names[0];
-             names_it->name_regex != nullptr; ++names_it)
+            names_it->name_regex != nullptr; ++names_it)
         {
             std::string rx(names_it->name_regex);
             rx += "|"    // or (ignored)
@@ -309,9 +361,9 @@ namespace boost { namespace inspect {
 
     //  inspect ( C++ source files )  ---------------------------------------//
 
-    void include_check::inspect(const string& library_name,
-        const path& full_path,     // example: c:/foo/boost/filesystem/path.hpp
-        const string& contents)    // contents of file to be inspected
+    void include_check::inspect(string const& library_name,
+        path const& full_path,     // example: c:/foo/boost/filesystem/path.hpp
+        string const& contents)    // contents of file to be inspected
     {
         std::string::size_type p = contents.find("hpxinspect:"
                                                  "noinclude");
@@ -345,6 +397,15 @@ namespace boost { namespace inspect {
         // if one of the includes is <hpx/hpx.hpp> assume all is well
         if (includes.find("hpx/hpx.hpp") != includes.end())
             return;
+
+        // if one of the includes starts with <hpx/include/...> assume all is
+        // well as well
+        constexpr char const* prefix = "hpx/include/";
+        if (auto it = includes.lower_bound(prefix);
+            it != includes.end() && it->find(prefix) == 0)
+        {
+            return;
+        }
 
         // for all given names, check whether corresponding include was found
         std::set<std::string> checked_includes;

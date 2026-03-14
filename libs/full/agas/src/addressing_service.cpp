@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2011-2024 Hartmut Kaiser
+//  Copyright (c) 2011-2025 Hartmut Kaiser
 //  Copyright (c) 2016 Parsa Amini
 //  Copyright (c) 2016 Thomas Heller
 //
@@ -14,29 +14,25 @@
 #include <hpx/agas_base/detail/bootstrap_component_namespace.hpp>
 #include <hpx/agas_base/detail/bootstrap_locality_namespace.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
-#include <hpx/async_combinators/wait_all.hpp>
-#include <hpx/datastructures/detail/dynamic_bitset.hpp>
-#include <hpx/functional/bind.hpp>
-#include <hpx/functional/bind_back.hpp>
-#include <hpx/functional/bind_front.hpp>
-#include <hpx/lock_registration/detail/register_locks.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/async_combinators.hpp>
 #include <hpx/modules/async_distributed.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
+#include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/runtime_configuration.hpp>
+#include <hpx/modules/runtime_local.hpp>
+#include <hpx/modules/serialization.hpp>
+#include <hpx/modules/synchronization.hpp>
+#include <hpx/modules/thread_support.hpp>
+#include <hpx/modules/type_support.hpp>
+#include <hpx/modules/util.hpp>
 #include <hpx/naming/split_gid.hpp>
-#include <hpx/runtime_configuration/runtime_configuration.hpp>
-#include <hpx/runtime_local/runtime_local_fwd.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/vector.hpp>
-#include <hpx/synchronization/shared_mutex.hpp>
-#include <hpx/thread_support/unlock_guard.hpp>
-#include <hpx/type_support/assert_owns_lock.hpp>
-#include <hpx/util/get_entry_as.hpp>
-#include <hpx/util/insert_checked.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -49,6 +45,8 @@
 #include <system_error>
 #include <utility>
 #include <vector>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx::agas {
 
@@ -296,7 +294,9 @@ namespace hpx::agas {
 
                 HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                     "addressing_service::resolve_locality", str);
-                return resolved_localities_[naming::invalid_gid];
+
+                static parcelset::endpoints_type const empty_endpoints;
+                return empty_endpoints;
             }
         }
 
@@ -314,7 +314,9 @@ namespace hpx::agas {
                     "addressing_service::resolve_locality",
                     "resolved locality insertion failed "
                     "due to a locking error or memory corruption");
-                return resolved_localities_[naming::invalid_gid];
+
+                static parcelset::endpoints_type const empty_endpoints;
+                return empty_endpoints;
             }
         }
         else if (it->second.empty() && !endpoints.empty())
@@ -873,7 +875,8 @@ namespace hpx::agas {
             if (naming::refers_to_local_lva(id))
             {
                 // handle (non-migratable) components located on this locality first
-                addr.type_ = naming::detail::get_component_type_from_gid(msb);
+                addr.type_ = static_cast<components::component_type>(
+                    naming::detail::get_component_type_from_gid(msb));
                 addr.address_ =
                     reinterpret_cast<naming::address::address_type>(lsb);
                 return true;
@@ -1311,8 +1314,8 @@ namespace hpx::agas {
                 threads::thread_priority) = &addressing_service::route;
 
             threads::thread_init_data data(
-                threads::make_thread_function_nullary(util::deferred_call(
-                    route_ptr, this, HPX_MOVE(p), HPX_MOVE(f), local_priority)),
+                threads::make_thread_function_nullary(
+                    route_ptr, this, HPX_MOVE(p), HPX_MOVE(f), local_priority),
                 "addressing_service::route", threads::thread_priority::normal,
                 threads::thread_schedule_hint(),
                 threads::thread_stacksize::default_,

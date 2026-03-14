@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/iterator_support/traits/is_sentinel_for.hpp>
+#include <hpx/modules/iterator_support.hpp>
 
 #include <iterator>
 #include <type_traits>
@@ -14,14 +14,14 @@
 namespace hpx::parallel::detail {
 
     // Generic implementation for advancing a given iterator to its sentinel
-    template <typename Iter, typename Sent>
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent>
     constexpr Iter advance_to_sentinel(Iter first, Sent last)
     {
         if constexpr (std::is_same_v<Iter, Sent>)
         {
             return last;
         }
-        else if constexpr (hpx::traits::is_sized_sentinel_for_v<Sent, Iter>)
+        else if constexpr (std::sized_sentinel_for<Sent, Iter>)
         {
             std::advance(first, last - first);
             return first;

@@ -7,11 +7,6 @@
 
 #pragma once
 
-// MS compatible compilers support #pragma once
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
-#pragma once
-#endif
-
 /////////1/////////2/////////3/////////4/////////5/////////6/////////7/////////8
 // utf8_codecvt_facet.hpp
 
@@ -86,9 +81,6 @@
 #include <cwchar>     // for mbstate_t
 #include <locale>
 
-// maximum length of a multibyte string
-#define MB_LENGTH_MAX 8
-
 //----------------------------------------------------------------------------//
 //                                                                            //
 //                          utf8_codecvt_facet                                //
@@ -98,7 +90,7 @@
 
 namespace hpx::program_options::detail {
 
-    struct HPX_CORE_EXPORT utf8_codecvt_facet
+    HPX_CXX_CORE_EXPORT struct HPX_CORE_EXPORT utf8_codecvt_facet
       : public std::codecvt<wchar_t, char, std::mbstate_t>
     {
     public:

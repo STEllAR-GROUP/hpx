@@ -9,14 +9,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_combinators/wait_all.hpp>
-#include <hpx/execution/executors/execution_information.hpp>
-#include <hpx/executors/execution_policy.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/parallel/algorithms/for_each.hpp>
-#include <hpx/runtime_local/get_worker_thread_num.hpp>
-#include <hpx/topology/topology.hpp>
-#include <hpx/type_support/construct_at.hpp>
+#include <hpx/modules/algorithms.hpp>
+#include <hpx/modules/async_combinators.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/executors.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/runtime_local.hpp>
+#include <hpx/modules/topology.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <limits>
@@ -31,7 +31,7 @@
 namespace hpx::parallel::util {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, typename Executors>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Executors>
     class numa_allocator
     {
         using executor_type = typename Executors::value_type;

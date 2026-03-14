@@ -7,11 +7,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/compute_local/host/get_targets.hpp>
+#include <hpx/modules/compute_local.hpp>
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
-#include <hpx/futures/future_fwd.hpp>
 #include <hpx/modules/compute_local.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/naming.hpp>
 
 #include <vector>

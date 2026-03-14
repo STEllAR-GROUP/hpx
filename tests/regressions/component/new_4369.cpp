@@ -27,7 +27,7 @@ public:
             std::vector<hpx::future<hpx::id_type>> futs(branch_factor);
             for (int ci = 0; ci < branch_factor; ci++)
             {
-                const auto loc = locs[next_proc++ % locs.size()];
+                auto const loc = locs[next_proc++ % locs.size()];
                 futs[ci] = hpx::async([loc, depth, next_proc, branch_factor]() {
                     return hpx::new_<tree>(
                         loc, depth - 1, next_proc, branch_factor)

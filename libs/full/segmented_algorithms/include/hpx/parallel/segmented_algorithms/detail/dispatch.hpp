@@ -9,17 +9,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions_base/plain_action.hpp>
-#include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/distribution_policies/colocating_distribution_policy.hpp>
-#include <hpx/naming_base/id_type.hpp>
-#include <hpx/type_support/decay.hpp>
-
-#include <hpx/executors/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/util/detail/algorithm_result.hpp>
-#include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
-#include <hpx/parallel/util/result_types.hpp>
+#include <hpx/modules/algorithms.hpp>
+#include <hpx/modules/executors.hpp>
+#include <hpx/modules/naming_base.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <exception>
 #include <list>

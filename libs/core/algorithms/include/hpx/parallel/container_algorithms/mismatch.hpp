@@ -367,43 +367,43 @@ namespace hpx { namespace ranges {
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/algorithms/traits/projected_range.hpp>
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/execution/algorithms/detail/predicates.hpp>
-#include <hpx/iterator_support/range.hpp>
-#include <hpx/iterator_support/traits/is_range.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/mismatch.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/result_types.hpp>
-#include <hpx/type_support/identity.hpp>
 
+#include <iterator>
 #include <type_traits>
 #include <utility>
 
 namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Iter1, typename Iter2>
+    HPX_CXX_CORE_EXPORT template <typename Iter1, typename Iter2>
     using mismatch_result = hpx::parallel::util::in_in_result<Iter1, Iter2>;
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::mismatch
-    inline constexpr struct mismatch_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct mismatch_t final
       : hpx::detail::tag_parallel_algorithm<mismatch_t>
     {
     private:
-        // clang-format off
         template <typename ExPolicy, typename Iter1, typename Sent1,
             typename Iter2, typename Sent2, typename Pred = equal_to,
-            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
+        // clang-format off
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_sentinel_for_v<Sent1, Iter1> &&
-                hpx::traits::is_sentinel_for_v<Sent2, Iter2> &&
+                std::sentinel_for<Sent1, Iter1> &&
+                std::sentinel_for<Sent2, Iter2> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy, Pred,
                     hpx::parallel::traits::projected<Proj1, Iter1>,
                     hpx::parallel::traits::projected<Proj2, Iter2>
                 >
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
             mismatch_result<Iter1, Iter2>>
@@ -411,9 +411,9 @@ namespace hpx::ranges {
             Sent1 last1, Iter2 first2, Sent2 last2, Pred op = Pred(),
             Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<Iter1>,
+            static_assert(std::forward_iterator<Iter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<Iter2>,
+            static_assert(std::forward_iterator<Iter2>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::mismatch_binary<
@@ -422,11 +422,11 @@ namespace hpx::ranges {
                     last2, HPX_MOVE(op), HPX_MOVE(proj1), HPX_MOVE(proj2));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename Rng1, typename Rng2,
-            typename Pred = equal_to,
-            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            typename Pred = equal_to, typename Proj1 = hpx::identity,
+            typename Proj2 = hpx::identity>
+        // clang-format off
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::parallel::traits::is_projected_range_v<Proj1, Rng1> &&
                 hpx::parallel::traits::is_projected_range_v<Proj2, Rng2> &&
@@ -436,7 +436,7 @@ namespace hpx::ranges {
                     hpx::parallel::traits::projected<Proj2,
                         typename hpx::traits::range_traits<Rng2>::iterator_type>
                 >
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
             mismatch_result<
@@ -447,12 +447,12 @@ namespace hpx::ranges {
             Proj2 proj2 = Proj2())
         {
             static_assert(
-                hpx::traits::is_forward_iterator<typename hpx::traits::
-                        range_traits<Rng1>::iterator_type>::value,
+                std::forward_iterator<
+                    typename hpx::traits::range_traits<Rng1>::iterator_type>,
                 "Requires at least forward iterator.");
             static_assert(
-                hpx::traits::is_forward_iterator<typename hpx::traits::
-                        range_traits<Rng2>::iterator_type>::value,
+                std::forward_iterator<
+                    typename hpx::traits::range_traits<Rng2>::iterator_type>,
                 "Requires at least forward iterator.");
 
             using result_type = mismatch_result<
@@ -466,27 +466,27 @@ namespace hpx::ranges {
                 HPX_MOVE(proj2));
         }
 
+        template <typename Iter1, typename Sent1, typename Iter2,
+            typename Sent2, typename Pred = equal_to,
+            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
-        template <typename Iter1, typename Sent1,
-            typename Iter2, typename Sent2, typename Pred = equal_to,
-            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_sentinel_for_v<Sent1, Iter1> &&
-                hpx::traits::is_sentinel_for_v<Sent2, Iter2> &&
+            requires(
+                std::sentinel_for<Sent1, Iter1> &&
+                std::sentinel_for<Sent2, Iter2> &&
                 hpx::parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Pred,
                     hpx::parallel::traits::projected<Proj1, Iter1>,
                     hpx::parallel::traits::projected<Proj2, Iter2>
                 >
-            )>
+            )
         // clang-format on
         friend mismatch_result<Iter1, Iter2> tag_fallback_invoke(mismatch_t,
             Iter1 first1, Sent1 last1, Iter2 first2, Sent2 last2,
             Pred op = Pred(), Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<Iter1>,
+            static_assert(std::forward_iterator<Iter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<Iter2>,
+            static_assert(std::forward_iterator<Iter2>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::mismatch_binary<
@@ -495,10 +495,10 @@ namespace hpx::ranges {
                     HPX_MOVE(op), HPX_MOVE(proj1), HPX_MOVE(proj2));
         }
 
-        // clang-format off
         template <typename Rng1, typename Rng2, typename Pred = equal_to,
-            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
+        // clang-format off
+            requires(
                 hpx::parallel::traits::is_projected_range_v<Proj1, Rng1> &&
                 hpx::parallel::traits::is_projected_range_v<Proj2, Rng2> &&
                 hpx::parallel::traits::is_indirect_callable_v<
@@ -508,7 +508,7 @@ namespace hpx::ranges {
                     hpx::parallel::traits::projected<Proj2,
                         typename hpx::traits::range_traits<Rng2>::iterator_type>
                 >
-            )>
+            )
         // clang-format on
         friend mismatch_result<
             typename hpx::traits::range_traits<Rng1>::iterator_type,
@@ -517,12 +517,12 @@ namespace hpx::ranges {
             Pred op = Pred(), Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
         {
             static_assert(
-                hpx::traits::is_forward_iterator<typename hpx::traits::
-                        range_traits<Rng1>::iterator_type>::value,
+                std::forward_iterator<
+                    typename hpx::traits::range_traits<Rng1>::iterator_type>,
                 "Requires at least forward iterator.");
             static_assert(
-                hpx::traits::is_forward_iterator<typename hpx::traits::
-                        range_traits<Rng2>::iterator_type>::value,
+                std::forward_iterator<
+                    typename hpx::traits::range_traits<Rng2>::iterator_type>,
                 "Requires at least forward iterator.");
 
             using result_type = mismatch_result<

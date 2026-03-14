@@ -1,5 +1,5 @@
 //  Copyright (c) 2020 ETH Zurich
-//  Copyright (c) 2022-2023 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,8 +8,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/functional/detail/tag_fallback_invoke.hpp>
+#include <hpx/modules/coroutines.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -17,12 +17,12 @@
 namespace hpx::execution::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Property, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename Property, typename Enable = void>
     struct is_scheduling_property : std::false_type
     {
     };
 
-    template <typename Property>
+    HPX_CXX_CORE_EXPORT template <typename Property>
     inline constexpr bool is_scheduling_property_v =
         is_scheduling_property<Property>::value;
 
@@ -38,6 +38,7 @@ namespace hpx::execution::experimental {
         template <typename Tag, typename... Ts>
         struct property_not_supported;
 
+        // NOLINTBEGIN(bugprone-crtp-constructor-accessibility)
         template <typename Tag>
         struct property_base : hpx::functional::detail::tag_fallback<Tag>
         {
@@ -47,10 +48,11 @@ namespace hpx::execution::experimental {
             friend constexpr auto tag_fallback_invoke(Tag, Ts&&...) noexcept
                 -> decltype(property_not_supported<Tag, Ts...>());
         };
+        // NOLINTEND(bugprone-crtp-constructor-accessibility)
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Property>
+    HPX_CXX_CORE_EXPORT template <typename Property>
     struct is_scheduling_property<Property,
         std::enable_if_t<
             std::is_base_of_v<detail::property_base<Property>, Property>>>
@@ -59,7 +61,7 @@ namespace hpx::execution::experimental {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    inline constexpr struct with_priority_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct with_priority_t final
       : detail::property_base<with_priority_t>
     {
     } with_priority{};
@@ -69,7 +71,7 @@ namespace hpx::execution::experimental {
     {
     };
 
-    inline constexpr struct get_priority_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct get_priority_t final
       : hpx::functional::detail::tag_fallback<get_priority_t>
     {
     private:
@@ -88,7 +90,7 @@ namespace hpx::execution::experimental {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    inline constexpr struct with_stacksize_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct with_stacksize_t final
       : detail::property_base<with_stacksize_t>
     {
     } with_stacksize{};
@@ -98,7 +100,7 @@ namespace hpx::execution::experimental {
     {
     };
 
-    inline constexpr struct get_stacksize_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct get_stacksize_t final
       : hpx::functional::detail::tag_fallback<get_stacksize_t>
     {
     private:
@@ -117,7 +119,7 @@ namespace hpx::execution::experimental {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    inline constexpr struct with_hint_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct with_hint_t final
       : detail::property_base<with_hint_t>
     {
     } with_hint{};
@@ -127,7 +129,7 @@ namespace hpx::execution::experimental {
     {
     };
 
-    inline constexpr struct get_hint_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct get_hint_t final
       : hpx::functional::detail::tag_fallback<get_hint_t>
     {
     private:
@@ -146,7 +148,7 @@ namespace hpx::execution::experimental {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    inline constexpr struct with_annotation_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct with_annotation_t final
       : detail::property_base<with_annotation_t>
     {
     } with_annotation{};
@@ -156,7 +158,7 @@ namespace hpx::execution::experimental {
     {
     };
 
-    inline constexpr struct get_annotation_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct get_annotation_t final
       : hpx::functional::detail::tag_fallback<get_annotation_t>
     {
     private:
@@ -175,12 +177,12 @@ namespace hpx::execution::experimental {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    inline constexpr struct with_first_core_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct with_first_core_t final
       : detail::property_base<with_first_core_t>
     {
     } with_first_core{};
 
-    inline constexpr struct get_first_core_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct get_first_core_t final
       : hpx::functional::detail::tag_fallback<get_first_core_t>
     {
     private:
@@ -198,3 +200,10 @@ namespace hpx::execution::experimental {
     {
     };
 }    // namespace hpx::execution::experimental
+
+namespace hpx {
+
+    template <typename Property>
+    concept scheduling_property =
+        hpx::execution::experimental::is_scheduling_property_v<Property>;
+}    // namespace hpx

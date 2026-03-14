@@ -5,11 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/serialization/base_object.hpp>
-#include <hpx/serialization/input_archive.hpp>
-#include <hpx/serialization/output_archive.hpp>
-#include <hpx/serialization/serialize.hpp>
-
+#include <hpx/modules/serialization.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <vector>
@@ -27,7 +23,7 @@ struct A
     template <typename Archive>
     void serialize(Archive& ar, unsigned)
     {
-        ar& a;
+        ar & a;
     }
     HPX_SERIALIZATION_POLYMORPHIC(A);
 };
@@ -52,7 +48,7 @@ struct B
     template <typename Archive>
     void serialize(Archive& ar, unsigned)
     {
-        ar& b;
+        ar & b;
     }
     HPX_SERIALIZATION_POLYMORPHIC_ABSTRACT(B);
 };
@@ -77,7 +73,7 @@ struct D : B
     {
         b = 4711;
         ar& hpx::serialization::base_object<B>(*this);
-        ar& d;
+        ar & d;
     }
     HPX_SERIALIZATION_POLYMORPHIC(D, override);
 };

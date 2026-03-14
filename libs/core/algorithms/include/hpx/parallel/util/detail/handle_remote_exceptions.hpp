@@ -7,9 +7,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/executors/execution_policy.hpp>
-#include <hpx/futures/future.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/executors.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/parallel/util/detail/handle_exception_termination_handler.hpp>
 
 #include <exception>
@@ -21,7 +21,7 @@
 namespace hpx::parallel::util::detail {
 
     ///////////////////////////////////////////////////////////////////////
-    template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
     struct handle_remote_exceptions
     {
         // std::bad_alloc has to be handled separately

@@ -6,12 +6,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/serialization/input_archive.hpp>
-#include <hpx/serialization/output_archive.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/unordered_map.hpp>
-#include <hpx/serialization/vector.hpp>
-
+#include <hpx/modules/serialization.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <algorithm>
@@ -37,7 +32,7 @@ struct A
         t_ = t;
         return *this;
     }
-    bool operator==(const A& a) const
+    bool operator==(A const& a) const
     {
         return t_ == a.t_;
     }
@@ -45,12 +40,12 @@ struct A
     template <typename Archive>
     void serialize(Archive& ar, unsigned)
     {
-        ar& t_;
+        ar & t_;
     }
 };
 
 template <class T>
-std::ostream& operator<<(std::ostream& os, const A<T>& a)
+std::ostream& operator<<(std::ostream& os, A<T> const& a)
 {
     return os << a.t_;
 }
@@ -71,7 +66,7 @@ void test(T min, T max)
         std::unordered_map<T, A<T>> is;
         iarchive >> is;
         HPX_TEST_EQ(os.size(), is.size());
-        for (const auto& v : os)
+        for (auto const& v : os)
         {
             HPX_TEST_EQ(os[v.first], is[v.first]);
         }
@@ -94,7 +89,7 @@ void test_fp(T min, T max)
         std::unordered_map<T, A<T>> is;
         iarchive >> is;
         HPX_TEST_EQ(os.size(), is.size());
-        for (const auto& v : os)
+        for (auto const& v : os)
         {
             HPX_TEST_EQ(os[v.first], is[v.first]);
         }
@@ -103,7 +98,7 @@ void test_fp(T min, T max)
 
 // prohibited, but for adl
 namespace std {
-    std::ostream& operator<<(std::ostream& os, const std::vector<int>& vec)
+    std::ostream& operator<<(std::ostream& os, std::vector<int> const& vec)
     {
         std::copy(vec.begin(), vec.end(), std::ostream_iterator<int>(os, " "));
         return os;
@@ -126,7 +121,7 @@ void test_vector_as_value()
     std::unordered_map<size_t, std::vector<int>> is;
     iarchive >> is;
     HPX_TEST_EQ(os.size(), is.size());
-    for (const auto& v : os)
+    for (auto const& v : os)
     {
         HPX_TEST_EQ(os[v.first], is[v.first]);
     }

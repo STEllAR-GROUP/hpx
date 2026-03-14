@@ -24,6 +24,7 @@ set(benchmarks
     timed_task_spawn
     skynet
     wait_all_timings
+    benchmark_stealing
 )
 
 set(timed_task_spawn_SOURCES activate_counters.cpp)
@@ -131,6 +132,7 @@ set(partitioned_vector_foreach_FLAGS DEPENDENCIES iostreams_component
 
 set(future_overhead_PARAMETERS THREADS_PER_LOCALITY 4)
 set(future_overhead_report_PARAMETERS THREADS_PER_LOCALITY 4)
+set(stream_report_PARAMETERS THREADS_PER_LOCALITY 2)
 
 # These tests do not run on hpx threads, so we don't want to pass hpx params
 # into them
@@ -146,6 +148,7 @@ set(print_heterogeneous_payloads_PARAMETERS NO_HPX_MAIN)
 set(hpx_homogeneous_timed_task_spawn_executors_PARAMETERS NO_HPX_MAIN)
 set(skynet_PARAMETERS NO_HPX_MAIN)
 set(timed_task_spawn_PARAMETERS NO_HPX_MAIN)
+set(benchmark_stealing_PARAMETERS NO_HPX_MAIN)
 set(hpx_tls_overhead_PARAMETERS NO_HPX_MAIN)
 set(native_tls_overhead_PARAMETERS NO_HPX_MAIN)
 set(coroutines_call_overhead_PARAMETERS NO_HPX_MAIN)
@@ -165,7 +168,7 @@ foreach(benchmark ${benchmarks})
     SOURCES ${sources} ${${benchmark}_FLAGS} ${${benchmark}_HEADERS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Benchmarks/Local"
+    FOLDER "Benchmarks/Local" ${HPX_WITH_CXX_MODULES_OPTION}
   )
 
   target_include_directories(

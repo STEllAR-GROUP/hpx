@@ -1,4 +1,4 @@
-//  Copyright (c) 2019-2023 Hartmut Kaiser
+//  Copyright (c) 2019-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,10 +10,10 @@
 #include <hpx/components_base/pinned_ptr.hpp>
 #include <hpx/components_base/server/migration_support.hpp>
 #include <hpx/components_base/traits/action_decorate_function.hpp>
-#include <hpx/functional/bind_front.hpp>
-#include <hpx/futures/future.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/threading_base.hpp>
-#include <hpx/naming_base/id_type.hpp>
 
 #include <cstdint>
 #include <type_traits>
@@ -25,6 +25,7 @@ namespace hpx::components {
     /// This hook has to be inserted into the derivation chain of any
     /// abstract_component_base for it to support migration.
     template <typename BaseComponent, typename Mutex = hpx::spinlock>
+    // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
     struct abstract_base_migration_support : BaseComponent
     {
     private:
@@ -52,7 +53,7 @@ namespace hpx::components {
         }
 
         // Pinning functionality
-        virtual void pin() = 0;
+        virtual bool pin() = 0;
         virtual bool unpin() = 0;
         [[nodiscard]] virtual std::uint32_t pin_count() const = 0;
         virtual void mark_as_migrated() = 0;
@@ -133,11 +134,11 @@ namespace hpx::components {
         }
 
         abstract_migration_support(abstract_migration_support const&) = delete;
-        abstract_migration_support(abstract_migration_support&&) = delete;
+        abstract_migration_support(abstract_migration_support&&) = default;
         abstract_migration_support& operator=(
             abstract_migration_support const&) = delete;
         abstract_migration_support& operator=(
-            abstract_migration_support&&) = delete;
+            abstract_migration_support&&) = default;
 
         ~abstract_migration_support() = default;
 
@@ -171,9 +172,9 @@ namespace hpx::components {
             return this->base_type::pin_count();
         }
 
-        void pin() override
+        bool pin() override
         {
-            this->base_type::pin();
+            return this->base_type::pin();
         }
         bool unpin() override
         {

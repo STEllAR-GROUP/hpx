@@ -7,5 +7,4 @@
 
 #pragma once
 
-#include <hpx/parallel/algorithms/search.hpp>
-#include <hpx/parallel/container_algorithms/search.hpp>
+#include <hpx/modules/algorithms.hpp>

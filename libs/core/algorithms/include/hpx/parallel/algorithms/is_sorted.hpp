@@ -226,11 +226,10 @@ namespace hpx {
 #else
 
 #include <hpx/config.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/executors/execution_policy.hpp>
-#include <hpx/functional/invoke.hpp>
-#include <hpx/iterator_support/range.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/coroutines.hpp>
+#include <hpx/modules/executors.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/is_sorted.hpp>
 #include <hpx/parallel/util/adapt_placement_mode.hpp>
@@ -255,7 +254,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        template <typename FwdIter, typename Sent>
+        HPX_CXX_CORE_EXPORT template <typename FwdIter, typename Sent>
         struct is_sorted : public algorithm<is_sorted<FwdIter, Sent>, bool>
         {
             constexpr is_sorted() noexcept
@@ -342,8 +341,9 @@ namespace hpx::parallel {
     ////////////////////////////////////////////////////////////////////////////
     // is_sorted_until
     namespace detail {
+
         /// \cond NOINTERNAL
-        template <typename FwdIter, typename Sent>
+        HPX_CXX_CORE_EXPORT template <typename FwdIter, typename Sent>
         struct is_sorted_until
           : public algorithm<is_sorted_until<FwdIter, Sent>, FwdIter>
         {
@@ -426,13 +426,11 @@ namespace hpx::parallel {
                 };
 
                 auto f2 = [first, tok](auto&&... data) mutable -> FwdIter {
+                    static_assert(sizeof...(data) < 2);
+
                     // make sure iterators embedded in function object that is
                     // attached to futures are invalidated
-                    static_assert(sizeof...(data) < 2);
-                    if constexpr (sizeof...(data) == 1)
-                    {
-                        util::detail::clear_container(data...);
-                    }
+                    util::detail::clear_container(data...);
 
                     difference_type loc = tok.get_data();
                     std::advance(first, loc);
@@ -452,19 +450,19 @@ namespace hpx::parallel {
 
 namespace hpx {
 
-    inline constexpr struct is_sorted_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct is_sorted_t final
       : hpx::detail::tag_parallel_algorithm<is_sorted_t>
     {
     private:
-        template <typename FwdIter, typename Pred = hpx::parallel::detail::less,
-            // clang-format off
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_forward_iterator_v<FwdIter> &&
+        template <typename FwdIter, typename Pred = hpx::parallel::detail::less>
+        // clang-format off
+            requires (
+                std::forward_iterator<FwdIter> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<FwdIter>::value_type,
                     typename std::iterator_traits<FwdIter>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend bool tag_fallback_invoke(
             hpx::is_sorted_t, FwdIter first, FwdIter last, Pred pred = Pred())
@@ -475,16 +473,16 @@ namespace hpx {
         }
 
         template <typename ExPolicy, typename FwdIter,
-            typename Pred = hpx::parallel::detail::less,
-            // clang-format off
-            HPX_CONCEPT_REQUIRES_(
+            typename Pred = hpx::parallel::detail::less>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_forward_iterator_v<FwdIter> &&
+                std::forward_iterator<FwdIter> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<FwdIter>::value_type,
                     typename std::iterator_traits<FwdIter>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::is_sorted_t,
             ExPolicy&& policy, FwdIter first, FwdIter last, Pred pred = Pred())
@@ -495,19 +493,19 @@ namespace hpx {
         }
     } is_sorted{};
 
-    inline constexpr struct is_sorted_until_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct is_sorted_until_t final
       : hpx::detail::tag_parallel_algorithm<is_sorted_until_t>
     {
     private:
-        template <typename FwdIter, typename Pred = hpx::parallel::detail::less,
-            // clang-format off
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_forward_iterator_v<FwdIter> &&
+        template <typename FwdIter, typename Pred = hpx::parallel::detail::less>
+        // clang-format off
+            requires (
+                std::forward_iterator<FwdIter> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<FwdIter>::value_type,
                     typename std::iterator_traits<FwdIter>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend FwdIter tag_fallback_invoke(hpx::is_sorted_until_t,
             FwdIter first, FwdIter last, Pred pred = Pred())
@@ -518,16 +516,16 @@ namespace hpx {
         }
 
         template <typename ExPolicy, typename FwdIter,
-            typename Pred = hpx::parallel::detail::less,
-            // clang-format off
-            HPX_CONCEPT_REQUIRES_(
+            typename Pred = hpx::parallel::detail::less>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_forward_iterator_v<FwdIter> &&
+                std::forward_iterator<FwdIter> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<FwdIter>::value_type,
                     typename std::iterator_traits<FwdIter>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::is_sorted_until_t,
             ExPolicy&& policy, FwdIter first, FwdIter last, Pred pred = Pred())

@@ -4,8 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/execution/queries/get_scheduler.hpp>
-#include <hpx/execution_base/completion_scheduler.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <exception>
@@ -18,7 +18,7 @@ namespace mylib {
     {
         constexpr friend HPX_FORCEINLINE auto tag_invoke(
             hpx::execution::experimental::get_forward_progress_guarantee_t,
-            const inline_scheduler_0&) noexcept
+            inline_scheduler_0 const&) noexcept
         {
             return hpx::execution::experimental::forward_progress_guarantee::
                 concurrent;

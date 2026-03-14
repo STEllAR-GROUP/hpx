@@ -27,7 +27,7 @@ foreach(subdir ${subdirs})
     ${subdir}_client INTERNAL_FLAGS
     SOURCES ${sources}
     DEPENDENCIES ${subdir}_component
-    FOLDER "Examples/Throttle"
+    FOLDER "Examples/Throttle" ${HPX_WITH_CXX_MODULES_OPTION}
   )
 
   add_hpx_example_target_dependencies("throttle" ${subdir}_client)
@@ -37,7 +37,7 @@ endforeach()
 add_hpx_executable(
   spin INTERNAL_FLAGS
   SOURCES spin.cpp
-  FOLDER "Examples/Throttle"
+  FOLDER "Examples/Throttle" ${HPX_WITH_CXX_MODULES_OPTION}
 )
 
 add_hpx_example_target_dependencies("throttle" spin)

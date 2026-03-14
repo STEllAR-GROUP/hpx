@@ -8,25 +8,22 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/functional/invoke.hpp>
+#include <hpx/modules/functional.hpp>
 
-#include <hpx/executors/execution_policy.hpp>
+#include <hpx/modules/executors.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/algorithms/detail/upper_lower_bound.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/clear_container.hpp>
 #include <hpx/parallel/util/foreach_partitioner.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
-#include <hpx/type_support/unused.hpp>
 
-#if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
-#include <boost/shared_array.hpp>
-#else
 #include <memory>
-#endif
 
 #include <algorithm>
 #include <cstddef>
+#include <iterator>
 #include <type_traits>
 #include <utility>
 
@@ -34,7 +31,7 @@ namespace hpx::parallel::detail {
     /// \cond NOINTERNAL
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename FwdIter>
+    HPX_CXX_CORE_EXPORT template <typename FwdIter>
     struct set_operations_buffer
     {
         template <typename T>
@@ -72,7 +69,7 @@ namespace hpx::parallel::detail {
             value_type, rewritable_ref<value_type>>;
     };
 
-    struct set_chunk_data
+    HPX_CXX_CORE_EXPORT struct set_chunk_data
     {
         static constexpr std::size_t uninit_start =
             static_cast<std::size_t>(-1);
@@ -92,9 +89,10 @@ namespace hpx::parallel::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename ExPolicy, typename Iter1, typename Sent1, typename Iter2,
-        typename Sent2, typename Iter3, typename F, typename Proj1,
-        typename Proj2, typename Combiner, typename SetOp>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter1,
+        typename Sent1, typename Iter2, typename Sent2, typename Iter3,
+        typename F, typename Proj1, typename Proj2, typename Combiner,
+        typename SetOp>
     util::detail::algorithm_result_t<ExPolicy,
         util::in_in_out_result<Iter1, Iter2, Iter3>>
     set_operation(ExPolicy&& policy, Iter1 first1, Sent1 last1, Iter2 first2,
@@ -117,19 +115,13 @@ namespace hpx::parallel::detail {
         std::size_t cores =
             hpx::execution::experimental::processing_units_count(
                 policy.parameters(), policy.executor(),
-                hpx::chrono::null_duration, (std::min)(len1, len2));
+                hpx::chrono::null_duration, (std::min) (len1, len2));
 
         std::size_t const step = (len1 + cores - 1) / cores;
 
-#if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
         std::shared_ptr<buffer_type[]> buffer(
             new buffer_type[combiner(len1, len2)]);
         std::shared_ptr<set_chunk_data[]> chunks(new set_chunk_data[cores]);
-#else
-        boost::shared_array<buffer_type> buffer(
-            new buffer_type[combiner(len1, len2)]);
-        boost::shared_array<set_chunk_data> chunks(new set_chunk_data[cores]);
-#endif
 
         // first step, is applied to all partitions
         auto f1 = [=](set_chunk_data* curr_chunk,
@@ -140,7 +132,7 @@ namespace hpx::parallel::detail {
             // find start in sequence 1
             std::size_t start1 = (curr_chunk - chunks.get()) * step;
             std::size_t end1 =
-                (std::min)(start1 + step, static_cast<std::size_t>(len1));
+                (std::min) (start1 + step, static_cast<std::size_t>(len1));
 
             if (start1 >= end1)
             {
@@ -163,8 +155,8 @@ namespace hpx::parallel::detail {
                     return;
                 }
 
-                // move backwards to find earliest element which is equal to the
-                // last element of the current chunk
+                // move backwards to find the earliest element which is equal to
+                // the last element of the current chunk
                 if (end1 != 0)
                 {
                     auto end_value1 = HPX_INVOKE(proj1, first1[end1 - 1]);
@@ -177,7 +169,7 @@ namespace hpx::parallel::detail {
                 }
             }
 
-            // move backwards to find earliest element which is equal to the
+            // move backwards to find the earliest element which is equal to the
             // first element of the current chunk
             if (start1 != 0)
             {
@@ -222,14 +214,13 @@ namespace hpx::parallel::detail {
         // second step, is executed after all partitions are done running
 
         // different versions of clang-format produce different formatting
-        // clang-format off
         auto f2 = [buffer, chunks, cores, first1, first2, dest](
-                      auto&& data) -> result_type {
-            // clang-format on
+                      auto&&... data) -> result_type {
+            static_assert(sizeof...(data) < 2);
 
             // make sure iterators embedded in function object that is attached
             // to futures are invalidated
-            util::detail::clear_container(data);
+            util::detail::clear_container(data...);
 
             // accumulate real length and rightmost positions in input sequences
             std::size_t first1_pos = 0;
@@ -243,11 +234,11 @@ namespace hpx::parallel::detail {
                 chunk->start_index = curr_chunk->start_index + curr_chunk->len;
                 if (curr_chunk->first1 != static_cast<std::size_t>(-1))
                 {
-                    first1_pos = (std::max)(first1_pos, curr_chunk->first1);
+                    first1_pos = (std::max) (first1_pos, curr_chunk->first1);
                 }
                 if (curr_chunk->first2 != static_cast<std::size_t>(-1))
                 {
-                    first2_pos = (std::max)(first2_pos, curr_chunk->first2);
+                    first2_pos = (std::max) (first2_pos, curr_chunk->first2);
                 }
             }
 
@@ -281,6 +272,5 @@ namespace hpx::parallel::detail {
         return parallel::util::partitioner<ExPolicy, result_type, void>::call(
             policy, chunks.get(), cores, HPX_MOVE(f1), HPX_MOVE(f2));
     }
-
     /// \endcond
 }    // namespace hpx::parallel::detail

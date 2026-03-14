@@ -7,8 +7,8 @@
 
 #include <hpx/algorithm.hpp>
 #include <hpx/init.hpp>
-#include <hpx/iterator_support/iterator_range.hpp>
 #include <hpx/iterator_support/tests/iter_sent.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <cstddef>
@@ -33,7 +33,7 @@ void test_remove_copy_sent()
 
     int value = 42;
 
-    auto pred = [](const int& n) -> bool { return n > 0; };
+    auto pred = [](int const& n) -> bool { return n > 0; };
 
     hpx::ranges::remove_copy(
         std::begin(c), sentinel<std::int16_t>{50}, std::begin(d), value);
@@ -58,7 +58,7 @@ void test_remove_copy_sent(ExPolicy policy)
 
     int value = 42;
 
-    auto pred = [](const int& n) -> bool { return n > 0; };
+    auto pred = [](int const& n) -> bool { return n > 0; };
 
     hpx::ranges::remove_copy(policy, std::begin(c), sentinel<std::int16_t>{50},
         std::begin(d), value);

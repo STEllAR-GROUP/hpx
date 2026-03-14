@@ -4,9 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/serialization/input_archive.hpp>
-#include <hpx/serialization/output_archive.hpp>
-#include <hpx/serialization/serialize.hpp>
+#include <hpx/modules/serialization.hpp>
 
 #include <iostream>
 #include <vector>
@@ -78,9 +76,9 @@ int main()
     foo::baq b3;
     foo::bap b4;
     oarchive << b1 << b2 << b3 << b4;
-    oarchive& b1& b2& b3& b4;
+    oarchive & b1 & b2 & b3 & b4;
 
     hpx::serialization::input_archive iarchive(buffer);
     iarchive >> b1 >> b2 >> b3 >> b4;
-    iarchive& b1& b2& b3& b4;
+    iarchive & b1 & b2 & b3 & b4;
 }

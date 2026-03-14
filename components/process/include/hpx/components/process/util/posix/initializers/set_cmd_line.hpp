@@ -14,15 +14,11 @@
 
 #if !defined(HPX_WINDOWS)
 #include <hpx/components/process/util/posix/initializers/initializer_base.hpp>
-#include <hpx/serialization/string.hpp>
-#include <hpx/serialization/vector.hpp>
+#include <hpx/modules/serialization.hpp>
 #include <hpx/modules/string_util.hpp>
 
-#if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
-#include <boost/shared_array.hpp>
-#else
+
 #include <memory>
-#endif
 
 #include <cstddef>
 #include <string>
@@ -33,7 +29,7 @@ namespace hpx::components::process::posix::initializers {
     class set_cmd_line : public initializer_base
     {
     public:
-        explicit set_cmd_line(const std::string& s)
+        explicit set_cmd_line(std::string const& s)
         {
             split_command_line(s);
             init_command_line_arguments();
@@ -59,7 +55,7 @@ namespace hpx::components::process::posix::initializers {
         void init_command_line_arguments()
         {
             cmd_line_.reset(new char*[args_.size() + 1]);
-            std::size_t i = 0;
+            std::ptrdiff_t i = 0;
             for (std::string const& s : args_)
                 cmd_line_[i++] = const_cast<char*>(s.c_str());
             cmd_line_[i] = nullptr;
@@ -70,24 +66,20 @@ namespace hpx::components::process::posix::initializers {
         template <typename Archive>
         void save(Archive& ar, unsigned const) const
         {
-            ar& args_;
+            ar & args_;
         }
 
         template <typename Archive>
-        void load(Archive& ar, const unsigned int)
+        void load(Archive& ar, unsigned int const)
         {
-            ar& args_;
+            ar & args_;
             init_command_line_arguments();
         }
 
         HPX_SERIALIZATION_SPLIT_MEMBER()
 
         std::vector<std::string> args_;
-#if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
         std::shared_ptr<char*[]> cmd_line_;
-#else
-        boost::shared_array<char*> cmd_line_;
-#endif
     };
 
 }    // namespace hpx::components::process::posix::initializers

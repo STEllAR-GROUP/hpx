@@ -1,5 +1,5 @@
 //  Copyright (c) 2005-2007 Andre Merzky
-//  Copyright (c) 2005-2022 Hartmut Kaiser
+//  Copyright (c) 2005-2025 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -28,11 +28,9 @@
 #include <hpx/assert.hpp>
 #include <hpx/ini/ini.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/serialization/map.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/string_util/classification.hpp>
-#include <hpx/string_util/split.hpp>
-#include <hpx/thread_support/unlock_guard.hpp>
+#include <hpx/modules/serialization.hpp>
+#include <hpx/modules/string_util.hpp>
+#include <hpx/modules/thread_support.hpp>
 
 #ifdef __APPLE__
 #include <crt_externs.h>
@@ -246,8 +244,8 @@ namespace hpx::util {
                 std::string sec_name(line.substr(1, line.size() - 2));
                 std::string::size_type pos = 0;
                 for (std::string::size_type pos1 = sec_name.find_first_of('.');
-                     std::string::npos != pos1;
-                     pos1 = sec_name.find_first_of('.', pos = pos1 + 1))
+                    std::string::npos != pos1;
+                    pos1 = sec_name.find_first_of('.', pos = pos1 + 1))
                 {
                     current = current->add_section_if_new(
                         sec_name.substr(pos, pos1 - pos));
@@ -273,8 +271,8 @@ namespace hpx::util {
                 // Example: hpx.commandline.allow_unknown
                 for (std::string::size_type dot_pos =
                          sec_key.find_first_of('.');
-                     std::string::npos != dot_pos;
-                     dot_pos = sec_key.find_first_of('.', pos = dot_pos + 1))
+                    std::string::npos != dot_pos;
+                    dot_pos = sec_key.find_first_of('.', pos = dot_pos + 1))
                 {
                     current = current->add_section_if_new(
                         sec_key.substr(pos, dot_pos - pos));
@@ -445,8 +443,8 @@ namespace hpx::util {
 
             std::string::size_type pos = 0;
             for (std::string::size_type pos1 = sec_name.find_first_of('.');
-                 std::string::npos != pos1;
-                 pos1 = sec_name.find_first_of('.', pos = pos1 + 1))
+                std::string::npos != pos1;
+                pos1 = sec_name.find_first_of('.', pos = pos1 + 1))
             {
                 current = current->add_section_if_new(
                     l, sec_name.substr(pos, pos1 - pos));
@@ -495,8 +493,8 @@ namespace hpx::util {
 
             std::string::size_type pos = 0;
             for (std::string::size_type pos1 = sec_name.find_first_of('.');
-                 std::string::npos != pos1;
-                 pos1 = sec_name.find_first_of('.', pos = pos1 + 1))
+                std::string::npos != pos1;
+                pos1 = sec_name.find_first_of('.', pos = pos1 + 1))
             {
                 current = current->add_section_if_new(
                     l, sec_name.substr(pos, pos1 - pos));
@@ -596,8 +594,8 @@ namespace hpx::util {
 
             std::string::size_type pos = 0;
             for (std::string::size_type pos1 = sec_name.find_first_of('.');
-                 std::string::npos != pos1;
-                 pos1 = sec_name.find_first_of('.', pos = pos1 + 1))
+                std::string::npos != pos1;
+                pos1 = sec_name.find_first_of('.', pos = pos1 + 1))
             {
                 current = current->add_section_if_new(
                     l, sec_name.substr(pos, pos1 - pos));
@@ -688,7 +686,7 @@ namespace hpx::util {
         split_key.pop_back();
 
         section const* cur_section = this;
-        for (const auto& iter : split_key)
+        for (auto const& iter : split_key)
         {
             auto next = cur_section->sections_.find(iter);
             if (cur_section->sections_.end() == next)

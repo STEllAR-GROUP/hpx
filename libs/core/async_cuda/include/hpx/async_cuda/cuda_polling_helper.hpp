@@ -11,17 +11,25 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_cuda/detail/cuda_event_callback.hpp>
-#include <hpx/runtime_local/runtime_local_fwd.hpp>
-#include <hpx/threading_base/thread_pool_base.hpp>
+#include <hpx/modules/runtime_local.hpp>
+#include <hpx/modules/threading_base.hpp>
 
 #include <string>
 
-namespace hpx { namespace cuda { namespace experimental {
+namespace hpx::cuda::experimental {
+
     // -----------------------------------------------------------------
     // This RAII helper class enables polling for a scoped block
-    struct [[nodiscard]] enable_user_polling
+    HPX_CXX_CORE_EXPORT struct [[nodiscard]] enable_user_polling
     {
-        enable_user_polling(std::string const& pool_name = "")
+        enable_user_polling()
+          : pool_name_()
+        {
+            // install polling loop on requested thread pool
+            detail::register_polling(hpx::resource::get_thread_pool(0));
+        }
+
+        explicit enable_user_polling(std::string const& pool_name)
           : pool_name_(pool_name)
         {
             // install polling loop on requested thread pool
@@ -52,5 +60,4 @@ namespace hpx { namespace cuda { namespace experimental {
     private:
         std::string pool_name_;
     };
-
-}}}    // namespace hpx::cuda::experimental
+}    // namespace hpx::cuda::experimental

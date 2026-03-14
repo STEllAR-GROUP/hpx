@@ -6,9 +6,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/compute_local/host/target.hpp>
-#include <hpx/resource_partitioner/detail/partitioner.hpp>
-#include <hpx/runtime_local/get_os_thread_count.hpp>
-#include <hpx/runtime_local/runtime_local.hpp>
+#include <hpx/modules/resource_partitioner.hpp>
+#include <hpx/modules/runtime_local.hpp>
 
 #include <cstddef>
 #include <vector>
@@ -24,7 +23,7 @@ namespace hpx::compute::host {
 
         auto const& rp = hpx::resource::get_partitioner();
         for (std::size_t num_thread = 0; num_thread != num_os_threads;
-             ++num_thread)
+            ++num_thread)
         {
             targets.emplace_back(rp.get_pu_mask(num_thread));
         }

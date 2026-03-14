@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2024 The STE||AR-Group
+# Copyright (c) 2019-2025 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,6 +12,7 @@ set(schedulers_headers
     hpx/schedulers/local_priority_queue_scheduler.hpp
     hpx/schedulers/local_queue_scheduler.hpp
     hpx/schedulers/lockfree_queue_backends.hpp
+    hpx/schedulers/macros.hpp
     hpx/schedulers/maintain_queue_wait_times.hpp
     hpx/schedulers/queue_helpers.hpp
     hpx/schedulers/queue_holder_numa.hpp
@@ -21,7 +22,6 @@ set(schedulers_headers
     hpx/schedulers/static_queue_scheduler.hpp
     hpx/schedulers/thread_queue.hpp
     hpx/schedulers/thread_queue_mc.hpp
-    hpx/modules/schedulers.hpp
 )
 
 if(HPX_WITH_WORK_REQUESTING_SCHEDULERS)
@@ -29,6 +29,8 @@ if(HPX_WITH_WORK_REQUESTING_SCHEDULERS)
                          hpx/schedulers/local_workrequesting_scheduler.hpp
   )
 endif()
+
+set(schedulers_macro_headers hpx/schedulers/macros.hpp)
 
 # cmake-format: off
 set(schedulers_compat_headers
@@ -52,22 +54,31 @@ set(schedulers_sources deadlock_detection.cpp maintain_queue_wait_times.cpp)
 include(HPX_AddModule)
 add_hpx_module(
   core schedulers
-  GLOBAL_HEADER_GEN OFF
+  GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${schedulers_sources}
   HEADERS ${schedulers_headers}
+  MACRO_HEADERS ${schedulers_macro_headers}
   COMPAT_HEADERS ${schedulers_compat_headers}
   SOURCES ${schedulers_sources}
   MODULE_DEPENDENCIES
     hpx_affinity
+    hpx_allocator_support
+    hpx_assertion
     hpx_concurrency
     hpx_config
-    hpx_assertion
+    hpx_datastructures
+    hpx_debugging
     hpx_errors
     hpx_format
     hpx_functional
     hpx_logging
     hpx_synchronization
     hpx_threading_base
+    hpx_thread_support
+    hpx_timing
+    hpx_topology
     hpx_type_support
+    hpx_util
   CMAKE_SUBDIRS examples tests
 )

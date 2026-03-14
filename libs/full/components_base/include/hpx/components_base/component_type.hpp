@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2017 Thomas Heller
 //  Copyright (c)      2011 Bryce Lelbach
 //
@@ -12,16 +12,10 @@
 #include <hpx/assert.hpp>
 #include <hpx/components_base/components_base_fwd.hpp>
 #include <hpx/components_base/traits/component_type_database.hpp>
-#include <hpx/functional/move_only_function.hpp>
-#include <hpx/naming_base/address.hpp>
-#include <hpx/naming_base/gid_type.hpp>
-#include <hpx/naming_base/naming_base.hpp>
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/preprocessor/expand.hpp>
-#include <hpx/preprocessor/nargs.hpp>
-#include <hpx/preprocessor/stringize.hpp>
-#include <hpx/preprocessor/strip_parens.hpp>
-#include <hpx/thread_support/atomic_count.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/naming_base.hpp>
+#include <hpx/modules/preprocessor.hpp>
+#include <hpx/modules/thread_support.hpp>
 
 #include <cstdint>
 #include <string>
@@ -172,17 +166,29 @@ namespace hpx::components {
     /// \brief Return the string representation for a given component type id
     HPX_EXPORT std::string get_component_type_name(component_type type);
 
+    inline constexpr int component_type_mask = 0x3FF;
+    inline constexpr int component_type_shift = 10;
+
     /// The lower short word of the component type is the type of the component
     /// exposing the actions.
     constexpr component_type get_base_type(component_type t) noexcept
     {
-        return static_cast<component_type>(t & 0x3FF);
+        if (t == to_int(component_enum_type::invalid))
+        {
+            return to_int(component_enum_type::invalid);
+        }
+        return static_cast<component_type>(t & component_type_mask);
     }
 
     /// The upper short word of the component is the actual component type
     constexpr component_type get_derived_type(component_type t) noexcept
     {
-        return static_cast<component_type>((t >> 10) & 0x3FF);
+        if (t == to_int(component_enum_type::invalid))
+        {
+            return to_int(component_enum_type::invalid);
+        }
+        return static_cast<component_type>(
+            (t >> component_type_shift) & component_type_mask);
     }
 
     /// A component derived from a base component exposing the actions needs to

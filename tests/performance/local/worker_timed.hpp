@@ -10,7 +10,6 @@
 #pragma once
 
 #include <hpx/modules/timing.hpp>
-
 #include <cstdint>
 
 HPX_FORCEINLINE void worker_timed(std::uint64_t delay_ns) noexcept
@@ -18,12 +17,12 @@ HPX_FORCEINLINE void worker_timed(std::uint64_t delay_ns) noexcept
     if (delay_ns == 0)
         return;
 
-    std::uint64_t start = hpx::chrono::high_resolution_clock::now();
+    using clock = hpx::chrono::high_resolution_clock;
 
-    while (true)
+    std::uint64_t const start = clock::now();
+
+    while ((clock::now() - start) < delay_ns)
     {
-        // Check if we've reached the specified delay.
-        if ((hpx::chrono::high_resolution_clock::now() - start) >= delay_ns)
-            break;
+        HPX_SMT_PAUSE;
     }
 }

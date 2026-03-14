@@ -8,8 +8,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/timing/steady_clock.hpp>
+#include <hpx/modules/coroutines.hpp>
+#include <hpx/modules/timing.hpp>
 
 #include <chrono>
 #include <cstddef>
@@ -17,9 +17,9 @@
 
 namespace hpx::execution_base {
 
-    struct agent_base;
+    HPX_CXX_CORE_EXPORT struct agent_base;
 
-    class HPX_CORE_EXPORT agent_ref
+    HPX_CXX_CORE_EXPORT class HPX_CORE_EXPORT agent_ref
     {
     public:
         agent_ref() = default;
@@ -47,7 +47,7 @@ namespace hpx::execution_base {
 
         void yield(
             char const* desc = "hpx::execution_base::agent_ref::yield") const;
-        void yield_k(std::size_t k,
+        bool yield_k(std::size_t k,
             char const* desc = "hpx::execution_base::agent_ref::yield_k") const;
         void suspend(
             char const* desc = "hpx::execution_base::agent_ref::suspend") const;
@@ -59,7 +59,8 @@ namespace hpx::execution_base {
 
         template <typename Rep, typename Period>
         void sleep_for(std::chrono::duration<Rep, Period> const& sleep_duration,
-            char const* desc = "hpx::execution_base::agent_ref::sleep_for")
+            char const* desc =
+                "hpx::execution_base::agent_ref::sleep_for") const
         {
             sleep_for(hpx::chrono::steady_duration{sleep_duration}, desc);
         }
@@ -67,7 +68,8 @@ namespace hpx::execution_base {
         template <typename Clock, typename Duration>
         void sleep_until(
             std::chrono::time_point<Clock, Duration> const& sleep_time,
-            char const* desc = "hpx::execution_base::agent_ref::sleep_until")
+            char const* desc =
+                "hpx::execution_base::agent_ref::sleep_until") const
         {
             sleep_until(hpx::chrono::steady_time_point{sleep_time}, desc);
         }

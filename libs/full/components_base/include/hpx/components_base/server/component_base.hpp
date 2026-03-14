@@ -13,12 +13,13 @@
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/components_base_fwd.hpp>
 #include <hpx/components_base/traits/is_component.hpp>
-#include <hpx/naming_base/address.hpp>
-#include <hpx/naming_base/id_type.hpp>
-#include <hpx/type_support/unused.hpp>
+#include <hpx/modules/naming_base.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <cstdint>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx::components {
 
@@ -86,6 +87,7 @@ namespace hpx::components {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component>
+    // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
     class component_base : public detail::base_component
     {
     protected:
@@ -98,6 +100,8 @@ namespace hpx::components {
         using base_type_holder = this_component_type;
         using wrapping_type = component<this_component_type>;
 
+        // NOLINTBEGIN(bugprone-crtp-constructor-accessibility)
+
         // Construct an empty component
         constexpr component_base() = default;
 
@@ -106,6 +110,8 @@ namespace hpx::components {
 
         component_base(component_base const&) = default;
         component_base(component_base&& rhs) noexcept = default;
+
+        // NOLINTEND(bugprone-crtp-constructor-accessibility)
 
         component_base& operator=(component_base const&) = default;
         component_base& operator=(component_base&& rhs) noexcept = default;
@@ -141,3 +147,5 @@ namespace hpx::components {
         }
     };
 }    // namespace hpx::components
+
+#include <hpx/config/warnings_suffix.hpp>

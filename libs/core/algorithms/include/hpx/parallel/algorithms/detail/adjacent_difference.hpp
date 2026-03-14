@@ -8,8 +8,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/detail/tag_fallback_invoke.hpp>
-#include <hpx/functional/invoke.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/parallel/util/loop.hpp>
 
 #include <type_traits>
@@ -17,7 +17,7 @@
 
 namespace hpx::parallel::detail {
 
-    template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
     struct sequential_adjacent_difference_t
       : hpx::functional::detail::tag_fallback<
             sequential_adjacent_difference_t<ExPolicy>>
@@ -45,13 +45,13 @@ namespace hpx::parallel::detail {
     };
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-    template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
     inline constexpr sequential_adjacent_difference_t<ExPolicy>
         sequential_adjacent_difference =
             sequential_adjacent_difference_t<ExPolicy>{};
 #else
-    template <typename ExPolicy, typename InIter, typename Sent,
-        typename OutIter, typename Op>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename InIter,
+        typename Sent, typename OutIter, typename Op>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr OutIter
     sequential_adjacent_difference(
         InIter first, Sent last, OutIter dest, Op&& op)

@@ -7,11 +7,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/function.hpp>
-#include <hpx/futures/future_fwd.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/naming_base/id_type.hpp>
-#include <hpx/serialization/serialization_fwd.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/naming_base.hpp>
+#include <hpx/modules/serialization.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -411,9 +411,9 @@ namespace hpx { namespace performance_counters {
         friend class hpx::serialization::access;
 
         HPX_EXPORT void serialize(
-            serialization::output_archive& ar, const unsigned int) const;
+            serialization::output_archive& ar, unsigned int const) const;
         HPX_EXPORT void serialize(
-            serialization::input_archive& ar, const unsigned int);
+            serialization::input_archive& ar, unsigned int const);
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -507,9 +507,9 @@ namespace hpx { namespace performance_counters {
         friend class hpx::serialization::access;
 
         HPX_EXPORT void serialize(
-            serialization::output_archive& ar, const unsigned int) const;
+            serialization::output_archive& ar, unsigned int const) const;
         HPX_EXPORT void serialize(
-            serialization::input_archive& ar, const unsigned int);
+            serialization::input_archive& ar, unsigned int const);
     };
 
     ///////////////////////////////////////////////////////////////////////
@@ -698,4 +698,4 @@ namespace hpx { namespace performance_counters {
         HPX_EXPORT naming::gid_type create_counter_local(
             counter_info const& info);
     }    // namespace detail
-}}       // namespace hpx::performance_counters
+}}    // namespace hpx::performance_counters

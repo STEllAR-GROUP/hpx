@@ -10,9 +10,8 @@
 
 // This is really an incomplete test; should be fleshed out.
 
-#include <hpx/iterator_support/iterator_facade.hpp>
 #include <hpx/iterator_support/tests/iterator_tests.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <type_traits>
@@ -60,7 +59,7 @@ struct proxy
     {
     }
 
-    operator int const &() const
+    operator int const&() const
     {
         return state;
     }
@@ -119,7 +118,7 @@ struct wrapper
     }
 
     template <typename U>
-    wrapper(const wrapper<U>& other,
+    wrapper(wrapper<U> const& other,
         typename std::enable_if<std::is_convertible<U, T>::value>::type* = 0)
       : m_x(other.m_x)
     {

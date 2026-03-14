@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2021 Giannis Gonidelis
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -9,15 +9,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/execution/executors/execution.hpp>
-#include <hpx/executors/exception_list.hpp>
-#include <hpx/executors/execution_policy.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/executors.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
 #include <hpx/parallel/util/result_types.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <exception>
 #if defined(HPX_HAVE_CXX17_STD_EXECUTION_POLICES)
@@ -29,14 +28,14 @@
 namespace hpx::parallel::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Result>
+    HPX_CXX_CORE_EXPORT template <typename Result>
     struct local_algorithm_result
     {
         using type = typename hpx::traits::segmented_local_iterator_traits<
             Result>::local_raw_iterator;
     };
 
-    template <typename Result1, typename Result2>
+    HPX_CXX_CORE_EXPORT template <typename Result1, typename Result2>
     struct local_algorithm_result<util::in_out_result<Result1, Result2>>
     {
         using type1 = typename hpx::traits::segmented_local_iterator_traits<
@@ -47,7 +46,7 @@ namespace hpx::parallel::detail {
         using type = util::in_out_result<type1, type2>;
     };
 
-    template <typename Result>
+    HPX_CXX_CORE_EXPORT template <typename Result>
     struct local_algorithm_result<util::min_max_result<Result>>
     {
         using type1 = typename hpx::traits::segmented_local_iterator_traits<
@@ -56,7 +55,8 @@ namespace hpx::parallel::detail {
         using type = util::min_max_result<type1>;
     };
 
-    template <typename Result1, typename Result2, typename Result3>
+    HPX_CXX_CORE_EXPORT template <typename Result1, typename Result2,
+        typename Result3>
     struct local_algorithm_result<
         util::in_in_out_result<Result1, Result2, Result3>>
     {
@@ -76,11 +76,11 @@ namespace hpx::parallel::detail {
         using type = void;
     };
 
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     using local_algorithm_result_t = typename local_algorithm_result<T>::type;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Derived, typename Result = void>
+    HPX_CXX_CORE_EXPORT template <typename Derived, typename Result = void>
     struct algorithm
     {
     private:
@@ -93,6 +93,7 @@ namespace hpx::parallel::detail {
         using result_type = Result;
         using local_result_type = local_algorithm_result_t<result_type>;
 
+        // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
         explicit constexpr algorithm(char const* const name) noexcept
           : name_(name)
         {

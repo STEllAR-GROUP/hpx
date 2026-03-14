@@ -7,12 +7,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/traits/is_tuple_like.hpp>
-#include <hpx/functional/detail/invoke.hpp>
-#include <hpx/functional/invoke_fused.hpp>
-#include <hpx/functional/invoke_result.hpp>
-#include <hpx/futures/traits/future_traits.hpp>
-#include <hpx/futures/traits/is_future.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/pack_traversal/pack_traversal.hpp>
 
 #include <cstddef>
@@ -76,8 +74,8 @@ namespace hpx::util::detail {
         template <typename T,
             std::enable_if_t<!traits::is_future_void_v<std::decay_t<T>>>* =
                 nullptr>
-        auto operator()(T&& future) const -> typename traits::future_traits<
-            typename std::decay<T>::type>::result_type
+        auto operator()(T&& future) const ->
+            typename traits::future_traits<std::decay_t<T>>::result_type
         {
             // CUDA needs std::forward here
             return std::forward<T>(future).get();
@@ -256,9 +254,9 @@ namespace hpx::util::detail {
     /// given pack args until the depth Depth.
     template <std::size_t Depth, typename T>
     auto functional_unwrap_depth_impl(T&& callable)
-        -> functional_unwrap_impl<typename std::decay<T>::type, Depth>
+        -> functional_unwrap_impl<std::decay_t<T>, Depth>
     {
-        return functional_unwrap_impl<typename std::decay<T>::type, Depth>(
+        return functional_unwrap_impl<std::decay_t<T>, Depth>(
             HPX_FORWARD(T, callable));
     }
 }    // namespace hpx::util::detail

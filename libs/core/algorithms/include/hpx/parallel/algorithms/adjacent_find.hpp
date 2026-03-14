@@ -123,10 +123,11 @@ namespace hpx {
 #else
 
 #include <hpx/config.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/execution/algorithms/detail/predicates.hpp>
-#include <hpx/executors/execution_policy.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/coroutines.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/executors.hpp>
+#include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/adjacent_find.hpp>
 #include <hpx/parallel/algorithms/detail/adjacent_find.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
@@ -138,7 +139,6 @@ namespace hpx {
 #include <hpx/parallel/util/invoke_projected.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
-#include <hpx/type_support/identity.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -153,7 +153,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        template <typename Iter, typename Sent>
+        HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent>
         struct adjacent_find : public algorithm<adjacent_find<Iter, Sent>, Iter>
         {
             constexpr adjacent_find() noexcept
@@ -218,12 +218,10 @@ namespace hpx::parallel {
                 auto f2 = [tok, count, first, last](
                               auto&&... data) mutable -> FwdIter {
                     static_assert(sizeof...(data) < 2);
-                    if constexpr (sizeof...(data) == 1)
-                    {
-                        // make sure iterators embedded in function object that
-                        // is attached to futures are invalidated
-                        util::detail::clear_container(data...);
-                    }
+
+                    // make sure iterators embedded in function object that
+                    // is attached to futures are invalidated
+                    util::detail::clear_container(data...);
 
                     difference_type adj_find_res = tok.get_data();
                     if (adj_find_res != count)
@@ -258,21 +256,17 @@ namespace hpx::parallel {
 
 namespace hpx {
 
-    inline constexpr struct adjacent_find_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct adjacent_find_t final
       : hpx::detail::tag_parallel_algorithm<adjacent_find_t>
     {
     private:
-        // clang-format off
         template <typename InIter,
-            typename Pred = hpx::parallel::detail::equal_to,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_input_iterator_v<InIter>
-            )>
-        // clang-format on
+            typename Pred = hpx::parallel::detail::equal_to>
+            requires(std::input_iterator<InIter>)
         friend InIter tag_fallback_invoke(
             hpx::adjacent_find_t, InIter first, InIter last, Pred pred = Pred())
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Requires at least input iterator.");
 
             return parallel::detail::adjacent_find<InIter, InIter>().call(
@@ -280,18 +274,18 @@ namespace hpx {
                 hpx::identity_v);
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter,
-            typename Pred = hpx::parallel::detail::equal_to,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_forward_iterator_v<FwdIter>
-            )>
+            typename Pred = hpx::parallel::detail::equal_to>
+        // clang-format off
+        requires (
+            hpx::is_execution_policy_v<ExPolicy> &&
+            std::forward_iterator<FwdIter>
+        )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::adjacent_find_t,
             ExPolicy&& policy, FwdIter first, FwdIter last, Pred pred = Pred())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least a forward iterator");
 
             return parallel::detail::adjacent_find<FwdIter, FwdIter>().call(

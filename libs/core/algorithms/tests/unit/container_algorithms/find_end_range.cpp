@@ -44,7 +44,8 @@ void test_find_end1(IteratorTag)
 
     base_iterator index = hpx::ranges::find_end(c, h);
 
-    base_iterator test_index = std::begin(c) + c.size() / 2;
+    base_iterator test_index =
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2);
 
     HPX_TEST(index == test_index);
 }
@@ -69,7 +70,8 @@ void test_find_end1(ExPolicy&& policy, IteratorTag)
 
     base_iterator index = hpx::ranges::find_end(policy, c, h);
 
-    base_iterator test_index = std::begin(c) + c.size() / 2;
+    base_iterator test_index =
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2);
 
     HPX_TEST(index == test_index);
 }
@@ -92,7 +94,8 @@ void test_find_end1_proj(IteratorTag)
     base_iterator index = hpx::ranges::find_end(c, h,
         std::equal_to<std::size_t>(), [](std::size_t x) { return x % 65536; });
 
-    base_iterator test_index = std::begin(c) + c.size() / 2;
+    base_iterator test_index =
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2);
 
     HPX_TEST(index == test_index);
 }
@@ -118,7 +121,8 @@ void test_find_end1_proj(ExPolicy&& policy, IteratorTag)
     base_iterator index = hpx::ranges::find_end(policy, c, h,
         std::equal_to<std::size_t>(), [](std::size_t x) { return x % 65536; });
 
-    base_iterator test_index = std::begin(c) + c.size() / 2;
+    base_iterator test_index =
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2);
 
     HPX_TEST(index == test_index);
 }
@@ -142,7 +146,8 @@ void test_find_end1_async(ExPolicy&& p, IteratorTag)
     f.wait();
 
     // create iterator at position of value to be found
-    base_iterator test_index = std::begin(c) + c.size() / 2;
+    base_iterator test_index =
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2);
 
     HPX_TEST(f.get() == test_index);
 }
@@ -167,7 +172,8 @@ void test_find_end1_async_proj(ExPolicy&& p, IteratorTag)
     f.wait();
 
     // create iterator at position of value to be found
-    base_iterator test_index = std::begin(c) + c.size() / 2;
+    base_iterator test_index =
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2);
 
     HPX_TEST(f.get() == test_index);
 }
@@ -218,7 +224,8 @@ void test_find_end2(IteratorTag)
 
     base_iterator index = hpx::ranges::find_end(c, h);
 
-    base_iterator test_index = std::begin(c) + c.size() - 2;
+    base_iterator test_index =
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() - 2);
 
     HPX_TEST(index == test_index);
 }
@@ -245,7 +252,8 @@ void test_find_end2(ExPolicy&& policy, IteratorTag)
 
     base_iterator index = hpx::ranges::find_end(policy, c, h);
 
-    base_iterator test_index = std::begin(c) + c.size() - 2;
+    base_iterator test_index =
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() - 2);
 
     HPX_TEST(index == test_index);
 }
@@ -272,7 +280,8 @@ void test_find_end2_proj(IteratorTag)
     base_iterator index =
         hpx::ranges::find_end(c, h, std::equal_to<std::size_t>(), proj, proj);
 
-    base_iterator test_index = std::begin(c) + c.size() - 2;
+    base_iterator test_index =
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() - 2);
 
     HPX_TEST(index == test_index);
 }
@@ -302,7 +311,8 @@ void test_find_end2_proj(ExPolicy&& policy, IteratorTag)
     base_iterator index = hpx::ranges::find_end(
         policy, c, h, std::equal_to<std::size_t>(), proj, proj);
 
-    base_iterator test_index = std::begin(c) + c.size() - 2;
+    base_iterator test_index =
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() - 2);
 
     HPX_TEST(index == test_index);
 }
@@ -328,7 +338,8 @@ void test_find_end2_async(ExPolicy&& p, IteratorTag)
     f.wait();
 
     // create iterator at position of value to be found
-    base_iterator test_index = std::begin(c) + c.size() - 2;
+    base_iterator test_index =
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() - 2);
 
     HPX_TEST(f.get() == test_index);
 }
@@ -358,7 +369,8 @@ void test_find_end2_async_proj(ExPolicy&& p, IteratorTag)
     f.wait();
 
     // create iterator at position of value to be found
-    base_iterator test_index = std::begin(c) + c.size() - 2;
+    base_iterator test_index =
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() - 2);
 
     HPX_TEST(f.get() == test_index);
 }
@@ -400,7 +412,8 @@ void test_find_end3(IteratorTag)
     std::fill(std::begin(c), std::end(c), dis(gen));
 
     // create subsequence large enough to always be split into multiple partitions
-    std::iota(std::begin(c), std::begin(c) + c.size() / 16 + 1, 1);
+    std::iota(std::begin(c),
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 16 + 1), 1);
     std::size_t sub_size = c.size() / 16 + 1;
 
     std::vector<std::size_t> h(sub_size);
@@ -426,7 +439,8 @@ void test_find_end3(ExPolicy&& policy, IteratorTag)
     std::fill(std::begin(c), std::end(c), dis(gen));
 
     // create subsequence large enough to always be split into multiple partitions
-    std::iota(std::begin(c), std::begin(c) + c.size() / 16 + 1, 1);
+    std::iota(std::begin(c),
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 16 + 1), 1);
     std::size_t sub_size = c.size() / 16 + 1;
 
     std::vector<std::size_t> h(sub_size);
@@ -449,7 +463,8 @@ void test_find_end3_proj(IteratorTag)
     std::fill(std::begin(c), std::end(c), dis(gen));
 
     // create subsequence large enough to always be split into multiple partitions
-    std::iota(std::begin(c), std::begin(c) + c.size() / 16 + 1, 1);
+    std::iota(std::begin(c),
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 16 + 1), 1);
     std::size_t sub_size = c.size() / 16 + 1;
 
     std::vector<std::size_t> h(sub_size);
@@ -478,7 +493,8 @@ void test_find_end3_proj(ExPolicy&& policy, IteratorTag)
     std::fill(std::begin(c), std::end(c), dis(gen));
 
     // create subsequence large enough to always be split into multiple partitions
-    std::iota(std::begin(c), std::begin(c) + c.size() / 16 + 1, 1);
+    std::iota(std::begin(c),
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 16 + 1), 1);
     std::size_t sub_size = c.size() / 16 + 1;
 
     std::vector<std::size_t> h(sub_size);
@@ -504,7 +520,8 @@ void test_find_end3_async(ExPolicy&& p, IteratorTag)
     std::fill(std::begin(c), std::end(c), dist(gen));
 
     // create subsequence large enough to always be split into multiple partitions
-    std::iota(std::begin(c), std::begin(c) + c.size() / 16 + 1, 1);
+    std::iota(std::begin(c),
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 16 + 1), 1);
     std::size_t sub_size = c.size() / 16 + 1;
 
     std::vector<std::size_t> h(sub_size);
@@ -531,7 +548,8 @@ void test_find_end3_async_proj(ExPolicy&& p, IteratorTag)
     std::fill(std::begin(c), std::end(c), dist(gen));
 
     // create subsequence large enough to always be split into multiple partitions
-    std::iota(std::begin(c), std::begin(c) + c.size() / 16 + 1, 1);
+    std::iota(std::begin(c),
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 16 + 1), 1);
     std::size_t sub_size = c.size() / 16 + 1;
 
     std::vector<std::size_t> h(sub_size);
@@ -596,7 +614,8 @@ void test_find_end4(IteratorTag)
     base_iterator index = hpx::ranges::find_end(
         c, h, [](std::size_t v1, std::size_t v2) { return !(v1 != v2); });
 
-    base_iterator test_index = std::begin(c) + c.size() / 2;
+    base_iterator test_index =
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2);
 
     HPX_TEST(index == test_index);
 }
@@ -622,7 +641,8 @@ void test_find_end4(ExPolicy&& policy, IteratorTag)
     base_iterator index = hpx::ranges::find_end(policy, c, h,
         [](std::size_t v1, std::size_t v2) { return !(v1 != v2); });
 
-    base_iterator test_index = std::begin(c) + c.size() / 2;
+    base_iterator test_index =
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2);
 
     HPX_TEST(index == test_index);
 }
@@ -648,7 +668,8 @@ void test_find_end4_proj(IteratorTag)
         c, h, [](std::size_t v1, std::size_t v2) { return !(v1 != v2); }, proj,
         proj);
 
-    base_iterator test_index = std::begin(c) + c.size() / 2;
+    base_iterator test_index =
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2);
 
     HPX_TEST(index == test_index);
 }
@@ -677,7 +698,8 @@ void test_find_end4_proj(ExPolicy&& policy, IteratorTag)
         policy, c, h,
         [](std::size_t v1, std::size_t v2) { return !(v1 != v2); }, proj, proj);
 
-    base_iterator test_index = std::begin(c) + c.size() / 2;
+    base_iterator test_index =
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2);
 
     HPX_TEST(index == test_index);
 }
@@ -702,7 +724,8 @@ void test_find_end4_async(ExPolicy&& p, IteratorTag)
     f.wait();
 
     //create iterator at position of value to be found
-    base_iterator test_index = std::begin(c) + c.size() / 2;
+    base_iterator test_index =
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2);
 
     HPX_TEST(f.get() == test_index);
 }
@@ -731,7 +754,8 @@ void test_find_end4_async_proj(ExPolicy&& p, IteratorTag)
     f.wait();
 
     //create iterator at position of value to be found
-    base_iterator test_index = std::begin(c) + c.size() / 2;
+    base_iterator test_index =
+        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2);
 
     HPX_TEST(f.get() == test_index);
 }

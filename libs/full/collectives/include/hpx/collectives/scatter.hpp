@@ -1,4 +1,5 @@
 //  Copyright (c) 2014-2025 Hartmut Kaiser
+//  Copyright (c) 2025 Lukas Zeil
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -389,13 +390,13 @@ namespace hpx { namespace collectives {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/async.hpp>
 #include <hpx/collectives/argument_types.hpp>
 #include <hpx/collectives/create_communicator.hpp>
 #include <hpx/components_base/agas_interface.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/type_support/unused.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -465,9 +466,9 @@ namespace hpx::collectives {
     template <typename T>
     hpx::future<T> scatter_from(communicator fid,
         this_site_arg this_site = this_site_arg(),
-        generation_arg generation = generation_arg())
+        generation_arg const generation = generation_arg())
     {
-        if (this_site == static_cast<std::size_t>(-1))
+        if (this_site.is_default())
         {
             this_site = agas::get_locality_id();
         }
@@ -501,18 +502,72 @@ namespace hpx::collectives {
         return fid.then(hpx::launch::sync, HPX_MOVE(scatter_from_data));
     }
 
+    ////////////////////////////////////////////////////////////////////////////
+    namespace detail {
+
+        template <typename T>
+        std::vector<std::vector<T>> scatter_data(
+            std::vector<T>&& data, arity_arg arity)
+        {
+            std::vector<std::vector<T>> grouped(arity);
+            std::size_t step_size = (data.size() + arity - 1) / arity;
+            for (std::size_t j = 0; j != arity; ++j)
+            {
+                std::move(data.begin() + j * step_size,
+                    data.begin() + (j + 1) * step_size,
+                    std::back_inserter(grouped[j]));
+            }
+            return grouped;
+        }
+    }    // namespace detail
+
     template <typename T>
-    hpx::future<T> scatter_from(communicator fid, generation_arg generation,
-        this_site_arg this_site = this_site_arg())
+    hpx::future<T> scatter_from(hierarchical_communicator const& communicators,
+        this_site_arg this_site = this_site_arg(),
+        generation_arg const generation = generation_arg())
     {
-        return scatter_from<T>(HPX_MOVE(fid), this_site, generation);
+        if (this_site.is_default())
+        {
+            this_site = agas::get_locality_id();
+        }
+
+        auto [current_communicator, current_site] = communicators[0];
+        if (communicators.size() == 1)
+        {
+            return scatter_from<T>(
+                current_communicator, current_site, generation);
+        }
+
+        std::vector<T> data = scatter_from<std::vector<T>>(
+            hpx::launch::sync, current_communicator, current_site, generation);
+
+        for (std::size_t i = 1; i < communicators.size() - 1; ++i)
+        {
+            data = scatter_to(hpx::launch::sync, communicators.get(i),
+                detail::scatter_data(HPX_MOVE(data), communicators.get_arity()),
+                this_site_arg(0), generation);
+        }
+
+        return scatter_to(
+            communicators.back(), HPX_MOVE(data), this_site_arg(0), generation);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    template <typename T, typename Communicator>
+        requires(is_communicator_v<std::decay_t<Communicator>>)
+    decltype(auto) scatter_from(Communicator&& comm,
+        generation_arg const generation,
+        this_site_arg const this_site = this_site_arg())
+    {
+        return scatter_from<T>(
+            HPX_FORWARD(Communicator, comm), this_site, generation);
     }
 
     template <typename T>
-    hpx::future<T> scatter_from(char const* basename,
-        this_site_arg this_site = this_site_arg(),
-        generation_arg generation = generation_arg(),
-        root_site_arg root_site = root_site_arg())
+    decltype(auto) scatter_from(char const* basename,
+        this_site_arg const this_site = this_site_arg(),
+        generation_arg const generation = generation_arg(),
+        root_site_arg const root_site = root_site_arg())
     {
         HPX_ASSERT(this_site != root_site);
         return scatter_from<T>(create_communicator(basename, num_sites_arg(),
@@ -521,26 +576,33 @@ namespace hpx::collectives {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
-    T scatter_from(hpx::launch::sync_policy, communicator fid,
-        this_site_arg this_site = this_site_arg(),
-        generation_arg generation = generation_arg())
+    template <typename T, typename Communicator>
+        requires(is_communicator_v<std::decay_t<Communicator>>)
+    decltype(auto) scatter_from(hpx::launch::sync_policy, Communicator&& comm,
+        this_site_arg const this_site = this_site_arg(),
+        generation_arg const generation = generation_arg())
     {
-        return scatter_from<T>(HPX_MOVE(fid), this_site, generation).get();
+        return scatter_from<T>(
+            HPX_FORWARD(Communicator, comm), this_site, generation)
+            .get();
+    }
+
+    template <typename T, typename Communicator>
+        requires(is_communicator_v<std::decay_t<Communicator>>)
+    decltype(auto) scatter_from(hpx::launch::sync_policy, Communicator&& comm,
+        generation_arg const generation,
+        this_site_arg const this_site = this_site_arg())
+    {
+        return scatter_from<T>(
+            HPX_FORWARD(Communicator, comm), this_site, generation)
+            .get();
     }
 
     template <typename T>
-    T scatter_from(hpx::launch::sync_policy, communicator fid,
-        generation_arg generation, this_site_arg this_site = this_site_arg())
-    {
-        return scatter_from<T>(HPX_MOVE(fid), this_site, generation).get();
-    }
-
-    template <typename T>
-    T scatter_from(hpx::launch::sync_policy, char const* basename,
-        this_site_arg this_site = this_site_arg(),
-        generation_arg generation = generation_arg(),
-        root_site_arg root_site = root_site_arg())
+    decltype(auto) scatter_from(hpx::launch::sync_policy, char const* basename,
+        this_site_arg const this_site = this_site_arg(),
+        generation_arg const generation = generation_arg(),
+        root_site_arg const root_site = root_site_arg())
     {
         HPX_ASSERT(this_site != root_site);
         return scatter_from<T>(create_communicator(basename, num_sites_arg(),
@@ -554,9 +616,9 @@ namespace hpx::collectives {
     template <typename T>
     hpx::future<T> scatter_to(communicator fid, std::vector<T>&& local_result,
         this_site_arg this_site = this_site_arg(),
-        generation_arg generation = generation_arg())
+        generation_arg const generation = generation_arg())
     {
-        if (this_site == static_cast<std::size_t>(-1))
+        if (this_site.is_default())
         {
             this_site = agas::get_locality_id();
         }
@@ -565,6 +627,28 @@ namespace hpx::collectives {
             return hpx::make_exceptional_future<T>(HPX_GET_EXCEPTION(
                 hpx::error::bad_parameter, "hpx::collectives::scatter_to",
                 "the generation number shouldn't be zero"));
+        }
+
+        // Handle operation right away if there is only one value.
+        if (auto [num_sites, comm_site] = fid.get_info(); num_sites == 1)
+        {
+            if (this_site != comm_site)
+            {
+                return hpx::make_exceptional_future<T>(HPX_GET_EXCEPTION(
+                    hpx::error::bad_parameter, "hpx::collectives::scatter_to",
+                    "the local site should be zero if only one site is "
+                    "involved"));
+            }
+
+            if constexpr (std::is_same_v<T, bool>)
+            {
+                return hpx::make_ready_future(
+                    static_cast<bool>(local_result[0]));
+            }
+            else
+            {
+                return hpx::make_ready_future(HPX_MOVE(local_result[0]));
+            }
         }
 
         auto scatter_to_data = [local_result = HPX_MOVE(local_result),
@@ -593,19 +677,57 @@ namespace hpx::collectives {
     }
 
     template <typename T>
-    hpx::future<T> scatter_to(communicator fid, std::vector<T>&& local_result,
-        generation_arg generation, this_site_arg this_site = this_site_arg())
+    hpx::future<T> scatter_to(hierarchical_communicator const& communicators,
+        std::vector<T>&& local_result,
+        this_site_arg this_site = this_site_arg(),
+        generation_arg const generation = generation_arg())
     {
+        if (this_site.is_default())
+        {
+            this_site = agas::get_locality_id();
+        }
+
+        auto [current_communicator, current_site] = communicators[0];
+        if (communicators.size() == 1)
+        {
+            return scatter_to(current_communicator, HPX_MOVE(local_result),
+                current_site, generation);
+        }
+
+        arity_arg arity = communicators.get_arity();
+        std::vector<T> data =
+            scatter_to(hpx::launch::sync, communicators.get(0),
+                detail::scatter_data(HPX_MOVE(local_result), arity),
+                this_site_arg(0), generation);
+
+        for (std::size_t i = 1; i < communicators.size() - 1; ++i)
+        {
+            data = scatter_to(hpx::launch::sync, communicators.get(i),
+                detail::scatter_data(HPX_MOVE(data), arity),
+                this_site_arg(this_site % arity), generation);
+        }
+
         return scatter_to(
-            HPX_MOVE(fid), HPX_MOVE(local_result), this_site, generation);
+            communicators.back(), HPX_MOVE(data), this_site_arg(0), generation);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    template <typename Communicator, typename T>
+        requires(is_communicator_v<std::decay_t<Communicator>>)
+    decltype(auto) scatter_to(Communicator&& comm,
+        std::vector<T>&& local_result, generation_arg const generation,
+        this_site_arg const this_site = this_site_arg())
+    {
+        return scatter_to(HPX_FORWARD(Communicator, comm),
+            HPX_MOVE(local_result), this_site, generation);
     }
 
     template <typename T>
-    hpx::future<T> scatter_to(char const* basename,
+    decltype(auto) scatter_to(char const* basename,
         std::vector<T>&& local_result,
-        num_sites_arg num_sites = num_sites_arg(),
-        this_site_arg this_site = this_site_arg(),
-        generation_arg generation = generation_arg())
+        num_sites_arg const num_sites = num_sites_arg(),
+        this_site_arg const this_site = this_site_arg(),
+        generation_arg const generation = generation_arg())
     {
         return scatter_to(create_communicator(basename, num_sites, this_site,
                               generation, root_site_arg(this_site.argument_)),
@@ -613,33 +735,35 @@ namespace hpx::collectives {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
-    T scatter_to(hpx::launch::sync_policy, communicator fid,
+    template <typename Communicator, typename T>
+        requires(is_communicator_v<std::decay_t<Communicator>>)
+    decltype(auto) scatter_to(hpx::launch::sync_policy, Communicator&& comm,
         std::vector<T>&& local_result,
-        this_site_arg this_site = this_site_arg(),
-        generation_arg generation = generation_arg())
+        this_site_arg const this_site = this_site_arg(),
+        generation_arg const generation = generation_arg())
     {
-        return scatter_to(
-            HPX_MOVE(fid), HPX_MOVE(local_result), this_site, generation)
+        return scatter_to(HPX_FORWARD(Communicator, comm),
+            HPX_MOVE(local_result), this_site, generation)
+            .get();
+    }
+
+    template <typename Communicator, typename T>
+        requires(is_communicator_v<std::decay_t<Communicator>>)
+    decltype(auto) scatter_to(hpx::launch::sync_policy, Communicator&& comm,
+        std::vector<T>&& local_result, generation_arg const generation,
+        this_site_arg const this_site = this_site_arg())
+    {
+        return scatter_to(HPX_FORWARD(Communicator, comm),
+            HPX_MOVE(local_result), this_site, generation)
             .get();
     }
 
     template <typename T>
-    T scatter_to(hpx::launch::sync_policy, communicator fid,
-        std::vector<T>&& local_result, generation_arg generation,
-        this_site_arg this_site = this_site_arg())
-    {
-        return scatter_to(
-            HPX_MOVE(fid), HPX_MOVE(local_result), this_site, generation)
-            .get();
-    }
-
-    template <typename T>
-    T scatter_to(hpx::launch::sync_policy, char const* basename,
+    decltype(auto) scatter_to(hpx::launch::sync_policy, char const* basename,
         std::vector<T>&& local_result,
-        num_sites_arg num_sites = num_sites_arg(),
-        this_site_arg this_site = this_site_arg(),
-        generation_arg generation = generation_arg())
+        num_sites_arg const num_sites = num_sites_arg(),
+        this_site_arg const this_site = this_site_arg(),
+        generation_arg const generation = generation_arg())
     {
         return scatter_to(create_communicator(basename, num_sites, this_site,
                               generation, root_site_arg(this_site.argument_)),

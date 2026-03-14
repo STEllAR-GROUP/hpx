@@ -133,7 +133,7 @@ std::vector<hpx::util::iterator_range<iter>> split(
     while (first != last)
     {
         iter prev = first;
-        std::advance(first, (std::min)(increment, std::distance(first, last)));
+        std::advance(first, (std::min) (increment, std::distance(first, last)));
         results.push_back(hpx::util::iterator_range(prev, first));
     }
     return results;
@@ -172,10 +172,10 @@ int void_parallel_sum(iter first, iter last, int num_parts)
     std::vector<hpx::future<void>> f =
         hpx::parallel::execution::bulk_async_execute(
             exec,
-            [&](const int& i) {
+            [&](int const& i) {
                 iter b = first + i * section_size;    //-V104
                 iter e = first +
-                    (std::min)(std::distance(first, last),
+                    (std::min) (std::distance(first, last),
                         static_cast<std::ptrdiff_t>(
                             (i + 1) * section_size)    //-V104
                     );

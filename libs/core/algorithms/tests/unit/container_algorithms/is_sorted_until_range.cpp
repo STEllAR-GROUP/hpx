@@ -20,7 +20,7 @@
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////
-int seed = std::random_device{}();
+unsigned int seed = std::random_device{}();
 std::mt19937 gen(seed);
 std::uniform_int_distribution<> dis(0, 99);
 
@@ -493,7 +493,8 @@ void test_sorted_until3(ExPolicy policy, IteratorTag)
             });
 
     base_iterator test_index1 = std::begin(c1) + 1;
-    base_iterator test_index2 = std::begin(c2) + c2.size() / 3;
+    base_iterator test_index2 =
+        std::begin(c2) + static_cast<std::ptrdiff_t>(c2.size() / 3);
 
     HPX_TEST(until1 == iterator(test_index1));
     HPX_TEST(until2 == iterator(test_index2));
@@ -547,7 +548,8 @@ void test_sorted_until3_async(ExPolicy p, IteratorTag)
             });
 
     base_iterator test_index1 = std::begin(c1) + 1;
-    base_iterator test_index2 = std::begin(c2) + c2.size() / 3;
+    base_iterator test_index2 =
+        std::begin(c2) + static_cast<std::ptrdiff_t>(c2.size() / 3);
 
     f1.wait();
     HPX_TEST(f1.get() == iterator(test_index1));
@@ -598,7 +600,8 @@ void test_sorted_until3_seq(IteratorTag)
         });
 
     base_iterator test_index1 = std::begin(c1) + 1;
-    base_iterator test_index2 = std::begin(c2) + c2.size() / 3;
+    base_iterator test_index2 =
+        std::begin(c2) + static_cast<std::ptrdiff_t>(c2.size() / 3);
 
     HPX_TEST(until1 == iterator(test_index1));
     HPX_TEST(until2 == iterator(test_index2));
@@ -648,7 +651,8 @@ void test_sorted_until3(ExPolicy policy)
         });
 
     auto test_index1 = std::begin(c1) + 1;
-    auto test_index2 = std::begin(c2) + c2.size() / 3;
+    auto test_index2 =
+        std::begin(c2) + static_cast<std::ptrdiff_t>(c2.size() / 3);
 
     HPX_TEST(until1 == test_index1);
     HPX_TEST(until2 == test_index2);
@@ -696,7 +700,8 @@ void test_sorted_until3_async(ExPolicy p)
     });
 
     auto test_index1 = std::begin(c1) + 1;
-    auto test_index2 = std::begin(c2) + c2.size() / 3;
+    auto test_index2 =
+        std::begin(c2) + static_cast<std::ptrdiff_t>(c2.size() / 3);
 
     f1.wait();
     HPX_TEST(f1.get() == test_index1);
@@ -744,7 +749,8 @@ void test_sorted_until3_seq()
         });
 
     auto test_index1 = std::begin(c1) + 1;
-    auto test_index2 = std::begin(c2) + c2.size() / 3;
+    auto test_index2 =
+        std::begin(c2) + static_cast<std::ptrdiff_t>(c2.size() / 3);
 
     HPX_TEST(until1 == test_index1);
     HPX_TEST(until2 == test_index2);

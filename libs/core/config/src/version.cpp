@@ -9,7 +9,7 @@
 
 #include <hpx/config/export_definitions.hpp>
 #include <hpx/config/version.hpp>
-#include <hpx/preprocessor/stringize.hpp>
+#include <hpx/modules/preprocessor.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {

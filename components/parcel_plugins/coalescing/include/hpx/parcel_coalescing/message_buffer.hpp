@@ -13,11 +13,11 @@
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/threading_base.hpp>
 
+#include <hpx/modules/parcelset_base.hpp>
 #include <hpx/parcelset/parcelset_fwd.hpp>
-#include <hpx/parcelset_base/locality.hpp>
-#include <hpx/parcelset_base/parcelport.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <utility>
 #include <vector>
 
@@ -26,13 +26,36 @@ namespace hpx::plugins::parcel::detail {
     class message_buffer
     {
     public:
-        enum message_buffer_append_state
+        enum class message_buffer_append_state : std::uint8_t
         {
             normal = 0,
             first_message = 1,
             buffer_now_full = 2,
             singleton_buffer = 3
         };
+
+#define HPX_MESSAGE_BUFFER_APPEND_STATE_UNSCOPED_ENUM_DEPRECATION_MSG          \
+    "The unscoped message_buffer_append_state names are deprecated. "          \
+    "Please use message_buffer_append_state::<value> instead."
+
+        HPX_DEPRECATED_V(
+            2, 0, HPX_MESSAGE_BUFFER_APPEND_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
+        static constexpr message_buffer_append_state normal =
+            message_buffer_append_state::normal;
+        HPX_DEPRECATED_V(
+            2, 0, HPX_MESSAGE_BUFFER_APPEND_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
+        static constexpr message_buffer_append_state first_message =
+            message_buffer_append_state::first_message;
+        HPX_DEPRECATED_V(
+            2, 0, HPX_MESSAGE_BUFFER_APPEND_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
+        static constexpr message_buffer_append_state buffer_now_full =
+            message_buffer_append_state::buffer_now_full;
+        HPX_DEPRECATED_V(
+            2, 0, HPX_MESSAGE_BUFFER_APPEND_STATE_UNSCOPED_ENUM_DEPRECATION_MSG)
+        static constexpr message_buffer_append_state singleton_buffer =
+            message_buffer_append_state::singleton_buffer;
+
+#undef HPX_MESSAGE_BUFFER_APPEND_STATE_UNSCOPED_ENUM_DEPRECATION_MSG
 
         message_buffer()
           : max_messages_(0)
@@ -81,9 +104,9 @@ namespace hpx::plugins::parcel::detail {
                         &parcelport::put_parcels;
 
                     threads::thread_init_data data(
-                        threads::make_thread_function_nullary(
-                            util::deferred_call(put_parcel_ptr, pp, dest_,
-                                HPX_MOVE(messages_), HPX_MOVE(handlers_))),
+                        threads::make_thread_function_nullary(put_parcel_ptr,
+                            pp, dest_, HPX_MOVE(messages_),
+                            HPX_MOVE(handlers_)),
                         "parcelhandler::put_parcel",
                         threads::thread_priority::boost,
                         threads::thread_schedule_hint(),
@@ -101,12 +124,13 @@ namespace hpx::plugins::parcel::detail {
         message_buffer_append_state append(parcelset::locality const& dest,
             parcelset::parcel p, parcelset::write_handler_type f)
         {
-            int result = normal;
+            message_buffer_append_state result =
+                message_buffer_append_state::normal;
             if (messages_.empty())
             {
                 HPX_ASSERT(handlers_.empty());
 
-                result = first_message;
+                result = message_buffer_append_state::first_message;
                 dest_ = dest;
             }
             else
@@ -119,9 +143,9 @@ namespace hpx::plugins::parcel::detail {
             handlers_.push_back(HPX_MOVE(f));
 
             if (messages_.size() >= max_messages_)
-                result = buffer_now_full;
+                result = message_buffer_append_state::buffer_now_full;
 
-            return message_buffer_append_state(result);
+            return result;
         }
 
         bool empty() const

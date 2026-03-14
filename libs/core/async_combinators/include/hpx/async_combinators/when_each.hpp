@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //  Copyright (c) 2016 Lukas Troska
 //
@@ -128,19 +128,12 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/async_base/launch_policy.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/futures/traits/acquire_future.hpp>
-#include <hpx/futures/traits/detail/future_traits.hpp>
-#include <hpx/futures/traits/future_access.hpp>
-#include <hpx/futures/traits/future_traits.hpp>
-#include <hpx/futures/traits/is_future.hpp>
-#include <hpx/futures/traits/is_future_range.hpp>
-#include <hpx/iterator_support/range.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/type_support/decay.hpp>
-#include <hpx/type_support/unwrap_ref.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -239,11 +232,13 @@ namespace hpx::lcos::detail {
                         // Attach a continuation to this future which will
                         // re-evaluate it and continue to the next argument
                         // (if any).
+                        Iter next_ = HPX_FORWARD(Iter, next);
+                        Iter end_ = HPX_FORWARD(Iter, end);
                         next_future_data->set_on_completed(
-                            [this_ = HPX_MOVE(this_), next = HPX_MOVE(next),
-                                end = HPX_MOVE(end)]() mutable -> void {
+                            [this_ = HPX_MOVE(this_), next_,
+                                end_]() mutable -> void {
                                 this_->template await_range<I>(
-                                    HPX_MOVE(next), HPX_MOVE(end));
+                                    HPX_MOVE(next_), HPX_MOVE(end_));
                             });
 
                         // explicitly destruct iterators as those might
@@ -340,7 +335,7 @@ namespace hpx::lcos::detail {
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    inline constexpr struct when_each_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct when_each_t final
       : hpx::functional::tag<when_each_t>
     {
     private:
@@ -360,9 +355,10 @@ namespace hpx {
             std::transform(lazy_values.begin(), lazy_values.end(),
                 std::back_inserter(values), traits::acquire_future_disp());
 
+            auto const tuple_size = values.size();
             hpx::intrusive_ptr<frame_type> p(
                 new frame_type(hpx::forward_as_tuple(HPX_MOVE(values)),
-                    HPX_FORWARD(F, func), values.size()));
+                    HPX_FORWARD(F, func), tuple_size));
 
             p->template do_await<0>();
 
@@ -431,7 +427,7 @@ namespace hpx {
     } when_each{};
 
     ///////////////////////////////////////////////////////////////////////////
-    inline constexpr struct when_each_n_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct when_each_n_t final
       : hpx::functional::tag<when_each_n_t>
     {
     private:

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //  Copyright (c)      2017 Shoshana Jakobovits
 //  Copyright (c) 2010-2011 Phillip LeBlanc, Dylan Stark
 //  Copyright (c)      2011 Bryce Lelbach
@@ -7,55 +7,38 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config.hpp>
 #include <hpx/hpx_init.hpp>
-#include <algorithm>
 
 #include <hpx/assert.hpp>
-#include <hpx/command_line_handling/command_line_handling.hpp>
-#include <hpx/coroutines/detail/context_impl.hpp>
-#include <hpx/execution/detail/execution_parameter_callbacks.hpp>
-#include <hpx/executors/exception_list.hpp>
-#include <hpx/functional/bind_front.hpp>
-#include <hpx/functional/function.hpp>
-#include <hpx/futures/detail/future_data.hpp>
 #include <hpx/hpx_finalize.hpp>
 #include <hpx/hpx_main_winsocket.hpp>
 #include <hpx/hpx_suspend.hpp>
 #include <hpx/hpx_user_main_config.hpp>
-#include <hpx/init_runtime/detail/init_logging.hpp>
-#include <hpx/init_runtime/detail/run_or_start.hpp>
-#include <hpx/init_runtime_local/init_runtime_local.hpp>
-#include <hpx/lock_registration/detail/register_locks.hpp>
+#include <hpx/modules/algorithms.hpp>
+#include <hpx/modules/command_line_handling.hpp>
+#include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/executors.hpp>
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/init_runtime_local.hpp>
+#include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/prefix.hpp>
+#include <hpx/modules/program_options.hpp>
+#include <hpx/modules/resource_partitioner.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/schedulers.hpp>
+#include <hpx/modules/string_util.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/modules/threading.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/timing.hpp>
-#include <hpx/parallel/util/detail/handle_exception_termination_handler.hpp>
-#include <hpx/prefix/find_prefix.hpp>
-#include <hpx/program_options/parsers.hpp>
-#include <hpx/program_options/variables_map.hpp>
-#include <hpx/resource_partitioner/partitioner.hpp>
-#include <hpx/runtime_local/config_entry.hpp>
-#include <hpx/runtime_local/custom_exception_info.hpp>
-#include <hpx/runtime_local/debugging.hpp>
-#include <hpx/runtime_local/detail/serialize_exception.hpp>
-#include <hpx/runtime_local/get_locality_id.hpp>
-#include <hpx/runtime_local/report_error.hpp>
-#include <hpx/runtime_local/runtime_handlers.hpp>
-#include <hpx/runtime_local/runtime_local.hpp>
-#include <hpx/runtime_local/runtime_local_fwd.hpp>
-#include <hpx/runtime_local/shutdown_function.hpp>
-#include <hpx/runtime_local/startup_function.hpp>
-#include <hpx/string_util/classification.hpp>
-#include <hpx/string_util/split.hpp>
-#include <hpx/threading/thread.hpp>
-#include <hpx/threading_base/detail/get_default_timer_service.hpp>
-#include <hpx/type_support/pack.hpp>
-#include <hpx/type_support/unused.hpp>
-#include <hpx/util/from_string.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #ifdef HPX_HAVE_MODULE_MPI_BASE
 #include <hpx/modules/mpi_base.hpp>
@@ -68,9 +51,9 @@
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/naming.hpp>
 #if defined(HPX_HAVE_NETWORKING)
+#include <hpx/modules/parcelset_base.hpp>
 #include <hpx/parcelports/init_all_parcelports.hpp>
 #include <hpx/parcelset/parcelhandler.hpp>
-#include <hpx/parcelset_base/locality_interface.hpp>
 #endif
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/query_counters.hpp>
@@ -78,7 +61,11 @@
 #include <hpx/runtime_distributed/runtime_fwd.hpp>
 #include <hpx/runtime_distributed/runtime_support.hpp>
 #endif
+#if defined(HPX_HAVE_LOGGING)
+#include <hpx/init_runtime/detail/init_logging.hpp>
+#endif
 
+#include <algorithm>
 #include <cmath>
 #include <cstddef>
 #include <cstdlib>
@@ -95,6 +82,8 @@
 #if !defined(HPX_WINDOWS)
 #include <signal.h>
 #endif
+
+#include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx_startup {
@@ -872,7 +861,8 @@ namespace hpx {
             try
             {
                 // make sure the runtime system is not active yet
-                if ((result = ensure_no_runtime_is_up()) != 0)
+                result = ensure_no_runtime_is_up();
+                if (result != 0)
                 {
                     return result;
                 }
@@ -930,7 +920,7 @@ namespace hpx {
                     // contain --hpx:help or --hpx:version, on error result is < 0)
                     if (result != 0)
                     {
-                        result = (std::min)(result, 0);
+                        result = (std::min) (result, 0);
                         return result;
                     }
 
@@ -1022,6 +1012,7 @@ namespace hpx {
                     return hpx::util::from_string<T>(
                         get_runtime().get_config().get_entry(config, default_));
                 }
+                // NOLINTNEXTLINE(bugprone-empty-catch)
                 catch (hpx::util::bad_lexical_cast const&)
                 {
                     // do nothing

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2018 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -21,6 +21,7 @@
 #include <hpx/config/debug.hpp>
 #include <hpx/config/deprecation.hpp>
 #include <hpx/config/emulate_deleted.hpp>
+#include <hpx/config/endian.hpp>
 #include <hpx/config/export_definitions.hpp>
 #include <hpx/config/forceinline.hpp>
 #include <hpx/config/forward.hpp>
@@ -39,8 +40,7 @@
 #error HPX cannot be compiled with a Boost version earlier than 1.71.0
 #endif
 
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/preprocessor/stringize.hpp>
+#include <hpx/modules/preprocessor.hpp>
 
 #include <cstddef>
 
@@ -259,21 +259,29 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+#if defined(HPX_DEBUG) && defined(HPX_HAVE_DEBUG_POSTFIX)
+#  define HPX_DEBUG_POSTFIX_STR HPX_PP_STRINGIZE(HPX_HAVE_DEBUG_POSTFIX)
+#else
+#  define HPX_DEBUG_POSTFIX_STR ""
+#endif
+
 #if !defined(HPX_WINDOWS)
-#  if defined(HPX_DEBUG)
-#    define HPX_MAKE_DLL_STRING(n)  "lib" + (n) + "d" + HPX_SHARED_LIB_EXTENSION
+#  if defined(HPX_DEBUG) && defined(HPX_HAVE_DEBUG_POSTFIX)
+#    define HPX_MAKE_DLL_STRING(n)                                             \
+        "lib" + (n) + HPX_DEBUG_POSTFIX_STR + HPX_SHARED_LIB_EXTENSION
 #  else
 #    define HPX_MAKE_DLL_STRING(n)  "lib" + (n) + HPX_SHARED_LIB_EXTENSION
 #  endif
-#elif defined(HPX_DEBUG)
-#  define HPX_MAKE_DLL_STRING(n)   ((n) + "d" + HPX_SHARED_LIB_EXTENSION)
+#elif defined(HPX_DEBUG) && defined(HPX_HAVE_DEBUG_POSTFIX)
+#  define HPX_MAKE_DLL_STRING(n)                                               \
+      ((n) + HPX_DEBUG_POSTFIX_STR + HPX_SHARED_LIB_EXTENSION)
 #else
 #  define HPX_MAKE_DLL_STRING(n)   ((n) + HPX_SHARED_LIB_EXTENSION)
 #endif
 
-#if defined(HPX_DEBUG)
-#  define HPX_MANGLE_NAME(n)     HPX_PP_CAT(n, d)
-#  define HPX_MANGLE_STRING(n)   ((n) + "d")
+#if defined(HPX_DEBUG) && defined(HPX_HAVE_DEBUG_POSTFIX)
+#  define HPX_MANGLE_NAME(n)     HPX_PP_CAT(n, HPX_HAVE_DEBUG_POSTFIX)
+#  define HPX_MANGLE_STRING(n)   ((n) + HPX_DEBUG_POSTFIX_STR)
 #else
 #  define HPX_MANGLE_NAME(n)     n
 #  define HPX_MANGLE_STRING(n)   n

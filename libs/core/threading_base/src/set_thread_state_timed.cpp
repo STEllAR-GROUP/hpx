@@ -6,14 +6,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/coroutines/coroutine.hpp>
-#include <hpx/functional/bind.hpp>
-#include <hpx/functional/bind_front.hpp>
+#include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/threading_base/create_thread.hpp>
 #include <hpx/threading_base/detail/get_default_timer_service.hpp>
 #include <hpx/threading_base/set_thread_state_timed.hpp>
 #include <hpx/threading_base/threading_base_fwd.hpp>
+#ifdef HPX_HAVE_MODULE_LIKWID
+#include <hpx/modules/likwid.hpp>
+#endif
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
 #include <winsock2.h>
@@ -99,7 +101,7 @@ namespace hpx::threads::detail {
 
         // create timer firing in correspondence with given time
         using deadline_timer =
-            asio::basic_waitable_timer<std::chrono::steady_clock>;
+            ::asio::basic_waitable_timer<std::chrono::steady_clock>;
 
         deadline_timer t(get_default_timer_service(), abs_time);
 
@@ -129,8 +131,15 @@ namespace hpx::threads::detail {
         // this waits for the thread to be reactivated when the timer fired
         // if it returns signaled the timer has been canceled, otherwise
         // the timer fired and the wake_timer_thread above has been executed
-        thread_restart_state const statex = get_self().yield(thread_result_type(
-            thread_schedule_state::suspended, invalid_thread_id));
+        thread_restart_state statex;
+
+        {
+#ifdef HPX_HAVE_MODULE_LIKWID
+            hpx::likwid::suspend_region region;
+#endif
+            statex = get_self().yield(thread_result_type(
+                thread_schedule_state::suspended, invalid_thread_id));
+        }
 
         HPX_ASSERT(statex == thread_restart_state::abort ||
             statex == thread_restart_state::timeout);

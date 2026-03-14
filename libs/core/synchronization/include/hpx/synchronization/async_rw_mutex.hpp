@@ -1,5 +1,5 @@
 //  Copyright (c) 2021 ETH Zurich
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,15 +7,11 @@
 
 #pragma once
 
-#include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/datastructures/detail/small_vector.hpp>
-#include <hpx/datastructures/optional.hpp>
-#include <hpx/execution_base/completion_signatures.hpp>
-#include <hpx/execution_base/operation_state.hpp>
-#include <hpx/execution_base/receiver.hpp>
-#include <hpx/execution_base/sender.hpp>
-#include <hpx/functional/move_only_function.hpp>
+#include <hpx/modules/allocator_support.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/synchronization/mutex.hpp>
 
 #include <exception>
@@ -28,13 +24,12 @@ namespace hpx::experimental {
 
     namespace detail {
 
-        enum class async_rw_mutex_access_type
-        {
+        HPX_CXX_CORE_EXPORT enum class async_rw_mutex_access_type {
             read,
             readwrite
         };
 
-        template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         struct async_rw_mutex_shared_state
         {
             using shared_state_ptr_type =
@@ -74,6 +69,7 @@ namespace hpx::experimental {
                 {
                     // The current state has now finished all accesses to the
                     // wrapped value, so we move the value to the next state.
+                    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
                     next_state->set_value(HPX_MOVE(value.value()));
 
                     for (auto& continuation : continuations)
@@ -158,11 +154,11 @@ namespace hpx::experimental {
             }
         };
 
-        template <typename ReadWriteT, typename ReadT,
+        HPX_CXX_CORE_EXPORT template <typename ReadWriteT, typename ReadT,
             async_rw_mutex_access_type AccessType>
         struct async_rw_mutex_access_wrapper;
 
-        template <typename ReadWriteT, typename ReadT>
+        HPX_CXX_CORE_EXPORT template <typename ReadWriteT, typename ReadT>
         struct async_rw_mutex_access_wrapper<ReadWriteT, ReadT,
             async_rw_mutex_access_type::read>
         {
@@ -191,6 +187,7 @@ namespace hpx::experimental {
             {
                 HPX_ASSERT(state);
                 HPX_ASSERT(state->value);
+                // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
                 return state->value.value();
             }
 
@@ -200,7 +197,7 @@ namespace hpx::experimental {
             }
         };
 
-        template <typename ReadWriteT, typename ReadT>
+        HPX_CXX_CORE_EXPORT template <typename ReadWriteT, typename ReadT>
         struct async_rw_mutex_access_wrapper<ReadWriteT, ReadT,
             async_rw_mutex_access_type::readwrite>
         {
@@ -238,6 +235,7 @@ namespace hpx::experimental {
             {
                 HPX_ASSERT(state);
                 HPX_ASSERT(state->value);
+                // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
                 return state->value.value();
             }
 
@@ -318,7 +316,7 @@ namespace hpx::experimental {
     ///
     /// A void mutex acts as a mutex around some user-managed resource, i.e. the
     /// void mutex does not manage any value and the types sent by the senders
-    /// are not convertible. The sent types are copyable and release access to
+    /// are not convertible. The types sent are copyable and release access to
     /// the protected resource when released.
     ///
     /// The order in which senders call set_value is determined by the order in
@@ -328,7 +326,8 @@ namespace hpx::experimental {
     /// Retrieving senders from the mutex is not thread-safe.
     ///
     /// The mutex is movable and non-copyable.
-    template <typename ReadWriteT = void, typename ReadT = ReadWriteT,
+    HPX_CXX_CORE_EXPORT template <typename ReadWriteT = void,
+        typename ReadT = ReadWriteT,
         typename Allocator = hpx::util::internal_allocator<>>
     class async_rw_mutex;
 
@@ -358,7 +357,7 @@ namespace hpx::experimental {
     // The protected value is moved from state to state and is released when the
     // last shared state is destroyed.
 
-    template <typename Allocator>
+    HPX_CXX_CORE_EXPORT template <typename Allocator>
     class async_rw_mutex<void, void, Allocator>
     {
     private:
@@ -548,7 +547,8 @@ namespace hpx::experimental {
         shared_state_ptr_type state;
     };
 
-    template <typename ReadWriteT, typename ReadT, typename Allocator>
+    HPX_CXX_CORE_EXPORT template <typename ReadWriteT, typename ReadT,
+        typename Allocator>
     class async_rw_mutex
     {
     private:

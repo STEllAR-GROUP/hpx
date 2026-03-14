@@ -38,7 +38,7 @@ foreach(test ${tests})
     SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Tests/Regressions/LCOs"
+    FOLDER "Tests/Regressions/LCOs" ${HPX_WITH_CXX_MODULES_OPTION}
   )
 
   target_link_libraries(${test}_test PRIVATE ${${test}_LIBRARIES})

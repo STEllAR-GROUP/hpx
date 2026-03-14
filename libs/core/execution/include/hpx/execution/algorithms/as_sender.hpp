@@ -1,5 +1,5 @@
 //  Copyright (c) 2021 ETH Zurich
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,17 +8,12 @@
 #pragma once
 
 #include <hpx/assert.hpp>
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
-#include <hpx/execution_base/completion_signatures.hpp>
-#include <hpx/execution_base/operation_state.hpp>
-#include <hpx/execution_base/receiver.hpp>
-#include <hpx/execution_base/sender.hpp>
-#include <hpx/functional/tag_invoke.hpp>
-#include <hpx/futures/detail/future_data.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/futures/traits/acquire_shared_state.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 
 #include <exception>
 #include <type_traits>
@@ -30,7 +25,7 @@ namespace hpx::execution::experimental {
 
         ///////////////////////////////////////////////////////////////////////////
         // Operation state for sender compatibility
-        template <typename Receiver, typename Future>
+        HPX_CXX_CORE_EXPORT template <typename Receiver, typename Future>
         class as_sender_operation_state
         {
         private:
@@ -129,7 +124,7 @@ namespace hpx::execution::experimental {
             future_type future_;
         };
 
-        template <typename Future>
+        HPX_CXX_CORE_EXPORT template <typename Future>
         struct as_sender_sender_base
         {
             using result_type = typename std::decay_t<Future>::result_type;
@@ -185,14 +180,18 @@ namespace hpx::execution::experimental {
 #endif
         };
 
-        template <typename Future>
+        HPX_CXX_CORE_EXPORT template <typename Future>
         struct as_sender_sender;
 
-        template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         struct as_sender_sender<hpx::future<T>>
           : public as_sender_sender_base<hpx::future<T>>
         {
+#if defined(HPX_HAVE_STDEXEC)
+            using sender_concept = hpx::execution::experimental::sender_t;
+#else
             using is_sender = void;
+#endif
             using future_type = hpx::future<T>;
             using base_type = as_sender_sender_base<hpx::future<T>>;
             using base_type::future_;
@@ -218,11 +217,15 @@ namespace hpx::execution::experimental {
             }
         };
 
-        template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         struct as_sender_sender<hpx::shared_future<T>>
           : as_sender_sender_base<hpx::shared_future<T>>
         {
+#if defined(HPX_HAVE_STDEXEC)
+            using sender_concept = hpx::execution::experimental::sender_t;
+#else
             using is_sender = void;
+#endif
             using future_type = hpx::shared_future<T>;
             using base_type = as_sender_sender_base<hpx::shared_future<T>>;
             using base_type::future_;
@@ -264,7 +267,7 @@ namespace hpx::execution::experimental {
     // The difference to keep_future is that as_future propagates the value
     // stored in the future while keep_future will propagate the future instance
     // itself.
-    inline constexpr struct as_sender_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct as_sender_t final
     {
         // clang-format off
         template <typename Future,

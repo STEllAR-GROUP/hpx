@@ -6,18 +6,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/execution_base/this_thread.hpp>
-#include <hpx/functional/deferred_call.hpp>
 #include <hpx/futures/detail/execute_thread.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/futures_factory.hpp>
-#include <hpx/threading_base/detail/switch_status.hpp>
-#include <hpx/threading_base/register_thread.hpp>
-#include <hpx/threading_base/set_thread_state.hpp>
-#include <hpx/threading_base/thread_data.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/coroutines.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/threading_base.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -205,7 +201,10 @@ namespace hpx::threads::detail {
             auto const hint = thread_schedule_hint(static_cast<std::int16_t>(
                 thrdptr->get_last_worker_thread_num()));
             scheduler->schedule_thread_last(HPX_MOVE(thrd), hint);
-            scheduler->do_some_work(hint.hint);
+            scheduler->do_some_work(
+                hint.mode == hpx::threads::thread_schedule_hint_mode::numa ?
+                    static_cast<std::size_t>(-1) :
+                    hint.hint);
         }
 
         HPX_ASSERT(state_val != thread_schedule_state::terminated);

@@ -1,5 +1,5 @@
 //  Copyright (c) 2022 Gregor Daiﬂ
-//  Copyright (c) 2024 Hartmut Kaiser
+//  Copyright (c) 2024-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,15 +10,12 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/async_base/async.hpp>
 #include <hpx/async_sycl/sycl_future.hpp>
-#include <hpx/errors/exception.hpp>
-#include <hpx/errors/try_catch_exception_ptr.hpp>
-#include <hpx/execution_base/execution.hpp>
-#include <hpx/execution_base/traits/is_executor.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/futures/traits/future_access.hpp>
 #include <hpx/include/post.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/futures.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -36,7 +33,7 @@ namespace hpx::sycl::experimental {
           : std::integral_constant<bool,
                 std::is_scalar<T>::value ||
                     std::is_same<T, ::sycl::event>::value ||
-                    std::is_same<T, const std::vector<::sycl::event>&>::value>
+                    std::is_same<T, std::vector<::sycl::event> const&>::value>
         {
         };
     }    // namespace detail
@@ -48,7 +45,7 @@ namespace hpx::sycl::experimental {
         // --------------------------------------------------------------------
         /// Create a SYCL executor (based on a sycl queue)
         template <typename sycl_device_selector>
-        explicit sycl_executor(const sycl_device_selector& selector)
+        explicit sycl_executor(sycl_device_selector const& selector)
           : command_queue(selector, ::sycl::property::queue::in_order{})
         {
         }

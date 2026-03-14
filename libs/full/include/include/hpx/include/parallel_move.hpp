@@ -7,5 +7,4 @@
 
 #pragma once
 
-#include <hpx/parallel/algorithms/move.hpp>
-#include <hpx/parallel/container_algorithms/move.hpp>
+#include <hpx/modules/algorithms.hpp>

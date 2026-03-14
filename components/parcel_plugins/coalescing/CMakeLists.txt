@@ -27,11 +27,12 @@ add_hpx_library(
   parcel_coalescing INTERNAL_FLAGS
   FOLDER "Core/Plugins/MessageHandlers"
   INSTALL_HEADERS PLUGIN PREPEND_HEADER_ROOT PREPEND_SOURCE_ROOT
+  ${HPX_WITH_UNITY_BUILD_OPTION} ${HPX_WITH_CXX_MODULES_OPTION}
   HEADER_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/include"
   HEADERS ${parcel_coalescing_headers}
   SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src"
   SOURCES ${parcel_coalescing_sources}
-  DEPENDENCIES ${additional_dependencies} ${HPX_WITH_UNITY_BUILD_OPTION}
+  DEPENDENCIES ${additional_dependencies}
 )
 
 target_compile_definitions(

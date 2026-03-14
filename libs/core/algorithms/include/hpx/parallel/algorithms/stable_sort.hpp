@@ -150,14 +150,12 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/projected.hpp>
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/execution/algorithms/detail/predicates.hpp>
-#include <hpx/execution/executors/execution.hpp>
-#include <hpx/execution/executors/execution_parameters.hpp>
-#include <hpx/executors/exception_list.hpp>
-#include <hpx/executors/execution_policy.hpp>
-#include <hpx/functional/invoke.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/executors.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/detail/advance_and_get_distance.hpp>
 #include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
@@ -167,11 +165,11 @@ namespace hpx {
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
-#include <hpx/type_support/identity.hpp>
 
 #include <algorithm>
 #include <cstddef>
 #include <exception>
+#include <iterator>
 #include <type_traits>
 #include <utility>
 
@@ -184,7 +182,7 @@ namespace hpx::parallel {
 
         ///////////////////////////////////////////////////////////////////////
         // stable_sort
-        template <typename RandomIt>
+        HPX_CXX_CORE_EXPORT template <typename RandomIt>
         struct stable_sort : public algorithm<stable_sort<RandomIt>, RandomIt>
         {
             constexpr stable_sort() noexcept
@@ -219,6 +217,10 @@ namespace hpx::parallel {
                 auto last_iter = first;
                 std::size_t count =
                     detail::advance_and_get_distance(last_iter, last);
+                if (count == 0)
+                {
+                    return algorithm_result::get(HPX_MOVE(last_iter));
+                }
 
                 // figure out the chunk size to use
                 std::size_t cores =
@@ -239,7 +241,8 @@ namespace hpx::parallel {
                     cores, count, max_chunks, chunk_size);
 
                 // we should not get smaller than our sort_limit_per_task
-                chunk_size = (std::max)(chunk_size, stable_sort_limit_per_task);
+                chunk_size =
+                    (std::max) (chunk_size, stable_sort_limit_per_task);
 
                 try
                 {
@@ -267,24 +270,24 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::stable_sort
-    inline constexpr struct stable_sort_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct stable_sort_t final
       : hpx::detail::tag_parallel_algorithm<stable_sort_t>
     {
-        // clang-format off
         template <typename RandomIt,
-            typename Comp = hpx::parallel::detail::less,
-            HPX_CONCEPT_REQUIRES_(
+            typename Comp = hpx::parallel::detail::less>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<RandomIt> &&
                 hpx::is_invocable_v<Comp,
                     hpx::traits::iter_value_t<RandomIt>,
                     hpx::traits::iter_value_t<RandomIt>
                 >
-            )>
+            )
         // clang-format on
         friend void tag_fallback_invoke(hpx::stable_sort_t, RandomIt first,
             RandomIt last, Comp comp = Comp())
         {
-            static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
+            static_assert(std::random_access_iterator<RandomIt>,
                 "Requires a random access iterator.");
 
             hpx::parallel::detail::stable_sort<RandomIt>().call(
@@ -292,23 +295,23 @@ namespace hpx {
                 hpx::identity_v);
         }
 
-        // clang-format off
         template <typename ExPolicy, typename RandomIt,
-            typename Comp = hpx::parallel::detail::less,
-            HPX_CONCEPT_REQUIRES_(
+            typename Comp = hpx::parallel::detail::less>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<RandomIt> &&
                 hpx::is_invocable_v<Comp,
                     hpx::traits::iter_value_t<RandomIt>,
                     hpx::traits::iter_value_t<RandomIt>
                 >
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy>
         tag_fallback_invoke(hpx::stable_sort_t, ExPolicy&& policy,
             RandomIt first, RandomIt last, Comp comp = Comp())
         {
-            static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
+            static_assert(std::random_access_iterator<RandomIt>,
                 "Requires a random access iterator.");
 
             using result_type =

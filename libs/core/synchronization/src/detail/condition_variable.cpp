@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2013-2015 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -6,19 +6,19 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/assert.hpp>
-#include <hpx/execution_base/agent_ref.hpp>
-#include <hpx/execution_base/this_thread.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/memory.hpp>
+#include <hpx/modules/thread_support.hpp>
+#include <hpx/modules/threading_base.hpp>
+#include <hpx/modules/timing.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/synchronization/detail/condition_variable.hpp>
 #include <hpx/synchronization/no_mutex.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/thread_support/unlock_guard.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/timing/steady_clock.hpp>
-#include <hpx/type_support/assert_owns_lock.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <exception>
 #include <mutex>
@@ -325,13 +325,18 @@ namespace hpx::lcos::local::detail {
     ///////////////////////////////////////////////////////////////////////////
     void intrusive_ptr_add_ref(condition_variable_data* p) noexcept
     {
-        ++p->count_;
+        p->count_.increment();
     }
 
     void intrusive_ptr_release(condition_variable_data* p) noexcept
     {
-        if (0 == --p->count_)
+        if (0 == p->count_.decrement())
         {
+            // The thread that decrements the reference count to zero must
+            // perform an acquire to ensure that it doesn't start destructing
+            // the object until all previous writes have drained.
+            std::atomic_thread_fence(std::memory_order_acquire);
+
             delete p;
         }
     }

@@ -1,5 +1,5 @@
 //  Copyright (c) 2015-2017 Francisco Jose Tapia
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,9 +8,8 @@
 #pragma once
 
 #include <hpx/assert.hpp>
-#include <hpx/iterator_support/counting_iterator.hpp>
-#include <hpx/iterator_support/iterator_range.hpp>
 #include <hpx/modules/async_combinators.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/parallel/algorithms/detail/is_sorted.hpp>
 #include <hpx/parallel/algorithms/detail/spin_sort.hpp>
 #include <hpx/parallel/util/merge_four.hpp>
@@ -31,14 +30,16 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::parallel::detail {
 
-    static constexpr std::uint32_t sample_sort_limit_per_task = 1 << 16;
+    HPX_CXX_CORE_EXPORT inline constexpr std::uint32_t
+        sample_sort_limit_per_task = 1 << 16;
 
     /// \struct sample_sort
     /// \brief This a structure for to implement a sample sort, exception
     ///        safe
     /// \tparam
     /// \remarks
-    template <typename Iter, typename Sent, typename Compare>
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent,
+        typename Compare>
     struct sample_sort_helper
     {
         using value_type = typename std::iterator_traits<Iter>::value_type;
@@ -164,7 +165,10 @@ namespace hpx::parallel::detail {
         std::size_t nelem = static_cast<std::size_t>(last - first);
 
         // Adjust when there are many threads and only a few elements
-        while (nelem > chunk_size && nthreads * nthreads > nelem >> 3)
+        while (nelem > chunk_size &&
+            static_cast<std::size_t>(nthreads) *
+                    static_cast<std::size_t>(nthreads) >
+                nelem >> 3)
         {
             nthreads /= 2;
         }
@@ -229,7 +233,7 @@ namespace hpx::parallel::detail {
     /// \remarks this is the comparison object for pointers. Receive a object
     ///          for to compare the objects pointed. The pointers can't be
     ///          nullptr
-    template <typename Iter, typename Comp>
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Comp>
     struct less_ptr_no_null
     {
         Comp comp;
@@ -264,7 +268,7 @@ namespace hpx::parallel::detail {
         value_type* buf_first = global_buf.begin();
 
         for (std::uint32_t i = 0; i < nthreads - 1;
-             ++i, it_first += chunk_size, buf_first += chunk_size)
+            ++i, it_first += chunk_size, buf_first += chunk_size)
         {
             vmem_thread.emplace_back(it_first, it_first + chunk_size);
             vbuf_thread.emplace_back(buf_first, buf_first + chunk_size);
@@ -294,7 +298,7 @@ namespace hpx::parallel::detail {
         {
             std::size_t const distance = vmem_thread[i].size() / nintervals;
             for (std::size_t j = 1, pos = distance; j < nintervals;
-                 ++j, pos += distance)
+                ++j, pos += distance)
             {
                 vsample.push_back(vmem_thread[i].begin() + pos);
             }
@@ -308,7 +312,7 @@ namespace hpx::parallel::detail {
         vmilestone.reserve(nintervals);
 
         for (std::uint32_t pos = nthreads >> 1; pos < vsample.size();
-             pos += nthreads)
+            pos += nthreads)
         {
             vmilestone.push_back(vsample[pos]);
         }
@@ -368,8 +372,8 @@ namespace hpx::parallel::detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Exec, typename Iter, typename Sent, typename Compare,
-        typename Value>
+    HPX_CXX_CORE_EXPORT template <typename Exec, typename Iter, typename Sent,
+        typename Compare, typename Value>
     void sample_sort(Exec&& exec, Iter first, Sent last, Compare&& comp,
         std::uint32_t num_threads, Value* paux, std::size_t naux,
         std::size_t chunk_size)
@@ -381,7 +385,8 @@ namespace hpx::parallel::detail {
         sorter(HPX_FORWARD(Exec, exec), first, last, paux, naux, chunk_size);
     }
 
-    template <typename Exec, typename Iter, typename Sent, typename Compare>
+    HPX_CXX_CORE_EXPORT template <typename Exec, typename Iter, typename Sent,
+        typename Compare>
     void sample_sort(Exec&& exec, Iter first, Sent last, Compare&& comp,
         std::uint32_t num_threads)
     {
@@ -393,7 +398,8 @@ namespace hpx::parallel::detail {
             static_cast<std::size_t>(sample_sort_limit_per_task));
     }
 
-    template <typename Exec, typename Iter, typename Sent, typename Compare>
+    HPX_CXX_CORE_EXPORT template <typename Exec, typename Iter, typename Sent,
+        typename Compare>
     void sample_sort(Exec&& exec, Iter first, Sent last, Compare&& comp,
         std::uint32_t num_threads,
         util::range<typename std::iterator_traits<Iter>::value_type*>
@@ -410,7 +416,7 @@ namespace hpx::parallel::detail {
             range_buf_initial.size(), chunk_size);
     }
 
-    template <typename Exec, typename Iter, typename Sent>
+    HPX_CXX_CORE_EXPORT template <typename Exec, typename Iter, typename Sent>
     void sample_sort(
         Exec&& exec, Iter first, Sent last, std::uint32_t num_threads)
     {
@@ -423,7 +429,7 @@ namespace hpx::parallel::detail {
             static_cast<std::size_t>(sample_sort_limit_per_task));
     }
 
-    template <typename Exec, typename Iter, typename Sent>
+    HPX_CXX_CORE_EXPORT template <typename Exec, typename Iter, typename Sent>
     void sample_sort(Exec&& exec, Iter first, Sent last)
     {
         using value_type = typename std::iterator_traits<Iter>::value_type;
@@ -434,5 +440,4 @@ namespace hpx::parallel::detail {
             static_cast<value_type*>(nullptr), static_cast<std::size_t>(0),
             static_cast<std::size_t>(sample_sort_limit_per_task));
     }
-
 }    // namespace hpx::parallel::detail

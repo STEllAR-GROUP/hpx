@@ -4,13 +4,8 @@
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/modules/program_options.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/program_options/detail/utf8_codecvt_facet.hpp>
-#include <hpx/program_options/option.hpp>
-#include <hpx/program_options/options_description.hpp>
-#include <hpx/program_options/parsers.hpp>
-#include <hpx/program_options/value_semantic.hpp>
-#include <hpx/program_options/variables_map.hpp>
 
 #include <cstddef>
 #include <locale>
@@ -83,7 +78,7 @@ void test_native_to_unicode()
     HPX_TEST(vm["foo"].as<wstring>() == L"\x044F");
 }
 
-vector<wstring> sv(const wchar_t* array[], unsigned size)
+vector<wstring> sv(wchar_t const* array[], unsigned size)
 {
     vector<wstring> r;
     for (unsigned i = 0; i < size; ++i)
@@ -91,7 +86,7 @@ vector<wstring> sv(const wchar_t* array[], unsigned size)
     return r;
 }
 
-void check_value(const woption& option, const char* name, const wchar_t* value)
+void check_value(woption const& option, char const* name, wchar_t const* value)
 {
     HPX_TEST_EQ(option.string_key, name);
     HPX_TEST_EQ(option.value.size(), std::size_t(1));
@@ -107,7 +102,7 @@ void test_command_line()
         ("bar,b", value<std::string>(), "")("baz", new untyped_value())(
             "qux,plug*", new untyped_value());
 
-    const wchar_t* cmdline4_[] = {
+    wchar_t const* cmdline4_[] = {
         L"--foo=1\u0FF52", L"-f4", L"--bar=11", L"-b4", L"--plug3=10"};
     vector<wstring> cmdline4 =
         sv(cmdline4_, sizeof(cmdline4_) / sizeof(cmdline4_[0]));

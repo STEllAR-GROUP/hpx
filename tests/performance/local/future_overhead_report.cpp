@@ -45,13 +45,15 @@ double null_function() noexcept
 {
     if (num_iterations > 0)
     {
-        const int array_size = 4096;
+        int const array_size = 4096;
         std::array<double, array_size> dummy;
         for (std::uint64_t i = 0; i < num_iterations; ++i)
         {
             for (std::uint64_t j = 0; j < array_size; ++j)
             {
-                dummy[j] = 1.0 / (2.0 * i * j + 1.0);
+                dummy[j] = 1.0 /
+                    (2.0 * static_cast<double>(i) * static_cast<double>(j) +
+                        1.0);
             }
         }
         return dummy[0];
@@ -68,13 +70,16 @@ struct scratcher
 };
 
 void measure_function_futures_create_thread_hierarchical_placement(
-    std::uint64_t count, const int repetitions)
+    std::uint64_t count, int const repetitions)
 {
     auto sched = hpx::threads::get_self_id_data()->get_scheduler_base();
 
     if (std::string("core-shared_priority_queue_scheduler") ==
         sched->get_description())
     {
+        auto const full_mask =
+            hpx::resource::get_partitioner().get_pool_pus_mask(
+                sched->get_parent_pool()->get_pool_name());
         sched->add_remove_scheduler_mode(
             hpx::threads::policies::scheduler_mode::assign_work_thread_parent,
             hpx::threads::policies::scheduler_mode::enable_stealing |
@@ -83,7 +88,8 @@ void measure_function_futures_create_thread_hierarchical_placement(
                     assign_work_round_robin |
                 hpx::threads::policies::scheduler_mode::steal_after_local |
                 hpx::threads::policies::scheduler_mode::
-                    steal_high_priority_first);
+                    steal_high_priority_first,
+            full_mask);
     }
     auto const desc = hpx::threads::thread_description();
     auto prio = hpx::threads::thread_priority::normal;
@@ -94,7 +100,7 @@ void measure_function_futures_create_thread_hierarchical_placement(
     hpx::util::perftests_report(
         "future overhead - create_thread_hierarchical - latch", "no-executor",
         repetitions, [&]() -> void {
-            hpx::latch l(count);
+            hpx::latch l(static_cast<std::int64_t>(count));
 
             auto const func = [&l]() {
                 null_function();
@@ -155,7 +161,7 @@ int hpx_main(variables_map& vm)
             numa_sensitive = 0;
 
         bool test_all = (vm.count("test-all") > 0);
-        const int repetitions = vm["repetitions"].as<int>();
+        int const repetitions = vm["repetitions"].as<int>();
 
         if (vm.count("info"))
             info_string = vm["info"].as<std::string>();
@@ -164,7 +170,7 @@ int hpx_main(variables_map& vm)
 
         num_iterations = vm["delay-iterations"].as<std::uint64_t>();
 
-        const std::uint64_t count = vm["futures"].as<std::uint64_t>();
+        std::uint64_t const count = vm["futures"].as<std::uint64_t>();
 
         hpx::util::perftests_init(vm);
 

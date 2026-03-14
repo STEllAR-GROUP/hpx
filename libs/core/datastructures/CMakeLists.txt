@@ -90,15 +90,17 @@ include(HPX_AddModule)
 add_hpx_module(
   core datastructures
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${datastructures_sources}
   HEADERS ${datastructures_headers}
   COMPAT_HEADERS ${datastructures_compat_headers}
-  EXCLUDE_FROM_GLOBAL_HEADER
-    "hpx/datastructures/variant_helper.hpp"
-    "hpx/datastructures/serialization/dynamic_bitset.hpp"
-    "hpx/datastructures/serialization/optional.hpp"
-    "hpx/datastructures/serialization/serializable_any.hpp"
-    "hpx/datastructures/serialization/tuple.hpp"
+  EXCLUDE_FROM_GLOBAL_HEADER "hpx/datastructures/variant_helper.hpp"
+  ADD_TO_GLOBAL_HEADER
+    "hpx/datastructures/detail/dynamic_bitset.hpp"
+    "hpx/datastructures/detail/flat_map.hpp"
+    "hpx/datastructures/detail/flat_set.hpp"
+    "hpx/datastructures/detail/intrusive_list.hpp"
+    "hpx/datastructures/detail/small_vector.hpp"
   MODULE_DEPENDENCIES hpx_assertion hpx_config hpx_concepts hpx_errors
                       hpx_serialization hpx_type_support
   CMAKE_SUBDIRS examples tests

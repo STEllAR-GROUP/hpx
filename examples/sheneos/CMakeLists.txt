@@ -24,7 +24,7 @@ if(HPX_WITH_EXAMPLES_HDF5)
     sheneos_client INTERNAL_FLAGS
     SOURCES sheneos_client.cpp
     DEPENDENCIES sheneos_component
-    FOLDER "Examples/ShenEOS"
+    FOLDER "Examples/ShenEOS" ${HPX_WITH_CXX_MODULES_OPTION}
   )
 
   # add dependencies to pseudo-target
@@ -34,7 +34,7 @@ if(HPX_WITH_EXAMPLES_HDF5)
     sheneos_test INTERNAL_FLAGS
     SOURCES sheneos_test.cpp
     DEPENDENCIES sheneos_component
-    FOLDER "Examples/ShenEOS"
+    FOLDER "Examples/ShenEOS" ${HPX_WITH_CXX_MODULES_OPTION}
   )
 
   # add dependencies to pseudo-target

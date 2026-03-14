@@ -13,13 +13,13 @@
 #include <hpx/actions_base/traits/action_priority.hpp>
 #include <hpx/agas_base/primary_namespace.hpp>
 #include <hpx/agas_base/server/primary_namespace.hpp>
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_colocated/functional/colocated_helpers.hpp>
 #include <hpx/async_colocated/post_colocated_callback_fwd.hpp>
 #include <hpx/async_colocated/register_post_colocated.hpp>
 #include <hpx/async_distributed/bind_action.hpp>
 #include <hpx/async_distributed/detail/post_continue_callback.hpp>
-#include <hpx/functional/bind.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/functional.hpp>
 
 #include <utility>
 

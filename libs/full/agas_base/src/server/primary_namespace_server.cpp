@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012-2024 Hartmut Kaiser
+//  Copyright (c) 2012-2025 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -12,14 +12,13 @@
 #include <hpx/assert.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/format.hpp>
-#include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/logging.hpp>
-#include <hpx/timing/scoped_timer.hpp>
-#include <hpx/type_support/assert_owns_lock.hpp>
-#include <hpx/util/get_and_reset_value.hpp>
-#include <hpx/util/insert_checked.hpp>
+#include <hpx/modules/timing.hpp>
+#include <hpx/modules/type_support.hpp>
+#include <hpx/modules/util.hpp>
 
 #include <atomic>
 #include <cstdint>
@@ -390,7 +389,7 @@ namespace hpx::agas::server {
     {
         naming::gid_type locality = naming::get_locality_from_gid(id);
         gva addr(locality,
-            static_cast<std::uint32_t>(
+            static_cast<components::component_type>(
                 naming::detail::get_component_type_from_gid(id.get_msb())),
             1, id.get_lsb());
         return primary_namespace::resolved_type(id, addr, locality);
@@ -494,7 +493,7 @@ namespace hpx::agas::server {
         {
             naming::gid_type const locality = naming::get_locality_from_gid(id);
             gva g(locality,
-                static_cast<std::uint32_t>(
+                static_cast<components::component_type>(
                     naming::detail::get_component_type_from_gid(id.get_msb())),
                 0, id.get_lsb());
 

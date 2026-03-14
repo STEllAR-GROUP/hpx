@@ -43,12 +43,6 @@ endif()
 # HPX Eve configuration
 # ##############################################################################
 if("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "EVE")
-  if("${HPX_WITH_CXX_STANDARD}" LESS "20")
-    hpx_error(
-      "HPX_WITH_DATAPAR_BACKEND set to ${HPX_WITH_DATAPAR_BACKEND} requires HPX_WITH_CXX_STANDARD >= 20, currently set to ${HPX_WITH_CXX_STANDARD}"
-    )
-  endif()
-
   hpx_option(
     HPX_WITH_FETCH_EVE
     BOOL
@@ -58,7 +52,7 @@ if("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "EVE")
     ADVANCED
   )
   hpx_option(
-    HPX_WITH_EVE_TAG STRING "Eve repository tag or branch" "v2023.02.15"
+    HPX_WITH_Eve_TAG STRING "Eve repository tag or branch" "v2023.02.15"
     CATEGORY "Build Targets"
     ADVANCED
   )

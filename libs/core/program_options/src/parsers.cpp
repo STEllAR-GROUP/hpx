@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/program_options/config.hpp>
-#include <hpx/debugging/environ.hpp>
+#include <hpx/modules/debugging.hpp>
 #include <hpx/program_options/detail/cmdline.hpp>
 #include <hpx/program_options/detail/config_file.hpp>
 #include <hpx/program_options/detail/convert.hpp>
@@ -43,13 +43,13 @@ namespace hpx::program_options {
 
             std::transform(opt.value.begin(), opt.value.end(),
                 back_inserter(result.value), [](auto&& arg) {
-                    return from_utf8(std::forward<decltype(arg)>(arg));
+                    return detail::from_utf8(std::forward<decltype(arg)>(arg));
                 });
 
             std::transform(opt.original_tokens.begin(),
                 opt.original_tokens.end(),
                 back_inserter(result.original_tokens), [](auto&& arg) {
-                    return from_utf8(std::forward<decltype(arg)>(arg));
+                    return detail::from_utf8(std::forward<decltype(arg)>(arg));
                 });
             return result;
         }
@@ -175,7 +175,7 @@ namespace hpx::program_options {
                 if (s.find(prefix) == 0)
                 {
                     for (std::string::size_type n = prefix.size(); n < s.size();
-                         ++n)
+                        ++n)
                     {
                         // Intel-Win-7.1 does not understand push_back on
                         // string.

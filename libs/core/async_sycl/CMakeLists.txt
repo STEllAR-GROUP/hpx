@@ -34,14 +34,17 @@ add_hpx_module(
   DEPENDENCIES
     hpx_allocator_support
     hpx_assertion
+    hpx_async_base
     hpx_concurrency
     hpx_config
     hpx_debugging
     hpx_errors
     hpx_execution_base
+    hpx_functional
     hpx_futures
     hpx_memory
     hpx_runtime_local
+    hpx_synchronization
     hpx_threading_base
   CMAKE_SUBDIRS examples tests
 )

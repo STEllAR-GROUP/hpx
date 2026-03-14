@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,16 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_combinators/wait_all.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/async_local/dataflow.hpp>
+#include <hpx/modules/async_local.hpp>
 #endif
 #include <hpx/algorithms/traits/is_pair.hpp>
-#include <hpx/execution/algorithms/detail/predicates.hpp>
-#include <hpx/execution/algorithms/then.hpp>
-#include <hpx/execution/executors/execution.hpp>
-#include <hpx/execution_base/completion_signatures.hpp>
-#include <hpx/execution_base/traits/is_executor_parameters.hpp>
+#include <hpx/modules/async_combinators.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/pack_traversal.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/util/detail/partitioner_iteration.hpp>
@@ -35,9 +33,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::parallel::util::detail {
 
-    template <typename Result, typename ExPolicy, typename FwdIter, typename F>
-    auto foreach_partition(
-        ExPolicy policy, FwdIter first, std::size_t count, F&& f)
+    HPX_CXX_CORE_EXPORT template <typename Result, typename ExPolicy,
+        typename FwdIter, typename F, typename ReShape>
+    auto foreach_partition(ExPolicy policy, FwdIter first, std::size_t count,
+        F&& f, ReShape&& reshape)
     {
         // estimate a chunk size based on number of cores used
         using parameters_type =
@@ -50,6 +49,7 @@ namespace hpx::parallel::util::detail {
             hpx::execution::experimental::extract_invokes_testing_function_v<
                 parameters_type>;
 
+        std::size_t cores = 1;
         if constexpr (has_variable_chunk_size)
         {
             static_assert(!invokes_testing_function,
@@ -57,30 +57,78 @@ namespace hpx::parallel::util::detail {
                 "has_variable_chunk_size and invokes_testing_function");
 
             auto&& shape = detail::get_bulk_iteration_shape_idx_variable(
-                policy, first, count);
+                policy, first, count, cores);
 
             return execution::bulk_async_execute(policy.executor(),
                 partitioner_iteration<Result, F>{HPX_FORWARD(F, f)},
-                HPX_MOVE(shape));
+                reshape(HPX_MOVE(shape)));
         }
         else if constexpr (!invokes_testing_function)
         {
-            auto&& shape =
-                detail::get_bulk_iteration_shape_idx(policy, first, count);
+            auto&& shape = detail::get_bulk_iteration_shape_idx(
+                policy, first, count, cores);
 
-            return execution::bulk_async_execute(policy.executor(),
-                partitioner_iteration<Result, F>{HPX_FORWARD(F, f)},
-                HPX_MOVE(shape));
+            using executor_type = decltype(policy.executor());
+            auto&& reshaped = reshape(HPX_MOVE(shape), cores);
+
+            // We attempt to perform some optimizations in case of non-task
+            // execution.
+            if constexpr (!hpx::is_async_execution_policy_v<ExPolicy> &&
+                !hpx::execution_policy_has_scheduler_executor_v<ExPolicy>)
+            {
+                // Switch to sequential execution for one-core, one-chunk case
+                // if the executor supports it.
+                if constexpr (std::is_void_v<Result> &&
+                    hpx::traits::is_one_way_executor_v<executor_type>)
+                {
+                    if (cores == 1 && std::size(reshaped) == 1)
+                    {
+                        return execution::sync_execute(policy.executor(),
+                            partitioner_iteration<Result, F>{HPX_FORWARD(F, f)},
+                            *std::begin(HPX_MOVE(reshaped)));
+                    }
+                }
+
+                if constexpr (hpx::traits::is_bulk_one_way_executor_v<
+                                  executor_type>)
+                {
+                    return execution::bulk_sync_execute(policy.executor(),
+                        partitioner_iteration<Result, F>{HPX_FORWARD(F, f)},
+                        HPX_MOVE(reshaped));
+                }
+                else
+                {
+                    // Fall back if given executor doesn't support any of the
+                    // above optimizations.
+                    auto&& items =
+                        execution::bulk_async_execute(policy.executor(),
+                            partitioner_iteration<Result, F>{HPX_FORWARD(F, f)},
+                            HPX_MOVE(reshaped));
+                    if (hpx::wait_all_nothrow(items))
+                    {
+                        using handle_local_exceptions =
+                            detail::handle_local_exceptions<ExPolicy>;
+                        handle_local_exceptions::call(items);
+                    }
+                    return hpx::unwrap(HPX_MOVE(items));
+                }
+            }
+            else
+            {
+                return execution::bulk_async_execute(policy.executor(),
+                    partitioner_iteration<Result, F>{HPX_FORWARD(F, f)},
+                    HPX_MOVE(reshaped));
+            }
         }
         else
         {
             std::vector<hpx::future<Result>> inititems;
             auto&& shape = detail::get_bulk_iteration_shape_idx(
-                policy, inititems, f, first, count);
+                policy, inititems, f, first, count, cores);
 
             auto&& workitems = execution::bulk_async_execute(policy.executor(),
                 partitioner_iteration<Result, F>{HPX_FORWARD(F, f)},
-                HPX_MOVE(shape));
+                reshape(HPX_MOVE(shape)));
 
             return std::make_pair(HPX_MOVE(inititems), HPX_MOVE(workitems));
         }
@@ -89,7 +137,18 @@ namespace hpx::parallel::util::detail {
     ///////////////////////////////////////////////////////////////////////
     // The static partitioner simply spawns one chunk of iterations for
     // each available core.
-    template <typename ExPolicy, typename Result>
+    HPX_CXX_CORE_EXPORT struct default_reshape
+    {
+        using is_transparent = std::true_type;
+
+        template <typename T, typename... Ts>
+        HPX_HOST_DEVICE constexpr T&& operator()(T&& t, Ts&&...) const noexcept
+        {
+            return HPX_FORWARD(T, t);
+        }
+    };
+
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Result>
     struct foreach_static_partitioner
     {
         using parameters_type = typename ExPolicy::executor_parameters_type;
@@ -99,9 +158,9 @@ namespace hpx::parallel::util::detail {
             detail::handle_local_exceptions<ExPolicy>;
 
         template <typename ExPolicy_, typename FwdIter, typename F1,
-            typename F2>
-        static decltype(auto) call(ExPolicy_&& policy, FwdIter first,
-            std::size_t count, F1&& f1, F2&& f2)
+            typename F2, typename ReShape = default_reshape>
+        static auto call(ExPolicy_&& policy, FwdIter first, std::size_t count,
+            F1&& f1, F2&& f2, ReShape&& reshape = ReShape{})
         {
             // inform parameter traits
             using scoped_executor_parameters =
@@ -114,14 +173,30 @@ namespace hpx::parallel::util::detail {
             FwdIter last = parallel::detail::next(first, count);
             try
             {
-                auto&& items = detail::foreach_partition<Result>(
-                    HPX_FORWARD(ExPolicy_, policy), first, count,
-                    HPX_FORWARD(F1, f1));
+                if constexpr (std::is_void_v<decltype(foreach_partition<Result>(
+                                  HPX_FORWARD(ExPolicy_, policy), first, count,
+                                  HPX_FORWARD(F1, f1),
+                                  HPX_FORWARD(ReShape, reshape)))>)
+                {
+                    detail::foreach_partition<Result>(
+                        HPX_FORWARD(ExPolicy_, policy), first, count,
+                        HPX_FORWARD(F1, f1), HPX_FORWARD(ReShape, reshape));
 
-                scoped_params.mark_end_of_scheduling();
+                    scoped_params.mark_end_of_scheduling();
 
-                return reduce(
-                    HPX_MOVE(items), HPX_FORWARD(F2, f2), HPX_MOVE(last));
+                    return HPX_INVOKE(f2, HPX_MOVE(last));
+                }
+                else
+                {
+                    auto&& items = foreach_partition<Result>(
+                        HPX_FORWARD(ExPolicy_, policy), first, count,
+                        HPX_FORWARD(F1, f1), HPX_FORWARD(ReShape, reshape));
+
+                    scoped_params.mark_end_of_scheduling();
+
+                    return reduce(
+                        HPX_MOVE(items), HPX_FORWARD(F2, f2), HPX_MOVE(last));
+                }
             }
             catch (...)
             {
@@ -153,9 +228,13 @@ namespace hpx::parallel::util::detail {
                 std::enable_if_t<!hpx::traits::is_pair_v<std::decay_t<Items>>>>
         static auto reduce(Items&& items, F&& f, FwdIter last)
         {
+            using decayed_items = std::decay_t<Items>;
+            constexpr bool is_future =
+                hpx::traits::is_future_v<decayed_items> ||
+                hpx::traits::is_future_range_v<decayed_items>;
+
             namespace ex = hpx::execution::experimental;
-            if constexpr (ex::is_sender_v<std::decay_t<Items>> &&
-                !hpx::traits::is_future_v<std::decay_t<Items>>)
+            if constexpr (ex::is_sender_v<decayed_items> && !is_future)
             {
                 // the predecessor sender could be exposing zero or more
                 // value types
@@ -166,12 +245,15 @@ namespace hpx::parallel::util::detail {
             }
             else
             {
-                // wait for all tasks to finish
-                if (hpx::wait_all_nothrow(items))
+                if constexpr (is_future)
                 {
-                    // always rethrow if items has at least one exceptional
-                    // future
-                    handle_local_exceptions::call(items);
+                    // wait for all tasks to finish
+                    if (hpx::wait_all_nothrow(items))
+                    {
+                        // always rethrow if items has at least one exceptional
+                        // future
+                        handle_local_exceptions::call(items);
+                    }
                 }
                 return HPX_INVOKE(f, HPX_MOVE(last));
             }
@@ -179,7 +261,7 @@ namespace hpx::parallel::util::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////
-    template <typename ExPolicy, typename Result>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Result>
     struct foreach_task_static_partitioner
     {
         using parameters_type = typename ExPolicy::executor_parameters_type;
@@ -192,9 +274,9 @@ namespace hpx::parallel::util::detail {
             detail::handle_local_exceptions<ExPolicy>;
 
         template <typename ExPolicy_, typename FwdIter, typename F1,
-            typename F2>
-        static hpx::future<FwdIter> call(ExPolicy_&& policy, FwdIter first,
-            std::size_t count, F1&& f1, F2&& f2)
+            typename F2, typename ReShape = default_reshape>
+        static decltype(auto) call(ExPolicy_&& policy, FwdIter first,
+            std::size_t count, F1&& f1, F2&& f2, ReShape&& reshape = ReShape{})
         {
             // inform parameter traits
             std::shared_ptr<scoped_executor_parameters> scoped_params =
@@ -206,7 +288,7 @@ namespace hpx::parallel::util::detail {
             {
                 auto&& items = detail::foreach_partition<Result>(
                     HPX_FORWARD(ExPolicy_, policy), first, count,
-                    HPX_FORWARD(F1, f1));
+                    HPX_FORWARD(F1, f1), HPX_FORWARD(ReShape, reshape));
 
                 scoped_params->mark_end_of_scheduling();
 
@@ -215,15 +297,24 @@ namespace hpx::parallel::util::detail {
             }
             catch (...)
             {
-                return hpx::make_exceptional_future<FwdIter>(
-                    std::current_exception());
+                try
+                {
+                    handle_local_exceptions::call(std::current_exception());
+                }
+                catch (...)
+                {
+                    using return_type =
+                        std::decay_t<std::invoke_result_t<F2&&, FwdIter&&>>;
+                    return hpx::make_exceptional_future<return_type>(
+                        std::current_exception());
+                }
             }
         }
 
     private:
         template <typename F, typename Items1, typename Items2,
             typename FwdIter>
-        static hpx::future<FwdIter> reduce(
+        static decltype(auto) reduce(
             [[maybe_unused]] std::shared_ptr<scoped_executor_parameters>&&
                 scoped_params,
             [[maybe_unused]] std::pair<Items1, Items2>&& items,
@@ -231,24 +322,27 @@ namespace hpx::parallel::util::detail {
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
             HPX_ASSERT(false);
-            return hpx::future<FwdIter>();
+            using return_type =
+                std::decay_t<std::invoke_result_t<F&&, FwdIter&&>>;
+            return hpx::future<return_type>();
 #else
             // wait for all tasks to finish
             // Note: the lambda takes the vectors by value (dataflow
             //       moves those into the lambda) to ensure that they
             //       will be destroyed before the lambda exists.
-            //       Otherwise the vectors stay alive in the dataflow's
+            //       Otherwise, the vectors stay alive in the dataflow's
             //       shared state and may reference data that has gone
             //       out of scope.
             return hpx::dataflow(
                 hpx::launch::sync,
                 [last, scoped_params = HPX_MOVE(scoped_params),
-                    f = HPX_FORWARD(F, f)](
-                    auto&& r1, auto&& r2) mutable -> FwdIter {
+                    f = HPX_FORWARD(F, f)](auto&& r1, auto&& r2) mutable {
                     HPX_UNUSED(scoped_params);
 
-                    handle_local_exceptions::call(r1);
-                    handle_local_exceptions::call(r2);
+                    handle_local_exceptions::call(
+                        HPX_FORWARD(decltype(r1), r1));
+                    handle_local_exceptions::call(
+                        HPX_FORWARD(decltype(r2), r2));
 
                     return f(HPX_MOVE(last));
                 },
@@ -259,7 +353,7 @@ namespace hpx::parallel::util::detail {
         template <typename F, typename Items, typename FwdIter,
             typename Enable =
                 std::enable_if_t<!hpx::traits::is_pair_v<std::decay_t<Items>>>>
-        static hpx::future<FwdIter> reduce(
+        static decltype(auto) reduce(
             [[maybe_unused]] std::shared_ptr<scoped_executor_parameters>&&
                 scoped_params,
             [[maybe_unused]] Items&& items, [[maybe_unused]] F&& f,
@@ -267,25 +361,27 @@ namespace hpx::parallel::util::detail {
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
             HPX_ASSERT(false);
-            return hpx::future<FwdIter>();
+            using return_type =
+                std::decay_t<std::invoke_result_t<F&&, FwdIter&&>>;
+            return hpx::future<return_type>();
 #else
             // wait for all tasks to finish
             return hpx::dataflow(
                 hpx::launch::sync,
                 [last, scoped_params = HPX_MOVE(scoped_params),
-                    f = HPX_FORWARD(F, f)](auto&& r) mutable -> FwdIter {
+                    f = HPX_FORWARD(F, f)](auto&& r) mutable {
                     HPX_UNUSED(scoped_params);
 
-                    handle_local_exceptions::call(r);
+                    handle_local_exceptions::call(HPX_FORWARD(decltype(r), r));
 
                     return f(HPX_MOVE(last));
                 },
-                HPX_MOVE(items));
+                HPX_FORWARD(Items, items));
 #endif
         }
 
         template <typename F, typename FwdIter>
-        static hpx::future<FwdIter> reduce(
+        static decltype(auto) reduce(
             [[maybe_unused]] std::shared_ptr<scoped_executor_parameters>&&
                 scoped_params,
             [[maybe_unused]] hpx::future<void>&& item, [[maybe_unused]] F&& f,
@@ -293,16 +389,18 @@ namespace hpx::parallel::util::detail {
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
             HPX_ASSERT(false);
-            return hpx::future<FwdIter>();
+            using return_type =
+                std::decay_t<std::invoke_result_t<F&&, FwdIter&&>>;
+            return hpx::future<return_type>();
 #else
             // wait for the task to finish, invoke the given function before
             // returning
             return item.then(hpx::launch::sync,
                 [last, scoped_params = HPX_MOVE(scoped_params),
-                    f = HPX_FORWARD(F, f)](auto&& r) mutable -> FwdIter {
+                    f = HPX_FORWARD(F, f)](auto&& r) mutable {
                     HPX_UNUSED(scoped_params);
 
-                    handle_local_exceptions::call(HPX_MOVE(r));
+                    handle_local_exceptions::call(HPX_FORWARD(decltype(r), r));
 
                     return f(HPX_MOVE(last));
                 });
@@ -316,7 +414,7 @@ namespace hpx::parallel::util {
     ///////////////////////////////////////////////////////////////////////////
     // ExPolicy: execution policy
     // Result:   intermediate result type of first step (default: void)
-    template <typename ExPolicy, typename Result = void>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Result = void>
     struct foreach_partitioner
       : detail::select_partitioner<std::decay_t<ExPolicy>,
             detail::foreach_static_partitioner,

@@ -18,7 +18,7 @@
 class A
 {
 public:
-    A& do_work(double x, const A& y, const A& z)
+    A& do_work(double x, A const& y, A const& z)
     {
         i = x + y.i + z.i;
         return *this;

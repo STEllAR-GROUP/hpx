@@ -46,7 +46,8 @@ void test_all_reduce_bool()
         hpx::future<bool> overall_result = all_reduce(all_reduce_bool_client,
             value, std::logical_or<>{}, generation_arg(i + 1));
 
-        HPX_TEST_EQ(value, overall_result.get());
+        HPX_TEST_EQ(
+            static_cast<bool>(value), static_cast<bool>(overall_result.get()));
     }
 }
 
@@ -71,14 +72,16 @@ void test_broadcast_bool()
             hpx::future<bool> result = broadcast_to(
                 broadcast_bool_client, value, generation_arg(i + 1));
 
-            HPX_TEST_EQ(value, result.get());
+            HPX_TEST_EQ(
+                static_cast<bool>(value), static_cast<bool>(result.get()));
         }
         else
         {
             hpx::future<bool> result = hpx::collectives::broadcast_from<bool>(
                 broadcast_bool_client, generation_arg(i + 1));
 
-            HPX_TEST_EQ(value, result.get());
+            HPX_TEST_EQ(
+                static_cast<bool>(value), static_cast<bool>(result.get()));
         }
     }
 }
@@ -102,7 +105,8 @@ void test_exclusive_scan_bool()
             exclusive_scan(exclusive_scan_bool_client, value, value,
                 std::logical_or<>{}, generation_arg(i + 1));
 
-        HPX_TEST_EQ(value, overall_result.get());
+        HPX_TEST_EQ(
+            static_cast<bool>(value), static_cast<bool>(overall_result.get()));
     }
 }
 
@@ -124,7 +128,8 @@ void test_inclusive_scan_bool()
         hpx::future<bool> overall_result = inclusive_scan(inclusive_scan_client,
             value, std::logical_or<>{}, generation_arg(i + 1));
 
-        HPX_TEST_EQ(value, overall_result.get());
+        HPX_TEST_EQ(
+            static_cast<bool>(value), static_cast<bool>(overall_result.get()));
     }
 }
 
@@ -146,7 +151,8 @@ void test_reduce_bool()
             hpx::future<bool> overall_result = reduce_here(reduce_bool_client,
                 value, std::logical_or<>{}, generation_arg(i + 1));
 
-            HPX_TEST_EQ(value, overall_result.get());
+            HPX_TEST_EQ(static_cast<bool>(value),
+                static_cast<bool>(overall_result.get()));
         }
         else
         {
@@ -184,14 +190,16 @@ void test_scatter_bool()
             hpx::future<bool> result = scatter_to(
                 scatter_bool_client, std::move(data), generation_arg(i + 1));
 
-            HPX_TEST_EQ(value, result.get());
+            HPX_TEST_EQ(
+                static_cast<bool>(value), static_cast<bool>(result.get()));
         }
         else
         {
             hpx::future<bool> result =
                 scatter_from<bool>(scatter_bool_client, generation_arg(i + 1));
 
-            HPX_TEST_EQ(value, result.get());
+            HPX_TEST_EQ(
+                static_cast<bool>(value), static_cast<bool>(result.get()));
         }
     }
 }

@@ -22,8 +22,8 @@ namespace hpx { namespace test { namespace server {
 
     simple_refcnt_checker::~simple_refcnt_checker()
     {
-        const std::uint32_t prefix_ = get_locality_id();
-        const naming::gid_type this_ = get_base_gid();
+        std::uint32_t const prefix_ = get_locality_id();
+        naming::gid_type const this_ = get_base_gid();
 
         std::ostringstream strm;
 

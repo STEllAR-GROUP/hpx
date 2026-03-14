@@ -19,10 +19,9 @@
 #include <hpx/components/process/export_definitions.hpp>
 #include <hpx/components/process/util/posix/pipe.hpp>
 
-namespace hpx { namespace components { namespace process { namespace posix
-{
+namespace hpx { namespace components { namespace process { namespace posix {
     HPX_PROCESS_EXPORT pipe create_pipe();
-    HPX_PROCESS_EXPORT pipe create_pipe(hpx::error_code &ec);
-}}}}
+    HPX_PROCESS_EXPORT pipe create_pipe(hpx::error_code& ec);
+}}}}    // namespace hpx::components::process::posix
 
 #endif

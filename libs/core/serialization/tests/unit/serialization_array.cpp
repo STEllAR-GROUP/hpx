@@ -7,16 +7,7 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/serialization/array.hpp>
-#include <hpx/serialization/input_archive.hpp>
-#include <hpx/serialization/output_archive.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/vector.hpp>
-
-#if defined(HPX_SERIALIZATION_HAVE_BOOST_TYPES)
-#include <hpx/serialization/boost_multi_array.hpp>
-#endif
-
+#include <hpx/modules/serialization.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <array>
@@ -44,7 +35,7 @@ struct A
     template <typename Archive>
     void serialize(Archive& ar, unsigned)
     {
-        ar& t_;
+        ar & t_;
     }
 };
 

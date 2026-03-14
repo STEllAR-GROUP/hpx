@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,24 +10,23 @@
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
 #include <winsock2.h>
 #endif
-#include <asio/ip/tcp.hpp>
 
 #include <cstddef>
+#include <exception>    // needed for the asio header below
 #include <map>
 #include <string>
 #include <utility>
 #include <vector>
 
-#if defined(HPX_MSVC_WARNING_PRAGMA)
-#pragma warning(push)
-#pragma warning(disable : 4251)
-#endif
+#include <asio/ip/tcp.hpp>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////
     // Try to retrieve default values from a batch environment
-    struct HPX_CORE_EXPORT batch_environment
+    HPX_CXX_CORE_EXPORT struct HPX_CORE_EXPORT batch_environment
     {
         // the constructor tries to read initial values from a batch
         // environment, filling our map of nodes and thread counts
@@ -80,7 +79,7 @@ namespace hpx::util {
         bool debug_;
 
 #if defined(HPX_HAVE_PARCELPORT_TCP)
-        using node_map_type = std::map<asio::ip::tcp::endpoint,
+        using node_map_type = std::map<::asio::ip::tcp::endpoint,
             std::pair<std::string, std::size_t>>;
 
         node_map_type nodes_;
@@ -88,6 +87,4 @@ namespace hpx::util {
     };
 }    // namespace hpx::util
 
-#if defined(HPX_MSVC_WARNING_PRAGMA)
-#pragma warning(pop)
-#endif
+#include <hpx/config/warnings_suffix.hpp>

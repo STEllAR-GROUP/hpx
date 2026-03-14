@@ -1,5 +1,5 @@
 // Copyright Vladimir Prus 2004.
-// Copyright (c) 2005-2022 Hartmut Kaiser
+// Copyright (c) 2005-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,12 +9,17 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
 #include <hpx/plugin/config.hpp>
-#include <hpx/datastructures/any.hpp>
+#include <hpx/plugin/config/defines.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/preprocessor.hpp>
+
+#if !defined(HPX_HAVE_CXX_MODULES) || defined(HPX_CORE_EXPORTS) ||             \
+    (defined(HPX_COMPILE_BMI) && defined(HPX_COMPILE_CORE_WITH_MODULES))
 #include <hpx/plugin/abstract_factory.hpp>
 #include <hpx/plugin/concrete_factory.hpp>
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/preprocessor/stringize.hpp>
+#endif
 
 #include <algorithm>
 #include <cctype>
@@ -128,7 +133,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 #define HPX_PLUGIN_EXPORT_LIST_(prefix, name, classname)                       \
     extern "C" HPX_PLUGIN_EXPORT_API std::map<std::string, hpx::any_nonser>*   \
-        HPX_PLUGIN_API HPX_PLUGIN_LIST_NAME_(prefix, name, classname)()        \
+        HPX_PLUGIN_API                                                         \
+        HPX_PLUGIN_LIST_NAME_(prefix, name, classname)()                       \
     {                                                                          \
         static std::map<std::string, hpx::any_nonser> r;                       \
         return &r;                                                             \

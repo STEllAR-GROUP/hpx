@@ -46,14 +46,15 @@ void test_shift_right_nonbidir(IteratorTag)
     std::size_t n = (std::rand() % (std::size_t) ARR_SIZE) + 1;
     hpx::shift_right(std::begin(c), std::end(c), n);
 
-    std::move_backward(std::begin(d), std::end(d) - n, std::end(d));
+    std::move_backward(std::begin(d),
+        std::end(d) - static_cast<std::ptrdiff_t>(n), std::end(d));
 
     // verify values
-    HPX_TEST(std::equal(
-        std::next(std::begin(c), n), std::end(c), std::begin(d) + n));
+    HPX_TEST(std::equal(std::next(std::begin(c), n), std::end(c),
+        std::begin(d) + static_cast<std::ptrdiff_t>(n)));
 
     // ensure shift by more than n does not crash
-    hpx::shift_right(std::begin(c), std::end(c), (std::size_t)(ARR_SIZE + 1));
+    hpx::shift_right(std::begin(c), std::end(c), (std::size_t) (ARR_SIZE + 1));
 }
 
 template <typename IteratorTag>
@@ -74,13 +75,15 @@ void test_shift_right(IteratorTag)
     std::size_t n = (std::rand() % (std::size_t) ARR_SIZE) + 1;
     hpx::shift_right(std::begin(c), std::end(c), n);
 
-    std::move_backward(std::begin(d), std::end(d) - n, std::end(d));
+    std::move_backward(std::begin(d),
+        std::end(d) - static_cast<std::ptrdiff_t>(n), std::end(d));
 
     // verify values
-    HPX_TEST(std::equal(std::begin(c) + n, std::end(c), std::begin(d) + n));
+    HPX_TEST(std::equal(std::begin(c) + static_cast<std::ptrdiff_t>(n),
+        std::end(c), std::begin(d) + static_cast<std::ptrdiff_t>(n)));
 
     // ensure shift by more than n does not crash
-    hpx::shift_right(std::begin(c), std::end(c), (std::size_t)(ARR_SIZE + 1));
+    hpx::shift_right(std::begin(c), std::end(c), (std::size_t) (ARR_SIZE + 1));
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -104,14 +107,16 @@ void test_shift_right(ExPolicy policy, IteratorTag)
     std::size_t n = (std::rand() % (std::size_t) ARR_SIZE) + 1;
     hpx::shift_right(policy, std::begin(c), std::end(c), n);
 
-    std::move_backward(std::begin(d), std::end(d) - n, std::end(d));
+    std::move_backward(std::begin(d),
+        std::end(d) - static_cast<std::ptrdiff_t>(n), std::end(d));
 
     // verify values
-    HPX_TEST(std::equal(std::begin(c) + n, std::end(c), std::begin(d) + n));
+    HPX_TEST(std::equal(std::begin(c) + static_cast<std::ptrdiff_t>(n),
+        std::end(c), std::begin(d) + static_cast<std::ptrdiff_t>(n)));
 
     // ensure shift by more than n does not crash
     hpx::shift_right(
-        policy, std::begin(c), std::end(c), (std::size_t)(ARR_SIZE + 1));
+        policy, std::begin(c), std::end(c), (std::size_t) (ARR_SIZE + 1));
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -138,14 +143,16 @@ void test_shift_right_async(ExPolicy p, IteratorTag)
     auto f2 = hpx::shift_right(p, std::begin(c), std::end(c), n);
     f2.wait();
 
-    std::move_backward(std::begin(d), std::end(d) - n, std::end(d));
+    std::move_backward(std::begin(d),
+        std::end(d) - static_cast<std::ptrdiff_t>(n), std::end(d));
 
     // verify values
-    HPX_TEST(std::equal(std::begin(c) + n, std::end(c), std::begin(d) + n));
+    HPX_TEST(std::equal(std::begin(c) + static_cast<std::ptrdiff_t>(n),
+        std::end(c), std::begin(d) + static_cast<std::ptrdiff_t>(n)));
 
     // ensure shift by more than n does not crash
     auto f3 = hpx::shift_right(
-        p, std::begin(c), std::end(c), (std::size_t)(ARR_SIZE + 1));
+        p, std::begin(c), std::end(c), (std::size_t) (ARR_SIZE + 1));
     f3.wait();
 }
 

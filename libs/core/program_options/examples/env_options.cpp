@@ -12,6 +12,8 @@
 #include <iostream>
 #include <string>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace po = hpx::program_options;
 
 std::string mapper(std::string env_var)

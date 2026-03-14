@@ -7,11 +7,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/detail/tag_fallback_invoke.hpp>
-#include <hpx/functional/invoke.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/detail/rfa.hpp>
 #include <hpx/parallel/util/loop.hpp>
-#include <hpx/type_support/pack.hpp>
 
 #include <cstddef>
 #include <cstring>
@@ -22,7 +22,7 @@
 
 namespace hpx::parallel::detail {
 
-    template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
     struct sequential_reduce_deterministic_t final
       : hpx::functional::detail::tag_fallback<
             sequential_reduce_deterministic_t<ExPolicy>>
@@ -32,10 +32,9 @@ namespace hpx::parallel::detail {
             typename Reduce>
         friend constexpr T tag_fallback_invoke(
             sequential_reduce_deterministic_t, ExPolicy&&, InIterB first,
-            InIterE last, T init, Reduce&& r)
+            InIterE last, T init, [[maybe_unused]] Reduce&& r)
         {
             /// TODO: Put constraint on Reduce to be a binary plus operator
-            (void) r;
 
             // hpx_rfa_bin_host_buffer should be initialized by the frontend of
             // this method
@@ -67,7 +66,7 @@ namespace hpx::parallel::detail {
         }
     };
 
-    template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
     struct sequential_reduce_deterministic_rfa_t final
       : hpx::functional::detail::tag_fallback<
             sequential_reduce_deterministic_rfa_t<ExPolicy>>
@@ -91,7 +90,7 @@ namespace hpx::parallel::detail {
             T max_val = static_cast<T>(0.0);
             std::size_t partition_size_lim = 0;
             for (auto e = first; partition_size_lim < partition_size;
-                 ++partition_size_lim, ++e)
+                ++partition_size_lim, ++e)
             {
                 T temp_max_val = std::abs(static_cast<T>(*e));
                 if (max_val < temp_max_val)
@@ -123,7 +122,7 @@ namespace hpx::parallel::detail {
             rfa += init;
             std::size_t partition_size_lim = 0;
             for (auto e = first; partition_size_lim < partition_size;
-                 ++partition_size_lim, ++e)
+                ++partition_size_lim, ++e)
             {
                 rfa += (*e);
             }
@@ -132,12 +131,12 @@ namespace hpx::parallel::detail {
     };
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-    template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
     inline constexpr sequential_reduce_deterministic_t<ExPolicy>
         sequential_reduce_deterministic =
             sequential_reduce_deterministic_t<ExPolicy>{};
 #else
-    template <typename ExPolicy, typename... Args>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename... Args>
     HPX_HOST_DEVICE HPX_FORCEINLINE auto sequential_reduce_deterministic(
         Args&&... args)
     {
@@ -147,12 +146,12 @@ namespace hpx::parallel::detail {
 #endif
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-    template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
     inline constexpr sequential_reduce_deterministic_rfa_t<ExPolicy>
         sequential_reduce_deterministic_rfa =
             sequential_reduce_deterministic_rfa_t<ExPolicy>{};
 #else
-    template <typename ExPolicy, typename... Args>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename... Args>
     HPX_HOST_DEVICE HPX_FORCEINLINE auto sequential_reduce_deterministic_rfa(
         Args&&... args)
     {

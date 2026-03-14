@@ -6,15 +6,12 @@
 
 #pragma once
 
-#include <hpx/concepts/has_member_xxx.hpp>
-#include <hpx/execution/queries/get_stop_token.hpp>
-#include <hpx/execution_base/completion_signatures.hpp>
-#include <hpx/execution_base/coroutine_utils.hpp>
-#include <hpx/execution_base/get_env.hpp>
-#include <hpx/functional/tag_invoke.hpp>
-#include <hpx/synchronization/stop_token.hpp>
-#include <hpx/type_support/coroutines_support.hpp>
-#include <hpx/type_support/meta.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/synchronization.hpp>
+#include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <any>
 #include <exception>
@@ -98,7 +95,7 @@ struct default_task_context_impl
     friend struct default_awaiter_context;
 
     friend auto tag_invoke(hpx::execution::experimental::get_stop_token_t,
-        const default_task_context_impl& self) noexcept
+        default_task_context_impl const& self) noexcept
         -> hpx::experimental::in_place_stop_token
     {
         return self.stop_token_;
@@ -217,7 +214,7 @@ struct default_awaiter_context<void>
         }
         else if (auto token = hpx::execution::experimental::get_stop_token(
                      hpx::execution::experimental::get_env(parent));
-                 token.stop_possible())
+            token.stop_possible())
         {
             stop_callback_.emplace<stop_callback_t>(
                 std::move(token), forward_stop_request{stop_source_});
@@ -344,7 +341,7 @@ private:
         using context_t =
             typename Context::template promise_context_t<_promise>;
         friend context_t tag_invoke(hpx::execution::experimental::get_env_t,
-            const _promise& self) noexcept
+            _promise const& self) noexcept
         {
             return self.context_;
         }

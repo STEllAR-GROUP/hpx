@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2023 Hartmut Kaiser
+# Copyright (c) 2007-2025 Hartmut Kaiser
 # Copyright (c)      2011 Bryce Lelbach
 # Copyright (c)      2018 Nikunj Gupta
 # Copyright (c) 2020 The STE||AR-Group
@@ -10,6 +10,7 @@
 include(HPX_Message)
 include(HPX_AddPseudoDependencies)
 include(HPX_AddPseudoTarget)
+include(HPX_CXXModules)
 
 # ##############################################################################
 # gather headers and sources
@@ -149,7 +150,11 @@ set(_is_executable "$<STREQUAL:$<TARGET_PROPERTY:TYPE>,EXECUTABLE>")
 set(_is_library "$<IN_LIST:$<TARGET_PROPERTY:TYPE>,${_library_types}>")
 
 add_library(hpx INTERFACE)
+add_library(init INTERFACE)
 add_library(wrap_main INTERFACE)
+if(NOT MSVC)
+  add_library(auto_wrap_main INTERFACE)
+endif()
 
 target_link_libraries(hpx INTERFACE hpx_full)
 
@@ -183,12 +188,28 @@ target_link_libraries(
 )
 
 target_link_libraries(wrap_main INTERFACE hpx_interface_wrap_main)
+target_link_libraries(init INTERFACE HPXInternal::hpx_init)
 target_link_libraries(hpx INTERFACE hpx_interface)
 
-# HPX::component is to be linked privately to all HPX components NOTE: The
-# _is_library guard only prevents simple mistakes of linking HPX::component to
-# executables. It does not prevent linking it to libraries that are not
-# components.
+set(hpx_targets hpx wrap_main init plugin component)
+set(hpx_internal_targets hpx_full hpx_interface hpx_interface_wrap_main)
+
+if(NOT MSVC)
+  add_library(hpx_interface_auto_wrap_main INTERFACE)
+  target_link_libraries(
+    hpx_interface_auto_wrap_main
+    INTERFACE $<${_is_executable}:HPXInternal::hpx_auto_wrap>
+  )
+  target_link_libraries(auto_wrap_main INTERFACE hpx_interface_auto_wrap_main)
+  set(hpx_targets ${hpx_targets} auto_wrap_main)
+  set(hpx_internal_targets ${hpx_internal_targets} hpx_interface_auto_wrap_main)
+endif()
+
+# HPX::component is to be linked privately to all HPX components
+#
+# NOTE: The _is_library guard only prevents simple mistakes of linking
+# HPX::component to executables. It does not prevent linking it to libraries
+# that are not components.
 add_library(component INTERFACE)
 target_compile_definitions(
   component
@@ -209,9 +230,6 @@ target_compile_definitions(
     "$<${_is_library}:HPX_PLUGIN_NAME_DEFAULT=hpx_$<TARGET_PROPERTY:NAME>>"
 )
 
-set(hpx_targets hpx wrap_main plugin component)
-set(hpx_internal_targets hpx_full hpx_interface hpx_interface_wrap_main)
-
 # cmake-format: off
 install(
   TARGETS ${hpx_targets}
@@ -219,7 +237,6 @@ install(
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT runtime
-          ${_optional}
 )
 
 install(
@@ -228,7 +245,6 @@ install(
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT runtime
-          ${_optional}
 )
 # cmake-format: on
 
@@ -300,16 +316,71 @@ set(HPX_LIBS
     CACHE INTERNAL "List of HPX libraries" FORCE
 )
 
+if(HPX_WITH_CXX_MODULES)
+  # the standard header needs to be recreated from scratch
+  unset(HPX_STANDARD_HEADERS CACHE)
+  unset(HPX_ENABLED_CXX_MODULES CACHE)
+endif()
+
 foreach(lib ${HPX_LIBS})
+
+  string(TOUPPER ${lib} uppercase_lib)
+  if(HPX_WITH_CXX_MODULES)
+    unset(HPX_${uppercase_lib}_ENABLED_CXX_MODULES CACHE)
+  endif()
+
+  # capitalize string
+  string(SUBSTRING ${lib} 0 1 first_letter)
+  string(TOUPPER ${first_letter} first_letter)
+  string(REGEX REPLACE "^.(.*)" "${first_letter}\\1" cap_libname "${lib}")
+
   # NOTE: hpx_full (i.e. the target representing libhpx.so) is still created in
   # src/CMakeLists.txt. When all of hpx_full has been modularized the target
   # creation can move here as well.
-  if(NOT ${lib} STREQUAL "full")
-    string(TOUPPER ${lib} uppercase_lib)
-    add_library(hpx_${lib} ${hpx_library_link_mode} src/empty.cpp)
-    target_compile_definitions(hpx_${lib} PRIVATE HPX_${uppercase_lib}_EXPORTS)
+  if(HPX_WITH_CXX_MODULES)
+    add_library(hpx_${lib}_module STATIC)
+    set_target_properties(
+      hpx_${lib}_module PROPERTIES POSITION_INDEPENDENT_CODE ON
+    )
+    hpx_configure_module_producer(hpx_${lib}_module)
 
+    target_link_libraries(
+      hpx_${lib}_module
+      PUBLIC hpx_${lib} hpx_public_flags
+      PRIVATE hpx_private_flags
+    )
+    set_target_properties(hpx_${lib}_module PROPERTIES FOLDER "Core")
+
+    add_hpx_source_group(
+      NAME hpx_${lib}_module
+      ROOT ${lib_module_basedir}
+      CLASS "Source Files"
+      TARGETS ${lib_module_file}
+    )
+
+    # prepare generation of module interface unit
+    set(lib_module_basedir ${PROJECT_BINARY_DIR}/libs/${lib})
+    set(lib_module_file
+        "${lib_module_basedir}/hpx_${lib}${HPX_MODULE_INTERFACE_EXTENSION}"
+    )
+    set(modulename_upper "${uppercase_lib}")
+  endif()
+
+  if(${lib} STREQUAL "full")
+    add_subdirectory(${lib})
+
+    if(HPX_WITH_CXX_MODULES)
+      hpx_configure_module_consumer(hpx_${lib} hpx_core_module_if)
+      hpx_configure_module_consumer(hpx_${lib}_module hpx_core_module_if)
+    endif()
+  else()
+    add_library(hpx_${lib} ${hpx_library_link_mode} src/empty.cpp)
+
+    target_compile_definitions(hpx_${lib} PRIVATE HPX_${uppercase_lib}_EXPORTS)
+    set_target_properties(hpx_${lib} PROPERTIES POSITION_INDEPENDENT_CODE ON)
     set_target_properties(hpx_${lib} PROPERTIES FOLDER "Core")
+
+    add_subdirectory(${lib})
 
     install(
       TARGETS hpx_${lib}
@@ -318,6 +389,7 @@ foreach(lib ${HPX_LIBS})
       ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime
       RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT runtime
     )
+    hpx_export_internal_targets(hpx_${lib})
 
     # install PDB if needed
     if(MSVC AND NOT HPX_WITH_STATIC_LINKING)
@@ -329,17 +401,81 @@ foreach(lib ${HPX_LIBS})
         OPTIONAL
       )
     endif()
-
-    hpx_export_internal_targets(hpx_${lib})
   endif()
 
-  add_subdirectory(${lib})
+  if(HPX_WITH_CXX_MODULES)
+    # generate list of headers to be #included by the module interface unit
+    set(cxx_module_headers)
+    foreach(cxx_module ${HPX_${uppercase_lib}_ENABLED_CXX_MODULES})
+      set(cxx_module_headers
+          "${cxx_module_headers}#include <hpx/modules/${cxx_module}.hpp>\n"
+      )
+    endforeach()
+
+    configure_file(
+      "${HPX_SOURCE_DIR}/cmake/templates/hpx.ixx.in" ${lib_module_file} @ONLY
+    )
+
+    target_link_libraries(hpx INTERFACE hpx_${lib}_module_if)
+
+    # cmake-format: off
+    target_sources(
+      hpx_${lib}_module PUBLIC
+          FILE_SET hpx_${lib}_public_sources
+              TYPE CXX_MODULES
+              BASE_DIRS ${lib_module_basedir}
+              FILES ${lib_module_file}
+    )
+
+    target_include_directories(hpx_${lib}_module PUBLIC
+        $<BUILD_INTERFACE:${lib_module_basedir}>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}/cxx>
+    )
+
+    # Clang emits DWARF-5 records while compiling the TracyClient library
+    if(HPX_TRACY_WITH_TRACY
+       AND (NOT MSVC)
+       AND (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID
+                                                     MATCHES "AppleClang")
+    )
+      target_link_options(hpx_${lib} PRIVATE "-fuse-ld=lld")
+    endif()
+
+    install(
+      TARGETS hpx_${lib}_module hpx_${lib}_module_if
+      EXPORT HPXInternalTargets
+      LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime
+      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime
+      RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT runtime
+      FILE_SET hpx_${lib}_public_sources
+          DESTINATION ${CMAKE_INSTALL_LIBDIR}/cxx
+      CXX_MODULES_BMI
+          DESTINATION ${CMAKE_INSTALL_LIBDIR}/cxx
+          COMPONENT runtime
+    )
+    hpx_export_internal_targets(hpx_${lib}_module hpx_${lib}_module_if)
+    # cmake-format: on
+
+  endif(HPX_WITH_CXX_MODULES)
 
   set(_hpx_${lib}_modules
       ${_hpx_${lib}_modules}
       PARENT_SCOPE
   )
 endforeach()
+
+if(HPX_WITH_CXX_MODULES)
+  # generate header file that #includes all required standard headers
+  set(cxx_standard_headers)
+  foreach(std_header ${HPX_STANDARD_HEADERS})
+    set(cxx_standard_headers "${cxx_standard_headers}#include ${std_header}\n")
+  endforeach()
+
+  configure_file(
+    "${HPX_SOURCE_DIR}/cmake/templates/std_headers.hpp.in"
+    "core/config/include/hpx/config/std_headers.hpp" @ONLY
+  )
+endif()
 
 # add_hpx_module populates HPX_ENABLED_MODULES
 foreach(module ${HPX_ENABLED_MODULES})

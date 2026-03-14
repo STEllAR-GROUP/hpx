@@ -5,10 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/init.hpp>
+#include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/parallel/algorithms/detail/rfa.hpp>
-#include <hpx/parallel/algorithms/reduce.hpp>
-#include <hpx/parallel/algorithms/reduce_deterministic.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -22,7 +20,7 @@
 
 #include "test_utils.hpp"
 
-int seed = std::random_device{}();
+unsigned int seed = std::random_device{}();
 std::mt19937 gen(seed);
 
 template <typename T>

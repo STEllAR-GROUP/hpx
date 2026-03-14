@@ -14,13 +14,11 @@
 // http://lafstern.org/matt/segmented.pdf.
 
 #include <hpx/config.hpp>
-#include <hpx/algorithms/traits/is_value_proxy.hpp>
-#include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
-#include <hpx/iterator_support/iterator_adaptor.hpp>
-#include <hpx/iterator_support/iterator_facade.hpp>
-#include <hpx/naming_base/id_type.hpp>
+#include <hpx/modules/algorithms.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/naming_base.hpp>
 
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_component_decl.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_fwd.hpp>
@@ -182,7 +180,7 @@ namespace hpx::segmented {
             template <typename T_,
                 typename Enable = std::enable_if_t<!std::is_same_v<
                     std::decay_t<T_>, local_vector_value_proxy>>>
-            local_vector_value_proxy& operator=(T_&& value)
+            local_vector_value_proxy const& operator=(T_&& value) const
             {
                 if (!it_.get_data())
                 {
@@ -270,7 +268,7 @@ namespace hpx::segmented {
             template <typename T_,
                 typename Enable = std::enable_if_t<
                     !std::is_same_v<std::decay_t<T_>, vector_value_proxy>>>
-            vector_value_proxy& operator=(T_&& value)
+            vector_value_proxy const& operator=(T_&& value) const
             {
                 v_->set_value(launch::sync, index_, HPX_FORWARD(T_, value));
                 return *this;

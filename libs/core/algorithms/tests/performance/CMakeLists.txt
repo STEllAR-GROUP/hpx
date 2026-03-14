@@ -10,6 +10,7 @@ set(benchmarks
     benchmark_is_heap
     benchmark_is_heap_until
     benchmark_merge
+    benchmark_merge_sweep
     benchmark_nth_element
     benchmark_nth_element_parallel
     benchmark_partial_sort
@@ -19,6 +20,7 @@ set(benchmarks
     benchmark_reduce_deterministic
     benchmark_remove
     benchmark_remove_if
+    benchmark_reverse
     benchmark_scan_algorithms
     benchmark_unique
     benchmark_unique_copy

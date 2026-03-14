@@ -161,11 +161,11 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/execution/algorithms/detail/predicates.hpp>
-#include <hpx/executors/execution_policy.hpp>
-#include <hpx/functional/invoke.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/executors.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/mismatch.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
@@ -189,7 +189,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        struct lexicographical_compare
+        HPX_CXX_CORE_EXPORT struct lexicographical_compare
           : public algorithm<lexicographical_compare, bool>
         {
             constexpr lexicographical_compare() noexcept
@@ -206,7 +206,7 @@ namespace hpx::parallel {
             {
                 // clang-format off
                 for (; first1 != last1 && first2 != last2;
-                    (void) ++first1, ++first2)
+                    ++first1, ++first2)
                 // clang-format on
                 {
                     if (HPX_INVOKE(pred, HPX_INVOKE(proj1, *first1),
@@ -263,7 +263,7 @@ namespace hpx::parallel {
 
                 using policy_type = std::decay_t<decltype(policy)>;
 
-                std::size_t count = (std::min)(count1, count2);
+                std::size_t count = (std::min) (count1, count2);
                 hpx::parallel::util::cancellation_token<std::size_t> tok(count);
 
                 auto f1 = [tok, pred, proj1, proj2](zip_iterator it,
@@ -287,13 +287,11 @@ namespace hpx::parallel {
 
                 auto f2 = [tok, first1, first2, last1, last2, pred, proj1,
                               proj2](auto&&... data) mutable -> bool {
+                    static_assert(sizeof...(data) < 2);
+
                     // make sure iterators embedded in function object that is
                     // attached to futures are invalidated
-                    static_assert(sizeof...(data) < 2);
-                    if constexpr (sizeof...(data) == 1)
-                    {
-                        util::detail::clear_container(data...);
-                    }
+                    util::detail::clear_container(data...);
 
                     std::size_t mismatched = tok.get_data();
 
@@ -326,28 +324,28 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::lexicographical_compare
-    inline constexpr struct lexicographical_compare_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct lexicographical_compare_t final
       : hpx::detail::tag_parallel_algorithm<lexicographical_compare_t>
     {
-        // clang-format off
         template <typename InIter1, typename InIter2,
-            typename Pred = hpx::parallel::detail::less,
-            HPX_CONCEPT_REQUIRES_(
+            typename Pred = hpx::parallel::detail::less>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<InIter1> &&
                 hpx::traits::is_iterator_v<InIter2> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<InIter1>::value_type,
                     typename std::iterator_traits<InIter2>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend bool tag_fallback_invoke(hpx::lexicographical_compare_t,
             InIter1 first1, InIter1 last1, InIter2 first2, InIter2 last2,
             Pred pred = Pred())
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter1>,
+            static_assert(std::input_iterator<InIter1>,
                 "Requires at least input iterator.");
-            static_assert(hpx::traits::is_input_iterator_v<InIter2>,
+            static_assert(std::input_iterator<InIter2>,
                 "Requires at least input iterator.");
 
             return hpx::parallel::detail::lexicographical_compare().call(
@@ -355,10 +353,10 @@ namespace hpx {
                 HPX_MOVE(pred), hpx::identity_v, hpx::identity_v);
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename Pred = hpx::parallel::detail::less,
-            HPX_CONCEPT_REQUIRES_(
+            typename Pred = hpx::parallel::detail::less>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
@@ -366,15 +364,15 @@ namespace hpx {
                     typename std::iterator_traits<FwdIter1>::value_type,
                     typename std::iterator_traits<FwdIter2>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(
             hpx::lexicographical_compare_t, ExPolicy&& policy, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, Pred pred = Pred())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::lexicographical_compare().call(

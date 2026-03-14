@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -47,7 +47,7 @@ hpx::future<void> spawn_level(std::size_t num_tasks)
         for (std::size_t i = 0; i != spread && spawn_hierarchically != 0; ++i)
         {
             std::size_t sub_spawn =
-                (std::min)(spawn_hierarchically, num_sub_tasks);
+                (std::min) (spawn_hierarchically, num_sub_tasks);
             spawn_hierarchically -= sub_spawn;
             num_tasks -= sub_spawn;
 
@@ -86,8 +86,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
         std::uint64_t end = hpx::chrono::high_resolution_clock::now();
 
-        seqential_time_per_task =
-            static_cast<double>(end - start) / 1e9 / num_tasks;
+        seqential_time_per_task = static_cast<double>(end - start) / 1e9 /
+            static_cast<double>(num_tasks);
         std::cout << "Elapsed sequential time: "
                   << static_cast<double>(end - start) / 1e9 << " [s], ("
                   << seqential_time_per_task << " [s])" << std::endl;
@@ -105,8 +105,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
         std::uint64_t end = hpx::chrono::high_resolution_clock::now();
 
-        hierarchical_time_per_task =
-            static_cast<double>(end - start) / 1e9 / num_tasks;
+        hierarchical_time_per_task = static_cast<double>(end - start) / 1e9 /
+            static_cast<double>(num_tasks);
         std::cout << "Elapsed hierarchical time: "
                   << static_cast<double>(end - start) / 1e9 << " [s], ("
                   << hierarchical_time_per_task << " [s])" << std::endl;

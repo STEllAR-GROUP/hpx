@@ -27,6 +27,7 @@ foreach(example_program ${example_programs})
     SOURCES ${sources}
     COMPONENT_DEPENDENCIES ${example_program} iostreams
     FOLDER "Examples/TupleSpace/${example_program}"
+           ${HPX_WITH_CXX_MODULES_OPTION}
   )
 
   add_hpx_example_target_dependencies("tuplespace" ${example_program}_client)

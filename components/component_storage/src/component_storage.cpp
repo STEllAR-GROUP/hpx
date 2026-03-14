@@ -7,14 +7,16 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/modules/async_distributed.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/runtime_components/new.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <hpx/components/component_storage/component_storage.hpp>
 
 #include <cstddef>
 #include <utility>
 #include <vector>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace components {
     component_storage::component_storage(hpx::id_type target_locality)

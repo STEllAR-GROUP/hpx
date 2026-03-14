@@ -5,10 +5,13 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// make available M_PI
-#define _USE_MATH_DEFINES
-
 #include <hpx/config.hpp>
+
+// make available M_PI
+#if !defined(_USE_MATH_DEFINES)
+#define _USE_MATH_DEFINES
+#endif
+
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/algorithm.hpp>
 #include <hpx/execution.hpp>
@@ -36,8 +39,6 @@ static std::string const pool_name = "mpi";
 
 // ------------------------------------------------------------------------
 // this is our custom scheduler type
-using numa_scheduler =
-    hpx::threads::policies::shared_priority_queue_scheduler<>;
 using namespace hpx::threads::policies;
 using hpx::threads::policies::scheduler_mode;
 
@@ -47,9 +48,11 @@ void do_stuff(std::size_t n, bool printout)
 {
     if (printout)
         std::cout << "[do stuff] " << n << "\n";
+
+    double convert = 2.0 * M_PI / static_cast<double>(n);
     for (std::size_t i(0); i < n; ++i)
     {
-        double f = std::sin(2 * M_PI * i / n);
+        double f = std::sin(convert * static_cast<double>(i));
         if (printout)
             std::cout << "sin(" << i << ") = " << f << ", ";
     }

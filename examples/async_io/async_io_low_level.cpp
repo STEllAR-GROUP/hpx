@@ -11,8 +11,8 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/runtime.hpp>
 #include <hpx/include/util.hpp>
-#include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/iostream.hpp>
+#include <hpx/modules/io_service.hpp>
 
 #include <iostream>
 #include <memory>
@@ -39,7 +39,12 @@ hpx::future<int> async_io(char const* string_to_write)
         hpx::get_runtime().get_thread_pool("io_pool");
 
     // ... and schedule the handler to run on one of its OS-threads.
+#if ASIO_VERSION >= 103400
+    ::asio::post(
+        pool->get_io_service(), hpx::bind(&do_async_io, string_to_write, p));
+#else
     pool->get_io_service().post(hpx::bind(&do_async_io, string_to_write, p));
+#endif
 
     return p->get_future();
 }

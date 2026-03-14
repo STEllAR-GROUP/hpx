@@ -7,7 +7,6 @@
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 
-#include <algorithm>
 #include <iostream>
 #include <random>
 #include <string>
@@ -70,7 +69,7 @@ int main(int argc, char* argv[])
     desc_commandline.add_options()("seed,s", value<unsigned int>(),
         "the random number generator seed to use for this run");
 
-    // By default this test should run on all available cores
+    // By default, this test should run on all available cores
     std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX

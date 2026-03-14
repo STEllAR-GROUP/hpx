@@ -4,13 +4,13 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/affinity/affinity_data.hpp>
-#include <hpx/hardware/timestamp.hpp>
+#include <hpx/modules/affinity.hpp>
+#include <hpx/modules/hardware.hpp>
+#include <hpx/modules/timing.hpp>
+#include <hpx/modules/topology.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/scheduler_state.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
-#include <hpx/timing/high_resolution_clock.hpp>
-#include <hpx/topology/topology.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -42,7 +42,7 @@ namespace hpx::threads {
 
         std::size_t const max_cores = get_os_thread_count();
         for (std::size_t thread_num = 0;
-             thread_num != max_cores && num_cores != 0; ++thread_num)
+            thread_num != max_cores && num_cores != 0; ++thread_num)
         {
             if (sched->get_state(thread_num).load() <= hpx::state::suspended)
             {
@@ -132,9 +132,9 @@ namespace hpx::threads {
     std::size_t thread_pool_base::get_active_os_thread_count() const
     {
         std::size_t active_os_thread_count = 0;
+        std::size_t const max_cores = get_os_thread_count();
 
-        for (std::size_t thread_num = 0; thread_num < get_os_thread_count();
-             ++thread_num)
+        for (std::size_t thread_num = 0; thread_num < max_cores; ++thread_num)
         {
             if (get_scheduler()->get_state(thread_num).load() <=
                 hpx::state::suspended)

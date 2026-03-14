@@ -16,17 +16,17 @@
 namespace hpx {
 
 #if defined(HPX_HAVE_CXX20_STD_CONSTRUCT_AT)
-    using std::construct_at;
+    HPX_CXX_CORE_EXPORT using std::construct_at;
 #else
-    template <typename T, typename... Ts,
-        typename Enable = std::void_t<decltype(
-            ::new (std::declval<void*>()) T(std::declval<Ts>()...))>>
+    HPX_CXX_CORE_EXPORT template <typename T, typename... Ts,
+        typename Enable = std::void_t<decltype(::new(std::declval<void*>())
+                T(std::declval<Ts>()...))>>
     constexpr T* construct_at(T* addr, Ts&&... ts) noexcept(noexcept(
-        ::new (const_cast<void*>(static_cast<const volatile void*>(addr)))
+        ::new(const_cast<void*>(static_cast<void const volatile*>(addr)))
             T(HPX_FORWARD(Ts, ts)...)))
     {
         return ::new (const_cast<void*>(
-            static_cast<const volatile void*>(addr))) T(HPX_FORWARD(Ts, ts)...);
+            static_cast<void const volatile*>(addr))) T(HPX_FORWARD(Ts, ts)...);
     }
 #endif
 

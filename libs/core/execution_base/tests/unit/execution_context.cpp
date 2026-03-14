@@ -17,7 +17,7 @@
 
 std::size_t dummy_called = 0;
 
-struct dummy_context : hpx::execution_base::context_base
+struct dummy_context final : hpx::execution_base::context_base
 {
     hpx::execution_base::resource_base const& resource() const noexcept override
     {
@@ -42,7 +42,10 @@ struct dummy_agent : hpx::execution_base::agent_base
     {
         ++dummy_called;
     }
-    void yield_k(std::size_t, char const*) override {}
+    bool yield_k(std::size_t, char const*) override
+    {
+        return true;
+    }
     void suspend(char const*) override {}
     void resume(hpx::threads::thread_priority, char const*) override {}
     void abort(char const*) override {}
@@ -113,9 +116,9 @@ void test_yield()
     simple_spinlock mutex;
     std::size_t counter = 0;
     std::size_t repetitions = 1000;
-    for (std::size_t i = 0; i !=
-         static_cast<std::size_t>(std::thread::hardware_concurrency()) * 10;
-         ++i)
+    for (std::size_t i = 0;
+        i != static_cast<std::size_t>(std::thread::hardware_concurrency()) * 10;
+        ++i)
     {
         ts.emplace_back([&mutex, &counter, repetitions]() {
             for (std::size_t repeat = 0; repeat != repetitions; ++repeat)

@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/execution/algorithms/detail/predicates.hpp>
-#include <hpx/functional/invoke.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 
 #include <algorithm>
@@ -17,7 +17,7 @@
 namespace hpx::parallel::detail {
 
     // provide implementation of std::rotate supporting iterators/sentinels
-    template <typename Iter, typename Sent>
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent>
     constexpr void sequential_rotate_helper(
         Iter first, Iter new_first, Sent last)
     {
@@ -40,7 +40,7 @@ namespace hpx::parallel::detail {
         }
     }
 
-    template <typename Iter, typename Sent>
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent>
     constexpr util::in_out_result<Iter, Sent> sequential_rotate(
         Iter first, Iter new_first, Sent last)
     {

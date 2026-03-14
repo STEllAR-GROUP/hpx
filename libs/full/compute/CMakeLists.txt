@@ -29,6 +29,7 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
       hpx_actions
       hpx_actions_base
       hpx_naming
+      hpx_naming_base
       hpx_performance_counters
       hpx_async_distributed
       hpx_runtime_components

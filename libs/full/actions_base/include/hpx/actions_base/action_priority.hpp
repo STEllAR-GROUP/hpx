@@ -9,7 +9,7 @@
 
 #include <hpx/actions_base/traits/action_priority.hpp>
 #include <hpx/actions_base/traits/extract_action.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
+#include <hpx/modules/coroutines.hpp>
 
 namespace hpx::actions {
 

@@ -8,13 +8,13 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/invoke.hpp>
-#include <hpx/type_support/identity.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/type_support.hpp>
 
 namespace hpx::parallel::detail {
 
-    template <typename Iter, typename Sent, typename Compare,
-        typename Proj = hpx::identity>
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent,
+        typename Compare, typename Proj = hpx::identity>
     constexpr bool is_sorted_sequential(
         Iter first, Sent last, Compare&& comp, Proj&& proj = Proj())
     {
@@ -22,9 +22,9 @@ namespace hpx::parallel::detail {
         if (first != last)
         {
             for (Iter it1 = first, it2 = ++first; it2 != last &&
-                 ((sorted = !HPX_INVOKE(
-                       comp, HPX_INVOKE(proj, *it2), HPX_INVOKE(proj, *it1))));
-                 it1 = it2++)
+                ((sorted = !HPX_INVOKE(
+                      comp, HPX_INVOKE(proj, *it2), HPX_INVOKE(proj, *it1))));
+                it1 = it2++)
             {
                 /**/
             }
@@ -32,8 +32,8 @@ namespace hpx::parallel::detail {
         return sorted;
     }
 
-    template <typename Iter, typename Sent, typename Compare,
-        typename Proj = hpx::identity>
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent,
+        typename Compare, typename Proj = hpx::identity>
     constexpr Iter is_sorted_until_sequential(
         Iter first, Sent last, Compare&& comp, Proj&& proj = Proj())
     {
@@ -42,9 +42,9 @@ namespace hpx::parallel::detail {
             Iter it1 = first;
             Iter it2 = ++first;
             for (; it2 != last &&
-                 !HPX_INVOKE(
-                     comp, HPX_INVOKE(proj, *it2), HPX_INVOKE(proj, *it1));
-                 it1 = it2++)
+                !HPX_INVOKE(
+                    comp, HPX_INVOKE(proj, *it2), HPX_INVOKE(proj, *it1));
+                it1 = it2++)
             {
                 /**/
             }

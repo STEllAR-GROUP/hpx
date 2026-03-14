@@ -5,7 +5,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.19 FATAL_ERROR)
 
 set(CTEST_TEST_TIMEOUT 300)
 set(CTEST_BUILD_PARALLELISM 20)

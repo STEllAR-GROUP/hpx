@@ -20,14 +20,16 @@
 //
 // and the second invocation should issue an error message.
 
-#include <hpx/datastructures/any.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/modules/program_options.hpp>
-#include <hpx/util/from_string.hpp>
 
 #include <iostream>
 #include <regex>
 #include <string>
 #include <vector>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 using namespace hpx::program_options;
 
@@ -54,7 +56,7 @@ bool operator==(magic_number const& lhs, magic_number const& rhs)
    regex can be used to validate values.
 */
 void validate(
-    any& v, const std::vector<std::string>& values, magic_number*, int)
+    any& v, std::vector<std::string> const& values, magic_number*, int)
 {
     static std::regex r(R"(\d\d\d-(\d\d\d))");
 
@@ -63,7 +65,7 @@ void validate(
 
     // Extract the first string from 'values'. If there is more than
     // one string, it's an error, and exception will be thrown.
-    const std::string& s = validators::get_single_string(values);
+    std::string const& s = validators::get_single_string(values);
 
     // Do regex match and convert the interesting part to
     // int.

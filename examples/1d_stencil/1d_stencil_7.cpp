@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2022 Hartmut Kaiser
+//  Copyright (c) 2014-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,8 +15,6 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/serialization.hpp>
-
-#include <boost/shared_array.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -78,8 +76,8 @@ public:
       , size_(size)
       , min_index_(0)
     {
-        double base_value = double(initial_value * size);
-        for (std::size_t i = 0; i != size; ++i)
+        double base_value = initial_value * double(size);
+        for (std::ptrdiff_t i = 0; i != static_cast<std::ptrdiff_t>(size); ++i)
             data_[i] = base_value + double(i);
     }
 
@@ -122,7 +120,7 @@ private:
     friend class hpx::serialization::access;
 
     template <typename Archive>
-    void serialize(Archive& ar, const unsigned int)
+    void serialize(Archive& ar, unsigned int const)
     {
         // clang-format off
         ar & data_ & size_ & min_index_;
@@ -380,13 +378,13 @@ stepper::space stepper::do_work(std::size_t np, std::size_t nx, std::size_t nt)
         {
             next[0].then([sem, t](partition&&) {
                 // inform semaphore about new lower limit
-                sem->signal(t);
+                sem->signal(static_cast<std::int64_t>(t));
             });
         }
 
         // suspend if the tree has become too deep, the continuation above
         // will resume this thread once the computation has caught up
-        sem->wait(t);
+        sem->wait(static_cast<std::int64_t>(t));
     }
 
     // Return the solution at time-step 'nt'.

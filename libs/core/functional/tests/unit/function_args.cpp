@@ -8,7 +8,7 @@
 
 // For more information, see http://www.boost.org
 
-#include <hpx/functional/function.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <iostream>
@@ -119,7 +119,7 @@ void f_rvalue_ref(counter&&) {}
 
 void test_by_rvalue_ref()
 {
-    hpx::function<void(counter &&)> f = f_rvalue_ref;
+    hpx::function<void(counter&&)> f = f_rvalue_ref;
 
     counter::reset();
 

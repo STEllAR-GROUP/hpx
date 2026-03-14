@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,17 +12,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/functional/deferred_call.hpp>
-#include <hpx/functional/function.hpp>
-#include <hpx/functional/move_only_function.hpp>
-#include <hpx/futures/future_fwd.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/synchronization/spinlock.hpp>
-#include <hpx/threading_base/scheduler_base.hpp>
-#include <hpx/threading_base/thread_data.hpp>
-#include <hpx/threading_base/thread_pool_base.hpp>
-#include <hpx/timing/steady_clock.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/synchronization.hpp>
+#include <hpx/modules/threading_base.hpp>
+#include <hpx/modules/timing.hpp>
 
+#include <concepts>
 #include <cstddef>
 #include <exception>
 #include <functional>
@@ -37,13 +34,13 @@
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    using thread_termination_handler_type =
+    HPX_CXX_CORE_EXPORT using thread_termination_handler_type =
         hpx::function<void(std::exception_ptr const& e)>;
-    HPX_CORE_EXPORT void set_thread_termination_handler(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void set_thread_termination_handler(
         thread_termination_handler_type f);
 
     /// The class thread represents a single thread of execution. Threads allow
-    /// multiple functions to execute concurrently. hreads begin execution
+    /// multiple functions to execute concurrently. Threads begin execution
     /// immediately upon construction of the associated thread object (pending
     /// any OS scheduling delays), starting at the top-level function provided
     /// as a constructor argument. The return value of the top-level function is
@@ -58,7 +55,7 @@ namespace hpx {
     /// same thread of execution; \a hpx::thread is not \a CopyConstructible or
     /// \a CopyAssignable, although it is \a MoveConstructible and \a
     /// MoveAssignable.
-    class HPX_CORE_EXPORT thread
+    HPX_CXX_CORE_EXPORT class HPX_CORE_EXPORT thread
     {
         using mutex_type = hpx::spinlock;
 
@@ -70,9 +67,8 @@ namespace hpx {
 
         thread() noexcept;
 
-        template <typename F,
-            typename Enable =
-                std::enable_if_t<!std::is_same_v<std::decay_t<F>, thread>>>
+        template <typename F>
+            requires(!std::same_as<std::decay_t<F>, thread>)
         explicit thread(F&& f)
         {
             auto thrd_data = threads::get_self_id_data();
@@ -116,17 +112,17 @@ namespace hpx {
         /// parallel context
         bool joinable() const noexcept
         {
-            std::lock_guard<mutex_type> l(mtx_);
+            std::scoped_lock<mutex_type> l(mtx_);
             return joinable_locked();
         }
 
         /// waits for the thread to finish its execution
         void join();
 
-        /// permits the thread to execute independently from the thread handle
+        /// permits the thread to execute independently of the thread handle
         void detach()
         {
-            std::lock_guard<mutex_type> l(mtx_);
+            std::scoped_lock<mutex_type> l(mtx_);
             detach_locked();
         }
 
@@ -136,7 +132,7 @@ namespace hpx {
         /// returns the underlying implementation-defined thread handle
         native_handle_type native_handle() const    //-V659
         {
-            std::lock_guard<mutex_type> l(mtx_);
+            std::scoped_lock<mutex_type> l(mtx_);
             return id_.noref();
         }
 
@@ -145,15 +141,15 @@ namespace hpx {
         [[nodiscard]] static unsigned int hardware_concurrency() noexcept;
 
         // extensions
-        void interrupt(bool flag = true);
+        void interrupt(bool flag = true) const;
         bool interruption_requested() const;
 
         static void interrupt(id, bool flag = true);
 
-        hpx::future<void> get_future(error_code& ec = throws);
+        hpx::future<void> get_future(error_code& ec = throws) const;
 
         std::size_t get_thread_data() const;
-        std::size_t set_thread_data(std::size_t);
+        std::size_t set_thread_data(std::size_t) const;
 
 #if defined(HPX_HAVE_LIBCDS)
         std::size_t get_libcds_data() const;
@@ -185,7 +181,7 @@ namespace hpx {
         threads::thread_id_ref_type id_;
     };
 
-    inline void swap(thread& x, thread& y) noexcept
+    HPX_CXX_CORE_EXPORT inline void swap(thread& x, thread& y) noexcept
     {
         x.swap(y);
     }
@@ -241,37 +237,43 @@ namespace hpx {
         }
     };
 
-    inline bool operator==(thread::id const& x, thread::id const& y) noexcept
+    HPX_CXX_CORE_EXPORT inline bool operator==(
+        thread::id const& x, thread::id const& y) noexcept
     {
         return x.id_ == y.id_;
     }
 
-    inline bool operator!=(thread::id const& x, thread::id const& y) noexcept
+    HPX_CXX_CORE_EXPORT inline bool operator!=(
+        thread::id const& x, thread::id const& y) noexcept
     {
         return !(x == y);
     }
 
-    inline bool operator<(thread::id const& x, thread::id const& y) noexcept
+    HPX_CXX_CORE_EXPORT inline bool operator<(
+        thread::id const& x, thread::id const& y) noexcept
     {
         return x.id_ < y.id_;
     }
 
-    inline bool operator>(thread::id const& x, thread::id const& y) noexcept
+    HPX_CXX_CORE_EXPORT inline bool operator>(
+        thread::id const& x, thread::id const& y) noexcept
     {
         return y < x;
     }
 
-    inline bool operator<=(thread::id const& x, thread::id const& y) noexcept
+    HPX_CXX_CORE_EXPORT inline bool operator<=(
+        thread::id const& x, thread::id const& y) noexcept
     {
         return !(x > y);
     }
 
-    inline bool operator>=(thread::id const& x, thread::id const& y) noexcept
+    HPX_CXX_CORE_EXPORT inline bool operator>=(
+        thread::id const& x, thread::id const& y) noexcept
     {
         return !(x < y);
     }
 
-    template <typename Char, typename Traits>
+    HPX_CXX_CORE_EXPORT template <typename Char, typename Traits>
     std::basic_ostream<Char, Traits>& operator<<(
         std::basic_ostream<Char, Traits>& out, thread::id const& id)
     {
@@ -283,7 +285,7 @@ namespace hpx {
     namespace this_thread {
 
         /// \brief Returns the id of the current thread
-        HPX_CORE_EXPORT thread::id get_id() noexcept;
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT thread::id get_id() noexcept;
 
         /// Provides a hint to the implementation to reschedule the execution of
         /// threads, allowing other threads to run.
@@ -296,18 +298,20 @@ namespace hpx {
         ///        the queue of the same-priority threads that are ready to run
         ///        (and if there are no other threads at the same priority,
         ///        yield has no effect).
-        HPX_CORE_EXPORT void yield() noexcept;
-        HPX_CORE_EXPORT void yield_to(thread::id) noexcept;
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void yield() noexcept;
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void yield_to(thread::id) noexcept;
 
         // extensions
-        HPX_CORE_EXPORT threads::thread_priority get_priority() noexcept;
-        HPX_CORE_EXPORT std::ptrdiff_t get_stack_size() noexcept;
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT threads::thread_priority
+        get_priority() noexcept;
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT std::ptrdiff_t
+        get_stack_size() noexcept;
 
-        HPX_CORE_EXPORT void interruption_point();
-        HPX_CORE_EXPORT bool interruption_enabled();
-        HPX_CORE_EXPORT bool interruption_requested();
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void interruption_point();
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT bool interruption_enabled();
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT bool interruption_requested();
 
-        HPX_CORE_EXPORT void interrupt();
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void interrupt();
 
         /// Blocks the execution of the current thread until specified
         /// \a abs_time has been reached.
@@ -321,7 +325,7 @@ namespace hpx {
         ///          block until after \a abs_time has been reached due to
         ///          process scheduling or resource contention delays.
         /// \param abs_time absolute time to block until
-        HPX_CORE_EXPORT void sleep_until(
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void sleep_until(
             hpx::chrono::steady_time_point const& abs_time);
 
         /// Blocks the execution of the current thread for at least the
@@ -332,25 +336,31 @@ namespace hpx {
         ///          duration. If an implementation uses a system clock instead,
         ///          the wait time may also be sensitive to clock adjustments.
         /// \param rel_time time duration to sleep
-        inline void sleep_for(hpx::chrono::steady_duration const& rel_time)
+        HPX_CXX_CORE_EXPORT inline void sleep_for(
+            hpx::chrono::steady_duration const& rel_time)
         {
             sleep_until(rel_time.from_now());
         }
 
-        HPX_CORE_EXPORT std::size_t get_thread_data();
-        HPX_CORE_EXPORT std::size_t set_thread_data(std::size_t);
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT std::size_t get_thread_data();
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT std::size_t set_thread_data(
+            std::size_t);
 
 #if defined(HPX_HAVE_LIBCDS)
-        HPX_CORE_EXPORT std::size_t get_libcds_data();
-        HPX_CORE_EXPORT std::size_t set_libcds_data(std::size_t);
-        HPX_CORE_EXPORT std::size_t get_libcds_hazard_pointer_data();
-        HPX_CORE_EXPORT std::size_t set_libcds_hazard_pointer_data(std::size_t);
-        HPX_CORE_EXPORT std::size_t get_libcds_dynamic_hazard_pointer_data();
-        HPX_CORE_EXPORT std::size_t set_libcds_dynamic_hazard_pointer_data(
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT std::size_t get_libcds_data();
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT std::size_t set_libcds_data(
             std::size_t);
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT std::size_t
+        get_libcds_hazard_pointer_data();
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT std::size_t
+        set_libcds_hazard_pointer_data(std::size_t);
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT std::size_t
+        get_libcds_dynamic_hazard_pointer_data();
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT std::size_t
+        set_libcds_dynamic_hazard_pointer_data(std::size_t);
 #endif
 
-        class HPX_CORE_EXPORT disable_interruption
+        HPX_CXX_CORE_EXPORT class HPX_CORE_EXPORT disable_interruption
         {
         private:
             disable_interruption(disable_interruption const&);
@@ -364,7 +374,7 @@ namespace hpx {
             ~disable_interruption();
         };
 
-        class HPX_CORE_EXPORT restore_interruption
+        HPX_CXX_CORE_EXPORT class HPX_CORE_EXPORT restore_interruption
         {
         private:
             restore_interruption(restore_interruption const&);
@@ -379,18 +389,15 @@ namespace hpx {
     }    // namespace this_thread
 }    // namespace hpx
 
-namespace std {
-
-    // specialize std::hash for hpx::thread::id
-    template <>
-    struct hash<::hpx::thread::id>
+// specialize std::hash for hpx::thread::id
+template <>
+struct std::hash<::hpx::thread::id>
+{
+    std::size_t operator()(::hpx::thread::id const& id) const noexcept
     {
-        std::size_t operator()(::hpx::thread::id const& id) const
-        {
-            std::hash<::hpx::threads::thread_id_ref_type> hasher_;
-            return hasher_(id.native_handle());
-        }
-    };
-}    // namespace std
+        std::hash<::hpx::threads::thread_id_ref_type> hasher_;
+        return hasher_(id.native_handle());
+    }
+};
 
 #include <hpx/config/warnings_suffix.hpp>

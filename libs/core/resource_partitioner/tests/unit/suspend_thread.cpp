@@ -24,7 +24,7 @@
 #include <utility>
 #include <vector>
 
-std::size_t const max_threads = (std::min)(static_cast<std::size_t>(4),
+std::size_t const max_threads = (std::min) (static_cast<std::size_t>(4),
     static_cast<std::size_t>(hpx::threads::hardware_concurrency()));
 
 int hpx_main()
@@ -43,7 +43,7 @@ int hpx_main()
     {
         // Check number of used resources
         for (std::size_t thread_num = 0; thread_num < num_threads - 1;
-             ++thread_num)
+            ++thread_num)
         {
             hpx::threads::suspend_processing_unit(tp, thread_num).get();
             HPX_TEST_EQ(static_cast<std::size_t>(num_threads - thread_num - 1),
@@ -51,7 +51,7 @@ int hpx_main()
         }
 
         for (std::size_t thread_num = 0; thread_num < num_threads - 1;
-             ++thread_num)
+            ++thread_num)
         {
             hpx::threads::resume_processing_unit(tp, thread_num).get();
             HPX_TEST_EQ(static_cast<std::size_t>(thread_num + 2),
@@ -80,7 +80,7 @@ int hpx_main()
         for (thread_num = 0; thread_num < num_threads; ++thread_num)
         {
             for (std::size_t thread_num_suspend = 0;
-                 thread_num_suspend < num_threads; ++thread_num_suspend)
+                thread_num_suspend < num_threads; ++thread_num_suspend)
             {
                 if (thread_num != thread_num_suspend)
                 {
@@ -93,7 +93,7 @@ int hpx_main()
             hpx::async(test_function).wait();
 
             for (std::size_t thread_num_resume = 0;
-                 thread_num_resume < num_threads; ++thread_num_resume)
+                thread_num_resume < num_threads; ++thread_num_resume)
             {
                 if (thread_num != thread_num_resume)
                 {
@@ -108,8 +108,8 @@ int hpx_main()
         // Check suspending and resuming the same thread without waiting for
         // each to finish.
         for (std::size_t thread_num = 0;
-             thread_num < hpx::resource::get_num_threads("default");
-             ++thread_num)
+            thread_num < hpx::resource::get_num_threads("default");
+            ++thread_num)
         {
             std::vector<hpx::future<void>> fs;
 
@@ -164,7 +164,7 @@ int hpx_main()
         while (t.elapsed() < 2)
         {
             for (std::size_t i = 0;
-                 i < hpx::resource::get_num_threads("default") * 10; ++i)
+                i < hpx::resource::get_num_threads("default") * 10; ++i)
             {
                 fs.push_back(hpx::async(policy, []() {}));
             }
@@ -203,7 +203,7 @@ int hpx_main()
 
         // Don't exit with suspended pus
         for (std::size_t thread_num_resume = 0; thread_num_resume < thread_num;
-             ++thread_num_resume)
+            ++thread_num_resume)
         {
             hpx::threads::resume_processing_unit(tp, thread_num_resume).get();
         }

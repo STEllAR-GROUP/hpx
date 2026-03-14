@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2022 The STE||AR-Group
+# Copyright (c) 2019-2025 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,10 +16,14 @@ set(string_util_headers
     hpx/string_util/trim.hpp
 )
 
+set(string_util_sources)
+
 include(HPX_AddModule)
 add_hpx_module(
   core string_util
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
+  SOURCES ${string_util_sources}
   HEADERS ${string_util_headers}
   MODULE_DEPENDENCIES hpx_assertion hpx_config hpx_errors hpx_iterator_support
   CMAKE_SUBDIRS examples tests

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2017 Shoshana Jakobovits
 //  Copyright (c) 2010-2011 Phillip LeBlanc, Dylan Stark
 //  Copyright (c)      2011 Bryce Lelbach
@@ -8,42 +8,29 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/assert.hpp>
-#include <hpx/command_line_handling_local/command_line_handling_local.hpp>
-#include <hpx/coroutines/detail/context_impl.hpp>
-#include <hpx/execution/detail/execution_parameter_callbacks.hpp>
-#include <hpx/executors/exception_list.hpp>
-#include <hpx/functional/bind_front.hpp>
-#include <hpx/functional/function.hpp>
-#include <hpx/futures/detail/future_data.hpp>
 #include <hpx/init_runtime_local/detail/init_logging.hpp>
 #include <hpx/init_runtime_local/init_runtime_local.hpp>
-#include <hpx/lock_registration/detail/register_locks.hpp>
+#include <hpx/modules/algorithms.hpp>
+#include <hpx/modules/command_line_handling_local.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/executors.hpp>
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/program_options.hpp>
+#include <hpx/modules/resource_partitioner.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/schedulers.hpp>
+#include <hpx/modules/string_util.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/modules/threading.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/timing.hpp>
-#include <hpx/parallel/util/detail/handle_exception_termination_handler.hpp>
-#include <hpx/program_options/parsers.hpp>
-#include <hpx/program_options/variables_map.hpp>
-#include <hpx/resource_partitioner/partitioner.hpp>
-#include <hpx/runtime_local/config_entry.hpp>
-#include <hpx/runtime_local/custom_exception_info.hpp>
-#include <hpx/runtime_local/debugging.hpp>
-#include <hpx/runtime_local/detail/serialize_exception.hpp>
-#include <hpx/runtime_local/get_locality_id.hpp>
-#include <hpx/runtime_local/runtime_handlers.hpp>
-#include <hpx/runtime_local/runtime_local.hpp>
-#include <hpx/runtime_local/shutdown_function.hpp>
-#include <hpx/runtime_local/startup_function.hpp>
-#include <hpx/string_util/classification.hpp>
-#include <hpx/string_util/split.hpp>
-#include <hpx/threading/thread.hpp>
-#include <hpx/threading_base/detail/get_default_timer_service.hpp>
-#include <hpx/type_support/pack.hpp>
-#include <hpx/type_support/unused.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #if defined(HPX_NATIVE_MIC) || defined(__bgq__)
 #include <cstdlib>
@@ -447,7 +434,8 @@ namespace hpx {
                 int result;
                 try
                 {
-                    if ((result = ensure_no_runtime_is_up()) != 0)
+                    result = ensure_no_runtime_is_up();
+                    if (result != 0)
                     {
                         return result;
                     }
@@ -550,5 +538,5 @@ namespace hpx {
                 return default_desc_;
             }
         }    // namespace detail
-    }        // namespace local
+    }    // namespace local
 }    // namespace hpx

@@ -1,6 +1,6 @@
 //  Copyright (c) 2015 Daniel Bourgeois
 //  Copyright (c) 2021 Karame M.Shokooh
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -99,6 +99,7 @@ void test_adjacent_difference_async_direct(Policy l, ExPolicy&& p)
     std::adjacent_difference(std::begin(c), std::end(c), std::begin(d_ans));
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(d_ans)));
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     HPX_TEST(std::end(d) == hpx::get<0>(*result));
 }
 

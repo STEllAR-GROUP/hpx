@@ -1,23 +1,17 @@
-//  Copyright (c) 2021-2022 Hartmut Kaiser
+//  Copyright (c) 2021-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// enforce pointers being serializable
-#define HPX_SERIALIZATION_HAVE_ALLOW_RAW_POINTER_SERIALIZATION
-
-// allow for const tuple members
-#define HPX_SERIALIZATION_HAVE_ALLOW_CONST_TUPLE_MEMBERS
-
 #include <hpx/config.hpp>
-#include <hpx/init.hpp>
-#include <hpx/serialization/input_archive.hpp>
-#include <hpx/serialization/output_archive.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/tuple.hpp>
+#include <hpx/modules/serialization.hpp>
 
+#if defined(HPX_SERIALIZATION_HAVE_ALLOW_RAW_POINTER_SERIALIZATION)
+
+#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/tuple.hpp>
 
 #include <cstddef>
 #include <string>
@@ -41,22 +35,28 @@ struct A
 
 int hpx_main()
 {
+#if defined(HPX_SERIALIZATION_HAVE_ALLOW_CONST_TUPLE_MEMBERS)
+    using tuple_type = hpx::tuple<int*, int const>;
+#else
+    using tuple_type = hpx::tuple<int*, int>;
+#endif
+
     // serialize raw pointer as part of tuple
     {
-        static_assert(hpx::traits::is_bitwise_serializable_v<
-            hpx::tuple<int*, int const>>);
+        // enforce pointers being serializable
+        static_assert(hpx::traits::is_bitwise_serializable_v<tuple_type>);
 
         int value = 42;
-        hpx::tuple<int*, int const> ot{&value, value};
+        tuple_type const ot{&value, value};
 
         std::vector<char> buffer;
         std::vector<hpx::serialization::serialization_chunk> chunks;
         hpx::serialization::output_archive oarchive(buffer, 0, &chunks);
         oarchive << ot;
-        std::size_t size = oarchive.bytes_written();
+        std::size_t const size = oarchive.bytes_written();
 
         hpx::serialization::input_archive iarchive(buffer, size, &chunks);
-        hpx::tuple<int*, int const> it{nullptr, 0};
+        tuple_type it{nullptr, 0};
         iarchive >> it;
         HPX_TEST(ot == it);
     }
@@ -69,3 +69,12 @@ int main(int argc, char* argv[])
     hpx::local::init(hpx_main, argc, argv);
     return hpx::util::report_errors();
 }
+
+#else
+
+int main(int, char*[])
+{
+    return 0;
+}
+
+#endif

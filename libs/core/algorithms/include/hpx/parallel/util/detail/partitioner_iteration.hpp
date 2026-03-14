@@ -7,7 +7,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/invoke_fused.hpp>
+#include <hpx/datastructures/traits/is_tuple_like.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -18,34 +20,80 @@ namespace hpx::parallel::util::detail {
 
     // Hand-crafted function object allowing to replace a more complex
     // bind(hpx::functional::invoke_fused(), f1, _1)
-    template <typename Result, typename F>
+    HPX_CXX_CORE_EXPORT template <typename Result, typename F>
     struct partitioner_iteration
     {
         std::decay_t<F> f_;
 
+        // Overload for tuple-like types - unpack using index_pack
         template <typename T>
-        HPX_HOST_DEVICE HPX_FORCEINLINE Result operator()(T&& t)
+            requires(hpx::traits::is_tuple_like_v<std::decay_t<T>>)
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Result operator()(T&& t)
         {
-            return hpx::invoke_fused_r<Result>(f_, HPX_FORWARD(T, t));
+            using embedded_index_pack_type = hpx::util::make_index_pack<
+                hpx::tuple_size<std::decay_t<T>>::value>;
+
+            // NOLINTBEGIN(bugprone-use-after-move)
+            if constexpr (std::is_invocable_v<F, embedded_index_pack_type, T&&>)
+            {
+                return HPX_INVOKE_R(
+                    Result, f_, embedded_index_pack_type{}, HPX_FORWARD(T, t));
+            }
+            else
+            {
+                return (*this)(embedded_index_pack_type{}, t);
+            }
+            // NOLINTEND(bugprone-use-after-move)
+        }
+
+        // Overload for non-tuple types (std::size_t from stdexec bulk)
+        template <typename T>
+            requires(!hpx::traits::is_tuple_like_v<std::decay_t<T>>)
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Result operator()(T&& t)
+        {
+            return HPX_INVOKE_R(Result, f_, HPX_FORWARD(T, t));
+        }
+
+        template <std::size_t... Is, typename... Ts>
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Result operator()(
+            hpx::util::index_pack<Is...>, hpx::tuple<Ts...>& t)
+        {
+            return hpx::util::void_guard<Result>(),
+                   HPX_INVOKE(f_, hpx::get<Is>(t)...);
+        }
+
+        template <std::size_t... Is, typename... Ts>
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Result operator()(
+            hpx::util::index_pack<Is...>, hpx::tuple<Ts...> const& t)
+        {
+            return hpx::util::void_guard<Result>(),
+                   HPX_INVOKE(f_, hpx::get<Is>(t)...);
+        }
+
+        template <std::size_t... Is, typename... Ts>
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Result operator()(
+            hpx::util::index_pack<Is...>, hpx::tuple<Ts...>&& t)
+        {
+            // NOLINTBEGIN(bugprone-use-after-move)
+            return hpx::util::void_guard<Result>(),
+                   HPX_INVOKE(f_, hpx::get<Is>(HPX_MOVE(t))...);
+            // NOLINTEND(bugprone-use-after-move)
         }
 
         template <typename Archive>
         void serialize(Archive& ar, unsigned)
         {
-            // clang-format off
             ar & f_;
-            // clang-format on
         }
     };
 }    // namespace hpx::parallel::util::detail
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-#include <hpx/functional/traits/get_function_address.hpp>
-#include <hpx/functional/traits/get_function_annotation.hpp>
+#include <hpx/modules/functional.hpp>
 
 namespace hpx::traits {
 
-    template <typename Result, typename F>
+    HPX_CXX_CORE_EXPORT template <typename Result, typename F>
     struct get_function_address<
         parallel::util::detail::partitioner_iteration<Result, F>>
     {
@@ -57,7 +105,7 @@ namespace hpx::traits {
         }
     };
 
-    template <typename Result, typename F>
+    HPX_CXX_CORE_EXPORT template <typename Result, typename F>
     struct get_function_annotation<
         parallel::util::detail::partitioner_iteration<Result, F>>
     {
@@ -70,7 +118,7 @@ namespace hpx::traits {
     };
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-    template <typename Result, typename F>
+    HPX_CXX_CORE_EXPORT template <typename Result, typename F>
     struct get_function_annotation_itt<
         parallel::util::detail::partitioner_iteration<Result, F>>
     {
@@ -83,4 +131,5 @@ namespace hpx::traits {
     };
 #endif
 }    // namespace hpx::traits
+
 #endif

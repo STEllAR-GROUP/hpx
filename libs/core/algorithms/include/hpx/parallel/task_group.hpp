@@ -1,4 +1,4 @@
-//  Copyright (c) 2021-2024 Hartmut Kaiser
+//  Copyright (c) 2021-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,19 +11,16 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/errors/exception_list.hpp>
-#include <hpx/errors/try_catch_exception_ptr.hpp>
-#include <hpx/execution_base/execution.hpp>
-#include <hpx/execution_base/traits/is_executor.hpp>
-#include <hpx/executors/parallel_executor.hpp>
-#include <hpx/functional/experimental/scope_exit.hpp>
-#include <hpx/functional/invoke_fused.hpp>
-#include <hpx/futures/detail/future_data.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/executors.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/serialization/serialization_fwd.hpp>
-#include <hpx/synchronization/latch.hpp>
+#include <hpx/modules/serialization.hpp>
+#include <hpx/modules/synchronization.hpp>
 
 #include <atomic>
 #include <exception>
@@ -35,7 +32,7 @@ namespace hpx::experimental {
 
     /// A \c task_group represents concurrent execution of a group of tasks.
     /// Tasks can be dynamically added to the group while it is executing.
-    class task_group
+    HPX_CXX_CORE_EXPORT class task_group
     {
     public:
         HPX_CORE_EXPORT task_group();
@@ -61,11 +58,12 @@ namespace hpx::experimental {
         /// \param f          The user defined function to invoke inside the task
         ///                   group.
         /// \param ts         Additional arguments to use to invoke \c f().
+
+        template <typename Executor, typename F, typename... Ts>
         // clang-format off
-        template <typename Executor, typename F, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_executor_any_v<std::decay_t<Executor>>
-            )>
+            )
         // clang-format on
         void run(Executor&& exec, F&& f, Ts&&... ts)
         {
@@ -80,12 +78,12 @@ namespace hpx::experimental {
 
             hpx::parallel::execution::post(HPX_FORWARD(Executor, exec),
                 [this, on_exit = HPX_MOVE(on_exit), f = HPX_FORWARD(F, f),
-                    t = hpx::make_tuple(HPX_FORWARD(Ts, ts)...)]() mutable {
+                    ... ts = HPX_FORWARD(Ts, ts)]() mutable {
                     // latch needs to be released before the lambda exits
                     auto _(HPX_MOVE(on_exit));
 
                     hpx::detail::try_catch_exception_ptr(
-                        [&]() { hpx::invoke_fused(HPX_MOVE(f), HPX_MOVE(t)); },
+                        [&]() { HPX_INVOKE(f, ts...); },
                         [this](std::exception_ptr e) {
                             add_exception(HPX_MOVE(e));
                         });
@@ -100,11 +98,12 @@ namespace hpx::experimental {
         /// \param f   The user defined function to invoke inside the task
         ///            group.
         /// \param ts  Additional arguments to use to invoke \c f().
+
+        template <typename F, typename... Ts>
         // clang-format off
-        template <typename F, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 !hpx::traits::is_executor_any_v<std::decay_t<F>>
-            )>
+            )
         // clang-format on
         void run(F&& f, Ts&&... ts)
         {

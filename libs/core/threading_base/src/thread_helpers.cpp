@@ -5,29 +5,31 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/threading_base/thread_helpers.hpp>
-
 #include <hpx/assert.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/execution_base/this_thread.hpp>
+#include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/timing.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/scheduler_state.hpp>
 #include <hpx/threading_base/set_thread_state.hpp>
 #include <hpx/threading_base/set_thread_state_timed.hpp>
 #include <hpx/threading_base/thread_description.hpp>
+#include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
-#include <hpx/timing/steady_clock.hpp>
 
 #ifdef HPX_HAVE_VERIFY_LOCKS
-#include <hpx/lock_registration/detail/register_locks.hpp>
+#include <hpx/modules/lock_registration.hpp>
 #endif
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
 #include <hpx/threading_base/detail/reset_lco_description.hpp>
 #endif
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
-#include <hpx/debugging/backtrace.hpp>
+#include <hpx/modules/debugging.hpp>
 #include <hpx/threading_base/detail/reset_backtrace.hpp>
+#endif
+#ifdef HPX_HAVE_MODULE_LIKWID
+#include <hpx/modules/likwid.hpp>
 #endif
 
 #include <atomic>
@@ -290,7 +292,6 @@ namespace hpx::threads {
         return get_thread_id_data(id)->set_libcds_dynamic_hazard_pointer_data(
             data);
     }
-
 #endif
 
     ////////////////////////////////////////////////////////////////////////////
@@ -467,7 +468,9 @@ namespace hpx::this_thread {
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
             threads::detail::reset_backtrace bt(id, ec);
 #endif
-
+#ifdef HPX_HAVE_MODULE_LIKWID
+            hpx::likwid::suspend_region region;
+#endif
             // We might need to dispatch 'nextid' to it's correct scheduler only
             // if our current scheduler is the same, we should yield to the id
             if (nextid &&
@@ -545,7 +548,9 @@ namespace hpx::this_thread {
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
             threads::detail::reset_backtrace bt(id, ec);
 #endif
-
+#ifdef HPX_HAVE_MODULE_LIKWID
+            hpx::likwid::suspend_region region;
+#endif
             std::atomic<bool> timer_started(false);
             threads::thread_id_ref_type const timer_id =
                 threads::set_thread_state(id.noref(), abs_time, &timer_started,

@@ -26,8 +26,8 @@
 #include <utility>
 #include <vector>
 
-std::size_t const max_threads = (std::min)(
-    std::size_t(4), std::size_t(hpx::threads::hardware_concurrency()));
+std::size_t const max_threads = (std::min) (std::size_t(4),
+    std::size_t(hpx::threads::hardware_concurrency()));
 
 int hpx_main(int argc, char* argv[])
 {
@@ -60,7 +60,7 @@ int hpx_main(int argc, char* argv[])
         while (t.elapsed() < 1)
         {
             for (std::size_t i = 0;
-                 i < hpx::resource::get_num_threads("default"); ++i)
+                i < hpx::resource::get_num_threads("default"); ++i)
             {
                 fs.push_back(hpx::parallel::execution::async_execute_after(
                     exec, std::chrono::milliseconds(dist(gen)), []() {}));
@@ -100,7 +100,7 @@ int hpx_main(int argc, char* argv[])
 
         // Don't exit with suspended pus
         for (std::size_t thread_num_resume = 0; thread_num_resume < thread_num;
-             ++thread_num_resume)
+            ++thread_num_resume)
         {
             hpx::threads::resume_processing_unit(tp, thread_num_resume).get();
         }

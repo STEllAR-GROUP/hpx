@@ -8,5 +8,5 @@
 
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/executors.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/timed_execution.hpp>
-#include <hpx/runtime_local/service_executors.hpp>

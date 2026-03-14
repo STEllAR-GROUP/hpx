@@ -7,37 +7,30 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/schedulers/thread_queue_mc.hpp>
-#include <hpx/threading_base/print.hpp>
-#include <hpx/threading_base/thread_data.hpp>
-//
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/threading_base.hpp>
+#include <hpx/schedulers/macros.hpp>
 #include <hpx/schedulers/queue_holder_thread.hpp>
-//
+#include <hpx/schedulers/thread_queue_mc.hpp>
+
 #include <cstddef>
 #include <cstdint>
 #include <exception>
 #include <vector>
 
-#if !defined(QUEUE_HOLDER_NUMA_DEBUG)
-#if defined(HPX_DEBUG)
-#define QUEUE_HOLDER_NUMA_DEBUG false
-#else
-#define QUEUE_HOLDER_NUMA_DEBUG false
-#endif
-#endif
-
 namespace hpx {
 
-    inline constexpr hpx::debug::enable_print<QUEUE_HOLDER_NUMA_DEBUG> nq_deb(
-        "QH_NUMA");
-}
+    HPX_CXX_CORE_EXPORT inline constexpr hpx::debug::enable_print<
+        QUEUE_HOLDER_NUMA_DEBUG>
+        nq_deb("QH_NUMA");
+}    // namespace hpx
 
 namespace hpx::threads::policies {
 
     // ----------------------------------------------------------------
     // Helper class to hold a set of thread queue holders.
     // ----------------------------------------------------------------
-    template <typename QueueType>
+    HPX_CXX_CORE_EXPORT template <typename QueueType>
     struct queue_holder_numa
     {
         // ----------------------------------------------------------------
@@ -88,7 +81,7 @@ namespace hpx::threads::policies {
             // loop over queues and take one task,
             std::size_t q = qidx;
             for (std::size_t i = 0; i < num_queues_;
-                 ++i, q = fast_mod((qidx + i), num_queues_))
+                ++i, q = fast_mod((qidx + i), num_queues_))
             {
                 if (queues_[q]->get_next_thread_HP(
                         thrd, (stealing || (i > 0)), i == 0))
@@ -121,7 +114,7 @@ namespace hpx::threads::policies {
             // queue
             std::size_t q = qidx;
             for (std::size_t i = 0; i < num_queues_;
-                 ++i, q = fast_mod((qidx + i), num_queues_))
+                ++i, q = fast_mod((qidx + i), num_queues_))
             {
                 // if we got a thread, return it, only allow stealing if i>0
                 if (queues_[q]->get_next_thread(thrd, (stealing || (i > 0))))
@@ -149,7 +142,7 @@ namespace hpx::threads::policies {
             // loop over queues and take one task,
             std::size_t q = qidx;
             for (std::size_t i = 0; i < num_queues_;
-                 ++i, q = fast_mod((qidx + i), num_queues_))
+                ++i, q = fast_mod((qidx + i), num_queues_))
             {
                 added =
                     receiver->add_new_HP(64, queues_[q], (stealing || (i > 0)));
@@ -181,7 +174,7 @@ namespace hpx::threads::policies {
             // loop over queues and take one task,
             std::size_t q = qidx;
             for (std::size_t i = 0; i < num_queues_;
-                 ++i, q = fast_mod((qidx + i), num_queues_))
+                ++i, q = fast_mod((qidx + i), num_queues_))
             {
                 added =
                     receiver->add_new(64, queues_[q], (stealing || (i > 0)));

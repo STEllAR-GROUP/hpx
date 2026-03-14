@@ -6,11 +6,14 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+include(HPX_CXXModules)
+
 cmake_policy(PUSH)
 
 hpx_set_cmake_policy(CMP0054 NEW)
 hpx_set_cmake_policy(CMP0060 NEW)
 hpx_set_cmake_policy(CMP0074 NEW)
+hpx_set_cmake_policy(CMP0144 NEW)
 hpx_set_cmake_policy(CMP0167 OLD)
 
 function(hpx_setup_target target)
@@ -34,6 +37,7 @@ function(hpx_setup_target target)
       VERSION
       HPX_PREFIX
       HEADER_ROOT
+      SCAN_FOR_MODULES
   )
   set(multi_value_args DEPENDENCIES COMPONENT_DEPENDENCIES COMPILE_FLAGS
                        LINK_FLAGS INSTALL_FLAGS INSTALL_PDB
@@ -74,12 +78,12 @@ function(hpx_setup_target target)
   get_target_property(target_SOURCES ${target} SOURCES)
 
   if(target_COMPILE_FLAGS)
-    hpx_append_property(${target} COMPILE_FLAGS ${target_COMPILE_FLAGS})
+    hpx_append_property(${target} COMPILE_FLAGS "${target_COMPILE_FLAGS}")
     hpx_debug("setup_target.${target}" "COMPILE_FLAGS: ${target_COMPILE_FLAGS}")
   endif()
 
   if(target_LINK_FLAGS)
-    hpx_append_property(${target} LINK_FLAGS ${target_LINK_FLAGS})
+    hpx_append_property(${target} LINK_FLAGS "${target_LINK_FLAGS}")
     hpx_debug("setup_target.${target}" "LINK_FLAGS: ${target_LINK_FLAGS}")
   endif()
 
@@ -171,10 +175,13 @@ function(hpx_setup_target target)
       set(_wrap_main_deps HPX::wrap_main)
     endif()
     target_link_libraries(${target} ${__tll_public} HPX::hpx ${_wrap_main_deps})
-    hpx_handle_component_dependencies(target_COMPONENT_DEPENDENCIES)
-    target_link_libraries(
-      ${target} ${__tll_public} ${target_COMPONENT_DEPENDENCIES}
-    )
+
+    if(HPX_WITH_DISTRIBUTED_RUNTIME)
+      hpx_handle_component_dependencies(target_COMPONENT_DEPENDENCIES)
+      target_link_libraries(
+        ${target} ${__tll_public} ${target_COMPONENT_DEPENDENCIES}
+      )
+    endif()
 
     if(HPX_WITH_PRECOMPILED_HEADERS_INTERNAL)
       if("${_type}" STREQUAL "EXECUTABLE")
@@ -183,6 +190,8 @@ function(hpx_setup_target target)
         )
       endif()
     endif()
+  elseif(HPX_WITH_CXX_MODULES AND target_SCAN_FOR_MODULES)
+    set(target_SCAN_FOR_MODULES OFF)
   endif()
 
   if(("${_type}" STREQUAL "EXECUTABLE") AND MINGW)
@@ -219,6 +228,37 @@ function(hpx_setup_target target)
   endif()
 
   set_target_properties(${target} PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+  if(HPX_WITH_CXX_MODULES AND target_SCAN_FOR_MODULES)
+    hpx_debug("setup_target.${target} SCAN_FOR_MODULES: ON")
+
+    hpx_configure_module_consumer(${target} hpx_core_module_if)
+    if(TARGET hpx_full_module_if)
+      hpx_configure_module_consumer(${target} hpx_full_module_if)
+    endif()
+  else()
+    hpx_debug("setup_target.${target} SCAN_FOR_MODULES: OFF")
+
+    if(HPX_WITH_CXX_MODULES)
+      # explicitly disable C++ modules
+      target_compile_definitions(
+        ${target} PRIVATE HPX_HAVE_FORCE_NO_CXX_MODULES
+      )
+
+      # If modules are enabled, Clang emits DWARF v5, which requires using lld
+      # instead of ld.
+      if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES
+                                                  "AppleClang"
+      )
+        get_target_property(_type ${target} TYPE)
+        if((_type STREQUAL "SHARED_LIBRARY") OR (_type STREQUAL "EXECUTABLE"))
+          target_link_options(${target} PRIVATE "-fuse-ld=lld")
+        endif()
+      endif()
+    endif()
+
+    set_target_properties(${target} PROPERTIES CXX_SCAN_FOR_MODULES OFF)
+  endif()
 
   get_target_property(target_EXCLUDE_FROM_ALL ${target} EXCLUDE_FROM_ALL)
 

@@ -6,5 +6,4 @@
 
 #pragma once
 
-#include <hpx/parallel/algorithms/destroy.hpp>
-#include <hpx/parallel/container_algorithms/destroy.hpp>
+#include <hpx/modules/algorithms.hpp>

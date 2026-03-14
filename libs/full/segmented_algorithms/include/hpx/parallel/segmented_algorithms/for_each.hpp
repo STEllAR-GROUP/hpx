@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,14 +7,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
-
-#include <hpx/executors/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/algorithms/for_each.hpp>
+#include <hpx/modules/algorithms.hpp>
+#include <hpx/modules/executors.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/util/detail/algorithm_result.hpp>
-#include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -115,8 +110,8 @@ namespace hpx::parallel {
             using local_iterator_type = typename traits::local_iterator;
             using result = util::detail::algorithm_result<ExPolicy, SegIter>;
 
-            using forced_seq = std::integral_constant<bool,
-                !hpx::traits::is_forward_iterator_v<SegIter>>;
+            using forced_seq =
+                std::integral_constant<bool, !std::forward_iterator<SegIter>>;
 
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);
@@ -186,17 +181,12 @@ namespace hpx::parallel {
 // The segmented iterators we support all live in namespace hpx::segmented
 namespace hpx::segmented {
 
-    // clang-format off
-    template <typename InIter,
-        typename F,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::traits::is_iterator_v<InIter> &&
-            hpx::traits::is_segmented_iterator_v<InIter>
-        )>
-    // clang-format on
+    template <typename InIter, typename F>
+        requires(hpx::traits::is_iterator_v<InIter> &&
+            hpx::traits::is_segmented_iterator_v<InIter>)
     InIter tag_invoke(hpx::for_each_t, InIter first, InIter last, F&& f)
     {
-        static_assert((hpx::traits::is_forward_iterator_v<InIter>),
+        static_assert((std::forward_iterator<InIter>),
             "Requires at least input iterator.");
 
         using iterator_traits = hpx::traits::segmented_iterator_traits<InIter>;
@@ -213,20 +203,15 @@ namespace hpx::segmented {
             hpx::identity_v, std::true_type());
     }
 
-    // clang-format off
-    template <typename ExPolicy, typename SegIter,
-        typename F,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy> &&
+    template <typename ExPolicy, typename SegIter, typename F>
+        requires(hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<SegIter> &&
-            hpx::traits::is_segmented_iterator_v<SegIter>
-        )>
-    // clang-format on
+            hpx::traits::is_segmented_iterator_v<SegIter>)
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy, SegIter>
     tag_invoke(
         hpx::for_each_t, ExPolicy&& policy, SegIter first, SegIter last, F&& f)
     {
-        static_assert((hpx::traits::is_forward_iterator_v<SegIter>),
+        static_assert((std::forward_iterator<SegIter>),
             "Requires at least forward iterator.");
 
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
@@ -248,18 +233,13 @@ namespace hpx::segmented {
             hpx::identity_v, is_seq());
     }
 
-    // clang-format off
-    template <typename InIter, typename Size,
-        typename F,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::traits::is_iterator_v<InIter> &&
-            hpx::traits::is_segmented_iterator_v<InIter>
-        )>
-    // clang-format on
+    template <typename InIter, typename Size, typename F>
+        requires(hpx::traits::is_iterator_v<InIter> &&
+            hpx::traits::is_segmented_iterator_v<InIter>)
     InIter tag_invoke(hpx::for_each_n_t, InIter first, Size count, F&& f)
     {
-        static_assert((hpx::traits::is_input_iterator_v<InIter>),
-            "Requires at least input iterator.");
+        static_assert(
+            (std::input_iterator<InIter>), "Requires at least input iterator.");
 
         using iterator_traits = hpx::traits::segmented_iterator_traits<InIter>;
 
@@ -277,20 +257,15 @@ namespace hpx::segmented {
             hpx::identity_v, std::true_type());
     }
 
-    // clang-format off
-    template <typename ExPolicy, typename SegIter, typename Size,
-        typename F,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy> &&
+    template <typename ExPolicy, typename SegIter, typename Size, typename F>
+        requires(hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<SegIter> &&
-            hpx::traits::is_segmented_iterator_v<SegIter>
-        )>
-    // clang-format on
+            hpx::traits::is_segmented_iterator_v<SegIter>)
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy, SegIter>
     tag_invoke(
         hpx::for_each_n_t, ExPolicy&& policy, SegIter first, Size count, F&& f)
     {
-        static_assert((hpx::traits::is_forward_iterator_v<SegIter>),
+        static_assert((std::forward_iterator<SegIter>),
             "Requires at least input iterator.");
 
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;

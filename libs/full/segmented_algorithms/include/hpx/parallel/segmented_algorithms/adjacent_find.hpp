@@ -1,4 +1,5 @@
 //  Copyright (c) 2017 Ajai V George
+//  Copyright (c) 2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,15 +8,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
-#include <hpx/executors/execution_policy.hpp>
-#include <hpx/functional/invoke.hpp>
-#include <hpx/parallel/algorithms/adjacent_find.hpp>
-#include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/modules/algorithms.hpp>
+#include <hpx/modules/executors.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/util/detail/algorithm_result.hpp>
-#include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
-#include <hpx/type_support/identity.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -54,8 +51,7 @@ namespace hpx::parallel {
 
             FwdIter output = last;
 
-            util::invoke_projected<Pred, Proj> pred_projected{
-                HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)};
+            util::invoke_projected<Pred, Proj> pred_projected{pred, proj};
 
             if (sit == send)
             {
@@ -94,7 +90,7 @@ namespace hpx::parallel {
                     output = traits::compose(sit, std::prev(end));
                 }
 
-                // handle all of the full partitions
+                // handle all the full partitions
                 if (!found)
                 {
                     for (++sit; sit != send; ++sit)
@@ -133,7 +129,6 @@ namespace hpx::parallel {
                         std::true_type(), beg, end, pred, proj);
                     if (out != end)
                     {
-                        found = true;
                         output = traits::compose(sit, out);
                     }
                 }
@@ -155,8 +150,8 @@ namespace hpx::parallel {
 
             using result = util::detail::algorithm_result<ExPolicy, FwdIter>;
 
-            using forced_seq = std::integral_constant<bool,
-                !hpx::traits::is_forward_iterator<FwdIter>::value>;
+            using forced_seq =
+                std::integral_constant<bool, !std::forward_iterator<FwdIter>>;
 
             segment_iterator1 sit = traits::segment(first);
             segment_iterator1 send = traits::segment(last);
@@ -168,8 +163,7 @@ namespace hpx::parallel {
             std::vector<FwdIter> between_segments;
             between_segments.reserve(std::distance(sit, send));
 
-            util::invoke_projected<Pred, Proj> pred_projected{
-                HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)};
+            util::invoke_projected<Pred, Proj> pred_projected{pred, proj};
 
             if (sit == send)
             {
@@ -180,13 +174,13 @@ namespace hpx::parallel {
                 {
                     segments.push_back(hpx::make_future<FwdIter>(
                         dispatch_async(traits::get_id(sit), algo, policy,
-                            forced_seq(), beg, end, pred, proj),
+                            forced_seq(), beg, end, HPX_FORWARD(Pred, pred),
+                            HPX_FORWARD(Proj, proj)),
                         [sit, end, last](
                             local_iterator_type const& out) -> FwdIter {
                             if (out != end)
                                 return traits::compose(sit, out);
-                            else
-                                return last;
+                            return last;
                         }));
                 }
             }
@@ -204,12 +198,11 @@ namespace hpx::parallel {
                             local_iterator_type const& out) -> FwdIter {
                             if (out != end)
                                 return traits::compose(sit, out);
-                            else
-                                return last;
+                            return last;
                         }));
                 }
 
-                // handle all of the full partitions
+                // handle all the full partitions
                 for (++sit; sit != send; ++sit)
                 {
                     beg = traits::begin(sit);
@@ -224,8 +217,7 @@ namespace hpx::parallel {
                                 local_iterator_type const& out) -> FwdIter {
                                 if (out != end)
                                     return traits::compose(sit, out);
-                                else
-                                    return last;
+                                return last;
                             }));
                     }
                 }
@@ -238,7 +230,8 @@ namespace hpx::parallel {
                     between_segments.push_back(traits::compose(sit, beg));
                     segments.push_back(hpx::make_future<FwdIter>(
                         dispatch_async(traits::get_id(sit), algo, policy,
-                            forced_seq(), beg, end, pred, proj),
+                            forced_seq(), beg, end, HPX_FORWARD(Pred, pred),
+                            HPX_FORWARD(Proj, proj)),
                         [sit, end, last](
                             local_iterator_type const& out) -> FwdIter {
                             if (out != end)
@@ -282,19 +275,14 @@ namespace hpx::parallel {
 // The segmented iterators we support all live in namespace hpx::segmented
 namespace hpx::segmented {
 
-    // clang-format off
-    template<typename InIter,
-        typename Pred,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::traits::is_iterator<InIter>::value &&
-            hpx::traits::is_segmented_iterator<InIter>::value
-        )>
-    // clang-format on
+    template <typename InIter, typename Pred>
+        requires(hpx::traits::is_iterator_v<InIter> &&
+            hpx::traits::is_segmented_iterator_v<InIter>)
     InIter tag_invoke(
         hpx::adjacent_find_t, InIter first, InIter last, Pred&& pred = Pred())
     {
-        static_assert((hpx::traits::is_input_iterator<InIter>::value),
-            "Requires at least input iterator.");
+        static_assert(
+            (std::input_iterator<InIter>), "Requires at least input iterator.");
 
         if (first == last)
         {
@@ -311,21 +299,15 @@ namespace hpx::segmented {
             hpx::identity_v, std::true_type());
     }
 
-    // clang-format off
-    template<typename ExPolicy, typename SegIter,
-        typename Pred,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy> &&
+    template <typename ExPolicy, typename SegIter, typename Pred>
+        requires(hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<SegIter> &&
-            hpx::traits::is_segmented_iterator_v<SegIter>
-        )>
-    // clang-format on
-    typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-        SegIter>::type
+            hpx::traits::is_segmented_iterator_v<SegIter>)
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, SegIter>
     tag_invoke(hpx::adjacent_find_t, ExPolicy&& policy, SegIter first,
         SegIter last, Pred&& pred)
     {
-        static_assert((hpx::traits::is_forward_iterator<SegIter>::value),
+        static_assert((std::forward_iterator<SegIter>),
             "Requires at least forward iterator.");
 
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;

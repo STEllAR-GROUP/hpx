@@ -7,22 +7,26 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/assert.hpp>
-#include <hpx/coroutines/detail/coroutine_accessor.hpp>
-#include <hpx/functional/function.hpp>
-#include <hpx/lock_registration/detail/register_locks.hpp>
+#include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/logging.hpp>
-#include <hpx/thread_support/unlock_guard.hpp>
+#include <hpx/modules/thread_support.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #if defined(HPX_HAVE_APEX)
 #include <hpx/threading_base/external_timer.hpp>
+#endif
+#if defined(HPX_HAVE_MODULE_TRACY)
+#include <hpx/modules/tracy.hpp>
 #endif
 
 #include <cstddef>
 #include <cstdint>
 #include <limits>
 #include <memory>
+#include <utility>
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace hpx::threads {
@@ -52,7 +56,8 @@ namespace hpx::threads {
     }    // namespace detail
 
     thread_data::thread_data(thread_init_data& init_data, void* queue,
-        std::ptrdiff_t stacksize, bool is_stackless, thread_id_addref addref)
+        std::ptrdiff_t const stacksize, bool const is_stackless,
+        thread_id_addref const addref)
       : detail::thread_data_reference_counting(addref)
       , priority_(init_data.priority)
       , requested_interrupt_(false)
@@ -163,7 +168,7 @@ namespace hpx::threads {
 
     void thread_data::free_thread_exit_callbacks()
     {
-        std::lock_guard<hpx::util::detail::spinlock> l(
+        std::scoped_lock<hpx::util::detail::spinlock> l(
             spinlock_pool::spinlock_for(this));
 
         // Exit functions should have been executed.
@@ -172,7 +177,7 @@ namespace hpx::threads {
         exit_funcs_.clear();
     }
 
-    bool thread_data::interruption_point(bool throw_on_interrupt)
+    bool thread_data::interruption_point(bool const throw_on_interrupt)
     {
         // We do not protect enabled_interrupt_ and requested_interrupt_ from
         // concurrent access here (which creates a benign data race) in order to
@@ -226,7 +231,9 @@ namespace hpx::threads {
         // from what the previous use required. However, the physical stack size
         // must be the same as before.
         stacksize_enum_ = init_data.stacksize;
-        HPX_ASSERT(stacksize_ == get_stack_size());
+
+        HPX_ASSERT(stacksize_enum_ == thread_stacksize::nostack ||
+            stacksize_ == get_stack_size());
         HPX_ASSERT(stacksize_ != 0);
 
         current_state_.store(thread_state(
@@ -271,6 +278,45 @@ namespace hpx::threads {
         set_timer_data(init_data.timer_data);
 #endif
     }
+
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+    threads::thread_description thread_data::get_description() const
+    {
+        std::scoped_lock<hpx::util::detail::spinlock> l(
+            spinlock_pool::spinlock_for(this));
+        return description_;
+    }
+
+    threads::thread_description thread_data::set_description(
+        threads::thread_description value)
+    {
+        std::scoped_lock<hpx::util::detail::spinlock> l(
+            spinlock_pool::spinlock_for(this));
+        std::swap(description_, value);
+
+#if defined(HPX_HAVE_MODULE_TRACY)
+        tracy::rename_region(description_.get_description());
+#endif
+
+        return value;
+    }
+
+    threads::thread_description thread_data::get_lco_description() const
+    {
+        std::scoped_lock<hpx::util::detail::spinlock> l(
+            spinlock_pool::spinlock_for(this));
+        return lco_description_;
+    }
+
+    threads::thread_description thread_data::set_lco_description(
+        threads::thread_description value)
+    {
+        std::scoped_lock<hpx::util::detail::spinlock> l(
+            spinlock_pool::spinlock_for(this));
+        std::swap(lco_description_, value);
+        return value;
+    }
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     thread_self& get_self()

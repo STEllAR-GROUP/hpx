@@ -15,7 +15,7 @@ set(HPX_COMPONENTS
 )
 
 set(iostreams_headers
-    hpx/components/iostreams/server/buffer.hpp
+    hpx/components/iostreams/server/data_buffer.hpp
     hpx/components/iostreams/server/order_output.hpp
     hpx/components/iostreams/server/output_stream.hpp
     hpx/components/iostreams/export_definitions.hpp
@@ -38,9 +38,10 @@ add_hpx_component(
   INSTALL_COMPONENT runtime
   HEADER_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/include"
   HEADERS ${iostreams_headers}
-  PREPEND_SOURCE_ROOT
+  PREPEND_SOURCE_ROOT ${HPX_WITH_UNITY_BUILD_OPTION}
+  ${HPX_WITH_CXX_MODULES_OPTION}
   SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src"
-  SOURCES ${iostreams_sources} ${HPX_WITH_UNITY_BUILD_OPTION}
+  SOURCES ${iostreams_sources}
 )
 
 target_compile_definitions(

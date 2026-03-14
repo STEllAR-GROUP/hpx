@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -12,27 +12,20 @@
 #include <hpx/async_distributed/detail/post.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
 #include <hpx/components_base/agas_interface.hpp>
-#include <hpx/functional/bind_front.hpp>
-#include <hpx/functional/function.hpp>
-#include <hpx/futures/packaged_continuation.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/runtime_local.hpp>
+#include <hpx/modules/serialization.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/performance_counters/base_performance_counter.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counter_interface.hpp>
 #include <hpx/performance_counters/counter_parser.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/registry.hpp>
-#include <hpx/runtime_local/get_num_all_localities.hpp>
-#include <hpx/runtime_local/get_os_thread_count.hpp>
-#include <hpx/runtime_local/runtime_local_fwd.hpp>
-#include <hpx/runtime_local/thread_pool_helpers.hpp>
-#include <hpx/serialization/base_object.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/string.hpp>
-#include <hpx/serialization/vector.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/util/from_string.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -41,6 +34,8 @@
 #include <string>
 #include <utility>
 #include <vector>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Initialization support for the performance counter actions

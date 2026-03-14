@@ -7,5 +7,4 @@
 
 #pragma once
 
-#include <hpx/parallel/algorithms/copy.hpp>
-#include <hpx/parallel/container_algorithms/copy.hpp>
+#include <hpx/modules/algorithms.hpp>

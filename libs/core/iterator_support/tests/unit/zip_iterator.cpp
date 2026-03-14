@@ -1,12 +1,12 @@
 // (C) Copyright Dave Abrahams and Thomas Becker 2003.
 //
-//  Copyright (c) 2016 Hartmut Kaiser
+//  Copyright (c) 2016-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/datastructures/tuple.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/testing.hpp>
 
@@ -77,7 +77,7 @@ int main(void)
 
     hpx::tuple<int, double> val_tuple(*zip_it_mixed);
 
-    hpx::tuple<const int&, double&> ref_tuple(*zip_it_mixed);
+    hpx::tuple<int const&, double&> ref_tuple(*zip_it_mixed);
 
     double dblOldVal = hpx::get<1>(ref_tuple);
     hpx::get<1>(ref_tuple) -= 41.;
@@ -140,12 +140,12 @@ int main(void)
 
     // typedefs for cons lists for dereferencing the zip iterator
     // made from the cons list above.
-    typedef tuple_cat_result_of_t<hpx::tuple<const int&>,
-        hpx::tuple<int&, int&, const int&, int&, int&, const int&, int&, int&,
-            const int&, const int&>>
+    typedef tuple_cat_result_of_t<hpx::tuple<int const&>,
+        hpx::tuple<int&, int&, int const&, int&, int&, int const&, int&, int&,
+            int const&, int const&>>
         cons_11_refs_type;
     //
-    typedef tuple_cat_result_of_t<hpx::tuple<const int&>, cons_11_refs_type>
+    typedef tuple_cat_result_of_t<hpx::tuple<int const&>, cons_11_refs_type>
         cons_12_refs_type;
 
     // typedef for zip iterator with 12 elements
@@ -192,12 +192,14 @@ int main(void)
         std::vector<double>::const_iterator>>
         zip_it_end(hpx::make_tuple(vect1.end(), vect2.end()));
 
+    // NOLINTBEGIN(bugprone-inc-dec-in-conditions)
     HPX_TEST(zip_it_run == zip_it_begin && 42. == hpx::get<0>(*zip_it_run) &&
         2.2 == hpx::get<1>(*zip_it_run) &&
         43. == hpx::get<0>(*(++zip_it_run)) &&
         3.3 == hpx::get<1>(*zip_it_run) &&
         44. == hpx::get<0>(*(++zip_it_run)) &&
         4.4 == hpx::get<1>(*zip_it_run) && zip_it_end == ++zip_it_run);
+    // NOLINTEND(bugprone-inc-dec-in-conditions)
 
     /////////////////////////////////////////////////////////////////////////////
     //
@@ -205,12 +207,14 @@ int main(void)
     //
     /////////////////////////////////////////////////////////////////////////////
 
+    // NOLINTBEGIN(bugprone-inc-dec-in-conditions)
     HPX_TEST(zip_it_run == zip_it_end && zip_it_end == zip_it_run-- &&
         44. == hpx::get<0>(*zip_it_run) && 4.4 == hpx::get<1>(*zip_it_run) &&
         43. == hpx::get<0>(*(--zip_it_run)) &&
         3.3 == hpx::get<1>(*zip_it_run) &&
         42. == hpx::get<0>(*(--zip_it_run)) &&
         2.2 == hpx::get<1>(*zip_it_run) && zip_it_begin == zip_it_run);
+    // NOLINTEND(bugprone-inc-dec-in-conditions)
 
     /////////////////////////////////////////////////////////////////////////////
     //
@@ -230,8 +234,10 @@ int main(void)
     //
     /////////////////////////////////////////////////////////////////////////////
 
+    // NOLINTBEGIN(bugprone-inc-dec-in-conditions)
     HPX_TEST(
         !(zip_it_run != zip_it_run_copy) && zip_it_run != ++zip_it_run_copy);
+    // NOLINTEND(bugprone-inc-dec-in-conditions)
 
     /////////////////////////////////////////////////////////////////////////////
     //
@@ -241,8 +247,10 @@ int main(void)
 
     // Note: zip_it_run_copy == zip_it_run + 1
     //
+    // NOLINTBEGIN(bugprone-inc-dec-in-conditions)
     HPX_TEST(zip_it_run < zip_it_run_copy &&
         !(zip_it_run < --zip_it_run_copy) && zip_it_run == zip_it_run_copy);
+    // NOLINTEND(bugprone-inc-dec-in-conditions)
 
     /////////////////////////////////////////////////////////////////////////////
     //
@@ -255,8 +263,10 @@ int main(void)
     ++zip_it_run;
     zip_it_run_copy += 2;
 
+    // NOLINTBEGIN(bugprone-inc-dec-in-conditions)
     HPX_TEST(zip_it_run <= zip_it_run_copy && zip_it_run <= --zip_it_run_copy &&
         !(zip_it_run <= --zip_it_run_copy) && zip_it_run <= zip_it_run);
+    // NOLINTEND(bugprone-inc-dec-in-conditions)
 
     /////////////////////////////////////////////////////////////////////////////
     //
@@ -266,8 +276,10 @@ int main(void)
 
     // Note: zip_it_run_copy == zip_it_run - 1
     //
+    // NOLINTBEGIN(bugprone-inc-dec-in-conditions)
     HPX_TEST(zip_it_run > zip_it_run_copy &&
         !(zip_it_run > ++zip_it_run_copy) && zip_it_run == zip_it_run_copy);
+    // NOLINTEND(bugprone-inc-dec-in-conditions)
 
     /////////////////////////////////////////////////////////////////////////////
     //
@@ -279,8 +291,10 @@ int main(void)
 
     // Note: zip_it_run == zip_it_run_copy + 1
     //
+    // NOLINTBEGIN(bugprone-inc-dec-in-conditions)
     HPX_TEST(zip_it_run >= zip_it_run_copy && --zip_it_run >= zip_it_run_copy &&
         !(zip_it_run >= ++zip_it_run_copy));
+    // NOLINTEND(bugprone-inc-dec-in-conditions)
 
     /////////////////////////////////////////////////////////////////////////////
     //

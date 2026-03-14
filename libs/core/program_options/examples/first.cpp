@@ -11,6 +11,8 @@
 
 #include <iostream>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace po = hpx::program_options;
 using namespace std;
 

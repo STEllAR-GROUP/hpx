@@ -14,6 +14,8 @@
 
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx::parcelset {
 
     void (*init_static_parcelport_factories)(

@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2023 The STE||AR-Group
+# Copyright (c) 2019-2025 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -32,6 +32,7 @@ set(algorithms_headers
     hpx/parallel/algorithms/detail/generate.hpp
     hpx/parallel/algorithms/detail/indirect.hpp
     hpx/parallel/algorithms/detail/insertion_sort.hpp
+    hpx/parallel/algorithms/detail/iota.hpp
     hpx/parallel/algorithms/detail/is_sorted.hpp
     hpx/parallel/algorithms/detail/mismatch.hpp
     hpx/parallel/algorithms/detail/parallel_stable_sort.hpp
@@ -67,6 +68,7 @@ set(algorithms_headers
     hpx/parallel/algorithms/generate.hpp
     hpx/parallel/algorithms/includes.hpp
     hpx/parallel/algorithms/inclusive_scan.hpp
+    hpx/parallel/algorithms/iota.hpp
     hpx/parallel/algorithms/is_heap.hpp
     hpx/parallel/algorithms/is_partitioned.hpp
     hpx/parallel/algorithms/is_sorted.hpp
@@ -124,12 +126,14 @@ set(algorithms_headers
     hpx/parallel/container_algorithms/exclusive_scan.hpp
     hpx/parallel/container_algorithms/fill.hpp
     hpx/parallel/container_algorithms/find.hpp
+    hpx/parallel/container_algorithms/fold.hpp
     hpx/parallel/container_algorithms/for_each.hpp
     hpx/parallel/container_algorithms/for_loop.hpp
     hpx/parallel/container_algorithms/generate.hpp
     hpx/parallel/container_algorithms.hpp
     hpx/parallel/container_algorithms/includes.hpp
     hpx/parallel/container_algorithms/inclusive_scan.hpp
+    hpx/parallel/container_algorithms/iota.hpp
     hpx/parallel/container_algorithms/is_heap.hpp
     hpx/parallel/container_algorithms/is_partitioned.hpp
     hpx/parallel/container_algorithms/is_sorted.hpp
@@ -172,22 +176,6 @@ set(algorithms_headers
     hpx/parallel/container_algorithms/unique.hpp
     hpx/parallel/container_memory.hpp
     hpx/parallel/container_numeric.hpp
-    hpx/parallel/datapar.hpp
-    hpx/parallel/datapar/adjacent_difference.hpp
-    hpx/parallel/datapar/adjacent_find.hpp
-    hpx/parallel/datapar/equal.hpp
-    hpx/parallel/datapar/fill.hpp
-    hpx/parallel/datapar/find.hpp
-    hpx/parallel/datapar/generate.hpp
-    hpx/parallel/datapar/handle_local_exceptions.hpp
-    hpx/parallel/datapar/iterator_helpers.hpp
-    hpx/parallel/datapar/loop.hpp
-    hpx/parallel/datapar/mismatch.hpp
-    hpx/parallel/datapar/reduce.hpp
-    hpx/parallel/datapar/replace.hpp
-    hpx/parallel/datapar/transfer.hpp
-    hpx/parallel/datapar/transform_loop.hpp
-    hpx/parallel/datapar/zip_iterator.hpp
     hpx/parallel/memory.hpp
     hpx/parallel/numeric.hpp
     hpx/parallel/run_on_all.hpp
@@ -236,6 +224,28 @@ set(algorithms_headers
     hpx/parallel/util/zip_iterator.hpp
 )
 
+if(HPX_WITH_DATAPAR)
+  set(algorithms_headers
+      ${algorithms_headers}
+      hpx/parallel/datapar.hpp
+      hpx/parallel/datapar/adjacent_difference.hpp
+      hpx/parallel/datapar/adjacent_find.hpp
+      hpx/parallel/datapar/equal.hpp
+      hpx/parallel/datapar/fill.hpp
+      hpx/parallel/datapar/find.hpp
+      hpx/parallel/datapar/generate.hpp
+      hpx/parallel/datapar/handle_local_exceptions.hpp
+      hpx/parallel/datapar/iterator_helpers.hpp
+      hpx/parallel/datapar/loop.hpp
+      hpx/parallel/datapar/mismatch.hpp
+      hpx/parallel/datapar/reduce.hpp
+      hpx/parallel/datapar/replace.hpp
+      hpx/parallel/datapar/transfer.hpp
+      hpx/parallel/datapar/transform_loop.hpp
+      hpx/parallel/datapar/zip_iterator.hpp
+  )
+endif()
+
 # cmake-format: off
 set(algorithms_compat_headers
     hpx/algorithms.hpp => hpx/algorithm.hpp
@@ -249,23 +259,47 @@ set(algorithms_compat_headers
 
 set(algorithms_sources handle_exception_termination_handler.cpp task_group.cpp)
 
+if(HPX_TRACY_WITH_TRACY)
+  set(additional_dependencies hpx_tracy)
+endif()
+
 include(HPX_AddModule)
 add_hpx_module(
   core algorithms
+  GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   HEADERS ${algorithms_headers}
   COMPAT_HEADERS ${algorithms_compat_headers}
+  ADD_TO_GLOBAL_HEADER "hpx/parallel/util/detail/chunk_size_iterator.hpp"
+                       "hpx/parallel/util/detail/handle_remote_exceptions.hpp"
   SOURCES ${algorithms_sources}
   MODULE_DEPENDENCIES
+    hpx_async_base
     hpx_async_combinators
     hpx_async_local
+    hpx_concepts
+    hpx_concurrency
     hpx_config
+    hpx_coroutines
+    hpx_datastructures
+    hpx_errors
+    hpx_execution_base
     hpx_execution
     hpx_executors
+    hpx_functional
     hpx_futures
     hpx_iterator_support
+    hpx_itt_notify
     hpx_lcos_local
+    hpx_memory
     hpx_pack_traversal
+    hpx_properties
     hpx_serialization
+    hpx_synchronization
+    hpx_tag_invoke
+    hpx_threading_base
+    hpx_type_support
     hpx_util
+    ${additional_dependencies}
   CMAKE_SUBDIRS examples tests
 )

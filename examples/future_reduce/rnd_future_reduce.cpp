@@ -24,18 +24,18 @@
 // their expectations.
 // Also. Routine can use either a lambda, or a function under control of USE_LAMBDA
 
-#define TEST_SUCCESS 1
-#define TEST_FAIL 0
+constexpr int TEST_SUCCESS = 1;
+constexpr int TEST_FAIL = 0;
 //
-#define FAILURE_RATE_PERCENT 5
-#define SAMPLES_PER_LOOP 10
-#define TEST_LOOPS 1000
+constexpr int FAILURE_RATE_PERCENT = 5;
+constexpr int SAMPLES_PER_LOOP = 10;
+constexpr int TEST_LOOPS = 1000;
 //
 std::random_device rseed;
 std::mt19937 gen(rseed());
 std::uniform_int_distribution<int> dist(0, 99);    // interval [0,100)
 
-#define USE_LAMBDA
+constexpr bool USE_LAMBDA = true;
 
 //----------------------------------------------------------------------------
 int reduce(hpx::future<std::vector<hpx::future<int>>>&& futvec)
@@ -51,6 +51,7 @@ int reduce(hpx::future<std::vector<hpx::future<int>>>&& futvec)
 }
 
 //----------------------------------------------------------------------------
+
 int generate_one()
 {
     // generate roughly x% fails
@@ -63,6 +64,7 @@ int generate_one()
 }
 
 //----------------------------------------------------------------------------
+
 hpx::future<int> test_reduce()
 {
     std::vector<hpx::future<int>> req_futures;
@@ -77,28 +79,34 @@ hpx::future<int> test_reduce()
     hpx::future<std::vector<hpx::future<int>>> all_ready =
         hpx::when_all(req_futures);
 
-#ifdef USE_LAMBDA
-    hpx::future<int> result = all_ready.then(
-        [](hpx::future<std::vector<hpx::future<int>>>&& futvec) -> int {
-            // futvec is ready or the lambda would not be called
-            std::vector<hpx::future<int>> vfs = futvec.get();
-            // all futures in v are ready as fut is ready
-            int res = TEST_SUCCESS;
-            for (hpx::future<int>& f : vfs)
-            {
-                if (f.get() == TEST_FAIL)
-                    return TEST_FAIL;
-            }
-            return res;
-        });
-#else
-    hpx::future<int> result = all_ready.then(reduce);
-#endif
-    //
+    hpx::future<int> result;
+
+    if constexpr (USE_LAMBDA)
+    {
+        result = all_ready.then(
+            [](hpx::future<std::vector<hpx::future<int>>>&& futvec) -> int {
+                // futvec is ready or the lambda would not be called
+                std::vector<hpx::future<int>> vfs = futvec.get();
+                // all futures in v are ready as fut is ready
+                int res = TEST_SUCCESS;
+                for (hpx::future<int>& f : vfs)
+                {
+                    if (f.get() == TEST_FAIL)
+                        return TEST_FAIL;
+                }
+                return res;
+            });
+    }
+    else
+    {
+        result = all_ready.then(reduce);
+    }
+
     return result;
 }
 
 //----------------------------------------------------------------------------
+
 int hpx_main()
 {
     hpx::chrono::high_resolution_timer htimer;
@@ -122,6 +130,7 @@ int hpx_main()
 }
 
 //----------------------------------------------------------------------------
+
 int main(int argc, char* argv[])
 {
     // Initialize and run HPX.

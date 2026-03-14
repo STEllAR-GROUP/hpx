@@ -11,10 +11,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/execution/execution.hpp>
-#include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/executors/parallel_executor.hpp>
 #include <hpx/modules/concepts.hpp>
+#include <hpx/modules/execution.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -25,7 +24,7 @@
 
 namespace hpx::execution::experimental {
 
-    template <typename Policy>
+    HPX_CXX_CORE_EXPORT template <typename Policy>
     class restricted_policy_executor
     {
     private:
@@ -113,22 +112,20 @@ namespace hpx::execution::experimental {
 
         embedded_executor generate_executor(std::uint16_t thread_num) const
         {
-            return hpx::execution::experimental::with_hint(
-                exec_, threads::thread_schedule_hint(thread_num));
+            return hpx::execution::experimental::with_hint(exec_,
+                threads::thread_schedule_hint(
+                    static_cast<std::int16_t>(thread_num)));
         }
 
     private:
         // property implementations
 
         // support all properties exposed by the embedded executor
-        // clang-format off
-        template <typename Tag, typename Property,
-            HPX_CONCEPT_REQUIRES_(
+        template <typename Tag, typename Property>
+            requires(
                 hpx::execution::experimental::is_scheduling_property_v<Tag> &&
-                hpx::functional::is_tag_invocable_v<
-                    Tag, embedded_executor, Property>
-            )>
-        // clang-format on
+                hpx::functional::is_tag_invocable_v<Tag, embedded_executor,
+                    Property>)
         friend restricted_policy_executor tag_invoke(
             Tag tag, restricted_policy_executor const& exec, Property&& prop)
         {
@@ -139,25 +136,16 @@ namespace hpx::execution::experimental {
             return exec_with_prop;
         }
 
-        // clang-format off
-        template <typename Tag,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::execution::experimental::is_scheduling_property_v<Tag> &&
-                hpx::functional::is_tag_invocable_v<Tag, embedded_executor>
-            )>
-        // clang-format on
+        template <scheduling_property Tag>
+            requires(
+                hpx::functional::is_tag_invocable_v<Tag, embedded_executor>)
         friend decltype(auto) tag_invoke(
             Tag tag, restricted_policy_executor const& exec)
         {
             return tag(exec.generate_executor(exec.get_current_thread_num()));
         }
 
-        // clang-format off
-        template <typename Parameters,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_parameters_v<Parameters>
-            )>
-        // clang-format on
+        template <executor_parameters Parameters>
         friend constexpr std::size_t tag_invoke(
             hpx::execution::experimental::processing_units_count_t tag,
             Parameters&& params, restricted_policy_executor const& exec,
@@ -213,12 +201,8 @@ namespace hpx::execution::experimental {
                 HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
-        // clang-format off
-        template <typename F, typename S, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
-                !std::is_integral_v<S>
-            )>
-        // clang-format on
+        template <typename F, typename S, typename... Ts>
+            requires(!std::is_integral_v<S>)
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::bulk_async_execute_t,
             restricted_policy_executor const& exec, F&& f, S const& shape,
@@ -229,12 +213,8 @@ namespace hpx::execution::experimental {
                 shape, HPX_FORWARD(Ts, ts)...);
         }
 
-        // clang-format off
-        template <typename F, typename S, typename Future, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
-                !std::is_integral_v<S>
-            )>
-        // clang-format on
+        template <typename F, typename S, typename Future, typename... Ts>
+            requires(!std::is_integral_v<S>)
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::bulk_then_execute_t,
             restricted_policy_executor const& exec, F&& f, S const& shape,
@@ -254,7 +234,7 @@ namespace hpx::execution::experimental {
         embedded_executor exec_;
     };
 
-    using restricted_thread_pool_executor =
+    HPX_CXX_CORE_EXPORT using restricted_thread_pool_executor =
         restricted_policy_executor<hpx::launch>;
 }    // namespace hpx::execution::experimental
 
@@ -262,13 +242,7 @@ namespace hpx::execution::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     /// \cond NOINTERNAL
-    template <typename Policy>
-    struct is_one_way_executor<restricted_policy_executor<Policy>>
-      : is_one_way_executor<hpx::execution::parallel_policy_executor<Policy>>
-    {
-    };
-
-    template <typename Policy>
+    HPX_CXX_CORE_EXPORT template <typename Policy>
     struct is_never_blocking_one_way_executor<
         restricted_policy_executor<Policy>>
       : is_never_blocking_one_way_executor<
@@ -276,27 +250,20 @@ namespace hpx::execution::experimental {
     {
     };
 
-    template <typename Policy>
-    struct is_bulk_one_way_executor<restricted_policy_executor<Policy>>
-      : is_bulk_one_way_executor<
-            hpx::execution::parallel_policy_executor<Policy>>
-    {
-    };
-
-    template <typename Policy>
+    HPX_CXX_CORE_EXPORT template <typename Policy>
     struct is_two_way_executor<restricted_policy_executor<Policy>>
       : is_two_way_executor<hpx::execution::parallel_policy_executor<Policy>>
     {
     };
 
-    template <typename Policy>
+    HPX_CXX_CORE_EXPORT template <typename Policy>
     struct is_bulk_two_way_executor<restricted_policy_executor<Policy>>
       : is_bulk_two_way_executor<
             hpx::execution::parallel_policy_executor<Policy>>
     {
     };
 
-    template <typename Policy>
+    HPX_CXX_CORE_EXPORT template <typename Policy>
     struct is_scheduler_executor<restricted_policy_executor<Policy>>
       : is_scheduler_executor<hpx::execution::parallel_policy_executor<Policy>>
     {

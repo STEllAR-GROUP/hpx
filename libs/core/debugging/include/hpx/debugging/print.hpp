@@ -9,10 +9,11 @@
 #include <hpx/config.hpp>
 
 #include <array>
+#include <atomic>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
-#include <iostream>
+#include <iosfwd>
 #include <sstream>
 #include <string>
 #include <tuple>
@@ -22,7 +23,7 @@
 
 // ------------------------------------------------------------
 // This file provides a simple to use printf style debugging
-// tool that can be used on a per file basis to enable output.
+// tool that can be used on a per-file basis to enable output.
 // It is not intended to be exposed to users, but rather as
 // an aid for hpx development.
 // ------------------------------------------------------------
@@ -53,10 +54,6 @@
 // The output will only be produced every N seconds
 // ------------------------------------------------------------
 
-// Used to wrap function call parameters to prevent evaluation
-// when debugging is disabled
-#define HPX_DP_LAZY(Expr, printer) printer.eval([&] { return Expr; })
-
 // ------------------------------------------------------------
 /// \cond NODETAIL
 namespace hpx::debug {
@@ -68,6 +65,30 @@ namespace hpx::debug {
 
         template <typename Int>
         HPX_CORE_EXPORT void print_dec(std::ostream& os, Int const& v, int n);
+
+        extern template HPX_CORE_EXPORT void print_dec(
+            std::ostream&, std::int16_t const&, int);
+        extern template HPX_CORE_EXPORT void print_dec(
+            std::ostream&, std::uint16_t const&, int);
+        extern template HPX_CORE_EXPORT void print_dec(
+            std::ostream&, std::int32_t const&, int);
+        extern template HPX_CORE_EXPORT void print_dec(
+            std::ostream&, std::uint32_t const&, int);
+        extern template HPX_CORE_EXPORT void print_dec(
+            std::ostream&, std::int64_t const&, int);
+        extern template HPX_CORE_EXPORT void print_dec(
+            std::ostream&, std::uint64_t const&, int);
+#if defined(__APPLE__)
+        extern template HPX_CORE_EXPORT void print_dec(
+            std::ostream&, long const&, int);
+        extern template HPX_CORE_EXPORT void print_dec(
+            std::ostream&, unsigned long const&, int);
+#endif
+
+        extern template HPX_CORE_EXPORT void print_dec(
+            std::ostream&, std::atomic<int> const&, int);
+        extern template HPX_CORE_EXPORT void print_dec(
+            std::ostream&, std::atomic<unsigned int> const&, int);
 
         template <int N, typename T>
         struct dec
@@ -88,7 +109,7 @@ namespace hpx::debug {
         };
     }    // namespace detail
 
-    template <int N = 2, typename T>
+    HPX_CXX_CORE_EXPORT template <int N = 2, typename T>
     [[nodiscard]] constexpr detail::dec<N, T> dec(T const& v) noexcept
     {
         return detail::dec<N, T>(v);
@@ -97,7 +118,7 @@ namespace hpx::debug {
     // ------------------------------------------------------------------
     // format as pointer
     // ------------------------------------------------------------------
-    struct ptr
+    HPX_CXX_CORE_EXPORT struct ptr
     {
         HPX_CORE_EXPORT explicit ptr(void const* v) noexcept;
         HPX_CORE_EXPORT explicit ptr(std::uintptr_t v) noexcept;
@@ -158,7 +179,7 @@ namespace hpx::debug {
         };
     }    // namespace detail
 
-    template <int N = 4, typename T>
+    HPX_CXX_CORE_EXPORT template <int N = 4, typename T>
     [[nodiscard]] constexpr detail::hex<N, T> hex(T const& v) noexcept
     {
         return detail::hex<N, T>(v);
@@ -191,7 +212,7 @@ namespace hpx::debug {
         };
     }    // namespace detail
 
-    template <int N = 8, typename T>
+    HPX_CXX_CORE_EXPORT template <int N = 8, typename T>
     [[nodiscard]] constexpr detail::bin<N, T> bin(T const& v) noexcept
     {
         return detail::bin<N, T>(v);
@@ -205,7 +226,7 @@ namespace hpx::debug {
         HPX_CORE_EXPORT void print_str(std::ostream& os, char const* v, int n);
     }
 
-    template <int N = 20>
+    HPX_CXX_CORE_EXPORT template <int N = 20>
     struct str
     {
         explicit constexpr str(char const* v) noexcept
@@ -225,7 +246,7 @@ namespace hpx::debug {
     // ------------------------------------------------------------------
     // format as ip address
     // ------------------------------------------------------------------
-    struct ipaddr
+    HPX_CXX_CORE_EXPORT struct ipaddr
     {
         HPX_CORE_EXPORT explicit ipaddr(void const* a) noexcept;
         HPX_CORE_EXPORT explicit ipaddr(std::uint32_t a) noexcept;
@@ -234,7 +255,7 @@ namespace hpx::debug {
         std::uint32_t const ipdata_;
 
         HPX_CORE_EXPORT friend std::ostream& operator<<(
-            std::ostream& os, ipaddr const& p);
+            std::ostream& os, ipaddr const& a);
     };
 
     // ------------------------------------------------------------------
@@ -252,7 +273,7 @@ namespace hpx::debug {
     // ------------------------------------------------------------------
     // helper function for printing CRC32
     // ------------------------------------------------------------------
-    [[nodiscard]] constexpr std::uint32_t crc32(
+    HPX_CXX_CORE_EXPORT [[nodiscard]] constexpr std::uint32_t crc32(
         void const*, std::size_t) noexcept
     {
         return 0;
@@ -263,17 +284,17 @@ namespace hpx::debug {
     // useful for debugging corruptions in buffers during
     // rma or other transfers
     // ------------------------------------------------------------------
-    struct mem_crc32
+    HPX_CXX_CORE_EXPORT struct mem_crc32
     {
         HPX_CORE_EXPORT mem_crc32(
             void const* a, std::size_t len, char const* txt) noexcept;
 
-        std::uint64_t const* addr_;
+        void const* addr_;
         std::size_t const len_;
         char const* txt_;
 
         HPX_CORE_EXPORT friend std::ostream& operator<<(
-            std::ostream& os, mem_crc32 const& p);
+            std::ostream& os, mem_crc32 const& a);
     };
 
     namespace detail {
@@ -311,6 +332,8 @@ namespace hpx::debug {
         HPX_CORE_EXPORT void generate_prefix(std::ostream& os);
 
         ///////////////////////////////////////////////////////////////////////
+        HPX_CORE_EXPORT void display_to_cout(std::string const& str);
+
         template <typename... Args>
         void display(char const* prefix, Args const&... args)
         {
@@ -321,7 +344,7 @@ namespace hpx::debug {
             generate_prefix(tempstream);
             ((tempstream << args << " "), ...);
             tempstream << std::endl;
-            std::cout << tempstream.str();
+            display_to_cout(tempstream.str());
         }
 
         template <typename... Args>
@@ -361,7 +384,7 @@ namespace hpx::debug {
         }
     }    // namespace detail
 
-    template <typename... Args>
+    HPX_CXX_CORE_EXPORT template <typename... Args>
     struct scoped_var
     {
         // capture tuple elements by reference - no temp vars in constructor please
@@ -386,9 +409,14 @@ namespace hpx::debug {
             detail::display(
                 "<SCO> ", prefix_, debug::str<>("<< leave >>"), buffered_msg);
         }
+
+        scoped_var(scoped_var const&) = delete;
+        scoped_var(scoped_var&&) = delete;
+        scoped_var& operator=(scoped_var const&) = delete;
+        scoped_var& operator=(scoped_var&&) = delete;
     };
 
-    template <typename... Args>
+    HPX_CXX_CORE_EXPORT template <typename... Args>
     struct timed_var
     {
         mutable std::chrono::steady_clock::time_point time_start_;
@@ -426,7 +454,7 @@ namespace hpx::debug {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <bool enable>
+    HPX_CXX_CORE_EXPORT template <bool Enable>
     struct enable_print;
 
     // when false, debug statements should produce no code
@@ -579,8 +607,7 @@ namespace hpx::debug {
         template <typename... T, typename... Args>
         void timed(timed_var<T...> const& init, Args const&... args) const
         {
-            auto now = std::chrono::steady_clock::now();
-            if (init.elapsed(now))
+            if (auto now = std::chrono::steady_clock::now(); init.elapsed(now))
             {
                 detail::timed(prefix_, init, args...);
             }

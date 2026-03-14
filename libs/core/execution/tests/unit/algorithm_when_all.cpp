@@ -11,14 +11,14 @@
 #if !defined(HPX_CLANG_VERSION) ||                                             \
     ((HPX_CLANG_VERSION / 10000) != 11 && (HPX_CLANG_VERSION / 10000) != 8)
 
-#include <hpx/async_base/dataflow.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/testing.hpp>
 
 #if defined(HPX_HAVE_STDEXEC)
 // TODO: Figure out why this is necessary for stdexec
 // but causes dataflow to be unresolvable without stdexec
-#include <hpx/execution/algorithms/when_all.hpp>
+#include <hpx/modules/execution.hpp>
 #endif
 
 #include "algorithm_test_utils.hpp"

@@ -26,6 +26,8 @@
 #include <iostream>
 #include <string>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 using namespace hpx::program_options;
 using namespace std;
 
@@ -74,7 +76,7 @@ int main(int ac, char* av[])
         }
         if (vm.count("help-module"))
         {
-            const auto& s = vm["help-module"].as<string>();
+            auto const& s = vm["help-module"].as<string>();
             if (s == "gui")
             {
                 cout << gui;

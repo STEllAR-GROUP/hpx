@@ -30,6 +30,8 @@ namespace boost { namespace inspect {
         register_signature(".hpp");
         register_signature(".hxx");
         register_signature(".ipp");
+        register_signature(".ixx");
+        register_signature(".cppm");
     }
 
     void end_check::inspect(const string& library_name,

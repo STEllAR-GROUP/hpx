@@ -1,4 +1,4 @@
-//  Copyright (c) 2021-2024 Hartmut Kaiser
+//  Copyright (c) 2021-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,27 +9,13 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/execution/algorithms/bulk.hpp>
-#include <hpx/execution/algorithms/keep_future.hpp>
-#include <hpx/execution/algorithms/start_detached.hpp>
-#include <hpx/execution/algorithms/sync_wait.hpp>
-#include <hpx/execution/algorithms/then.hpp>
-#include <hpx/execution/algorithms/transfer.hpp>
-#include <hpx/execution/algorithms/transfer_just.hpp>
-#include <hpx/execution/executors/default_parameters.hpp>
-#include <hpx/execution/executors/execution.hpp>
-#include <hpx/execution/executors/execution_parameters.hpp>
-#include <hpx/execution_base/execution.hpp>
-#include <hpx/execution_base/sender.hpp>
-#include <hpx/execution_base/traits/is_executor.hpp>
-#include <hpx/functional/bind_back.hpp>
-#include <hpx/functional/deferred_call.hpp>
-#include <hpx/functional/invoke_fused.hpp>
-#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/modules/concepts.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/timing.hpp>
 #include <hpx/modules/topology.hpp>
-#include <hpx/timing/steady_clock.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -42,7 +28,7 @@ namespace hpx::execution::experimental {
     // A explicit_scheduler_executor wraps any P2300 scheduler and implements
     // the executor functionalities for those. All scheduling functions return
     // senders.
-    template <typename BaseScheduler>
+    HPX_CXX_CORE_EXPORT template <typename BaseScheduler>
     struct explicit_scheduler_executor
     {
         static_assert(hpx::execution::experimental::is_scheduler_v<
@@ -150,6 +136,7 @@ namespace hpx::execution::experimental {
             }
             else
             {
+                // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
                 return hpx::get<0>(HPX_MOVE(*result));
             }
         }
@@ -177,10 +164,11 @@ namespace hpx::execution::experimental {
         }
 
         // BulkTwoWayExecutor interface
+        // Integral shape overload - passes integral directly to bulk
         // clang-format off
         template <typename F, typename S, typename... Ts,
             HPX_CONCEPT_REQUIRES_(
-               !std::is_integral_v<S>
+                std::is_integral_v<S>
             )>
         // clang-format on
         friend decltype(auto) tag_invoke(
@@ -188,15 +176,22 @@ namespace hpx::execution::experimental {
             explicit_scheduler_executor const& exec, F&& f, S const& shape,
             Ts&&... ts)
         {
-#if defined(HPX_HAVE_STDEXEC)
-//            We are using HPX's bulk implementation for now, so this works for
-//            other types too.
-//            static_assert(
-//                std::is_integral_v<S>,
-//                "P2300 expects bulk to be called only with integral types"
-//            );
-#endif
+            return bulk(schedule(exec.sched_), shape,
+                hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
+        }
 
+        // Range shape overload
+        // clang-format off
+        template <typename F, typename S, typename... Ts,
+            HPX_CONCEPT_REQUIRES_(
+                !std::is_integral_v<S>
+            )>
+        // clang-format on
+        friend decltype(auto) tag_invoke(
+            hpx::parallel::execution::bulk_async_execute_t,
+            explicit_scheduler_executor const& exec, F&& f, S const& shape,
+            Ts&&... ts)
+        {
             using shape_element =
                 typename hpx::traits::range_traits<S>::value_type;
             using result_type = hpx::util::detail::invoke_deferred_result_t<F,
@@ -217,43 +212,45 @@ namespace hpx::execution::experimental {
             else
             {
                 using size_type = decltype(util::size(shape));
-                const size_type shape_size = util::size(shape);
+                size_type const shape_size = util::size(shape);
 
                 using result_vector_type = std::vector<result_type>;
                 result_vector_type result_vector(shape_size);
 
-                auto f_wrapper = [](const size_type i,
+                auto f_wrapper = [](size_type const i,
                                      result_vector_type& result_vector,
-                                     const S& shape, F& f, Ts&... ts) {
+                                     S const& shape, F& f, Ts&... ts) {
                     auto it = util::begin(shape);
                     std::advance(it, i);
                     result_vector[i] = HPX_INVOKE(f, *it, ts...);
                 };
 
                 auto get_result = [](result_vector_type&& result_vector,
-                                      const S&, F&&, Ts&&...) {
+                                      S const&, F&&, Ts&&...) {
                     return HPX_MOVE(result_vector);
                 };
 
 #if defined(HPX_HAVE_STDEXEC)
                 return just(HPX_MOVE(result_vector), shape, HPX_FORWARD(F, f),
                            HPX_FORWARD(Ts, ts)...) |
-                    continue_on(exec.sched_) |
+                    continues_on(exec.sched_) |
                     bulk(shape_size, HPX_MOVE(f_wrapper)) |
                     then(HPX_MOVE(get_result));
 #else
-                return transfer_just(exec.sched_, HPX_MOVE(result_vector),
-                           shape, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...) |
-                    bulk(shape_size, HPX_MOVE(f_wrapper)) |
-                    then(HPX_MOVE(get_result));
+                return then(
+                    bulk(transfer_just(exec.sched_, HPX_MOVE(result_vector),
+                             shape, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...),
+                        shape_size, HPX_MOVE(f_wrapper)),
+                    HPX_MOVE(get_result));
 #endif
             }
         }
 
+        // Integral shape overload - passes integral directly
         // clang-format off
         template <typename F, typename S, typename... Ts,
             HPX_CONCEPT_REQUIRES_(
-               !std::is_integral_v<S>
+                std::is_integral_v<S>
             )>
         // clang-format on
         friend decltype(auto) tag_invoke(
@@ -266,10 +263,47 @@ namespace hpx::execution::experimental {
                     exec, HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...));
         }
 
+        // Range shape overload
+        // clang-format off
+        template <typename F, typename S, typename... Ts,
+            HPX_CONCEPT_REQUIRES_(
+                !std::is_integral_v<S>
+            )>
+        // clang-format on
+        friend decltype(auto) tag_invoke(
+            hpx::parallel::execution::bulk_sync_execute_t,
+            explicit_scheduler_executor const& exec, F&& f, S const& shape,
+            Ts&&... ts)
+        {
+            hpx::this_thread::experimental::sync_wait(
+                hpx::parallel::execution::bulk_async_execute(
+                    exec, HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...));
+        }
+
+        // Integral shape overload - passes integral directly to bulk
         // clang-format off
         template <typename F, typename S, typename Future, typename... Ts,
             HPX_CONCEPT_REQUIRES_(
-               !std::is_integral_v<S>
+                std::is_integral_v<S>
+            )>
+        // clang-format on
+        friend auto tag_invoke(hpx::parallel::execution::bulk_then_execute_t,
+            explicit_scheduler_executor const& exec, F&& f, S const& shape,
+            Future&& predecessor, Ts&&... ts)
+        {
+            auto pre_req =
+                when_all(keep_future(HPX_FORWARD(Future, predecessor)));
+
+            return transfer(HPX_MOVE(pre_req), exec.sched_) |
+                bulk(shape,
+                    hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
+        }
+
+        // Range shape overload
+        // clang-format off
+        template <typename F, typename S, typename Future, typename... Ts,
+            HPX_CONCEPT_REQUIRES_(
+                !std::is_integral_v<S>
             )>
         // clang-format on
         friend auto tag_invoke(hpx::parallel::execution::bulk_then_execute_t,
@@ -286,8 +320,9 @@ namespace hpx::execution::experimental {
             auto pre_req =
                 when_all(keep_future(HPX_FORWARD(Future, predecessor)));
 
-            return bulk(transfer(HPX_MOVE(pre_req), exec.sched_), shape,
-                hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
+            return transfer(HPX_MOVE(pre_req), exec.sched_) |
+                bulk(shape,
+                    hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
         }
 
     private:
@@ -295,16 +330,18 @@ namespace hpx::execution::experimental {
         /// \endcond
     };
 
-    template <typename BaseScheduler>
+    HPX_CXX_CORE_EXPORT template <typename BaseScheduler>
     explicit explicit_scheduler_executor(BaseScheduler&& sched)
         -> explicit_scheduler_executor<std::decay_t<BaseScheduler>>;
 
     // support all properties exposed by the wrapped scheduler
     // clang-format off
-    template <typename Tag, typename BaseScheduler, typename Property,
+    HPX_CXX_CORE_EXPORT template <typename Tag, typename BaseScheduler,
+        typename Property,
         HPX_CONCEPT_REQUIRES_(
             hpx::execution::experimental::is_scheduling_property_v<Tag>
         )>
+    // clang-format on
     auto tag_invoke(Tag tag,
         explicit_scheduler_executor<BaseScheduler> const& exec, Property&& prop)
         -> decltype(explicit_scheduler_executor<BaseScheduler>(
@@ -314,10 +351,9 @@ namespace hpx::execution::experimental {
         return explicit_scheduler_executor<BaseScheduler>(
             tag(exec.sched(), HPX_FORWARD(Property, prop)));
     }
-    // clang-format on
 
     // clang-format off
-    template <typename Tag, typename BaseScheduler,
+    HPX_CXX_CORE_EXPORT template <typename Tag, typename BaseScheduler,
         HPX_CONCEPT_REQUIRES_(
             hpx::execution::experimental::is_scheduling_property_v<Tag>
         )>
@@ -333,37 +369,37 @@ namespace hpx::execution::experimental {
 namespace hpx::execution::experimental {
 
     /// \cond NOINTERNAL
-    template <typename BaseScheduler>
+    HPX_CXX_CORE_EXPORT template <typename BaseScheduler>
     struct is_one_way_executor<hpx::execution::experimental::
             explicit_scheduler_executor<BaseScheduler>> : std::true_type
     {
     };
 
-    template <typename BaseScheduler>
+    HPX_CXX_CORE_EXPORT template <typename BaseScheduler>
     struct is_never_blocking_one_way_executor<hpx::execution::experimental::
             explicit_scheduler_executor<BaseScheduler>> : std::true_type
     {
     };
 
-    template <typename BaseScheduler>
+    HPX_CXX_CORE_EXPORT template <typename BaseScheduler>
     struct is_bulk_one_way_executor<hpx::execution::experimental::
             explicit_scheduler_executor<BaseScheduler>> : std::true_type
     {
     };
 
-    template <typename BaseScheduler>
+    HPX_CXX_CORE_EXPORT template <typename BaseScheduler>
     struct is_two_way_executor<hpx::execution::experimental::
             explicit_scheduler_executor<BaseScheduler>> : std::true_type
     {
     };
 
-    template <typename BaseScheduler>
+    HPX_CXX_CORE_EXPORT template <typename BaseScheduler>
     struct is_bulk_two_way_executor<hpx::execution::experimental::
             explicit_scheduler_executor<BaseScheduler>> : std::true_type
     {
     };
 
-    template <typename BaseScheduler>
+    HPX_CXX_CORE_EXPORT template <typename BaseScheduler>
     struct is_scheduler_executor<hpx::execution::experimental::
             explicit_scheduler_executor<BaseScheduler>> : std::true_type
     {

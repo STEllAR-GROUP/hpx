@@ -9,8 +9,8 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DATAPAR)
-#include <hpx/execution/traits/is_execution_policy.hpp>
-#include <hpx/functional/tag_invoke.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/parallel/algorithms/detail/fill.hpp>
 #include <hpx/parallel/datapar/handle_local_exceptions.hpp>
 #include <hpx/parallel/datapar/loop.hpp>
@@ -20,10 +20,10 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { namespace detail {
+namespace hpx::parallel::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    struct datapar_fill
+    HPX_CXX_CORE_EXPORT struct datapar_fill
     {
         template <typename ExPolicy, typename Iter, typename Sent, typename T>
         HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
@@ -31,15 +31,19 @@ namespace hpx { namespace parallel { namespace detail {
         call(ExPolicy&&, Iter first, Sent last, T const& val)
         {
             hpx::parallel::util::loop_ind<std::decay_t<ExPolicy>>(
-                first, last, [&val](auto& v) { v = val; });
+                first, last, [&val](auto&& v) { v = val; });
             return first;
         }
     };
 
-    template <typename ExPolicy, typename Iter, typename Sent, typename T,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_vectorpack_execution_policy_v<ExPolicy>&& hpx::parallel::
-                util::detail::iterator_datapar_compatible<Iter>::value)>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter,
+        typename Sent, typename T>
+    // clang-format off
+        requires (
+            hpx::is_vectorpack_execution_policy_v<ExPolicy> &&
+            hpx::parallel::util::detail::iterator_datapar_compatible<Iter>::value
+        )
+    // clang-format on
     HPX_HOST_DEVICE HPX_FORCEINLINE Iter tag_invoke(sequential_fill_t,
         ExPolicy&& policy, Iter first, Sent last, T const& value)
     {
@@ -48,7 +52,7 @@ namespace hpx { namespace parallel { namespace detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    struct datapar_fill_n
+    HPX_CXX_CORE_EXPORT struct datapar_fill_n
     {
         template <typename ExPolicy, typename Iter, typename T>
         HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
@@ -56,20 +60,24 @@ namespace hpx { namespace parallel { namespace detail {
         call(ExPolicy&&, Iter first, std::size_t count, T const& val)
         {
             hpx::parallel::util::loop_n_ind<std::decay_t<ExPolicy>>(
-                first, count, [&val](auto& v) { v = val; });
+                first, count, [&val](auto&& v) { v = val; });
             return first;
         }
     };
 
-    template <typename ExPolicy, typename Iter, typename T,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_vectorpack_execution_policy_v<ExPolicy>&& hpx::parallel::
-                util::detail::iterator_datapar_compatible<Iter>::value)>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter, typename T>
+    // clang-format off
+        requires (
+            hpx::is_vectorpack_execution_policy_v<ExPolicy> &&
+            parallel::util::detail::iterator_datapar_compatible<Iter>::value
+        )
+    // clang-format on
     HPX_HOST_DEVICE HPX_FORCEINLINE Iter tag_invoke(sequential_fill_n_t,
         ExPolicy&& policy, Iter first, std::size_t count, T const& value)
     {
         return datapar_fill_n::call(
             HPX_FORWARD(ExPolicy, policy), first, count, value);
     }
-}}}    // namespace hpx::parallel::detail
+}    // namespace hpx::parallel::detail
+
 #endif

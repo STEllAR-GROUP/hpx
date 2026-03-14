@@ -12,9 +12,8 @@
 #include <hpx/agas_base/server/primary_namespace.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/format.hpp>
-#include <hpx/functional/bind_back.hpp>
-#include <hpx/functional/function.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/naming/credit_handling.hpp>
 #include <hpx/performance_counters/agas_namespace_action_code.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
@@ -27,6 +26,8 @@
 #include <cstdint>
 #include <string>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx { namespace agas { namespace server {
 
     // register all performance counter types exposed by this component
@@ -37,7 +38,7 @@ namespace hpx { namespace agas { namespace server {
                 agas::server::primary_namespace_service_name));
 
         for (std::size_t i = 0;
-             i != agas::detail::num_primary_namespace_services; ++i)
+            i != agas::detail::num_primary_namespace_services; ++i)
         {
             // global counters are handled elsewhere
             if (agas::detail::primary_namespace_services[i].code_ ==
@@ -88,7 +89,7 @@ namespace hpx { namespace agas { namespace server {
                 agas::server::primary_namespace_service_name));
 
         for (std::size_t i = 0;
-             i != agas::detail::num_primary_namespace_services; ++i)
+            i != agas::detail::num_primary_namespace_services; ++i)
         {
             // local counters are handled elsewhere
             if (agas::detail::primary_namespace_services[i].code_ !=
@@ -153,7 +154,7 @@ namespace hpx { namespace agas { namespace server {
         namespace_action_code code = invalid_request;
         detail::counter_target target = agas::detail::counter_target_invalid;
         for (std::size_t i = 0;
-             i != agas::detail::num_primary_namespace_services; ++i)
+            i != agas::detail::num_primary_namespace_services; ++i)
         {
             if (p.countername_ ==
                 agas::detail::primary_namespace_services[i].name_)

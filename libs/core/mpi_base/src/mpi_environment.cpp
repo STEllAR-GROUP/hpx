@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/concepts/has_xxx.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/mpi_base.hpp>
@@ -78,6 +78,9 @@ namespace hpx::util {
                     get_entry_as(cfg, "hpx.parcel.mpi.priority", 0))) ||
             (get_entry_as(cfg, "hpx.parcel.lci.enable", 1) &&
                 (get_entry_as(cfg, "hpx.parcel.lci.priority", 1) >
+                    get_entry_as(cfg, "hpx.parcel.mpi.priority", 0))) ||
+            (get_entry_as(cfg, "hpx.parcel.lcw.enable", 1) &&
+                (get_entry_as(cfg, "hpx.parcel.lcw.priority", 1) >
                     get_entry_as(cfg, "hpx.parcel.mpi.priority", 0))))
         {
             LBT_(info) << "MPI support disabled via configuration settings\n";

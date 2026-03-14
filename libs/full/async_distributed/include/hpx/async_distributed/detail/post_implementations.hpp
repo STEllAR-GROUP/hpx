@@ -16,8 +16,7 @@
 #include <hpx/components_base/pinned_ptr.hpp>
 #include <hpx/components_base/traits/component_supports_migration.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/naming_base/address.hpp>
-#include <hpx/naming_base/id_type.hpp>
+#include <hpx/modules/naming_base.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -118,7 +117,7 @@ namespace hpx::detail {
                 HPX_ASSERT(
                     !traits::action_was_object_migrated<action_type>::call(
                         id, addr.address_)
-                         .first);
+                        .first);
                 HPX_ASSERT(pin_count_is_valid<component_type>(addr.address_));
             }
 
@@ -226,7 +225,7 @@ namespace hpx::detail {
                 HPX_ASSERT(
                     !traits::action_was_object_migrated<action_type>::call(
                         id, addr.address_)
-                         .first);
+                        .first);
                 HPX_ASSERT(pin_count_is_valid<component_type>(addr.address_));
             }
 

@@ -274,16 +274,16 @@ namespace hpx { namespace collectives {
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/async.hpp>
 #include <hpx/collectives/argument_types.hpp>
 #include <hpx/collectives/create_communicator.hpp>
 #include <hpx/components_base/agas_interface.hpp>
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/parallel/algorithms/exclusive_scan.hpp>
-#include <hpx/type_support/unused.hpp>
+#include <hpx/modules/algorithms.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/type_support.hpp>
 
+#include <concepts>
 #include <cstddef>
 #include <type_traits>
 #include <utility>
@@ -293,7 +293,7 @@ namespace hpx::collectives::detail {
 
     template <typename T, typename InIter, typename Sent, typename OutIter,
         typename Op>
-    static constexpr void exclusive_scan(
+    constexpr void exclusive_scan(
         InIter first, Sent last, OutIter dest, Op&& op)
     {
         // the first value given goes to the second destination
@@ -302,8 +302,22 @@ namespace hpx::collectives::detail {
         for (/* */; first != last; (void) ++first, ++dest)
         {
             T next = HPX_INVOKE(op, temp, *first);
-            *dest = temp;
-            temp = next;
+            *dest = HPX_MOVE(temp);
+            temp = HPX_MOVE(next);
+        }
+    }
+
+    template <typename InIter, typename Sent, typename OutIter, typename T,
+        typename Op>
+    constexpr void exclusive_scan_init(
+        InIter first, Sent last, OutIter dest, T init, Op&& op)
+    {
+        T temp = init;
+        for (/* */; first != last; (void) ++first, ++dest)
+        {
+            init = HPX_INVOKE(op, HPX_MOVE(init), *first);
+            *dest = HPX_MOVE(temp);
+            temp = init;
         }
     }
 }    // namespace hpx::collectives::detail
@@ -357,7 +371,7 @@ namespace hpx::traits {
                         std::vector<T_> dest;
                         dest.resize(data.size());
 
-                        if constexpr (!std::is_same_v<T_, bool>)
+                        if constexpr (!std::same_as<T_, bool>)
                         {
                             collectives::detail::exclusive_scan<T_>(
                                 data.begin(), data.end(), dest.begin(),
@@ -410,16 +424,17 @@ namespace hpx::traits {
                         std::vector<T_> dest;
                         dest.resize(data.size());
 
-                        if constexpr (!std::is_same_v<T_, bool>)
+                        if constexpr (!std::same_as<T_, bool>)
                         {
-                            hpx::exclusive_scan(data.begin(), data.end(),
-                                dest.begin(), HPX_FORWARD(Init, init),
-                                HPX_FORWARD(F, op));
+                            collectives::detail::exclusive_scan_init(
+                                data.begin(), data.end(), dest.begin(),
+                                HPX_FORWARD(Init, init), HPX_FORWARD(F, op));
                         }
                         else
                         {
-                            hpx::exclusive_scan(data.begin(), data.end(),
-                                dest.begin(), static_cast<bool>(init),
+                            collectives::detail::exclusive_scan_init(
+                                data.begin(), data.end(), dest.begin(),
+                                static_cast<bool>(init),
                                 [&](auto lhs, auto rhs) {
                                     return HPX_FORWARD(F, op)(
                                         static_cast<bool>(lhs),
@@ -443,11 +458,11 @@ namespace hpx::collectives {
     template <typename T, typename F>
     hpx::future<std::decay_t<T>> exclusive_scan(communicator fid,
         T&& local_result, F&& op, this_site_arg this_site = this_site_arg(),
-        generation_arg generation = generation_arg())
+        generation_arg const generation = generation_arg())
     {
         using arg_type = std::decay_t<T>;
 
-        if (this_site == static_cast<std::size_t>(-1))
+        if (this_site.is_default())
         {
             this_site = agas::get_locality_id();
         }
@@ -456,6 +471,20 @@ namespace hpx::collectives {
             return hpx::make_exceptional_future<arg_type>(HPX_GET_EXCEPTION(
                 hpx::error::bad_parameter, "hpx::collectives::exclusive_scan",
                 "the generation number shouldn't be zero"));
+        }
+
+        // Handle operation right away if there is only one value.
+        if (auto [num_sites, comm_site] = fid.get_info(); num_sites == 1)
+        {
+            if (this_site != comm_site)
+            {
+                return hpx::make_exceptional_future<arg_type>(
+                    HPX_GET_EXCEPTION(hpx::error::bad_parameter,
+                        "hpx::collectives::exclusive_scan",
+                        "the local site should be zero if only one site is "
+                        "involved"));
+            }
+            return hpx::make_ready_future(arg_type{});
         }
 
         auto exclusive_scan_data =
@@ -496,10 +525,11 @@ namespace hpx::collectives {
 
     template <typename T, typename F>
     hpx::future<std::decay_t<T>> exclusive_scan(char const* basename,
-        T&& local_result, F&& op, num_sites_arg num_sites = num_sites_arg(),
+        T&& local_result, F&& op,
+        num_sites_arg const num_sites = num_sites_arg(),
         this_site_arg this_site = this_site_arg(),
-        generation_arg generation = generation_arg(),
-        root_site_arg root_site = root_site_arg())
+        generation_arg const generation = generation_arg(),
+        root_site_arg const root_site = root_site_arg())
     {
         return exclusive_scan(create_communicator(basename, num_sites,
                                   this_site, generation, root_site),
@@ -529,10 +559,10 @@ namespace hpx::collectives {
     template <typename T, typename F>
     decltype(auto) exclusive_scan(hpx::launch::sync_policy,
         char const* basename, T&& local_result, F&& op,
-        num_sites_arg num_sites = num_sites_arg(),
+        num_sites_arg const num_sites = num_sites_arg(),
         this_site_arg this_site = this_site_arg(),
-        generation_arg generation = generation_arg(),
-        root_site_arg root_site = root_site_arg())
+        generation_arg const generation = generation_arg(),
+        root_site_arg const root_site = root_site_arg())
     {
         return exclusive_scan(create_communicator(basename, num_sites,
                                   this_site, generation, root_site),
@@ -542,20 +572,16 @@ namespace hpx::collectives {
 
     ////////////////////////////////////////////////////////////////////////////
     // Version of exclusive scan that takes an initial value for element 0.
-    // clang-format off
-    template <typename T, typename Init, typename F,
-        HPX_CONCEPT_REQUIRES_(
-            !std::is_same_v<this_site_arg, std::decay_t<F>>
-        )>
-    // clang-format on
+    template <typename T, typename Init, typename F>
+        requires(!std::same_as<this_site_arg, std::decay_t<F>>)
     hpx::future<std::decay_t<T>> exclusive_scan(communicator fid,
         T&& local_result, Init&& init, F&& op,
         this_site_arg this_site = this_site_arg(),
-        generation_arg generation = generation_arg())
+        generation_arg const generation = generation_arg())
     {
         using arg_type = std::decay_t<T>;
 
-        if (this_site == static_cast<std::size_t>(-1))
+        if (this_site.is_default())
         {
             this_site = agas::get_locality_id();
         }
@@ -564,6 +590,20 @@ namespace hpx::collectives {
             return hpx::make_exceptional_future<arg_type>(HPX_GET_EXCEPTION(
                 hpx::error::bad_parameter, "hpx::collectives::exclusive_scan",
                 "the generation number shouldn't be zero"));
+        }
+
+        // Handle operation right away if there is only one value.
+        if (auto [num_sites, comm_site] = fid.get_info(); num_sites == 1)
+        {
+            if (this_site != comm_site)
+            {
+                return hpx::make_exceptional_future<arg_type>(
+                    HPX_GET_EXCEPTION(hpx::error::bad_parameter,
+                        "hpx::collectives::exclusive_scan",
+                        "the local site should be zero if only one site is "
+                        "involved"));
+            }
+            return hpx::make_ready_future<arg_type>(HPX_FORWARD(Init, init));
         }
 
         auto exclusive_scan_data =
@@ -596,12 +636,8 @@ namespace hpx::collectives {
         return fid.then(hpx::launch::sync, HPX_MOVE(exclusive_scan_data));
     }
 
-    // clang-format off
-    template <typename T, typename Init, typename F,
-        HPX_CONCEPT_REQUIRES_(
-            !std::is_same_v<generation_arg, std::decay_t<F>>
-        )>
-    // clang-format on
+    template <typename T, typename Init, typename F>
+        requires(!std::same_as<generation_arg, std::decay_t<F>>)
     hpx::future<std::decay_t<T>> exclusive_scan(communicator fid,
         T&& local_result, Init&& init, F&& op, generation_arg generation,
         this_site_arg this_site = this_site_arg())
@@ -610,18 +646,14 @@ namespace hpx::collectives {
             HPX_FORWARD(Init, init), HPX_FORWARD(F, op), this_site, generation);
     }
 
-    // clang-format off
-    template <typename T, typename Init, typename F,
-        HPX_CONCEPT_REQUIRES_(
-            !std::is_same_v<num_sites_arg, std::decay_t<F>>
-        )>
-    // clang-format on
+    template <typename T, typename Init, typename F>
+        requires(!std::same_as<num_sites_arg, std::decay_t<F>>)
     hpx::future<std::decay_t<T>> exclusive_scan(char const* basename,
         T&& local_result, Init&& init, F&& op,
-        num_sites_arg num_sites = num_sites_arg(),
-        this_site_arg this_site = this_site_arg(),
-        generation_arg generation = generation_arg(),
-        root_site_arg root_site = root_site_arg())
+        num_sites_arg const num_sites = num_sites_arg(),
+        this_site_arg const this_site = this_site_arg(),
+        generation_arg const generation = generation_arg(),
+        root_site_arg const root_site = root_site_arg())
     {
         return exclusive_scan(create_communicator(basename, num_sites,
                                   this_site, generation, root_site),
@@ -629,49 +661,37 @@ namespace hpx::collectives {
             HPX_FORWARD(F, op), this_site);
     }
 
-    // clang-format off
-    template <typename T, typename Init, typename F,
-        HPX_CONCEPT_REQUIRES_(
-            !std::is_same_v<this_site_arg, std::decay_t<F>>
-        )>
-    // clang-format on
+    template <typename T, typename Init, typename F>
+        requires(!std::same_as<this_site_arg, std::decay_t<F>>)
     decltype(auto) exclusive_scan(hpx::launch::sync_policy, communicator fid,
         T&& local_result, Init&& init, F&& op,
-        this_site_arg this_site = this_site_arg(),
-        generation_arg generation = generation_arg())
+        this_site_arg const this_site = this_site_arg(),
+        generation_arg const generation = generation_arg())
     {
         return exclusive_scan(HPX_MOVE(fid), HPX_FORWARD(T, local_result),
             HPX_FORWARD(Init, init), HPX_FORWARD(F, op), this_site, generation)
             .get();
     }
 
-    // clang-format off
-    template <typename T, typename Init, typename F,
-        HPX_CONCEPT_REQUIRES_(
-            !std::is_same_v<generation_arg, std::decay_t<F>>
-        )>
-    // clang-format on
+    template <typename T, typename Init, typename F>
+        requires(!std::same_as<generation_arg, std::decay_t<F>>)
     decltype(auto) exclusive_scan(hpx::launch::sync_policy, communicator fid,
-        T&& local_result, Init&& init, F&& op, generation_arg generation,
-        this_site_arg this_site = this_site_arg())
+        T&& local_result, Init&& init, F&& op, generation_arg const generation,
+        this_site_arg const this_site = this_site_arg())
     {
         return exclusive_scan(HPX_MOVE(fid), HPX_FORWARD(T, local_result),
             HPX_FORWARD(Init, init), HPX_FORWARD(F, op), this_site, generation)
             .get();
     }
 
-    // clang-format off
-    template <typename T, typename Init, typename F,
-        HPX_CONCEPT_REQUIRES_(
-            !std::is_same_v<num_sites_arg, std::decay_t<F>>
-        )>
-    // clang-format on
+    template <typename T, typename Init, typename F>
+        requires(!std::same_as<num_sites_arg, std::decay_t<F>>)
     decltype(auto) exclusive_scan(hpx::launch::sync_policy,
         char const* basename, T&& local_result, Init&& init, F&& op,
-        num_sites_arg num_sites = num_sites_arg(),
-        this_site_arg this_site = this_site_arg(),
-        generation_arg generation = generation_arg(),
-        root_site_arg root_site = root_site_arg())
+        num_sites_arg const num_sites = num_sites_arg(),
+        this_site_arg const this_site = this_site_arg(),
+        generation_arg const generation = generation_arg(),
+        root_site_arg const root_site = root_site_arg())
     {
         return exclusive_scan(create_communicator(basename, num_sites,
                                   this_site, generation, root_site),

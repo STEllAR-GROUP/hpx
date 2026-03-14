@@ -5,8 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/program_options/config.hpp>
+#include <hpx/modules/string_util.hpp>
 #include <hpx/program_options/parsers.hpp>
-#include <hpx/string_util/tokenizer.hpp>
 
 #include <string>
 #include <vector>
@@ -26,7 +26,7 @@ namespace hpx::program_options::detail {
 
         std::vector<std::basic_string<Char>> result;
         for (auto cur_token(tok.begin()), end_token(tok.end());
-             cur_token != end_token; ++cur_token)
+            cur_token != end_token; ++cur_token)
         {
             if (!cur_token->empty())
                 result.push_back(*cur_token);

@@ -11,7 +11,7 @@
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/actions_base/actions_base_fwd.hpp>
 #include <hpx/actions_base/actions_base_support.hpp>
-#include <hpx/preprocessor/stringize.hpp>
+#include <hpx/modules/preprocessor.hpp>
 
 #include <cstdint>
 #include <string>

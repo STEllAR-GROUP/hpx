@@ -13,7 +13,7 @@
 // Copyright (c) 2014 Glen Joseph Fernandes (glenjofe@gmail.com)
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/detail/dynamic_bitset.hpp>
+#include <hpx/modules/datastructures.hpp>
 
 #include "bitset_test.hpp"
 
@@ -202,7 +202,7 @@ void run_test_cases()
         Tests::from_block_range(blocks);
     }
     {
-        unsigned const int n = (std::numeric_limits<unsigned char>::max)();
+        unsigned int const n = (std::numeric_limits<unsigned char>::max)();
         std::vector<Block> blocks(n);
         for (typename std::vector<Block>::size_type i = 0; i < n; ++i)
             blocks[i] = static_cast<Block>(i);
@@ -434,7 +434,7 @@ void run_test_cases()
     }
     {
         hpx::detail::dynamic_bitset<Block> a(std::string("1"));
-        unsigned const int n = (std::numeric_limits<unsigned char>::max)();
+        unsigned int const n = (std::numeric_limits<unsigned char>::max)();
         std::vector<Block> blocks(n);
         for (typename std::vector<Block>::size_type i = 0; i < n; ++i)
             blocks[i] = static_cast<Block>(i);

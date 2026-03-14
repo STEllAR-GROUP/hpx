@@ -8,13 +8,12 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/execution/executors/execution.hpp>
-#include <hpx/execution/traits/executor_traits.hpp>
-#include <hpx/execution_base/traits/is_executor.hpp>
-#include <hpx/futures/future.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/timing.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/timed_execution/timed_execution_fwd.hpp>
-#include <hpx/timing/steady_clock.hpp>
-#include <hpx/type_support/detail/wrap_int.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -154,6 +153,5 @@ namespace hpx::parallel::execution::detail {
                 std::declval<F>(), std::declval<Ts>()...));
         };
     };
-
     /// \endcond
 }    // namespace hpx::parallel::execution::detail

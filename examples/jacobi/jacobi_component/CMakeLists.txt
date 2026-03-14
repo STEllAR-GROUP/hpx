@@ -10,5 +10,5 @@ add_hpx_component(
   SOURCE_GLOB "*.c*"
   HEADER_GLOB "*.h*" ${jacobi_component_FLAGS}
   FOLDER "Examples/Jacobi"
-  COMPONENT_DEPENDENCIES iostreams
+  COMPONENT_DEPENDENCIES iostreams ${HPX_WITH_CXX_MODULES_OPTION}
 )

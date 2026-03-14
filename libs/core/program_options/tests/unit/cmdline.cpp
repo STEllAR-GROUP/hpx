@@ -6,14 +6,8 @@
 //  or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/assert.hpp>
+#include <hpx/modules/program_options.hpp>
 #include <hpx/modules/testing.hpp>
-
-#include <hpx/program_options/cmdline.hpp>
-#include <hpx/program_options/detail/cmdline.hpp>
-#include <hpx/program_options/errors.hpp>
-#include <hpx/program_options/option.hpp>
-#include <hpx/program_options/options_description.hpp>
-#include <hpx/program_options/value_semantic.hpp>
 
 #include <cstddef>
 #include <iostream>
@@ -30,15 +24,15 @@ using namespace std;
    we'd have to specify the type of exception that should be thrown.
 */
 
-const int s_success = 0;
-const int s_unknown_option = 1;
-const int s_ambiguous_option = 2;
+int const s_success = 0;
+int const s_unknown_option = 1;
+int const s_ambiguous_option = 2;
 // const int s_long_not_allowed = 3;
 // const int s_long_adjacent_not_allowed = 4;
 // const int s_short_adjacent_not_allowed = 5;
-const int s_empty_adjacent_parameter = 6;
-const int s_missing_parameter = 7;
-const int s_extra_parameter = 8;
+int const s_empty_adjacent_parameter = 6;
+int const s_missing_parameter = 7;
+int const s_extra_parameter = 8;
 // const int s_unrecognized_line = 9;
 
 int translate_syntax_error_kind(invalid_command_line_syntax::kind_t k)
@@ -61,9 +55,9 @@ int translate_syntax_error_kind(invalid_command_line_syntax::kind_t k)
 
 struct test_case
 {
-    const char* input;
+    char const* input;
     int expected_status;
-    const char* expected_result;
+    char const* expected_result;
 };
 
 /* Parses the syntax description in 'syntax' and initialized
@@ -71,7 +65,7 @@ struct test_case
    The "hpx::program_options" in parameter type is needed because CW9
    has std::detail and it causes an ambiguity.
 */
-void apply_syntax(options_description& desc, const char* syntax)
+void apply_syntax(options_description& desc, char const* syntax)
 {
     string s;
     stringstream ss;
@@ -111,8 +105,8 @@ void apply_syntax(options_description& desc, const char* syntax)
     }
 }
 
-void test_cmdline(const char* syntax, command_line_style::style_t style,
-    const test_case* cases)
+void test_cmdline(char const* syntax, command_line_style::style_t style,
+    test_case const* cases)
 {
     for (int i = 0; cases[i].input; ++i)
     {

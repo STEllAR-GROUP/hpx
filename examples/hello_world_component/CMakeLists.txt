@@ -15,6 +15,10 @@ if(EXISTS "${HPX_DIR}")
     add_library(hello_world_component SHARED hello_world_component.cpp)
   endif()
 
+  if(HPX_WITH_CXX_MODULES)
+    set(CMAKE_CXX_SCAN_FOR_MODULES ON)
+  endif()
+
   add_executable(hello_world_client hello_world_client.cpp)
   target_include_directories(hello_world_client PRIVATE ${test_SOURCE_DIR})
 

@@ -8,7 +8,7 @@
 #include <hpx/init.hpp>
 #include <hpx/iterator_support/tests/iter_sent.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/type_support/unused.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -64,13 +64,13 @@ struct user_defined_type
         return *this;
     };
 
-    static const std::vector<std::string> name_list;
+    static std::vector<std::string> const name_list;
 
     int val;
     std::string name;
 };
 
-const std::vector<std::string> user_defined_type::name_list{
+std::vector<std::string> const user_defined_type::name_list{
     "ABB", "ABC", "ACB", "BASE", "CAA", "CAAA", "CAAB"};
 
 struct random_fill

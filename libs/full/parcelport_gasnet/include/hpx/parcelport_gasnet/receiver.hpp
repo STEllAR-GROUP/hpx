@@ -40,7 +40,7 @@ namespace hpx::parcelset::policies::gasnet {
         struct exp_backoff
         {
             int numTries;
-            const static int maxRetries = 10;
+            static int const maxRetries = 10;
 
             void operator()()
             {

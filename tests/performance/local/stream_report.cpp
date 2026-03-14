@@ -1,5 +1,5 @@
 //  Copyright (c) 2015 Thomas Heller
-//  Copyright (c) 2015 Hartmut Kaiser
+//  Copyright (c) 2015-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -22,9 +22,10 @@
 #include <hpx/format.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/compute.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/thread.hpp>
-#include <hpx/type_support/unused.hpp>
 #include <hpx/version.hpp>
 
 #include <cstddef>
@@ -95,12 +96,13 @@ hpx::threads::topology& retrieve_topology()
 ///////////////////////////////////////////////////////////////////////////////
 double mysecond()
 {
-    return hpx::chrono::high_resolution_clock::now() * 1e-9;
+    return static_cast<double>(hpx::chrono::high_resolution_clock::now()) *
+        1e-9;
 }
 
 int checktick()
 {
-    static const std::size_t M = 20;
+    static std::size_t const M = 20;
     double timesfound[M];
 
     // Collect a sequence of M unique time values from the system.
@@ -120,7 +122,7 @@ int checktick()
     for (std::size_t i = 1; i < M; i++)
     {
         int Delta = (int) (1.0E6 * (timesfound[i] - timesfound[i - 1]));
-        minDelta = (std::min)(minDelta, (std::max)(Delta, 0));
+        minDelta = (std::min) (minDelta, (std::max) (Delta, 0));
     }
 
     return (minDelta);
@@ -308,7 +310,7 @@ void check_results(std::size_t iterations, Vector const& a_res,
 template <typename T>
 struct multiply_step
 {
-    explicit multiply_step(T factor)
+    explicit constexpr multiply_step(T factor) noexcept
       : factor_(factor)
     {
     }
@@ -318,7 +320,7 @@ struct multiply_step
     //         (used in invoke()) to get the return type
 
     template <typename U>
-    HPX_HOST_DEVICE HPX_FORCEINLINE T operator()(U val) const
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr T operator()(U val) const noexcept
     {
         return val * factor_;
     }
@@ -334,7 +336,8 @@ struct add_step
     //         (used in invoke()) to get the return type
 
     template <typename U>
-    HPX_HOST_DEVICE HPX_FORCEINLINE T operator()(U val1, U val2) const
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr T operator()(
+        U val1, U val2) const noexcept
     {
         return val1 + val2;
     }
@@ -343,7 +346,7 @@ struct add_step
 template <typename T>
 struct triad_step
 {
-    explicit triad_step(T factor)
+    explicit constexpr triad_step(T factor) noexcept
       : factor_(factor)
     {
     }
@@ -353,7 +356,8 @@ struct triad_step
     //         (used in invoke()) to get the return type
 
     template <typename U>
-    HPX_HOST_DEVICE HPX_FORCEINLINE T operator()(U val1, U val2) const
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr T operator()(
+        U val1, U val2) const noexcept
     {
         return val1 + val2 * factor_;
     }

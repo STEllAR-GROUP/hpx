@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/function.hpp>
 #include <hpx/modules/command_line_handling_local.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/util.hpp>
@@ -24,7 +24,7 @@
 namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
-    struct HPX_EXPORT command_line_handling
+    HPX_CXX_EXPORT struct HPX_EXPORT command_line_handling
       : hpx::local::detail::command_line_handling
     {
         using base_type = hpx::local::detail::command_line_handling;

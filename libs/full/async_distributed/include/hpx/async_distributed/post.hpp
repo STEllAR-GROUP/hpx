@@ -40,7 +40,7 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/async_distributed/bind_action.hpp>
 #include <hpx/async_distributed/detail/post.hpp>
-#include <hpx/async_local/post.hpp>
+#include <hpx/modules/async_local.hpp>
 
 #include <type_traits>
 #include <utility>

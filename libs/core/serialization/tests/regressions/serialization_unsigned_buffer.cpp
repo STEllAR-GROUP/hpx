@@ -4,9 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/serialization/input_archive.hpp>
-#include <hpx/serialization/output_archive.hpp>
-#include <hpx/serialization/serialize.hpp>
+#include <hpx/modules/serialization.hpp>
 
 #include <cstdint>
 #include <vector>
@@ -31,7 +29,7 @@ struct A
     template <typename Archive>
     void serialize(Archive& ar, unsigned)
     {
-        ar& t_;
+        ar & t_;
     }
 };
 

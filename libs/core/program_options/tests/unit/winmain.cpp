@@ -5,9 +5,9 @@
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if defined(HPX_WINDOWS)
+#include <hpx/modules/preprocessor.hpp>
+#include <hpx/modules/program_options.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/program_options/parsers.hpp>
 
 #include <cctype>
 #include <cstdlib>
@@ -19,7 +19,7 @@ using namespace hpx::program_options;
 using namespace std;
 
 void check_equal(
-    const std::vector<string>& actual, char const** expected, int n)
+    std::vector<string> const& actual, char const** expected, int n)
 {
     if (actual.size() != n)
     {

@@ -9,13 +9,12 @@
 #include <hpx/assert.hpp>
 #include <hpx/components_base/server/one_size_heap_list.hpp>
 #include <hpx/components_base/server/wrapper_heap_base.hpp>
-#include <hpx/functional/bind_front.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/synchronization.hpp>
-#include <hpx/runtime_local/state.hpp>
-#include <hpx/threading_base/register_thread.hpp>
-#include <hpx/threading_base/thread_data.hpp>
+#include <hpx/modules/threading_base.hpp>
 #if defined(HPX_DEBUG)
 #include <hpx/modules/logging.hpp>
 #endif

@@ -12,19 +12,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/debugging/print.hpp>
-#include <hpx/functional/function.hpp>
+#include <hpx/modules/debugging.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/threading_base.hpp>
+#include <hpx/modules/topology.hpp>
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
+#include <hpx/schedulers/macros.hpp>
 #include <hpx/schedulers/queue_holder_numa.hpp>
 #include <hpx/schedulers/queue_holder_thread.hpp>
 #include <hpx/schedulers/thread_queue_mc.hpp>
-#include <hpx/threading_base/print.hpp>
-#include <hpx/threading_base/scheduler_base.hpp>
-#include <hpx/threading_base/thread_data.hpp>
-#include <hpx/threading_base/thread_num_tss.hpp>
-#include <hpx/threading_base/thread_queue_init_parameters.hpp>
-#include <hpx/topology/topology.hpp>
 
 #include <array>
 #include <atomic>
@@ -40,46 +37,36 @@
 #include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
-
-#if !defined(SHARED_PRIORITY_SCHEDULER_DEBUG)
-#if defined(HPX_DEBUG)
-#define SHARED_PRIORITY_SCHEDULER_DEBUG false
-#else
-#define SHARED_PRIORITY_SCHEDULER_DEBUG false
-#endif
-#endif
-
 #if defined(__linux) || defined(linux) || defined(__linux__)
 #include <linux/unistd.h>
 #include <sys/mman.h>
-#define SHARED_PRIORITY_SCHEDULER_LINUX
 #endif
 
 // #define SHARED_PRIORITY_SCHEDULER_DEBUG_NUMA
 
 namespace hpx {
 
-    using print_onoff =
+    HPX_CXX_CORE_EXPORT using print_onoff =
         hpx::debug::enable_print<SHARED_PRIORITY_SCHEDULER_DEBUG>;
-    using print_on = hpx::debug::enable_print<false>;
+    HPX_CXX_CORE_EXPORT using print_on = hpx::debug::enable_print<false>;
 
-    inline constexpr print_onoff spq_deb("SPQUEUE");
-    inline constexpr print_on spq_arr("SPQUEUE");
+    HPX_CXX_CORE_EXPORT inline constexpr print_onoff spq_deb("SPQUEUE");
+    HPX_CXX_CORE_EXPORT inline constexpr print_on spq_arr("SPQUEUE");
 }    // namespace hpx
 
 namespace hpx::threads::policies {
 
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
-    using default_shared_priority_queue_scheduler_terminated_queue =
+    HPX_CXX_CORE_EXPORT using default_shared_priority_queue_scheduler_terminated_queue =
         lockfree_lifo;
 #else
-    using default_shared_priority_queue_scheduler_terminated_queue =
+    HPX_CXX_CORE_EXPORT using default_shared_priority_queue_scheduler_terminated_queue =
         lockfree_fifo;
 #endif
 
     // Holds core/queue ratios used by schedulers.
-    struct core_ratios
+    HPX_CXX_CORE_EXPORT struct core_ratios
     {
         constexpr core_ratios(std::size_t high_priority,
             std::size_t normal_priority, std::size_t low_priority) noexcept
@@ -104,7 +91,7 @@ namespace hpx::threads::policies {
     // scheduling hints into account when creating and scheduling work.
     //
     // Warning: PendingQueuing lifo causes lockup on termination
-    template <typename Mutex = std::mutex,
+    HPX_CXX_CORE_EXPORT template <typename Mutex = std::mutex,
         typename PendingQueuing = concurrentqueue_fifo,
         typename TerminatedQueuing =
             default_shared_priority_queue_scheduler_terminated_queue>
@@ -171,7 +158,6 @@ namespace hpx::threads::policies {
           , thread_init_counter_(0)
           , pool_index_(static_cast<std::size_t>(-1))
         {
-            scheduler_base::set_scheduler_mode(scheduler_mode::default_);
             HPX_ASSERT(num_workers_ != 0);
         }
 
@@ -192,10 +178,11 @@ namespace hpx::threads::policies {
         }
 
         // get/set scheduler mode
-        void set_scheduler_mode(scheduler_mode mode) noexcept override
+        void set_scheduler_mode(scheduler_mode mode,
+            hpx::threads::mask_cref_type pu_mask) noexcept override
         {
             // clang-format off
-            scheduler_base::set_scheduler_mode(mode);
+            scheduler_base::set_scheduler_mode(mode, pu_mask);
             round_robin_ = mode & policies::scheduler_mode::assign_work_round_robin;
             steal_hp_first_ =
                 mode & policies::scheduler_mode::steal_high_priority_first;
@@ -392,7 +379,6 @@ namespace hpx::threads::policies {
             {
                 // Create thread on requested NUMA domain
                 spq_deb.set(msg, "HINT_NUMA  ");
-                // TODO: This case does not handle suspended PUs.
                 domain_num = fast_mod(data.schedulehint.hint, num_domains_);
                 // if the thread creating the new task is on the domain
                 // assigned to the new task - try to reuse the core as well
@@ -400,7 +386,6 @@ namespace hpx::threads::policies {
                     d_lookup_[local_num] == domain_num)
                 {
                     thread_num = local_num;    //-V1048
-                    q_index = q_lookup_[thread_num];
                 }
                 else
                 {
@@ -410,8 +395,14 @@ namespace hpx::threads::policies {
                     thread_num +=
                         numa_holder_[domain_num].thread_queue(0)->worker_next(
                             q_counts_[domain_num]);
-                    q_index = q_lookup_[thread_num];
                 }
+                // Ensure the selected PU is active, consistent with the
+                // handling of thread and none scheduling hint modes.
+                thread_num = select_active_pu(thread_num);
+                // cppcheck-suppress redundantAssignment
+                domain_num = d_lookup_[thread_num];    //-V519
+                // cppcheck-suppress redundantAssignment
+                q_index = q_lookup_[thread_num];    //-V519
                 break;
             }
             default:
@@ -776,6 +767,10 @@ namespace hpx::threads::policies {
                         debug::threadinfo<threads::thread_id_ref_type*>(&thrd));
                 }
                 thread_num = select_active_pu(thread_num, allow_fallback);
+                // cppcheck-suppress redundantAssignment
+                domain_num = d_lookup_[thread_num];    //-V519
+                // cppcheck-suppress redundantAssignment
+                q_index = q_lookup_[thread_num];    //-V519
                 break;
             }
             case thread_schedule_hint_mode::thread:
@@ -793,21 +788,25 @@ namespace hpx::threads::policies {
             }
             case thread_schedule_hint_mode::numa:
             {
-                // Create thread on requested NUMA domain
+                // Schedule thread on requested NUMA domain
                 spq_deb.set(msg, "HINT_NUMA  ");
-                // TODO: This case does not handle suspended PUs.
                 domain_num = fast_mod(schedulehint.hint, num_domains_);
-                // if the thread creating the new task is on the domain
-                // assigned to the new task - try to reuse the core as well
-                if (d_lookup_[thread_num] == domain_num)
+                // if the current thread is on the requested domain, reuse it;
+                // otherwise fall back to the first queue on that domain
+                if (d_lookup_[thread_num] != domain_num)
                 {
-                    q_index = q_lookup_[thread_num];
+                    thread_num = q_offset_[domain_num];
+                    thread_num +=
+                        numa_holder_[domain_num].thread_queue(0)->worker_next(
+                            q_counts_[domain_num]);
                 }
-                else
-                {
-                    throw std::runtime_error(
-                        "counter problem in thread scheduler");
-                }
+                // Ensure the selected PU is active, consistent with the
+                // handling of thread and none scheduling hint modes.
+                thread_num = select_active_pu(thread_num, allow_fallback);
+                // cppcheck-suppress redundantAssignment
+                domain_num = d_lookup_[thread_num];    //-V519
+                // cppcheck-suppress redundantAssignment
+                q_index = q_lookup_[thread_num];    //-V519
                 break;
             }
 
@@ -984,7 +983,7 @@ namespace hpx::threads::policies {
 
                 std::map<std::size_t, std::size_t> domain_map;
                 for (std::size_t local_id = 0; local_id != num_workers_;
-                     ++local_id)
+                    ++local_id)
                 {
                     std::size_t const global_id =
                         local_to_global_thread_index(local_id);
@@ -1010,7 +1009,7 @@ namespace hpx::threads::policies {
                 // unusual numa topologies with (e.g.) High Bandwidth Memory on
                 // numa nodes with no processors
                 for (std::size_t local_id = 0; local_id < num_workers_;
-                     ++local_id)
+                    ++local_id)
                 {
                     d_lookup_[local_id] = static_cast<std::size_t>(
                         domain_map[d_lookup_[local_id]]);
@@ -1415,7 +1414,7 @@ namespace hpx::threads::policies {
 
         detail::affinity_data const& affinity_data_;
 
-        const thread_queue_init_parameters queue_parameters_;
+        thread_queue_init_parameters const queue_parameters_;
 
         // used to make sure the scheduler is only initialized once on a thread
         std::mutex init_mutex;

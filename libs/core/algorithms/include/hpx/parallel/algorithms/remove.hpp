@@ -214,12 +214,12 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/execution/algorithms/detail/predicates.hpp>
-#include <hpx/executors/execution_policy.hpp>
-#include <hpx/functional/invoke.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/iterator_support/zip_iterator.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/executors.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/algorithms/detail/find.hpp>
@@ -228,12 +228,6 @@ namespace hpx {
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
-#include <hpx/type_support/identity.hpp>
-#include <hpx/type_support/unused.hpp>
-
-#if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
-#include <boost/shared_array.hpp>
-#endif
 
 #include <algorithm>
 #include <cstddef>
@@ -249,7 +243,8 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        template <typename Iter, typename Sent, typename Pred, typename Proj>
+        HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent,
+            typename Pred, typename Proj>
         constexpr Iter sequential_remove_if(
             Iter first, Sent last, Pred pred, Proj proj)
         {
@@ -267,7 +262,7 @@ namespace hpx::parallel {
             return first;
         }
 
-        template <typename FwdIter>
+        HPX_CXX_CORE_EXPORT template <typename FwdIter>
         struct remove_if : public algorithm<remove_if<FwdIter>, FwdIter>
         {
             constexpr remove_if() noexcept
@@ -305,11 +300,7 @@ namespace hpx::parallel {
                         return algorithm_result::get(HPX_MOVE(first));
                 }
 
-#if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
                 std::shared_ptr<bool[]> flags(new bool[count]);
-#else
-                boost::shared_array<bool> flags(new bool[count]);
-#endif
 
                 using hpx::get;
 
@@ -375,22 +366,22 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::remove_if
-    inline constexpr struct remove_if_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct remove_if_t final
       : hpx::detail::tag_parallel_algorithm<remove_if_t>
     {
+        template <typename FwdIter, typename Pred>
         // clang-format off
-        template <typename FwdIter,
-            typename Pred, HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<FwdIter>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend FwdIter tag_fallback_invoke(
             hpx::remove_if_t, FwdIter first, FwdIter last, Pred pred)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::remove_if<FwdIter>().call(
@@ -398,20 +389,20 @@ namespace hpx {
                 hpx::identity_v);
         }
 
+        template <typename ExPolicy, typename FwdIter, typename Pred>
         // clang-format off
-        template <typename ExPolicy, typename FwdIter,
-            typename Pred, HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<FwdIter>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::remove_if_t,
             ExPolicy&& policy, FwdIter first, FwdIter last, Pred pred)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::remove_if<FwdIter>().call(
@@ -422,16 +413,16 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::remove
-    inline constexpr struct remove_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct remove_t final
       : hpx::detail::tag_parallel_algorithm<remove_t>
     {
     private:
-        // clang-format off
         template <typename FwdIter,
-            typename T = typename std::iterator_traits<FwdIter>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+            typename T = typename std::iterator_traits<FwdIter>::value_type>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend FwdIter tag_fallback_invoke(
             hpx::remove_t, FwdIter first, FwdIter last, T const& value)
@@ -442,13 +433,13 @@ namespace hpx {
                 [value](Type const& a) -> bool { return value == a; });
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter,
-            typename T = typename std::iterator_traits<FwdIter>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+            typename T = typename std::iterator_traits<FwdIter>::value_type>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::remove_t,
             ExPolicy&& policy, FwdIter first, FwdIter last, T const& value)

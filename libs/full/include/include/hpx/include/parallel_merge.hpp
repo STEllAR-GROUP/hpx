@@ -6,5 +6,4 @@
 
 #pragma once
 
-#include <hpx/parallel/algorithms/merge.hpp>
-#include <hpx/parallel/container_algorithms/merge.hpp>
+#include <hpx/modules/algorithms.hpp>

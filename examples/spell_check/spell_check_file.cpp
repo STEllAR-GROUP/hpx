@@ -10,6 +10,7 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
+#include <hpx/include/async.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/runtime.hpp>
 #include <hpx/include/util.hpp>
@@ -221,7 +222,7 @@ int hpx_main()
                 hpx::id_type const locality_id = hpx::find_here();
                 search_action temp;
                 wordRun.push_back(
-                    async(temp, locality_id, start, wordcount, single));
+                    hpx::async(temp, locality_id, start, wordcount, single));
                 sAct.push_back(temp);
                 //cout << search(0, wordcount, single) << endl;
             }

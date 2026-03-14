@@ -18,25 +18,26 @@
 
 namespace hpx { namespace components { namespace process { namespace posix {
 
-namespace initializers {
+    namespace initializers {
 
-class close_fd : public initializer_base
-{
-public:
-    explicit close_fd(int fd) : fd_(fd) {}
+        class close_fd : public initializer_base
+        {
+        public:
+            explicit close_fd(int fd)
+              : fd_(fd)
+            {
+            }
 
-    template <class PosixExecutor>
-    void on_exec_setup(PosixExecutor&) const
-    {
-        ::close(fd_);
-    }
+            template <class PosixExecutor>
+            void on_exec_setup(PosixExecutor&) const
+            {
+                ::close(fd_);
+            }
 
-private:
-    int fd_;
-};
+        private:
+            int fd_;
+        };
 
-}
-
-}}}}
+}}}}}    // namespace hpx::components::process::posix::initializers
 
 #endif

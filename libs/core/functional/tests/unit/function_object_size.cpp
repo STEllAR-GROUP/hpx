@@ -6,9 +6,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/functional/serialization/serializable_function.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/serialization.hpp>
-#include <hpx/serialization/access.hpp>
 
 #include <cstdint>
 #include <iostream>
@@ -26,7 +25,7 @@ private:
     template <typename Archive>
     void serialize(Archive& ar, unsigned const)
     {
-        ar& x_;
+        ar & x_;
         std::cout << "small_object: serialize(" << x_ << ")\n";
     }
 
@@ -80,8 +79,8 @@ private:
     template <typename Archive>
     void serialize(Archive& ar, unsigned const)
     {
-        ar& x_;
-        ar& y_;
+        ar & x_;
+        ar & y_;
         std::cout << "big_object: serialize(" << x_ << ", " << y_ << ")\n";
     }
 

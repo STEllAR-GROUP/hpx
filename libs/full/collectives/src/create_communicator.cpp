@@ -1,4 +1,5 @@
 //  Copyright (c) 2020-2025 Hartmut Kaiser
+//  Copyright (c) 2025 Lukas Zeil
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,26 +10,31 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
+#include <hpx/collectives/argument_types.hpp>
 #include <hpx/collectives/create_communicator.hpp>
 #include <hpx/components/basename_registration.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/server/component.hpp>
-#include <hpx/errors/throw_exception.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/async_distributed.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/lock_registration.hpp>
+#include <hpx/modules/synchronization.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/runtime_components/component_factory.hpp>
 #include <hpx/runtime_components/new.hpp>
 #include <hpx/runtime_distributed/server/runtime_support.hpp>
-#include <hpx/synchronization/mutex.hpp>
-#include <hpx/type_support/extra_data.hpp>
 
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <mutex>
 #include <string>
 #include <utility>
+#include <vector>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx::util {
 
@@ -119,11 +125,11 @@ namespace hpx::collectives {
         num_sites_arg num_sites, this_site_arg this_site,
         generation_arg generation, root_site_arg root_site)
     {
-        if (num_sites == static_cast<std::size_t>(-1))
+        if (num_sites.is_default())
         {
             num_sites = agas::get_num_localities(hpx::launch::sync);
         }
-        if (this_site == static_cast<std::size_t>(-1))
+        if (this_site.is_default())
         {
             this_site = agas::get_locality_id();
             if (root_site == static_cast<std::size_t>(-1))    //-V1051
@@ -136,16 +142,28 @@ namespace hpx::collectives {
         HPX_ASSERT(
             root_site != static_cast<std::size_t>(-1) && root_site < num_sites);
 
-        std::string name(basename);
-        if (generation != static_cast<std::size_t>(-1))
+        std::string name;
+        if (num_sites != 1)
         {
-            name += std::to_string(generation) + "/";
+            name = basename;
+            if (!generation.is_default())
+            {
+                name += std::to_string(generation) + "/";
+            }
         }
 
         if (this_site == root_site)
         {
             // create a new communicator
             auto c = hpx::local_new<communicator>(num_sites, basename);
+
+            // Return communicator object right away if there is only one site
+            // involved.
+            if (num_sites == 1)
+            {
+                c.set_info(num_sites, this_site);
+                return c;
+            }
 
             // register the communicator's id using the given basename, this
             // keeps the communicator alive
@@ -179,11 +197,11 @@ namespace hpx::collectives {
         char const* basename, num_sites_arg num_sites, this_site_arg this_site,
         generation_arg generation, root_site_arg root_site)
     {
-        if (num_sites == static_cast<std::size_t>(-1))
+        if (num_sites.is_default())
         {
             num_sites = agas::get_num_localities(hpx::launch::sync);
         }
-        if (this_site == static_cast<std::size_t>(-1))
+        if (this_site.is_default())
         {
             this_site = agas::get_locality_id();
             if (root_site == static_cast<std::size_t>(-1))    //-V1051
@@ -197,7 +215,7 @@ namespace hpx::collectives {
             root_site != static_cast<std::size_t>(-1) && root_site < num_sites);
 
         std::string name(basename);
-        if (generation != static_cast<std::size_t>(-1))
+        if (!generation.is_default())
         {
             name += std::to_string(generation) + "/";
         }
@@ -249,17 +267,29 @@ namespace hpx::collectives {
 
         // make sure the communicator will be registered in the local AGAS
         // symbol service instance
-        std::string name = hpx::util::format("/{}{}{}", agas::get_locality_id(),
-            basename[0] == '/' ? "" : "/", basename);
-        if (generation != static_cast<std::size_t>(-1))
+        std::string name;
+        if (num_sites != 1)
         {
-            name += std::to_string(generation) + "/";
+            name = hpx::util::format("/{}{}{}", agas::get_locality_id(),
+                basename[0] == '/' ? "" : "/", basename);
+            if (!generation.is_default())
+            {
+                name += std::to_string(generation) + "/";
+            }
         }
 
         if (this_site == root_site)
         {
             // create a new communicator
             auto c = hpx::local_new<communicator>(num_sites, basename);
+
+            // Return communicator object right away if there is only one site
+            // involved.
+            if (num_sites == 1)
+            {
+                c.set_info(num_sites, this_site);
+                return c;
+            }
 
             // register the communicator's id using the given basename, this
             // keeps the communicator alive
@@ -270,8 +300,8 @@ namespace hpx::collectives {
             {
                 HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "hpx::collectives::detail::create_local_communicator",
-                    "the given base name for the communicator operation was "
-                    "already registered: {}",
+                    "the given base name for the communicator operation "
+                    "was already registered: {}",
                     c.registered_name());
             }
 
@@ -305,7 +335,7 @@ namespace hpx::collectives {
         // symbol service instance
         std::string name = hpx::util::format("/{}{}{}", agas::get_locality_id(),
             basename[0] == '/' ? "" : "/", basename);
-        if (generation != static_cast<std::size_t>(-1))
+        if (!generation.is_default())
         {
             name += std::to_string(generation) + "/";
         }
@@ -338,6 +368,106 @@ namespace hpx::collectives {
             policy, HPX_MOVE(name), root_site);
         c.set_info(num_sites, this_site, root_site);
         return c;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace {
+
+        void recursively_fill_communicators(
+            std::vector<hpx::tuple<communicator, this_site_arg>>& communicators,
+            std::size_t left, std::size_t right, std::string const& basename,
+            arity_arg arity, this_site_arg this_site, num_sites_arg num_sites,
+            generation_arg generation)
+        {
+            std::string name(basename);
+            name += std::to_string(left) + "-" + std::to_string(right) + "/";
+
+            if (right - left < arity)
+            {
+                auto c = create_communicator(name.c_str(),
+                    num_sites_arg(right - left + 1),
+                    this_site_arg(this_site - left), generation_arg(generation),
+                    root_site_arg(0));
+
+                communicators.emplace_back(
+                    HPX_MOVE(c), this_site_arg(this_site - left));
+                return;
+            }
+
+            std::size_t division_steps = (right - left + 1) / arity;
+            for (std::size_t i = 0; i != arity; ++i)
+            {
+                std::size_t current_left = left + division_steps * i;
+                if (this_site == current_left)
+                {
+                    auto c = create_communicator(name.c_str(),
+                        num_sites_arg(arity), this_site_arg(i),
+                        generation_arg(generation), root_site_arg(0));
+
+                    communicators.emplace_back(HPX_MOVE(c), this_site_arg(i));
+                }
+
+                std::size_t current_right =
+                    (std::min) (current_left + division_steps - 1, right);
+                if (this_site >= current_left && this_site < current_right + 1)
+                {
+                    recursively_fill_communicators(communicators, current_left,
+                        current_right, basename, arity, this_site, num_sites,
+                        generation);
+                    break;
+                }
+            }
+        }
+    }    // namespace
+
+    hierarchical_communicator create_hierarchical_communicator(
+        char const* basename, num_sites_arg num_sites, this_site_arg this_site,
+        arity_arg arity, generation_arg generation, root_site_arg root_site)
+    {
+        if (num_sites.is_default())
+        {
+            num_sites = agas::get_num_localities(hpx::launch::sync);
+        }
+        if (this_site.is_default())
+        {
+            this_site = agas::get_locality_id();
+            if (root_site == static_cast<std::size_t>(-1))    //-V1051
+            {
+                root_site = 0;
+            }
+        }
+        if (root_site != 0)
+        {
+            this_site = this_site - root_site % num_sites;
+        }
+
+        HPX_ASSERT(this_site < num_sites);
+        HPX_ASSERT(
+            root_site != static_cast<std::size_t>(-1) && root_site < num_sites);
+
+        std::string name(basename);
+        if (!generation.is_default())
+        {
+            name += std::to_string(generation) + "/";
+        }
+
+        std::vector<hpx::tuple<communicator, this_site_arg>> communicators;
+        recursively_fill_communicators(communicators, 0, num_sites - 1, name,
+            arity, this_site, num_sites, generation);
+        return hierarchical_communicator(
+            HPX_MOVE(communicators), arity, root_site, num_sites, this_site);
+    }
+
+    hpx::tuple<num_sites_arg, this_site_arg, root_site_arg>
+    hierarchical_communicator::get_info_ex() const noexcept
+    {
+        return hpx::make_tuple(num_sites, this_site, root_site);
+    }
+
+    hpx::tuple<num_sites_arg, this_site_arg>
+    hierarchical_communicator::get_info() const noexcept
+    {
+        return hpx::make_tuple(num_sites, this_site);
     }
 
     ///////////////////////////////////////////////////////////////////////////

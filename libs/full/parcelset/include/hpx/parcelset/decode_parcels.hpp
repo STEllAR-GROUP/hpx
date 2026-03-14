@@ -19,9 +19,7 @@
 #include <hpx/modules/timing.hpp>
 
 #include <hpx/components_base/agas_interface.hpp>
-#include <hpx/parcelset_base/detail/data_point.hpp>
-#include <hpx/parcelset_base/detail/parcel_route_handler.hpp>
-#include <hpx/parcelset_base/parcel_interface.hpp>
+#include <hpx/modules/parcelset_base.hpp>
 
 #if ASIO_HAS_BOOST_THROW_EXCEPTION != 0
 #include <boost/exception/exception.hpp>
@@ -33,6 +31,8 @@
 #include <system_error>
 #include <utility>
 #include <vector>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx::parcelset {
 
@@ -54,12 +54,12 @@ namespace hpx::parcelset {
         parcelset::data_point& data = buffer.data_point_;
         data.num_zchunks_ += buffer.chunks_.size();
         data.num_zchunks_per_msg_max_ =
-            (std::max)(data.num_zchunks_per_msg_max_,
+            (std::max) (data.num_zchunks_per_msg_max_,
                 static_cast<std::int64_t>(buffer.chunks_.size()));
         for (auto& chunk : buffer.chunks_)
         {
             data.size_zchunks_total_ += chunk.size();
-            data.size_zchunks_max_ = (std::max)(data.size_zchunks_max_,
+            data.size_zchunks_max_ = (std::max) (data.size_zchunks_max_,
                 static_cast<std::int64_t>(chunk.size()));
         }
 #endif
@@ -90,7 +90,7 @@ namespace hpx::parcelset {
             // append non-zero-copy chunks as needed
             std::size_t index = 0;
             for (std::size_t i = num_zero_copy_chunks;
-                 i != num_zero_copy_chunks + num_non_zero_copy_chunks; ++i)
+                i != num_zero_copy_chunks + num_non_zero_copy_chunks; ++i)
             {
                 transmission_chunk_type& c = buffer.transmission_chunks_[i];
                 auto const first = static_cast<std::size_t>(
@@ -113,7 +113,7 @@ namespace hpx::parcelset {
 #if defined(HPX_DEBUG)
             // make sure that all spots have been populated
             for (std::size_t i = 0;
-                 i != num_zero_copy_chunks + num_non_zero_copy_chunks; ++i)
+                i != num_zero_copy_chunks + num_non_zero_copy_chunks; ++i)
             {
                 HPX_ASSERT(chunks[i].size_ != 0);
             }
@@ -140,12 +140,12 @@ namespace hpx::parcelset {
         parcelset::data_point& data = buffer.data_point_;
         data.num_zchunks_ += buffer.chunks_.size();
         data.num_zchunks_per_msg_max_ =
-            (std::max)(data.num_zchunks_per_msg_max_,
+            (std::max) (data.num_zchunks_per_msg_max_,
                 static_cast<std::int64_t>(buffer.chunks_.size()));
         for (auto& chunk : buffer.chunks_)
         {
             data.size_zchunks_total_ += chunk.size();
-            data.size_zchunks_max_ = (std::max)(data.size_zchunks_max_,
+            data.size_zchunks_max_ = (std::max) (data.size_zchunks_max_,
                 static_cast<std::int64_t>(chunk.size()));
         }
 #endif
@@ -176,7 +176,7 @@ namespace hpx::parcelset {
             // append non-zero-copy chunks as needed
             std::size_t index = 0;
             for (std::size_t i = num_zero_copy_chunks;
-                 i != num_zero_copy_chunks + num_non_zero_copy_chunks; ++i)
+                i != num_zero_copy_chunks + num_non_zero_copy_chunks; ++i)
             {
                 transmission_chunk_type& c = buffer.transmission_chunks_[i];
                 auto const first = static_cast<std::size_t>(
@@ -199,7 +199,7 @@ namespace hpx::parcelset {
 #if defined(HPX_DEBUG)
             // make sure that all spots have been populated
             for (std::size_t i = 0;
-                 i != num_zero_copy_chunks + num_non_zero_copy_chunks; ++i)
+                i != num_zero_copy_chunks + num_non_zero_copy_chunks; ++i)
             {
                 HPX_ASSERT(chunks[i].size_ != 0);
             }
@@ -237,8 +237,8 @@ namespace hpx::parcelset {
 
             // schedule all but the first parcel on a new thread.
             hpx::threads::thread_init_data init_data(
-                hpx::threads::make_thread_function_nullary(util::deferred_call(
-                    HPX_MOVE(f), HPX_MOVE(deferred_parcels[i]))),
+                hpx::threads::make_thread_function_nullary(
+                    HPX_MOVE(f), HPX_MOVE(deferred_parcels[i])),
                 "schedule_parcel", threads::thread_priority::boost,
                 threads::thread_schedule_hint(
                     static_cast<std::int16_t>(num_thread)),
@@ -504,5 +504,7 @@ namespace hpx::parcelset {
         return decode_message_zero_copy(parcelport, buffer, 0, num_thread);
     }
 }    // namespace hpx::parcelset
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif

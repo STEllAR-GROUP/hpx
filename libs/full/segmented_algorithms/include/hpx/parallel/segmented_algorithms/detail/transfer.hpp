@@ -7,16 +7,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/dataflow.hpp>
-
-#include <hpx/executors/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/modules/algorithms.hpp>
+#include <hpx/modules/executors.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/util/detail/algorithm_result.hpp>
-#include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
-#include <hpx/parallel/util/result_types.hpp>
 
 #include <algorithm>
 #include <exception>
@@ -148,8 +143,8 @@ namespace hpx::parallel {
             using local_iterator_pair = util::in_out_result<local_iterator_type,
                 local_output_iterator_type>;
 
-            using forced_seq = std::integral_constant<bool,
-                !hpx::traits::is_forward_iterator<SegIter>::value>;
+            using forced_seq =
+                std::integral_constant<bool, !std::forward_iterator<SegIter>>;
 
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);

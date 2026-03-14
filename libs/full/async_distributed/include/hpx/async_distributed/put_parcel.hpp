@@ -19,15 +19,14 @@
 #include <hpx/actions_base/traits/is_continuation.hpp>
 #include <hpx/async_distributed/put_parcel_fwd.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
-#include <hpx/functional/traits/is_action.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/naming_base.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/naming/credit_handling.hpp>
 #include <hpx/naming/split_gid.hpp>
-#include <hpx/naming_base/address.hpp>
-#include <hpx/naming_base/id_type.hpp>
 #include <hpx/parcelset/parcel.hpp>
 #include <hpx/parcelset/parcelhandler.hpp>
 #include <hpx/parcelset/parcelset_fwd.hpp>
-#include <hpx/runtime_local/runtime_local.hpp>
 
 #include <cstddef>
 #include <memory>

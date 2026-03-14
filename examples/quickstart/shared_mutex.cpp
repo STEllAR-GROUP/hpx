@@ -9,9 +9,9 @@
 
 #include <hpx/future.hpp>
 #include <hpx/init.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/shared_mutex.hpp>
 #include <hpx/thread.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <atomic>
 #include <chrono>

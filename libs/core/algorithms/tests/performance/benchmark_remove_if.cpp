@@ -26,6 +26,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 unsigned int seed = std::random_device{}();
+
 ///////////////////////////////////////////////////////////////////////////////
 struct random_fill
 {
@@ -61,7 +62,7 @@ struct vector_type
     }
 
     std::vector<int> vec_;
-    static const std::size_t vec_size_{30};
+    static std::size_t const vec_size_{30};
 };
 
 struct array_type
@@ -78,7 +79,7 @@ struct array_type
         return arr_ == t.arr_;
     }
 
-    static const std::size_t arr_size_{30};
+    static std::size_t const arr_size_{30};
     std::array<int, arr_size_> arr_;
 };
 
@@ -95,11 +96,11 @@ double run_remove_if_benchmark_std(int test_count, OrgIter org_first,
         hpx::copy(hpx::execution::par, org_first, org_last, first);
 
         std::uint64_t elapsed = hpx::chrono::high_resolution_clock::now();
-        (void) std::remove_if(first, last, pred);
+        [[maybe_unused]] auto result = std::remove_if(first, last, pred);
         time += hpx::chrono::high_resolution_clock::now() - elapsed;
     }
 
-    return (time * 1e-9) / test_count;
+    return (static_cast<double>(time) * 1e-9) / test_count;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -119,7 +120,7 @@ double run_remove_if_benchmark_hpx(int test_count, ExPolicy policy,
         time += hpx::chrono::high_resolution_clock::now() - elapsed;
     }
 
-    return (time * 1e-9) / test_count;
+    return (static_cast<double>(time) * 1e-9) / test_count;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

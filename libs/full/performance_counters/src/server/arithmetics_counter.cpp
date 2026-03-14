@@ -1,20 +1,21 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/continuation.hpp>
 #include <hpx/components_base/agas_interface.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/string_util.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/performance_counter.hpp>
 #include <hpx/performance_counters/server/arithmetics_counter.hpp>
 #include <hpx/runtime_components/derived_component_factory.hpp>
-#include <hpx/runtime_local/runtime_local_fwd.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -22,6 +23,8 @@
 #include <string>
 #include <utility>
 #include <vector>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::performance_counters::server {
@@ -119,15 +122,15 @@ namespace hpx::performance_counters::server {
         }
 
         if (base_values[0].scale_inverse_ &&
-            base_values[0].scaling_ != 1.0)    //-V550
+            static_cast<double>(base_values[0].scaling_) != 1.0)    //-V550
         {
-            base_values[0].value_ =
-                static_cast<std::int64_t>(value * base_values[0].scaling_);
+            base_values[0].value_ = static_cast<std::int64_t>(
+                value * static_cast<double>(base_values[0].scaling_));
         }
         else
         {
-            base_values[0].value_ =
-                static_cast<std::int64_t>(value / base_values[0].scaling_);
+            base_values[0].value_ = static_cast<std::int64_t>(
+                value / static_cast<double>(base_values[0].scaling_));
         }
 
         base_values[0].time_ =

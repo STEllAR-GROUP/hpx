@@ -77,7 +77,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     // it needs to run on N>2 ranks to be useful
     HPX_TEST_MSG(size > 1, "This test requires N>1 mpi ranks");
 
-    const std::uint64_t iterations = vm["iterations"].as<std::uint64_t>();
+    std::uint64_t const iterations = vm["iterations"].as<std::uint64_t>();
     //
     output = vm.count("output") != 0;
 

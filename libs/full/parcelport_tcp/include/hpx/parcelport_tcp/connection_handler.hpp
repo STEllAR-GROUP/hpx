@@ -13,10 +13,10 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_TCP)
+#include <hpx/modules/parcelset_base.hpp>
 #include <hpx/parcelport_tcp/locality.hpp>
 #include <hpx/parcelport_tcp/sender.hpp>
 #include <hpx/parcelset/parcelport_impl.hpp>
-#include <hpx/parcelset_base/locality.hpp>
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
 #include <winsock2.h>
@@ -51,17 +51,17 @@ namespace hpx::parcelset {
         using send_immediate_parcels = std::false_type;
         using is_connectionless = std::false_type;
 
-        static constexpr const char* type() noexcept
+        static constexpr char const* type() noexcept
         {
             return "tcp";
         }
 
-        static constexpr const char* pool_name() noexcept
+        static constexpr char const* pool_name() noexcept
         {
             return "parcel-pool-tcp";
         }
 
-        static constexpr const char* pool_name_postfix() noexcept
+        static constexpr char const* pool_name_postfix() noexcept
         {
             return "-tcp";
         }
@@ -98,7 +98,7 @@ namespace hpx::parcelset {
             // Return the name of this locality
             std::string get_locality_name() const override
             {
-                return asio::ip::host_name();
+                return ::asio::ip::host_name();
             }
 
             std::shared_ptr<sender> create_connection(
@@ -116,7 +116,7 @@ namespace hpx::parcelset {
                 std::shared_ptr<receiver> const& receiver_conn);
 
             /// Acceptor used to listen for incoming connections.
-            asio::ip::tcp::acceptor* acceptor_;
+            ::asio::ip::tcp::acceptor* acceptor_;
 
             /// The list of accepted connections
             mutable hpx::spinlock connections_mtx_;

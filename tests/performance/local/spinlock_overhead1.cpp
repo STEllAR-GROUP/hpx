@@ -9,13 +9,13 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #include <hpx/actions_base/plain_action.hpp>
-#include <hpx/async_combinators/wait_each.hpp>
 #include <hpx/async_distributed/continuation.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/iostream.hpp>
-#include <hpx/lock_registration/detail/register_locks.hpp>
+#include <hpx/modules/async_combinators.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/timing.hpp>
 
@@ -179,9 +179,9 @@ double null_function(std::size_t i)
         std::lock_guard<test::local_spinlock> l(mtx[idx]);
         d = global_init[idx];
     }
-    for (double j = 0.; j < num_iterations; ++j)
+    for (std::uint64_t j = 0.; j < num_iterations; ++j)
     {
-        d += 1. / (2. * j + 1.);
+        d += 1. / (2. * static_cast<double>(j) + 1.);
     }
     {
         std::lock_guard<test::local_spinlock> l(mtx[idx]);
@@ -198,12 +198,12 @@ int hpx_main(variables_map& vm)
     {
         num_iterations = vm["delay-iterations"].as<std::uint64_t>();
 
-        const std::uint64_t count = vm["futures"].as<std::uint64_t>();
+        std::uint64_t const count = vm["futures"].as<std::uint64_t>();
 
         k1 = vm["k1"].as<std::size_t>();
         k2 = vm["k2"].as<std::size_t>();
 
-        const id_type here = find_here();
+        id_type const here = find_here();
 
         if (HPX_UNLIKELY(0 == count))
             throw std::logic_error("error: count of 0 futures specified\n");
@@ -230,7 +230,7 @@ int hpx_main(variables_map& vm)
                     futures);
 
                 // stop the clock
-                const double duration = walltime.elapsed();
+                double const duration = walltime.elapsed();
 
                 if (vm.count("csv"))
                     hpx::util::format_to(

@@ -6,4 +6,4 @@
 
 #pragma once
 
-#include <hpx/parallel/task_group.hpp>
+#include <hpx/modules/algorithms.hpp>

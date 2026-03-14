@@ -37,8 +37,8 @@ struct payload_precision_tracker : htts2::clocksource<BaseClock>
     // Returns: the uncertainty of the mean lost payload.
     double precision_uncertainty() const
     {
-        return (std::max)(
-            this->clock_uncertainty(), precision_stat_uncertainty());
+        return (
+            std::max) (this->clock_uncertainty(), precision_stat_uncertainty());
     }
 
     double average_precision() const

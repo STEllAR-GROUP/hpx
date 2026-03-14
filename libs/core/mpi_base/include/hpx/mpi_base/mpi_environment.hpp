@@ -13,8 +13,8 @@
     defined(HPX_HAVE_MODULE_MPI_BASE)
 
 #include <hpx/modules/runtime_configuration.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/mpi_base/mpi.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 
 #include <cstdlib>
 #include <string>
@@ -23,7 +23,7 @@
 
 namespace hpx::util {
 
-    struct HPX_CORE_EXPORT mpi_environment
+    HPX_CXX_CORE_EXPORT struct HPX_CORE_EXPORT mpi_environment
     {
         static bool check_mpi_environment(runtime_configuration const& cfg);
 
@@ -123,12 +123,13 @@ namespace hpx::util {
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace util {
-    struct HPX_CORE_EXPORT mpi_environment
+namespace hpx::util {
+
+    HPX_CXX_CORE_EXPORT struct HPX_CORE_EXPORT mpi_environment
     {
         static bool check_mpi_environment(runtime_configuration const& cfg);
     };
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
 #include <hpx/config/warnings_suffix.hpp>
 

@@ -29,6 +29,7 @@ foreach(example_program ${example_programs})
     ${example_program} INTERNAL_FLAGS
     SOURCES ${sources} ${${example_program}_FLAGS}
     FOLDER "Examples/PerformanceCounters/${example_program}"
+           ${HPX_WITH_CXX_MODULES_OPTION}
   )
 
   add_hpx_example_target_dependencies("performance_counters" ${example_program})

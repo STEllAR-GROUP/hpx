@@ -14,8 +14,7 @@
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/iterator_facade.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/type_support/identity.hpp>
-#include <hpx/type_support/lazy_conditional.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <iterator>
 #include <type_traits>
@@ -112,9 +111,10 @@ namespace hpx::util {
     //   Difference - the difference_type of the resulting iterator. If not
     //      supplied, iterator_traits<Base>::difference_type is used.
     //
-    template <typename Derived, typename Base, typename Value = void,
-        typename Category = void, typename Reference = void,
-        typename Difference = void, typename Pointer = void>
+    HPX_CXX_CORE_EXPORT template <typename Derived, typename Base,
+        typename Value = void, typename Category = void,
+        typename Reference = void, typename Difference = void,
+        typename Pointer = void>
     class iterator_adaptor
       : public hpx::util::detail::iterator_adaptor_base<Derived, Base, Value,
             Category, Reference, Difference, Pointer>::type
@@ -127,6 +127,7 @@ namespace hpx::util {
         friend class hpx::util::iterator_core_access;
 
     public:
+        // NOLINTBEGIN(bugprone-crtp-constructor-accessibility)
         HPX_HOST_DEVICE iterator_adaptor() = default;
 
         HPX_HOST_DEVICE explicit constexpr iterator_adaptor(
@@ -134,6 +135,7 @@ namespace hpx::util {
           : iterator_(iter)
         {
         }
+        // NOLINTEND(bugprone-crtp-constructor-accessibility)
 
         using base_type = Base;
 
@@ -205,7 +207,7 @@ namespace hpx::util {
         // prevent this function from being instantiated if not needed
         template <typename Iterator = Base,
             typename Enable =
-                std::enable_if_t<traits::is_bidirectional_iterator_v<Iterator>>>
+                std::enable_if_t<std::bidirectional_iterator<Iterator>>>
         HPX_HOST_DEVICE HPX_FORCEINLINE void decrement() noexcept(
             noexcept(--std::declval<Base&>()))
         {

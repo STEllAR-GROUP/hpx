@@ -15,6 +15,7 @@
 #include <hpx/modules/testing.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <cstdint>
 #include <iostream>
 #include <list>
@@ -265,8 +266,8 @@ void test_partial_sort_copy2(IteratorTag)
     {
         A = B;
 
-        hpx::partial_sort_copy(
-            lst.begin(), lst.end(), A.begin(), A.begin() + i, compare_t());
+        hpx::partial_sort_copy(lst.begin(), lst.end(), A.begin(),
+            A.begin() + static_cast<std::ptrdiff_t>(i), compare_t());
 
         for (std::uint64_t j = 0; j < i; ++j)
         {
@@ -298,7 +299,7 @@ void test_partial_sort_copy2(ExPolicy policy, IteratorTag)
         A = B;
 
         hpx::partial_sort_copy(policy, lst.begin(), lst.end(), A.begin(),
-            A.begin() + i, compare_t());
+            A.begin() + static_cast<std::ptrdiff_t>(i), compare_t());
 
         for (std::uint64_t j = 0; j < i; ++j)
         {
@@ -329,8 +330,8 @@ void test_partial_sort_copy2_async(ExPolicy p, IteratorTag)
     {
         A = B;
 
-        auto f = hpx::partial_sort_copy(
-            p, lst.begin(), lst.end(), A.begin(), A.begin() + i, compare_t());
+        auto f = hpx::partial_sort_copy(p, lst.begin(), lst.end(), A.begin(),
+            A.begin() + static_cast<std::ptrdiff_t>(i), compare_t());
         f.wait();
 
         for (std::uint64_t j = 0; j < i; ++j)
@@ -379,13 +380,13 @@ void test_partial_sort_copy3(IteratorTag)
     std::shuffle(A.begin(), A.end(), my_rand);
     lst.insert(lst.end(), A.begin(), A.end());
 
-    const uint32_t STEP = NELEM / 20;
+    uint32_t const STEP = NELEM / 20;
 
     for (std::uint64_t i = 0; i <= NELEM; i += STEP)
     {
         A = B;
-        hpx::partial_sort_copy(
-            lst.begin(), lst.end(), A.begin(), A.begin() + i, compare_t());
+        hpx::partial_sort_copy(lst.begin(), lst.end(), A.begin(),
+            A.begin() + static_cast<std::ptrdiff_t>(i), compare_t());
 
         for (std::uint64_t j = 0; j < i; ++j)
         {
@@ -414,13 +415,13 @@ void test_partial_sort_copy3(ExPolicy policy, IteratorTag)
     std::shuffle(A.begin(), A.end(), my_rand);
     lst.insert(lst.end(), A.begin(), A.end());
 
-    const uint32_t STEP = NELEM / 20;
+    uint32_t const STEP = NELEM / 20;
 
     for (std::uint64_t i = 0; i <= NELEM; i += STEP)
     {
         A = B;
         hpx::partial_sort_copy(policy, lst.begin(), lst.end(), A.begin(),
-            A.begin() + i, compare_t());
+            A.begin() + static_cast<std::ptrdiff_t>(i), compare_t());
 
         for (std::uint64_t j = 0; j < i; ++j)
         {
@@ -449,13 +450,13 @@ void test_partial_sort_copy3_async(ExPolicy p, IteratorTag)
     std::shuffle(A.begin(), A.end(), my_rand);
     lst.insert(lst.end(), A.begin(), A.end());
 
-    const uint32_t STEP = NELEM / 20;
+    uint32_t const STEP = NELEM / 20;
 
     for (std::uint64_t i = 0; i <= NELEM; i += STEP)
     {
         A = B;
-        auto f = hpx::partial_sort_copy(
-            p, lst.begin(), lst.end(), A.begin(), A.begin() + i, compare_t());
+        auto f = hpx::partial_sort_copy(p, lst.begin(), lst.end(), A.begin(),
+            A.begin() + static_cast<std::ptrdiff_t>(i), compare_t());
         f.wait();
 
         for (std::uint64_t j = 0; j < i; ++j)

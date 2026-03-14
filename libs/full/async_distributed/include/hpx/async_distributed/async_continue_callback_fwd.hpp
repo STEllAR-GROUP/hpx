@@ -8,7 +8,7 @@
 
 #include <hpx/actions_base/traits/is_distribution_policy.hpp>
 #include <hpx/async_distributed/async_continue_fwd.hpp>
-#include <hpx/futures/traits/promise_local_result.hpp>
+#include <hpx/modules/futures.hpp>
 
 #ifndef HPX_MSVC
 #include <type_traits>

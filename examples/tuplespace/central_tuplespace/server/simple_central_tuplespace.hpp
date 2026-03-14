@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/chrono.hpp>
 #include <hpx/components_base/server/locking_hook.hpp>
@@ -23,7 +24,7 @@
 // #define TS_DEBUG
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace examples { namespace server {
+namespace examples::server {
 
     ///////////////////////////////////////////////////////////////////////////
     /// This class is a simple central tuplespace (SCTS) as an HPX component.
@@ -62,11 +63,11 @@ namespace examples { namespace server {
     //]
     {
     public:
-        typedef hpx::util::storage::tuple tuple_type;
-        typedef hpx::util::storage::tuple::elem_type elem_type;
-        typedef hpx::spinlock mutex_type;
+        using tuple_type = hpx::util::storage::tuple;
+        using elem_type = hpx::util::storage::tuple::elem_type;
+        using mutex_type = hpx::spinlock;
 
-        typedef examples::server::tuples_warehouse tuples_type;
+        using tuples_type = examples::server::tuples_warehouse;
 
         // pre-defined timeout values
         enum
@@ -76,7 +77,7 @@ namespace examples { namespace server {
         };
 
         //[simple_central_tuplespace_server_ctor
-        simple_central_tuplespace() {}
+        simple_central_tuplespace() = default;
         //]
 
         ///////////////////////////////////////////////////////////////////////
@@ -179,7 +180,7 @@ namespace examples { namespace server {
         mutable mutex_type mtx_;
         //]
     };
-}}    // namespace examples::server
+}    // namespace examples::server
 
 //[simple_central_tuplespace_registration_declarations
 HPX_REGISTER_ACTION_DECLARATION(

@@ -5,11 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/serialization/input_archive.hpp>
-#include <hpx/serialization/output_archive.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/shared_ptr.hpp>
-
+#include <hpx/modules/serialization.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <iostream>
@@ -34,7 +30,7 @@ struct A
 template <typename Archive>
 void serialize(Archive& ar, A& a, unsigned)
 {
-    ar& a.a;
+    ar & a.a;
 }
 
 A* a_factory(hpx::serialization::input_archive& ar)
@@ -72,13 +68,13 @@ struct B
 template <typename Archive>
 void serialize(Archive& ar, B& b, unsigned)
 {
-    ar& b.b;
+    ar & b.b;
 }
 
 B* b_factory(hpx::serialization::input_archive& ar)
 {
     double b;
-    ar& b;
+    ar & b;
 
     bool flag = (b < 8);
     return new B(b, flag);
@@ -104,7 +100,7 @@ struct C
 template <typename Archive, typename T>
 void serialize(Archive& ar, C<T>& c, unsigned)
 {
-    ar& c.c;
+    ar & c.c;
 }
 
 template <typename T>

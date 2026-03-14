@@ -20,7 +20,7 @@
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////
-int seed = std::random_device{}();
+unsigned int seed = std::random_device{}();
 std::mt19937 gen(seed);
 
 ///////////////////////////////////////////////////////////////////////////
@@ -189,7 +189,7 @@ void test_make_heap_exception(IteratorTag)
             decorated_iterator(hpx::util::end(c)));
         HPX_TEST(false);
     }
-    catch (hpx::exception_list const& e)
+    catch (hpx::exception_list const&)
     {
         caught_exception = true;
         //test::test_num_exceptions<ExPolicy, IteratorTag>::call(policy, e);
@@ -223,7 +223,7 @@ void test_make_heap_exception(ExPolicy&& policy, IteratorTag)
             decorated_iterator(hpx::util::end(c)));
         HPX_TEST(false);
     }
-    catch (hpx::exception_list const& e)
+    catch (hpx::exception_list const&)
     {
         caught_exception = true;
         //test::test_num_exceptions<ExPolicy, IteratorTag>::call(policy, e);
@@ -259,7 +259,7 @@ void test_make_heap_exception_async(ExPolicy&& p, IteratorTag)
 
         HPX_TEST(false);
     }
-    catch (hpx::exception_list const& e)
+    catch (hpx::exception_list const&)
     {
         caught_exception = true;
         //test::test_num_exceptions<ExPolicy, IteratorTag>::call(policy, e);

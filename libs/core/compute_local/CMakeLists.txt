@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2022 The STE||AR-Group
+# Copyright (c) 2019-2025 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -19,12 +19,15 @@ set(compute_local_headers
     hpx/compute_local/host/numa_domains.hpp
     hpx/compute_local/host/target.hpp
     hpx/compute_local/host/traits/access_target.hpp
+    hpx/compute_local/macros.hpp
     hpx/compute_local/serialization/vector.hpp
     hpx/compute_local/traits/access_target.hpp
     hpx/compute_local/traits/allocator_traits.hpp
     hpx/compute_local/traits.hpp
     hpx/compute_local/vector.hpp
 )
+
+set(compute_local_macro_headers hpx/compute_local/macros.hpp)
 
 # cmake-format: off
 set(compute_local_compat_headers
@@ -41,18 +44,24 @@ include(HPX_AddModule)
 add_hpx_module(
   core compute_local
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${compute_local_sources}
   HEADERS ${compute_local_headers}
+  MACRO_HEADERS ${compute_local_macro_headers}
   COMPAT_HEADERS ${compute_local_compat_headers}
   MODULE_DEPENDENCIES
     hpx_algorithms
     hpx_allocator_support
     hpx_async_combinators
+    hpx_async_local
     hpx_concepts
     hpx_config
+    hpx_coroutines
     hpx_datastructures
     hpx_execution
+    hpx_execution_base
     hpx_executors
+    hpx_errors
     hpx_functional
     hpx_futures
     hpx_iterator_support

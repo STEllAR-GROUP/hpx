@@ -54,7 +54,7 @@ int universal_ans(
     bool is_faulty = false;
 
     // Check if the node is faulty
-    for (const auto& locale : f_locales)
+    for (auto const& locale : f_locales)
     {
         // Throw a runtime error in case the node is faulty
         if (locale == hpx::find_here())

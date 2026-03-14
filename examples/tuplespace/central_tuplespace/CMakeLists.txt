@@ -18,7 +18,7 @@ foreach(component ${components})
     INSTALL_COMPONENT examples
     HEADER_GLOB "${component}.h*"
     SOURCE_GLOB "${component}.c*"
-    FOLDER "Examples/TupleSpace/${component}"
+    FOLDER "Examples/TupleSpace/${component}" ${HPX_WITH_CXX_MODULES_OPTION}
   )
 
 endforeach()

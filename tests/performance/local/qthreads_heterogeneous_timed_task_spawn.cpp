@@ -31,8 +31,8 @@
 // EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <hpx/assert.hpp>
-#include <hpx/functional/bind.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/timing.hpp>
 
 #include <hpx/modules/program_options.hpp>

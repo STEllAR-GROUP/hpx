@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2023 Hartmut Kaiser
+//  Copyright (c) 2017-2025 Hartmut Kaiser
 //  Copyright (c) 2017 Google
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -8,11 +8,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/execution/traits/executor_traits.hpp>
-#include <hpx/execution_base/execution.hpp>
-#include <hpx/execution_base/traits/is_executor.hpp>
-#include <hpx/functional/detail/tag_fallback_invoke.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/timing.hpp>
 
 #include <type_traits>
@@ -40,7 +38,7 @@ namespace hpx::parallel::execution {
     // extensions
 
     // forward declare timed_executor wrapper
-    template <typename BaseExecutor>
+    HPX_CXX_CORE_EXPORT template <executor_any BaseExecutor>
     struct timed_executor;
 
     // define customization points
@@ -68,16 +66,11 @@ namespace hpx::parallel::execution {
     ///       calling execution::post() on the underlying non-time-scheduled
     ///       execution agent.
     ///
-    inline constexpr struct post_at_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct post_at_t final
       : hpx::functional::detail::tag_fallback<post_at_t>
     {
     private:
-        // clang-format off
-        template <typename Executor, typename F, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_any_v<Executor>
-            )>
-        // clang-format on
+        template <executor_any Executor, typename F, typename... Ts>
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(post_at_t,
             Executor&& exec, hpx::chrono::steady_time_point const& abs_time,
             F&& f, Ts&&... ts)
@@ -108,16 +101,11 @@ namespace hpx::parallel::execution {
     ///       calling execution::post() on the underlying non-time-scheduled
     ///       execution agent.
     ///
-    inline constexpr struct post_after_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct post_after_t final
       : hpx::functional::detail::tag_fallback<post_after_t>
     {
     private:
-        // clang-format off
-        template <typename Executor, typename F, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_any_v<Executor>
-            )>
-        // clang-format on
+        template <executor_any Executor, typename F, typename... Ts>
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(post_after_t,
             Executor&& exec, hpx::chrono::steady_duration const& rel_time,
             F&& f, Ts&&... ts)
@@ -154,16 +142,11 @@ namespace hpx::parallel::execution {
     ///       calling execution::async_execute() on the underlying
     ///       non-time-scheduled execution agent.
     ///
-    inline constexpr struct async_execute_at_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct async_execute_at_t final
       : hpx::functional::detail::tag_fallback<async_execute_at_t>
     {
     private:
-        // clang-format off
-        template <typename Executor, typename F, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_any_v<Executor>
-            )>
-        // clang-format on
+        template <executor_any Executor, typename F, typename... Ts>
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             async_execute_at_t, Executor&& exec,
             hpx::chrono::steady_time_point const& abs_time, F&& f, Ts&&... ts)
@@ -195,16 +178,11 @@ namespace hpx::parallel::execution {
     ///       calling execution::async_execute() on the underlying
     ///       non-time-scheduled execution agent.
     ///
-    inline constexpr struct async_execute_after_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct async_execute_after_t final
       : hpx::functional::detail::tag_fallback<async_execute_after_t>
     {
     private:
-        // clang-format off
-        template <typename Executor, typename F, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_any_v<Executor>
-            )>
-        // clang-format on
+        template <executor_any Executor, typename F, typename... Ts>
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             async_execute_after_t, Executor&& exec,
             hpx::chrono::steady_duration const& rel_time, F&& f, Ts&&... ts)
@@ -236,16 +214,11 @@ namespace hpx::parallel::execution {
     ///       calling execution::sync_execute() on the underlying
     ///       non-time-scheduled execution agent.
     ///
-    inline constexpr struct sync_execute_at_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct sync_execute_at_t final
       : hpx::functional::detail::tag_fallback<sync_execute_at_t>
     {
     private:
-        // clang-format off
-        template <typename Executor, typename F, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_any_v<Executor>
-            )>
-        // clang-format on
+        template <executor_any Executor, typename F, typename... Ts>
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             sync_execute_at_t, Executor&& exec,
             hpx::chrono::steady_time_point const& abs_time, F&& f, Ts&&... ts)
@@ -277,16 +250,11 @@ namespace hpx::parallel::execution {
     ///       calling execution::sync_execute() on the underlying
     ///       non-time-scheduled execution agent.
     ///
-    inline constexpr struct sync_execute_after_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct sync_execute_after_t final
       : hpx::functional::detail::tag_fallback<sync_execute_after_t>
     {
     private:
-        // clang-format off
-        template <typename Executor, typename F, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_any_v<Executor>
-            )>
-        // clang-format on
+        template <executor_any Executor, typename F, typename... Ts>
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             sync_execute_after_t, Executor&& exec,
             hpx::chrono::steady_duration const& rel_time, F&& f, Ts&&... ts)

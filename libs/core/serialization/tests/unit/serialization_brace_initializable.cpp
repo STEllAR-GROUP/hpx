@@ -4,6 +4,16 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// clang-format off
+#if defined(__clang__)
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wmissing-field-initializers"
+#elif defined (__GNUC__)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+#endif
+// clang-format on
+
 #include <hpx/config.hpp>
 
 #include <hpx/modules/serialization.hpp>
@@ -24,15 +34,8 @@ static_assert(hpx::traits::is_brace_constructible<A, 3>(),
     "hpx::traits::is_brace_constructible<A, 3>()");
 static_assert(!hpx::traits::is_brace_constructible<A, 4>(),
     "!hpx::traits::is_brace_constructible<A, 4>()");
-
-#if !defined(HPX_HAVE_CXX20_PAREN_INITIALIZATION_OF_AGGREGATES)
-static_assert(!hpx::traits::is_paren_constructible<A, 3>(),
-    "!hpx::traits::is_paren_constructible<A, 3>()");
-#else
 static_assert(hpx::traits::is_paren_constructible<A, 3>(),
     "hpx::traits::is_paren_constructible<A, 3>()");
-#endif
-
 static_assert(hpx::traits::detail::arity<A>().value == 3,
     "hpx::traits::detail::arity<A>() == size<3>{}");
 static_assert(hpx::traits::has_struct_serialization<A>::value,
@@ -40,7 +43,7 @@ static_assert(hpx::traits::has_struct_serialization<A>::value,
 static_assert(
     !hpx::traits::has_serialize_adl<A>::value, "!has_serialize_adl<A>::value");
 
-bool operator==(const A& a1, const A& a2)
+bool operator==(A const& a1, A const& a2)
 {
     return std::tie(a1.str, a1.floating_number, a1.int_number) ==
         std::tie(a2.str, a2.floating_number, a2.int_number);
@@ -56,15 +59,8 @@ static_assert(hpx::traits::is_brace_constructible<B, 2>(),
     "hpx::traits::is_brace_constructible<B, 2>()");
 static_assert(!hpx::traits::is_brace_constructible<B, 3>(),
     "!hpx::traits::is_brace_constructible<B, 3>()");
-
-#if !defined(HPX_HAVE_CXX20_PAREN_INITIALIZATION_OF_AGGREGATES)
-static_assert(!hpx::traits::is_paren_constructible<B, 2>(),
-    "!hpx::traits::is_paren_constructible<B, 2>()");
-#else
 static_assert(hpx::traits::is_paren_constructible<B, 2>(),
     "hpx::traits::is_paren_constructible<B, 2>()");
-#endif
-
 static_assert(hpx::traits::detail::arity<B>().value == 2,
     "hpx::traits::detail::arity<B>() == size<2>{}");
 static_assert(hpx::traits::has_struct_serialization<B>::value,
@@ -72,7 +68,7 @@ static_assert(hpx::traits::has_struct_serialization<B>::value,
 static_assert(
     !hpx::traits::has_serialize_adl<B>::value, "!has_serialize_adl<B>::value");
 
-bool operator==(const B& b1, const B& b2)
+bool operator==(B const& b1, B const& b2)
 {
     return std::tie(b1.a, b1.sign) == std::tie(b2.a, b2.sign);
 }
@@ -104,3 +100,11 @@ int main()
 
     return hpx::util::report_errors();
 }
+
+// clang-format off
+#if defined(__clang__)
+#  pragma clang diagnostic pop
+#elif defined (__GNUC__)
+#  pragma GCC diagnostic pop
+#endif
+// clang-format on

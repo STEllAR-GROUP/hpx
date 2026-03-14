@@ -12,8 +12,8 @@
 #include <hpx/agas_base/server/locality_namespace.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/components_base/agas_interface.hpp>
-#include <hpx/naming_base/id_type.hpp>
-#include <hpx/parcelset_base/locality.hpp>
+#include <hpx/modules/naming_base.hpp>
+#include <hpx/modules/parcelset_base.hpp>
 
 #include <cstdint>
 #include <string>
@@ -104,7 +104,7 @@ namespace hpx { namespace agas { namespace detail {
     {
         HPX_ASSERT(locality_id == 0);
         HPX_UNUSED(locality_id);
-        const char* servicename("locality#0/");
+        char const* servicename("locality#0/");
         server_.register_server_instance(servicename);
     }
 

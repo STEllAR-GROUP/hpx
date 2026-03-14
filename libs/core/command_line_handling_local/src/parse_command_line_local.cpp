@@ -9,10 +9,10 @@
 #if defined(HPX_COMMAND_LINE_HANDLING_HAVE_JSON_CONFIGURATION_FILES)
 #include <hpx/command_line_handling_local/json_config_file.hpp>
 #endif
-#include <hpx/datastructures/any.hpp>
-#include <hpx/ini/ini.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
+#include <hpx/modules/ini.hpp>
 
 #include <cstddef>
 #include <fstream>
@@ -379,13 +379,14 @@ namespace hpx::local::detail {
                     .style(unix_style)
                     .extra_parser(option_parser(rtcfg, as_bool(mode))),
                 notmode)
-                                          .run());
+                    .run());
 
             // collect unregistered options, if needed
             if (unregistered_options)
             {
                 using hpx::program_options::collect_unrecognized;
-                using hpx::program_options::exclude_positional;
+                using hpx::program_options::collect_unrecognized_mode::
+                    exclude_positional;
                 *unregistered_options =
                     collect_unrecognized(opts.options, exclude_positional);
 
@@ -408,13 +409,14 @@ namespace hpx::local::detail {
                     .style(unix_style)
                     .extra_parser(option_parser(rtcfg, as_bool(mode))),
                 notmode)
-                                          .run());
+                    .run());
 
             // collect unregistered options, if needed
             if (unregistered_options)
             {
                 using hpx::program_options::collect_unrecognized;
-                using hpx::program_options::include_positional;
+                using hpx::program_options::collect_unrecognized_mode::
+                    include_positional;
                 *unregistered_options =
                     collect_unrecognized(opts.options, include_positional);
 

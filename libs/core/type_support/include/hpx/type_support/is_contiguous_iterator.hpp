@@ -7,13 +7,17 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+
 #include <array>
 #include <iterator>
+#include <string>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
 namespace hpx::traits {
+
     ///////////////////////////////////////////////////////////////////////////
     // Iterators are contiguous if they are pointers (without concepts we have
     // no generic way of determining whether an iterator is contiguous)
@@ -49,7 +53,8 @@ namespace hpx::traits {
         ///////////////////////////////////////////////////////////////////////
         template <typename T>
         inline constexpr bool has_valid_vector_v =
-            std::is_copy_assignable_v<T> && !std::is_function_v<T>;
+            std::is_copy_assignable_v<T> && !std::is_function_v<T> &&
+            !std::is_same_v<T, bool>;
 
         template <typename T, typename Enable = void>
         struct is_std_vector_iterator : std::false_type
@@ -135,8 +140,15 @@ namespace hpx::traits {
 
         template <typename Iter>
         struct is_std_basic_string_iterator<Iter,
-            std::enable_if_t<has_value_type_helper<Iter>::value>>
-          : is_valid_char_type<iter_value_type_t<Iter>>
+            std::enable_if_t<has_value_type_helper<Iter>::value &&
+                is_valid_char_type<iter_value_type_t<Iter>>::value>>
+          : std::bool_constant<
+                std::is_same_v<typename std::basic_string<
+                                   iter_value_type_t<Iter>>::iterator,
+                    Iter> ||
+                std::is_same_v<typename std::basic_string<
+                                   iter_value_type_t<Iter>>::const_iterator,
+                    Iter>>
         {
         };
 
@@ -155,16 +167,16 @@ namespace hpx::traits {
         };
     }    // namespace detail
 
-    template <typename Iter>
+    HPX_CXX_CORE_EXPORT template <typename Iter>
     struct is_contiguous_iterator : detail::is_known_contiguous_iterator<Iter>
     {
     };
 
-    template <typename Iter>
+    HPX_CXX_CORE_EXPORT template <typename Iter>
     using is_contiguous_iterator_t =
         typename is_contiguous_iterator<Iter>::type;
 
-    template <typename Iter>
+    HPX_CXX_CORE_EXPORT template <typename Iter>
     inline constexpr bool is_contiguous_iterator_v =
         is_contiguous_iterator<Iter>::value;
 }    // namespace hpx::traits

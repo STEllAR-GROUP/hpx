@@ -55,6 +55,7 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <cstddef>
 #include <cstdint>
 #include <limits>
 #include <type_traits>
@@ -63,7 +64,8 @@
 #include <hpx/config.hpp>
 
 namespace hpx::parallel::detail::rfa {
-    template <typename F>
+
+    HPX_CXX_CORE_EXPORT template <typename F>
     struct type4
     {
         F x;
@@ -72,50 +74,51 @@ namespace hpx::parallel::detail::rfa {
         F w;
     };
 
-    template <typename F>
+    HPX_CXX_CORE_EXPORT template <typename F>
     struct type2
     {
         F x;
         F y;
     };
-    using float4 = type4<float>;
-    using double4 = type4<double>;
-    using float2 = type2<float>;
-    using double2 = type2<double>;
 
-    auto abs_max(float4 a)
+    HPX_CXX_CORE_EXPORT using float4 = type4<float>;
+    HPX_CXX_CORE_EXPORT using double4 = type4<double>;
+    HPX_CXX_CORE_EXPORT using float2 = type2<float>;
+    HPX_CXX_CORE_EXPORT using double2 = type2<double>;
+
+    HPX_CXX_CORE_EXPORT inline auto abs_max(float4 a)
     {
         auto x = std::abs(a.x);
         auto y = std::abs(a.y);
         auto z = std::abs(a.z);
         auto w = std::abs(a.w);
-        const std::vector<float> v = {x, y, z, w};
+        std::vector<float> const v = {x, y, z, w};
         return *std::max_element(v.begin(), v.end());
     }
 
-    auto abs_max(double4 a)
+    HPX_CXX_CORE_EXPORT inline auto abs_max(double4 a)
     {
         auto x = std::abs(a.x);
         auto y = std::abs(a.y);
         auto z = std::abs(a.z);
         auto w = std::abs(a.w);
-        const std::vector<double> v = {x, y, z, w};
+        std::vector<double> const v = {x, y, z, w};
         return *std::max_element(v.begin(), v.end());
     }
 
-    auto abs_max(float2 a)
+    HPX_CXX_CORE_EXPORT inline auto abs_max(float2 a)
     {
         auto x = std::abs(a.x);
         auto y = std::abs(a.y);
-        const std::vector<float> v = {x, y};
+        std::vector<float> const v = {x, y};
         return *std::max_element(v.begin(), v.end());
     }
 
-    auto abs_max(double2 a)
+    HPX_CXX_CORE_EXPORT inline auto abs_max(double2 a)
     {
         auto x = std::abs(a.x);
         auto y = std::abs(a.y);
-        const std::vector<double> v = {x, y};
+        std::vector<double> const v = {x, y};
         return *std::max_element(v.begin(), v.end());
     }
 
@@ -129,7 +132,7 @@ namespace hpx::parallel::detail::rfa {
 #define MAX_JUMP 5
     static_assert(MAX_JUMP <= 5, "MAX_JUMP greater than max");
 
-    template <typename Real>
+    HPX_CXX_CORE_EXPORT template <typename Real>
     inline constexpr Real ldexp_impl(Real arg, int exp) noexcept
     {
         return std::ldexp(arg, exp);
@@ -151,7 +154,7 @@ namespace hpx::parallel::detail::rfa {
         // return arg;
     }
 
-    template <class ftype>
+    HPX_CXX_CORE_EXPORT template <class ftype>
     struct RFA_bins
     {
         static constexpr auto BIN_WIDTH =
@@ -198,15 +201,15 @@ namespace hpx::parallel::detail::rfa {
         }
     };
 
-    static char hpx_rfa_bin_host_buffer[sizeof(RFA_bins<double>)];
+    HPX_CXX_CORE_EXPORT inline char
+        hpx_rfa_bin_host_buffer[sizeof(RFA_bins<double>)];
 
     ///Class to hold a reproducible summation of the numbers passed to it
     ///
     ///@param ftype Floating-point data type; either `float` or `double
     ///@param FOLD  The fold; use 3 as a default unless you understand it.
-    template <class ftype_, int FOLD_ = 3,
-        typename std::enable_if_t<std::is_floating_point<ftype_>::value>* =
-            nullptr>
+    HPX_CXX_CORE_EXPORT template <class ftype_, int FOLD_ = 3,
+        typename std::enable_if_t<std::is_floating_point_v<ftype_>>* = nullptr>
     class alignas(2 * sizeof(ftype_)) reproducible_floating_accumulator
     {
     public:
@@ -214,7 +217,7 @@ namespace hpx::parallel::detail::rfa {
         static constexpr int FOLD = FOLD_;
 
     private:
-        std::array<ftype, 2 * FOLD> data = {{0}};
+        std::array<ftype, static_cast<std::size_t>(2) * FOLD> data = {{0}};
 
         ///Floating-point precision bin width
         static constexpr auto BIN_WIDTH =
@@ -246,7 +249,7 @@ namespace hpx::parallel::detail::rfa {
         ///Applies also to binned complex double precision.
         static constexpr auto ENDURANCE = 1 << (MANT_DIG - BIN_WIDTH - 2);
         ///Return a binned floating-point reference bin
-        inline const ftype* binned_bins(const int x) const
+        inline ftype const* binned_bins(int const x) const
         {
             return &reinterpret_cast<RFA_bins<ftype>&>(
                 hpx_rfa_bin_host_buffer)[x];
@@ -263,18 +266,18 @@ namespace hpx::parallel::detail::rfa {
             return *reinterpret_cast<uint64_t*>(&x);
         }
         ///Get the bit representation of a const float
-        static inline uint32_t get_bits(const float& x)
+        static inline uint32_t get_bits(float const& x)
         {
-            return *reinterpret_cast<const uint32_t*>(&x);
+            return *reinterpret_cast<uint32_t const*>(&x);
         }
         ///Get the bit representation of a const double
-        static inline uint64_t get_bits(const double& x)
+        static inline uint64_t get_bits(double const& x)
         {
-            return *reinterpret_cast<const uint64_t*>(&x);
+            return *reinterpret_cast<uint64_t const*>(&x);
         }
 
         ///Return primary vector value const ref
-        inline const ftype& primary(int i) const
+        inline ftype const& primary(int i) const
         {
             if constexpr (FOLD <= MAX_JUMP)
             {
@@ -306,7 +309,7 @@ namespace hpx::parallel::detail::rfa {
         }
 
         ///Return carry vector value const ref
-        inline const ftype& carry(int i) const
+        inline ftype const& carry(int i) const
         {
             if constexpr (FOLD <= MAX_JUMP)
             {
@@ -340,46 +343,46 @@ namespace hpx::parallel::detail::rfa {
         ///Return primary vector value ref
         inline ftype& primary(int i)
         {
-            const auto& c = *this;
+            auto const& c = *this;
             return const_cast<ftype&>(c.primary(i));
         }
 
         ///Return carry vector value ref
         inline ftype& carry(int i)
         {
-            const auto& c = *this;
+            auto const& c = *this;
             return const_cast<ftype&>(c.carry(i));
         }
 
 #ifdef DISABLE_ZERO
-        static inline constexpr bool ISZERO(const ftype)
+        static inline constexpr bool ISZERO(ftype const)
         {
             return false;
         }
 #else
-        static inline constexpr bool ISZERO(const ftype x)
+        static inline constexpr bool ISZERO(ftype const x)
         {
             return x == 0.0;
         }
 #endif
 
 #ifdef DISABLE_NANINF
-        static inline constexpr int ISNANINF(const ftype)
+        static inline constexpr int ISNANINF(ftype const)
         {
             return false;
         }
 #else
-        static inline constexpr int ISNANINF(const ftype x)
+        static inline constexpr int ISNANINF(ftype const x)
         {
-            const auto bits = get_bits(x);
+            auto const bits = get_bits(x);
             return (bits & ((2ull * MAX_EXP - 1) << (MANT_DIG - 1))) ==
                 ((2ull * MAX_EXP - 1) << (MANT_DIG - 1));
         }
 #endif
 
-        static inline constexpr int EXP(const ftype x)
+        static inline constexpr int EXP(ftype const x)
         {
-            const auto bits = get_bits(x);
+            auto const bits = get_bits(x);
             return (bits >> (MANT_DIG - 1)) & (2 * MAX_EXP - 1);
         }
 
@@ -387,7 +390,7 @@ namespace hpx::parallel::detail::rfa {
         ///The index of a non-binned type is the smallest index a binned type would
         ///need to have to sum it reproducibly. Higher indices correspond to smaller
         ///bins.
-        static inline constexpr int binned_dindex(const ftype x)
+        static inline constexpr int binned_dindex(ftype const x)
         {
             int exp = EXP(x);
             if (exp == 0)
@@ -399,7 +402,7 @@ namespace hpx::parallel::detail::rfa {
                 else
                 {
                     std::frexp(x, &exp);
-                    return (std::max)((MAX_EXP - exp) / BIN_WIDTH, MAXINDEX);
+                    return (std::max) ((MAX_EXP - exp) / BIN_WIDTH, MAXINDEX);
                 }
             }
             return ((MAX_EXP + EXP_BIAS) - exp) / BIN_WIDTH;
@@ -430,7 +433,7 @@ namespace hpx::parallel::detail::rfa {
         ///@param incpriY stride within Y's primary vector (use every incpriY'th element)
         ///@param inccarY stride within Y's carry vector (use every inccarY'th element)
         void binned_dmdupdate(
-            const ftype max_abs_val, const int incpriY, const int inccarY)
+            ftype const max_abs_val, int const incpriY, int const inccarY)
         {
             if (ISNANINF(primary(0)))
                 return;
@@ -438,7 +441,7 @@ namespace hpx::parallel::detail::rfa {
             int X_index = binned_dindex(max_abs_val);
             if (ISZERO(primary(0)))
             {
-                const ftype* const bins = binned_bins(X_index);
+                ftype const* const bins = binned_bins(X_index);
                 for (int i = 0; i < FOLD; i++)
                 {
                     primary(i * incpriY) = bins[i];
@@ -460,7 +463,7 @@ namespace hpx::parallel::detail::rfa {
                         primary(i * incpriY) = primary((i - shift) * incpriY);
                         carry(i * inccarY) = carry((i - shift) * inccarY);
                     }
-                    const ftype* const bins = binned_bins(X_index);
+                    ftype const* const bins = binned_bins(X_index);
 #if !defined(HPX_CLANG_VERSION)
                     HPX_UNROLL
 #endif
@@ -481,7 +484,7 @@ namespace hpx::parallel::detail::rfa {
         ///larger than the index of @p X
         ///
         ///@param incpriY stride within Y's primary vector (use every incpriY'th element)
-        void binned_dmddeposit(const ftype X, const int incpriY)
+        void binned_dmddeposit(ftype const X, int const incpriY)
         {
             ftype M;
             ftype x = X;
@@ -552,7 +555,7 @@ namespace hpx::parallel::detail::rfa {
         ///
         ///@param incpriX stride within X's primary vector (use every incpriX'th element)
         ///@param inccarX stride within X's carry vector (use every inccarX'th element)
-        inline void binned_dmrenorm(const int incpriX, const int inccarX)
+        inline void binned_dmrenorm(int const incpriX, int const inccarX)
         {
             if (ISZERO(primary(0)) || ISNANINF(primary(0)))
                 return;
@@ -577,7 +580,7 @@ namespace hpx::parallel::detail::rfa {
         ///
         ///@param incpriY stride within Y's primary vector (use every incpriY'th element)
         ///@param inccarY stride within Y's carry vector (use every inccarY'th element)
-        void binned_dmdadd(const ftype X, const int incpriY, const int inccarY)
+        void binned_dmdadd(ftype const X, int const incpriY, int const inccarY)
         {
             binned_dmdupdate(X, incpriY, inccarY);
             binned_dmddeposit(X, incpriY);
@@ -588,7 +591,7 @@ namespace hpx::parallel::detail::rfa {
         ///
         ///@param incpriX stride within X's primary vector (use every incpriX'th element)
         ///@param inccarX stride within X's carry vector (use every inccarX'th element)
-        double binned_conv_double(const int incpriX, const int inccarX) const
+        double binned_conv_double(int const incpriX, int const inccarX) const
         {
             int i = 0;
 
@@ -601,14 +604,15 @@ namespace hpx::parallel::detail::rfa {
             double scale_down;
             double scale_up;
             int scaled;
-            const auto X_index = binned_index();
-            const auto* const bins = binned_bins(X_index);
+            auto const X_index = binned_index();
+            auto const* const bins = binned_bins(X_index);
             if (X_index <= (3 * MANT_DIG) / BIN_WIDTH)
             {
                 scale_down = std::ldexp(0.5, 1 - (2 * MANT_DIG - BIN_WIDTH));
                 scale_up = std::ldexp(0.5, 1 + (2 * MANT_DIG - BIN_WIDTH));
-                scaled = (std::max)(
-                    (std::min)(FOLD, (3 * MANT_DIG) / BIN_WIDTH - X_index), 0);
+                scaled = (std::max) ((std::min) (FOLD,
+                                         (3 * MANT_DIG) / BIN_WIDTH - X_index),
+                    0);
                 if (X_index == 0)
                 {
                     Y += ((double) carry(0)) *
@@ -672,7 +676,7 @@ namespace hpx::parallel::detail::rfa {
         ///
         ///@param incpriX stride within X's primary vector (use every incpriX'th element)
         ///@param inccarX stride within X's carry vector (use every inccarX'th element)
-        float binned_conv_single(const int incpriX, const int inccarX) const
+        float binned_conv_single(int const incpriX, int const inccarX) const
         {
             int i = 0;
             double Y = 0.0;
@@ -685,8 +689,8 @@ namespace hpx::parallel::detail::rfa {
             //Note that the following order of summation is in order of decreasing
             //exponent. The following code is specific to SBWIDTH=13, FLT_MANT_DIG=24, and
             //the number of carries equal to 1.
-            const auto X_index = binned_index();
-            const auto* const bins = binned_bins(X_index);
+            auto const X_index = binned_index();
+            auto const* const bins = binned_bins(X_index);
             if (X_index == 0)
             {
                 Y += (double) carry(0) * (double) (((double) bins[0]) / 6.0) *
@@ -720,9 +724,9 @@ namespace hpx::parallel::detail::rfa {
         ///@param inccarX stride within X's carry vector (use every inccarX'th element)
         ///@param incpriY stride within Y's primary vector (use every incpriY'th element)
         ///@param inccarY stride within Y's carry vector (use every inccarY'th element)
-        void binned_dmdmadd(const reproducible_floating_accumulator& x,
-            const int incpriX, const int inccarX, const int incpriY,
-            const int inccarY)
+        void binned_dmdmadd(reproducible_floating_accumulator const& x,
+            int const incpriX, int const inccarX, int const incpriY,
+            int const inccarY)
         {
             if (ISZERO(x.primary(0)))
                 return;
@@ -743,12 +747,12 @@ namespace hpx::parallel::detail::rfa {
                 return;
             }
 
-            const auto X_index = x.binned_index();
-            const auto Y_index = this->binned_index();
-            const auto shift = Y_index - X_index;
+            auto const X_index = x.binned_index();
+            auto const Y_index = this->binned_index();
+            auto const shift = Y_index - X_index;
             if (shift > 0)
             {
-                const auto* const bins = binned_bins(Y_index);
+                auto const* const bins = binned_bins(Y_index);
 //shift Y upwards and add X to Y
 #if !defined(HPX_CLANG_VERSION)
                 HPX_UNROLL
@@ -775,7 +779,7 @@ namespace hpx::parallel::detail::rfa {
             }
             else if (shift < 0)
             {
-                const auto* const bins = binned_bins(X_index);
+                auto const* const bins = binned_bins(X_index);
 //shift X upwards and add X to Y
 #if !defined(HPX_CLANG_VERSION)
                 HPX_UNROLL
@@ -791,7 +795,7 @@ namespace hpx::parallel::detail::rfa {
             }
             else if (shift == 0)
             {
-                const auto* const bins = binned_bins(X_index);
+                auto const* const bins = binned_bins(X_index);
 // add X to Y
 #if !defined(HPX_CLANG_VERSION)
                 HPX_UNROLL
@@ -808,7 +812,7 @@ namespace hpx::parallel::detail::rfa {
 
         ///Add two manually specified binned fp (Y += X)
         ///Performs the operation Y += X
-        void binned_dbdbadd(const reproducible_floating_accumulator& other)
+        void binned_dbdbadd(reproducible_floating_accumulator const& other)
         {
             binned_dmdmadd(other, 1, 1, 1, 1);
         }
@@ -816,10 +820,10 @@ namespace hpx::parallel::detail::rfa {
     public:
         reproducible_floating_accumulator() = default;
         reproducible_floating_accumulator(
-            const reproducible_floating_accumulator&) = default;
+            reproducible_floating_accumulator const&) = default;
         ///Sets this binned fp equal to another binned fp
         reproducible_floating_accumulator& operator=(
-            const reproducible_floating_accumulator&) = default;
+            reproducible_floating_accumulator const&) = default;
 
         ///Set the binned fp to zero
         void zero()
@@ -849,7 +853,7 @@ namespace hpx::parallel::detail::rfa {
         ///NOTE: Casts @p x to the type of the binned fp
         template <typename U,
             typename std::enable_if_t<std::is_arithmetic_v<U>>* = nullptr>
-        reproducible_floating_accumulator& operator+=(const U x)
+        reproducible_floating_accumulator& operator+=(U const x)
         {
             binned_dmdadd(static_cast<ftype>(x), 1, 1);
             return *this;
@@ -859,7 +863,7 @@ namespace hpx::parallel::detail::rfa {
         ///NOTE: Casts @p x to the type of the binned fp
         template <typename U,
             typename std::enable_if_t<std::is_arithmetic_v<U>>* = nullptr>
-        reproducible_floating_accumulator& operator-=(const U x)
+        reproducible_floating_accumulator& operator-=(U const x)
         {
             binned_dmdadd(-static_cast<ftype>(x), 1, 1);
             return *this;
@@ -867,7 +871,7 @@ namespace hpx::parallel::detail::rfa {
 
         ///Accumulate a binned fp @p x into the binned fp.
         reproducible_floating_accumulator& operator+=(
-            const reproducible_floating_accumulator& other)
+            reproducible_floating_accumulator const& other)
         {
             binned_dbdbadd(other);
             return *this;
@@ -876,20 +880,20 @@ namespace hpx::parallel::detail::rfa {
         ///Accumulate-subtract a binned fp @p x into the binned fp.
         ///NOTE: Makes a copy and performs arithmetic; slow.
         reproducible_floating_accumulator& operator-=(
-            const reproducible_floating_accumulator& other)
+            reproducible_floating_accumulator const& other)
         {
-            const auto temp = -other;
+            auto const temp = -other;
             binned_dbdbadd(temp);
         }
 
         ///Determines if two binned fp are equal
-        bool operator==(const reproducible_floating_accumulator& other) const
+        bool operator==(reproducible_floating_accumulator const& other) const
         {
             return data == other.data;
         }
 
         ///Determines if two binned fp are not equal
-        bool operator!=(const reproducible_floating_accumulator& other) const
+        bool operator!=(reproducible_floating_accumulator const& other) const
         {
             return !operator==(other);
         }
@@ -898,7 +902,7 @@ namespace hpx::parallel::detail::rfa {
         ///NOTE: Casts @p x to the type of the binned fp
         template <typename U,
             typename std::enable_if_t<std::is_arithmetic_v<U>>* = nullptr>
-        reproducible_floating_accumulator& operator=(const U x)
+        reproducible_floating_accumulator& operator=(U const x)
         {
             zero();
             binned_dmdadd(static_cast<ftype>(x), 1, 1);
@@ -914,7 +918,7 @@ namespace hpx::parallel::detail::rfa {
             reproducible_floating_accumulator temp = *this;
             if (primary(0) != 0.0)
             {
-                const auto* const bins = binned_bins(binned_index());
+                auto const* const bins = binned_bins(binned_index());
                 for (int i = 0; i < FOLD; i++)
                 {
                     temp.primary(i * incpriX) =
@@ -947,12 +951,12 @@ namespace hpx::parallel::detail::rfa {
         ///@param binned_sum  The value of the sum computed using binned types
         ///@return            The absolute error bound
         static constexpr ftype error_bound(
-            const uint64_t N, const ftype max_abs_val, const ftype binned_sum)
+            uint64_t const N, ftype const max_abs_val, ftype const binned_sum)
         {
-            const double X = std::abs(max_abs_val);
-            const double S = std::abs(binned_sum);
+            double const X = std::abs(max_abs_val);
+            double const S = std::abs(binned_sum);
             return static_cast<ftype>(
-                (std::max)(X, std::ldexp(0.5, MIN_EXP - 1)) *
+                (std::max) (X, std::ldexp(0.5, MIN_EXP - 1)) *
                     std::ldexp(0.5, (1 - FOLD) * BIN_WIDTH + 1) * N +
                 ((7.0 * EPSILON) /
                     (1.0 - 6.0 * std::sqrt(static_cast<double>(EPSILON)) -
@@ -961,7 +965,7 @@ namespace hpx::parallel::detail::rfa {
         }
 
         ///Add @p x to the binned fp
-        void add(const ftype x)
+        void add(ftype const x)
         {
             binned_dmdadd(x, 1, 1);
         }
@@ -972,7 +976,7 @@ namespace hpx::parallel::detail::rfa {
         ///@param last        End of range
         ///@param max_abs_val Maximum absolute value of any member of the range
         template <typename InputIt>
-        void add(InputIt first, InputIt last, const ftype max_abs_val)
+        void add(InputIt first, InputIt last, ftype const max_abs_val)
         {
             binned_dmdupdate(std::abs(max_abs_val), 1, 1);
             size_t count = 0;
@@ -999,8 +1003,8 @@ namespace hpx::parallel::detail::rfa {
         template <typename InputIt>
         void add(InputIt first, InputIt last)
         {
-            const auto max_abs_val = *std::max_element(
-                first, last, [](const auto& a, const auto& b) {
+            auto const max_abs_val = *std::max_element(
+                first, last, [](auto const& a, auto const& b) {
                     return std::abs(a) < std::abs(b);
                 });
             add(first, last, static_cast<ftype>(max_abs_val));
@@ -1013,7 +1017,7 @@ namespace hpx::parallel::detail::rfa {
         ///@param max_abs_val Maximum absolute value of any member of the range
         template <typename T,
             typename std::enable_if_t<std::is_arithmetic_v<T>>* = nullptr>
-        void add(const T* input, const size_t N, const ftype max_abs_val)
+        void add(T const* input, size_t const N, ftype const max_abs_val)
         {
             if (N == 0)
                 return;
@@ -1029,7 +1033,7 @@ namespace hpx::parallel::detail::rfa {
         ///@param N           Number of elements to add
         template <typename T,
             typename std::enable_if_t<std::is_arithmetic_v<T>>* = nullptr>
-        void add(const T* input, const size_t N)
+        void add(T const* input, size_t const N)
         {
             if (N == 0)
                 return;
@@ -1037,14 +1041,14 @@ namespace hpx::parallel::detail::rfa {
             T max_abs_val = input[0];
             for (size_t i = 0; i < N; i++)
             {
-                max_abs_val = (std::max)(max_abs_val, std::abs(input[i]));
+                max_abs_val = (std::max) (max_abs_val, std::abs(input[i]));
             }
             add(input, N, max_abs_val);
         }
 
         ///Accumulate a float4 @p x into the binned fp.
         ///NOTE: Casts @p x to the type of the binned fp
-        reproducible_floating_accumulator& operator+=(const float4& x)
+        reproducible_floating_accumulator& operator+=(float4 const& x)
         {
             binned_dmdupdate(abs_max(x), 1, 1);
             binned_dmddeposit(static_cast<ftype>(x.x), 1);
@@ -1056,7 +1060,7 @@ namespace hpx::parallel::detail::rfa {
 
         ///Accumulate a double2 @p x into the binned fp.
         ///NOTE: Casts @p x to the type of the binned fp
-        reproducible_floating_accumulator& operator+=(const float2& x)
+        reproducible_floating_accumulator& operator+=(float2 const& x)
         {
             binned_dmdupdate(abs_max(x), 1, 1);
             binned_dmddeposit(static_cast<ftype>(x.x), 1);
@@ -1066,7 +1070,7 @@ namespace hpx::parallel::detail::rfa {
 
         ///Accumulate a double2 @p x into the binned fp.
         ///NOTE: Casts @p x to the type of the binned fp
-        reproducible_floating_accumulator& operator+=(const double2& x)
+        reproducible_floating_accumulator& operator+=(double2 const& x)
         {
             binned_dmdupdate(abs_max(x), 1, 1);
             binned_dmddeposit(static_cast<ftype>(x.x), 1);
@@ -1074,7 +1078,7 @@ namespace hpx::parallel::detail::rfa {
             return *this;
         }
 
-        void add(const float4* input, const size_t N, float max_abs_val)
+        void add(float4 const* input, size_t const N, float max_abs_val)
         {
             if (N == 0)
                 return;
@@ -1096,7 +1100,7 @@ namespace hpx::parallel::detail::rfa {
             }
         }
 
-        void add(const double2* input, const size_t N, double max_abs_val)
+        void add(double2 const* input, size_t const N, double max_abs_val)
         {
             if (N == 0)
                 return;
@@ -1116,7 +1120,7 @@ namespace hpx::parallel::detail::rfa {
             }
         }
 
-        void add(const float2* input, const size_t N, double max_abs_val)
+        void add(float2 const* input, size_t const N, double max_abs_val)
         {
             if (N == 0)
                 return;
@@ -1136,7 +1140,7 @@ namespace hpx::parallel::detail::rfa {
             }
         }
 
-        void add(const float4* input, const size_t N)
+        void add(float4 const* input, size_t const N)
         {
             if (N == 0)
                 return;
@@ -1149,7 +1153,7 @@ namespace hpx::parallel::detail::rfa {
             add(input, N, max_abs_val);
         }
 
-        void add(const double2* input, const size_t N)
+        void add(double2 const* input, size_t const N)
         {
             if (N == 0)
                 return;
@@ -1162,7 +1166,7 @@ namespace hpx::parallel::detail::rfa {
             add(input, N, max_abs_val);
         }
 
-        void add(const float2* input, const size_t N)
+        void add(float2 const* input, size_t const N)
         {
             if (N == 0)
                 return;
@@ -1186,7 +1190,7 @@ namespace hpx::parallel::detail::rfa {
         ///`add()` for an example
         template <typename T,
             typename std::enable_if_t<std::is_arithmetic_v<T>>* = nullptr>
-        void set_max_abs_val(const T mav)
+        void set_max_abs_val(T const mav)
         {
             binned_dmdupdate(std::abs(mav), 1, 1);
         }
@@ -1194,7 +1198,7 @@ namespace hpx::parallel::detail::rfa {
         ///Add @p x to the binned fp
         ///
         ///This is intended to be used after a call to `set_max_abs_val()`
-        void unsafe_add(const ftype x)
+        void unsafe_add(ftype const x)
         {
             binned_dmddeposit(x, 1);
         }
@@ -1208,5 +1212,4 @@ namespace hpx::parallel::detail::rfa {
             binned_dmrenorm(1, 1);
         }
     };
-
 }    // namespace hpx::parallel::detail::rfa

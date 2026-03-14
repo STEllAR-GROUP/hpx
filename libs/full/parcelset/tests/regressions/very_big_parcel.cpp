@@ -23,8 +23,8 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-const std::size_t nbytes_default = (std::numeric_limits<int>::max)();
-const std::size_t nbytes_add_default = 0;
+std::size_t const nbytes_default = (std::numeric_limits<int>::max)();
+std::size_t const nbytes_add_default = 0;
 
 struct config_t
 {
@@ -56,7 +56,7 @@ public:
     }
 
     template <typename Archive>
-    void serialize(Archive& ar, const unsigned int)
+    void serialize(Archive& ar, unsigned int const)
     {
         // clang-format off
         ar & _data;

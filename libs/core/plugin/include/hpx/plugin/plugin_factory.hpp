@@ -1,5 +1,5 @@
 //  Copyright Vladimir Prus 2004.
-//  Copyright (c) 2005-2014 Hartmut Kaiser
+//  Copyright (c) 2005-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,10 +8,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/any.hpp>
-#include <hpx/functional/function.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/plugin/abstract_factory.hpp>
 #include <hpx/plugin/dll.hpp>
 #include <hpx/plugin/export_plugin.hpp>
@@ -25,18 +25,20 @@
 #include <utility>
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx::util::plugin {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        template <typename BasePlugin, typename DeleterType>
+        HPX_CXX_CORE_EXPORT template <typename BasePlugin, typename DeleterType>
         std::pair<abstract_factory<BasePlugin>*, dll_handle>
         get_abstract_factory_static(get_plugins_list_type f, DeleterType d,
             std::string const& class_name, std::string const& libname = "",
             error_code& ec = throws)
         {
-            using PointedType = std::remove_pointer_t<get_plugins_list_type>;
+            using pointed_type = std::remove_pointer_t<get_plugins_list_type>;
 
             exported_plugins_type& e = *f();
 
@@ -44,11 +46,10 @@ namespace hpx::util::plugin {
             std::transform(clsname.begin(), clsname.end(), clsname.begin(),
                 [](char c) { return std::tolower(c); });
 
-            auto it = e.find(clsname);
-            if (it != e.end())
+            if (auto const it = e.find(clsname); it != e.end())
             {
                 auto** xw =
-                    hpx::any_cast<abstract_factory<BasePlugin>*>(&(*it).second);
+                    hpx::any_cast<abstract_factory<BasePlugin>*>(&it->second);
 
                 if (!xw)
                 {
@@ -60,7 +61,7 @@ namespace hpx::util::plugin {
                 }
 
                 abstract_factory<BasePlugin>* w = *xw;
-                return std::make_pair(w, shared_ptr<PointedType>(f, d));
+                return std::make_pair(w, shared_ptr<pointed_type>(f, d));
             }
             else
             {
@@ -105,7 +106,7 @@ namespace hpx::util::plugin {
             }
         }
 
-        template <typename BasePlugin>
+        HPX_CXX_CORE_EXPORT template <typename BasePlugin>
         std::pair<abstract_factory<BasePlugin>*, dll_handle>
         get_abstract_factory(dll const& d, std::string const& class_name,
             std::string const& base_name, error_code& ec = throws)
@@ -127,19 +128,20 @@ namespace hpx::util::plugin {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        inline void get_abstract_factory_names_static(get_plugins_list_type f,
-            std::vector<std::string>& names, error_code& /*ec*/ = throws)
+        HPX_CXX_CORE_EXPORT inline void get_abstract_factory_names_static(
+            get_plugins_list_type f, std::vector<std::string>& names,
+            error_code& /*ec*/ = throws)
         {
             exported_plugins_type& e = *f();
 
             auto const end = e.end();
             for (auto it = e.begin(); it != end; ++it)
             {
-                names.push_back((*it).first);
+                names.push_back(it->first);
             }
         }
 
-        inline void get_abstract_factory_names(dll const& d,
+        HPX_CXX_CORE_EXPORT inline void get_abstract_factory_names(dll const& d,
             std::string const& base_name, std::vector<std::string>& names,
             error_code& ec = throws)
         {
@@ -159,7 +161,8 @@ namespace hpx::util::plugin {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        struct plugin_factory_item_base
+        HPX_CXX_CORE_EXPORT struct HPX_PLUGIN_EXPORT_API
+            plugin_factory_item_base
         {
             plugin_factory_item_base(dll& d, std::string basename)
               : m_dll(d)
@@ -181,11 +184,13 @@ namespace hpx::util::plugin {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename BasePlugin, typename Base, typename Parameters>
-        struct plugin_factory_item;
+        HPX_CXX_CORE_EXPORT template <typename BasePlugin, typename Base,
+            typename Parameters>
+        struct HPX_PLUGIN_EXPORT_API plugin_factory_item;
 
-        template <typename BasePlugin, typename Base, typename... Parameters>
-        struct plugin_factory_item<BasePlugin, Base,
+        HPX_CXX_CORE_EXPORT template <typename BasePlugin, typename Base,
+            typename... Parameters>
+        struct HPX_PLUGIN_EXPORT_API plugin_factory_item<BasePlugin, Base,
             hpx::util::pack<Parameters...>> : public Base
         {
             plugin_factory_item(dll& d, std::string basename)
@@ -219,10 +224,14 @@ namespace hpx::util::plugin {
         ///////////////////////////////////////////////////////////////////////
         // empty deleter for the smart pointer to be used for static
         // plugin_factories
-        inline void empty_deleter(get_plugins_list_type) noexcept {}
+        HPX_CXX_CORE_EXPORT constexpr inline void empty_deleter(
+            get_plugins_list_type) noexcept
+        {
+        }
 
         ///////////////////////////////////////////////////////////////////////
-        struct static_plugin_factory_item_base
+        HPX_CXX_CORE_EXPORT struct HPX_PLUGIN_EXPORT_API
+            static_plugin_factory_item_base
         {
             explicit static_plugin_factory_item_base(
                 get_plugins_list_type const& f_) noexcept    //-V835
@@ -243,16 +252,18 @@ namespace hpx::util::plugin {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename BasePlugin, typename Base, typename Parameters>
-        struct static_plugin_factory_item;
+        HPX_CXX_CORE_EXPORT template <typename BasePlugin, typename Base,
+            typename Parameters>
+        struct HPX_PLUGIN_EXPORT_API static_plugin_factory_item;
 
-        template <typename BasePlugin, typename Base, typename... Parameters>
-        struct static_plugin_factory_item<BasePlugin, Base,
-            hpx::util::pack<Parameters...>> : public Base
+        HPX_CXX_CORE_EXPORT template <typename BasePlugin, typename Base,
+            typename... Parameters>
+        struct HPX_PLUGIN_EXPORT_API static_plugin_factory_item<BasePlugin,
+            Base, hpx::util::pack<Parameters...>> : public Base
         {
             explicit static_plugin_factory_item(
-                get_plugins_list_type const& f_) noexcept    //-V835
-              : Base(f_)
+                get_plugins_list_type const& f) noexcept    //-V835
+              : Base(f)
             {
             }
 
@@ -281,8 +292,8 @@ namespace hpx::util::plugin {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename BasePlugin>
-    struct plugin_factory
+    HPX_CXX_CORE_EXPORT template <typename BasePlugin>
+    struct HPX_PLUGIN_EXPORT_API plugin_factory
       : detail::plugin_factory_item<BasePlugin,
             detail::plugin_factory_item_base, virtual_constructor_t<BasePlugin>>
     {
@@ -299,8 +310,8 @@ namespace hpx::util::plugin {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename BasePlugin>
-    struct static_plugin_factory
+    HPX_CXX_CORE_EXPORT template <typename BasePlugin>
+    struct HPX_PLUGIN_EXPORT_API static_plugin_factory
       : detail::static_plugin_factory_item<BasePlugin,
             detail::static_plugin_factory_item_base,
             virtual_constructor_t<BasePlugin>>
@@ -318,3 +329,5 @@ namespace hpx::util::plugin {
         }
     };
 }    // namespace hpx::util::plugin
+
+#include <hpx/config/warnings_suffix.hpp>

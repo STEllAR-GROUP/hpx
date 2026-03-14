@@ -7,18 +7,20 @@
 // This example shows a config file (in ini format) being parsed by the
 // program_options library. It includes a number of different value types.
 
+#include <hpx/modules/preprocessor.hpp>
 #include <hpx/modules/program_options.hpp>
-#include <hpx/preprocessor/stringize.hpp>
 
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace po = hpx::program_options;
 using namespace std;
 
-const double FLOAT_SEPARATION = 0.00000000001;
+double const FLOAT_SEPARATION = 0.00000000001;
 
 template <typename Double1, typename Double2>
 bool check_float(Double1 test, Double2 expected)
@@ -154,15 +156,15 @@ po::options_description set_options()
 vector<string> parse_file(
     stringstream& file, po::options_description& opts, po::variables_map& vm)
 {
-    const bool ALLOW_UNREGISTERED = true;
+    bool const ALLOW_UNREGISTERED = true;
     cout << file.str() << endl;
 
     po::parsed_options parsed =
         parse_config_file(file, opts, ALLOW_UNREGISTERED);
 
     store(parsed, vm);
-    vector<string> unregistered =
-        po::collect_unrecognized(parsed.options, po::exclude_positional);
+    vector<string> unregistered = po::collect_unrecognized(
+        parsed.options, po::collect_unrecognized_mode::exclude_positional);
     notify(vm);
 
     return unregistered;

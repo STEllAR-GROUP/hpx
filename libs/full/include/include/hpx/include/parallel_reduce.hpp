@@ -8,8 +8,5 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/parallel/algorithms/reduce.hpp>
-#include <hpx/parallel/algorithms/reduce_by_key.hpp>
-#include <hpx/parallel/container_algorithms/reduce.hpp>
-
+#include <hpx/modules/algorithms.hpp>
 #include <hpx/parallel/segmented_algorithms/reduce.hpp>

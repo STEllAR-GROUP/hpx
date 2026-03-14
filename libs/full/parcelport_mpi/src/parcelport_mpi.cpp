@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Thomas Heller
 //  Copyright (c)      2020 Google
 //
@@ -9,23 +9,22 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)
+#include <hpx/modules/command_line_handling.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/mpi_base.hpp>
+#include <hpx/modules/parcelset_base.hpp>
+#include <hpx/modules/plugin.hpp>
 #include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/util.hpp>
-#include <hpx/plugin/traits/plugin_config_data.hpp>
-
-#include <hpx/command_line_handling/command_line_handling.hpp>
 #include <hpx/parcelport_mpi/locality.hpp>
 #include <hpx/parcelport_mpi/receiver.hpp>
 #include <hpx/parcelport_mpi/sender.hpp>
 #include <hpx/parcelset/parcelport_impl.hpp>
-#include <hpx/parcelset_base/locality.hpp>
 #include <hpx/plugin_factories/parcelport_factory.hpp>
 
 #include <atomic>
@@ -52,17 +51,17 @@ namespace hpx::parcelset {
         using send_immediate_parcels = std::true_type;
         using is_connectionless = std::true_type;
 
-        static constexpr const char* type() noexcept
+        static constexpr char const* type() noexcept
         {
             return "mpi";
         }
 
-        static constexpr const char* pool_name() noexcept
+        static constexpr char const* pool_name() noexcept
         {
             return "parcel-pool-mpi";
         }
 
-        static constexpr const char* pool_name_postfix() noexcept
+        static constexpr char const* pool_name_postfix() noexcept
         {
             return "-mpi";
         }
@@ -181,8 +180,14 @@ namespace hpx::parcelset {
 
                 for (std::size_t i = 0; i != io_service_pool_.size(); ++i)
                 {
+#if ASIO_VERSION >= 103400
+                    ::asio::post(
+                        io_service_pool_.get_io_service(static_cast<int>(i)),
+                        hpx::bind(&parcelport::io_service_work, this));
+#else
                     io_service_pool_.get_io_service(static_cast<int>(i))
                         .post(hpx::bind(&parcelport::io_service_work, this));
+#endif
                 }
                 return true;
             }

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2015 Daniel Bourgeois
 //  Copyright (c)      2017 Taeguk Kwon
 //  Copyright (c)      2021 Akhil J Nair
@@ -11,17 +11,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_combinators/wait_all.hpp>
-#include <hpx/execution/execution.hpp>
-#include <hpx/execution/executors/execution.hpp>
+#include <hpx/modules/async_combinators.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
 #include <hpx/parallel/util/detail/select_partitioner.hpp>
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/async_local/dataflow.hpp>
+#include <hpx/modules/async_local.hpp>
 #endif
 
 #include <algorithm>
@@ -37,11 +36,12 @@ namespace hpx::parallel::util {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         ///////////////////////////////////////////////////////////////////////
         // The static partitioner simply spawns one chunk of iterations for
         // each available core.
-        template <typename ExPolicy, typename R, typename Result1,
-            typename Result2>
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename R,
+            typename Result1, typename Result2>
         struct scan_static_partitioner
         {
             using parameters_type = typename ExPolicy::executor_parameters_type;
@@ -89,9 +89,10 @@ namespace hpx::parallel::util {
                         experimental::extract_has_variable_chunk_size<
                             parameters_type>::type;
 
+                    std::size_t cores = 1;
                     auto shape = detail::get_bulk_iteration_shape(
                         has_variable_chunk_size(), policy, workitems, f1, first,
-                        count, 1);
+                        count, cores, 1);
 
                     // schedule every chunk on a separate thread
                     std::size_t size = hpx::util::size(shape);
@@ -203,8 +204,8 @@ namespace hpx::parallel::util {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename ExPolicy, typename R, typename Result1,
-            typename Result2>
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename R,
+            typename Result1, typename Result2>
         struct scan_task_static_partitioner
         {
             template <typename ExPolicy_, typename FwdIter, typename T,
@@ -213,15 +214,14 @@ namespace hpx::parallel::util {
                 std::size_t count, T&& init, F1&& f1, F2&& f2, F3&& f3, F4&& f4)
             {
                 return execution::async_execute(policy.executor(),
-                    [first, count, policy = HPX_FORWARD(ExPolicy_, policy),
-                        init = HPX_FORWARD(T, init), f1 = HPX_FORWARD(F1, f1),
-                        f2 = HPX_FORWARD(F2, f2), f3 = HPX_FORWARD(F3, f3),
+                    [first, count, policy, init = HPX_FORWARD(T, init),
+                        f1 = HPX_FORWARD(F1, f1), f2 = HPX_FORWARD(F2, f2),
+                        f3 = HPX_FORWARD(F3, f3),
                         f4 = HPX_FORWARD(F4, f4)]() mutable -> R {
                         using partitioner_type =
                             scan_static_partitioner<ExPolicy, R, Result1,
                                 Result2>;
-                        return partitioner_type::call(
-                            HPX_FORWARD(ExPolicy_, policy), first, count,
+                        return partitioner_type::call(policy, first, count,
                             HPX_MOVE(init), f1, f2, f3, f4);
                     });
             }
@@ -233,8 +233,8 @@ namespace hpx::parallel::util {
     // R:           overall result type
     // Result1:     intermediate result type of first and second step
     // Result2:     intermediate result of the third step
-    template <typename ExPolicy, typename R = void, typename Result1 = R,
-        typename Result2 = void>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename R = void,
+        typename Result1 = R, typename Result2 = void>
     struct scan_partitioner
       : detail::select_partitioner<std::decay_t<ExPolicy>,
             detail::scan_static_partitioner,

@@ -385,8 +385,8 @@ namespace sheneos {
                 context_data& d = p.second;
                 lazy_results.push_back(hpx::async<action_type>(
                     p.first, std::move(d.coords_), eosvalue)
-                                           .then(on_completed_bulk_one(
-                                               partitions, d, overall_result)));
+                        .then(on_completed_bulk_one(
+                            partitions, d, overall_result)));
             }
 
             // wait for all asynchronous operations to complete
@@ -498,8 +498,8 @@ namespace sheneos {
                 context_data& d = p.second;
                 lazy_results.push_back(hpx::async<action_type>(
                     p.first, std::move(d.coords_), eosvalues)
-                                           .then(on_completed_bulk(partitions,
-                                               d, overall_results)));
+                        .then(
+                            on_completed_bulk(partitions, d, overall_results)));
             }
 
             // wait for all asynchronous operations to complete

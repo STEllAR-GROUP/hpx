@@ -19,7 +19,7 @@
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////
-int seed = std::random_device{}();
+unsigned int seed = std::random_device{}();
 std::mt19937 gen(seed);
 
 template <typename IteratorTag>
@@ -30,11 +30,12 @@ void test_remove_copy_if(IteratorTag)
 
     std::vector<int> c(10007);
     std::vector<int> d(c.size());
-    std::uniform_int_distribution<> dis(0, (c.size() >> 1) - 1);
-    std::uniform_int_distribution<> dist(0, c.size() - 1);
+    std::uniform_int_distribution<> dis(
+        0, static_cast<int>((c.size() >> 1) - 1));
+    std::uniform_int_distribution<> dist(0, static_cast<int>(c.size() - 1));
 
     std::size_t middle_idx = dis(gen);
-    auto middle = std::begin(c) + middle_idx;
+    auto middle = std::begin(c) + static_cast<std::ptrdiff_t>(middle_idx);
     std::iota(std::begin(c), middle, static_cast<int>(dist(gen)));
     std::fill(middle, std::end(c), -1);
 
@@ -70,11 +71,12 @@ void test_remove_copy_if(ExPolicy policy, IteratorTag)
 
     std::vector<int> c(10007);
     std::vector<int> d(c.size());
-    std::uniform_int_distribution<> dis(0, (c.size() >> 1) - 1);
-    std::uniform_int_distribution<> dist(0, c.size() - 1);
+    std::uniform_int_distribution<> dis(
+        0, static_cast<int>((c.size() >> 1) - 1));
+    std::uniform_int_distribution<> dist(0, static_cast<int>(c.size() - 1));
 
     std::size_t middle_idx = dis(gen);
-    auto middle = std::begin(c) + middle_idx;
+    auto middle = std::begin(c) + static_cast<std::ptrdiff_t>(middle_idx);
     std::iota(std::begin(c), middle, static_cast<int>(dist(gen)));
     std::fill(middle, std::end(c), -1);
 
@@ -107,11 +109,12 @@ void test_remove_copy_if_async(ExPolicy p, IteratorTag)
 
     std::vector<int> c(10007);
     std::vector<int> d(c.size());
-    std::uniform_int_distribution<> dis(0, (c.size() >> 1) - 1);
-    std::uniform_int_distribution<> dist(0, c.size() - 1);
+    std::uniform_int_distribution<> dis(
+        0, static_cast<int>((c.size() >> 1) - 1));
+    std::uniform_int_distribution<> dist(0, static_cast<int>(c.size() - 1));
 
     std::size_t middle_idx = dis(gen);
-    auto middle = std::begin(c) + middle_idx;
+    auto middle = std::begin(c) + static_cast<std::ptrdiff_t>(middle_idx);
     std::iota(std::begin(c), middle, static_cast<int>(dist(gen)));
     std::fill(middle, std::end(c), -1);
 
@@ -148,11 +151,12 @@ void test_remove_copy_if_outiter(ExPolicy policy, IteratorTag)
 
     std::vector<int> c(10007);
     std::vector<int> d(0);
-    std::uniform_int_distribution<> dis(0, (c.size() >> 1) - 1);
-    std::uniform_int_distribution<> dist(0, c.size() - 1);
+    std::uniform_int_distribution<> dis(
+        0, static_cast<int>((c.size() >> 1) - 1));
+    std::uniform_int_distribution<> dist(0, static_cast<int>(c.size() - 1));
 
     std::size_t middle_idx = dis(gen);
-    auto middle = std::begin(c) + middle_idx;
+    auto middle = std::begin(c) + static_cast<std::ptrdiff_t>(middle_idx);
     std::iota(std::begin(c), middle, static_cast<int>(dist(gen)));
     std::fill(middle, std::end(c), -1);
 
@@ -176,11 +180,12 @@ void test_remove_copy_if_outiter_async(ExPolicy p, IteratorTag)
 
     std::vector<int> c(10007);
     std::vector<int> d(0);
-    std::uniform_int_distribution<> dis(0, (c.size() >> 1) - 1);
-    std::uniform_int_distribution<> dist(0, c.size() - 1);
+    std::uniform_int_distribution<> dis(
+        0, static_cast<int>((c.size() >> 1) - 1));
+    std::uniform_int_distribution<> dist(0, static_cast<int>(c.size() - 1));
 
     std::size_t middle_idx = dis(gen);
-    auto middle = std::begin(c) + middle_idx;
+    auto middle = std::begin(c) + static_cast<std::ptrdiff_t>(middle_idx);
     std::iota(std::begin(c), middle, static_cast<int>(dist(gen)));
     std::fill(middle, std::end(c), -1);
 

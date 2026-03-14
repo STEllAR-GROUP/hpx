@@ -6,7 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/datastructures/any.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <iostream>

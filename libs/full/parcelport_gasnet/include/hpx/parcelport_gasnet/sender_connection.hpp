@@ -17,12 +17,11 @@
 #include <hpx/modules/timing.hpp>
 
 #include <hpx/gasnet_base/gasnet_environment.hpp>
+#include <hpx/modules/parcelset_base.hpp>
 #include <hpx/parcelport_gasnet/header.hpp>
 #include <hpx/parcelport_gasnet/locality.hpp>
 #include <hpx/parcelset/parcelport_connection.hpp>
 #include <hpx/parcelset/parcelset_fwd.hpp>
-#include <hpx/parcelset_base/detail/gatherer.hpp>
-#include <hpx/parcelset_base/parcelport.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -152,10 +151,10 @@ namespace hpx::parcelset::policies::gasnet {
                 // compute + send the number of GASNET_PAGEs to send and the
                 // remainder number of bytes to a GASNET_PAGE
                 //
-                const std::size_t chunks[] = {
+                std::size_t const chunks[] = {
                     static_cast<size_t>(header_.data_size_ / GASNET_PAGESIZE),
                     static_cast<size_t>(header_.data_size_ % GASNET_PAGESIZE)};
-                const std::size_t sizeof_chunks = sizeof(chunks);
+                std::size_t const sizeof_chunks = sizeof(chunks);
                 // clang-format off
                 std::memcpy(hpx::util::gasnet_environment::segments
                     [hpx::util::gasnet_environment::rank()].addr,
@@ -252,7 +251,9 @@ namespace hpx::parcelset::policies::gasnet {
             {
                 serialization::serialization_chunk& c =
                     buffer_.chunks_[chunks_idx_];
-                if (c.type_ == serialization::chunk_type::chunk_type_pointer)
+                if (c.type_ == serialization::chunk_type::chunk_type_pointer ||
+                    c.type_ ==
+                        serialization::chunk_type::chunk_type_const_pointer)
                 {
                     if (!request_done())
                     {

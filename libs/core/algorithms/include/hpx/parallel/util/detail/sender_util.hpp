@@ -1,5 +1,5 @@
 //  Copyright (c) ETH Zurich 2021
-//  Copyright (c) 2022-2023 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,15 +7,10 @@
 
 #pragma once
 
-#include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
-#include <hpx/execution/algorithms/let_value.hpp>
-#include <hpx/execution/algorithms/then.hpp>
-#include <hpx/execution/traits/is_execution_policy.hpp>
-#include <hpx/execution_base/completion_signatures.hpp>
-#include <hpx/execution_base/sender.hpp>
-#include <hpx/executors/execute_on.hpp>
-#include <hpx/executors/execution_policy.hpp>
-#include <hpx/executors/explicit_scheduler_executor.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/executors.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -26,7 +21,7 @@ namespace hpx::detail {
     // algorithm overloads, where one needs to bind an execution policy to an
     // algorithm for use in execution::then. Typically used together with
     // then_with_bound_algorithm.
-    template <typename Tag, typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename Tag, typename ExPolicy>
     struct bound_algorithm
     {
         std::decay_t<ExPolicy> policy;
@@ -41,17 +36,17 @@ namespace hpx::detail {
     };
 
     // Detects if the given type is a bound_algorithm.
-    template <typename Bound>
+    HPX_CXX_CORE_EXPORT template <typename Bound>
     struct is_bound_algorithm : std::false_type
     {
     };
 
-    template <typename Tag, typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename Tag, typename ExPolicy>
     struct is_bound_algorithm<bound_algorithm<Tag, ExPolicy>> : std::true_type
     {
     };
 
-    template <typename Bound>
+    HPX_CXX_CORE_EXPORT template <typename Bound>
     inline constexpr bool is_bound_algorithm_v =
         is_bound_algorithm<Bound>::value;
 
@@ -59,7 +54,8 @@ namespace hpx::detail {
     // take senders. Takes an execution policy, a predecessor sender, and an
     // "algorithm" (i.e. a tag) and applies then with the predecessor sender and
     // the execution policy bound to the algorithm.
-    template <typename Tag, typename ExPolicy, typename Predecessor>
+    HPX_CXX_CORE_EXPORT template <typename Tag, typename ExPolicy,
+        typename Predecessor>
     decltype(auto) then_with_bound_algorithm(
         Predecessor&& predecessor, ExPolicy&& policy)
     {
@@ -116,19 +112,20 @@ namespace hpx::detail {
     //   3. In the context of the experimental support for p2500
     //      (wg21.link/p2500) this also adds two overloads that take either a
     //      scheduler or a policy_aware_scheduler as its first argument (instead
-    //      of the usual execution policy). These overloads use an scheduler
+    //      of the usual execution policy). These overloads use a scheduler
     //      based executor that is re-wrapped into an execution policy that is
     //      then passed on to the underlying algorithm APIs.
-    template <typename Tag>
+    HPX_CXX_CORE_EXPORT template <typename Tag>
+    // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
     struct tag_parallel_algorithm : hpx::functional::detail::tag_fallback<Tag>
     {
+        template <typename Sender, typename ExPolicy>
         // clang-format off
-        template <typename Sender, typename ExPolicy,
-            HPX_CONCEPT_REQUIRES_(
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                !detail::is_bound_algorithm_v<Sender> &&
                 hpx::execution::experimental::is_sender_v<Sender>
-            )>
+            )
         // clang-format on
         friend auto tag_fallback_invoke(Tag, Sender&& sender, ExPolicy&& policy)
         {
@@ -136,12 +133,8 @@ namespace hpx::detail {
                 HPX_FORWARD(Sender, sender), HPX_FORWARD(ExPolicy, policy));
         }
 
-        // clang-format off
-        template <typename ExPolicy,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy_v<ExPolicy>
-            )>
-        // clang-format on
+        template <typename ExPolicy>
+            requires(hpx::is_execution_policy_v<ExPolicy>)
         friend auto tag_fallback_invoke(Tag, ExPolicy&& policy)
         {
             return hpx::execution::experimental::detail::partial_algorithm<Tag,
@@ -154,12 +147,8 @@ namespace hpx::detail {
         // matching execution policy. Forward call to algorithm by passing the
         // resulting re-wrapped execution policy.
         //
-        // clang-format off
-        template <typename Scheduler, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::execution::experimental::is_scheduler_v<Scheduler>
-            )>
-        // clang-format on
+        template <typename Scheduler, typename... Ts>
+            requires(hpx::execution::experimental::is_scheduler_v<Scheduler>)
         friend auto tag_fallback_invoke(
             Tag tag, Scheduler&& scheduler, Ts&&... ts)
         {
@@ -176,6 +165,7 @@ namespace hpx::detail {
         // policy_aware_scheduler, re-wrap those and forward the resulting
         // execution policy to the underlying algorithm.
         //
+
         // clang-format off
         template <typename Scheduler, typename... Ts,
             HPX_CONCEPT_REQUIRES_(

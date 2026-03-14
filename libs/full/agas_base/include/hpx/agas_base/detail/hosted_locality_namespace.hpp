@@ -15,10 +15,9 @@
 #include <hpx/agas_base/locality_namespace.hpp>
 #include <hpx/agas_base/server/locality_namespace.hpp>
 #include <hpx/async_distributed/base_lco_with_value.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/naming_base/address.hpp>
-#include <hpx/naming_base/id_type.hpp>
-#include <hpx/parcelset_base/locality.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/naming_base.hpp>
+#include <hpx/modules/parcelset_base.hpp>
 
 #include <cstdint>
 #include <map>

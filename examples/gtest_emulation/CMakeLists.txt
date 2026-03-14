@@ -12,6 +12,10 @@ if(EXISTS "${HPX_DIR}")
 
   find_package(HPX REQUIRED)
 
+  if(HPX_WITH_CXX_MODULES)
+    set(CMAKE_CXX_SCAN_FOR_MODULES ON)
+  endif()
+
   # Add a static library which contains a main to emulate gtest_main
   add_library(static_main_lib STATIC static_main.cpp)
 

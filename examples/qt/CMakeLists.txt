@@ -20,7 +20,7 @@ if(HPX_WITH_EXAMPLES_QT4)
   add_hpx_executable(
     qt INTERNAL_FLAGS MODULE qt
     SOURCES ${qt_sources} ${qt_FLAGS}
-    FOLDER "Examples/Qt"
+    FOLDER "Examples/Qt" ${HPX_WITH_CXX_MODULES_OPTION}
   )
 
   target_include_directories(

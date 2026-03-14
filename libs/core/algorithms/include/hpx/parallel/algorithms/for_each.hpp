@@ -242,9 +242,10 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/is_value_proxy.hpp>
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/modules/executors.hpp>
+#include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
@@ -253,7 +254,6 @@ namespace hpx {
 #include <hpx/parallel/util/invoke_projected.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
-#include <hpx/type_support/identity.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -271,7 +271,8 @@ namespace hpx::parallel {
         /// \cond NOINTERNAL
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename ExPolicy, typename F, typename Proj = hpx::identity>
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename F,
+            typename Proj = hpx::identity>
         struct for_each_iteration
         {
             using execution_policy_type = std::decay_t<ExPolicy>;
@@ -326,7 +327,7 @@ namespace hpx::parallel {
             }
         };
 
-        template <typename ExPolicy, typename F>
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename F>
         struct for_each_iteration<ExPolicy, F, hpx::identity>
         {
             using execution_policy_type = std::decay_t<ExPolicy>;
@@ -393,7 +394,7 @@ namespace hpx::parallel {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Iter>
+        HPX_CXX_CORE_EXPORT template <typename Iter>
         struct for_each_n : public algorithm<for_each_n<Iter>, Iter>
         {
             constexpr for_each_n() noexcept
@@ -451,7 +452,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        template <typename Iter>
+        HPX_CXX_CORE_EXPORT template <typename Iter>
         struct for_each : public algorithm<for_each<Iter>, Iter>
         {
             constexpr for_each() noexcept
@@ -465,7 +466,7 @@ namespace hpx::parallel {
                 [[maybe_unused]] ExPolicy&& policy, InIterB first, InIterE last,
                 F&& f, Proj&& proj)
             {
-                if constexpr (hpx::traits::is_random_access_iterator_v<InIterB>)
+                if constexpr (std::random_access_iterator<InIterB>)
                 {
                     return util::loop_n<std::decay_t<ExPolicy>>(first,
                         static_cast<std::size_t>(detail::distance(first, last)),
@@ -486,7 +487,7 @@ namespace hpx::parallel {
             static constexpr InIterB sequential(
                 ExPolicy&&, InIterB first, InIterE last, F&& f, hpx::identity)
             {
-                if constexpr (hpx::traits::is_random_access_iterator_v<InIterB>)
+                if constexpr (std::random_access_iterator<InIterB>)
                 {
                     return util::loop_n_ind<std::decay_t<ExPolicy>>(first,
                         static_cast<std::size_t>(detail::distance(first, last)),
@@ -541,21 +542,20 @@ namespace hpx {
     //       that the non-segmented algorithms do not need to be explicitly
     //       disabled for other, possibly external specializations.
     //
-    inline constexpr struct for_each_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct for_each_t final
       : hpx::detail::tag_parallel_algorithm<for_each_t>
     {
     private:
+        template <typename InIter, typename F>
         // clang-format off
-        template <typename InIter,
-            typename F,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<InIter>
-            )>
+            )
         // clang-format on
         friend F tag_fallback_invoke(
             hpx::for_each_t, InIter first, InIter last, F f)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Requires at least input iterator.");
 
             if (first != last)
@@ -567,43 +567,42 @@ namespace hpx {
             return HPX_FORWARD(F, f);
         }
 
+        template <typename ExPolicy, typename FwdIter, typename F>
         // clang-format off
-        template <typename ExPolicy, typename FwdIter,
-            typename F,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::for_each_t,
             ExPolicy&& policy, FwdIter first, FwdIter last, F f)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::util::detail::algorithm_result<ExPolicy,
                 FwdIter>::get(hpx::parallel::detail::for_each<FwdIter>()
-                                  .call(HPX_FORWARD(ExPolicy, policy), first,
-                                      last, HPX_MOVE(f), hpx::identity_v));
+                    .call(HPX_FORWARD(ExPolicy, policy), first, last,
+                        HPX_MOVE(f), hpx::identity_v));
         }
     } for_each{};
 
     ///////////////////////////////////////////////////////////////////////////
-    inline constexpr struct for_each_n_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct for_each_n_t final
       : hpx::detail::tag_parallel_algorithm<for_each_n_t>
     {
     private:
+        template <typename InIter, typename Size, typename F>
         // clang-format off
-        template <typename InIter, typename Size, typename F,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_input_iterator_v<InIter> &&
+            requires (
+                std::input_iterator<InIter> &&
                 std::is_integral_v<Size>
-            )>
+            )
         // clang-format on
         friend InIter tag_fallback_invoke(
             hpx::for_each_n_t, InIter first, Size count, F f)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Requires at least input iterator.");
 
             // if count is representing a negative value, we do nothing
@@ -617,18 +616,19 @@ namespace hpx {
                 HPX_MOVE(f), hpx::identity_v);
         }
 
+        template <typename ExPolicy, typename FwdIter, typename Size,
+            typename F>
         // clang-format off
-        template <typename ExPolicy, typename FwdIter, typename Size, typename F,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_forward_iterator_v<FwdIter> &&
+                std::forward_iterator<FwdIter> &&
                 std::is_integral_v<Size>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::for_each_n_t,
             ExPolicy&& policy, FwdIter first, Size count, F f)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             constexpr bool has_scheduler_executor =
@@ -660,7 +660,7 @@ namespace hpx {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 namespace hpx::traits {
 
-    template <typename ExPolicy, typename F, typename Proj>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename F, typename Proj>
     struct get_function_address<
         parallel::detail::for_each_iteration<ExPolicy, F, Proj>>
     {
@@ -672,7 +672,7 @@ namespace hpx::traits {
         }
     };
 
-    template <typename ExPolicy, typename F, typename Proj>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename F, typename Proj>
     struct get_function_annotation<
         parallel::detail::for_each_iteration<ExPolicy, F, Proj>>
     {
@@ -685,7 +685,7 @@ namespace hpx::traits {
     };
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-    template <typename ExPolicy, typename F, typename Proj>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename F, typename Proj>
     struct get_function_annotation_itt<
         parallel::detail::for_each_iteration<ExPolicy, F, Proj>>
     {

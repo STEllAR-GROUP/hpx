@@ -17,15 +17,13 @@
 
 namespace hpx { namespace components { namespace process { namespace posix {
 
-namespace initializers {
+    namespace initializers {
 
-class hide_console : public initializer_base
-{
-public:
-};
+        class hide_console : public initializer_base
+        {
+        public:
+        };
 
-}
-
-}}}}
+}}}}}    // namespace hpx::components::process::posix::initializers
 
 #endif

@@ -34,7 +34,7 @@ struct test : hpx::components::managed_component_base<test>
     {
         for (std::size_t i = 0; i != iterations; ++i)
         {
-            const std::size_t num_pongs = 50;
+            std::size_t const num_pongs = 50;
             std::vector<hpx::future<void>> futures;
             futures.reserve(num_pongs);
             for (std::size_t j = 0; j != num_pongs; ++j)

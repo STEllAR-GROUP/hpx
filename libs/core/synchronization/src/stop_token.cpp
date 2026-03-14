@@ -28,11 +28,16 @@ namespace hpx::detail {
     void intrusive_ptr_release(stop_state* p) noexcept
     {
         std::uint64_t const old_state = p->state_.fetch_sub(
-            stop_state::token_ref_increment, std::memory_order_acq_rel);
+            stop_state::token_ref_increment, std::memory_order_release);
 
         if ((old_state & stop_state::token_ref_mask) ==
             stop_state::token_ref_increment)
         {
+            // The thread that decrements the reference count to zero must
+            // perform an acquire to ensure that it doesn't start destructing
+            // the object until all previous writes have drained.
+            std::atomic_thread_fence(std::memory_order_acquire);
+
             delete p;
         }
     }
@@ -217,7 +222,7 @@ namespace hpx::detail {
             // block until it finishes executing.
             for (std::size_t k = 0; !cb->callback_finished_executing_.load(
                      std::memory_order_relaxed);
-                 ++k)
+                ++k)
             {
                 hpx::execution_base::this_thread::yield_k(
                     k, "stop_state::remove_callback");

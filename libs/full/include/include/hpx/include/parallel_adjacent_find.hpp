@@ -8,6 +8,5 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/parallel/algorithms/adjacent_find.hpp>
-
+#include <hpx/modules/algorithms.hpp>
 #include <hpx/parallel/segmented_algorithms/adjacent_find.hpp>

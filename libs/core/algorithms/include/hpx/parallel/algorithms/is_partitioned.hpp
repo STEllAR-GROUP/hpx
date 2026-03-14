@@ -1,6 +1,6 @@
 //  Copyright (c) 2020 ETH Zurich
 //  Copyright (c) 2015 Daniel Bourgeois
-//  Copyright (c) 2017-2023 Hartmut Kaiser
+//  Copyright (c) 2017-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -111,9 +111,9 @@ namespace hpx {
 #else
 
 #include <hpx/config.hpp>
-#include <hpx/executors/execution_policy.hpp>
-#include <hpx/functional/invoke.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/executors.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
@@ -136,7 +136,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         inline bool sequential_is_partitioned(std::vector<T>&& res)
         {
             auto first = res.begin();
@@ -158,7 +158,7 @@ namespace hpx::parallel {
             return true;
         }
 
-        template <typename Iter, typename Sent>
+        HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent>
         struct is_partitioned
           : public algorithm<is_partitioned<Iter, Sent>, bool>
         {
@@ -229,7 +229,8 @@ namespace hpx::parallel {
                 auto f2 = [tok](auto&& results) -> bool {
                     if (tok.was_cancelled())
                         return false;
-                    return sequential_is_partitioned(HPX_MOVE(results));
+                    return sequential_is_partitioned(
+                        HPX_FORWARD(decltype(results), results));
                 };
 
                 return util::partitioner<ExPolicy, bool,
@@ -243,15 +244,15 @@ namespace hpx::parallel {
 
 namespace hpx {
 
-    inline constexpr struct is_partitioned_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct is_partitioned_t final
       : hpx::detail::tag_parallel_algorithm<is_partitioned_t>
     {
     private:
+        template <typename FwdIter, typename Pred>
         // clang-format off
-        template <typename FwdIter, typename Pred,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_forward_iterator_v<FwdIter>
-            )>
+            requires (
+                std::forward_iterator<FwdIter>
+            )
         // clang-format on
         friend bool tag_fallback_invoke(
             hpx::is_partitioned_t, FwdIter first, FwdIter last, Pred pred)
@@ -261,13 +262,12 @@ namespace hpx {
                     hpx::identity_v);
         }
 
+        template <typename ExPolicy, typename FwdIter, typename Pred>
         // clang-format off
-        template <typename ExPolicy, typename FwdIter,
-            typename Pred,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_forward_iterator_v<FwdIter>
-            )>
+                std::forward_iterator<FwdIter>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::is_partitioned_t,
             ExPolicy&& policy, FwdIter first, FwdIter last, Pred pred)

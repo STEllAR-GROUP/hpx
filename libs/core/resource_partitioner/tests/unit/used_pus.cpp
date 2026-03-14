@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
 {
     hpx::local::init_params init_args;
     init_args.cfg = {"hpx.os_threads=" +
-        std::to_string(((std::min)(std::size_t(4),
+        std::to_string(((std::min) (std::size_t(4),
             std::size_t(hpx::threads::hardware_concurrency()))))};
 
     // now run the test

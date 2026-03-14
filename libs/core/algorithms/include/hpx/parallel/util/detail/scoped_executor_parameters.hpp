@@ -7,12 +7,12 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/execution/executors/execution_parameters.hpp>
+#include <hpx/modules/execution.hpp>
 
 namespace hpx::parallel::util::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Parameters, typename Executor>
+    HPX_CXX_CORE_EXPORT template <typename Parameters, typename Executor>
     struct scoped_executor_parameters
     {
     public:
@@ -41,7 +41,7 @@ namespace hpx::parallel::util::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Parameters, typename Executor>
+    HPX_CXX_CORE_EXPORT template <typename Parameters, typename Executor>
     struct scoped_executor_parameters_ref
     {
     public:

@@ -102,7 +102,7 @@ struct sub_block
 
     void load(hpx::serialization::input_archive& ar, unsigned)
     {
-        ar& size_;
+        ar & size_;
         if (size_ > 0)
         {
             data_ = new double[size_];
@@ -114,7 +114,7 @@ struct sub_block
 
     void save(hpx::serialization::output_archive& ar, unsigned) const
     {
-        ar& size_;
+        ar & size_;
         if (size_ > 0)
         {
             hpx::serialization::array<double> arr(data_, size_);
@@ -154,13 +154,13 @@ struct block : hpx::components::client_base<block, block_component>
     typedef hpx::components::client_base<block, block_component> base_type;
     block() {}
 
-    block(std::uint64_t id, const char* base_name)
+    block(std::uint64_t id, char const* base_name)
       : base_type(hpx::find_from_basename(base_name, id))
     {
         get_id();
     }
 
-    block(std::uint64_t id, std::uint64_t size, const char* base_name)
+    block(std::uint64_t id, std::uint64_t size, char const* base_name)
       : base_type(hpx::new_<block_component>(hpx::find_here(), size))
     {
         hpx::register_with_basename(base_name, get_id(), id);
@@ -202,14 +202,14 @@ hpx::future<sub_block> transpose_phase(std::vector<block> const& A,
     std::uint64_t num_blocks, std::uint64_t /* num_local_blocks */,
     std::uint64_t block_size, std::uint64_t tile_size)
 {
-    const std::uint64_t from_phase = b;
-    const std::uint64_t A_offset = from_phase * block_size;
+    std::uint64_t const from_phase = b;
+    std::uint64_t const A_offset = from_phase * block_size;
 
     auto phase_range = hpx::util::counting_shape(num_blocks);
     for (std::uint64_t phase : phase_range)
     {
-        const std::uint64_t from_block = phase;
-        const std::uint64_t B_offset = phase * block_size;
+        std::uint64_t const from_block = phase;
+        std::uint64_t const B_offset = phase * block_size;
 
         hpx::future<sub_block> from =
             A[from_block].get_sub_block(A_offset, block_size);
@@ -321,7 +321,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
             auto range = hpx::util::counting_shape(blocks_start, blocks_end);
 
-            const std::uint64_t block_size = block_order * block_order;
+            std::uint64_t const block_size = block_order * block_order;
             for_each(par, range, [&](std::uint64_t b) {
                 transpose_phase(A, B, block_order, b, num_blocks,
                     num_local_blocks, block_size, tile_size)
@@ -333,8 +333,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
             if (iter > 0 || iterations == 1)    // Skip the first iteration
             {
                 avgtime = avgtime + elapsed;
-                maxtime = (std::max)(maxtime, elapsed);
-                mintime = (std::min)(mintime, elapsed);
+                maxtime = (std::max) (maxtime, elapsed);
+                mintime = (std::min) (mintime, elapsed);
             }
 
             if (root)
@@ -351,8 +351,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
             {
                 std::cout << "Solution validates\n";
                 avgtime = avgtime /
-                    static_cast<double>((std::max)(
-                        iterations - 1, static_cast<std::uint64_t>(1)));
+                    static_cast<double>((std::max) (iterations - 1,
+                        static_cast<std::uint64_t>(1)));
                 std::cout << "Rate (MB/s): " << 1.e-6 * bytes / mintime << ", "
                           << "Avg time (s): " << avgtime << ", "
                           << "Min time (s): " << mintime << ", "
@@ -414,8 +414,8 @@ void transpose(sub_block const A, sub_block B, std::uint64_t block_order,
         {
             for (std::uint64_t j = 0; j != block_order; j += tile_size)
             {
-                std::uint64_t max_i = (std::min)(block_order, i + tile_size);
-                std::uint64_t max_j = (std::min)(block_order, j + tile_size);
+                std::uint64_t max_i = (std::min) (block_order, i + tile_size);
+                std::uint64_t max_j = (std::min) (block_order, j + tile_size);
 
                 for (std::uint64_t it = i; it != max_i; ++it)
                 {

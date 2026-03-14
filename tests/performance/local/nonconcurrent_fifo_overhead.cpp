@@ -6,7 +6,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/concurrency/barrier.hpp>
 #include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/program_options.hpp>
@@ -137,7 +136,7 @@ std::pair<double, double> bench_fifo(Fifo& fifo, std::uint64_t local_iterations)
     high_resolution_timer t;
 
     for (std::uint64_t block = 0; block < (local_iterations / blocksize);
-         ++block)
+        ++block)
     {
         // Restart the clock.
         t.restart();

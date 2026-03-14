@@ -10,13 +10,12 @@
 #include <hpx/actions_base/traits/action_select_direct_execution.hpp>
 #include <hpx/actions_base/traits/action_was_object_migrated.hpp>
 #include <hpx/actions_base/traits/extract_action.hpp>
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/detail/async_implementations.hpp>
 #include <hpx/async_distributed/detail/sync_implementations_fwd.hpp>
-#include <hpx/async_local/sync_fwd.hpp>
 #include <hpx/components_base/traits/component_supports_migration.hpp>
-#include <hpx/naming_base/address.hpp>
-#include <hpx/naming_base/id_type.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/async_local.hpp>
+#include <hpx/modules/naming_base.hpp>
 
 #include <utility>
 

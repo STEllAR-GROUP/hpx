@@ -237,8 +237,8 @@ namespace hpx { namespace ranges {
         typename Comp = ranges::less,
         typename Proj1 = hpx::identity,
         typename Proj2 = hpx::identity>
-    partial_sort_copy_result<hpx::traits::range_iterator_t<Rng1>,
-        hpx::traits::range_iterator_t<Rng2>>
+    partial_sort_copy_result<std::ranges::iterator_t<Rng1>,
+        std::ranges::iterator_t<Rng2>>
     partial_sort_copy(Rng1&& rng1, Rng2&& rng2, Comp&& comp = Comp(),
         Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
 
@@ -319,8 +319,8 @@ namespace hpx { namespace ranges {
         typename Proj1 = hpx::identity,
         typename Proj2 = hpx::identity>
     parallel::util::detail::algorithm_result_t<ExPolicy,
-        partial_sort_copy_result<hpx::traits::range_iterator_t<Rng1>,
-        hpx::traits::range_iterator_t<Rng2>>>
+        partial_sort_copy_result<std::ranges::iterator_t<Rng1>,
+        std::ranges::iterator_t<Rng2>>>
     partial_sort_copy(
         ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2, Comp&& comp = Comp(),
         Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
@@ -332,37 +332,38 @@ namespace hpx { namespace ranges {
 
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/projected_range.hpp>
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/iterator_support/range.hpp>
-#include <hpx/iterator_support/traits/is_range.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/partial_sort_copy.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/result_types.hpp>
-#include <hpx/type_support/identity.hpp>
 
+#include <iterator>
+#include <ranges>
 #include <type_traits>
 #include <utility>
 
 namespace hpx::ranges {
 
-    template <typename I, typename O>
+    HPX_CXX_CORE_EXPORT template <typename I, typename O>
     using partial_sort_copy_result = parallel::util::in_out_result<I, O>;
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::partial_sort_copy
-    inline constexpr struct partial_sort_copy_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct partial_sort_copy_t final
       : hpx::detail::tag_parallel_algorithm<partial_sort_copy_t>
     {
     private:
-        // clang-format off
         template <typename InIter, typename Sent1, typename RandIter,
             typename Sent2, typename Comp = ranges::less,
-            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
+        // clang-format off
+            requires(
                 hpx::traits::is_iterator_v<InIter> &&
-                hpx::traits::is_sentinel_for_v<Sent1, InIter> &&
+                std::sentinel_for<Sent1, InIter> &&
                 hpx::traits::is_iterator_v<RandIter> &&
-                hpx::traits::is_sentinel_for_v<Sent2, RandIter> &&
+                std::sentinel_for<Sent2, RandIter> &&
                 parallel::traits::is_projected_v<Proj1, InIter> &&
                 parallel::traits::is_projected_v<Proj2, RandIter> &&
                 parallel::traits::is_indirect_callable_v<
@@ -370,17 +371,17 @@ namespace hpx::ranges {
                     parallel::traits::projected<Proj1, InIter>,
                     parallel::traits::projected<Proj1, InIter>
                 >
-            )>
+            )
         // clang-format on
         friend partial_sort_copy_result<InIter, RandIter> tag_fallback_invoke(
             hpx::ranges::partial_sort_copy_t, InIter first, Sent1 last,
             RandIter r_first, Sent2 r_last, Comp comp = Comp(),
             Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
-                "Requires an input iterator.");
+            static_assert(
+                std::input_iterator<InIter>, "Requires an input iterator.");
 
-            static_assert(hpx::traits::is_random_access_iterator_v<RandIter>,
+            static_assert(std::random_access_iterator<RandIter>,
                 "Requires a random access iterator.");
 
             using result_type = partial_sort_copy_result<InIter, RandIter>;
@@ -390,17 +391,16 @@ namespace hpx::ranges {
                 HPX_MOVE(comp), HPX_MOVE(proj1), HPX_MOVE(proj2));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter, typename Sent1,
-            typename RandIter, typename Sent2,
-            typename Comp = ranges::less,
-            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            typename RandIter, typename Sent2, typename Comp = ranges::less,
+            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
+        // clang-format off
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
-                hpx::traits::is_sentinel_for_v<Sent1, FwdIter> &&
+                std::sentinel_for<Sent1, FwdIter> &&
                 hpx::traits::is_iterator_v<RandIter> &&
-                hpx::traits::is_sentinel_for_v<Sent2, RandIter> &&
+                std::sentinel_for<Sent2, RandIter> &&
                 parallel::traits::is_projected_v<Proj1, FwdIter> &&
                 parallel::traits::is_projected_v<Proj2, RandIter> &&
                 parallel::traits::is_indirect_callable_v<
@@ -408,7 +408,7 @@ namespace hpx::ranges {
                     parallel::traits::projected<Proj1, FwdIter>,
                     parallel::traits::projected<Proj1, FwdIter>
                 >
-            )>
+            )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
             partial_sort_copy_result<FwdIter, RandIter>>
@@ -416,10 +416,10 @@ namespace hpx::ranges {
             FwdIter first, Sent1 last, RandIter r_first, Sent2 r_last,
             Comp comp = Comp(), Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
-                "Requires a forward iterator.");
+            static_assert(
+                std::forward_iterator<FwdIter>, "Requires a forward iterator.");
 
-            static_assert(hpx::traits::is_random_access_iterator_v<RandIter>,
+            static_assert(std::random_access_iterator<RandIter>,
                 "Requires a random access iterator.");
 
             using result_type = partial_sort_copy_result<FwdIter, RandIter>;
@@ -429,13 +429,12 @@ namespace hpx::ranges {
                 HPX_MOVE(comp), HPX_MOVE(proj1), HPX_MOVE(proj2));
         }
 
+        template <typename Rng1, typename Rng2, typename Comp = ranges::less,
+            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
-        template <typename Rng1, typename Rng2,
-            typename Comp = ranges::less,
-            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_range_v<Rng1> &&
-                hpx::traits::is_range_v<Rng2> &&
+            requires(
+                std::ranges::range<Rng1> &&
+                std::ranges::range<Rng2> &&
                 parallel::traits::is_projected_range_v<Proj1, Rng1> &&
                 parallel::traits::is_projected_range_v<Proj2, Rng2> &&
                 parallel::traits::is_indirect_callable_v<
@@ -443,24 +442,23 @@ namespace hpx::ranges {
                     parallel::traits::projected_range<Proj1, Rng1>,
                     parallel::traits::projected_range<Proj1, Rng1>
                 >
-            )>
+            )
         // clang-format on
-        friend partial_sort_copy_result<hpx::traits::range_iterator_t<Rng1>,
-            hpx::traits::range_iterator_t<Rng2>>
+        friend partial_sort_copy_result<std::ranges::iterator_t<Rng1>,
+            std::ranges::iterator_t<Rng2>>
         tag_fallback_invoke(hpx::ranges::partial_sort_copy_t, Rng1&& rng1,
             Rng2&& rng2, Comp comp = Comp(), Proj1 proj1 = Proj1(),
             Proj2 proj2 = Proj2())
         {
-            using iterator_type1 = hpx::traits::range_iterator_t<Rng1>;
-            using iterator_type2 = hpx::traits::range_iterator_t<Rng2>;
+            using iterator_type1 = std::ranges::iterator_t<Rng1>;
+            using iterator_type2 = std::ranges::iterator_t<Rng2>;
             using result_type =
                 partial_sort_copy_result<iterator_type1, iterator_type2>;
 
-            static_assert(hpx::traits::is_forward_iterator_v<iterator_type1>,
+            static_assert(std::forward_iterator<iterator_type1>,
                 "Requires a forward iterator.");
 
-            static_assert(
-                hpx::traits::is_random_access_iterator_v<iterator_type2>,
+            static_assert(std::random_access_iterator<iterator_type2>,
                 "Requires a random access iterator.");
 
             return hpx::parallel::detail::partial_sort_copy<result_type>().call(
@@ -470,14 +468,14 @@ namespace hpx::ranges {
                 HPX_MOVE(proj2));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename Rng1, typename Rng2,
-            typename Comp = ranges::less,
-            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            typename Comp = ranges::less, typename Proj1 = hpx::identity,
+            typename Proj2 = hpx::identity>
+        // clang-format off
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng1> &&
-                hpx::traits::is_range_v<Rng2> &&
+                std::ranges::range<Rng1> &&
+                std::ranges::range<Rng2> &&
                 parallel::traits::is_projected_range_v<Proj1, Rng1> &&
                 parallel::traits::is_projected_range_v<Proj2, Rng2> &&
                 parallel::traits::is_indirect_callable_v<
@@ -485,25 +483,24 @@ namespace hpx::ranges {
                     parallel::traits::projected_range<Proj1, Rng1>,
                     parallel::traits::projected_range<Proj1, Rng1>
                 >
-            )>
+            )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
-            partial_sort_copy_result<hpx::traits::range_iterator_t<Rng1>,
-                hpx::traits::range_iterator_t<Rng2>>>
+            partial_sort_copy_result<std::ranges::iterator_t<Rng1>,
+                std::ranges::iterator_t<Rng2>>>
         tag_fallback_invoke(hpx::ranges::partial_sort_copy_t, ExPolicy&& policy,
             Rng1&& rng1, Rng2&& rng2, Comp comp = Comp(), Proj1 proj1 = Proj1(),
             Proj2 proj2 = Proj2())
         {
-            using iterator_type1 = hpx::traits::range_iterator_t<Rng1>;
-            using iterator_type2 = hpx::traits::range_iterator_t<Rng2>;
+            using iterator_type1 = std::ranges::iterator_t<Rng1>;
+            using iterator_type2 = std::ranges::iterator_t<Rng2>;
             using result_type =
                 partial_sort_copy_result<iterator_type1, iterator_type2>;
 
-            static_assert(hpx::traits::is_forward_iterator_v<iterator_type1>,
+            static_assert(std::forward_iterator<iterator_type1>,
                 "Requires a forward iterator.");
 
-            static_assert(
-                hpx::traits::is_random_access_iterator_v<iterator_type2>,
+            static_assert(std::random_access_iterator<iterator_type2>,
                 "Requires a random access iterator.");
 
             return hpx::parallel::detail::partial_sort_copy<result_type>().call(

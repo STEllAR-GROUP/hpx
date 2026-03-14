@@ -17,6 +17,8 @@
 HPX_PLUGIN_EXPORT_LIST(HPX_PLUGIN_COMPONENT_PREFIX, factory)
 HPX_REGISTER_REGISTRY_MODULE()
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx { namespace components { namespace server {
 
     void runtime_support::add_pre_startup_function(startup_function_type f)

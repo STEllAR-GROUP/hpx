@@ -7,14 +7,17 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/function.hpp>
+#include <hpx/modules/functional.hpp>
 
 namespace hpx::parallel::util::detail {
 
-    using parallel_exception_termination_handler_type = hpx::function<void()>;
+    HPX_CXX_CORE_EXPORT using parallel_exception_termination_handler_type =
+        hpx::function<void()>;
 
-    HPX_CORE_EXPORT void set_parallel_exception_termination_handler(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void
+    set_parallel_exception_termination_handler(
         parallel_exception_termination_handler_type f);
 
-    [[noreturn]] HPX_CORE_EXPORT void parallel_exception_termination_handler();
+    HPX_CXX_CORE_EXPORT [[noreturn]] HPX_CORE_EXPORT void
+    parallel_exception_termination_handler();
 }    // namespace hpx::parallel::util::detail

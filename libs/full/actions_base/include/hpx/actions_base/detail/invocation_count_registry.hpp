@@ -1,4 +1,4 @@
-//  Copyright (c) 2015-2024 Hartmut Kaiser
+//  Copyright (c) 2015-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/hashing/jenkins_hash.hpp>
-#include <hpx/type_support/static.hpp>
+#include <hpx/modules/hashing.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstdint>
 #include <string>

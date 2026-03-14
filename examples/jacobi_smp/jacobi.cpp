@@ -25,7 +25,7 @@ using hpx::program_options::variables_map;
 
 namespace jacobi_smp {
 
-    void jacobi_kernel(double* dst, const double* src, std::size_t n)
+    void jacobi_kernel(double* dst, double const* src, std::size_t n)
     {
 #ifdef HPX_INTEL_VERSION
 #pragma vector always

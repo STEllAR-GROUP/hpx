@@ -1,6 +1,6 @@
 //  Copyright (c) 2014 Thomas Heller
 //  Copyright (c) 2015 Anton Bikineev
-//  Copyright (c) 2022-2024 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,7 +9,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/config/endian.hpp>
 #include <hpx/serialization/config/defines.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/modules/errors.hpp>
@@ -18,8 +17,7 @@
 #include <hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 #include <hpx/serialization/detail/raw_ptr.hpp>
 #include <hpx/serialization/input_container.hpp>
-#include <hpx/serialization/traits/is_bitwise_serializable.hpp>
-#include <hpx/serialization/traits/is_not_bitwise_serializable.hpp>
+#include <hpx/serialization/traits/is_serialization_supported.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -31,7 +29,7 @@
 
 namespace hpx::serialization {
 
-    struct input_archive : basic_archive<input_archive>
+    HPX_CXX_CORE_EXPORT struct input_archive : basic_archive<input_archive>
     {
         using base_type = basic_archive<input_archive>;
 
@@ -102,6 +100,7 @@ namespace hpx::serialization {
             load(t);
         }
 
+        // NOLINTBEGIN(bugprone-multi-level-implicit-pointer-conversion)
         template <typename T>
         void load(T& t)
         {
@@ -112,28 +111,21 @@ namespace hpx::serialization {
 #endif
             if constexpr (!std::is_integral_v<T> && !std::is_enum_v<T>)
             {
-                // check for normal serialization first
-                constexpr bool has_serialize =
-                    hpx::traits::is_intrusive_polymorphic_v<T> ||
-                    access::has_serialize_v<T> || std::is_empty_v<T> ||
-                    hpx::traits::has_serialize_adl_v<T>;
-
-                constexpr bool optimized =
-                    hpx::traits::is_bitwise_serializable_v<T> ||
-                    !hpx::traits::is_not_bitwise_serializable_v<T>;
-
                 if constexpr (traits::is_nonintrusive_polymorphic_v<T>)
                 {
                     // non-bitwise polymorphic serialization
                     detail::polymorphic_nonintrusive_factory::instance().load(
                         *this, t);
                 }
-                else if constexpr (has_serialize)
+                else if constexpr (hpx::traits::is_serialization_supported<
+                                       T>::has_serialize ||
+                    access::has_serialize_v<T>)
                 {
                     // non-bitwise normal serialization
                     access::serialize(*this, t, 0);
                 }
-                else if constexpr (optimized)
+                else if constexpr (hpx::traits::is_serialization_supported<
+                                       T>::has_optimized)
                 {
                     // bitwise serialization
                     static_assert(!std::is_abstract_v<T>,
@@ -151,19 +143,18 @@ namespace hpx::serialization {
 #endif
                     load_binary(&t, sizeof(t));
                 }
-                else if constexpr (hpx::traits::has_struct_serialization_v<T>)
+                else if constexpr (hpx::traits::is_serialization_supported<
+                                       T>::has_refl_serialize ||
+                    hpx::traits::has_struct_serialization_v<T>)
                 {
-                    // struct serialization
+                    // struct serialization or reflection-based serialization
                     access::serialize(*this, t, 0);
                 }
                 else
                 {
-                    static_assert(traits::is_nonintrusive_polymorphic_v<T> ||
-                            has_serialize || optimized ||
-                            hpx::traits::has_struct_serialization_v<T>,
-                        "traits::is_nonintrusive_polymorphic_v<T> || "
-                        "has_serialize || optimized || "
-                        "hpx::traits::has_struct_serialization_v<T>");
+                    static_assert(hpx::traits::is_serialization_supported_v<T>,
+                        "hpx::traits::is_serialization_supported_v<T> must be "
+                        "true");
                 }
             }
 #if defined(HPX_SERIALIZATION_HAVE_SUPPORTS_ENDIANESS)
@@ -250,6 +241,7 @@ namespace hpx::serialization {
             load_binary(&p, sizeof(std::size_t));
         }
 #endif
+        // NOLINTEND(bugprone-multi-level-implicit-pointer-conversion)
 
         [[nodiscard]] constexpr std::size_t bytes_read() const noexcept
         {

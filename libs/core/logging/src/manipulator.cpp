@@ -14,6 +14,7 @@
 // See http://www.boost.org for updates, documentation, and revision history.
 // See http://www.torjo.com/log2/ for more details
 
+#include <hpx/config.hpp>
 #include <hpx/logging/manipulator.hpp>
 
 namespace hpx::util::logging {

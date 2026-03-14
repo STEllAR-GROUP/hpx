@@ -9,10 +9,8 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DATAPAR)
-#include <hpx/execution/traits/is_execution_policy.hpp>
-#include <hpx/execution/traits/vector_pack_alignment_size.hpp>
-#include <hpx/execution/traits/vector_pack_type.hpp>
-#include <hpx/functional/tag_invoke.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/parallel/algorithms/detail/generate.hpp>
 #include <hpx/parallel/datapar/handle_local_exceptions.hpp>
 #include <hpx/parallel/datapar/iterator_helpers.hpp>
@@ -24,9 +22,9 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { namespace detail {
+namespace hpx::parallel::detail {
 
-    template <typename Iterator>
+    HPX_CXX_CORE_EXPORT template <typename Iterator>
     struct datapar_generate_helper
     {
         using iterator_type = std::decay_t<Iterator>;
@@ -46,14 +44,14 @@ namespace hpx { namespace parallel { namespace detail {
         {
             std::size_t len = count;
             for (; !hpx::parallel::util::detail::is_data_aligned(first) &&
-                 len != 0;
-                 --len)
+                len != 0;
+                --len)
             {
                 *first++ = f.template operator()<value_type>();
             }
 
             for (std::int64_t len_v = std::int64_t(len - (size + 1)); len_v > 0;
-                 len_v -= size, len -= size)
+                len_v -= size, len -= size)
             {
                 auto tmp = f.template operator()<V>();
                 traits::vector_pack_store<V, value_type>::aligned(tmp, first);
@@ -83,7 +81,7 @@ namespace hpx { namespace parallel { namespace detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    struct datapar_generate
+    HPX_CXX_CORE_EXPORT struct datapar_generate
     {
         template <typename ExPolicy, typename Iter, typename Sent, typename F>
         HPX_HOST_DEVICE HPX_FORCEINLINE static Iter call(
@@ -95,7 +93,8 @@ namespace hpx { namespace parallel { namespace detail {
         }
     };
 
-    template <typename ExPolicy, typename Iter, typename Sent, typename F>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter,
+        typename Sent, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE
         typename std::enable_if<hpx::is_vectorpack_execution_policy_v<ExPolicy>,
             Iter>::type
@@ -107,7 +106,7 @@ namespace hpx { namespace parallel { namespace detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    struct datapar_generate_n
+    HPX_CXX_CORE_EXPORT struct datapar_generate_n
     {
         template <typename ExPolicy, typename Iter, typename F>
         HPX_HOST_DEVICE HPX_FORCEINLINE static Iter call(
@@ -118,7 +117,7 @@ namespace hpx { namespace parallel { namespace detail {
         }
     };
 
-    template <typename ExPolicy, typename Iter, typename F>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE
         typename std::enable_if<hpx::is_vectorpack_execution_policy_v<ExPolicy>,
             Iter>::type
@@ -128,5 +127,6 @@ namespace hpx { namespace parallel { namespace detail {
         return datapar_generate_n::call(
             HPX_FORWARD(ExPolicy, policy), first, count, HPX_FORWARD(F, f));
     }
-}}}    // namespace hpx::parallel::detail
+}    // namespace hpx::parallel::detail
+
 #endif

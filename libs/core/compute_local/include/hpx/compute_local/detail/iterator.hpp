@@ -11,14 +11,15 @@
 #include <hpx/config.hpp>
 #include <hpx/compute_local/detail/get_proxy_type.hpp>
 #include <hpx/compute_local/traits/allocator_traits.hpp>
-#include <hpx/iterator_support/iterator_adaptor.hpp>
+#include <hpx/modules/iterator_support.hpp>
 
 #include <cstddef>
 #include <iterator>
+#include <type_traits>
 
 namespace hpx::compute::detail {
 
-    template <typename T, typename Allocator>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Allocator>
     struct iterator
       : hpx::util::iterator_adaptor<iterator<T, Allocator>,
             typename traits::allocator_traits<Allocator>::pointer,
@@ -39,6 +40,9 @@ namespace hpx::compute::detail {
         using target_type =
             typename traits::allocator_traits<Allocator>::target_type;
 
+        // disable use of brackets_proxy in iterator_facade
+        using use_brackets_proxy = std::false_type;
+
         HPX_HOST_DEVICE iterator() noexcept
           : base_type(nullptr)
           , target_(nullptr)
@@ -54,6 +58,7 @@ namespace hpx::compute::detail {
         {
         }
 
+    public:
         HPX_HOST_DEVICE iterator(iterator const& other) noexcept
           : base_type(other)
           , target_(other.target_)
@@ -78,12 +83,12 @@ namespace hpx::compute::detail {
         target_type const* target_;
     };
 
-    template <typename T, typename Allocator>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Allocator>
     struct reverse_iterator
     {
     };
 
-    template <typename T, typename Allocator>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Allocator>
     struct const_reverse_iterator
     {
     };

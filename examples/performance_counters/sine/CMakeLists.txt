@@ -14,7 +14,7 @@ add_hpx_component(
   FOLDER "Examples/PerformanceCounters/Sine"
   HEADER_GLOB "${root}/*.h*"
   SOURCE_GLOB "${root}/sine.c*"
-  AUTOGLOB PLUGIN
+  AUTOGLOB PLUGIN ${HPX_WITH_CXX_MODULES_OPTION}
 )
 
 # ##############################################################################
@@ -23,7 +23,7 @@ add_hpx_executable(
   sine_client INTERNAL_FLAGS
   SOURCES sine_client.cpp
   DEPENDENCIES sine_component
-  FOLDER "Examples/PerformanceCounters/Sine"
+  FOLDER "Examples/PerformanceCounters/Sine" ${HPX_WITH_CXX_MODULES_OPTION}
 )
 
 # add a custom target for this example

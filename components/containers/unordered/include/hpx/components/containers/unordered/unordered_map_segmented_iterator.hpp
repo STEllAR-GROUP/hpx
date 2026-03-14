@@ -15,7 +15,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/iterator_support/iterator_adaptor.hpp>
+#include <hpx/modules/iterator_support.hpp>
 
 #include <hpx/components/containers/unordered/partition_unordered_map_component.hpp>
 

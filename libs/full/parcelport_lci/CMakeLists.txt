@@ -19,11 +19,7 @@ set(parcelport_lci_headers
     hpx/parcelport_lci/receiver_base.hpp
     hpx/parcelport_lci/sender_base.hpp
     hpx/parcelport_lci/sender_connection_base.hpp
-    hpx/parcelport_lci/backlog_queue.hpp
     hpx/parcelport_lci/parcelport_lci.hpp
-    hpx/parcelport_lci/putva/sender_putva.hpp
-    hpx/parcelport_lci/putva/sender_connection_putva.hpp
-    hpx/parcelport_lci/putva/receiver_putva.hpp
     hpx/parcelport_lci/sendrecv/sender_sendrecv.hpp
     hpx/parcelport_lci/sendrecv/sender_connection_sendrecv.hpp
     hpx/parcelport_lci/sendrecv/receiver_sendrecv.hpp
@@ -43,11 +39,8 @@ set(parcelport_lci_sources
     config.cpp
     locality.cpp
     parcelport_lci.cpp
-    backlog_queue.cpp
     sender_connection_base.cpp
     sender_base.cpp
-    putva/sender_putva.cpp
-    putva/sender_connection_putva.cpp
     sendrecv/sender_sendrecv.cpp
     sendrecv/sender_connection_sendrecv.cpp
     sendrecv/receiver_sendrecv.cpp
@@ -69,7 +62,8 @@ add_hpx_module(
   HEADERS ${parcelport_lci_headers}
   COMPAT_HEADERS ${parcelport_lci_compat_headers}
   DEPENDENCIES hpx_core hpx_dependencies_boost LCI::LCI
-  MODULE_DEPENDENCIES hpx_actions hpx_command_line_handling hpx_parcelset
+  MODULE_DEPENDENCIES hpx_actions hpx_command_line_handling hpx_parcelset_base
+                      hpx_parcelset
   CMAKE_SUBDIRS examples tests
 )
 

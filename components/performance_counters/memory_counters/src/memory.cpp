@@ -7,10 +7,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/components_base/component_startup_shutdown.hpp>
-#include <hpx/functional/function.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/runtime_configuration.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/performance_counters/manage_counter_type.hpp>
-#include <hpx/runtime_configuration/component_factory_base.hpp>
-#include <hpx/runtime_local/startup_function.hpp>
 
 #include <hpx/components/performance_counters/memory_counters/mem_counter.hpp>
 

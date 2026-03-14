@@ -18,6 +18,10 @@ void test_atomic()
 
     // force using libatomic, if needed
     [[maybe_unused]] bool b = a.is_lock_free();
+
+    // Newer HIP environments seem to need libatomic for compare_exchange
+    T expected;
+    a.compare_exchange_strong(expected, i);
 }
 
 struct index_data

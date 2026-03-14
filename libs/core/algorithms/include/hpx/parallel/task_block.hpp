@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,14 +11,12 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/async_local/async.hpp>
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/errors/try_catch_exception_ptr.hpp>
-#include <hpx/execution/executors/execution.hpp>
-#include <hpx/execution/traits/is_execution_policy.hpp>
-#include <hpx/executors/execution_policy.hpp>
-#include <hpx/futures/future.hpp>
+#include <hpx/modules/async_local.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/executors.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/parallel/task_group.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 
@@ -33,13 +31,14 @@ namespace hpx::experimental {
 
     namespace detail {
 
-        struct define_task_block_impl;
+        HPX_CXX_CORE_EXPORT struct define_task_block_impl;
     }    // namespace detail
 
     /// The class \a task_canceled_exception defines the type of objects thrown
     /// by task_block::run or task_block::wait if they detect that an exception
     /// is pending within the current parallel region.
-    class HPX_ALWAYS_EXPORT task_canceled_exception : public hpx::exception
+    HPX_CXX_CORE_EXPORT class HPX_ALWAYS_EXPORT task_canceled_exception
+      : public hpx::exception
     {
     public:
         task_canceled_exception() noexcept
@@ -90,7 +89,8 @@ namespace hpx::experimental {
     /// \tparam ExPolicy The execution policy an instance of a \a task_block was
     ///         created with. This defaults to \a parallel_policy.
     ///
-    template <typename ExPolicy = hpx::execution::parallel_policy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy =
+                                      hpx::execution::parallel_policy>
     class task_block
     {
     private:
@@ -116,6 +116,7 @@ namespace hpx::experimental {
             {
                 wait_for_completion();
             }
+            // NOLINTNEXTLINE(bugprone-empty-catch)
             catch (...)
             {
             }
@@ -303,7 +304,7 @@ namespace hpx::experimental {
     namespace detail {
 
         /// \cond NOINTERNAL
-        struct define_task_block_impl
+        HPX_CXX_CORE_EXPORT struct define_task_block_impl
         {
             template <typename ExPolicy, typename F>
             void operator()(ExPolicy&& policy, F&& f) const
@@ -326,7 +327,8 @@ namespace hpx::experimental {
             }
         };
 
-        inline constexpr define_task_block_impl define_task_block{};
+        HPX_CXX_CORE_EXPORT inline constexpr define_task_block_impl
+            define_task_block{};
         /// \endcond
     }    // namespace detail
 
@@ -355,12 +357,8 @@ namespace hpx::experimental {
     /// \note It is expected (but not mandated) that f will (directly or
     ///       indirectly) call tr.run(_callable_object_).
     ///
-    // clang-format off
-    template <typename ExPolicy, typename F,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<std::decay_t<ExPolicy>>
-        )>
-    // clang-format on
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename F>
+        requires(hpx::is_execution_policy_v<std::decay_t<ExPolicy>>)
     decltype(auto) define_task_block(ExPolicy&& policy, F&& f)
     {
         if constexpr (hpx::is_async_execution_policy_v<std::decay_t<ExPolicy>>)
@@ -384,7 +382,7 @@ namespace hpx::experimental {
     ///             MoveConstructible.
     ///
     /// \param f    The user defined function to invoke inside the task block.
-    ///             Given an lvalue \a tr of type \a task_block, the expression,
+    ///             Given a lvalue \a tr of type \a task_block, the expression,
     ///             (void)f(tr), shall be well-formed.
     ///
     /// Postcondition: All tasks spawned from \a f have finished execution.
@@ -396,7 +394,7 @@ namespace hpx::experimental {
     /// \note It is expected (but not mandated) that f will (directly or
     ///       indirectly) call tr.run(_callable_object_).
     ///
-    template <typename F>
+    HPX_CXX_CORE_EXPORT template <typename F>
     void define_task_block(F&& f)
     {
         detail::define_task_block(hpx::execution::par, HPX_FORWARD(F, f));
@@ -427,14 +425,14 @@ namespace hpx::experimental {
     /// \note It is expected (but not mandated) that f will (directly or
     ///       indirectly) call tr.run(_callable_object_).
     ///
-    template <typename ExPolicy, typename F>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename F>
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy>
     define_task_block_restore_thread(ExPolicy&& policy, F&& f)
     {
         static_assert(hpx::is_execution_policy_v<ExPolicy>,
             "hpx::is_execution_policy_v<ExPolicy>");
 
-        // By design we always return on the same (HPX-) thread as we started
+        // By design, we always return on the same (HPX-) thread as we started
         // executing define_task_block_restore_thread.
         return define_task_block(
             HPX_FORWARD(ExPolicy, policy), HPX_FORWARD(F, f));
@@ -463,10 +461,10 @@ namespace hpx::experimental {
     /// \note It is expected (but not mandated) that f will (directly or
     ///       indirectly) call tr.run(_callable_object_).
     ///
-    template <typename F>
+    HPX_CXX_CORE_EXPORT template <typename F>
     void define_task_block_restore_thread(F&& f)
     {
-        // By design we always return on the same (HPX-) thread as we started
+        // By design, we always return on the same (HPX-) thread as we started
         // executing define_task_block_restore_thread.
         define_task_block_restore_thread(
             hpx::execution::par, HPX_FORWARD(F, f));
@@ -476,7 +474,7 @@ namespace hpx::experimental {
 /// \cond NOINTERNAL
 namespace std {
 
-    template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
     hpx::experimental::task_block<ExPolicy>* addressof(
         hpx::experimental::task_block<ExPolicy>&) = delete;
 }
@@ -495,9 +493,8 @@ namespace hpx::parallel {
         "hpx::experimental::task_block instead") =
         hpx::experimental::task_block<ExPolicy>;
 
-    template <typename ExPolicy, typename F,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_async_execution_policy<std::decay_t<ExPolicy>>::value)>
+    template <typename ExPolicy, typename F>
+        requires(hpx::is_async_execution_policy_v<std::decay_t<ExPolicy>>)
     HPX_DEPRECATED_V(1, 9,
         "hpx::parallel:v2::define_task_block is deprecated, use "
         "hpx::experimental::define_task_block instead")
@@ -506,9 +503,8 @@ namespace hpx::parallel {
         return hpx::experimental::define_task_block(policy, f);
     }
 
-    template <typename ExPolicy, typename F,
-        HPX_CONCEPT_REQUIRES_(
-            !hpx::is_async_execution_policy<std::decay_t<ExPolicy>>::value)>
+    template <typename ExPolicy, typename F>
+        requires(!hpx::is_async_execution_policy_v<std::decay_t<ExPolicy>>)
     HPX_DEPRECATED_V(1, 9,
         "hpx::parallel:v2::define_task_block is deprecated, use "
         "hpx::experimental::define_task_block instead")
@@ -544,5 +540,4 @@ namespace hpx::parallel {
     {
         return hpx::experimental::define_task_block_restore_thread(f);
     }
-
 }    // namespace hpx::parallel

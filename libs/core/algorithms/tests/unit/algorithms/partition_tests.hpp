@@ -6,9 +6,9 @@
 
 #pragma once
 
+#include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/parallel/algorithms/partition.hpp>
-#include <hpx/type_support/unused.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -21,7 +21,7 @@
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-int seed = std::random_device{}();
+unsigned int seed = std::random_device{}();
 std::mt19937 _gen(seed);
 
 struct throw_always
@@ -46,13 +46,14 @@ struct user_defined_type
 {
     user_defined_type() = default;
     user_defined_type(int rand_no)
-      : val(rand_no)
+      : val(static_cast<unsigned int>(rand_no))
     {
-        std::uniform_int_distribution<> dis(0, name_list.size() - 1);
+        std::uniform_int_distribution<> dis(
+            0, static_cast<int>(name_list.size() - 1));
         name = name_list[dis(_gen)];
     }
 
-    bool operator<(int rand_base) const
+    bool operator<(unsigned int rand_base) const
     {
         static std::string const base_name = "BASE";
 
@@ -75,20 +76,21 @@ struct user_defined_type
         return this->name == t.name && this->val == t.val;
     }
 
-    static const std::vector<std::string> name_list;
+    static std::vector<std::string> const name_list;
 
-    int val;
+    unsigned int val;
     std::string name;
 };
 
-const std::vector<std::string> user_defined_type::name_list{
+std::vector<std::string> const user_defined_type::name_list{
     "ABB", "ABC", "ACB", "BASE", "CAA", "CAAA", "CAAB"};
 
 struct random_fill
 {
-    random_fill(int rand_base, int half_range /* >= 0 */)
+    random_fill(std::size_t rand_base, std::size_t half_range /* >= 0 */)
       : gen(_gen())
-      , dist(rand_base - half_range, rand_base + half_range)
+      , dist(static_cast<int>(rand_base - half_range),
+            static_cast<int>(rand_base + half_range))
     {
     }
 
@@ -347,8 +349,8 @@ void test_partition_bad_alloc_async(ExPolicy policy, IteratorTag)
 template <typename IteratorTag, typename DataType, typename Pred>
 void test_partition(IteratorTag, DataType, Pred pred, int rand_base)
 {
-    const std::size_t size = 30007;
-    const int half_range = size / 10;
+    std::size_t const size = 30007;
+    int const half_range = size / 10;
 
     test_partition(IteratorTag(), DataType(), pred, size,
         random_fill(rand_base, half_range));
@@ -359,8 +361,8 @@ template <typename ExPolicy, typename IteratorTag, typename DataType,
 void test_partition(
     ExPolicy policy, IteratorTag, DataType, Pred pred, int rand_base)
 {
-    const std::size_t size = 30007;
-    const int half_range = size / 10;
+    std::size_t const size = 30007;
+    int const half_range = size / 10;
 
     test_partition(policy, IteratorTag(), DataType(), pred, size,
         random_fill(rand_base, half_range));
@@ -371,8 +373,8 @@ template <typename ExPolicy, typename IteratorTag, typename DataType,
 void test_partition_async(
     ExPolicy policy, IteratorTag, DataType, Pred pred, int rand_base)
 {
-    const std::size_t size = 30007;
-    const int half_range = size / 10;
+    std::size_t const size = 30007;
+    int const half_range = size / 10;
 
     test_partition_async(policy, IteratorTag(), DataType(), pred, size,
         random_fill(rand_base, half_range));
@@ -410,21 +412,25 @@ void test_partition()
 {
     using namespace hpx::execution;
 
-    int rand_base = _gen();
+    unsigned int rand_base = _gen();
 
     ////////// Test cases for 'int' type.
     test_partition(
         IteratorTag(), int(),
-        [rand_base](const int n) -> bool { return n < rand_base; }, rand_base);
+        [rand_base](unsigned int const n) -> bool { return n < rand_base; },
+        rand_base);
     test_partition(
         seq, IteratorTag(), int(),
-        [rand_base](const int n) -> bool { return n < rand_base; }, rand_base);
+        [rand_base](unsigned int const n) -> bool { return n < rand_base; },
+        rand_base);
     test_partition(
         par, IteratorTag(), int(),
-        [rand_base](const int n) -> bool { return n <= rand_base; }, rand_base);
+        [rand_base](unsigned int const n) -> bool { return n <= rand_base; },
+        rand_base);
     test_partition(
         par_unseq, IteratorTag(), int(),
-        [rand_base](const int n) -> bool { return n > rand_base; }, rand_base);
+        [rand_base](unsigned int const n) -> bool { return n > rand_base; },
+        rand_base);
 
     ////////// Test cases for user defined type.
     test_partition(
@@ -451,10 +457,12 @@ void test_partition()
     ////////// Asynchronous test cases for 'int' type.
     test_partition_async(
         seq(task), IteratorTag(), int(),
-        [rand_base](const int n) -> bool { return n >= rand_base; }, rand_base);
+        [rand_base](unsigned int const n) -> bool { return n >= rand_base; },
+        rand_base);
     test_partition_async(
         par(task), IteratorTag(), int(),
-        [rand_base](const int n) -> bool { return n < rand_base; }, rand_base);
+        [rand_base](unsigned int const n) -> bool { return n < rand_base; },
+        rand_base);
 
     ////////// Asynchronous test cases for user defined type.
     test_partition_async(
@@ -470,8 +478,8 @@ void test_partition()
 
     ////////// Corner test cases.
     test_partition(
-        par, IteratorTag(), int(), [](const int) -> bool { return true; },
-        rand_base);
+        par, IteratorTag(), int(),
+        [](unsigned int const) -> bool { return true; }, rand_base);
     test_partition(
         par_unseq, IteratorTag(), user_defined_type(),
         [](user_defined_type const&) -> bool { return false; }, rand_base);
@@ -480,7 +488,8 @@ void test_partition()
 #if !defined(HPX_DEBUG) && !defined(HPX_HAVE_SANITIZERS)
     test_partition_heavy(
         par, IteratorTag(), int(),
-        [rand_base](const int n) -> bool { return n < rand_base; }, rand_base);
+        [rand_base](unsigned int const n) -> bool { return n < rand_base; },
+        rand_base);
 #endif
 }
 

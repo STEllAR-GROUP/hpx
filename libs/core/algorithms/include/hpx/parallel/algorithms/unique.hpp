@@ -298,11 +298,12 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/projected.hpp>
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/execution/algorithms/detail/predicates.hpp>
-#include <hpx/executors/execution_policy.hpp>
-#include <hpx/functional/invoke.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/executors.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/detail/advance_and_get_distance.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
@@ -313,12 +314,6 @@ namespace hpx {
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/scan_partitioner.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
-#include <hpx/type_support/identity.hpp>
-#include <hpx/type_support/unused.hpp>
-
-#if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
-#include <boost/shared_array.hpp>
-#endif
 
 #include <algorithm>
 #include <cstddef>
@@ -336,7 +331,8 @@ namespace hpx::parallel {
         /// \cond NOINTERNAL
 
         // sequential unique with projection function
-        template <typename FwdIter, typename Sent, typename Pred, typename Proj>
+        HPX_CXX_CORE_EXPORT template <typename FwdIter, typename Sent,
+            typename Pred, typename Proj>
         constexpr FwdIter sequential_unique(
             FwdIter first, Sent last, Pred&& pred, Proj&& proj)
         {
@@ -363,7 +359,7 @@ namespace hpx::parallel {
             return ++result;
         }
 
-        template <typename Iter>
+        HPX_CXX_CORE_EXPORT template <typename Iter>
         struct unique : public algorithm<unique<Iter>, Iter>
         {
             constexpr unique() noexcept
@@ -404,11 +400,8 @@ namespace hpx::parallel {
                     }
                 }
 
-#if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
                 std::shared_ptr<bool[]> flags(new bool[count]);
-#else
-                boost::shared_array<bool> flags(new bool[count]);
-#endif
+
                 flags[0] = false;
 
                 using hpx::get;
@@ -429,6 +422,7 @@ namespace hpx::parallel {
                             bool r = hpx::invoke(pred, hpx::invoke(proj, *base),
                                 hpx::invoke(proj, get<0>(*it)));
 
+                            // NOLINTNEXTLINE(bugprone-assignment-in-if-condition)
                             if (!((get<1>(*it) = r)))
                                 base = get<0>(it.get_iterator_tuple());
                         });
@@ -492,8 +486,8 @@ namespace hpx::parallel {
         /// \cond NOINTERNAL
 
         // sequential unique_copy with projection function
-        template <typename FwdIter, typename Sent, typename OutIter,
-            typename Pred, typename Proj>
+        HPX_CXX_CORE_EXPORT template <typename FwdIter, typename Sent,
+            typename OutIter, typename Pred, typename Proj>
         constexpr unique_copy_result<FwdIter, OutIter> sequential_unique_copy(
             FwdIter first, Sent last, OutIter dest, Pred&& pred, Proj&& proj,
             std::true_type)
@@ -525,8 +519,8 @@ namespace hpx::parallel {
         }
 
         // sequential unique_copy with projection function
-        template <typename InIter, typename Sent, typename OutIter,
-            typename Pred, typename Proj>
+        HPX_CXX_CORE_EXPORT template <typename InIter, typename Sent,
+            typename OutIter, typename Pred, typename Proj>
         constexpr unique_copy_result<InIter, OutIter> sequential_unique_copy(
             InIter first, Sent last, OutIter dest, Pred&& pred, Proj&& proj,
             std::false_type)
@@ -555,7 +549,7 @@ namespace hpx::parallel {
                 HPX_MOVE(first), HPX_MOVE(dest)};
         }
 
-        template <typename IterPair>
+        HPX_CXX_CORE_EXPORT template <typename IterPair>
         struct unique_copy : public algorithm<unique_copy<IterPair>, IterPair>
         {
             constexpr unique_copy() noexcept
@@ -569,9 +563,10 @@ namespace hpx::parallel {
                 ExPolicy, InIter first, Sent last, OutIter dest, Pred&& pred,
                 Proj&& proj)
             {
+                using type = std::bool_constant<std::forward_iterator<InIter>>;
+
                 return sequential_unique_copy(first, last, dest,
-                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj),
-                    hpx::traits::is_forward_iterator<InIter>());
+                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj), type());
             }
 
             template <typename ExPolicy, typename FwdIter1, typename Sent,
@@ -607,11 +602,8 @@ namespace hpx::parallel {
                         HPX_MOVE(++first), HPX_MOVE(dest)});
                 }
 
-#if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
                 std::shared_ptr<bool[]> flags(new bool[count - 1]);
-#else
-                boost::shared_array<bool> flags(new bool[count - 1]);
-#endif
+
                 std::size_t init = 0;
 
                 using hpx::get;
@@ -631,6 +623,7 @@ namespace hpx::parallel {
                             bool r = HPX_INVOKE(pred, HPX_INVOKE(proj, *base),
                                 HPX_INVOKE(proj, get<0>(*it)));
 
+                            // NOLINTNEXTLINE(bugprone-assignment-in-if-condition)
                             if (!((get<1>(*it) = r)))
                             {
                                 base = get<0>(it.get_iterator_tuple());
@@ -691,24 +684,24 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::unique
-    inline constexpr struct unique_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct unique_t final
       : hpx::detail::tag_parallel_algorithm<unique_t>
     {
-        // clang-format off
         template <typename FwdIter,
-            typename Pred = hpx::parallel::detail::equal_to,
-            HPX_CONCEPT_REQUIRES_(
+            typename Pred = hpx::parallel::detail::equal_to>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::is_invocable_v<Pred,
                     hpx::traits::iter_value_t<FwdIter>,
                     hpx::traits::iter_value_t<FwdIter>
                 >
-            )>
+            )
         // clang-format on
         friend FwdIter tag_fallback_invoke(
             hpx::unique_t, FwdIter first, FwdIter last, Pred pred = Pred())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::unique<FwdIter>().call(
@@ -716,22 +709,22 @@ namespace hpx {
                 hpx::identity_v);
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter,
-            typename Pred = hpx::parallel::detail::equal_to,
-            HPX_CONCEPT_REQUIRES_(
+            typename Pred = hpx::parallel::detail::equal_to>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::is_invocable_v<Pred,
                     hpx::traits::iter_value_t<FwdIter>,
                     hpx::traits::iter_value_t<FwdIter>
                 >
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::unique_t,
             ExPolicy&& policy, FwdIter first, FwdIter last, Pred pred = Pred())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::unique<FwdIter>().call(
@@ -742,25 +735,25 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::unique_copy
-    inline constexpr struct unique_copy_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct unique_copy_t final
       : hpx::detail::tag_parallel_algorithm<unique_copy_t>
     {
-        // clang-format off
         template <typename InIter, typename OutIter,
-            typename Pred = hpx::parallel::detail::equal_to,
-            HPX_CONCEPT_REQUIRES_(
+            typename Pred = hpx::parallel::detail::equal_to>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::traits::is_iterator_v<OutIter> &&
                 hpx::is_invocable_v<Pred,
                     hpx::traits::iter_value_t<InIter>,
                     hpx::traits::iter_value_t<OutIter>
                 >
-            )>
+            )
         // clang-format on
         friend OutIter tag_fallback_invoke(hpx::unique_copy_t, InIter first,
             InIter last, OutIter dest, Pred pred = Pred())
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Requires at least input iterator.");
 
             using result_type = parallel::util::in_out_result<InIter, OutIter>;
@@ -771,10 +764,10 @@ namespace hpx {
                     hpx::identity_v));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename Pred = hpx::parallel::detail::equal_to,
-            HPX_CONCEPT_REQUIRES_(
+            typename Pred = hpx::parallel::detail::equal_to>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
@@ -782,14 +775,14 @@ namespace hpx {
                     hpx::traits::iter_value_t<FwdIter1>,
                     hpx::traits::iter_value_t<FwdIter2>
                 >
-            )>
+            )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
         tag_fallback_invoke(hpx::unique_copy_t, ExPolicy&& policy,
             FwdIter1 first, FwdIter1 last, FwdIter2 dest, Pred pred = Pred())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");
 
             using result_type =

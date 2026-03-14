@@ -23,7 +23,7 @@
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-int seed = std::random_device{}();
+unsigned int seed = std::random_device{}();
 std::mt19937 gen(seed);
 
 struct set_42

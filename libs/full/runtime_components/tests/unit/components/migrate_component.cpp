@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2023 Hartmut Kaiser
+//  Copyright (c) 2014-2025 Hartmut Kaiser
 //  Copyright (c)      2016 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -149,7 +149,7 @@ struct test_server
     }
 
     test_server(test_server&& rhs) noexcept
-      : base_type(std::move(rhs))
+      : base_type(static_cast<base_type&&>(rhs))
       , data_(rhs.data_)
     {
         rhs.data_ = 0;
@@ -162,6 +162,7 @@ struct test_server
     }
     test_server& operator=(test_server&& rhs) noexcept
     {
+        base_type::operator=(static_cast<base_type&&>(rhs));
         data_ = rhs.data_;
         rhs.data_ = 0;
         return *this;

@@ -4,12 +4,13 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/iterator_support/iterator_facade.hpp>
 #include <hpx/iterator_support/tests/iterator_tests.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <cstdint>
 #include <iterator>
+#include <type_traits>
 
 // Try to instantiate iterator_facade with a custom iterator_tag
 struct test_iterator_tag : std::random_access_iterator_tag
@@ -54,6 +55,7 @@ public:
     }
 
     std::int64_t val = 42;
+    using use_brackets_proxy = std::true_type;
 };
 
 int main()

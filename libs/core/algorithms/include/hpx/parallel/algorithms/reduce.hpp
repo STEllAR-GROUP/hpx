@@ -356,10 +356,10 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/executors/execution_policy.hpp>
-#include <hpx/iterator_support/range.hpp>
-#include <hpx/pack_traversal/unwrap.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/executors.hpp>
+#include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/pack_traversal.hpp>
 #include <hpx/parallel/algorithms/detail/accumulate.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
@@ -382,7 +382,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         struct reduce : public algorithm<reduce<T>, T>
         {
             constexpr reduce() noexcept
@@ -443,22 +443,22 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::reduce
-    inline constexpr struct reduce_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct reduce_t final
       : hpx::detail::tag_parallel_algorithm<reduce_t>
     {
     private:
-        // clang-format off
         template <typename ExPolicy, typename FwdIter, typename F,
-            typename T = typename std::iterator_traits<FwdIter>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+            typename T = typename std::iterator_traits<FwdIter>::value_type>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend auto tag_fallback_invoke(hpx::reduce_t, ExPolicy&& policy,
             FwdIter first, FwdIter last, T init, F f)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::reduce<T>().call(
@@ -466,18 +466,18 @@ namespace hpx {
                 HPX_MOVE(f));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter,
-            typename T = typename std::iterator_traits<FwdIter>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+            typename T = typename std::iterator_traits<FwdIter>::value_type>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend auto tag_fallback_invoke(hpx::reduce_t, ExPolicy&& policy,
             FwdIter first, FwdIter last, T init)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::reduce<T>().call(
@@ -485,17 +485,17 @@ namespace hpx {
                 std::plus<>{});
         }
 
+        template <typename ExPolicy, typename FwdIter>
         // clang-format off
-        template <typename ExPolicy, typename FwdIter,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend auto tag_fallback_invoke(
             hpx::reduce_t, ExPolicy&& policy, FwdIter first, FwdIter last)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             using value_type =
@@ -506,50 +506,50 @@ namespace hpx {
                 std::plus<>{});
         }
 
-        // clang-format off
         template <typename InIter, typename F,
-            typename T = typename std::iterator_traits<InIter>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+            typename T = typename std::iterator_traits<InIter>::value_type>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<InIter>
-            )>
+            )
         // clang-format on
         friend T tag_fallback_invoke(
             hpx::reduce_t, InIter first, InIter last, T init, F f)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Requires at least input iterator.");
 
             return hpx::parallel::detail::reduce<T>().call(
                 hpx::execution::seq, first, last, HPX_MOVE(init), HPX_MOVE(f));
         }
 
-        // clang-format off
         template <typename InIter,
-            typename T = typename std::iterator_traits<InIter>::value_type,
-            HPX_CONCEPT_REQUIRES_(
+            typename T = typename std::iterator_traits<InIter>::value_type>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<InIter>
-            )>
+            )
         // clang-format on
         friend T tag_fallback_invoke(
             hpx::reduce_t, InIter first, InIter last, T init)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Requires at least input iterator.");
 
             return hpx::parallel::detail::reduce<T>().call(hpx::execution::seq,
                 first, last, HPX_MOVE(init), std::plus<>{});
         }
 
+        template <typename InIter>
         // clang-format off
-        template <typename InIter,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<InIter>
-            )>
+            )
         // clang-format on
         friend typename std::iterator_traits<InIter>::value_type
         tag_fallback_invoke(hpx::reduce_t, InIter first, InIter last)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Requires at least input iterator.");
 
             using value_type =

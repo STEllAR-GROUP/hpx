@@ -20,9 +20,9 @@
 using allocator_type = hpx::compute::host::block_allocator<double>;
 using data_type = hpx::compute::vector<double, allocator_type>;
 
-const double k = 0.5;    // heat transfer coefficient
-const double dt = 1.;    // time step
-const double dx = 1.;    // grid spacing
+double const k = 0.5;    // heat transfer coefficient
+double const dt = 1.;    // time step
+double const dx = 1.;    // grid spacing
 
 template <typename Container>
 void init(std::array<Container, 2>& U, std::size_t Nx, std::size_t rank = 0,
@@ -41,8 +41,8 @@ void init(std::array<Container, 2>& U, std::size_t Nx, std::size_t rank = 0,
     }
 }
 
-void stencil_update(std::array<data_type, 2>& U, const std::size_t& begin,
-    const std::size_t& end, const std::size_t t)
+void stencil_update(std::array<data_type, 2>& U, std::size_t const& begin,
+    std::size_t const& end, std::size_t const t)
 {
     data_type& curr = U[t % 2];
     data_type& next = U[(t + 1) % 2];

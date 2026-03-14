@@ -47,6 +47,9 @@ namespace hpx::collectives::detail {
         // replace reference to our own client (manages base-name registration)
         clients_[this_site] = HPX_MOVE(here);
     }
+
+    channel_communicator::~channel_communicator() = default;
+
 }    // namespace hpx::collectives::detail
 
 #endif    // !HPX_COMPUTE_DEVICE_CODE

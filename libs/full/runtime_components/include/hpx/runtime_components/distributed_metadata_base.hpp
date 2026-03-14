@@ -14,9 +14,7 @@
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
 #include <hpx/components_base/server/component.hpp>
 #include <hpx/components_base/server/component_base.hpp>
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/preprocessor/expand.hpp>
-#include <hpx/preprocessor/nargs.hpp>
+#include <hpx/modules/preprocessor.hpp>
 
 #include <type_traits>
 

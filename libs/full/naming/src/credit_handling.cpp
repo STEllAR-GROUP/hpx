@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -7,30 +7,29 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/detail/agas_interface_functions.hpp>
-#include <hpx/lcos_local/detail/preprocess_future.hpp>
-#include <hpx/memory/serialization/intrusive_ptr.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/checkpoint_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/futures.hpp>
+#include <hpx/modules/lcos_local.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/memory.hpp>
+#include <hpx/modules/naming_base.hpp>
+#include <hpx/modules/runtime_local.hpp>
+#include <hpx/modules/serialization.hpp>
+#include <hpx/modules/thread_support.hpp>
 #include <hpx/naming/credit_handling.hpp>
 #include <hpx/naming/detail/preprocess_gid_types.hpp>
 #include <hpx/naming/split_gid.hpp>
-#include <hpx/naming_base/address.hpp>
-#include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime_local/runtime_local_fwd.hpp>
-#include <hpx/serialization/serialization_fwd.hpp>
-#include <hpx/serialization/traits/is_bitwise_serializable.hpp>
-#include <hpx/thread_support/unlock_guard.hpp>
 
 #include <cstdint>
 #include <mutex>
 #include <utility>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -228,7 +227,7 @@ namespace hpx::naming {
             HPX_ASSERT(overflow_credit >= 0);
 
             new_credit =
-                (std::min)(static_cast<std::int64_t>(HPX_GLOBALCREDIT_INITIAL),
+                (std::min) (static_cast<std::int64_t>(HPX_GLOBALCREDIT_INITIAL),
                     new_credit);
             naming::detail::set_credit_for_gid(gid, new_credit);
 
@@ -372,10 +371,12 @@ namespace hpx::naming {
 
             gid_type newid = id;    // strips lock-bit
 
-            set_log2credit_for_gid(id, log2credits - 1);
+            set_log2credit_for_gid(
+                id, static_cast<std::int16_t>(log2credits - 1));
             set_credit_split_mask_for_gid(id);
 
-            set_log2credit_for_gid(newid, log2credits - 1);
+            set_log2credit_for_gid(
+                newid, static_cast<std::int16_t>(log2credits - 1));
             set_credit_split_mask_for_gid(newid);
 
             return newid;

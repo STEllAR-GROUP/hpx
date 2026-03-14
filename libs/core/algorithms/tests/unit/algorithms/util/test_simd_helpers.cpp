@@ -4,8 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/parallel/unseq/simd_helpers.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -13,7 +13,7 @@
 #include <utility>
 #include <vector>
 
-int seed = std::random_device{}();
+unsigned int seed = std::random_device{}();
 std::mt19937 gen(seed);
 
 using hpx::parallel::util::unseq_first_n, hpx::parallel::util::unseq2_first_n;

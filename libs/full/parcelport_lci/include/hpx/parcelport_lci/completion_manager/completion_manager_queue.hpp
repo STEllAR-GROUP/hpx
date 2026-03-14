@@ -17,39 +17,41 @@
 namespace hpx::parcelset::policies::lci {
     struct completion_manager_queue : public completion_manager_base
     {
-        completion_manager_queue(parcelport* pp)
+        completion_manager_queue(parcelport* pp, bool zero_copy_am_ = false)
           : completion_manager_base(pp)
         {
-            // LCI_queue_create(LCI_UR_DEVICE, &queue);
-            // Hack for now
-            LCI_queue_createx(LCI_UR_DEVICE,
-                LCI_SERVER_NUM_PKTS * (size_t) config_t::ndevices, &queue);
+            queue = ::lci::alloc_cq_x().zero_copy_am(zero_copy_am_)();
         }
 
         ~completion_manager_queue()
         {
-            LCI_queue_free(&queue);
+            ::lci::free_comp(&queue);
         }
 
-        LCI_comp_t alloc_completion()
+        ::lci::comp_t alloc_completion()
         {
             return queue;
         }
 
-        void enqueue_completion(LCI_comp_t comp)
+        void free_completion(::lci::comp_t comp)
         {
             HPX_UNUSED(comp);
         }
 
-        LCI_request_t poll();
+        void enqueue_completion(::lci::comp_t comp)
+        {
+            HPX_UNUSED(comp);
+        }
 
-        LCI_comp_t get_completion_object()
+        ::lci::status_t poll();
+
+        ::lci::comp_t get_completion_object()
         {
             return queue;
         }
 
     private:
-        LCI_comp_t queue;
+        ::lci::comp_t queue;
     };
 }    // namespace hpx::parcelset::policies::lci
 

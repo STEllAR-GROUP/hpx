@@ -23,11 +23,7 @@
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/modules/iterator_support.hpp>
 
-#if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
-#include <boost/shared_array.hpp>
-#else
 #include <memory>
-#endif
 
 #include <algorithm>
 #include <cstddef>
@@ -140,12 +136,12 @@ public:
       : data_(new double[size])
       , size_(size)
     {
-        double base_value = double(initial_value * size);
-        for (std::size_t i = 0; i != size; ++i)
+        double base_value = initial_value * double(size);
+        for (std::ptrdiff_t i = 0; i != static_cast<std::ptrdiff_t>(size); ++i)
             data_[i] = base_value + double(i);
     }
 
-    partition_data(std::size_t size, const double* other)
+    partition_data(std::size_t size, double const* other)
       : data_(new double[size])
       , size_(size)
     {
@@ -163,11 +159,11 @@ public:
 
     double& operator[](std::size_t idx)
     {
-        return data_[idx];
+        return data_[static_cast<std::ptrdiff_t>(idx)];
     }
     double operator[](std::size_t idx) const
     {
-        return data_[idx];
+        return data_[static_cast<std::ptrdiff_t>(idx)];
     }
 
     void copy_into_array(double* a) const
@@ -242,13 +238,8 @@ struct stepper
 
     // do all the work on 'np' partitions, 'nx' data points each, for 'nt'
     // time steps
-#if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
     hpx::future<space> do_work(std::size_t np, std::size_t nx, std::size_t nt,
         std::shared_ptr<double[]> data)
-#else
-    hpx::future<space> do_work(std::size_t np, std::size_t nx, std::size_t nt,
-        boost::shared_array<double> data)
-#endif
     {
         using hpx::dataflow;
         using hpx::unwrapping;
@@ -358,7 +349,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     // Set up APEX tuning
     // The tunable parameter -- how many partitions to divide data into
     long np_index = 1;
-    long* tune_params[1] = {0L};
+    long* tune_params[1] = {nullptr};
     long num_params = 1;
     long mins[1] = {0};
     long maxs[1] = {(long) divisors.size()};
@@ -370,11 +361,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     // Create the stepper object
     stepper step;
 
-#if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
     std::shared_ptr<double[]> data;
-#else
-    boost::shared_array<double> data;
-#endif
     for (std::uint64_t i = 0; i < nr; ++i)
     {
         std::uint64_t parts = divisors[np_index];

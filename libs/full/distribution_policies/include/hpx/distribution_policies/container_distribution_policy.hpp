@@ -12,9 +12,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/distribution_policies/default_distribution_policy.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/shared_ptr.hpp>
-#include <hpx/serialization/vector.hpp>
+#include <hpx/modules/serialization.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -86,7 +84,7 @@ namespace hpx {
                     (num_partitions_ == static_cast<std::size_t>(-1)) ?
                     localities_->size() :
                     num_partitions_;
-                return (std::max)(num_parts, static_cast<std::size_t>(1));
+                return (std::max) (num_parts, static_cast<std::size_t>(1));
             }
             return static_cast<std::size_t>(1);
         }
@@ -108,7 +106,7 @@ namespace hpx {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& ar, const unsigned int /* version */)
+        void serialize(Archive& ar, unsigned int const /* version */)
         {
             // clang-format off
             ar & localities_ & num_partitions_;

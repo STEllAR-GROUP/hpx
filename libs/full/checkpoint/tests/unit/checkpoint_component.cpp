@@ -14,8 +14,8 @@
 #include <hpx/include/components.hpp>
 #include <hpx/include/runtime.hpp>
 #include <hpx/modules/checkpoint.hpp>
+#include <hpx/modules/serialization.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/serialization/shared_ptr.hpp>
 
 #include <iostream>
 #include <memory>
@@ -63,7 +63,7 @@ struct data_server : hpx::components::component_base<data_server>
     // Serialization Definition
     friend class hpx::serialization::access;
     template <typename Archive>
-    void serialize(Archive& arch, const unsigned int /* version */)
+    void serialize(Archive& arch, unsigned int const /* version */)
     {
         // clang-format off
         arch & data_;

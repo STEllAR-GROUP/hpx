@@ -8,8 +8,8 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
+#include <hpx/modules/pack_traversal.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/pack_traversal/traits/pack_traversal_rebind_container.hpp>
 
 #include <cstddef>
 #include <numeric>
@@ -47,7 +47,7 @@ int hpx_main()
         values_futures.emplace_back(hpx::make_ready_future(i));
     }
 
-    auto f = hpx::dataflow(hpx::unwrapping([](const auto&& values) {
+    auto f = hpx::dataflow(hpx::unwrapping([](auto const&& values) {
         return std::accumulate(values.begin(), values.end(), 0);
     }),
         values_futures);

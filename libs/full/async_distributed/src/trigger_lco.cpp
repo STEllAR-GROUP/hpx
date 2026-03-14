@@ -9,14 +9,15 @@
 #include <hpx/async_distributed/post.hpp>
 #include <hpx/async_distributed/trigger_lco.hpp>
 
-#include <hpx/naming_base/address.hpp>
-#include <hpx/naming_base/id_type.hpp>
+#include <hpx/modules/naming_base.hpp>
 #if defined(HPX_MSVC) && !defined(HPX_DEBUG)
 #include <hpx/async_distributed/base_lco_with_value.hpp>
 #endif
 
 #include <exception>
 #include <utility>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx {
 

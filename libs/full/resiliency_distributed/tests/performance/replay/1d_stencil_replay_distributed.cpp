@@ -75,7 +75,8 @@ public:
         for (std::size_t k = 0; k != subdomain_width + 1; ++k)
         {
             data_[k] = std::sin(2 * pi *
-                ((0.0 + subdomain_width * subdomain_index + k) /
+                ((0.0 + static_cast<double>(subdomain_width) * subdomain_index +
+                     static_cast<double>(k)) /
                     static_cast<double>(subdomain_width * subdomains)));
             checksum_ += data_[k];
         }
@@ -140,11 +141,11 @@ public:
         return std::abs(checksum_ - test_value_);
     }
 
-    friend std::vector<double>::const_iterator begin(const partition_data& v)
+    friend std::vector<double>::const_iterator begin(partition_data const& v)
     {
         return begin(v.data_);
     }
-    friend std::vector<double>::const_iterator end(const partition_data& v)
+    friend std::vector<double>::const_iterator end(partition_data const& v)
     {
         return end(v.data_);
     }
@@ -166,7 +167,7 @@ private:
     friend class hpx::serialization::access;
 
     template <typename Archive>
-    void serialize(Archive& ar, const unsigned int)
+    void serialize(Archive& ar, unsigned int const)
     {
         // clang-format off
         ar & data_;
@@ -204,16 +205,19 @@ partition_data stencil_update(std::size_t sti, partition_data const& center,
     partition_data const& left, partition_data const& right, std::size_t error,
     bool is_faulty_node)
 {
-    const std::size_t size = center.size() - 1;
+    std::size_t const size = center.size() - 1;
     partition_data workspace(size + 2 * sti + 1);
 
-    std::copy(end(left) - sti - 1, end(left) - 1, &workspace[0]);
+    std::copy(end(left) - static_cast<std::ptrdiff_t>(sti) - 1, end(left) - 1,
+        &workspace[0]);
     std::copy(begin(center), end(center) - 1, &workspace[sti]);
-    std::copy(begin(right), begin(right) + sti + 1, &workspace[size + sti]);
+    std::copy(begin(right), begin(right) + static_cast<std::ptrdiff_t>(sti) + 1,
+        &workspace[size + sti]);
 
-    double left_checksum = std::accumulate(end(left) - sti - 1, end(left), 0.0);
-    double right_checksum =
-        std::accumulate(begin(right), begin(right) + sti + 1, 0.0);
+    double left_checksum = std::accumulate(
+        end(left) - static_cast<std::ptrdiff_t>(sti) - 1, end(left), 0.0);
+    double right_checksum = std::accumulate(
+        begin(right), begin(right) + static_cast<std::ptrdiff_t>(sti) + 1, 0.0);
 
     double checksum = left_checksum - center[0] + center.checksum() - right[0] +
         right_checksum;

@@ -8,17 +8,17 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/concurrency/cache_line_data.hpp>
+#include <hpx/modules/allocator_support.hpp>
+#include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
+#include <hpx/schedulers/macros.hpp>
 #include <hpx/schedulers/queue_holder_thread.hpp>
-#include <hpx/threading_base/thread_data.hpp>
-#include <hpx/threading_base/thread_queue_init_parameters.hpp>
 
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
-#include <hpx/timing/tick_counter.hpp>
+#include <hpx/modules/timing.hpp>
 #endif
 
 #include <atomic>
@@ -32,27 +32,20 @@
 #include <string>
 #include <utility>
 
-#if !defined(THREAD_QUEUE_MC_DEBUG)
-#if defined(HPX_DEBUG)
-#define THREAD_QUEUE_MC_DEBUG false
-#else
-#define THREAD_QUEUE_MC_DEBUG false
-#endif
-#endif
-
 //#define DEBUG_QUEUE_EXTRA 1
 
 namespace hpx {
 
-    inline constexpr hpx::debug::enable_print<THREAD_QUEUE_MC_DEBUG> tqmc_deb(
-        "_TQ_MC_");
-}
+    HPX_CXX_CORE_EXPORT inline constexpr hpx::debug::enable_print<
+        THREAD_QUEUE_MC_DEBUG>
+        tqmc_deb("_TQ_MC_");
+}    // namespace hpx
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::threads::policies {
 
-    template <typename Mutex, typename PendingQueuing, typename StagedQueuing,
-        typename TerminatedQueuing>
+    HPX_CXX_CORE_EXPORT template <typename Mutex, typename PendingQueuing,
+        typename StagedQueuing, typename TerminatedQueuing>
     class thread_queue_mc
     {
     public:

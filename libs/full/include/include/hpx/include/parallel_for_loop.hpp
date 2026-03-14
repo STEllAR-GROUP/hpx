@@ -6,4 +6,4 @@
 
 #pragma once
 
-#include <hpx/parallel/algorithms/for_loop.hpp>
+#include <hpx/modules/algorithms.hpp>

@@ -15,7 +15,7 @@
 
 #if defined(HPX_WINDOWS)
 #include <hpx/components/process/util/windows/initializers/initializer_base.hpp>
-#include <hpx/serialization/serialization_fwd.hpp>
+#include <hpx/modules/serialization.hpp>
 
 #include <utility>
 
@@ -46,7 +46,7 @@ namespace hpx { namespace components { namespace process { namespace windows {
             template <typename Archive>
             void serialize(Archive& ar, unsigned const)
             {
-                ar& handler_;
+                ar & handler_;
             }
 
             Handler handler_;

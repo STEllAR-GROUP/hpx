@@ -1,22 +1,19 @@
-//  Copyright (c) 2015-2024 Hartmut Kaiser
+//  Copyright (c) 2015-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/futures/detail/future_data.hpp>
-#include <hpx/futures/future.hpp>
-
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
-#include <hpx/errors/try_catch_exception_ptr.hpp>
-#include <hpx/execution_base/this_thread.hpp>
-#include <hpx/functional/deferred_call.hpp>
-#include <hpx/functional/move_only_function.hpp>
 #include <hpx/futures/detail/execute_thread.hpp>
+#include <hpx/futures/detail/future_data.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/futures/futures_factory.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/memory.hpp>
 

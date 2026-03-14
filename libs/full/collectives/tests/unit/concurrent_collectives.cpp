@@ -1,4 +1,4 @@
-//  Copyright (c) 2019-2024 Hartmut Kaiser
+//  Copyright (c) 2019-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -818,7 +818,9 @@ int hpx_main(hpx::program_options::variables_map& vm)
     if (here == 0)
     {
         distributed.init(gen, ITERATIONS);
-        local.init(gen, 10 * ITERATIONS);
+        local.init(gen,
+            static_cast<std::size_t>(10) *
+                static_cast<std::size_t>(ITERATIONS));
     }
     else
     {
@@ -857,6 +859,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
         if (here == 0)
         {
+            // NOLINTBEGIN(bugprone-narrowing-conversions)
             std::cout << "remote all_gather timing:     "
                       << f1.get() / distributed.get_iterations("all_gather")
                       << " [s]\n";
@@ -884,6 +887,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
             std::cout << "remote scatter timing:        "
                       << f9.get() / distributed.get_iterations("scatter")
                       << " [s]\n";
+            // NOLINTEND(bugprone-narrowing-conversions)
         }
     }
 #endif
@@ -912,6 +916,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
         hpx::wait_all(f1, f2, f3, f4, f5, f6, f7, f8, f9);
 
+        // NOLINTBEGIN(bugprone-narrowing-conversions)
         std::cout << "local all_gather timing:     "
                   << f1.get() / local.get_iterations("all_gather") << " [s]\n";
         std::cout << "local all_reduce timing:     "
@@ -932,6 +937,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
                   << f8.get() / local.get_iterations("reduce") << " [s]\n";
         std::cout << "local scatter timing:        "
                   << f9.get() / local.get_iterations("scatter") << " [s]\n";
+        // NOLINTEND(bugprone-narrowing-conversions)
     }
 
     return hpx::finalize();

@@ -7,14 +7,14 @@
 #pragma once
 
 #include <hpx/program_options/config.hpp>
-#include <hpx/iterator_support/iterator_facade.hpp>
+#include <hpx/modules/iterator_support.hpp>
 
 #include <iterator>
 
-namespace hpx { namespace program_options {
+namespace hpx::program_options {
 
     /** The 'eof_iterator' class is useful for constructing forward iterators
-        in cases where iterator extract data from some source and it's easy
+        in cases where iterator extract data from some source, and it's easy
         to detect 'eof' \-- i.e. the situation where there's no data. One
         apparent example is reading lines from a file.
 
@@ -44,12 +44,13 @@ namespace hpx { namespace program_options {
         and 'dereference'. It's very good for the cases where data extraction
         implicitly moves data pointer, like for stream operation.
     */
-    template <class Derived, class ValueType>
+    HPX_CXX_CORE_EXPORT template <class Derived, class ValueType>
     class eof_iterator
       : public util::iterator_facade<Derived, ValueType const,
             std::forward_iterator_tag>
     {
     public:
+        // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
         eof_iterator() = default;
 
     protected:    // interface for derived
@@ -88,4 +89,4 @@ namespace hpx { namespace program_options {
         bool m_at_eof = false;
         ValueType m_value;
     };
-}}    // namespace hpx::program_options
+}    // namespace hpx::program_options

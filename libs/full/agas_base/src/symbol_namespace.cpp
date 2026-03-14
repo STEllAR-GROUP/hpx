@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
 //  Copyright (c) 2016 Thomas Heller
-//  Copyright (c) 2012-2024 Hartmut Kaiser
+//  Copyright (c) 2012-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,9 +15,10 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/base_lco_with_value.hpp>
 #include <hpx/components_base/agas_interface.hpp>
-#include <hpx/hashing/jenkins_hash.hpp>
 #include <hpx/modules/async_distributed.hpp>
-#include <hpx/util/from_string.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/format.hpp>
+#include <hpx/modules/hashing.hpp>
 
 #include <cctype>
 #include <cstdint>

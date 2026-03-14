@@ -1,4 +1,4 @@
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,12 +20,9 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
+#include <hpx/serialization.hpp>
 
-#if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
-#include <boost/shared_array.hpp>
-#else
 #include <memory>
-#endif
 
 #include <cstddef>
 #include <cstdint>
@@ -58,11 +55,7 @@ inline std::size_t idx(std::size_t i, int dir, std::size_t size)
 struct partition_data
 {
 private:
-#if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
     typedef std::shared_ptr<double[]> buffer_type;
-#else
-    typedef boost::shared_array<double> buffer_type;
-#endif
 
 public:
     partition_data()
@@ -80,18 +73,18 @@ public:
       : data_(new double[size])
       , size_(size)
     {
-        double base_value = double(initial_value * size);
-        for (std::size_t i = 0; i != size; ++i)
+        double base_value = initial_value * double(size);
+        for (std::ptrdiff_t i = 0; i != static_cast<std::ptrdiff_t>(size); ++i)
             data_[i] = base_value + double(i);
     }
 
     double& operator[](std::size_t idx)
     {
-        return data_[idx];
+        return data_[static_cast<std::ptrdiff_t>(idx)];
     }
     double operator[](std::size_t idx) const
     {
-        return data_[idx];
+        return data_[static_cast<std::ptrdiff_t>(idx)];
     }
 
     std::size_t size() const
@@ -106,9 +99,21 @@ private:
     friend class hpx::serialization::access;
 
     template <typename Archive>
-    void serialize(Archive&, const unsigned int) const
+    void save(Archive& ar, unsigned int const) const
     {
+        ar & size_;
+        ar& hpx::serialization::make_array(data_.get(), size_);
     }
+
+    template <typename Archive>
+    void load(Archive& ar, unsigned int const)
+    {
+        ar & size_;
+        data_.reset(new double[size_]);
+        ar& hpx::serialization::make_array(data_.get(), size_);
+    }
+
+    HPX_SERIALIZATION_SPLIT_MEMBER()
 
 private:
     buffer_type data_;

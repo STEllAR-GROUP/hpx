@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2011 Thomas Heller
 //
@@ -26,27 +26,22 @@
 #include <hpx/actions_base/traits/action_stacksize.hpp>
 #include <hpx/actions_base/traits/action_trigger_continuation_fwd.hpp>
 #include <hpx/actions_base/traits/is_distribution_policy.hpp>
-#include <hpx/async_base/launch_policy.hpp>
-#include <hpx/async_base/sync.hpp>
-#include <hpx/async_local/sync_fwd.hpp>
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/traits/action_decorate_function.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/functional/invoke_fused.hpp>
-#include <hpx/functional/traits/is_action.hpp>
-#include <hpx/futures/traits/promise_local_result.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/async_local.hpp>
+#include <hpx/modules/coroutines.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/logging.hpp>
-#include <hpx/naming_base/address.hpp>
-#include <hpx/naming_base/id_type.hpp>
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/preprocessor/expand.hpp>
-#include <hpx/preprocessor/nargs.hpp>
-#include <hpx/runtime_local/report_error.hpp>
-#include <hpx/type_support/pack.hpp>
-#include <hpx/util/get_and_reset_value.hpp>
+#include <hpx/modules/naming_base.hpp>
+#include <hpx/modules/preprocessor.hpp>
+#include <hpx/modules/runtime_local.hpp>
+#include <hpx/modules/type_support.hpp>
+#include <hpx/modules/util.hpp>
 #if defined(HPX_HAVE_ITTNOTIFY) && HPX_HAVE_ITTNOTIFY != 0 &&                  \
     !defined(HPX_HAVE_APEX)
 #include <hpx/modules/itt_notify.hpp>
@@ -60,6 +55,8 @@
 #include <string_view>
 #include <type_traits>
 #include <utility>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx::actions {
 
@@ -113,6 +110,7 @@ namespace hpx::actions {
                     hpx::invoke_fused(action_invoke<Action>{lva_, comptype_},
                         HPX_MOVE(args_));
                 }
+                // NOLINTNEXTLINE(bugprone-empty-catch)
                 catch (hpx::thread_interrupted const&)
                 {    //-V565
                      /* swallow this exception */
@@ -483,6 +481,7 @@ namespace hpx::actions {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename TF, TF F, typename Derived = void>
+    // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
     struct direct_action
       : action<TF, F,
             detail::action_type_t<direct_action<TF, F, Derived>, Derived>>
@@ -531,6 +530,8 @@ namespace hpx::actions {
     /// \endcond
 }    // namespace hpx::actions
 // namespace hpx::actions
+
+#include <hpx/config/warnings_suffix.hpp>
 
 /// \cond NOINTERNAL
 

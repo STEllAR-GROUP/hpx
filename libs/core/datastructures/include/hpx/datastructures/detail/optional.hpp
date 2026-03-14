@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2023 Hartmut Kaiser
+//  Copyright (c) 2017-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/type_support/construct_at.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -22,16 +22,17 @@
 
 namespace hpx::optional_ns {
 
-    struct nullopt_t
+    HPX_CXX_CORE_EXPORT struct nullopt_t
     {
         struct init
         {
         };
         constexpr explicit nullopt_t(nullopt_t::init) noexcept {}
     };
-    constexpr nullopt_t nullopt{nullopt_t::init()};
+    HPX_CXX_CORE_EXPORT constexpr nullopt_t nullopt{nullopt_t::init()};
 
-    class HPX_ALWAYS_EXPORT bad_optional_access : public std::logic_error
+    HPX_CXX_CORE_EXPORT class HPX_ALWAYS_EXPORT bad_optional_access
+      : public std::logic_error
     {
     public:
         explicit bad_optional_access(std::string const& what_arg)
@@ -47,14 +48,14 @@ namespace hpx::optional_ns {
 
     namespace _optional_swap {
 
-        using std::swap;
+        HPX_CXX_CORE_EXPORT using std::swap;
 
-        template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         void check_swap() noexcept(
             noexcept(swap(std::declval<T&>(), std::declval<T&>())));
     }    // namespace _optional_swap
 
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     class optional
     {
     public:
@@ -92,18 +93,19 @@ namespace hpx::optional_ns {
             }
         }
 
-        template <typename U = T,
-            typename = std::enable_if_t<std::is_constructible_v<T, U&&>>>
+        template <typename U = T>
+            requires(std::is_constructible_v<T, U &&>)
         explicit optional(U&& val) noexcept(
             std::is_nothrow_move_constructible_v<T>)
           : empty_(true)
         {
-            hpx::construct_at(reinterpret_cast<T*>(&storage_), HPX_MOVE(val));
+            hpx::construct_at(
+                reinterpret_cast<T*>(&storage_), HPX_FORWARD(U, val));
             empty_ = false;
         }
 
-        template <typename U,
-            typename = std::enable_if_t<std::is_constructible_v<T, U const&>>>
+        template <typename U>
+            requires(std::is_constructible_v<T, U const&>)
         constexpr optional(optional<U> const& val)
           : empty_(true)
         {
@@ -113,8 +115,8 @@ namespace hpx::optional_ns {
                 empty_ = false;
             }
         }
-        template <typename U,
-            typename = std::enable_if_t<std::is_constructible_v<T, U&&>>>
+        template <typename U>
+            requires(std::is_constructible_v<T, U &&>)
         constexpr optional(optional<U>&& val) noexcept(
             std::is_nothrow_move_constructible_v<T>)
           : empty_(true)
@@ -159,8 +161,8 @@ namespace hpx::optional_ns {
             return *this;
         }
         optional& operator=(optional&& other) noexcept(
-            std::is_nothrow_move_assignable_v<T>&&
-                std::is_nothrow_move_constructible_v<T>)
+            std::is_nothrow_move_assignable_v<T> &&
+            std::is_nothrow_move_constructible_v<T>)
         {
             if (this == &other)
             {
@@ -204,9 +206,8 @@ namespace hpx::optional_ns {
 
             return *this;
         }
-        template <typename U,
-            typename Enable =
-                std::enable_if_t<std::is_constructible_v<T, U const&>>>
+        template <typename U>
+            requires(std::is_constructible_v<T, U const&>)
         optional& operator=(optional<U> const& other)
         {
             optional tmp(other);
@@ -214,8 +215,8 @@ namespace hpx::optional_ns {
 
             return *this;
         }
-        template <typename U,
-            typename Enable = std::enable_if_t<std::is_constructible_v<T, U&&>>>
+        template <typename U>
+            requires(std::is_constructible_v<T, U &&>)
         optional& operator=(optional<U>&& other)
         {
             optional tmp(HPX_MOVE(other));
@@ -356,8 +357,8 @@ namespace hpx::optional_ns {
 #endif
 
         void swap(optional& other) noexcept(
-            std::is_nothrow_move_constructible_v<T>&& noexcept(
-                _optional_swap::check_swap<T>()))
+            std::is_nothrow_move_constructible_v<T> &&
+            noexcept(_optional_swap::check_swap<T>()))
         {
             // do nothing if both are empty
             if (empty_ && other.empty_)
@@ -502,9 +503,8 @@ namespace hpx::optional_ns {
             return optional<result_type>();
         }
 
-        template <typename F,
-            typename = std::enable_if_t<std::is_invocable_v<F> &&
-                std::is_copy_constructible_v<T>>>
+        template <typename F>
+            requires(std::is_invocable_v<F> && std::is_copy_constructible_v<T>)
         constexpr optional or_else(F&& f) const&
         {
             if (*this)
@@ -514,9 +514,8 @@ namespace hpx::optional_ns {
             return {HPX_FORWARD(F, f)()};
         }
 
-        template <typename F,
-            typename = std::enable_if_t<std::is_invocable_v<F> &&
-                std::is_move_constructible_v<T>>>
+        template <typename F>
+            requires(std::is_invocable_v<F> && std::is_move_constructible_v<T>)
         optional or_else(F&& f) &&
         {
             if (*this)
@@ -527,16 +526,15 @@ namespace hpx::optional_ns {
         }
 
     private:
-        std::aligned_storage_t<sizeof(T), alignof(T)> storage_;
+        hpx::aligned_storage_t<sizeof(T), alignof(T)> storage_;
         bool empty_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     [[nodiscard]] constexpr bool operator==(
         optional<T> const& lhs, optional<T> const& rhs)
     {
-        // different clang-format versions disagree
         // clang-format off
         return (static_cast<bool>(lhs) != static_cast<bool>(rhs)) ? false :
             (!static_cast<bool>(lhs) && !static_cast<bool>(rhs))  ? true :
@@ -544,14 +542,14 @@ namespace hpx::optional_ns {
         // clang-format on
     }
 
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     [[nodiscard]] constexpr bool operator!=(
         optional<T> const& lhs, optional<T> const& rhs)
     {
         return !(lhs == rhs);
     }
 
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     [[nodiscard]] constexpr bool operator<(
         optional<T> const& lhs, optional<T> const& rhs)
     {
@@ -560,14 +558,14 @@ namespace hpx::optional_ns {
                                            *rhs < *lhs;
     }
 
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     [[nodiscard]] constexpr bool operator>=(
         optional<T> const& lhs, optional<T> const& rhs)
     {
         return !(lhs < rhs);
     }
 
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     [[nodiscard]] constexpr bool operator>(
         optional<T> const& lhs, optional<T> const& rhs)
     {
@@ -576,7 +574,7 @@ namespace hpx::optional_ns {
                                            *rhs > *lhs;
     }
 
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     [[nodiscard]] constexpr bool operator<=(
         optional<T> const& lhs, optional<T> const& rhs)
     {
@@ -584,14 +582,14 @@ namespace hpx::optional_ns {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     [[nodiscard]] constexpr bool operator==(
         optional<T> const& opt, nullopt_t) noexcept
     {
         return !static_cast<bool>(opt);
     }
 
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     [[nodiscard]] constexpr bool operator==(
         nullopt_t, optional<T> const& opt) noexcept
     {
@@ -605,63 +603,63 @@ namespace hpx::optional_ns {
         return static_cast<bool>(opt);
     }
 
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     [[nodiscard]] constexpr bool operator!=(
         nullopt_t, optional<T> const& opt) noexcept
     {
         return static_cast<bool>(opt);
     }
 
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     [[nodiscard]] constexpr bool operator<(
         optional<T> const&, nullopt_t) noexcept
     {
         return false;
     }
 
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     [[nodiscard]] constexpr bool operator<(
         nullopt_t, optional<T> const& opt) noexcept
     {
         return static_cast<bool>(opt);
     }
 
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     [[nodiscard]] constexpr bool operator>=(
         optional<T> const&, nullopt_t) noexcept
     {
         return true;
     }
 
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     [[nodiscard]] constexpr bool operator>=(
         nullopt_t, optional<T> const& opt) noexcept
     {
         return !static_cast<bool>(opt);
     }
 
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     [[nodiscard]] constexpr bool operator>(
         optional<T> const& opt, nullopt_t) noexcept
     {
         return static_cast<bool>(opt);
     }
 
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     [[nodiscard]] constexpr bool operator>(
         nullopt_t, optional<T> const&) noexcept
     {
         return false;
     }
 
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     [[nodiscard]] constexpr bool operator<=(
         optional<T> const& opt, nullopt_t) noexcept
     {
         return !static_cast<bool>(opt);
     }
 
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     [[nodiscard]] constexpr bool operator<=(
         nullopt_t, optional<T> const&) noexcept
     {
@@ -669,84 +667,84 @@ namespace hpx::optional_ns {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     [[nodiscard]] constexpr bool operator==(
         optional<T> const& opt, T const& value)
     {
         return static_cast<bool>(opt) ? (*opt == value) : false;
     }
 
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     [[nodiscard]] constexpr bool operator==(
         T const& value, optional<T> const& opt)
     {
         return static_cast<bool>(opt) ? (value == *opt) : false;
     }
 
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     [[nodiscard]] constexpr bool operator!=(
         optional<T> const& opt, T const& value)
     {
         return !(opt == value);
     }
 
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     [[nodiscard]] constexpr bool operator!=(
         T const& value, optional<T> const& opt)
     {
         return !(value == *opt);
     }
 
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     [[nodiscard]] constexpr bool operator<(
         optional<T> const& opt, T const& value)
     {
         return static_cast<bool>(opt) ? (*opt < value) : true;
     }
 
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     [[nodiscard]] constexpr bool operator<(
         T const& value, optional<T> const& opt)
     {
         return static_cast<bool>(opt) ? (value < *opt) : false;
     }
 
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     [[nodiscard]] constexpr bool operator>=(
         optional<T> const& opt, T const& value)
     {
         return !(*opt < value);
     }
 
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     [[nodiscard]] constexpr bool operator>=(
         T const& value, optional<T> const& opt)
     {
         return !(value < *opt);
     }
 
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     [[nodiscard]] constexpr bool operator>(
         optional<T> const& opt, T const& value)
     {
         return static_cast<bool>(opt) ? (*opt > value) : false;
     }
 
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     [[nodiscard]] constexpr bool operator>(
         T const& value, optional<T> const& opt)
     {
         return static_cast<bool>(opt) ? (value > *opt) : true;
     }
 
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     [[nodiscard]] constexpr bool operator<=(
         optional<T> const& opt, T const& value)
     {
         return !(*opt > value);
     }
 
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     [[nodiscard]] constexpr bool operator<=(
         T const& value, optional<T> const& opt)
     {
@@ -754,26 +752,26 @@ namespace hpx::optional_ns {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     void swap(optional<T>& x, optional<T>& y) noexcept(noexcept(x.swap(y)))
     {
         x.swap(y);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     constexpr optional<std::decay_t<T>> make_optional(T&& v)
     {
         return optional<std::decay_t<T>>(HPX_FORWARD(T, v));
     }
 
-    template <typename T, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename T, typename... Ts>
     constexpr optional<T> make_optional(Ts&&... ts)
     {
         return optional<T>(std::in_place, HPX_FORWARD(Ts, ts)...);
     }
 
-    template <typename T, typename U, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename T, typename U, typename... Ts>
     constexpr optional<T> make_optional(std::initializer_list<U> il, Ts&&... ts)
     {
         return optional<T>(std::in_place, il, HPX_FORWARD(Ts, ts)...);
@@ -781,7 +779,7 @@ namespace hpx::optional_ns {
 }    // namespace hpx::optional_ns
 
 ///////////////////////////////////////////////////////////////////////////////
-template <typename T>
+HPX_CXX_CORE_EXPORT template <typename T>
 struct std::hash<::hpx::optional_ns::optional<T>>
 {
     constexpr std::size_t operator()(

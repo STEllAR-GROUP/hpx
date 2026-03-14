@@ -5,9 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/init.hpp>
+#include <hpx/modules/serialization.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/serialization/complex.hpp>
-#include <hpx/serialization/vector.hpp>
 
 #include <complex>
 #include <vector>
@@ -31,13 +30,13 @@ struct my_struct
 
     /// HPX.Serialization
     template <typename Archive>
-    inline void serialize(Archive& ar, const unsigned int)
+    inline void serialize(Archive& ar, unsigned int const)
     {
-        ar& x;
+        ar & x;
     }
     template <class Archive>
     inline void friend load_construct_data(
-        Archive&, my_struct* b, const unsigned int)
+        Archive&, my_struct* b, unsigned int const)
     {
         ::new (b) my_struct(0);
     }

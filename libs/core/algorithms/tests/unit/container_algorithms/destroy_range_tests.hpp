@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2017 Hartmut Kaiser
+//  Copyright (c) 2014-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -142,9 +142,9 @@ void test_destroy_exception(IteratorTag)
 
     HPX_TEST_EQ(data_type::instance_count.load(), data_size);
 
-    std::uniform_int_distribution<> dis(0, data_size - 1);
+    std::uniform_int_distribution<> dis(0, static_cast<int>(data_size - 1));
     std::atomic<std::size_t> throw_after(dis(gen));    //-V104
-    std::int64_t throw_after_ = throw_after.load();
+    std::size_t throw_after_ = throw_after.load();
 
     bool caught_exception = false;
     try
@@ -198,9 +198,9 @@ void test_destroy_exception(ExPolicy&& policy, IteratorTag)
 
     HPX_TEST_EQ(data_type::instance_count.load(), data_size);
 
-    std::uniform_int_distribution<> dis(0, data_size - 1);
+    std::uniform_int_distribution<> dis(0, static_cast<int>(data_size - 1));
     std::atomic<std::size_t> throw_after(dis(gen));    //-V104
-    std::int64_t throw_after_ = throw_after.load();
+    std::size_t throw_after_ = throw_after.load();
 
     bool caught_exception = false;
     try
@@ -251,9 +251,9 @@ void test_destroy_exception_async(ExPolicy&& policy, IteratorTag)
 
     HPX_TEST_EQ(data_type::instance_count.load(), data_size);
 
-    std::uniform_int_distribution<> dis(0, data_size - 1);
+    std::uniform_int_distribution<> dis(0, static_cast<int>(data_size - 1));
     std::atomic<std::size_t> throw_after(dis(gen));    //-V104
-    std::int64_t throw_after_ = throw_after.load();
+    std::size_t throw_after_ = throw_after.load();
 
     bool caught_exception = false;
     bool returned_from_algorithm = false;
@@ -314,9 +314,9 @@ void test_destroy_bad_alloc(ExPolicy&& policy, IteratorTag)
 
     HPX_TEST_EQ(data_type::instance_count.load(), data_size);
 
-    std::uniform_int_distribution<> dis(0, data_size - 1);
+    std::uniform_int_distribution<> dis(0, static_cast<int>(data_size - 1));
     std::atomic<std::size_t> throw_after(dis(gen));    //-V104
-    std::int64_t throw_after_ = throw_after.load();
+    std::size_t throw_after_ = throw_after.load();
 
     bool caught_bad_alloc = false;
     try
@@ -367,9 +367,9 @@ void test_destroy_bad_alloc_async(ExPolicy&& policy, IteratorTag)
 
     HPX_TEST_EQ(data_type::instance_count.load(), data_size);
 
-    std::uniform_int_distribution<> dis(0, data_size - 1);
+    std::uniform_int_distribution<> dis(0, static_cast<int>(data_size - 1));
     std::atomic<std::size_t> throw_after(dis(gen));    //-V104
-    std::int64_t throw_after_ = throw_after.load();
+    std::size_t throw_after_ = throw_after.load();
 
     bool caught_bad_alloc = false;
     bool returned_from_algorithm = false;

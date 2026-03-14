@@ -43,7 +43,7 @@ namespace jacobi_smp {
         std::size_t end_;
     };
 
-    void jacobi_kernel(double* dst, const double* src, std::size_t n);
+    void jacobi_kernel(double* dst, double const* src, std::size_t n);
 
     inline void report_timing(
         std::size_t n, std::size_t iterations, double elapsed)

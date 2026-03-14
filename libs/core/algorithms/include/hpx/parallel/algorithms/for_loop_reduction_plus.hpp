@@ -11,7 +11,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/execution/algorithms/detail/predicates.hpp>
+#include <hpx/modules/execution.hpp>
 #include <hpx/parallel/algorithms/for_loop_reduction.hpp>
 
 #include <functional>
@@ -65,7 +65,7 @@ namespace hpx::experimental {
     ///          views are combined by invoking the copy of combiner, passing it
     ///          the two views to be combined.
     ///
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     HPX_FORCEINLINE constexpr hpx::parallel::detail::reduction_helper<T,
         std::plus<T>>
     reduction_plus(T& var)
@@ -73,7 +73,7 @@ namespace hpx::experimental {
         return reduction(var, T(), std::plus<T>());
     }
 
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     HPX_FORCEINLINE constexpr hpx::parallel::detail::reduction_helper<T,
         std::plus<T>>
     reduction_plus(T& var, T const& identity)

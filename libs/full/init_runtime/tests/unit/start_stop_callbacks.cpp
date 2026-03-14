@@ -1,13 +1,13 @@
-//  Copyright (c) 2018 Hartmut Kaiser
+//  Copyright (c) 2018-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/init.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/runtime.hpp>
-#include <hpx/util/from_string.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -100,7 +100,12 @@ int hpx_main()
 int main(int argc, char* argv[])
 {
     auto on_start = hpx::register_thread_on_start_func(&on_thread_start);
+
+#if defined(HPX_HAVE_MODULE_LIKWID)
+    HPX_TEST(!on_start.empty());    // likwid support installs a start handler
+#else
     HPX_TEST(on_start.empty());
+#endif
 
     auto on_stop = hpx::register_thread_on_stop_func(&on_thread_stop);
     HPX_TEST(on_stop.empty());

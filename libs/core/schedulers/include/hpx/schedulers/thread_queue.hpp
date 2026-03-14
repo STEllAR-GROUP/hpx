@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -8,34 +8,30 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/concurrency/cache_line_data.hpp>
-#include <hpx/functional/function.hpp>
+#include <hpx/modules/allocator_support.hpp>
+#include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/thread_support.hpp>
+#include <hpx/modules/threading_base.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/schedulers/queue_helpers.hpp>
-#include <hpx/thread_support/unlock_guard.hpp>
-#include <hpx/threading_base/scheduler_base.hpp>
-#include <hpx/threading_base/thread_data.hpp>
-#include <hpx/threading_base/thread_data_stackful.hpp>
-#include <hpx/threading_base/thread_data_stackless.hpp>
-#include <hpx/threading_base/thread_queue_init_parameters.hpp>
-#include <hpx/type_support/assert_owns_lock.hpp>
 
 #if defined(HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION)
 #include <hpx/schedulers/deadlock_detection.hpp>
 #endif
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
+#include <hpx/modules/timing.hpp>
 #include <hpx/schedulers/maintain_queue_wait_times.hpp>
-#include <hpx/timing/high_resolution_clock.hpp>
 #endif
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
-#include <hpx/timing/tick_counter.hpp>
-#include <hpx/util/get_and_reset_value.hpp>
+#include <hpx/modules/timing.hpp>
+#include <hpx/modules/util.hpp>
 #endif
 #ifdef HPX_HAVE_THREAD_STEALING_COUNTS
-#include <hpx/util/get_and_reset_value.hpp>
+#include <hpx/modules/util.hpp>
 #endif
 
 #include <algorithm>
@@ -50,6 +46,8 @@
 #include <unordered_set>
 #include <utility>
 #include <vector>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::threads::policies {
@@ -86,8 +84,8 @@ namespace hpx::threads::policies {
     //         typedef ... type;
     //     };
     // };
-    template <typename Mutex, typename PendingQueuing, typename StagedQueuing,
-        typename TerminatedQueuing>
+    HPX_CXX_CORE_EXPORT template <typename Mutex, typename PendingQueuing,
+        typename StagedQueuing, typename TerminatedQueuing>
     class thread_queue
     {
     private:
@@ -107,7 +105,7 @@ namespace hpx::threads::policies {
         {
             thread_init_data data;
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-            std::uint64_t waittime;
+            std::uint64_t wait_time;
 #endif
         };
 
@@ -115,7 +113,7 @@ namespace hpx::threads::policies {
         struct thread_description
         {
             thread_id_ref_type data;
-            std::uint64_t waittime;
+            std::uint64_t wait_time;
         };
         using thread_description_ptr = thread_description*;
 #else
@@ -341,9 +339,10 @@ namespace hpx::threads::policies {
                 }
             }
 
-            std::size_t const addednew = add_new(add_count, addfrom, lk, steal);
-            added += addednew;
-            return addednew != 0;
+            std::size_t const added_new =
+                add_new(add_count, addfrom, lk, steal);
+            added += added_new;
+            return added_new != 0;
         }
 
         void recycle_thread(thread_id_type const& thrd)
@@ -396,10 +395,10 @@ namespace hpx::threads::policies {
             if (delete_all)
             {
                 // delete all threads
-                thread_data* todelete;
-                while (terminated_items_.pop(todelete))
+                thread_data* to_delete;
+                while (terminated_items_.pop(to_delete))
                 {
-                    thread_id_type tid(todelete);
+                    thread_id_type tid(to_delete);
                     --terminated_items_count_;
 
                     // this thread has to be managed by this queue, it may have
@@ -420,18 +419,20 @@ namespace hpx::threads::policies {
             else
             {
                 // delete only this many threads
-                std::int64_t delete_count = (std::min)(
-                    static_cast<std::int64_t>(terminated_items_count_ / 10),
-                    static_cast<std::int64_t>(parameters_.max_delete_count_));
+                std::int64_t delete_count =
+                    (std::min) (static_cast<std::int64_t>(
+                                    terminated_items_count_ / 10),
+                        static_cast<std::int64_t>(
+                            parameters_.max_delete_count_));
 
                 // delete at least this many threads
-                delete_count = (std::max)(delete_count,
+                delete_count = (std::max) (delete_count,
                     static_cast<std::int64_t>(parameters_.min_delete_count_));
 
-                thread_data* todelete;
-                while (delete_count && terminated_items_.pop(todelete))
+                thread_data* to_delete;
+                while (delete_count && terminated_items_.pop(to_delete))
                 {
-                    thread_id_type tid(todelete);
+                    thread_id_type tid(to_delete);
                     --terminated_items_count_;
 
                     // this thread has to be managed by this queue, it may have
@@ -862,8 +863,8 @@ namespace hpx::threads::policies {
             }
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-            thread_description_ptr tdesc;
-            if (work_items_.pop(tdesc, steal))
+            thread_description_ptr task_desc;
+            if (work_items_.pop(task_desc, steal))
             {
                 --work_items_count_.data_;
 
@@ -871,12 +872,12 @@ namespace hpx::threads::policies {
                 {
                     work_items_wait_ +=
                         hpx::chrono::high_resolution_clock::now() -
-                        tdesc->waittime;
+                        task_desc->waittime;
                     ++work_items_wait_count_;
                 }
 
-                thrd = HPX_MOVE(tdesc->data);
-                delete tdesc;
+                thrd = HPX_MOVE(task_desc->data);
+                delete task_desc;
 
                 return true;
             }
@@ -898,9 +899,10 @@ namespace hpx::threads::policies {
         std::size_t get_next_threads(Iterator it, std::int64_t max_items,
             bool allow_stealing = false, bool steal = false)
         {
-            std::int64_t const work_items_count = (std::min)(
-                work_items_count_.data_.load(std::memory_order_relaxed),
-                max_items);
+            std::int64_t const work_items_count =
+                (std::min) (work_items_count_.data_.load(
+                                std::memory_order_relaxed),
+                    max_items);
 
             if (work_items_count == 0)
             {
@@ -916,19 +918,19 @@ namespace hpx::threads::policies {
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
             std::size_t const max_items_requested = max_items;
 
-            thread_description_ptr tdesc;
-            while (work_items_.pop(tdesc, steal))
+            thread_description_ptr task_desc;
+            while (work_items_.pop(task_desc, steal))
             {
                 if (get_maintain_queue_wait_times_enabled())
                 {
                     work_items_wait_ +=
                         hpx::chrono::high_resolution_clock::now() -
-                        tdesc->waittime;
+                        task_desc->waittime;
                     ++work_items_wait_count_;
                 }
 
-                *it++ = HPX_MOVE(tdesc->data);
-                delete tdesc;
+                *it++ = HPX_MOVE(task_desc->data);
+                delete task_desc;
 
                 --max_items;
                 if (--work_items_count_.data_ == 0)
@@ -1103,9 +1105,18 @@ namespace hpx::threads::policies {
         inline bool wait_or_add_new(
             bool, std::size_t& added, bool steal = false) HPX_HOT
         {
-            if (0 == new_tasks_count_.data_.load(std::memory_order_relaxed))
+            // no need to try converting from other queue if that has no staged
+            // threads
+            auto const new_tasks_count =
+                new_tasks_count_.data_.load(std::memory_order_relaxed);
+            if (HPX_LIKELY(0 == new_tasks_count))
             {
                 return true;
+            }
+
+            if (new_tasks_count < parameters_.min_tasks_to_steal_staged_)
+            {
+                return false;
             }
 
             // No obvious work has to be done, so a lock won't hurt too much.
@@ -1180,8 +1191,8 @@ namespace hpx::threads::policies {
                     // Before exiting each of the OS threads deletes the
                     // remaining terminated HPX threads
                     // REVIEW: Should we be doing this if we are stealing?
-                    bool const canexit = cleanup_terminated_locked(true);
-                    if (!running && canexit)
+                    bool const can_exit = cleanup_terminated_locked(true);
+                    if (!running && can_exit)
                     {
                         // we don't have any registered work items anymore
                         //do_some_work();       // notify possibly waiting threads
@@ -1340,3 +1351,5 @@ namespace hpx::threads::policies {
         thread_queue<Mutex, PendingQueuing, StagedQueuing,
             TerminatedQueuing>::task_description_alloc_;
 }    // namespace hpx::threads::policies
+
+#include <hpx/config/warnings_suffix.hpp>

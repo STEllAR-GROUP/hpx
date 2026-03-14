@@ -8,6 +8,7 @@
 #include <hpx/init.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/tuple.hpp>
 
 #include <cstddef>
@@ -25,40 +26,17 @@ int partition_size = 10000;
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::experimental::detail {
-    template <typename Iterator>
-    HPX_FORCEINLINE Iterator previous(Iterator it, std::false_type)
-    {
-        return --it;
-    }
-
-    template <typename Iterator>
-    HPX_FORCEINLINE Iterator previous(Iterator const& it, std::true_type)
-    {
-        return it - 1;
-    }
 
     template <typename Iterator>
     HPX_FORCEINLINE Iterator previous(Iterator const& it)
     {
-        return previous(it, hpx::traits::is_random_access_iterator<Iterator>());
-    }
-
-    template <typename Iterator>
-    HPX_FORCEINLINE Iterator next(Iterator it, std::false_type)
-    {
-        return ++it;
-    }
-
-    template <typename Iterator>
-    HPX_FORCEINLINE Iterator next(Iterator const& it, std::true_type)
-    {
-        return it + 1;
+        return std::prev(it);
     }
 
     template <typename Iterator>
     HPX_FORCEINLINE Iterator next(Iterator const& it)
     {
-        return next(it, hpx::traits::is_random_access_iterator<Iterator>());
+        return std::next(it);
     }
 }    // namespace hpx::experimental::detail
 
@@ -515,9 +493,11 @@ int hpx_main(hpx::program_options::variables_map& vm)
             std::uint64_t t = 0;
             for (int i = 0; i != test_count; ++i)
                 t += bench_stencil3_iterator_full();
-            std::cout << "full: " << (t * 1e-9) / test_count << std::endl;
+            std::cout << "full: "
+                      << (static_cast<double>(t) * 1e-9) / test_count
+                      << std::endl;
             hpx::util::print_cdash_timing(
-                "Stencil3Full", (t * 1e-9) / test_count);
+                "Stencil3Full", (static_cast<double>(t) * 1e-9) / test_count);
         }
 
         // now run explicit (no-check) stencil3 tests
@@ -525,20 +505,22 @@ int hpx_main(hpx::program_options::variables_map& vm)
             std::uint64_t t = 0;
             for (int i = 0; i != test_count; ++i)
                 t += bench_stencil3_iterator_v1();
-            std::cout << "nocheck(v1): " << (t * 1e-9) / test_count
+            std::cout << "nocheck(v1): "
+                      << (static_cast<double>(t) * 1e-9) / test_count
                       << std::endl;
-            hpx::util::print_cdash_timing(
-                "Stencil3NocheckV1", (t * 1e-9) / test_count);
+            hpx::util::print_cdash_timing("Stencil3NocheckV1",
+                (static_cast<double>(t) * 1e-9) / test_count);
         }
 
         {
             std::uint64_t t = 0;
             for (int i = 0; i != test_count; ++i)
                 t += bench_stencil3_iterator_v2();
-            std::cout << "nocheck(v2): " << (t * 1e-9) / test_count
+            std::cout << "nocheck(v2): "
+                      << (static_cast<double>(t) * 1e-9) / test_count
                       << std::endl;
-            hpx::util::print_cdash_timing(
-                "Stencil3NocheckV2", (t * 1e-9) / test_count);
+            hpx::util::print_cdash_timing("Stencil3NocheckV2",
+                (static_cast<double>(t) * 1e-9) / test_count);
         }
 
         // now run explicit tests
@@ -546,9 +528,11 @@ int hpx_main(hpx::program_options::variables_map& vm)
             std::uint64_t t = 0;
             for (int i = 0; i != test_count; ++i)
                 t += bench_stencil3_iterator_explicit();
-            std::cout << "explicit: " << (t * 1e-9) / test_count << std::endl;
-            hpx::util::print_cdash_timing(
-                "Stencil3Explicit", (t * 1e-9) / test_count);
+            std::cout << "explicit: "
+                      << (static_cast<double>(t) * 1e-9) / test_count
+                      << std::endl;
+            hpx::util::print_cdash_timing("Stencil3Explicit",
+                (static_cast<double>(t) * 1e-9) / test_count);
         }
     }
 

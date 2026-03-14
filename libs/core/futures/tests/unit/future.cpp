@@ -416,6 +416,7 @@ void promise_set_value(hpx::promise<int>& pi)
     {
         pi.set_value(42);
     }
+    // NOLINTNEXTLINE(bugprone-empty-catch)
     catch (...)
     {
     }

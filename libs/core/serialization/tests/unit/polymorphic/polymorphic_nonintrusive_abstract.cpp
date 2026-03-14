@@ -5,11 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/serialization/base_object.hpp>
-#include <hpx/serialization/input_archive.hpp>
-#include <hpx/serialization/output_archive.hpp>
-#include <hpx/serialization/serialize.hpp>
-
+#include <hpx/modules/serialization.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <cstddef>
@@ -39,7 +35,7 @@ HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC_TEMPLATE((template <class T>), Base<T>)
 template <typename Archive, typename T>
 void serialize(Archive& ar, Base<T>& b, unsigned)
 {
-    ar& b.prefix_;
+    ar & b.prefix_;
 }
 
 template <typename T>
@@ -70,7 +66,7 @@ template <typename Archive, typename T>
 void serialize(Archive& ar, Derived1<T>& d1, unsigned)
 {
     ar& hpx::serialization::base_object<Base<T>>(d1);
-    ar& d1.size_;
+    ar & d1.size_;
 }
 
 struct Derived2 : Derived1<double>
@@ -98,7 +94,7 @@ template <typename Archive>
 void serialize(Archive& ar, Derived2& d2, unsigned)
 {
     ar& hpx::serialization::base_object<Derived1<double>>(d2);
-    ar& d2.message_;
+    ar & d2.message_;
 }
 
 int main()

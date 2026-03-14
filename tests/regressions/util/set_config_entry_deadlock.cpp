@@ -6,10 +6,10 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/functional/bind.hpp>
 #include <hpx/hpx_init.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/runtime_local/config_entry.hpp>
 
 #include <atomic>
 #include <string>

@@ -12,7 +12,7 @@
 
 // For more information, see http://www.boost.org
 
-#include <hpx/functional/function.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/testing.hpp>
 
 struct tried_to_copy
@@ -26,7 +26,7 @@ struct MaybeThrowOnCopy
     {
     }
 
-    MaybeThrowOnCopy(const MaybeThrowOnCopy& other)
+    MaybeThrowOnCopy(MaybeThrowOnCopy const& other)
       : value(other.value)
     {
         if (throwOnCopy)
@@ -34,7 +34,7 @@ struct MaybeThrowOnCopy
     }
 
     // NOLINTNEXTLINE(bugprone-unhandled-self-assignment)
-    MaybeThrowOnCopy& operator=(const MaybeThrowOnCopy& other)
+    MaybeThrowOnCopy& operator=(MaybeThrowOnCopy const& other)
     {
         if (throwOnCopy)
             throw tried_to_copy();

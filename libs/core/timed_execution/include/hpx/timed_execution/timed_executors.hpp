@@ -9,18 +9,16 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/execution/traits/executor_traits.hpp>
-#include <hpx/executors/execution_policy.hpp>
-#include <hpx/executors/parallel_executor.hpp>
-#include <hpx/executors/sequenced_executor.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/executors.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/threading.hpp>
+#include <hpx/modules/timing.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/timed_execution/timed_execution.hpp>
-#include <hpx/timing/steady_clock.hpp>
-#include <hpx/type_support/detail/wrap_int.hpp>
 
 #include <chrono>
+#include <concepts>
 #include <functional>
 #include <type_traits>
 #include <utility>
@@ -71,17 +69,14 @@ namespace hpx::parallel::execution {
                     HPX_FORWARD(Executor, exec), HPX_FORWARD(F, f));
             }
 
-            // different versions of clang-format disagree
-            // clang-format off
             template <typename Executor, typename F, typename... Ts>
             static auto call(hpx::traits::detail::wrap_int, Executor&& exec,
                 std::chrono::steady_clock::time_point const& abs_time, F&& f,
                 Ts&&... ts)
-                -> decltype(
-                    execution::async_execute(HPX_FORWARD(Executor, exec),
-                        HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)
+                -> decltype(execution::async_execute(
+                    HPX_FORWARD(Executor, exec), HPX_FORWARD(F, f),
+                    HPX_FORWARD(Ts, ts)...)
                         .get())
-            // clang-format on
             {
                 auto predecessor = make_ready_future_at(abs_time);
                 return execution::then_execute(
@@ -109,7 +104,6 @@ namespace hpx::parallel::execution {
                     HPX_FORWARD(Ts, ts)...);
             }
 
-            // clang-format off
             template <typename Executor, typename F, typename... Ts,
                 typename Enable =
                     std::enable_if_t<!hpx::functional::is_tag_invocable_v<
@@ -123,8 +117,7 @@ namespace hpx::parallel::execution {
             static auto call(int, Executor&& exec,
                 std::chrono::steady_clock::time_point const& abs_time, F&& f,
                 Ts&&... ts) -> decltype(exec.sync_execute_at(abs_time,
-                                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
-            // clang-format on
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
             {
                 return exec.sync_execute_at(
                     abs_time, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
@@ -161,7 +154,6 @@ namespace hpx::parallel::execution {
                     HPX_FORWARD(Ts, ts)...);
             }
 
-            // clang-format off
             template <typename Executor, typename F, typename... Ts,
                 typename Enable =
                     std::enable_if_t<!hpx::functional::is_tag_invocable_v<
@@ -175,8 +167,7 @@ namespace hpx::parallel::execution {
             static auto call(int, Executor&& exec,
                 std::chrono::steady_clock::time_point const& abs_time, F&& f,
                 Ts&&... ts) -> decltype(exec.sync_execute_at(abs_time,
-                                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
-            // clang-format on
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
             {
                 return exec.sync_execute_at(
                     abs_time, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
@@ -209,16 +200,13 @@ namespace hpx::parallel::execution {
                     HPX_FORWARD(Executor, exec), HPX_FORWARD(F, f));
             }
 
-            // different versions of clang-format disagree
-            // clang-format off
             template <typename Executor, typename F, typename... Ts>
             static auto call(hpx::traits::detail::wrap_int, Executor&& exec,
                 std::chrono::steady_clock::time_point const& abs_time, F&& f,
                 Ts&&... ts)
-                -> decltype(
-                    execution::async_execute(HPX_FORWARD(Executor, exec),
-                        HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
-            // clang-format on
+                -> decltype(execution::async_execute(
+                    HPX_FORWARD(Executor, exec), HPX_FORWARD(F, f),
+                    HPX_FORWARD(Ts, ts)...))
             {
                 auto predecessor = make_ready_future_at(abs_time);
                 return execution::then_execute(
@@ -246,7 +234,6 @@ namespace hpx::parallel::execution {
                     HPX_FORWARD(Ts, ts)...);
             }
 
-            // clang-format off
             template <typename Executor, typename F, typename... Ts,
                 typename Enable =
                     std::enable_if_t<!hpx::functional::is_tag_invocable_v<
@@ -261,8 +248,7 @@ namespace hpx::parallel::execution {
             static auto call(int, Executor&& exec,
                 std::chrono::steady_clock::time_point const& abs_time, F&& f,
                 Ts&&... ts) -> decltype(exec.async_execute_at(abs_time,
-                                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
-            // clang-format on
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
             {
                 return exec.async_execute_at(
                     abs_time, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
@@ -272,16 +258,13 @@ namespace hpx::parallel::execution {
         template <>
         struct async_execute_at_helper<hpx::execution::sequenced_execution_tag>
         {
-            // different versions of clang-format disagree
-            // clang-format off
             template <typename Executor, typename F, typename... Ts>
             static auto call(hpx::traits::detail::wrap_int, Executor&& exec,
                 std::chrono::steady_clock::time_point const& abs_time, F&& f,
                 Ts&&... ts)
-                -> decltype(
-                    execution::async_execute(HPX_FORWARD(Executor, exec),
-                        HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
-            // clang-format on
+                -> decltype(execution::async_execute(
+                    HPX_FORWARD(Executor, exec), HPX_FORWARD(F, f),
+                    HPX_FORWARD(Ts, ts)...))
             {
                 this_thread::sleep_until(abs_time);
                 return execution::async_execute(HPX_FORWARD(Executor, exec),
@@ -304,7 +287,6 @@ namespace hpx::parallel::execution {
                     HPX_FORWARD(Ts, ts)...);
             }
 
-            // clang-format off
             template <typename Executor, typename F, typename... Ts,
                 typename Enable =
                     std::enable_if_t<!hpx::functional::is_tag_invocable_v<
@@ -319,8 +301,7 @@ namespace hpx::parallel::execution {
             static auto call(int, Executor&& exec,
                 std::chrono::steady_clock::time_point const& abs_time, F&& f,
                 Ts&&... ts) -> decltype(exec.async_execute_at(abs_time,
-                                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
-            // clang-format on
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
             {
                 return exec.async_execute_at(
                     abs_time, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
@@ -381,7 +362,6 @@ namespace hpx::parallel::execution {
                     HPX_FORWARD(Ts, ts)...);
             }
 
-            // clang-format off
             template <typename Executor, typename F, typename... Ts,
                 typename Enable =
                     std::enable_if_t<!hpx::functional::is_tag_invocable_v<
@@ -395,8 +375,7 @@ namespace hpx::parallel::execution {
             static auto call(int, Executor&& exec,
                 std::chrono::steady_clock::time_point const& abs_time, F&& f,
                 Ts&&... ts) -> decltype(exec.post_at(abs_time,
-                                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
-            // clang-format on
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
             {
                 return exec.post_at(
                     abs_time, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
@@ -429,8 +408,6 @@ namespace hpx::parallel::execution {
                 hpx::parallel::execution::post_at(HPX_FORWARD(Executor, exec),
                     abs_time, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
             }
-
-            // clang-format off
             template <typename Executor, typename F, typename... Ts,
                 typename Enable =
                     std::enable_if_t<!hpx::functional::is_tag_invocable_v<
@@ -444,8 +421,7 @@ namespace hpx::parallel::execution {
             static auto call(int, Executor&& exec,
                 std::chrono::steady_clock::time_point const& abs_time, F&& f,
                 Ts&&... ts) -> decltype(exec.post_at(abs_time,
-                                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
-            // clang-format on
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
             {
                 return exec.post_at(
                     abs_time, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
@@ -468,7 +444,7 @@ namespace hpx::parallel::execution {
 
     ///////////////////////////////////////////////////////////////////////////
     // Executor allowing to run things at a given point in time
-    template <typename BaseExecutor>
+    HPX_CXX_CORE_EXPORT template <executor_any BaseExecutor>
     struct timed_executor
     {
         using base_executor_type = std::decay_t<BaseExecutor>;
@@ -554,14 +530,9 @@ namespace hpx::parallel::execution {
         }
 
         // support all properties exposed by the wrapped executor
-        // clang-format off
-        template <typename Tag, typename Property,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::execution::experimental::is_scheduling_property_v<Tag> &&
-                hpx::functional::is_tag_invocable_v<
-                    Tag, BaseExecutor, Property>
-            )>
-        // clang-format on
+        template <scheduling_property Tag, typename Property>
+            requires(hpx::functional::is_tag_invocable_v<Tag, BaseExecutor,
+                Property>)
         friend timed_executor tag_invoke(
             Tag tag, timed_executor const& exec, Property&& prop)
         {
@@ -569,13 +540,8 @@ namespace hpx::parallel::execution {
                 tag, exec.exec_, HPX_FORWARD(Property, prop)));
         }
 
-        // clang-format off
-        template <typename Tag,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::execution::experimental::is_scheduling_property_v<Tag> &&
-                hpx::functional::is_tag_invocable_v<Tag, BaseExecutor>
-            )>
-        // clang-format on
+        template <scheduling_property Tag>
+            requires(hpx::functional::is_tag_invocable_v<Tag, BaseExecutor>)
         friend decltype(auto) tag_invoke(Tag tag, timed_executor const& exec)
         {
             return hpx::functional::tag_invoke(tag, exec.exec_);
@@ -586,10 +552,10 @@ namespace hpx::parallel::execution {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    using sequenced_timed_executor =
+    HPX_CXX_CORE_EXPORT using sequenced_timed_executor =
         timed_executor<hpx::execution::sequenced_executor>;
 
-    using parallel_timed_executor =
+    HPX_CXX_CORE_EXPORT using parallel_timed_executor =
         timed_executor<hpx::execution::parallel_executor>;
 }    // namespace hpx::parallel::execution
 
@@ -597,21 +563,21 @@ namespace hpx::execution::experimental {
     /// \cond NOINTERNAL
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename BaseExecutor>
+    HPX_CXX_CORE_EXPORT template <typename BaseExecutor>
     struct is_one_way_executor<
         parallel::execution::timed_executor<BaseExecutor>>
       : is_one_way_executor<std::decay_t<BaseExecutor>>
     {
     };
 
-    template <typename BaseExecutor>
+    HPX_CXX_CORE_EXPORT template <typename BaseExecutor>
     struct is_two_way_executor<
         parallel::execution::timed_executor<BaseExecutor>>
       : is_two_way_executor<std::decay_t<BaseExecutor>>
     {
     };
 
-    template <typename BaseExecutor>
+    HPX_CXX_CORE_EXPORT template <typename BaseExecutor>
     struct is_never_blocking_one_way_executor<
         parallel::execution::timed_executor<BaseExecutor>>
       : is_never_blocking_one_way_executor<std::decay_t<BaseExecutor>>

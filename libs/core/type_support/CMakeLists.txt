@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2024 The STE||AR-Group
+# Copyright (c) 2019-2026 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,7 +7,9 @@
 set(type_support_headers
     hpx/type_support/detail/with_result_of.hpp
     hpx/type_support/detail/wrap_int.hpp
+    hpx/type_support/aligned_storage.hpp
     hpx/type_support/assert_owns_lock.hpp
+    hpx/type_support/base_from_member.hpp
     hpx/type_support/bit_cast.hpp
     hpx/type_support/construct_at.hpp
     hpx/type_support/decay.hpp
@@ -23,14 +25,17 @@ set(type_support_headers
     hpx/type_support/lazy_conditional.hpp
     hpx/type_support/lazy_enable_if.hpp
     hpx/type_support/pack.hpp
+    hpx/type_support/macros.hpp
     hpx/type_support/meta.hpp
     hpx/type_support/relocate_at.hpp
+    hpx/type_support/select.hpp
     hpx/type_support/static.hpp
     hpx/type_support/uninitialized_relocation_primitives.hpp
     hpx/type_support/unwrap_ref.hpp
     hpx/type_support/unused.hpp
     hpx/type_support/void_guard.hpp
 )
+set(type_support_macro_headers hpx/type_support/macros.hpp)
 
 if(HPX_WITH_CXX20_COROUTINES)
   set(type_support_headers
@@ -62,9 +67,13 @@ include(HPX_AddModule)
 add_hpx_module(
   core type_support
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${type_support_sources}
   HEADERS ${type_support_headers}
+  MACRO_HEADERS ${type_support_macro_headers}
   COMPAT_HEADERS ${type_support_compat_headers}
+  ADD_TO_GLOBAL_HEADER hpx/type_support/detail/with_result_of.hpp
+                       hpx/type_support/detail/wrap_int.hpp
   MODULE_DEPENDENCIES hpx_assertion hpx_concepts hpx_config
   CMAKE_SUBDIRS examples tests
 )

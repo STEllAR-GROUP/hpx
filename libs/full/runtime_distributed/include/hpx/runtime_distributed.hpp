@@ -10,11 +10,12 @@
 #include <hpx/config.hpp>
 #include <hpx/agas/addressing_service.hpp>
 #include <hpx/components_base/generate_unique_ids.hpp>
-#include <hpx/io_service/io_service_pool_fwd.hpp>
+#include <hpx/modules/io_service.hpp>
+#include <hpx/modules/parcelset_base.hpp>
+#include <hpx/modules/runtime_local.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/parcelset/message_handler_fwd.hpp>
 #include <hpx/parcelset/parcelhandler.hpp>
-#include <hpx/parcelset_base/locality.hpp>
-#include <hpx/parcelset_base/parcelport.hpp>
 #include <hpx/performance_counters/query_counters.hpp>
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/runtime_components/server/console_error_sink_singleton.hpp>
@@ -22,8 +23,6 @@
 #include <hpx/runtime_distributed/find_localities.hpp>
 #include <hpx/runtime_distributed/runtime_fwd.hpp>
 #include <hpx/runtime_distributed/server/runtime_support.hpp>
-#include <hpx/runtime_local/runtime_local.hpp>
-#include <hpx/threading_base/callback_notifier.hpp>
 
 #include <condition_variable>
 #include <cstddef>
@@ -236,7 +235,7 @@ namespace hpx {
         ///////////////////////////////////////////////////////////////////////
         /// \brief Allow access to the AGAS client instance used by the HPX
         ///        runtime.
-        naming::resolver_client& get_agas_client();
+        agas::addressing_service& get_agas_client();
 
 #if defined(HPX_HAVE_NETWORKING)
         /// \brief Allow access to the parcel handler instance used by the HPX
@@ -404,7 +403,7 @@ namespace hpx {
         notification_policy_type parcel_handler_notifier_;
         parcelset::parcelhandler parcel_handler_;
 #endif
-        naming::resolver_client agas_client_;
+        agas::addressing_service agas_client_;
         applier::applier applier_;
 
         // locality basename -> used cores

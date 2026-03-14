@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #endif
@@ -15,6 +15,7 @@
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 
+#include <iterator>
 #include <type_traits>
 #include <utility>
 
@@ -23,8 +24,9 @@ namespace hpx::parallel {
     ///////////////////////////////////////////////////////////////////////////
     // transfer
     namespace detail {
+
         ///////////////////////////////////////////////////////////////////////
-        template <typename FwdIter, typename OutIter>
+        HPX_CXX_CORE_EXPORT template <typename FwdIter, typename OutIter>
         struct iterators_are_segmented
           : std::integral_constant<bool,
                 hpx::traits::segmented_iterator_traits<
@@ -34,7 +36,7 @@ namespace hpx::parallel {
         {
         };
 
-        template <typename FwdIter, typename OutIter>
+        HPX_CXX_CORE_EXPORT template <typename FwdIter, typename OutIter>
         struct iterators_are_not_segmented
           : std::integral_constant<bool,
                 !hpx::traits::segmented_iterator_traits<
@@ -46,8 +48,8 @@ namespace hpx::parallel {
 
         ///////////////////////////////////////////////////////////////////////
         // parallel version
-        template <typename Algo, typename ExPolicy, typename FwdIter1,
-            typename Sent1, typename FwdIter2>
+        HPX_CXX_CORE_EXPORT template <typename Algo, typename ExPolicy,
+            typename FwdIter1, typename Sent1, typename FwdIter2>
         decltype(auto) transfer_(ExPolicy&& policy, FwdIter1 first, Sent1 last,
             FwdIter2 dest, std::false_type)
         {
@@ -57,8 +59,8 @@ namespace hpx::parallel {
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         // forward declare segmented version
-        template <typename Algo, typename ExPolicy, typename FwdIter1,
-            typename Sent1, typename FwdIter2>
+        HPX_CXX_CORE_EXPORT template <typename Algo, typename ExPolicy,
+            typename FwdIter1, typename Sent1, typename FwdIter2>
         typename util::detail::algorithm_result<ExPolicy,
             util::in_out_result<FwdIter1, FwdIter2>>::type
         transfer_(ExPolicy&& policy, FwdIter1 first, Sent1 last, FwdIter2 dest,
@@ -103,24 +105,25 @@ namespace hpx::parallel {
         //           element in the destination range, one past the last element
         //           transferred.
         //
+        HPX_CXX_CORE_EXPORT template <typename Algo, typename ExPolicy,
+            typename FwdIter1, typename Sent1, typename FwdIter2>
         // clang-format off
-        template <typename Algo, typename ExPolicy, typename FwdIter1,
-            typename Sent1, typename FwdIter2,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
-                hpx::traits::is_sentinel_for_v<Sent1, FwdIter1> &&
+                std::sentinel_for<Sent1, FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2>
-            )>
+            )
         // clang-format on
         decltype(auto) transfer(
             ExPolicy&& policy, FwdIter1 first, Sent1 last, FwdIter2 dest)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Required at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2> ||
+            static_assert(std::forward_iterator<FwdIter2> ||
                     (hpx::is_sequenced_execution_policy_v<ExPolicy> &&
-                        hpx::traits::is_output_iterator_v<FwdIter2>),
+                        std::output_iterator<
+                            hpx::traits::iter_value_t<FwdIter1>, FwdIter2>),
                 "Requires at least forward iterator or sequential execution.");
 
 #if defined(HPX_COMPUTE_DEVICE_CODE)

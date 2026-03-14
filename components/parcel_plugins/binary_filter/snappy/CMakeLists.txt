@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2022 Hartmut Kaiser
+# Copyright (c) 2007-2026 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -29,9 +29,10 @@ add_hpx_library(
   HEADERS "hpx/include/compression_snappy.hpp"
           "hpx/binary_filter/snappy_serialization_filter.hpp"
           "hpx/binary_filter/snappy_serialization_filter_registration.hpp"
-  PREPEND_HEADER_ROOT INSTALL_HEADERS
+  PREPEND_HEADER_ROOT INSTALL_HEADERS ${HPX_WITH_UNITY_BUILD_OPTION}
+  ${HPX_WITH_CXX_MODULES_OPTION}
   FOLDER "Core/Plugins/Compression"
-  DEPENDENCIES ${Snappy_LIBRARY} ${HPX_WITH_UNITY_BUILD_OPTION}
+  DEPENDENCIES ${Snappy_LIBRARY}
 )
 
 target_include_directories(
@@ -39,13 +40,13 @@ target_include_directories(
 )
 target_link_directories(compression_snappy PRIVATE ${Snappy_LIBRARY_DIR})
 
-target_link_libraries(
-  compression_snappy PUBLIC Boost::iostreams ${SNAPPY_LIBRARY}
-)
+target_link_libraries(compression_snappy PUBLIC ${SNAPPY_LIBRARY})
 
 add_hpx_pseudo_dependencies(
   components.parcel_plugins.binary_filter.snappy compression_snappy
 )
-add_hpx_pseudo_dependencies(core components.parcel_plugins.binary_filter.snappy)
+add_hpx_pseudo_dependencies(
+  components components.parcel_plugins.binary_filter.snappy
+)
 
 add_subdirectory(tests)

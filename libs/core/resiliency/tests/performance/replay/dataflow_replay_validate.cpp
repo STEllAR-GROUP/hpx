@@ -1,6 +1,6 @@
 //  Copyright (c) 2019 National Technology & Engineering Solutions of Sandia,
 //                     LLC (NTESS).
-//  Copyright (c) 2014-2022 Hartmut Kaiser
+//  Copyright (c) 2014-2025 Hartmut Kaiser
 //  Copyright (c) 2014 Patricia Grubel
 //  Copyright (c) 2019 Nikunj Gupta
 //
@@ -71,7 +71,8 @@ public:
         for (std::size_t k = 0; k != subdomain_width + 1; ++k)
         {
             data_[k] = std::sin(2 * pi *
-                ((0.0 + subdomain_width * subdomain_index + k) /
+                ((0.0 + static_cast<double>(subdomain_width) * subdomain_index +
+                     static_cast<double>(k)) /
                     static_cast<double>(subdomain_width * subdomains)));
             checksum_ += data_[k];
         }
@@ -119,11 +120,11 @@ public:
         return std::abs(checksum_ - test_value_);
     }
 
-    friend std::vector<double>::const_iterator begin(const partition_data& v)
+    friend std::vector<double>::const_iterator begin(partition_data const& v)
     {
         return begin(v.data_);
     }
-    friend std::vector<double>::const_iterator end(const partition_data& v)
+    friend std::vector<double>::const_iterator end(partition_data const& v)
     {
         return end(v.data_);
     }
@@ -198,7 +199,7 @@ struct stepper
             ++counter;
         }
 
-        const std::size_t size = center_input.size() - 1;
+        std::size_t const size = center_input.size() - 1;
         partition_data workspace(3 * size + 1);
         std::copy(begin(left_input), end(left_input) - 1, &workspace[0]);
         std::copy(begin(center_input), end(center_input) - 1, &workspace[size]);
@@ -271,13 +272,13 @@ struct stepper
             {
                 next[0].then([sem, t](partition&&) {
                     // inform semaphore about new lower limit
-                    sem->signal(t);
+                    sem->signal(static_cast<std::int64_t>(t));
                 });
             }
 
             // suspend if the tree has become too deep, the continuation above
             // will resume this thread once the computation has caught up
-            sem->wait(t);
+            sem->wait(static_cast<std::int64_t>(t));
         }
 
         // Return the solution at time-step 'iterations'.

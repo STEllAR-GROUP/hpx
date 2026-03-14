@@ -17,7 +17,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/datastructures/detail/dynamic_bitset.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <algorithm>    // for std::min
@@ -167,9 +167,9 @@ struct bitset_test
     template <typename Ch, typename Tr, typename Al>
     static void from_string(std::basic_string<Ch, Tr, Al> const& str,
         std::size_t pos, std::size_t max_char,
-        std::size_t num_bits = (std::size_t)(-1))
+        std::size_t num_bits = (std::size_t) (-1))
     {
-        std::size_t rlen = (std::min)(max_char, str.size() - pos);
+        std::size_t rlen = (std::min) (max_char, str.size() - pos);
 
         // The resulting size N of the bitset is num_bits, if
         // that is different from the default arg, rlen otherwise.
@@ -178,13 +178,13 @@ struct bitset_test
         // Subsequent decreasing character positions correspond to
         // increasing bit positions.
 
-        bool const size_upon_string = num_bits == (std::size_t)(-1);
+        bool const size_upon_string = num_bits == (std::size_t) (-1);
         Bitset b = size_upon_string ? Bitset(str, pos, max_char) :
                                       Bitset(str, pos, max_char, num_bits);
 
         std::size_t const actual_size = size_upon_string ? rlen : num_bits;
         HPX_TEST(b.size() == actual_size);
-        std::size_t m = (std::min)(num_bits, rlen);
+        std::size_t m = (std::min) (num_bits, rlen);
         std::size_t j;
         for (j = 0; j < m; ++j)
             HPX_TEST(bool(bool(b[j])) == (str[pos + m - 1 - j] == '1'));
@@ -428,7 +428,7 @@ struct bitset_test
         Bitset b(lhs), c(lhs);
         b.append(blocks.begin(), blocks.end());
         for (typename std::vector<Block>::const_iterator i = blocks.begin();
-             i != blocks.end(); ++i)
+            i != blocks.end(); ++i)
             c.append(*i);
         HPX_TEST(b == c);
     }
@@ -1082,7 +1082,7 @@ struct bitset_test
         {
             // Compare from most significant to least.
 
-            size_type leqsize((std::min)(asize, bsize));
+            size_type leqsize((std::min) (asize, bsize));
             size_type i;
             for (i = 0; i < leqsize; ++i, --asize, --bsize)
             {
@@ -1188,6 +1188,10 @@ struct bitset_test
         }
     }
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 140000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overflow"
+#endif
     static void operator_shift_left(Bitset const& lhs, std::size_t pos)
     {
         Bitset x(lhs);
@@ -1199,6 +1203,9 @@ struct bitset_test
         Bitset x(lhs);
         HPX_TEST((lhs >> pos) == (x >>= pos));
     }
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 140000
+#pragma GCC diagnostic pop
+#endif
 
     // operator|
     static void operator_or(Bitset const& lhs, Bitset const& rhs)
@@ -1390,7 +1397,7 @@ struct bitset_test
             }
             size_type after_spaces = pos;
             // {digits} or part of them
-            const typename Bitset::size_type max_digits = w > 0 &&
+            typename Bitset::size_type const max_digits = w > 0 &&
                     static_cast<typename Bitset::size_type>(w) < b.max_size() ?
                 static_cast<typename Bitset::size_type>(w) :
                 b.max_size();

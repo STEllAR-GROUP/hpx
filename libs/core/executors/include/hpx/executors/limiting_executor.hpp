@@ -8,14 +8,13 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/has_member_xxx.hpp>
-#include <hpx/execution/traits/executor_traits.hpp>
-#include <hpx/execution_base/execution.hpp>
-#include <hpx/execution_base/this_thread.hpp>
-#include <hpx/execution_base/traits/is_executor.hpp>
-#include <hpx/functional/detail/invoke.hpp>
-#include <hpx/functional/experimental/scope_exit.hpp>
-#include <hpx/threading_base/print.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/threading_base.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -32,15 +31,16 @@
 namespace hpx::execution::experimental {
 
     // by convention the title is 7 chars (for alignment)
-    using print_on = hpx::debug::enable_print<false>;
-    static constexpr print_on lim_debug("LIMEXEC");
+    HPX_CXX_CORE_EXPORT using print_on = hpx::debug::enable_print<false>;
+    inline constexpr print_on lim_debug("LIMEXEC");
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         HPX_HAS_MEMBER_XXX_TRAIT_DEF(in_flight_estimate)
     }    // namespace detail
 
-    template <typename BaseExecutor>
+    HPX_CXX_CORE_EXPORT template <typename BaseExecutor>
     struct limiting_executor
     {
         // --------------------------------------------------------------------
@@ -160,6 +160,14 @@ namespace hpx::execution::experimental {
           , upper_threshold_(upper)
           , block_(block_on_destruction)
         {
+            if (lower > upper)
+            {
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                    "limiting_executor::limiting_executor",
+                    "lower threshold ({}) must not exceed upper "
+                    "threshold ({})",
+                    lower, upper);
+            }
         }
 
         limiting_executor(std::size_t lower, std::size_t upper,
@@ -170,6 +178,14 @@ namespace hpx::execution::experimental {
           , upper_threshold_(upper)
           , block_(block_on_destruction)
         {
+            if (lower > upper)
+            {
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                    "limiting_executor::limiting_executor",
+                    "lower threshold ({}) must not exceed upper "
+                    "threshold ({})",
+                    lower, upper);
+            }
         }
 
         // --------------------------------------------------------------------
@@ -237,8 +253,8 @@ namespace hpx::execution::experimental {
 
         // --------------------------------------------------------------------
         // BulkTwoWayExecutor interface
-        template <typename F, typename S, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(!std::is_integral_v<S>)>
+        template <typename F, typename S, typename... Ts>
+            requires(!std::is_integral_v<S>)
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::bulk_async_execute_t,
             limiting_executor& exec, F&& f, S const& shape, Ts&&... ts)
@@ -250,8 +266,8 @@ namespace hpx::execution::experimental {
         }
 
         // --------------------------------------------------------------------
-        template <typename F, typename S, typename Future, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(!std::is_integral_v<S>)>
+        template <typename F, typename S, typename Future, typename... Ts>
+            requires(!std::is_integral_v<S>)
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::bulk_then_execute_t,
             limiting_executor& exec, F&& f, S const& shape,
@@ -280,8 +296,16 @@ namespace hpx::execution::experimental {
             hpx::util::yield_while([&]() { return (count_ > 0); });
         }
 
-        void set_threshold(std::size_t lower, std::size_t upper) noexcept
+        void set_threshold(std::size_t lower, std::size_t upper)
         {
+            if (lower > upper)
+            {
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                    "limiting_executor::set_threshold",
+                    "lower threshold ({}) must not exceed upper "
+                    "threshold ({})",
+                    lower, upper);
+            }
             lower_threshold_ = lower;
             upper_threshold_ = upper;
         }
@@ -318,42 +342,42 @@ namespace hpx::execution::experimental {
     // --------------------------------------------------------------------
     // simple forwarding implementations of executor traits
     // --------------------------------------------------------------------
-    template <typename BaseExecutor>
+    HPX_CXX_CORE_EXPORT template <typename BaseExecutor>
     struct is_one_way_executor<
         hpx::execution::experimental::limiting_executor<BaseExecutor>>
       : is_one_way_executor<std::decay_t<BaseExecutor>>
     {
     };
 
-    template <typename BaseExecutor>
+    HPX_CXX_CORE_EXPORT template <typename BaseExecutor>
     struct is_never_blocking_one_way_executor<
         hpx::execution::experimental::limiting_executor<BaseExecutor>>
       : is_never_blocking_one_way_executor<std::decay_t<BaseExecutor>>
     {
     };
 
-    template <typename BaseExecutor>
+    HPX_CXX_CORE_EXPORT template <typename BaseExecutor>
     struct is_two_way_executor<
         hpx::execution::experimental::limiting_executor<BaseExecutor>>
       : is_two_way_executor<std::decay_t<BaseExecutor>>
     {
     };
 
-    template <typename BaseExecutor>
+    HPX_CXX_CORE_EXPORT template <typename BaseExecutor>
     struct is_bulk_one_way_executor<
         hpx::execution::experimental::limiting_executor<BaseExecutor>>
       : is_bulk_one_way_executor<std::decay_t<BaseExecutor>>
     {
     };
 
-    template <typename BaseExecutor>
+    HPX_CXX_CORE_EXPORT template <typename BaseExecutor>
     struct is_bulk_two_way_executor<
         hpx::execution::experimental::limiting_executor<BaseExecutor>>
       : is_bulk_two_way_executor<std::decay_t<BaseExecutor>>
     {
     };
 
-    template <typename BaseExecutor>
+    HPX_CXX_CORE_EXPORT template <typename BaseExecutor>
     struct is_scheduler_executor<
         hpx::execution::experimental::limiting_executor<BaseExecutor>>
       : is_scheduler_executor<std::decay_t<BaseExecutor>>

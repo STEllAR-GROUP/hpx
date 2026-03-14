@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -13,10 +13,10 @@
 #include <hpx/actions_base/traits/action_does_termination_detection.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
 #include <hpx/components_base/component_type.hpp>
-#include <hpx/datastructures/tuple.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/serialization.hpp>
 #include <hpx/runtime_components/console_logging.hpp>
-#include <hpx/serialization/vector.hpp>
 
 #include <cstddef>
 #include <string>
@@ -76,6 +76,7 @@ namespace hpx::components::server {
                 // call the function, ignoring the return value
                 console_logging(HPX_FORWARD(T, v));
             }
+            // NOLINTNEXTLINE(bugprone-empty-catch)
             catch (...)
             {
                 // no logging!

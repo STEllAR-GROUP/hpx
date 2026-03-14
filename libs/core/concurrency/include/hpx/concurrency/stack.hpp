@@ -13,7 +13,7 @@
 #include <hpx/concurrency/detail/copy_payload.hpp>
 #include <hpx/concurrency/detail/freelist_stack.hpp>
 #include <hpx/concurrency/detail/tagged_ptr.hpp>
-#include <hpx/datastructures/tuple.hpp>
+#include <hpx/modules/datastructures.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -56,8 +56,9 @@ namespace hpx::lockfree {
      *  - T must have a copy constructor
      *
      */
-    template <typename T, typename Allocator = std::allocator<T>,
-        std::size_t Capacity = 0, bool IsFixedSize = false>
+    HPX_CXX_CORE_EXPORT template <typename T,
+        typename Allocator = std::allocator<T>, std::size_t Capacity = 0,
+        bool IsFixedSize = false>
     class stack
     {
     private:
@@ -321,7 +322,7 @@ namespace hpx::lockfree {
             catch (...)
             {
                 for (node* current_node = new_top_node;
-                     current_node != nullptr;)
+                    current_node != nullptr;)
                 {
                     node* next = current_node->next;
                     pool.template destruct<Threadsafe>(current_node);
@@ -771,7 +772,8 @@ namespace hpx::lockfree {
         pool_t pool;
     };
 
-    template <typename T, typename Allocator = std::allocator<T>>
+    HPX_CXX_CORE_EXPORT template <typename T,
+        typename Allocator = std::allocator<T>>
     class variable_size_stack : public stack<T, Allocator>
     {
         using stack<T, Allocator>::stack;

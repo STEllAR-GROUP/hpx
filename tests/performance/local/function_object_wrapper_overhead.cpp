@@ -7,8 +7,8 @@
 
 // make inspect happy: hpxinspect:nodeprecatedinclude hpxinspect:nodeprecatedname
 
-#include <hpx/functional/function.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/timing.hpp>
 
 #include <hpx/modules/program_options.hpp>

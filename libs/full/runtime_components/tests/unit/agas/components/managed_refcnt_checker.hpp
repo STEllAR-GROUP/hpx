@@ -13,8 +13,10 @@
 #include <hpx/async_distributed/promise.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/include/client.hpp>
-#include <hpx/threading_base/thread_data.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
+#include <hpx/modules/threading_base.hpp>
+#ifdef HPX_HAVE_MODULE_LIKWID
+#include <hpx/modules/likwid.hpp>
+#endif
 
 #include "stubs/managed_refcnt_checker.hpp"
 
@@ -99,6 +101,9 @@ namespace hpx { namespace test {
             threads::set_thread_state(
                 self_id.noref(), d, threads::thread_schedule_state::pending);
 
+#ifdef HPX_HAVE_MODULE_LIKWID
+            hpx::likwid::suspend_region region;
+#endif
             // Suspend this thread.
             threads::get_self().yield(threads::thread_result_type(
                 threads::thread_schedule_state::suspended,

@@ -19,17 +19,15 @@
 #include <hpx/components_base/server/create_component.hpp>
 #include <hpx/components_base/traits/is_component.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/parcelset_base.hpp>
 #include <hpx/modules/plugin.hpp>
 #include <hpx/modules/program_options.hpp>
-#include <hpx/parcelset_base/locality.hpp>
+#include <hpx/modules/runtime_configuration.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/plugin_factories/plugin_factory_base.hpp>
 #include <hpx/runtime_components/components_fwd.hpp>
-#include <hpx/runtime_configuration/static_factory_data.hpp>
 #include <hpx/runtime_distributed/find_here.hpp>
-#include <hpx/synchronization/latch.hpp>
-#include <hpx/synchronization/mutex.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 
 #include <atomic>
 #include <condition_variable>
@@ -271,7 +269,7 @@ namespace hpx::components::server {
     protected:
         // Load all components from the ini files found in the configuration
         int load_components(util::section& ini, naming::gid_type const& prefix,
-            naming::resolver_client& agas_client,
+            agas::addressing_service& agas_client,
             hpx::program_options::options_description& options,
             std::set<std::string>& startup_handled);
 
@@ -279,13 +277,13 @@ namespace hpx::components::server {
         bool load_component(hpx::util::plugin::dll& d, util::section& ini,
             std::string const& instance, std::string const& component,
             filesystem::path const& lib, naming::gid_type const& prefix,
-            naming::resolver_client& agas_client, bool isdefault,
+            agas::addressing_service& agas_client, bool isdefault,
             bool isenabled, hpx::program_options::options_description& options,
             std::set<std::string>& startup_handled);
         bool load_component_dynamic(util::section& ini,
             std::string const& instance, std::string const& component,
             filesystem::path lib, naming::gid_type const& prefix,
-            naming::resolver_client& agas_client, bool isdefault,
+            agas::addressing_service& agas_client, bool isdefault,
             bool isenabled, hpx::program_options::options_description& options,
             std::set<std::string>& startup_handled);
 
@@ -298,7 +296,7 @@ namespace hpx::components::server {
         bool load_component_static(util::section& ini,
             std::string const& instance, std::string const& component,
             filesystem::path const& lib, naming::gid_type const& prefix,
-            naming::resolver_client& agas_client, bool isdefault,
+            agas::addressing_service& agas_client, bool isdefault,
             bool isenabled, hpx::program_options::options_description& options,
             std::set<std::string>& startup_handled);
         bool load_startup_shutdown_functions_static(

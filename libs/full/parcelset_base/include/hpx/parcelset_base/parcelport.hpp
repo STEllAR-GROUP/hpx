@@ -1,5 +1,5 @@
 //  Copyright (c) 2014-2015 Thomas Heller
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //  Copyright (c) 2007 Richard D Guidry Jr
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2011 Katelyn Kufahl
@@ -13,9 +13,9 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/io_service/io_service_pool_fwd.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/io_service.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/synchronization.hpp>
 
@@ -44,7 +44,7 @@ namespace hpx::parcelset {
     /// The parcelport is the lowest possible representation of the parcel
     /// interface inside a locality. It provides the minimal functionality
     /// to send and to receive parcels.
-    class HPX_EXPORT parcelport
+    HPX_CXX_EXPORT class HPX_EXPORT parcelport
       : public std::enable_shared_from_this<parcelport>
     {
         parcelport(parcelport const&) = delete;

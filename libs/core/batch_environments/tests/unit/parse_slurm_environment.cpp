@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/batch_environments/slurm_environment.hpp>
+#include <hpx/modules/batch_environments.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <array>
@@ -12,6 +12,8 @@
 #include <string>
 #include <utility>
 #include <vector>
+
+#include "hpx/batch_environments/detail/slurm_environment.hpp"
 
 #if _WIN32
 #include <windows.h>
@@ -27,20 +29,20 @@ static constexpr bool enable_debug = false;
 //   NodeName=inode11 CPUs=4 Sockets=1 CoresPerSocket=4 ThreadsPerCore=1
 
 static auto run_in_slurm_env(
-    std::vector<std::pair<const char*, const char*>>&& environment,
+    std::vector<std::pair<char const*, char const*>>&& environment,
     std::vector<std::size_t>&& num_threads) -> void
 {
-    static const std::vector<std::string> hpx_nodelist{
+    static std::vector<std::string> const hpx_nodelist{
         "anode1", "anode2", "inode7", "inode11", "inode14", "inode20"};
-    static constexpr std::array<const char*, 13u> procids{
+    static constexpr std::array<char const*, 13u> procids{
         {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"}};
-    static constexpr std::array<const char*, 13u> nodeids{
+    static constexpr std::array<char const*, 13u> nodeids{
         {"0", "0", "0", "1", "1", "2", "2", "3", "3", "4", "4", "5", "5"}};
 
     for (auto& procid : procids)
     {
         auto index(static_cast<std::size_t>(std::atoi(procid)));
-        std::vector<std::pair<const char*, const char*>> defaultenvironment{
+        std::vector<std::pair<char const*, char const*>> defaultenvironment{
             {"SLURM_STEP_NUM_TASKS", "13"},
             {"SLURM_STEP_NODELIST", "anode[1-2],inode[7,11,14,20]"},
             {"SLURM_STEP_TASKS_PER_NODE", "3,2(x5)"}, {"SLURM_PROCID", procid},
@@ -57,7 +59,7 @@ static auto run_in_slurm_env(
         }
 
         std::vector<std::string> nodelist;
-        hpx::util::batch_environments::slurm_environment env(
+        hpx::util::batch_environments::detail::slurm_environment env(
             nodelist, enable_debug);
         HPX_TEST_EQ(env.valid(), true);
         HPX_TEST_EQ(nodelist == hpx_nodelist, true);

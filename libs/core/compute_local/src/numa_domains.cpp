@@ -8,10 +8,9 @@
 
 #include <hpx/compute_local/host/numa_domains.hpp>
 #include <hpx/compute_local/host/target.hpp>
-#include <hpx/resource_partitioner/detail/partitioner.hpp>
-#include <hpx/runtime_local/get_os_thread_count.hpp>
-#include <hpx/topology/cpu_mask.hpp>
-#include <hpx/topology/topology.hpp>
+#include <hpx/modules/resource_partitioner.hpp>
+#include <hpx/modules/runtime_local.hpp>
+#include <hpx/modules/topology.hpp>
 
 #include <cstddef>
 #include <vector>
@@ -38,7 +37,7 @@ namespace hpx::compute::host {
 
         std::size_t const num_os_threads = hpx::get_os_thread_count();
         for (std::size_t num_thread = 0; num_thread != num_os_threads;
-             ++num_thread)
+            ++num_thread)
         {
             std::size_t const pu_num = rp.get_pu_num(num_thread);
             std::size_t const numa_node = topo.get_numa_node_number(pu_num);

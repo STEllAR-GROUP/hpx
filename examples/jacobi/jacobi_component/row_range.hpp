@@ -11,7 +11,9 @@
 #include <hpx/assert.hpp>
 #include <hpx/include/util.hpp>
 #include <hpx/modules/memory.hpp>
+#include <hpx/modules/serialization.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <vector>
 
@@ -46,18 +48,24 @@ namespace jacobi {
 
         friend void intrusive_ptr_add_ref(value_holder* p) noexcept
         {
-            ++p->count_;
+            p->count_.increment();
         }
         friend void intrusive_ptr_release(value_holder* p) noexcept
         {
-            if (0 == --p->count_)
+            if (0 == p->count_.decrement())
+            {
+                // The thread that decrements the reference count to zero must
+                // perform an acquire to ensure that it doesn't start destructing
+                // the object until all previous writes have drained.
+                std::atomic_thread_fence(std::memory_order_acquire);
                 delete p;
+            }
         }
 
         template <typename Archive>
         void serialize(Archive& ar, unsigned)
         {
-            ar& v_;
+            ar & v_;
         }
     };
 
@@ -109,7 +117,7 @@ namespace jacobi {
             values_.reset(new value_holder());
             ar & values_->v_;
             begin_ = 0;
-            end_ = values_->v_.size();
+            end_ = static_cast<std::ptrdiff_t>(values_->v_.size());
             HPX_ASSERT(end_ > begin_);
         }
 
@@ -119,7 +127,7 @@ namespace jacobi {
             HPX_ASSERT(values_);
             std::vector<double> tmp(
                 values_->v_.begin() + begin_, values_->v_.begin() + end_);
-            ar& tmp;
+            ar & tmp;
         }
 
         HPX_SERIALIZATION_SPLIT_MEMBER()

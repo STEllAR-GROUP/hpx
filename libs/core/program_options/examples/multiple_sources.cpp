@@ -16,12 +16,14 @@
 #include <string>
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace po = hpx::program_options;
 using namespace std;
 
 // A helper function to simplify the main part.
 template <class T>
-ostream& operator<<(ostream& os, const vector<T>& v)
+ostream& operator<<(ostream& os, vector<T> const& v)
 {
     copy(v.begin(), v.end(), ostream_iterator<T>(os, " "));
     return os;

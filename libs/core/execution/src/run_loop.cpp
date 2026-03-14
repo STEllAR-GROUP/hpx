@@ -6,19 +6,26 @@
 
 #include <hpx/execution/algorithms/run_loop.hpp>
 
+#include <atomic>
+
 #if !defined(HPX_HAVE_STDEXEC)
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::execution::experimental::detail {
 
     void intrusive_ptr_add_ref(run_loop_data* p) noexcept
     {
-        ++p->count_;
+        p->count_.increment();
     }
 
     void intrusive_ptr_release(run_loop_data* p) noexcept
     {
-        if (0 == --p->count_)
+        if (0 == p->count_.decrement())
         {
+            // The thread that decrements the reference count to zero must
+            // perform an acquire to ensure that it doesn't start destructing
+            // the object until all previous writes have drained.
+            std::atomic_thread_fence(std::memory_order_acquire);
+
             delete p;
         }
     }

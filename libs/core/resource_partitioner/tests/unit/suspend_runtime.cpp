@@ -26,7 +26,7 @@ void test_scheduler(
     hpx::local::init_params init_args;
 
     init_args.cfg = {"hpx.os_threads=" +
-        std::to_string(((std::min)(std::size_t(4),
+        std::to_string(((std::min) (std::size_t(4),
             std::size_t(hpx::threads::hardware_concurrency()))))};
     init_args.rp_callback = [scheduler](auto& rp,
                                 hpx::program_options::variables_map const&) {

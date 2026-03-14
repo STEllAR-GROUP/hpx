@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include <hpx/naming_base/id_type.hpp>
-#include <hpx/type_support/detail/wrap_int.hpp>
+#include <hpx/modules/naming_base.hpp>
+#include <hpx/modules/type_support.hpp>
 
 namespace hpx::traits {
 

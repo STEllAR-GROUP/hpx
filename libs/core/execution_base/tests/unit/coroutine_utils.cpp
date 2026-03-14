@@ -4,12 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/execution/algorithms/just.hpp>
-#include <hpx/execution/algorithms/sync_wait.hpp>
-#include <hpx/execution_base/completion_signatures.hpp>
-#include <hpx/execution_base/coroutine_utils.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/type_support/coroutines_support.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include "coroutine_task.hpp"
 
@@ -163,7 +161,7 @@ struct recv_set_value
     {
     }
     friend dependent tag_invoke(
-        hpx::execution::experimental::get_env_t, const recv_set_value&) noexcept
+        hpx::execution::experimental::get_env_t, recv_set_value const&) noexcept
     {
         return {};
     }
@@ -241,7 +239,7 @@ int main()
         static_assert(ex::is_awaiter_v<awaiter>);
 
         static_assert(!ex::detail::has_free_operator_co_await_v<
-                      awaitable_sender_1<awaiter>>);
+            awaitable_sender_1<awaiter>>);
 #if !defined(HPX_HAVE_STDEXEC)
         static_assert(
             ex::detail::has_free_operator_co_await_v<awaitable_sender_2>);
@@ -369,6 +367,8 @@ int main()
     try
     {
         // Awaitables are implicitly senders:
+
+        // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
         auto i = hpx::this_thread::experimental::sync_wait(
             async_answer(hpx::execution::experimental::just(42),
                 hpx::execution::experimental::just()))

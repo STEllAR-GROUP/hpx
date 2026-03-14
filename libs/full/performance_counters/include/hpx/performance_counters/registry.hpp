@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/function.hpp>
-#include <hpx/naming_base/id_type.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/performance_counters/counters.hpp>
 
 #include <cstddef>

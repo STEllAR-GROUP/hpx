@@ -1,5 +1,5 @@
 //  Copyright (c)      2020 ETH Zurich
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -23,6 +23,8 @@
 #include <string>
 #include <system_error>
 #include <typeinfo>
+
+#include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::serialization {
@@ -355,3 +357,5 @@ namespace hpx::serialization {
     template HPX_CORE_EXPORT void load(
         hpx::serialization::input_archive&, std::exception_ptr&, unsigned int);
 }    // namespace hpx::serialization
+
+#include <hpx/config/warnings_suffix.hpp>

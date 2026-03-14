@@ -419,15 +419,13 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/execution/algorithms/detail/predicates.hpp>
-#include <hpx/executors/execution_policy.hpp>
-#include <hpx/functional/invoke.hpp>
-#include <hpx/functional/invoke_result.hpp>
-#include <hpx/functional/traits/is_invocable.hpp>
-#include <hpx/iterator_support/range.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/pack_traversal/unwrap.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/executors.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/pack_traversal.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/algorithms/detail/reduce.hpp>
@@ -449,7 +447,7 @@ namespace hpx::parallel {
     // transform_reduce
     namespace detail {
 
-        template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         struct transform_reduce : public algorithm<transform_reduce<T>, T>
         {
             constexpr transform_reduce() noexcept
@@ -511,7 +509,7 @@ namespace hpx::parallel {
     // transform_reduce_binary
     namespace detail {
 
-        template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         struct transform_reduce_binary
           : public algorithm<transform_reduce_binary<T>, T>
         {
@@ -594,33 +592,31 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::transform_reduce
-    inline constexpr struct transform_reduce_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct transform_reduce_t final
       : hpx::detail::tag_parallel_algorithm<transform_reduce_t>
     {
     private:
-        // clang-format off
         template <typename ExPolicy, typename FwdIter, typename T,
-            typename Reduce, typename Convert,
-            HPX_CONCEPT_REQUIRES_(
+            typename Reduce, typename Convert>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::is_invocable_v<Convert,
                    typename std::iterator_traits<FwdIter>::value_type> &&
                 hpx::is_invocable_v<Reduce,
                    hpx::util::invoke_result_t<Convert,
-                       typename std::iterator_traits<FwdIter>::value_type
-                   >,
+                       typename std::iterator_traits<FwdIter>::value_type>,
                    hpx::util::invoke_result_t<Convert,
-                       typename std::iterator_traits<FwdIter>::value_type
-                   >
+                       typename std::iterator_traits<FwdIter>::value_type>
                 >
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(transform_reduce_t,
             ExPolicy&& policy, FwdIter first, FwdIter last, T init,
             Reduce red_op, Convert conv_op)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::transform_reduce<T>().call(
@@ -628,27 +624,25 @@ namespace hpx {
                 HPX_MOVE(red_op), HPX_MOVE(conv_op));
         }
 
-        // clang-format off
         template <typename InIter, typename T, typename Reduce,
-            typename Convert,
-            HPX_CONCEPT_REQUIRES_(
+            typename Convert>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::is_invocable_v<Convert,
                    typename std::iterator_traits<InIter>::value_type> &&
                 hpx::is_invocable_v<Reduce,
                    hpx::util::invoke_result_t<Convert,
-                       typename std::iterator_traits<InIter>::value_type
-                   >,
+                       typename std::iterator_traits<InIter>::value_type>,
                    hpx::util::invoke_result_t<Convert,
-                       typename std::iterator_traits<InIter>::value_type
-                   >
+                       typename std::iterator_traits<InIter>::value_type>
                 >
-            )>
+            )
         // clang-format on
         friend T tag_fallback_invoke(transform_reduce_t, InIter first,
             InIter last, T init, Reduce red_op, Convert conv_op)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Requires at least input iterator.");
 
             return hpx::parallel::detail::transform_reduce<T>().call(
@@ -656,22 +650,22 @@ namespace hpx {
                 HPX_MOVE(red_op), HPX_MOVE(conv_op));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename T,
-            HPX_CONCEPT_REQUIRES_(
+            typename T>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(transform_reduce_t,
             ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2,
             T init)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::transform_reduce_binary<T>().call(
@@ -680,19 +674,19 @@ namespace hpx {
                 hpx::parallel::detail::multiplies());
         }
 
+        template <typename InIter1, typename InIter2, typename T>
         // clang-format off
-        template <typename InIter1, typename InIter2, typename T,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<InIter1> &&
                 hpx::traits::is_iterator_v<InIter2>
-            )>
+            )
         // clang-format on
         friend T tag_fallback_invoke(transform_reduce_t, InIter1 first1,
             InIter1 last1, InIter2 first2, T init)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter1>,
+            static_assert(std::input_iterator<InIter1>,
                 "Requires at least input iterator.");
-            static_assert(hpx::traits::is_input_iterator_v<InIter2>,
+            static_assert(std::input_iterator<InIter2>,
                 "Requires at least input iterator.");
 
             return hpx::parallel::detail::transform_reduce_binary<T>().call(
@@ -701,36 +695,33 @@ namespace hpx {
                 hpx::parallel::detail::multiplies());
         }
 
-        // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename T, typename Reduce, typename Convert,
-            HPX_CONCEPT_REQUIRES_(
+            typename T, typename Reduce, typename Convert>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
                 hpx::is_invocable_v<Convert,
                     typename std::iterator_traits<FwdIter1>::value_type,
-                    typename std::iterator_traits<FwdIter2>::value_type
-                > &&
+                    typename std::iterator_traits<FwdIter2>::value_type> &&
                 hpx::is_invocable_v<Reduce,
                     hpx::util::invoke_result_t<Convert,
                         typename std::iterator_traits<FwdIter1>::value_type,
-                        typename std::iterator_traits<FwdIter2>::value_type
-                    >,
+                        typename std::iterator_traits<FwdIter2>::value_type>,
                     hpx::util::invoke_result_t<Convert,
                         typename std::iterator_traits<FwdIter1>::value_type,
-                        typename std::iterator_traits<FwdIter2>::value_type
-                    >
+                        typename std::iterator_traits<FwdIter2>::value_type>
                 >
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(transform_reduce_t,
             ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2,
             T init, Reduce red_op, Convert conv_op)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::transform_reduce_binary<T>().call(
@@ -738,35 +729,32 @@ namespace hpx {
                 HPX_MOVE(init), HPX_MOVE(red_op), HPX_MOVE(conv_op));
         }
 
-        // clang-format off
         template <typename InIter1, typename InIter2, typename T,
-            typename Reduce, typename Convert,
-            HPX_CONCEPT_REQUIRES_(
+            typename Reduce, typename Convert>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<InIter1> &&
                 hpx::traits::is_iterator_v<InIter2> &&
                 hpx::is_invocable_v<Convert,
                     typename std::iterator_traits<InIter1>::value_type,
-                    typename std::iterator_traits<InIter2>::value_type
-                > &&
+                    typename std::iterator_traits<InIter2>::value_type> &&
                 hpx::is_invocable_v<Reduce,
                     hpx::util::invoke_result_t<Convert,
                         typename std::iterator_traits<InIter1>::value_type,
-                        typename std::iterator_traits<InIter2>::value_type
-                    >,
+                        typename std::iterator_traits<InIter2>::value_type>,
                     hpx::util::invoke_result_t<Convert,
                         typename std::iterator_traits<InIter1>::value_type,
-                        typename std::iterator_traits<InIter2>::value_type
-                    >
+                        typename std::iterator_traits<InIter2>::value_type>
                 >
-            )>
+            )
         // clang-format on
         friend T tag_fallback_invoke(transform_reduce_t, InIter1 first1,
             InIter1 last1, InIter2 first2, T init, Reduce red_op,
             Convert conv_op)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter1>,
+            static_assert(std::input_iterator<InIter1>,
                 "Requires at least input iterator.");
-            static_assert(hpx::traits::is_input_iterator_v<InIter2>,
+            static_assert(std::input_iterator<InIter2>,
                 "Requires at least input iterator.");
 
             return hpx::parallel::detail::transform_reduce_binary<T>().call(

@@ -8,10 +8,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/iterator_support/zip_iterator.hpp>
-#include <hpx/naming_base/id_type.hpp>
+#include <hpx/modules/algorithms.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/parallel/segmented_algorithms/functional/segmented_iterator_helpers.hpp>
 
 #include <cstddef>

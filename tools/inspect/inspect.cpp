@@ -456,7 +456,6 @@ namespace {
         {
             // display error messages with group indication
             error_msg current;
-            string sep;
             for (error_msg_vector::iterator itr(msgs.begin());
                  itr != msgs.end(); ++itr)
             {
@@ -1125,7 +1124,7 @@ void print_output(std::ostream& out, inspector_list const& inspectors)
                "<tr>\n"
                "<td>"
                "<a href = \"https://github.com/STEllAR-GROUP/hpx\">"
-               "<img src=\"http://stellar.cct.lsu.edu/files/stellar100.png\""
+               "<img src=\"https://stellar-group.org/files/stellar100.png\""
                " alt=\"STE||AR logo\" />"
                "</a>\n"
                "</td>\n"

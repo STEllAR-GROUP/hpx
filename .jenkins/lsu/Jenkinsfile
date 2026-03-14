@@ -1,7 +1,7 @@
 #!groovy
 
 // Copyright (c) 2020 ETH Zurich
-// Copyright (c) 2022 Hartmut Kaiser
+// Copyright (c) 2022-2025 Hartmut Kaiser
 // Copyright (c) 2024 Alireza Kheirkhahan
 //
 // SPDX-License-Identifier: BSL-1.0
@@ -26,9 +26,9 @@ pipeline {
     stages {
         stage('checkout') {
             steps {
-                dir('hpx') {
+                dir("hpx_${env.BUILD_ID}") {
                     checkout scm
-                    echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
+                    echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL} (base directory: ${env.WORKSPACE})"
                 }
             }
         }
@@ -37,7 +37,7 @@ pipeline {
                 axes {
                     axis {
                         name 'configuration_name'
-                        values 'gcc-11', 'gcc-12', 'gcc-13', 'gcc-14', 'gcc-15', 'clang-17-apex', 'clang-16', 'clang-17', 'clang-18', 'clang-19', 'clang-20', 'gcc-12-cuda-12', 'gcc-12-cuda-12-dgx', 'hipcc'
+                        values 'gcc-12', 'gcc-13', 'gcc-14', 'gcc-15', 'clang-17-apex', 'clang-16', 'clang-17', 'clang-18', 'clang-19', 'clang-20', 'gcc-12-cuda-12', 'gcc-12-cuda-12-dgx', 'hipcc'
                     }
                     axis {
                          name 'build_type'
@@ -47,7 +47,7 @@ pipeline {
                 stages {
                     stage('build') {
                         steps {
-                            dir('hpx') {
+                            dir("hpx_${env.BUILD_ID}") {
                                 sh '''
                                 #!/bin/bash -l
                                 .jenkins/lsu/entry.sh
@@ -62,8 +62,8 @@ pipeline {
 
     post {
         always {
-            archiveArtifacts artifacts: 'hpx/jenkins-hpx-*', fingerprint: true
-            archiveArtifacts artifacts: 'hpx/build/*/Testing/**', fingerprint: true
+            archiveArtifacts artifacts: "hpx_${env.BUILD_ID}/jenkins-hpx-*", fingerprint: true
+            archiveArtifacts artifacts: "hpx_${env.BUILD_ID}/build/*/Testing/**", fingerprint: true
         }
     }
 }

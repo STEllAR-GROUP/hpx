@@ -17,6 +17,7 @@ include(HPX_AddModule)
 add_hpx_module(
   core async_local
   GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   HEADERS ${async_local_headers}
   MODULE_DEPENDENCIES hpx_async_base hpx_execution hpx_executors hpx_config
   CMAKE_SUBDIRS examples tests

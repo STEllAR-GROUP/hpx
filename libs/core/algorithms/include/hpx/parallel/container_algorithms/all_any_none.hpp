@@ -708,14 +708,15 @@ namespace hpx { namespace ranges {
 
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/projected_range.hpp>
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/executors/execution_policy.hpp>
-#include <hpx/iterator_support/range.hpp>
-#include <hpx/iterator_support/traits/is_range.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/executors.hpp>
+#include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/all_any_none.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
-#include <hpx/type_support/identity.hpp>
 
+#include <iterator>
+#include <ranges>
 #include <type_traits>
 #include <utility>
 
@@ -723,29 +724,29 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::none_of
-    inline constexpr struct none_of_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct none_of_t final
       : hpx::detail::tag_parallel_algorithm<none_of_t>
     {
     private:
-        // clang-format off
         template <typename ExPolicy, typename Rng, typename F,
-            typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            typename Proj = hpx::identity>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                std::ranges::range<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable<ExPolicy, F,
                     hpx::parallel::traits::projected_range<Proj, Rng>
                 >::value
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
         tag_fallback_invoke(
             none_of_t, ExPolicy&& policy, Rng&& rng, F f, Proj proj = Proj())
         {
-            using iterator_type = hpx::traits::range_iterator_t<Rng>;
+            using iterator_type = std::ranges::iterator_t<Rng>;
 
-            static_assert(hpx::traits::is_forward_iterator_v<iterator_type>,
+            static_assert(std::forward_iterator<iterator_type>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::none_of().call(
@@ -753,24 +754,24 @@ namespace hpx::ranges {
                 hpx::util::end(rng), HPX_MOVE(f), HPX_MOVE(proj));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename Iter, typename Sent, typename F,
-            typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            typename Proj = hpx::identity>
+        // clang-format off
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<Iter> &&
-                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
+                std::sentinel_for<Sent, Iter> &&
                 hpx::parallel::traits::is_projected_v<Proj, Iter> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy, F,
                     hpx::parallel::traits::projected<Proj, Iter>
                 >
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
         tag_fallback_invoke(none_of_t, ExPolicy&& policy, Iter first, Sent last,
             F f, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<Iter>,
+            static_assert(std::forward_iterator<Iter>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::none_of().call(
@@ -778,24 +779,23 @@ namespace hpx::ranges {
                 HPX_MOVE(proj));
         }
 
+        template <typename Rng, typename F, typename Proj = hpx::identity>
         // clang-format off
-        template <typename Rng, typename F,
-            typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_range_v<Rng> &&
+            requires (
+                std::ranges::range<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, F,
                     hpx::parallel::traits::projected_range<Proj, Rng>
                 >
-            )>
+            )
         // clang-format on
         friend bool tag_fallback_invoke(
             none_of_t, Rng&& rng, F f, Proj proj = Proj())
         {
-            using iterator_type = hpx::traits::range_iterator_t<Rng>;
+            using iterator_type = std::ranges::iterator_t<Rng>;
 
-            static_assert(hpx::traits::is_input_iterator_v<iterator_type>,
+            static_assert(std::input_iterator<iterator_type>,
                 "Required at least input iterator.");
 
             return hpx::parallel::detail::none_of().call(hpx::execution::seq,
@@ -803,24 +803,24 @@ namespace hpx::ranges {
                 HPX_MOVE(proj));
         }
 
-        // clang-format off
         template <typename Iter, typename Sent, typename F,
-            typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            typename Proj = hpx::identity>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<Iter> &&
-                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
+                std::sentinel_for<Sent, Iter> &&
                 hpx::parallel::traits::is_projected_v<Proj, Iter> &&
                 hpx::parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, F,
                     hpx::parallel::traits::projected<Proj, Iter>
                 >
-            )>
+            )
         // clang-format on
         friend bool tag_fallback_invoke(
             none_of_t, Iter first, Sent last, F f, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_input_iterator_v<Iter>,
-                "Required at least input iterator.");
+            static_assert(
+                std::input_iterator<Iter>, "Required at least input iterator.");
 
             return hpx::parallel::detail::none_of().call(
                 hpx::execution::seq, first, last, HPX_MOVE(f), HPX_MOVE(proj));
@@ -829,29 +829,28 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::any_of
-    inline constexpr struct any_of_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct any_of_t final
       : hpx::detail::tag_parallel_algorithm<any_of_t>
     {
     private:
-        // clang-format off
         template <typename ExPolicy, typename Rng, typename F,
-            typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+            typename Proj = hpx::identity>
+        // clang-format off
+            requires(hpx::is_execution_policy_v<ExPolicy> &&
+                std::ranges::range<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy, F,
                     hpx::parallel::traits::projected_range<Proj, Rng>
                 >
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
         tag_fallback_invoke(
             any_of_t, ExPolicy&& policy, Rng&& rng, F f, Proj proj = Proj())
         {
-            using iterator_type = hpx::traits::range_iterator_t<Rng>;
+            using iterator_type = std::ranges::iterator_t<Rng>;
 
-            static_assert(hpx::traits::is_forward_iterator_v<iterator_type>,
+            static_assert(std::forward_iterator<iterator_type>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::any_of().call(
@@ -859,24 +858,24 @@ namespace hpx::ranges {
                 hpx::util::end(rng), HPX_MOVE(f), HPX_MOVE(proj));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename Iter, typename Sent, typename F,
-            typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            typename Proj = hpx::identity>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<Iter> &&
-                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
+                std::sentinel_for<Sent, Iter> &&
                 hpx::parallel::traits::is_projected_v<Proj, Iter> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy, F,
                     hpx::parallel::traits::projected<Proj, Iter>
                 >
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
         tag_fallback_invoke(any_of_t, ExPolicy&& policy, Iter first, Sent last,
             F f, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<Iter>,
+            static_assert(std::forward_iterator<Iter>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::any_of().call(
@@ -884,24 +883,23 @@ namespace hpx::ranges {
                 HPX_MOVE(proj));
         }
 
+        template <typename Rng, typename F, typename Proj = hpx::identity>
         // clang-format off
-        template <typename Rng, typename F,
-            typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_range_v<Rng> &&
+            requires (
+                std::ranges::range<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, F,
                     hpx::parallel::traits::projected_range<Proj, Rng>
                 >
-            )>
+            )
         // clang-format on
         friend bool tag_fallback_invoke(
             any_of_t, Rng&& rng, F f, Proj proj = Proj())
         {
-            using iterator_type = hpx::traits::range_iterator_t<Rng>;
+            using iterator_type = std::ranges::iterator_t<Rng>;
 
-            static_assert(hpx::traits::is_input_iterator_v<iterator_type>,
+            static_assert(std::input_iterator<iterator_type>,
                 "Required at least input iterator.");
 
             return hpx::parallel::detail::any_of().call(hpx::execution::seq,
@@ -909,24 +907,24 @@ namespace hpx::ranges {
                 HPX_MOVE(proj));
         }
 
-        // clang-format off
         template <typename Iter, typename Sent, typename F,
-            typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            typename Proj = hpx::identity>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<Iter> &&
-                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
+                std::sentinel_for<Sent, Iter> &&
                 hpx::parallel::traits::is_projected_v<Proj, Iter> &&
                 hpx::parallel::traits::is_indirect_callable_v<
                 hpx::execution::sequenced_policy, F,
                     hpx::parallel::traits::projected<Proj, Iter>
                 >
-            )>
+            )
         // clang-format on
         friend bool tag_fallback_invoke(
             any_of_t, Iter first, Sent last, F f, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_input_iterator_v<Iter>,
-                "Required at least input iterator.");
+            static_assert(
+                std::input_iterator<Iter>, "Required at least input iterator.");
 
             return hpx::parallel::detail::any_of().call(
                 hpx::execution::seq, first, last, HPX_MOVE(f), HPX_MOVE(proj));
@@ -935,29 +933,29 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::all_of
-    inline constexpr struct all_of_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct all_of_t final
       : hpx::detail::tag_parallel_algorithm<all_of_t>
     {
     private:
-        // clang-format off
         template <typename ExPolicy, typename Rng, typename F,
-            typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            typename Proj = hpx::identity>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                std::ranges::range<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy, F,
                     hpx::parallel::traits::projected_range<Proj, Rng>
                 >
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
         tag_fallback_invoke(
             all_of_t, ExPolicy&& policy, Rng&& rng, F f, Proj proj = Proj())
         {
-            using iterator_type = hpx::traits::range_iterator_t<Rng>;
+            using iterator_type = std::ranges::iterator_t<Rng>;
 
-            static_assert(hpx::traits::is_forward_iterator_v<iterator_type>,
+            static_assert(std::forward_iterator<iterator_type>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::all_of().call(
@@ -965,24 +963,24 @@ namespace hpx::ranges {
                 hpx::util::end(rng), HPX_MOVE(f), HPX_MOVE(proj));
         }
 
-        // clang-format off
         template <typename ExPolicy, typename Iter, typename Sent, typename F,
-            typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            typename Proj = hpx::identity>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<Iter> &&
-                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
+                std::sentinel_for<Sent, Iter> &&
                 hpx::parallel::traits::is_projected_v<Proj, Iter> &&
                 hpx::parallel::traits::is_indirect_callable_v<ExPolicy, F,
                     hpx::parallel::traits::projected<Proj, Iter>
                 >
-            )>
+            )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
         tag_fallback_invoke(all_of_t, ExPolicy&& policy, Iter first, Sent last,
             F f, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<Iter>,
+            static_assert(std::forward_iterator<Iter>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::all_of().call(
@@ -990,24 +988,23 @@ namespace hpx::ranges {
                 HPX_MOVE(proj));
         }
 
+        template <typename Rng, typename F, typename Proj = hpx::identity>
         // clang-format off
-        template <typename Rng, typename F,
-            typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_range_v<Rng> &&
+            requires (
+                std::ranges::range<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable_v<
                 hpx::execution::sequenced_policy, F,
                     hpx::parallel::traits::projected_range<Proj, Rng>
                 >
-            )>
+            )
         // clang-format on
         friend bool tag_fallback_invoke(
             all_of_t, Rng&& rng, F f, Proj proj = Proj())
         {
-            using iterator_type = hpx::traits::range_iterator_t<Rng>;
+            using iterator_type = std::ranges::iterator_t<Rng>;
 
-            static_assert(hpx::traits::is_input_iterator_v<iterator_type>,
+            static_assert(std::input_iterator<iterator_type>,
                 "Required at least input iterator.");
 
             return hpx::parallel::detail::all_of().call(hpx::execution::seq,
@@ -1015,24 +1012,24 @@ namespace hpx::ranges {
                 HPX_MOVE(proj));
         }
 
-        // clang-format off
         template <typename Iter, typename Sent, typename F,
-            typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
+            typename Proj = hpx::identity>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<Iter> &&
-                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
+                std::sentinel_for<Sent, Iter> &&
                 hpx::parallel::traits::is_projected_v<Proj, Iter> &&
                 hpx::parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, F,
                     hpx::parallel::traits::projected<Proj, Iter>
                 >
-            )>
+            )
         // clang-format on
         friend bool tag_fallback_invoke(
             all_of_t, Iter first, Sent last, F f, Proj proj = Proj())
         {
-            static_assert(hpx::traits::is_input_iterator_v<Iter>,
-                "Required at least input iterator.");
+            static_assert(
+                std::input_iterator<Iter>, "Required at least input iterator.");
 
             return hpx::parallel::detail::all_of().call(
                 hpx::execution::seq, first, last, HPX_MOVE(f), HPX_MOVE(proj));

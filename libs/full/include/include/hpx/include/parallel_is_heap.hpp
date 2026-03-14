@@ -6,5 +6,4 @@
 
 #pragma once
 
-#include <hpx/parallel/algorithms/is_heap.hpp>
-#include <hpx/parallel/container_algorithms/is_heap.hpp>
+#include <hpx/modules/algorithms.hpp>

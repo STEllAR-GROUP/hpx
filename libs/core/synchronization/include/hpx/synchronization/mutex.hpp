@@ -12,26 +12,28 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/coroutines/coroutine_fwd.hpp>
-#include <hpx/coroutines/thread_id_type.hpp>
+#include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/threading_base.hpp>
+#include <hpx/modules/timing.hpp>
 #include <hpx/synchronization/detail/condition_variable.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/threading_base/threading_base_fwd.hpp>
-#include <hpx/timing/steady_clock.hpp>
+#if defined(HPX_HAVE_MODULE_TRACY)
+#include <hpx/modules/tracy.hpp>
+#endif
 
 namespace hpx::threads {
 
-    using thread_id_ref_type = thread_id_ref;
-    using thread_self = coroutines::detail::coroutine_self;
+    HPX_CXX_CORE_EXPORT using thread_id_ref_type = thread_id_ref;
+    HPX_CXX_CORE_EXPORT using thread_self = coroutines::detail::coroutine_self;
 
     /// The function \a get_self_id returns the HPX thread id of the current
     /// thread (or zero if the current thread is not a HPX thread).
-    HPX_CORE_EXPORT thread_id get_self_id() noexcept;
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT thread_id get_self_id() noexcept;
 
     /// The function \a get_self_ptr returns a pointer to the (OS thread
     /// specific) self reference to the current HPX thread.
-    HPX_CORE_EXPORT thread_self* get_self_ptr() noexcept;
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT thread_self* get_self_ptr() noexcept;
 }    // namespace hpx::threads
 
 namespace hpx {
@@ -60,11 +62,14 @@ namespace hpx {
     ///
     ///        \a hpx::mutex is neither copyable nor movable.
     ///
-    class mutex
+    HPX_CXX_CORE_EXPORT class mutex
     {
     public:
         /// \brief \a hpx::mutex is neither copyable nor movable
-        HPX_NON_COPYABLE(mutex);
+        mutex(mutex const&) = delete;
+        mutex(mutex&&) = delete;
+        mutex& operator=(mutex const&) = delete;
+        mutex& operator=(mutex&&) = delete;
 
     protected:
         /// \cond NOPROTECTED
@@ -84,7 +89,7 @@ namespace hpx {
         ///
         /// \param description description of the \a mutex.
         ///
-#if defined(HPX_HAVE_ITTNOTIFY)
+#if HPX_HAVE_ITTNOTIFY != 0 || defined(HPX_HAVE_MODULE_TRACY)
         HPX_CORE_EXPORT mutex(char const* const description = "");
 #else
         HPX_HOST_DEVICE_CONSTEXPR mutex(char const* const = "") noexcept
@@ -240,6 +245,9 @@ namespace hpx {
         mutable mutex_type mtx_;
         threads::thread_id_type owner_id_;
         hpx::lcos::local::detail::condition_variable cond_;
+#if defined(HPX_HAVE_MODULE_TRACY)
+        hpx::tracy::lock_data context_;
+#endif
         /// \endcond NOPROTECTED
     };
 
@@ -258,11 +266,14 @@ namespace hpx {
     ///
     ///        \a hpx::timed_mutex is neither copyable nor movable.
     ///
-    class timed_mutex : private mutex
+    HPX_CXX_CORE_EXPORT class timed_mutex : private mutex
     {
     public:
         /// \brief \a hpx::timed_mutex is neither copyable nor movable
-        HPX_NON_COPYABLE(timed_mutex);
+        timed_mutex(timed_mutex const&) = delete;
+        timed_mutex(timed_mutex&&) = delete;
+        timed_mutex& operator=(timed_mutex const&) = delete;
+        timed_mutex& operator=(timed_mutex&&) = delete;
 
     public:
         ///

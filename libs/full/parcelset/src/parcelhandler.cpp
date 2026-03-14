@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //  Copyright (c) 2013-2014 Thomas Heller
 //  Copyright (c) 2007      Richard D Guidry Jr
 //  Copyright (c) 2011      Bryce Lelbach & Katelyn Kufahl
@@ -29,15 +29,13 @@
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/modules/util.hpp>
-#include <hpx/util/from_string.hpp>
 
 #include <hpx/components_base/agas_interface.hpp>
-#include <hpx/naming_base/gid_type.hpp>
+#include <hpx/modules/naming_base.hpp>
+#include <hpx/modules/parcelset_base.hpp>
 #include <hpx/parcelset/init_parcelports.hpp>
 #include <hpx/parcelset/message_handler_fwd.hpp>
 #include <hpx/parcelset/parcelhandler.hpp>
-#include <hpx/parcelset_base/parcelset_base_fwd.hpp>
-#include <hpx/parcelset_base/policies/message_handler.hpp>
 #include <hpx/plugin_factories/parcelport_factory_base.hpp>
 
 #include <asio/error.hpp>
@@ -58,6 +56,8 @@
 #if defined(HPX_HAVE_PARCEL_PROFILING)
 #include <chrono>
 #endif
+
+#include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::detail {
@@ -87,9 +87,11 @@ namespace hpx::parcelset {
       : tm_(nullptr)
       , use_alternative_parcelports_(false)
       , enable_parcel_handling_(true)
+      , handlers_mtx_("parcelhandler::handlers_mtx")
       , load_message_handlers_(
             util::get_entry_as<int>(cfg, "hpx.parcel.message_handlers", 0) != 0)
       , count_routed_(0)
+      , mtx_("parcelhandler::mtx")
       , write_handler_(&default_write_handler)
 #if defined(HPX_HAVE_NETWORKING)
       , is_networking_enabled_(cfg.enable_networking())
@@ -524,7 +526,6 @@ namespace hpx::parcelset {
     }
 
     namespace detail {
-
         void parcel_sent_handler(
             parcelhandler::write_handler_type const& f,    //-V669
             std::error_code const& ec, parcelset::parcel const& p)
@@ -620,8 +621,8 @@ namespace hpx::parcelset {
                     parcel, write_handler_type) = &parcelhandler::put_parcel;
 
                 threads::thread_init_data data(
-                    threads::make_thread_function_nullary(util::deferred_call(
-                        put_parcel_ptr, this, HPX_MOVE(p), HPX_MOVE(f))),
+                    threads::make_thread_function_nullary(
+                        put_parcel_ptr, this, HPX_MOVE(p), HPX_MOVE(f)),
                     "parcelhandler::put_parcel",
                     threads::thread_priority::boost,
                     threads::thread_schedule_hint(),
@@ -765,9 +766,8 @@ namespace hpx::parcelset {
                 std::vector<write_handler_type>) = &parcelhandler::put_parcels;
 
             threads::thread_init_data data(
-                threads::make_thread_function_nullary(
-                    util::deferred_call(put_parcels_ptr, this,
-                        HPX_MOVE(parcels), HPX_MOVE(handlers))),
+                threads::make_thread_function_nullary(put_parcels_ptr, this,
+                    HPX_MOVE(parcels), HPX_MOVE(handlers)),
                 "parcelhandler::put_parcels", threads::thread_priority::boost,
                 threads::thread_schedule_hint(),
                 threads::thread_stacksize::medium,
@@ -910,12 +910,12 @@ namespace hpx::parcelset {
             // If we are in a stopped state, ignore some errors
             if (hpx::is_stopped_or_shutting_down())
             {
-                using asio::error::make_error_code;
-                if (ec == make_error_code(asio::error::connection_aborted) ||
-                    ec == make_error_code(asio::error::connection_reset) ||
-                    ec == make_error_code(asio::error::broken_pipe) ||
-                    ec == make_error_code(asio::error::not_connected) ||
-                    ec == make_error_code(asio::error::eof))
+                using ::asio::error::make_error_code;
+                if (ec == make_error_code(::asio::error::connection_aborted) ||
+                    ec == make_error_code(::asio::error::connection_reset) ||
+                    ec == make_error_code(::asio::error::broken_pipe) ||
+                    ec == make_error_code(::asio::error::not_connected) ||
+                    ec == make_error_code(::asio::error::eof))
                 {
                     return;
                 }
@@ -923,7 +923,8 @@ namespace hpx::parcelset {
             else if (hpx::tolerate_node_faults())
             {
                 if (ec ==
-                    asio::error::make_error_code(asio::error::connection_reset))
+                    ::asio::error::make_error_code(
+                        ::asio::error::connection_reset))
                 {
                     return;
                 }

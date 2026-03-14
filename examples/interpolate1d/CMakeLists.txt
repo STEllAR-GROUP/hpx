@@ -31,7 +31,7 @@ if(HPX_WITH_EXAMPLES_HDF5)
       ${subdir}_client INTERNAL_FLAGS
       SOURCES ${sources}
       DEPENDENCIES ${subdir}_component
-      FOLDER "Examples/Interpolate1D"
+      FOLDER "Examples/Interpolate1D" ${HPX_WITH_CXX_MODULES_OPTION}
     )
 
     add_hpx_example_target_dependencies("interpolate1d" ${subdir}_client)
@@ -47,7 +47,7 @@ if(HPX_WITH_EXAMPLES_HDF5)
     create_1d_testdata INTERNAL_FLAGS
     SOURCES create_testdata.cpp
     NOLIBS
-    FOLDER "Examples/Interpolate1D"
+    FOLDER "Examples/Interpolate1D" ${HPX_WITH_CXX_MODULES_OPTION}
   )
 
   target_include_directories(create_1d_testdata PRIVATE ${HDF5_INCLUDE_DIRS})

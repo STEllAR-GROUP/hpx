@@ -58,7 +58,7 @@ foreach(example_program ${example_programs})
   add_hpx_executable(
     ${example_program} INTERNAL_FLAGS
     SOURCES ${sources} ${${example_program}_FLAGS}
-    FOLDER "Examples/1D Stencil"
+    FOLDER "Examples/1D Stencil" ${HPX_WITH_CXX_MODULES_OPTION}
   )
 
   add_hpx_example_target_dependencies("1d_stencil" ${example_program})

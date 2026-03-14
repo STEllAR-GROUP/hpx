@@ -40,9 +40,9 @@ The table below shows the supported compilers for |hpx|.
    =================== ================== ==================
    Name                Minimum Version    Latest tested
    =================== ================== ==================
-   |gcc|_              11.0               15.0
+   |gcc|_              12.0               15.0
    |clang|_            16.0               20.0
-   |visual_cxx|_ (x64) 2019               2022
+   |visual_cxx|_ (x64) 2022               2022
    =================== ================== ==================
 
 Software and libraries
@@ -55,7 +55,7 @@ The table below presents all the necessary prerequisites for building |hpx|.
    ====================== =================== ================== ==================
    \                      Name                Minimum Version    Latest tested
    ====================== =================== ================== ==================
-   **Build System**       |cmake|_            3.18               4.0
+   **Build System**       |cmake|_            3.20               4.1
    **Required Libraries** |boost|_            1.71.0             1.88.0
    \                      |hwloc|_            1.5                2.4
    ====================== =================== ================== ==================
@@ -73,7 +73,7 @@ standard library features when available.
 .. note::
 
    When building Boost using gcc, please note that it is required to specify a
-   ``cxxflags=-std=c++17`` command line argument to ``b2`` (``bjam``).
+   ``cxxflags=-std=c++20`` command line argument to ``b2`` (``bjam``).
 
 .. note::
 

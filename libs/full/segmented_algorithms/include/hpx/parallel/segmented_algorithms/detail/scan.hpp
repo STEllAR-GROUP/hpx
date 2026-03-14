@@ -1,5 +1,5 @@
 //  Copyright (c) 2016 Minh-Khanh Do
-//  Copyright (c) 2020-2024 Hartmut Kaiser
+//  Copyright (c) 2020-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,26 +10,21 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/async_distributed/dataflow.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/functional/invoke.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/pack_traversal/unwrap.hpp>
-#include <hpx/parallel/util/partitioner.hpp>
-#include <hpx/type_support/unused.hpp>
-#include <hpx/type_support/void_guard.hpp>
-
-#include <hpx/execution/executors/execution.hpp>
-#include <hpx/executors/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/modules/algorithms.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/executors.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/pack_traversal.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/util/detail/algorithm_result.hpp>
-#include <hpx/parallel/util/loop.hpp>
 
 #include <algorithm>
 #include <cstddef>
+#include <iterator>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -249,7 +244,7 @@ namespace hpx::parallel {
 
                 // handle all partitions
                 for (++sit_in, ++sit_out; sit_in != send_in;
-                     ++sit_in, ++sit_out)
+                    ++sit_in, ++sit_out)
                 {
                     beg_in = traits_in::begin(sit_in);
                     end_in = traits_in::end(sit_in);
@@ -372,7 +367,7 @@ namespace hpx::parallel {
 
                 // handle all partitions
                 for (++sit_in, ++sit_out; sit_in != send_in;
-                     ++sit_in, ++sit_out)
+                    ++sit_in, ++sit_out)
                 {
                     beg = traits_in::begin(sit_in);
                     end = traits_in::end(sit_in);
@@ -410,8 +405,8 @@ namespace hpx::parallel {
                 // segment
                 dispatch(traits_out::get_id(out_iters[i]),
                     segmented_scan_void<Algo>(), policy, std::true_type(),
-                    get<0>(in_iters[i]), get<1>(in_iters[i]), out,
-                    HPX_FORWARD(Conv, conv), last_value, HPX_FORWARD(Op, op));
+                    get<0>(in_iters[i]), get<1>(in_iters[i]), out, conv,
+                    last_value, op);
 
                 // 3. Step: compute new init values for the next segment
                 last_value = op(results[i], last_value);
@@ -537,8 +532,8 @@ namespace hpx::parallel {
             using difference_type = typename std::iterator_traits<
                 segment_iterator_in>::difference_type;
 
-            using forced_seq = std::integral_constant<bool,
-                !hpx::traits::is_forward_iterator<SegIter>::value>;
+            using forced_seq =
+                std::integral_constant<bool, !std::forward_iterator<SegIter>>;
 
             using local_iterator_in_tuple =
                 hpx::tuple<local_iterator_type_in, local_iterator_type_in>;
@@ -590,7 +585,7 @@ namespace hpx::parallel {
 
                 // handle all partitions
                 for (++sit_in, ++sit_out; sit_in != send_in;
-                     ++sit_in, ++sit_out)
+                    ++sit_in, ++sit_out)
                 {
                     beg = traits_in::begin(sit_in);
                     end = traits_in::end(sit_in);
@@ -687,8 +682,8 @@ namespace hpx::parallel {
             using difference_type = typename std::iterator_traits<
                 segment_iterator>::difference_type;
 
-            using forced_seq = std::integral_constant<bool,
-                !hpx::traits::is_forward_iterator<SegIter>::value>;
+            using forced_seq =
+                std::integral_constant<bool, !std::forward_iterator<SegIter>>;
 
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,20 +7,17 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/execution/algorithms/just.hpp>
-#include <hpx/execution/algorithms/sync_wait.hpp>
-#include <hpx/execution/algorithms/then.hpp>
-#include <hpx/execution/traits/is_execution_policy.hpp>
-#include <hpx/executors/execution_policy_fwd.hpp>
-#include <hpx/functional/detail/invoke.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/type_support/unused.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/executors.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #if defined(HPX_HAVE_STDEXEC)
 // for is_sender
-#include <hpx/execution_base/completion_signatures.hpp>
+#include <hpx/modules/execution_base.hpp>
 #endif
 
 #include <type_traits>
@@ -29,10 +26,11 @@
 namespace hpx::parallel::util::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename ExPolicy, typename T, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename T,
+        typename Enable = void>
     struct algorithm_result_impl;
 
-    template <typename ExPolicy, typename T>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename T>
     struct algorithm_result_impl<ExPolicy, T,
         std::enable_if_t<!hpx::is_async_execution_policy_v<ExPolicy> &&
             !hpx::execution_policy_has_scheduler_executor_v<ExPolicy>>>
@@ -60,7 +58,7 @@ namespace hpx::parallel::util::detail {
         }
     };
 
-    template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
     struct algorithm_result_impl<ExPolicy, void,
         std::enable_if_t<!hpx::is_async_execution_policy_v<ExPolicy> &&
             !hpx::execution_policy_has_scheduler_executor_v<ExPolicy>>>
@@ -85,7 +83,7 @@ namespace hpx::parallel::util::detail {
         }
     };
 
-    template <typename ExPolicy, typename T>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename T>
     struct algorithm_result_impl<ExPolicy, T,
         std::enable_if_t<hpx::is_async_execution_policy_v<ExPolicy> &&
             !hpx::execution_policy_has_scheduler_executor_v<ExPolicy>>>
@@ -105,7 +103,7 @@ namespace hpx::parallel::util::detail {
         }
     };
 
-    template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
     struct algorithm_result_impl<ExPolicy, void,
         std::enable_if_t<hpx::is_async_execution_policy_v<ExPolicy> &&
             !hpx::execution_policy_has_scheduler_executor_v<ExPolicy>>>
@@ -136,7 +134,7 @@ namespace hpx::parallel::util::detail {
         }
     };
 
-    template <typename ExPolicy, typename T>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename T>
     struct algorithm_result_impl<ExPolicy, T,
         std::enable_if_t<!hpx::is_async_execution_policy_v<ExPolicy> &&
             hpx::execution_policy_has_scheduler_executor_v<ExPolicy>>>
@@ -165,6 +163,7 @@ namespace hpx::parallel::util::detail {
                 }
                 else
                 {
+                    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
                     return hpx::get<0>(*result);
                 }
             }
@@ -175,7 +174,7 @@ namespace hpx::parallel::util::detail {
         }
     };
 
-    template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
     struct algorithm_result_impl<ExPolicy, void,
         std::enable_if_t<!hpx::is_async_execution_policy_v<ExPolicy> &&
             hpx::execution_policy_has_scheduler_executor_v<ExPolicy>>>
@@ -197,7 +196,7 @@ namespace hpx::parallel::util::detail {
         }
     };
 
-    template <typename ExPolicy, typename T>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename T>
     struct algorithm_result_impl<ExPolicy, T,
         std::enable_if_t<hpx::is_async_execution_policy_v<ExPolicy> &&
             hpx::execution_policy_has_scheduler_executor_v<ExPolicy>>>
@@ -221,7 +220,7 @@ namespace hpx::parallel::util::detail {
         }
     };
 
-    template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
     struct algorithm_result_impl<ExPolicy, void,
         std::enable_if_t<hpx::is_async_execution_policy_v<ExPolicy> &&
             hpx::execution_policy_has_scheduler_executor_v<ExPolicy>>>
@@ -245,23 +244,24 @@ namespace hpx::parallel::util::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename ExPolicy, typename T = void>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename T = void>
     struct algorithm_result : algorithm_result_impl<std::decay_t<ExPolicy>, T>
     {
         static_assert(!std::is_lvalue_reference_v<T>,
             "T shouldn't be a lvalue reference");
     };
 
-    template <typename ExPolicy, typename T = void>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename T = void>
     using algorithm_result_t = typename algorithm_result<ExPolicy, T>::type;
 
     ///////////////////////////////////////////////////////////////////////////
+
+    HPX_CXX_CORE_EXPORT template <typename U, typename Conv>
     // clang-format off
-    template <typename U, typename Conv,
-        HPX_CONCEPT_REQUIRES_(
+        requires (
            !hpx::execution::experimental::is_sender_v<U> &&
             hpx::is_invocable_v<Conv, U>
-        )>
+        )
     // clang-format on
     constexpr hpx::util::invoke_result_t<Conv, U> convert_to_result(
         U&& val, Conv&& conv)
@@ -269,12 +269,8 @@ namespace hpx::parallel::util::detail {
         return HPX_INVOKE(conv, val);
     }
 
-    // clang-format off
-    template <typename Sender, typename Conv,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::execution::experimental::is_sender_v<Sender>
-        )>
-    // clang-format on
+    HPX_CXX_CORE_EXPORT template <typename Sender, typename Conv>
+        requires(hpx::execution::experimental::is_sender_v<Sender>)
     constexpr decltype(auto) convert_to_result(Sender&& sender, Conv&& conv)
     {
         return hpx::execution::experimental::then(HPX_FORWARD(Sender, sender),
@@ -283,8 +279,8 @@ namespace hpx::parallel::util::detail {
             });
     }
 
-    template <typename U, typename Conv,
-        HPX_CONCEPT_REQUIRES_(hpx::is_invocable_v<Conv, U>)>
+    HPX_CXX_CORE_EXPORT template <typename U, typename Conv>
+        requires(hpx::is_invocable_v<Conv, U>)
     hpx::future<hpx::util::invoke_result_t<Conv, U>> convert_to_result(
         hpx::future<U>&& f, Conv&& conv)
     {

@@ -154,11 +154,12 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/execution/algorithms/detail/predicates.hpp>
-#include <hpx/executors/execution_policy.hpp>
-#include <hpx/functional/invoke.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/executors.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/iterator_support.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/upper_lower_bound.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
@@ -166,7 +167,6 @@ namespace hpx {
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/result_types.hpp>
-#include <hpx/type_support/identity.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -181,9 +181,9 @@ namespace hpx::parallel {
     // includes
     namespace detail {
 
-        template <typename Iter1, typename Sent1, typename Iter2,
-            typename Sent2, typename F, typename Proj1, typename Proj2,
-            typename CancelToken>
+        HPX_CXX_CORE_EXPORT template <typename Iter1, typename Sent1,
+            typename Iter2, typename Sent2, typename F, typename Proj1,
+            typename Proj2, typename CancelToken>
         constexpr bool sequential_includes(Iter1 first1, Sent1 last1,
             Iter2 first2, Sent2 last2, F&& f, Proj1&& proj1, Proj2&& proj2,
             CancelToken& tok)
@@ -218,8 +218,9 @@ namespace hpx::parallel {
             return true;
         }
 
-        template <typename Iter1, typename Sent1, typename Iter2,
-            typename Sent2, typename F, typename Proj1, typename Proj2>
+        HPX_CXX_CORE_EXPORT template <typename Iter1, typename Sent1,
+            typename Iter2, typename Sent2, typename F, typename Proj1,
+            typename Proj2>
         constexpr bool sequential_includes(Iter1 first1, Sent1 last1,
             Iter2 first2, Sent2 last2, F&& f, Proj1&& proj1, Proj2&& proj2)
         {
@@ -249,7 +250,7 @@ namespace hpx::parallel {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        struct includes : public algorithm<includes, bool>
+        HPX_CXX_CORE_EXPORT struct includes : public algorithm<includes, bool>
         {
             constexpr includes() noexcept
               : algorithm("includes")
@@ -377,14 +378,14 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::includes
-    inline constexpr struct includes_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct includes_t final
       : hpx::detail::tag_parallel_algorithm<includes_t>
     {
     private:
-        // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename Pred = hpx::parallel::detail::less,
-            HPX_CONCEPT_REQUIRES_(
+            typename Pred = hpx::parallel::detail::less>
+        // clang-format off
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
@@ -392,15 +393,15 @@ namespace hpx {
                     typename std::iterator_traits<FwdIter1>::value_type,
                     typename std::iterator_traits<FwdIter2>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(includes_t, ExPolicy&& policy,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2,
             Pred op = Pred())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::includes().call(
@@ -408,24 +409,24 @@ namespace hpx {
                 HPX_MOVE(op), hpx::identity_v, hpx::identity_v);
         }
 
-        // clang-format off
         template <typename FwdIter1, typename FwdIter2,
-            typename Pred = hpx::parallel::detail::less,
-            HPX_CONCEPT_REQUIRES_(
+            typename Pred = hpx::parallel::detail::less>
+        // clang-format off
+            requires (
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<FwdIter1>::value_type,
                     typename std::iterator_traits<FwdIter2>::value_type
                 >
-            )>
+            )
         // clang-format on
         friend bool tag_fallback_invoke(includes_t, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, Pred op = Pred())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::includes().call(hpx::execution::seq,

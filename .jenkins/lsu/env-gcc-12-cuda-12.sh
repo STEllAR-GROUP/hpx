@@ -13,7 +13,7 @@ module load hwloc
 module load cuda/12
 module load openmpi
 
-export CXX_STD="17"
+export CXX_STD="20"
 
 configure_extra_options+=" -DHPX_WITH_CXX_STANDARD=${CXX_STD}"
 configure_extra_options+=" -DHPX_WITH_MALLOC=system"

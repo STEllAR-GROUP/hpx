@@ -1,4 +1,4 @@
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -47,17 +47,18 @@ struct wait_op
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Policy, typename Vector>
-std::uint64_t foreach_vector(Policy&& policy, Vector const& v)
+double foreach_vector(Policy&& policy, Vector const& v)
 {
     std::uint64_t start = hpx::chrono::high_resolution_clock::now();
 
     for (int i = 0; i != test_count; ++i)
     {
-        hpx::ranges::for_each(
-            std::forward<Policy>(policy), v, wait_op<Vector>());
+        hpx::ranges::for_each(policy, v, wait_op<Vector>());
     }
 
-    return (hpx::chrono::high_resolution_clock::now() - start) / test_count;
+    return static_cast<double>(
+               (hpx::chrono::high_resolution_clock::now() - start)) /
+        static_cast<double>(test_count);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -85,8 +86,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
         // retrieve reference time
         std::vector<int> ref(vector_size);
-        std::uint64_t seq_ref = foreach_vector(hpx::execution::seq, ref);
-        std::uint64_t par_ref =
+        double seq_ref = foreach_vector(hpx::execution::seq, ref);
+        double par_ref =
             foreach_vector(hpx::execution::par.with(cs), ref);    //-V106
 
         // sequential hpx::partitioned_vector iteration
@@ -94,12 +95,11 @@ int hpx_main(hpx::program_options::variables_map& vm)
             hpx::partitioned_vector<int> v(vector_size);
 
             hpx::cout << "hpx::partitioned_vector<int>(execution::seq): "
-                      << foreach_vector(hpx::execution::seq, v) /
-                    double(seq_ref)
+                      << foreach_vector(hpx::execution::seq, v) / seq_ref
                       << "\n";
             hpx::cout << "hpx::partitioned_vector<int>(execution::par): "
                       << foreach_vector(hpx::execution::par.with(cs), v) /
-                    double(par_ref)    //-V106
+                    par_ref
                       << "\n";
         }
 
@@ -109,13 +109,12 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
             hpx::cout << "hpx::partitioned_vector<int>(execution::seq, "
                          "container_layout(2)): "
-                      << foreach_vector(hpx::execution::seq, v) /
-                    double(seq_ref)
+                      << foreach_vector(hpx::execution::seq, v) / seq_ref
                       << "\n";
             hpx::cout << "hpx::partitioned_vector<int>(execution::par, "
                          "container_layout(2)): "
                       << foreach_vector(hpx::execution::par.with(cs), v) /
-                    double(par_ref)    //-V106
+                    par_ref
                       << "\n";
         }
 
@@ -125,13 +124,12 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
             hpx::cout << "hpx::partitioned_vector<int>(execution::seq, "
                          "container_layout(10)): "
-                      << foreach_vector(hpx::execution::seq, v) /
-                    double(seq_ref)
+                      << foreach_vector(hpx::execution::seq, v) / seq_ref
                       << "\n";
             hpx::cout << "hpx::partitioned_vector<int>(execution::par, "
                          "container_layout(10)): "
                       << foreach_vector(hpx::execution::par.with(cs), v) /
-                    double(par_ref)    //-V106
+                    par_ref
                       << "\n";
         }
     }

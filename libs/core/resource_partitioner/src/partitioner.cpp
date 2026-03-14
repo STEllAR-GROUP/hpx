@@ -5,9 +5,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/topology.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
-#include <hpx/topology/cpu_mask.hpp>
 
 #include <cstddef>
 #include <memory>

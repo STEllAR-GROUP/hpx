@@ -7,4 +7,4 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/parallel/task_block.hpp>
+#include <hpx/modules/algorithms.hpp>

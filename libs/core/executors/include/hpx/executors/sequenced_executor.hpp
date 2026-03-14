@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,25 +9,18 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/errors/exception_list.hpp>
-#include <hpx/execution/detail/async_launch_policy_dispatch.hpp>
-#include <hpx/execution/detail/sync_launch_policy_dispatch.hpp>
-#include <hpx/execution/executors/execution.hpp>
-#include <hpx/execution/executors/execution_parameters.hpp>
-#include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/executors/execution_policy_mappings.hpp>
 #include <hpx/executors/parallel_executor.hpp>
-#include <hpx/functional/deferred_call.hpp>
-#include <hpx/functional/invoke.hpp>
-#include <hpx/futures/future.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/pack_traversal.hpp>
+#include <hpx/modules/serialization.hpp>
+#include <hpx/modules/threading_base.hpp>
+#include <hpx/modules/timing.hpp>
 #include <hpx/modules/topology.hpp>
-#include <hpx/pack_traversal/unwrap.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/threading_base/annotated_function.hpp>
-#include <hpx/threading_base/detail/get_default_pool.hpp>
-#include <hpx/threading_base/thread_description.hpp>
-#include <hpx/threading_base/thread_num_tss.hpp>
-#include <hpx/timing/steady_clock.hpp>
 
 #include <cstddef>
 #include <iterator>
@@ -43,7 +36,7 @@ namespace hpx::execution {
     /// which execute in the calling thread. The sequential order is given by
     /// the lexicographical order of indices in the index space.
     ///
-    struct sequenced_executor
+    HPX_CXX_CORE_EXPORT struct sequenced_executor
     {
         /// \cond NOINTERNAL
         bool operator==(sequenced_executor const& /*rhs*/) const noexcept
@@ -128,12 +121,8 @@ namespace hpx::execution {
         }
 
         // BulkTwoWayExecutor interface
-        // clang-format off
-        template <typename F, typename S, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
-                !std::is_integral_v<S>
-            )>
-        // clang-format on
+        template <typename F, typename S, typename... Ts>
+            requires(!std::is_integral_v<S>)
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::bulk_async_execute_t,
             [[maybe_unused]] sequenced_executor const& exec, F&& f,
@@ -158,9 +147,9 @@ namespace hpx::execution {
                         desc, f, elem, ts...));
                 }
             }
-            catch (std::bad_alloc const& ba)
+            catch (std::bad_alloc const&)
             {
-                throw ba;
+                throw;
             }
             catch (...)
             {
@@ -170,12 +159,8 @@ namespace hpx::execution {
             return results;
         }
 
-        // clang-format off
-        template <typename F, typename S, typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
-                !std::is_integral_v<S>
-            )>
-        // clang-format on
+        template <typename F, typename S, typename... Ts>
+            requires(!std::is_integral_v<S>)
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::bulk_sync_execute_t,
             sequenced_executor const& exec, F&& f, S const& shape, Ts&&... ts)
@@ -185,12 +170,8 @@ namespace hpx::execution {
         }
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-        // clang-format off
-        template <typename Executor_,
-            HPX_CONCEPT_REQUIRES_(
-                std::is_convertible_v<Executor_, sequenced_executor>
-            )>
-        // clang-format on
+        template <typename Executor_>
+            requires(std::is_convertible_v<Executor_, sequenced_executor>)
         friend constexpr auto tag_invoke(
             hpx::execution::experimental::with_annotation_t,
             Executor_ const& exec, char const* annotation)
@@ -200,12 +181,8 @@ namespace hpx::execution {
             return exec_with_annotation;
         }
 
-        // clang-format off
-        template <typename Executor_,
-            HPX_CONCEPT_REQUIRES_(
-                std::is_convertible_v<Executor_, sequenced_executor>
-            )>
-        // clang-format on
+        template <typename Executor_>
+            requires(std::is_convertible_v<Executor_, sequenced_executor>)
         friend auto tag_invoke(hpx::execution::experimental::with_annotation_t,
             Executor_ const& exec, std::string annotation)
         {
@@ -223,12 +200,7 @@ namespace hpx::execution {
         }
 #endif
 
-        // clang-format off
-        template <typename Parameters,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_parameters_v<Parameters>
-            )>
-        // clang-format on
+        template <executor_parameters Parameters>
         friend constexpr std::size_t tag_invoke(
             hpx::execution::experimental::processing_units_count_t,
             Parameters&&, sequenced_executor const&,
@@ -268,7 +240,7 @@ namespace hpx::execution {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& /* ar */, unsigned int const /* version */)
+        static constexpr void serialize(Archive&, unsigned int const) noexcept
         {
         }
 

@@ -7,9 +7,9 @@
 
 #pragma once
 
+#include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/parallel/algorithms/sort.hpp>
 
 #include "test_utils.hpp"
 
@@ -36,7 +36,7 @@
 // --------------------------------------------------------------------
 // Fill a vector with random numbers in the range [lower, upper]
 template <typename T>
-void rnd_fill(std::vector<T>& V, const T lower, const T upper, const T seed)
+void rnd_fill(std::vector<T>& V, T const lower, T const upper, T const seed)
 {
     // use the default random engine and an uniform distribution
     std::mt19937 eng(static_cast<unsigned int>(seed));
@@ -53,10 +53,10 @@ void rnd_fill(std::vector<T>& V, const T lower, const T upper, const T seed)
 std::string random_string(size_t length)
 {
     auto randchar = []() -> char {
-        const char charset[] = "0123456789"
+        char const charset[] = "0123456789"
                                "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                "abcdefghijklmnopqrstuvwxyz";
-        const size_t max_index = (sizeof(charset) - 1);
+        size_t const max_index = (sizeof(charset) - 1);
         return charset[rand() % max_index];
     };
     std::string str(length, 0);
@@ -68,7 +68,7 @@ std::string random_string(size_t length)
 // fill a vector with random strings
 void rnd_strings(std::vector<std::string>& V)
 {
-    const std::size_t test_size = HPX_SORT_TEST_SIZE_STRINGS;
+    std::size_t const test_size = HPX_SORT_TEST_SIZE_STRINGS;
     // Fill vector with random strings
     V.clear();
     V.reserve(test_size);
@@ -83,7 +83,7 @@ void rnd_strings(std::vector<std::string>& V)
 // check that the array is sorted correctly
 template <class IA, typename Compare>
 int verify_(
-    const std::vector<IA>& A, Compare comp, std::uint64_t elapsed, bool print)
+    std::vector<IA> const& A, Compare comp, std::uint64_t elapsed, bool print)
 {
     if (A.size() < 2)
     {
@@ -93,13 +93,13 @@ int verify_(
     {
         IA temp = *(A.begin());
         for (typename std::vector<IA>::const_iterator it = A.begin();
-             it != A.end(); ++it)
+            it != A.end(); ++it)
         {
             if (comp((*it), temp))
             {
                 if (print)
-                    hpx::util::format_to(
-                        std::cout, "fail {:8.6}", elapsed / 1e9)
+                    hpx::util::format_to(std::cout, "fail {:8.6}",
+                        static_cast<double>(elapsed) / 1e9)
                         << A.size() << std::endl;
                 return 0;
             }
@@ -107,7 +107,8 @@ int verify_(
         }
     }
     if (print)
-        hpx::util::format_to(std::cout, "OK {:8.6}", elapsed / 1e9)
+        hpx::util::format_to(
+            std::cout, "OK {:8.6}", static_cast<double>(elapsed) / 1e9)
             << A.size() << std::endl;
     return 1;
 }
@@ -231,7 +232,7 @@ void test_sort_exception(ExPolicy&& policy, T)
                 std::random_access_iterator_tag>
                 decorated_iterator;
 
-            hpx::sort(std::forward<ExPolicy>(policy),
+            hpx::sort(policy,
                 decorated_iterator(
                     c.begin(), []() { throw std::runtime_error("test"); }),
                 decorated_iterator(c.end()));
@@ -264,7 +265,7 @@ void test_sort_exception(ExPolicy&& policy, T)
                 std::random_access_iterator_tag>
                 decorated_iterator;
 
-            hpx::sort(std::forward<ExPolicy>(policy),
+            hpx::sort(policy,
                 decorated_iterator(c.begin(), []() { throw std::bad_alloc(); }),
                 decorated_iterator(c.end()));
 
@@ -310,7 +311,7 @@ void test_sort_exception(ExPolicy&& policy, T, Compare comp)
                 std::random_access_iterator_tag>
                 decorated_iterator;
 
-            hpx::sort(std::forward<ExPolicy>(policy),
+            hpx::sort(policy,
                 decorated_iterator(
                     c.begin(), []() { throw std::runtime_error("test"); }),
                 decorated_iterator(c.end()), comp);
@@ -343,7 +344,7 @@ void test_sort_exception(ExPolicy&& policy, T, Compare comp)
                 std::random_access_iterator_tag>
                 decorated_iterator;
 
-            hpx::sort(std::forward<ExPolicy>(policy),
+            hpx::sort(policy,
                 decorated_iterator(c.begin(), []() { throw std::bad_alloc(); }),
                 decorated_iterator(c.end()), comp);
 
@@ -390,7 +391,7 @@ void test_sort_exception_async(ExPolicy&& policy, T)
                 std::random_access_iterator_tag>
                 decorated_iterator;
 
-            hpx::future<void> f = hpx::sort(std::forward<ExPolicy>(policy),
+            hpx::future<void> f = hpx::sort(policy,
                 decorated_iterator(
                     c.begin(), []() { throw std::runtime_error("test"); }),
                 decorated_iterator(c.end()));
@@ -428,7 +429,7 @@ void test_sort_exception_async(ExPolicy&& policy, T)
                 std::random_access_iterator_tag>
                 decorated_iterator;
 
-            hpx::future<void> f = hpx::sort(std::forward<ExPolicy>(policy),
+            hpx::future<void> f = hpx::sort(policy,
                 decorated_iterator(c.begin(), []() { throw std::bad_alloc(); }),
                 decorated_iterator(c.end()));
 
@@ -479,7 +480,7 @@ void test_sort_exception_async(ExPolicy&& policy, T, Compare comp)
                 std::random_access_iterator_tag>
                 decorated_iterator;
 
-            hpx::future<void> f = hpx::sort(std::forward<ExPolicy>(policy),
+            hpx::future<void> f = hpx::sort(policy,
                 decorated_iterator(
                     c.begin(), []() { throw std::runtime_error("test"); }),
                 decorated_iterator(c.end()), comp);
@@ -517,7 +518,7 @@ void test_sort_exception_async(ExPolicy&& policy, T, Compare comp)
                 std::random_access_iterator_tag>
                 decorated_iterator;
 
-            hpx::future<void> f = hpx::sort(std::forward<ExPolicy>(policy),
+            hpx::future<void> f = hpx::sort(policy,
                 decorated_iterator(c.begin(), []() { throw std::bad_alloc(); }),
                 decorated_iterator(c.end()), comp);
 
@@ -634,7 +635,7 @@ void test_sort2_async(ExPolicy&& policy, T, Compare comp = Compare())
 // overload of test routine 1 for strings
 // call sort on a string array with no comparison operator
 template <typename ExPolicy>
-void test_sort1(ExPolicy&& policy, const std::string&)
+void test_sort1(ExPolicy&& policy, std::string const&)
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
@@ -659,7 +660,7 @@ void test_sort1(ExPolicy&& policy, const std::string&)
 // call sort on a string array with a comparison operator
 template <typename ExPolicy, typename Compare = std::less<std::string>>
 void test_sort1_comp(
-    ExPolicy&& policy, const std::string&, Compare comp = Compare())
+    ExPolicy&& policy, std::string const&, Compare comp = Compare())
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");

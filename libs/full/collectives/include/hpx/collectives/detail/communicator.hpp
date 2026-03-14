@@ -1,4 +1,4 @@
-//  Copyright (c) 2020-2024 Hartmut Kaiser
+//  Copyright (c) 2020-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,16 +11,16 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #include <hpx/actions_base/component_action.hpp>
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/components_base/server/component_base.hpp>
-#include <hpx/datastructures/any.hpp>
-#include <hpx/functional/experimental/scope_exit.hpp>
-#include <hpx/lcos_local/and_gate.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/lcos_local.hpp>
 #include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/logging.hpp>
-#include <hpx/synchronization/spinlock.hpp>
-#include <hpx/type_support/assert_owns_lock.hpp>
-#include <hpx/type_support/unused.hpp>
+#include <hpx/modules/synchronization.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <mutex>

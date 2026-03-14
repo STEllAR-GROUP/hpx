@@ -110,7 +110,8 @@ used CMake options.
 
 .. option:: HPX_WITH_CXX_STANDARD
 
-   Set a specific C++ standard version e.g. ``HPX_WITH_CXX_STANDARD=20``. The default and minimum value is 17.
+   Set a specific C++ standard version e.g. ``HPX_WITH_CXX_STANDARD=23``.
+   The default and minimum value is ``20``. Possible values are ``20``, ``23``, or ``26``.
 
 .. option:: HPX_WITH_EXAMPLES
 
@@ -119,6 +120,10 @@ used CMake options.
 .. option:: HPX_WITH_TESTS
 
    Build tests.
+
+.. option:: HPX_WITH_DEBUG_POSTFIX
+
+   Set the postfix for debug libraries. The default is ``d``. This variable is used to set ``CMAKE_DEBUG_POSTFIX`` and is only relevant for Debug builds or multi-configuration generators. The default rarely needs to be changed. It ensures that generated debug binaries have a different name than release binaries, which is important to avoid ABI problems when both debug and release binaries are installed on the same system.
 
 For a complete list of available |cmake|_ variables that influence the build of
 |hpx|, see :ref:`cmake_variables`.
@@ -151,6 +156,38 @@ Available build types are:
    build type as you used to build |hpx|. For CMake builds, this means that
    the ``CMAKE_BUILD_TYPE`` variables have to match and for projects not using
    |cmake|_, the ``HPX_DEBUG`` macro has to be set in debug mode.
+
+.. _cmake_presets:
+
+Using CMake Presets
+===================
+
+|hpx| provides a ``CMakePresets.json`` file which includes a variety of pre-defined build configurations.
+These presets allow you to easily configure the build for common scenarios without needing to manually specify multiple CMake variables.
+
+To use a preset, you can use the ``--preset`` option with CMake:
+
+.. code-block:: shell-session
+
+    $ cmake --preset <preset-name>
+    $ cmake --build --preset <preset-name>
+
+Some of the available presets include:
+
+* ``default``: Standard release build with tests and examples enabled.
+* ``minimal``: Minimal build with only core features (no tests, examples, or tools).
+* ``full``: Full build with all standard features enabled.
+* ``debug``: Debug build with symbols and debug-optimized settings.
+* ``performance``: Build optimized for performance analysis with APEX profiling.
+* ``cuda``: Build with CUDA support (requires CUDA toolkit).
+* ``sycl``: Build with SYCL support (requires compatible compiler).
+* ``sanitizer-address``: Build with AddressSanitizer enabled.
+
+For a full list of available presets, you can run:
+
+.. code-block:: shell-session
+
+    $ cmake --list-presets
 
 .. _build_recipes:
 

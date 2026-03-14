@@ -81,7 +81,7 @@ void test_jthread_with_token()
 
                 // wait until interrupt is signaled
                 for ([[maybe_unused]] int i = 0; !stoptoken.stop_requested();
-                     ++i)
+                    ++i)
                 {
                     hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
                 }
@@ -262,7 +262,7 @@ void test_hpx_thread()
             // "interrupted" not derived from std::exception
             HPX_TEST(false);
         }
-        catch (const char* e)
+        catch (char const* e)
         {
             caught_exception = true;
         }
@@ -366,7 +366,7 @@ void test_temporarily_disable_token()
                     throw "interrupted";
                 }
             }
-            catch (const char*)
+            catch (char const*)
             {
                 state.store(State::interrupted);
             }

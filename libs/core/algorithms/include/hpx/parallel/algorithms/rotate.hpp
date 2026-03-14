@@ -1,9 +1,10 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //  Copyright (c) 2021-2022 Chuanqiu He
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+//
 /// \page hpx::rotate, hpx::rotate_copy
 /// \headerfile hpx/algorithm.hpp
 /// \file hpx/parallel/algorithms/rotate.hpp
@@ -184,16 +185,13 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/async_base/scheduling_properties.hpp>
-#include <hpx/async_local/dataflow.hpp>
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/execution/algorithms/when_all.hpp>
-#include <hpx/execution/traits/is_execution_policy.hpp>
-#include <hpx/executors/execution_policy.hpp>
-#include <hpx/executors/execution_policy_parameters.hpp>
-#include <hpx/futures/traits/is_future.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/async_local.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/modules/execution.hpp>
+#include <hpx/modules/executors.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/parallel/algorithms/copy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/rotate.hpp>
@@ -216,7 +214,8 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        template <typename ExPolicy, typename FwdIter, typename Sent>
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename FwdIter,
+            typename Sent>
         decltype(auto) rotate_helper(
             ExPolicy policy, FwdIter first, FwdIter new_first, Sent last)
         {
@@ -243,27 +242,36 @@ namespace hpx::parallel {
                     static_cast<double>(size_left + size_right);
 
                 // avoid cores_left == 0 after integer rounding
-                cores_left = (std::max)(static_cast<std::size_t>(1),
+                cores_left = (std::max) (static_cast<std::size_t>(1),
                     static_cast<std::size_t>(
                         partition_size_ratio * static_cast<double>(cores)));
             }
 
             // cores_right should be at least 1.
             std::size_t cores_right =
-                (std::max)(static_cast<std::size_t>(1), cores - cores_left);
+                (std::max) (static_cast<std::size_t>(1), cores - cores_left);
 
             // invoke the reverse operations on the left and right sections
             // concurrently
             auto p = policy(hpx::execution::task);
 
+            auto rebound_left_params =
+                hpx::execution::experimental::rebind_executor_parameters(
+                    p.parameters(),
+                    hpx::execution::experimental::num_cores(cores_left));
             auto left_policy =
-                hpx::execution::experimental::with_processing_units_count(
-                    p, cores_left);
+                hpx::execution::experimental::create_rebound_policy(
+                    p, rebound_left_params);
+
+            auto rebound_right_params =
+                hpx::execution::experimental::rebind_executor_parameters(
+                    p.parameters(),
+                    hpx::execution::experimental::num_cores(cores_right));
             auto right_policy =
-                hpx::execution::experimental::with_processing_units_count(
+                hpx::execution::experimental::create_rebound_policy(
                     hpx::execution::experimental::with_first_core(
                         p, cores == 1 ? first_core : first_core + cores_left),
-                    cores_right);
+                    rebound_right_params);
 
             detail::reverse<FwdIter> r;
 
@@ -321,7 +329,7 @@ namespace hpx::parallel {
             }
         }
 
-        template <typename IterPair>
+        HPX_CXX_CORE_EXPORT template <typename IterPair>
         struct rotate : algorithm<rotate<IterPair>, IterPair>
         {
             constexpr rotate() noexcept
@@ -354,7 +362,8 @@ namespace hpx::parallel {
         /// \cond NOINTERNAL
 
         // sequential rotate_copy
-        template <typename InIter, typename Sent, typename OutIter>
+        HPX_CXX_CORE_EXPORT template <typename InIter, typename Sent,
+            typename OutIter>
         constexpr util::in_out_result<InIter, OutIter> sequential_rotate_copy(
             InIter first, InIter new_first, Sent last, OutIter dest_first)
         {
@@ -366,8 +375,8 @@ namespace hpx::parallel {
                 HPX_MOVE(p1.in), HPX_MOVE(p2.out)};
         }
 
-        template <typename ExPolicy, typename FwdIter1, typename Sent,
-            typename FwdIter2>
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename FwdIter1,
+            typename Sent, typename FwdIter2>
         decltype(auto) rotate_copy_helper(ExPolicy policy, FwdIter1 first,
             FwdIter1 new_first, Sent last, FwdIter2 dest_first)
         {
@@ -407,7 +416,7 @@ namespace hpx::parallel {
             }
         }
 
-        template <typename IterPair>
+        HPX_CXX_CORE_EXPORT template <typename IterPair>
         struct rotate_copy : algorithm<rotate_copy<IterPair>, IterPair>
         {
             constexpr rotate_copy() noexcept
@@ -443,19 +452,19 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::rotate
-    inline constexpr struct rotate_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct rotate_t final
       : hpx::detail::tag_parallel_algorithm<rotate_t>
     {
+        template <typename FwdIter>
         // clang-format off
-        template <typename FwdIter,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend FwdIter tag_fallback_invoke(
             hpx::rotate_t, FwdIter first, FwdIter new_first, FwdIter last)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             return parallel::util::get_second_element(
@@ -464,22 +473,22 @@ namespace hpx {
                     .call(hpx::execution::seq, first, new_first, last));
         }
 
+        template <typename ExPolicy, typename FwdIter>
         // clang-format off
-        template <typename ExPolicy, typename FwdIter,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::rotate_t,
             ExPolicy&& policy, FwdIter first, FwdIter new_first, FwdIter last)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             using is_seq = std::integral_constant<bool,
                 hpx::is_sequenced_execution_policy_v<ExPolicy> ||
-                    !hpx::traits::is_bidirectional_iterator_v<FwdIter>>;
+                    !std::bidirectional_iterator<FwdIter>>;
 
             return parallel::util::get_second_element(
                 hpx::parallel::detail::rotate<
@@ -491,22 +500,23 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::rotate_copy
-    inline constexpr struct rotate_copy_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct rotate_copy_t final
       : hpx::detail::tag_parallel_algorithm<rotate_copy_t>
     {
+        template <typename FwdIter, typename OutIter>
         // clang-format off
-        template <typename FwdIter, typename OutIter,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::traits::is_iterator_v<OutIter>
-            )>
+            )
         // clang-format on
         friend OutIter tag_fallback_invoke(hpx::rotate_copy_t, FwdIter first,
             FwdIter new_first, FwdIter last, OutIter dest_first)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_output_iterator_v<OutIter>,
+            static_assert(std::output_iterator<OutIter,
+                              hpx::traits::iter_value_t<FwdIter>>,
                 "Requires at least output iterator.");
 
             return parallel::util::get_second_element(
@@ -516,26 +526,26 @@ namespace hpx {
                         dest_first));
         }
 
+        template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
         // clang-format off
-        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter2>
-            )>
+            )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::rotate_copy_t,
             ExPolicy&& policy, FwdIter1 first, FwdIter1 new_first,
             FwdIter1 last, FwdIter2 dest_first)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Requires at least forward iterator.");
 
             using is_seq = std::integral_constant<bool,
                 hpx::is_sequenced_execution_policy_v<ExPolicy> ||
-                    !hpx::traits::is_forward_iterator_v<FwdIter1>>;
+                    !std::forward_iterator<FwdIter1>>;
 
             return parallel::util::get_second_element(
                 hpx::parallel::detail::rotate_copy<

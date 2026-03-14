@@ -13,17 +13,20 @@
 
 namespace hpx::detail {
 
-    std::string get_locality_base_name()
-    {
-        runtime const* rt = get_runtime_ptr();
-        if (rt == nullptr)
+    namespace {
+
+        std::string get_locality_base_name()
         {
-            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
-                "hpx::detail::get_locality_name",
-                "the runtime system is not operational at this point");
+            runtime const* rt = get_runtime_ptr();
+            if (rt == nullptr)
+            {
+                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                    "hpx::detail::get_locality_name",
+                    "the runtime system is not operational at this point");
+            }
+            return rt->get_locality_name();
         }
-        return rt->get_locality_name();
-    }
+    }    // namespace
 
     std::string get_locality_name()
     {

@@ -4,18 +4,6 @@
 #  Distributed under the Boost Software License, Version 1.0. (See accompanying
 #  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(HPX_WITH_STDEXEC)
-  if(HPX_WITH_CXX_STANDARD LESS 20)
-    hpx_error("HPX_WITH_STDEXEC Requires C++20 or later.")
-  endif()
-  if(NOT HPX_WITH_CXX20_STD_IDENTITY)
-    hpx_error("HPX_WITH_STDEXEC Requires std::identity.")
-  endif()
-  if(MSVC)
-    hpx_error("HPX_WITH_STDEXEC is not available on MSVC.")
-  endif()
-endif()
-
 if(STDEXEC_ROOT AND NOT Stdexec_ROOT)
   set(Stdexec_ROOT ${STDEXEC_ROOT})
   # remove STDEXEC_ROOT from the cache
@@ -91,7 +79,7 @@ if(HPX_WITH_STDEXEC)
     endif()
 
   else()
-    find_package(Stdexec REQUIRED)
+    find_package(Stdexec)
 
     if(Stdexec_FOUND)
       hpx_add_config_define(HPX_HAVE_STDEXEC)

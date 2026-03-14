@@ -1,6 +1,6 @@
 //  Copyright (c) 2013-2019 Thomas Heller
 //  Copyright (c) 2008 Peter Dimov
-//  Copyright (c) 2018-2022 Hartmut Kaiser
+//  Copyright (c) 2018-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,13 +8,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/errors/throw_exception.hpp>
 #include <hpx/execution_base/agent_base.hpp>
 #include <hpx/execution_base/context_base.hpp>
 #include <hpx/execution_base/this_thread.hpp>
+#include <hpx/modules/coroutines.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
-#include <hpx/timing/steady_clock.hpp>
+#include <hpx/modules/timing.hpp>
 
 #include <condition_variable>
 #include <cstddef>
@@ -25,6 +25,7 @@
 #include <utility>
 
 #if defined(HPX_WINDOWS)
+#include <ctime>
 #include <windows.h>
 #else
 #ifndef _AIX
@@ -40,12 +41,82 @@ namespace hpx::execution_base {
 
     namespace {
 
-        struct default_context : execution_base::context_base
+#if defined(HPX_WINDOWS)
+        // Number of performance counter increments per nanosecond, or zero if
+        // it could not be determined.
+        struct ticks_per_nanosecond
         {
-            resource_base const& resource() const noexcept override
+            ticks_per_nanosecond()
+            {
+                LARGE_INTEGER freq;
+                if (QueryPerformanceFrequency(&freq))
+                    ticks = static_cast<double>(freq.QuadPart) / 1e9;
+            }
+
+            double ticks = 0.0;
+        };
+        ticks_per_nanosecond ticks;
+
+        // our own (crude) implementation of nanosleep
+        int win_nanosleep(std::timespec const& delay)
+        {
+            if (delay.tv_nsec < 0 || delay.tv_nsec >= 999999999)
+            {
+                return -1;
+            }
+
+            // for small delays we busy-wait
+            if (delay.tv_sec == 0 && ticks.ticks != 0.0)
+            {
+                // compensate for fluctuations introduced by Sleep()
+                auto const sleep_for = delay.tv_nsec / 1000000 - 10;
+
+                // overall number of ticks to delay
+                auto const ticks_to_delay = static_cast<long>(
+                    static_cast<double>(delay.tv_nsec) * ticks.ticks);
+
+                LARGE_INTEGER counter;
+                if (QueryPerformanceCounter(&counter))
+                {
+                    // wait until the performance counter has reached this value
+                    auto const wait_until = counter.QuadPart + ticks_to_delay;
+
+                    // use Sleep() if appropriate
+                    if (sleep_for > 0)
+                    {
+                        Sleep(sleep_for);
+                    }
+
+                    // simply busy-wait for the remaining amount of time, don't
+                    // wait if delay is zero
+                    while (counter.QuadPart < wait_until &&
+                        QueryPerformanceCounter(&counter))
+                    {
+                    }
+                    return 0;
+                }
+            }
+
+            // Fallback and longer delays
+            Sleep(static_cast<long>(delay.tv_sec) * 1000 +
+                delay.tv_nsec / 1000000);
+
+            return 0;
+        }
+
+        constexpr std::timespec wait_0ns = {.tv_sec = 0, .tv_nsec = 0};
+        constexpr std::timespec wait_1000ns = {.tv_sec = 0, .tv_nsec = 1000};
+#endif
+
+        ///////////////////////////////////////////////////////////////////////
+        struct default_context final : execution_base::context_base
+        {
+            [[nodiscard]] resource_base const& resource()
+                const noexcept override
             {
                 return resource_;
             }
+
             resource_base resource_;
         };
 
@@ -65,7 +136,7 @@ namespace hpx::execution_base {
             }
 
             void yield(char const* desc) override;
-            void yield_k(std::size_t k, char const* desc) override;
+            bool yield_k(std::size_t k, char const* desc) override;
             void suspend(char const* desc) override;
             void resume(hpx::threads::thread_priority priority,
                 char const* desc) override;
@@ -96,33 +167,38 @@ namespace hpx::execution_base {
         void default_agent::yield(char const* /* desc */)
         {
 #if defined(HPX_WINDOWS)
-            Sleep(0);
+            win_nanosleep(wait_0ns);
 #else
             sched_yield();
 #endif
         }
 
-        void default_agent::yield_k(std::size_t k, char const* /* desc */)
+        bool default_agent::yield_k(std::size_t k, char const* /* desc */)
         {
             if (k < 4)    //-V112
             {
+                return false;
             }
             else if (k < 16)
             {
                 HPX_SMT_PAUSE;
+                return false;
             }
             else if (k < 32 || k & 1)    //-V112
             {
 #if defined(HPX_WINDOWS)
-                Sleep(0);
+                win_nanosleep(wait_0ns);
+                return true;
 #else
                 sched_yield();
+                return true;
 #endif
             }
             else
             {
 #if defined(HPX_WINDOWS)
-                Sleep(1);
+                win_nanosleep(wait_1000ns);
+                return true;
 #else
                 // g++ -Wextra warns on {} or {0}
                 struct timespec rqtp = {0, 0};
@@ -134,6 +210,7 @@ namespace hpx::execution_base {
                 rqtp.tv_nsec = 1000;
 
                 nanosleep(&rqtp, nullptr);
+                return true;
 #endif
             }
         }
@@ -263,9 +340,9 @@ namespace hpx::execution_base {
             agent().yield(desc);
         }
 
-        void yield_k(std::size_t k, char const* desc)
+        bool yield_k(std::size_t k, char const* desc)
         {
-            agent().yield_k(k, desc);
+            return agent().yield_k(k, desc);
         }
 
         void suspend(char const* desc)

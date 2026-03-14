@@ -14,6 +14,8 @@
 
 #include <cstdint>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(std::int16_t, int16_t,
     hpx::actions::base_lco_with_value_int16_get,
     hpx::actions::base_lco_with_value_int16_set)

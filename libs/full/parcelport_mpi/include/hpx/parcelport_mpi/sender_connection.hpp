@@ -14,12 +14,11 @@
 #include <hpx/assert.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/mpi_base.hpp>
+#include <hpx/modules/parcelset_base.hpp>
 #include <hpx/parcelport_mpi/header.hpp>
 #include <hpx/parcelport_mpi/locality.hpp>
 #include <hpx/parcelset/parcelport_connection.hpp>
 #include <hpx/parcelset/parcelset_fwd.hpp>
-#include <hpx/parcelset_base/detail/gatherer.hpp>
-#include <hpx/parcelset_base/parcelport.hpp>
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS)
 #include <hpx/modules/timing.hpp>
 #endif
@@ -310,7 +309,9 @@ namespace hpx::parcelset::policies::mpi {
             while (chunks_idx_ < buffer_.chunks_.size())
             {
                 auto const& c = buffer_.chunks_[chunks_idx_];
-                if (c.type_ == serialization::chunk_type::chunk_type_pointer)
+                if (c.type_ == serialization::chunk_type::chunk_type_pointer ||
+                    c.type_ ==
+                        serialization::chunk_type::chunk_type_const_pointer)
                 {
                     if (!request_done())
                     {

@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2024 Hartmut Kaiser
+//  Copyright (c) 2017-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,13 +11,11 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/execution/detail/future_exec.hpp>
-#include <hpx/execution_base/execution.hpp>
-#include <hpx/execution_base/traits/is_executor.hpp>
-#include <hpx/functional/function.hpp>
-#include <hpx/functional/move_only_function.hpp>
-#include <hpx/futures/future.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/thread_support.hpp>
-#include <hpx/type_support/construct_at.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -88,6 +86,7 @@ namespace hpx::parallel::execution {
             using pointer = std::size_t*;
             using reference = std::size_t&;
 
+            shape_iter() = default;
             template <typename Iterator>
             explicit shape_iter(Iterator it)
               : impl_(new shape_iter_impl<Iterator>(it))
@@ -102,7 +101,8 @@ namespace hpx::parallel::execution {
 
             shape_iter& operator=(shape_iter const& rhs)
             {
-                impl_->copy(*rhs.impl_);
+                if (this != &rhs)
+                    impl_->copy(*rhs.impl_);
                 return *this;
             }
 
@@ -138,7 +138,7 @@ namespace hpx::parallel::execution {
             }
 
         protected:
-            std::unique_ptr<shape_iter_impl_base> impl_;
+            std::unique_ptr<shape_iter_impl_base> impl_{};
         };
 
         struct range_proxy
@@ -233,20 +233,20 @@ namespace hpx::parallel::execution {
             }
 
             template <typename T>
-            static void* allocate(void* storage, std::size_t storage_size)
+            static void* allocate(void* storage, std::size_t const storage_size)
             {
                 if (sizeof(T) > storage_size)
                 {
                     using storage_t =
-                        std::aligned_storage_t<sizeof(T), alignof(T)>;
+                        hpx::aligned_storage_t<sizeof(T), alignof(T)>;
                     return new storage_t;
                 }
                 return storage;
             }
 
             template <typename T>
-            static void _deallocate(
-                void* obj, std::size_t storage_size, bool destroy) noexcept
+            static void _deallocate(void* obj, std::size_t const storage_size,
+                bool const destroy) noexcept
             {
                 if (destroy)
                 {
@@ -256,15 +256,15 @@ namespace hpx::parallel::execution {
                 if (sizeof(T) > storage_size)
                 {
                     using storage_t =
-                        std::aligned_storage_t<sizeof(T), alignof(T)>;
+                        hpx::aligned_storage_t<sizeof(T), alignof(T)>;
                     delete static_cast<storage_t*>(obj);
                 }
             }
             void (*deallocate)(void*, std::size_t storage_size, bool) noexcept;
 
             template <typename T>
-            static void* _copy(void* storage, std::size_t storage_size,
-                void const* src, bool destroy)
+            static void* _copy(void* storage, std::size_t const storage_size,
+                void const* src, bool const destroy)
             {
                 if (destroy)
                 {
@@ -672,10 +672,10 @@ namespace hpx::parallel::execution {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Sig>
+    HPX_CXX_CORE_EXPORT template <typename Sig>
     class polymorphic_executor;
 
-    template <typename R, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename R, typename... Ts>
     class polymorphic_executor<R(Ts...)> : detail::polymorphic_executor_base
     {
         using base_type = detail::polymorphic_executor_base;
@@ -843,11 +843,11 @@ namespace hpx::parallel::execution {
         }
 
         // BulkOneWayExecutor interface
+        template <typename F, typename Shape>
         // clang-format off
-        template <typename F, typename Shape,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 !std::is_integral_v<Shape>
-            )>
+            )
         // clang-format on
         HPX_FORCEINLINE friend std::vector<R> tag_invoke(
             hpx::parallel::execution::bulk_sync_execute_t,
@@ -865,11 +865,11 @@ namespace hpx::parallel::execution {
         }
 
         // BulkTwoWayExecutor interface
+        template <typename F, typename Shape>
         // clang-format off
-        template <typename F, typename Shape,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 !std::is_integral_v<Shape>
-            )>
+            )
         // clang-format on
         HPX_FORCEINLINE friend std::vector<hpx::future<R>> tag_invoke(
             hpx::parallel::execution::bulk_async_execute_t,
@@ -886,11 +886,11 @@ namespace hpx::parallel::execution {
                 HPX_FORWARD(Ts, ts)...);
         }
 
+        template <typename F, typename Shape>
         // clang-format off
-        template <typename F, typename Shape,
-            HPX_CONCEPT_REQUIRES_(
+            requires (
                 !std::is_integral_v<Shape>
-            )>
+            )
         // clang-format on
         HPX_FORCEINLINE friend hpx::future<std::vector<R>> tag_invoke(
             hpx::parallel::execution::bulk_then_execute_t,
@@ -930,31 +930,31 @@ namespace hpx::parallel::execution {
 namespace hpx::execution::experimental {
 
     /// \cond NOINTERNAL
-    template <typename Sig>
+    HPX_CXX_CORE_EXPORT template <typename Sig>
     struct is_never_blocking_one_way_executor<
         parallel::execution::polymorphic_executor<Sig>> : std::true_type
     {
     };
 
-    template <typename Sig>
+    HPX_CXX_CORE_EXPORT template <typename Sig>
     struct is_one_way_executor<parallel::execution::polymorphic_executor<Sig>>
       : std::true_type
     {
     };
 
-    template <typename Sig>
+    HPX_CXX_CORE_EXPORT template <typename Sig>
     struct is_two_way_executor<parallel::execution::polymorphic_executor<Sig>>
       : std::true_type
     {
     };
 
-    template <typename Sig>
+    HPX_CXX_CORE_EXPORT template <typename Sig>
     struct is_bulk_one_way_executor<
         parallel::execution::polymorphic_executor<Sig>> : std::true_type
     {
     };
 
-    template <typename Sig>
+    HPX_CXX_CORE_EXPORT template <typename Sig>
     struct is_bulk_two_way_executor<
         parallel::execution::polymorphic_executor<Sig>> : std::true_type
     {

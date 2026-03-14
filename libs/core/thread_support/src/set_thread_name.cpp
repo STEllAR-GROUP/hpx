@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,8 +9,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/thread_support/set_thread_name.hpp>
+
 #include <cstddef>
 #include <string>
+
+#if defined(HPX_HAVE_MODULE_TRACY)
+#include <hpx/modules/tracy.hpp>
+#endif
 
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__)) &&               \
     !defined(HPX_MINGW)
@@ -84,9 +89,12 @@ namespace hpx::util {
         }
     }    // namespace detail
 
-    void set_thread_name(const char* thread_name) noexcept
+    void set_thread_name(char const* thread_name) noexcept
     {
         detail::set_thread_name(thread_name);
+#if defined(HPX_HAVE_MODULE_TRACY)
+        hpx::tracy::set_thread_name(thread_name);
+#endif
     }
 }    // namespace hpx::util
 
@@ -98,18 +106,22 @@ namespace hpx::util {
     void set_thread_name(char const* thread_name) noexcept
     {
         pthread_setname_np(pthread_self(), thread_name);
+#if defined(HPX_HAVE_MODULE_TRACY)
+        hpx::tracy::set_thread_name(thread_name);
+#endif
     }
-
 }    // namespace hpx::util
 
 #else
 
 namespace hpx::util {
 
-    void set_thread_name(char const*) noexcept
+    void set_thread_name([[maybe_unused]] char const* thread_name) noexcept
     {
-        return;
+#if defined(HPX_HAVE_MODULE_TRACY)
+        hpx::tracy::set_thread_name(thread_name);
+#endif
     }
-
 }    // namespace hpx::util
+
 #endif

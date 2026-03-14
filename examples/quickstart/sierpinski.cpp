@@ -42,7 +42,7 @@ public:
         this->area = area;
     }
 
-    inline sierpinski operator+(const sierpinski& other) const
+    inline sierpinski operator+(sierpinski const& other) const
     {
         sierpinski res = sierpinski(black_triangles + other.black_triangles,
             white_triangles + other.white_triangles, area + other.area);
@@ -53,7 +53,7 @@ private:
     //Serialization is necessary to transmit objects from one locality to another
     friend class hpx::serialization::access;
     template <class Archive>
-    void serialize(Archive& ar, const unsigned int)
+    void serialize(Archive& ar, unsigned int const)
     {
         // clang-format off
         ar & black_triangles;

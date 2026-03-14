@@ -42,7 +42,7 @@ namespace hpx { namespace components { namespace process { namespace posix {
             }
 
             template <class Arg>
-            void operator()(const Arg& arg) const
+            void operator()(Arg const& arg) const
             {
                 arg.on_fork_setup(e_);
             }
@@ -136,7 +136,7 @@ namespace hpx { namespace components { namespace process { namespace posix {
             return child(pid);
         }
 
-        const char* exe;
+        char const* exe;
         char** cmd_line;
         char** env;
     };

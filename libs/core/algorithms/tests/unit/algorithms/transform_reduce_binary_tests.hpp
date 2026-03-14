@@ -12,7 +12,6 @@
 #include <hpx/execution.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/numeric.hpp>
-#include <hpx/parallel/algorithms/transform_reduce.hpp>
 
 #include <algorithm>
 #include <cstddef>

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,10 +7,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/modules/serialization.hpp>
 #include <hpx/naming_base/gid_type.hpp>
 #include <hpx/naming_base/naming_base.hpp>
-#include <hpx/serialization/serialization_fwd.hpp>
-#include <hpx/serialization/traits/is_bitwise_serializable.hpp>
 
 #include <cstdint>
 #include <ostream>
@@ -18,13 +17,9 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-//  address serialization format version
-#define HPX_ADDRESS_VERSION 0x20
-
-///////////////////////////////////////////////////////////////////////////////
 namespace hpx::naming {
 
-    struct address
+    HPX_CXX_EXPORT struct address
     {
         using component_type = naming::component_type;
         using address_type = naming::address_type;
@@ -92,7 +87,8 @@ namespace hpx::naming {
         HPX_SERIALIZATION_SPLIT_MEMBER();
     };
 
-    HPX_EXPORT std::ostream& operator<<(std::ostream& os, address const& addr);
+    HPX_CXX_EXPORT HPX_EXPORT std::ostream& operator<<(
+        std::ostream& os, address const& addr);
 }    // namespace hpx::naming
 
 HPX_IS_BITWISE_SERIALIZABLE(hpx::naming::address)

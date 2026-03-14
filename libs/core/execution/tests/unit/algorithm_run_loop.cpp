@@ -1,5 +1,5 @@
 //  Copyright (c) 2024 Isidoros Tsaousis-Seiras
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2025 Hartmut Kaiser
 //  Copyright (c) 2020 ETH Zurich
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -267,6 +267,7 @@ void test_sender_receiver_then_wait()
 #endif
 }
 
+// NOLINTBEGIN(bugprone-unchecked-optional-access)
 void test_sender_receiver_then_sync_wait()
 {
     ex::run_loop loop;
@@ -2545,6 +2546,7 @@ void test_bulk()
 #endif
     }
 }
+// NOLINTEND(bugprone-unchecked-optional-access)
 
 void test_completion_scheduler()
 {

@@ -5,10 +5,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/modules/serialization.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/serialization/base_object.hpp>
-#include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/shared_ptr.hpp>
 
 #include <iostream>
 #include <memory>
@@ -26,7 +24,7 @@ struct A
 
     A() = default;
 
-    virtual ~A(){};
+    virtual ~A() {};
 
     virtual void foo() const = 0;
 };
@@ -46,7 +44,7 @@ struct B : A<T>
 
     B() = default;
 
-    virtual ~B(){};
+    ~B() override {}
 
     void foo() const override {}
 
@@ -80,30 +78,29 @@ HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC_TEMPLATE(
 HPX_SERIALIZATION_REGISTER_CLASS_TEMPLATE(
     (template <class S, class T>), (C<S, T>) )
 
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
 
     template <class Archive, class T>
     void serialize(Archive& archive, A<T>& s, unsigned)
     {
-        archive& s.a;
+        archive & s.a;
     }
 
     template <class Archive, class T>
     void serialize(Archive& archive, B<T>& s, unsigned)
     {
         archive& hpx::serialization::base_object<A<T>>(s);
-        archive& s.b;
+        archive & s.b;
     }
 
     template <class Archive, class S, class T>
     void serialize(Archive& archive, C<S, T>& s, unsigned)
     {
         archive& hpx::serialization::base_object<A<T>>(s);
-        archive& s.b;
-        archive& s.c;
+        archive & s.b;
+        archive & s.c;
     }
-
-}}    // namespace hpx::serialization
+}    // namespace hpx::serialization
 
 int main()
 {

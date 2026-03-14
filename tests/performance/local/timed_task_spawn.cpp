@@ -13,11 +13,10 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 
-#include <hpx/functional/bind.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/string_util.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/string_util/classification.hpp>
-#include <hpx/string_util/split.hpp>
 
 #include <chrono>
 #include <condition_variable>
@@ -99,7 +98,7 @@ void print_results(std::uint64_t cores, double walltime, double warmup_estimate,
         header = false;
         cout << "Delay,Tasks,STasks,OS_Threads,Execution_Time_sec,Warmup_sec";
 
-        for (const auto& counter_shortname : counter_shortnames)
+        for (auto const& counter_shortname : counter_shortnames)
         {
             cout << "," << counter_shortname;
         }

@@ -4,8 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/init.hpp>
+#include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/thread.hpp>
 
@@ -21,7 +21,7 @@
 typedef std::tuple<std::size_t, std::ptrdiff_t, std::ptrdiff_t> info;
 typedef std::stack<info> info_stack;
 
-void stack_remaining(const char* txt, info_stack& stack)
+void stack_remaining(char const* txt, info_stack& stack)
 {
 #if defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
     std::size_t stack_ptr = hpx::threads::coroutines::detail::get_stack_ptr();
@@ -70,7 +70,7 @@ int hpx_main()
     // test stack vars
     stack_waste(20, my_stack_info);
 
-    std::ptrdiff_t current_stack = 0;
+    [[maybe_unused]] std::ptrdiff_t current_stack = 0;
     while (!my_stack_info.empty())
     {
         info i = my_stack_info.top();

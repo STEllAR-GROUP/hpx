@@ -1,4 +1,4 @@
-//  Copyright (c) 2023 Hartmut Kaiser
+//  Copyright (c) 2023-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/move_only_function.hpp>
+#include <hpx/modules/functional.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -18,10 +18,11 @@ namespace hpx::threads::detail {
 
     struct scheduling_callbacks
     {
+        using outer_callback_type = hpx::move_only_function<bool()>;
         using callback_type = hpx::move_only_function<void()>;
         using background_callback_type = hpx::move_only_function<bool()>;
 
-        explicit scheduling_callbacks(callback_type&& outer,
+        explicit scheduling_callbacks(outer_callback_type&& outer,
             callback_type&& inner = callback_type(),
             background_callback_type&& background = background_callback_type(),
             std::size_t max_background_threads =
@@ -32,12 +33,12 @@ namespace hpx::threads::detail {
           , inner_(HPX_MOVE(inner))
           , background_(HPX_MOVE(background))
           , max_background_threads_(max_background_threads)
-          , max_idle_loop_count_(max_idle_loop_count)
-          , max_busy_loop_count_(max_busy_loop_count)
+          , max_idle_loop_count_(static_cast<std::int64_t>(max_idle_loop_count))
+          , max_busy_loop_count_(static_cast<std::int64_t>(max_busy_loop_count))
         {
         }
 
-        callback_type outer_;
+        outer_callback_type outer_;
         callback_type inner_;
         background_callback_type background_;
         std::size_t const max_background_threads_;
