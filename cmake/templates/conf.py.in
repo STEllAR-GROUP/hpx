@@ -734,6 +734,7 @@ add_function_parentheses = False
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
+pygments_dark_style = 'monokai'
 
 # A list of ignored prefixes for module index sorting.
 modindex_common_prefix = [ 'hpx' ]
@@ -772,6 +773,7 @@ html_favicon = '_static/images/favicon.png'
 html_static_path = ['_static']
 html_css_files = ['custom.css']
 html_context = {
+    'default_mode': 'auto',
     'display_github': True,
     'github_user': 'STEllAR-GROUP',
     'github_repo': 'hpx',
