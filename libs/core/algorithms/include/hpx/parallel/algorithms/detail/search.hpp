@@ -279,7 +279,7 @@ namespace hpx::parallel::detail {
                 return first;
             if (first == last)
                 return last;
-            difference_type n = std::distance(first, last);
+            difference_type n = hpx::parallel::detail::distance(first, last);
             if (static_cast<difference_type>(count) > n)
                 return last;
 
@@ -323,7 +323,7 @@ namespace hpx::parallel::detail {
             if (first == last)
                 return result_type::get(HPX_MOVE(last));
 
-            difference_type n = std::distance(first, last);
+            difference_type n = hpx::parallel::detail::distance(first, last);
             if (static_cast<difference_type>(count) > n)
                 return result_type::get(HPX_MOVE(last));
 
