@@ -15,6 +15,7 @@
 #include <hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 
 #include <memory>
+#include <type_traits>
 
 namespace hpx::serialization::detail {
     template <typename Derived>

@@ -35,7 +35,7 @@ if(HPX_SERIALIZATION_WITH_BOOST_TYPES)
   set(tests ${tests} serialization_boost_variant)
 endif()
 
-if(!HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
+if(NOT HPX_SERIALIZATION_WITH_ALLOW_AUTO_GENERATE)
   set(tests ${tests} serialization_brace_initializable)
 endif()
 
