@@ -8,10 +8,13 @@
 
 #if defined(HPX_HAVE_MODULE_TRACY)
 #include <hpx/tracy/tracy.hpp>
+#include <hpx/tracy/tracy_tls.hpp>
 
+#include <cstring>
 #include <string>
 
 #include <tracy/Tracy.hpp>
+#include <tracy/TracyC.h>
 
 namespace hpx::tracy {
 
@@ -21,14 +24,28 @@ namespace hpx::tracy {
     }
 
     // Expose Tracy fibers support
-    void enter_fiber(char const* name) noexcept
+    void enter_fiber(char const* fiber_name, char const* zone_name,
+        std::uint32_t color) noexcept
     {
-        ::TracyFiberEnter(name);
+        // Mark TLS so rename_region / mark_event are no-ops inside the fiber.
+        set_in_fiber(true);
+
+        // Switch Tracy's zone stack to this fiber.
+        ::TracyFiberEnter(fiber_name);
+
+        // Open a zone on the fiber's zone stack — this makes the fiber
+        // track visible in Tracy as a colored bar labeled with zone_name.
+        start_fiber_zone(zone_name, color);
     }
 
     void leave_fiber() noexcept
     {
+        // Close the fiber zone BEFORE leaving the fiber context, so that
+        // TracyCZoneEnd goes to the fiber's zone stack, not the OS thread's.
+        stop_fiber_zone();
+
         ::TracyFiberLeave;
+        set_in_fiber(false);
     }
 
     // Create a new plot in Tracy
