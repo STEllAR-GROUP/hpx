@@ -237,20 +237,20 @@ namespace hpx::threads::detail {
                                                        .get_description();
                                 // Dual-view Tracy instrumentation:
                                 //
-                                // rctx declared FIRST \u2192 constructed first \u2192
+                                // rctx declared FIRST -> constructed first ->
                                 //   ZoneBegin fires with NO active fiber,
                                 //   so Tracy attributes it to the OS worker
                                 //   thread row (utilization view).
                                 //
-                                // fctx declared SECOND \u2192 constructed second \u2192
+                                // fctx declared SECOND -> constructed second ->
                                 //   TracyFiberEnter fires INSIDE the open zone,
                                 //   so Tracy also shows this slice on the fiber
                                 //   track (M:N migration view).
                                 //
                                 // Destruction is C++ reverse order:
-                                //   ~fctx first \u2192 TracyFiberLeave
-                                //   ~rctx last  \u2192 ZoneEnd
-                                // Zone outlives the fiber context \u2014 correct.
+                                //   ~fctx first -> TracyFiberLeave
+                                //   ~rctx last  -> ZoneEnd
+                                // Zone outlives the fiber context - correct.
                                 std::optional<tracy::region> rctx;
                                 std::optional<tracy::fiber_region> fctx;
                                 if (name != nullptr && !thrdptr->is_stackless())
