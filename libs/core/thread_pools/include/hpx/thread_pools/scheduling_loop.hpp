@@ -29,7 +29,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <memory>
-#include <optional>
 #include <utility>
 
 namespace hpx::threads::detail {
@@ -235,6 +234,10 @@ namespace hpx::threads::detail {
 #if defined(HPX_HAVE_MODULE_TRACY)
                                 char const* name = thrdptr->get_description()
                                                        .get_description();
+                                bool const enable_tracy =
+                                    name != nullptr && !thrdptr->is_stackless();
+                                char const* fiber_name = enable_tracy ?
+                                    thrdptr->get_tracy_fiber_name() : nullptr;
                                 // Dual-view Tracy instrumentation:
                                 //
                                 // rctx declared FIRST -> constructed first ->
@@ -251,16 +254,11 @@ namespace hpx::threads::detail {
                                 //   ~fctx first -> TracyFiberLeave
                                 //   ~rctx last  -> ZoneEnd
                                 // Zone outlives the fiber context - correct.
-                                std::optional<tracy::region> rctx;
-                                std::optional<tracy::fiber_region> fctx;
-                                if (name != nullptr && !thrdptr->is_stackless())
-                                {
-                                    rctx.emplace(name, num_thread,
-                                        thrdptr->get_thread_phase());
-                                    fctx.emplace(
-                                        thrdptr->get_tracy_fiber_name(), name,
-                                        static_cast<std::uint32_t>(num_thread));
-                                }
+                                tracy::region rctx(name, num_thread,
+                                    thrdptr->get_thread_phase(), enable_tracy);
+                                tracy::fiber_region fctx(
+                                    fiber_name, name,
+                                    static_cast<std::uint32_t>(num_thread), enable_tracy);
 #endif
 
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
