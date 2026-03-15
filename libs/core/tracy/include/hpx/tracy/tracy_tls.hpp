@@ -16,7 +16,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::tracy {
 
-    HPX_CXX_EXPORT struct region_data
+    HPX_CXX_CORE_EXPORT struct region_data
     {
         char const* name = nullptr;
         std::uint64_t data = 0;
@@ -24,14 +24,14 @@ namespace hpx::tracy {
         std::uint32_t phase = 0;
     };
 
-    HPX_CXX_EXPORT HPX_CORE_EXPORT region_data start_region(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT region_data start_region(
         char const*, std::size_t = 0, std::size_t = 0) noexcept;
-    HPX_CXX_EXPORT HPX_CORE_EXPORT char const* rename_region(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT char const* rename_region(
         char const*) noexcept;
-    HPX_CXX_EXPORT HPX_CORE_EXPORT region_data stop_region(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT region_data stop_region(
         region_data const& prev_region) noexcept;
 
-    HPX_CXX_EXPORT struct region
+    HPX_CXX_CORE_EXPORT struct region
     {
         explicit region(char const* name, std::size_t const thread_num,
             std::size_t phase) noexcept
@@ -48,7 +48,7 @@ namespace hpx::tracy {
         region_data surrounding_region;
     };
 
-    HPX_CXX_EXPORT struct suspend_region
+    HPX_CXX_CORE_EXPORT struct suspend_region
     {
         suspend_region() noexcept
           : suspended_region(stop_region({}))
@@ -67,7 +67,7 @@ namespace hpx::tracy {
         region_data suspended_region;
     };
 
-    HPX_CXX_EXPORT struct mark_event
+    HPX_CXX_CORE_EXPORT struct mark_event
     {
         explicit mark_event(char const* name) noexcept
           : previous_name(rename_region(name))
