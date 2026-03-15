@@ -289,44 +289,18 @@ namespace hpx::threads {
 
 #if defined(HPX_HAVE_MODULE_TRACY)
     private:
-        mutable char tracy_fiber_name_[64] = {0};
+        mutable char tracy_fiber_name_[64];
 
     public:
+        static char const* get_tracy_description_name(
+            threads::thread_description const& description,
+            char const* fallback) noexcept;
+
         // Returns a unique, stable string identifying this HPX task as a Tracy
         // fiber. Built lazily on first call and cached in tracy_fiber_name_.
         // Format: "<description>_<thread_id_ptr>" so each HPX task gets its
         // own fiber track in the Tracy profiler.
-        char const* get_tracy_fiber_name() const noexcept
-        {
-            if (tracy_fiber_name_[0] == '\0')
-            {
-                char const* name = "fiber";
-                threads::thread_description const desc = get_description();
-#if defined(HPX_HAVE_THREAD_DESCRIPTION)
-                if (desc.kind() ==
-                    threads::thread_description::data_type::description)
-                {
-                    char const* description_name = desc.get_description();
-                    if (description_name != nullptr &&
-                        description_name[0] != '\0')
-                    {
-                        name = description_name;
-                    }
-                }
-#else
-                char const* description_name = desc.get_description();
-                if (description_name != nullptr && description_name[0] != '\0')
-                {
-                    name = description_name;
-                }
-#endif
-                // Use the HPX thread_id pointer as the unique numeric suffix
-                // so each HPX task gets its own fiber track in Tracy.
-                std::snprintf(tracy_fiber_name_, sizeof(tracy_fiber_name_),
-                    "%s_%p", name, get_thread_id().get());
-            }
-            return tracy_fiber_name_;
-        }
+        char const* get_tracy_fiber_name() const noexcept;
 #endif
 
 #if !defined(HPX_HAVE_THREAD_PARENT_REFERENCE)

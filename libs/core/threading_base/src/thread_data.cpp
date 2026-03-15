@@ -24,6 +24,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <cstdio>
 #include <limits>
 #include <memory>
 #include <utility>
@@ -113,6 +114,9 @@ namespace hpx::threads {
 #endif
 #if defined(HPX_HAVE_APEX)
         set_timer_data(init_data.timer_data);
+#endif
+#if defined(HPX_HAVE_MODULE_TRACY)
+        tracy_fiber_name_[0] = '\0';
 #endif
     }
 
@@ -319,6 +323,46 @@ namespace hpx::threads {
             spinlock_pool::spinlock_for(this));
         std::swap(lco_description_, value);
         return value;
+    }
+#endif
+
+#if defined(HPX_HAVE_MODULE_TRACY)
+    char const* thread_data::get_tracy_description_name(
+        threads::thread_description const& description,
+        char const* fallback) noexcept
+    {
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+        if (description.kind() ==
+            threads::thread_description::data_type::description)
+        {
+            char const* description_name = description.get_description();
+            if (description_name != nullptr && description_name[0] != '\0')
+            {
+                return description_name;
+            }
+        }
+#else
+        char const* description_name = description.get_description();
+        if (description_name != nullptr && description_name[0] != '\0')
+        {
+            return description_name;
+        }
+#endif
+        return fallback;
+    }
+
+    char const* thread_data::get_tracy_fiber_name() const noexcept
+    {
+        if (tracy_fiber_name_[0] == '\0')
+        {
+            char const* name =
+                get_tracy_description_name(get_description(), "fiber");
+            // Use the HPX thread_id pointer as the unique numeric suffix
+            // so each HPX task gets its own fiber track in Tracy.
+            std::snprintf(tracy_fiber_name_, sizeof(tracy_fiber_name_), "%s_%p",
+                name, get_thread_id().get());
+        }
+        return tracy_fiber_name_;
     }
 #endif
 
