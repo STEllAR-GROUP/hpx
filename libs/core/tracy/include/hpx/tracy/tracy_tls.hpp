@@ -53,7 +53,7 @@ namespace hpx::tracy {
     HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void resume_fiber_zone(
         char const* zone_name = nullptr, std::uint32_t color = 0) noexcept;
 
-    HPX_CXX_EXPORT struct region
+    HPX_CXX_CORE_EXPORT struct region
     {
         explicit region(char const* name, std::size_t const thread_num,
             std::size_t phase, bool enabled = true) noexcept
@@ -86,7 +86,7 @@ namespace hpx::tracy {
     // to the fiber's stack.
     //
     // Use fiber_suspend_region instead - it operates only on the fiber zone.
-    HPX_CXX_EXPORT struct suspend_region
+    HPX_CXX_CORE_EXPORT struct suspend_region
     {
         suspend_region() noexcept
           : suspended_region(stop_region({}))
