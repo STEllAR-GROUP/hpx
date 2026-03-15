@@ -52,7 +52,12 @@ namespace hpx {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
+#if defined(__APPLE__) && defined(__clang__)
+    HPX_CXX_CORE_EXPORT class __attribute__((visibility("default")))
+    HPX_CORE_EXPORT runtime
+#else
     HPX_CXX_CORE_EXPORT class HPX_CORE_EXPORT runtime
+#endif
     {
     public:
         /// Generate a new notification policy instance for the given thread

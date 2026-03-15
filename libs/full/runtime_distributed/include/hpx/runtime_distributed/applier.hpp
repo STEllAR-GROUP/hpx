@@ -12,7 +12,7 @@
 #include <hpx/runtime_distributed/applier_fwd.hpp>    // this needs to go first
 
 #include <hpx/assert.hpp>
-#include <hpx/components_base/component_type.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/parcelset/parcel.hpp>

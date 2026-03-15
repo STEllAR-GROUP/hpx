@@ -43,7 +43,8 @@ add_hpx_module(
   HEADERS ${init_runtime_headers}
   SOURCES ${init_runtime_sources}
   DEPENDENCIES hpx_core
-  MODULE_DEPENDENCIES hpx_command_line_handling hpx_parcelset_base
-                      ${init_runtime_optional_module_dependencies}
+  MODULE_DEPENDENCIES
+    hpx_command_line_handling hpx_components_base hpx_parcelset_base
+    ${init_runtime_optional_module_dependencies}
   CMAKE_SUBDIRS examples tests
 )

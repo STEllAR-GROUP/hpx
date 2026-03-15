@@ -83,7 +83,8 @@ namespace hpx::components {
 
     /// This hook has to be inserted into the derivation chain of any component
     /// for it to support migration.
-    template <typename BaseComponent, typename Mutex = hpx::spinlock>
+    HPX_CXX_EXPORT template <typename BaseComponent,
+        typename Mutex = hpx::spinlock>
     struct migration_support : BaseComponent
     {
     private:

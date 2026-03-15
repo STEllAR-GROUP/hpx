@@ -14,15 +14,15 @@ namespace hpx::traits {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        struct fixed_component_tag
+        HPX_CXX_EXPORT struct fixed_component_tag
         {
         };
 
-        struct component_tag
+        HPX_CXX_EXPORT struct component_tag
         {
         };
 
-        struct managed_component_tag
+        HPX_CXX_EXPORT struct managed_component_tag
         {
         };
 
@@ -30,7 +30,7 @@ namespace hpx::traits {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, typename Enable = void>
+    HPX_CXX_EXPORT template <typename Component, typename Enable = void>
     struct is_component : std::false_type
     {
     };
@@ -67,11 +67,11 @@ namespace hpx::traits {
     {
     };
 
-    template <typename Component>
+    HPX_CXX_EXPORT template <typename Component>
     inline constexpr bool is_component_v = is_component<Component>::value;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, typename Enable = void>
+    HPX_CXX_EXPORT template <typename T, typename Enable = void>
     struct is_component_or_component_array : is_component<T>
     {
     };
@@ -86,12 +86,12 @@ namespace hpx::traits {
     {
     };
 
-    template <typename Component>
+    HPX_CXX_EXPORT template <typename Component>
     inline constexpr bool is_component_or_component_array_v =
         is_component_or_component_array<Component>::value;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Component>
+    HPX_CXX_EXPORT template <typename Component>
     struct is_fixed_component
       : std::is_base_of<traits::detail::fixed_component_tag, Component>
     {
@@ -102,12 +102,12 @@ namespace hpx::traits {
     {
     };
 
-    template <typename Component>
+    HPX_CXX_EXPORT template <typename Component>
     inline constexpr bool is_fixed_component_v =
         is_fixed_component<Component>::value;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Component>
+    HPX_CXX_EXPORT template <typename Component>
     struct is_managed_component
       : std::is_base_of<traits::detail::managed_component_tag, Component>
     {
@@ -119,7 +119,7 @@ namespace hpx::traits {
     {
     };
 
-    template <typename Component>
+    HPX_CXX_EXPORT template <typename Component>
     inline constexpr bool is_managed_component_v =
         is_managed_component<Component>::value;
 

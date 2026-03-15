@@ -38,13 +38,5 @@
 #include <hpx/actions_base/traits/is_distribution_policy.hpp>
 #include <hpx/actions_base/traits/is_valid_action.hpp>
 #include <hpx/async_distributed/traits/action_trigger_continuation.hpp>
-#include <hpx/components_base/traits/action_decorate_function.hpp>
-#include <hpx/components_base/traits/component_config_data.hpp>
-#include <hpx/components_base/traits/component_heap_type.hpp>
-#include <hpx/components_base/traits/component_pin_support.hpp>
-#include <hpx/components_base/traits/component_supports_migration.hpp>
-#include <hpx/components_base/traits/component_type_database.hpp>
-#include <hpx/components_base/traits/component_type_is_compatible.hpp>
-#include <hpx/components_base/traits/is_component.hpp>
-#include <hpx/components_base/traits/managed_component_policies.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/parcelset_base.hpp>

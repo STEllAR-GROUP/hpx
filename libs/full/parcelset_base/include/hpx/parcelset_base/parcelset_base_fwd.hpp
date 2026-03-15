@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+
 #include <hpx/modules/functional.hpp>
 
 #include <cstdint>
