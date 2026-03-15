@@ -1,9 +1,10 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //  Copyright (c) 2021-2022 Chuanqiu He
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+//
 /// \page hpx::rotate, hpx::rotate_copy
 /// \headerfile hpx/algorithm.hpp
 /// \file hpx/parallel/algorithms/rotate.hpp
@@ -254,14 +255,23 @@ namespace hpx::parallel {
             // concurrently
             auto p = policy(hpx::execution::task);
 
+            auto rebound_left_params =
+                hpx::execution::experimental::rebind_executor_parameters(
+                    p.parameters(),
+                    hpx::execution::experimental::num_cores(cores_left));
             auto left_policy =
-                hpx::execution::experimental::with_processing_units_count(
-                    p, cores_left);
+                hpx::execution::experimental::create_rebound_policy(
+                    p, rebound_left_params);
+
+            auto rebound_right_params =
+                hpx::execution::experimental::rebind_executor_parameters(
+                    p.parameters(),
+                    hpx::execution::experimental::num_cores(cores_right));
             auto right_policy =
-                hpx::execution::experimental::with_processing_units_count(
+                hpx::execution::experimental::create_rebound_policy(
                     hpx::execution::experimental::with_first_core(
                         p, cores == 1 ? first_core : first_core + cores_left),
-                    cores_right);
+                    rebound_right_params);
 
             detail::reverse<FwdIter> r;
 

@@ -40,6 +40,8 @@ if(HPX_WITH_DATAPAR)
       replace_copy_datapar
       replace_datapar
       replace_if_datapar
+      search_datapar
+      search_n_datapar
       transform_binary_datapar
       transform_binary2_datapar
       transform_datapar

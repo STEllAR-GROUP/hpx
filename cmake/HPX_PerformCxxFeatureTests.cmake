@@ -118,7 +118,6 @@ function(hpx_perform_cxx_feature_tests)
       DEFINITIONS HPX_HAVE_CXX20_STD_CONSTRUCT_AT
     )
 
-    hpx_check_for_cxx20_std_bit_cast(DEFINITIONS HPX_HAVE_CXX20_STD_BIT_CAST)
   endif()
 
   if(HPX_WITH_CXX20_COROUTINES)
@@ -133,6 +132,10 @@ function(hpx_perform_cxx_feature_tests)
 
   hpx_check_for_cxx26_experimental_scope(
     DEFINITIONS HPX_HAVE_CXX26_EXPERIMENTAL_SCOPE
+  )
+
+  hpx_check_for_cxx26_experimental_meta(
+    DEFINITIONS HPX_HAVE_CXX26_EXPERIMENTAL_META
   )
 
   hpx_check_for_cxx26_contracts(DEFINITIONS HPX_HAVE_CXX26_CONTRACTS)

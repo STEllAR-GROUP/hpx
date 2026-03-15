@@ -562,15 +562,6 @@ function(hpx_check_for_cxx20_std_construct_at)
 endfunction()
 
 # ##############################################################################
-function(hpx_check_for_cxx20_std_bit_cast)
-  add_hpx_config_test(
-    HPX_WITH_CXX20_STD_BIT_CAST
-    SOURCE cmake/tests/cxx20_std_bit_cast.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
 function(hpx_check_for_cxx23_std_generator)
   add_hpx_config_test(
     HPX_WITH_CXX23_STD_GENERATOR
@@ -601,6 +592,15 @@ function(hpx_check_for_cxx26_contracts)
   add_hpx_config_test(
     HPX_WITH_CXX26_CONTRACTS
     SOURCE cmake/tests/cxx26_contracts.cpp
+    FILE ${ARGN}
+  )
+endfunction()
+
+# ##############################################################################
+function(hpx_check_for_cxx26_experimental_meta)
+  add_hpx_config_test(
+    HPX_WITH_CXX26_EXPERIMENTAL_META
+    SOURCE cmake/tests/cxx26_experimental_meta.cpp
     FILE ${ARGN}
   )
 endfunction()
