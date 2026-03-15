@@ -12,9 +12,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
-#include <mutex>
-#include <string>
-#include <unordered_set>
 
 #include <tracy/TracyC.h>
 
@@ -22,37 +19,14 @@
 namespace hpx::tracy {
 
     namespace {
-
-        // Global string interning for zone labels.
-        // TracyCZoneName consumes raw pointers and can be called long after
-        // the original source string's lifetime ended. Interning ensures
-        // label pointers remain valid for the process lifetime.
-        char const* intern_zone_label(char const* label, char const* fallback)
+        char const* intern_zone_label(
+            char const* label, char const* fallback) noexcept
         {
             if (label == nullptr || label[0] == '\0')
             {
                 label = fallback;
             }
-
-            // A simple static lock and set for in-memory string interning.
-            static std::unordered_set<std::string> interned_strings;
-            static std::mutex interning_mutex;
-
-            std::lock_guard<std::mutex> lock(interning_mutex);
-            auto it = interned_strings.find(label);
-            if (it != interned_strings.end())
-            {
-                return it->c_str();
-            }
-
-            constexpr std::size_t MAX_TRACY_LABELS = 4096;
-            if (interned_strings.size() > MAX_TRACY_LABELS)
-            {
-                return fallback;
-            }
-
-            auto result = interned_strings.insert(label);
-            return result.first->c_str();
+            return label;
         }
 
         // Store currently active Tracy zone
@@ -101,6 +75,21 @@ namespace hpx::tracy {
         {
             thread_local fiber_zone_data fz;
             return fz;
+        }
+
+        void open_fiber_zone(fiber_zone_data& fz, char const* zone_name,
+            std::uint32_t color) noexcept
+        {
+            // clang-format off
+            TracyCZoneC(ctx, color, 1)
+            TracyCZoneName(ctx, zone_name, std::strlen(zone_name))
+                // clang-format on
+
+                tracy_context data;
+            data.context = ctx;
+
+            fz.ctx_value = data.value;
+            fz.active = true;
         }
     }    // namespace
 
@@ -154,28 +143,12 @@ namespace hpx::tracy {
 
     void start_fiber_zone(char const* zone_name, std::uint32_t color) noexcept
     {
-        char const* safe_zone_name = "fiber";
-        try
-        {
-            safe_zone_name = intern_zone_label(zone_name, "fiber");
-        }
-        catch (...)
-        {
-        }
-
-        // clang-format off
-        TracyCZoneC(ctx, color, 1)
-        TracyCZoneName(ctx, safe_zone_name, std::strlen(safe_zone_name))
-            // clang-format on
-
-            tracy_context data;
-        data.context = ctx;
+        char const* safe_zone_name = intern_zone_label(zone_name, "fiber");
 
         auto& fz = current_fiber_zone();
-        fz.ctx_value = data.value;
+        open_fiber_zone(fz, safe_zone_name, color);
         fz.zone_name = safe_zone_name;
         fz.color = color;
-        fz.active = true;
     }
 
     void stop_fiber_zone() noexcept
@@ -217,24 +190,9 @@ namespace hpx::tracy {
         // Open a grey "suspended" zone on the fiber stack.
         // 0xAAAAAA = medium grey, distinguishable from any worker-index color.
         constexpr std::uint32_t suspended_color = 0xAAAAAA;
-        char const* safe_reason = "suspend";
-        try
-        {
-            safe_reason = intern_zone_label(suspend_reason, "suspend");
-        }
-        catch (...)
-        {
-        }
+        char const* safe_reason = intern_zone_label(suspend_reason, "suspend");
 
-        // clang-format off
-        TracyCZoneC(sctx, suspended_color, 1)
-        TracyCZoneName(sctx, safe_reason, std::strlen(safe_reason))
-            // clang-format on
-
-            tracy_context sdata;
-        sdata.context = sctx;
-        fz.ctx_value = sdata.value;
-        fz.active = true;
+        open_fiber_zone(fz, safe_reason, suspended_color);
         // zone_name and color are preserved from start_fiber_zone so that
         // resume_fiber_zone can restore the original running zone.
     }
@@ -262,25 +220,10 @@ namespace hpx::tracy {
 
         // Reopen the running zone with cached or supplied name/color.
         char const* name = (zone_name != nullptr) ? zone_name : fz.zone_name;
-        char const* safe_name = "fiber";
-        try
-        {
-            safe_name = intern_zone_label(name, "fiber");
-        }
-        catch (...)
-        {
-        }
+        char const* safe_name = intern_zone_label(name, "fiber");
         std::uint32_t col = (color != 0) ? color : fz.color;
 
-        // clang-format off
-        TracyCZoneC(rctx, col, 1)
-        TracyCZoneName(rctx, safe_name, std::strlen(safe_name))
-            // clang-format on
-
-            tracy_context rdata;
-        rdata.context = rctx;
-        fz.ctx_value = rdata.value;
-        fz.active = true;
+        open_fiber_zone(fz, safe_name, col);
     }
 
     char const* rename_region(char const* new_region) noexcept
