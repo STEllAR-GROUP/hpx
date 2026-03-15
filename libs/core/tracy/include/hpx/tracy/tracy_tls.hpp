@@ -56,17 +56,25 @@ namespace hpx::tracy {
     HPX_CXX_EXPORT struct region
     {
         explicit region(char const* name, std::size_t const thread_num,
-            std::size_t phase) noexcept
-          : surrounding_region(start_region(name, thread_num, phase))
+            std::size_t phase, bool enabled = true) noexcept
         {
+            if (enabled)
+            {
+                surrounding_region = start_region(name, thread_num, phase);
+                active = true;
+            }
         }
 
         ~region() noexcept
         {
-            stop_region(surrounding_region);
+            if (active)
+            {
+                stop_region(surrounding_region);
+            }
         }
 
     private:
+        bool active = false;
         region_data surrounding_region;
     };
 
