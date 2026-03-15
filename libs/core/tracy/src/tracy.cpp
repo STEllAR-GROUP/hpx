@@ -10,6 +10,7 @@
 #include <hpx/tracy/tracy.hpp>
 #include <hpx/tracy/tracy_tls.hpp>
 
+#include <cstdint>
 #include <cstring>
 #include <string>
 
@@ -33,7 +34,7 @@ namespace hpx::tracy {
         // Switch Tracy's zone stack to this fiber.
         ::TracyFiberEnter(fiber_name);
 
-        // Open a zone on the fiber's zone stack — this makes the fiber
+        // Open a zone on the fiber's zone stack - this makes the fiber
         // track visible in Tracy as a colored bar labeled with zone_name.
         start_fiber_zone(zone_name, color);
     }
