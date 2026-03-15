@@ -255,6 +255,10 @@ namespace hpx::threads {
         backtrace_ = nullptr;
 #endif
 
+#if defined(HPX_HAVE_MODULE_TRACY)
+        tracy_fiber_name_[0] = '\0';
+#endif
+
         LTM_(debug).format("thread::thread({}), description({}), rebind", this,
             get_description());
 
