@@ -54,7 +54,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
 #if defined(__APPLE__) && defined(__clang__)
     HPX_CXX_CORE_EXPORT class __attribute__((visibility("default")))
-        HPX_CORE_EXPORT runtime
+    HPX_CORE_EXPORT runtime
 #else
     HPX_CXX_CORE_EXPORT class HPX_CORE_EXPORT runtime
 #endif

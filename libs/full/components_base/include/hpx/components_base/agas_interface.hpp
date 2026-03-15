@@ -15,10 +15,10 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
+#include <hpx/modules/parcelset_base.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/gid_type.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/modules/parcelset_base.hpp>
 
 #include <cstddef>
 #include <cstdint>
