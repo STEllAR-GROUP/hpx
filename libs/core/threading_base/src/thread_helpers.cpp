@@ -14,6 +14,7 @@
 #include <hpx/threading_base/scheduler_state.hpp>
 #include <hpx/threading_base/set_thread_state.hpp>
 #include <hpx/threading_base/set_thread_state_timed.hpp>
+#include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
@@ -438,18 +439,8 @@ namespace hpx::this_thread {
         char const* get_tracy_suspend_reason(
             threads::thread_description const& description) noexcept
         {
-#if defined(HPX_HAVE_THREAD_DESCRIPTION)
-            if (description.kind() ==
-                threads::thread_description::data_type::description)
-            {
-                char const* reason = description.get_description();
-                if (reason != nullptr && reason[0] != '\0')
-                {
-                    return reason;
-                }
-            }
-#endif
-            return "this_thread::suspend";
+            return threads::thread_data::get_tracy_description_name(
+                description, "this_thread::suspend");
         }
     }    // namespace
 #endif
