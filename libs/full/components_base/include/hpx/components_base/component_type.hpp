@@ -170,8 +170,8 @@ namespace hpx::components {
     HPX_CXX_EXPORT HPX_EXPORT std::string get_component_type_name(
         component_type type);
 
-    inline constexpr component_type component_type_mask = 0x3FF;
-    inline constexpr component_type component_type_shift = 10;
+    HPX_CXX_EXPORT inline constexpr component_type component_type_mask = 0x3FF;
+    HPX_CXX_EXPORT inline constexpr component_type component_type_shift = 10;
 
     /// The lower short word of the component type is the type of the component
     /// exposing the actions.

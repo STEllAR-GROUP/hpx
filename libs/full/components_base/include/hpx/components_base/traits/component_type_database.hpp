@@ -12,12 +12,17 @@
 
 namespace hpx::components {
 
-    using component_type = std::int32_t;
+    HPX_CXX_EXPORT using component_type = std::int32_t;
 }    // namespace hpx::components
 
 namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
+    HPX_CXX_EXPORT inline constexpr components::component_type
+        component_type_mask = 0x3FF;
+    HPX_CXX_EXPORT inline constexpr components::component_type
+        component_type_shift = 10;
+
     HPX_CXX_EXPORT template <typename Component, typename Enable = void>
     struct component_type_database
     {

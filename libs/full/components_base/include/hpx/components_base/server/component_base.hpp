@@ -25,7 +25,7 @@ namespace hpx::components {
 
     namespace detail {
 
-        struct base_component : traits::detail::component_tag
+        HPX_CXX_EXPORT struct base_component : traits::detail::component_tag
         {
             constexpr base_component() = default;
             HPX_EXPORT ~base_component();

@@ -14,15 +14,15 @@ namespace hpx::traits {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        struct fixed_component_tag
+        HPX_CXX_EXPORT struct fixed_component_tag
         {
         };
 
-        struct component_tag
+        HPX_CXX_EXPORT struct component_tag
         {
         };
 
-        struct managed_component_tag
+        HPX_CXX_EXPORT struct managed_component_tag
         {
         };
 
@@ -67,7 +67,7 @@ namespace hpx::traits {
     {
     };
 
-    template <typename Component>
+    HPX_CXX_EXPORT template <typename Component>
     inline constexpr bool is_component_v = is_component<Component>::value;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -86,7 +86,7 @@ namespace hpx::traits {
     {
     };
 
-    template <typename Component>
+    HPX_CXX_EXPORT template <typename Component>
     inline constexpr bool is_component_or_component_array_v =
         is_component_or_component_array<Component>::value;
 
@@ -102,7 +102,7 @@ namespace hpx::traits {
     {
     };
 
-    template <typename Component>
+    HPX_CXX_EXPORT template <typename Component>
     inline constexpr bool is_fixed_component_v =
         is_fixed_component<Component>::value;
 
@@ -119,7 +119,7 @@ namespace hpx::traits {
     {
     };
 
-    template <typename Component>
+    HPX_CXX_EXPORT template <typename Component>
     inline constexpr bool is_managed_component_v =
         is_managed_component<Component>::value;
 

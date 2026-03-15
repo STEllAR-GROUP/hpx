@@ -104,7 +104,7 @@ namespace hpx::agas {
     HPX_CXX_EXPORT HPX_EXPORT std::uint32_t get_locality_id(
         error_code& ec = throws);
 
-    inline hpx::naming::gid_type get_locality()
+    HPX_CXX_EXPORT inline hpx::naming::gid_type get_locality()
     {
         return naming::get_gid_from_locality_id(get_locality_id());
     }
@@ -113,7 +113,7 @@ namespace hpx::agas {
     HPX_CXX_EXPORT HPX_EXPORT std::vector<std::uint32_t> get_all_locality_ids(
         naming::component_type type, error_code& ec = throws);
 
-    inline std::vector<std::uint32_t> get_all_locality_ids(
+    HPX_CXX_EXPORT inline std::vector<std::uint32_t> get_all_locality_ids(
         error_code& ec = throws)
     {
         return get_all_locality_ids(naming::component_invalid, ec);
@@ -143,19 +143,19 @@ namespace hpx::agas {
             naming::address const&)>&& f,
         error_code& ec = throws);
 
-    inline bool is_local_address_cached(
+    HPX_CXX_EXPORT inline bool is_local_address_cached(
         hpx::id_type const& id, error_code& ec = throws)
     {
         return is_local_address_cached(id.get_gid(), ec);
     }
 
-    inline bool is_local_address_cached(
+    HPX_CXX_EXPORT inline bool is_local_address_cached(
         hpx::id_type const& id, naming::address& addr, error_code& ec = throws)
     {
         return is_local_address_cached(id.get_gid(), addr, ec);
     }
 
-    inline bool is_local_address_cached(hpx::id_type const& id,
+    HPX_CXX_EXPORT inline bool is_local_address_cached(hpx::id_type const& id,
         naming::address& addr, std::pair<bool, components::pinned_ptr>& r,
         hpx::move_only_function<std::pair<bool, components::pinned_ptr>(
             naming::address const&)>&& f,
@@ -173,7 +173,8 @@ namespace hpx::agas {
     HPX_CXX_EXPORT HPX_EXPORT bool is_local_lva_encoded_address(
         naming::gid_type const& gid);
 
-    inline bool is_local_lva_encoded_address(hpx::id_type const& id)
+    HPX_CXX_EXPORT inline bool is_local_lva_encoded_address(
+        hpx::id_type const& id)
     {
         return is_local_lva_encoded_address(id.get_gid());
     }
