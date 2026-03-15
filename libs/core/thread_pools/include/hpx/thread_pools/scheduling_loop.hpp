@@ -258,10 +258,8 @@ namespace hpx::threads::detail {
                                     rctx.emplace(name, num_thread,
                                         thrdptr->get_thread_phase());
                                     fctx.emplace(
-                                        thrdptr->get_tracy_fiber_name(),
-                                        name,
-                                        static_cast<std::uint32_t>(
-                                            num_thread));
+                                        thrdptr->get_tracy_fiber_name(), name,
+                                        static_cast<std::uint32_t>(num_thread));
                                 }
 #endif
 

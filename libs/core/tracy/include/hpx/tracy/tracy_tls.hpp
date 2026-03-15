@@ -48,8 +48,7 @@ namespace hpx::tracy {
     HPX_CXX_EXPORT HPX_CORE_EXPORT void suspend_fiber_zone(
         char const* suspend_reason = nullptr) noexcept;
     HPX_CXX_EXPORT HPX_CORE_EXPORT void resume_fiber_zone(
-        char const* zone_name = nullptr,
-        std::uint32_t color = 0) noexcept;
+        char const* zone_name = nullptr, std::uint32_t color = 0) noexcept;
 
     HPX_CXX_EXPORT struct region
     {
