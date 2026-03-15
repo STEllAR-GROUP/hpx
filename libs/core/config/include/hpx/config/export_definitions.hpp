@@ -50,15 +50,15 @@
 # define  HPX_CORE_EXPORT       HPX_SYMBOL_IMPORT
 #endif
 
-///////////////////////////////////////////////////////////////////////////////
-// C++20 module export definitions
-#if defined(HPX_COMPILE_BMI)
-# if defined(HPX_COMPILE_CORE_WITH_MODULES)
-#  define HPX_CXX_CORE_EXPORT                   export
-# elif defined(HPX_COMPILE_FULL_WITH_MODULES)
-#  define HPX_CXX_EXPORT                        export
-# endif
-#endif
+// ///////////////////////////////////////////////////////////////////////////////
+// // C++20 module export definitions
+// #if defined(HPX_COMPILE_BMI)
+// # if defined(HPX_COMPILE_CORE_WITH_MODULES)
+// #  define HPX_CXX_CORE_EXPORT                   export
+// # elif defined(HPX_COMPILE_FULL_WITH_MODULES)
+// #  define HPX_CXX_EXPORT                        export
+// # endif
+// #endif
 
 #if !defined(HPX_CXX_CORE_EXPORT)
 # define HPX_CXX_CORE_EXPORT                    /* empty */
