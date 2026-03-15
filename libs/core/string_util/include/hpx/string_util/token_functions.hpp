@@ -42,6 +42,7 @@
 #include <iterator>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 namespace hpx::string_util {

@@ -20,6 +20,7 @@
 
 #include <cstddef>
 #include <mutex>
+#include <type_traits>
 #include <utility>
 
 namespace hpx::lcos::local {

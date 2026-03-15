@@ -125,7 +125,7 @@ namespace hpx::parallel::detail {
                 return sequential_iota(
                     HPX_FORWARD(Expolicy, policy), first, last, value);
             }
-        };
+        }
     };
 
 }    // namespace hpx::parallel::detail
