@@ -13,6 +13,7 @@
 #include <atomic>
 #include <random>
 #include <set>
+#include <type_traits>
 #include <utility>
 
 constexpr int N = 500;    // number of objects to construct
