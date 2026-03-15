@@ -10,6 +10,7 @@
 
 #if defined(HPX_HAVE_MODULE_TRACY)
 
+#include <cstdint>
 #include <string>
 
 namespace hpx::tracy {
@@ -17,14 +18,16 @@ namespace hpx::tracy {
     HPX_CXX_EXPORT HPX_CORE_EXPORT void set_thread_name(
         char const* name) noexcept;
 
-    HPX_CXX_EXPORT HPX_CORE_EXPORT void enter_fiber(char const* name) noexcept;
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void enter_fiber(char const* fiber_name,
+        char const* zone_name = nullptr, std::uint32_t color = 0) noexcept;
     HPX_CXX_EXPORT HPX_CORE_EXPORT void leave_fiber() noexcept;
 
     HPX_CXX_EXPORT struct fiber_region
     {
-        explicit fiber_region(char const* name) noexcept
+        explicit fiber_region(char const* fiber_name,
+            char const* zone_name = nullptr, std::uint32_t color = 0) noexcept
         {
-            enter_fiber(name);
+            enter_fiber(fiber_name, zone_name, color);
         }
 
         ~fiber_region() noexcept

@@ -29,6 +29,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <optional>
 #include <utility>
 
 namespace hpx::threads::detail {
@@ -234,8 +235,32 @@ namespace hpx::threads::detail {
 #if defined(HPX_HAVE_MODULE_TRACY)
                                 char const* name = thrdptr->get_description()
                                                        .get_description();
-                                tracy::region rctx(name, num_thread,
-                                    thrdptr->get_thread_phase());
+                                // Dual-view Tracy instrumentation:
+                                //
+                                // rctx declared FIRST \u2192 constructed first \u2192
+                                //   ZoneBegin fires with NO active fiber,
+                                //   so Tracy attributes it to the OS worker
+                                //   thread row (utilization view).
+                                //
+                                // fctx declared SECOND \u2192 constructed second \u2192
+                                //   TracyFiberEnter fires INSIDE the open zone,
+                                //   so Tracy also shows this slice on the fiber
+                                //   track (M:N migration view).
+                                //
+                                // Destruction is C++ reverse order:
+                                //   ~fctx first \u2192 TracyFiberLeave
+                                //   ~rctx last  \u2192 ZoneEnd
+                                // Zone outlives the fiber context \u2014 correct.
+                                std::optional<tracy::region> rctx;
+                                std::optional<tracy::fiber_region> fctx;
+                                if (name != nullptr && !thrdptr->is_stackless())
+                                {
+                                    rctx.emplace(name, num_thread,
+                                        thrdptr->get_thread_phase());
+                                    fctx.emplace(
+                                        thrdptr->get_tracy_fiber_name(), name,
+                                        static_cast<std::uint32_t>(num_thread));
+                                }
 #endif
 
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
