@@ -14,13 +14,14 @@
 
 namespace hpx::tracy {
 
-    HPX_CXX_EXPORT HPX_CORE_EXPORT void set_thread_name(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void set_thread_name(
         char const* name) noexcept;
 
-    HPX_CXX_EXPORT HPX_CORE_EXPORT void enter_fiber(char const* name) noexcept;
-    HPX_CXX_EXPORT HPX_CORE_EXPORT void leave_fiber() noexcept;
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void enter_fiber(
+        char const* name) noexcept;
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void leave_fiber() noexcept;
 
-    HPX_CXX_EXPORT struct fiber_region
+    HPX_CXX_CORE_EXPORT struct fiber_region
     {
         explicit fiber_region(char const* name) noexcept
         {
@@ -33,10 +34,10 @@ namespace hpx::tracy {
         }
     };
 
-    HPX_CXX_EXPORT HPX_CORE_EXPORT void create_counter(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void create_counter(
         std::string const& name) noexcept;
 
-    HPX_CXX_EXPORT HPX_CORE_EXPORT void sample_value(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void sample_value(
         std::string const& name, double value) noexcept;
 
 }    // namespace hpx::tracy
