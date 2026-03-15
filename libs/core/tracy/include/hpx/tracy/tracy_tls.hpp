@@ -30,8 +30,28 @@ namespace hpx::tracy {
         char const*) noexcept;
     HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT region_data stop_region(
         region_data const& prev_region) noexcept;
+    // Set/clear the per-OS-thread "inside fiber" flag used to guard
+    // rename_region from operating on a stale zone ctx.
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void set_in_fiber(bool) noexcept;
 
-    HPX_CXX_CORE_EXPORT struct region
+    // Open/close a zone on the fiber's zone stack so that the fiber track
+    // is visible in Tracy.  Must be called after/before TracyFiberEnter/Leave.
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void start_fiber_zone(
+        char const* zone_name, std::uint32_t color = 0) noexcept;
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void stop_fiber_zone() noexcept;
+
+    // Suspend/resume the zone that is currently open on the fiber's zone stack.
+    // Call suspend_fiber_zone() just before self_.yield() and
+    // resume_fiber_zone() immediately after self_.yield() returns.
+    // Both operate solely on current_fiber_zone() — they never touch the
+    // OS-thread zone (current_region()), so there is no zone-stack conflict.
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void suspend_fiber_zone(
+        char const* suspend_reason = nullptr) noexcept;
+    HPX_CXX_EXPORT HPX_CORE_EXPORT void resume_fiber_zone(
+        char const* zone_name = nullptr,
+        std::uint32_t color = 0) noexcept;
+
+    HPX_CXX_EXPORT struct region
     {
         explicit region(char const* name, std::size_t const thread_num,
             std::size_t phase) noexcept

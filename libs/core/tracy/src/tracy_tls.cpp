@@ -27,8 +27,7 @@ namespace hpx::tracy {
         // TracyCZoneName consumes raw pointers and can be called long after
         // the original source string's lifetime ended. Interning ensures
         // label pointers remain valid for the process lifetime.
-        char const* intern_zone_label(
-            char const* label, char const* fallback)
+        char const* intern_zone_label(char const* label, char const* fallback)
         {
             if (label == nullptr || label[0] == '\0')
             {
@@ -167,9 +166,9 @@ namespace hpx::tracy {
         // clang-format off
         TracyCZoneC(ctx, color, 1)
         TracyCZoneName(ctx, safe_zone_name, std::strlen(safe_zone_name))
-        // clang-format on
+            // clang-format on
 
-        tracy_context data;
+            tracy_context data;
         data.context = ctx;
 
         auto& fz = current_fiber_zone();
@@ -188,8 +187,8 @@ namespace hpx::tracy {
             data.value = fz.ctx_value;
             // clang-format off
             TracyCZoneEnd(data.context)
-            // clang-format on
-            fz.active = false;
+                // clang-format on
+                fz.active = false;
             fz.ctx_value = 0;
         }
     }
@@ -230,9 +229,9 @@ namespace hpx::tracy {
         // clang-format off
         TracyCZoneC(sctx, suspended_color, 1)
         TracyCZoneName(sctx, safe_reason, std::strlen(safe_reason))
-        // clang-format on
+            // clang-format on
 
-        tracy_context sdata;
+            tracy_context sdata;
         sdata.context = sctx;
         fz.ctx_value = sdata.value;
         fz.active = true;
@@ -276,9 +275,9 @@ namespace hpx::tracy {
         // clang-format off
         TracyCZoneC(rctx, col, 1)
         TracyCZoneName(rctx, safe_name, std::strlen(safe_name))
-        // clang-format on
+            // clang-format on
 
-        tracy_context rdata;
+            tracy_context rdata;
         rdata.context = rctx;
         fz.ctx_value = rdata.value;
         fz.active = true;

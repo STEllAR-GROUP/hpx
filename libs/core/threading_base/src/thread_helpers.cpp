@@ -31,6 +31,9 @@
 #ifdef HPX_HAVE_MODULE_LIKWID
 #include <hpx/modules/likwid.hpp>
 #endif
+#ifdef HPX_HAVE_MODULE_TRACY
+#include <hpx/modules/tracy.hpp>
+#endif
 
 #include <atomic>
 #include <cstddef>
@@ -427,6 +430,30 @@ namespace hpx::threads {
 
 namespace hpx::this_thread {
 
+#ifdef HPX_HAVE_MODULE_TRACY
+    namespace {
+        // Extract the suspend reason from the thread description so the fiber
+        // track in Tracy shows a meaningful label (e.g. the LCO being waited
+        // on) instead of a generic "this_thread::suspend" string.
+        char const* get_tracy_suspend_reason(
+            threads::thread_description const& description) noexcept
+        {
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+            if (description.kind() ==
+                threads::thread_description::data_type::description)
+            {
+                char const* reason = description.get_description();
+                if (reason != nullptr && reason[0] != '\0')
+                {
+                    return reason;
+                }
+            }
+#endif
+            return "this_thread::suspend";
+        }
+    }    // namespace
+#endif
+
     // The function 'suspend' will return control to the thread manager
     // (suspends the current thread). It sets the new state of this thread to
     // the thread state passed as the parameter.
@@ -470,6 +497,10 @@ namespace hpx::this_thread {
 #endif
 #ifdef HPX_HAVE_MODULE_LIKWID
             hpx::likwid::suspend_region region;
+#endif
+#ifdef HPX_HAVE_MODULE_TRACY
+            hpx::tracy::fiber_suspend_region tracy_suspend(
+                get_tracy_suspend_reason(description));
 #endif
             // We might need to dispatch 'nextid' to it's correct scheduler only
             // if our current scheduler is the same, we should yield to the id
@@ -550,6 +581,10 @@ namespace hpx::this_thread {
 #endif
 #ifdef HPX_HAVE_MODULE_LIKWID
             hpx::likwid::suspend_region region;
+#endif
+#ifdef HPX_HAVE_MODULE_TRACY
+            hpx::tracy::fiber_suspend_region tracy_suspend(
+                get_tracy_suspend_reason(description));
 #endif
             std::atomic<bool> timer_started(false);
             threads::thread_id_ref_type const timer_id =
