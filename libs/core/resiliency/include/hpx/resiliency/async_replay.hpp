@@ -97,15 +97,7 @@ namespace hpx::resiliency::experimental {
                             throw abort_replay_exception();
                         }
 
-                        if (n != 0)
-                        {
-                            // return result
-                            return hpx::make_ready_future(HPX_MOVE(result));
-                        }
-
-                        // throw aborting exception as attempts were
-                        // exhausted
-                        throw abort_replay_exception();
+                        return hpx::make_ready_future(HPX_MOVE(result));
                     });
             }
 
