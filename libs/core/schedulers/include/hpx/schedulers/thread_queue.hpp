@@ -893,7 +893,7 @@ namespace hpx::threads::policies {
             return false;
         }
 
-        // Return the next thread to be executed, return false if none is
+        // Return the next threads to be executed, return 0 if none are
         // available
         template <typename Iterator>
         std::size_t get_next_threads(Iterator it, std::int64_t max_items,
@@ -906,13 +906,13 @@ namespace hpx::threads::policies {
 
             if (work_items_count == 0)
             {
-                return false;
+                return 0;
             }
 
             if (allow_stealing &&
                 parameters_.min_tasks_to_steal_pending_ > work_items_count)
             {
-                return false;
+                return 0;
             }
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
