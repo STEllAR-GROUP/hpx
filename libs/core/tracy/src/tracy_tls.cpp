@@ -66,7 +66,7 @@ namespace hpx::tracy {
         // rename_region (called by mark_event) must be a no-op in that case:
         // the zone ctx in TLS belongs to the OS-thread zone opened before
         // FiberEnter, but Tracy's internal zone stack has switched to the
-        // fiber's stack — calling TracyCZoneName on the OS zone while inside
+        // fiber's stack - calling TracyCZoneName on the OS zone while inside
         // a fiber causes a "zone name destination doesn't match" crash.
         bool& in_fiber() noexcept
         {
@@ -196,7 +196,7 @@ namespace hpx::tracy {
     // Close the running fiber zone and open a "suspended" zone (grey) so
     // the fiber track shows a distinct bar during the suspension gap.
     // Called just before self_.yield() inside execution_agent::do_yield().
-    // Only touches current_fiber_zone() — never calls stop_region() so the
+    // Only touches current_fiber_zone() - never calls stop_region() so the
     // OS-thread zone (current_region()) is completely untouched.
     void suspend_fiber_zone(char const* suspend_reason) noexcept
     {

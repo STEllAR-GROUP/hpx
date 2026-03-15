@@ -43,7 +43,7 @@ namespace hpx::tracy {
     // Suspend/resume the zone that is currently open on the fiber's zone stack.
     // Call suspend_fiber_zone() just before self_.yield() and
     // resume_fiber_zone() immediately after self_.yield() returns.
-    // Both operate solely on current_fiber_zone() — they never touch the
+    // Both operate solely on current_fiber_zone() - they never touch the
     // OS-thread zone (current_region()), so there is no zone-stack conflict.
     HPX_CXX_EXPORT HPX_CORE_EXPORT void suspend_fiber_zone(
         char const* suspend_reason = nullptr) noexcept;
@@ -68,7 +68,15 @@ namespace hpx::tracy {
         region_data surrounding_region;
     };
 
-    HPX_CXX_CORE_EXPORT struct suspend_region
+    // NOTE: suspend_region (OS-thread zone version) is intentionally NOT
+    // used for the fiber path.  Calling stop_region() while inside a Tracy
+    // fiber context corrupts the zone stack and causes an abort because the
+    // ctx stored in current_region() belongs to the OS-thread zone opened
+    // before TracyFiberEnter, but Tracy's internal stack has already switched
+    // to the fiber's stack.
+    //
+    // Use fiber_suspend_region instead - it operates only on the fiber zone.
+    HPX_CXX_EXPORT struct suspend_region
     {
         suspend_region() noexcept
           : suspended_region(stop_region({}))
@@ -101,6 +109,26 @@ namespace hpx::tracy {
 
     private:
         char const* previous_name;
+    };
+
+    // RAII guard that closes the running fiber zone before self_.yield() and
+    // reopens it after self_.yield() returns. Fully inline so it is visible
+    // to all translation units (execution_agent.cpp, thread_helpers.cpp, etc.)
+    // without requiring a separate shared-library export.
+    // Only touches current_fiber_zone() - never calls stop_region() /
+    // start_region() - so there is no zone-stack conflict.
+    struct fiber_suspend_region
+    {
+        explicit fiber_suspend_region(
+            char const* suspend_reason = nullptr) noexcept
+        {
+            suspend_fiber_zone(suspend_reason);
+        }
+
+        ~fiber_suspend_region() noexcept
+        {
+            resume_fiber_zone();
+        }
     };
 }    // namespace hpx::tracy
 
