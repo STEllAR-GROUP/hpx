@@ -969,7 +969,7 @@ namespace hpx::experimental {
             BiIter2 dest_last) noexcept(util::detail::relocation_traits<BiIter1,
             BiIter2>::is_noexcept_relocatable_v)
         {
-            static_assert(std::bidirectional_iterator<BiIter1> &&
+            static_assert(std::bidirectional_iterator<BiIter1>,
                 "The 'first' and 'last' arguments must meet the requirements "
                 "of bidirectional iterators.");
             static_assert(std::bidirectional_iterator<BiIter2>,
