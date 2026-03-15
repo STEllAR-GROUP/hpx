@@ -2227,8 +2227,8 @@ void test_stdexec_domain_queries()
             "bulk_chunked sender should satisfy "
             "bulk_chunked_or_unchunked_sender concept");
 
-        auto transformed =
-            domain.transform_sender(std::move(chunked_sndr), env);
+        auto transformed = domain.transform_sender(
+            ex::set_value_t{}, std::move(chunked_sndr), env);
 
         static_assert(is_thread_pool_bulk_sender<
                           std::decay_t<decltype(transformed)>>::value,
@@ -2250,8 +2250,8 @@ void test_stdexec_domain_queries()
             "bulk_unchunked sender should satisfy "
             "bulk_chunked_or_unchunked_sender concept");
 
-        auto transformed =
-            domain.transform_sender(std::move(unchunked_sndr), env);
+        auto transformed = domain.transform_sender(
+            ex::set_value_t{}, std::move(unchunked_sndr), env);
 
         static_assert(is_thread_pool_bulk_sender<
                           std::decay_t<decltype(transformed)>>::value,

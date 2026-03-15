@@ -176,8 +176,13 @@ namespace hpx::execution::experimental {
             explicit_scheduler_executor const& exec, F&& f, S const& shape,
             Ts&&... ts)
         {
+#if defined(HPX_HAVE_STDEXEC)
+            return bulk(schedule(exec.sched_), par, shape,
+                hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
+#else
             return bulk(schedule(exec.sched_), shape,
                 hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
+#endif
         }
 
         // Range shape overload
@@ -206,8 +211,22 @@ namespace hpx::execution::experimental {
 
             if constexpr (std::is_void_v<result_type>)
             {
+#if defined(HPX_HAVE_STDEXEC)
+                // stdexec::bulk requires integral shape and execution policy
+                using size_type = decltype(util::size(shape));
+                size_type const n = util::size(shape);
+                return bulk(schedule(exec.sched_), par, n,
+                    [shape,
+                        bound_f = hpx::bind_back(HPX_FORWARD(F, f),
+                            HPX_FORWARD(Ts, ts)...)](size_type i) mutable {
+                        auto it = util::begin(shape);
+                        std::advance(it, i);
+                        HPX_INVOKE(bound_f, *it);
+                    });
+#else
                 return bulk(schedule(exec.sched_), shape,
                     hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
+#endif
             }
             else
             {
@@ -234,7 +253,7 @@ namespace hpx::execution::experimental {
                 return just(HPX_MOVE(result_vector), shape, HPX_FORWARD(F, f),
                            HPX_FORWARD(Ts, ts)...) |
                     continues_on(exec.sched_) |
-                    bulk(shape_size, HPX_MOVE(f_wrapper)) |
+                    bulk(par, shape_size, HPX_MOVE(f_wrapper)) |
                     then(HPX_MOVE(get_result));
 #else
                 return then(
@@ -294,9 +313,15 @@ namespace hpx::execution::experimental {
             auto pre_req =
                 when_all(keep_future(HPX_FORWARD(Future, predecessor)));
 
+#if defined(HPX_HAVE_STDEXEC)
+            return transfer(HPX_MOVE(pre_req), exec.sched_) |
+                bulk(par, shape,
+                    hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
+#else
             return transfer(HPX_MOVE(pre_req), exec.sched_) |
                 bulk(shape,
                     hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
+#endif
         }
 
         // Range shape overload
@@ -320,9 +345,24 @@ namespace hpx::execution::experimental {
             auto pre_req =
                 when_all(keep_future(HPX_FORWARD(Future, predecessor)));
 
+#if defined(HPX_HAVE_STDEXEC)
+            using size_type = decltype(util::size(shape));
+            size_type const n = util::size(shape);
+            return transfer(HPX_MOVE(pre_req), exec.sched_) |
+                bulk(par, n,
+                    [shape,
+                        bound_f = hpx::bind_back(
+                            HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)](
+                        size_type i, auto&... args) mutable {
+                        auto it = util::begin(shape);
+                        std::advance(it, i);
+                        HPX_INVOKE(bound_f, *it, args...);
+                    });
+#else
             return transfer(HPX_MOVE(pre_req), exec.sched_) |
                 bulk(shape,
                     hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
+#endif
         }
 
     private:
