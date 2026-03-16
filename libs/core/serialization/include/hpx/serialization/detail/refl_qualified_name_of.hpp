@@ -15,6 +15,7 @@
 #include <string>
 #include <string_view>
 #include <vector>
+#include <cstdint>
 
 #include <meta>
 #include <ranges>
@@ -62,6 +63,9 @@ namespace hpx::serialization::detail {
     template <std::size_t N>
     fixed_string(char const (&)[N]) -> fixed_string<N - 1>;
 
+    template <typename T>
+    using strip_all_t = std::remove_cv_t<std::remove_pointer_t<std::remove_reference_t<std::remove_cv_t<T>>>>;
+
     // Helper to recursively build the enclosing namespaces of a type
     template <std::meta::info Scope>
     struct scope_builder
@@ -72,13 +76,103 @@ namespace hpx::serialization::detail {
             {
                 return fixed_string("");
             }
+            else if constexpr (std::is_fundamental_v<strip_all_t<typename[:Scope:]>>) 
+            {
+                using type = strip_all_t<typename[:Scope:]>;
+                auto ftype = fixed_string("");
+                if constexpr (std::is_same_v<type, signed char>) {
+                    ftype = fixed_string("signed char");
+                }   
+                else if constexpr (std::is_same_v<type, unsigned char>) {
+                    ftype = fixed_string("unsigned char");
+                }
+                else if constexpr (std::is_same_v<type, short int>) {
+                    ftype = fixed_string("short int");
+                }
+                else if constexpr (std::is_same_v<type, unsigned short int>) {
+                    ftype = fixed_string("unsigned short int");
+                }
+                else if constexpr (std::is_same_v<type, int>) {
+                    ftype = fixed_string("int");
+                }
+                else if constexpr (std::is_same_v<type, unsigned int>) {
+                    ftype = fixed_string("unsigned int");
+                }
+                else if constexpr (std::is_same_v<type, long int>) {
+                    ftype = fixed_string("long int");
+                }
+                else if constexpr (std::is_same_v<type, unsigned long int>) {
+                    ftype = fixed_string("unsigned long int");
+                }
+                else if constexpr (std::is_same_v<type, long long int>) {
+                    ftype = fixed_string("long long int");
+                }
+                else if constexpr (std::is_same_v<type, unsigned long long int>) {
+                    ftype = fixed_string("unsigned long long int");
+                }
+                else if constexpr (std::is_same_v<type, char8_t>) {
+                    ftype = fixed_string("char8_t");
+                }
+                else if constexpr (std::is_same_v<type, char16_t>) {
+                    ftype = fixed_string("char16_t");
+                }
+                else if constexpr (std::is_same_v<type, char32_t>) {
+                    ftype = fixed_string("char32_t");
+                }
+                else if constexpr (std::is_same_v<type, wchar_t>) {
+                    ftype = fixed_string("wchar_t");
+                }
+                else if constexpr (std::is_same_v<type, char>) {
+                    ftype = fixed_string("char");
+                }
+                else if constexpr (std::is_same_v<type, bool>) {
+                    ftype = fixed_string("bool");
+                }
+                else if constexpr (std::is_same_v<type, float>) {
+                    ftype = fixed_string("float");
+                }
+                else if constexpr (std::is_same_v<type, double>) {
+                    ftype = fixed_string("double");
+                }
+                else if constexpr (std::is_same_v<type, long double>) {
+                    ftype = fixed_string("long double");
+                }
+                else if constexpr (std::is_same_v<type, void>) {
+                    ftype = fixed_string("void");
+                }
+                else if constexpr (std::is_same_v<type, std::nullptr_t>) {
+                    ftype = fixed_string("std::nullptr_t");
+                }
+
+                if constexpr (std::is_pointer_v<typename[:Scope:]>) {
+                    ftype = ftype + fixed_string("*");
+                    if constexpr (std::is_const_v<typename[:Scope:]>) {
+                        ftype = ftype + fixed_string(" const");
+                    }
+                    if constexpr (std::is_volatile_v<typename[:Scope:]>) {
+                        ftype = ftype + fixed_string(" volatile");
+                    }
+                }
+                else if constexpr (std::is_lvalue_reference_v<typename[:Scope:]>) {
+                    ftype = ftype + fixed_string("&");
+                }
+                else if constexpr (std::is_rvalue_reference_v<typename[:Scope:]>) {
+                    ftype = ftype + fixed_string("&&");
+                }
+
+                using pointee_type = std::remove_pointer_t<std::remove_reference_t<std::remove_cv_t<typename[:Scope:]>>>;
+                if constexpr (std::is_const_v<typename[:Scope:]>) {
+                    ftype = fixed_string("const ") + ftype;
+                }
+                if constexpr (std::is_volatile_v<typename[:Scope:]>) {
+                    ftype = fixed_string("volatile ") + ftype;
+                }
+
+                return ftype;
+            }
             else if constexpr (!std::meta::has_identifier(Scope))
             {
-                // For types without identifiers (primitives,
-                // pointers, etc.), use display_string_of as the
-                // fallback,  this should guarantee uniqueness of
-                // the string made for a type even though
-                // display_string_of is implementationd defined
+                // Fallback for missed types such as functions, lambdas, etc.
                 constexpr auto name_view = std::meta::display_string_of(Scope);
                 return fixed_string<name_view.size()>(name_view);
             }
