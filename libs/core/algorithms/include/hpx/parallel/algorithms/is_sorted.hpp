@@ -299,10 +299,9 @@ namespace hpx::parallel {
 
                 // Note: replacing the invoke() with HPX_INVOKE()
                 // below makes gcc generate errors
-                auto f1 = [tok, last,
-                              pred_projected = HPX_MOVE(pred_projected)](
-                              FwdIter_ part_begin,
-                              std::size_t part_size) mutable
+                auto f1 =
+                    [tok, last, pred_projected = HPX_MOVE(pred_projected)](
+                        FwdIter_ part_begin, std::size_t part_size) mutable
                     -> intermediate_result_t {
                     FwdIter_ trail = part_begin++;
                     util::loop_n<std::decay_t<ExPolicy>>(part_begin,
@@ -354,7 +353,7 @@ namespace hpx::parallel {
               : algorithm<is_sorted_until, FwdIter>("is_sorted_until")
             {
             }
-            
+
             template <typename ExPolicy, typename FwdIter_, typename Sent_,
                 typename Pred, typename Proj>
             static constexpr FwdIter_ sequential(
