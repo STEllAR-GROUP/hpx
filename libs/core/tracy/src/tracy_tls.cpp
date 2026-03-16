@@ -1,4 +1,5 @@
 //  Copyright (c) 2025-2026 Hartmut Kaiser
+//  Copyright (c) 2026 Vansh Dobhal
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -80,12 +81,10 @@ namespace hpx::tracy {
         void open_fiber_zone(fiber_zone_data& fz, char const* zone_name,
             std::uint32_t color) noexcept
         {
-            // clang-format off
-            TracyCZoneC(ctx, color, 1)
-            TracyCZoneName(ctx, zone_name, std::strlen(zone_name))
-                // clang-format on
+            TracyCZoneC(ctx, color, 1);
+            TracyCZoneName(ctx, zone_name, std::strlen(zone_name));
 
-                tracy_context data;
+            tracy_context data;
             data.context = ctx;
 
             fz.ctx_value = data.value;
@@ -98,29 +97,27 @@ namespace hpx::tracy {
         HPX_CORE_EXPORT region_data start_region(char const* new_region,
             std::size_t const thread_num, std::size_t const phase) noexcept
         {
-            // clang-format off
 #if defined(HPX_HAVE_STACKTRACES)
-        TracyCZoneCS(ctx, static_cast<std::uint32_t>(thread_num),
-            HPX_HAVE_THREAD_BACKTRACE_DEPTH, 1)
+            TracyCZoneCS(ctx, static_cast<std::uint32_t>(thread_num),
+                HPX_HAVE_THREAD_BACKTRACE_DEPTH, 1);
 #else
-        TracyCZoneC(ctx, static_cast<std::uint32_t>(thread_num), 1)
+            TracyCZoneC(ctx, static_cast<std::uint32_t>(thread_num), 1);
 #endif
-        TracyCZoneName(ctx, new_region, std::strlen(new_region))
-        TracyCZoneValue(ctx, static_cast<std::uint32_t>(phase))
+            TracyCZoneName(ctx, new_region, std::strlen(new_region));
+            TracyCZoneValue(ctx, static_cast<std::uint32_t>(phase));
 
-        tracy_context data;
-        data.context = ctx;
+            tracy_context data;
+            data.context = ctx;
 
-        region_data& region = current_region();
-        region_data const prev_region = region;
+            region_data& region = current_region();
+            region_data const prev_region = region;
 
-        region.name = new_region;
-        region.data = data.value;
-        region.color = static_cast<std::uint32_t>(thread_num);
-        region.phase = static_cast<std::uint32_t>(phase);
+            region.name = new_region;
+            region.data = data.value;
+            region.color = static_cast<std::uint32_t>(thread_num);
+            region.phase = static_cast<std::uint32_t>(phase);
 
-        return prev_region;
-            // clang-format on
+            return prev_region;
         }
 
         HPX_CORE_EXPORT region_data stop_region(
@@ -133,7 +130,7 @@ namespace hpx::tracy {
             {
                 tracy_context data;
                 data.value = curr_region.data;
-                TracyCZoneEnd(data.context)
+                TracyCZoneEnd(data.context);
             }
 
             return curr_region;
@@ -162,10 +159,8 @@ namespace hpx::tracy {
             {
                 tracy_context data;
                 data.value = fz.ctx_value;
-                // clang-format off
-            TracyCZoneEnd(data.context)
-                    // clang-format on
-                    fz.active = false;
+                TracyCZoneEnd(data.context);
+                fz.active = false;
                 fz.ctx_value = 0;
             }
         }
@@ -186,9 +181,7 @@ namespace hpx::tracy {
             {
                 tracy_context data;
                 data.value = fz.ctx_value;
-                // clang-format off
-            TracyCZoneEnd(data.context)
-                // clang-format on
+                TracyCZoneEnd(data.context);
             }
             fz.active = false;
 
@@ -220,9 +213,7 @@ namespace hpx::tracy {
             {
                 tracy_context data;
                 data.value = fz.ctx_value;
-                // clang-format off
-            TracyCZoneEnd(data.context)
-                // clang-format on
+                TracyCZoneEnd(data.context);
             }
             fz.active = false;
 
@@ -248,15 +239,14 @@ namespace hpx::tracy {
             if (auto& [name, value, _1_, _2_] = current_region();
                 name != nullptr)
             {
-                // clang-format off
-            char const* previous_name = name;
-            name = new_region;
+                char const* previous_name = name;
+                name = new_region;
 
-            tracy_context data;
-            data.value = value;
-            TracyCZoneName(data.context, new_region, std::strlen(new_region))
-            return previous_name;
-                // clang-format on
+                tracy_context data;
+                data.value = value;
+                TracyCZoneName(
+                    data.context, new_region, std::strlen(new_region));
+                return previous_name;
             }
             return nullptr;
         }

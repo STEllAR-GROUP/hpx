@@ -1,4 +1,5 @@
 //  Copyright (c) 2025-2026 Hartmut Kaiser
+//  Copyright (c) 2026 Vansh Dobhal
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -24,44 +25,47 @@ namespace hpx::tracy {
         std::uint32_t phase = 0;
     };
 
-    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT region_data start_region(
-    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT region_data start_region(
-        char const*, std::size_t = 0, std::size_t = 0) noexcept;
-    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT char const* rename_region(
-    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT char const* rename_region(
-        char const*) noexcept;
-    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT region_data stop_region(
-    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT region_data stop_region(
-        region_data const& prev_region) noexcept;
-    // Set/clear the per-OS-thread "inside fiber" flag used to guard
-    // rename_region from operating on a stale zone ctx.
-    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void set_in_fiber(bool) noexcept;
+    namespace detail {
 
-    // Open/close a zone on the fiber's zone stack so that the fiber track
-    // is visible in Tracy.  Must be called after/before TracyFiberEnter/Leave.
-    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void start_fiber_zone(
-        char const* zone_name, std::uint32_t color = 0) noexcept;
-    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void stop_fiber_zone() noexcept;
+        HPX_CORE_EXPORT region_data start_region(
+            char const*, std::size_t = 0, std::size_t = 0) noexcept;
+        HPX_CORE_EXPORT char const* rename_region(char const*) noexcept;
+        HPX_CORE_EXPORT region_data stop_region(
+            region_data const& prev_region) noexcept;
+        // Set/clear the per-OS-thread "inside fiber" flag used to guard
+        // rename_region from operating on a stale zone ctx.
+        HPX_CORE_EXPORT void set_in_fiber(bool) noexcept;
 
-    // Suspend/resume the zone that is currently open on the fiber's zone stack.
-    // Call suspend_fiber_zone() just before self_.yield() and
-    // resume_fiber_zone() immediately after self_.yield() returns.
-    // Both operate solely on current_fiber_zone() - they never touch the
-    // OS-thread zone (current_region()), so there is no zone-stack conflict.
-    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void suspend_fiber_zone(
-        char const* suspend_reason = nullptr) noexcept;
-    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void resume_fiber_zone(
-        char const* zone_name = nullptr, std::uint32_t color = 0) noexcept;
+        // Open/close a zone on the fiber's zone stack so that the fiber track
+        // is visible in Tracy.  Must be called after/before
+        // TracyFiberEnter/Leave.
+        HPX_CORE_EXPORT void start_fiber_zone(
+            char const* zone_name, std::uint32_t color = 0) noexcept;
+        HPX_CORE_EXPORT void stop_fiber_zone() noexcept;
+
+        // Suspend/resume the zone that is currently open on the fiber's zone
+        // stack. Call suspend_fiber_zone() just before self_.yield() and
+        // resume_fiber_zone() immediately after self_.yield() returns.
+        // Both operate solely on current_fiber_zone() - they never touch the
+        // OS-thread zone (current_region()), so there is no zone-stack
+        // conflict.
+        HPX_CORE_EXPORT void suspend_fiber_zone(
+            char const* suspend_reason = nullptr) noexcept;
+        HPX_CORE_EXPORT void resume_fiber_zone(
+            char const* zone_name = nullptr, std::uint32_t color = 0) noexcept;
+
+    }    // namespace detail
 
     HPX_CXX_CORE_EXPORT struct region
     {
         explicit region(char const* name, std::size_t const thread_num,
             std::size_t phase, bool enabled = true) noexcept
+          : active(enabled)
         {
-            if (enabled)
+            if (active)
             {
-                surrounding_region = start_region(name, thread_num, phase);
-                active = true;
+                surrounding_region =
+                    detail::start_region(name, thread_num, phase);
             }
         }
 
@@ -69,12 +73,12 @@ namespace hpx::tracy {
         {
             if (active)
             {
-                stop_region(surrounding_region);
+                detail::stop_region(surrounding_region);
             }
         }
 
     private:
-        bool active = false;
+        bool active;
         region_data surrounding_region;
     };
 
@@ -89,7 +93,7 @@ namespace hpx::tracy {
     HPX_CXX_CORE_EXPORT struct suspend_region
     {
         suspend_region() noexcept
-          : suspended_region(stop_region({}))
+          : suspended_region(detail::stop_region({}))
         {
         }
 
@@ -97,8 +101,8 @@ namespace hpx::tracy {
         {
             if (suspended_region.name != nullptr)
             {
-                start_region(suspended_region.name, suspended_region.color,
-                    suspended_region.phase);
+                detail::start_region(suspended_region.name,
+                    suspended_region.color, suspended_region.phase);
             }
         }
 
@@ -108,13 +112,13 @@ namespace hpx::tracy {
     HPX_CXX_CORE_EXPORT struct mark_event
     {
         explicit mark_event(char const* name) noexcept
-          : previous_name(rename_region(name))
+          : previous_name(detail::rename_region(name))
         {
         }
 
         ~mark_event()
         {
-            rename_region(previous_name);
+            detail::rename_region(previous_name);
         }
 
     private:
@@ -132,12 +136,12 @@ namespace hpx::tracy {
         explicit fiber_suspend_region(
             char const* suspend_reason = nullptr) noexcept
         {
-            suspend_fiber_zone(suspend_reason);
+            detail::suspend_fiber_zone(suspend_reason);
         }
 
         ~fiber_suspend_region() noexcept
         {
-            resume_fiber_zone();
+            detail::resume_fiber_zone();
         }
     };
 }    // namespace hpx::tracy
