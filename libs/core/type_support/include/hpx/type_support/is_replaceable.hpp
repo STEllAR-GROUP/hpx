@@ -15,7 +15,7 @@
 
 namespace hpx::experimental {
 
-#if defined(__cpp_lib_is_replaceable)
+#if defined(__cpp_lib_trivially_relocatable)
     HPX_CXX_CORE_EXPORT template <typename T>
     struct is_replaceable : std::is_replaceable<T>
     {

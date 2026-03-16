@@ -104,4 +104,25 @@ namespace hpx::experimental {
 
 static_assert(is_replaceable_v<opt_in_replaceable>);
 
+// volatile types are not replaceable because their state is unstable and
+// bitwise move-assignment (replacement) cannot guarantee preservation of
+// their specific access semantics.
+static_assert(!is_replaceable_v<int volatile>);
+static_assert(is_replaceable_v<int volatile*>);     // pointer to volatile is OK
+static_assert(!is_replaceable_v<int* volatile>);    // volatile pointer is not
+
+struct has_const_member
+{
+    int const x;
+};
+// move assignment is deleted for classes with const members
+static_assert(!is_replaceable_v<has_const_member>);
+
+struct has_volatile_member
+{
+    int volatile x;
+};
+// volatile members do not necessarily make move assignment non-trivial
+static_assert(is_replaceable_v<has_volatile_member>);
+
 int main() {}
