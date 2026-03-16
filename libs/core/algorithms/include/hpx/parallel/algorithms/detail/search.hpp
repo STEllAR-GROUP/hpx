@@ -278,10 +278,13 @@ namespace hpx::parallel::detail {
             if (count <= 0)
                 return first;
             if (first == last)
-                return last;
+                return first;
             difference_type n = hpx::parallel::detail::distance(first, last);
             if (static_cast<difference_type>(count) > n)
-                return last;
+            {
+                std::advance(first, n);
+                return first;
+            }
 
             auto value_proj = proj(value);
 
@@ -304,7 +307,8 @@ namespace hpx::parallel::detail {
                     return it;
             }
 
-            return last;
+            std::advance(first, n);
+            return first;
         }
         template <typename ExPolicy, typename Size, typename T, typename Pred,
             typename Proj>
@@ -321,11 +325,14 @@ namespace hpx::parallel::detail {
                 return result_type::get(HPX_MOVE(first));
 
             if (first == last)
-                return result_type::get(HPX_MOVE(last));
+                return result_type::get(HPX_MOVE(first));
 
             difference_type n = hpx::parallel::detail::distance(first, last);
             if (static_cast<difference_type>(count) > n)
-                return result_type::get(HPX_MOVE(last));
+            {
+                std::advance(first, n);
+                return result_type::get(HPX_MOVE(first));
+            }
 
             // Number of valid starting positions
             difference_type max_start =
@@ -354,13 +361,16 @@ namespace hpx::parallel::detail {
                     tok, HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
             };
 
-            auto f2 = [first, last, max_start, tok](
+            auto f2 = [first, n, max_start, tok](
                           auto&&... data) mutable -> FwdIter {
                 util::detail::clear_container(data...);
 
                 difference_type idx = tok.get_data();
                 if (idx == max_start)
-                    return HPX_MOVE(last);
+                {
+                    std::advance(first, n);
+                    return HPX_MOVE(first);
+                }
 
                 std::advance(first, idx);
                 return HPX_MOVE(first);
