@@ -66,8 +66,18 @@ namespace hpx::program_options {
 
         /** Initializes the class with the passed data.
          */
+        option_description(char const* name,
+            std::shared_ptr<value_semantic const> s);
+
+        /** Initializes the class with the passed data.
+         */
         option_description(
             char const* name, value_semantic const* s, char const* description);
+
+        /** Initializes the class with the passed data.
+         */
+        option_description(char const* name,
+            std::shared_ptr<value_semantic const> s, char const* description);
 
         virtual ~option_description();
 

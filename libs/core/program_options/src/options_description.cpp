@@ -50,10 +50,25 @@ namespace hpx::program_options {
         this->set_names(names);
     }
 
+    option_description::option_description(char const* name,
+        std::shared_ptr<value_semantic const> s)
+      : m_value_semantic(HPX_MOVE(s))
+    {
+        this->set_names(name);
+    }
+
     option_description::option_description(
         char const* names, value_semantic const* s, char const* description)
       : m_description(description)
       , m_value_semantic(s)
+    {
+        this->set_names(names);
+    }
+
+    option_description::option_description(char const* names,
+        std::shared_ptr<value_semantic const> s, char const* description)
+      : m_description(description)
+      , m_value_semantic(HPX_MOVE(s))
     {
         this->set_names(names);
     }
@@ -254,13 +269,14 @@ namespace hpx::program_options {
         // Create untyped semantic which accepts zero tokens: i.e.
         // no value can be specified on command line.
         //
-        // Use unique_ptr to hold the semantic temporarily. If the
-        // option_description constructor or its allocation throws, the semantic
-        // is automatically freed. We only release() ownership after the
-        // option_description has been successfully constructed.
-        std::unique_ptr<untyped_value> semantic(new untyped_value(true));
-        std::shared_ptr<option_description> d(
-            new option_description(name, semantic.release(), description));
+        // By creating a shared_ptr first, and passing it to the new
+        // option_description constructor that accepts a shared_ptr, we avoid
+        // any possibility of a memory leak if allocation fails.
+        std::shared_ptr<value_semantic const> semantic =
+            std::make_shared<untyped_value>(true);
+        std::shared_ptr<option_description> d =
+            std::make_shared<option_description>(
+                name, HPX_MOVE(semantic), description);
 
         owner->add(HPX_MOVE(d));
         return *this;
