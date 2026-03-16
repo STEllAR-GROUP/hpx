@@ -237,7 +237,8 @@ namespace hpx::threads::detail {
                                 bool const enable_tracy =
                                     name != nullptr && !thrdptr->is_stackless();
                                 char const* fiber_name = enable_tracy ?
-                                    thrdptr->get_tracy_fiber_name() : nullptr;
+                                    thrdptr->get_tracy_fiber_name() :
+                                    nullptr;
                                 // Dual-view Tracy instrumentation:
                                 //
                                 // rctx declared FIRST -> constructed first ->
