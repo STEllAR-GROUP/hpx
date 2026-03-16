@@ -115,6 +115,7 @@ namespace hpx {
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
@@ -187,7 +188,13 @@ namespace hpx::parallel {
                 constexpr bool has_scheduler_executor =
                     hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
-                difference_type count = std::distance(first, last);
+                if constexpr (!has_scheduler_executor)
+                {
+                    if (first == last)
+                        return result::get(true);
+                }
+
+                difference_type count = detail::distance(first, last);
 
                 if constexpr (!has_scheduler_executor)
                 {
