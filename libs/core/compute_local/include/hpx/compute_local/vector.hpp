@@ -22,6 +22,7 @@
 #include <initializer_list>
 #include <iterator>
 #include <memory>
+#include <stdexcept>
 #include <type_traits>
 #include <utility>
 
@@ -210,8 +211,40 @@ namespace hpx::compute {
             return *this;
         }
 
-        // TODO: implement assign
+        void assign(size_type count, T const& value)
+        {
+            clear();
+            if (capacity_ < count)
+            {
+                alloc_traits::deallocate(alloc_, data_, capacity_);
+                capacity_ = count;
+                data_ = alloc_traits::allocate(alloc_, capacity_);
+            }
+            size_ = count;
+            alloc_traits::bulk_construct(alloc_, data_, size_, value);
+        }
 
+        template <typename InIter,
+            typename Enable =
+                typename std::enable_if<std::input_iterator<InIter>>::type>
+        void assign(InIter first, InIter last)
+        {
+            clear();
+            size_type count = std::distance(first, last);
+            if (capacity_ < count)
+            {
+                alloc_traits::deallocate(alloc_, data_, capacity_);
+                capacity_ = count;
+                data_ = alloc_traits::allocate(alloc_, capacity_);
+            }
+            size_ = count;
+            hpx::parallel::util::copy(first, last, begin());
+        }
+
+        void assign(std::initializer_list<T> ilist)
+        {
+            assign(ilist.begin(), ilist.end());
+        }
         /// Returns the allocator associated with the container
         allocator_type get_allocator() const noexcept
         {
@@ -220,7 +253,24 @@ namespace hpx::compute {
 
         ///////////////////////////////////////////////////////////////////////
         // Element access
-        // TODO: implement at()
+        
+        reference at(size_type pos)
+        {
+            if (pos >= size_)
+            {
+                throw std::out_of_range("vector::at");
+            }
+            return *(data_ + pos);
+        }
+
+        const_reference at(size_type pos) const
+        {
+            if (pos >= size_)
+            {
+                throw std::out_of_range("vector::at");
+            }
+            return *(data_ + pos);
+        }
 
         HPX_HOST_DEVICE
         reference operator[](size_type pos)
@@ -355,7 +405,6 @@ namespace hpx::compute {
 
         ///////////////////////////////////////////////////////////////////////
         // Iterators
-        // TODO: implement cbegin, cend, rbegin, crbegin, rend, crend
         // TODO: debug support
         iterator begin() noexcept
         {
@@ -385,6 +434,36 @@ namespace hpx::compute {
         const_iterator end() const noexcept
         {
             return const_iterator(data_, size_, alloc_traits::target(alloc_));
+        }
+
+        reverse_iterator rbegin() noexcept
+        {
+            return reverse_iterator(end());
+        }
+
+        reverse_iterator rend() noexcept
+        {
+            return reverse_iterator(begin());
+        }
+
+        const_reverse_iterator crbegin() const noexcept
+        {
+            return const_reverse_iterator(cend());
+        }
+
+        const_reverse_iterator crend() const noexcept
+        {
+            return const_reverse_iterator(cbegin());
+        }
+
+        const_reverse_iterator rbegin() const noexcept
+        {
+            return crbegin();
+        }
+
+        const_reverse_iterator rend() const noexcept
+        {
+            return crend();
         }
 
         /// Effects: Exchanges the contents and capacity() of *this with that
