@@ -19,6 +19,10 @@
 
 #include <meta>
 #include <ranges>
+#include <string>
+#include <string_view>
+#include <type_traits>
+#include <vector>
 
 namespace hpx::serialization::detail {
     // A simple wrapper around a char array that can be constructed
@@ -73,91 +77,41 @@ namespace hpx::serialization::detail {
     {
         static consteval auto fundamental_type_name() noexcept
         {
-            using type = base_type_t<typename[:Scope:]>;
-            if constexpr (std::is_same_v<type, signed char>)
+            static constexpr std::pair<std::meta::info, std::string_view>
+                lookup_table[] = {
+                    std::pair{^^signed char, "signed char"},
+                    std::pair{^^unsigned char, "unsigned char"},
+                    std::pair{^^short int, "short int"},
+                    std::pair{^^unsigned short int, "unsigned short int"},
+                    std::pair{^^int, "int"},
+                    std::pair{^^unsigned int, "unsigned int"},
+                    std::pair{^^long int, "long int"},
+                    std::pair{^^unsigned long int, "unsigned long int"},
+                    std::pair{^^long long int, "long long int"},
+                    std::pair{
+                        ^^unsigned long long int, "unsigned long long int"},
+                    std::pair{^^char, "char"},
+                    std::pair{^^char8_t, "char8_t"},
+                    std::pair{^^char16_t, "char16_t"},
+                    std::pair{^^char32_t, "char32_t"},
+                    std::pair{^^wchar_t, "wchar_t"},
+                    std::pair{^^bool, "bool"},
+                    std::pair{^^float, "float"},
+                    std::pair{^^double, "double"},
+                    std::pair{^^long double, "long double"},
+                    std::pair{^^void, "void"},
+                    std::pair{^^std::nullptr_t, "std::nullptr_t"},
+                };
+
+            for (auto const& [type_info, name] : lookup_table)
             {
-                return fixed_string("signed char");
+                if (dealias(type_info) ==
+                    dealias(^^base_type_t<typename[:Scope:]>))
+                {
+                    return name;
+                }
             }
-            else if constexpr (std::is_same_v<type, unsigned char>)
-            {
-                return fixed_string("unsigned char");
-            }
-            else if constexpr (std::is_same_v<type, short int>)
-            {
-                return fixed_string("short int");
-            }
-            else if constexpr (std::is_same_v<type, unsigned short int>)
-            {
-                return fixed_string("unsigned short int");
-            }
-            else if constexpr (std::is_same_v<type, int>)
-            {
-                return fixed_string("int");
-            }
-            else if constexpr (std::is_same_v<type, unsigned int>)
-            {
-                return fixed_string("unsigned int");
-            }
-            else if constexpr (std::is_same_v<type, long int>)
-            {
-                return fixed_string("long int");
-            }
-            else if constexpr (std::is_same_v<type, unsigned long int>)
-            {
-                return fixed_string("unsigned long int");
-            }
-            else if constexpr (std::is_same_v<type, long long int>)
-            {
-                return fixed_string("long long int");
-            }
-            else if constexpr (std::is_same_v<type, unsigned long long int>)
-            {
-                return fixed_string("unsigned long long int");
-            }
-            else if constexpr (std::is_same_v<type, char8_t>)
-            {
-                return fixed_string("char8_t");
-            }
-            else if constexpr (std::is_same_v<type, char16_t>)
-            {
-                return fixed_string("char16_t");
-            }
-            else if constexpr (std::is_same_v<type, char32_t>)
-            {
-                return fixed_string("char32_t");
-            }
-            else if constexpr (std::is_same_v<type, wchar_t>)
-            {
-                return fixed_string("wchar_t");
-            }
-            else if constexpr (std::is_same_v<type, char>)
-            {
-                return fixed_string("char");
-            }
-            else if constexpr (std::is_same_v<type, bool>)
-            {
-                return fixed_string("bool");
-            }
-            else if constexpr (std::is_same_v<type, float>)
-            {
-                return fixed_string("float");
-            }
-            else if constexpr (std::is_same_v<type, double>)
-            {
-                return fixed_string("double");
-            }
-            else if constexpr (std::is_same_v<type, long double>)
-            {
-                return fixed_string("long double");
-            }
-            else if constexpr (std::is_same_v<type, void>)
-            {
-                return fixed_string("void");
-            }
-            else if constexpr (std::is_same_v<type, std::nullptr_t>)
-            {
-                return fixed_string("std::nullptr_t");
-            }
+            return std::string_view{};
         }
 
         static consteval auto get_value() noexcept
@@ -175,19 +129,19 @@ namespace hpx::serialization::detail {
                     using base_type = std::remove_pointer_t<
                         std::remove_reference_t<std::remove_cv_t<raw_type>>>;
 
-                    constexpr auto base = [] {
+                    constexpr auto ftype_sv = fundamental_type_name();
+                    constexpr auto ftype_name =
+                        fixed_string<ftype_sv.size()>(ftype_sv);
+                    constexpr auto base = [ftype_name] {
                         if constexpr (std::is_const_v<base_type> &&
                             std::is_volatile_v<base_type>)
-                            return fixed_string("const volatile ") +
-                                fundamental_type_name();
+                            return fixed_string("const volatile ") + ftype_name;
                         else if constexpr (std::is_const_v<base_type>)
-                            return fixed_string("const ") +
-                                fundamental_type_name();
+                            return fixed_string("const ") + ftype_name;
                         else if constexpr (std::is_volatile_v<base_type>)
-                            return fixed_string("volatile ") +
-                                fundamental_type_name();
+                            return fixed_string("volatile ") + ftype_name;
                         else
-                            return fundamental_type_name();
+                            return ftype_name;
                     }();
 
                     if constexpr (std::is_pointer_v<raw_type>)
