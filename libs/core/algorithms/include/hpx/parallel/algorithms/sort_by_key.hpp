@@ -152,7 +152,7 @@ namespace hpx::experimental {
             "Requires a random access iterator.");
 
         ValueIter value_last = value_first;
-        std::advance(value_last, std::distance(key_first, key_last));
+        std::advance(value_last, hpx::parallel::detail::distance(key_first, key_last));
 
         using iterator_type = hpx::util::zip_iterator<KeyIter, ValueIter>;
 

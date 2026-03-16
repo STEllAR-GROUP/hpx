@@ -635,7 +635,7 @@ namespace hpx::parallel {
 
                 using difference_type =
                     typename std::iterator_traits<FwdIter1>::difference_type;
-                difference_type count = std::distance(first1, last1);
+                difference_type count = detail::distance(first1, last1);
 
                 decltype(auto) policy =
                     hpx::execution::experimental::adapt_placement_mode(
