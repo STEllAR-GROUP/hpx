@@ -15,6 +15,7 @@
 #include <cstdint>
 #include <exception>
 #include <string>
+#include <type_traits>
 #include <utility>
 
 #include <hpx/config/warnings_prefix.hpp>

@@ -8,3 +8,5 @@
 #pragma once
 
 #include <hpx/modules/algorithms.hpp>
+#include <hpx/parallel/segmented_algorithms/replace.hpp>
+#include <hpx/parallel/segmented_algorithms/replace_copy.hpp>

@@ -27,6 +27,7 @@
 #include <iterator>    // used to implement append(Iter, Iter)
 #include <memory>
 #include <string>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
