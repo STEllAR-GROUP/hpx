@@ -257,8 +257,7 @@ namespace hpx::threads::detail {
                                 tracy::region rctx(name, num_thread,
                                     thrdptr->get_thread_phase(), enable_tracy);
                                 tracy::fiber_region fctx(
-                                    fiber_name, name,
-                                    static_cast<std::uint32_t>(num_thread), enable_tracy);
+                                    fiber_name, name, num_thread, enable_tracy);
 #endif
 
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
