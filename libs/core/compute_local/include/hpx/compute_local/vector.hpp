@@ -217,8 +217,9 @@ namespace hpx::compute {
             if (capacity_ < count)
             {
                 alloc_traits::deallocate(alloc_, data_, capacity_);
+                pointer new_data = alloc_traits::allocate(alloc_, count);
                 capacity_ = count;
-                data_ = alloc_traits::allocate(alloc_, capacity_);
+                data_ = new_data;
             }
             size_ = count;
             alloc_traits::bulk_construct(alloc_, data_, size_, value);
@@ -234,8 +235,9 @@ namespace hpx::compute {
             if (capacity_ < count)
             {
                 alloc_traits::deallocate(alloc_, data_, capacity_);
+                pointer new_data = alloc_traits::allocate(alloc_, count);
                 capacity_ = count;
-                data_ = alloc_traits::allocate(alloc_, capacity_);
+                data_ = new_data;
             }
             size_ = count;
             hpx::parallel::util::copy(first, last, begin());
