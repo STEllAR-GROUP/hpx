@@ -18,7 +18,8 @@ namespace empty_space {
 }    // namespace empty_space
 
 namespace a::b::c::d {
-    template <typename T1, typename T2, typename T3, typename T4, typename T5>
+    template <typename T1, typename T2, typename T3, typename T4, typename T5,
+        typename T6, typename T7, typename T8>
     struct pentagon
     {
     };
@@ -51,10 +52,13 @@ int main()
 
     // Deep Namespace + High Arity
     {
-        using type = a::b::c::d::pentagon<int, char, double, float, long>;
+        using type = a::b::c::d::pentagon<int, char, double, float, long,
+            signed char const volatile* const, int&&, double&>;
         char const* name = qualified_name_of<type>::get();
         HPX_TEST_EQ(std::string(name),
-            std::string("a::b::c::d::pentagon<int,char,double,float,long>"));
+            std::string(
+                "a::b::c::d::pentagon<int,char,double,float,long int,const "
+                "volatile signed char* const,int&&,double&>"));
     }
 
     // Deeply Nested Custom Types as Template Args
