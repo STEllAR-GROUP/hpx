@@ -95,10 +95,11 @@ namespace hpx::tracy {
 
     namespace detail {
 
-    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT region_data start_region(char const* new_region,
-        std::size_t const thread_num, std::size_t const phase) noexcept
-    {
-        // clang-format off
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT region_data start_region(
+            char const* new_region, std::size_t const thread_num,
+            std::size_t const phase) noexcept
+        {
+            // clang-format off
 #if defined(HPX_HAVE_STACKTRACES)
         TracyCZoneCS(ctx, static_cast<std::uint32_t>(thread_num),
             HPX_HAVE_THREAD_BACKTRACE_DEPTH, 1)
@@ -120,125 +121,134 @@ namespace hpx::tracy {
         region.phase = static_cast<std::uint32_t>(phase);
 
         return prev_region;
-        // clang-format on
-    }
-
-    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT region_data stop_region(region_data const& prev_region) noexcept
-    {
-        region_data const curr_region = current_region();
-
-        current_region() = prev_region;
-        if (curr_region.name != nullptr)
-        {
-            tracy_context data;
-            data.value = curr_region.data;
-            TracyCZoneEnd(data.context)
+            // clang-format on
         }
 
-        return curr_region;
-    }
-
-    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void set_in_fiber(bool value) noexcept
-    {
-        in_fiber() = value;
-    }
-
-    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void start_fiber_zone(char const* zone_name, std::uint32_t color) noexcept
-    {
-        char const* safe_zone_name = intern_zone_label(zone_name, "fiber");
-
-        auto& fz = current_fiber_zone();
-        open_fiber_zone(fz, safe_zone_name, color);
-        fz.zone_name = safe_zone_name;
-        fz.color = color;
-    }
-
-    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void stop_fiber_zone() noexcept
-    {
-        auto& fz = current_fiber_zone();
-        if (fz.active)
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT region_data stop_region(
+            region_data const& prev_region) noexcept
         {
-            tracy_context data;
-            data.value = fz.ctx_value;
-            // clang-format off
+            region_data const curr_region = current_region();
+
+            current_region() = prev_region;
+            if (curr_region.name != nullptr)
+            {
+                tracy_context data;
+                data.value = curr_region.data;
+                TracyCZoneEnd(data.context)
+            }
+
+            return curr_region;
+        }
+
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void set_in_fiber(
+            bool value) noexcept
+        {
+            in_fiber() = value;
+        }
+
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void start_fiber_zone(
+            char const* zone_name, std::uint32_t color) noexcept
+        {
+            char const* safe_zone_name = intern_zone_label(zone_name, "fiber");
+
+            auto& fz = current_fiber_zone();
+            open_fiber_zone(fz, safe_zone_name, color);
+            fz.zone_name = safe_zone_name;
+            fz.color = color;
+        }
+
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void stop_fiber_zone() noexcept
+        {
+            auto& fz = current_fiber_zone();
+            if (fz.active)
+            {
+                tracy_context data;
+                data.value = fz.ctx_value;
+                // clang-format off
+            TracyCZoneEnd(data.context)
+                    // clang-format on
+                    fz.active = false;
+                fz.ctx_value = 0;
+            }
+        }
+
+        // Close the running fiber zone and open a "suspended" zone (grey) so
+        // the fiber track shows a distinct bar during the suspension gap.
+        // Called just before self_.yield() inside execution_agent::do_yield().
+        // Only touches current_fiber_zone() - never calls stop_region() so the
+        // OS-thread zone (current_region()) is completely untouched.
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void suspend_fiber_zone(
+            char const* suspend_reason) noexcept
+        {
+            auto& fz = current_fiber_zone();
+            if (!fz.active)
+                return;
+
+            // Close the running zone.
+            {
+                tracy_context data;
+                data.value = fz.ctx_value;
+                // clang-format off
             TracyCZoneEnd(data.context)
                 // clang-format on
-                fz.active = false;
-            fz.ctx_value = 0;
+            }
+            fz.active = false;
+
+            // Open a grey "suspended" zone on the fiber stack.
+            // 0xAAAAAA = medium grey, distinguishable from any worker-index color.
+            constexpr std::uint32_t suspended_color = 0xAAAAAA;
+            char const* safe_reason =
+                intern_zone_label(suspend_reason, "suspend");
+
+            open_fiber_zone(fz, safe_reason, suspended_color);
+            // zone_name and color are preserved from start_fiber_zone so that
+            // resume_fiber_zone can restore the original running zone.
         }
-    }
 
-    // Close the running fiber zone and open a "suspended" zone (grey) so
-    // the fiber track shows a distinct bar during the suspension gap.
-    // Called just before self_.yield() inside execution_agent::do_yield().
-    // Only touches current_fiber_zone() - never calls stop_region() so the
-    // OS-thread zone (current_region()) is completely untouched.
-    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void suspend_fiber_zone(char const* suspend_reason) noexcept
-    {
-        auto& fz = current_fiber_zone();
-        if (!fz.active)
-            return;
-
-        // Close the running zone.
+        // Close the "suspended" zone and reopen the original running zone.
+        // Called immediately after self_.yield() returns inside do_yield(),
+        // i.e. when the task has been rescheduled onto a worker thread.
+        // zone_name / color default to nullptr/0 which means "use the cached
+        // values from start_fiber_zone".
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void resume_fiber_zone(
+            char const* zone_name, std::uint32_t color) noexcept
         {
-            tracy_context data;
-            data.value = fz.ctx_value;
-            // clang-format off
+            auto& fz = current_fiber_zone();
+            if (!fz.active)
+                return;
+
+            // Close the suspended (grey) zone.
+            {
+                tracy_context data;
+                data.value = fz.ctx_value;
+                // clang-format off
             TracyCZoneEnd(data.context)
-            // clang-format on
+                // clang-format on
+            }
+            fz.active = false;
+
+            // Reopen the running zone with cached or supplied name/color.
+            char const* name =
+                (zone_name != nullptr) ? zone_name : fz.zone_name;
+            char const* safe_name = intern_zone_label(name, "fiber");
+            std::uint32_t col = (color != 0) ? color : fz.color;
+
+            open_fiber_zone(fz, safe_name, col);
         }
-        fz.active = false;
 
-        // Open a grey "suspended" zone on the fiber stack.
-        // 0xAAAAAA = medium grey, distinguishable from any worker-index color.
-        constexpr std::uint32_t suspended_color = 0xAAAAAA;
-        char const* safe_reason = intern_zone_label(suspend_reason, "suspend");
-
-        open_fiber_zone(fz, safe_reason, suspended_color);
-        // zone_name and color are preserved from start_fiber_zone so that
-        // resume_fiber_zone can restore the original running zone.
-    }
-
-    // Close the "suspended" zone and reopen the original running zone.
-    // Called immediately after self_.yield() returns inside do_yield(),
-    // i.e. when the task has been rescheduled onto a worker thread.
-    // zone_name / color default to nullptr/0 which means "use the cached
-    // values from start_fiber_zone".
-    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void resume_fiber_zone(char const* zone_name, std::uint32_t color) noexcept
-    {
-        auto& fz = current_fiber_zone();
-        if (!fz.active)
-            return;
-
-        // Close the suspended (grey) zone.
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT char const* rename_region(
+            char const* new_region) noexcept
         {
-            tracy_context data;
-            data.value = fz.ctx_value;
-            // clang-format off
-            TracyCZoneEnd(data.context)
-            // clang-format on
-        }
-        fz.active = false;
+            // No-op inside a fiber context: the TLS zone ctx belongs to the
+            // OS-thread zone, not the fiber's zone stack. Calling TracyCZoneName
+            // here would corrupt Tracy's zone stack and cause an abort.
+            if (in_fiber())
+                return new_region;
 
-        // Reopen the running zone with cached or supplied name/color.
-        char const* name = (zone_name != nullptr) ? zone_name : fz.zone_name;
-        char const* safe_name = intern_zone_label(name, "fiber");
-        std::uint32_t col = (color != 0) ? color : fz.color;
-
-        open_fiber_zone(fz, safe_name, col);
-    }
-
-    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT char const* rename_region(char const* new_region) noexcept
-    {
-        // No-op inside a fiber context: the TLS zone ctx belongs to the
-        // OS-thread zone, not the fiber's zone stack. Calling TracyCZoneName
-        // here would corrupt Tracy's zone stack and cause an abort.
-        if (in_fiber())
-            return new_region;
-
-        if (auto& [name, value, _1_, _2_] = current_region(); name != nullptr)
-        {
-            // clang-format off
+            if (auto& [name, value, _1_, _2_] = current_region();
+                name != nullptr)
+            {
+                // clang-format off
             char const* previous_name = name;
             name = new_region;
 
@@ -246,10 +256,10 @@ namespace hpx::tracy {
             data.value = value;
             TracyCZoneName(data.context, new_region, std::strlen(new_region))
             return previous_name;
-            // clang-format on
+                // clang-format on
+            }
+            return nullptr;
         }
-        return nullptr;
-    }
 
     }    // namespace detail
 }    // namespace hpx::tracy

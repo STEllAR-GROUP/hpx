@@ -10,6 +10,7 @@
 #include <hpx/tracy/tracy.hpp>
 #include <hpx/tracy/tracy_tls.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <string>
@@ -27,7 +28,8 @@ namespace hpx::tracy {
     namespace detail {
 
         // Expose Tracy fibers support
-        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void enter_fiber(char const* fiber_name, char const* zone_name,
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void enter_fiber(
+            char const* fiber_name, char const* zone_name,
             std::size_t color) noexcept
         {
             // Mark TLS so rename_region / mark_event are no-ops inside the fiber.
