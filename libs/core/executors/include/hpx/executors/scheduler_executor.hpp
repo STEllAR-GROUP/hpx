@@ -184,12 +184,11 @@ namespace hpx::execution::experimental {
                 using size_type = decltype(hpx::util::size(shape));
                 size_type const n = hpx::util::size(shape);
                 return make_future(bulk(schedule(exec.sched_), par, n,
-                    [shape,
-                        bound_f = hpx::bind_back(HPX_FORWARD(F, f),
-                            HPX_FORWARD(Ts, ts)...)](size_type i) mutable {
+                    [shape, f = HPX_FORWARD(F, f),
+                        ... args = HPX_FORWARD(Ts, ts)](size_type i) mutable {
                         auto it = hpx::util::begin(shape);
                         std::advance(it, i);
-                        HPX_INVOKE(bound_f, *it);
+                        HPX_INVOKE(f, *it, args...);
                     }));
 #else
                 return make_future(bulk(schedule(exec.sched_), shape,
@@ -261,15 +260,15 @@ namespace hpx::execution::experimental {
             size_type const n = hpx::util::size(shape);
             return hpx::util::void_guard<result_type>(),
                    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-                   *hpx::this_thread::experimental::sync_wait(bulk(
-                       schedule(exec.sched_), par, n,
-                       [shape,
-                           bound_f = hpx::bind_back(HPX_FORWARD(F, f),
-                               HPX_FORWARD(Ts, ts)...)](size_type i) mutable {
-                           auto it = hpx::util::begin(shape);
-                           std::advance(it, i);
-                           HPX_INVOKE(bound_f, *it);
-                       }));
+                   *hpx::this_thread::experimental::sync_wait(
+                       bulk(schedule(exec.sched_), par, n,
+                           [shape, f = HPX_FORWARD(F, f),
+                               ... args = HPX_FORWARD(Ts, ts)](
+                               size_type i) mutable {
+                               auto it = hpx::util::begin(shape);
+                               std::advance(it, i);
+                               HPX_INVOKE(f, *it, args...);
+                           }));
 #else
             return hpx::util::void_guard<result_type>(),
                    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
@@ -302,13 +301,12 @@ namespace hpx::execution::experimental {
                 size_type const n = hpx::util::size(shape);
                 auto loop =
                     bulk(transfer(HPX_MOVE(pre_req), exec.sched_), par, n,
-                        [shape,
-                            bound_f = hpx::bind_back(
-                                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)](
-                            size_type i, auto&... args) mutable {
+                        [shape, f = HPX_FORWARD(F, f),
+                            ... args = HPX_FORWARD(Ts, ts)](
+                            size_type i, auto&... receiver_args) mutable {
                             auto it = hpx::util::begin(shape);
                             std::advance(it, i);
-                            HPX_INVOKE(bound_f, *it, args...);
+                            HPX_INVOKE(f, *it, args..., receiver_args...);
                         });
 #else
                 auto loop = bulk(transfer(HPX_MOVE(pre_req), exec.sched_),
