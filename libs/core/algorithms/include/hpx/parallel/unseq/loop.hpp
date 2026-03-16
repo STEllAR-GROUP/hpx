@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/executors.hpp>
+#include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/util/loop.hpp>
 
 #include <algorithm>
@@ -83,7 +84,8 @@ namespace hpx::parallel::util {
                 if constexpr (std::random_access_iterator<Begin>)
                 {
                     return unseq_loop_n::call(
-                        it, std::distance(it, end), HPX_FORWARD(F, f));
+                        it, hpx::parallel::detail::distance(it, end),
+                        HPX_FORWARD(F, f));
                 }
                 else
                 {
@@ -118,7 +120,8 @@ namespace hpx::parallel::util {
                 if constexpr (std::random_access_iterator<Begin>)
                 {
                     return unseq_loop_n_ind::call(
-                        it, std::distance(it, end), HPX_FORWARD(F, f));
+                        it, hpx::parallel::detail::distance(it, end),
+                        HPX_FORWARD(F, f));
                 }
                 else
                 {
@@ -145,7 +148,8 @@ namespace hpx::parallel::util {
 
                 if constexpr (iterators_are_random_access)
                 {
-                    std::size_t const num = std::distance(it1, last1);
+                    std::size_t const num =
+                        hpx::parallel::detail::distance(it1, last1);
 
                     // clang-format off
                     HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
