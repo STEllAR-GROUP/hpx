@@ -24,30 +24,34 @@ namespace hpx::tracy {
         ::tracy::SetThreadName(name);
     }
 
-    // Expose Tracy fibers support
-    void enter_fiber(char const* fiber_name, char const* zone_name,
-        std::uint32_t color) noexcept
-    {
-        // Mark TLS so rename_region / mark_event are no-ops inside the fiber.
-        set_in_fiber(true);
+    namespace detail {
 
-        // Switch Tracy's zone stack to this fiber.
-        ::TracyFiberEnter(fiber_name);
+        // Expose Tracy fibers support
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void enter_fiber(char const* fiber_name, char const* zone_name,
+            std::size_t color) noexcept
+        {
+            // Mark TLS so rename_region / mark_event are no-ops inside the fiber.
+            set_in_fiber(true);
 
-        // Open a zone on the fiber's zone stack - this makes the fiber
-        // track visible in Tracy as a colored bar labeled with zone_name.
-        start_fiber_zone(zone_name, color);
-    }
+            // Switch Tracy's zone stack to this fiber.
+            ::TracyFiberEnter(fiber_name);
 
-    void leave_fiber() noexcept
-    {
-        // Close the fiber zone BEFORE leaving the fiber context, so that
-        // TracyCZoneEnd goes to the fiber's zone stack, not the OS thread's.
-        stop_fiber_zone();
+            // Open a zone on the fiber's zone stack - this makes the fiber
+            // track visible in Tracy as a colored bar labeled with zone_name.
+            start_fiber_zone(zone_name, static_cast<std::uint32_t>(color));
+        }
 
-        ::TracyFiberLeave;
-        set_in_fiber(false);
-    }
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void leave_fiber() noexcept
+        {
+            // Close the fiber zone BEFORE leaving the fiber context, so that
+            // TracyCZoneEnd goes to the fiber's zone stack, not the OS thread's.
+            stop_fiber_zone();
+
+            ::TracyFiberLeave;
+            set_in_fiber(false);
+        }
+
+    }    // namespace detail
 
     // Create a new plot in Tracy
     void create_counter(std::string const& name) noexcept

@@ -303,7 +303,7 @@ namespace hpx::threads {
         std::swap(description_, value);
 
 #if defined(HPX_HAVE_MODULE_TRACY)
-        tracy::rename_region(description_.get_description());
+        tracy::detail::rename_region(description_.get_description());
 #endif
 
         return value;
