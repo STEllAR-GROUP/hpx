@@ -1444,7 +1444,7 @@ namespace hpx::parallel {
                         return result::get(HPX_MOVE(last));
                 }
 
-                difference_type count = std::distance(first, last);
+                difference_type count = detail::distance(first, last);
 
                 if (s_first == s_last)
                 {
