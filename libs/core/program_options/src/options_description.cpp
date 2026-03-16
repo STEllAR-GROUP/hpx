@@ -253,13 +253,14 @@ namespace hpx::program_options {
     {
         // Create untyped semantic which accepts zero tokens: i.e.
         // no value can be specified on command line.
-        // Store the semantic in a shared_ptr first to ensure exception safety:
-        // if make_shared<option_description> fails, the semantic won't leak.
-        std::shared_ptr<value_semantic const> semantic =
-            std::make_shared<untyped_value>(true);
-        std::shared_ptr<option_description> d =
-            std::make_shared<option_description>(
-                name, semantic.get(), description);
+        //
+        // Use unique_ptr to hold the semantic temporarily. If the
+        // option_description constructor or its allocation throws, the semantic
+        // is automatically freed. We only release() ownership after the
+        // option_description has been successfully constructed.
+        std::unique_ptr<untyped_value> semantic(new untyped_value(true));
+        std::shared_ptr<option_description> d(
+            new option_description(name, semantic.release(), description));
 
         owner->add(HPX_MOVE(d));
         return *this;
