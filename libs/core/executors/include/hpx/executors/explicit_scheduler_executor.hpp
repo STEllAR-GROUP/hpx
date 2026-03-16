@@ -239,14 +239,12 @@ namespace hpx::execution::experimental {
                                      result_vector_type& result_vector,
                                      S const& shape, F& f, Ts&... ts) {
                     auto it = std::begin(shape);
-                    result_vector[i] =
-                        HPX_INVOKE(f, *std::next(it, i), ts...);
+                    result_vector[i] = HPX_INVOKE(f, *std::next(it, i), ts...);
                 };
 
-                auto get_result = [](result_vector_type&& [[maybe_unused]] result_vector,
-                                      S const&, F&&, Ts&&...) {
-                    return HPX_MOVE(result_vector);
-                };
+                auto get_result =
+                    [](result_vector_type&& result_vector, S const&, F&&,
+                        Ts&&...) { return HPX_MOVE(result_vector); };
 
 #if defined(HPX_HAVE_STDEXEC)
                 return just(HPX_MOVE(result_vector), shape, HPX_FORWARD(F, f),
