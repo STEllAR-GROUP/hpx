@@ -95,9 +95,8 @@ namespace hpx::tracy {
 
     namespace detail {
 
-        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT region_data start_region(
-            char const* new_region, std::size_t const thread_num,
-            std::size_t const phase) noexcept
+        HPX_CORE_EXPORT region_data start_region(char const* new_region,
+            std::size_t const thread_num, std::size_t const phase) noexcept
         {
             // clang-format off
 #if defined(HPX_HAVE_STACKTRACES)
@@ -124,7 +123,7 @@ namespace hpx::tracy {
             // clang-format on
         }
 
-        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT region_data stop_region(
+        HPX_CORE_EXPORT region_data stop_region(
             region_data const& prev_region) noexcept
         {
             region_data const curr_region = current_region();
@@ -140,13 +139,12 @@ namespace hpx::tracy {
             return curr_region;
         }
 
-        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void set_in_fiber(
-            bool value) noexcept
+        HPX_CORE_EXPORT void set_in_fiber(bool value) noexcept
         {
             in_fiber() = value;
         }
 
-        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void start_fiber_zone(
+        HPX_CORE_EXPORT void start_fiber_zone(
             char const* zone_name, std::uint32_t color) noexcept
         {
             char const* safe_zone_name = intern_zone_label(zone_name, "fiber");
@@ -157,7 +155,7 @@ namespace hpx::tracy {
             fz.color = color;
         }
 
-        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void stop_fiber_zone() noexcept
+        HPX_CORE_EXPORT void stop_fiber_zone() noexcept
         {
             auto& fz = current_fiber_zone();
             if (fz.active)
@@ -177,7 +175,7 @@ namespace hpx::tracy {
         // Called just before self_.yield() inside execution_agent::do_yield().
         // Only touches current_fiber_zone() - never calls stop_region() so the
         // OS-thread zone (current_region()) is completely untouched.
-        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void suspend_fiber_zone(
+        HPX_CORE_EXPORT void suspend_fiber_zone(
             char const* suspend_reason) noexcept
         {
             auto& fz = current_fiber_zone();
@@ -195,7 +193,8 @@ namespace hpx::tracy {
             fz.active = false;
 
             // Open a grey "suspended" zone on the fiber stack.
-            // 0xAAAAAA = medium grey, distinguishable from any worker-index color.
+            // 0xAAAAAA = medium grey, distinguishable from any
+            // worker-index color.
             constexpr std::uint32_t suspended_color = 0xAAAAAA;
             char const* safe_reason =
                 intern_zone_label(suspend_reason, "suspend");
@@ -210,7 +209,7 @@ namespace hpx::tracy {
         // i.e. when the task has been rescheduled onto a worker thread.
         // zone_name / color default to nullptr/0 which means "use the cached
         // values from start_fiber_zone".
-        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void resume_fiber_zone(
+        HPX_CORE_EXPORT void resume_fiber_zone(
             char const* zone_name, std::uint32_t color) noexcept
         {
             auto& fz = current_fiber_zone();
@@ -236,12 +235,13 @@ namespace hpx::tracy {
             open_fiber_zone(fz, safe_name, col);
         }
 
-        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT char const* rename_region(
+        HPX_CORE_EXPORT char const* rename_region(
             char const* new_region) noexcept
         {
             // No-op inside a fiber context: the TLS zone ctx belongs to the
-            // OS-thread zone, not the fiber's zone stack. Calling TracyCZoneName
-            // here would corrupt Tracy's zone stack and cause an abort.
+            // OS-thread zone, not the fiber's zone stack. Calling
+            // TracyCZoneName here would corrupt Tracy's zone stack and cause
+            // an abort.
             if (in_fiber())
                 return new_region;
 

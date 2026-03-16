@@ -28,11 +28,11 @@ namespace hpx::tracy {
     namespace detail {
 
         // Expose Tracy fibers support
-        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void enter_fiber(
-            char const* fiber_name, char const* zone_name,
-            std::size_t color) noexcept
+        HPX_CORE_EXPORT void enter_fiber(char const* fiber_name,
+            char const* zone_name, std::size_t color) noexcept
         {
-            // Mark TLS so rename_region / mark_event are no-ops inside the fiber.
+            // Mark TLS so rename_region / mark_event are no-ops inside
+            // the fiber.
             set_in_fiber(true);
 
             // Switch Tracy's zone stack to this fiber.
@@ -43,10 +43,11 @@ namespace hpx::tracy {
             start_fiber_zone(zone_name, static_cast<std::uint32_t>(color));
         }
 
-        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void leave_fiber() noexcept
+        HPX_CORE_EXPORT void leave_fiber() noexcept
         {
             // Close the fiber zone BEFORE leaving the fiber context, so that
-            // TracyCZoneEnd goes to the fiber's zone stack, not the OS thread's.
+            // TracyCZoneEnd goes to the fiber's zone stack, not the OS
+            // thread's.
             stop_fiber_zone();
 
             ::TracyFiberLeave;
