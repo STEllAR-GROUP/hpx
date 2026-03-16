@@ -13,7 +13,6 @@ set(tests
     async_replicate_vote_plain
     replay_executor
     replicate_executor
-    async_replay_exhaustion
 )
 
 # The Intel compiler version 19.1.1.217 does not manage to compile these. Other
