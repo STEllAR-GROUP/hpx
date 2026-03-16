@@ -218,6 +218,7 @@ namespace hpx::compute {
             {
                 alloc_traits::deallocate(alloc_, data_, capacity_);
                 data_ = nullptr;
+                size_ = 0;
                 capacity_ = 0;
 
                 pointer new_data = alloc_traits::allocate(alloc_, count);
@@ -239,6 +240,7 @@ namespace hpx::compute {
             {
                 alloc_traits::deallocate(alloc_, data_, capacity_);
                 data_ = nullptr;
+                size_ = 0;
                 capacity_ = 0;
 
                 pointer new_data = alloc_traits::allocate(alloc_, count);
