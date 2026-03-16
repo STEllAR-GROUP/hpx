@@ -282,7 +282,6 @@ namespace hpx::parallel::util::detail {
         std::size_t max_chunks =
             hpx::execution::experimental::maximal_number_of_chunks(
                 policy.parameters(), policy.executor(), cores, count);
-        HPX_ASSERT(0 != max_chunks);
 
         Stride stride = parallel::detail::abs(s);
 
@@ -317,7 +316,7 @@ namespace hpx::parallel::util::detail {
             chunk = (std::min) (count, chunk);
             count -= chunk;
 
-            it_or_r = next_or_subrange(it_or_r, count, chunk);
+            it_or_r = next_or_subrange(it_or_r, chunk, count);
         }
 
         // Report the calculated parameters to the corresponding parameters
@@ -373,7 +372,7 @@ namespace hpx::parallel::util::detail {
 
     HPX_CXX_CORE_EXPORT template <typename F, typename FwdIter>
     void add_ready_future_idx(std::vector<hpx::shared_future<void>>& workitems,
-        F&& f, std::size_t base_idx, FwdIter first, std::size_t count)
+        F&& f, FwdIter first, std::size_t base_idx, std::size_t count)
     {
         HPX_FORWARD(F, f)(first, count, base_idx);
         workitems.push_back(hpx::make_ready_future());
