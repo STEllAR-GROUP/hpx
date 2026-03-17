@@ -30,6 +30,9 @@
 #ifdef HPX_HAVE_MODULE_LIKWID
 #include <hpx/modules/likwid.hpp>
 #endif
+#ifdef HPX_HAVE_MODULE_TRACY
+#include <hpx/modules/tracy.hpp>
+#endif
 
 #include <cstddef>
 #include <cstdint>
@@ -187,6 +190,16 @@ namespace hpx::threads {
 #endif
 #ifdef HPX_HAVE_MODULE_LIKWID
             hpx::likwid::suspend_region region;
+#endif
+#ifdef HPX_HAVE_MODULE_TRACY
+            // fiber_suspend_region operates only on the fiber zone stack
+            // (current_fiber_zone). It does NOT touch the OS-thread zone
+            // (current_region / stop_region), so there is no zone-stack
+            // conflict. The sequence is:
+            //   constructor: close running zone \u2192 open grey "suspended" zone
+            //   self_.yield(): fiber parks, scheduler picks next task
+            //   destructor:  close "suspended" zone \u2192 reopen running zone
+            hpx::tracy::fiber_suspend_region tracy_suspend(desc);
 #endif
 
             HPX_ASSERT(thrd_data != nullptr &&
