@@ -28,14 +28,13 @@
 
 namespace hpx::compute {
 
-    HPX_CXX_CORE_EXPORT template <typename T,
-        typename Allocator = std::allocator<T>>
+    template <typename T, typename Allocator = std::allocator<T>>
     class vector
     {
         using alloc_traits = traits::allocator_traits<Allocator>;
 
     public:
-        /// Member types (FIXME: add reference to std
+        /// Member types
         using value_type = T;
         using allocator_type = Allocator;
         using access_target = typename alloc_traits::access_target;
@@ -47,9 +46,8 @@ namespace hpx::compute {
         using const_pointer = typename alloc_traits::const_pointer;
         using iterator = detail::iterator<T, Allocator>;
         using const_iterator = detail::iterator<T const, Allocator>;
-        using reverse_iterator = detail::reverse_iterator<T, Allocator>;
-        using const_reverse_iterator =
-            detail::const_reverse_iterator<T, Allocator>;
+        using reverse_iterator = std::reverse_iterator<iterator>;
+        using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
         // Default constructor. Constructs an empty container
         explicit vector(Allocator const& alloc = Allocator())
@@ -86,8 +84,8 @@ namespace hpx::compute {
         }
 
         template <typename InIter,
-            typename Enable =
-                typename std::enable_if<std::input_iterator<InIter>>::type>
+            typename Enable = typename std::enable_if<
+                hpx::traits::is_input_iterator_v<InIter>>::type>
         vector(InIter first, InIter last, Allocator const& alloc)
           : size_(std::distance(first, last))
           , capacity_(size_)
@@ -230,8 +228,8 @@ namespace hpx::compute {
         }
 
         template <typename InIter,
-            typename Enable =
-                typename std::enable_if<std::input_iterator<InIter>>::type>
+            typename Enable = typename std::enable_if<
+                hpx::traits::is_input_iterator_v<InIter>>::type>
         void assign(InIter first, InIter last)
         {
             clear();
@@ -263,7 +261,7 @@ namespace hpx::compute {
 
         ///////////////////////////////////////////////////////////////////////
         // Element access
-        
+
         reference at(size_type pos)
         {
             if (pos >= size_)
@@ -368,7 +366,6 @@ namespace hpx::compute {
 #endif
         }
 
-        //
         std::size_t size() const noexcept
         {
             return size_;
@@ -510,8 +507,7 @@ namespace hpx::compute {
         pointer data_;
     };
 
-    /// Effects: x.swap(y);
-    HPX_CXX_CORE_EXPORT template <typename T, typename Allocator>
+    template <typename T, typename Allocator>
     HPX_FORCEINLINE void swap(
         vector<T, Allocator>& x, vector<T, Allocator>& y) noexcept
     {
@@ -519,8 +515,10 @@ namespace hpx::compute {
     }
 }    // namespace hpx::compute
 
-HPX_CXX_CORE_EXPORT template <typename T, typename Allocator>
-struct hpx::traits::is_contiguous_iterator<
-    hpx::compute::detail::iterator<T, Allocator>> : std::true_type
-{
-};
+namespace hpx::traits {
+    template <typename T, typename Allocator>
+    struct is_contiguous_iterator<hpx::compute::detail::iterator<T, Allocator>>
+      : std::true_type
+    {
+    };
+}    // namespace hpx::traits
