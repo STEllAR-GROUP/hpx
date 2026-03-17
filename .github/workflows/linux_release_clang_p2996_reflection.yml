@@ -11,7 +11,7 @@ on: [pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: sleepingeight/clang-cpp-refl:latest
+    container: stellargroup/clang_p2996_build_env:1
 
     steps:
     - uses: actions/checkout@v6
