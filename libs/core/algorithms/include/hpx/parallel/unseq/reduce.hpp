@@ -10,8 +10,8 @@
 #include <hpx/config.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/executors.hpp>
-#include <hpx/parallel/algorithms/detail/reduce.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
+#include <hpx/parallel/algorithms/detail/reduce.hpp>
 #include <hpx/parallel/unseq/reduce_helpers.hpp>
 
 #include <cstddef>

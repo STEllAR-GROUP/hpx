@@ -139,8 +139,8 @@ namespace hpx::parallel::util {
                 if constexpr (iterators_are_random_access)
                 {
                     auto&& in_out = util::transform_loop_n<
-                        hpx::execution::unsequenced_policy>(
-                        it, hpx::parallel::detail::distance(it, last), dest,
+                        hpx::execution::unsequenced_policy>(it,
+                        hpx::parallel::detail::distance(it, last), dest,
                         HPX_FORWARD(F, f));
 
                     return util::in_out_result<InIter, OutIter>{
@@ -199,8 +199,8 @@ namespace hpx::parallel::util {
                 if constexpr (iterators_are_random_access)
                 {
                     auto&& in_out = util::transform_loop_n_ind<
-                        hpx::execution::unsequenced_policy>(
-                        it, hpx::parallel::detail::distance(it, last), dest,
+                        hpx::execution::unsequenced_policy>(it,
+                        hpx::parallel::detail::distance(it, last), dest,
                         HPX_FORWARD(F, f));
 
                     return util::in_out_result<InIter, OutIter>{

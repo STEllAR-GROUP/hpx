@@ -83,8 +83,8 @@ namespace hpx::parallel::util {
             {
                 if constexpr (std::random_access_iterator<Begin>)
                 {
-                    return unseq_loop_n::call(
-                        it, hpx::parallel::detail::distance(it, end),
+                    return unseq_loop_n::call(it,
+                        hpx::parallel::detail::distance(it, end),
                         HPX_FORWARD(F, f));
                 }
                 else
@@ -119,8 +119,8 @@ namespace hpx::parallel::util {
             {
                 if constexpr (std::random_access_iterator<Begin>)
                 {
-                    return unseq_loop_n_ind::call(
-                        it, hpx::parallel::detail::distance(it, end),
+                    return unseq_loop_n_ind::call(it,
+                        hpx::parallel::detail::distance(it, end),
                         HPX_FORWARD(F, f));
                 }
                 else
