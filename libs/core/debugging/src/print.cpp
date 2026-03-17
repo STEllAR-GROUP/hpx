@@ -27,6 +27,7 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
+#include <cstdio>
 
 #if defined(__FreeBSD__)
 HPX_CORE_EXPORT char** freebsd_environ = nullptr;
@@ -277,16 +278,8 @@ namespace hpx::debug {
                 int const rank = guess_rank();
                 if (rank >= 0)
                 {
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wrestrict"
-#endif
-                    std::string const temp =
-                        "(" + std::to_string(guess_rank()) + ")";
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
-#pragma GCC diagnostic pop
-#endif
-                    std::strcat(hostname_, temp.c_str());
+                    std::size_t const len = std::strlen(hostname_);
+                    std::snprintf(hostname_ + len, sizeof(hostname_) - len, "(%d)", rank);
                 }
             }
             return hostname_;
