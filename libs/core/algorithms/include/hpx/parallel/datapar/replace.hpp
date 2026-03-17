@@ -48,7 +48,7 @@ namespace hpx { namespace parallel { namespace detail {
             {
                 return for_each_n<InIter>().call(
                     HPX_FORWARD(ExPolicy, policy), first,
-                    std::distance(first, last),
+                    detail::distance(first, last),
                     [old_value, new_value, proj = HPX_FORWARD(Proj, proj)](
                         auto& v) -> void {
                         traits::mask_assign(

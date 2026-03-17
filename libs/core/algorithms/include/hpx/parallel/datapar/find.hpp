@@ -12,6 +12,7 @@
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/executors.hpp>
 #include <hpx/modules/tag_invoke.hpp>
+#include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/algorithms/detail/find.hpp>
 #include <hpx/parallel/datapar/handle_local_exceptions.hpp>
 #include <hpx/parallel/datapar/iterator_helpers.hpp>
@@ -402,7 +403,7 @@ namespace hpx::parallel::detail {
             if (first == last)
                 return last;
 
-            std::size_t count = std::distance(first, last);
+            std::size_t count = detail::distance(first, last);
             util::cancellation_token<std::size_t> tok(count);
 
             call(first, s_first, s_last, 0, count, tok, HPX_FORWARD(Pred, op),
@@ -433,7 +434,7 @@ namespace hpx::parallel::detail {
 
                     util::cancellation_token<> local_tok;
                     util::loop_n<hpx::execution::simd_policy>(s_first,
-                        std::distance(s_first, s_last), local_tok,
+                        detail::distance(s_first, s_last), local_tok,
                         [&local_tok, &proj2, &op, &val](auto curr) {
                             auto msk =
                                 HPX_INVOKE(op, val, HPX_INVOKE(proj2, *curr));
