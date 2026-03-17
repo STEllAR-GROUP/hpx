@@ -16,8 +16,3 @@ html[data-theme="dark"] code {
     background-color: #1a2f2a;
 }
 
-/* Invert the blue logo to white in dark mode */
-html[data-theme="dark"] .navbar-brand img,
-html[data-theme="dark"] .sidebar-brand img {
-    filter: brightness(0) invert(1);
-}
