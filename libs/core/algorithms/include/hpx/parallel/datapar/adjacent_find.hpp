@@ -38,7 +38,7 @@ namespace hpx::parallel::detail {
             ++next;
 
             auto zip_iter = hpx::util::zip_iterator(first, next);
-            std::size_t const count = detail::distance(first, last);
+            std::size_t const count = distance(first, last);
             util::cancellation_token<std::size_t> tok(count);
 
             call(0, zip_iter, count - 1, tok,

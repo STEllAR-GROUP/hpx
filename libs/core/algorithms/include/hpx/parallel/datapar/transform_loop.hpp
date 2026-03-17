@@ -196,8 +196,8 @@ namespace hpx::parallel::util {
                 if constexpr (datapar_compatible)
                 {
                     return util::transform_loop_n<hpx::execution::simd_policy>(
-                        first, detail::distance(first, last), dest,
-                        HPX_FORWARD(F, f));
+                        first, hpx::parallel::detail::distance(first, last),
+                        dest, HPX_FORWARD(F, f));
                 }
                 else
                 {
@@ -265,7 +265,8 @@ namespace hpx::parallel::util {
                 {
                     return util::transform_loop_n_ind<
                         hpx::execution::simd_policy>(first,
-                        detail::distance(first, last), dest, HPX_FORWARD(F, f));
+                        hpx::parallel::detail::distance(first, last), dest,
+                        HPX_FORWARD(F, f));
                 }
                 else
                 {
@@ -429,8 +430,8 @@ namespace hpx::parallel::util {
                 {
                     auto ret = util::transform_binary_loop_n<
                         hpx::execution::par_simd_policy>(first1,
-                        detail::distance(first1, last1), first2, dest,
-                        HPX_FORWARD(F, f));
+                        hpx::parallel::detail::distance(first1, last1), first2,
+                        dest, HPX_FORWARD(F, f));
 
                     return util::in_in_out_result<InIter1, InIter2, OutIter>{
                         hpx::get<0>(ret), hpx::get<1>(ret), hpx::get<2>(ret)};
@@ -463,8 +464,8 @@ namespace hpx::parallel::util {
                     // different versions of clang-format do different things
                     // clang-format off
                     std::size_t count = (std::min)(
-                        detail::distance(first1, last1),
-                        detail::distance(first2, last2));
+                        hpx::parallel::detail::distance(first1, last1),
+                        hpx::parallel::detail::distance(first2, last2));
                     // clang-format on
 
                     auto ret = util::transform_binary_loop_n<
@@ -625,8 +626,8 @@ namespace hpx::parallel::util {
             {
                 auto ret = util::transform_binary_loop_ind_n<
                     hpx::execution::par_simd_policy>(first1,
-                    detail::distance(first1, last1), first2, dest,
-                    HPX_FORWARD(F, f));
+                    hpx::parallel::detail::distance(first1, last1), first2,
+                    dest, HPX_FORWARD(F, f));
 
                 return util::in_in_out_result<InIter1, InIter2, OutIter>{
                     hpx::get<0>(ret), hpx::get<1>(ret), hpx::get<2>(ret)};
@@ -661,8 +662,9 @@ namespace hpx::parallel::util {
             call(InIter1 first1, InIter1 last1, InIter2 first2, InIter2 last2,
                 OutIter dest, F&& f)
             {
-                std::size_t count = (std::min) (detail::distance(first1, last1),
-                    detail::distance(first2, last2));
+                std::size_t count =
+                    (std::min) (hpx::parallel::detail::distance(first1, last1),
+                        hpx::parallel::detail::distance(first2, last2));
 
                 auto ret = util::transform_binary_loop_ind_n<
                     hpx::execution::par_simd_policy>(

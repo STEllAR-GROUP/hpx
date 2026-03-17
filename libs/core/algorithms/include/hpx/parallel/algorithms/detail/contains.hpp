@@ -29,7 +29,8 @@ namespace hpx::parallel::detail {
         {
             using difference_type =
                 typename std::iterator_traits<Iterator>::difference_type;
-            difference_type distance = hpx::parallel::detail::distance(first, last);
+            difference_type distance =
+                hpx::parallel::detail::distance(first, last);
             if (distance <= 0)
                 return false;
 
