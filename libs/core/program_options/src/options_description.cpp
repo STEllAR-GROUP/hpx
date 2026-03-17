@@ -272,7 +272,8 @@ namespace hpx::program_options {
         // By creating a unique_ptr first, and passing it to the new
         // option_description constructor that accepts a unique_ptr, we avoid
         // any possibility of a memory leak if allocation fails.
-        std::unique_ptr<value_semantic const> semantic(new untyped_value(true));
+        std::unique_ptr<value_semantic const> semantic =
+            std::make_unique<untyped_value>(true);
         std::shared_ptr<option_description> d =
             std::make_shared<option_description>(
                 name, HPX_MOVE(semantic), description);
