@@ -379,7 +379,7 @@ rst_prolog += '''
 .. _hpxcl: https://github.com/STEllAR-GROUP/hpxcl/
 
 .. |hpsf| replace:: HPSF
-.. _hpsf: https://hpsf.io/
+.. _hpsf: https://hpsf.io/projects/hpx/
 
 .. |lsu| replace:: Louisiana State University (LSU)
 .. _lsu: https://www.lsu.edu
@@ -699,8 +699,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'HPX'
-project_copyright = f"2008-{datetime.now().year}, The STE||AR Group"
-author = 'The STE||AR Group'
+project_copyright = f"{datetime.now().year}, HPX Project, a Series of LF Projects, LLC"
+author = 'The HPX project'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
