@@ -14,6 +14,7 @@
 #include <hpx/threading_base/scheduler_state.hpp>
 #include <hpx/threading_base/set_thread_state.hpp>
 #include <hpx/threading_base/set_thread_state_timed.hpp>
+#include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
@@ -30,6 +31,9 @@
 #endif
 #ifdef HPX_HAVE_MODULE_LIKWID
 #include <hpx/modules/likwid.hpp>
+#endif
+#ifdef HPX_HAVE_MODULE_TRACY
+#include <hpx/modules/tracy.hpp>
 #endif
 
 #include <atomic>
@@ -427,6 +431,20 @@ namespace hpx::threads {
 
 namespace hpx::this_thread {
 
+#ifdef HPX_HAVE_MODULE_TRACY
+    namespace {
+        // Extract the suspend reason from the thread description so the fiber
+        // track in Tracy shows a meaningful label (e.g. the LCO being waited
+        // on) instead of a generic "this_thread::suspend" string.
+        char const* get_tracy_suspend_reason(
+            threads::thread_description const& description) noexcept
+        {
+            return threads::thread_data::get_tracy_description_name(
+                description, "this_thread::suspend");
+        }
+    }    // namespace
+#endif
+
     // The function 'suspend' will return control to the thread manager
     // (suspends the current thread). It sets the new state of this thread to
     // the thread state passed as the parameter.
@@ -470,6 +488,10 @@ namespace hpx::this_thread {
 #endif
 #ifdef HPX_HAVE_MODULE_LIKWID
             hpx::likwid::suspend_region region;
+#endif
+#ifdef HPX_HAVE_MODULE_TRACY
+            hpx::tracy::fiber_suspend_region tracy_suspend(
+                get_tracy_suspend_reason(description));
 #endif
             // We might need to dispatch 'nextid' to it's correct scheduler only
             // if our current scheduler is the same, we should yield to the id
@@ -550,6 +572,10 @@ namespace hpx::this_thread {
 #endif
 #ifdef HPX_HAVE_MODULE_LIKWID
             hpx::likwid::suspend_region region;
+#endif
+#ifdef HPX_HAVE_MODULE_TRACY
+            hpx::tracy::fiber_suspend_region tracy_suspend(
+                get_tracy_suspend_reason(description));
 #endif
             std::atomic<bool> timer_started(false);
             threads::thread_id_ref_type const timer_id =
