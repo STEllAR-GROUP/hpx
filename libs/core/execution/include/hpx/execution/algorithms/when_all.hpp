@@ -242,12 +242,10 @@ namespace hpx::execution::experimental {
                 static constexpr bool sends_stopped = true;
             };
 
-            // clang-format off
             template <typename Env>
             friend auto tag_invoke(get_completion_signatures_t,
-                when_all_sender const&,
-                Env) noexcept -> generate_completion_signatures<Env>;
-            // clang-format on
+                when_all_sender const&, Env) noexcept
+                -> generate_completion_signatures<Env>;
 
             static constexpr std::size_t num_predecessors = sizeof...(Senders);
             static_assert(num_predecessors > 0,
@@ -538,10 +536,8 @@ namespace hpx::execution::experimental {
       : hpx::functional::detail::tag_fallback<when_all_t>
     {
     private:
-        // clang-format off
         template <typename... Senders>
-        requires (hpx::util::all_of_v<is_sender<Senders>...>)
-        // clang-format on
+            requires(hpx::util::all_of_v<is_sender<Senders>...>)
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             when_all_t, Senders&&... senders)
         {
@@ -593,12 +589,13 @@ namespace hpx::execution::experimental {
 
     // the following enables directly using dataflow() with senders
 
-    HPX_CXX_EXPORT template <typename F, typename Sender, typename... Senders,
-        HPX_CONCEPT_REQUIRES_(!hpx::traits::is_future_v<std::decay_t<Sender>> &&
+    HPX_CXX_CORE_EXPORT template <typename F, typename Sender,
+        typename... Senders>
+        requires(!hpx::traits::is_future_v<std::decay_t<Sender>> &&
             is_sender_v<Sender> &&
             ((!hpx::traits::is_future_v<std::decay_t<Senders>> &&
                  is_sender_v<Senders>) &&
-                ...))>
+                ...))
     HPX_FORCEINLINE constexpr auto tag_invoke(
         hpx::detail::dataflow_t, F&& f, Sender&& sender, Senders&&... senders)
         -> decltype(then(when_all(HPX_FORWARD(Sender, sender),
@@ -610,12 +607,13 @@ namespace hpx::execution::experimental {
             HPX_FORWARD(F, f));
     }
 
-    HPX_CXX_EXPORT template <typename F, typename Sender, typename... Senders,
-        HPX_CONCEPT_REQUIRES_(!hpx::traits::is_future_v<std::decay_t<Sender>> &&
+    HPX_CXX_CORE_EXPORT template <typename F, typename Sender,
+        typename... Senders>
+        requires(!hpx::traits::is_future_v<std::decay_t<Sender>> &&
             is_sender_v<Sender> &&
             ((!hpx::traits::is_future_v<std::decay_t<Senders>> &&
                  is_sender_v<Senders>) &&
-                ...))>
+                ...))
     HPX_FORCEINLINE constexpr auto tag_invoke(hpx::detail::dataflow_t,
         hpx::launch, F&& f, Sender&& sender, Senders&&... senders)
         -> decltype(then(when_all(HPX_FORWARD(Sender, sender),
