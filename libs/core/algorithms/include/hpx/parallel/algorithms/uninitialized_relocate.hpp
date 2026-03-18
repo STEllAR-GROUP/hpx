@@ -533,7 +533,7 @@ namespace hpx::parallel {
                             try
                             {
                                 for (std::size_t j = c; j < n;
-                                     j += d, ++partial)
+                                    j += d, ++partial)
                                 {
                                     hpx::experimental::detail::
                                         relocate_at_helper(
@@ -547,28 +547,24 @@ namespace hpx::parallel {
                                     std::destroy_at(dest_ptr + c + k * d);
                                 }
                                 for (std::size_t j = c + (partial + 1) * d;
-                                     j < n; j += d)
+                                    j < n; j += d)
                                 {
                                     std::destroy_at(first_ptr + j);
                                 }
                                 for (std::size_t done_ci = 0;
-                                     done_ci < chains_done; ++done_ci)
+                                    done_ci < chains_done; ++done_ci)
                                 {
-                                    std::size_t done_c =
-                                        chain_start + done_ci;
-                                    for (std::size_t j = done_c; j < n;
-                                         j += d)
+                                    std::size_t done_c = chain_start + done_ci;
+                                    for (std::size_t j = done_c; j < n; j += d)
                                     {
                                         std::destroy_at(dest_ptr + j);
                                     }
                                 }
                                 for (std::size_t todo_ci = ci + 1;
-                                     todo_ci < num_chains; ++todo_ci)
+                                    todo_ci < num_chains; ++todo_ci)
                                 {
-                                    std::size_t todo_c =
-                                        chain_start + todo_ci;
-                                    for (std::size_t j = todo_c; j < n;
-                                         j += d)
+                                    std::size_t todo_c = chain_start + todo_ci;
+                                    for (std::size_t j = todo_c; j < n; j += d)
                                     {
                                         std::destroy_at(first_ptr + j);
                                     }
@@ -601,12 +597,12 @@ namespace hpx::parallel {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        // parallel_uninitialized_relocate_n_overlapping_backward
+        // parallel_uninitialized_relocate_n_backward
         HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename BiIter1,
             typename BiIter2>
             requires(hpx::traits::is_contiguous_iterator_v<BiIter1> &&
                 hpx::traits::is_contiguous_iterator_v<BiIter2>)
-        decltype(auto) parallel_uninitialized_relocate_n_overlapping_backward(
+        decltype(auto) parallel_uninitialized_relocate_n_backward(
             ExPolicy&& policy, BiIter1 first, std::size_t n, BiIter2 dest_last,
             std::size_t d)
         {
@@ -632,9 +628,8 @@ namespace hpx::parallel {
                 {
                     auto dest_first = std::prev(dest_last, n);
                     return util::detail::algorithm_result<ExPolicy,
-                        util::in_out_result<BiIter1, BiIter2>>::
-                        get(util::in_out_result<BiIter1, BiIter2>{
-                            first, dest_first});
+                        util::in_out_result<BiIter1, BiIter2>>::get(util::
+                            in_out_result<BiIter1, BiIter2>{first, dest_first});
                 }
             }
 
@@ -657,7 +652,7 @@ namespace hpx::parallel {
                             try
                             {
                                 for (std::size_t k = k_max + 1; k-- > 0;
-                                     ++partial)
+                                    ++partial)
                                 {
                                     std::size_t j = c + k * d;
                                     hpx::experimental::detail::
@@ -674,31 +669,27 @@ namespace hpx::parallel {
                                 }
                                 if (partial < k_max + 1)
                                 {
-                                    for (std::size_t k = 0;
-                                         k < k_max - partial; ++k)
+                                    for (std::size_t k = 0; k < k_max - partial;
+                                        ++k)
                                     {
                                         std::size_t j = c + k * d;
                                         std::destroy_at(first_ptr + j);
                                     }
                                 }
                                 for (std::size_t done_ci = 0;
-                                     done_ci < chains_done; ++done_ci)
+                                    done_ci < chains_done; ++done_ci)
                                 {
-                                    std::size_t done_c =
-                                        chain_start + done_ci;
-                                    for (std::size_t j = done_c; j < n;
-                                         j += d)
+                                    std::size_t done_c = chain_start + done_ci;
+                                    for (std::size_t j = done_c; j < n; j += d)
                                     {
                                         std::destroy_at(dest_first_ptr + j);
                                     }
                                 }
                                 for (std::size_t todo_ci = ci + 1;
-                                     todo_ci < num_chains; ++todo_ci)
+                                    todo_ci < num_chains; ++todo_ci)
                                 {
-                                    std::size_t todo_c =
-                                        chain_start + todo_ci;
-                                    for (std::size_t j = todo_c; j < n;
-                                         j += d)
+                                    std::size_t todo_c = chain_start + todo_ci;
+                                    for (std::size_t j = todo_c; j < n; j += d)
                                     {
                                         std::destroy_at(first_ptr + j);
                                     }
@@ -750,9 +741,8 @@ namespace hpx::parallel {
                 if (count == 0)
                 {
                     return util::detail::algorithm_result<ExPolicy,
-                        util::in_out_result<BiIter, FwdIter>>::
-                        get(util::in_out_result<BiIter, FwdIter>{
-                            first, dest_first});
+                        util::in_out_result<BiIter, FwdIter>>::get(util::
+                            in_out_result<BiIter, FwdIter>{first, dest_first});
                 }
             }
 
@@ -762,8 +752,8 @@ namespace hpx::parallel {
             return util::partitioner_with_cleanup<ExPolicy,
                 util::in_out_result<BiIter, FwdIter>, partition_result_type>::
                 call(
-                    HPX_FORWARD(ExPolicy, policy),
-                    zip_iter(first, dest_first), count,
+                    HPX_FORWARD(ExPolicy, policy), zip_iter(first, dest_first),
+                    count,
                     [](zip_iter t, std::size_t part_size) mutable
                         -> partition_result_type {
                         using hpx::get;
@@ -1064,8 +1054,7 @@ namespace hpx::experimental {
                 {
                     auto last = std::next(first, count);
                     auto dest_last = std::next(dest, count);
-                    has_overlap =
-                        (first < dest_last) && (dest_last < last);
+                    has_overlap = (first < dest_last) && (dest_last < last);
 
                     if (has_overlap)
                     {
@@ -1074,26 +1063,32 @@ namespace hpx::experimental {
                                 InIter, FwdIter>::is_memcpyable;
                         if constexpr (!is_trivially_relocatable)
                         {
-                            auto d = static_cast<std::size_t>(
-                                std::distance(dest, first));
-                            if constexpr (has_scheduler_executor)
+                            using value_type = std::iter_value_t<InIter>;
+                            // only safe to parallelize if the move constructor
+                            // is noexcept; otherwise fall back to sequential
+                            if constexpr (std::is_nothrow_move_constructible_v<
+                                              value_type>)
                             {
-                                namespace ex =
-                                    hpx::execution::experimental;
-                                return ex::unique_any_sender<FwdIter>(
-                                    parallel::util::get_second_element(
+                                auto d = static_cast<std::size_t>(
+                                    std::distance(dest, first));
+                                if constexpr (has_scheduler_executor)
+                                {
+                                    namespace ex = hpx::execution::experimental;
+                                    return ex::unique_any_sender<
+                                        FwdIter>(parallel::util::get_second_element(
                                         hpx::parallel::detail::
                                             parallel_uninitialized_relocate_n_overlapping(
                                                 HPX_FORWARD(ExPolicy, policy),
                                                 first, count, dest, d)));
-                            }
-                            else
-                            {
-                                return parallel::util::get_second_element(
-                                    hpx::parallel::detail::
-                                        parallel_uninitialized_relocate_n_overlapping(
-                                            HPX_FORWARD(ExPolicy, policy),
-                                            first, count, dest, d));
+                                }
+                                else
+                                {
+                                    return parallel::util::get_second_element(
+                                        hpx::parallel::detail::
+                                            parallel_uninitialized_relocate_n_overlapping(
+                                                HPX_FORWARD(ExPolicy, policy),
+                                                first, count, dest, d));
+                                }
                             }
                         }
                     }
@@ -1104,13 +1099,13 @@ namespace hpx::experimental {
                     if constexpr (has_scheduler_executor)
                     {
                         namespace ex = hpx::execution::experimental;
-                        return ex::unique_any_sender<
-                            FwdIter>(parallel::util::get_second_element(
-                            hpx::parallel::detail::uninitialized_relocate_n<
-                                parallel::util::in_out_result<InIter,
-                                    FwdIter>>()
-                                .call(HPX_FORWARD(ExPolicy, policy), first,
-                                    count, dest)));
+                        return ex::unique_any_sender<FwdIter>(
+                            parallel::util::get_second_element(
+                                hpx::parallel::detail::uninitialized_relocate_n<
+                                    parallel::util::in_out_result<InIter,
+                                        FwdIter>>()
+                                    .call(HPX_FORWARD(ExPolicy, policy), first,
+                                        count, dest)));
                     }
                     else
                     {
@@ -1240,8 +1235,7 @@ namespace hpx::experimental {
                 {
                     auto last = std::next(first, count);
                     auto dest_last = std::next(dest, count);
-                    has_overlap =
-                        (first < dest_last) && (dest_last < last);
+                    has_overlap = (first < dest_last) && (dest_last < last);
 
                     if (has_overlap)
                     {
@@ -1250,26 +1244,32 @@ namespace hpx::experimental {
                                 InIter1, FwdIter>::is_memcpyable;
                         if constexpr (!is_trivially_relocatable)
                         {
-                            auto d = static_cast<std::size_t>(
-                                std::distance(dest, first));
-                            if constexpr (has_scheduler_executor)
+                            using value_type = std::iter_value_t<InIter1>;
+                            // only safe to parallelize if the move constructor
+                            // is noexcept; otherwise fall back to sequential
+                            if constexpr (std::is_nothrow_move_constructible_v<
+                                              value_type>)
                             {
-                                namespace ex =
-                                    hpx::execution::experimental;
-                                return ex::unique_any_sender<FwdIter>(
-                                    parallel::util::get_second_element(
+                                auto d = static_cast<std::size_t>(
+                                    std::distance(dest, first));
+                                if constexpr (has_scheduler_executor)
+                                {
+                                    namespace ex = hpx::execution::experimental;
+                                    return ex::unique_any_sender<
+                                        FwdIter>(parallel::util::get_second_element(
                                         hpx::parallel::detail::
                                             parallel_uninitialized_relocate_n_overlapping(
                                                 HPX_FORWARD(ExPolicy, policy),
                                                 first, count, dest, d)));
-                            }
-                            else
-                            {
-                                return parallel::util::get_second_element(
-                                    hpx::parallel::detail::
-                                        parallel_uninitialized_relocate_n_overlapping(
-                                            HPX_FORWARD(ExPolicy, policy),
-                                            first, count, dest, d));
+                                }
+                                else
+                                {
+                                    return parallel::util::get_second_element(
+                                        hpx::parallel::detail::
+                                            parallel_uninitialized_relocate_n_overlapping(
+                                                HPX_FORWARD(ExPolicy, policy),
+                                                first, count, dest, d));
+                                }
                             }
                         }
                     }
@@ -1280,13 +1280,13 @@ namespace hpx::experimental {
                     if constexpr (has_scheduler_executor)
                     {
                         namespace ex = hpx::execution::experimental;
-                        return ex::unique_any_sender<
-                            FwdIter>(parallel::util::get_second_element(
-                            hpx::parallel::detail::uninitialized_relocate_n<
-                                parallel::util::in_out_result<InIter1,
-                                    FwdIter>>()
-                                .call(HPX_FORWARD(ExPolicy, policy), first,
-                                    count, dest)));
+                        return ex::unique_any_sender<FwdIter>(
+                            parallel::util::get_second_element(
+                                hpx::parallel::detail::uninitialized_relocate_n<
+                                    parallel::util::in_out_result<InIter1,
+                                        FwdIter>>()
+                                    .call(HPX_FORWARD(ExPolicy, policy), first,
+                                        count, dest)));
                     }
                     else
                     {
@@ -1409,8 +1409,7 @@ namespace hpx::experimental {
                     hpx::traits::is_contiguous_iterator_v<BiIter2>)
                 {
                     auto dest_first = std::prev(dest_last, count);
-                    has_overlap =
-                        (first < dest_first) && (dest_first < last);
+                    has_overlap = (first < dest_first) && (dest_first < last);
 
                     if (has_overlap)
                     {
@@ -1419,26 +1418,32 @@ namespace hpx::experimental {
                                 BiIter1, BiIter2>::is_memcpyable;
                         if constexpr (!is_trivially_relocatable)
                         {
-                            auto d = static_cast<std::size_t>(
-                                std::distance(first, dest_first));
-                            if constexpr (has_scheduler_executor)
+                            using value_type = std::iter_value_t<BiIter1>;
+                            // only safe to parallelize if the move constructor
+                            // is noexcept; otherwise fall back to sequential
+                            if constexpr (std::is_nothrow_move_constructible_v<
+                                              value_type>)
                             {
-                                namespace ex =
-                                    hpx::execution::experimental;
-                                return ex::unique_any_sender<BiIter2>(
-                                    parallel::util::get_second_element(
+                                auto d = static_cast<std::size_t>(
+                                    std::distance(first, dest_first));
+                                if constexpr (has_scheduler_executor)
+                                {
+                                    namespace ex = hpx::execution::experimental;
+                                    return ex::unique_any_sender<
+                                        BiIter2>(parallel::util::get_second_element(
                                         hpx::parallel::detail::
-                                            parallel_uninitialized_relocate_n_overlapping_backward(
+                                            parallel_uninitialized_relocate_n_backward(
                                                 HPX_FORWARD(ExPolicy, policy),
                                                 first, count, dest_last, d)));
-                            }
-                            else
-                            {
-                                return parallel::util::get_second_element(
-                                    hpx::parallel::detail::
-                                        parallel_uninitialized_relocate_n_overlapping_backward(
-                                            HPX_FORWARD(ExPolicy, policy),
-                                            first, count, dest_last, d));
+                                }
+                                else
+                                {
+                                    return parallel::util::get_second_element(
+                                        hpx::parallel::detail::
+                                            parallel_uninitialized_relocate_n_backward(
+                                                HPX_FORWARD(ExPolicy, policy),
+                                                first, count, dest_last, d));
+                                }
                             }
                         }
                     }
@@ -1450,9 +1455,8 @@ namespace hpx::experimental {
                     {
                         namespace ex = hpx::execution::experimental;
                         return ex::unique_any_sender<BiIter2>(
-                            parallel::util::get_second_element(
-                                hpx::parallel::detail::
-                                    uninitialized_relocate_backward<
+                            parallel::util::get_second_element(hpx::parallel::
+                                    detail::uninitialized_relocate_backward<
                                         parallel::util::in_out_result<BiIter1,
                                             BiIter2>>()
                                         .call(HPX_FORWARD(ExPolicy, policy),
@@ -1462,11 +1466,10 @@ namespace hpx::experimental {
                     {
                         return parallel::util::get_second_element(
                             hpx::parallel::detail::
-                                uninitialized_relocate_backward<
-                                    parallel::util::in_out_result<BiIter1,
-                                        BiIter2>>()
-                                    .call(HPX_FORWARD(ExPolicy, policy),
-                                        first, last, dest_last));
+                                uninitialized_relocate_backward<parallel::util::
+                                        in_out_result<BiIter1, BiIter2>>()
+                                    .call(HPX_FORWARD(ExPolicy, policy), first,
+                                        last, dest_last));
                     }
                 }
             }
