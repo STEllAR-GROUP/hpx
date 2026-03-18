@@ -199,7 +199,7 @@ void transform_binary_tests(std::vector<hpx::id_type>& localities)
         auto dest = x.begin();
         std::advance(dest, dest_offset);
 
-        auto verify = [&]() {
+        auto verify_subrange_result = [&]() {
             std::vector<V> expected(n, V(-1));
             for (std::size_t i = 0; i < range_size; ++i)
             {
@@ -218,24 +218,24 @@ void transform_binary_tests(std::vector<hpx::id_type>& localities)
         hpx::fill(hpx::execution::seq, x.begin(), x.end(), V(-1));
         hpx::transform(
             hpx::execution::seq, first1, last1, first2, dest, add<V>());
-        verify();
+        verify_subrange_result();
 
         hpx::fill(hpx::execution::seq, x.begin(), x.end(), V(-1));
         hpx::transform(
             hpx::execution::par, first1, last1, first2, dest, add<V>());
-        verify();
+        verify_subrange_result();
 
         hpx::fill(hpx::execution::seq, x.begin(), x.end(), V(-1));
-        hpx::transform(hpx::execution::seq(hpx::execution::task), first1,
-            last1, first2, dest, add<V>())
+        hpx::transform(hpx::execution::seq(hpx::execution::task), first1, last1,
+            first2, dest, add<V>())
             .get();
-        verify();
+        verify_subrange_result();
 
         hpx::fill(hpx::execution::seq, x.begin(), x.end(), V(-1));
-        hpx::transform(hpx::execution::par(hpx::execution::task), first1,
-            last1, first2, dest, add<V>())
+        hpx::transform(hpx::execution::par(hpx::execution::task), first1, last1,
+            first2, dest, add<V>())
             .get();
-        verify();
+        verify_subrange_result();
     }
 }
 #endif

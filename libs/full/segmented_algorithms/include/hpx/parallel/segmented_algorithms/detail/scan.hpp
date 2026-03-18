@@ -653,8 +653,7 @@ namespace hpx::parallel {
                 // wait for 1. step of current partition to prevent race condition
                 // when used in place
                 finalitems.push_back(hpx::dataflow(policy.executor(),
-                    hpx::unwrapping(
-                        [=](T last_value, T) mutable -> void {
+                    hpx::unwrapping([=](T last_value, T) mutable -> void {
                         dispatch(traits_out::get_id(out_it),
                             segmented_scan_void<Algo>(), hpx::execution::seq,
                             std::true_type(), get<0>(in_tuple),
@@ -666,8 +665,9 @@ namespace hpx::parallel {
                 // 3. Step: compute new init value for the next segment
                 // performed as soon as the needed results are ready
                 workitems.push_back(hpx::dataflow(policy.executor(),
-                    hpx::unwrapping(
-                        [=](T lhs, T rhs) { return hpx::invoke(*op_ptr, lhs, rhs); }),
+                    hpx::unwrapping([=](T lhs, T rhs) {
+                        return hpx::invoke(*op_ptr, lhs, rhs);
+                    }),
                     workitems.back(), res));
                 ++i;
             }

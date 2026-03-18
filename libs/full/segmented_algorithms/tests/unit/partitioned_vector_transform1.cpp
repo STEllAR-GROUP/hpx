@@ -186,7 +186,7 @@ void transform_tests(std::vector<hpx::id_type>& localities)
         auto dest = w.begin();
         std::advance(dest, dest_offset);
 
-        auto verify = [&](U unchanged) {
+        auto verify_subrange_result = [&](U unchanged) {
             std::vector<U> expected(n, unchanged);
             for (std::size_t i = 0; i < range_size; ++i)
             {
@@ -203,25 +203,23 @@ void transform_tests(std::vector<hpx::id_type>& localities)
 
         hpx::fill(hpx::execution::seq, w.begin(), w.end(), U(-1));
         hpx::transform(hpx::execution::seq, first, last, dest, pfo<U>());
-        verify(U(-1));
+        verify_subrange_result(U(-1));
 
         hpx::fill(hpx::execution::seq, w.begin(), w.end(), U(-1));
         hpx::transform(hpx::execution::par, first, last, dest, pfo<U>());
-        verify(U(-1));
+        verify_subrange_result(U(-1));
 
         hpx::fill(hpx::execution::seq, w.begin(), w.end(), U(-1));
-        hpx::transform(
-            hpx::execution::seq(hpx::execution::task), first, last, dest,
-            pfo<U>())
+        hpx::transform(hpx::execution::seq(hpx::execution::task), first, last,
+            dest, pfo<U>())
             .get();
-        verify(U(-1));
+        verify_subrange_result(U(-1));
 
         hpx::fill(hpx::execution::seq, w.begin(), w.end(), U(-1));
-        hpx::transform(
-            hpx::execution::par(hpx::execution::task), first, last, dest,
-            pfo<U>())
+        hpx::transform(hpx::execution::par(hpx::execution::task), first, last,
+            dest, pfo<U>())
             .get();
-        verify(U(-1));
+        verify_subrange_result(U(-1));
     }
 }
 

@@ -13,8 +13,8 @@
 #include <hpx/modules/testing.hpp>
 
 #include <cstddef>
-#include <iterator>
 #include <iostream>
+#include <iterator>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -101,25 +101,26 @@ void adjacent_find_tests(std::vector<hpx::id_type>& localities)
         auto last = first;
         std::advance(last, range_size);
 
-        auto verify = [&](typename hpx::partitioned_vector<T>::iterator r) {
-            HPX_TEST_EQ(std::distance(vals.begin(), r), 5);
-        };
+        auto verify_subrange_result =
+            [&](typename hpx::partitioned_vector<T>::iterator r) {
+                HPX_TEST_EQ(std::distance(vals.begin(), r), 5);
+            };
 
         auto result = hpx::adjacent_find(hpx::execution::seq, first, last);
-        verify(result);
+        verify_subrange_result(result);
 
         auto rpar = hpx::adjacent_find(hpx::execution::par, first, last);
-        verify(rpar);
+        verify_subrange_result(rpar);
 
-        auto r2 = hpx::adjacent_find(hpx::execution::seq(hpx::execution::task),
-                      first, last)
+        auto r2 = hpx::adjacent_find(
+            hpx::execution::seq(hpx::execution::task), first, last)
                       .get();
-        verify(r2);
+        verify_subrange_result(r2);
 
-        auto r3 = hpx::adjacent_find(hpx::execution::par(hpx::execution::task),
-                      first, last)
+        auto r3 = hpx::adjacent_find(
+            hpx::execution::par(hpx::execution::task), first, last)
                       .get();
-        verify(r3);
+        verify_subrange_result(r3);
     }
 }
 

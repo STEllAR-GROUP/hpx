@@ -110,7 +110,7 @@ void adjacent_difference_tests(std::vector<hpx::id_type>& localities)
         auto dest = out.begin();
         std::advance(dest, dest_offset);
 
-        auto verify = [&]() {
+        auto verify_subrange_result = [&]() {
             std::vector<T> expected(n, T(-1));
             expected[dest_offset] = T(first_offset);
             for (std::size_t i = 1; i < range_size; ++i)
@@ -128,23 +128,23 @@ void adjacent_difference_tests(std::vector<hpx::id_type>& localities)
 
         hpx::fill(hpx::execution::seq, out.begin(), out.end(), T(-1));
         hpx::adjacent_difference(hpx::execution::seq, first, last, dest);
-        verify();
+        verify_subrange_result();
 
         hpx::fill(hpx::execution::seq, out.begin(), out.end(), T(-1));
         hpx::adjacent_difference(hpx::execution::par, first, last, dest);
-        verify();
+        verify_subrange_result();
 
         hpx::fill(hpx::execution::seq, out.begin(), out.end(), T(-1));
         hpx::adjacent_difference(
             hpx::execution::seq(hpx::execution::task), first, last, dest)
             .get();
-        verify();
+        verify_subrange_result();
 
         hpx::fill(hpx::execution::seq, out.begin(), out.end(), T(-1));
         hpx::adjacent_difference(
             hpx::execution::par(hpx::execution::task), first, last, dest)
             .get();
-        verify();
+        verify_subrange_result();
     }
 }
 

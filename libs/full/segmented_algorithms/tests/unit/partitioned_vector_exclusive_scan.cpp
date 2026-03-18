@@ -415,7 +415,7 @@ void exclusive_scan_tests(std::vector<hpx::id_type>& localities)
         auto dest = out.begin();
         std::advance(dest, dest_offset);
 
-        auto verify = [&]() {
+        auto verify_subrange_result = [&]() {
             std::vector<T> expected(n, T(-1));
             T acc = T(0);
             for (std::size_t i = 0; i < range_size; ++i)
@@ -435,26 +435,24 @@ void exclusive_scan_tests(std::vector<hpx::id_type>& localities)
         hpx::fill(hpx::execution::seq, out.begin(), out.end(), T(-1));
         hpx::exclusive_scan(
             hpx::execution::seq, first, last, dest, T(0), opt<T>());
-        verify();
+        verify_subrange_result();
 
         hpx::fill(hpx::execution::seq, out.begin(), out.end(), T(-1));
         hpx::exclusive_scan(
             hpx::execution::par, first, last, dest, T(0), opt<T>());
-        verify();
+        verify_subrange_result();
 
         hpx::fill(hpx::execution::seq, out.begin(), out.end(), T(-1));
-        hpx::exclusive_scan(
-            hpx::execution::seq(hpx::execution::task), first, last, dest,
-            T(0), opt<T>())
+        hpx::exclusive_scan(hpx::execution::seq(hpx::execution::task), first,
+            last, dest, T(0), opt<T>())
             .get();
-        verify();
+        verify_subrange_result();
 
         hpx::fill(hpx::execution::seq, out.begin(), out.end(), T(-1));
-        hpx::exclusive_scan(
-            hpx::execution::par(hpx::execution::task), first, last, dest,
-            T(0), opt<T>())
+        hpx::exclusive_scan(hpx::execution::par(hpx::execution::task), first,
+            last, dest, T(0), opt<T>())
             .get();
-        verify();
+        verify_subrange_result();
     }
 
     // minimal regression for carry propagation order mismatch across segments
@@ -478,10 +476,10 @@ void exclusive_scan_tests(std::vector<hpx::id_type>& localities)
         concat_op op;
         S init = "X";
 
-        hpx::exclusive_scan(
-            hpx::execution::seq, in.begin(), in.end(), out_seq.begin(), init, op);
-        hpx::exclusive_scan(
-            hpx::execution::par, in.begin(), in.end(), out_par.begin(), init, op);
+        hpx::exclusive_scan(hpx::execution::seq, in.begin(), in.end(),
+            out_seq.begin(), init, op);
+        hpx::exclusive_scan(hpx::execution::par, in.begin(), in.end(),
+            out_par.begin(), init, op);
 
         auto seq_it = out_seq.begin();
         auto par_it = out_par.begin();
