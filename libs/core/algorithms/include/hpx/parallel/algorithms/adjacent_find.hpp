@@ -130,6 +130,7 @@ namespace hpx {
 #include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/adjacent_find.hpp>
 #include <hpx/parallel/algorithms/detail/adjacent_find.hpp>
+#include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/adapt_placement_mode.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
@@ -234,7 +235,7 @@ namespace hpx::parallel {
                     }
                     else
                     {
-                        first = last;
+                        first = detail::advance_to_sentinel(first, last);
                     }
                     return first;
                 };
