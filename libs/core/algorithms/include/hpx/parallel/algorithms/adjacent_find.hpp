@@ -235,7 +235,8 @@ namespace hpx::parallel {
                     }
                     else
                     {
-                        first = detail::advance_to_sentinel(first, last);
+                        first = hpx::parallel::detail::advance_to_sentinel(
+                            first, last);
                     }
                     return first;
                 };

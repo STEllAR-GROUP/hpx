@@ -1388,7 +1388,7 @@ namespace hpx::parallel {
                     }
                     else
                     {
-                        first1 = detail::advance_to_sentinel(first1, last1);
+                        first1 = hpx::parallel::detail::advance_to_sentinel(first1, last1);
                     }
                     return first1;
                 };
@@ -1493,7 +1493,7 @@ namespace hpx::parallel {
                     }
                     else
                     {
-                        first = last;
+                        first = hpx::parallel::detail::advance_to_sentinel(first, last);
                     }
 
                     return first;
