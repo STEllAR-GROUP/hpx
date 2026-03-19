@@ -123,6 +123,7 @@ namespace hpx {
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
+#include <ranges>
 #include <type_traits>
 #include <utility>
 
@@ -214,7 +215,7 @@ namespace hpx::parallel {
                                 HPX_MOVE(trail));
                             return result;
                         }
-                        std::iter_swap(mid, trail);
+                        std::ranges::iter_swap(mid, trail);
                     }
                 }
             }

@@ -22,6 +22,7 @@
 #include <cstring>    // for std::memmove
 #include <iterator>
 #include <memory>
+#include <ranges>
 #include <type_traits>
 #include <utility>
 
@@ -285,7 +286,7 @@ namespace hpx::parallel::util {
                 while (first != last)
                 {
                     // NOLINTNEXTLINE(bugprone-macro-repeated-side-effects)
-                    *dest++ = HPX_MOVE(*first++);
+                    *dest++ = std::ranges::iter_move(first++);
                 }
 
                 return in_out_result<InIter, OutIter>{
@@ -335,17 +336,14 @@ namespace hpx::parallel::util {
                     (void) ++first, ++dest, i += 4)    //-V112
                 // clang-format on
                 {
-                    *dest = HPX_MOVE(*first);
-                    // NOLINTNEXTLINE(bugprone-macro-repeated-side-effects)
-                    *++dest = HPX_MOVE(*++first);
-                    // NOLINTNEXTLINE(bugprone-macro-repeated-side-effects)
-                    *++dest = HPX_MOVE(*++first);
-                    // NOLINTNEXTLINE(bugprone-macro-repeated-side-effects)
-                    *++dest = HPX_MOVE(*++first);
+                    *dest = std::ranges::iter_move(first);
+                    *++dest = std::ranges::iter_move(++first);
+                    *++dest = std::ranges::iter_move(++first);
+                    *++dest = std::ranges::iter_move(++first);
                 }
                 for (/**/; count < num; (void) ++first, ++dest, ++count)
                 {
-                    *dest = HPX_MOVE(*first);
+                    *dest = std::ranges::iter_move(first);
                 }
                 return in_out_result<InIter, OutIter>{
                     HPX_MOVE(first), HPX_MOVE(dest)};
@@ -449,7 +447,7 @@ namespace hpx::parallel::util {
                         HPX_FORWARD(ExPolicy, policy), first, num, dest,
                         [](InIter it, OutIter current) -> void {
                             hpx::construct_at(
-                                std::addressof(*current), HPX_MOVE(*it));
+                                std::addressof(*current), std::ranges::iter_move(it));
                         },
                         [](OutIter it) -> void {
                             std::destroy_at(std::addressof(*it));

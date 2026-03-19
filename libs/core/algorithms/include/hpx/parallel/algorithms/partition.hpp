@@ -479,6 +479,7 @@ namespace hpx {
 #include <hpx/parallel/util/zip_iterator.hpp>
 
 #include <memory>
+#include <ranges>
 
 #include <algorithm>
 #include <cstddef>
@@ -608,12 +609,12 @@ namespace hpx::parallel {
             {
                 if (HPX_INVOKE(f, HPX_INVOKE(proj, *first)))
                 {
-                    *next = HPX_MOVE(*first);
+                    *next = std::ranges::iter_move(first);
                     ++next;
                 }
                 else
                 {
-                    false_values.emplace_back(HPX_MOVE(*first));
+                    false_values.emplace_back(std::ranges::iter_move(first));
                 }
 
                 ++first;

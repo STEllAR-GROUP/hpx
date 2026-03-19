@@ -123,6 +123,7 @@ namespace hpx {
 
 #include <algorithm>
 #include <iterator>
+#include <ranges>
 #include <type_traits>
 #include <utility>
 
@@ -147,7 +148,7 @@ namespace hpx::parallel {
                 HPX_FORWARD(ExPolicy, policy), zip_iterator(first1, first2), n,
                 [](reference t) -> void {
                     using hpx::get;
-                    std::swap(get<0>(t), get<1>(t));
+                    std::ranges::swap(get<0>(t), get<1>(t));
                 },
                 hpx::identity_v));
         }
