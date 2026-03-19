@@ -1085,14 +1085,7 @@ namespace hpx::parallel {
                     auto find_res =
                         static_cast<difference_type>(tok.get_data());
 
-                    if (find_res != count)
-                    {
-                        std::advance(first, find_res);
-                    }
-                    else
-                    {
-                        first = detail::advance_to_sentinel(first, last);
-                    }
+                    std::advance(first, find_res);
                     return first;
                 };
 
@@ -1176,14 +1169,7 @@ namespace hpx::parallel {
                     auto find_res =
                         static_cast<difference_type>(tok.get_data());
 
-                    if (find_res != count)
-                    {
-                        std::advance(first, find_res);
-                    }
-                    else
-                    {
-                        first = detail::advance_to_sentinel(first, last);
-                    }
+                    std::advance(first, find_res);
                     return first;
                 };
 
@@ -1266,14 +1252,7 @@ namespace hpx::parallel {
                     auto find_res =
                         static_cast<difference_type>(tok.get_data());
 
-                    if (find_res != count)
-                    {
-                        std::advance(first, find_res);
-                    }
-                    else
-                    {
-                        first = detail::advance_to_sentinel(first, last);
-                    }
+                    std::advance(first, find_res);
                     return first;
                 };
 
@@ -1382,14 +1361,7 @@ namespace hpx::parallel {
 
                     difference_type find_end_res = tok.get_data();
 
-                    if (find_end_res >= 0 && find_end_res != count)
-                    {
-                        std::advance(first1, find_end_res);
-                    }
-                    else
-                    {
-                        first1 = hpx::parallel::detail::advance_to_sentinel(first1, last1);
-                    }
+                    std::advance(first1, find_end_res);
                     return first1;
                 };
 
@@ -1487,14 +1459,7 @@ namespace hpx::parallel {
 
                     difference_type find_first_of_res = tok.get_data();
 
-                    if (find_first_of_res != count)
-                    {
-                        std::advance(first, find_first_of_res);
-                    }
-                    else
-                    {
-                        first = hpx::parallel::detail::advance_to_sentinel(first, last);
-                    }
+                    std::advance(first, find_first_of_res);
 
                     return first;
                 };

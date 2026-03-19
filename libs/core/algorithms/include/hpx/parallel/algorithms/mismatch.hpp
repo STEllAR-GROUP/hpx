@@ -645,17 +645,8 @@ namespace hpx::parallel {
                     util::detail::clear_container(data...);
 
                     auto mismatched = tok.get_data();
-                    if (mismatched != count1)
-                        std::advance(first1, mismatched);
-                    else
-                        first1 = hpx::parallel::detail::advance_to_sentinel(
-                            first1, last1);
-
-                    if (mismatched != count2)
-                        std::advance(first2, mismatched);
-                    else
-                        first2 = hpx::parallel::detail::advance_to_sentinel(
-                            first2, last2);
+                    std::advance(first1, mismatched);
+                    std::advance(first2, mismatched);
 
                     return {first1, first2};
                 };
@@ -771,10 +762,7 @@ namespace hpx::parallel {
 
                     difference_type mismatched =
                         static_cast<difference_type>(tok.get_data());
-                    if (mismatched != count)
-                        std::advance(first1, mismatched);
-                    else
-                        first1 = detail::advance_to_sentinel(first1, last1);
+                    std::advance(first1, mismatched);
 
                     std::advance(first2, mismatched);
                     return std::make_pair(first1, first2);

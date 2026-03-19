@@ -229,15 +229,7 @@ namespace hpx::parallel {
                     util::detail::clear_container(data...);
 
                     difference_type adj_find_res = tok.get_data();
-                    if (adj_find_res != count)
-                    {
-                        std::advance(first, adj_find_res);
-                    }
-                    else
-                    {
-                        first = hpx::parallel::detail::advance_to_sentinel(
-                            first, last);
-                    }
+                    std::advance(first, adj_find_res);
                     return first;
                 };
 

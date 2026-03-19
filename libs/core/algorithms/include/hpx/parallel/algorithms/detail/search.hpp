@@ -239,15 +239,7 @@ namespace hpx::parallel::detail {
                 util::detail::clear_container(data...);
 
                 difference_type search_res = tok.get_data();
-                if (search_res != count)
-                {
-                    std::advance(first, search_res);
-                }
-                else
-                {
-                    first =
-                        hpx::parallel::detail::advance_to_sentinel(first, last);
-                }
+                std::advance(first, search_res);
 
                 return HPX_MOVE(first);
             };
@@ -360,7 +352,7 @@ namespace hpx::parallel::detail {
                     tok, HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
             };
 
-            auto f2 = [first, n, max_start, tok](
+            auto f2 = [first, last, n, max_start, tok](
                           auto&&... data) mutable -> FwdIter {
                 util::detail::clear_container(data...);
 
