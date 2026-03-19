@@ -446,8 +446,8 @@ namespace hpx::parallel::util {
                     ::hpx::parallel::util::loop_with_cleanup_n(
                         HPX_FORWARD(ExPolicy, policy), first, num, dest,
                         [](InIter it, OutIter current) -> void {
-                            hpx::construct_at(
-                                std::addressof(*current), std::ranges::iter_move(it));
+                            hpx::construct_at(std::addressof(*current),
+                                std::ranges::iter_move(it));
                         },
                         [](OutIter it) -> void {
                             std::destroy_at(std::addressof(*it));
