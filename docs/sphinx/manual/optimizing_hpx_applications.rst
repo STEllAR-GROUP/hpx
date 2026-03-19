@@ -302,10 +302,17 @@ be found in the section :ref:`counters`.
 HPX-Top
 -------
 
-|hpx-top| is a real-time, terminal-based dashboard designed for monitoring the
+**HPX-Top** is a real-time, terminal-based dashboard designed for monitoring the
 health and performance of distributed |hpx| applications. Inspired by tools like
 ``htop`` and ``btop``, it provides a high-level overview of system utilization,
 network flow, and internal runtime metrics.
+
+.. figure:: ../_static/images/hpx_top.png
+   :alt: HPX-Top Dashboard Screenshot
+   :align: center
+   :width: 100%
+
+   HPX-Top Real-time Performance Dashboard
 
 Features
 ~~~~~~~~
@@ -322,7 +329,7 @@ Features
 Usage
 ~~~~~
 
-|hpx-top| is implemented as a Python script that acts as a wrapper around your |hpx|
+HPX-Top is implemented as a Python script that acts as a wrapper around your |hpx|
 application. It automatically configures the necessary performance counters and
 output formats.
 
@@ -338,7 +345,7 @@ To monitor an |hpx| application, launch it through ``hpx-top.py``:
 
    $ python3 tools/hpx-top.py ./your_application --hpx:threads=4 [other HPX flags]
 
-You can also run |hpx-top| in mock mode to explore the interface without a running
+You can also run HPX-Top in mock mode to explore the interface without a running
 |hpx| application:
 
 .. code-block:: shell-session
