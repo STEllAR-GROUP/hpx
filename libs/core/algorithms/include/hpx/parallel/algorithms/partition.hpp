@@ -737,11 +737,8 @@ namespace hpx::parallel {
                 if (first == last)
                     break;
 
-#if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
                 std::ranges::iter_swap(first++, last);
-#else
-                std::iter_swap(first++, last);
-#endif
+
             }
 
             return first;
@@ -765,11 +762,8 @@ namespace hpx::parallel {
             {
                 if (HPX_INVOKE(pred, HPX_INVOKE(proj, *it)))
                 {
-#if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
                     std::ranges::iter_swap(first++, it);
-#else
-                    std::iter_swap(first++, it);
-#endif
+
                 }
             }
 
@@ -1007,11 +1001,8 @@ namespace hpx::parallel {
             {
                 while (first != last)
                 {
-#if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
                     std::ranges::iter_swap(first++, dest++);
-#else
-                    std::iter_swap(first++, dest++);
-#endif
+
                 }
                 return dest;
             }
@@ -1049,12 +1040,9 @@ namespace hpx::parallel {
                     if (right_block.empty())
                         return left_block;
 
-#if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
                     std::ranges::iter_swap(
                         left_block.first++, right_block.first++);
-#else
-                    std::iter_swap(left_block.first++, right_block.first++);
-#endif
+
                 }
             }
 
@@ -1113,12 +1101,9 @@ namespace hpx::parallel {
                     if (right_iter->empty() || right_iter->block_no < 0)
                         break;
 
-#if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
                     std::ranges::iter_swap(
                         left_iter->first++, right_iter->first++);
-#else
-                    std::iter_swap(left_iter->first++, right_iter->first++);
-#endif
+
                 }
 
                 if (left_iter < right_iter ||
