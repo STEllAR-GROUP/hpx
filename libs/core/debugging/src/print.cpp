@@ -17,6 +17,7 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
+#include <cstdio>
 #include <cstring>
 #include <functional>
 #include <iomanip>
@@ -27,7 +28,6 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
-#include <cstdio>
 
 #if defined(__FreeBSD__)
 HPX_CORE_EXPORT char** freebsd_environ = nullptr;
@@ -279,7 +279,8 @@ namespace hpx::debug {
                 if (rank >= 0)
                 {
                     std::size_t const len = std::strlen(hostname_);
-                    std::snprintf(hostname_ + len, sizeof(hostname_) - len, "(%d)", rank);
+                    std::snprintf(
+                        hostname_ + len, sizeof(hostname_) - len, "(%d)", rank);
                 }
             }
             return hostname_;
