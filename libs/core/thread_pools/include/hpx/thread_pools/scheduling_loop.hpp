@@ -234,8 +234,31 @@ namespace hpx::threads::detail {
 #if defined(HPX_HAVE_MODULE_TRACY)
                                 char const* name = thrdptr->get_description()
                                                        .get_description();
+                                bool const enable_tracy =
+                                    name != nullptr && !thrdptr->is_stackless();
+                                char const* fiber_name = enable_tracy ?
+                                    thrdptr->get_tracy_fiber_name() :
+                                    nullptr;
+                                // Dual-view Tracy instrumentation:
+                                //
+                                // rctx declared FIRST -> constructed first ->
+                                //   ZoneBegin fires with NO active fiber,
+                                //   so Tracy attributes it to the OS worker
+                                //   thread row (utilization view).
+                                //
+                                // fctx declared SECOND -> constructed second ->
+                                //   TracyFiberEnter fires INSIDE the open zone,
+                                //   so Tracy also shows this slice on the fiber
+                                //   track (M:N migration view).
+                                //
+                                // Destruction is C++ reverse order:
+                                //   ~fctx first -> TracyFiberLeave
+                                //   ~rctx last  -> ZoneEnd
+                                // Zone outlives the fiber context - correct.
                                 tracy::region rctx(name, num_thread,
-                                    thrdptr->get_thread_phase());
+                                    thrdptr->get_thread_phase(), enable_tracy);
+                                tracy::fiber_region fctx(
+                                    fiber_name, name, num_thread, enable_tracy);
 #endif
 
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
