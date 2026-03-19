@@ -290,7 +290,8 @@ namespace hpx::parallel::util {
         {
             auto& r = vrange_input[pos[0]];
 
-            util::construct_object(&*it_dest++, std::ranges::iter_move(r.begin()));
+            util::construct_object(
+                &*it_dest++, std::ranges::iter_move(r.begin()));
             r = util::range<Iter, Sent>(r.begin() + 1, r.end());
 
             if (r.size() == 0)
