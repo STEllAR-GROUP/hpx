@@ -325,8 +325,7 @@ namespace hpx::execution::experimental {
 
         // Additional stdexec concepts and utilities needed for domain customization
         HPX_CXX_CORE_EXPORT using stdexec::__completes_on;
-        HPX_CXX_CORE_EXPORT using stdexec::__starts_on;
-        HPX_CXX_CORE_EXPORT using stdexec::sender_expr_for;
+        HPX_CXX_CORE_EXPORT using stdexec::__sender_for;
     }    // namespace stdexec_internal
 }    // namespace hpx::execution::experimental
 
