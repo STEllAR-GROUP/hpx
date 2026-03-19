@@ -193,7 +193,6 @@ namespace hpx::parallel {
                 if (it != first)
                 {
                     std::ranges::iter_swap(it, first);
-
                 }
 
                 return;
@@ -306,7 +305,6 @@ namespace hpx::parallel {
                         // swap first element and partitionIter
                         // (ending element of first group)
                         std::ranges::iter_swap(first, partition_iter);
-
 
                         // if nth element < partitioned index,
                         // it lies in [first, partitionIter)

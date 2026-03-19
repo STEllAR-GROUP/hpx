@@ -168,7 +168,6 @@ namespace hpx::parallel {
                 while (first1 != last1)
                 {
                     std::ranges::iter_swap(first1++, first2++);
-
                 }
                 return first2;
             }
@@ -182,7 +181,6 @@ namespace hpx::parallel {
                 while (first1 != last1 && first2 != last2)
                 {
                     std::ranges::iter_swap(first1++, first2++);
-
                 }
                 return swap_ranges_result<FwdIter1, FwdIter2>{first1, first2};
             }
@@ -206,7 +204,7 @@ namespace hpx::parallel {
                 auto dist2 = detail::distance(first2, last2);
 
                 return parallel_swap_ranges(HPX_FORWARD(ExPolicy, policy),
-                    first1, first2, (std::min) (dist1, dist2));
+                    first1, first2, (std::min)(dist1, dist2));
             }
         };
         /// \endcond

@@ -201,7 +201,6 @@ namespace hpx::parallel {
             Iter it_val =
                 mid3(first + 1, first + n2, last - 1, HPX_FORWARD(Comp, comp));
             std::ranges::iter_swap(first, it_val);
-
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -292,7 +291,6 @@ namespace hpx::parallel {
                     if (HPX_INVOKE(comp, *it, *first))
                     {
                         std::ranges::iter_swap(it, first);
-
                     }
                 }
                 return;

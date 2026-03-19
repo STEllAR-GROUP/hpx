@@ -105,8 +105,8 @@ function(hpx_perform_cxx_feature_tests)
     endif()
 
     hpx_check_for_cxx20_std_execution_policies(
-      DEFINITIONS HPX_HAVE_CXX20_STD_EXECUTION_POLICES
-      DEFINITIONS HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP
+      DEFINITIONS HPX_HAVE_CXX20_STD_EXECUTION_POLICES DEFINITIONS
+      HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP
     )
 
     # hpx_check_for_cxx20_trivial_virtual_destructor was deleted

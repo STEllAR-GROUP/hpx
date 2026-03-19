@@ -227,10 +227,9 @@ namespace hpx::parallel {
                 auto last2 = detail::advance_to_sentinel(first, last);
                 // NOLINTNEXTLINE(bugprone-inc-dec-in-conditions)
                 for (auto tail = last2; !(first == tail || first == --tail);
-                    ++first)
+                     ++first)
                 {
                     std::ranges::iter_swap(first, tail);
-
                 }
                 return last2;
             }
@@ -255,7 +254,6 @@ namespace hpx::parallel {
                                 [first, last2](std::size_t i) -> void {
                                     std::ranges::iter_swap(
                                         first + i, last2 - 1 - i);
-
                                 },
                                 hpx::identity_v),
                         [last2](auto) -> BidirIter { return last2; });

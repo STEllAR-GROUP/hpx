@@ -79,6 +79,5 @@ namespace hpx::parallel::detail {
             first + 6 * chunk, first + 7 * chunk, last - 1, comp);
 
         std::ranges::iter_swap(first, itaux);
-
     }
 }    // namespace hpx::parallel::detail

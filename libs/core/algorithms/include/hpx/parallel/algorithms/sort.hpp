@@ -241,7 +241,6 @@ namespace hpx::parallel {
 
             std::ranges::iter_swap(first, c_last);
 
-
             // spawn tasks for each sub section
             hpx::future<RandomIt> left = execution::async_execute(
                 policy.executor(), &sort_thread<ExPolicy, RandomIt, Comp>,
@@ -304,7 +303,7 @@ namespace hpx::parallel {
                 cores, count, max_chunks, chunk_size);
 
             // we should not get smaller than our sort_limit_per_task
-            chunk_size = (std::max) (chunk_size, sort_limit_per_task);
+            chunk_size = (std::max)(chunk_size, sort_limit_per_task);
 
             if (count < chunk_size)
             {
