@@ -55,6 +55,7 @@ add_hpx_module(
     hpx_schedulers
     hpx_tag_invoke
     hpx_threading_base
+    hpx_tracing
     hpx_topology
     ${additional_dependencies}
   CMAKE_SUBDIRS examples tests

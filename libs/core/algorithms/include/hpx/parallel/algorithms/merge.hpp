@@ -302,7 +302,7 @@ namespace hpx {
 #include <hpx/parallel/util/foreach_partitioner.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 #if defined(HPX_HAVE_MODULE_TRACY)
-#include <hpx/modules/tracy.hpp>
+#include <hpx/modules/tracing.hpp>
 #endif
 
 #include <algorithm>
@@ -719,7 +719,7 @@ namespace hpx::parallel {
                 hpx::util::itt::mark_event e(notify_event);
 #endif
 #if defined(HPX_HAVE_MODULE_TRACY)
-                hpx::tracy::mark_event evt("get diagonal index");
+                hpx::tracing::mark_event evt("get diagonal index");
 #endif
                 auto const shape_size = std::size(shape);
 
@@ -759,7 +759,7 @@ namespace hpx::parallel {
             hpx::util::itt::mark_event e(notify_event);
 #endif
 #if defined(HPX_HAVE_MODULE_TRACY)
-            hpx::tracy::mark_event evt("get diagonal intersection");
+            hpx::tracing::mark_event evt("get diagonal intersection");
 #endif
             if (len1 == 0)
                 return {0, (std::min) (k, len2)};
@@ -817,7 +817,7 @@ namespace hpx::parallel {
             hpx::util::itt::mark_event e(notify_event);
 #endif
 #if defined(HPX_HAVE_MODULE_TRACY)
-            hpx::tracy::mark_event evt("get diagonal intersection");
+            hpx::tracing::mark_event evt("get diagonal intersection");
 #endif
             if (len1 == 0)
                 return {0, (std::min) (k, len2)};

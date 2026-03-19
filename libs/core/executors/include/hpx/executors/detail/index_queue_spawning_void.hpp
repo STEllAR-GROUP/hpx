@@ -27,7 +27,7 @@
 #include <hpx/modules/topology.hpp>
 #include <hpx/modules/type_support.hpp>
 #if defined(HPX_HAVE_MODULE_TRACY)
-#include <hpx/modules/tracy.hpp>
+#include <hpx/modules/tracing.hpp>
 #endif
 
 #include <algorithm>
@@ -79,7 +79,7 @@ namespace hpx::parallel::execution::detail {
                 hpx::util::itt::mark_event e(notify_event);
 #endif
 #if defined(HPX_HAVE_MODULE_TRACY)
-                hpx::tracy::mark_event evt("do_work_chunk");
+                hpx::tracing::mark_event evt("do_work_chunk");
 #endif
 
                 auto const i_begin = *index * chunk_size;
@@ -117,7 +117,8 @@ namespace hpx::parallel::execution::detail {
                         hpx::util::itt::mark_event e(notify_event);
 #endif
 #if defined(HPX_HAVE_MODULE_TRACY)
-                        hpx::tracy::mark_event evt("do_work_chunk (stealing)");
+                        hpx::tracing::mark_event evt(
+                            "do_work_chunk (stealing)");
 #endif
 
                         auto const i_begin = *index * chunk_size;
@@ -159,7 +160,7 @@ namespace hpx::parallel::execution::detail {
             hpx::util::itt::mark_event e(notify_event);
 #endif
 #if defined(HPX_HAVE_MODULE_TRACY)
-            hpx::tracy::mark_event evt("finish");
+            hpx::tracing::mark_event evt("finish");
 #endif
 
             std::uint32_t const prev_value =
@@ -443,7 +444,7 @@ namespace hpx::parallel::execution::detail {
             hpx::util::itt::mark_event e(notify_event);
 #endif
 #if defined(HPX_HAVE_MODULE_TRACY)
-            hpx::tracy::mark_event evt("index_queue_spawning::execute");
+            hpx::tracing::mark_event evt("index_queue_spawning::execute");
 #endif
 
             auto const size =

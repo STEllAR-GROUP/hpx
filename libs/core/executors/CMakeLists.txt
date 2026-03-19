@@ -139,6 +139,7 @@ add_hpx_module(
     hpx_timing
     hpx_threading
     hpx_threading_base
+    hpx_tracing
     hpx_topology
     hpx_type_support
     ${additional_dependencies}

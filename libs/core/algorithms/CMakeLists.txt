@@ -301,6 +301,7 @@ add_hpx_module(
     hpx_synchronization
     hpx_tag_invoke
     hpx_threading_base
+    hpx_tracing
     hpx_type_support
     hpx_util
     ${additional_dependencies}

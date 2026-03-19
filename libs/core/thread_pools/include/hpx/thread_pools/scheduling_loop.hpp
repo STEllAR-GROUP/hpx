@@ -12,6 +12,7 @@
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/threading_base.hpp>
+#include <hpx/modules/tracing.hpp>
 #include <hpx/thread_pools/detail/background_thread.hpp>
 #include <hpx/thread_pools/detail/scheduling_callbacks.hpp>
 #include <hpx/thread_pools/detail/scheduling_counters.hpp>
@@ -231,11 +232,22 @@ namespace hpx::threads::detail {
                                 task.add_metadata(
                                     task_phase, thrdptr->get_thread_phase());
 #endif
+                                char const* name = nullptr;
+                                bool enable_tracy = false;
+                                std::size_t phase = 0;
+
 #if defined(HPX_HAVE_MODULE_TRACY)
-                                char const* name = thrdptr->get_description()
-                                                       .get_description();
-                                bool const enable_tracy =
+                                name = thrdptr->get_description()
+                                           .get_description();
+                                enable_tracy =
                                     name != nullptr && !thrdptr->is_stackless();
+                                phase = thrdptr->get_thread_phase();
+#endif
+
+                                hpx::tracing::region rctx(
+                                    name, num_thread, phase, enable_tracy);
+
+#if defined(HPX_HAVE_MODULE_TRACY)
                                 char const* fiber_name = enable_tracy ?
                                     thrdptr->get_tracy_fiber_name() :
                                     nullptr;
@@ -255,8 +267,6 @@ namespace hpx::threads::detail {
                                 //   ~fctx first -> TracyFiberLeave
                                 //   ~rctx last  -> ZoneEnd
                                 // Zone outlives the fiber context - correct.
-                                tracy::region rctx(name, num_thread,
-                                    thrdptr->get_thread_phase(), enable_tracy);
                                 tracy::fiber_region fctx(
                                     fiber_name, name, num_thread, enable_tracy);
 #endif
