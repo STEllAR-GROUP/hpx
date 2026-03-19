@@ -227,7 +227,7 @@ namespace hpx::parallel {
                 auto last2 = detail::advance_to_sentinel(first, last);
                 // NOLINTNEXTLINE(bugprone-inc-dec-in-conditions)
                 for (auto tail = last2; !(first == tail || first == --tail);
-                     ++first)
+                    ++first)
                 {
                     std::ranges::iter_swap(first, tail);
                 }
