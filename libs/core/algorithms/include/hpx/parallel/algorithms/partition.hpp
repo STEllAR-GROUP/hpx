@@ -478,15 +478,14 @@ namespace hpx {
 #include <hpx/parallel/util/transfer.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 
-#include <memory>
-#include <ranges>
-
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
 #include <iterator>
 #include <list>
+#include <memory>
+#include <ranges>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -715,11 +714,13 @@ namespace hpx::parallel {
         /// \cond NOINTERNAL
 
         // sequential partition with projection function for bidirectional iterator.
+        // clang-format off
         HPX_CXX_CORE_EXPORT template <typename BidirIter, typename Pred,
             typename Proj>
-            requires(std::bidirectional_iterator<BidirIter>)
+            requires (std::bidirectional_iterator<BidirIter>)
         constexpr BidirIter sequential_partition(
             BidirIter first, BidirIter last, Pred&& pred, Proj&& proj)
+        // clang-format on
         {
             while (true)
             {
@@ -744,13 +745,14 @@ namespace hpx::parallel {
             return first;
         }
 
-        // sequential partition with projection function for forward iterator.
+        // clang-format off
         HPX_CXX_CORE_EXPORT template <typename FwdIter, typename Pred,
             typename Proj>
-            requires(std::forward_iterator<FwdIter> &&
+            requires (std::forward_iterator<FwdIter> &&
                 !std::bidirectional_iterator<FwdIter>)
         constexpr FwdIter sequential_partition(
             FwdIter first, FwdIter last, Pred&& pred, Proj&& proj)
+        // clang-format on
         {
             while (first != last && HPX_INVOKE(pred, HPX_INVOKE(proj, *first)))
                 ++first;
