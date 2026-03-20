@@ -19,10 +19,12 @@
 #include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
+#include <exception>
 #include <initializer_list>
 #include <iterator>
 #include <memory>
 #include <stdexcept>
+#include <string>
 #include <type_traits>
 #include <utility>
 
@@ -86,8 +88,8 @@ namespace hpx::compute {
         template <typename InIter,
             typename Enable = typename std::enable_if<
                 hpx::traits::is_input_iterator_v<InIter>>::type>
-        vector(InIter first, InIter last, Allocator const& alloc)
-          : size_(std::distance(first, last))
+        vector(InIter first, InIter last, Allocator const& alloc = Allocator())
+          : size_(static_cast<size_type>(std::distance(first, last)))
           , capacity_(size_)
           , alloc_(alloc)
           , data_(alloc_traits::allocate(alloc_, size_))
@@ -135,7 +137,8 @@ namespace hpx::compute {
             other.capacity_ = 0;
         }
 
-        vector(std::initializer_list<T> init, Allocator const& alloc)
+        vector(std::initializer_list<T> init,
+            Allocator const& alloc = Allocator())
           : size_(init.size())
           , capacity_(init.size())
           , alloc_(alloc)
@@ -233,7 +236,7 @@ namespace hpx::compute {
         void assign(InIter first, InIter last)
         {
             clear();
-            size_type count = std::distance(first, last);
+            size_type count = static_cast<size_type>(std::distance(first, last));
             if (capacity_ < count)
             {
                 alloc_traits::deallocate(alloc_, data_, capacity_);

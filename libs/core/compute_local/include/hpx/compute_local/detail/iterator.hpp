@@ -54,7 +54,16 @@ namespace hpx::compute::detail {
         iterator(typename traits::allocator_traits<Allocator>::pointer p,
             std::size_t pos, target_type const& target) noexcept
           : base_type(p + pos)
-          , target_(&target)
+          , target_(target)
+        {
+        }
+
+        template <typename U,
+            typename Enable =
+                std::enable_if_t<std::is_same_v<T, U const>>>
+        HPX_HOST_DEVICE iterator(iterator<U, Allocator> const& other) noexcept
+          : base_type(other.base())
+          , target_(other.target())
         {
         }
 
@@ -76,11 +85,11 @@ namespace hpx::compute::detail {
 
         HPX_HOST_DEVICE target_type const& target() const noexcept
         {
-            return *target_;
+            return target_;
         }
 
     private:
-        target_type const* target_;
+        target_type target_;
     };
 
 }    // namespace hpx::compute::detail
