@@ -8,9 +8,9 @@
 #include <hpx/config.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/tag_invoke.hpp>
+#include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/util/loop.hpp>
 
-#include <algorithm>
 #include <cstddef>
 #include <type_traits>
 #include <utility>
@@ -29,7 +29,8 @@ namespace hpx::parallel::detail {
         {
             using difference_type =
                 typename std::iterator_traits<Iterator>::difference_type;
-            difference_type distance = detail::distance(first, last);
+            difference_type distance =
+                hpx::parallel::detail::distance(first, last);
             if (distance <= 0)
                 return false;
 

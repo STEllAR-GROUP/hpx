@@ -17,7 +17,7 @@
 #if defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
 #include <cstddef>
 #include <cstdint>
-#include <experimental/meta>
+#include <meta>
 
 namespace hpx::serialization::detail {
 

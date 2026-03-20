@@ -50,13 +50,12 @@ namespace hpx::execution::experimental {
             threads::thread_stacksize stacksize =
                 threads::thread_stacksize::default_,
             threads::thread_schedule_hint schedulehint = {},
-            std::size_t hierarchical_threshold =
+            [[maybe_unused]] std::size_t hierarchical_threshold =
                 hierarchical_threshold_default_)
           : first_thread_(static_cast<std::uint16_t>(first_thread))
           , os_thread_(0)
           , exec_(priority, stacksize, schedulehint,
-                parallel::execution::detail::get_default_policy<Policy>::call(),
-                hierarchical_threshold)
+                parallel::execution::detail::get_default_policy<Policy>::call())
         {
             // set initial number of cores
             exec_ = hpx::execution::experimental::with_processing_units_count(

@@ -52,14 +52,23 @@ void test_bulk_async(Executor& exec)
     using hpx::placeholders::_1;
     using hpx::placeholders::_2;
 
-    std::vector<hpx::future<int>> results =
-        hpx::parallel::execution::bulk_async_execute(
-            exec, hpx::bind(&bulk_test, tid, _1, true, _2), v, 42);
+    auto results = hpx::parallel::execution::bulk_async_execute(
+        exec, hpx::bind(&bulk_test, tid, _1, true, _2), v, 42);
 
-    HPX_TEST(std::equal(std::begin(results), std::end(results), std::begin(v),
-        [](hpx::future<int>& lhs, int const& rhs) {
-            return lhs.get() == rhs;
-        }));
+    // bulk_async_execute returns either a future<vector<result_type>> or a
+    // vector<future<result_type>>
+    if constexpr (hpx::traits::is_future_v<decltype(results)>)
+    {
+        auto r = results.get();
+        HPX_TEST(std::equal(std::begin(r), std::end(r), std::begin(v)));
+    }
+    else
+    {
+        HPX_TEST(std::equal(std::begin(results), std::end(results),
+            std::begin(v), [](hpx::future<int>& lhs, int const& rhs) {
+                return lhs.get() == rhs;
+            }));
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
