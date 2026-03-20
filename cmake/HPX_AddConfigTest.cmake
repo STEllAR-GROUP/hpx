@@ -551,7 +551,6 @@ function(hpx_check_for_cxx20_std_ranges_iter_swap)
     FILE ${ARGN}
   )
 endfunction()
-endfunction()
 
 # ##############################################################################
 function(hpx_check_for_cxx23_std_generator)
