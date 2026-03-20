@@ -25,7 +25,7 @@ namespace hpx {
         ::new(const_cast<void*>(static_cast<void const volatile*>(addr)))
             T(HPX_FORWARD(Ts, ts)...)))
     {
-        return ::new (const_cast<void*>(
+        return ::new(const_cast<void*>(
             static_cast<void const volatile*>(addr))) T(HPX_FORWARD(Ts, ts)...);
     }
 #endif

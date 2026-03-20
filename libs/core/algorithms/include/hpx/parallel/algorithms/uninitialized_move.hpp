@@ -323,7 +323,7 @@ namespace hpx::parallel {
             {
                 return hpx::parallel::util::uninit_move_n(
                     HPX_FORWARD(ExPolicy, policy), first,
-                    std::distance(first, last), dest);
+                    detail::distance(first, last), dest);
             }
 
             template <typename ExPolicy, typename Iter, typename Sent,

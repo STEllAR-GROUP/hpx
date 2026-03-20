@@ -587,7 +587,7 @@ namespace hpx::parallel {
                     detail::relocation_traits<InIter1,
                         FwdIter>::is_noexcept_relocatable_v)
             {
-                auto count = std::distance(first, last);
+                auto count = detail::distance(first, last);
 
                 return parallel_uninitialized_relocate_n(
                     HPX_FORWARD(ExPolicy, policy), first, count, dest);
@@ -644,7 +644,7 @@ namespace hpx::parallel {
                     util::detail::relocation_traits<BiIter1,
                         BiIter2>::is_noexcept_relocatable_v)
             {
-                auto count = std::distance(first, last);
+                auto count = detail::distance(first, last);
 
                 auto dest_first = std::prev(dest_last, count);
 
@@ -835,7 +835,8 @@ namespace hpx::experimental {
                 "Relocating from this source type to this destination type is "
                 "ill-formed");
             // if count is representing a negative value, we do nothing
-            if (hpx::parallel::detail::is_negative(std::distance(first, last)))
+            if (hpx::parallel::detail::is_negative(
+                    detail::distance(first, last)))
             {
                 return dest;
             }
@@ -873,7 +874,7 @@ namespace hpx::experimental {
                 "Relocating from this source type to this destination type is "
                 "ill-formed");
 
-            auto count = std::distance(first, last);
+            auto count = detail::distance(first, last);
             constexpr bool has_scheduler_executor =
                 hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
@@ -1016,7 +1017,7 @@ namespace hpx::experimental {
                 "Relocating from this source type to this destination type is "
                 "ill-formed");
 
-            auto count = std::distance(first, last);
+            auto count = detail::distance(first, last);
             constexpr bool has_scheduler_executor =
                 hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
