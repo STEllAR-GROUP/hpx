@@ -484,8 +484,6 @@ namespace hpx {
 #include <exception>
 #include <iterator>
 #include <list>
-#include <memory>
-#include <ranges>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -714,13 +712,11 @@ namespace hpx::parallel {
         /// \cond NOINTERNAL
 
         // sequential partition with projection function for bidirectional iterator.
-        // clang-format off
         HPX_CXX_CORE_EXPORT template <typename BidirIter, typename Pred,
             typename Proj>
             requires (std::bidirectional_iterator<BidirIter>)
         constexpr BidirIter sequential_partition(
             BidirIter first, BidirIter last, Pred&& pred, Proj&& proj)
-        // clang-format on
         {
             while (true)
             {

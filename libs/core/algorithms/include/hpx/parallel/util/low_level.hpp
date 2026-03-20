@@ -55,9 +55,8 @@ namespace hpx::parallel::util {
         {
             return;
         }
-
-        construct_object(std::addressof(*first), std::ranges::iter_move(first));
-
+        
+        construct_object(std::addressof(*first), HPX_MOVE(val));    
         Iter it1 = first, it2 = first + 1;
         while (it2 != last)
         {
