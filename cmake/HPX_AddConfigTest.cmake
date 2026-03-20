@@ -488,7 +488,6 @@ function(hpx_check_for_cxx20_coroutines)
     FILE ${ARGN}
   )
 endfunction()
-endfunction()
 
 # ##############################################################################
 function(hpx_check_for_pthread_setname_np)
