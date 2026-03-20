@@ -125,6 +125,7 @@ namespace hpx {
 
 #include <algorithm>
 #include <cstddef>
+#include <cstdint>
 #include <iterator>
 #include <type_traits>
 #include <utility>
@@ -205,8 +206,7 @@ namespace hpx::parallel {
                 util::invoke_projected<Pred, Proj> pred_projected(
                     HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
                 util::cancellation_token<> tok;
-                using intermediate_result_t =
-                    std::conditional_t<has_scheduler_executor, char, bool>;
+                using intermediate_result_t = std::uint8_t;
 
                 // Note: replacing the invoke() with HPX_INVOKE()
                 // below makes gcc generate errors
