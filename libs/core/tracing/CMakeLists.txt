@@ -7,7 +7,7 @@
 set(tracing_headers hpx/tracing/tracing.hpp)
 set(tracing_sources)
 
-set(tracing_module_dependencies hpx_config)
+set(tracing_module_dependencies hpx_config hpx_threading_base)
 if(HPX_TRACY_WITH_TRACY)
   list(APPEND tracing_module_dependencies hpx_tracy)
 endif()

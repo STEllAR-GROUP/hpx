@@ -11,6 +11,8 @@
 #include <cstddef>
 
 #if defined(HPX_HAVE_MODULE_TRACY)
+#include <hpx/modules/threading_base.hpp>
+#include <hpx/tracy/tracy.hpp>
 #include <hpx/tracy/tracy_tls.hpp>
 #endif
 
@@ -31,6 +33,20 @@ namespace hpx::tracing {
 #endif
         {
         }
+
+        explicit region(
+            [[maybe_unused]] hpx::threads::thread_data* thrdptr) noexcept
+#if defined(HPX_HAVE_MODULE_TRACY)
+          : impl(thrdptr != nullptr ?
+                    thrdptr->get_description().get_description() :
+                    nullptr,
+                0, thrdptr != nullptr ? thrdptr->get_thread_phase() : 0,
+                thrdptr != nullptr &&
+                    thrdptr->get_description().get_description() != nullptr &&
+                    !thrdptr->is_stackless())
+#endif
+        {
+        }
     };
 
     HPX_CXX_CORE_EXPORT struct mark_event
@@ -42,6 +58,28 @@ namespace hpx::tracing {
         explicit mark_event([[maybe_unused]] char const* name) noexcept
 #if defined(HPX_HAVE_MODULE_TRACY)
           : impl(name)
+#endif
+        {
+        }
+    };
+
+    HPX_CXX_CORE_EXPORT struct fiber_region
+    {
+#if defined(HPX_HAVE_MODULE_TRACY)
+        hpx::tracy::fiber_region impl;
+#endif
+
+        explicit fiber_region(
+            [[maybe_unused]] hpx::threads::thread_data* thrdptr) noexcept
+#if defined(HPX_HAVE_MODULE_TRACY)
+          : impl(thrdptr != nullptr ? thrdptr->get_tracy_fiber_name() : nullptr,
+                thrdptr != nullptr ?
+                    thrdptr->get_description().get_description() :
+                    nullptr,
+                0,
+                thrdptr != nullptr &&
+                    thrdptr->get_description().get_description() != nullptr &&
+                    !thrdptr->is_stackless())
 #endif
         {
         }
