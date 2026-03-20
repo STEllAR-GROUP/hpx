@@ -195,7 +195,8 @@ namespace hpx::parallel {
                         return result::get(true);
                 }
 
-                difference_type count = detail::distance(first, last);
+                difference_type count =
+                    hpx::parallel::detail::distance(first, last);
 
                 if constexpr (!has_scheduler_executor)
                 {
