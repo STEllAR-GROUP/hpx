@@ -14,13 +14,13 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/algorithm.hpp>
 #include <hpx/compute.hpp>
+#include <hpx/compute_local/vector.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/util.hpp>
 #include <hpx/modules/compute_local.hpp>
-#include <hpx/compute_local/vector.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/program_options.hpp>
 
