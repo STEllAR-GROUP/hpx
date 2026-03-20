@@ -229,7 +229,7 @@ namespace hpx::threads::detail {
                                 task.add_metadata(
                                     task_phase, thrdptr->get_thread_phase());
 #endif
-                                hpx::tracing::region rctx(thrdptr);
+                                hpx::tracing::region rctx(thrdptr, num_thread);
 
                                 // Dual-view Tracy instrumentation:
                                 //
@@ -247,7 +247,8 @@ namespace hpx::threads::detail {
                                 //   ~fctx first -> TracyFiberLeave
                                 //   ~rctx last  -> ZoneEnd
                                 // Zone outlives the fiber context - correct.
-                                hpx::tracing::fiber_region fctx(thrdptr);
+                                hpx::tracing::fiber_region fctx(
+                                    thrdptr, num_thread);
 
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
                                 // Record time elapsed in thread changing state
