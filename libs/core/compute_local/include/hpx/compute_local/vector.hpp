@@ -200,6 +200,12 @@ namespace hpx::compute {
             if (this == &other)
                 return *this;
 
+            if (data_ != nullptr)
+            {
+                alloc_traits::bulk_destroy(alloc_, data_, size_);
+                alloc_traits::deallocate(alloc_, data_, capacity_);
+            }
+
             size_ = other.size_;
             capacity_ = other.capacity_;
             alloc_ = HPX_MOVE(other.alloc_);
