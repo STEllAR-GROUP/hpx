@@ -8,16 +8,12 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/modules/threading_base.hpp>
 
 #include <cstddef>
 
 #if defined(HPX_HAVE_MODULE_TRACY)
-#include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/tracy.hpp>
-#else
-namespace hpx::threads {
-    class thread_data;
-}
 #endif
 
 namespace hpx::tracing {
