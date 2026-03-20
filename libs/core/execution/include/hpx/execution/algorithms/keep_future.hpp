@@ -113,6 +113,14 @@ namespace hpx::execution::experimental {
             keep_future_sender(keep_future_sender const&) = delete;
             keep_future_sender& operator=(keep_future_sender const&) = delete;
 
+            template <typename Env>
+            friend auto tag_invoke(
+                get_completion_signatures_t, keep_future_sender const&, Env&&)
+                -> typename base_type::completion_signatures
+            {
+                return {};
+            }
+
             template <typename Receiver>
             friend operation_state<Receiver, future_type> tag_invoke(
                 connect_t, keep_future_sender&& s, Receiver&& receiver)
@@ -146,6 +154,14 @@ namespace hpx::execution::experimental {
             keep_future_sender& operator=(keep_future_sender&&) = default;
             keep_future_sender(keep_future_sender const&) = default;
             keep_future_sender& operator=(keep_future_sender const&) = default;
+
+            template <typename Env>
+            friend auto tag_invoke(
+                get_completion_signatures_t, keep_future_sender const&, Env&&)
+                -> typename base_type::completion_signatures
+            {
+                return {};
+            }
 
             template <typename Receiver>
             friend operation_state<Receiver, future_type> tag_invoke(
