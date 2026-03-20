@@ -31,6 +31,14 @@ struct non_awaitable_sender
 {
     using is_sender = void;
     using completion_signatures = Signatures;
+
+    template <typename Env>
+    friend auto tag_invoke(
+        hpx::execution::experimental::get_completion_signatures_t,
+        non_awaitable_sender const&, Env&&) -> completion_signatures
+    {
+        return {};
+    }
 };
 
 #if !defined(HPX_HAVE_STDEXEC)

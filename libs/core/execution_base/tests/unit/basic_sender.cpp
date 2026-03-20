@@ -158,6 +158,13 @@ struct sender_1
     };
 #endif
 
+    template <typename Env>
+    friend auto tag_invoke(ex::get_completion_signatures_t, sender_1 const&,
+        Env&&) -> completion_signatures
+    {
+        return {};
+    }
+
     struct operation_state : immovable
     {
         example_receiver& r;
@@ -196,6 +203,13 @@ struct sender_2
     };
 #endif
 
+    template <typename Env>
+    friend auto tag_invoke(ex::get_completion_signatures_t, sender_2 const&,
+        Env&&) -> completion_signatures
+    {
+        return {};
+    }
+
     struct operation_state : immovable
     {
         example_receiver& r;
@@ -220,6 +234,13 @@ struct sender_3
     using completion_signatures =
         ex::completion_signatures<ex::set_value_t(int),
             ex::set_error_t(std::exception_ptr)>;
+
+    template <typename Env>
+    friend auto tag_invoke(ex::get_completion_signatures_t, sender_3 const&,
+        Env&&) -> completion_signatures
+    {
+        return {};
+    }
 
     struct operation_state : immovable
     {
@@ -261,6 +282,13 @@ struct sender_4
         static constexpr bool sends_stopped = val;
     };
 #endif
+
+    template <typename Env>
+    friend auto tag_invoke(ex::get_completion_signatures_t, sender_4 const&,
+        Env&&) -> completion_signatures
+    {
+        return {};
+    }
 };
 
 static std::size_t void_receiver_set_value_calls = 0;
