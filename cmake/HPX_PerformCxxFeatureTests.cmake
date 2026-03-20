@@ -103,7 +103,6 @@ function(hpx_perform_cxx_feature_tests)
         DEFINITIONS HPX_HAVE_CXX20_NO_UNIQUE_ADDRESS_ATTRIBUTE
       )
     endif()
-    )
 
     hpx_check_for_cxx20_std_ranges_iter_swap(
       DEFINITIONS HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP
