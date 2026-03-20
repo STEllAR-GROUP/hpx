@@ -8,8 +8,6 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_CXX20_STD_DEFAULT_SENTINEL)
-
 #include <iterator>
 
 namespace hpx {
@@ -17,16 +15,3 @@ namespace hpx {
     HPX_CXX_CORE_EXPORT using std::default_sentinel;
     HPX_CXX_CORE_EXPORT using std::default_sentinel_t;
 }    // namespace hpx
-
-#else
-
-namespace hpx {
-
-    HPX_CXX_CORE_EXPORT struct default_sentinel_t
-    {
-    };
-    HPX_CXX_CORE_EXPORT inline constexpr default_sentinel_t default_sentinel =
-        default_sentinel_t{};
-}    // namespace hpx
-
-#endif

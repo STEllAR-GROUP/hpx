@@ -40,7 +40,7 @@ jobs:
                       [ "${{ github.ref_type }}" == "tag" ] ); then
                     DOCUMENTATION_OUTPUT_FORMATS="html;singlehtml;latexpdf"
                   else
-                    DOCUMENTATION_OUTPUT_FORMATS="html"  # ← FIX INDENTATION
+                    DOCUMENTATION_OUTPUT_FORMATS="html"
                   fi
 
                   # Disable Vc for now as otherwise we need to reconfigure during the

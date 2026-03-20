@@ -14,9 +14,6 @@
 
 using hpx::naming::gid_type;
 
-// TODO: Subtraction tests.
-// TODO: Comparison tests.
-
 int main()
 {
     {    // constructor and retrieval (get_msb/get_lsb) tests
@@ -637,6 +634,61 @@ int main()
         gid.set_msb(std::uint64_t(0x0ULL));
         HPX_TEST_EQ_MSG(
             bool(gid), true, "'lsb == true' and 'msb == false' case failed");
+    }
+
+    {    // subtraction tests (operator-)
+        // Basic subtraction (no borrowing needed)
+        //   0x00000000000001000000000000000200
+        // - 0x00000000000000500000000000000100
+        // ------------------------------------
+        //   0x00000000000000B00000000000000100
+        gid_type gid0(0x100ULL, 0x200ULL);
+        gid_type gid1(0x50ULL, 0x100ULL);
+        gid_type result0 = gid0 - gid1;
+        HPX_TEST_EQ(result0.get_msb(), 0xB0ULL);
+        HPX_TEST_EQ(result0.get_lsb(), 0x100ULL);
+
+        // Another simple subtraction
+        //   0x00000000000000500000000000000100
+        // - 0x00000000000000100000000000000050
+        // ------------------------------------
+        //   0x000000000000004000000000000000B0
+        gid_type gid2(0x10ULL, 0x50ULL);
+        gid_type result1 = gid1 - gid2;
+        HPX_TEST_EQ(result1.get_msb(), 0x40ULL);
+        HPX_TEST_EQ(result1.get_lsb(), 0xB0ULL);
+
+        // Boundary case with borrowing across 64-bit boundary
+        //   0x00000000000000010000000000000000
+        // - 0x00000000000000000000000000000001
+        // ------------------------------------
+        //   0x0000000000000000ffffffffffffffff
+        gid_type gid3(0x1ULL, std::uint64_t{0});
+        gid_type gid4(std::uint64_t{0}, 0x1ULL);
+        gid_type result2 = gid3 - gid4;
+        HPX_TEST_EQ(result2.get_msb(), 0x0ULL);
+        HPX_TEST_EQ(result2.get_lsb(), ~0x0ULL);
+
+        // Self-subtraction (result should be zero)
+        gid_type result3 = gid0 - gid0;
+        HPX_TEST_EQ(result3.get_msb(), 0x0ULL);
+        HPX_TEST_EQ(result3.get_lsb(), 0x0ULL);
+
+        // Large values subtraction with special bits masking
+        std::uint64_t const special_bits_mask =
+            gid_type::locality_id_mask | gid_type::internal_bits_mask;
+        gid_type gid5(~0x0ULL & ~special_bits_mask, ~0x0ULL);
+        gid_type gid6(0x1ULL, 0x1ULL);
+        gid_type result4 = gid5 - gid6;
+        HPX_TEST_EQ(result4.get_msb() & ~special_bits_mask,
+            (~0x0ULL - 0x1ULL) & ~special_bits_mask);
+        HPX_TEST_EQ(result4.get_lsb(), 0xFFFFFFFFFFFFFFFEULL);
+
+        // Verify subtraction doesn't mutate the originals
+        HPX_TEST_EQ(gid0.get_msb(), 0x100ULL);
+        HPX_TEST_EQ(gid0.get_lsb(), 0x200ULL);
+        HPX_TEST_EQ(gid1.get_msb(), 0x50ULL);
+        HPX_TEST_EQ(gid1.get_lsb(), 0x100ULL);
     }
 
     return hpx::util::report_errors();

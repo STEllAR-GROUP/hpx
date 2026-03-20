@@ -14,6 +14,7 @@
 #include <atomic>
 #include <exception>
 #include <string>
+#include <type_traits>
 #include <utility>
 
 namespace ex = hpx::execution::experimental;

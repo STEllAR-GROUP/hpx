@@ -27,6 +27,8 @@
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
+#include <cstdio>
+#include <cstring>
 #include <forward_list>
 #include <limits>
 #include <memory>
@@ -285,6 +287,22 @@ namespace hpx::threads {
             threads::thread_description value);
 #endif
 
+#if defined(HPX_HAVE_MODULE_TRACY)
+    private:
+        mutable char tracy_fiber_name_[64];
+
+    public:
+        static char const* get_tracy_description_name(
+            threads::thread_description const& description,
+            char const* fallback) noexcept;
+
+        // Returns a unique, stable string identifying this HPX task as a Tracy
+        // fiber. Built lazily on first call and cached in tracy_fiber_name_.
+        // Format: "<description>_<thread_id_ptr>" so each HPX task gets its
+        // own fiber track in the Tracy profiler.
+        char const* get_tracy_fiber_name() const noexcept;
+#endif
+
 #if !defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
         /// Return the locality of the parent thread
         static constexpr std::uint32_t get_parent_locality_id() noexcept
@@ -424,11 +442,37 @@ namespace hpx::threads {
         }
 
         // handle thread interruption
-        bool interruption_requested() const noexcept;
-        bool interruption_enabled() const noexcept;
-        bool set_interruption_enabled(bool enable) noexcept;
+        constexpr bool interruption_requested() const noexcept
+        {
+            return requested_interrupt_;
+        }
 
-        void interrupt(bool flag = true);
+        constexpr bool interruption_enabled() const noexcept
+        {
+            return enabled_interrupt_;
+        }
+
+        bool set_interruption_enabled(bool enable) noexcept
+        {
+            using std::swap;
+            swap(enabled_interrupt_, enable);
+            return enable;
+        }
+
+        void interrupt(bool const flag = true)
+        {
+            std::unique_lock<hpx::util::detail::spinlock> l(
+                spinlock_pool::spinlock_for(this));
+            if (flag && !enabled_interrupt_)
+            {
+                l.unlock();
+
+                HPX_THROW_EXCEPTION(hpx::error::thread_not_interruptable,
+                    "thread_data::interrupt",
+                    "interrupts are disabled for this thread");
+            }
+            requested_interrupt_ = flag;
+        }
 
         bool interruption_point(bool throw_on_interrupt = true);
 

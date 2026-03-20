@@ -28,6 +28,7 @@ tests.unit.modules.algorithms.algorithms.includes
 tests.unit.modules.algorithms.algorithms.inclusive_scan
 tests.unit.modules.algorithms.algorithms.inclusive_scan_exception
 tests.unit.modules.algorithms.algorithms.inplace_merge
+tests.unit.modules.algorithms.algorithms.iota
 tests.unit.modules.algorithms.algorithms.is_partitioned
 tests.unit.modules.algorithms.algorithms.is_sorted
 tests.unit.modules.algorithms.algorithms.is_sorted_until

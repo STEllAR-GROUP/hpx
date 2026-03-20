@@ -98,19 +98,22 @@ namespace hpx::parallel::util::detail {
                         partitioner_iteration<Result, F>{HPX_FORWARD(F, f)},
                         HPX_MOVE(shape));
                 }
-
-                // Fall back if given executor doesn't support any of the above
-                // optimizations.
-                auto&& items = execution::bulk_async_execute(policy.executor(),
-                    partitioner_iteration<Result, F>{HPX_FORWARD(F, f)},
-                    HPX_MOVE(shape));
-                if (hpx::wait_all_nothrow(items))
+                else
                 {
-                    using handle_local_exceptions =
-                        detail::handle_local_exceptions<ExPolicy>;
-                    handle_local_exceptions::call(items);
+                    // Fall back if given executor doesn't support any of the
+                    // above optimizations.
+                    auto&& items =
+                        execution::bulk_async_execute(policy.executor(),
+                            partitioner_iteration<Result, F>{HPX_FORWARD(F, f)},
+                            HPX_MOVE(shape));
+                    if (hpx::wait_all_nothrow(items))
+                    {
+                        using handle_local_exceptions =
+                            detail::handle_local_exceptions<ExPolicy>;
+                        handle_local_exceptions::call(items);
+                    }
+                    return hpx::unwrap(HPX_MOVE(items));
                 }
-                return hpx::unwrap(HPX_MOVE(items));
             }
             else
             {
@@ -195,19 +198,22 @@ namespace hpx::parallel::util::detail {
                         partitioner_iteration<Result, F>{HPX_FORWARD(F, f)},
                         HPX_MOVE(shape));
                 }
-
-                // Fall back if given executor doesn't support any of the above
-                // optimizations.
-                auto&& items = execution::bulk_async_execute(policy.executor(),
-                    partitioner_iteration<Result, F>{HPX_FORWARD(F, f)},
-                    HPX_MOVE(shape));
-                if (hpx::wait_all_nothrow(items))
+                else
                 {
-                    using handle_local_exceptions =
-                        detail::handle_local_exceptions<ExPolicy>;
-                    handle_local_exceptions::call(items);
+                    // Fall back if given executor doesn't support any of the
+                    // above optimizations.
+                    auto&& items =
+                        execution::bulk_async_execute(policy.executor(),
+                            partitioner_iteration<Result, F>{HPX_FORWARD(F, f)},
+                            HPX_MOVE(shape));
+                    if (hpx::wait_all_nothrow(items))
+                    {
+                        using handle_local_exceptions =
+                            detail::handle_local_exceptions<ExPolicy>;
+                        handle_local_exceptions::call(items);
+                    }
+                    return hpx::unwrap(HPX_MOVE(items));
                 }
-                return hpx::unwrap(HPX_MOVE(items));
             }
             else
             {
@@ -640,8 +646,17 @@ namespace hpx::parallel::util::detail {
 
                     handle_local_exceptions::call(r);
 
-                    return hpx::util::void_guard<R>(),
-                           f(HPX_FORWARD(decltype(r), r));
+                    if constexpr (hpx::traits::is_future_v<decltype((r))> &&
+                        !std::is_void_v<
+                            hpx::traits::future_traits_t<decltype((r))>>)
+                    {
+                        return hpx::util::void_guard<R>(), f(r.get());
+                    }
+                    else
+                    {
+                        return hpx::util::void_guard<R>(),
+                               f(HPX_FORWARD(decltype(r), r));
+                    }
                 },
                 HPX_FORWARD(Items, workitems));
 #endif

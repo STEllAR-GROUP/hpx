@@ -32,6 +32,7 @@ set(algorithms_headers
     hpx/parallel/algorithms/detail/generate.hpp
     hpx/parallel/algorithms/detail/indirect.hpp
     hpx/parallel/algorithms/detail/insertion_sort.hpp
+    hpx/parallel/algorithms/detail/iota.hpp
     hpx/parallel/algorithms/detail/is_sorted.hpp
     hpx/parallel/algorithms/detail/mismatch.hpp
     hpx/parallel/algorithms/detail/parallel_stable_sort.hpp
@@ -68,6 +69,7 @@ set(algorithms_headers
     hpx/parallel/algorithms/generate.hpp
     hpx/parallel/algorithms/includes.hpp
     hpx/parallel/algorithms/inclusive_scan.hpp
+    hpx/parallel/algorithms/iota.hpp
     hpx/parallel/algorithms/is_heap.hpp
     hpx/parallel/algorithms/is_partitioned.hpp
     hpx/parallel/algorithms/is_sorted.hpp
@@ -132,6 +134,7 @@ set(algorithms_headers
     hpx/parallel/container_algorithms.hpp
     hpx/parallel/container_algorithms/includes.hpp
     hpx/parallel/container_algorithms/inclusive_scan.hpp
+    hpx/parallel/container_algorithms/iota.hpp
     hpx/parallel/container_algorithms/is_heap.hpp
     hpx/parallel/container_algorithms/is_partitioned.hpp
     hpx/parallel/container_algorithms/is_sorted.hpp
@@ -239,6 +242,7 @@ if(HPX_WITH_DATAPAR)
       hpx/parallel/datapar/reduce.hpp
       hpx/parallel/datapar/remove.hpp
       hpx/parallel/datapar/replace.hpp
+      hpx/parallel/datapar/search.hpp
       hpx/parallel/datapar/transfer.hpp
       hpx/parallel/datapar/transform_loop.hpp
       hpx/parallel/datapar/zip_iterator.hpp
@@ -269,8 +273,10 @@ add_hpx_module(
   GLOBAL_HEADER_MODULE_GEN ON
   HEADERS ${algorithms_headers}
   COMPAT_HEADERS ${algorithms_compat_headers}
-  ADD_TO_GLOBAL_HEADER "hpx/parallel/util/detail/chunk_size_iterator.hpp"
-                       "hpx/parallel/util/detail/handle_remote_exceptions.hpp"
+  ADD_TO_GLOBAL_HEADER
+    "hpx/parallel/util/detail/chunk_size.hpp"
+    "hpx/parallel/util/detail/chunk_size_iterator.hpp"
+    "hpx/parallel/util/detail/handle_remote_exceptions.hpp"
   SOURCES ${algorithms_sources}
   MODULE_DEPENDENCIES
     hpx_async_base

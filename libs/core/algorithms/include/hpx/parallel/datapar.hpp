@@ -25,6 +25,7 @@
 #include <hpx/parallel/datapar/reduce.hpp>
 #include <hpx/parallel/datapar/remove.hpp>
 #include <hpx/parallel/datapar/replace.hpp>
+#include <hpx/parallel/datapar/search.hpp>
 #include <hpx/parallel/datapar/transfer.hpp>
 #include <hpx/parallel/datapar/transform_loop.hpp>
 #include <hpx/parallel/datapar/zip_iterator.hpp>

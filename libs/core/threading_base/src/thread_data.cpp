@@ -24,6 +24,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <cstdio>
 #include <limits>
 #include <memory>
 #include <utility>
@@ -114,6 +115,9 @@ namespace hpx::threads {
 #if defined(HPX_HAVE_APEX)
         set_timer_data(init_data.timer_data);
 #endif
+#if defined(HPX_HAVE_MODULE_TRACY)
+        tracy_fiber_name_[0] = '\0';
+#endif
     }
 
     thread_data::~thread_data()
@@ -175,42 +179,6 @@ namespace hpx::threads {
         HPX_ASSERT(exit_funcs_.empty() || ran_exit_funcs_);
 
         exit_funcs_.clear();
-    }
-
-    bool thread_data::interruption_requested() const noexcept
-    {
-        std::scoped_lock<hpx::util::detail::spinlock> l(
-            spinlock_pool::spinlock_for(this));
-        return requested_interrupt_;
-    }
-
-    bool thread_data::interruption_enabled() const noexcept
-    {
-        std::scoped_lock<hpx::util::detail::spinlock> l(
-            spinlock_pool::spinlock_for(this));
-        return enabled_interrupt_;
-    }
-
-    bool thread_data::set_interruption_enabled(bool enable) noexcept
-    {
-        std::scoped_lock<hpx::util::detail::spinlock> l(
-            spinlock_pool::spinlock_for(this));
-        std::swap(enabled_interrupt_, enable);
-        return enable;
-    }
-
-    void thread_data::interrupt(bool const flag)
-    {
-        std::unique_lock<hpx::util::detail::spinlock> l(
-            spinlock_pool::spinlock_for(this));
-        if (flag && !enabled_interrupt_)
-        {
-            l.unlock();
-            HPX_THROW_EXCEPTION(hpx::error::thread_not_interruptable,
-                "thread_data::interrupt",
-                "interrupts are disabled for this thread");
-        }
-        requested_interrupt_ = flag;
     }
 
     bool thread_data::interruption_point(bool const throw_on_interrupt)
@@ -291,6 +259,10 @@ namespace hpx::threads {
         backtrace_ = nullptr;
 #endif
 
+#if defined(HPX_HAVE_MODULE_TRACY)
+        tracy_fiber_name_[0] = '\0';
+#endif
+
         LTM_(debug).format("thread::thread({}), description({}), rebind", this,
             get_description());
 
@@ -331,7 +303,7 @@ namespace hpx::threads {
         std::swap(description_, value);
 
 #if defined(HPX_HAVE_MODULE_TRACY)
-        tracy::rename_region(description_.get_description());
+        tracy::detail::rename_region(description_.get_description());
 #endif
 
         return value;
@@ -351,6 +323,46 @@ namespace hpx::threads {
             spinlock_pool::spinlock_for(this));
         std::swap(lco_description_, value);
         return value;
+    }
+#endif
+
+#if defined(HPX_HAVE_MODULE_TRACY)
+    char const* thread_data::get_tracy_description_name(
+        threads::thread_description const& description,
+        char const* fallback) noexcept
+    {
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+        if (description.kind() ==
+            threads::thread_description::data_type::description)
+        {
+            char const* description_name = description.get_description();
+            if (description_name != nullptr && description_name[0] != '\0')
+            {
+                return description_name;
+            }
+        }
+#else
+        char const* description_name = description.get_description();
+        if (description_name != nullptr && description_name[0] != '\0')
+        {
+            return description_name;
+        }
+#endif
+        return fallback;
+    }
+
+    char const* thread_data::get_tracy_fiber_name() const noexcept
+    {
+        if (tracy_fiber_name_[0] == '\0')
+        {
+            char const* name =
+                get_tracy_description_name(get_description(), "fiber");
+            // Use the HPX thread_id pointer as the unique numeric suffix
+            // so each HPX task gets its own fiber track in Tracy.
+            std::snprintf(tracy_fiber_name_, sizeof(tracy_fiber_name_), "%s_%p",
+                name, get_thread_id().get());
+        }
+        return tracy_fiber_name_;
     }
 #endif
 

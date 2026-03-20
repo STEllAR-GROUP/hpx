@@ -25,6 +25,7 @@
 
 #include <exception>
 #include <mutex>
+#include <type_traits>
 
 namespace hpx::execution::experimental {
 

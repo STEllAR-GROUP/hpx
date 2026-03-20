@@ -94,7 +94,7 @@ public:
 
 private:
     // Serialization support: even if all of the code below runs on one
-    // locality only, we need to provide an (empty) implementation for the
+    // locality only, we need to provide an implementation for the
     // serialization as all arguments passed to actions have to support this.
     friend class hpx::serialization::access;
 
@@ -279,10 +279,10 @@ struct stepper
     space do_work(std::size_t np, std::size_t nx, std::size_t nt);
 };
 
-// Global functions can be exposed as actions as well. That allows to invoke
+// Static member functions can be exposed as actions as well. That allows to invoke
 // those remotely. The macro HPX_PLAIN_ACTION() defines a new action type
-// 'heat_part_action' which wraps the global function heat_part(). It can be
-// used to call that function on a given locality.
+// 'heat_part_action' which wraps the static member function
+// stepper::heat_part(). It can be used to call that function on a given locality.
 HPX_PLAIN_ACTION(stepper::heat_part, heat_part_action)
 
 ///////////////////////////////////////////////////////////////////////////////

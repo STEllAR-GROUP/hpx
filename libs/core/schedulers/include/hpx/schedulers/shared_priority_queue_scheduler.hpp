@@ -368,9 +368,10 @@ namespace hpx::threads::policies {
             case thread_schedule_hint_mode::thread:
             {
                 spq_deb.set(msg, "HINT_THREAD");
-                // @TODO. We should check that the thread num is valid
                 // Create thread on requested worker thread
-                thread_num = select_active_pu(data.schedulehint.hint);
+                thread_num = select_active_pu(
+                    fast_mod(static_cast<std::size_t>(data.schedulehint.hint),
+                        num_workers_));
                 domain_num = d_lookup_[thread_num];
                 q_index = q_lookup_[thread_num];
                 break;
@@ -379,7 +380,6 @@ namespace hpx::threads::policies {
             {
                 // Create thread on requested NUMA domain
                 spq_deb.set(msg, "HINT_NUMA  ");
-                // TODO: This case does not handle suspended PUs.
                 domain_num = fast_mod(data.schedulehint.hint, num_domains_);
                 // if the thread creating the new task is on the domain
                 // assigned to the new task - try to reuse the core as well
@@ -387,7 +387,6 @@ namespace hpx::threads::policies {
                     d_lookup_[local_num] == domain_num)
                 {
                     thread_num = local_num;    //-V1048
-                    q_index = q_lookup_[thread_num];
                 }
                 else
                 {
@@ -397,8 +396,14 @@ namespace hpx::threads::policies {
                     thread_num +=
                         numa_holder_[domain_num].thread_queue(0)->worker_next(
                             q_counts_[domain_num]);
-                    q_index = q_lookup_[thread_num];
                 }
+                // Ensure the selected PU is active, consistent with the
+                // handling of thread and none scheduling hint modes.
+                thread_num = select_active_pu(thread_num);
+                // cppcheck-suppress redundantAssignment
+                domain_num = d_lookup_[thread_num];    //-V519
+                // cppcheck-suppress redundantAssignment
+                q_index = q_lookup_[thread_num];    //-V519
                 break;
             }
             default:
@@ -763,38 +768,46 @@ namespace hpx::threads::policies {
                         debug::threadinfo<threads::thread_id_ref_type*>(&thrd));
                 }
                 thread_num = select_active_pu(thread_num, allow_fallback);
+                // cppcheck-suppress redundantAssignment
+                domain_num = d_lookup_[thread_num];    //-V519
+                // cppcheck-suppress redundantAssignment
+                q_index = q_lookup_[thread_num];    //-V519
                 break;
             }
             case thread_schedule_hint_mode::thread:
             {
-                // @TODO. We should check that the thread num is valid
-                // Create thread on requested worker thread
                 spq_deb.set(msg, "HINT_THREAD");
                 spq_deb.debug(debug::str<>("schedule_thread"),
                     "received HINT_THREAD", debug::dec<3>(schedulehint.hint));
-                thread_num =
-                    select_active_pu(schedulehint.hint, allow_fallback);
+                thread_num = select_active_pu(
+                    fast_mod(static_cast<std::size_t>(schedulehint.hint),
+                        num_workers_),
+                    allow_fallback);
                 domain_num = d_lookup_[thread_num];
                 q_index = q_lookup_[thread_num];
                 break;
             }
             case thread_schedule_hint_mode::numa:
             {
-                // Create thread on requested NUMA domain
+                // Schedule thread on requested NUMA domain
                 spq_deb.set(msg, "HINT_NUMA  ");
-                // TODO: This case does not handle suspended PUs.
                 domain_num = fast_mod(schedulehint.hint, num_domains_);
-                // if the thread creating the new task is on the domain
-                // assigned to the new task - try to reuse the core as well
-                if (d_lookup_[thread_num] == domain_num)
+                // if the current thread is on the requested domain, reuse it;
+                // otherwise fall back to the first queue on that domain
+                if (d_lookup_[thread_num] != domain_num)
                 {
-                    q_index = q_lookup_[thread_num];
+                    thread_num = q_offset_[domain_num];
+                    thread_num +=
+                        numa_holder_[domain_num].thread_queue(0)->worker_next(
+                            q_counts_[domain_num]);
                 }
-                else
-                {
-                    throw std::runtime_error(
-                        "counter problem in thread scheduler");
-                }
+                // Ensure the selected PU is active, consistent with the
+                // handling of thread and none scheduling hint modes.
+                thread_num = select_active_pu(thread_num, allow_fallback);
+                // cppcheck-suppress redundantAssignment
+                domain_num = d_lookup_[thread_num];    //-V519
+                // cppcheck-suppress redundantAssignment
+                q_index = q_lookup_[thread_num];    //-V519
                 break;
             }
 

@@ -13,8 +13,11 @@ set(executors_headers
     hpx/executors/guided_pool_executor.hpp
     hpx/executors/async.hpp
     hpx/executors/dataflow.hpp
+    hpx/executors/detail/bulk_invoke_helper.hpp
     hpx/executors/detail/hierarchical_spawning.hpp
     hpx/executors/detail/index_queue_spawning.hpp
+    hpx/executors/detail/index_queue_spawning_result.hpp
+    hpx/executors/detail/index_queue_spawning_void.hpp
     hpx/executors/execute_on.hpp
     hpx/executors/exception_list.hpp
     hpx/executors/execution_policy_annotation.hpp
@@ -109,6 +112,7 @@ add_hpx_module(
   MODULE_DEPENDENCIES
     hpx_allocator_support
     hpx_async_base
+    hpx_async_combinators
     hpx_concepts
     hpx_concurrency
     hpx_config

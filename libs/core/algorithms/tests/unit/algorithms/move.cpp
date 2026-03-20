@@ -33,8 +33,8 @@ void test_move(IteratorTag)
     std::iota(std::begin(c), std::end(c), gen());
     hpx::move(iterator(std::begin(c)), iterator(std::end(c)), std::begin(d));
 
-    //copy contents of d back into c for testing
-    std::copy(std::begin(d), std::end(d), std::begin(d));
+    // copy contents of d back into c for testing
+    std::copy(std::begin(d), std::end(d), std::begin(c));
 
     std::size_t count = 0;
     HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d),
@@ -61,8 +61,8 @@ void test_move(ExPolicy policy, IteratorTag)
     hpx::move(
         policy, iterator(std::begin(c)), iterator(std::end(c)), std::begin(d));
 
-    //copy contents of d back into c for testing
-    std::copy(std::begin(d), std::end(d), std::begin(d));
+    // copy contents of d back into c for testing
+    std::copy(std::begin(d), std::end(d), std::begin(c));
 
     std::size_t count = 0;
     HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d),

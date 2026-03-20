@@ -200,9 +200,13 @@ namespace hpx::parallel {
 
                 using policy_type = std::decay_t<decltype(policy)>;
 
+                difference_type count = detail::distance(first, last);
+
                 FwdIter next = first;
-                ++next;
-                difference_type count = std::distance(first, last);
+                if (count > 0)
+                {
+                    ++next;
+                }
                 util::cancellation_token<difference_type> tok(count);
 
                 util::invoke_projected<Pred, Proj> pred_projected{

@@ -105,7 +105,7 @@ namespace hpx::threads::policies {
         {
             thread_init_data data;
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-            std::uint64_t waittime;
+            std::uint64_t wait_time;
 #endif
         };
 
@@ -113,7 +113,7 @@ namespace hpx::threads::policies {
         struct thread_description
         {
             thread_id_ref_type data;
-            std::uint64_t waittime;
+            std::uint64_t wait_time;
         };
         using thread_description_ptr = thread_description*;
 #else
@@ -288,7 +288,7 @@ namespace hpx::threads::policies {
 
         ///////////////////////////////////////////////////////////////////////
         bool add_new_always(std::size_t& added, thread_queue* addfrom,
-            std::unique_lock<mutex_type>& lk, bool steal = false)
+            std::unique_lock<mutex_type>& lk, bool const steal = false)
         {
             HPX_ASSERT_OWNS_LOCK(lk);
 
@@ -313,16 +313,17 @@ namespace hpx::threads::policies {
             {
                 std::int64_t const count =
                     static_cast<std::int64_t>(thread_map_.size());
+
                 if (parameters_.max_thread_count_ >=
                     count + parameters_.min_add_new_count_)
-                {    //-V104
+                {
                     HPX_ASSERT(parameters_.max_thread_count_ - count <
                         (std::numeric_limits<std::int64_t>::max)());
-                    add_count = parameters_.max_thread_count_ - count;
-                    if (add_count < parameters_.min_add_new_count_)
-                        add_count = parameters_.min_add_new_count_;
-                    if (add_count > parameters_.max_add_new_count_)
-                        add_count = parameters_.max_add_new_count_;
+
+                    add_count =
+                        std::clamp(parameters_.max_thread_count_ - count,
+                            parameters_.min_add_new_count_,
+                            parameters_.max_add_new_count_);
                 }
                 else if (work_items_.empty())
                 {
@@ -339,9 +340,10 @@ namespace hpx::threads::policies {
                 }
             }
 
-            std::size_t const addednew = add_new(add_count, addfrom, lk, steal);
-            added += addednew;
-            return addednew != 0;
+            std::size_t const added_new =
+                add_new(add_count, addfrom, lk, steal);
+            added += added_new;
+            return added_new != 0;
         }
 
         void recycle_thread(thread_id_type const& thrd)
@@ -394,10 +396,10 @@ namespace hpx::threads::policies {
             if (delete_all)
             {
                 // delete all threads
-                thread_data* todelete;
-                while (terminated_items_.pop(todelete))
+                thread_data* to_delete;
+                while (terminated_items_.pop(to_delete))
                 {
-                    thread_id_type tid(todelete);
+                    thread_id_type tid(to_delete);
                     --terminated_items_count_;
 
                     // this thread has to be managed by this queue, it may have
@@ -428,10 +430,10 @@ namespace hpx::threads::policies {
                 delete_count = (std::max) (delete_count,
                     static_cast<std::int64_t>(parameters_.min_delete_count_));
 
-                thread_data* todelete;
-                while (delete_count && terminated_items_.pop(todelete))
+                thread_data* to_delete;
+                while (delete_count && terminated_items_.pop(to_delete))
                 {
-                    thread_id_type tid(todelete);
+                    thread_id_type tid(to_delete);
                     --terminated_items_count_;
 
                     // this thread has to be managed by this queue, it may have
@@ -862,8 +864,8 @@ namespace hpx::threads::policies {
             }
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-            thread_description_ptr tdesc;
-            if (work_items_.pop(tdesc, steal))
+            thread_description_ptr task_desc;
+            if (work_items_.pop(task_desc, steal))
             {
                 --work_items_count_.data_;
 
@@ -871,12 +873,12 @@ namespace hpx::threads::policies {
                 {
                     work_items_wait_ +=
                         hpx::chrono::high_resolution_clock::now() -
-                        tdesc->waittime;
+                        task_desc->waittime;
                     ++work_items_wait_count_;
                 }
 
-                thrd = HPX_MOVE(tdesc->data);
-                delete tdesc;
+                thrd = HPX_MOVE(task_desc->data);
+                delete task_desc;
 
                 return true;
             }
@@ -892,7 +894,7 @@ namespace hpx::threads::policies {
             return false;
         }
 
-        // Return the next thread to be executed, return false if none is
+        // Return the next threads to be executed, return 0 if none are
         // available
         template <typename Iterator>
         std::size_t get_next_threads(Iterator it, std::int64_t max_items,
@@ -905,31 +907,31 @@ namespace hpx::threads::policies {
 
             if (work_items_count == 0)
             {
-                return false;
+                return 0;
             }
 
             if (allow_stealing &&
                 parameters_.min_tasks_to_steal_pending_ > work_items_count)
             {
-                return false;
+                return 0;
             }
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
             std::size_t const max_items_requested = max_items;
 
-            thread_description_ptr tdesc;
-            while (work_items_.pop(tdesc, steal))
+            thread_description_ptr task_desc;
+            while (work_items_.pop(task_desc, steal))
             {
                 if (get_maintain_queue_wait_times_enabled())
                 {
                     work_items_wait_ +=
                         hpx::chrono::high_resolution_clock::now() -
-                        tdesc->waittime;
+                        task_desc->waittime;
                     ++work_items_wait_count_;
                 }
 
-                *it++ = HPX_MOVE(tdesc->data);
-                delete tdesc;
+                *it++ = HPX_MOVE(task_desc->data);
+                delete task_desc;
 
                 --max_items;
                 if (--work_items_count_.data_ == 0)
@@ -1101,8 +1103,8 @@ namespace hpx::threads::policies {
         // manager to allow for maintenance tasks to be executed in the
         // scheduler. Returns true if the OS thread calling this function has to
         // be terminated (i.e. no more work has to be done).
-        inline bool wait_or_add_new(
-            bool, std::size_t& added, bool steal = false) HPX_HOT
+        inline bool wait_or_add_new(bool const running, std::size_t& added,
+            bool const steal = false) HPX_HOT
         {
             // no need to try converting from other queue if that has no staged
             // threads
@@ -1110,7 +1112,7 @@ namespace hpx::threads::policies {
                 new_tasks_count_.data_.load(std::memory_order_relaxed);
             if (HPX_LIKELY(0 == new_tasks_count))
             {
-                return true;
+                return !running;
             }
 
             if (new_tasks_count < parameters_.min_tasks_to_steal_staged_)
@@ -1135,8 +1137,8 @@ namespace hpx::threads::policies {
             return !add_new_always(added, this, lk, steal);
         }
 
-        inline bool wait_or_add_new(bool running, std::size_t& added,
-            thread_queue* addfrom, bool steal = false) HPX_HOT
+        inline bool wait_or_add_new(bool const running, std::size_t& added,
+            thread_queue* add_from, bool const steal = false) HPX_HOT
         {
             // try to generate new threads from task lists, but only if our own
             // list of threads is empty
@@ -1147,7 +1149,7 @@ namespace hpx::threads::policies {
                 // don't try to steal if there are only a few tasks left on this
                 // queue
                 std::int64_t new_tasks_count =
-                    addfrom->new_tasks_count_.data_.load(
+                    add_from->new_tasks_count_.data_.load(
                         std::memory_order_relaxed);
 
                 bool const enough_threads = new_tasks_count != 0 &&
@@ -1161,7 +1163,7 @@ namespace hpx::threads::policies {
                             "thread_queue::wait_or_add_new: not enough threads "
                             "to steal from queue {} to queue {}, have {} but "
                             "need at least {}",
-                            addfrom, this, new_tasks_count,
+                            add_from, this, new_tasks_count,
                             parameters_.min_tasks_to_steal_staged_);
                     }
 
@@ -1184,17 +1186,17 @@ namespace hpx::threads::policies {
 
                 // stop running after all HPX threads have been terminated
                 bool const added_new =
-                    add_new_always(added, addfrom, lk, steal);
+                    add_new_always(added, add_from, lk, steal);
                 if (!added_new)
                 {
                     // Before exiting each of the OS threads deletes the
                     // remaining terminated HPX threads
                     // REVIEW: Should we be doing this if we are stealing?
-                    bool const canexit = cleanup_terminated_locked(true);
-                    if (!running && canexit)
+                    bool const can_exit = cleanup_terminated_locked(true);
+                    if (!running && can_exit)
                     {
                         // we don't have any registered work items anymore
-                        //do_some_work();       // notify possibly waiting threads
+                        // do_some_work();       // notify possibly waiting threads
                         return true;    // terminate scheduling loop
                     }
                     return false;
@@ -1206,8 +1208,8 @@ namespace hpx::threads::policies {
                 }
             }
 
-            bool const canexit = cleanup_terminated(true);
-            if (!running && canexit)
+            bool const can_exit = cleanup_terminated(true);
+            if (!running && can_exit)
             {
                 // we don't have any registered work items anymore
                 return true;    // terminate scheduling loop
@@ -1217,9 +1219,10 @@ namespace hpx::threads::policies {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        bool dump_suspended_threads([[maybe_unused]] std::size_t num_thread,
+        bool dump_suspended_threads(
+            [[maybe_unused]] std::size_t const num_thread,
             [[maybe_unused]] std::int64_t& idle_loop_count,
-            [[maybe_unused]] bool running)
+            [[maybe_unused]] bool const running)
         {
 #if !defined(HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION)
             return false;
