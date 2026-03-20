@@ -38,7 +38,7 @@ namespace hpx::detail {
 #if !defined(HPX_MSVC) && !defined(__CUDACC__) &&                              \
     !defined(HPX_COMPUTE_DEVICE_CODE)
     HPX_CXX_CORE_EXPORT template <typename T>
-    inline constexpr empty_vtable_t<T> empty_vtable{};
+    inline empty_vtable_t<T> empty_vtable{};
 
     HPX_CXX_CORE_EXPORT template <typename T>
     T const* get_empty_vtable()

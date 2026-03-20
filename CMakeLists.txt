@@ -1067,13 +1067,13 @@ hpx_option(
 hpx_option(
   HPX_WITH_FETCH_ASIO
   BOOL
-  "Use FetchContent to fetch Asio. By default an installed Asio will be used. (default: OFF)"
-  OFF
+  "Use FetchContent to fetch Asio. By default an installed Asio will be used. (default: ON)"
+  ON
   CATEGORY "Build Targets"
   ADVANCED
 )
 
-set(HPX_WITH_ASIO_TAG_DEFAULT "asio-1-21-0")
+set(HPX_WITH_ASIO_TAG_DEFAULT "asio-1-30-2")
 if(HPX_WITH_HIP)
   # newer versions of Asio currently fail when compiled with HIPCC
   set(HPX_WITH_ASIO_TAG_DEFAULT "asio-1-16-0")
