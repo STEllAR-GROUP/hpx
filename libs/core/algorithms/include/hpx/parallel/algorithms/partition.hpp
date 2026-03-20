@@ -588,7 +588,8 @@ namespace hpx::parallel {
 
                         // for some library implementations std::rotate
                         // does not return the new middle point
-                        std::advance(first_it, detail::distance(mid, last_it));
+                        std::advance(first_it,
+                            hpx::parallel::detail::distance(mid, last_it));
                         return first_it;
                     },
                     HPX_MOVE(left), HPX_MOVE(right));
@@ -837,7 +838,7 @@ namespace hpx::parallel {
                     RandIter first, RandIter last, std::size_t block_size)
                   : first_(first)
                   , left_(0)
-                  , right_(detail::distance(first, last))
+                  , right_(hpx::parallel::detail::distance(first, last))
                   , block_size_(block_size)
                 {
                 }
@@ -918,7 +919,8 @@ namespace hpx::parallel {
                 block_manager(
                     FwdIter first, FwdIter last, std::size_t block_size)
                   : boundary_(first)
-                  , blocks_((detail::distance(first, last) + block_size - 1) /
+                  , blocks_((hpx::parallel::detail::distance(first, last) +
+                                block_size - 1) /
                         block_size)
                 {
                     left_ = 0;
@@ -1198,23 +1200,24 @@ namespace hpx::parallel {
 
                 for (std::size_t i = 0; i < counts.size(); ++i)
                 {
-                    counts[i] = detail::distance(
+                    counts[i] = hpx::parallel::detail::distance(
                         remaining_blocks[i].first, remaining_blocks[i].last);
                     count_sum += counts[i];
                 }
 
-                remaining_block_indexes[0] =
-                    detail::distance(first, remaining_blocks[0].first);
+                remaining_block_indexes[0] = hpx::parallel::detail::distance(
+                    first, remaining_blocks[0].first);
                 for (std::size_t i = 1; i < remaining_block_indexes.size(); ++i)
                 {
                     remaining_block_indexes[i] =
                         remaining_block_indexes[i - 1] + counts[i - 1] +
-                        detail::distance(remaining_blocks[i - 1].last,
+                        hpx::parallel::detail::distance(
+                            remaining_blocks[i - 1].last,
                             remaining_blocks[i].first);
                 }
 
                 std::size_t const boundary_end_index =
-                    detail::distance(first, boundary);
+                    hpx::parallel::detail::distance(first, boundary);
                 std::size_t boundary_begin_index =
                     boundary_end_index - count_sum;
 
@@ -1300,7 +1303,7 @@ namespace hpx::parallel {
                     hpx::execution::experimental::processing_units_count(
                         policy.parameters(), policy.executor(),
                         hpx::chrono::null_duration,
-                        detail::distance(first, last));
+                        hpx::parallel::detail::distance(first, last));
 
                 // TODO: Find better block size.
                 constexpr std::size_t block_size =

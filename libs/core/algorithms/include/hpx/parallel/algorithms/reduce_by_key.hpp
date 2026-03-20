@@ -277,7 +277,8 @@ namespace hpx::parallel::detail {
         auto t = zipiter.out.get_iterator_tuple();
         iKey key_end = hpx::get<0>(t);
         return util::in_out_result<iKey, iVal>{key_end,
-            std::next(val_start, detail::distance(key_start, key_end))};
+            std::next(val_start,
+                hpx::parallel::detail::distance(key_start, key_end))};
     }
 
     // async version that returns future<pair> from future<zip_iterator<blah>>
@@ -292,7 +293,8 @@ namespace hpx::parallel::detail {
                 auto t = zipiter.second.get_iterator_tuple();
                 iKey key_end = hpx::get<0>(t);
                 return result_type{key_end,
-                    std::next(val_start, detail::distance(key_start, key_end))};
+                    std::next(val_start,
+                        hpx::parallel::detail::distance(key_start, key_end))};
             });
     }
 
