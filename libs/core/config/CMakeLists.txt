@@ -28,6 +28,7 @@ set(config_macro_headers
     hpx/config/lambda_capture_this.hpp
     hpx/config/manual_profiling.hpp
     hpx/config/move.hpp
+    hpx/config/static_linker_check.hpp
     hpx/config/threads_stack.hpp
     hpx/config/warnings_prefix.hpp
     hpx/config/warnings_suffix.hpp
