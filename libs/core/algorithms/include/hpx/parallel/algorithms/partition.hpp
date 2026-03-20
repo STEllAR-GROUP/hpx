@@ -487,6 +487,7 @@ namespace hpx {
 #include <type_traits>
 #include <utility>
 #include <vector>
+#include <memory>
 
 namespace hpx::parallel {
 

@@ -23,7 +23,7 @@ namespace hpx::util::plugin {
 
         HPX_CXX_CORE_EXPORT template <typename BasePlugin, typename Concrete,
             typename Base, typename... Parameters>
-        struct HPX_PLUGIN_EXPORT_API concrete_factory_item<BasePlugin, Concrete,
+            struct concrete_factory_item<BasePlugin, Concrete,
             Base, hpx::util::pack<Parameters...>> : public Base
         {
             [[nodiscard]] BasePlugin* create(
@@ -37,7 +37,7 @@ namespace hpx::util::plugin {
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_CXX_CORE_EXPORT template <typename BasePlugin, typename Concrete>
-    struct HPX_PLUGIN_EXPORT_API concrete_factory
+    struct concrete_factory
       : detail::concrete_factory_item<BasePlugin, Concrete,
             abstract_factory<BasePlugin>, virtual_constructor_t<BasePlugin>>
     {
