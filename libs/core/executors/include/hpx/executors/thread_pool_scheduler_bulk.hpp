@@ -369,6 +369,20 @@ namespace hpx::execution::experimental::detail {
 #endif
         OperationState* op_state;
 
+#if defined(HPX_HAVE_STDEXEC)
+        template <typename E>
+        void set_error(E&& e) && noexcept
+        {
+            hpx::execution::experimental::set_error(
+                HPX_MOVE(op_state->receiver), HPX_FORWARD(E, e));
+        }
+
+        void set_stopped() && noexcept
+        {
+            hpx::execution::experimental::set_stopped(
+                HPX_MOVE(op_state->receiver));
+        }
+#else
         template <typename E>
         friend void tag_invoke(hpx::execution::experimental::set_error_t,
             bulk_receiver&& r, E&& e) noexcept
@@ -383,6 +397,7 @@ namespace hpx::execution::experimental::detail {
             hpx::execution::experimental::set_stopped(
                 HPX_MOVE(r.op_state->receiver));
         }
+#endif
 
         // Initialize a queue for a worker thread.
         void init_queue_depth_first(std::size_t const worker_thread,
@@ -500,10 +515,26 @@ namespace hpx::execution::experimental::detail {
                 return;
             }
 
-            // Calculate chunk size based on execution mode
+            // Calculate chunk size based on execution mode and sequential policy
             std::uint32_t chunk_size;
             std::uint32_t num_chunks;
-            if constexpr (OperationState::is_chunked)
+            
+            // For sequential policy: single chunk covering entire range
+            if (op_state->is_sequential)
+            {
+                if constexpr (OperationState::is_chunked)
+                {
+                    chunk_size = size;
+                    num_chunks = 1;
+                }
+                else
+                {
+                    chunk_size = 1;
+                    num_chunks = size;
+                }
+                op_state->num_worker_threads = 1;
+            }
+            else if constexpr (OperationState::is_chunked)
             {
                 chunk_size = get_bulk_scheduler_chunk_size(
                     op_state->num_worker_threads, size);
@@ -524,6 +555,13 @@ namespace hpx::execution::experimental::detail {
                 op_state->tasks_remaining.data_ = num_chunks;
                 op_state->pu_mask =
                     detail::limit_mask(op_state->pu_mask, num_chunks);
+            }
+            // limit to a single task
+            else if (op_state->is_sequential)
+            {
+                op_state->tasks_remaining.data_ = 1;
+                op_state->pu_mask =
+                    detail::limit_mask(op_state->pu_mask, 1);
             }
 
             HPX_ASSERT(hpx::threads::count(op_state->pu_mask) ==
@@ -634,6 +672,25 @@ namespace hpx::execution::experimental::detail {
             }
         }
 
+#if defined(HPX_HAVE_STDEXEC)
+        template <typename... Ts>
+            requires(
+                (OperationState::is_chunked &&
+                    std::invocable<F, range_value_type, range_value_type,
+                        std::add_lvalue_reference_t<Ts>...>) ||
+                (!OperationState::is_chunked &&
+                    std::invocable<F, range_value_type,
+                        std::add_lvalue_reference_t<Ts>...>))
+        void set_value(Ts&&... ts) && noexcept
+        {
+            hpx::detail::try_catch_exception_ptr(
+                [&]() { this->execute(HPX_FORWARD(Ts, ts)...); },
+                [&](std::exception_ptr ep) {
+                    hpx::execution::experimental::set_error(
+                        HPX_MOVE(this->op_state->receiver), HPX_MOVE(ep));
+                });
+        }
+#else
         template <typename... Ts>
             requires(std::invocable<F, range_value_type,
                 std::add_lvalue_reference_t<Ts>...>)
@@ -647,6 +704,7 @@ namespace hpx::execution::experimental::detail {
                         HPX_MOVE(r.op_state->receiver), HPX_MOVE(ep));
                 });
         }
+#endif
     };
 
     // This sender represents bulk work that will be performed using the
@@ -675,6 +733,7 @@ namespace hpx::execution::experimental::detail {
         HPX_NO_UNIQUE_ADDRESS std::decay_t<Shape> shape;
         HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
         hpx::threads::mask_type pu_mask;
+        bool is_sequential = false;
 
     public:
         template <typename Sender_, typename Shape_, typename F_>
@@ -710,6 +769,16 @@ namespace hpx::execution::experimental::detail {
         thread_pool_bulk_sender& operator=(
             thread_pool_bulk_sender const&) = default;
 
+        void set_sequential(bool seq) noexcept
+        {
+            is_sequential = seq;
+        }
+
+        bool get_sequential() const noexcept
+        {
+            return is_sequential;
+        }
+
 #if defined(HPX_HAVE_STDEXEC)
         using sender_concept = hpx::execution::experimental::sender_t;
 
@@ -728,26 +797,26 @@ namespace hpx::execution::experimental::detail {
             std::decay_t<Sender> const& pred_snd;
             thread_pool_policy_scheduler<Policy> const& sch;
 
+            constexpr auto query(
+                hpx::execution::experimental::get_completion_scheduler_t<
+                    hpx::execution::experimental::set_value_t>) const noexcept
+            {
+                return sch;
+            }
+
             template <typename CPO>
                 requires(meta::value<meta::one_of<CPO,
                              hpx::execution::experimental::set_error_t,
                              hpx::execution::experimental::set_stopped_t>> &&
                     hpx::execution::experimental::detail::
                         has_completion_scheduler_v<CPO, std::decay_t<Sender>>)
-            friend constexpr auto tag_invoke(
-                hpx::execution::experimental::get_completion_scheduler_t<CPO>
-                    tag,
-                env const& e) noexcept
-            {
-                return tag(hpx::execution::experimental::get_env(e.pred_snd));
-            }
-
-            friend constexpr auto tag_invoke(
+            constexpr auto query(
                 hpx::execution::experimental::get_completion_scheduler_t<
-                    hpx::execution::experimental::set_value_t>,
-                env const& e) noexcept
+                    CPO>) const noexcept
             {
-                return e.sch;
+                return hpx::execution::experimental::
+                    get_completion_scheduler<CPO>(
+                        hpx::execution::experimental::get_env(pred_snd));
             }
         };
 
@@ -828,6 +897,7 @@ namespace hpx::execution::experimental::detail {
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver> receiver;
             hpx::util::cache_aligned_data<std::atomic<std::size_t>>
                 tasks_remaining;
+            bool is_sequential = false;
 
             using value_types = value_types_of_t<Sender,
                 hpx::execution::experimental::empty_env, decayed_tuple,
@@ -840,7 +910,7 @@ namespace hpx::execution::experimental::detail {
                 typename F_, typename Receiver_>
             operation_state(Scheduler_&& scheduler, Sender_&& sender,
                 Shape_&& shape, F_&& f, hpx::threads::mask_type pumask,
-                Receiver_&& receiver)
+                Receiver_&& receiver, bool is_seq = false)
               : scheduler(HPX_FORWARD(Scheduler_, scheduler))
               , op_state(hpx::execution::experimental::connect(
                     HPX_FORWARD(Sender_, sender),
@@ -856,6 +926,7 @@ namespace hpx::execution::experimental::detail {
               , shape(HPX_FORWARD(Shape_, shape))
               , f(HPX_FORWARD(F_, f))
               , receiver(HPX_FORWARD(Receiver_, receiver))
+              , is_sequential(is_seq)
             {
                 tasks_remaining.data_.store(
                     num_worker_threads, std::memory_order_relaxed);
@@ -864,6 +935,16 @@ namespace hpx::execution::experimental::detail {
 
             friend void tag_invoke(start_t, operation_state& os) noexcept
             {
+#if defined(HPX_HAVE_STDEXEC)
+                // Check stop token before starting work
+                auto stop_token = stdexec::get_stop_token(
+                    stdexec::get_env(os.receiver));
+                if (stop_token.stop_requested())
+                {
+                    stdexec::set_stopped(HPX_MOVE(os.receiver));
+                    return;
+                }
+#endif
                 hpx::execution::experimental::start(os.op_state);
             }
         };
@@ -876,7 +957,7 @@ namespace hpx::execution::experimental::detail {
             return operation_state<std::decay_t<Receiver>>{
                 HPX_MOVE(s.scheduler), HPX_MOVE(s.sender), HPX_MOVE(s.shape),
                 HPX_MOVE(s.f), HPX_MOVE(s.pu_mask),
-                HPX_FORWARD(Receiver, receiver)};
+                HPX_FORWARD(Receiver, receiver), s.is_sequential};
         }
 
         template <typename Receiver>
@@ -885,7 +966,7 @@ namespace hpx::execution::experimental::detail {
         {
             return operation_state<std::decay_t<Receiver>>{s.scheduler,
                 s.sender, s.shape, s.f, s.pu_mask,
-                HPX_FORWARD(Receiver, receiver)};
+                HPX_FORWARD(Receiver, receiver), s.is_sequential};
         }
     };
 }    // namespace hpx::execution::experimental::detail
