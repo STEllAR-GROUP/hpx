@@ -114,6 +114,7 @@ jobs:
                   retention-days: 3
 
     tests-dynamic:
+        name: ${{ matrix.name }} (${{ matrix.count }} tests)
         needs: configure-core-core_local-components
         runs-on: ubuntu-latest
         container: stellargroup/build_env:17
