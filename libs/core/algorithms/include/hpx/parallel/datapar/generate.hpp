@@ -88,7 +88,7 @@ namespace hpx::parallel::detail {
         HPX_HOST_DEVICE HPX_FORCEINLINE static Iter call(
             ExPolicy&&, Iter first, Sent last, F&& f)
         {
-            std::size_t count = distance(first, last);
+            std::size_t count = hpx::parallel::detail::distance(first, last);
             return datapar_generate_helper<Iter>::call(
                 first, count, HPX_FORWARD(F, f));
         }

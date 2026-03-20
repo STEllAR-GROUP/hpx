@@ -46,14 +46,14 @@ namespace hpx { namespace parallel { namespace detail {
             }
             else
             {
-                return for_each_n<InIter>().call(
-                    HPX_FORWARD(ExPolicy, policy), first, distance(first, last),
+                    HPX_FORWARD(ExPolicy, policy), first,
+                    hpx::parallel::detail::distance(first, last),
                     [old_value, new_value, proj = HPX_FORWARD(Proj, proj)](
                         auto& v) -> void {
-                        using var_type = std::decay_t<decltype(v)>;
-                        traits::mask_assign(
-                            HPX_INVOKE(proj, v) == var_type(old_value), v,
-                            var_type(new_value));
+                            using var_type = std::decay_t<decltype(v)>;
+                            traits::mask_assign(
+                                HPX_INVOKE(proj, v) == var_type(old_value), v,
+                                var_type(new_value));
                     },
                     hpx::identity_v);
             }
@@ -106,15 +106,15 @@ namespace hpx { namespace parallel { namespace detail {
             }
             else
             {
-                return for_each_n<InIter>().call(
-                    HPX_FORWARD(ExPolicy, policy), first, distance(first, last),
+                    HPX_FORWARD(ExPolicy, policy), first,
+                    hpx::parallel::detail::distance(first, last),
                     [new_value, f = HPX_FORWARD(F, f),
                         proj = HPX_FORWARD(Proj, proj)](
                         auto& v) mutable -> void {
-                        using var_type = std::decay_t<decltype(v)>;
-                        traits::mask_assign(
-                            HPX_INVOKE(f, (HPX_INVOKE(proj, v))), v,
-                            var_type(new_value));
+                            using var_type = std::decay_t<decltype(v)>;
+                            traits::mask_assign(
+                                HPX_INVOKE(f, (HPX_INVOKE(proj, v))), v,
+                                var_type(new_value));
                     },
                     hpx::identity_v);
             }
@@ -161,7 +161,7 @@ namespace hpx { namespace parallel { namespace detail {
                 return util::detail::get_in_out_result(
                     util::loop_n_ind<ExPolicy>(
                         hpx::util::zip_iterator(first, dest),
-                        distance(first, sent),
+                        hpx::parallel::detail::distance(first, sent),
                         [old_value, new_value, proj = HPX_FORWARD(Proj, proj)](
                             auto& v) {
                             using var_type = std::decay_t<decltype(get<0>(v))>;
@@ -179,7 +179,7 @@ namespace hpx { namespace parallel { namespace detail {
                     for_each_n<zip_iterator>().call(
                         HPX_FORWARD(ExPolicy, policy),
                         hpx::util::zip_iterator(first, dest),
-                        distance(first, sent),
+                        hpx::parallel::detail::distance(first, sent),
                         [old_value, new_value, proj = HPX_FORWARD(Proj, proj)](
                             auto& v) -> void {
                             using hpx::get;
@@ -235,7 +235,7 @@ namespace hpx { namespace parallel { namespace detail {
                 return util::detail::get_in_out_result(
                     util::loop_n_ind<ExPolicy>(
                         hpx::util::zip_iterator(first, dest),
-                        distance(first, last),
+                        hpx::parallel::detail::distance(first, last),
                         [new_value, f = HPX_FORWARD(F, f),
                             proj = HPX_FORWARD(Proj, proj)](
                             auto& v) mutable -> void {
@@ -254,7 +254,7 @@ namespace hpx { namespace parallel { namespace detail {
                     for_each_n<zip_iterator>().call(
                         HPX_FORWARD(ExPolicy, policy),
                         hpx::util::zip_iterator(first, dest),
-                        distance(first, last),
+                        hpx::parallel::detail::distance(first, last),
                         [new_value, f = HPX_FORWARD(F, f),
                             proj = HPX_FORWARD(Proj, proj)](
                             auto& v) mutable -> void {
