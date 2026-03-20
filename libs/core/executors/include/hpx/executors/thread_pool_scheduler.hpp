@@ -67,32 +67,23 @@ namespace hpx::execution::experimental {
     // Concept to match bulk sender types
     template <typename Sender>
     concept bulk_chunked_or_unchunked_sender =
-        hpx::execution::experimental::stdexec_internal::sender_expr_for<Sender,
+        hpx::execution::experimental::stdexec_internal::__sender_for<Sender,
             hpx::execution::experimental::bulk_chunked_t> ||
-        hpx::execution::experimental::stdexec_internal::sender_expr_for<Sender,
+        hpx::execution::experimental::stdexec_internal::__sender_for<Sender,
             hpx::execution::experimental::bulk_unchunked_t>;
 
     // Domain customization for stdexec bulk operations
-    // Only the env-based transform_sender is provided. The early (no-env)
-    // transform falls through to default_domain, and the late transform
-    // handles both completes_on and starts_on patterns at connection time.
+    // Following the stdexec parallel_scheduler pattern (set_value_t tag-based).
     template <typename Policy>
     struct thread_pool_domain : stdexec::default_domain
     {
         // transform_sender for bulk operations
-        // (following stdexec system_context.hpp pattern env-based only)
+        // (following stdexec parallel_scheduler pattern)
         template <bulk_chunked_or_unchunked_sender Sender, typename Env>
-        auto transform_sender(Sender&& sndr, Env const& env) const noexcept
+        constexpr auto transform_sender(
+            hpx::execution::experimental::set_value_t, Sender&& sndr,
+            Env const& env) const noexcept
         {
-            static_assert(
-                hpx::execution::experimental::stdexec_internal::__completes_on<
-                    Sender, thread_pool_policy_scheduler<Policy>, Env> ||
-                    hpx::execution::experimental::stdexec_internal::__starts_on<
-                        Sender, thread_pool_policy_scheduler<Policy>, Env>,
-                "No thread_pool_policy_scheduler instance can be found in the "
-                "sender's attributes or receiver's environment "
-                "on which to schedule bulk work.");
-
             auto sched = hpx::execution::experimental::get_scheduler(env);
 
             // Extract bulk parameters using structured binding
@@ -103,9 +94,8 @@ namespace hpx::execution::experimental {
                 hpx::util::counting_shape(decltype(shape){0}, shape);
 
             constexpr bool is_chunked =
-                !hpx::execution::experimental::stdexec_internal::
-                    sender_expr_for<Sender,
-                        hpx::execution::experimental::bulk_unchunked_t>;
+                !hpx::execution::experimental::stdexec_internal::__sender_for<
+                    Sender, hpx::execution::experimental::bulk_unchunked_t>;
 
             return hpx::execution::experimental::detail::
                 thread_pool_bulk_sender<Policy, std::decay_t<decltype(child)>,
