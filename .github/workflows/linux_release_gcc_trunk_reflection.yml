@@ -11,7 +11,7 @@ on: [pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: sleepingeight/gcc-cpp-refl:latest
+    container: stellargroup/gcc_trunk_build_env:1
 
     steps:
     - uses: actions/checkout@v6
