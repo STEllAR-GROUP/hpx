@@ -1,0 +1,105 @@
+name: Slash Command Dispatch
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  pull-requests: write
+  issues: write
+  contents: read
+
+jobs:
+  ok-to-test:
+    name: "Check for /ok to test command"
+    # Only run on pull requests and if the comment contains '/ok to test'
+    if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '/ok to test') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify permissions and react
+        uses: actions/github-script@v6
+        env:
+          CIRCLE_CI_TOKEN: ${{ secrets.CIRCLECI_TOKEN }}
+        with:
+          script: |
+            // 1. Get the pull request author and the commenter
+            const pr = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+            const prAuthor = pr.data.user.login;
+            const commenter = context.actor;
+
+            // 2. Check commenter permissions first
+            let permissionLvl;
+            try {
+              const response = await github.rest.repos.getCollaboratorPermissionLevel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                username: commenter,
+              });
+              permissionLvl = response.data;
+            } catch (error) {
+              console.error("Error checking permissions:", error);
+              core.setFailed("Failed to verify permissions.");
+              return;
+            }
+
+            // 3. Allow if they are a maintainer (even on their own PR)
+            // Block only if they are NOT a maintainer
+            const level = permissionLvl.permission.toLowerCase();
+            const isMaintainer = ['admin', 'maintain', 'write'].includes(level);
+
+            if (!isMaintainer) {
+                console.log(`User ${commenter} is not a maintainer (Permission: ${level}). Rejecting.`);
+                await github.rest.reactions.createForIssueComment({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    comment_id: context.payload.comment.id,
+                    content: 'confused'
+                });
+                core.setFailed(`Insufficient permissions to run /ok to test. User has: ${level}`);
+                return;
+            }
+
+            console.log(`Permissions verified for ${commenter}. Triggering heavy tests.`);
+
+            // 4. Add +1 (thumbs up) reaction to acknowledge the command
+            await github.rest.reactions.createForIssueComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: context.payload.comment.id,
+              content: '+1',
+            });
+
+            // 5. Add 'ok-to-test' label to the PR so GitHub Actions heavy workflows can trigger
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: ['ok-to-test']
+            });
+            // 6. Trigger CircleCI pipeline via API (with run_heavy_tests=true parameter)
+            // NOTE: CIRCLE_CI_TOKEN must be a Personal API Token from CircleCI, not just a project token,
+            // in order to trigger pipelines via the v2 API.
+            const response = await fetch(`https://circleci.com/api/v2/project/gh/${context.repo.owner}/${context.repo.repo}/pipeline`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Circle-Token': process.env.CIRCLE_CI_TOKEN
+              },
+              body: JSON.stringify({
+                branch: pr.data.head.ref,
+                parameters: {
+                  run_heavy_tests: true
+                }
+              })
+            });
+
+            if (!response.ok) {
+              console.error("Failed to trigger CircleCI:", await response.text());
+              core.setFailed("Failed to trigger CircleCI pipeline.");
+            } else {
+              console.log("Successfully triggered CircleCI pipeline.");
+            }

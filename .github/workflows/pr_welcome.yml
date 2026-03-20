@@ -1,0 +1,48 @@
+name: PR Welcome
+
+on:
+  pull_request_target:
+    types: [opened]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  welcome-message:
+    name: "Post Welcome Message"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add Welcome Comment
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const prAuthor = context.payload.pull_request.user.login;
+            
+            // Check if the PR author is a repository member/collaborator
+            try {
+              const { data: permissionLvl } = await github.rest.repos.getCollaboratorPermissionLevel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                username: prAuthor,
+              });
+
+              // If they have admin, write, or maintain, they are not an external contributor.
+              // We only want to notify external contributors about the /ok to test workflow.
+              const level = permissionLvl.permission.toLowerCase();
+              const internalPermissions = ['admin', 'maintain', 'write'];
+              if (internalPermissions.includes(level)) {
+                console.log(`User ${prAuthor} is an internal contributor (Permission: ${level}). Skipping welcome message.`);
+                return;
+              }
+            } catch (error) {
+              console.log("Could not fetch permission level, assuming external contributor.", error);
+            }
+
+            const body = `Hi @${prAuthor}! Thanks for the PR.\n\nA maintainer will trigger the full tests once they've had a quick look at your changes. In the meantime, please check the results below!`;
+
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
