@@ -34,6 +34,7 @@
 
 #include <exec/ensure_started.hpp>
 #include <exec/execute.hpp>
+#include <exec/sender_for.hpp>
 #include <exec/split.hpp>
 #include <exec/start_detached.hpp>
 #include <stdexec/execution.hpp>
@@ -142,6 +143,9 @@ namespace hpx::execution::experimental {
     HPX_CXX_CORE_EXPORT using stdexec::transfer_just;
     HPX_CXX_CORE_EXPORT using stdexec::transfer_just_t;
 
+    // Sender for
+    HPX_CXX_CORE_EXPORT using exec::sender_for;
+
     // Bulk operations
     HPX_CXX_CORE_EXPORT using stdexec::bulk;
     HPX_CXX_CORE_EXPORT using stdexec::bulk_chunked;
@@ -175,9 +179,6 @@ namespace hpx::execution::experimental {
 
         HPX_CXX_CORE_EXPORT using namespace stdexec::tags;
     }
-
-    // Domain
-    HPX_CXX_CORE_EXPORT using stdexec::default_domain;
 
     // Execute (moved to exec:: namespace in newer stdexec)
     HPX_CXX_CORE_EXPORT using exec::execute;
@@ -240,10 +241,6 @@ namespace hpx::execution::experimental {
     // Then
     HPX_CXX_CORE_EXPORT using stdexec::then;
     HPX_CXX_CORE_EXPORT using stdexec::then_t;
-
-    // Transfer just
-    HPX_CXX_CORE_EXPORT using stdexec::transfer_just;
-    HPX_CXX_CORE_EXPORT using stdexec::transfer_just_t;
 
     // Completion signature manipulators
     HPX_CXX_CORE_EXPORT using stdexec::completion_signatures_of_t;

@@ -12,9 +12,6 @@
 #include <atomic>
 #include <chrono>
 #include <exception>
-#include <iostream>
-#include <iomanip>
-#include <mutex>
 #include <optional>
 #include <set>
 #include <stdexcept>
@@ -35,8 +32,8 @@ int hpx_main(int, char*[])
     // parallel_scheduler models scheduler concept
     {
         auto sched = ex::get_parallel_scheduler();
-        static_assert(
-            ex::scheduler<decltype(sched)>, "parallel_scheduler must model scheduler");
+        static_assert(ex::scheduler<decltype(sched)>,
+            "parallel_scheduler must model scheduler");
     }
 
     // parallel_scheduler is not default constructible
@@ -49,11 +46,9 @@ int hpx_main(int, char*[])
 
     // parallel_scheduler is copyable and movable
     {
-        static_assert(
-            std::is_copy_constructible_v<ex::parallel_scheduler>,
+        static_assert(std::is_copy_constructible_v<ex::parallel_scheduler>,
             "parallel_scheduler should be copy constructible");
-        static_assert(
-            std::is_move_constructible_v<ex::parallel_scheduler>,
+        static_assert(std::is_move_constructible_v<ex::parallel_scheduler>,
             "parallel_scheduler should be move constructible");
         static_assert(
             std::is_nothrow_copy_constructible_v<ex::parallel_scheduler>,
@@ -61,11 +56,9 @@ int hpx_main(int, char*[])
         static_assert(
             std::is_nothrow_move_constructible_v<ex::parallel_scheduler>,
             "move constructor should be noexcept");
-        static_assert(
-            std::is_nothrow_copy_assignable_v<ex::parallel_scheduler>,
+        static_assert(std::is_nothrow_copy_assignable_v<ex::parallel_scheduler>,
             "copy assignment should be noexcept");
-        static_assert(
-            std::is_nothrow_move_assignable_v<ex::parallel_scheduler>,
+        static_assert(std::is_nothrow_move_assignable_v<ex::parallel_scheduler>,
             "move assignment should be noexcept");
     }
 
@@ -88,15 +81,14 @@ int hpx_main(int, char*[])
         auto snd = ex::schedule(ex::get_parallel_scheduler());
         using sender_t = decltype(snd);
 
-        static_assert(ex::sender<sender_t>,
-            "schedule() result must model sender");
+        static_assert(
+            ex::sender<sender_t>, "schedule() result must model sender");
         static_assert(ex::sender_of<sender_t, ex::set_value_t()>,
             "schedule() result must be sender_of<set_value_t()>");
         static_assert(ex::sender_of<sender_t, ex::set_stopped_t()>,
             "schedule() result must be sender_of<set_stopped_t()>");
     }
-    
-    // Basic Execution Tests
+
     // Trivial schedule task (bare sync_wait, no then)
     {
         ex::parallel_scheduler sched = ex::get_parallel_scheduler();
@@ -128,9 +120,8 @@ int hpx_main(int, char*[])
     // get_completion_scheduler returns the scheduler
     {
         ex::parallel_scheduler sched = ex::get_parallel_scheduler();
-        HPX_TEST(
-            ex::get_completion_scheduler<ex::set_value_t>(
-                ex::get_env(ex::schedule(sched))) == sched);
+        HPX_TEST(ex::get_completion_scheduler<ex::set_value_t>(
+                     ex::get_env(ex::schedule(sched))) == sched);
     }
 
     // Chain task: two then calls execute on same thread
@@ -140,10 +131,10 @@ int hpx_main(int, char*[])
         std::thread::id pool_id2{};
         ex::parallel_scheduler sched = ex::get_parallel_scheduler();
 
-        auto snd =
-            ex::then(ex::schedule(sched), [&] { pool_id = std::this_thread::get_id(); });
-        auto snd2 =
-            ex::then(std::move(snd), [&] { pool_id2 = std::this_thread::get_id(); });
+        auto snd = ex::then(
+            ex::schedule(sched), [&] { pool_id = std::this_thread::get_id(); });
+        auto snd2 = ex::then(
+            std::move(snd), [&] { pool_id2 = std::this_thread::get_id(); });
 
         ex::sync_wait(std::move(snd2));
 
@@ -197,8 +188,6 @@ int hpx_main(int, char*[])
         HPX_TEST_EQ(r3, 3);
     }
 
-    // Bulk Execution Tests
-
     // Simple bulk task
     {
         std::thread::id this_id = std::this_thread::get_id();
@@ -206,20 +195,13 @@ int hpx_main(int, char*[])
         std::thread::id pool_ids[num_tasks]{};
         ex::parallel_scheduler sched = ex::get_parallel_scheduler();
 
-        std::cout << "\n=== BULK (par) with " << num_tasks << " tasks ===\n";
-        std::cout << "Main thread ID: " << this_id << "\n";
 
         auto bulk_snd = ex::bulk(
             ex::schedule(sched), ex::par, num_tasks, [&](unsigned long id) {
                 pool_ids[id] = std::this_thread::get_id();
-                std::cout << "  Task " << std::setw(2) << id << " on thread "
-                          << pool_ids[id] << "\n";
             });
 
         ex::sync_wait(std::move(bulk_snd));
-
-        std::set<std::thread::id> unique_threads(pool_ids, pool_ids + num_tasks);
-        std::cout << "Unique threads used: " << unique_threads.size() << "\n";
 
         for (auto pool_id : pool_ids)
         {
@@ -273,9 +255,8 @@ int hpx_main(int, char*[])
         ex::parallel_scheduler sched = ex::get_parallel_scheduler();
         bool caught_error = false;
 
-        auto bulk_snd = ex::bulk(
-            ex::schedule(sched), ex::par, 20,
-            [](std::size_t i) {
+        auto bulk_snd =
+            ex::bulk(ex::schedule(sched), ex::par, 20, [](std::size_t i) {
                 if (i == 10)
                     throw std::runtime_error("Bulk error");
             });
@@ -285,16 +266,14 @@ int hpx_main(int, char*[])
             ex::sync_wait(std::move(bulk_snd));
             HPX_TEST(false);
         }
-        catch (const std::runtime_error& e)
+        catch (std::runtime_error const& e)
         {
             caught_error = true;
-            HPX_TEST(std::string(e.what()).find("Bulk error") !=
-                std::string::npos);
+            HPX_TEST(
+                std::string(e.what()).find("Bulk error") != std::string::npos);
         }
         HPX_TEST(caught_error);
     }
-
-    // bulk_chunked Tests
 
     // Simple bulk_chunked task
     {
@@ -303,25 +282,13 @@ int hpx_main(int, char*[])
         std::thread::id pool_ids[num_tasks]{};
         ex::parallel_scheduler sched = ex::get_parallel_scheduler();
 
-        std::cout << "\n=== BULK_CHUNKED (par) with " << num_tasks << " tasks ===\n";
-        std::cout << "Main thread ID: " << this_id << "\n";
-        std::atomic<int> chunk_count{0};
-
-        auto bulk_snd = ex::bulk_chunked(
-            ex::schedule(sched), ex::par, num_tasks,
-            [&](unsigned long b, unsigned long e) {
-                int chunk_id = chunk_count++;
-                std::cout << "  Chunk " << chunk_id << ": [" << b << ", " << e
-                          << ") on thread " << std::this_thread::get_id() << "\n";
+        auto bulk_snd = ex::bulk_chunked(ex::schedule(sched), ex::par,
+            num_tasks, [&](unsigned long b, unsigned long e) {
                 for (unsigned long id = b; id < e; ++id)
                     pool_ids[id] = std::this_thread::get_id();
             });
 
         ex::sync_wait(std::move(bulk_snd));
-
-        std::cout << "Total chunks: " << chunk_count.load() << "\n";
-        std::set<std::thread::id> unique_threads(pool_ids, pool_ids + num_tasks);
-        std::cout << "Unique threads used: " << unique_threads.size() << "\n";
 
         for (auto pool_id : pool_ids)
         {
@@ -333,33 +300,15 @@ int hpx_main(int, char*[])
     // bulk_chunked performs chunking (with large shape)
     {
         std::atomic<bool> has_chunking{false};
-        std::atomic<int> chunk_count{0};
-        std::atomic<std::size_t> max_chunk_size{0};
         ex::parallel_scheduler sched = ex::get_parallel_scheduler();
 
-        std::cout << "\n=== BULK_CHUNKED (par) with 10000 tasks - Chunking Test ===\n";
-
-        auto bulk_snd = ex::bulk_chunked(
-            ex::schedule(sched), ex::par, 10000,
+        auto bulk_snd = ex::bulk_chunked(ex::schedule(sched), ex::par, 10000,
             [&](unsigned long b, unsigned long e) {
-                std::size_t chunk_size = e - b;
-                chunk_count++;
-                if (chunk_size > 1)
+                if ((e - b) > 1)
                     has_chunking = true;
-                std::size_t expected = max_chunk_size.load();
-                while (chunk_size > expected &&
-                       !max_chunk_size.compare_exchange_weak(expected, chunk_size))
-                    ;
-                if (chunk_count <= 5 || chunk_count % 10 == 0)
-                    std::cout << "  Chunk " << chunk_count.load() << ": [" << b
-                              << ", " << e << ") size=" << chunk_size << "\n";
             });
 
         ex::sync_wait(std::move(bulk_snd));
-        std::cout << "Total chunks: " << chunk_count.load()
-                  << " | Max chunk size: " << max_chunk_size.load()
-                  << " | Has chunking: " << (has_chunking.load() ? "yes" : "no")
-                  << "\n";
         HPX_TEST(has_chunking.load());
     }
 
@@ -390,15 +339,9 @@ int hpx_main(int, char*[])
         std::atomic<int> execution_count{0};
         ex::parallel_scheduler sched = ex::get_parallel_scheduler();
 
-        std::cout << "\n=== BULK_CHUNKED (seq) with " << num_tasks
-                  << " tasks - Single Chunk Test ===\n";
-        std::cout << "Expected: 1 chunk covering [0, " << num_tasks << ")\n";
 
-        auto bulk_snd = ex::bulk_chunked(
-            ex::schedule(sched), ex::seq, num_tasks,
-            [&](std::size_t b, std::size_t e) {
-                std::cout << "  Chunk [" << b << ", " << e << ") on thread "
-                          << std::this_thread::get_id() << "\n";
+        auto bulk_snd = ex::bulk_chunked(ex::schedule(sched), ex::seq,
+            num_tasks, [&](std::size_t b, std::size_t e) {
                 HPX_TEST_EQ(b, std::size_t(0));
                 HPX_TEST_EQ(e, num_tasks);
                 execution_count++;
@@ -406,13 +349,10 @@ int hpx_main(int, char*[])
 
         ex::sync_wait(std::move(bulk_snd));
 
-        std::cout << "Actual chunks: " << execution_count.load() << "\n";
         // Per P2079R10 reference: seq should produce exactly 1 chunk
         // with b==0, e==num_tasks.
         HPX_TEST_EQ(execution_count.load(), 1);
     }
-
-    // bulk_unchunked Tests
 
     // Simple bulk_unchunked task
     {
@@ -421,21 +361,13 @@ int hpx_main(int, char*[])
         std::thread::id pool_ids[num_tasks]{};
         ex::parallel_scheduler sched = ex::get_parallel_scheduler();
 
-        std::cout << "\n=== BULK_UNCHUNKED (par) with " << num_tasks << " tasks ===\n";
-        std::cout << "Main thread ID: " << this_id << "\n";
 
         auto bulk_snd = ex::bulk_unchunked(
-            ex::schedule(sched), ex::par, num_tasks,
-            [&](unsigned long id) {
+            ex::schedule(sched), ex::par, num_tasks, [&](unsigned long id) {
                 pool_ids[id] = std::this_thread::get_id();
-                std::cout << "  Task " << std::setw(2) << id << " on thread "
-                          << pool_ids[id] << "\n";
             });
 
         ex::sync_wait(std::move(bulk_snd));
-
-        std::set<std::thread::id> unique_threads(pool_ids, pool_ids + num_tasks);
-        std::cout << "Unique threads used: " << unique_threads.size() << "\n";
 
         for (auto pool_id : pool_ids)
         {
@@ -450,24 +382,14 @@ int hpx_main(int, char*[])
         std::thread::id pool_ids[num_tasks]{};
         ex::parallel_scheduler sched = ex::get_parallel_scheduler();
 
-        std::cout << "\n=== BULK_UNCHUNKED (seq) with " << num_tasks
-                  << " tasks - Single Thread Test ===\n";
-        std::cout << "Expected: All tasks on same thread\n";
 
         auto bulk_snd = ex::bulk_unchunked(
-            ex::schedule(sched), ex::seq, num_tasks,
-            [&](unsigned long id) {
+            ex::schedule(sched), ex::seq, num_tasks, [&](unsigned long id) {
                 pool_ids[id] = std::this_thread::get_id();
-                std::cout << "  Task " << std::setw(2) << id << " on thread "
-                          << pool_ids[id] << "\n";
-                std::this_thread::sleep_for(
-                    std::chrono::milliseconds{1});
+                std::this_thread::sleep_for(std::chrono::milliseconds{1});
             });
 
         ex::sync_wait(std::move(bulk_snd));
-
-        std::set<std::thread::id> unique_threads(pool_ids, pool_ids + num_tasks);
-        std::cout << "Unique threads used: " << unique_threads.size() << "\n";
 
         for (auto pool_id : pool_ids)
         {
@@ -494,53 +416,8 @@ int hpx_main(int, char*[])
         HPX_TEST(!called);
     }
 
-    // Test completes_on pattern (scheduler from child sender's completion scheduler)
-    {
-        std::cout << "\n=== TEST: completes_on pattern with bulk_chunked ===" << std::endl;
-        auto sched = ex::get_parallel_scheduler();
-        std::vector<int> v(10, 0);
-        
-        auto snd = ex::schedule(sched)
-            | ex::then([&v]() { return 42; })
-            | ex::bulk_chunked(ex::par, 10, [&v](std::size_t i, std::size_t, int val) {
-                v[i] = val;
-            });
-        
-        ex::sync_wait(std::move(snd));
-        
-        // All elements should be set to 42
-        for (int i = 0; i < 10; ++i) {
-            HPX_TEST_EQ(v[i], 42);
-        }
-        std::cout << "✓ completes_on pattern works correctly" << std::endl;
-    }
-
-    // Test completes_on with value chaining
-    {
-        std::cout << "\n=== TEST: completes_on with value chaining ===" << std::endl;
-        auto sched = ex::get_parallel_scheduler();
-        std::vector<int> v(10, 0);
-        
-        // schedule() -> then() creates completes_on pattern
-        // The then() sender's completion scheduler is the parallel_scheduler
-        auto snd = ex::schedule(sched)
-            | ex::then([]() { return 99; })
-            | ex::bulk_chunked(ex::par, 10, [&v](std::size_t i, std::size_t, int val) {
-                v[i] = val;
-            });
-        
-        ex::sync_wait(std::move(snd));
-        
-        // All elements should be set to 99
-        for (int i = 0; i < 10; ++i) {
-            HPX_TEST_EQ(v[i], 99);
-        }
-        std::cout << "✓ completes_on with value chaining works correctly" << std::endl;
-    }
-
     // Test set_value_t completion scheduler query
     {
-        std::cout << "\n=== TEST: set_value_t completion scheduler query ===" << std::endl;
         auto sched = ex::get_parallel_scheduler();
         auto snd = ex::schedule(sched);
         auto env = ex::get_env(snd);
@@ -548,40 +425,30 @@ int hpx_main(int, char*[])
         // Query the completion scheduler for set_value_t
         auto completion_sched = ex::get_completion_scheduler<ex::set_value_t>(env);
         HPX_TEST_EQ(completion_sched, sched);
-        std::cout << "✓ set_value_t completion scheduler query works" << std::endl;
     }
 
-    // Test that set_stopped_t is NOT exposed (should not compile if attempted)
-    // This is a compile-time check, so we just document the expected behavior
+    // Test that set_stopped_t IS now exposed (per project decision / Isidoros)
     {
-        std::cout << "\n=== TEST: set_stopped_t NOT exposed in completion scheduler ===" << std::endl;
         auto sched = ex::get_parallel_scheduler();
         auto snd = ex::schedule(sched);
         auto env = ex::get_env(snd);
-        
-        // The following would NOT compile if attempted:
-        // auto stopped_sched = ex::get_completion_scheduler<ex::set_stopped_t>(env);
-        // This is correct per P2079R10: only set_value_t is exposed.
-        std::cout << "✓ set_stopped_t correctly NOT exposed (compile-time verified)" << std::endl;
+
+        auto stopped_sched = ex::get_completion_scheduler<ex::set_stopped_t>(env);
+        HPX_TEST_EQ(stopped_sched, sched);
     }
 
     // Test receiver double-move safety: if execute() throws, receiver is still valid
     {
-        std::cout << "\n=== TEST: receiver double-move safety ===" << std::endl;
         auto sched = ex::get_parallel_scheduler();
-        bool error_called = false;
-        
         auto snd = ex::schedule(sched)
             | ex::then([]() { return 42; });
         
         // This should complete successfully without double-move issues
         ex::sync_wait(std::move(snd));
-        std::cout << "✓ receiver double-move safety verified" << std::endl;
     }
 
     // Test bulk_unchunked with completes_on pattern
     {
-        std::cout << "\n=== TEST: bulk_unchunked with completes_on pattern ===" << std::endl;
         auto sched = ex::get_parallel_scheduler();
         std::vector<int> v(10, 0);
         
@@ -597,12 +464,10 @@ int hpx_main(int, char*[])
         for (int i = 0; i < 10; ++i) {
             HPX_TEST_EQ(v[i], 77);
         }
-        std::cout << "✓ bulk_unchunked with completes_on pattern works" << std::endl;
     }
 
     // Test bulk_unchunked with multiple value arguments
     {
-        std::cout << "\n=== TEST: bulk_unchunked with multiple values ===" << std::endl;
         auto sched = ex::get_parallel_scheduler();
         std::vector<int> v(10, 0);
         
@@ -618,12 +483,10 @@ int hpx_main(int, char*[])
         for (int i = 0; i < 10; ++i) {
             HPX_TEST_EQ(v[i], 88);
         }
-        std::cout << "✓ bulk_unchunked with multiple values works" << std::endl;
     }
 
     // Test sequential bulk with completes_on
     {
-        std::cout << "\n=== TEST: sequential bulk with completes_on ===" << std::endl;
         auto sched = ex::get_parallel_scheduler();
         std::vector<int> v(5, 0);
         std::set<std::thread::id> thread_ids;
@@ -645,7 +508,6 @@ int hpx_main(int, char*[])
         }
         // Sequential execution should use only 1 thread
         HPX_TEST_EQ(thread_ids.size(), std::size_t(1));
-        std::cout << "✓ sequential bulk with completes_on works (1 thread)" << std::endl;
     }
 #endif
 

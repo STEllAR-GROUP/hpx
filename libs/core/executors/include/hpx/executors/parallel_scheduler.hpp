@@ -47,73 +47,64 @@ namespace hpx::execution::experimental {
     // thread_pool_bulk_sender.
     struct parallel_scheduler_domain : stdexec::default_domain
     {
-        template <typename OpTag, bulk_chunked_or_unchunked_sender Sender,
-            typename Env>
-        auto transform_sender(OpTag, Sender&& sndr, Env const& env) const
-            noexcept
+        template <bulk_chunked_or_unchunked_sender Sender, typename Env>
+        auto transform_sender(hpx::execution::experimental::set_value_t,
+            Sender&& sndr, Env const& env) const noexcept
         {
-            static_assert(
-                hpx::execution::experimental::stdexec_internal::
-                    __completes_on<Sender, parallel_scheduler, Env> ||
-                    hpx::execution::experimental::stdexec_internal::
-                        __starts_on<Sender, parallel_scheduler, Env>,
-                "No parallel_scheduler instance can be found in the "
-                "sender's attributes or receiver's environment "
-                "on which to schedule bulk work.");
+            if constexpr (hpx::execution::experimental::stdexec_internal::
+                              __completes_on<Sender, parallel_scheduler, Env>)
+            {
+                // Extract bulk parameters using structured binding
+                auto&& [tag, data, child] = sndr;
+                auto&& [pol, shape, f] = data;
 
-            // Extract bulk parameters using structured binding
-            auto&& [tag, data, child] = sndr;
-            auto&& [pol, shape, f] = data;
+                // Get the parallel_scheduler from the child sender's
+                // completion scheduler (completes_on pattern)
+                auto par_sched =
+                    hpx::execution::experimental::get_completion_scheduler<
+                        hpx::execution::experimental::set_value_t>(
+                        hpx::execution::experimental::get_env(child));
 
-            // Get the parallel_scheduler based on the matching pattern:
-            //   completes_on: from the child sender's completion scheduler
-            //   starts_on:    from the receiver's environment
-            auto par_sched = [&]() {
-                if constexpr (
-                    hpx::execution::experimental::stdexec_internal::
-                        __completes_on<Sender, parallel_scheduler, Env>)
-                {
-                    return hpx::execution::experimental::
-                        get_completion_scheduler<
-                            hpx::execution::experimental::set_value_t>(
-                            hpx::execution::experimental::get_env(child));
-                }
-                else
-                {
-                    return hpx::execution::experimental::get_scheduler(
-                        env);
-                }
-            }();
+                // Extract the underlying thread pool scheduler
+                auto underlying = par_sched.get_underlying_scheduler();
 
-            // Extract the underlying thread pool scheduler
-            auto underlying = par_sched.get_underlying_scheduler();
+                auto iota_shape =
+                    hpx::util::counting_shape(decltype(shape){0}, shape);
 
-            auto iota_shape =
-                hpx::util::counting_shape(decltype(shape){0}, shape);
+                constexpr bool is_chunked = !stdexec::__sender_for<Sender,
+                    hpx::execution::experimental::bulk_unchunked_t>;
 
-            constexpr bool is_chunked =
-                !hpx::execution::experimental::stdexec_internal::
-                    sender_expr_for<Sender,
-                        hpx::execution::experimental::bulk_unchunked_t>;
+                // Determine parallelism at compile time from policy type
+                // (pol is a __policy_wrapper, use __get() to unwrap)
+                constexpr bool is_parallel =
+                    !is_sequenced_policy_v<std::decay_t<decltype(pol.__get())>>;
 
-            // Check if policy is sequential (pol is a __policy_wrapper,
-            // use __get() to unwrap the actual policy type)
-            bool is_seq =
-                is_sequenced_policy_v<std::decay_t<decltype(pol.__get())>>;
-
-            auto bulk_snd = hpx::execution::experimental::detail::
-                thread_pool_bulk_sender<hpx::launch,
-                    std::decay_t<decltype(child)>,
-                    std::decay_t<decltype(iota_shape)>,
-                    std::decay_t<decltype(f)>, is_chunked>{
+                // Pass the pre-cached PU mask so thread_pool_bulk_sender
+                // skips its own full_mask() computation on every invocation.
+                hpx::threads::mask_type pu_mask = par_sched.get_pu_mask();
+                return hpx::execution::experimental::detail::
+                    thread_pool_bulk_sender<hpx::launch,
+                        std::decay_t<decltype(child)>,
+                        std::decay_t<decltype(iota_shape)>,
+                        std::decay_t<decltype(f)>, is_chunked, is_parallel>{
                         HPX_MOVE(underlying),
                         HPX_FORWARD(decltype(child), child),
-                        HPX_MOVE(iota_shape),
-                        HPX_FORWARD(decltype(f), f)};
-
-            // Store the policy for sequential execution handling
-            bulk_snd.set_sequential(is_seq);
-            return bulk_snd;
+                        HPX_MOVE(iota_shape), HPX_FORWARD(decltype(f), f),
+                        HPX_MOVE(pu_mask)};
+            }
+            else
+            {
+                // P2079R10: bulk operations require the parallel_scheduler
+                // in the environment. Add a continues_on transition to the
+                // parallel_scheduler before the bulk algorithm.
+                static_assert(
+                    hpx::execution::experimental::stdexec_internal::
+                        __completes_on<Sender, parallel_scheduler, Env>,
+                    "Cannot dispatch bulk algorithm to the parallel_scheduler: "
+                    "no parallel_scheduler found in the environment. "
+                    "Add a continues_on transition to the parallel_scheduler "
+                    "before the bulk algorithm.");
+            }
         }
     };
 #endif
@@ -124,33 +115,50 @@ namespace hpx::execution::experimental {
     public:
         parallel_scheduler() = delete;
 
+        // Compute and cache the PU mask once at construction time so that
+        // parallel_scheduler_domain::transform_sender can pass it directly to
+        // thread_pool_bulk_sender, avoiding the expensive full_mask() call
+        // (which iterates all PUs) on every bulk_chunked invocation.
         explicit parallel_scheduler(
-            thread_pool_policy_scheduler<hpx::launch> sched) noexcept
+            thread_pool_policy_scheduler<hpx::launch> sched)
           : scheduler_(sched)
+          , pu_mask_(hpx::execution::experimental::detail::full_mask(
+                hpx::execution::experimental::get_first_core(scheduler_),
+                hpx::execution::experimental::processing_units_count(
+                    hpx::execution::experimental::null_parameters, scheduler_,
+                    hpx::chrono::null_duration, 0)))
         {
         }
 
         parallel_scheduler(parallel_scheduler const& other) noexcept
           : scheduler_(other.scheduler_)
+          , pu_mask_(other.pu_mask_)
         {
         }
 
         parallel_scheduler(parallel_scheduler&& other) noexcept
           : scheduler_(HPX_MOVE(other.scheduler_))
+          , pu_mask_(HPX_MOVE(other.pu_mask_))
         {
         }
 
         parallel_scheduler& operator=(parallel_scheduler const& other) noexcept
         {
             if (this != &other)
+            {
                 scheduler_ = other.scheduler_;
+                pu_mask_ = other.pu_mask_;
+            }
             return *this;
         }
 
         parallel_scheduler& operator=(parallel_scheduler&& other) noexcept
         {
             if (this != &other)
+            {
                 scheduler_ = HPX_MOVE(other.scheduler_);
+                pu_mask_ = HPX_MOVE(other.pu_mask_);
+            }
             return *this;
         }
 
@@ -178,8 +186,7 @@ namespace hpx::execution::experimental {
             thread_pool_policy_scheduler<hpx::launch> scheduler_;
 
             template <typename Receiver_>
-            operation_state(
-                Receiver_&& receiver,
+            operation_state(Receiver_&& receiver,
                 thread_pool_policy_scheduler<hpx::launch> const& sched)
               : receiver_(HPX_FORWARD(Receiver_, receiver))
               , scheduler_(sched)
@@ -195,10 +202,10 @@ namespace hpx::execution::experimental {
                 stdexec::start_t, operation_state& os) noexcept
             {
 #if defined(HPX_HAVE_STDEXEC)
-                // P2079R10 ยง4.1: if stop_token is stopped, complete
+                // P2079R10 4.1: if stop_token is stopped, complete
                 // with set_stopped as soon as is practical.
-                auto stop_token = stdexec::get_stop_token(
-                    stdexec::get_env(os.receiver_));
+                auto stop_token =
+                    stdexec::get_stop_token(stdexec::get_env(os.receiver_));
                 if (stop_token.stop_requested())
                 {
                     stdexec::set_stopped(HPX_MOVE(os.receiver_));
@@ -231,16 +238,17 @@ namespace hpx::execution::experimental {
             Scheduler sched_;
 
             using sender_concept = stdexec::sender_t;
-            using completion_signatures = stdexec::completion_signatures<
-                stdexec::set_value_t(),
-                stdexec::set_error_t(std::exception_ptr),
-                stdexec::set_stopped_t()>;
+            using completion_signatures =
+                stdexec::completion_signatures<stdexec::set_value_t(),
+                    stdexec::set_error_t(std::exception_ptr),
+                    stdexec::set_stopped_t()>;
 
             template <typename Receiver>
             friend operation_state<std::decay_t<Receiver>> tag_invoke(
-                stdexec::connect_t, sender const& s, Receiver&& receiver)
-                noexcept(std::is_nothrow_constructible_v<
-                    std::decay_t<Receiver>, Receiver>)
+                stdexec::connect_t, sender const& s,
+                Receiver&& receiver) noexcept(std::
+                    is_nothrow_constructible_v<std::decay_t<Receiver>,
+                        Receiver>)
             {
                 return {HPX_FORWARD(Receiver, receiver),
                     s.sched_.get_underlying_scheduler()};
@@ -248,9 +256,10 @@ namespace hpx::execution::experimental {
 
             template <typename Receiver>
             friend operation_state<std::decay_t<Receiver>> tag_invoke(
-                stdexec::connect_t, sender&& s, Receiver&& receiver)
-                noexcept(std::is_nothrow_constructible_v<
-                    std::decay_t<Receiver>, Receiver>)
+                stdexec::connect_t, sender&& s,
+                Receiver&& receiver) noexcept(std::
+                    is_nothrow_constructible_v<std::decay_t<Receiver>,
+                        Receiver>)
             {
                 return {HPX_FORWARD(Receiver, receiver),
                     s.sched_.get_underlying_scheduler()};
@@ -260,12 +269,18 @@ namespace hpx::execution::experimental {
             {
                 Scheduler const& sched_;
 
-                // P2079R10: only expose completion scheduler for set_value_t.
-                // set_stopped may fire on the calling thread (not the pool),
-                // so claiming parallel_scheduler as the completion scheduler
-                // for set_stopped_t would be technically inaccurate.
-                auto query(stdexec::get_completion_scheduler_t<
-                    stdexec::set_value_t>) const noexcept
+                // P2079R10: expose completion scheduler for set_value_t
+                // and set_stopped_t
+                auto query(
+                    stdexec::get_completion_scheduler_t<stdexec::set_value_t>)
+                    const noexcept
+                {
+                    return sched_;
+                }
+
+                auto query(
+                    stdexec::get_completion_scheduler_t<stdexec::set_stopped_t>)
+                    const noexcept
                 {
                     return sched_;
                 }
@@ -280,14 +295,13 @@ namespace hpx::execution::experimental {
 #endif
             };
 
-            friend env tag_invoke(
-                stdexec::get_env_t, sender const& s) noexcept
+            friend env tag_invoke(stdexec::get_env_t, sender const& s) noexcept
             {
                 return {s.sched_};
             }
         };
 
-        // Direct schedule() member for modern stdexec (non-deprecated path)
+        // Direct schedule() member for modern stdexec
         sender<parallel_scheduler> schedule() const noexcept
         {
             return {*this};
@@ -300,11 +314,14 @@ namespace hpx::execution::experimental {
             return {};
         }
 
-        // Completion domain query: stdexec resolves domains for sender
-        // algorithms via get_completion_domain_t, not get_domain_t.
+        // Required for stdexec domain resolution: when a bulk sender's
+        // completing domain is resolved, stdexec queries the completion
+        // scheduler with get_completion_domain_t<set_value_t>. Without
+        // this, the resolution falls to default_domain and our
+        // parallel_scheduler_domain::transform_sender is never called.
         parallel_scheduler_domain query(
-            stdexec::get_completion_domain_t<stdexec::set_value_t>) const
-            noexcept
+            stdexec::get_completion_domain_t<stdexec::set_value_t>)
+            const noexcept
         {
             return {};
         }
@@ -316,12 +333,19 @@ namespace hpx::execution::experimental {
             return scheduler_;
         }
 
+        hpx::threads::mask_type const& get_pu_mask() const noexcept
+        {
+            return pu_mask_;
+        }
+
     private:
         thread_pool_policy_scheduler<hpx::launch> scheduler_;
+        // Cached PU mask — computed once, reused for every bulk_chunked call.
+        hpx::threads::mask_type pu_mask_;
     };
 
     // Stream output operator for parallel_scheduler
-    inline std::ostream& operator<<(std::ostream& os, const parallel_scheduler&)
+    inline std::ostream& operator<<(std::ostream& os, parallel_scheduler const&)
     {
         return os << "parallel_scheduler";
     }
