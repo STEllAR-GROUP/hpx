@@ -22,6 +22,7 @@
 #include <string>
 #include <string_view>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 namespace hpx::serialization::detail {
@@ -103,15 +104,25 @@ namespace hpx::serialization::detail {
                     std::pair{^^std::nullptr_t, "std::nullptr_t"},
                 };
 
-            for (auto const& [type_info, name] : lookup_table)
-            {
-                if (dealias(type_info) ==
-                    dealias(^^base_type_t<typename[:Scope:]>))
+            constexpr auto result = []() {
+                struct search_result
                 {
-                    return name;
+                    bool found = false;
+                    std::string_view name = "<unknown>";
+                };
+                for (auto const& [type_info, name] : lookup_table)
+                {
+                    if (dealias(type_info) ==
+                        dealias(^^base_type_t<typename[:Scope:]>))
+                    {
+                        return search_result{true, name};
+                    }
                 }
-            }
-            return std::string_view{};
+                return search_result{false, "<unknown>"};
+            }();
+
+            static_assert(result.found, "Unknown fundamental type");
+            return result.name;
         }
 
         static consteval auto get_value() noexcept
@@ -125,56 +136,52 @@ namespace hpx::serialization::detail {
                 if constexpr (std::meta::is_type(Scope) &&
                     std::is_fundamental_v<base_type_t<typename[:Scope:]>>)
                 {
-                    using raw_type = typename[:Scope:];
-                    using base_type = std::remove_pointer_t<
-                        std::remove_reference_t<std::remove_cv_t<raw_type>>>;
-
-                    constexpr auto ftype_sv = fundamental_type_name();
-                    constexpr auto ftype_name =
-                        fixed_string<ftype_sv.size()>(ftype_sv);
-                    constexpr auto base = [ftype_name] {
-                        if constexpr (std::is_const_v<base_type> &&
-                            std::is_volatile_v<base_type>)
-                            return fixed_string("const volatile ") + ftype_name;
-                        else if constexpr (std::is_const_v<base_type>)
-                            return fixed_string("const ") + ftype_name;
-                        else if constexpr (std::is_volatile_v<base_type>)
-                            return fixed_string("volatile ") + ftype_name;
-                        else
-                            return ftype_name;
-                    }();
-
-                    if constexpr (std::is_pointer_v<raw_type>)
+                    // Reconstructs the qualified name of a fundamental type by
+                    // recursively handling pointers and references, and finally
+                    // fetching the base name for the core fundamental type.
+                    // Ex: const volatile int *const&
+                    using T = typename[:Scope:];
+                    if constexpr (std::is_lvalue_reference_v<T>)
                     {
-                        if constexpr (std::is_const_v<raw_type> &&
-                            std::is_volatile_v<raw_type>)
-                        {
+                        return scope_builder<dealias(
+                                   ^^std::remove_reference_t<T>)>::value +
+                            fixed_string("&");
+                    }
+                    else if constexpr (std::is_rvalue_reference_v<T>)
+                    {
+                        return scope_builder<dealias(
+                                   ^^std::remove_reference_t<T>)>::value +
+                            fixed_string("&&");
+                    }
+                    else if constexpr (std::is_pointer_v<T>)
+                    {
+                        constexpr auto base = scope_builder<dealias(
+                            ^^std::remove_pointer_t<T>)>::value;
+                        if constexpr (std::is_const_v<T> &&
+                            std::is_volatile_v<T>)
                             return base + fixed_string("* const volatile");
-                        }
-                        else if constexpr (std::is_const_v<raw_type>)
-                        {
+                        else if constexpr (std::is_const_v<T>)
                             return base + fixed_string("* const");
-                        }
-                        else if constexpr (std::is_volatile_v<raw_type>)
-                        {
+                        else if constexpr (std::is_volatile_v<T>)
                             return base + fixed_string("* volatile");
-                        }
                         else
-                        {
                             return base + fixed_string("*");
-                        }
-                    }
-                    else if constexpr (std::is_lvalue_reference_v<raw_type>)
-                    {
-                        return base + fixed_string("&");
-                    }
-                    else if constexpr (std::is_rvalue_reference_v<raw_type>)
-                    {
-                        return base + fixed_string("&&");
                     }
                     else
                     {
-                        return base;
+                        constexpr auto ftype_sv = fundamental_type_name();
+                        constexpr auto ftype_name =
+                            fixed_string<ftype_sv.size()>(ftype_sv);
+
+                        if constexpr (std::is_const_v<T> &&
+                            std::is_volatile_v<T>)
+                            return fixed_string("const volatile ") + ftype_name;
+                        else if constexpr (std::is_const_v<T>)
+                            return fixed_string("const ") + ftype_name;
+                        else if constexpr (std::is_volatile_v<T>)
+                            return fixed_string("volatile ") + ftype_name;
+                        else
+                            return ftype_name;
                     }
                 }
                 else
