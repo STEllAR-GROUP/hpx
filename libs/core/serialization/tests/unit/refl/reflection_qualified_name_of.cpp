@@ -51,10 +51,12 @@ int main()
 
     // Deep Namespace + High Arity
     {
-        using type = a::b::c::d::pentagon<int, char, double, float, long>;
+        using type =
+            a::b::c::d::pentagon<int, char, double, float, unsigned int>;
         char const* name = qualified_name_of<type>::get();
         HPX_TEST_EQ(std::string(name),
-            std::string("a::b::c::d::pentagon<int,char,double,float,long>"));
+            std::string(
+                "a::b::c::d::pentagon<int,char,double,float,unsigned int>"));
     }
 
     // Deeply Nested Custom Types as Template Args
