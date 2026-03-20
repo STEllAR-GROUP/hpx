@@ -59,8 +59,7 @@ namespace hpx::compute::detail {
         }
 
         template <typename U,
-            typename Enable =
-                std::enable_if_t<std::is_same_v<T, U const>>>
+            typename Enable = std::enable_if_t<std::is_same_v<T, U const>>>
         HPX_HOST_DEVICE iterator(iterator<U, Allocator> const& other) noexcept
           : base_type(other.base())
           , target_(other.target())

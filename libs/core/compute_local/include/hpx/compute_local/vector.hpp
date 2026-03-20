@@ -137,8 +137,8 @@ namespace hpx::compute {
             other.capacity_ = 0;
         }
 
-        vector(std::initializer_list<T> init,
-            Allocator const& alloc = Allocator())
+        vector(
+            std::initializer_list<T> init, Allocator const& alloc = Allocator())
           : size_(init.size())
           , capacity_(init.size())
           , alloc_(alloc)
@@ -236,7 +236,8 @@ namespace hpx::compute {
         void assign(InIter first, InIter last)
         {
             clear();
-            size_type count = static_cast<size_type>(std::distance(first, last));
+            size_type count =
+                static_cast<size_type>(std::distance(first, last));
             if (capacity_ < count)
             {
                 alloc_traits::deallocate(alloc_, data_, capacity_);
