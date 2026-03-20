@@ -48,7 +48,6 @@ void static_checks()
         "hpx::is_parallel_execution_policy<std::execution::parallel_"
         "unsequenced_policy>::value");
 
-#if defined(HPX_HAVE_CXX20_STD_EXECUTION_POLICES)
     static_assert(
         hpx::is_execution_policy<std::execution::unsequenced_policy>::value,
         "hpx::is_execution_policy<std::execution::unsequenced_policy>::value");
@@ -60,7 +59,6 @@ void static_checks()
                       std::execution::unsequenced_policy>::value,
         "!hpx::is_parallel_execution_policy<std::execution::unsequenced_policy>"
         "::value");
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
