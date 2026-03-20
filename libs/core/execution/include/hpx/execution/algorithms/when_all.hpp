@@ -563,11 +563,9 @@ namespace hpx::execution::experimental {
       : hpx::functional::detail::tag_fallback<transfer_when_all_t>
     {
     private:
-        // clang-format off
         template <typename Sched, typename... Senders>
-        requires (is_scheduler_v<Sched> &&
+            requires(is_scheduler_v<Sched> &&
                 hpx::util::all_of_v<is_sender<Senders>...>)
-        // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             transfer_when_all_t, Sched&& sched, Senders&&... senders)
         {
