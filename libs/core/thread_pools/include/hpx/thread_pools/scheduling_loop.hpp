@@ -22,9 +22,6 @@
     !defined(HPX_HAVE_APEX)
 #include <hpx/modules/itt_notify.hpp>
 #endif
-#if defined(HPX_HAVE_MODULE_TRACY)
-#include <hpx/modules/tracy.hpp>
-#endif
 
 #include <atomic>
 #include <cstddef>
@@ -232,25 +229,8 @@ namespace hpx::threads::detail {
                                 task.add_metadata(
                                     task_phase, thrdptr->get_thread_phase());
 #endif
-                                char const* name = nullptr;
-                                bool enable_tracy = false;
-                                std::size_t phase = 0;
+                                hpx::tracing::region rctx(thrdptr);
 
-#if defined(HPX_HAVE_MODULE_TRACY)
-                                name = thrdptr->get_description()
-                                           .get_description();
-                                enable_tracy =
-                                    name != nullptr && !thrdptr->is_stackless();
-                                phase = thrdptr->get_thread_phase();
-#endif
-
-                                hpx::tracing::region rctx(
-                                    name, num_thread, phase, enable_tracy);
-
-#if defined(HPX_HAVE_MODULE_TRACY)
-                                char const* fiber_name = enable_tracy ?
-                                    thrdptr->get_tracy_fiber_name() :
-                                    nullptr;
                                 // Dual-view Tracy instrumentation:
                                 //
                                 // rctx declared FIRST -> constructed first ->
@@ -267,9 +247,7 @@ namespace hpx::threads::detail {
                                 //   ~fctx first -> TracyFiberLeave
                                 //   ~rctx last  -> ZoneEnd
                                 // Zone outlives the fiber context - correct.
-                                tracy::fiber_region fctx(
-                                    fiber_name, name, num_thread, enable_tracy);
-#endif
+                                hpx::tracing::fiber_region fctx(thrdptr);
 
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
                                 // Record time elapsed in thread changing state
