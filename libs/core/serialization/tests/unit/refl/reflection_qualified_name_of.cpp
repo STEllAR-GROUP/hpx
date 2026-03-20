@@ -18,7 +18,8 @@ namespace empty_space {
 }    // namespace empty_space
 
 namespace a::b::c::d {
-    template <typename T1, typename T2, typename T3, typename T4, typename T5>
+    template <typename T1, typename T2, typename T3, typename T4, typename T5,
+        typename T6, typename T7, typename T8>
     struct pentagon
     {
     };
@@ -37,6 +38,19 @@ namespace local {
     };
 }    // namespace local
 
+namespace crtp {
+    template <typename Derived, typename Value>
+    struct base
+    {
+        using value_type = Value;
+    };
+
+    template <typename T>
+    struct derived : base<derived<T>, T>
+    {
+    };
+}    // namespace crtp
+
 int main()
 {
     using hpx::serialization::detail::qualified_name_of;
@@ -51,10 +65,13 @@ int main()
 
     // Deep Namespace + High Arity
     {
-        using type = a::b::c::d::pentagon<int, char, double, float, long>;
+        using type = a::b::c::d::pentagon<int, char, double, float, long,
+            signed char const volatile* const, int&&, double&>;
         char const* name = qualified_name_of<type>::get();
         HPX_TEST_EQ(std::string(name),
-            std::string("a::b::c::d::pentagon<int,char,double,float,long>"));
+            std::string(
+                "a::b::c::d::pentagon<int,char,double,float,long int,const "
+                "volatile signed char* const,int&&,double&>"));
     }
 
     // Deeply Nested Custom Types as Template Args
@@ -73,6 +90,21 @@ int main()
             "world::continent::country::city<local::person>>";
 
         HPX_TEST_EQ(std::string(name), expected);
+    }
+
+    // CRTP types
+    {
+        using base_type =
+            crtp::base<crtp::derived<signed short int const volatile* const&&>,
+                long long const volatile* const>;
+        char const* base_name = qualified_name_of<base_type>::get();
+        HPX_TEST_EQ(std::string(base_name),
+            "crtp::base<crtp::derived<const volatile short int* const&&>,const "
+            "volatile long long int* const>");
+
+        using derived_type = crtp::derived<wchar_t&>;
+        char const* derived_name = qualified_name_of<derived_type>::get();
+        HPX_TEST_EQ(std::string(derived_name), "crtp::derived<wchar_t&>");
     }
 
     return hpx::util::report_errors();
