@@ -714,7 +714,7 @@ namespace hpx::parallel {
         // sequential partition with projection function for bidirectional iterator.
         HPX_CXX_CORE_EXPORT template <typename BidirIter, typename Pred,
             typename Proj>
-            requires (std::bidirectional_iterator<BidirIter>)
+            requires(std::bidirectional_iterator<BidirIter>)
         constexpr BidirIter sequential_partition(
             BidirIter first, BidirIter last, Pred&& pred, Proj&& proj)
         {
