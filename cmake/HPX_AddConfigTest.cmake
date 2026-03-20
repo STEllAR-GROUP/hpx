@@ -533,7 +533,6 @@ function(hpx_check_for_cxx20_std_endian)
     FILE ${ARGN}
   )
 endfunction()
-endfunction()
 
 # ##############################################################################
 function(hpx_check_for_cxx20_std_ranges_iter_swap)
