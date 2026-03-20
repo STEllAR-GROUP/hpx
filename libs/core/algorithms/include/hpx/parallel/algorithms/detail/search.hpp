@@ -352,7 +352,7 @@ namespace hpx::parallel::detail {
                     tok, HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
             };
 
-            auto f2 = [first, last, n, max_start, tok](
+            auto f2 = [first, last, max_start, tok](
                           auto&&... data) mutable -> FwdIter {
                 util::detail::clear_container(data...);
 
