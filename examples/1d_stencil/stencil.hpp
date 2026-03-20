@@ -13,6 +13,7 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/util.hpp>
 #include <hpx/modules/compute_local.hpp>
+#include <hpx/compute_local/vector.hpp>
 
 #include <algorithm>
 #include <array>
