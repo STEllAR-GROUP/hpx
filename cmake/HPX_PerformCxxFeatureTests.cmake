@@ -93,9 +93,6 @@ function(hpx_perform_cxx_feature_tests)
     hpx_check_for_cxx20_experimental_simd(
       DEFINITIONS HPX_HAVE_CXX20_EXPERIMENTAL_SIMD
     )
-
-    hpx_check_for_cxx20_lambda_capture(
-      DEFINITIONS HPX_HAVE_CXX20_LAMBDA_CAPTURE
     )
 
     if(HPX_WITH_SUPPORT_NO_UNIQUE_ADDRESS_ATTRIBUTE AND NOT MSVC) # see above

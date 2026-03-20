@@ -488,14 +488,6 @@ function(hpx_check_for_cxx20_coroutines)
     FILE ${ARGN}
   )
 endfunction()
-
-# ##############################################################################
-function(hpx_check_for_cxx20_lambda_capture)
-  add_hpx_config_test(
-    HPX_WITH_CXX20_LAMBDA_CAPTURE
-    SOURCE cmake/tests/cxx20_lambda_capture.cpp
-    FILE ${ARGN}
-  )
 endfunction()
 
 # ##############################################################################
