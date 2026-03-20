@@ -543,7 +543,6 @@ function(hpx_check_for_cxx20_std_execution_policies)
   )
 endfunction()
 
-
 # ##############################################################################
 function(hpx_check_for_cxx20_std_construct_at)
   add_hpx_config_test(
