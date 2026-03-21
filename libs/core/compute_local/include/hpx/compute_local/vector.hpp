@@ -19,7 +19,6 @@
 #include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
-#include <exception>
 #include <initializer_list>
 #include <iterator>
 #include <memory>

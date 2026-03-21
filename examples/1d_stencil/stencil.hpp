@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/algorithm.hpp>
-#include <hpx/compute.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/lcos.hpp>
