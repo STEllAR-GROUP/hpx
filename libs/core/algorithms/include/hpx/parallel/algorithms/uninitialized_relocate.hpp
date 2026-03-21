@@ -482,12 +482,19 @@ namespace hpx::parallel {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        // parallel_uninitialized_relocate_n_overlapping
+        // parallel_uninitialized_relocate_n_overlap
+        //
+        // Decomposes [first, first+n) into d independent chains, where d is
+        // the overlap distance (distance from first to dest). Chain c covers
+        // elements at positions c, c+d, c+2d, .... Elements within a chain
+        // are relocated in order (front-to-back) to avoid overwriting a
+        // source before it has been relocated. Chains are independent of each
+        // other and are distributed across threads by the partitioner.
         HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename InIter,
             typename FwdIter>
             requires(hpx::traits::is_contiguous_iterator_v<InIter> &&
                 hpx::traits::is_contiguous_iterator_v<FwdIter>)
-        decltype(auto) parallel_uninitialized_relocate_n_overlapping(
+        decltype(auto) parallel_uninitialized_relocate_n_overlap(
             ExPolicy&& policy, InIter first, std::size_t n, FwdIter dest,
             std::size_t d)
         {
@@ -516,93 +523,103 @@ namespace hpx::parallel {
                 }
             }
 
-            return util::partitioner_with_cleanup<ExPolicy,
-                util::in_out_result<InIter, FwdIter>, chain_group_result>::
-                call(
-                    HPX_FORWARD(ExPolicy, policy), counting_iter(0), d,
-                    [first_ptr, dest_ptr, n, d](counting_iter it,
-                        std::size_t num_chains) mutable -> chain_group_result {
-                        std::size_t chain_start = *it;
-                        std::size_t chains_done = 0;
+            // Relocates assigned chains sequentially; handles cleanup on throw.
+            auto processor =
+                [first_ptr, dest_ptr, n, d](counting_iter it,
+                    std::size_t num_chains) mutable -> chain_group_result {
+                std::size_t chain_start = *it;
+                std::size_t chains_done = 0;
 
-                        for (std::size_t ci = 0; ci < num_chains; ++ci)
+                for (std::size_t ci = 0; ci < num_chains; ++ci)
+                {
+                    std::size_t c = chain_start + ci;
+                    std::size_t partial = 0;
+
+                    try
+                    {
+                        for (std::size_t j = c; j < n; j += d, ++partial)
                         {
-                            std::size_t c = chain_start + ci;
-                            std::size_t partial = 0;
-
-                            try
-                            {
-                                for (std::size_t j = c; j < n;
-                                    j += d, ++partial)
-                                {
-                                    hpx::experimental::detail::
-                                        relocate_at_helper(
-                                            first_ptr + j, dest_ptr + j);
-                                }
-                            }
-                            catch (...)
-                            {
-                                for (std::size_t k = 0; k < partial; ++k)
-                                {
-                                    std::destroy_at(dest_ptr + c + k * d);
-                                }
-                                for (std::size_t j = c + (partial + 1) * d;
-                                    j < n; j += d)
-                                {
-                                    std::destroy_at(first_ptr + j);
-                                }
-                                for (std::size_t done_ci = 0;
-                                    done_ci < chains_done; ++done_ci)
-                                {
-                                    std::size_t done_c = chain_start + done_ci;
-                                    for (std::size_t j = done_c; j < n; j += d)
-                                    {
-                                        std::destroy_at(dest_ptr + j);
-                                    }
-                                }
-                                for (std::size_t todo_ci = ci + 1;
-                                    todo_ci < num_chains; ++todo_ci)
-                                {
-                                    std::size_t todo_c = chain_start + todo_ci;
-                                    for (std::size_t j = todo_c; j < n; j += d)
-                                    {
-                                        std::destroy_at(first_ptr + j);
-                                    }
-                                }
-                                throw;
-                            }
-
-                            ++chains_done;
+                            hpx::experimental::detail::relocate_at_helper(
+                                first_ptr + j, dest_ptr + j);
                         }
-
-                        return {chain_start, chains_done};
-                    },
-                    [first, dest, n](auto&&... data) mutable
-                        -> util::in_out_result<InIter, FwdIter> {
-                        static_assert(sizeof...(data) < 2);
-                        util::detail::clear_container(data...);
-                        return util::in_out_result<InIter, FwdIter>{
-                            std::next(first, n), std::next(dest, n)};
-                    },
-                    [dest_ptr, n, d](chain_group_result&& r) -> void {
-                        for (std::size_t ci = 0; ci < r.chains_done; ++ci)
+                    }
+                    catch (...)
+                    {
+                        for (std::size_t k = 0; k < partial; ++k)
                         {
-                            std::size_t c = r.chain_start + ci;
-                            for (std::size_t j = c; j < n; j += d)
+                            std::destroy_at(dest_ptr + c + k * d);
+                        }
+                        for (std::size_t j = c + (partial + 1) * d; j < n;
+                            j += d)
+                        {
+                            std::destroy_at(first_ptr + j);
+                        }
+                        for (std::size_t done_ci = 0; done_ci < chains_done;
+                            ++done_ci)
+                        {
+                            std::size_t done_c = chain_start + done_ci;
+                            for (std::size_t j = done_c; j < n; j += d)
                             {
                                 std::destroy_at(dest_ptr + j);
                             }
                         }
-                    });
+                        for (std::size_t todo_ci = ci + 1; todo_ci < num_chains;
+                            ++todo_ci)
+                        {
+                            std::size_t todo_c = chain_start + todo_ci;
+                            for (std::size_t j = todo_c; j < n; j += d)
+                            {
+                                std::destroy_at(first_ptr + j);
+                            }
+                        }
+                        throw;
+                    }
+
+                    ++chains_done;
+                }
+
+                return {chain_start, chains_done};
+            };
+
+            // Builds the return iterators once all partitions succeed.
+            auto finalizer = [first, dest, n](auto&&... data) mutable
+                -> util::in_out_result<InIter, FwdIter> {
+                static_assert(sizeof...(data) < 2);
+                util::detail::clear_container(data...);
+                return util::in_out_result<InIter, FwdIter>{
+                    std::next(first, n), std::next(dest, n)};
+            };
+
+            // Destroys relocated elements of a completed partition on failure.
+            auto cleanup = [dest_ptr, n, d](chain_group_result&& r) -> void {
+                for (std::size_t ci = 0; ci < r.chains_done; ++ci)
+                {
+                    std::size_t c = r.chain_start + ci;
+                    for (std::size_t j = c; j < n; j += d)
+                    {
+                        std::destroy_at(dest_ptr + j);
+                    }
+                }
+            };
+
+            return util::partitioner_with_cleanup<ExPolicy,
+                util::in_out_result<InIter, FwdIter>,
+                chain_group_result>::call(HPX_FORWARD(ExPolicy, policy),
+                counting_iter(0), d, processor, finalizer, cleanup);
         }
 
         ///////////////////////////////////////////////////////////////////////
-        // parallel_uninitialized_relocate_n_backward
+        // parallel_uninitialized_relocate_n_bwd_overlap
+        //
+        // Same chain decomposition as parallel_uninitialized_relocate_n_overlap,
+        // but elements within each chain are relocated back-to-front (from the
+        // last element of the chain down to chain index c) to avoid overwriting
+        // a source before it has been relocated in a right-shift overlap.
         HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename BiIter1,
             typename BiIter2>
             requires(hpx::traits::is_contiguous_iterator_v<BiIter1> &&
                 hpx::traits::is_contiguous_iterator_v<BiIter2>)
-        decltype(auto) parallel_uninitialized_relocate_n_backward(
+        decltype(auto) parallel_uninitialized_relocate_n_bwd_overlap(
             ExPolicy&& policy, BiIter1 first, std::size_t n, BiIter2 dest_last,
             std::size_t d)
         {
@@ -633,92 +650,97 @@ namespace hpx::parallel {
                 }
             }
 
-            return util::partitioner_with_cleanup<ExPolicy,
-                util::in_out_result<BiIter1, BiIter2>, chain_group_result>::
-                call(
-                    HPX_FORWARD(ExPolicy, policy), counting_iter(0), d,
-                    [first_ptr, dest_first_ptr, n, d](counting_iter it,
-                        std::size_t num_chains) mutable -> chain_group_result {
-                        std::size_t chain_start = *it;
-                        std::size_t chains_done = 0;
+            // Relocates assigned chains back-to-front; handles cleanup on throw.
+            auto processor =
+                [first_ptr, dest_first_ptr, n, d](counting_iter it,
+                    std::size_t num_chains) mutable -> chain_group_result {
+                std::size_t chain_start = *it;
+                std::size_t chains_done = 0;
 
-                        for (std::size_t ci = 0; ci < num_chains; ++ci)
+                for (std::size_t ci = 0; ci < num_chains; ++ci)
+                {
+                    std::size_t c = chain_start + ci;
+
+                    std::size_t k_max = (n - 1 - c) / d;
+                    std::size_t partial = 0;
+
+                    try
+                    {
+                        for (std::size_t k = k_max + 1; k-- > 0; ++partial)
                         {
-                            std::size_t c = chain_start + ci;
-
-                            std::size_t k_max = (n - 1 - c) / d;
-                            std::size_t partial = 0;
-
-                            try
-                            {
-                                for (std::size_t k = k_max + 1; k-- > 0;
-                                    ++partial)
-                                {
-                                    std::size_t j = c + k * d;
-                                    hpx::experimental::detail::
-                                        relocate_at_helper(
-                                            first_ptr + j, dest_first_ptr + j);
-                                }
-                            }
-                            catch (...)
-                            {
-                                for (std::size_t k = 0; k < partial; ++k)
-                                {
-                                    std::size_t j = c + (k_max - k) * d;
-                                    std::destroy_at(dest_first_ptr + j);
-                                }
-                                if (partial < k_max + 1)
-                                {
-                                    for (std::size_t k = 0; k < k_max - partial;
-                                        ++k)
-                                    {
-                                        std::size_t j = c + k * d;
-                                        std::destroy_at(first_ptr + j);
-                                    }
-                                }
-                                for (std::size_t done_ci = 0;
-                                    done_ci < chains_done; ++done_ci)
-                                {
-                                    std::size_t done_c = chain_start + done_ci;
-                                    for (std::size_t j = done_c; j < n; j += d)
-                                    {
-                                        std::destroy_at(dest_first_ptr + j);
-                                    }
-                                }
-                                for (std::size_t todo_ci = ci + 1;
-                                    todo_ci < num_chains; ++todo_ci)
-                                {
-                                    std::size_t todo_c = chain_start + todo_ci;
-                                    for (std::size_t j = todo_c; j < n; j += d)
-                                    {
-                                        std::destroy_at(first_ptr + j);
-                                    }
-                                }
-                                throw;
-                            }
-
-                            ++chains_done;
+                            std::size_t j = c + k * d;
+                            hpx::experimental::detail::relocate_at_helper(
+                                first_ptr + j, dest_first_ptr + j);
                         }
-
-                        return {chain_start, chains_done};
-                    },
-                    [first, dest_last, n](auto&&... data) mutable
-                        -> util::in_out_result<BiIter1, BiIter2> {
-                        static_assert(sizeof...(data) < 2);
-                        util::detail::clear_container(data...);
-                        return util::in_out_result<BiIter1, BiIter2>{
-                            first, std::prev(dest_last, n)};
-                    },
-                    [dest_first_ptr, n, d](chain_group_result&& r) -> void {
-                        for (std::size_t ci = 0; ci < r.chains_done; ++ci)
+                    }
+                    catch (...)
+                    {
+                        for (std::size_t k = 0; k < partial; ++k)
                         {
-                            std::size_t c = r.chain_start + ci;
-                            for (std::size_t j = c; j < n; j += d)
+                            std::size_t j = c + (k_max - k) * d;
+                            std::destroy_at(dest_first_ptr + j);
+                        }
+                        if (partial < k_max + 1)
+                        {
+                            for (std::size_t k = 0; k < k_max - partial; ++k)
+                            {
+                                std::size_t j = c + k * d;
+                                std::destroy_at(first_ptr + j);
+                            }
+                        }
+                        for (std::size_t done_ci = 0; done_ci < chains_done;
+                            ++done_ci)
+                        {
+                            std::size_t done_c = chain_start + done_ci;
+                            for (std::size_t j = done_c; j < n; j += d)
                             {
                                 std::destroy_at(dest_first_ptr + j);
                             }
                         }
-                    });
+                        for (std::size_t todo_ci = ci + 1; todo_ci < num_chains;
+                            ++todo_ci)
+                        {
+                            std::size_t todo_c = chain_start + todo_ci;
+                            for (std::size_t j = todo_c; j < n; j += d)
+                            {
+                                std::destroy_at(first_ptr + j);
+                            }
+                        }
+                        throw;
+                    }
+
+                    ++chains_done;
+                }
+
+                return {chain_start, chains_done};
+            };
+
+            // Builds the return iterators once all partitions succeed.
+            auto finalizer = [first, dest_last, n](auto&&... data) mutable
+                -> util::in_out_result<BiIter1, BiIter2> {
+                static_assert(sizeof...(data) < 2);
+                util::detail::clear_container(data...);
+                return util::in_out_result<BiIter1, BiIter2>{
+                    first, std::prev(dest_last, n)};
+            };
+
+            // Destroys relocated elements of a completed partition on failure.
+            auto cleanup = [dest_first_ptr, n, d](
+                               chain_group_result&& r) -> void {
+                for (std::size_t ci = 0; ci < r.chains_done; ++ci)
+                {
+                    std::size_t c = r.chain_start + ci;
+                    for (std::size_t j = c; j < n; j += d)
+                    {
+                        std::destroy_at(dest_first_ptr + j);
+                    }
+                }
+            };
+
+            return util::partitioner_with_cleanup<ExPolicy,
+                util::in_out_result<BiIter1, BiIter2>,
+                chain_group_result>::call(HPX_FORWARD(ExPolicy, policy),
+                counting_iter(0), d, processor, finalizer, cleanup);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -1077,7 +1099,7 @@ namespace hpx::experimental {
                                     return ex::unique_any_sender<
                                         FwdIter>(parallel::util::get_second_element(
                                         hpx::parallel::detail::
-                                            parallel_uninitialized_relocate_n_overlapping(
+                                            parallel_uninitialized_relocate_n_overlap(
                                                 HPX_FORWARD(ExPolicy, policy),
                                                 first, count, dest, d)));
                                 }
@@ -1085,7 +1107,7 @@ namespace hpx::experimental {
                                 {
                                     return parallel::util::get_second_element(
                                         hpx::parallel::detail::
-                                            parallel_uninitialized_relocate_n_overlapping(
+                                            parallel_uninitialized_relocate_n_overlap(
                                                 HPX_FORWARD(ExPolicy, policy),
                                                 first, count, dest, d));
                                 }
@@ -1258,7 +1280,7 @@ namespace hpx::experimental {
                                     return ex::unique_any_sender<
                                         FwdIter>(parallel::util::get_second_element(
                                         hpx::parallel::detail::
-                                            parallel_uninitialized_relocate_n_overlapping(
+                                            parallel_uninitialized_relocate_n_overlap(
                                                 HPX_FORWARD(ExPolicy, policy),
                                                 first, count, dest, d)));
                                 }
@@ -1266,7 +1288,7 @@ namespace hpx::experimental {
                                 {
                                     return parallel::util::get_second_element(
                                         hpx::parallel::detail::
-                                            parallel_uninitialized_relocate_n_overlapping(
+                                            parallel_uninitialized_relocate_n_overlap(
                                                 HPX_FORWARD(ExPolicy, policy),
                                                 first, count, dest, d));
                                 }
@@ -1432,7 +1454,7 @@ namespace hpx::experimental {
                                     return ex::unique_any_sender<
                                         BiIter2>(parallel::util::get_second_element(
                                         hpx::parallel::detail::
-                                            parallel_uninitialized_relocate_n_backward(
+                                            parallel_uninitialized_relocate_n_bwd_overlap(
                                                 HPX_FORWARD(ExPolicy, policy),
                                                 first, count, dest_last, d)));
                                 }
@@ -1440,7 +1462,7 @@ namespace hpx::experimental {
                                 {
                                     return parallel::util::get_second_element(
                                         hpx::parallel::detail::
-                                            parallel_uninitialized_relocate_n_backward(
+                                            parallel_uninitialized_relocate_n_bwd_overlap(
                                                 HPX_FORWARD(ExPolicy, policy),
                                                 first, count, dest_last, d));
                                 }
