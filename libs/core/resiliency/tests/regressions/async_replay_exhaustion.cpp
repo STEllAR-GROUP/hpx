@@ -59,7 +59,8 @@ int hpx_main()
     }
 
     {
-        // Test async_replay_validate: fails on 1st attempt, succeeds on 2nd (final) attempt.
+        // Test async_replay_validate: fails on 1st attempt, succeeds on
+        // 2nd (final) attempt.
         call_count = 0;
         hpx::future<int> f =
             hpx::resiliency::experimental::async_replay_validate(
