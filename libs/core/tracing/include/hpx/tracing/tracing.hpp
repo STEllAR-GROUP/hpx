@@ -14,85 +14,90 @@
 
 #if defined(HPX_HAVE_MODULE_TRACY)
 #include <hpx/modules/tracy.hpp>
-#endif
 
 namespace hpx::tracing {
 
     HPX_CXX_CORE_EXPORT struct region
     {
-#if defined(HPX_HAVE_MODULE_TRACY)
-        hpx::tracy::region impl;
+        region(char const* name, std::size_t num_thread, std::size_t phase,
+            bool enabled) noexcept;
 
+        explicit region(hpx::threads::thread_data* thrdptr,
+            std::size_t num_thread) noexcept;
+
+        ~region();
+
+    private:
         static hpx::tracy::region create_tracy_region(
-            hpx::threads::thread_data* thrdptr, std::size_t num_thread) noexcept
-        {
-            char const* name = thrdptr->get_description().get_description();
-            bool const enable_tracy =
-                name != nullptr && !thrdptr->is_stackless();
-            return hpx::tracy::region(
-                name, num_thread, thrdptr->get_thread_phase(), enable_tracy);
-        }
-#endif
+            hpx::threads::thread_data* thrdptr,
+            std::size_t num_thread) noexcept;
 
-        region([[maybe_unused]] char const* name,
-            [[maybe_unused]] std::size_t thread_num,
-            [[maybe_unused]] std::size_t phase,
-            [[maybe_unused]] bool enabled) noexcept
-#if defined(HPX_HAVE_MODULE_TRACY)
-          : impl(name, thread_num, phase, enabled)
-#endif
-        {
-        }
-
-        explicit region([[maybe_unused]] hpx::threads::thread_data* thrdptr,
-            [[maybe_unused]] std::size_t num_thread) noexcept
-#if defined(HPX_HAVE_MODULE_TRACY)
-          : impl(create_tracy_region(thrdptr, num_thread))
-#endif
-        {
-        }
+        hpx::tracy::region impl;
     };
 
     HPX_CXX_CORE_EXPORT struct mark_event
     {
-#if defined(HPX_HAVE_MODULE_TRACY)
-        hpx::tracy::mark_event impl;
-#endif
+        explicit mark_event(char const* name) noexcept;
+        ~mark_event();
 
-        explicit mark_event([[maybe_unused]] char const* name) noexcept
-#if defined(HPX_HAVE_MODULE_TRACY)
-          : impl(name)
-#endif
-        {
-        }
+    private:
+        hpx::tracy::mark_event impl;
     };
 
     HPX_CXX_CORE_EXPORT struct fiber_region
     {
-#if defined(HPX_HAVE_MODULE_TRACY)
-        hpx::tracy::fiber_region impl;
+        explicit fiber_region(hpx::threads::thread_data* thrdptr,
+            std::size_t num_thread) noexcept;
 
+        ~fiber_region();
+
+    private:
         static hpx::tracy::fiber_region create_tracy_fiber_region(
-            hpx::threads::thread_data* thrdptr, std::size_t num_thread) noexcept
-        {
-            char const* name = thrdptr->get_description().get_description();
-            bool const enable_tracy =
-                name != nullptr && !thrdptr->is_stackless();
-            char const* fiber_name =
-                enable_tracy ? thrdptr->get_tracy_fiber_name() : nullptr;
-            return hpx::tracy::fiber_region(
-                fiber_name, name, num_thread, enable_tracy);
-        }
-#endif
+            hpx::threads::thread_data* thrdptr,
+            std::size_t num_thread) noexcept;
 
-        explicit fiber_region(
+        hpx::tracy::fiber_region impl;
+    };
+
+}    // namespace hpx::tracing
+
+#else
+
+namespace hpx::tracing {
+
+    struct region
+    {
+        constexpr region([[maybe_unused]] char const* name,
+            [[maybe_unused]] std::size_t num_thread,
+            [[maybe_unused]] std::size_t phase,
+            [[maybe_unused]] bool enabled) noexcept
+        {
+        }
+
+        constexpr explicit region(
             [[maybe_unused]] hpx::threads::thread_data* thrdptr,
             [[maybe_unused]] std::size_t num_thread) noexcept
-#if defined(HPX_HAVE_MODULE_TRACY)
-          : impl(create_tracy_fiber_region(thrdptr, num_thread))
-#endif
+        {
+        }
+    };
+
+    struct mark_event
+    {
+        constexpr explicit mark_event(
+            [[maybe_unused]] char const* name) noexcept
+        {
+        }
+    };
+
+    struct fiber_region
+    {
+        constexpr explicit fiber_region(
+            [[maybe_unused]] hpx::threads::thread_data* thrdptr,
+            [[maybe_unused]] std::size_t num_thread) noexcept
         {
         }
     };
 
 }    // namespace hpx::tracing
+
+#endif
