@@ -10,6 +10,8 @@
 //   1. Introspecting the environment (describe_environment)
 //   2. Running a comparative for_each benchmark (seq vs par)
 //   3. Printing the full telemetry report
+//
+// See PR #7079 for design details and compliance constraints.
 
 #include <hpx/config.hpp>
 
@@ -29,7 +31,7 @@ int hpx_main()
     namespace sandbox = hpx::experimental::sandbox;
 
     // 1. Print environment report
-    sandbox::describe_environment();
+    sandbox::describe_environment(std::cout);
 
     // 2. Prepare test data — large enough to show parallel benefit
     constexpr std::size_t N = 500'000;
@@ -52,7 +54,7 @@ int hpx_main()
     );
 
     // 5. Print the benchmark report
-    report.print();
+    report.print(std::cout);
 
     // 6. Sanity checks (non-fatal)
     if (report.speedup < 0.0)

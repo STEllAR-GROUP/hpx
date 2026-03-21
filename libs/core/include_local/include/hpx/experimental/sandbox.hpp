@@ -29,6 +29,7 @@
 #include <hpx/config.hpp>
 
 #include <hpx/execution.hpp>
+#include <hpx/format.hpp>
 #include <hpx/runtime_local/runtime_local_fwd.hpp>
 #include <hpx/topology/topology.hpp>
 
@@ -36,8 +37,7 @@
 #include <chrono>
 #include <cstddef>
 #include <cstdlib>
-#include <iomanip>
-#include <iostream>
+#include <iosfwd>
 #include <string>
 #include <thread>
 #include <vector>
@@ -57,21 +57,20 @@ namespace hpx::experimental::sandbox {
 
         /// \brief Print a formatted environment report.
         ///
-        /// \param os  Output stream (defaults to \c std::cout).
-        void print(std::ostream& os = std::cout) const
+        /// \param os  Output stream.
+        void print(std::ostream& os) const
         {
-            os << "\n";
-            os << "=== HPX Sandbox --- Environment " << std::string(25, '=')
-               << "\n";
-            os << "  Cores:           " << cores << "\n";
-            os << "  PUs:             " << pus << "\n";
-            os << "  NUMA domains:    " << numa_nodes << "\n";
-            os << "  HPX workers:     " << hpx_workers << "\n";
-            os << "  Sandbox:         "
-               << (is_sandbox ? "yes (constrained environment detected)" :
-                                "no (full hardware access)")
-               << "\n";
-            os << std::string(56, '=') << "\n";
+            hpx::util::format_to(os, "\n");
+            hpx::util::format_to(os, "=== HPX Sandbox --- Environment {}\n",
+                std::string(25, '='));
+            hpx::util::format_to(os, "  Cores:           {}\n", cores);
+            hpx::util::format_to(os, "  PUs:             {}\n", pus);
+            hpx::util::format_to(os, "  NUMA domains:    {}\n", numa_nodes);
+            hpx::util::format_to(os, "  HPX workers:     {}\n", hpx_workers);
+            hpx::util::format_to(os, "  Sandbox:         {}\n",
+                is_sandbox ? "yes (constrained environment detected)" :
+                             "no (full hardware access)");
+            hpx::util::format_to(os, "{}\n", std::string(56, '='));
         }
     };
 
@@ -80,49 +79,50 @@ namespace hpx::experimental::sandbox {
     {
         std::string label;              ///< User-provided description
         std::size_t iterations = 0;     ///< Measurement iterations
-        double seq_median_ms = 0.0;     ///< Sequential median time (ms)
-        double par_median_ms = 0.0;     ///< Parallel median time (ms)
+        double seq_mean_ms = 0.0;       ///< Sequential mean time (ms)
+        double par_mean_ms = 0.0;       ///< Parallel mean time (ms)
         double speedup = 0.0;           ///< seq_time / par_time
         double efficiency_pct = 0.0;    ///< (speedup / workers) * 100
         std::size_t num_workers = 0;    ///< HPX workers during measurement
 
         /// \brief Print a formatted benchmark report.
         ///
-        /// \param os  Output stream (defaults to \c std::cout).
-        void print(std::ostream& os = std::cout) const
+        /// \param os  Output stream.
+        void print(std::ostream& os) const
         {
-            os << "\n";
-            os << "=== HPX Sandbox --- Benchmark " << std::string(26, '=')
-               << "\n";
-            os << "  Label:           \"" << label << "\"\n";
-            os << "  Iterations:      " << iterations << "\n";
-            os << "  Workers:         " << num_workers << "\n";
-            os << std::string(56, '-') << "\n";
-            os << "  Sequential:      " << std::fixed << std::setprecision(3)
-               << seq_median_ms << " ms\n";
-            os << "  Parallel:        " << std::fixed << std::setprecision(3)
-               << par_median_ms << " ms\n";
-            os << std::string(56, '-') << "\n";
-            os << "  Speedup:         " << std::fixed << std::setprecision(2)
-               << speedup << "x\n";
-            os << "  Efficiency:      " << std::fixed << std::setprecision(1)
-               << efficiency_pct << "%\n";
-            os << std::string(56, '-') << "\n";
+            hpx::util::format_to(os, "\n");
+            hpx::util::format_to(
+                os, "=== HPX Sandbox --- Benchmark {}\n", std::string(26, '='));
+            hpx::util::format_to(os, "  Label:           \"{}\"\n", label);
+            hpx::util::format_to(os, "  Iterations:      {}\n", iterations);
+            hpx::util::format_to(os, "  Workers:         {}\n", num_workers);
+            hpx::util::format_to(os, "{}\n", std::string(56, '-'));
+            hpx::util::format_to(
+                os, "  Sequential:      {:.3f} ms\n", seq_mean_ms);
+            hpx::util::format_to(
+                os, "  Parallel:        {:.3f} ms\n", par_mean_ms);
+            hpx::util::format_to(os, "{}\n", std::string(56, '-'));
+            hpx::util::format_to(os, "  Speedup:         {:.2f}x\n", speedup);
+            hpx::util::format_to(
+                os, "  Efficiency:      {:.1f}%\n", efficiency_pct);
+            hpx::util::format_to(os, "{}\n", std::string(56, '-'));
 
             // Verdict
-            os << "  Verdict:         ";
+            hpx::util::format_to(os, "  Verdict:         ");
             if (efficiency_pct >= 80.0)
-                os << "Excellent scaling";
+                hpx::util::format_to(os, "Excellent scaling\n");
             else if (efficiency_pct >= 60.0)
-                os << "Good scaling";
+                hpx::util::format_to(os, "Good scaling\n");
             else if (efficiency_pct >= 40.0)
-                os << "Moderate scaling (check granularity)";
+                hpx::util::format_to(
+                    os, "Moderate scaling (check granularity)\n");
             else if (speedup > 1.0)
-                os << "Limited scaling (overhead-dominated)";
+                hpx::util::format_to(
+                    os, "Limited scaling (overhead-dominated)\n");
             else
-                os << "No speedup (work too small or contention)";
-            os << "\n";
-            os << std::string(56, '=') << "\n";
+                hpx::util::format_to(
+                    os, "No speedup (work too small or contention)\n");
+            hpx::util::format_to(os, "{}\n", std::string(56, '='));
         }
     };
 
@@ -140,11 +140,6 @@ namespace hpx::experimental::sandbox {
             if (std::getenv("HPX_SANDBOX") != nullptr)
                 return true;
 
-            // 3. Very limited hardware suggests a sandbox / container
-            unsigned int hw = std::thread::hardware_concurrency();
-            if (hw > 0 && hw <= 4)
-                return true;
-
             return false;
         }
 
@@ -159,21 +154,20 @@ namespace hpx::experimental::sandbox {
                 .count();
         }
 
-        // Run a callable N times and return the median wall time
+        // Run a callable N times and return the mean wall time
         template <typename F>
-        double median_ms(F&& fn, std::size_t iterations)
+        double mean_ms(F&& fn, std::size_t iterations)
         {
             // Warmup (discard first run)
             fn();
 
-            std::vector<double> times(iterations);
+            double total = 0.0;
             for (std::size_t i = 0; i < iterations; ++i)
             {
-                times[i] = time_once_ms(fn);
+                total += time_once_ms(fn);
             }
 
-            std::sort(times.begin(), times.end());
-            return times[iterations / 2];
+            return total / static_cast<double>(iterations);
         }
 
     }    // namespace detail
@@ -209,34 +203,34 @@ namespace hpx::experimental::sandbox {
     /// Convenience wrapper that calls \c detect_environment() and
     /// prints the result.
     ///
-    /// \param os  Output stream (defaults to \c std::cout).
+    /// \param os  Output stream.
     ///
     /// \note Must be called from within a running HPX runtime.
-    inline void describe_environment(std::ostream& os = std::cout)
+    inline void describe_environment(std::ostream& os)
     {
         detect_environment().print(os);
     }
 
-    /// \brief Measure the median execution time of a callable.
+    /// \brief Measure the mean execution time of a callable.
     ///
     /// Runs the callable once for warmup, then \p iterations times,
-    /// and returns the median wall-clock time in milliseconds.
+    /// and returns the mean wall-clock time in milliseconds.
     ///
     /// \tparam F       Callable type (must be invocable with no arguments).
     /// \param fn       The callable to measure.
     /// \param iterations Number of timed runs (default: 5).
     ///
-    /// \returns Median wall-clock time in milliseconds.
+    /// \returns Mean wall-clock time in milliseconds.
     template <typename F>
     double measure(F&& fn, std::size_t iterations = 5)
     {
-        return detail::median_ms(std::forward<F>(fn), iterations);
+        return detail::mean_ms(std::forward<F>(fn), iterations);
     }
 
     /// \brief Compare sequential and parallel execution of the same work.
     ///
     /// Runs \p seq_fn and \p par_fn each for \p iterations iterations
-    /// (plus warmup), takes the median time of each, and computes
+    /// (plus warmup), takes the mean time of each, and computes
     /// speedup and parallel efficiency.
     ///
     /// Example usage:
@@ -251,7 +245,7 @@ namespace hpx::experimental::sandbox {
     ///         hpx::for_each(hpx::execution::par,
     ///             v.begin(), v.end(), work);
     ///     });
-    /// report.print();
+    /// report.print(std::cout);
     /// \endcode
     ///
     /// \tparam SeqFn   Callable type for the sequential baseline.
@@ -274,15 +268,15 @@ namespace hpx::experimental::sandbox {
         report.num_workers = hpx::get_num_worker_threads();
 
         // Measure sequential baseline
-        report.seq_median_ms = detail::median_ms(seq_fn, iterations);
+        report.seq_mean_ms = detail::mean_ms(seq_fn, iterations);
 
         // Measure parallel variant
-        report.par_median_ms = detail::median_ms(par_fn, iterations);
+        report.par_mean_ms = detail::mean_ms(par_fn, iterations);
 
         // Compute scaling metrics
-        if (report.par_median_ms > 0.0)
+        if (report.par_mean_ms > 0.0)
         {
-            report.speedup = report.seq_median_ms / report.par_median_ms;
+            report.speedup = report.seq_mean_ms / report.par_mean_ms;
         }
 
         if (report.num_workers > 0)
