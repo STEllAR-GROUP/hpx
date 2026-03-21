@@ -4,15 +4,13 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// Verify that hpx/local.hpp provides access to the Standard Parallel Toolkit:
-// futures, parallel algorithms, numeric algorithms, and execution policies.
+// Verify that hpx/local.hpp provides access to the Standard Parallel Toolkit.
 //
-// For zero-boilerplate main() wrapping, we must explicitly include hpx_main.hpp.
+// We use hpx::local::init to avoid any dependency on the full wrap module.
 
 #include <hpx/config.hpp>
 
-#include <hpx/hpx_main.hpp>
-
+#include <hpx/init.hpp>
 #include <hpx/local.hpp>
 
 #include <cstddef>
@@ -20,7 +18,7 @@
 #include <numeric>
 #include <vector>
 
-int main()
+int hpx_main(int argc, char* argv[])
 {
     // 1. Verify hpx::async and hpx::future are reachable
     hpx::future<int> f = hpx::async([]() { return 42; });
@@ -39,5 +37,10 @@ int main()
     std::cout << "async result: " << result << ", reduce sum: " << sum
               << std::endl;
 
-    return 0;
+    return hpx::local::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    return hpx::local::init(hpx_main, argc, argv);
 }

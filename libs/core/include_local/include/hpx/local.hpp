@@ -21,7 +21,7 @@
 ///
 /// \note For zero-boilerplate `main()` wrapping to automatically start
 ///       and stop the HPX runtime, please additionally include
-///       `#include <hpx/hpx_main.hpp>`.
+///       the main wrapping header from the HPX wrap module.
 
 #pragma once
 
