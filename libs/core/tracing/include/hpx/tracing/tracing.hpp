@@ -67,8 +67,7 @@ namespace hpx::tracing {
 
     HPX_CXX_CORE_EXPORT struct [[maybe_unused]] region
     {
-        constexpr region(
-            char const*, std::size_t = 0, std::size_t = 0, bool = true) noexcept
+        constexpr region(char const*, std::size_t, std::size_t, bool) noexcept
         {
         }
 
