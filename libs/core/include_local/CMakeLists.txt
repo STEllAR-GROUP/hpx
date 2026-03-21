@@ -31,6 +31,7 @@ set(include_local_headers
     hpx/type_traits.hpp
     hpx/unwrap.hpp
     hpx/experimental/run_on_all.hpp
+    hpx/experimental/sandbox.hpp
     hpx/experimental/scope.hpp
     hpx/experimental/task_group.hpp
 )
@@ -116,6 +117,7 @@ add_hpx_module(
     hpx_thread_support
     hpx_timed_execution
     hpx_timing
+    hpx_topology
     hpx_type_support
     hpx_util
   CMAKE_SUBDIRS examples tests
