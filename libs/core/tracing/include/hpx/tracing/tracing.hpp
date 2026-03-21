@@ -65,9 +65,10 @@ namespace hpx::tracing {
 
 namespace hpx::tracing {
 
-    HPX_CXX_CORE_EXPORT struct region
+    HPX_CXX_CORE_EXPORT struct [[maybe_unused]] region
     {
-        constexpr region(char const*, std::size_t, std::size_t, bool) noexcept
+        constexpr region(
+            char const*, std::size_t = 0, std::size_t = 0, bool = true) noexcept
         {
         }
 
@@ -77,12 +78,12 @@ namespace hpx::tracing {
         }
     };
 
-    HPX_CXX_CORE_EXPORT struct mark_event
+    HPX_CXX_CORE_EXPORT struct [[maybe_unused]] mark_event
     {
         constexpr explicit mark_event(char const*) noexcept {}
     };
 
-    HPX_CXX_CORE_EXPORT struct fiber_region
+    HPX_CXX_CORE_EXPORT struct [[maybe_unused]] fiber_region
     {
         constexpr explicit fiber_region(
             hpx::threads::thread_data*, std::size_t) noexcept

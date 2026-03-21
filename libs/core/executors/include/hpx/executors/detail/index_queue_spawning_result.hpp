@@ -77,7 +77,7 @@ namespace hpx::parallel::execution::detail {
                 static hpx::util::itt::event notify_event("do_work_chunk");
                 hpx::util::itt::mark_event e(notify_event);
 #endif
-                [[maybe_unused]] hpx::tracing::mark_event evt("do_work_chunk");
+                hpx::tracing::mark_event evt("do_work_chunk");
 
                 auto const i_begin = *index * chunk_size;
                 auto const i_end = (std::min) (i_begin + chunk_size,
@@ -113,7 +113,7 @@ namespace hpx::parallel::execution::detail {
                             "do_work_chunk (stealing)");
                         hpx::util::itt::mark_event e(notify_event);
 #endif
-                        [[maybe_unused]] hpx::tracing::mark_event evt(
+                        hpx::tracing::mark_event evt(
                             "do_work_chunk (stealing)");
 
                         auto const i_begin = *index * chunk_size;
@@ -154,7 +154,7 @@ namespace hpx::parallel::execution::detail {
             static hpx::util::itt::event notify_event("finish");
             hpx::util::itt::mark_event e(notify_event);
 #endif
-            [[maybe_unused]] hpx::tracing::mark_event evt("finish");
+            hpx::tracing::mark_event evt("finish");
 
             std::uint32_t const prev_value =
                 state->tasks_remaining.data_.fetch_sub(
@@ -437,8 +437,7 @@ namespace hpx::parallel::execution::detail {
                 "index_queue_spawning::execute");
             hpx::util::itt::mark_event e(notify_event);
 #endif
-            [[maybe_unused]] hpx::tracing::mark_event evt(
-                "index_queue_spawning::execute");
+            hpx::tracing::mark_event evt("index_queue_spawning::execute");
 
             auto const size =
                 static_cast<std::uint32_t>(hpx::util::size(shape));
