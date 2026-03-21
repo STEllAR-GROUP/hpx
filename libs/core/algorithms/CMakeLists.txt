@@ -260,10 +260,6 @@ set(algorithms_compat_headers
 
 set(algorithms_sources handle_exception_termination_handler.cpp task_group.cpp)
 
-if(HPX_TRACY_WITH_TRACY)
-  set(additional_dependencies hpx_tracy)
-endif()
-
 include(HPX_AddModule)
 add_hpx_module(
   core algorithms
@@ -304,6 +300,5 @@ add_hpx_module(
     hpx_tracing
     hpx_type_support
     hpx_util
-    ${additional_dependencies}
   CMAKE_SUBDIRS examples tests
 )

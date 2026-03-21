@@ -28,10 +28,6 @@ set(thread_pools_sources detail/background_thread.cpp detail/scheduling_log.cpp
                          scheduled_thread_pool.cpp
 )
 
-if(HPX_TRACY_WITH_TRACY)
-  set(additional_dependencies hpx_tracy)
-endif()
-
 include(HPX_AddModule)
 add_hpx_module(
   core thread_pools
@@ -57,6 +53,5 @@ add_hpx_module(
     hpx_threading_base
     hpx_tracing
     hpx_topology
-    ${additional_dependencies}
   CMAKE_SUBDIRS examples tests
 )
