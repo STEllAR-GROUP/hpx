@@ -85,9 +85,8 @@ namespace hpx::compute {
             alloc_traits::bulk_construct(alloc_, data_, size_);
         }
 
-        template <typename InIter,
-            typename Enable = typename std::enable_if<
-                hpx::traits::is_input_iterator_v<InIter>>::type>
+        template <typename InIter>
+            requires hpx::traits::is_input_iterator_v<InIter>
         vector(InIter first, InIter last, Allocator const& alloc = Allocator())
           : size_(static_cast<size_type>(std::distance(first, last)))
           , capacity_(size_)
@@ -160,6 +159,9 @@ namespace hpx::compute {
             {
                 alloc_traits::bulk_destroy(alloc_, data_, size_);
                 alloc_traits::deallocate(alloc_, data_, capacity_);
+                data_ = nullptr;
+                size_ = 0;
+                capacity_ = 0;
             }
 #if !defined(__CUDA_ARCH__)
             catch (...)
@@ -236,9 +238,8 @@ namespace hpx::compute {
             alloc_traits::bulk_construct(alloc_, data_, size_, value);
         }
 
-        template <typename InIter,
-            typename Enable = typename std::enable_if<
-                hpx::traits::is_input_iterator_v<InIter>>::type>
+        template <typename InIter>
+            requires hpx::traits::is_input_iterator_v<InIter>
         void assign(InIter first, InIter last)
         {
             clear();

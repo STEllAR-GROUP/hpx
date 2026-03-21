@@ -14,7 +14,6 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/algorithm.hpp>
 #include <hpx/compute.hpp>
-#include <hpx/compute_local/vector.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/components.hpp>

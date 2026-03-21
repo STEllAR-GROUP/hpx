@@ -20,7 +20,7 @@
 namespace hpx::compute::detail {
 
     template <typename T, typename Allocator>
-    struct iterator
+    class iterator
       : hpx::util::iterator_adaptor<iterator<T, Allocator>,
             typename traits::allocator_traits<Allocator>::pointer,
             typename traits::allocator_traits<Allocator>::value_type,
@@ -58,8 +58,8 @@ namespace hpx::compute::detail {
         {
         }
 
-        template <typename U,
-            typename Enable = std::enable_if_t<std::is_same_v<T, U const>>>
+        template <typename U>
+            requires(!std::same_as<T, U const>)
         HPX_HOST_DEVICE iterator(iterator<U, Allocator> const& other) noexcept
           : base_type(other.base())
           , target_(other.target())
