@@ -15,6 +15,7 @@ set(tests
     algorithm_let_error
     algorithm_let_stopped
     algorithm_let_value
+    algorithm_p2300_additions_test
     algorithm_run_loop
     algorithm_split
     algorithm_start_detached
@@ -40,6 +41,7 @@ set(tests
     minimal_sync_executor
     persistent_executor_parameters
     rebind_executor_parameters
+    test_100_percent_p2300
 )
 
 set(future_then_executor_PARAMETERS THREADS_PER_LOCALITY 4)

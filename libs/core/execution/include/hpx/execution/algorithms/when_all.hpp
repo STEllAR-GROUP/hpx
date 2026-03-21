@@ -552,15 +552,6 @@ namespace hpx::execution::experimental {
         }
     } when_all{};
 
-    // TODO:
-    // execution::when_all_with_variant is used to join multiple sender chains
-    // and create a sender whose execution is dependent on all the input
-    // senders, each of which may have one or more sets of sent values.
-    HPX_CXX_CORE_EXPORT inline constexpr struct when_all_with_variant_t final
-      : hpx::functional::tag<when_all_with_variant_t>
-    {
-    } when_all_with_variant{};
-
     // execution::transfer_when_all is used to join multiple sender chains
     // and create a sender whose execution is dependent on all the input
     // senders that only send a single set of values each, while also making
@@ -585,15 +576,6 @@ namespace hpx::execution::experimental {
                 HPX_FORWARD(Sched, sched));
         }
     } transfer_when_all{};
-
-    // TODO:
-    // execution::transfer_when_all_with_variant is used to join multiple
-    // sender chains and create a sender whose execution is dependent on all
-    // the input senders, which may have one or more sets of sent values.
-    HPX_CXX_CORE_EXPORT inline constexpr struct transfer_when_all_with_variant_t
-        final : hpx::functional::tag<transfer_when_all_with_variant_t>
-    {
-    } transfer_when_all_with_variant{};
 
     // the following enables directly using dataflow() with senders
 
