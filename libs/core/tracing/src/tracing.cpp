@@ -7,6 +7,8 @@
 
 #include <hpx/tracing/tracing.hpp>
 
+#include <cstddef>
+
 #if defined(HPX_HAVE_MODULE_TRACY)
 
 namespace hpx::tracing {
