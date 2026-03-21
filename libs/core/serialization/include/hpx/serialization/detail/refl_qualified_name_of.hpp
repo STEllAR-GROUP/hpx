@@ -16,7 +16,7 @@
 #include <string_view>
 #include <vector>
 
-#include <experimental/meta>
+#include <meta>
 #include <ranges>
 
 namespace hpx::serialization::detail {
