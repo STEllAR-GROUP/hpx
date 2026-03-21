@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/init.hpp>
+#include <hpx/init_local.hpp>
 #include <hpx/local.hpp>
 
 #include <cstddef>
@@ -18,7 +18,7 @@
 #include <numeric>
 #include <vector>
 
-int hpx_main(int argc, char* argv[])
+int test_main(int argc, char* argv[])
 {
     // 1. Verify hpx::async and hpx::future are reachable
     hpx::future<int> f = hpx::async([]() { return 42; });
@@ -42,5 +42,5 @@ int hpx_main(int argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
-    return hpx::local::init(hpx_main, argc, argv);
+    return hpx::local::init(test_main, argc, argv);
 }

@@ -22,14 +22,14 @@
 ///   - **Console-friendly telemetry** formatted for fixed-width output
 ///
 /// All functions must be called from within a running HPX runtime
-/// (e.g. from \c hpx_main or an HPX thread).
+/// (e.g. from an HPX thread).
 
 #pragma once
 
 #include <hpx/config.hpp>
 
-#include <hpx/execution.hpp>
-#include <hpx/format.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/runtime_local/runtime_local_fwd.hpp>
 #include <hpx/topology/topology.hpp>
 

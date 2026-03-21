@@ -15,10 +15,10 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/algorithm.hpp>
-#include <hpx/execution.hpp>
 #include <hpx/experimental/sandbox.hpp>
-#include <hpx/init.hpp>
+#include <hpx/init_local.hpp>
+#include <hpx/modules/algorithms.hpp>
+#include <hpx/modules/execution.hpp>
 
 #include <cmath>
 #include <cstddef>
@@ -26,7 +26,7 @@
 #include <numeric>
 #include <vector>
 
-int hpx_main()
+int test_main()
 {
     namespace sandbox = hpx::experimental::sandbox;
 
@@ -69,5 +69,5 @@ int hpx_main()
 
 int main(int argc, char** argv)
 {
-    return hpx::local::init(hpx_main, argc, argv);
+    return hpx::local::init(test_main, argc, argv);
 }

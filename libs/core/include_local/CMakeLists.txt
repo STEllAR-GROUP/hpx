@@ -38,11 +38,9 @@ set(include_local_headers
 
 if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
   set(generated_include_local_headers
-      hpx/algorithm.hpp
       hpx/barrier.hpp
       hpx/channel.hpp
       hpx/compute.hpp
-      hpx/future.hpp
       hpx/latch.hpp
       hpx/runtime.hpp
   )
@@ -51,7 +49,6 @@ endif()
 # The headers in hpx/local/ were deprecated in HPX V1.9.1
 # cmake-format: off
 set(include_local_compat_headers
-    hpx/local/algorithm.hpp => hpx/algorithm.hpp
     hpx/local/any.hpp => hpx/any.hpp
     hpx/local/barrier.hpp => hpx/barrier.hpp
     hpx/local/channel.hpp => hpx/channel.hpp
@@ -62,7 +59,6 @@ set(include_local_compat_headers
     hpx/local/exception.hpp => hpx/exception.hpp
     hpx/local/execution.hpp => hpx/execution.hpp
     hpx/local/functional.hpp => hpx/functional.hpp
-    hpx/local/future.hpp => hpx/future.hpp
     hpx/local/generator.hpp => hpx/generator.hpp
     hpx/local/latch.hpp => hpx/latch.hpp
     hpx/local/memory.hpp => hpx/memory.hpp
