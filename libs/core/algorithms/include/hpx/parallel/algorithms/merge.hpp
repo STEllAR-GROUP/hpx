@@ -716,7 +716,8 @@ namespace hpx::parallel {
                 static hpx::util::itt::event notify_event("get diagonal index");
                 hpx::util::itt::mark_event e(notify_event);
 #endif
-                hpx::tracing::mark_event evt("get diagonal index");
+                [[maybe_unused]] hpx::tracing::mark_event evt(
+                    "get diagonal index");
                 auto const shape_size = std::size(shape);
 
                 if (n == 0)
@@ -754,7 +755,8 @@ namespace hpx::parallel {
                 "get diagonal intersection");
             hpx::util::itt::mark_event e(notify_event);
 #endif
-            hpx::tracing::mark_event evt("get diagonal intersection");
+            [[maybe_unused]] hpx::tracing::mark_event evt(
+                "get diagonal intersection");
             if (len1 == 0)
                 return {0, (std::min) (k, len2)};
             if (len2 == 0)
@@ -810,7 +812,8 @@ namespace hpx::parallel {
                 "get diagonal intersection");
             hpx::util::itt::mark_event e(notify_event);
 #endif
-            hpx::tracing::mark_event evt("get diagonal intersection");
+            [[maybe_unused]] hpx::tracing::mark_event evt(
+                "get diagonal intersection");
             if (len1 == 0)
                 return {0, (std::min) (k, len2)};
             if (len2 == 0)
