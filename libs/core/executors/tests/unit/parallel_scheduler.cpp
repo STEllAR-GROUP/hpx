@@ -166,7 +166,7 @@ int hpx_main(int, char*[])
             ex::sync_wait(std::move(snd));
             HPX_TEST(false);
         }
-        catch (const std::runtime_error& e)
+        catch (std::runtime_error const& e)
         {
             caught_error = true;
             HPX_TEST_EQ(std::string(e.what()), std::string("test error"));
@@ -194,7 +194,6 @@ int hpx_main(int, char*[])
         constexpr std::size_t num_tasks = 16;
         std::thread::id pool_ids[num_tasks]{};
         ex::parallel_scheduler sched = ex::get_parallel_scheduler();
-
 
         auto bulk_snd = ex::bulk(
             ex::schedule(sched), ex::par, num_tasks, [&](unsigned long id) {
@@ -318,9 +317,8 @@ int hpx_main(int, char*[])
         bool covered[num_tasks]{};
         ex::parallel_scheduler sched = ex::get_parallel_scheduler();
 
-        auto bulk_snd = ex::bulk_chunked(
-            ex::schedule(sched), ex::par, num_tasks,
-            [&](unsigned long b, unsigned long e) {
+        auto bulk_snd = ex::bulk_chunked(ex::schedule(sched), ex::par,
+            num_tasks, [&](unsigned long b, unsigned long e) {
                 for (auto i = b; i < e; ++i)
                     covered[i] = true;
             });
@@ -338,7 +336,6 @@ int hpx_main(int, char*[])
         constexpr std::size_t num_tasks = 200;
         std::atomic<int> execution_count{0};
         ex::parallel_scheduler sched = ex::get_parallel_scheduler();
-
 
         auto bulk_snd = ex::bulk_chunked(ex::schedule(sched), ex::seq,
             num_tasks, [&](std::size_t b, std::size_t e) {
@@ -361,7 +358,6 @@ int hpx_main(int, char*[])
         std::thread::id pool_ids[num_tasks]{};
         ex::parallel_scheduler sched = ex::get_parallel_scheduler();
 
-
         auto bulk_snd = ex::bulk_unchunked(
             ex::schedule(sched), ex::par, num_tasks, [&](unsigned long id) {
                 pool_ids[id] = std::this_thread::get_id();
@@ -381,7 +377,6 @@ int hpx_main(int, char*[])
         constexpr std::size_t num_tasks = 16;
         std::thread::id pool_ids[num_tasks]{};
         ex::parallel_scheduler sched = ex::get_parallel_scheduler();
-
 
         auto bulk_snd = ex::bulk_unchunked(
             ex::schedule(sched), ex::seq, num_tasks, [&](unsigned long id) {
@@ -421,9 +416,10 @@ int hpx_main(int, char*[])
         auto sched = ex::get_parallel_scheduler();
         auto snd = ex::schedule(sched);
         auto env = ex::get_env(snd);
-        
+
         // Query the completion scheduler for set_value_t
-        auto completion_sched = ex::get_completion_scheduler<ex::set_value_t>(env);
+        auto completion_sched =
+            ex::get_completion_scheduler<ex::set_value_t>(env);
         HPX_TEST_EQ(completion_sched, sched);
     }
 
@@ -433,16 +429,16 @@ int hpx_main(int, char*[])
         auto snd = ex::schedule(sched);
         auto env = ex::get_env(snd);
 
-        auto stopped_sched = ex::get_completion_scheduler<ex::set_stopped_t>(env);
+        auto stopped_sched =
+            ex::get_completion_scheduler<ex::set_stopped_t>(env);
         HPX_TEST_EQ(stopped_sched, sched);
     }
 
     // Test receiver double-move safety: if execute() throws, receiver is still valid
     {
         auto sched = ex::get_parallel_scheduler();
-        auto snd = ex::schedule(sched)
-            | ex::then([]() { return 42; });
-        
+        auto snd = ex::schedule(sched) | ex::then([]() { return 42; });
+
         // This should complete successfully without double-move issues
         ex::sync_wait(std::move(snd));
     }
@@ -451,17 +447,16 @@ int hpx_main(int, char*[])
     {
         auto sched = ex::get_parallel_scheduler();
         std::vector<int> v(10, 0);
-        
-        auto snd = ex::schedule(sched)
-            | ex::then([&v]() { return 77; })
-            | ex::bulk_unchunked(ex::par, 10, [&v](std::size_t i, int val) {
-                v[i] = val;
-            });
-        
+
+        auto snd = ex::schedule(sched) | ex::then([&v]() { return 77; }) |
+            ex::bulk_unchunked(
+                ex::par, 10, [&v](std::size_t i, int val) { v[i] = val; });
+
         ex::sync_wait(std::move(snd));
-        
+
         // All elements should be set to 77
-        for (int i = 0; i < 10; ++i) {
+        for (int i = 0; i < 10; ++i)
+        {
             HPX_TEST_EQ(v[i], 77);
         }
     }
@@ -470,17 +465,16 @@ int hpx_main(int, char*[])
     {
         auto sched = ex::get_parallel_scheduler();
         std::vector<int> v(10, 0);
-        
-        auto snd = ex::schedule(sched)
-            | ex::then([]() { return 88; })
-            | ex::bulk_unchunked(ex::par, 10, [&v](std::size_t i, int val) {
-                v[i] = val;
-            });
-        
+
+        auto snd = ex::schedule(sched) | ex::then([]() { return 88; }) |
+            ex::bulk_unchunked(
+                ex::par, 10, [&v](std::size_t i, int val) { v[i] = val; });
+
         ex::sync_wait(std::move(snd));
-        
+
         // All elements should be set to 88
-        for (int i = 0; i < 10; ++i) {
+        for (int i = 0; i < 10; ++i)
+        {
             HPX_TEST_EQ(v[i], 88);
         }
     }
@@ -490,20 +484,20 @@ int hpx_main(int, char*[])
         auto sched = ex::get_parallel_scheduler();
         std::vector<int> v(5, 0);
         std::set<std::thread::id> thread_ids;
-        
-        auto snd = ex::schedule(sched)
-            | ex::then([&v]() { return 55; })
-            | ex::bulk_chunked(ex::seq, 5,
+
+        auto snd = ex::schedule(sched) | ex::then([&v]() { return 55; }) |
+            ex::bulk_chunked(ex::seq, 5,
                 [&v, &thread_ids](std::size_t begin, std::size_t end, int val) {
                     for (std::size_t i = begin; i < end; ++i)
                         v[i] = val;
                     thread_ids.insert(std::this_thread::get_id());
                 });
-        
+
         ex::sync_wait(std::move(snd));
-        
+
         // All elements should be set to 55
-        for (int i = 0; i < 5; ++i) {
+        for (int i = 0; i < 5; ++i)
+        {
             HPX_TEST_EQ(v[i], 55);
         }
         // Sequential execution should use only 1 thread

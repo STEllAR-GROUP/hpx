@@ -15,13 +15,9 @@
 #include <exception>
 #include <memory>
 
-#if !defined(HPX_HAVE_STDEXEC)
-#include <hpx/execution/queries/get_stop_token.hpp>
-#include <hpx/synchronization/stop_token.hpp>
-#endif
-
 namespace hpx::execution::experimental {
 
+#if defined(HPX_HAVE_STDEXEC)
     namespace detail {
         // Singleton-like shared thread pool for parallel_scheduler
         inline hpx::threads::thread_pool_base* get_default_parallel_pool()
@@ -37,7 +33,8 @@ namespace hpx::execution::experimental {
     // Forward declaration for parallel_scheduler_domain
     class parallel_scheduler;
 
-#if defined(HPX_HAVE_STDEXEC)
+    inline parallel_scheduler get_parallel_scheduler();
+
     // P2079R10: Domain for parallel_scheduler bulk operations.
     // The existing thread_pool_domain checks __completes_on with
     // thread_pool_policy_scheduler, but parallel_scheduler's sender
@@ -60,10 +57,21 @@ namespace hpx::execution::experimental {
 
                 // Get the parallel_scheduler from the child sender's
                 // completion scheduler (completes_on pattern)
-                auto par_sched =
-                    hpx::execution::experimental::get_completion_scheduler<
-                        hpx::execution::experimental::set_value_t>(
-                        hpx::execution::experimental::get_env(child));
+                auto par_sched = [&]() {
+                    if constexpr (hpx::is_invocable_v<
+                                      hpx::execution::experimental::get_completion_scheduler_t<
+                                          hpx::execution::experimental::set_value_t>,
+                                      decltype(hpx::execution::experimental::get_env(child))>)
+                    {
+                        return hpx::execution::experimental::get_completion_scheduler<
+                            hpx::execution::experimental::set_value_t>(
+                            hpx::execution::experimental::get_env(child));
+                    }
+                    else
+                    {
+                        return hpx::execution::experimental::get_parallel_scheduler();
+                    }
+                }();
 
                 // Extract the underlying thread pool scheduler
                 auto underlying = par_sched.get_underlying_scheduler();
@@ -86,11 +94,11 @@ namespace hpx::execution::experimental {
                     thread_pool_bulk_sender<hpx::launch,
                         std::decay_t<decltype(child)>,
                         std::decay_t<decltype(iota_shape)>,
-                        std::decay_t<decltype(f)>, is_chunked, is_parallel>{
+                        std::decay_t<decltype(f)>, is_chunked, is_parallel>(
                         HPX_MOVE(underlying),
                         HPX_FORWARD(decltype(child), child),
                         HPX_MOVE(iota_shape), HPX_FORWARD(decltype(f), f),
-                        HPX_MOVE(pu_mask)};
+                        HPX_MOVE(pu_mask));
             }
             else
             {
@@ -107,7 +115,6 @@ namespace hpx::execution::experimental {
             }
         }
     };
-#endif
 
     // P2079R10 parallel_scheduler implementation
     class parallel_scheduler
@@ -199,7 +206,7 @@ namespace hpx::execution::experimental {
             operation_state& operator=(operation_state const&) = delete;
 
             friend void tag_invoke(
-                stdexec::start_t, operation_state& os) noexcept
+                start_t, operation_state& os) noexcept
             {
 #if defined(HPX_HAVE_STDEXEC)
                 // P2079R10 4.1: if stop_token is stopped, complete
@@ -353,16 +360,18 @@ namespace hpx::execution::experimental {
     // P2079R10 get_parallel_scheduler function
     inline parallel_scheduler get_parallel_scheduler()
     {
-        // Use the default thread pool with async policy for parallel execution
-        auto pool = detail::get_default_parallel_pool();
-        if (!pool)
-        {
-            // clang-format off
-            std::terminate(); // As per P2079R10, terminate if backend is unavailable
-            // clang-format on
-        }
-        return parallel_scheduler(thread_pool_policy_scheduler<hpx::launch>(
-            pool, hpx::launch::async));
+        static const parallel_scheduler default_sched = []() {
+            auto pool = detail::get_default_parallel_pool();
+            if (!pool)
+            {
+                std::terminate(); // As per P2079R10, terminate if backend is unavailable
+            }
+            return parallel_scheduler(thread_pool_policy_scheduler<hpx::launch>(
+                pool, hpx::launch::async));
+        }();
+        return default_sched;
     }
+
+#endif    // HPX_HAVE_STDEXEC
 
 }    // namespace hpx::execution::experimental
