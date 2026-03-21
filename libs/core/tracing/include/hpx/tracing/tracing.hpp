@@ -17,7 +17,7 @@
 
 namespace hpx::tracing {
 
-    HPX_CXX_CORE_EXPORT struct region
+    struct HPX_CORE_EXPORT region
     {
         region(char const* name, std::size_t num_thread, std::size_t phase,
             bool enabled) noexcept;
@@ -35,7 +35,7 @@ namespace hpx::tracing {
         hpx::tracy::region impl;
     };
 
-    HPX_CXX_CORE_EXPORT struct mark_event
+    struct HPX_CORE_EXPORT mark_event
     {
         explicit mark_event(char const* name) noexcept;
         ~mark_event();
@@ -44,7 +44,7 @@ namespace hpx::tracing {
         hpx::tracy::mark_event impl;
     };
 
-    HPX_CXX_CORE_EXPORT struct fiber_region
+    struct HPX_CORE_EXPORT fiber_region
     {
         explicit fiber_region(hpx::threads::thread_data* thrdptr,
             std::size_t num_thread) noexcept;
