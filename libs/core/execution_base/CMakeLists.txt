@@ -19,6 +19,7 @@ set(execution_base_headers
     hpx/execution_base/get_env.hpp
     hpx/execution_base/operation_state.hpp
     hpx/execution_base/receiver.hpp
+    hpx/execution_base/receiver_inlining.hpp
     hpx/execution_base/resource_base.hpp
     hpx/execution_base/sender.hpp
     hpx/execution_base/stdexec_forward.hpp
