@@ -17,7 +17,7 @@
 
 namespace hpx::tracing {
 
-    struct HPX_CORE_EXPORT region
+    HPX_CXX_CORE_EXPORT struct HPX_CORE_EXPORT region
     {
         region(char const* name, std::size_t num_thread, std::size_t phase,
             bool enabled) noexcept;
@@ -35,7 +35,7 @@ namespace hpx::tracing {
         hpx::tracy::region impl;
     };
 
-    struct HPX_CORE_EXPORT mark_event
+    HPX_CXX_CORE_EXPORT struct HPX_CORE_EXPORT mark_event
     {
         explicit mark_event(char const* name) noexcept;
         ~mark_event();
@@ -44,7 +44,7 @@ namespace hpx::tracing {
         hpx::tracy::mark_event impl;
     };
 
-    struct HPX_CORE_EXPORT fiber_region
+    HPX_CXX_CORE_EXPORT struct HPX_CORE_EXPORT fiber_region
     {
         explicit fiber_region(hpx::threads::thread_data* thrdptr,
             std::size_t num_thread) noexcept;
@@ -65,35 +65,27 @@ namespace hpx::tracing {
 
 namespace hpx::tracing {
 
-    struct region
+    HPX_CXX_CORE_EXPORT struct region
     {
-        constexpr region([[maybe_unused]] char const* name,
-            [[maybe_unused]] std::size_t num_thread,
-            [[maybe_unused]] std::size_t phase,
-            [[maybe_unused]] bool enabled) noexcept
+        constexpr region(char const*, std::size_t, std::size_t, bool) noexcept
         {
         }
 
         constexpr explicit region(
-            [[maybe_unused]] hpx::threads::thread_data* thrdptr,
-            [[maybe_unused]] std::size_t num_thread) noexcept
+            hpx::threads::thread_data*, std::size_t) noexcept
         {
         }
     };
 
-    struct mark_event
+    HPX_CXX_CORE_EXPORT struct mark_event
     {
-        constexpr explicit mark_event(
-            [[maybe_unused]] char const* name) noexcept
-        {
-        }
+        constexpr explicit mark_event(char const*) noexcept {}
     };
 
-    struct fiber_region
+    HPX_CXX_CORE_EXPORT struct fiber_region
     {
         constexpr explicit fiber_region(
-            [[maybe_unused]] hpx::threads::thread_data* thrdptr,
-            [[maybe_unused]] std::size_t num_thread) noexcept
+            hpx::threads::thread_data*, std::size_t) noexcept
         {
         }
     };
