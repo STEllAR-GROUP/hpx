@@ -232,6 +232,7 @@ namespace hpx::parallel::detail {
                 HPX_FORWARD(Args, args)...);
         }
 
+#if defined(HPX_HAVE_CXX20_STD_EXECUTION_POLICES)
         template <typename... Args>
         HPX_FORCEINLINE constexpr decltype(auto) call(
             std::execution::unsequenced_policy, Args&&... args)
@@ -239,6 +240,7 @@ namespace hpx::parallel::detail {
             return call2(hpx::execution::unseq, std::false_type(),
                 HPX_FORWARD(Args, args)...);
         }
+#endif
 #endif
 
     private:
