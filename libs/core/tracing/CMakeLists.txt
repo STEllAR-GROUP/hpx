@@ -6,7 +6,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tracing_headers hpx/tracing/tracing.hpp)
-set(tracing_sources src/tracing.cpp)
+set(tracing_sources tracing.cpp)
 
 set(tracing_module_dependencies hpx_config hpx_threading_base)
 if(HPX_TRACY_WITH_TRACY)
