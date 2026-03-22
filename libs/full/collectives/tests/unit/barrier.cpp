@@ -16,7 +16,9 @@
 #include <atomic>
 #include <cstddef>
 #include <functional>
+#include <memory>
 #include <string>
+#include <thread>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -99,9 +101,31 @@ void remote_test_single(hpx::program_options::variables_map& vm)
     }
 }
 
+void test_release_from_non_hpx_thread(hpx::program_options::variables_map& vm)
+{
+    std::size_t iterations = 0;
+    if (vm.count("iterations"))
+        iterations = vm["iterations"].as<std::size_t>();
+
+    for (std::size_t i = 0; i != iterations; ++i)
+    {
+        auto b = std::make_shared<hpx::distributed::barrier>(
+            hpx::util::format(
+                "/test/barrier/release_from_external_thread/{}/{}",
+                hpx::get_locality_id(), i),
+            1, 0);
+
+        std::thread t([b]() { b->release(); });
+        t.join();
+    }
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(hpx::program_options::variables_map& vm)
 {
+    // Regression test for release() from non-HPX threads.
+    test_release_from_non_hpx_thread(vm);
+
     local_tests(vm);
 
     remote_test_single(vm);
