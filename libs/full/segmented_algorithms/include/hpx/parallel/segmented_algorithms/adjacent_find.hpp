@@ -57,7 +57,7 @@ namespace hpx::parallel {
             {
                 // all elements are on the same partition
                 local_iterator_type beg = traits::local(first);
-                local_iterator_type end = traits::end(sit);
+                local_iterator_type end = traits::local(last);
                 if (beg != end)
                 {
                     local_iterator_type out = dispatch(traits::get_id(sit),
