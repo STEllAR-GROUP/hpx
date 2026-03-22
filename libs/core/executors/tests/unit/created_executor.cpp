@@ -147,16 +147,15 @@ int parallel_sum(iter first, iter last, int num_parts)
     std::vector<hpx::util::iterator_range<iter>> input =
         split(first, last, num_parts);
 
-    std::vector<hpx::future<int>> v =
-        hpx::parallel::execution::bulk_async_execute(
-            exec,
-            [](hpx::util::iterator_range<iter> const& rng) -> int {
-                return std::accumulate(std::begin(rng), std::end(rng), 0);
-            },
-            input);
+    auto v = hpx::parallel::execution::bulk_async_execute(
+        exec,
+        [](hpx::util::iterator_range<iter> const& rng) -> int {
+            return std::accumulate(std::begin(rng), std::end(rng), 0);
+        },
+        input);
 
-    return std::accumulate(std::begin(v), std::end(v), 0,
-        [](int a, hpx::future<int>& b) -> int { return a + b.get(); });
+    auto results = v.get();
+    return std::accumulate(std::begin(results), std::end(results), 0);
 }
 
 // parallel sum using void parallel executer
