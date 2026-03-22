@@ -20,8 +20,6 @@ namespace hpx::parallel::detail {
     constexpr typename std::iterator_traits<InIterB>::difference_type distance(
         InIterB first, InIterE last)
     {
-        // we add this since passing in random access iterators
-        // as begin and end might not pass the sized sentinel check
         if constexpr (std::is_same_v<InIterB, InIterE> &&
             std::random_access_iterator<InIterB>)
         {
