@@ -10,10 +10,10 @@
 #include <hpx/components_base/server/component_heap.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/async_combinators.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
-#include <hpx/modules/errors.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/type_support.hpp>
 
