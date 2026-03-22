@@ -14,6 +14,7 @@
 #include <hpx/threading_base/detail/get_default_pool.hpp>
 #include <exception>
 #include <memory>
+#include <type_traits>
 
 namespace hpx::execution::experimental {
 
@@ -59,17 +60,22 @@ namespace hpx::execution::experimental {
                 // completion scheduler (completes_on pattern)
                 auto par_sched = [&]() {
                     if constexpr (hpx::is_invocable_v<
-                                      hpx::execution::experimental::get_completion_scheduler_t<
-                                          hpx::execution::experimental::set_value_t>,
-                                      decltype(hpx::execution::experimental::get_env(child))>)
+                                      hpx::execution::experimental::
+                                          get_completion_scheduler_t<hpx::
+                                              execution::experimental::
+                                                  set_value_t>,
+                                      decltype(hpx::execution::experimental::
+                                                   get_env(child))>)
                     {
-                        return hpx::execution::experimental::get_completion_scheduler<
-                            hpx::execution::experimental::set_value_t>(
-                            hpx::execution::experimental::get_env(child));
+                        return hpx::execution::experimental::
+                            get_completion_scheduler<
+                                hpx::execution::experimental::set_value_t>(
+                                hpx::execution::experimental::get_env(child));
                     }
                     else
                     {
-                        return hpx::execution::experimental::get_parallel_scheduler();
+                        return hpx::execution::experimental::
+                            get_parallel_scheduler();
                     }
                 }();
 
@@ -205,8 +211,7 @@ namespace hpx::execution::experimental {
             operation_state& operator=(operation_state&&) = default;
             operation_state& operator=(operation_state const&) = delete;
 
-            friend void tag_invoke(
-                start_t, operation_state& os) noexcept
+            friend void tag_invoke(start_t, operation_state& os) noexcept
             {
 #if defined(HPX_HAVE_STDEXEC)
                 // P2079R10 4.1: if stop_token is stopped, complete
@@ -347,7 +352,7 @@ namespace hpx::execution::experimental {
 
     private:
         thread_pool_policy_scheduler<hpx::launch> scheduler_;
-        // Cached PU mask — computed once, reused for every bulk_chunked call.
+        // Cached PU mask - computed once, reused for every bulk_chunked call.
         hpx::threads::mask_type pu_mask_;
     };
 
@@ -360,11 +365,12 @@ namespace hpx::execution::experimental {
     // P2079R10 get_parallel_scheduler function
     inline parallel_scheduler get_parallel_scheduler()
     {
-        static const parallel_scheduler default_sched = []() {
+        static parallel_scheduler const default_sched = []() {
             auto pool = detail::get_default_parallel_pool();
             if (!pool)
             {
-                std::terminate(); // As per P2079R10, terminate if backend is unavailable
+                std::
+                    terminate();    // As per P2079R10, terminate if backend is unavailable
             }
             return parallel_scheduler(thread_pool_policy_scheduler<hpx::launch>(
                 pool, hpx::launch::async));

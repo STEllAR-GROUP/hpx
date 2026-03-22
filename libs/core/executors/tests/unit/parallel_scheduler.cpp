@@ -11,12 +11,15 @@
 
 #include <atomic>
 #include <chrono>
+#include <cstddef>
 #include <exception>
 #include <optional>
 #include <set>
 #include <stdexcept>
+#include <string>
 #include <thread>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 namespace ex = hpx::execution::experimental;
@@ -24,7 +27,6 @@ namespace ex = hpx::execution::experimental;
 #if defined(HPX_HAVE_STDEXEC)
 // Include stdexec async_scope for stop token testing
 #include <exec/async_scope.hpp>
-#endif
 
 int hpx_main(int, char*[])
 {
@@ -394,7 +396,6 @@ int hpx_main(int, char*[])
         }
     }
 
-#if defined(HPX_HAVE_STDEXEC)
     // Stop token support test (P2079R10 requirement)
     {
         ex::parallel_scheduler sched = ex::get_parallel_scheduler();
@@ -503,10 +504,16 @@ int hpx_main(int, char*[])
         // Sequential execution should use only 1 thread
         HPX_TEST_EQ(thread_ids.size(), std::size_t(1));
     }
-#endif
 
     return hpx::local::finalize();
 }
+#else
+int hpx_main(int, char*[])
+{
+    // parallel_scheduler requires HPX_HAVE_STDEXEC
+    return hpx::local::finalize();
+}
+#endif
 
 int main(int argc, char* argv[])
 {

@@ -42,20 +42,19 @@ namespace hpx::execution::experimental {
         };
 
         template <typename Policy>
-        struct has_thread_pool_backend<
-            thread_pool_policy_scheduler<Policy>> : std::true_type
+        struct has_thread_pool_backend<thread_pool_policy_scheduler<Policy>>
+          : std::true_type
         {
         };
 
         // Helper to extract thread pool parameters from a scheduler
         template <typename Scheduler>
-        struct thread_pool_params; // primary: not defined
+        struct thread_pool_params;    // primary: not defined
 
         template <typename Policy>
         struct thread_pool_params<thread_pool_policy_scheduler<Policy>>
         {
-            static auto* pool(
-                thread_pool_policy_scheduler<Policy> const& sched)
+            static auto* pool(thread_pool_policy_scheduler<Policy> const& sched)
             {
                 return sched.get_thread_pool();
             }
@@ -79,8 +78,8 @@ namespace hpx::execution::experimental {
             static auto pu_mask(
                 thread_pool_policy_scheduler<Policy> const& sched)
             {
-                return hpx::execution::experimental::
-                    get_processing_units_mask(sched);
+                return hpx::execution::experimental::get_processing_units_mask(
+                    sched);
             }
         };
     }    // namespace detail
@@ -254,8 +253,8 @@ namespace hpx::execution::experimental {
 
                     return hpx::parallel::execution::detail::
                         index_queue_bulk_async_execute(pool, first_core,
-                            num_cores, policy, HPX_FORWARD(F, f), shape,
-                            mask, HPX_FORWARD(Ts, ts)...);
+                            num_cores, policy, HPX_FORWARD(F, f), shape, mask,
+                            HPX_FORWARD(Ts, ts)...);
                 }
                 else if constexpr (requires {
                                        exec.sched_.get_underlying_scheduler();
@@ -287,7 +286,8 @@ namespace hpx::execution::experimental {
                         size_type const n = hpx::util::size(shape);
                         return make_future(bulk(schedule(exec.sched_), par, n,
                             [shape, f = HPX_FORWARD(F, f),
-                                ... args = HPX_FORWARD(Ts, ts)](size_type i) mutable {
+                                ... args = HPX_FORWARD(Ts, ts)](
+                                size_type i) mutable {
                                 auto it = hpx::util::begin(shape);
                                 std::advance(it, i);
                                 HPX_INVOKE(f, *it, args...);
@@ -300,7 +300,8 @@ namespace hpx::execution::experimental {
                     size_type const n = hpx::util::size(shape);
                     return make_future(bulk(schedule(exec.sched_), par, n,
                         [shape, f = HPX_FORWARD(F, f),
-                            ... args = HPX_FORWARD(Ts, ts)](size_type i) mutable {
+                            ... args = HPX_FORWARD(Ts, ts)](
+                            size_type i) mutable {
                             auto it = hpx::util::begin(shape);
                             std::advance(it, i);
                             HPX_INVOKE(f, *it, args...);
@@ -501,8 +502,9 @@ namespace hpx::execution::experimental {
 
                             hpx::parallel::execution::detail::
                                 index_queue_bulk_sync_execute(pool, first_core,
-                                    num_cores, policy, HPX_FORWARD(decltype(f), f),
-                                    shape, mask, HPX_FORWARD(decltype(ts), ts)...);
+                                    num_cores, policy,
+                                    HPX_FORWARD(decltype(f), f), shape, mask,
+                                    HPX_FORWARD(decltype(ts), ts)...);
                         },
                         HPX_FORWARD(Future, predecessor));
                 }
@@ -538,8 +540,7 @@ namespace hpx::execution::experimental {
                                     index_queue_bulk_sync_execute(pool,
                                         first_core, num_cores, policy,
                                         HPX_FORWARD(decltype(f), f), shape,
-                                        mask,
-                                        HPX_FORWARD(decltype(ts), ts)...);
+                                        mask, HPX_FORWARD(decltype(ts), ts)...);
                             },
                             HPX_FORWARD(Future, predecessor));
                     }
@@ -557,8 +558,7 @@ namespace hpx::execution::experimental {
                                 size_type i, auto&... receiver_args) mutable {
                                 auto it = hpx::util::begin(shape);
                                 std::advance(it, i);
-                                HPX_INVOKE(
-                                    f, *it, args..., receiver_args...);
+                                HPX_INVOKE(f, *it, args..., receiver_args...);
                             });
                         return make_future(HPX_MOVE(loop));
                     }
@@ -566,19 +566,19 @@ namespace hpx::execution::experimental {
                 else
                 {
                     // Fallback: sender pipeline
-                    auto pre_req = when_all(
-                        keep_future(HPX_FORWARD(Future, predecessor)));
+                    auto pre_req =
+                        when_all(keep_future(HPX_FORWARD(Future, predecessor)));
                     using size_type = decltype(hpx::util::size(shape));
                     size_type const n = hpx::util::size(shape);
-                    auto loop = bulk(
-                        transfer(HPX_MOVE(pre_req), exec.sched_), par, n,
-                        [shape, f = HPX_FORWARD(F, f),
-                            ... args = HPX_FORWARD(Ts, ts)](
-                            size_type i, auto&... receiver_args) mutable {
-                            auto it = hpx::util::begin(shape);
-                            std::advance(it, i);
-                            HPX_INVOKE(f, *it, args..., receiver_args...);
-                        });
+                    auto loop =
+                        bulk(transfer(HPX_MOVE(pre_req), exec.sched_), par, n,
+                            [shape, f = HPX_FORWARD(F, f),
+                                ... args = HPX_FORWARD(Ts, ts)](
+                                size_type i, auto&... receiver_args) mutable {
+                                auto it = hpx::util::begin(shape);
+                                std::advance(it, i);
+                                HPX_INVOKE(f, *it, args..., receiver_args...);
+                            });
                     return make_future(HPX_MOVE(loop));
                 }
 #else
