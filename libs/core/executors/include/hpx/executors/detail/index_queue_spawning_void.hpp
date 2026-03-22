@@ -25,10 +25,8 @@
 #include <hpx/modules/threading.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/topology.hpp>
+#include <hpx/modules/tracing.hpp>
 #include <hpx/modules/type_support.hpp>
-#if defined(HPX_HAVE_MODULE_TRACY)
-#include <hpx/modules/tracy.hpp>
-#endif
 
 #include <algorithm>
 #include <atomic>
@@ -78,9 +76,7 @@ namespace hpx::parallel::execution::detail {
                 static hpx::util::itt::event notify_event("do_work_chunk");
                 hpx::util::itt::mark_event e(notify_event);
 #endif
-#if defined(HPX_HAVE_MODULE_TRACY)
-                hpx::tracy::mark_event evt("do_work_chunk");
-#endif
+                hpx::tracing::mark_event evt("do_work_chunk");
 
                 auto const i_begin = *index * chunk_size;
                 auto const i_end = (std::min) (i_begin + chunk_size,
@@ -116,9 +112,8 @@ namespace hpx::parallel::execution::detail {
                             "do_work_chunk (stealing)");
                         hpx::util::itt::mark_event e(notify_event);
 #endif
-#if defined(HPX_HAVE_MODULE_TRACY)
-                        hpx::tracy::mark_event evt("do_work_chunk (stealing)");
-#endif
+                        hpx::tracing::mark_event evt(
+                            "do_work_chunk (stealing)");
 
                         auto const i_begin = *index * chunk_size;
                         auto const i_end = (std::min) (i_begin + chunk_size,
@@ -158,9 +153,7 @@ namespace hpx::parallel::execution::detail {
             static hpx::util::itt::event notify_event("finish");
             hpx::util::itt::mark_event e(notify_event);
 #endif
-#if defined(HPX_HAVE_MODULE_TRACY)
-            hpx::tracy::mark_event evt("finish");
-#endif
+            hpx::tracing::mark_event evt("finish");
 
             std::uint32_t const prev_value =
                 state->tasks_remaining.data_.fetch_sub(
@@ -442,9 +435,7 @@ namespace hpx::parallel::execution::detail {
                 "index_queue_spawning::execute");
             hpx::util::itt::mark_event e(notify_event);
 #endif
-#if defined(HPX_HAVE_MODULE_TRACY)
-            hpx::tracy::mark_event evt("index_queue_spawning::execute");
-#endif
+            hpx::tracing::mark_event evt("index_queue_spawning::execute");
 
             auto const size =
                 static_cast<std::uint32_t>(hpx::util::size(shape));
