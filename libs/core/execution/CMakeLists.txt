@@ -9,6 +9,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(execution_headers
     hpx/execution/algorithms/as_sender.hpp
     hpx/execution/algorithms/bulk.hpp
+    hpx/execution/algorithms/continues_on.hpp
     hpx/execution/algorithms/detail/is_negative.hpp
     hpx/execution/algorithms/detail/inject_scheduler.hpp
     hpx/execution/algorithms/detail/partial_algorithm.hpp
@@ -16,22 +17,32 @@ set(execution_headers
     hpx/execution/algorithms/detail/single_result.hpp
     hpx/execution/algorithms/ensure_started.hpp
     hpx/execution/algorithms/execute.hpp
+    hpx/execution/algorithms/into_variant.hpp
     hpx/execution/algorithms/just.hpp
     hpx/execution/algorithms/keep_future.hpp
     hpx/execution/algorithms/let_error.hpp
     hpx/execution/algorithms/let_stopped.hpp
     hpx/execution/algorithms/let_value.hpp
     hpx/execution/algorithms/make_future.hpp
+    hpx/execution/algorithms/read_env.hpp
     hpx/execution/algorithms/run_loop.hpp
     hpx/execution/algorithms/schedule_from.hpp
     hpx/execution/algorithms/split.hpp
+    hpx/execution/algorithms/starts_on.hpp
     hpx/execution/algorithms/start_detached.hpp
+    hpx/execution/algorithms/stopped_as_error.hpp
+    hpx/execution/algorithms/stopped_as_optional.hpp
     hpx/execution/algorithms/sync_wait.hpp
     hpx/execution/algorithms/then.hpp
     hpx/execution/algorithms/transfer.hpp
     hpx/execution/algorithms/transfer_just.hpp
+    hpx/execution/algorithms/transfer_when_all_with_variant.hpp
+    hpx/execution/algorithms/upon_error.hpp
+    hpx/execution/algorithms/upon_stopped.hpp
     hpx/execution/algorithms/when_all.hpp
     hpx/execution/algorithms/when_all_vector.hpp
+    hpx/execution/algorithms/when_all_with_variant.hpp
+    hpx/execution/algorithms/write_env.hpp
     hpx/execution/detail/async_launch_policy_dispatch.hpp
     hpx/execution/detail/execution_parameter_callbacks.hpp
     hpx/execution/detail/future_exec.hpp

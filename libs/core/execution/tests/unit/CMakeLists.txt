@@ -7,25 +7,37 @@
 set(tests
     algorithm_as_sender
     algorithm_bulk
+    algorithm_continues_on
     algorithm_ensure_started
     algorithm_execute
+    algorithm_into_variant
     algorithm_just
     algorithm_just_error
     algorithm_just_stopped
     algorithm_let_error
     algorithm_let_stopped
     algorithm_let_value
+    algorithm_p2300_additions_test
+    algorithm_read_env
     algorithm_run_loop
     algorithm_split
     algorithm_start_detached
+    algorithm_starts_on
+    algorithm_stopped_as_error
+    algorithm_stopped_as_optional
     algorithm_sync_wait
     algorithm_sync_wait_with_variant
     algorithm_then
     algorithm_transfer
     algorithm_transfer_just
     algorithm_transfer_when_all
+    algorithm_transfer_when_all_with_variant
+    algorithm_upon_error
+    algorithm_upon_stopped
     algorithm_when_all
     algorithm_when_all_vector
+    algorithm_when_all_with_variant
+    algorithm_write_env
     bulk_async
     environment_queries
     executor_parameters
@@ -40,6 +52,7 @@ set(tests
     minimal_sync_executor
     persistent_executor_parameters
     rebind_executor_parameters
+    test_100_percent_p2300
 )
 
 set(future_then_executor_PARAMETERS THREADS_PER_LOCALITY 4)
