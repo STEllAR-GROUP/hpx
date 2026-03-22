@@ -1074,7 +1074,7 @@ namespace hpx::parallel {
                         val, HPX_FORWARD(Proj, proj));
                 };
 
-                auto f2 = [tok, count, first, last](
+                auto f2 = [tok, first](
                               auto&&... data) mutable -> Iter {
                     static_assert(sizeof...(data) < 2);
 
@@ -1158,7 +1158,7 @@ namespace hpx::parallel {
                         tok, HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
                 };
 
-                auto f2 = [tok, count, first, last](
+                auto f2 = [tok, first](
                               auto&&... data) mutable -> Iter {
                     static_assert(sizeof...(data) < 2);
 
@@ -1241,7 +1241,7 @@ namespace hpx::parallel {
                         tok, HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
                 };
 
-                auto f2 = [tok, count, first, last](
+                auto f2 = [tok, first](
                               auto&&... data) mutable -> Iter {
                     static_assert(sizeof...(data) < 2);
 
@@ -1351,7 +1351,7 @@ namespace hpx::parallel {
                         HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
                 };
 
-                auto f2 = [tok, count, first1, last1](
+                auto f2 = [tok, first1](
                               auto&&... data) mutable -> Iter1 {
                     static_assert(sizeof...(data) < 2);
 
@@ -1449,7 +1449,7 @@ namespace hpx::parallel {
                         HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
                 };
 
-                auto f2 = [tok, count, first, last](
+                auto f2 = [tok, first](
                               auto&&... data) mutable -> FwdIter {
                     static_assert(sizeof...(data) < 2);
 
