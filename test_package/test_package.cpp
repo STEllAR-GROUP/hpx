@@ -1,16 +1,22 @@
-#include &lt;hpx/hpx_init.hpp&gt;
-#include &lt;hpx/iostream.hpp&gt;
-#include &lt;hpx/future.hpp&gt;
+//  Copyright (c) 2026 Pratyksh Gupta
+//
+//  SPDX-License-Identifier: BSL-1.0
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+#include <hpx/hpx_init.hpp>
+#include <hpx/iostream.hpp>
+#include <hpx/future.hpp>
 
 int hpx_main()
 {
     // Print a simple message using HPX
-    hpx::cout &lt;&lt; "Hello from HPX! HPX is working correctly." &lt;&lt; hpx::endl;
-    
+    hpx::cout << "Hello from HPX! HPX is working correctly." << hpx::endl;
+
     // Test basic future functionality
-    hpx::future&lt;int&gt; f = hpx::async([]() { return 42; });
-    hpx::cout &lt;&lt; "The answer is: " &lt;&lt; f.get() &lt;&lt; hpx::endl;
-    
+    hpx::future<int> f = hpx::async([]() { return 42; });
+    hpx::cout << "The answer is: " << f.get() << hpx::endl;
+
     return hpx::finalize();
 }
 

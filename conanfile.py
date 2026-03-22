@@ -1,3 +1,9 @@
+# Copyright (c) 2026 Pratyksh Gupta
+#
+# SPDX-License-Identifier: BSL-1.0
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
 from conan import ConanFile
 from conan.tools.cmake import CMake, CMakeToolchain, CMakeDeps, cmake_layout
 from conan.tools.files import copy, rmdir, load
@@ -14,7 +20,7 @@ class HPXConan(ConanFile):
     license = "BSL-1.0"
     author = "STE||AR Group"
     url = "https://github.com/STEllAR-GROUP/hpx"
-    homepage = "https://hpx.stellar-group.org"
+    homepage = "https://hpx.dev"
     description = "The C++ Standards Library for Parallelism and Concurrency"
     topics = ("hpx", "parallelism", "concurrency", "distributed-computing", "hpc", "runtime-system")
 
