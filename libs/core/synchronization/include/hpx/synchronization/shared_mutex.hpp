@@ -77,20 +77,30 @@ namespace hpx::detail {
         bool set_state(shared_state& s1, shared_state& s) noexcept
         {
             ++s.data.tag;
-            return s1.value == state.load(std::memory_order_relaxed).value &&
-                state.compare_exchange_strong(s1, s, std::memory_order_release);
+            shared_state current = state.load(std::memory_order_relaxed);
+            if (s1.value != current.value)
+            {
+                s1 = current;
+                return false;
+            }
+            return state.compare_exchange_strong(
+                s1, s, std::memory_order_acq_rel, std::memory_order_acquire);
         }
 
         bool set_state(shared_state& s1, shared_state& s,
             std::unique_lock<mutex_type>& lk) noexcept
         {
-            if (s1.value != state.load(std::memory_order_relaxed).value)
-                return false;
-
             ++s.data.tag;
+            shared_state current = state.load(std::memory_order_relaxed);
+            if (s1.value != current.value)
+            {
+                s1 = current;
+                return false;
+            }
 
             lk = std::unique_lock<mutex_type>(state_change);
-            if (state.compare_exchange_strong(s1, s, std::memory_order_release))
+            if (state.compare_exchange_strong(
+                    s1, s, std::memory_order_acq_rel, std::memory_order_acquire))
                 return true;
 
             lk.unlock();
@@ -99,10 +109,22 @@ namespace hpx::detail {
 
         void lock_shared()
         {
+            auto s = state.load(std::memory_order_acquire);
+            while (!s.data.exclusive && !s.data.exclusive_waiting_blocked)
+            {
+                auto s1 = s;
+                ++s.data.shared_count;
+                if (set_state(s1, s))
+                {
+                    return;
+                }
+                s.value = s1.value;
+            }
+
             while (true)
             {
                 std::unique_lock<mutex_type> lk(state_change);
-                auto s = state.load(std::memory_order_acquire);
+                s = state.load(std::memory_order_acquire);
                 while (s.data.exclusive || s.data.exclusive_waiting_blocked)
                 {
                     shared_cond.wait(lk);
@@ -121,9 +143,9 @@ namespace hpx::detail {
 
         bool try_lock_shared()
         {
+            auto s = state.load(std::memory_order_acquire);
             while (true)
             {
-                auto s = state.load(std::memory_order_acquire);
                 if (s.data.exclusive || s.data.exclusive_waiting_blocked)
                 {
                     return false;
@@ -136,8 +158,30 @@ namespace hpx::detail {
                 {
                     break;
                 }
+                s.value = s1.value;
             }
             return true;
+        }
+
+        bool try_unlock_shared_fast() noexcept
+        {
+            while (true)
+            {
+                auto s = state.load(std::memory_order_acquire);
+                auto s1 = s;
+
+                if (s.data.shared_count == 1 && s.data.exclusive_waiting_blocked)
+                {
+                    return false;
+                }
+
+                --s.data.shared_count;
+                if (set_state(s1, s))
+                {
+                    return true;
+                }
+                s.value = s1.value;
+            }
         }
 
         void unlock_shared()
@@ -509,18 +553,23 @@ namespace hpx::detail {
 
         void lock_shared()
         {
+            if (data_->try_lock_shared())
+                return;
+
             auto data = data_;
             data->lock_shared();
         }
 
         bool try_lock_shared()
         {
-            auto data = data_;
-            return data->try_lock_shared();
+            return data_->try_lock_shared();
         }
 
         void unlock_shared()
         {
+            if (data_->try_unlock_shared_fast())
+                return;
+
             auto data = data_;
             data->unlock_shared();
         }
