@@ -76,6 +76,22 @@ namespace hpx::execution::experimental::detail {
         return static_cast<std::uint32_t>(chunk_size);
     }
 
+    // For bulk_chunked: create exactly num_threads large chunks (one per worker).
+    // Unlike get_bulk_scheduler_chunk_size which creates ~8x more chunks per
+    // thread for fine-grained work stealing, this variant maximises spatial
+    // locality and minimises work-stealing queue overhead for the chunked case.
+    // Work stealing is still attempted but rarely needed for uniform workloads.
+    HPX_CXX_CORE_EXPORT constexpr std::uint32_t
+    get_bulk_scheduler_chunk_size_chunked(
+        std::uint32_t const num_threads, std::size_t const n) noexcept
+    {
+        if (num_threads == 0)
+            return static_cast<std::uint32_t>(n);
+        // ceiling division: ceil(n / num_threads) -> one chunk per worker thread
+        return static_cast<std::uint32_t>(
+            (n + static_cast<std::size_t>(num_threads) - 1) / num_threads);
+    }
+
     // For bulk_unchunked: f(index, ...)
     HPX_CXX_CORE_EXPORT template <std::size_t... Is, typename F, typename T,
         typename Ts>
@@ -166,9 +182,10 @@ namespace hpx::execution::experimental::detail {
             using index_pack_type = hpx::detail::fused_index_pack_t<Ts>;
 
             auto const i_begin =
-                static_cast<std::size_t>(index) * task_f->chunk_size;
+                static_cast<std::size_t>(index) * op_state->chunk_size;
             auto const i_end =
-                (std::min) (i_begin + task_f->chunk_size, task_f->size);
+                (std::min) (i_begin + op_state->chunk_size,
+                    static_cast<std::size_t>(op_state->size));
 
             if constexpr (OperationState::is_chunked)
             {
@@ -202,7 +219,7 @@ namespace hpx::execution::experimental::detail {
                 do_work_chunk(ts, *index);
             }
 
-            if (task_f->allow_stealing)
+            if (op_state->allow_stealing)
             {
                 // Then steal from the opposite end of the neighboring queues
                 static constexpr auto opposite_end =
@@ -235,7 +252,7 @@ namespace hpx::execution::experimental::detail {
         void operator()(Ts& ts) const
         {
             // schedule chunks from the end, if needed
-            if (task_f->reverse_placement)
+            if (op_state->reverse_placement)
             {
                 do_work<hpx::concurrency::detail::queue_end::right>(ts);
             }
@@ -276,11 +293,7 @@ namespace hpx::execution::experimental::detail {
     struct task_function
     {
         OperationState* const op_state;
-        std::size_t const size;
-        std::uint32_t const chunk_size;
         std::uint32_t const worker_thread;
-        bool reverse_placement;
-        bool allow_stealing;
 
         // Visit the values sent by the predecessor sender.
         void do_work() const
@@ -369,6 +382,20 @@ namespace hpx::execution::experimental::detail {
 #endif
         OperationState* op_state;
 
+#if defined(HPX_HAVE_STDEXEC)
+        template <typename E>
+        void set_error(E&& e) && noexcept
+        {
+            hpx::execution::experimental::set_error(
+                HPX_MOVE(op_state->receiver), HPX_FORWARD(E, e));
+        }
+
+        void set_stopped() && noexcept
+        {
+            hpx::execution::experimental::set_stopped(
+                HPX_MOVE(op_state->receiver));
+        }
+#else
         template <typename E>
         friend void tag_invoke(hpx::execution::experimental::set_error_t,
             bulk_receiver&& r, E&& e) noexcept
@@ -383,6 +410,7 @@ namespace hpx::execution::experimental::detail {
             hpx::execution::experimental::set_stopped(
                 HPX_MOVE(r.op_state->receiver));
         }
+#endif
 
         // Initialize a queue for a worker thread.
         void init_queue_depth_first(std::size_t const worker_thread,
@@ -500,12 +528,30 @@ namespace hpx::execution::experimental::detail {
                 return;
             }
 
-            // Calculate chunk size based on execution mode
+            // Calculate chunk size based on execution mode and sequential policy
             std::uint32_t chunk_size;
             std::uint32_t num_chunks;
-            if constexpr (OperationState::is_chunked)
+
+            // For sequential policy: single chunk covering entire range
+            if constexpr (!OperationState::is_parallel)
             {
-                chunk_size = get_bulk_scheduler_chunk_size(
+                if constexpr (OperationState::is_chunked)
+                {
+                    chunk_size = size;
+                    num_chunks = 1;
+                }
+                else
+                {
+                    chunk_size = 1;
+                    num_chunks = size;
+                }
+                op_state->num_worker_threads = 1;
+            }
+            else if constexpr (OperationState::is_chunked)
+            {
+                // One large chunk per worker thread: minimises queue overhead
+                // and maximises locality for memory-bound work.
+                chunk_size = get_bulk_scheduler_chunk_size_chunked(
                     op_state->num_worker_threads, size);
                 num_chunks = (size + chunk_size - 1) / chunk_size;
             }
@@ -517,14 +563,25 @@ namespace hpx::execution::experimental::detail {
 
             // launch only as many tasks as we have chunks
             std::size_t const num_pus = op_state->num_worker_threads;
-            if (num_chunks <
+            if constexpr (!OperationState::is_parallel)
+            {
+                // Sequential: force single task execution
+                op_state->tasks_remaining.data_.store(
+                    1, std::memory_order_relaxed);
+                op_state->pu_mask = detail::limit_mask(op_state->pu_mask, 1);
+            }
+            else if (num_chunks <
                 static_cast<std::uint32_t>(op_state->num_worker_threads))
             {
                 op_state->num_worker_threads = num_chunks;
-                op_state->tasks_remaining.data_ = num_chunks;
+                op_state->tasks_remaining.data_.store(
+                    num_chunks, std::memory_order_relaxed);
                 op_state->pu_mask =
                     detail::limit_mask(op_state->pu_mask, num_chunks);
             }
+
+            op_state->size = size;
+            op_state->chunk_size = chunk_size;
 
             HPX_ASSERT(hpx::threads::count(op_state->pu_mask) ==
                 op_state->num_worker_threads);
@@ -576,10 +633,10 @@ namespace hpx::execution::experimental::detail {
                     rp.get_pu_num(local_worker_thread + op_state->first_thread);
             }
 
-            bool reverse_placement =
+            op_state->reverse_placement =
                 hint.placement_mode() == placement::depth_first_reverse ||
                 hint.placement_mode() == placement::breadth_first_reverse;
-            bool allow_stealing =
+            op_state->allow_stealing =
                 !hpx::threads::do_not_share_function(hint.sharing_mode());
 
             for (std::uint32_t pu = 0;
@@ -615,8 +672,7 @@ namespace hpx::execution::experimental::detail {
 
                 // Schedule task for this worker thread
                 do_work_task(
-                    task_function<OperationState>{op_state, size, chunk_size,
-                        worker_thread, reverse_placement, allow_stealing});
+                    task_function<OperationState>{op_state, worker_thread});
 
                 ++worker_thread;
             }
@@ -628,12 +684,29 @@ namespace hpx::execution::experimental::detail {
             // Handle the queue for the local thread.
             if (main_thread_ok)
             {
-                do_work_local(task_function<OperationState>{this->op_state,
-                    size, chunk_size, local_worker_thread, reverse_placement,
-                    allow_stealing});
+                do_work_local(task_function<OperationState>{
+                    this->op_state, local_worker_thread});
             }
         }
 
+#if defined(HPX_HAVE_STDEXEC)
+        template <typename... Ts>
+            requires((OperationState::is_chunked &&
+                         std::invocable<F, range_value_type, range_value_type,
+                             std::add_lvalue_reference_t<Ts>...>) ||
+                (!OperationState::is_chunked &&
+                    std::invocable<F, range_value_type,
+                        std::add_lvalue_reference_t<Ts>...>) )
+        void set_value(Ts&&... ts) && noexcept
+        {
+            hpx::detail::try_catch_exception_ptr(
+                [&]() { this->execute(HPX_FORWARD(Ts, ts)...); },
+                [&](std::exception_ptr ep) {
+                    hpx::execution::experimental::set_error(
+                        HPX_MOVE(this->op_state->receiver), HPX_MOVE(ep));
+                });
+        }
+#else
         template <typename... Ts>
             requires(std::invocable<F, range_value_type,
                 std::add_lvalue_reference_t<Ts>...>)
@@ -647,6 +720,7 @@ namespace hpx::execution::experimental::detail {
                         HPX_MOVE(r.op_state->receiver), HPX_MOVE(ep));
                 });
         }
+#endif
     };
 
     // This sender represents bulk work that will be performed using the
@@ -666,7 +740,8 @@ namespace hpx::execution::experimental::detail {
     // threads.
     //
     HPX_CXX_CORE_EXPORT template <typename Policy, typename Sender,
-        typename Shape, typename F, bool IsChunked = false>
+        typename Shape, typename F, bool IsChunked = false,
+        bool IsParallel = true>
     class thread_pool_bulk_sender
     {
     private:
@@ -728,26 +803,25 @@ namespace hpx::execution::experimental::detail {
             std::decay_t<Sender> const& pred_snd;
             thread_pool_policy_scheduler<Policy> const& sch;
 
+            constexpr auto query(
+                hpx::execution::experimental::get_completion_scheduler_t<
+                    hpx::execution::experimental::set_value_t>) const noexcept
+            {
+                return sch;
+            }
+
             template <typename CPO>
                 requires(meta::value<meta::one_of<CPO,
                              hpx::execution::experimental::set_error_t,
                              hpx::execution::experimental::set_stopped_t>> &&
                     hpx::execution::experimental::detail::
                         has_completion_scheduler_v<CPO, std::decay_t<Sender>>)
-            friend constexpr auto tag_invoke(
-                hpx::execution::experimental::get_completion_scheduler_t<CPO>
-                    tag,
-                env const& e) noexcept
+            constexpr auto query(
+                hpx::execution::experimental::get_completion_scheduler_t<CPO>)
+                const noexcept
             {
-                return tag(hpx::execution::experimental::get_env(e.pred_snd));
-            }
-
-            friend constexpr auto tag_invoke(
-                hpx::execution::experimental::get_completion_scheduler_t<
-                    hpx::execution::experimental::set_value_t>,
-                env const& e) noexcept
-            {
-                return e.sch;
+                return hpx::execution::experimental::get_completion_scheduler<
+                    CPO>(hpx::execution::experimental::get_env(pred_snd));
             }
         };
 
@@ -810,6 +884,7 @@ namespace hpx::execution::experimental::detail {
         struct operation_state
         {
             static constexpr bool is_chunked = IsChunked;
+            static constexpr bool is_parallel = IsParallel;
 
             using operation_state_type =
                 hpx::execution::experimental::connect_result_t<Sender,
@@ -819,6 +894,10 @@ namespace hpx::execution::experimental::detail {
             operation_state_type op_state;
             std::size_t first_thread;
             std::size_t num_worker_threads;
+            std::size_t size = 0;
+            std::uint32_t chunk_size = 0;
+            bool reverse_placement = false;
+            bool allow_stealing = false;
             hpx::threads::mask_type pu_mask;
             std::vector<hpx::util::cache_aligned_data<
                 hpx::concurrency::detail::non_contiguous_index_queue<>>>
@@ -864,6 +943,16 @@ namespace hpx::execution::experimental::detail {
 
             friend void tag_invoke(start_t, operation_state& os) noexcept
             {
+#if defined(HPX_HAVE_STDEXEC)
+                // Check stop token before starting work
+                auto stop_token =
+                    stdexec::get_stop_token(stdexec::get_env(os.receiver));
+                if (stop_token.stop_requested())
+                {
+                    stdexec::set_stopped(HPX_MOVE(os.receiver));
+                    return;
+                }
+#endif
                 hpx::execution::experimental::start(os.op_state);
             }
         };
