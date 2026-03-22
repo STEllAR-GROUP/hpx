@@ -41,8 +41,7 @@ namespace hpx::execution::experimental {
                         if constexpr (sizeof...(Ts) == 0)
                         {
                             hpx::execution::experimental::set_value(
-                                HPX_MOVE(receiver),
-                                hpx::optional<meta::pack<>>());
+                                HPX_MOVE(receiver));
                         }
                         else if constexpr (sizeof...(Ts) == 1)
                         {

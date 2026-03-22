@@ -15,10 +15,12 @@
 namespace hpx::execution::experimental {
 
     template <typename Rcvr, typename ChildOp>
-    concept inlinable_receiver = receiver<Rcvr> && requires(ChildOp* child) {
-        { Rcvr::make_receiver_for(child) } noexcept;
-        requires std::is_same_v<decltype(Rcvr::make_receiver_for(child)), Rcvr>;
-    };
+    concept inlinable_receiver =
+        is_receiver_v<Rcvr> && requires(ChildOp* child) {
+            { Rcvr::make_receiver_for(child) } noexcept;
+            requires std::is_same_v<decltype(Rcvr::make_receiver_for(child)),
+                Rcvr>;
+        };
 
     template <typename Derived, typename Receiver>
     class inlinable_operation_state

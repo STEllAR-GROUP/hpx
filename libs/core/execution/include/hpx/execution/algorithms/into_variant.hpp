@@ -21,8 +21,10 @@
 #include <hpx/modules/type_support.hpp>
 
 #include <exception>
+#include <tuple>
 #include <type_traits>
 #include <utility>
+#include <variant>
 
 namespace hpx::execution::experimental {
 
@@ -42,21 +44,21 @@ namespace hpx::execution::experimental {
                         {
                             hpx::execution::experimental::set_value(
                                 HPX_MOVE(receiver),
-                                hpx::variant<meta::pack<>>(meta::pack<>{}));
+                                std::variant<std::tuple<>>());
                         }
                         else if constexpr (sizeof...(Ts) == 1)
                         {
                             hpx::execution::experimental::set_value(
                                 HPX_MOVE(receiver),
-                                hpx::variant<hpx::tuple<std::decay_t<Ts>...>>(
-                                    hpx::make_tuple(HPX_FORWARD(Ts, ts)...)));
+                                std::variant<std::tuple<std::decay_t<Ts>...>>(
+                                    std::make_tuple(HPX_FORWARD(Ts, ts)...)));
                         }
                         else
                         {
                             hpx::execution::experimental::set_value(
                                 HPX_MOVE(receiver),
-                                hpx::variant<hpx::tuple<std::decay_t<Ts>...>>(
-                                    hpx::make_tuple(HPX_FORWARD(Ts, ts)...)));
+                                std::variant<std::tuple<std::decay_t<Ts>...>>(
+                                    std::make_tuple(HPX_FORWARD(Ts, ts)...)));
                         }
                     },
                     [&](std::exception_ptr ep) {
@@ -113,7 +115,7 @@ namespace hpx::execution::experimental {
                 template <template <typename...> typename Tuple,
                     template <typename...> typename Variant>
                 using value_types = Variant<hpx::util::detail::transform_t<
-                    value_types_of_t<Sender, Env, meta::pack, meta::pack>,
+                    value_types_of_t<Sender, Env, std::tuple, Variant>,
                     wrap_in_tuple>>;
 
                 template <template <typename...> typename Variant>
