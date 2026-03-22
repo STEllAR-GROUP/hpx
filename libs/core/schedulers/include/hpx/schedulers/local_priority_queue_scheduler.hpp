@@ -55,7 +55,7 @@ namespace hpx::threads::policies {
     /// whenever no other work is available.
     HPX_CXX_CORE_EXPORT template <typename Mutex = std::mutex,
         typename PendingQueuing = lockfree_fifo,
-        typename StagedQueuing = lockfree_fifo,
+        typename StagedQueuing = concurrentqueue_fifo,
         typename TerminatedQueuing =
             default_local_priority_queue_scheduler_terminated_queue>
     class local_priority_queue_scheduler : public scheduler_base
