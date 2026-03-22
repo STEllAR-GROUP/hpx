@@ -130,6 +130,7 @@ namespace hpx {
 #include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/adjacent_find.hpp>
 #include <hpx/parallel/algorithms/detail/adjacent_find.hpp>
+#include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/adapt_placement_mode.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
@@ -228,14 +229,7 @@ namespace hpx::parallel {
                     util::detail::clear_container(data...);
 
                     difference_type adj_find_res = tok.get_data();
-                    if (adj_find_res != count)
-                    {
-                        std::advance(first, adj_find_res);
-                    }
-                    else
-                    {
-                        first = last;
-                    }
+                    std::advance(first, adj_find_res);
                     return first;
                 };
 
