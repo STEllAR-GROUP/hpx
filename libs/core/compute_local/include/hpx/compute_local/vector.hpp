@@ -1,5 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2016 Thomas Heller
+//  Copyright (c) 2024-2026 Hartmut Kaiser
+//  Copyright (c) 2026 Arpit
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -19,6 +21,7 @@
 #include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
+#include <exception>
 #include <initializer_list>
 #include <iterator>
 #include <memory>
@@ -28,7 +31,8 @@
 
 namespace hpx::compute {
 
-    template <typename T, typename Allocator = std::allocator<T>>
+    HPX_CXX_CORE_EXPORT template <typename T,
+        typename Allocator = std::allocator<T>>
     class vector
     {
         using alloc_traits = traits::allocator_traits<Allocator>;
@@ -401,7 +405,7 @@ namespace hpx::compute {
         /// Remarks: If an exception is thrown other than by the move
         /// constructor of a non-CopyInsertable T there are no effects.
         ///
-        static void resize(size_type /* size */)
+        void resize(size_type /* size */)
         {
             // TODO: implement this
         }
@@ -525,7 +529,7 @@ namespace hpx::compute {
 }    // namespace hpx::compute
 
 namespace hpx::traits {
-    template <typename T, typename Allocator>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Allocator>
     struct is_contiguous_iterator<hpx::compute::detail::iterator<T, Allocator>>
       : std::true_type
     {
