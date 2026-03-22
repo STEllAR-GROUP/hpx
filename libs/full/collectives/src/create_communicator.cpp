@@ -395,9 +395,19 @@ namespace hpx::collectives {
             }
 
             std::size_t division_steps = (right - left + 1) / arity;
+            std::size_t remainder = (right - left + 1) % arity;
+            std::size_t offset = 0;
+
             for (std::size_t i = 0; i != arity; ++i)
             {
-                std::size_t current_left = left + division_steps * i;
+                std::size_t const current_group_size =
+                    division_steps + (i < remainder ? 1 : 0);
+
+                std::size_t const current_left = left + offset;
+                std::size_t const current_right =
+                    current_left + current_group_size - 1;
+                offset += current_group_size;
+
                 if (this_site == current_left)
                 {
                     auto c = create_communicator(name.c_str(),
@@ -407,8 +417,6 @@ namespace hpx::collectives {
                     communicators.emplace_back(HPX_MOVE(c), this_site_arg(i));
                 }
 
-                std::size_t current_right =
-                    (std::min) (current_left + division_steps - 1, right);
                 if (this_site >= current_left && this_site < current_right + 1)
                 {
                     recursively_fill_communicators(communicators, current_left,
