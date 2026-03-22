@@ -24,12 +24,6 @@ namespace hpx::tracing {
             name, num_thread, thrdptr->get_thread_phase(), enabled);
     }
 
-    region::region(char const* name, std::size_t num_thread, std::size_t phase,
-        bool enabled) noexcept
-      : impl(name, num_thread, phase, enabled)
-    {
-    }
-
     region::region(
         hpx::threads::thread_data* thrdptr, std::size_t num_thread) noexcept
       : impl(create_tracy_region(thrdptr, num_thread))

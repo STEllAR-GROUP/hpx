@@ -19,9 +19,6 @@ namespace hpx::tracing {
 
     HPX_CXX_CORE_EXPORT struct HPX_CORE_EXPORT region
     {
-        region(char const* name, std::size_t num_thread, std::size_t phase,
-            bool enabled) noexcept;
-
         explicit region(hpx::threads::thread_data* thrdptr,
             std::size_t num_thread) noexcept;
 
@@ -67,10 +64,6 @@ namespace hpx::tracing {
 
     HPX_CXX_CORE_EXPORT struct [[maybe_unused]] region
     {
-        constexpr region(char const*, std::size_t, std::size_t, bool) noexcept
-        {
-        }
-
         constexpr explicit region(
             hpx::threads::thread_data*, std::size_t) noexcept
         {
