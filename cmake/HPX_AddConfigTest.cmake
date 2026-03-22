@@ -535,15 +535,6 @@ function(hpx_check_for_cxx20_std_endian)
 endfunction()
 
 # ##############################################################################
-function(hpx_check_for_cxx20_std_execution_policies)
-  add_hpx_config_test(
-    HPX_WITH_CXX20_STD_EXECUTION_POLICES
-    SOURCE cmake/tests/cxx20_std_execution_policies.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
 function(hpx_check_for_cxx20_std_ranges_iter_swap)
   add_hpx_config_test(
     HPX_WITH_CXX20_STD_RANGES_ITER_SWAP
