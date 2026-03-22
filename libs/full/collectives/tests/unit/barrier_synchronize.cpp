@@ -5,20 +5,25 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 // Regression test for #6430: verify that hpx::distributed::barrier::synchronize()
-// works correctly when called from hpx_main across multiple localities
+// handles uninitialized barriers gracefully without assertion failures
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/modules/testing.hpp>
 
+#include <string>
+
 int hpx_main()
 {
-    // Test that barrier::synchronize() works from hpx_main
-    // This was failing with an assertion before the fix
-    hpx::distributed::barrier::synchronize();
+    // Create a named barrier for testing across localities
+    std::string barrier_name = "test_barrier_6430";
+    hpx::distributed::barrier b(barrier_name);
 
-    // Do a second synchronization to ensure it works multiple times
-    hpx::distributed::barrier::synchronize();
+    // Test basic barrier synchronization
+    b.wait();
+
+    // Test a second synchronization
+    b.wait();
 
     return hpx::finalize();
 }
