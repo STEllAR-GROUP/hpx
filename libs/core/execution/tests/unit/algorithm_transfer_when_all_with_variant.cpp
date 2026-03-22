@@ -64,13 +64,15 @@ int main()
             HPX_TEST(hpx::holds_alternative<
                 hpx::tuple<custom_type_non_default_constructible>>(v2));
             HPX_TEST_EQ(
-                hpx::get<0>(hpx::get<
-                    hpx::tuple<custom_type_non_default_constructible>>(v1))
+                hpx::get<0>(
+                    hpx::get<hpx::tuple<custom_type_non_default_constructible>>(
+                        v1))
                     .x,
                 42);
             HPX_TEST_EQ(
-                hpx::get<0>(hpx::get<
-                    hpx::tuple<custom_type_non_default_constructible>>(v2))
+                hpx::get<0>(
+                    hpx::get<hpx::tuple<custom_type_non_default_constructible>>(
+                        v2))
                     .x,
                 100);
         };
@@ -87,8 +89,8 @@ int main()
         auto scheduler = loop.get_scheduler();
 
         std::atomic<bool> set_value_called{false};
-        auto s =
-            ex::transfer_when_all_with_variant(scheduler, ex::just(), ex::just(42));
+        auto s = ex::transfer_when_all_with_variant(
+            scheduler, ex::just(), ex::just(42));
 
         static_assert(ex::is_sender_v<decltype(s)>);
 

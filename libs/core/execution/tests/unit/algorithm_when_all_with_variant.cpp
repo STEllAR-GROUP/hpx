@@ -55,8 +55,9 @@ int main()
                 hpx::tuple<custom_type_non_default_constructible>>(v2));
             HPX_TEST_EQ(hpx::get<0>(hpx::get<hpx::tuple<int>>(v1)), 42);
             HPX_TEST_EQ(
-                hpx::get<0>(hpx::get<
-                    hpx::tuple<custom_type_non_default_constructible>>(v2))
+                hpx::get<0>(
+                    hpx::get<hpx::tuple<custom_type_non_default_constructible>>(
+                        v2))
                     .x,
                 100);
         };

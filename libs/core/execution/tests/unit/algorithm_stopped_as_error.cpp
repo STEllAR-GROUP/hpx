@@ -23,8 +23,8 @@ int main()
     {
         std::atomic<bool> set_error_called{false};
         auto s1 = stopped_sender{};
-        auto s2 = ex::stopped_as_error(
-            std::move(s1), std::runtime_error("stopped"));
+        auto s2 =
+            ex::stopped_as_error(std::move(s1), std::runtime_error("stopped"));
 
         static_assert(ex::is_sender_v<decltype(s2)>);
 #if defined(HPX_HAVE_STDEXEC)
@@ -47,8 +47,8 @@ int main()
     {
         std::atomic<bool> set_value_called{false};
         auto s1 = ex::just(42);
-        auto s2 = ex::stopped_as_error(
-            std::move(s1), std::runtime_error("stopped"));
+        auto s2 =
+            ex::stopped_as_error(std::move(s1), std::runtime_error("stopped"));
 
         static_assert(ex::is_sender_v<decltype(s2)>);
 #if defined(HPX_HAVE_STDEXEC)
@@ -72,8 +72,8 @@ int main()
     {
         std::atomic<bool> set_value_called{false};
         auto s1 = ex::just(custom_type_non_default_constructible{42});
-        auto s2 = ex::stopped_as_error(
-            std::move(s1), std::runtime_error("stopped"));
+        auto s2 =
+            ex::stopped_as_error(std::move(s1), std::runtime_error("stopped"));
 
         static_assert(ex::is_sender_v<decltype(s2)>);
 #if defined(HPX_HAVE_STDEXEC)

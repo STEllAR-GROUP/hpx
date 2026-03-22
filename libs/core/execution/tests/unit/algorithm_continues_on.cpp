@@ -50,9 +50,8 @@ int main()
         auto scheduler = loop.get_scheduler();
 
         std::atomic<bool> set_value_called{false};
-        auto s =
-            ex::continues_on(ex::just(custom_type_non_default_constructible{42}),
-                scheduler);
+        auto s = ex::continues_on(
+            ex::just(custom_type_non_default_constructible{42}), scheduler);
 
         static_assert(ex::is_sender_v<decltype(s)>);
 #if defined(HPX_HAVE_STDEXEC)

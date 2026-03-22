@@ -43,8 +43,9 @@ int main()
 
     {
         std::atomic<bool> set_value_called{false};
-        auto s = ex::read_env(
-            [](auto const&) { return custom_type_non_default_constructible{42}; });
+        auto s = ex::read_env([](auto const&) {
+            return custom_type_non_default_constructible{42};
+        });
 
         static_assert(ex::is_sender_v<decltype(s)>);
 

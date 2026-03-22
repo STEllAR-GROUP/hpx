@@ -72,7 +72,8 @@ int main()
 #endif
 
         check_value_types<
-            hpx::variant<hpx::tuple<custom_type_non_default_constructible>>>(s2);
+            hpx::variant<hpx::tuple<custom_type_non_default_constructible>>>(
+            s2);
         check_error_types<hpx::variant<std::exception_ptr>>(s2);
         check_sends_stopped<false>(s2);
 

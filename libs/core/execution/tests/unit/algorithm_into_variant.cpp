@@ -29,8 +29,8 @@ int main()
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
 #endif
 
-        check_value_types<hpx::variant<hpx::tuple<hpx::variant<hpx::tuple<int>>>>>(
-            s);
+        check_value_types<
+            hpx::variant<hpx::tuple<hpx::variant<hpx::tuple<int>>>>>(s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
         check_sends_stopped<false>(s);
 
@@ -75,7 +75,8 @@ int main()
 
         static_assert(ex::is_sender_v<decltype(s)>);
 
-        check_value_types<hpx::variant<hpx::tuple<hpx::variant<hpx::tuple<>>>>>(s);
+        check_value_types<hpx::variant<hpx::tuple<hpx::variant<hpx::tuple<>>>>>(
+            s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
         check_sends_stopped<false>(s);
 
