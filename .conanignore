@@ -1,0 +1,52 @@
+# Build directories
+build/
+build_*/
+.build/
+cmake-build-*/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Git files
+.git/
+.gitignore
+.gitattributes
+.github/
+
+# CI/CD files
+.circleci/
+.jenkins/
+.gitlab-ci.yml
+azure-pipelines.yml
+
+# Documentation build artifacts
+docs/_build/
+docs/sphinx/_build/
+
+# Test and example build artifacts
+*.o
+*.a
+*.so
+*.dylib
+*.dll
+*.exe
+
+# Temporary and log files
+*.log
+*.tmp
+*.bak
+*.cache
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Conan specific
+test_package/build/
+.conan/
