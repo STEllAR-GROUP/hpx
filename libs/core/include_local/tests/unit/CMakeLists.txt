@@ -6,8 +6,8 @@
 
 set(tests local_header sandbox)
 
-set(local_header_FLAGS NOLIBS DEPENDENCIES HPX::hpx HPX::wrap_main)
-set(sandbox_FLAGS NOLIBS DEPENDENCIES HPX::hpx HPX::wrap_main)
+set(local_header_FLAGS NOLIBS DEPENDENCIES HPX::hpx)
+set(sandbox_FLAGS NOLIBS DEPENDENCIES HPX::hpx)
 
 foreach(test ${tests})
   set(sources ${test}.cpp)

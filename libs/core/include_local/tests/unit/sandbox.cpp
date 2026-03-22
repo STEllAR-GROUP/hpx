@@ -15,10 +15,10 @@
 
 #include <hpx/config.hpp>
 
+#include <hpx/execution.hpp>
 #include <hpx/experimental/sandbox.hpp>
 #include <hpx/init_local.hpp>
-#include <hpx/modules/algorithms.hpp>
-#include <hpx/modules/execution.hpp>
+#include <hpx/numeric.hpp>
 
 #include <cmath>
 #include <cstddef>

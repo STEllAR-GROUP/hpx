@@ -38,10 +38,7 @@ set(include_local_headers
 
 if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
   set(generated_include_local_headers
-      hpx/barrier.hpp
-      hpx/channel.hpp
-      hpx/compute.hpp
-      hpx/latch.hpp
+      hpx/barrier.hpp hpx/channel.hpp hpx/compute.hpp hpx/latch.hpp
       hpx/runtime.hpp
   )
 endif()
