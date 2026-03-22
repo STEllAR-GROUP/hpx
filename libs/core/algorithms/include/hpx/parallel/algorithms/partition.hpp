@@ -478,14 +478,13 @@ namespace hpx {
 #include <hpx/parallel/util/transfer.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 
-#include <memory>
-
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
 #include <iterator>
 #include <list>
+#include <memory>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -608,12 +607,12 @@ namespace hpx::parallel {
             {
                 if (HPX_INVOKE(f, HPX_INVOKE(proj, *first)))
                 {
-                    *next = HPX_MOVE(*first);
+                    *next = std::ranges::iter_move(first);
                     ++next;
                 }
                 else
                 {
-                    false_values.emplace_back(HPX_MOVE(*first));
+                    false_values.emplace_back(std::ranges::iter_move(first));
                 }
 
                 ++first;
@@ -737,23 +736,20 @@ namespace hpx::parallel {
                 if (first == last)
                     break;
 
-#if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
                 std::ranges::iter_swap(first++, last);
-#else
-                std::iter_swap(first++, last);
-#endif
             }
 
             return first;
         }
 
-        // sequential partition with projection function for forward iterator.
+        // clang-format off
         HPX_CXX_CORE_EXPORT template <typename FwdIter, typename Pred,
             typename Proj>
-            requires(std::forward_iterator<FwdIter> &&
+            requires (std::forward_iterator<FwdIter> &&
                 !std::bidirectional_iterator<FwdIter>)
         constexpr FwdIter sequential_partition(
             FwdIter first, FwdIter last, Pred&& pred, Proj&& proj)
+        // clang-format on
         {
             while (first != last && HPX_INVOKE(pred, HPX_INVOKE(proj, *first)))
                 ++first;
@@ -765,11 +761,7 @@ namespace hpx::parallel {
             {
                 if (HPX_INVOKE(pred, HPX_INVOKE(proj, *it)))
                 {
-#if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
                     std::ranges::iter_swap(first++, it);
-#else
-                    std::iter_swap(first++, it);
-#endif
                 }
             }
 
@@ -1007,11 +999,7 @@ namespace hpx::parallel {
             {
                 while (first != last)
                 {
-#if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
                     std::ranges::iter_swap(first++, dest++);
-#else
-                    std::iter_swap(first++, dest++);
-#endif
                 }
                 return dest;
             }
@@ -1049,12 +1037,8 @@ namespace hpx::parallel {
                     if (right_block.empty())
                         return left_block;
 
-#if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
                     std::ranges::iter_swap(
                         left_block.first++, right_block.first++);
-#else
-                    std::iter_swap(left_block.first++, right_block.first++);
-#endif
                 }
             }
 
@@ -1113,12 +1097,8 @@ namespace hpx::parallel {
                     if (right_iter->empty() || right_iter->block_no < 0)
                         break;
 
-#if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
                     std::ranges::iter_swap(
                         left_iter->first++, right_iter->first++);
-#else
-                    std::iter_swap(left_iter->first++, right_iter->first++);
-#endif
                 }
 
                 if (left_iter < right_iter ||

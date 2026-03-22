@@ -217,6 +217,7 @@ namespace hpx {
 #include <cstddef>
 #include <iterator>
 #include <memory>
+#include <ranges>
 #include <type_traits>
 #include <utility>
 
@@ -237,7 +238,8 @@ namespace hpx::parallel {
                 util::loop_with_cleanup_n(
                     first, count, dest,
                     [](InIter1 it, InIter2 dest) -> void {
-                        hpx::construct_at(std::addressof(*dest), HPX_MOVE(*it));
+                        hpx::construct_at(
+                            std::addressof(*dest), std::ranges::iter_move(it));
                     },
                     [](InIter2 dest) -> void {
                         std::destroy_at(std::addressof(*dest));

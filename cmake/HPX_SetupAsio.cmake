@@ -17,7 +17,7 @@ if(NOT HPX_WITH_FETCH_ASIO)
   find_package(Asio 1.12.0)
   if(NOT Asio_FOUND)
     hpx_error(
-      "Could not find Asio. Set Asio_ROOT as a CMake or environment variable to point to the Asio root install directory. Alternatively, set HPX_WITH_FETCH_ASIO=ON to fetch Asio using CMake's FetchContent (when using this option Asio will be installed together with HPX, be careful about conflicts with separately installed versions of Asio)."
+      "Could not find Asio. Set Asio_ROOT as a CMake or environment variable to point to the Asio root install directory. Alternatively, set HPX_WITH_FETCH_ASIO=ON to fetch Asio using CMake's FetchContent (this is currently the default, but might have failed or been disabled)."
     )
   endif()
 elseif(NOT TARGET Asio::asio AND NOT HPX_FIND_PACKAGE)
