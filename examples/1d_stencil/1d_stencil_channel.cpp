@@ -19,6 +19,7 @@
 #include <hpx/include/components.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/util.hpp>
+#include <hpx/modules/compute_local.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/program_options.hpp>
 
