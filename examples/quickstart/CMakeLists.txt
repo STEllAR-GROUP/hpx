@@ -27,6 +27,7 @@ set(example_programs
     mutex_docs
     pipeline1
     safe_object
+    sender_diamond
     shared_mutex
     simple_future_continuation
     task_group_docs
@@ -138,6 +139,7 @@ set(sierpinski_PARAMETERS THREADS_PER_LOCALITY 4)
 set(partitioned_vector_spmd_foreach_PARAMETERS THREADS_PER_LOCALITY 4)
 set(pingpong_PARAMETERS THREADS_PER_LOCALITY 4)
 set(simple_future_continuation_PARAMETERS THREADS_PER_LOCALITY 4)
+set(sender_diamond_PARAMETERS THREADS_PER_LOCALITY 4)
 set(timed_futures_PARAMETERS THREADS_PER_LOCALITY 4)
 set(vector_counting_dotproduct_PARAMETERS THREADS_PER_LOCALITY 4)
 set(vector_zip_dotproduct_PARAMETERS THREADS_PER_LOCALITY 4)
