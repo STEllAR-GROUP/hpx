@@ -641,8 +641,18 @@ namespace hpx::collectives {
                 "the generation number shouldn't be zero"));
         }
 
+        auto [num_sites, comm_site] = fid.get_info();
+
+        if (local_result.size() != num_sites)
+        {
+            return hpx::make_exceptional_future<T>(HPX_GET_EXCEPTION(
+                hpx::error::bad_parameter, "hpx::collectives::scatter_to",
+                "the number of values to scatter must be equal to the number "
+                "of participating sites"));
+        }
+
         // Handle operation right away if there is only one value.
-        if (auto [num_sites, comm_site] = fid.get_info(); num_sites == 1)
+        if (num_sites == 1)
         {
             if (this_site != comm_site)
             {
