@@ -512,6 +512,72 @@ void test_overlapping()
     return;
 }
 
+// Right-overlap test: dest > first, dest < first + count
+// This is the scenario that Issue #1 failed to detect — the parallel path
+// would run on overlapping ranges, causing inter-chunk data races.
+// Only trivially relocatable types are tested because sequential forward
+// relocation with right-overlap is only correct via memmove (buffer_memcpy_tag).
+template <typename Ex>
+void test_right_overlapping()
+{
+    constexpr int offset = 4;
+
+    static_assert(M + offset <= N);
+
+    {    // Right-overlapping trivially-relocatable
+        auto [ptr, ___] = setup<trivially_relocatable_struct_overlapping>();
+
+        // Destroy the objects in [M, M + offset) that will be overwritten
+        // by the destination tail extending beyond the source range
+        std::destroy(ptr + M, ptr + M + offset);
+        HPX_TEST(trivially_relocatable_struct_overlapping::destroyed == offset);
+
+        // relocate M objects `offset` positions forward (right-overlap)
+        // source: [ptr, ptr + M), dest: [ptr + offset, ptr + M + offset)
+        uninitialized_relocate_n(Ex{}, ptr, M, ptr + offset);
+
+        // Bookkeeping: remove old positions, add new positions
+        for (int i = 0; i < M; i++)
+        {
+            trivially_relocatable_struct_overlapping::made.erase(ptr + i);
+        }
+        for (int i = 0; i < M; i++)
+        {
+            trivially_relocatable_struct_overlapping::made.insert(
+                ptr + offset + i);
+        }
+
+        // No move constructor or destructor should be called
+        // because the objects are trivially relocatable
+        HPX_TEST(trivially_relocatable_struct_overlapping::moved == 0);
+        HPX_TEST(trivially_relocatable_struct_overlapping::destroyed == offset);
+
+        // Objects relocated forward by offset
+        for (int i = 0; i < M; i++)
+        {
+            HPX_TEST(ptr[offset + i].data == i);
+        }
+
+        // Objects after destination not touched
+        for (int i = M + offset; i < N; i++)
+        {
+            HPX_TEST(ptr[i].data == i);
+        }
+
+        // Destroy objects within their lifetime
+        // from our perspective objects in the range [0, offset) are destroyed
+        std::destroy(ptr + offset, ptr + M + offset);
+        std::destroy(ptr + M + offset, ptr + N);
+
+        HPX_TEST(trivially_relocatable_struct_overlapping::made.empty());
+
+        std::free(ptr);
+    }
+    clear();
+
+    return;
+}
+
 int hpx_main()
 {
     test<hpx::execution::sequenced_policy>();
@@ -519,6 +585,9 @@ int hpx_main()
 
     test_overlapping<hpx::execution::sequenced_policy>();
     test_overlapping<hpx::execution::parallel_policy>();
+
+    test_right_overlapping<hpx::execution::sequenced_policy>();
+    test_right_overlapping<hpx::execution::parallel_policy>();
 
     return hpx::local::finalize();
 }
