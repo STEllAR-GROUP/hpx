@@ -8,19 +8,18 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/iterator_support.hpp>
 
 #include <iterator>
 #include <type_traits>
 
-namespace hpx { namespace parallel { namespace detail {
+namespace hpx::parallel::detail {
 
     // provide implementation of std::distance supporting iterators/sentinels
-    template <typename InIterB, typename InIterE>
+    HPX_CXX_CORE_EXPORT template <typename InIterB, typename InIterE>
     constexpr typename std::iterator_traits<InIterB>::difference_type distance(
         InIterB first, InIterE last)
     {
-#if defined(HPX_HAVE_CXX20_STD_CONCEPTS)
         if constexpr (std::is_same_v<InIterB, InIterE> &&
             std::random_access_iterator<InIterB>)
         {
@@ -30,15 +29,6 @@ namespace hpx { namespace parallel { namespace detail {
         {
             return last - first;
         }
-#else
-        if constexpr (std::is_same<InIterB, InIterE>::value &&
-            std::is_base_of<std::random_access_iterator_tag,
-                typename std::iterator_traits<InIterB>::iterator_category>::
-                value)
-        {
-            return last - first;
-        }
-#endif
         else
         {
             typename std::iterator_traits<InIterB>::difference_type offset = 0;
@@ -49,4 +39,4 @@ namespace hpx { namespace parallel { namespace detail {
             return offset;
         }
     }
-}}}    // namespace hpx::parallel::detail
+}    // namespace hpx::parallel::detail
