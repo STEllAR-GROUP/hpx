@@ -12,6 +12,7 @@ set(tests
     all_to_all
     all_to_all_sync
     barrier
+    barrier_synchronize
     broadcast
     broadcast_component
     broadcast_hierarchical
