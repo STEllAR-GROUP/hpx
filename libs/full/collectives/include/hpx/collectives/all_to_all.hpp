@@ -216,6 +216,7 @@ namespace hpx { namespace collectives {
 #include <hpx/collectives/create_communicator.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/modules/async_base.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/type_support.hpp>
 
@@ -262,6 +263,14 @@ namespace hpx::traits {
                     result.reserve(data.size());
                     for (auto& v : data)
                     {
+                        if (v.size() != data.size())
+                        {
+                            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                                "hpx::collectives::all_to_all",
+                                "each participating site must contribute "
+                                "exactly num_sites elements");
+                        }
+
                         result.push_back(Communicator::template handle_bool<T>(
                             HPX_MOVE(v[which])));
                     }
