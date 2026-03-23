@@ -51,7 +51,8 @@ int hpx_main(variables_map& vm)
     num_iterations = vm["iterations"].as<std::uint64_t>();
     reader_threads = hpx::get_num_worker_threads();
 
-    std::cout << "Starting benchmark with " << reader_threads << " threads..." << std::endl;
+    std::cout << "Starting benchmark with " << reader_threads << " threads..."
+              << std::endl;
 
     std::vector<hpx::future<void>> futures;
     futures.reserve(reader_threads);
@@ -68,7 +69,8 @@ int hpx_main(variables_map& vm)
     double const duration = walltime.elapsed();
 
     std::cout << "Total time: " << duration << " seconds" << std::endl;
-    std::cout << "Average time per reader thread: " << duration / reader_threads << " seconds" << std::endl;
+    std::cout << "Average time per reader thread: " << duration / reader_threads
+              << " seconds" << std::endl;
 
     hpx::util::print_cdash_timing("SharedMutexOverhead", duration);
 
@@ -80,8 +82,9 @@ int main(int argc, char* argv[])
 {
     options_description cmdline("usage: " HPX_APPLICATION_STRING " [options]");
 
-    cmdline.add_options()
-        ("iterations", value<std::uint64_t>()->default_value(100000), "number of iterations per thread");
+    cmdline.add_options()("iterations",
+        value<std::uint64_t>()->default_value(100000),
+        "number of iterations per thread");
 
     hpx::init_params init_args;
     init_args.desc_cmdline = cmdline;

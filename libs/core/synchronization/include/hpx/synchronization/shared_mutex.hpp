@@ -99,8 +99,8 @@ namespace hpx::detail {
             }
 
             lk = std::unique_lock<mutex_type>(state_change);
-            if (state.compare_exchange_strong(
-                    s1, s, std::memory_order_acq_rel, std::memory_order_acquire))
+            if (state.compare_exchange_strong(s1, s, std::memory_order_acq_rel,
+                    std::memory_order_acquire))
                 return true;
 
             lk.unlock();
@@ -170,7 +170,8 @@ namespace hpx::detail {
                 auto s = state.load(std::memory_order_acquire);
                 auto s1 = s;
 
-                if (s.data.shared_count == 1 && s.data.exclusive_waiting_blocked)
+                if (s.data.shared_count == 1 &&
+                    s.data.exclusive_waiting_blocked)
                 {
                     return false;
                 }
