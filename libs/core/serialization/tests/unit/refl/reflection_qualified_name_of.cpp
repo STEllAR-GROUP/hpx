@@ -51,6 +51,9 @@ namespace crtp {
     };
 }    // namespace crtp
 
+using person_type = local::person;
+HPX_SERIALIZATION_REGISTER_CLASS_NAME(person_type, "heisenberg");
+
 int main()
 {
     using hpx::serialization::detail::qualified_name_of;
@@ -105,6 +108,13 @@ int main()
         using derived_type = crtp::derived<wchar_t&>;
         char const* derived_name = qualified_name_of<derived_type>::get();
         HPX_TEST_EQ(std::string(derived_name), "crtp::derived<wchar_t&>");
+    }
+
+    // User defined names
+    {
+        char const* name = hpx::serialization::detail::get_serialization_name<
+            local::person>()();
+        HPX_TEST_EQ(std::string(name), "heisenberg");
     }
 
     return hpx::util::report_errors();
