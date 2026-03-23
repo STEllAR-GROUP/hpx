@@ -58,8 +58,8 @@ namespace hpx { namespace parallel {
             {
                 // all elements are on the same partition
                 local_iterator_type1 beg = traits1::local(first);
-                local_iterator_type1 end = traits1::end(sit);
-                local_iterator_type2 ldest = traits2::begin(sdest);
+                local_iterator_type1 end = traits1::local(last);
+                local_iterator_type2 ldest = traits2::local(dest);
                 if (beg != end)
                 {
                     util::in_out_result<local_iterator_type1,
@@ -75,7 +75,7 @@ namespace hpx { namespace parallel {
                 // handle the remaining part of the first partition
                 local_iterator_type1 beg = traits1::local(first);
                 local_iterator_type1 end = traits1::end(sit);
-                local_iterator_type2 ldest = traits2::begin(sdest);
+                local_iterator_type2 ldest = traits2::local(dest);
                 util::in_out_result<local_iterator_type1, local_iterator_type2>
                     out;
                 if (beg != end)
@@ -151,7 +151,7 @@ namespace hpx { namespace parallel {
                 // all elements are on the same partition
                 local_iterator_type1 beg = traits1::local(first);
                 local_iterator_type1 end = traits1::local(last);
-                local_iterator_type2 ldest = traits2::begin(sdest);
+                local_iterator_type2 ldest = traits2::local(dest);
                 if (beg != end)
                 {
                     segments.push_back(dispatch_async(traits2::get_id(sdest),
@@ -163,7 +163,7 @@ namespace hpx { namespace parallel {
                 // handle the remaining part of the first partition
                 local_iterator_type1 beg = traits1::local(first);
                 local_iterator_type1 end = traits1::end(sit);
-                local_iterator_type2 ldest = traits2::begin(sdest);
+                local_iterator_type2 ldest = traits2::local(dest);
                 if (beg != end)
                 {
                     segments.push_back(dispatch_async(traits2::get_id(sdest),
@@ -249,7 +249,7 @@ namespace hpx { namespace parallel {
                 local_iterator_type1 beg1 = traits1::local(first1);
                 local_iterator_type1 end1 = traits1::local(last1);
                 local_iterator_type2 beg2 = traits2::local(first2);
-                local_iterator_type3 ldest = traits3::begin(sdest);
+                local_iterator_type3 ldest = traits3::local(dest);
                 if (beg1 != end1)
                 {
                     util::in_in_out_result<local_iterator_type1,
@@ -268,7 +268,7 @@ namespace hpx { namespace parallel {
                 local_iterator_type1 beg1 = traits1::local(first1);
                 local_iterator_type1 end1 = traits1::end(sit1);
                 local_iterator_type2 beg2 = traits2::local(first2);
-                local_iterator_type3 ldest = traits3::begin(sdest);
+                local_iterator_type3 ldest = traits3::local(dest);
                 util::in_in_out_result<local_iterator_type1,
                     local_iterator_type2, local_iterator_type3>
                     out;
@@ -366,7 +366,7 @@ namespace hpx { namespace parallel {
                 local_iterator_type1 beg1 = traits1::local(first1);
                 local_iterator_type1 end1 = traits1::local(last1);
                 local_iterator_type2 beg2 = traits2::local(first2);
-                local_iterator_type3 ldest = traits3::begin(sdest);
+                local_iterator_type3 ldest = traits3::local(dest);
                 if (beg1 != end1)
                 {
                     segments.push_back(dispatch_async(traits1::get_id(sit1),
@@ -380,7 +380,7 @@ namespace hpx { namespace parallel {
                 local_iterator_type1 beg1 = traits1::local(first1);
                 local_iterator_type1 end1 = traits1::end(sit1);
                 local_iterator_type2 beg2 = traits2::local(first2);
-                local_iterator_type3 ldest = traits3::begin(sdest);
+                local_iterator_type3 ldest = traits3::local(dest);
                 if (beg1 != end1)
                 {
                     segments.push_back(dispatch_async(traits1::get_id(sit1),
@@ -473,7 +473,7 @@ namespace hpx { namespace parallel {
                 local_iterator_type1 end1 = traits1::local(last1);
                 local_iterator_type2 beg2 = traits2::local(first2);
                 local_iterator_type2 end2 = traits2::local(last2);
-                local_iterator_type3 ldest = traits3::begin(sdest);
+                local_iterator_type3 ldest = traits3::local(dest);
                 if (beg1 != end1 && beg2 != end2)
                 {
                     util::in_in_out_result<local_iterator_type1,
@@ -493,7 +493,7 @@ namespace hpx { namespace parallel {
                 local_iterator_type1 end1 = traits1::end(sit1);
                 local_iterator_type2 beg2 = traits2::local(first2);
                 local_iterator_type2 end2 = traits2::end(sit2);
-                local_iterator_type3 ldest = traits3::begin(sdest);
+                local_iterator_type3 ldest = traits3::local(dest);
                 util::in_in_out_result<local_iterator_type1,
                     local_iterator_type2, local_iterator_type3>
                     out;
@@ -591,7 +591,7 @@ namespace hpx { namespace parallel {
                 local_iterator_type1 end1 = traits1::local(last1);
                 local_iterator_type2 beg2 = traits2::local(first2);
                 local_iterator_type2 end2 = traits2::local(last2);
-                local_iterator_type3 ldest = traits3::begin(sdest);
+                local_iterator_type3 ldest = traits3::local(dest);
                 if (beg1 != end1 && beg2 != end2)
                 {
                     segments.push_back(dispatch_async(traits1::get_id(sit1),
@@ -606,7 +606,7 @@ namespace hpx { namespace parallel {
                 local_iterator_type1 end1 = traits1::end(sit1);
                 local_iterator_type2 beg2 = traits2::local(first2);
                 local_iterator_type2 end2 = traits2::end(sit2);
-                local_iterator_type3 ldest = traits3::begin(sdest);
+                local_iterator_type3 ldest = traits3::local(dest);
                 if (beg1 != end1 && beg2 != end2)
                 {
                     segments.push_back(dispatch_async(traits1::get_id(sit1),

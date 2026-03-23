@@ -62,12 +62,13 @@ namespace hpx::parallel {
             {
                 // all elements are on the same partition
                 local_iterator_type1 beg = traits1::local(first);
-                local_iterator_type1 end = traits1::end(sit);
-                local_iterator_type2 ldest = traits2::begin(sdest);
+                local_iterator_type1 end = traits1::local(last);
+                local_iterator_type2 ldest = traits2::local(dest);
                 if (beg != end)
                 {
                     local_iterator_type2 out = dispatch(traits2::get_id(sdest),
                         algo, policy, std::true_type(), beg, end, ldest, op);
+                    dest = traits2::compose(sdest, out);
                 }
             }
             else
@@ -75,7 +76,7 @@ namespace hpx::parallel {
                 // handle the remaining part of the first partition
                 local_iterator_type1 beg = traits1::local(first);
                 local_iterator_type1 end = traits1::end(sit);
-                local_iterator_type2 ldest = traits2::begin(sdest);
+                local_iterator_type2 ldest = traits2::local(dest);
                 local_iterator_type2 out = traits2::local(dest);
                 if (beg != end)
                 {
@@ -172,7 +173,7 @@ namespace hpx::parallel {
                 // all elements are on the same partition
                 local_iterator_type1 beg = traits1::local(first);
                 local_iterator_type1 end = traits1::local(last);
-                local_iterator_type2 ldest = traits2::begin(sdest);
+                local_iterator_type2 ldest = traits2::local(dest);
                 if (beg != end)
                 {
                     segments.push_back(dispatch_async(traits2::get_id(sdest),
@@ -184,7 +185,7 @@ namespace hpx::parallel {
                 // handle the remaining part of the first partition
                 local_iterator_type1 beg = traits1::local(first);
                 local_iterator_type1 end = traits1::end(sit);
-                local_iterator_type2 ldest = traits2::begin(sdest);
+                local_iterator_type2 ldest = traits2::local(dest);
                 if (beg != end)
                 {
                     segments.push_back(dispatch_async(traits2::get_id(sdest),

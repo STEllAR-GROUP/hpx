@@ -8,7 +8,6 @@ name: Build and Test
 
 on:
   pull_request:
-    types: [labeled]
   push:
     branches:
       - master
@@ -17,11 +16,6 @@ on:
 
 jobs:
     configure-core-core_local-components:
-        # On PRs, only run if the 'ok-to-test' label is present.
-        # On pushes to master/release, always run.
-        if: >-
-          github.event_name != 'pull_request' ||
-          contains(github.event.pull_request.labels.*.name, 'ok-to-test')
         runs-on: ubuntu-latest
         container: stellargroup/build_env:17
 
@@ -1417,3 +1411,4 @@ jobs:
               working-directory: build
               run: |
                 ninja -j2 -k 0 tests.performance
+                

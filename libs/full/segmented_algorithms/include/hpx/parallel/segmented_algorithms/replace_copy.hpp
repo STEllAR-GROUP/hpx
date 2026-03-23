@@ -57,8 +57,8 @@ namespace hpx::parallel {
             {
                 // all elements are on the same partition
                 local_iterator_type1 beg = traits1::local(first);
-                local_iterator_type1 end = traits1::end(sit);
-                local_iterator_type2 ldest = traits2::begin(sdest);
+                local_iterator_type1 end = traits1::local(last);
+                local_iterator_type2 ldest = traits2::local(dest);
                 if (beg != end)
                 {
                     util::in_out_result<local_iterator_type1,
@@ -75,7 +75,7 @@ namespace hpx::parallel {
                 // handle the remaining part of the first partition
                 local_iterator_type1 beg = traits1::local(first);
                 local_iterator_type1 end = traits1::end(sit);
-                local_iterator_type2 ldest = traits2::begin(sdest);
+                local_iterator_type2 ldest = traits2::local(dest);
                 util::in_out_result<local_iterator_type1, local_iterator_type2>
                     out;
                 if (beg != end)
@@ -153,7 +153,7 @@ namespace hpx::parallel {
                 // all elements are on the same partition
                 local_iterator_type1 beg = traits1::local(first);
                 local_iterator_type1 end = traits1::local(last);
-                local_iterator_type2 ldest = traits2::begin(sdest);
+                local_iterator_type2 ldest = traits2::local(dest);
                 if (beg != end)
                 {
                     segments.push_back(dispatch_async(traits2::get_id(sdest),
@@ -166,7 +166,7 @@ namespace hpx::parallel {
                 // handle the remaining part of the first partition
                 local_iterator_type1 beg = traits1::local(first);
                 local_iterator_type1 end = traits1::end(sit);
-                local_iterator_type2 ldest = traits2::begin(sdest);
+                local_iterator_type2 ldest = traits2::local(dest);
                 if (beg != end)
                 {
                     segments.push_back(dispatch_async(traits2::get_id(sdest),
@@ -245,8 +245,8 @@ namespace hpx::parallel {
             {
                 // all elements are on the same partition
                 local_iterator_type1 beg = traits1::local(first);
-                local_iterator_type1 end = traits1::end(sit);
-                local_iterator_type2 ldest = traits2::begin(sdest);
+                local_iterator_type1 end = traits1::local(last);
+                local_iterator_type2 ldest = traits2::local(dest);
                 if (beg != end)
                 {
                     util::in_out_result<local_iterator_type1,
@@ -263,7 +263,7 @@ namespace hpx::parallel {
                 // handle the remaining part of the first partition
                 local_iterator_type1 beg = traits1::local(first);
                 local_iterator_type1 end = traits1::end(sit);
-                local_iterator_type2 ldest = traits2::begin(sdest);
+                local_iterator_type2 ldest = traits2::local(dest);
                 util::in_out_result<local_iterator_type1, local_iterator_type2>
                     out;
                 if (beg != end)
@@ -341,7 +341,7 @@ namespace hpx::parallel {
                 // all elements are on the same partition
                 local_iterator_type1 beg = traits1::local(first);
                 local_iterator_type1 end = traits1::local(last);
-                local_iterator_type2 ldest = traits2::begin(sdest);
+                local_iterator_type2 ldest = traits2::local(dest);
                 if (beg != end)
                 {
                     segments.push_back(dispatch_async(traits2::get_id(sdest),
@@ -354,7 +354,7 @@ namespace hpx::parallel {
                 // handle the remaining part of the first partition
                 local_iterator_type1 beg = traits1::local(first);
                 local_iterator_type1 end = traits1::end(sit);
-                local_iterator_type2 ldest = traits2::begin(sdest);
+                local_iterator_type2 ldest = traits2::local(dest);
                 if (beg != end)
                 {
                     segments.push_back(dispatch_async(traits2::get_id(sdest),
