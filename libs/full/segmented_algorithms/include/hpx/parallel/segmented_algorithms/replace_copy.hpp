@@ -21,6 +21,7 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
+#include "hpx/config/forward.hpp"
 
 namespace hpx::parallel {
 
@@ -65,7 +66,7 @@ namespace hpx::parallel {
                         local_iterator_type2>
                         out = dispatch(traits2::get_id(sdest), algo, policy,
                             std::true_type(), beg, end, ldest, old_value,
-                            new_value, proj);
+                            new_value, HPX_FORWARD(Proj, proj));
                     last = traits1::compose(send, out.in);
                     dest = traits2::compose(sdest, out.out);
                 }
@@ -107,7 +108,7 @@ namespace hpx::parallel {
                 {
                     out = dispatch(traits2::get_id(sdest), algo, policy,
                         std::true_type(), beg, end, ldest, old_value, new_value,
-                        proj);
+                        HPX_FORWARD(Proj, proj));
                 }
                 last = traits1::compose(send, out.in);
                 dest = traits2::compose(sdest, out.out);
