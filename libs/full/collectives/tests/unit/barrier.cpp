@@ -15,6 +15,7 @@
 
 #include <atomic>
 #include <cstddef>
+#include <exception>
 #include <functional>
 #include <memory>
 #include <string>
@@ -115,8 +116,28 @@ void test_release_from_non_hpx_thread(hpx::program_options::variables_map& vm)
                 hpx::get_locality_id(), i),
             1, 0);
 
-        std::thread t([b]() { b->release(); });
-        t.join();
+        // Avoid joining a std::thread from hpx_main when running with a single
+        // HPX worker thread. release() from the external thread internally uses
+        // run_as_hpx_thread and needs the HPX scheduler to make progress.
+        hpx::promise<void> release_finished;
+        hpx::future<void> release_done = release_finished.get_future();
+
+        std::thread t([b, p = HPX_MOVE(release_finished)]() mutable {
+            try
+            {
+                b->release();
+                p.set_value();
+            }
+            catch (...)
+            {
+                p.set_exception(std::current_exception());
+            }
+        });
+        t.detach();
+
+        // This suspends the current HPX thread and allows the scheduler to run
+        // the HPX work queued by run_as_hpx_thread.
+        release_done.get();
     }
 }
 
