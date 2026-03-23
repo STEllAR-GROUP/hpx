@@ -9,16 +9,31 @@ import sys
 import json
 import re
 import math
+import os
+
+def get_excluded_tests():
+    exclude_file = os.path.join(os.path.dirname(__file__), "workflows", "exclude.targets")
+    excluded = set()
+    if os.path.exists(exclude_file):
+        with open(exclude_file, "r") as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith("#"):
+                    excluded.add(line)
+    return excluded
 
 def generate_matrix(ctest_output, num_buckets):
     tests = []
     pattern = re.compile(r"^\s*Test\s*#\d+:\s*(.+)$")
     
+    excluded = get_excluded_tests()
+    
     for line in ctest_output.splitlines():
         match = pattern.match(line)
         if match:
             test_name = match.group(1).strip()
-            tests.append(test_name)
+            if test_name not in excluded:
+                tests.append(test_name)
     
     tests.sort()
     
