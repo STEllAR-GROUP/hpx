@@ -40,26 +40,10 @@ namespace hpx::execution::experimental {
             {
                 hpx::detail::try_catch_exception_ptr(
                     [&]() {
-                        if constexpr (sizeof...(Ts) == 0)
-                        {
-                            hpx::execution::experimental::set_value(
-                                HPX_MOVE(receiver),
-                                std::variant<std::tuple<>>());
-                        }
-                        else if constexpr (sizeof...(Ts) == 1)
-                        {
-                            hpx::execution::experimental::set_value(
-                                HPX_MOVE(receiver),
-                                std::variant<std::tuple<std::decay_t<Ts>...>>(
-                                    std::make_tuple(HPX_FORWARD(Ts, ts)...)));
-                        }
-                        else
-                        {
-                            hpx::execution::experimental::set_value(
-                                HPX_MOVE(receiver),
-                                std::variant<std::tuple<std::decay_t<Ts>...>>(
-                                    std::make_tuple(HPX_FORWARD(Ts, ts)...)));
-                        }
+                        hpx::execution::experimental::set_value(
+                            HPX_MOVE(receiver),
+                            hpx::variant<hpx::tuple<std::decay_t<Ts>...>>(
+                                hpx::make_tuple(HPX_FORWARD(Ts, ts)...)));
                     },
                     [&](std::exception_ptr ep) {
                         hpx::execution::experimental::set_error(
@@ -103,20 +87,13 @@ namespace hpx::execution::experimental {
 
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Sender> sender;
 
-            template <typename... Ts>
-            struct wrap_in_tuple
-            {
-                using type = hpx::tuple<std::decay_t<Ts>...>;
-            };
-
             template <typename Env>
             struct generate_completion_signatures
             {
                 template <template <typename...> typename Tuple,
                     template <typename...> typename Variant>
-                using value_types = Variant<hpx::util::detail::transform_t<
-                    value_types_of_t<Sender, Env, std::tuple, Variant>,
-                    wrap_in_tuple>>;
+                using value_types = Variant<hpx::tuple<
+                    value_types_of_t<Sender, Env, hpx::tuple, hpx::variant>>>;
 
                 template <template <typename...> typename Variant>
                 using error_types = hpx::util::detail::unique_concat_t<
