@@ -789,10 +789,9 @@ namespace hpx {
                 >
             )
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter2>::type
-        tag_fallback_invoke(hpx::copy_if_t, ExPolicy&& policy, FwdIter1 first,
-            FwdIter1 last, FwdIter2 dest, Pred pred)
+        friend decltype(auto) tag_fallback_invoke(hpx::copy_if_t,
+            ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest,
+            Pred&& pred)
         {
             static_assert(std::forward_iterator<FwdIter1>,
                 "Required at least forward iterator.");
@@ -806,7 +805,7 @@ namespace hpx {
                 hpx::parallel::detail::copy_if<
                     hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>>()
                     .call(HPX_FORWARD(ExPolicy, policy), first, last, dest,
-                        HPX_MOVE(pred), hpx::identity_v));
+                        HPX_FORWARD(Pred, pred), hpx::identity_v));
         }
 
         template <typename FwdIter1, typename FwdIter2, typename Pred>
