@@ -168,6 +168,7 @@ if(HPX_WITH_STDEXEC)
       all_of_sender
       any_of_sender
       copy_sender
+      copyif_sender
       copyn_sender
       count_sender
       countif_sender
