@@ -11,6 +11,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/executors/parallel_executor.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/coroutines.hpp>
@@ -1383,4 +1384,63 @@ namespace hpx::execution::experimental {
     {
     };
     /// \endcond
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Create a fork_join_executor from another executor
+    namespace detail {
+
+        template <typename Executor>
+        decltype(auto) fork_join_executor_from(Executor&& exec)
+        {
+            hpx::threads::mask_type const pu_mask =
+                get_processing_units_mask(exec);
+
+            hpx::launch const policy = exec.policy();
+            hpx::threads::thread_priority const priority =
+                policy.get_priority();
+
+            hpx::threads::thread_stacksize stacksize = policy.get_stacksize();
+            if (stacksize == hpx::threads::thread_stacksize::nostack)
+                stacksize = hpx::threads::thread_stacksize::small_;
+
+            fork_join_executor result(pu_mask, priority, stacksize);
+
+            char const* annotation = get_annotation(exec);
+            if (annotation == nullptr)
+                return result;
+
+            return with_annotation(result, annotation);
+        }
+    }    // namespace detail
+
+    template <typename Policy, bool HierarchicalSpawning>
+    decltype(auto) fork_join_executor_from(
+        hpx::execution::parallel_policy_executor<Policy, HierarchicalSpawning>&
+            exec)
+    {
+        return detail::fork_join_executor_from(exec);
+    }
+
+    template <typename Policy, bool HierarchicalSpawning>
+    decltype(auto) fork_join_executor_from(
+        hpx::execution::parallel_policy_executor<Policy,
+            HierarchicalSpawning> const& exec)
+    {
+        return detail::fork_join_executor_from(exec);
+    }
+
+    template <typename Policy, bool HierarchicalSpawning>
+    decltype(auto) fork_join_executor_from(
+        hpx::execution::parallel_policy_executor<Policy, HierarchicalSpawning>&&
+            exec)
+    {
+        return detail::fork_join_executor_from(HPX_MOVE(exec));
+    }
+
+    // fallback for everything but parallel_executor
+    template <typename Executor>
+    decltype(auto) fork_join_executor_from(Executor&& exec)
+    {
+        return HPX_FORWARD(Executor, exec);
+    }
 }    // namespace hpx::execution::experimental
