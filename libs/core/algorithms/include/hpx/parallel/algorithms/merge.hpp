@@ -288,6 +288,7 @@ namespace hpx {
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/itt_notify.hpp>
+#include <hpx/modules/tracing.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/copy.hpp>
 #include <hpx/parallel/algorithms/detail/advance_and_get_distance.hpp>
@@ -301,9 +302,6 @@ namespace hpx {
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/foreach_partitioner.hpp>
 #include <hpx/parallel/util/result_types.hpp>
-#if defined(HPX_HAVE_MODULE_TRACY)
-#include <hpx/modules/tracy.hpp>
-#endif
 
 #include <algorithm>
 #include <cstddef>
@@ -718,9 +716,7 @@ namespace hpx::parallel {
                 static hpx::util::itt::event notify_event("get diagonal index");
                 hpx::util::itt::mark_event e(notify_event);
 #endif
-#if defined(HPX_HAVE_MODULE_TRACY)
-                hpx::tracy::mark_event evt("get diagonal index");
-#endif
+                hpx::tracing::mark_event evt("get diagonal index");
                 auto const shape_size = std::size(shape);
 
                 if (n == 0)
@@ -758,9 +754,7 @@ namespace hpx::parallel {
                 "get diagonal intersection");
             hpx::util::itt::mark_event e(notify_event);
 #endif
-#if defined(HPX_HAVE_MODULE_TRACY)
-            hpx::tracy::mark_event evt("get diagonal intersection");
-#endif
+            hpx::tracing::mark_event evt("get diagonal intersection");
             if (len1 == 0)
                 return {0, (std::min) (k, len2)};
             if (len2 == 0)
@@ -816,9 +810,7 @@ namespace hpx::parallel {
                 "get diagonal intersection");
             hpx::util::itt::mark_event e(notify_event);
 #endif
-#if defined(HPX_HAVE_MODULE_TRACY)
-            hpx::tracy::mark_event evt("get diagonal intersection");
-#endif
+            hpx::tracing::mark_event evt("get diagonal intersection");
             if (len1 == 0)
                 return {0, (std::min) (k, len2)};
             if (len2 == 0)
