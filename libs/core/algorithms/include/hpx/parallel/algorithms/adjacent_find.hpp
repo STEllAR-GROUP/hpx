@@ -220,8 +220,7 @@ namespace hpx::parallel {
                         base_idx, it, part_size, tok, pred_projected);
                 };
 
-                auto f2 = [tok, count, first, last](
-                              auto&&... data) mutable -> FwdIter {
+                auto f2 = [tok, first](auto&&... data) mutable -> FwdIter {
                     static_assert(sizeof...(data) < 2);
 
                     // make sure iterators embedded in function object that
