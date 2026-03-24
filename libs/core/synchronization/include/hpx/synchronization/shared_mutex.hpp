@@ -140,6 +140,27 @@ namespace hpx::detail {
             return true;
         }
 
+        bool try_unlock_shared_fast()
+        {
+            while (true)
+            {
+                auto s = state.load(std::memory_order_acquire);
+                if (s.data.exclusive || s.data.exclusive_waiting_blocked ||
+                    s.data.upgrade || s.data.shared_count <= 1)
+                {
+                    return false;
+                }
+
+                auto s1 = s;
+                --s.data.shared_count;
+                if (set_state(s1, s))
+                {
+                    return true;
+                }
+                s = s1;
+            }
+        }
+
         void unlock_shared()
         {
             while (true)
@@ -510,6 +531,8 @@ namespace hpx::detail {
         void lock_shared()
         {
             auto data = data_;
+            if (data->try_lock_shared())
+                return;
             data->lock_shared();
         }
 
@@ -522,6 +545,8 @@ namespace hpx::detail {
         void unlock_shared()
         {
             auto data = data_;
+            if (data->try_unlock_shared_fast())
+                return;
             data->unlock_shared();
         }
 
