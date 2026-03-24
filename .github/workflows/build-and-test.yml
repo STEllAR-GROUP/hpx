@@ -1411,3 +1411,4 @@ jobs:
               working-directory: build
               run: |
                 ninja -j2 -k 0 tests.performance
+                

@@ -11,6 +11,7 @@ set(tests
     execution_policy_mappings
     explicit_scheduler_executor
     fork_join_executor
+    fork_join_executor_from
     limiting_executor
     parallel_executor
     parallel_executor_parameters

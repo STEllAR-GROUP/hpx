@@ -388,12 +388,12 @@ namespace hpx::execution::experimental {
             {
                 return {s.scheduler, HPX_FORWARD(Receiver, receiver)};
             }
+
+#if defined(HPX_HAVE_STDEXEC)
             struct env
             {
                 std::decay_t<Scheduler> const& sched;
 
-#if defined(HPX_HAVE_STDEXEC)
-                // query() member function for newer stdexec
                 auto query(stdexec::get_domain_t) const noexcept
                 {
                     return stdexec::get_domain(sched);
@@ -408,7 +408,6 @@ namespace hpx::execution::experimental {
                 {
                     return sched;
                 }
-#endif
 
                 template <typename CPO>
                     requires(meta::value<
@@ -421,14 +420,11 @@ namespace hpx::execution::experimental {
                     return e.sched;
                 }
 
-#if defined(HPX_HAVE_STDEXEC)
-                // Add domain query to sender environment
                 friend constexpr auto tag_invoke(
                     stdexec::get_domain_t, env const& e) noexcept
                 {
                     return stdexec::get_domain(e.sched);
                 }
-#endif
             };
 
             friend constexpr auto tag_invoke(
@@ -437,6 +433,17 @@ namespace hpx::execution::experimental {
             {
                 return env{s.scheduler};
             };
+#else
+            template <typename CPO>
+                requires(
+                    meta::value<meta::one_of<CPO, set_value_t, set_stopped_t>>)
+            friend constexpr auto tag_invoke(
+                hpx::execution::experimental::get_completion_scheduler_t<CPO>,
+                sender const& s) noexcept
+            {
+                return s.scheduler;
+            }
+#endif
         };
 
         friend constexpr hpx::execution::experimental::

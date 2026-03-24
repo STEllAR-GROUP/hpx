@@ -30,8 +30,8 @@ namespace hpx::tracy {
     HPX_CXX_CORE_EXPORT struct fiber_region
     {
         explicit fiber_region(char const* fiber_name,
-            char const* zone_name = nullptr, std::size_t color = 0,
-            bool enabled = true) noexcept
+            char const* zone_name = nullptr, std::size_t const color = 0,
+            bool const enabled = true) noexcept
           : active(enabled)
         {
             if (active)
