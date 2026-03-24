@@ -1770,7 +1770,7 @@ namespace hpx::threads::policies {
                     (void) dist;
                     iterate([&](std::size_t const other_num_thread) {
                         return static_cast<std::size_t>(
-                                   numa_domains[other_num_thread]) == domain;
+                            numa_domains[other_num_thread]) == domain;
                     });
                 }
             }
