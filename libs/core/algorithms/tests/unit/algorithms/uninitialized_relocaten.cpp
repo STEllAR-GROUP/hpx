@@ -513,7 +513,7 @@ void test_overlapping()
 }
 
 // Right-overlap test: dest > first, dest < first + count
-// This is the scenario that Issue #1 failed to detect — the parallel path
+// This is the scenario that Issue #1 failed to detect - the parallel path
 // would run on overlapping ranges, causing inter-chunk data races.
 // Only trivially relocatable types are tested because sequential forward
 // relocation with right-overlap is only correct via memmove (buffer_memcpy_tag).
