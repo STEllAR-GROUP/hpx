@@ -20,6 +20,7 @@
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
 #include <hpx/schedulers/thread_queue.hpp>
 
+#include <algorithm>
 #include <atomic>
 #include <cmath>
 #include <cstddef>
@@ -122,6 +123,7 @@ namespace hpx::threads::policies {
           , queues_(num_queues_)
           , high_priority_queues_(num_queues_)
           , victims_(num_queues_)
+          , thread_numa_domain_(num_queues_, 0)
         {
             if (!deferred_initialization)
             {
@@ -541,7 +543,6 @@ namespace hpx::threads::policies {
         void create_thread(thread_init_data& data, thread_id_ref_type* id,
             error_code& ec) override
         {
-            // NOTE: This scheduler ignores NUMA hints.
             std::size_t num_thread = static_cast<std::size_t>(-1);
             thread_priority priority = data.priority;
 
@@ -559,6 +560,32 @@ namespace hpx::threads::policies {
                     priority = thread_priority::bound;
                     data.priority = thread_priority::normal;
                 }
+            }
+            else if (data.schedulehint.mode ==
+                thread_schedule_hint_mode::numa)
+            {
+                // Route to a worker thread on the requested NUMA domain.
+                // Fall back to round-robin if the domain has no threads.
+                HPX_ASSERT(data.schedulehint.hint >= 0);
+                auto const& topo = create_topology();
+                std::size_t num_nodes = topo.get_number_of_numa_nodes();
+                if (num_nodes == 0)
+                    num_nodes = 1;
+                std::size_t const requested_domain =
+                    static_cast<std::size_t>(data.schedulehint.hint) %
+                    num_nodes;
+
+                std::size_t const start = curr_queue_++ % num_queues_;
+                for (std::size_t i = 0; i < num_queues_; ++i)
+                {
+                    std::size_t const idx = (start + i) % num_queues_;
+                    if (thread_numa_domain_[idx] == requested_domain)
+                    {
+                        num_thread = idx;
+                        break;
+                    }
+                }
+                data.schedulehint.mode = thread_schedule_hint_mode::thread;
             }
             else
             {
@@ -1644,6 +1671,10 @@ namespace hpx::threads::policies {
                 victims_[num_thread].data_.victim_threads_;
             victim_threads.reserve(num_threads);
 
+            // Record this thread's NUMA domain for use in create_thread().
+            thread_numa_domain_[num_thread] =
+                static_cast<std::size_t>(numa_domains[num_thread]);
+
             std::size_t const num_pu = affinity_data_.get_pu_num(num_thread);
             mask_cref_type pu_mask = topo.get_thread_affinity_mask(num_pu);
             mask_cref_type numa_mask = numa_masks[num_thread];
@@ -1710,19 +1741,38 @@ namespace hpx::threads::policies {
                     num_thread) &&
                 any(first_mask & pu_mask))
             {
-                iterate([&](std::size_t const other_num_thread) {
-                    // allow stealing from neighboring NUMA domain only
-                    std::ptrdiff_t const numa_distance =
-                        numa_domains[num_thread] -
-                        numa_domains[other_num_thread];
-                    if (numa_distance > 1 || numa_distance < -1)
-                        return false;
-                    // steal of even cores from neighboring NUMA domains
-                    if (numa_distance == 1 || numa_distance == -1)
-                        return other_num_thread % 2 == 0;
-                    // cores from our domain are handled above
-                    return false;
-                });
+                // Build a list of (hardware_latency_distance, domain_id)
+                // for all NUMA domains other than our own, then sweep them
+                // in ascending distance order so that the victim list
+                // prefers closer domains over farther ones.
+                std::size_t const my_domain =
+                    static_cast<std::size_t>(numa_domains[num_thread]);
+                std::size_t num_nodes = topo.get_number_of_numa_nodes();
+                if (num_nodes == 0)
+                    num_nodes = 1;
+
+                std::vector<std::pair<std::size_t, std::size_t>>
+                    domain_by_distance;
+                domain_by_distance.reserve(num_nodes - 1);
+                for (std::size_t n = 0; n < num_nodes; ++n)
+                {
+                    if (n != my_domain)
+                    {
+                        domain_by_distance.emplace_back(
+                            topo.get_numa_distance(my_domain, n), n);
+                    }
+                }
+                std::sort(
+                    domain_by_distance.begin(), domain_by_distance.end());
+
+                for (auto const& [dist, domain] : domain_by_distance)
+                {
+                    (void) dist;
+                    iterate([&](std::size_t const other_num_thread) {
+                        return static_cast<std::size_t>(
+                                   numa_domains[other_num_thread]) == domain;
+                    });
+                }
             }
         }
 
@@ -1786,6 +1836,11 @@ namespace hpx::threads::policies {
             std::size_t victim_offset_ = 0;
         };
         std::vector<util::cache_line_data<victims>> victims_;
+
+        // NUMA domain index for each worker thread, indexed by thread number.
+        // Populated during on_start_thread(); used for NUMA-hint routing in
+        // create_thread() and for distance-ordered victim list construction.
+        std::vector<std::size_t> thread_numa_domain_;
     };    // namespace hpx::threads::policies
 }    // namespace hpx::threads::policies
 
