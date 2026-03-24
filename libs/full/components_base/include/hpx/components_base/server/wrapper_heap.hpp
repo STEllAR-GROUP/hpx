@@ -52,12 +52,13 @@ namespace hpx::components::detail {
                 return nullptr;
             }
 
-            HPX_EXPORT static util::internal_allocator<char> alloc_;
+            HPX_EXPORT inline static util::internal_allocator<char> alloc_ = {};
         };
     }    // namespace one_size_heap_allocators
 
     ///////////////////////////////////////////////////////////////////////////
-    class HPX_EXPORT wrapper_heap : public util::wrapper_heap_base
+    HPX_CXX_EXPORT class HPX_EXPORT wrapper_heap
+      : public util::wrapper_heap_base
     {
     public:
         using allocator_type = one_size_heap_allocators::fixed_mallocator;
@@ -137,7 +138,7 @@ namespace hpx::components::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     // heap using malloc and friends
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     class fixed_wrapper_heap : public wrapper_heap
     {
         using base_type = wrapper_heap;

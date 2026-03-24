@@ -62,16 +62,16 @@ namespace hpx::traits {
         }
     };
 
-    template <typename Component, typename Enable = void>
+    HPX_CXX_EXPORT template <typename Component, typename Enable = void>
     struct component_decorates_action : detail::has_decorates_action<Component>
     {
     };
 
-    template <typename Component>
+    HPX_CXX_EXPORT template <typename Component>
     inline constexpr bool component_decorates_action_v =
         component_decorates_action<Component>::value;
 
-    template <typename Component, typename Enable = void>
+    HPX_CXX_EXPORT template <typename Component, typename Enable = void>
     struct component_decorate_function
     {
         template <typename F>

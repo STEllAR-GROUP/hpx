@@ -13,10 +13,62 @@
 #include <hpx/components_base/traits/component_pin_support.hpp>
 #include <hpx/modules/naming_base.hpp>
 
-#include <type_traits>
-
 namespace hpx::components {
 
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail {
+
+        class pinned_ptr_base
+        {
+        public:
+            constexpr pinned_ptr_base() noexcept = default;
+
+            constexpr explicit pinned_ptr_base(
+                naming::address_type lva) noexcept
+              : lva_(lva)
+            {
+            }
+
+            pinned_ptr_base(pinned_ptr_base const&) = delete;
+            pinned_ptr_base(pinned_ptr_base&&) = delete;
+            pinned_ptr_base& operator=(pinned_ptr_base const&) = delete;
+            pinned_ptr_base& operator=(pinned_ptr_base&&) = delete;
+
+            virtual ~pinned_ptr_base() = default;
+
+        protected:
+            naming::address_type lva_ = nullptr;
+        };
+
+        template <typename Component>
+        class pinned_ptr final : public pinned_ptr_base
+        {
+        public:
+            explicit pinned_ptr(naming::address_type lva) noexcept
+              : pinned_ptr_base(lva)
+            {
+                HPX_ASSERT(nullptr != this->lva_);
+
+                // pin associated component instance
+                traits::component_pin_support<Component>::pin(
+                    get_lva<Component>::call(this->lva_));
+            }
+
+            pinned_ptr(pinned_ptr const&) = delete;
+            pinned_ptr(pinned_ptr&&) = delete;
+            pinned_ptr& operator=(pinned_ptr const&) = delete;
+            pinned_ptr& operator=(pinned_ptr&&) = delete;
+
+            ~pinned_ptr() override
+            {
+                // unpin associated component instance
+                traits::component_pin_support<Component>::unpin(
+                    get_lva<Component>::call(this->lva_));
+            }
+        };
+    }    // namespace detail
+
+    ///////////////////////////////////////////////////////////////////////////
     class pinned_ptr
     {
         template <typename T>
@@ -24,32 +76,10 @@ namespace hpx::components {
         {
         };
 
-        using unpin_type = void (*)(naming::address_type);
-
-        template <typename Component>
-        static void unpin_impl(naming::address_type lva)
-        {
-            if (lva != nullptr)
-            {
-                traits::component_pin_support<Component>::unpin(
-                    get_lva<Component>::call(lva));
-            }
-        }
-
         template <typename Component>
         pinned_ptr(naming::address_type lva, id<Component>)
-          : lva_(lva)
-          , unpin_(&unpin_impl<Component>)
+          : data_(new detail::pinned_ptr<Component>(lva))
         {
-            HPX_ASSERT(nullptr != this->lva_);
-
-            // pin associated component instance
-            if (!traits::component_pin_support<Component>::pin(
-                    get_lva<Component>::call(this->lva_)))
-            {
-                this->lva_ = nullptr;
-                this->unpin_ = nullptr;
-            }
         }
 
     public:
@@ -57,19 +87,14 @@ namespace hpx::components {
 
         ~pinned_ptr()
         {
-            if (unpin_ != nullptr && lva_ != nullptr)
-            {
-                unpin_(lva_);
-            }
+            delete data_;
         }
 
         pinned_ptr(pinned_ptr const&) = delete;
         pinned_ptr(pinned_ptr&& rhs) noexcept
-          : lva_(rhs.lva_)
-          , unpin_(rhs.unpin_)
+          : data_(rhs.data_)
         {
-            rhs.lva_ = nullptr;
-            rhs.unpin_ = nullptr;
+            rhs.data_ = nullptr;
         }
 
         pinned_ptr& operator=(pinned_ptr const&) = delete;
@@ -77,21 +102,15 @@ namespace hpx::components {
         {
             if (this != &rhs)
             {
-                if (unpin_ != nullptr && lva_ != nullptr)
-                {
-                    unpin_(lva_);
-                }
-                lva_ = rhs.lva_;
-                unpin_ = rhs.unpin_;
-                rhs.lva_ = nullptr;
-                rhs.unpin_ = nullptr;
+                data_ = rhs.data_;
+                rhs.data_ = nullptr;
             }
             return *this;
         }
 
         explicit constexpr operator bool() const noexcept
         {
-            return lva_ != nullptr;
+            return data_ != nullptr;
         }
 
         template <typename Component>
@@ -111,7 +130,6 @@ namespace hpx::components {
         }
 
     private:
-        naming::address_type lva_ = nullptr;
-        unpin_type unpin_ = nullptr;
+        detail::pinned_ptr_base* data_ = nullptr;
     };
 }    // namespace hpx::components

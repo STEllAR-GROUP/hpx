@@ -24,7 +24,7 @@
 namespace hpx::components {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Component>
+    HPX_CXX_EXPORT template <typename Component>
     // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
     class fixed_component_base : public traits::detail::fixed_component_tag
     {

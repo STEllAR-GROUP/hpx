@@ -7,8 +7,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/components_base/server/one_size_heap_list.hpp>
-#include <hpx/components_base/server/wrapper_heap_base.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/functional.hpp>

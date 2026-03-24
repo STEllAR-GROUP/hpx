@@ -134,12 +134,13 @@ namespace hpx::components {
         }
 
         // Pinning functionality
-        bool pin() noexcept
+        void pin() noexcept
         {
             intrusive_ptr_add_ref(data_.get());    // keep alive
 
             std::unique_lock l(data_->mtx_);
 
+            HPX_ASSERT_LOCKED(l, data_->pin_count_ != ~0x0u);
             if (data_->pin_count_ != ~0x0u)
             {
                 // there shouldn't be any pinning happening once the pin-count
@@ -148,12 +149,7 @@ namespace hpx::components {
                     data_->pin_count_ != 0 ||
                         (!started_migration_ && !was_marked_for_migration_));
                 ++data_->pin_count_;
-                return true;
             }
-
-            intrusive_ptr_release(data_.get());    // release keep alive
-
-            return false;
         }
 
         bool unpin()

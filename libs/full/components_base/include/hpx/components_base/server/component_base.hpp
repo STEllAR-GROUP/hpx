@@ -18,7 +18,6 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <type_traits>
 
 #include <hpx/config/warnings_prefix.hpp>
 

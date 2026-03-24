@@ -12,7 +12,7 @@
 
 namespace hpx::util {
 
-    struct wrapper_heap_base
+    HPX_CXX_EXPORT struct wrapper_heap_base
     {
         struct heap_parameters
         {

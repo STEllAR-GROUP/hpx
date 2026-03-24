@@ -7,8 +7,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/components_base/agas_interface.hpp>
-#include <hpx/components_base/server/wrapper_heap.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/itt_notify.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/naming_base.hpp>
@@ -29,10 +28,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::components::detail {
 
-    namespace one_size_heap_allocators {
-
-        util::internal_allocator<char> fixed_mallocator::alloc_;
-    }
 
 #if HPX_DEBUG_WRAPPER_HEAP != 0
 #define HPX_WRAPPER_HEAP_INITIALIZED_MEMORY 1

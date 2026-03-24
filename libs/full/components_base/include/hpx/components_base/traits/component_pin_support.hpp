@@ -20,9 +20,8 @@ namespace hpx::traits {
         struct pin_helper
         {
             template <typename Component>
-            static constexpr bool call(wrap_int, Component*) noexcept
+            static constexpr void call(wrap_int, Component*) noexcept
             {
-                return true;
             }
 
             // forward the call if the component implements the function
@@ -72,9 +71,9 @@ namespace hpx::traits {
     template <typename Component, typename Enable = void>
     struct component_pin_support
     {
-        static constexpr bool pin(Component* p) noexcept
+        static constexpr void pin(Component* p) noexcept
         {
-            return detail::pin_helper::call(0, p);
+            detail::pin_helper::call(0, p);
         }
 
         static constexpr bool unpin(Component* p) noexcept
