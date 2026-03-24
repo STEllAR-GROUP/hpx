@@ -1893,6 +1893,17 @@ hpx_option(
   ADVANCED
 )
 
+hpx_option(
+  HPX_WITH_CXX20_STD_EXECUTION_POLICES
+  BOOL
+  "Support using std execution policies for HPX parallel algorithms (default: ON)."
+  ON
+  ADVANCED
+)
+if(HPX_WITH_CXX20_STD_EXECUTION_POLICES)
+  hpx_add_config_define(HPX_HAVE_CXX20_STD_EXECUTION_POLICES)
+endif()
+
 # Need to include the CUDA setup before the config test to enable the CUDA
 # language
 include(HPX_SetupCUDA)

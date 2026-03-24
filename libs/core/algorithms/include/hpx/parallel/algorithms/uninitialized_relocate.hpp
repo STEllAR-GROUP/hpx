@@ -123,6 +123,12 @@ namespace hpx {
     /// unordered fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
+    /// \note   Parallel execution requires both \a first and \a dest to be
+    ///         contiguous iterators. If either iterator is non-contiguous,
+    ///         the algorithm cannot determine whether the source and destination
+    ///         ranges overlap, and will silently fall back to sequential
+    ///         execution regardless of the execution policy provided.
+    ///
     /// \returns  The \a uninitialized_relocate algorithm returns a
     ///           \a hpx::future<FwdIter>, if the execution policy is of type
     ///           \a sequenced_task_policy or
@@ -243,6 +249,12 @@ namespace hpx {
     /// unordered fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
+    /// \note   Parallel execution requires both \a first and \a dest_last to
+    ///         be contiguous iterators. If either iterator is non-contiguous,
+    ///         the algorithm cannot determine whether the source and destination
+    ///         ranges overlap, and will silently fall back to sequential
+    ///         execution regardless of the execution policy provided.
+    ///
     /// \returns  The \a uninitialized_relocate_backward algorithm returns a
     ///           \a hpx::future<FwdIter>, if the execution policy is of type
     ///           \a sequenced_task_policy or
@@ -360,6 +372,12 @@ namespace hpx {
     /// \a parallel_task_policy are permitted to execute in an
     /// unordered fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
+    ///
+    /// \note   Parallel execution requires both \a first and \a dest to be
+    ///         contiguous iterators. If either iterator is non-contiguous,
+    ///         the algorithm cannot determine whether the source and destination
+    ///         ranges overlap, and will silently fall back to sequential
+    ///         execution regardless of the execution policy provided.
     ///
     /// \returns  The \a uninitialized_relocate_n algorithm returns a
     ///           \a hpx::future<FwdIter> if the execution policy is of type
