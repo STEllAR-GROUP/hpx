@@ -14,10 +14,6 @@ on:
       - 'release**'
   workflow_dispatch:
 
-concurrency:
-  group: docs-build-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   build-documentation:
     runs-on: ubuntu-latest
