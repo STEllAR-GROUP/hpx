@@ -19,14 +19,14 @@ namespace hpx::tracing {
 
     HPX_CXX_CORE_EXPORT struct HPX_CORE_EXPORT region
     {
-        explicit region(hpx::threads::thread_data* thrdptr,
+        explicit region(hpx::threads::thread_data const* thrdptr,
             std::size_t num_thread) noexcept;
 
         ~region();
 
     private:
         static hpx::tracy::region create_tracy_region(
-            hpx::threads::thread_data* thrdptr,
+            hpx::threads::thread_data const* thrdptr,
             std::size_t num_thread) noexcept;
 
         hpx::tracy::region impl;
@@ -43,14 +43,14 @@ namespace hpx::tracing {
 
     HPX_CXX_CORE_EXPORT struct HPX_CORE_EXPORT fiber_region
     {
-        explicit fiber_region(hpx::threads::thread_data* thrdptr,
+        explicit fiber_region(hpx::threads::thread_data const* thrdptr,
             std::size_t num_thread) noexcept;
 
         ~fiber_region();
 
     private:
         static hpx::tracy::fiber_region create_tracy_fiber_region(
-            hpx::threads::thread_data* thrdptr,
+            hpx::threads::thread_data const* thrdptr,
             std::size_t num_thread) noexcept;
 
         hpx::tracy::fiber_region impl;
@@ -65,7 +65,7 @@ namespace hpx::tracing {
     HPX_CXX_CORE_EXPORT struct [[maybe_unused]] region
     {
         constexpr explicit region(
-            hpx::threads::thread_data*, std::size_t) noexcept
+            hpx::threads::thread_data const*, std::size_t) noexcept
         {
         }
     };
@@ -78,7 +78,7 @@ namespace hpx::tracing {
     HPX_CXX_CORE_EXPORT struct [[maybe_unused]] fiber_region
     {
         constexpr explicit fiber_region(
-            hpx::threads::thread_data*, std::size_t) noexcept
+            hpx::threads::thread_data const*, std::size_t) noexcept
         {
         }
     };

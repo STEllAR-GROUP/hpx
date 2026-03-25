@@ -390,11 +390,13 @@ namespace hpx::threads::policies {
             if (delete_all)
             {
                 // delete all threads
+                std::int64_t term_delta = 0;
+                std::int64_t map_delta = 0;
                 thread_data* to_delete;
                 while (terminated_items_.pop(to_delete))
                 {
+                    ++term_delta;
                     thread_id_type tid(to_delete);
-                    --terminated_items_count_;
 
                     // this thread has to be managed by this queue, it may have
                     // ended up on the terminate threads list more than once,
@@ -406,10 +408,15 @@ namespace hpx::threads::policies {
                     if (thread_map_.erase(tid) != 0)
                     {
                         recycle_thread(tid);
-                        --thread_map_count_;
-                        HPX_ASSERT(thread_map_count_ >= 0);
+                        ++map_delta;
                     }
                 }
+                terminated_items_count_.fetch_sub(
+                    term_delta, std::memory_order_acq_rel);
+                [[maybe_unused]] std::int64_t remaining =
+                    thread_map_count_.fetch_sub(
+                        map_delta, std::memory_order_acq_rel);
+                HPX_ASSERT(remaining - map_delta >= 0);
             }
             else
             {
@@ -424,11 +431,13 @@ namespace hpx::threads::policies {
                 delete_count = (std::max) (delete_count,
                     static_cast<std::int64_t>(parameters_.min_delete_count_));
 
+                std::int64_t term_delta = 0;
+                std::int64_t map_delta = 0;
                 thread_data* to_delete;
                 while (delete_count && terminated_items_.pop(to_delete))
                 {
+                    ++term_delta;
                     thread_id_type tid(to_delete);
-                    --terminated_items_count_;
 
                     // this thread has to be managed by this queue, it may have
                     // ended up on the terminate threads list more than once,
@@ -440,11 +449,16 @@ namespace hpx::threads::policies {
                     if (thread_map_.erase(tid) != 0)
                     {
                         recycle_thread(tid);
-                        --thread_map_count_;
-                        HPX_ASSERT(thread_map_count_ >= 0);
+                        ++map_delta;
                     }
                     --delete_count;
                 }
+                terminated_items_count_.fetch_sub(
+                    term_delta, std::memory_order_acq_rel);
+                [[maybe_unused]] std::int64_t remaining =
+                    thread_map_count_.fetch_sub(
+                        map_delta, std::memory_order_acq_rel);
+                HPX_ASSERT(remaining - map_delta >= 0);
             }
             return terminated_items_count_.load(std::memory_order_acquire) == 0;
         }
