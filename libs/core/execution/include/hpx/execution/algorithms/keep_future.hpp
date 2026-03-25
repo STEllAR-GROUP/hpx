@@ -116,10 +116,7 @@ namespace hpx::execution::experimental {
             template <typename Env>
             friend auto tag_invoke(
                 get_completion_signatures_t, keep_future_sender const&, Env&&)
-                -> typename base_type::completion_signatures
-            {
-                return {};
-            }
+                -> typename base_type::completion_signatures;
 
             template <typename Receiver>
             friend operation_state<Receiver, future_type> tag_invoke(
@@ -158,10 +155,7 @@ namespace hpx::execution::experimental {
             template <typename Env>
             friend auto tag_invoke(
                 get_completion_signatures_t, keep_future_sender const&, Env&&)
-                -> typename base_type::completion_signatures
-            {
-                return {};
-            }
+                -> typename base_type::completion_signatures;
 
             template <typename Receiver>
             friend operation_state<Receiver, future_type> tag_invoke(

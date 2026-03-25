@@ -327,9 +327,7 @@ namespace hpx::execution::experimental {
 
     namespace detail {
 
-#if defined(HPX_HAVE_STDEXEC)
-    }
-#else
+#if !defined(HPX_HAVE_STDEXEC)
         HPX_CXX_CORE_EXPORT struct no_completion_signatures
         {
         };
@@ -360,6 +358,7 @@ namespace hpx::execution::experimental {
         HPX_CXX_CORE_EXPORT template <typename Sender>
         inline constexpr bool is_enable_sender_v = has_is_sender_v<Sender>;
 #endif    // HPX_HAVE_CXX20_COROUTINES
+#endif    // !HPX_HAVE_STDEXEC
     }    // namespace detail
 
     // execution::get_completion_signatures is a customization point object. Let
@@ -454,7 +453,6 @@ namespace hpx::execution::experimental {
 #endif
         }
     } get_completion_signatures{};
-#endif    // NOT HPX_HAVE_STDEXEC
 
     // A sender is a type that is describing an asynchronous operation. The
     // operation itself might not have started yet. In order to get the result

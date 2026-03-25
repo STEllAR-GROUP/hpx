@@ -160,10 +160,7 @@ struct sender_1
 
     template <typename Env>
     friend auto tag_invoke(ex::get_completion_signatures_t, sender_1 const&,
-        Env&&) -> completion_signatures
-    {
-        return {};
-    }
+        Env&&) -> completion_signatures;
 
     struct operation_state : immovable
     {
@@ -205,10 +202,7 @@ struct sender_2
 
     template <typename Env>
     friend auto tag_invoke(ex::get_completion_signatures_t, sender_2 const&,
-        Env&&) -> completion_signatures
-    {
-        return {};
-    }
+        Env&&) -> completion_signatures;
 
     struct operation_state : immovable
     {
@@ -237,10 +231,7 @@ struct sender_3
 
     template <typename Env>
     friend auto tag_invoke(ex::get_completion_signatures_t, sender_3 const&,
-        Env&&) -> completion_signatures
-    {
-        return {};
-    }
+        Env&&) -> completion_signatures;
 
     struct operation_state : immovable
     {
@@ -285,10 +276,7 @@ struct sender_4
 
     template <typename Env>
     friend auto tag_invoke(ex::get_completion_signatures_t, sender_4 const&,
-        Env&&) -> completion_signatures
-    {
-        return {};
-    }
+        Env&&) -> completion_signatures;
 };
 
 static std::size_t void_receiver_set_value_calls = 0;
