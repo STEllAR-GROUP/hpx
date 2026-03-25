@@ -188,6 +188,9 @@ int hpx_main()
                 }
             }
         }
+
+        // Regression coverage: non-divisible partitioning (num_sites % arity)
+        test_local_use(10, 3);
     }
 
     return hpx::finalize();
