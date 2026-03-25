@@ -14,7 +14,7 @@
 #pragma warning(disable : 4100)
 #endif
 
-#include <hpx/hpx_init.hpp>
+#include <hpx/init_params.hpp>
 
 // We support different implementation depending upon the Operating
 // System in use.
