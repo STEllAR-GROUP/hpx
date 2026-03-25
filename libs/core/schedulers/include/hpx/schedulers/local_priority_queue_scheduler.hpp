@@ -1750,7 +1750,8 @@ namespace hpx::threads::policies {
 
                 // Only steal from directly neighboring NUMA domains
                 // (minimum distance) to limit cross-NUMA traffic.
-                std::size_t min_dist = std::numeric_limits<std::size_t>::max();
+                std::size_t min_dist =
+                    (std::numeric_limits<std::size_t>::max)();
                 for (std::size_t n = 0; n < num_nodes; ++n)
                 {
                     if (n != my_domain)
