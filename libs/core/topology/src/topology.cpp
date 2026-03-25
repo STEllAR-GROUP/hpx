@@ -350,8 +350,8 @@ namespace hpx::threads {
                 {
                     if (dist->objs[j] == nullptr)
                         continue;
-                    std::size_t const nj = static_cast<std::size_t>(
-                        dist->objs[j]->logical_index);
+                    std::size_t const nj =
+                        static_cast<std::size_t>(dist->objs[j]->logical_index);
                     if (ni < num_nodes && nj < num_nodes)
                     {
                         numa_node_distances_[ni][nj] = static_cast<std::size_t>(

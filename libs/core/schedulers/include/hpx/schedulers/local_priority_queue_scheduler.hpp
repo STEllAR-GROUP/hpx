@@ -559,8 +559,7 @@ namespace hpx::threads::policies {
                 HPX_ASSERT(data.schedulehint.hint >= 0);
                 num_thread = data.schedulehint.hint;
             }
-            else if (data.schedulehint.mode ==
-                thread_schedule_hint_mode::numa)
+            else if (data.schedulehint.mode == thread_schedule_hint_mode::numa)
             {
                 // Route to a worker thread on the requested NUMA domain.
                 // Fall back to round-robin if the domain has no threads.
@@ -1751,8 +1750,7 @@ namespace hpx::threads::policies {
 
                 // Only steal from directly neighboring NUMA domains
                 // (minimum distance) to limit cross-NUMA traffic.
-                std::size_t min_dist =
-                    std::numeric_limits<std::size_t>::max();
+                std::size_t min_dist = std::numeric_limits<std::size_t>::max();
                 for (std::size_t n = 0; n < num_nodes; ++n)
                 {
                     if (n != my_domain)
@@ -1771,7 +1769,7 @@ namespace hpx::threads::policies {
                         continue;
                     iterate([&](std::size_t const other_num_thread) {
                         return static_cast<std::size_t>(
-                            numa_domains[other_num_thread]) == n;
+                                   numa_domains[other_num_thread]) == n;
                     });
                 }
             }
