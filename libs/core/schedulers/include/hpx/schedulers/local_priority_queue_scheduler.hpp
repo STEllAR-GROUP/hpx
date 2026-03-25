@@ -20,12 +20,12 @@
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
 #include <hpx/schedulers/thread_queue.hpp>
 
-#include <algorithm>
 #include <atomic>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
+#include <limits>
 #include <mutex>
 #include <string_view>
 #include <type_traits>
@@ -546,20 +546,18 @@ namespace hpx::threads::policies {
             std::size_t num_thread = static_cast<std::size_t>(-1);
             thread_priority priority = data.priority;
 
-            // If the user specified a concrete thread to use, and the initial
-            // priority is initially_bound, then schedule the thread as
-            // initially bound to make sure the thread starts running on the
-            // specified core.
+            // If the initial priority is initially_bound, promote it to
+            // bound for the first scheduling step, regardless of hint mode.
+            if (data.priority == thread_priority::initially_bound)
+            {
+                priority = thread_priority::bound;
+                data.priority = thread_priority::normal;
+            }
+
             if (data.schedulehint.mode == thread_schedule_hint_mode::thread)
             {
                 HPX_ASSERT(data.schedulehint.hint >= 0);
                 num_thread = data.schedulehint.hint;
-
-                if (data.priority == thread_priority::initially_bound)
-                {
-                    priority = thread_priority::bound;
-                    data.priority = thread_priority::normal;
-                }
             }
             else if (data.schedulehint.mode ==
                 thread_schedule_hint_mode::numa)
@@ -1751,26 +1749,29 @@ namespace hpx::threads::policies {
                 if (num_nodes == 0)
                     num_nodes = 1;
 
-                std::vector<std::pair<std::size_t, std::size_t>>
-                    domain_by_distance;
-                domain_by_distance.reserve(num_nodes - 1);
+                // Only steal from directly neighboring NUMA domains
+                // (minimum distance) to limit cross-NUMA traffic.
+                std::size_t min_dist =
+                    std::numeric_limits<std::size_t>::max();
                 for (std::size_t n = 0; n < num_nodes; ++n)
                 {
                     if (n != my_domain)
                     {
-                        domain_by_distance.emplace_back(
-                            topo.get_numa_distance(my_domain, n), n);
+                        std::size_t const d =
+                            topo.get_numa_distance(my_domain, n);
+                        if (d < min_dist)
+                            min_dist = d;
                     }
                 }
-                std::sort(
-                    domain_by_distance.begin(), domain_by_distance.end());
-
-                for (auto const& [dist, domain] : domain_by_distance)
+                for (std::size_t n = 0; n < num_nodes; ++n)
                 {
-                    (void) dist;
+                    if (n == my_domain)
+                        continue;
+                    if (topo.get_numa_distance(my_domain, n) != min_dist)
+                        continue;
                     iterate([&](std::size_t const other_num_thread) {
                         return static_cast<std::size_t>(
-                            numa_domains[other_num_thread]) == domain;
+                            numa_domains[other_num_thread]) == n;
                     });
                 }
             }
