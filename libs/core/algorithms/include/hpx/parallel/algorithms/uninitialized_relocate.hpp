@@ -771,8 +771,8 @@ namespace hpx::experimental {
                 {
                     auto dest_last = std::next(dest, count);
                     auto last = std::next(first, count);
-                    // if it is not overlapping in the left direction
-                    if (!((first < dest_last) && (dest_last < last)))
+                    // if ranges are completely disjoint (no overlap in either direction)
+                    if (dest >= last || dest_last <= first)
                     {
                         // use parallel version
                         if constexpr (has_scheduler_executor)
@@ -918,8 +918,8 @@ namespace hpx::experimental {
                     hpx::traits::is_contiguous_iterator_v<FwdIter>)
                 {
                     auto dest_last = std::next(dest, count);
-                    // if it is not overlapping in the left direction
-                    if (!((first < dest_last) && (dest_last < last)))
+                    // if ranges are completely disjoint (no overlap in either direction)
+                    if (dest >= last || dest_last <= first)
                     {
                         // use parallel version
                         if constexpr (has_scheduler_executor)
