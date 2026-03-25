@@ -7,10 +7,8 @@
 
 |circleci_status| |codacy_quality| |codacy_coverage| |OpenSSF| |CFF| |JOSS| |zenodo_doi|
 
-Documentation: `latest
-<https://hpx-docs.stellar-group.org/latest/html/index.html>`_,
-`development (master)
-<https://hpx-docs.stellar-group.org/branches/master/html/index.html>`_
+Documentation: `latest <https://docs.hpx.dev/latest/html/index.html>`_,
+`development (master) <https://docs.hpx.dev/branches/master/html/index.html>`_
 
 |hpx_logo|
 
