@@ -33,11 +33,12 @@ namespace hpx {
         std::function<void()> shutdown;
     };
 
-    HPX_CORE_EXPORT int init(std::function<int(hpx::program_options::variables_map&)> f,
-        int argc, char** argv, init_params const& params = init_params());
+    HPX_CORE_EXPORT int init(
+        std::function<int(hpx::program_options::variables_map&)> f, int argc,
+        char** argv, init_params const& params = init_params());
 
-    HPX_CORE_EXPORT int init(std::function<int(int, char**)> f, int argc, char** argv,
-        init_params const& params = init_params());
+    HPX_CORE_EXPORT int init(std::function<int(int, char**)> f, int argc,
+        char** argv, init_params const& params = init_params());
 
     HPX_CORE_EXPORT int init(std::function<int()> f, int argc, char** argv,
         init_params const& params = init_params());

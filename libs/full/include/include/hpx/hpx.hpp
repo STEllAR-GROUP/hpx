@@ -13,11 +13,11 @@
 #include <hpx/execution.hpp>
 #include <hpx/functional.hpp>
 #include <hpx/future.hpp>
+#include <hpx/init_params.hpp>
 #include <hpx/memory.hpp>
 #include <hpx/numeric.hpp>
 #include <hpx/optional.hpp>
 #include <hpx/runtime.hpp>
-#include <hpx/init_params.hpp>
 #include <hpx/serialization.hpp>
 #include <hpx/task_block.hpp>
 #include <hpx/tuple.hpp>

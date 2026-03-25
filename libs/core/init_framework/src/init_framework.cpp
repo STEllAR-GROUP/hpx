@@ -39,8 +39,7 @@ namespace hpx {
         return hpx::local::init(HPX_MOVE(f), argc, argv, map_params(params));
     }
 
-    int init(std::nullptr_t, int argc, char** argv,
-        init_params const& params)
+    int init(std::nullptr_t, int argc, char** argv, init_params const& params)
     {
         return hpx::local::init(nullptr, argc, argv, map_params(params));
     }
@@ -56,4 +55,4 @@ namespace hpx {
         return hpx::local::finalize(ec);
     }
 
-} // namespace hpx
+}    // namespace hpx

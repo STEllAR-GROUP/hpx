@@ -32,7 +32,7 @@ namespace hpx_start {
 #endif
     // The default application name is populated by including hpx/hpx_main.hpp
     // or if HPX_AUTO_WRAP_MAIN_ACTIVATE is defined.
-    HPX_SYMBOL_EXPORT extern const char* app_name_libhpx_wrap;
+    HPX_SYMBOL_EXPORT extern char const* app_name_libhpx_wrap;
     HPX_SYMBOL_EXPORT const char* app_name_libhpx_wrap __attribute__((weak)) =
         HPX_APPLICATION_STRING;
 
