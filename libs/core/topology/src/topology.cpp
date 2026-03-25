@@ -335,8 +335,11 @@ namespace hpx::threads {
         hwloc_distances_s* dist = nullptr;
         {
             std::unique_lock<mutex_type> lk(topo_mtx);
-            hwloc_distances_get_by_type(topo, HWLOC_OBJ_NUMANODE, &nr, &dist,
-                HWLOC_DISTANCES_KIND_MEANS_LATENCY, 0);
+            if (hwloc_distances_get_by_type(topo, HWLOC_OBJ_NUMANODE, &nr,
+                    &dist, HWLOC_DISTANCES_KIND_MEANS_LATENCY, 0) < 0)
+            {
+                dist = nullptr;
+            }
         }
         if (dist != nullptr)
         {
