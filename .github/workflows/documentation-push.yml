@@ -16,6 +16,10 @@ on:
       - 'release**'
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   deploy-documentation:
     runs-on: ubuntu-latest
@@ -34,7 +38,7 @@ jobs:
       uses: dawidd6/action-download-artifact@v19
       with:
         workflow: documentation-build.yml
-        commit: ${{ github.event.workflow_run.head_sha }}
+        commit: ${{ github.event.workflow_run.head_sha || github.sha }}
         name: documentation-artifacts
         path: /__w/hpx/hpx/build/share/hpx/docs
 
@@ -42,7 +46,7 @@ jobs:
       uses: dawidd6/action-download-artifact@v19
       with:
         workflow: depreport.yml
-        commit: ${{ github.event.workflow_run.head_sha }}
+        commit: ${{ github.event.workflow_run.head_sha || github.sha }}
         name: hpx-depreport
         path: /__w/hpx/hpx/build/share/hpx/docs/report
 
@@ -78,7 +82,7 @@ jobs:
           -DHPX_BINARY_DIR=/__w/hpx/hpx/build \
           -DHPX_WITH_GIT_BRANCH=master \
           -DHPX_WITH_DOCUMENTATION_OUTPUT_FORMATS="html singlehtml latexpdf" \
-          "-DGIT_REPOSITORY=git@github.com:STEllAR-GROUP/hpx-docs.git;--branch;HPXBot-test" \
+          "-DGIT_REPOSITORY=git@github.com:TheHPXProject/hpx-docs.git;--branch;test-branch" \
           -P /__w/hpx/hpx/cmake/HPX_UpdateGitDocs.cmake
 
     - name: Cleanup SSH agent

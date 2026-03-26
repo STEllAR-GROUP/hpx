@@ -14,6 +14,10 @@ on:
       - 'release**'
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   build-documentation:
     runs-on: ubuntu-latest
@@ -36,7 +40,7 @@ jobs:
               -DHPX_WITH_EXAMPLES=ON \
               -DHPX_WITH_TESTS=OFF \
               -DHPX_WITH_DOCUMENTATION=ON \
-              -DHPX_WITH_DOCUMENTATION_OUTPUT_FORMATS="html;singlehtml;latexpdf" \
+              -DHPX_WITH_DOCUMENTATION_OUTPUT_FORMATS="html;singlehtml;latexpdf"
 
     - name: Build Documentation (HTML)
       timeout-minutes: 120
