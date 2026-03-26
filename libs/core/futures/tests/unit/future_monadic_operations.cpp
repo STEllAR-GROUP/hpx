@@ -7,8 +7,8 @@
 #include <hpx/config.hpp>
 #include <hpx/future.hpp>
 #include <hpx/futures/monadic_operations.hpp>
-#include <hpx/modules/testing.hpp>
 #include <hpx/init.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <string>
 
@@ -17,16 +17,14 @@ void test_transform()
 {
     // value
     auto f = hpx::make_ready_future(42);
-    auto f2 = hpx::futures::transform(std::move(f), [](int val) {
-        return std::to_string(val);
-    });
+    auto f2 = hpx::futures::transform(
+        std::move(f), [](int val) { return std::to_string(val); });
     HPX_TEST_EQ(f2.get(), "42");
 
     // void
     auto f_void = hpx::make_ready_future();
-    auto f_void2 = hpx::futures::transform(std::move(f_void), []() {
-        return 10;
-    });
+    auto f_void2 =
+        hpx::futures::transform(std::move(f_void), []() { return 10; });
     HPX_TEST_EQ(f_void2.get(), 10);
 }
 
@@ -34,39 +32,37 @@ void test_and_then()
 {
     // flatten
     auto f = hpx::make_ready_future(42);
-    auto f2 = hpx::futures::and_then(std::move(f), [](int val) {
-        return hpx::make_ready_future(std::to_string(val));
-    });
+    auto f2 = hpx::futures::and_then(std::move(f),
+        [](int val) { return hpx::make_ready_future(std::to_string(val)); });
     HPX_TEST_EQ(f2.get(), "42");
 }
 
 void test_or_else()
 {
     // active exception
-    auto f = hpx::make_exceptional_future<int>(hpx::exception(
-        hpx::error::bad_parameter, "testing or_else"));
+    auto f = hpx::make_exceptional_future<int>(
+        hpx::exception(hpx::error::bad_parameter, "testing or_else"));
 
-    auto f2 = hpx::futures::or_else(std::move(f), [](std::exception_ptr const& /*e*/) {
-        return hpx::make_ready_future(100);
-    });
+    auto f2 = hpx::futures::or_else(
+        std::move(f), [](std::exception_ptr const& /*e*/) {
+            return hpx::make_ready_future(100);
+        });
 
     HPX_TEST_EQ(f2.get(), 100);
 
     // active exception fallback to void argument signature
-    auto f3 = hpx::make_exceptional_future<int>(hpx::exception(
-        hpx::error::bad_parameter, "testing or_else"));
+    auto f3 = hpx::make_exceptional_future<int>(
+        hpx::exception(hpx::error::bad_parameter, "testing or_else"));
 
-    auto f4 = hpx::futures::or_else(std::move(f3), []() {
-        return hpx::make_ready_future(200);
-    });
+    auto f4 = hpx::futures::or_else(
+        std::move(f3), []() { return hpx::make_ready_future(200); });
 
     HPX_TEST_EQ(f4.get(), 200);
 
     // no exception (value drops through)
     auto f5 = hpx::make_ready_future(42);
-    auto f6 = hpx::futures::or_else(std::move(f5), [](std::exception_ptr const&) {
-        return hpx::make_ready_future(1);
-    });
+    auto f6 = hpx::futures::or_else(std::move(f5),
+        [](std::exception_ptr const&) { return hpx::make_ready_future(1); });
     HPX_TEST_EQ(f6.get(), 42);
 }
 
@@ -74,9 +70,8 @@ void test_or_else()
 void test_shared_transform()
 {
     hpx::shared_future<int> f = hpx::make_ready_future(42);
-    auto f2 = hpx::futures::transform(f, [](int val) {
-        return std::to_string(val);
-    });
+    auto f2 =
+        hpx::futures::transform(f, [](int val) { return std::to_string(val); });
     HPX_TEST_EQ(f2.get(), "42");
     HPX_TEST_EQ(f.get(), 42);
 }
@@ -84,20 +79,18 @@ void test_shared_transform()
 void test_shared_and_then()
 {
     hpx::shared_future<int> f = hpx::make_ready_future(42);
-    auto f2 = hpx::futures::and_then(f, [](int val) {
-        return hpx::make_ready_future(std::to_string(val));
-    });
+    auto f2 = hpx::futures::and_then(
+        f, [](int val) { return hpx::make_ready_future(std::to_string(val)); });
     HPX_TEST_EQ(f2.get(), "42");
 }
 
 void test_shared_or_else()
 {
-    hpx::shared_future<int> f = hpx::make_exceptional_future<int>(hpx::exception(
-        hpx::error::bad_parameter, "testing shared or_else"));
+    hpx::shared_future<int> f = hpx::make_exceptional_future<int>(
+        hpx::exception(hpx::error::bad_parameter, "testing shared or_else"));
 
-    auto f2 = hpx::futures::or_else(f, [](std::exception_ptr const&) {
-        return hpx::make_ready_future(300);
-    });
+    auto f2 = hpx::futures::or_else(f,
+        [](std::exception_ptr const&) { return hpx::make_ready_future(300); });
     HPX_TEST_EQ(f2.get(), 300);
 }
 
@@ -117,8 +110,7 @@ int hpx_main()
 
 int main(int argc, char* argv[])
 {
-    HPX_TEST_EQ_MSG(
-        hpx::local::init(hpx_main, argc, argv), 0,
+    HPX_TEST_EQ_MSG(hpx::local::init(hpx_main, argc, argv), 0,
         "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
