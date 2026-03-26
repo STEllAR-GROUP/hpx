@@ -59,7 +59,7 @@ namespace hpx::tracy {
     HPX_CXX_CORE_EXPORT struct region
     {
         explicit region(char const* name, std::size_t const thread_num,
-            std::size_t phase, bool enabled = true) noexcept
+            std::size_t const phase, bool const enabled = true) noexcept
           : active(enabled)
         {
             if (active)

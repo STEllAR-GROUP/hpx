@@ -196,6 +196,10 @@ int hpx_main()
                 }
             }
         }
+
+        // Regression coverage: uneven hierarchical chunking
+        // (num_sites % arity != 0)
+        test_local_use(10, 3);
     }
 
     return hpx::finalize();
