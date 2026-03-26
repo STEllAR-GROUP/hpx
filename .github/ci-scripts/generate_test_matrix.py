@@ -15,7 +15,6 @@ def get_excluded_tests():
     exclude_file = os.path.abspath(os.path.join(
         os.path.dirname(__file__), "..", "workflows", "excludes.targets"
     ))
-    
     excluded = set()
     if os.path.exists(exclude_file):
         with open(exclude_file, "r") as f:
