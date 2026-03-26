@@ -18,53 +18,19 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace futures {
+namespace hpx {
 
-    // ---------------------------------------------------------------
-    // transform: apply f to the value inside a ready future
-    // ---------------------------------------------------------------
-    template <typename Future, typename F,
-        typename R = typename hpx::traits::future_traits<
-            std::decay_t<Future>>::result_type>
-        requires(hpx::traits::is_future_v<std::decay_t<Future>> &&
-            (std::is_void_v<R> ? std::invocable<std::decay_t<F>> :
-                                 std::invocable<std::decay_t<F>, R>) )
-    auto transform(Future&& fut, F&& f)
-    {
-        if constexpr (std::is_void_v<R>)
-        {
-            return fut.then([f = std::forward<F>(f)](auto&& f_inner) mutable {
-                f_inner.get();
-                return f();
-            });
-        }
-        else
-        {
-            return fut.then([f = std::forward<F>(f)](auto&& f_inner) mutable {
-                return HPX_INVOKE(f, f_inner.get());
-            });
-        }
-    }
-
-    // ---------------------------------------------------------------
-    // and_then: chain a continuation that itself returns a future
-    // ---------------------------------------------------------------
     namespace detail {
 
         // Helper: compute invoke_result while accounting for void R
         template <typename R, typename F>
-        struct invoke_result_helper;
-
-        template <typename R, typename F>
-            requires(!std::is_void_v<R>)
-        struct invoke_result_helper<R, F>
+        struct invoke_result_helper
         {
             using type = std::invoke_result_t<F, R>;
         };
 
-        template <typename R, typename F>
-            requires(std::is_void_v<R>)
-        struct invoke_result_helper<R, F>
+        template <typename F>
+        struct invoke_result_helper<void, F>
         {
             using type = std::invoke_result_t<F>;
         };
@@ -73,40 +39,9 @@ namespace hpx { namespace futures {
         using invoke_result_helper_t =
             typename invoke_result_helper<R, F>::type;
 
-    }    // namespace detail
-
-    template <typename Future, typename F,
-        typename R = typename hpx::traits::future_traits<
-            std::decay_t<Future>>::result_type,
-        typename InvokeResult =
-            detail::invoke_result_helper_t<R, std::decay_t<F>>>
-        requires(hpx::traits::is_future_v<std::decay_t<Future>> &&
-            hpx::traits::is_future_v<InvokeResult>)
-    auto and_then(Future&& fut, F&& f)
-    {
-        if constexpr (std::is_void_v<R>)
-        {
-            return fut.then([f = std::forward<F>(f)](auto&& f_inner) mutable {
-                f_inner.get();
-                return f();
-            });
-        }
-        else
-        {
-            return fut.then([f = std::forward<F>(f)](auto&& f_inner) mutable {
-                return HPX_INVOKE(f, f_inner.get());
-            });
-        }
-    }
-
-    // ---------------------------------------------------------------
-    // or_else: error recovery — executes f only when the future
-    //          holds an exception
-    // ---------------------------------------------------------------
-    namespace detail {
-
-        // Lazy wrappers so std::conditional_t can select the struct
-        // without eagerly instantiating both ::type members.
+        // Lazy wrappers for or_else result type deduction.
+        // std::conditional_t selects the struct without eagerly
+        // instantiating both ::type members.
         template <typename F>
         struct or_else_result_eptr
         {
@@ -122,6 +57,63 @@ namespace hpx { namespace futures {
 
     }    // namespace detail
 
+    // -----------------------------------------------------------------
+    // transform: apply f to the value inside a ready future
+    // -----------------------------------------------------------------
+    HPX_CXX_CORE_EXPORT
+    template <typename Future, typename F,
+        typename R = typename hpx::traits::future_traits<
+            std::decay_t<Future>>::result_type>
+        requires(hpx::traits::is_future_v<std::decay_t<Future>> &&
+            (std::is_void_v<R> ? std::invocable<std::decay_t<F>> :
+                                 std::invocable<std::decay_t<F>, R>) )
+    auto transform(Future&& fut, F&& f)
+    {
+        return fut.then([f = std::forward<F>(f)](auto&& f_inner) mutable {
+            if constexpr (std::is_void_v<R>)
+            {
+                f_inner.get();
+                return f();
+            }
+            else
+            {
+                return HPX_INVOKE(f, f_inner.get());
+            }
+        });
+    }
+
+    // -----------------------------------------------------------------
+    // and_then: chain a continuation that itself returns a future
+    //           (automatic flattening — no .unwrap() needed)
+    // -----------------------------------------------------------------
+    HPX_CXX_CORE_EXPORT
+    template <typename Future, typename F,
+        typename R = typename hpx::traits::future_traits<
+            std::decay_t<Future>>::result_type,
+        typename InvokeResult =
+            detail::invoke_result_helper_t<R, std::decay_t<F>>>
+        requires(hpx::traits::is_future_v<std::decay_t<Future>> &&
+            hpx::traits::is_future_v<InvokeResult>)
+    auto and_then(Future&& fut, F&& f)
+    {
+        return fut.then([f = std::forward<F>(f)](auto&& f_inner) mutable {
+            if constexpr (std::is_void_v<R>)
+            {
+                f_inner.get();
+                return f();
+            }
+            else
+            {
+                return HPX_INVOKE(f, f_inner.get());
+            }
+        });
+    }
+
+    // -----------------------------------------------------------------
+    // or_else: error recovery — executes f only when the future
+    //          holds an exception
+    // -----------------------------------------------------------------
+    HPX_CXX_CORE_EXPORT
     template <typename Future, typename F,
         typename R = typename hpx::traits::future_traits<
             std::decay_t<Future>>::result_type>
@@ -171,4 +163,4 @@ namespace hpx { namespace futures {
             });
     }
 
-}}    // namespace hpx::futures
+}    // namespace hpx
