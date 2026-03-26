@@ -37,6 +37,18 @@ namespace local {
     };
 }    // namespace local
 
+namespace server {
+    struct request
+    {
+    };
+}    // namespace server
+
+namespace client {
+    struct request
+    {
+    };
+}    // namespace client
+
 int main()
 {
     using hpx::serialization::detail::qualified_name_of;
@@ -75,6 +87,16 @@ int main()
             "world::continent::country::city<local::person>>";
 
         HPX_TEST_EQ(std::string(name), expected);
+    }
+
+    // Same Name in Different Namespaces
+    {
+        std::string server_req = qualified_name_of<server::request>::get();
+        std::string client_req = qualified_name_of<client::request>::get();
+
+        HPX_TEST_NEQ(server_req, client_req);
+        HPX_TEST_EQ(server_req, std::string("server::request"));
+        HPX_TEST_EQ(client_req, std::string("client::request"));
     }
 
     return hpx::util::report_errors();
