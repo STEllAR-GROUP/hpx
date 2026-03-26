@@ -224,9 +224,8 @@ namespace hpx::segmented {
             hpx::traits::segmented_iterator_traits<SegIter2>;
 
         return hpx::parallel::detail::segmented_equal(
-            hpx::parallel::detail::equal(),
-            hpx::execution::seq, first1, last1, first2, HPX_FORWARD(Pred, pred),
-            std::true_type());
+            hpx::parallel::detail::equal(), hpx::execution::seq, first1, last1,
+            first2, HPX_FORWARD(Pred, pred), std::true_type());
     }
 
     template <typename ExPolicy, typename SegIter1, typename SegIter2,
@@ -261,8 +260,7 @@ namespace hpx::segmented {
             hpx::traits::segmented_iterator_traits<SegIter2>;
 
         return hpx::parallel::detail::segmented_equal(
-            hpx::parallel::detail::equal(),
-            HPX_FORWARD(ExPolicy, policy), first1, last1, first2,
-            HPX_FORWARD(Pred, pred), is_seq());
+            hpx::parallel::detail::equal(), HPX_FORWARD(ExPolicy, policy),
+            first1, last1, first2, HPX_FORWARD(Pred, pred), is_seq());
     }
 }    // namespace hpx::segmented
