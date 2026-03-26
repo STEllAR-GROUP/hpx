@@ -5,9 +5,13 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#ifndef HPX_COMPONENTS_BASE_GET_LVA_HPP
+#define HPX_COMPONENTS_BASE_GET_LVA_HPP
+
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/components_base/components_base_fwd.hpp>
 #include <hpx/components_base/traits/is_component.hpp>
 #include <hpx/modules/naming_base.hpp>
 
@@ -15,6 +19,9 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
+
+    HPX_CXX_EXPORT template <typename Component, typename Enable>
+    struct get_lva;
 
     ///////////////////////////////////////////////////////////////////////////
     /// The \a get_lva template is a helper structure allowing to convert a
@@ -28,7 +35,7 @@ namespace hpx {
     ///
     /// \tparam Component  This is the type of the component implementing the
     ///                    action to execute.
-    HPX_CXX_EXPORT template <typename Component, typename Enable = void>
+    template <typename Component, typename Enable>
     struct get_lva
     {
         constexpr static Component* call(naming::address_type lva) noexcept
@@ -54,3 +61,5 @@ namespace hpx {
         }
     };
 }    // namespace hpx
+
+#endif

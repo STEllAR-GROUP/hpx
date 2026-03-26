@@ -10,6 +10,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/components_base/get_lva.hpp>
 #include <hpx/components_base/traits/action_decorate_function.hpp>
+
 #include <hpx/components_base/traits/component_pin_support.hpp>
 #include <hpx/modules/naming_base.hpp>
 
@@ -117,7 +118,8 @@ namespace hpx::components {
         static pinned_ptr create([[maybe_unused]] naming::address_type lva)
         {
             using component_type = std::remove_cv_t<Component>;
-            if constexpr (traits::component_decorates_action_v<component_type>)
+            if constexpr (traits::component_decorates_action<
+                              component_type>::value)
             {
                 // created pinned_ptr actually pins object it refers to
                 return pinned_ptr(lva, id<component_type>{});

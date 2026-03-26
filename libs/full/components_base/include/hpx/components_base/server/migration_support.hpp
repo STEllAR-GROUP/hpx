@@ -11,6 +11,7 @@
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/pinned_ptr.hpp>
 #include <hpx/components_base/traits/action_decorate_function.hpp>
+
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/memory.hpp>
@@ -134,7 +135,7 @@ namespace hpx::components {
         }
 
         // Pinning functionality
-        void pin() noexcept
+        bool pin() noexcept
         {
             intrusive_ptr_add_ref(data_.get());    // keep alive
 
@@ -149,7 +150,9 @@ namespace hpx::components {
                     data_->pin_count_ != 0 ||
                         (!started_migration_ && !was_marked_for_migration_));
                 ++data_->pin_count_;
+                return true;
             }
+            return false;
         }
 
         bool unpin()

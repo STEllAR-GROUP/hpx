@@ -8,9 +8,12 @@
 
 namespace hpx::traits {
 
+    HPX_CXX_EXPORT template <typename Component, typename Enable = void>
+    struct component_config_data;
+
     ///////////////////////////////////////////////////////////////////////////
     // Customization point for component config data injection
-    HPX_CXX_EXPORT template <typename Component, typename Enable = void>
+    template <typename Component, typename Enable>
     struct component_config_data
     {
         // by default no additional config data is injected into the factory

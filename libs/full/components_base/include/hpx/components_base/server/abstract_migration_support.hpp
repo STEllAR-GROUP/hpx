@@ -10,6 +10,7 @@
 #include <hpx/components_base/pinned_ptr.hpp>
 #include <hpx/components_base/server/migration_support.hpp>
 #include <hpx/components_base/traits/action_decorate_function.hpp>
+
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/naming_base.hpp>
@@ -53,7 +54,7 @@ namespace hpx::components {
         }
 
         // Pinning functionality
-        virtual void pin() = 0;
+        virtual bool pin() = 0;
         virtual bool unpin() = 0;
         [[nodiscard]] virtual std::uint32_t pin_count() const = 0;
         virtual void mark_as_migrated() = 0;
@@ -172,9 +173,9 @@ namespace hpx::components {
             return this->base_type::pin_count();
         }
 
-        void pin() override
+        bool pin() override
         {
-            this->base_type::pin();
+            return this->base_type::pin();
         }
         bool unpin() override
         {

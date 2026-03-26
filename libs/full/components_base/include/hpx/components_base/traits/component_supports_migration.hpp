@@ -9,6 +9,8 @@
 #include <hpx/modules/type_support.hpp>
 
 namespace hpx::traits {
+    HPX_CXX_EXPORT template <typename Component, typename Enable = void>
+    struct component_supports_migration;
 
     ///////////////////////////////////////////////////////////////////////////
     // Customization point for component capabilities
@@ -40,7 +42,7 @@ namespace hpx::traits {
         }
     }    // namespace detail
 
-    template <typename Component, typename Enable = void>
+    template <typename Component, typename Enable>
     struct component_supports_migration
     {
         // returns whether target supports migration

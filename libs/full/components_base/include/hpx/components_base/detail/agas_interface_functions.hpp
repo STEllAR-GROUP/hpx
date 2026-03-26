@@ -26,241 +26,224 @@
 namespace hpx::agas::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    inline HPX_CXX_EXPORT bool (*is_console)() = nullptr;
+    inline bool (*is_console)() = nullptr;
 
     ///////////////////////////////////////////////////////////////////////////
-    inline HPX_CXX_EXPORT bool (*register_name)(std::string const& name,
+    inline bool (*register_name)(std::string const& name,
         naming::gid_type const& gid, error_code& ec) = nullptr;
 
-    inline HPX_CXX_EXPORT bool (*register_name_id)(std::string const& name,
+    inline bool (*register_name_id)(std::string const& name,
         hpx::id_type const& id, error_code& ec) = nullptr;
 
-    inline HPX_CXX_EXPORT future<bool> (*register_name_async)(
+    inline future<bool> (*register_name_async)(
         std::string const& name, hpx::id_type const& id) = nullptr;
 
     ///////////////////////////////////////////////////////////////////////////
-    inline HPX_CXX_EXPORT hpx::id_type (*unregister_name)(
+    inline hpx::id_type (*unregister_name)(
         std::string const& name, error_code& ec) = nullptr;
 
-    inline HPX_CXX_EXPORT future<hpx::id_type> (*unregister_name_async)(
+    inline future<hpx::id_type> (*unregister_name_async)(
         std::string const& name) = nullptr;
 
     ///////////////////////////////////////////////////////////////////////////
-    inline HPX_CXX_EXPORT hpx::id_type (*resolve_name)(
+    inline hpx::id_type (*resolve_name)(
         std::string const& name, error_code& ec) = nullptr;
 
-    inline HPX_CXX_EXPORT future<hpx::id_type> (*resolve_name_async)(
+    inline future<hpx::id_type> (*resolve_name_async)(
         std::string const& name) = nullptr;
 
     ///////////////////////////////////////////////////////////////////////////
-    inline HPX_CXX_EXPORT future<std::uint32_t> (*get_num_localities_async)(
+    inline future<std::uint32_t> (*get_num_localities_async)(
         naming::component_type type) = nullptr;
 
-    inline HPX_CXX_EXPORT std::uint32_t (*get_num_localities)(
+    inline std::uint32_t (*get_num_localities)(
         naming::component_type type, error_code& ec) = nullptr;
 
     ///////////////////////////////////////////////////////////////////////////
-    inline HPX_CXX_EXPORT std::string (*get_component_type_name)(
+    inline std::string (*get_component_type_name)(
         naming::component_type type, error_code& ec) = nullptr;
 
     ///////////////////////////////////////////////////////////////////////////
-    inline HPX_CXX_EXPORT future<std::vector<std::uint32_t>> (
+    inline future<std::vector<std::uint32_t>> (
         *get_num_threads_async)() = nullptr;
 
-    inline HPX_CXX_EXPORT std::vector<std::uint32_t> (*get_num_threads)(
+    inline std::vector<std::uint32_t> (*get_num_threads)(
         error_code& ec) = nullptr;
 
     ///////////////////////////////////////////////////////////////////////////
-    inline HPX_CXX_EXPORT future<std::uint32_t> (
-        *get_num_overall_threads_async)() = nullptr;
+    inline future<std::uint32_t> (*get_num_overall_threads_async)() = nullptr;
 
-    inline HPX_CXX_EXPORT std::uint32_t (*get_num_overall_threads)(
-        error_code& ec) = nullptr;
+    inline std::uint32_t (*get_num_overall_threads)(error_code& ec) = nullptr;
 
     ///////////////////////////////////////////////////////////////////////////
-    inline HPX_CXX_EXPORT std::uint32_t (*get_locality_id)(
-        error_code& ec) = nullptr;
+    inline std::uint32_t (*get_locality_id)(error_code& ec) = nullptr;
 
-    inline HPX_CXX_EXPORT std::vector<std::uint32_t> (*get_all_locality_ids)(
+    inline std::vector<std::uint32_t> (*get_all_locality_ids)(
         naming::component_type type, error_code& ec) = nullptr;
 
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_NETWORKING)
-    inline HPX_CXX_EXPORT parcelset::endpoints_type const& (*resolve_locality)(
+    inline parcelset::endpoints_type const& (*resolve_locality)(
         naming::gid_type const& gid, error_code& ec) = nullptr;
 
-    inline HPX_CXX_EXPORT void (*remove_resolved_locality)(
+    inline void (*remove_resolved_locality)(
         naming::gid_type const& gid) = nullptr;
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
-    inline HPX_CXX_EXPORT bool (*is_local_address_cached)(
+    inline bool (*is_local_address_cached)(
         naming::gid_type const& gid, error_code& ec) = nullptr;
 
-    inline HPX_CXX_EXPORT bool (*is_local_address_cached_addr)(
-        naming::gid_type const& gid, naming::address& addr,
-        error_code& ec) = nullptr;
+    inline bool (*is_local_address_cached_addr)(naming::gid_type const& gid,
+        naming::address& addr, error_code& ec) = nullptr;
 
-    inline HPX_CXX_EXPORT bool (*is_local_address_cached_addr_pinned_ptr)(
+    inline bool (*is_local_address_cached_addr_pinned_ptr)(
         naming::gid_type const& gid, naming::address& addr,
         std::pair<bool, components::pinned_ptr>& r,
         hpx::move_only_function<std::pair<bool, components::pinned_ptr>(
             naming::address const&)>&& f,
         error_code& ec) = nullptr;
 
-    inline HPX_CXX_EXPORT void (*update_cache_entry)(
-        naming::gid_type const& gid, naming::address const& addr,
-        std::uint64_t count, std::uint64_t offset, error_code& ec) = nullptr;
+    inline void (*update_cache_entry)(naming::gid_type const& gid,
+        naming::address const& addr, std::uint64_t count, std::uint64_t offset,
+        error_code& ec) = nullptr;
 
     ///////////////////////////////////////////////////////////////////////////
-    inline HPX_CXX_EXPORT bool (*is_local_lva_encoded_address)(
+    inline bool (*is_local_lva_encoded_address)(
         naming::gid_type const& gid) = nullptr;
 
     ///////////////////////////////////////////////////////////////////////////
-    inline HPX_CXX_EXPORT hpx::future_or_value<naming::address> (
-        *resolve_async)(hpx::id_type const& id) = nullptr;
+    inline hpx::future_or_value<naming::address> (*resolve_async)(
+        hpx::id_type const& id) = nullptr;
 
-    inline HPX_CXX_EXPORT naming::address (*resolve)(
+    inline naming::address (*resolve)(
         hpx::id_type const& id, error_code& ec) = nullptr;
 
-    inline HPX_CXX_EXPORT bool (*resolve_local)(naming::gid_type const& gid,
+    inline bool (*resolve_local)(naming::gid_type const& gid,
         naming::address& addr, error_code& ec) = nullptr;
 
-    inline HPX_CXX_EXPORT bool (*resolve_cached)(
+    inline bool (*resolve_cached)(
         naming::gid_type const& gid, naming::address& addr) = nullptr;
 
     ///////////////////////////////////////////////////////////////////////////
-    inline HPX_CXX_EXPORT hpx::future<bool> (*bind_async)(
-        naming::gid_type const& gid, naming::address const& addr,
-        std::uint32_t locality_id) = nullptr;
+    inline hpx::future<bool> (*bind_async)(naming::gid_type const& gid,
+        naming::address const& addr, std::uint32_t locality_id) = nullptr;
 
-    inline HPX_CXX_EXPORT bool (*bind)(naming::gid_type const& gid,
+    inline bool (*bind)(naming::gid_type const& gid,
         naming::address const& addr, std::uint32_t locality_id,
         error_code& ec) = nullptr;
 
-    inline HPX_CXX_EXPORT hpx::future<bool> (*bind_async_locality)(
-        naming::gid_type const& gid, naming::address const& addr,
+    inline hpx::future<bool> (*bind_async_locality)(naming::gid_type const& gid,
+        naming::address const& addr,
         naming::gid_type const& locality_) = nullptr;
 
-    inline HPX_CXX_EXPORT bool (*bind_locality)(naming::gid_type const& gid,
+    inline bool (*bind_locality)(naming::gid_type const& gid,
         naming::address const& addr, naming::gid_type const& locality_,
         error_code& ec) = nullptr;
 
-    inline HPX_CXX_EXPORT hpx::future<naming::address> (*unbind_async)(
+    inline hpx::future<naming::address> (*unbind_async)(
         naming::gid_type const& gid, std::uint64_t count) = nullptr;
 
-    inline HPX_CXX_EXPORT naming::address (*unbind)(naming::gid_type const& gid,
+    inline naming::address (*unbind)(naming::gid_type const& gid,
         std::uint64_t count, error_code& ec) = nullptr;
 
     ///////////////////////////////////////////////////////////////////////////
-    inline HPX_CXX_EXPORT bool (*bind_gid_local)(naming::gid_type const& gid,
+    inline bool (*bind_gid_local)(naming::gid_type const& gid,
         naming::address const& addr, error_code& ec) = nullptr;
-    inline HPX_CXX_EXPORT void (*unbind_gid_local)(
+    inline void (*unbind_gid_local)(
         naming::gid_type const& gid, error_code& ec) = nullptr;
 
-    inline HPX_CXX_EXPORT bool (*bind_range_local)(naming::gid_type const& gid,
+    inline bool (*bind_range_local)(naming::gid_type const& gid,
         std::size_t count, naming::address const& addr, std::size_t offset,
         error_code& ec) = nullptr;
-    inline HPX_CXX_EXPORT void (*unbind_range_local)(
-        naming::gid_type const& gid, std::size_t count,
-        error_code& ec) = nullptr;
-
-    ///////////////////////////////////////////////////////////////////////////
-    inline HPX_CXX_EXPORT void (*garbage_collect_non_blocking)(
-        error_code& ec) = nullptr;
-
-    inline HPX_CXX_EXPORT void (*garbage_collect)(error_code& ec) = nullptr;
-
-    inline HPX_CXX_EXPORT void (*garbage_collect_non_blocking_id)(
-        hpx::id_type const& id, error_code& ec) = nullptr;
-
-    inline HPX_CXX_EXPORT void (*garbage_collect_id)(
-        hpx::id_type const& id, error_code& ec) = nullptr;
-
-    ///////////////////////////////////////////////////////////////////////////
-    inline HPX_CXX_EXPORT hpx::id_type (*get_console_locality)(
-        error_code& ec) = nullptr;
-
-    ///////////////////////////////////////////////////////////////////////////
-    inline HPX_CXX_EXPORT naming::gid_type (*get_next_id)(
+    inline void (*unbind_range_local)(naming::gid_type const& gid,
         std::size_t count, error_code& ec) = nullptr;
 
     ///////////////////////////////////////////////////////////////////////////
-    inline HPX_CXX_EXPORT void (*decref)(naming::gid_type const& id,
-        std::int64_t credits, error_code& ec) = nullptr;
+    inline void (*garbage_collect_non_blocking)(error_code& ec) = nullptr;
+
+    inline void (*garbage_collect)(error_code& ec) = nullptr;
+
+    inline void (*garbage_collect_non_blocking_id)(
+        hpx::id_type const& id, error_code& ec) = nullptr;
+
+    inline void (*garbage_collect_id)(
+        hpx::id_type const& id, error_code& ec) = nullptr;
 
     ///////////////////////////////////////////////////////////////////////////
-    inline HPX_CXX_EXPORT hpx::future_or_value<std::int64_t> (*incref_async)(
+    inline hpx::id_type (*get_console_locality)(error_code& ec) = nullptr;
+
+    ///////////////////////////////////////////////////////////////////////////
+    inline naming::gid_type (*get_next_id)(
+        std::size_t count, error_code& ec) = nullptr;
+
+    ///////////////////////////////////////////////////////////////////////////
+    inline void (*decref)(naming::gid_type const& id, std::int64_t credits,
+        error_code& ec) = nullptr;
+
+    ///////////////////////////////////////////////////////////////////////////
+    inline hpx::future_or_value<std::int64_t> (*incref_async)(
         naming::gid_type const& gid, std::int64_t credits,
         hpx::id_type const& keep_alive) = nullptr;
 
     ///////////////////////////////////////////////////////////////////////////
-    inline HPX_CXX_EXPORT std::int64_t (*replenish_credits)(
-        naming::gid_type& gid) = nullptr;
+    inline std::int64_t (*replenish_credits)(naming::gid_type& gid) = nullptr;
 
     ///////////////////////////////////////////////////////////////////////////
-    inline HPX_CXX_EXPORT hpx::future_or_value<id_type> (
-        *get_colocation_id_async)(hpx::id_type const& id) = nullptr;
+    inline hpx::future_or_value<id_type> (*get_colocation_id_async)(
+        hpx::id_type const& id) = nullptr;
 
-    inline HPX_CXX_EXPORT hpx::id_type (*get_colocation_id)(
+    inline hpx::id_type (*get_colocation_id)(
         hpx::id_type const& id, error_code& ec) = nullptr;
 
     ///////////////////////////////////////////////////////////////////////////
-    inline HPX_CXX_EXPORT hpx::future<hpx::id_type> (
-        *on_symbol_namespace_event)(
+    inline hpx::future<hpx::id_type> (*on_symbol_namespace_event)(
         std::string const& name, bool call_for_past_events) = nullptr;
 
     ///////////////////////////////////////////////////////////////////////////
-    inline HPX_CXX_EXPORT
-        hpx::future<std::pair<hpx::id_type, naming::address>> (
-            *begin_migration)(hpx::id_type const& id) = nullptr;
+    inline hpx::future<std::pair<hpx::id_type, naming::address>> (
+        *begin_migration)(hpx::id_type const& id) = nullptr;
 
-    inline HPX_CXX_EXPORT bool (*end_migration)(
-        hpx::id_type const& id) = nullptr;
+    inline bool (*end_migration)(hpx::id_type const& id) = nullptr;
 
-    inline HPX_CXX_EXPORT hpx::future<void> (*mark_as_migrated)(
-        naming::gid_type const& gid,
+    inline hpx::future<void> (*mark_as_migrated)(naming::gid_type const& gid,
         hpx::move_only_function<std::pair<bool, hpx::future<void>>()>&& f,
         bool expect_to_be_marked_as_migrating) = nullptr;
 
-    inline HPX_CXX_EXPORT std::pair<bool, components::pinned_ptr> (
-        *was_object_migrated)(naming::gid_type const& gid,
+    inline std::pair<bool, components::pinned_ptr> (*was_object_migrated)(
+        naming::gid_type const& gid,
         hpx::move_only_function<components::pinned_ptr()>&& f) = nullptr;
 
-    inline HPX_CXX_EXPORT void (*unmark_as_migrated)(
-        naming::gid_type const& gid,
+    inline void (*unmark_as_migrated)(naming::gid_type const& gid,
         hpx::move_only_function<void()>&& f) = nullptr;
 
     ///////////////////////////////////////////////////////////////////////////
-    inline HPX_CXX_EXPORT hpx::future<std::map<std::string, hpx::id_type>> (
+    inline hpx::future<std::map<std::string, hpx::id_type>> (
         *find_symbols_async)(std::string const& pattern) = nullptr;
 
-    inline HPX_CXX_EXPORT std::map<std::string, hpx::id_type> (*find_symbols)(
+    inline std::map<std::string, hpx::id_type> (*find_symbols)(
         std::string const& pattern) = nullptr;
 
     ///////////////////////////////////////////////////////////////////////////
-    inline HPX_CXX_EXPORT naming::component_type (*register_factory)(
-        std::uint32_t prefix, std::string const& name,
-        error_code& ec) = nullptr;
+    inline naming::component_type (*register_factory)(std::uint32_t prefix,
+        std::string const& name, error_code& ec) = nullptr;
 
-    inline HPX_CXX_EXPORT naming::component_type (*get_component_id)(
+    inline naming::component_type (*get_component_id)(
         std::string const& name, error_code& ec) = nullptr;
 
     ///////////////////////////////////////////////////////////////////////////
-    inline HPX_CXX_EXPORT void (*destroy_component)(
+    inline void (*destroy_component)(
         naming::gid_type const& gid, naming::address const& addr) = nullptr;
 
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_NETWORKING)
-    inline HPX_CXX_EXPORT void (*route)(parcelset::parcel&& p,
+    inline void (*route)(parcelset::parcel&& p,
         hpx::function<void(std::error_code const&, parcelset::parcel const&)>&&,
         threads::thread_priority local_priority) = nullptr;
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
-    inline HPX_CXX_EXPORT naming::address_type (
-        *get_primary_ns_lva)() = nullptr;
-    inline HPX_CXX_EXPORT naming::address_type (*get_symbol_ns_lva)() = nullptr;
-    inline HPX_CXX_EXPORT naming::address_type (
-        *get_runtime_support_lva)() = nullptr;
+    inline naming::address_type (*get_primary_ns_lva)() = nullptr;
+    inline naming::address_type (*get_symbol_ns_lva)() = nullptr;
+    inline naming::address_type (*get_runtime_support_lva)() = nullptr;
 }    // namespace hpx::agas::detail

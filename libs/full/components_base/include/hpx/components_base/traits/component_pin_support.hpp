@@ -12,6 +12,8 @@
 #include <cstdint>
 
 namespace hpx::traits {
+    HPX_CXX_EXPORT template <typename Component, typename Enable = void>
+    struct component_pin_support;
 
     ///////////////////////////////////////////////////////////////////////////
     // Customization point for component pinning
@@ -68,7 +70,7 @@ namespace hpx::traits {
         };
     }    // namespace detail
 
-    template <typename Component, typename Enable = void>
+    template <typename Component, typename Enable>
     struct component_pin_support
     {
         static constexpr void pin(Component* p) noexcept

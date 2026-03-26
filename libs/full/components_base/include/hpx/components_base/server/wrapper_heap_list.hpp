@@ -22,7 +22,7 @@ namespace hpx::components::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     // list of managed_component heaps
-    HPX_CXX_EXPORT template <typename Heap>
+    template <typename Heap>
     class wrapper_heap_list : public util::one_size_heap_list
     {
         using base_type = util::one_size_heap_list;

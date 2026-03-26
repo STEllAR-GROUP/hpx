@@ -12,13 +12,16 @@
 
 namespace hpx::components {
 
-    HPX_CXX_EXPORT using component_type = std::int32_t;
+    using component_type = std::int32_t;
 }    // namespace hpx::components
 
 namespace hpx::traits {
 
-    ///////////////////////////////////////////////////////////////////////////
     HPX_CXX_EXPORT template <typename Component, typename Enable = void>
+    struct component_type_database;
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Component, typename Enable>
     struct component_type_database
     {
         static components::component_type value;
@@ -28,11 +31,11 @@ namespace hpx::traits {
     };
 
     // components::component_invalid;
-    HPX_CXX_EXPORT template <typename Component, typename Enable>
+    template <typename Component, typename Enable>
     components::component_type
         component_type_database<Component, Enable>::value = -1;
 
-    HPX_CXX_EXPORT template <typename Component, typename Enable>
+    template <typename Component, typename Enable>
     struct component_type_database<Component const, Enable>
       : component_type_database<Component, Enable>
     {

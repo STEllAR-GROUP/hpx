@@ -21,7 +21,7 @@ namespace hpx::components {
     ///////////////////////////////////////////////////////////////////////////
     /// The \a component_startup_shutdown class provides a minimal
     /// implementation of a component's startup/shutdown function provider.
-    HPX_CXX_EXPORT template <bool (*Startup)(startup_function_type&, bool&),
+    template <bool (*Startup)(startup_function_type&, bool&),
         bool (*Shutdown)(shutdown_function_type&, bool&)>
     struct component_startup_shutdown : component_startup_shutdown_base
     {

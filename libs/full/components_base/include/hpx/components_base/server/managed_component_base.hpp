@@ -262,7 +262,7 @@ namespace hpx::components {
     };
 
     // reference counting
-    HPX_CXX_EXPORT template <typename Component, typename Derived>
+    template <typename Component, typename Derived>
     void intrusive_ptr_add_ref(
         managed_component<Component, Derived>* p) noexcept
     {
@@ -270,7 +270,7 @@ namespace hpx::components {
             traits::managed_component_dtor_policy_t<Component>>::addref(p
                 ->component_);
     }
-    HPX_CXX_EXPORT template <typename Component, typename Derived>
+    template <typename Component, typename Derived>
     void intrusive_ptr_release(
         managed_component<Component, Derived>* p) noexcept
     {
@@ -302,7 +302,7 @@ namespace hpx::components {
     /// \tparam Component Component type
     /// \tparam Derived Most derived component type
     ///
-    HPX_CXX_EXPORT template <typename Component, typename Derived>
+    template <typename Component, typename Derived>
     class managed_component
     {
     public:
@@ -464,7 +464,7 @@ namespace hpx::components {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Component, typename Wrapper,
+    template <typename Component, typename Wrapper,
         typename CtorPolicy, typename DtorPolicy>
     hpx::id_type managed_component_base<Component, Wrapper, CtorPolicy,
         DtorPolicy>::get_unmanaged_id() const
@@ -473,7 +473,7 @@ namespace hpx::components {
         return back_ptr_->get_unmanaged_id();
     }
 
-    HPX_CXX_EXPORT template <typename Component, typename Wrapper,
+    template <typename Component, typename Wrapper,
         typename CtorPolicy, typename DtorPolicy>
     hpx::id_type managed_component_base<Component, Wrapper, CtorPolicy,
         DtorPolicy>::get_id() const
@@ -492,7 +492,7 @@ namespace hpx::components {
         return hpx::id_type(gid, hpx::id_type::management_type::managed);
     }
 
-    HPX_CXX_EXPORT template <typename Component, typename Wrapper,
+    template <typename Component, typename Wrapper,
         typename CtorPolicy, typename DtorPolicy>
     naming::gid_type managed_component_base<Component, Wrapper, CtorPolicy,
         DtorPolicy>::get_base_gid() const

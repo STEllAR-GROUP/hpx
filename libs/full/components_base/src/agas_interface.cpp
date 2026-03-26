@@ -5,7 +5,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/modules/components_base.hpp>
+#include <hpx/config.hpp>
+#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/detail/agas_interface_functions.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/coroutines.hpp>

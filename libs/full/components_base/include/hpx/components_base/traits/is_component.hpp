@@ -4,12 +4,29 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#ifndef HPX_COMPONENTS_BASE_TRAITS_IS_COMPONENT_HPP
+#define HPX_COMPONENTS_BASE_TRAITS_IS_COMPONENT_HPP
+
 #pragma once
 
+#include <hpx/config.hpp>
+#include <hpx/components_base/components_base_fwd.hpp>
 #include <cstddef>
 #include <type_traits>
 
 namespace hpx::traits {
+
+    HPX_CXX_EXPORT template <typename Component, typename Enable>
+    struct is_component;
+
+    HPX_CXX_EXPORT template <typename Component>
+    struct is_fixed_component;
+
+    HPX_CXX_EXPORT template <typename Component>
+    struct is_managed_component;
+
+    template <typename T, typename Enable = void>
+    struct is_component_or_component_array;
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
@@ -30,13 +47,13 @@ namespace hpx::traits {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, typename Enable = void>
+    template <typename Component, typename Enable>
     struct is_component : std::false_type
     {
     };
 
     template <typename Component>
-    struct is_component<Component const> : is_component<Component>
+    struct is_component<Component const, void> : is_component<Component, void>
     {
     };
 
@@ -68,27 +85,28 @@ namespace hpx::traits {
     };
 
     template <typename Component>
-    inline constexpr bool is_component_v = is_component<Component>::value;
+    inline constexpr bool is_component_v =
+        is_component<Component, void>::value;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, typename Enable = void>
-    struct is_component_or_component_array : is_component<T>
+    template <typename T, typename Enable>
+    struct is_component_or_component_array : is_component<T, void>
     {
     };
 
     template <typename T>
-    struct is_component_or_component_array<T[]> : is_component<T>
+    struct is_component_or_component_array<T[], void> : is_component<T, void>
     {
     };
 
     template <typename T, std::size_t N>
-    struct is_component_or_component_array<T[N]> : is_component<T>
+    struct is_component_or_component_array<T[N], void> : is_component<T, void>
     {
     };
 
     template <typename Component>
     inline constexpr bool is_component_or_component_array_v =
-        is_component_or_component_array<Component>::value;
+        is_component_or_component_array<Component, void>::value;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component>
@@ -124,3 +142,5 @@ namespace hpx::traits {
         is_managed_component<Component>::value;
 
 }    // namespace hpx::traits
+
+#endif

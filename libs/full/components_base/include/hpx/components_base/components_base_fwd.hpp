@@ -14,13 +14,43 @@
 #include <hpx/config.hpp>
 #include <hpx/components_base/traits/managed_component_policies.hpp>
 
+namespace hpx {
+
+    HPX_CXX_EXPORT template <typename Component, typename Enable = void>
+    struct get_lva;
+
+    namespace traits {
+
+        HPX_CXX_EXPORT template <typename Component, typename Enable = void>
+        struct is_component;
+
+        HPX_CXX_EXPORT template <typename Component>
+        struct is_fixed_component;
+
+        HPX_CXX_EXPORT template <typename Component>
+        struct is_managed_component;
+
+        HPX_CXX_EXPORT template <typename Action, typename Enable = void>
+        struct has_decorates_action;
+
+        HPX_CXX_EXPORT template <typename Action, typename Enable = void>
+        struct action_decorate_function;
+
+        HPX_CXX_EXPORT template <typename Component, typename Enable = void>
+        struct component_decorates_action;
+
+        HPX_CXX_EXPORT template <typename Component, typename Enable = void>
+        struct component_decorate_function;
+    }    // namespace traits
+}    // namespace hpx
+
 namespace hpx::components {
 
     ///////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT class pinned_ptr;
+    class pinned_ptr;
 
     ///////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Component>
+    template <typename Component>
     class fixed_component;
 
     /// The \a component class wraps around a given component type, adding
@@ -40,16 +70,16 @@ namespace hpx::components {
     HPX_CXX_EXPORT template <typename Component = void>
     class component_base;
 
-    HPX_CXX_EXPORT template <typename Component = void>
+    template <typename Component = void>
     class fixed_component_base;
 
-    HPX_CXX_EXPORT template <typename Component = void>
+    template <typename Component = void>
     class abstract_component_base;
 
-    HPX_CXX_EXPORT template <typename Component, typename Derived = void>
+    template <typename Component, typename Derived = void>
     class abstract_managed_component_base;
 
-    HPX_CXX_EXPORT template <typename Component, typename Wrapper = void,
+    template <typename Component, typename Wrapper = void,
         typename CtorPolicy = traits::construct_without_back_ptr,
         typename DtorPolicy = traits::managed_object_controls_lifetime>
     class managed_component_base;

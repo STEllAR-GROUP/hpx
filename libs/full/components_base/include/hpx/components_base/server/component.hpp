@@ -22,7 +22,7 @@
 namespace hpx::components::detail {
 
     ///////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Component>
+    template <typename Component>
     struct simple_heap
     {
         static void* alloc(std::size_t count)
@@ -39,14 +39,14 @@ namespace hpx::components::detail {
         static util::internal_allocator<Component> alloc_;
     };
 
-    HPX_CXX_EXPORT template <typename Component>
+    template <typename Component>
     util::internal_allocator<Component> simple_heap<Component>::alloc_;
 }    // namespace hpx::components::detail
 
 namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Component, typename Enable>
+    template <typename Component, typename Enable>
     struct component_heap_type
     {
         using type = hpx::components::detail::simple_heap<Component>;
@@ -56,7 +56,7 @@ namespace hpx::traits {
 namespace hpx::components {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Component>
+    template <typename Component>
     class component : public Component
     {
     public:

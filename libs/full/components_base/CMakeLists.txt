@@ -94,7 +94,6 @@ set(components_base_sources
     address_ostream.cpp
     agas_interface.cpp
     component_type.cpp
-    detail/agas_interface_functions.cpp
     generate_unique_ids.cpp
     server/component_base.cpp
     server/one_size_heap_list.cpp
