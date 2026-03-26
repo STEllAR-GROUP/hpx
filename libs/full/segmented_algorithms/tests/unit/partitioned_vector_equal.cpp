@@ -81,7 +81,7 @@ void equal_algo_tests_with_policy_async(
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T, typename DistPolicy>
 void equal_tests_with_policy(
-    std::size_t size, std::size_t /* localities */, DistPolicy const& policy)
+    std::size_t size, std::size_t, DistPolicy const& policy)
 {
     using namespace hpx::execution;
 

@@ -218,11 +218,6 @@ namespace hpx::segmented {
         if (first1 == last1)
             return true;
 
-        using iterator_traits1 =
-            hpx::traits::segmented_iterator_traits<SegIter1>;
-        using iterator_traits2 =
-            hpx::traits::segmented_iterator_traits<SegIter2>;
-
         return hpx::parallel::detail::segmented_equal(
             hpx::parallel::detail::equal(), hpx::execution::seq, first1, last1,
             first2, HPX_FORWARD(Pred, pred), std::true_type());
@@ -253,11 +248,6 @@ namespace hpx::segmented {
         }
 
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
-        using iterator_traits1 =
-            hpx::traits::segmented_iterator_traits<SegIter1>;
-        using iterator_traits2 =
-            hpx::traits::segmented_iterator_traits<SegIter2>;
 
         return hpx::parallel::detail::segmented_equal(
             hpx::parallel::detail::equal(), HPX_FORWARD(ExPolicy, policy),
