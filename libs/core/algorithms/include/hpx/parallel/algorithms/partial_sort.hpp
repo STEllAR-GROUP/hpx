@@ -231,15 +231,15 @@ namespace hpx::parallel {
                 pivot3(first, end, comp);
             }
 
-            typename std::iterator_traits<Iter>::value_type const& pivot =
+            typename std::iterator_traits<Iter>::value_type const pivot =
                 *first;
 
             Iter c_first = first + 1, c_last = end - 1;
-            while (HPX_INVOKE(comp, *c_first, pivot))
+            while (c_first < end && HPX_INVOKE(comp, *c_first, pivot))
             {
                 ++c_first;
             }
-            while (HPX_INVOKE(comp, pivot, *c_last))
+            while (c_last > first && HPX_INVOKE(comp, pivot, *c_last))
             {
                 --c_last;
             }
@@ -251,11 +251,11 @@ namespace hpx::parallel {
 #else
                 std::iter_swap(c_first++, c_last--);
 #endif
-                while (HPX_INVOKE(comp, *c_first, pivot))
+                while (c_first < end && HPX_INVOKE(comp, *c_first, pivot))
                 {
                     ++c_first;
                 }
-                while (HPX_INVOKE(comp, pivot, *c_last))
+                while (c_last > first && HPX_INVOKE(comp, pivot, *c_last))
                 {
                     --c_last;
                 }
