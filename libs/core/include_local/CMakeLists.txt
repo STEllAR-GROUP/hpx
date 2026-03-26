@@ -41,6 +41,7 @@ if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
       hpx/channel.hpp
       hpx/compute.hpp
       hpx/future.hpp
+      hpx/init.hpp
       hpx/latch.hpp
       hpx/runtime.hpp
   )
@@ -103,6 +104,7 @@ add_hpx_module(
     hpx_format
     hpx_functional
     hpx_futures
+    hpx_init_runtime_local
     hpx_lcos_local
     hpx_memory
     hpx_pack_traversal
