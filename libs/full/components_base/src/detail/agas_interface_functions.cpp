@@ -13,11 +13,11 @@ namespace hpx::agas::detail {
     bool (*is_console)() = nullptr;
 
     ///////////////////////////////////////////////////////////////////////////
-    bool (*register_name)(std::string const& name,
-        naming::gid_type const& gid, error_code& ec) = nullptr;
+    bool (*register_name)(std::string const& name, naming::gid_type const& gid,
+        error_code& ec) = nullptr;
 
-    bool (*register_name_id)(std::string const& name,
-        hpx::id_type const& id, error_code& ec) = nullptr;
+    bool (*register_name_id)(std::string const& name, hpx::id_type const& id,
+        error_code& ec) = nullptr;
 
     future<bool> (*register_name_async)(
         std::string const& name, hpx::id_type const& id) = nullptr;
@@ -75,30 +75,28 @@ namespace hpx::agas::detail {
     bool (*is_local_address_cached)(
         naming::gid_type const& gid, error_code& ec) = nullptr;
 
-    bool (*is_local_address_cached_addr)(
-        naming::gid_type const& gid, naming::address& addr,
-        error_code& ec) = nullptr;
+    bool (*is_local_address_cached_addr)(naming::gid_type const& gid,
+        naming::address& addr, error_code& ec) = nullptr;
 
-    bool (*is_local_address_cached_addr_pinned_ptr)(
-        naming::gid_type const& gid, naming::address& addr,
-        std::pair<bool, components::pinned_ptr>& r,
+    bool (*is_local_address_cached_addr_pinned_ptr)(naming::gid_type const& gid,
+        naming::address& addr, std::pair<bool, components::pinned_ptr>& r,
         hpx::move_only_function<std::pair<bool, components::pinned_ptr>(
             naming::address const&)>&& f,
         error_code& ec) = nullptr;
 
-    void (*update_cache_entry)(
-        naming::gid_type const& gid, naming::address const& addr,
-        std::uint64_t count, std::uint64_t offset, error_code& ec) = nullptr;
+    void (*update_cache_entry)(naming::gid_type const& gid,
+        naming::address const& addr, std::uint64_t count, std::uint64_t offset,
+        error_code& ec) = nullptr;
 
     ///////////////////////////////////////////////////////////////////////////
-    bool (*is_local_lva_encoded_address)(
-        naming::gid_type const& gid) = nullptr;
+    bool (*is_local_lva_encoded_address)(naming::gid_type const& gid) = nullptr;
 
     ///////////////////////////////////////////////////////////////////////////
     hpx::future_or_value<naming::address> (*resolve_async)(
         hpx::id_type const& id) = nullptr;
 
-    naming::address (*resolve)(hpx::id_type const& id, error_code& ec) = nullptr;
+    naming::address (*resolve)(
+        hpx::id_type const& id, error_code& ec) = nullptr;
 
     bool (*resolve_local)(naming::gid_type const& gid, naming::address& addr,
         error_code& ec) = nullptr;
@@ -114,7 +112,8 @@ namespace hpx::agas::detail {
         std::uint32_t locality_id, error_code& ec) = nullptr;
 
     hpx::future<bool> (*bind_async_locality)(naming::gid_type const& gid,
-        naming::address const& addr, naming::gid_type const& locality_) = nullptr;
+        naming::address const& addr,
+        naming::gid_type const& locality_) = nullptr;
 
     bool (*bind_locality)(naming::gid_type const& gid,
         naming::address const& addr, naming::gid_type const& locality_,
@@ -123,20 +122,20 @@ namespace hpx::agas::detail {
     hpx::future<naming::address> (*unbind_async)(
         naming::gid_type const& gid, std::uint64_t count) = nullptr;
 
-    naming::address (*unbind)(
-        naming::gid_type const& gid, std::uint64_t count,
+    naming::address (*unbind)(naming::gid_type const& gid, std::uint64_t count,
         error_code& ec) = nullptr;
 
     ///////////////////////////////////////////////////////////////////////////
     bool (*bind_gid_local)(naming::gid_type const& gid,
         naming::address const& addr, error_code& ec) = nullptr;
-    void (*unbind_gid_local)(naming::gid_type const& gid, error_code& ec) = nullptr;
+    void (*unbind_gid_local)(
+        naming::gid_type const& gid, error_code& ec) = nullptr;
 
     bool (*bind_range_local)(naming::gid_type const& gid, std::size_t count,
         naming::address const& addr, std::size_t offset,
         error_code& ec) = nullptr;
-    void (*unbind_range_local)(
-        naming::gid_type const& gid, std::size_t count, error_code& ec) = nullptr;
+    void (*unbind_range_local)(naming::gid_type const& gid, std::size_t count,
+        error_code& ec) = nullptr;
 
     ///////////////////////////////////////////////////////////////////////////
     void (*garbage_collect_non_blocking)(error_code& ec) = nullptr;
@@ -146,17 +145,19 @@ namespace hpx::agas::detail {
     void (*garbage_collect_non_blocking_id)(
         hpx::id_type const& id, error_code& ec) = nullptr;
 
-    void (*garbage_collect_id)(hpx::id_type const& id, error_code& ec) = nullptr;
+    void (*garbage_collect_id)(
+        hpx::id_type const& id, error_code& ec) = nullptr;
 
     ///////////////////////////////////////////////////////////////////////////
     hpx::id_type (*get_console_locality)(error_code& ec) = nullptr;
 
     ///////////////////////////////////////////////////////////////////////////
-    naming::gid_type (*get_next_id)(std::size_t count, error_code& ec) = nullptr;
+    naming::gid_type (*get_next_id)(
+        std::size_t count, error_code& ec) = nullptr;
 
     ///////////////////////////////////////////////////////////////////////////
-    void (*decref)(
-        naming::gid_type const& id, std::int64_t credits, error_code& ec) = nullptr;
+    void (*decref)(naming::gid_type const& id, std::int64_t credits,
+        error_code& ec) = nullptr;
 
     ///////////////////////////////////////////////////////////////////////////
     hpx::future_or_value<std::int64_t> (*incref_async)(
@@ -191,8 +192,8 @@ namespace hpx::agas::detail {
         naming::gid_type const& gid,
         hpx::move_only_function<components::pinned_ptr()>&& f) = nullptr;
 
-    void (*unmark_as_migrated)(
-        naming::gid_type const& gid, hpx::move_only_function<void()>&& f) = nullptr;
+    void (*unmark_as_migrated)(naming::gid_type const& gid,
+        hpx::move_only_function<void()>&& f) = nullptr;
 
     ///////////////////////////////////////////////////////////////////////////
     hpx::future<std::map<std::string, hpx::id_type>> (*find_symbols_async)(
@@ -202,8 +203,8 @@ namespace hpx::agas::detail {
         std::string const& pattern) = nullptr;
 
     ///////////////////////////////////////////////////////////////////////////
-    naming::component_type (*register_factory)(
-        std::uint32_t prefix, std::string const& name, error_code& ec) = nullptr;
+    naming::component_type (*register_factory)(std::uint32_t prefix,
+        std::string const& name, error_code& ec) = nullptr;
 
     naming::component_type (*get_component_id)(
         std::string const& name, error_code& ec) = nullptr;

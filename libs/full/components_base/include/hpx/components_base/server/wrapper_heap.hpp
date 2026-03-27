@@ -57,8 +57,7 @@ namespace hpx::components::detail {
     }    // namespace one_size_heap_allocators
 
     ///////////////////////////////////////////////////////////////////////////
-    class HPX_EXPORT wrapper_heap
-      : public util::wrapper_heap_base
+    class HPX_EXPORT wrapper_heap : public util::wrapper_heap_base
     {
     public:
         using allocator_type = one_size_heap_allocators::fixed_mallocator;

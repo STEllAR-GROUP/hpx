@@ -26,7 +26,8 @@ namespace hpx::components {
     // declared in hpx/modules/naming.hpp
     // using component_type = std::int32_t;
 
-    enum class component_enum_type : naming::component_type {
+    enum class component_enum_type : naming::component_type
+    {
         invalid = naming::address::component_invalid,
 
         // Runtime support component (provides system services such as
@@ -68,8 +69,7 @@ namespace hpx::components {
         first_dynamic = last,
     };
 
-    constexpr naming::component_type to_int(
-        component_enum_type t) noexcept
+    constexpr naming::component_type to_int(component_enum_type t) noexcept
     {
         return static_cast<naming::component_type>(t);
     }
@@ -82,11 +82,11 @@ namespace hpx::components {
     inline constexpr component_enum_type component_invalid =
         component_enum_type::invalid;
     HPX_DEPRECATED_V(1, 10, HPX_COMPONENT_ENUM_TYPE_ENUM_DEPRECATION_MSG)
-    inline constexpr component_enum_type
-        component_runtime_support = component_enum_type::runtime_support;
+    inline constexpr component_enum_type component_runtime_support =
+        component_enum_type::runtime_support;
     HPX_DEPRECATED_V(1, 10, HPX_COMPONENT_ENUM_TYPE_ENUM_DEPRECATION_MSG)
-    inline constexpr component_enum_type
-        component_plain_function = component_enum_type::plain_function;
+    inline constexpr component_enum_type component_plain_function =
+        component_enum_type::plain_function;
     HPX_DEPRECATED_V(1, 10, HPX_COMPONENT_ENUM_TYPE_ENUM_DEPRECATION_MSG)
     inline constexpr component_enum_type component_base_lco =
         component_enum_type::base_lco;
@@ -95,9 +95,8 @@ namespace hpx::components {
         component_base_lco_with_value_unmanaged =
             component_enum_type::base_lco_with_value_unmanaged;
     HPX_DEPRECATED_V(1, 10, HPX_COMPONENT_ENUM_TYPE_ENUM_DEPRECATION_MSG)
-    inline constexpr component_enum_type
-        component_base_lco_with_value =
-            component_enum_type::base_lco_with_value;
+    inline constexpr component_enum_type component_base_lco_with_value =
+        component_enum_type::base_lco_with_value;
     HPX_DEPRECATED_V(1, 10, HPX_COMPONENT_ENUM_TYPE_ENUM_DEPRECATION_MSG)
     inline constexpr component_enum_type component_latch =
         component_enum_type::latch;
@@ -108,31 +107,28 @@ namespace hpx::components {
     inline constexpr component_enum_type component_promise =
         component_enum_type::promise;
     HPX_DEPRECATED_V(1, 10, HPX_COMPONENT_ENUM_TYPE_ENUM_DEPRECATION_MSG)
-    inline constexpr component_enum_type
-        component_agas_locality_namespace =
-            component_enum_type::agas_locality_namespace;
+    inline constexpr component_enum_type component_agas_locality_namespace =
+        component_enum_type::agas_locality_namespace;
     HPX_DEPRECATED_V(1, 10, HPX_COMPONENT_ENUM_TYPE_ENUM_DEPRECATION_MSG)
-    inline constexpr component_enum_type
-        component_agas_primary_namespace =
-            component_enum_type::agas_primary_namespace;
+    inline constexpr component_enum_type component_agas_primary_namespace =
+        component_enum_type::agas_primary_namespace;
     HPX_DEPRECATED_V(1, 10, HPX_COMPONENT_ENUM_TYPE_ENUM_DEPRECATION_MSG)
-    inline constexpr component_enum_type
-        component_agas_component_namespace =
-            component_enum_type::agas_component_namespace;
+    inline constexpr component_enum_type component_agas_component_namespace =
+        component_enum_type::agas_component_namespace;
     HPX_DEPRECATED_V(1, 10, HPX_COMPONENT_ENUM_TYPE_ENUM_DEPRECATION_MSG)
-    inline constexpr component_enum_type
-        component_agas_symbol_namespace =
-            component_enum_type::agas_symbol_namespace;
+    inline constexpr component_enum_type component_agas_symbol_namespace =
+        component_enum_type::agas_symbol_namespace;
     HPX_DEPRECATED_V(1, 10, HPX_COMPONENT_ENUM_TYPE_ENUM_DEPRECATION_MSG)
     inline constexpr component_enum_type component_last =
         component_enum_type::last;
     HPX_DEPRECATED_V(1, 10, HPX_COMPONENT_ENUM_TYPE_ENUM_DEPRECATION_MSG)
-    inline constexpr component_enum_type
-        component_first_dynamic = component_enum_type::first_dynamic;
+    inline constexpr component_enum_type component_first_dynamic =
+        component_enum_type::first_dynamic;
 
 #undef HPX_COMPONENT_ENUM_TYPE_ENUM_DEPRECATION_MSG
 
-    enum class factory_state : std::uint8_t {
+    enum class factory_state : std::uint8_t
+    {
         enabled = 0,
         disabled = 1,
         check = 2
@@ -148,45 +144,37 @@ namespace hpx::components {
     "Please use hpx::components::factory_state::<value> instead."
 
     HPX_DEPRECATED_V(1, 10, HPX_FACTORY_STATE_ENUM_DEPRECATION_MSG)
-    inline constexpr factory_state factory_enabled =
-        factory_state::enabled;
+    inline constexpr factory_state factory_enabled = factory_state::enabled;
     HPX_DEPRECATED_V(1, 10, HPX_FACTORY_STATE_ENUM_DEPRECATION_MSG)
-    inline constexpr factory_state factory_disabled =
-        factory_state::disabled;
+    inline constexpr factory_state factory_disabled = factory_state::disabled;
     HPX_DEPRECATED_V(1, 10, HPX_FACTORY_STATE_ENUM_DEPRECATION_MSG)
-    inline constexpr factory_state factory_check =
-        factory_state::check;
+    inline constexpr factory_state factory_check = factory_state::check;
 
 #undef HPX_FACTORY_STATE_ENUM_DEPRECATION_MSG
 
     // access data related to component instance counts
     HPX_EXPORT bool& enabled(component_type type);
-    HPX_EXPORT util::atomic_count& instance_count(
-        component_type type);
+    HPX_EXPORT util::atomic_count& instance_count(component_type type);
 
-    using component_deleter_type =
-        void (*)(hpx::naming::gid_type const&, hpx::naming::address const&);
-    HPX_EXPORT component_deleter_type& deleter(
-        component_type type);
+    using component_deleter_type = void (*)(
+        hpx::naming::gid_type const&, hpx::naming::address const&);
+    HPX_EXPORT component_deleter_type& deleter(component_type type);
 
     HPX_EXPORT bool enumerate_instance_counts(
         hpx::move_only_function<bool(component_type)> const& f);
 
     /// \brief Return the string representation for a given component type id
-    HPX_EXPORT std::string get_component_type_name(
-        component_type type);
+    HPX_EXPORT std::string get_component_type_name(component_type type);
 
     /// The lower short word of the component type is the type of the component
     /// exposing the actions.
-    constexpr component_type get_base_type(
-        component_type t) noexcept
+    constexpr component_type get_base_type(component_type t) noexcept
     {
         return static_cast<component_type>(t & 0x3FF);
     }
 
     /// The upper short word of the component is the actual component type
-    constexpr component_type get_derived_type(
-        component_type t) noexcept
+    constexpr component_type get_derived_type(component_type t) noexcept
     {
         return static_cast<component_type>((t >> 10) & 0x3FF);
     }
