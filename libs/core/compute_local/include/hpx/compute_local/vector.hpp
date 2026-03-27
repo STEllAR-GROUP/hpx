@@ -1,7 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2016 Thomas Heller
-//  Copyright (c) 2024-2026 Hartmut Kaiser
-//  Copyright (c) 2026 Arpit
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -38,7 +36,7 @@ namespace hpx::compute {
         using alloc_traits = traits::allocator_traits<Allocator>;
 
     public:
-        /// Member types
+        /// Member types (FIXME: add reference to std
         using value_type = T;
         using allocator_type = Allocator;
         using access_target = typename alloc_traits::access_target;
@@ -138,8 +136,7 @@ namespace hpx::compute {
             other.capacity_ = 0;
         }
 
-        vector(
-            std::initializer_list<T> init, Allocator const& alloc = Allocator())
+        vector(std::initializer_list<T> init, Allocator const& alloc)
           : size_(init.size())
           , capacity_(init.size())
           , alloc_(alloc)
@@ -520,7 +517,8 @@ namespace hpx::compute {
         pointer data_;
     };
 
-    template <typename T, typename Allocator>
+    /// Effects: x.swap(y);
+    HPX_CXX_CORE_EXPORT template <typename T, typename Allocator>
     HPX_FORCEINLINE void swap(
         vector<T, Allocator>& x, vector<T, Allocator>& y) noexcept
     {
@@ -528,10 +526,8 @@ namespace hpx::compute {
     }
 }    // namespace hpx::compute
 
-namespace hpx::traits {
-    HPX_CXX_CORE_EXPORT template <typename T, typename Allocator>
-    struct is_contiguous_iterator<hpx::compute::detail::iterator<T, Allocator>>
-      : std::true_type
-    {
-    };
-}    // namespace hpx::traits
+HPX_CXX_CORE_EXPORT template <typename T, typename Allocator>
+struct hpx::traits::is_contiguous_iterator<
+    hpx::compute::detail::iterator<T, Allocator>> : std::true_type
+{
+};

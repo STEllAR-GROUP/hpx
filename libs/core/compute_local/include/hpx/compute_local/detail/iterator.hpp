@@ -1,7 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2016 Thomas Heller
-//  Copyright (c) 2024-2026 Hartmut Kaiser
-//  Copyright (c) 2026 Arpit
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -24,7 +22,7 @@ namespace hpx::compute::detail {
 
     HPX_CXX_CORE_EXPORT template <typename T, typename Allocator>
     struct iterator
-      : public hpx::util::iterator_adaptor<iterator<T, Allocator>,
+      : hpx::util::iterator_adaptor<iterator<T, Allocator>,
             typename traits::allocator_traits<Allocator>::pointer,
             typename traits::allocator_traits<Allocator>::value_type,
             std::random_access_iterator_tag,
@@ -38,20 +36,18 @@ namespace hpx::compute::detail {
 
         using proxy_type = typename get_proxy_type<T>::type*;
 
-        // disable use of brackets_proxy in iterator_facade to ensure C++20
-        // random_access_iterator concept is satisfied
-        using use_brackets_proxy = std::false_type;
-
-    private:
         using const_reference =
             typename traits::allocator_traits<Allocator>::const_reference;
         using target_type =
             typename traits::allocator_traits<Allocator>::target_type;
 
-    public:
+        // disable use of brackets_proxy in iterator_facade to ensure C++20
+        // random_access_iterator concept is satisfied
+        using use_brackets_proxy = std::false_type;
+
         HPX_HOST_DEVICE iterator() noexcept
           : base_type(nullptr)
-          , target_()
+          , target_(nullptr)
         {
         }
 
@@ -60,15 +56,15 @@ namespace hpx::compute::detail {
         iterator(typename traits::allocator_traits<Allocator>::pointer p,
             std::size_t pos, target_type const& target) noexcept
           : base_type(p + pos)
-          , target_(target)
+          , target_(&target)
         {
         }
 
         template <typename U>
-            requires(!std::same_as<T, U const>)
+            requires(std::same_as<T, U const>)
         HPX_HOST_DEVICE iterator(iterator<U, Allocator> const& other) noexcept
           : base_type(other.base())
-          , target_(other.target())
+          , target_(&other.target())
         {
         }
 
@@ -89,11 +85,11 @@ namespace hpx::compute::detail {
 
         HPX_HOST_DEVICE target_type const& target() const noexcept
         {
-            return target_;
+            return *target_;
         }
 
     private:
-        target_type target_;
+        target_type const* target_;
     };
 
 }    // namespace hpx::compute::detail
