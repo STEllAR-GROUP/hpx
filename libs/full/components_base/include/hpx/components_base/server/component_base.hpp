@@ -87,7 +87,6 @@ namespace hpx::components {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component>
-    // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
     class component_base : public detail::base_component
     {
     protected:

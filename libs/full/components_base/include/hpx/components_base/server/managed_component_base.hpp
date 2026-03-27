@@ -464,8 +464,8 @@ namespace hpx::components {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, typename Wrapper,
-        typename CtorPolicy, typename DtorPolicy>
+    template <typename Component, typename Wrapper, typename CtorPolicy,
+        typename DtorPolicy>
     hpx::id_type managed_component_base<Component, Wrapper, CtorPolicy,
         DtorPolicy>::get_unmanaged_id() const
     {
@@ -473,8 +473,8 @@ namespace hpx::components {
         return back_ptr_->get_unmanaged_id();
     }
 
-    template <typename Component, typename Wrapper,
-        typename CtorPolicy, typename DtorPolicy>
+    template <typename Component, typename Wrapper, typename CtorPolicy,
+        typename DtorPolicy>
     hpx::id_type managed_component_base<Component, Wrapper, CtorPolicy,
         DtorPolicy>::get_id() const
     {
@@ -492,8 +492,8 @@ namespace hpx::components {
         return hpx::id_type(gid, hpx::id_type::management_type::managed);
     }
 
-    template <typename Component, typename Wrapper,
-        typename CtorPolicy, typename DtorPolicy>
+    template <typename Component, typename Wrapper, typename CtorPolicy,
+        typename DtorPolicy>
     naming::gid_type managed_component_base<Component, Wrapper, CtorPolicy,
         DtorPolicy>::get_base_gid() const
     {

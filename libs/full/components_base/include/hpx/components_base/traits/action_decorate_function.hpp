@@ -18,16 +18,16 @@
 
 namespace hpx::traits {
 
-    HPX_CXX_EXPORT template <typename Action, typename Enable>
+    template <typename Action, typename Enable>
     struct has_decorates_action;
 
-    HPX_CXX_EXPORT template <typename Action, typename Enable>
+    template <typename Action, typename Enable>
     struct action_decorate_function;
 
-    HPX_CXX_EXPORT template <typename Component, typename Enable>
+    template <typename Component, typename Enable>
     struct component_decorates_action;
 
-    HPX_CXX_EXPORT template <typename Component, typename Enable>
+    template <typename Component, typename Enable>
     struct component_decorate_function;
 
     ///////////////////////////////////////////////////////////////////////////

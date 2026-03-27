@@ -16,16 +16,16 @@
 
 namespace hpx::traits {
 
-    HPX_CXX_EXPORT template <typename Component, typename Enable>
+    template <typename Component, typename Enable>
     struct is_component;
 
-    HPX_CXX_EXPORT template <typename Component>
+    template <typename Component>
     struct is_fixed_component;
 
-    HPX_CXX_EXPORT template <typename Component>
+    template <typename Component>
     struct is_managed_component;
 
-    template <typename T, typename Enable = void>
+    template <typename T, typename Enable>
     struct is_component_or_component_array;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -85,8 +85,7 @@ namespace hpx::traits {
     };
 
     template <typename Component>
-    inline constexpr bool is_component_v =
-        is_component<Component, void>::value;
+    inline constexpr bool is_component_v = is_component<Component, void>::value;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Enable>

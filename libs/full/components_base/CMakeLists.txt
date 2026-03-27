@@ -93,6 +93,7 @@ set(components_base_compat_headers
 set(components_base_sources
     address_ostream.cpp
     agas_interface.cpp
+    detail/agas_interface_functions.cpp
     component_type.cpp
     generate_unique_ids.cpp
     server/component_base.cpp

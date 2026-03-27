@@ -30,6 +30,9 @@ namespace hpx {
         HPX_CXX_EXPORT template <typename Component>
         struct is_managed_component;
 
+        HPX_CXX_EXPORT template <typename T, typename Enable = void>
+        struct is_component_or_component_array;
+
         HPX_CXX_EXPORT template <typename Action, typename Enable = void>
         struct has_decorates_action;
 
@@ -47,10 +50,10 @@ namespace hpx {
 namespace hpx::components {
 
     ///////////////////////////////////////////////////////////////////////
-    class pinned_ptr;
+    HPX_CXX_EXPORT class pinned_ptr;
 
     ///////////////////////////////////////////////////////////////////////
-    template <typename Component>
+    HPX_CXX_EXPORT template <typename Component>
     class fixed_component;
 
     /// The \a component class wraps around a given component type, adding
@@ -70,16 +73,19 @@ namespace hpx::components {
     HPX_CXX_EXPORT template <typename Component = void>
     class component_base;
 
-    template <typename Component = void>
+    HPX_CXX_EXPORT template <typename Component = void>
     class fixed_component_base;
 
-    template <typename Component = void>
+    HPX_CXX_EXPORT template <typename Component = void>
     class abstract_component_base;
 
-    template <typename Component, typename Derived = void>
+    HPX_CXX_EXPORT template <typename Component = void>
+    class abstract_fixed_component_base;
+
+    HPX_CXX_EXPORT template <typename Component, typename Derived = void>
     class abstract_managed_component_base;
 
-    template <typename Component, typename Wrapper = void,
+    HPX_CXX_EXPORT template <typename Component, typename Wrapper = void,
         typename CtorPolicy = traits::construct_without_back_ptr,
         typename DtorPolicy = traits::managed_object_controls_lifetime>
     class managed_component_base;
