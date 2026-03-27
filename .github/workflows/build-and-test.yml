@@ -23,6 +23,12 @@ jobs:
 
         steps:
             - uses: actions/checkout@v6
+            - name: Start RAM Profiling
+              shell: bash
+              run: |
+                chmod +x .github/ci-scripts/profile_ram.sh
+                nohup .github/ci-scripts/profile_ram.sh ram_profile.csv > /dev/null 2>&1 &
+                echo "PROFILER_PID=$!" >> $GITHUB_ENV
 
             - name: Configure (Running CMake)
               shell: bash
@@ -112,6 +118,14 @@ jobs:
                   name: hpx-build-${{ github.sha }}
                   path: build.tar.gz
                   retention-days: 3
+            - name: Show RAM Profile Results
+              if: always()
+              shell: bash
+              run: |
+                if [ ! -z "$PROFILER_PID" ]; then
+                  kill $PROFILER_PID || true
+                fi
+                python3 .github/ci-scripts/analyze_ram.py ram_profile.csv
 
     tests-dynamic:
         name: ${{ matrix.name }} (${{ matrix.count }} tests)
@@ -128,6 +142,12 @@ jobs:
                   sparse-checkout: |
                       .github
                   sparse-checkout-cone-mode: false
+            - name: Start RAM Profiling
+              shell: bash
+              run: |
+                chmod +x .github/ci-scripts/profile_ram.sh
+                nohup .github/ci-scripts/profile_ram.sh ram_profile.csv > /dev/null 2>&1 &
+                echo "PROFILER_PID=$!" >> $GITHUB_ENV
 
             - name: Download build artifacts
               uses: actions/download-artifact@v8
@@ -167,3 +187,11 @@ jobs:
               with:
                   name: ${{ matrix.name }}-artifacts
                   path: build/${{ matrix.name }}/
+            - name: Show RAM Profile Results
+              if: always()
+              shell: bash
+              run: |
+                if [ ! -z "$PROFILER_PID" ]; then
+                  kill $PROFILER_PID || true
+                fi
+                python3 .github/ci-scripts/analyze_ram.py ram_profile.csv
