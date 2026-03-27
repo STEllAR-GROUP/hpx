@@ -248,6 +248,9 @@ namespace hpx::lcos::local {
         static_assert(sizeof(consumer_state) <=
                 std::hardware_destructive_interference_size,
             "consumer_state exceeds one cache line; false sharing possible");
+        static_assert(alignof(consumer_state) ==
+                std::hardware_destructive_interference_size,
+            "consumer_state is not cache-line aligned");
 
         // The producer thread exclusively reads/writes producer_:
         //   tail       - advanced on every successful set(); the consumer never
@@ -270,7 +273,14 @@ namespace hpx::lcos::local {
         static_assert(sizeof(producer_state) <=
                 std::hardware_destructive_interference_size,
             "producer_state exceeds one cache line; false sharing possible");
+        static_assert(alignof(producer_state) ==
+                std::hardware_destructive_interference_size,
+            "producer_state is not cache-line aligned");
 
+        // consumer_ is mutable because get() and is_empty() are const member
+        // functions (the channel is logically read-only from the consumer's
+        // perspective) but they update tail_cached, which is an internal
+        // optimisation detail invisible to callers.
         mutable consumer_state consumer_;
         producer_state producer_;
 
@@ -461,6 +471,9 @@ namespace hpx::lcos::local {
         static_assert(sizeof(consumer_state) <=
                 std::hardware_destructive_interference_size,
             "consumer_state exceeds one cache line; false sharing possible");
+        static_assert(alignof(consumer_state) ==
+                std::hardware_destructive_interference_size,
+            "consumer_state is not cache-line aligned");
 
         // The producer thread exclusively reads/writes producer_:
         //   tail       - advanced on every successful set(); the consumer never
@@ -483,7 +496,14 @@ namespace hpx::lcos::local {
         static_assert(sizeof(producer_state) <=
                 std::hardware_destructive_interference_size,
             "producer_state exceeds one cache line; false sharing possible");
+        static_assert(alignof(producer_state) ==
+                std::hardware_destructive_interference_size,
+            "producer_state is not cache-line aligned");
 
+        // consumer_ is mutable because get() and is_empty() are const member
+        // functions (the channel is logically read-only from the consumer's
+        // perspective) but they update tail_cached, which is an internal
+        // optimisation detail invisible to callers.
         mutable consumer_state consumer_;
         producer_state producer_;
 
