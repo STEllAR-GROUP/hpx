@@ -82,7 +82,7 @@ jobs:
           -DHPX_BINARY_DIR=/__w/hpx/hpx/build \
           -DHPX_WITH_GIT_BRANCH=master \
           -DHPX_WITH_DOCUMENTATION_OUTPUT_FORMATS="html singlehtml latexpdf" \
-          "-DGIT_REPOSITORY=git@github.com:TheHPXProject/hpx-docs.git" \
+          "-DGIT_REPOSITORY=git@github.com:TheHPXProject/hpx-docs.git;--branch;master" \
           -P /__w/hpx/hpx/cmake/HPX_UpdateGitDocs.cmake
 
     - name: Cleanup SSH agent
