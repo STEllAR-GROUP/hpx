@@ -743,7 +743,7 @@ jobs:
                 --no-compress-output \
                 --output-on-failure \
                 --tests-regex \
-                  "^(`grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit1.container_algorithms | sed ':b;N;$!bb;s/\n/|/g'`)$" \
+                  `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit1.container_algorithms | sed ':b;N;$!bb;s/\n/|/g'` \
                 --exclude-regex \
                   tests.unit.modules.algorithms.container_algorithms.for_loop_range_generator
       - run:
@@ -778,7 +778,7 @@ jobs:
                 --no-compress-output \
                 --output-on-failure \
                 --tests-regex \
-                  "^(`grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit2.container_algorithms | sed ':b;N;$!bb;s/\n/|/g'`)$"
+                  `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit2.container_algorithms | sed ':b;N;$!bb;s/\n/|/g'`
       - run:
           <<: *convert_xml
       - run:
