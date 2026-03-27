@@ -82,7 +82,7 @@ namespace hpx::futures {
 
     // -----------------------------------------------------------------
     // and_then: chain a continuation that itself returns a future
-    //           (automatic flattening — no .unwrap() needed)
+    //           (automatic flattening -- no .unwrap() needed)
     // -----------------------------------------------------------------
     HPX_CXX_CORE_EXPORT template <typename Future, typename F,
         typename R = typename hpx::traits::future_traits<
@@ -107,7 +107,7 @@ namespace hpx::futures {
     }
 
     // -----------------------------------------------------------------
-    // or_else: error recovery — executes f only when the future
+    // or_else: error recovery -- executes f only when the future
     //          holds an exception
     // -----------------------------------------------------------------
     HPX_CXX_CORE_EXPORT template <typename Future, typename F,
