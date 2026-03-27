@@ -50,7 +50,7 @@ namespace hpx::lcos::local {
             // (in monotonic terms).  When next_tail != head_cached the buffer
             // cannot be full — the consumer has freed at least as many slots as
             // head_cached indicates, leaving room to write.
-            if (next_tail != producer_.head_cached)
+            if (next_tail != producer_.head_cached) [[likely]]
             {
                 return false;
             }
@@ -70,7 +70,7 @@ namespace hpx::lcos::local {
             // on the real tail (producer only moves it forward), so when
             // head != tail_cached the buffer definitely has items and we can
             // return false without any cross-thread acquire.
-            if (head != consumer_.tail_cached)
+            if (head != consumer_.tail_cached) [[likely]]
             {
                 return false;
             }
@@ -304,7 +304,7 @@ namespace hpx::lcos::local {
             // (in monotonic terms).  When next_tail != head_cached the buffer
             // cannot be full — the consumer has freed at least as many slots as
             // head_cached indicates, leaving room to write.
-            if (next_tail != producer_.head_cached)
+            if (next_tail != producer_.head_cached) [[likely]]
             {
                 return false;
             }
@@ -324,7 +324,7 @@ namespace hpx::lcos::local {
             // on the real tail (producer only moves it forward), so when
             // head != tail_cached the buffer definitely has items and we can
             // return false without any cross-thread acquire.
-            if (head != consumer_.tail_cached)
+            if (head != consumer_.tail_cached) [[likely]]
             {
                 return false;
             }
