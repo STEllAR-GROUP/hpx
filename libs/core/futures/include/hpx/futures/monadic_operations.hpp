@@ -17,7 +17,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx {
+namespace hpx::futures {
 
     namespace detail {
 
@@ -159,4 +159,4 @@ namespace hpx {
             });
     }
 
-}    // namespace hpx
+}    // namespace hpx::futures

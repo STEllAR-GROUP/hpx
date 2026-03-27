@@ -18,7 +18,7 @@ int hpx_main()
     // and_then: automatic flattening (no .unwrap() needed)
     //
     //   Legacy:   fut.then(F).unwrap()   -- F returns future<T>
-    //   Monadic:  hpx::and_then(fut, F)  -- automatic unwrap
+    //   Monadic:  hpx::futures::and_then(fut, F)  -- automatic unwrap
     // -----------------------------------------------------------
     auto f_legacy = hpx::make_ready_future(42)
                         .then([](auto fut) {
@@ -27,7 +27,7 @@ int hpx_main()
                         })
                         .unwrap();
 
-    auto f_monadic = hpx::and_then(hpx::make_ready_future(42),
+    auto f_monadic = hpx::futures::and_then(hpx::make_ready_future(42),
         [](int val) { return hpx::make_ready_future(std::to_string(val)); });
 
     std::cout << "Legacy  and_then: " << f_legacy.get() << std::endl;
@@ -37,12 +37,12 @@ int hpx_main()
     // or_else: declarative error recovery (no try/catch)
     //
     //   Legacy:   try { fut.get(); } catch(...) { ... }
-    //   Monadic:  hpx::or_else(fut, recovery_fn)
+    //   Monadic:  hpx::futures::or_else(fut, recovery_fn)
     // -----------------------------------------------------------
     auto f_err = hpx::make_exceptional_future<int>(
         std::runtime_error("something failed"));
 
-    auto f_recovered = hpx::or_else(std::move(f_err),
+    auto f_recovered = hpx::futures::or_else(std::move(f_err),
         [](std::exception_ptr const&) { return hpx::make_ready_future(-1); });
 
     std::cout << "or_else recovery: " << f_recovered.get() << std::endl;
@@ -50,7 +50,7 @@ int hpx_main()
     // -----------------------------------------------------------
     // transform: apply a pure function to a future's value
     // -----------------------------------------------------------
-    auto f_transformed = hpx::transform(hpx::make_ready_future(42),
+    auto f_transformed = hpx::futures::transform(hpx::make_ready_future(42),
         [](int val) { return std::to_string(val); });
 
     std::cout << "transform: " << f_transformed.get() << std::endl;
