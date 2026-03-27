@@ -8,7 +8,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/futures/traits/is_future.hpp>
 #include <hpx/modules/functional.hpp>
@@ -60,8 +59,7 @@ namespace hpx {
     // -----------------------------------------------------------------
     // transform: apply f to the value inside a ready future
     // -----------------------------------------------------------------
-    HPX_CXX_CORE_EXPORT
-    template <typename Future, typename F,
+    HPX_CXX_CORE_EXPORT template <typename Future, typename F,
         typename R = typename hpx::traits::future_traits<
             std::decay_t<Future>>::result_type>
         requires(hpx::traits::is_future_v<std::decay_t<Future>> &&
@@ -86,8 +84,7 @@ namespace hpx {
     // and_then: chain a continuation that itself returns a future
     //           (automatic flattening — no .unwrap() needed)
     // -----------------------------------------------------------------
-    HPX_CXX_CORE_EXPORT
-    template <typename Future, typename F,
+    HPX_CXX_CORE_EXPORT template <typename Future, typename F,
         typename R = typename hpx::traits::future_traits<
             std::decay_t<Future>>::result_type,
         typename InvokeResult =
@@ -113,8 +110,7 @@ namespace hpx {
     // or_else: error recovery — executes f only when the future
     //          holds an exception
     // -----------------------------------------------------------------
-    HPX_CXX_CORE_EXPORT
-    template <typename Future, typename F,
+    HPX_CXX_CORE_EXPORT template <typename Future, typename F,
         typename R = typename hpx::traits::future_traits<
             std::decay_t<Future>>::result_type>
         requires(hpx::traits::is_future_v<std::decay_t<Future>>)
