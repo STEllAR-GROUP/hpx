@@ -14,54 +14,47 @@
 ///////////////////////////////////////////////////////////////////////////////
 void test_transform()
 {
-    // value
+    // value: f returns a non-future, transform wraps it
     auto f = hpx::make_ready_future(42);
     auto f2 = hpx::futures::transform(
         std::move(f), [](int val) { return std::to_string(val); });
     HPX_TEST_EQ(f2.get(), "42");
 
-    // void
-    auto f_void = hpx::make_ready_future();
-    auto f_void2 =
-        hpx::futures::transform(std::move(f_void), []() { return 10; });
-    HPX_TEST_EQ(f_void2.get(), 10);
+    // void: f takes no argument
+    auto fv = hpx::make_ready_future();
+    auto fv2 = hpx::futures::transform(std::move(fv), []() { return 10; });
+    HPX_TEST_EQ(fv2.get(), 10);
 }
 
 void test_and_then()
 {
-    // flatten: f returns a future, and_then auto-unwraps it
+    // and_then delegates to .then() directly.
+    // f receives the future directly (HPX convention for .then()).
     auto f = hpx::make_ready_future(42);
     auto f2 = hpx::futures::and_then(std::move(f),
-        [](int val) { return hpx::make_ready_future(std::to_string(val)); });
+        [](hpx::future<int> val) { return std::to_string(val.get()); });
     HPX_TEST_EQ(f2.get(), "42");
 }
 
 void test_or_else()
 {
-    // active exception with exception_ptr signature
-    auto f = hpx::make_exceptional_future<int>(
-        hpx::exception(hpx::error::bad_parameter, "testing or_else"));
-
+    // exception path: f receives exception_ptr and returns T directly
+    auto f1 = hpx::make_exceptional_future<int>(
+        hpx::exception(hpx::error::bad_parameter, "test"));
     auto f2 = hpx::futures::or_else(
-        std::move(f), [](std::exception_ptr const& /*e*/) {
-            return hpx::make_ready_future(100);
-        });
-
+        std::move(f1), [](std::exception_ptr const& /*e*/) { return 100; });
     HPX_TEST_EQ(f2.get(), 100);
 
-    // active exception with void argument signature
+    // exception path: f takes no argument
     auto f3 = hpx::make_exceptional_future<int>(
-        hpx::exception(hpx::error::bad_parameter, "testing or_else"));
-
-    auto f4 = hpx::futures::or_else(
-        std::move(f3), []() { return hpx::make_ready_future(200); });
-
+        hpx::exception(hpx::error::bad_parameter, "test"));
+    auto f4 = hpx::futures::or_else(std::move(f3), []() { return 200; });
     HPX_TEST_EQ(f4.get(), 200);
 
-    // no exception (value passes through)
+    // no-exception: value passes through unchanged, f is not called
     auto f5 = hpx::make_ready_future(42);
-    auto f6 = hpx::futures::or_else(std::move(f5),
-        [](std::exception_ptr const&) { return hpx::make_ready_future(1); });
+    auto f6 = hpx::futures::or_else(
+        std::move(f5), [](std::exception_ptr const&) { return -1; });
     HPX_TEST_EQ(f6.get(), 42);
 }
 
@@ -78,18 +71,17 @@ void test_shared_transform()
 void test_shared_and_then()
 {
     hpx::shared_future<int> f = hpx::make_ready_future(42);
-    auto f2 = hpx::futures::and_then(
-        f, [](int val) { return hpx::make_ready_future(std::to_string(val)); });
+    auto f2 = hpx::futures::and_then(f,
+        [](hpx::shared_future<int> val) { return std::to_string(val.get()); });
     HPX_TEST_EQ(f2.get(), "42");
 }
 
 void test_shared_or_else()
 {
     hpx::shared_future<int> f = hpx::make_exceptional_future<int>(
-        hpx::exception(hpx::error::bad_parameter, "testing shared or_else"));
-
-    auto f2 = hpx::futures::or_else(f,
-        [](std::exception_ptr const&) { return hpx::make_ready_future(300); });
+        hpx::exception(hpx::error::bad_parameter, "test"));
+    auto f2 =
+        hpx::futures::or_else(f, [](std::exception_ptr const&) { return 300; });
     HPX_TEST_EQ(f2.get(), 300);
 }
 
