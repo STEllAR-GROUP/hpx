@@ -31,9 +31,9 @@ jobs:
 
           cmake --version
           if [ "${{ github.event_name }}" != "pull_request" ] && \
-            ( [ "${{ github.ref_name }}" == "master" ] || \
+            { [ "${{ github.ref_name }}" == "master" ] || \
               [[ "${{ github.ref_name }}" =~ ^release.* ]] || \
-              [ "${{ github.ref_type }}" == "tag" ] ); then
+              [ "${{ github.ref_type }}" == "tag" ]; }; then
             DOCUMENTATION_OUTPUT_FORMATS="html;singlehtml;latexpdf"
           else
             DOCUMENTATION_OUTPUT_FORMATS="html"
