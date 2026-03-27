@@ -543,19 +543,6 @@ function(hpx_check_for_cxx20_std_execution_policies)
   )
 endfunction()
 
-# ##############################################################################
-<<<<<<< HEAD
-=======
-function(hpx_check_for_cxx20_std_construct_at)
-  add_hpx_config_test(
-    HPX_WITH_CXX20_STD_CONSTRUCT_AT
-    SOURCE cmake/tests/cxx20_std_construct_at.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
->>>>>>> f783acbbfd (Modernasized HPX algorithm headers)
 function(hpx_check_for_cxx23_std_generator)
   add_hpx_config_test(
     HPX_WITH_CXX23_STD_GENERATOR
