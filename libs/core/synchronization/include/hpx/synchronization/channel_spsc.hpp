@@ -35,6 +35,42 @@ namespace hpx::lcos::local {
         channel_mode = channel_mode::normal>
     class channel_spsc
     {
+    private:
+        [[nodiscard]] HPX_FORCEINLINE bool is_full(
+            std::size_t tail) noexcept
+        {
+            std::size_t next_tail = tail + 1;
+            if (next_tail >= size_)
+            {
+                next_tail = 0;
+            }
+            if (next_tail == head_cached_.data_) [[unlikely]]
+            {
+                head_cached_.data_ =
+                    head_.data_.load(std::memory_order_acquire);
+                if (next_tail == head_cached_.data_)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        [[nodiscard]] HPX_FORCEINLINE bool is_empty(
+            std::size_t head) const noexcept
+        {
+            if (head == tail_cached_.data_) [[unlikely]]
+            {
+                tail_cached_.data_ =
+                    tail_.data_.load(std::memory_order_acquire);
+                if (head == tail_cached_.data_)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
     public:
         explicit channel_spsc(std::size_t size)
           : size_(size + 1)
@@ -103,8 +139,7 @@ namespace hpx::lcos::local {
             {
                 return true;
             }
-            return head_.data_.load(std::memory_order_relaxed) ==
-                tail_.data_.load(std::memory_order_acquire);
+            return is_empty(head_.data_.load(std::memory_order_relaxed));
         }
 
         bool get(T* val = nullptr) const noexcept
@@ -116,14 +151,9 @@ namespace hpx::lcos::local {
 
             std::size_t head = head_.data_.load(std::memory_order_relaxed);
 
-            if (head == tail_cached_.data_) [[unlikely]]
+            if (is_empty(head))
             {
-                tail_cached_.data_ =
-                    tail_.data_.load(std::memory_order_acquire);
-                if (head == tail_cached_.data_)
-                {
-                    return false;
-                }
+                return false;
             }
 
             if (val == nullptr)
@@ -150,19 +180,9 @@ namespace hpx::lcos::local {
 
             std::size_t tail = tail_.data_.load(std::memory_order_relaxed);
 
-            std::size_t next_tail = tail + 1;
-            if (next_tail >= size_)
+            if (is_full(tail))
             {
-                next_tail = 0;
-            }
-            if (next_tail == head_cached_.data_) [[unlikely]]
-            {
-                head_cached_.data_ =
-                    head_.data_.load(std::memory_order_acquire);
-                if (next_tail == head_cached_.data_)
-                {
-                    return false;
-                }
+                return false;
             }
 
             buffer_[tail] = HPX_MOVE(t);
@@ -215,6 +235,42 @@ namespace hpx::lcos::local {
     HPX_CXX_CORE_EXPORT template <typename T>
     class channel_spsc<T, channel_mode::dont_support_close>
     {
+    private:
+        [[nodiscard]] HPX_FORCEINLINE bool is_full(
+            std::size_t tail) noexcept
+        {
+            std::size_t next_tail = tail + 1;
+            if (next_tail >= size_)
+            {
+                next_tail = 0;
+            }
+            if (next_tail == head_cached_.data_) [[unlikely]]
+            {
+                head_cached_.data_ =
+                    head_.data_.load(std::memory_order_acquire);
+                if (next_tail == head_cached_.data_)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        [[nodiscard]] HPX_FORCEINLINE bool is_empty(
+            std::size_t head) const noexcept
+        {
+            if (head == tail_cached_.data_) [[unlikely]]
+            {
+                tail_cached_.data_ =
+                    tail_.data_.load(std::memory_order_acquire);
+                if (head == tail_cached_.data_)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
     public:
         explicit channel_spsc(std::size_t size)
           : size_(size + 1)
@@ -264,22 +320,16 @@ namespace hpx::lcos::local {
 
         [[nodiscard]] bool is_empty() const noexcept
         {
-            return head_.data_.load(std::memory_order_relaxed) ==
-                tail_.data_.load(std::memory_order_acquire);
+            return is_empty(head_.data_.load(std::memory_order_relaxed));
         }
 
         bool get(T* val = nullptr) const noexcept
         {
             std::size_t head = head_.data_.load(std::memory_order_relaxed);
 
-            if (head == tail_cached_.data_) [[unlikely]]
+            if (is_empty(head))
             {
-                tail_cached_.data_ =
-                    tail_.data_.load(std::memory_order_acquire);
-                if (head == tail_cached_.data_)
-                {
-                    return false;
-                }
+                return false;
             }
 
             if (val == nullptr)
@@ -301,19 +351,9 @@ namespace hpx::lcos::local {
         {
             std::size_t tail = tail_.data_.load(std::memory_order_relaxed);
 
-            std::size_t next_tail = tail + 1;
-            if (next_tail >= size_)
+            if (is_full(tail))
             {
-                next_tail = 0;
-            }
-            if (next_tail == head_cached_.data_) [[unlikely]]
-            {
-                head_cached_.data_ =
-                    head_.data_.load(std::memory_order_acquire);
-                if (next_tail == head_cached_.data_)
-                {
-                    return false;
-                }
+                return false;
             }
 
             buffer_[tail] = HPX_MOVE(t);
