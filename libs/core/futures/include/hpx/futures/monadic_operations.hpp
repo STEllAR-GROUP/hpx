@@ -20,9 +20,8 @@ namespace hpx::futures {
     // -----------------------------------------------------------------
     // transform: apply f to the value inside a future.
     //
-    //   f takes T (or nothing for void) and returns any value.
-    //   The result is a hpx::future of f's return type.
-    //   Delegates to .then() + hpx::make_ready_future for consistency.
+    //   f takes T (or nothing for void) and returns any value U.
+    //   The result is a hpx::future<U>.
     //
     //   hpx::futures::transform(fut, [](int v) { return v * 2; })
     //   -> hpx::future<int>
@@ -37,11 +36,11 @@ namespace hpx::futures {
             if constexpr (std::is_void_v<R>)
             {
                 f_inner.get();
-                return hpx::make_ready_future(f());
+                return f();
             }
             else
             {
-                return hpx::make_ready_future(HPX_INVOKE(f, f_inner.get()));
+                return HPX_INVOKE(f, f_inner.get());
             }
         });
     }
@@ -49,12 +48,11 @@ namespace hpx::futures {
     // -----------------------------------------------------------------
     // and_then: chain a continuation onto a future.
     //
-    //   Delegates directly to .then(). hpx::future::then() already
-    //   auto-unwraps if f returns a future<T>, so no manual .unwrap()
-    //   is needed. f may also throw to propagate exceptions.
+    //   Delegates directly to .then() -- HPX already auto-unwraps if
+    //   f returns a future<T>. f may also throw to forward exceptions.
     //
-    //   hpx::futures::and_then(fut, [](int v) { return to_string(v); })
-    //   -> hpx::future<string>
+    //   hpx::futures::and_then(fut, [](hpx::future<int> f) { ... })
+    //   -> hpx::future<U>
     // -----------------------------------------------------------------
     HPX_CXX_CORE_EXPORT template <typename Future, typename F>
         requires(hpx::traits::is_future_v<std::decay_t<Future>>)
@@ -68,7 +66,7 @@ namespace hpx::futures {
     //          an exception. f returns T (the value type) directly.
     //
     //   If no exception: value passes through unchanged.
-    //   If exception:    f is called and its return value is used.
+    //   If exception:    f is called and its return value substituted.
     //                    f may also rethrow / throw a different error.
     //
     //   hpx::futures::or_else(fut, [](std::exception_ptr) { return -1; })
