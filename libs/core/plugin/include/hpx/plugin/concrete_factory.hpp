@@ -25,14 +25,11 @@ namespace hpx::util::plugin {
             typename Base, typename... Parameters>
         struct concrete_factory_item<BasePlugin, Concrete, Base,
             hpx::util::pack<Parameters...>> : public Base
-            struct concrete_factory_item<BasePlugin, Concrete,
-            Base, hpx::util::pack<Parameters...>> : public Base
         {
             [[nodiscard]] BasePlugin* create(
                 dll_handle const& dll, Parameters... parameters) override
             {
                 return new plugin_wrapper<Concrete, Parameters...>(
-                    dll, parameters...);
                     dll, parameters...);
             }
         };
