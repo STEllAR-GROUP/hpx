@@ -708,6 +708,10 @@ namespace hpx::execution::experimental::detail {
         using sender_concept = hpx::execution::experimental::sender_t;
 
         template <typename Env>
+#if defined(HPX_CLANG_VERSION)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#endif
         friend auto tag_invoke(
             hpx::execution::experimental::get_completion_signatures_t,
             thread_pool_bulk_sender const&, Env const&)
@@ -716,6 +720,9 @@ namespace hpx::execution::experimental::detail {
                 hpx::execution::experimental::completion_signatures<
                     hpx::execution::experimental::set_error_t(
                         std::exception_ptr)>>;
+#if defined(HPX_CLANG_VERSION)
+#pragma clang diagnostic pop
+#endif
 
         struct env
         {

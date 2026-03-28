@@ -30,11 +30,13 @@
 #pragma clang diagnostic ignored "-Weverything"
 #endif
 
+// NOLINTBEGIN(bugprone-crtp-constructor-accessibility,bugprone-unhandled-exception-at-new)
 #include <exec/ensure_started.hpp>
 #include <exec/execute.hpp>
 #include <exec/split.hpp>
 #include <exec/start_detached.hpp>
 #include <stdexec/execution.hpp>
+// NOLINTEND(bugprone-crtp-constructor-accessibility,bugprone-unhandled-exception-at-new)
 
 #if defined(HPX_GCC_VERSION)
 #pragma GCC diagnostic pop

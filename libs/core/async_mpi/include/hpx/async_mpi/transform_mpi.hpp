@@ -145,6 +145,7 @@ namespace hpx::mpi::experimental {
             HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
 
             using is_sender = void;
+            using sender_concept = hpx::execution::experimental::sender_t;
 
             template <typename... Args>
             struct invoke_function_transformation_helper

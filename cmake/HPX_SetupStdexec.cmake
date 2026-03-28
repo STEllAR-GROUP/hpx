@@ -37,8 +37,8 @@ if(HPX_WITH_FETCH_STDEXEC)
 
     add_library(Stdexec INTERFACE)
     target_include_directories(
-      Stdexec INTERFACE $<BUILD_INTERFACE:${stdexec_SOURCE_DIR}/include>
-                        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+      Stdexec SYSTEM INTERFACE $<BUILD_INTERFACE:${stdexec_SOURCE_DIR}/include>
+                               $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
     )
 
     install(

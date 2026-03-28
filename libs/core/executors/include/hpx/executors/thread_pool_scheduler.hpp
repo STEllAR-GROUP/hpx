@@ -572,7 +572,7 @@ namespace hpx::execution::experimental {
     // Add get_domain query to the scheduler (following system_context.hpp pattern)
     template <typename Policy>
     constexpr auto tag_invoke(stdexec::get_domain_t,
-        thread_pool_policy_scheduler<Policy> const& sched) noexcept
+        thread_pool_policy_scheduler<Policy> const&) noexcept
     {
         return thread_pool_domain<Policy>{};
     }
