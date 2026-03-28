@@ -21,7 +21,6 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
-#include "hpx/config/forward.hpp"
 
 namespace hpx::parallel {
 
