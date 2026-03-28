@@ -20,6 +20,7 @@
 
 #if defined(HPX_HAVE_STDEXEC)
 #include <hpx/executors/detail/index_queue_spawning.hpp>
+#include <hpx/executors/parallel_scheduler.hpp>
 #endif
 
 #include <cstddef>
@@ -47,9 +48,47 @@ namespace hpx::execution::experimental {
         {
         };
 
+        // parallel_scheduler wraps thread_pool_policy_scheduler; use the same
+        // index_queue fast path with thread_pool_params<parallel_scheduler>
+        // so pu_mask() can return the cached mask from get_pu_mask().
+        template <>
+        struct has_thread_pool_backend<parallel_scheduler> : std::true_type
+        {
+        };
+
         // Helper to extract thread pool parameters from a scheduler
         template <typename Scheduler>
         struct thread_pool_params;    // primary: not defined
+
+        template <>
+        struct thread_pool_params<parallel_scheduler>
+        {
+            static auto* pool(parallel_scheduler const& sched)
+            {
+                return sched.get_underlying_scheduler().get_thread_pool();
+            }
+            static std::size_t first_core(parallel_scheduler const& sched)
+            {
+                return hpx::execution::experimental::get_first_core(
+                    sched.get_underlying_scheduler());
+            }
+            static std::size_t num_cores(parallel_scheduler const& sched)
+            {
+                return hpx::execution::experimental::processing_units_count(
+                    hpx::execution::experimental::null_parameters,
+                    sched.get_underlying_scheduler(),
+                    hpx::chrono::null_duration, 0);
+            }
+            static auto const& policy(parallel_scheduler const& sched)
+            {
+                return sched.get_underlying_scheduler().policy();
+            }
+            static hpx::threads::mask_type pu_mask(
+                parallel_scheduler const& sched)
+            {
+                return sched.get_pu_mask();
+            }
+        };
 
         template <typename Policy>
         struct thread_pool_params<thread_pool_policy_scheduler<Policy>>

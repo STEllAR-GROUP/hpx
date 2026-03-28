@@ -92,6 +92,24 @@ namespace hpx::execution::experimental::detail {
             (n + static_cast<std::size_t>(num_threads) - 1) / num_threads);
     }
 
+    /// Round a chunk up to a multiple of 16 when it is
+    /// smaller than size
+    HPX_CXX_CORE_EXPORT constexpr std::uint32_t align_chunk_for_vectorization(
+        std::uint32_t chunk, std::uint32_t const size) noexcept
+    {
+        constexpr std::uint32_t g = 16;
+        if (chunk == 0 || chunk >= size)
+            return chunk;
+        std::uint64_t c = chunk;
+        if (c % g != 0)
+        {
+            c = ((c + g - 1) / g) * g;
+        }
+        if (c > size)
+            c = size;
+        return static_cast<std::uint32_t>(c);
+    }
+
     // For bulk_unchunked: f(index, ...)
     HPX_CXX_CORE_EXPORT template <std::size_t... Is, typename F, typename T,
         typename Ts>
@@ -183,9 +201,8 @@ namespace hpx::execution::experimental::detail {
 
             auto const i_begin =
                 static_cast<std::size_t>(index) * op_state->chunk_size;
-            auto const i_end =
-                (std::min) (i_begin + op_state->chunk_size,
-                    static_cast<std::size_t>(op_state->size));
+            auto const i_end = (std::min) (i_begin + op_state->chunk_size,
+                static_cast<std::size_t>(op_state->size));
 
             if constexpr (OperationState::is_chunked)
             {
@@ -195,14 +212,14 @@ namespace hpx::execution::experimental::detail {
             }
             else
             {
-                // bulk_unchunked: f(index, values...) for each element
-                // In unchunked case, chunk_size is 1
-                // so each chunk will only have one element.
-                // The regular bulk invocation will go through the is_chunked case.
+                // bulk_unchunked: one element call f(shape_index, values...) per i.
                 auto it = std::ranges::next(
                     hpx::util::begin(op_state->shape), i_begin);
-                bulk_scheduler_invoke_helper(
-                    index_pack_type{}, op_state->f, *it, ts);
+                for (auto i = i_begin; i < i_end; ++i, ++it)
+                {
+                    bulk_scheduler_invoke_helper(
+                        index_pack_type{}, op_state->f, *it, ts);
+                }
             }
         }
 
@@ -319,7 +336,8 @@ namespace hpx::execution::experimental::detail {
         // Otherwise, it will call set_value on the connected receiver.
         void finish() const
         {
-            if (--(op_state->tasks_remaining.data_) == 0)
+            if (op_state->tasks_remaining.data_.fetch_sub(
+                    1, std::memory_order_acq_rel) == 1)
             {
                 if (op_state->bad_alloc_thrown.load(std::memory_order_relaxed))
                 {
@@ -557,8 +575,16 @@ namespace hpx::execution::experimental::detail {
             }
             else
             {
-                chunk_size = 1;
-                num_chunks = size;
+                chunk_size = get_bulk_scheduler_chunk_size(
+                    op_state->num_worker_threads, size);
+                num_chunks = (size + chunk_size - 1) / chunk_size;
+            }
+
+            if constexpr (OperationState::is_unsequenced &&
+                OperationState::is_parallel)
+            {
+                chunk_size = align_chunk_for_vectorization(chunk_size, size);
+                num_chunks = (size + chunk_size - 1) / chunk_size;
             }
 
             // launch only as many tasks as we have chunks
@@ -723,6 +749,16 @@ namespace hpx::execution::experimental::detail {
 #endif
     };
 
+#if !defined(HPX_HAVE_STDEXEC)
+    // With stdexec, thread_pool_scheduler.hpp forward declares this template
+    // with default arguments; without it, declare here so the definition below
+    // does not repeat default template arguments.
+    template <typename Policy, typename Sender, typename Shape, typename F,
+        bool IsChunked = false, bool IsParallel = true,
+        bool IsUnsequenced = false>
+    class thread_pool_bulk_sender;
+#endif
+
     // This sender represents bulk work that will be performed using the
     // thread_pool_scheduler.
     //
@@ -740,8 +776,8 @@ namespace hpx::execution::experimental::detail {
     // threads.
     //
     HPX_CXX_CORE_EXPORT template <typename Policy, typename Sender,
-        typename Shape, typename F, bool IsChunked = false,
-        bool IsParallel = true>
+        typename Shape, typename F, bool IsChunked, bool IsParallel,
+        bool IsUnsequenced>
     class thread_pool_bulk_sender
     {
     private:
@@ -885,6 +921,7 @@ namespace hpx::execution::experimental::detail {
         {
             static constexpr bool is_chunked = IsChunked;
             static constexpr bool is_parallel = IsParallel;
+            static constexpr bool is_unsequenced = IsUnsequenced;
 
             using operation_state_type =
                 hpx::execution::experimental::connect_result_t<Sender,
@@ -899,9 +936,11 @@ namespace hpx::execution::experimental::detail {
             bool reverse_placement = false;
             bool allow_stealing = false;
             hpx::threads::mask_type pu_mask;
+
             std::vector<hpx::util::cache_aligned_data<
                 hpx::concurrency::detail::non_contiguous_index_queue<>>>
                 queues;
+
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Shape> shape;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver> receiver;

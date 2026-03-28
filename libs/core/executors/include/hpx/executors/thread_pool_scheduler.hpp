@@ -29,7 +29,8 @@
 // Forward declaration
 namespace hpx::execution::experimental::detail {
     template <typename Policy, typename Sender, typename Shape, typename F,
-        bool IsChunked, bool IsParallel>
+        bool IsChunked = false, bool IsParallel = true,
+        bool IsUnsequenced = false>
     class thread_pool_bulk_sender;
 }
 #endif
@@ -85,6 +86,19 @@ namespace hpx::execution::experimental {
     inline constexpr bool is_sequenced_policy_v<stdexec::unsequenced_policy> =
         true;
 
+    //True for unseq and par_unseq
+    template <typename Policy>
+    inline constexpr bool is_unsequenced_bulk_policy_v = false;
+
+    template <>
+    inline constexpr bool
+        is_unsequenced_bulk_policy_v<stdexec::unsequenced_policy> = true;
+
+    template <>
+    inline constexpr bool
+        is_unsequenced_bulk_policy_v<stdexec::parallel_unsequenced_policy> =
+            true;
+
     // Domain customization for stdexec bulk operations
     // Only the env-based transform_sender is provided. The early (no-env)
     // transform falls through to default_domain, and the late transform
@@ -129,12 +143,23 @@ namespace hpx::execution::experimental {
             constexpr bool is_parallel =
                 !is_sequenced_policy_v<std::decay_t<decltype(pol.__get())>>;
 
+            constexpr bool is_unsequenced = is_unsequenced_bulk_policy_v<
+                std::decay_t<decltype(pol.__get())>>;
+
+            // Pre-compute the PU mask once and pass it to the 5-arg
+            // constructor to avoid the expensive full_mask() call (O(N^2))
+            // that the 4-arg constructor would trigger on every bulk
+            // operation.
+            auto pu_mask =
+                hpx::execution::experimental::get_processing_units_mask(sched);
+
             return hpx::execution::experimental::detail::
                 thread_pool_bulk_sender<Policy, std::decay_t<decltype(child)>,
                     std::decay_t<decltype(iota_shape)>,
-                    std::decay_t<decltype(f)>, is_chunked, is_parallel>{
-                    HPX_MOVE(sched), HPX_FORWARD(decltype(child), child),
-                    HPX_MOVE(iota_shape), HPX_FORWARD(decltype(f), f)};
+                    std::decay_t<decltype(f)>, is_chunked, is_parallel,
+                    is_unsequenced>{HPX_MOVE(sched),
+                    HPX_FORWARD(decltype(child), child), HPX_MOVE(iota_shape),
+                    HPX_FORWARD(decltype(f), f), HPX_MOVE(pu_mask)};
         }
     };
 

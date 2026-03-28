@@ -396,6 +396,22 @@ int hpx_main(int, char*[])
         }
     }
 
+    // bulk with par_unseq)
+    {
+        constexpr std::size_t num_tasks = 128;
+        std::atomic<std::size_t> count{0};
+        ex::parallel_scheduler sched = ex::get_parallel_scheduler();
+
+        auto bulk_snd = ex::bulk(
+            ex::schedule(sched), ex::par_unseq, num_tasks,
+            [&](std::size_t) {
+                count.fetch_add(1, std::memory_order_relaxed);
+            });
+
+        ex::sync_wait(std::move(bulk_snd));
+        HPX_TEST_EQ(count.load(), num_tasks);
+    }
+
     // Stop token support test (P2079R10 requirement)
     {
         ex::parallel_scheduler sched = ex::get_parallel_scheduler();
@@ -503,6 +519,125 @@ int hpx_main(int, char*[])
         }
         // Sequential execution should use only 1 thread
         HPX_TEST_EQ(thread_ids.size(), std::size_t(1));
+    }
+
+    // Unchunked internal chunking: large shape covers entire range
+    {
+        constexpr std::size_t n = 100000;
+        auto sched = ex::get_parallel_scheduler();
+        std::vector<std::atomic<int>> flags(n);
+        for (auto& f : flags)
+            f.store(0, std::memory_order_relaxed);
+
+        auto snd = ex::bulk_unchunked(
+            ex::schedule(sched), ex::par, n, [&](std::size_t i) {
+                flags[i].fetch_add(1, std::memory_order_relaxed);
+            });
+
+        ex::sync_wait(std::move(snd));
+
+        for (std::size_t i = 0; i < n; ++i)
+        {
+            HPX_TEST_EQ(flags[i].load(), 1);
+        }
+    }
+
+    // Unchunked internal chunking: value propagation with large shape
+    {
+        constexpr std::size_t n = 50000;
+        auto sched = ex::get_parallel_scheduler();
+        std::vector<int> results(n, 0);
+
+        auto snd = ex::schedule(sched) | ex::then([]() { return 7; }) |
+            ex::bulk_unchunked(ex::par, n,
+                [&](std::size_t i, int val) { results[i] = val + 1; });
+
+        auto [passthrough] = ex::sync_wait(std::move(snd)).value();
+        HPX_TEST_EQ(passthrough, 7);
+
+        for (std::size_t i = 0; i < n; ++i)
+        {
+            HPX_TEST_EQ(results[i], 8);
+        }
+    }
+
+    // Unchunked + bulk large shape covers entire range
+    {
+        constexpr std::size_t n = 100000;
+        auto sched = ex::get_parallel_scheduler();
+        std::vector<std::atomic<int>> flags(n);
+        for (auto& f : flags)
+            f.store(0, std::memory_order_relaxed);
+
+        auto snd = ex::bulk(
+            ex::schedule(sched), ex::par, n, [&](std::size_t i) {
+                flags[i].fetch_add(1, std::memory_order_relaxed);
+            });
+
+        ex::sync_wait(std::move(snd));
+
+        for (std::size_t i = 0; i < n; ++i)
+        {
+            HPX_TEST_EQ(flags[i].load(), 1);
+        }
+    }
+
+    // Chained bulk: bulk -> then -> bulk (composability via sender chaining)
+    {
+        constexpr std::size_t n = 256;
+        auto sched = ex::get_parallel_scheduler();
+        std::vector<std::atomic<int>> phase1(n);
+        std::vector<std::atomic<int>> phase2(n);
+        for (auto& p : phase1)
+            p.store(0, std::memory_order_relaxed);
+        for (auto& p : phase2)
+            p.store(0, std::memory_order_relaxed);
+
+        auto snd = ex::bulk(
+                       ex::schedule(sched), ex::par, n,
+                       [&](std::size_t i) {
+                           phase1[i].store(1, std::memory_order_relaxed);
+                       }) |
+            ex::bulk(ex::par, n, [&](std::size_t i) {
+                phase2[i].store(
+                    phase1[i].load(std::memory_order_relaxed) + 1,
+                    std::memory_order_relaxed);
+            });
+
+        ex::sync_wait(std::move(snd));
+
+        for (std::size_t i = 0; i < n; ++i)
+        {
+            HPX_TEST_EQ(phase1[i].load(), 1);
+            HPX_TEST_EQ(phase2[i].load(), 2);
+        }
+    }
+
+    // Mixed bulk variants chained: bulk_chunked -> bulk_unchunked
+    {
+        constexpr std::size_t n = 200;
+        auto sched = ex::get_parallel_scheduler();
+        std::vector<std::atomic<int>> results(n);
+        for (auto& r : results)
+            r.store(0, std::memory_order_relaxed);
+
+        auto snd = ex::bulk_chunked(
+                       ex::schedule(sched), ex::par, n,
+                       [&](std::size_t begin, std::size_t end) {
+                           for (std::size_t i = begin; i < end; ++i)
+                               results[i].fetch_add(
+                                   10, std::memory_order_relaxed);
+                       }) |
+            ex::bulk_unchunked(ex::par, n, [&](std::size_t i) {
+                results[i].fetch_add(1, std::memory_order_relaxed);
+            });
+
+        ex::sync_wait(std::move(snd));
+
+        for (std::size_t i = 0; i < n; ++i)
+        {
+            HPX_TEST_EQ(results[i].load(), 11);
+        }
     }
 
     return hpx::local::finalize();

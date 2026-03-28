@@ -59,13 +59,13 @@ namespace hpx::execution::experimental {
                 // Get the parallel_scheduler from the child sender's
                 // completion scheduler (completes_on pattern)
                 auto par_sched = [&]() {
-                    if constexpr (hpx::is_invocable_v<
-                                      hpx::execution::experimental::
-                                          get_completion_scheduler_t<hpx::
-                                              execution::experimental::
-                                                  set_value_t>,
-                                      decltype(hpx::execution::experimental::
-                                                   get_env(child))>)
+                    if constexpr (
+                        hpx::is_invocable_v<
+                            hpx::execution::experimental::
+                                get_completion_scheduler_t<
+                                    hpx::execution::experimental::set_value_t>,
+                            decltype(hpx::execution::experimental::get_env(
+                                child))>)
                     {
                         return hpx::execution::experimental::
                             get_completion_scheduler<
@@ -93,6 +93,9 @@ namespace hpx::execution::experimental {
                 constexpr bool is_parallel =
                     !is_sequenced_policy_v<std::decay_t<decltype(pol.__get())>>;
 
+                constexpr bool is_unsequenced = is_unsequenced_bulk_policy_v<
+                    std::decay_t<decltype(pol.__get())>>;
+
                 // Pass the pre-cached PU mask so thread_pool_bulk_sender
                 // skips its own full_mask() computation on every invocation.
                 hpx::threads::mask_type pu_mask = par_sched.get_pu_mask();
@@ -100,8 +103,8 @@ namespace hpx::execution::experimental {
                     thread_pool_bulk_sender<hpx::launch,
                         std::decay_t<decltype(child)>,
                         std::decay_t<decltype(iota_shape)>,
-                        std::decay_t<decltype(f)>, is_chunked, is_parallel>(
-                        HPX_MOVE(underlying),
+                        std::decay_t<decltype(f)>, is_chunked, is_parallel,
+                        is_unsequenced>(HPX_MOVE(underlying),
                         HPX_FORWARD(decltype(child), child),
                         HPX_MOVE(iota_shape), HPX_FORWARD(decltype(f), f),
                         HPX_MOVE(pu_mask));
