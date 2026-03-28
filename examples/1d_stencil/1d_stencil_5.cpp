@@ -54,6 +54,10 @@ inline std::size_t idx(std::size_t i, int dir, std::size_t size)
 struct partition_data
 {
 private:
+    // This example runs on a single locality, so it does not actually exercise
+    // serialization at runtime. We still use serialize_buffer here because
+    // action arguments must remain serializable and the ownership semantics of
+    // the partition buffer are explicit with this type.
     typedef hpx::serialization::serialize_buffer<double> buffer_type;
 
 public:
@@ -92,9 +96,9 @@ public:
     }
 
 private:
-    // Serialization support: even if all of the code below runs on one
-    // locality only, we need to provide an implementation for the
-    // serialization as all arguments passed to actions have to support this.
+    // Serialization support is required even though 1d_stencil_5 itself is not
+    // a fully distributed example and does not rely on serialization during
+    // execution. Action arguments still need to provide serialization support.
     friend class hpx::serialization::access;
 
     template <typename Archive>
