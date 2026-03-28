@@ -9,7 +9,9 @@
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 
+#include <exception>
 #include <string>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_transform()

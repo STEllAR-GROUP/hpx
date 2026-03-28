@@ -8,9 +8,11 @@
 #include <hpx/future.hpp>
 #include <hpx/init.hpp>
 
+#include <exception>
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <utility>
 
 int hpx_main()
 {
