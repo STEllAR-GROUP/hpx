@@ -77,7 +77,8 @@ int main()
     }
 
     // operator| overload
-    {}
+    {
+    }
 
     // tag_invoke overload
     {

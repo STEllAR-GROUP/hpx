@@ -109,6 +109,7 @@ struct example_sender
     hpx::tuple<std::decay_t<Ts>...> ts;
 
     using is_sender = void;
+    using sender_concept = ex::sender_t;
 
     // clang-format off
     template <typename Env>

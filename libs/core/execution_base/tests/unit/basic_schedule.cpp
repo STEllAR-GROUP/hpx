@@ -26,6 +26,7 @@ template <typename Scheduler = dummy_scheduler>
 struct example_sender_template
 {
     using is_sender = void;
+    using sender_concept = ex::sender_t;
 
     using completion_signatures = ex::completion_signatures<ex::set_value_t(),
         ex::set_error_t(std::exception_ptr)>;

@@ -87,6 +87,7 @@ inline void check_sends_stopped(Sender&&)
 struct void_sender
 {
     using is_sender = void;
+    using sender_concept = hpx::execution::experimental::sender_t;
     template <typename R>
     struct operation_state
     {
@@ -193,6 +194,7 @@ struct stopped_sender
 struct stopped_sender_with_value_type
 {
     using is_sender = void;
+    using sender_concept = hpx::execution::experimental::sender_t;
 
     template <typename R>
     struct operation_state
@@ -466,6 +468,7 @@ struct check_exception_ptr
 struct custom_sender_tag_invoke
 {
     using is_sender = void;
+    using sender_concept = hpx::execution::experimental::sender_t;
 
     std::atomic<bool>& tag_invoke_overload_called;
 
@@ -505,6 +508,7 @@ struct custom_sender_tag_invoke
 struct custom_sender
 {
     using is_sender = void;
+    using sender_concept = hpx::execution::experimental::sender_t;
     std::atomic<bool>& start_called;
     std::atomic<bool>& connect_called;
     std::atomic<bool>& tag_invoke_overload_called;
@@ -542,6 +546,7 @@ struct custom_sender
 struct custom_sender_multi_tuple
 {
     using is_sender = void;
+    using sender_concept = hpx::execution::experimental::sender_t;
     std::atomic<bool>& start_called;
     std::atomic<bool>& connect_called;
     std::atomic<bool>& tag_invoke_overload_called;
@@ -591,6 +596,7 @@ template <typename T>
 struct custom_typed_sender
 {
     using is_sender = void;
+    using sender_concept = hpx::execution::experimental::sender_t;
     std::decay_t<T> x;
 
     std::atomic<bool>& start_called;
@@ -705,6 +711,7 @@ struct example_scheduler_template
     struct my_sender
     {
         using is_sender = void;
+        using sender_concept = hpx::execution::experimental::sender_t;
         friend env_with_scheduler<std::conditional_t<std::is_void_v<Derived>,
             example_scheduler_template, Derived>>
         tag_invoke(
@@ -874,6 +881,7 @@ namespace my_namespace {
     struct my_sender
     {
         using is_sender = void;
+        using sender_concept = hpx::execution::experimental::sender_t;
         template <typename R>
         struct operation_state
         {

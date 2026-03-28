@@ -17,6 +17,7 @@ struct this_test_example_scheduler
     struct example_sender
     {
         using is_sender = void;
+        using sender_concept = ex::sender_t;
         using completion_signatures = ex::completion_signatures<>;
 
         friend env_with_scheduler<this_test_example_scheduler> tag_invoke(

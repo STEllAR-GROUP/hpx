@@ -756,7 +756,7 @@ namespace hpx::execution::experimental {
         storage_type storage{};
 
     public:
-        using is_sender = void;
+        using sender_concept = hpxexec::sender_t;
 
         unique_any_sender() = default;
 
@@ -822,7 +822,7 @@ namespace hpx::execution::experimental {
         storage_type storage{};
 
     public:
-        using is_sender = void;    // Indicate that any_sender is a sender
+        using sender_concept = hpxexec::sender_t;
 
         any_sender() = default;
 

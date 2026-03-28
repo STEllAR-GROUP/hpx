@@ -36,19 +36,11 @@
 #include <exec/start_detached.hpp>
 #include <stdexec/execution.hpp>
 
-#include <type_traits>
-
 #if defined(HPX_GCC_VERSION)
 #pragma GCC diagnostic pop
 #elif defined(HPX_CLANG_VERSION)
 #pragma clang diagnostic pop
 #endif
-
-namespace stdexec {
-    template <typename T>
-        requires requires { typename std::remove_cvref_t<T>::is_sender; }
-    inline constexpr bool enable_sender<T> = true;
-}    // namespace stdexec
 
 namespace hpx::execution::experimental {
     // Domain

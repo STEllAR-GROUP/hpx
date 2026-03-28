@@ -23,6 +23,7 @@ template <typename Scheduler>
 struct execute_example_sender
 {
     using is_sender = void;
+    using sender_concept = ex::sender_t;
 
     friend env_with_scheduler<Scheduler> tag_invoke(
         ex::get_env_t, execute_example_sender const&) noexcept
