@@ -745,7 +745,7 @@ namespace hpx::parallel {
         // sequential partition with projection function for forward iterator.
         HPX_CXX_CORE_EXPORT template <typename FwdIter, typename Pred,
             typename Proj>
-            requires (std::forward_iterator<FwdIter> &&
+            requires(std::forward_iterator<FwdIter> &&
                 !std::bidirectional_iterator<FwdIter>)
         constexpr FwdIter sequential_partition(
             FwdIter first, FwdIter last, Pred&& pred, Proj&& proj)
