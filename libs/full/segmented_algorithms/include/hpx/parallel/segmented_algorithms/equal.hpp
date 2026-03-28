@@ -74,8 +74,7 @@ namespace hpx { namespace parallel {
                 if (beg1 != end1)
                 {
                     overall_result = dispatch(traits1::get_id(sit1), algo,
-                        policy, std::true_type(), beg1, end1, beg2,
-                        HPX_FORWARD(Pred, pred));
+                        policy, std::true_type(), beg1, end1, beg2, pred);
                 }
 
                 // handle all of the full partitions
@@ -91,8 +90,7 @@ namespace hpx { namespace parallel {
                     if (beg1 != end1)
                     {
                         overall_result &= dispatch(traits1::get_id(sit1), algo,
-                            policy, std::true_type(), beg1, end1, beg2,
-                            HPX_FORWARD(Pred, pred));
+                            policy, std::true_type(), beg1, end1, beg2, pred);
                     }
                 }
 
@@ -163,8 +161,7 @@ namespace hpx { namespace parallel {
                 if (beg1 != end1)
                 {
                     segments.push_back(dispatch_async(traits1::get_id(sit1),
-                        algo, policy, forced_seq(), beg1, end1, beg2,
-                        HPX_FORWARD(Pred, pred)));
+                        algo, policy, forced_seq(), beg1, end1, beg2, pred));
                 }
 
                 // handle all of the full partitions
@@ -175,9 +172,9 @@ namespace hpx { namespace parallel {
                     beg2 = traits2::begin(sit2);
                     if (beg1 != end1)
                     {
-                        segments.push_back(dispatch_async(traits1::get_id(sit1),
-                            algo, policy, forced_seq(), beg1, end1, beg2,
-                            HPX_FORWARD(Pred, pred)));
+                        segments.push_back(
+                            dispatch_async(traits1::get_id(sit1), algo, policy,
+                                forced_seq(), beg1, end1, beg2, pred));
                     }
                 }
 
