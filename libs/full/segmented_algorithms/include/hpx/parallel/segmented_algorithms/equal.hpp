@@ -32,7 +32,7 @@ namespace hpx { namespace parallel {
             typename SegIter2, typename Pred>
         static typename util::detail::algorithm_result<ExPolicy, bool>::type
         segmented_equal(Algo&& algo, ExPolicy const& policy, SegIter1 first1,
-            SegIter1 last1, SegIter2 first2, Pred pred, std::true_type)
+            SegIter1 last1, SegIter2 first2, Pred&& pred, std::true_type)
         {
             // Traits for Vector A
             typedef hpx::traits::segmented_iterator_traits<SegIter1> traits1;
@@ -61,7 +61,8 @@ namespace hpx { namespace parallel {
                 if (beg1 != end1)
                 {
                     overall_result &= dispatch(traits1::get_id(sit1), algo,
-                        policy, std::true_type(), beg1, end1, beg2, pred);
+                        policy, std::true_type(), beg1, end1, beg2,
+                        HPX_FORWARD(Pred, pred));
                 }
             }
             else
@@ -73,7 +74,8 @@ namespace hpx { namespace parallel {
                 if (beg1 != end1)
                 {
                     overall_result = dispatch(traits1::get_id(sit1), algo,
-                        policy, std::true_type(), beg1, end1, beg2, pred);
+                        policy, std::true_type(), beg1, end1, beg2,
+                        HPX_FORWARD(Pred, pred));
                 }
 
                 // handle all of the full partitions
@@ -89,7 +91,8 @@ namespace hpx { namespace parallel {
                     if (beg1 != end1)
                     {
                         overall_result &= dispatch(traits1::get_id(sit1), algo,
-                            policy, std::true_type(), beg1, end1, beg2, pred);
+                            policy, std::true_type(), beg1, end1, beg2,
+                            HPX_FORWARD(Pred, pred));
                     }
                 }
 
@@ -100,7 +103,8 @@ namespace hpx { namespace parallel {
                 if (beg1 != end1)
                 {
                     overall_result &= dispatch(traits1::get_id(sit1), algo,
-                        policy, std::true_type(), beg1, end1, beg2, pred);
+                        policy, std::true_type(), beg1, end1, beg2,
+                        HPX_FORWARD(Pred, pred));
                 }
             }
 
@@ -112,7 +116,7 @@ namespace hpx { namespace parallel {
             typename SegIter2, typename Pred>
         static typename util::detail::algorithm_result<ExPolicy, bool>::type
         segmented_equal(Algo&& algo, ExPolicy const& policy, SegIter1 first1,
-            SegIter1 last1, SegIter2 first2, Pred pred, std::false_type)
+            SegIter1 last1, SegIter2 first2, Pred&& pred, std::false_type)
         {
             // Traits for Vector A
             typedef hpx::traits::segmented_iterator_traits<SegIter1> traits1;
@@ -146,7 +150,8 @@ namespace hpx { namespace parallel {
                 if (beg1 != end1)
                 {
                     segments.push_back(dispatch_async(traits1::get_id(sit1),
-                        algo, policy, forced_seq(), beg1, end1, beg2, pred));
+                        algo, policy, forced_seq(), beg1, end1, beg2,
+                        HPX_FORWARD(Pred, pred)));
                 }
             }
             else
@@ -158,7 +163,8 @@ namespace hpx { namespace parallel {
                 if (beg1 != end1)
                 {
                     segments.push_back(dispatch_async(traits1::get_id(sit1),
-                        algo, policy, forced_seq(), beg1, end1, beg2, pred));
+                        algo, policy, forced_seq(), beg1, end1, beg2,
+                        HPX_FORWARD(Pred, pred)));
                 }
 
                 // handle all of the full partitions
@@ -169,9 +175,9 @@ namespace hpx { namespace parallel {
                     beg2 = traits2::begin(sit2);
                     if (beg1 != end1)
                     {
-                        segments.push_back(
-                            dispatch_async(traits1::get_id(sit1), algo, policy,
-                                forced_seq(), beg1, end1, beg2, pred));
+                        segments.push_back(dispatch_async(traits1::get_id(sit1),
+                            algo, policy, forced_seq(), beg1, end1, beg2,
+                            HPX_FORWARD(Pred, pred)));
                     }
                 }
 
@@ -182,7 +188,8 @@ namespace hpx { namespace parallel {
                 if (beg1 != end1)
                 {
                     segments.push_back(dispatch_async(traits1::get_id(sit1),
-                        algo, policy, forced_seq(), beg1, end1, beg2, pred));
+                        algo, policy, forced_seq(), beg1, end1, beg2,
+                        HPX_FORWARD(Pred, pred)));
                 }
             }
 
