@@ -742,7 +742,7 @@ namespace hpx::parallel {
             return first;
         }
 
-        // clang-format off
+        // sequential partition with projection function for forward iterator.
         HPX_CXX_CORE_EXPORT template <typename FwdIter, typename Pred,
             typename Proj>
             requires (std::forward_iterator<FwdIter> &&

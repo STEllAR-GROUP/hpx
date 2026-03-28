@@ -1067,8 +1067,8 @@ hpx_option(
 hpx_option(
   HPX_WITH_FETCH_ASIO
   BOOL
-  "Use FetchContent to fetch Asio. By default an installed Asio will be used. (default: ON)"
-  ON
+  "Use FetchContent to fetch Asio. By default an installed Asio will be used. (default: OFF)"
+  OFF
   CATEGORY "Build Targets"
   ADVANCED
 )
