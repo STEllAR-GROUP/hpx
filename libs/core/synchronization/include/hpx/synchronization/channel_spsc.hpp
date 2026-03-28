@@ -36,8 +36,7 @@ namespace hpx::lcos::local {
     class channel_spsc
     {
     private:
-        [[nodiscard]] HPX_FORCEINLINE bool is_full(
-            std::size_t tail) noexcept
+        [[nodiscard]] HPX_FORCEINLINE bool is_full(std::size_t tail) noexcept
         {
             std::size_t next_tail = tail + 1;
             if (next_tail >= size_)
@@ -236,8 +235,7 @@ namespace hpx::lcos::local {
     class channel_spsc<T, channel_mode::dont_support_close>
     {
     private:
-        [[nodiscard]] HPX_FORCEINLINE bool is_full(
-            std::size_t tail) noexcept
+        [[nodiscard]] HPX_FORCEINLINE bool is_full(std::size_t tail) noexcept
         {
             std::size_t next_tail = tail + 1;
             if (next_tail >= size_)
