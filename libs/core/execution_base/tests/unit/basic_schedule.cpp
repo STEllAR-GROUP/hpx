@@ -31,8 +31,7 @@ struct example_sender_template
     using completion_signatures = ex::completion_signatures<ex::set_value_t(),
         ex::set_error_t(std::exception_ptr)>;
 
-    friend env_with_scheduler<Scheduler> tag_invoke(
-        ex::get_env_t, example_sender_template const&) noexcept
+    env_with_scheduler<Scheduler> get_env() const noexcept
     {
         return {};
     }
@@ -71,7 +70,7 @@ struct scheduler_1
 {
     using sender_1 = example_sender_template<scheduler_1>;
 
-    friend sender_1 tag_invoke(ex::schedule_t, scheduler_1)
+    sender_1 schedule() const noexcept
     {
         ++friend_tag_invoke_schedule_calls;
         return {};
@@ -92,6 +91,12 @@ struct scheduler_2
 {
     using sender_2 = example_sender_template<scheduler_2>;
 
+    sender_2 schedule() const noexcept
+    {
+        ++tag_invoke_schedule_calls;
+        return {};
+    }
+
     constexpr bool operator==(scheduler_2 const&) const noexcept
     {
         return true;
@@ -102,12 +107,6 @@ struct scheduler_2
         return false;
     }
 };
-
-example_sender_template<scheduler_2> tag_invoke(ex::schedule_t, scheduler_2)
-{
-    ++tag_invoke_schedule_calls;
-    return {};
-}
 
 int main()
 {

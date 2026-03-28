@@ -56,6 +56,11 @@
 #include <utility>
 #include <vector>
 
+#if defined(HPX_CLANG_VERSION)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 namespace ex = hpx::execution::experimental;
 namespace tt = hpx::this_thread::experimental;
 
@@ -1915,6 +1920,10 @@ int main(int argc, char* argv[])
 
     return hpx::util::report_errors();
 }
+
+#if defined(HPX_CLANG_VERSION)
+#pragma clang diagnostic pop
+#endif
 
 #else
 

@@ -171,7 +171,6 @@ namespace hpx {
 #include <cstddef>
 #include <exception>
 #include <iterator>
-#include <list>
 #include <type_traits>
 #include <utility>
 

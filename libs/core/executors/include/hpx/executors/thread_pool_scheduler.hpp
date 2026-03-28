@@ -302,18 +302,25 @@ namespace hpx::execution::experimental {
 
             ~operation_state() = default;
 
-            friend void tag_invoke(start_t, operation_state& os) noexcept
+            void start() & noexcept
             {
                 hpx::detail::try_catch_exception_ptr(
                     [&]() {
-                        os.scheduler.execute([&os]() mutable {
+                        scheduler.execute([this]() mutable {
                             hpx::execution::experimental::set_value(
-                                HPX_MOVE(os.receiver));
+                                HPX_MOVE(receiver));
                         });
                     },
                     [&](std::exception_ptr ep) {
+                        #if defined(HPX_CLANG_VERSION)
+                        #pragma clang diagnostic push
+                        #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+                        #endif
                         hpx::execution::experimental::set_error(
-                            HPX_MOVE(os.receiver), HPX_MOVE(ep));
+                            HPX_MOVE(receiver), HPX_MOVE(ep));
+                        #if defined(HPX_CLANG_VERSION)
+                        #pragma clang diagnostic pop
+                        #endif
                     });
             }
         };
@@ -330,23 +337,23 @@ namespace hpx::execution::experimental {
                         std::exception_ptr),
                     hpx::execution::experimental::set_stopped_t()>;
 
-            template <typename Env>
-            friend auto tag_invoke(
-                hpx::execution::experimental::get_completion_signatures_t,
-                sender const&, Env) noexcept -> completion_signatures;
-
-            template <typename Receiver>
-            friend operation_state<Scheduler, Receiver> tag_invoke(
-                connect_t, sender&& s, Receiver&& receiver)
+            template <typename Self, typename... Env>
+            static consteval auto get_completion_signatures() noexcept
+                -> completion_signatures
             {
-                return {HPX_MOVE(s.scheduler), HPX_FORWARD(Receiver, receiver)};
+                return {};
             }
 
             template <typename Receiver>
-            friend operation_state<Scheduler, Receiver> tag_invoke(
-                connect_t, sender& s, Receiver&& receiver)
+            operation_state<Scheduler, Receiver> connect(Receiver&& receiver) &&
             {
-                return {s.scheduler, HPX_FORWARD(Receiver, receiver)};
+                return {HPX_MOVE(scheduler), HPX_FORWARD(Receiver, receiver)};
+            }
+
+            template <typename Receiver>
+            operation_state<Scheduler, Receiver> connect(Receiver&& receiver) &
+            {
+                return {scheduler, HPX_FORWARD(Receiver, receiver)};
             }
 
 #if defined(HPX_HAVE_STDEXEC)
@@ -368,7 +375,6 @@ namespace hpx::execution::experimental {
                 {
                     return sched;
                 }
-
                 template <typename CPO>
                     requires(meta::value<
                         meta::one_of<CPO, set_value_t, set_stopped_t>>)
@@ -398,12 +404,10 @@ namespace hpx::execution::experimental {
                 }
             };
 
-            friend constexpr auto tag_invoke(
-                hpx::execution::experimental::get_env_t,
-                sender const& s) noexcept
+            constexpr auto get_env() const noexcept
             {
-                return env{s.scheduler};
-            };
+                return env{scheduler};
+            }
 #else
             template <typename CPO>
                 requires(

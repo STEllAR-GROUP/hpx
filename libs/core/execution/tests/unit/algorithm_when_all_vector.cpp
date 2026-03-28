@@ -25,6 +25,11 @@
 #include <utility>
 #include <vector>
 
+#if defined(HPX_CLANG_VERSION)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 namespace ex = hpx::execution::experimental;
 
 int main()
@@ -523,6 +528,10 @@ int main()
 
     return 0;
 }
+
+#if defined(HPX_CLANG_VERSION)
+#pragma clang diagnostic pop
+#endif
 #else
 int main()
 {

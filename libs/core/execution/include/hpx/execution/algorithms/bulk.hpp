@@ -94,21 +94,19 @@ namespace hpx::execution::experimental {
                 }
 
                 template <typename Error>
-                friend void tag_invoke(
-                    set_error_t, bulk_receiver&& r, Error&& error) noexcept
+                void set_error(Error&& error) && noexcept
                 {
                     hpxexec::set_error(
-                        HPX_MOVE(r.receiver), HPX_FORWARD(Error, error));
+                        HPX_MOVE(receiver), HPX_FORWARD(Error, error));
                 }
 
-                friend void tag_invoke(
-                    set_stopped_t, bulk_receiver&& r) noexcept
+                void set_stopped() && noexcept
                 {
-                    hpxexec::set_stopped(HPX_MOVE(r.receiver));
+                    hpxexec::set_stopped(HPX_MOVE(receiver));
                 }
 
                 template <typename... Ts>
-                void set_value(Ts&&... ts) noexcept
+                void set_value(Ts&&... ts) && noexcept
                 {
                     hpx::detail::try_catch_exception_ptr(
                         [&]() {
@@ -123,21 +121,6 @@ namespace hpx::execution::experimental {
                             hpxexec::set_error(
                                 HPX_MOVE(receiver), HPX_MOVE(ep));
                         });
-                }
-
-                template <typename... Ts>
-                friend auto tag_invoke(
-                    set_value_t, bulk_receiver&& r, Ts&&... ts) noexcept
-                    -> decltype(hpxexec::set_value(
-                                    std::declval<std::decay_t<Receiver>&&>(),
-                                    HPX_FORWARD(Ts, ts)...),
-                        void())
-                {
-                    // set_value is in a member function only because of a
-                    // compiler bug in GCC 7. When the body of set_value is
-                    // inlined here compilation fails with an internal compiler
-                    // error.
-                    r.set_value(HPX_FORWARD(Ts, ts)...);
                 }
             };
 

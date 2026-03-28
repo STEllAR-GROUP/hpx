@@ -17,10 +17,10 @@
 #include <utility>
 #include <vector>
 
+using hpx::execution::experimental::continues_on;
 using hpx::execution::experimental::execute;
 using hpx::execution::experimental::then;
 using hpx::execution::experimental::thread_pool_scheduler;
-using hpx::execution::experimental::transfer;
 using hpx::experimental::async_rw_mutex;
 using hpx::this_thread::experimental::sync_wait;
 
@@ -205,9 +205,9 @@ void test_multiple_accesses(
     // Read-only and read-write access return senders of different types
     // clang-format off
     using r_sender_type = std::decay_t<decltype(
-        rwm.read() | transfer(exec) | then(checker{true, 0, count, 0}))>;
+        rwm.read() | continues_on(exec) | then(checker{true, 0, count, 0}))>;
     using rw_sender_type = std::decay_t<decltype(
-        rwm.readwrite() | transfer(exec) | then(checker{false, 0, count, 0}))>;
+        rwm.readwrite() | continues_on(exec) | then(checker{false, 0, count, 0}))>;
     // clang-format on
 
     std::vector<r_sender_type> r_senders;
@@ -228,13 +228,13 @@ void test_multiple_accesses(
         {
             if (readonly)
             {
-                r_senders.push_back(rwm.read() | transfer(exec) |
+                r_senders.push_back(rwm.read() | continues_on(exec) |
                     then(checker{readonly, expected_predecessor_count, count,
                         min_expected_count, max_expected_count}));
             }
             else
             {
-                rw_senders.push_back(rwm.readwrite() | transfer(exec) |
+                rw_senders.push_back(rwm.readwrite() | continues_on(exec) |
                     then(checker{readonly, expected_predecessor_count, count,
                         min_expected_count, max_expected_count}));
                 // Only read-write access is allowed to change the value

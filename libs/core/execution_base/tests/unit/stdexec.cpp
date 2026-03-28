@@ -14,8 +14,10 @@
 int main()
 {
     auto x = hpx::execution::experimental::just(42);
+    auto result = hpx::execution::experimental::sync_wait(std::move(x));
 
-    auto [a] = hpx::execution::experimental::sync_wait(std::move(x)).value();
+    HPX_TEST(result.has_value());
+    auto [a] = std::move(*result);
 
     HPX_TEST(a == 42);
 

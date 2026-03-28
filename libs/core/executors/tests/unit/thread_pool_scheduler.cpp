@@ -33,6 +33,11 @@
 #include <utility>
 #include <vector>
 
+#if defined(HPX_CLANG_VERSION)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 struct custom_type_non_default_constructible_non_copyable
 {
     int x;
@@ -2330,6 +2335,10 @@ int main(int argc, char* argv[])
 
     return hpx::util::report_errors();
 }
+
+#if defined(HPX_CLANG_VERSION)
+#pragma clang diagnostic pop
+#endif
 #else
 int main()
 {

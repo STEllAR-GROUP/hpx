@@ -210,8 +210,19 @@ namespace hpx::execution::experimental {
 
             if constexpr (std::is_void_v<result_type>)
             {
-                return bulk(schedule(exec.sched_), shape,
-                    hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
+                // Match scheduler_executor by expanding arbitrary shapes to an
+                // integral bulk domain. This avoids routing algorithm chunk
+                // shapes through the generic non-integral bulk sender path.
+                using size_type = decltype(util::size(shape));
+                size_type const shape_size = util::size(shape);
+
+                return bulk(schedule(exec.sched_), shape_size,
+                    [shape, f = HPX_FORWARD(F, f),
+                        ... args = HPX_FORWARD(Ts, ts)](size_type i) mutable {
+                        auto it = util::begin(shape);
+                        std::advance(it, i);
+                        HPX_INVOKE(f, *it, args...);
+                    });
             }
             else
             {

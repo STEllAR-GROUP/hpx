@@ -30,6 +30,19 @@ namespace hpx::execution::experimental {
     // enforce proper formatting
     namespace detail {
 
+        template <typename OperationState>
+        void start_operation_state(OperationState& op_state) noexcept
+        {
+            if constexpr (requires { op_state.start(); })
+            {
+                op_state.start();
+            }
+            else
+            {
+                hpxexec::start(op_state);
+            }
+        }
+
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Warray-bounds"
@@ -44,7 +57,7 @@ namespace hpx::execution::experimental {
             // Note: MSVC toolset v142 fails compiling 'data->' below, using
             // '(*data).' instead
             template <typename U>
-            void set_value(U&& u) && noexcept
+            void set_value_impl(U&& u) && noexcept
             {
                 hpx::detail::try_catch_exception_ptr(
                     [&]() { (*data).set_value(HPX_FORWARD(U, u)); },
@@ -54,16 +67,14 @@ namespace hpx::execution::experimental {
                 data.reset();
             }
 
-        private:
-            friend void tag_invoke(set_error_t, future_receiver_base&& r,
-                std::exception_ptr ep) noexcept
+        public:
+            void set_error(std::exception_ptr ep) && noexcept
             {
-                r.data->set_exception(HPX_MOVE(ep));
-                r.data.reset();
+                data->set_exception(HPX_MOVE(ep));
+                data.reset();
             }
 
-            friend void tag_invoke(
-                set_stopped_t, future_receiver_base&&) noexcept
+            void set_stopped() && noexcept
             {
                 std::terminate();
             }
@@ -76,12 +87,10 @@ namespace hpx::execution::experimental {
         struct future_receiver
           : future_receiver_base<hpx::lcos::detail::future_data_base<T>>
         {
-        private:
             template <typename U>
-            friend void tag_invoke(
-                set_value_t, future_receiver&& r, U&& u) noexcept
+            void set_value(U&& u) && noexcept
             {
-                HPX_MOVE(r).set_value(HPX_FORWARD(U, u));
+                HPX_MOVE(*this).set_value_impl(HPX_FORWARD(U, u));
             }
         };
 
@@ -89,10 +98,9 @@ namespace hpx::execution::experimental {
         struct future_receiver<void>
           : future_receiver_base<hpx::lcos::detail::future_data_base<void>>
         {
-        private:
-            friend void tag_invoke(set_value_t, future_receiver&& r) noexcept
+            void set_value() && noexcept
             {
-                HPX_MOVE(r).set_value(hpx::util::unused);
+                HPX_MOVE(*this).set_value_impl(hpx::util::unused);
             }
         };
 
@@ -134,7 +142,7 @@ namespace hpx::execution::experimental {
               , op_state(hpxexec::connect(HPX_FORWARD(Sender, sender),
                     detail::future_receiver<T>{{this}}))
             {
-                hpxexec::start(op_state);
+                detail::start_operation_state(op_state);
             }
             // NOLINTEND(bugprone-crtp-constructor-accessibility)
         };

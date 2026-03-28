@@ -96,15 +96,14 @@ struct non_sender_7
 struct example_receiver
 {
     using receiver_concept = ex::receiver_t;
-    friend void tag_invoke(
-        ex::set_error_t, example_receiver&&, std::exception_ptr) noexcept
+
+    void set_error(std::exception_ptr) && noexcept {}
+
+    void set_stopped() && noexcept {}
+
+    void set_value(int v) && noexcept
     {
-    }
-    friend void tag_invoke(ex::set_stopped_t, example_receiver&&) noexcept {}
-    friend void tag_invoke(
-        ex::set_value_t, example_receiver&& r, int v) noexcept
-    {
-        r.i = v;
+        i = v;
     }
 
     int i = -1;
@@ -114,12 +113,12 @@ template <typename... T>
 struct receiver_2
 {
     using receiver_concept = ex::receiver_t;
-    friend void tag_invoke(
-        ex::set_error_t, receiver_2&&, std::exception_ptr) noexcept
-    {
-    }
-    friend void tag_invoke(ex::set_stopped_t, receiver_2&&) noexcept {}
-    friend void tag_invoke(ex::set_value_t, receiver_2&&, T...) noexcept {}
+
+    void set_error(std::exception_ptr) && noexcept {}
+
+    void set_stopped() && noexcept {}
+
+    void set_value(T...) && noexcept {}
 };
 
 struct sender_1
@@ -137,10 +136,11 @@ struct sender_1
     struct operation_state : immovable
     {
         example_receiver& r;
-        friend void tag_invoke(ex::start_t, operation_state& os) noexcept
+
+        void start() & noexcept
         {
-            ex::set_value(std::move(os.r), 4711);
-        };
+            ex::set_value(std::move(r), 4711);
+        }
     };
 
     friend operation_state tag_invoke(
@@ -166,10 +166,11 @@ struct sender_2
     struct operation_state : immovable
     {
         example_receiver& r;
-        friend void tag_invoke(ex::start_t, operation_state& os) noexcept
+
+        void start() & noexcept
         {
-            ex::set_value(std::move(os.r), 4711);
-        };
+            ex::set_value(std::move(r), 4711);
+        }
     };
 };
 
@@ -195,10 +196,11 @@ struct sender_3
     struct operation_state : immovable
     {
         example_receiver& r;
-        friend void tag_invoke(ex::start_t, operation_state& os) noexcept
+
+        void start() & noexcept
         {
-            ex::set_value(std::move(os.r), 4711);
-        };
+            ex::set_value(std::move(r), 4711);
+        }
     };
 
     friend operation_state tag_invoke(
@@ -225,12 +227,13 @@ static std::size_t void_receiver_set_value_calls = 0;
 
 struct void_receiver
 {
-    friend void tag_invoke(
-        ex::set_error_t, void_receiver&&, std::exception_ptr) noexcept
-    {
-    }
-    friend void tag_invoke(ex::set_stopped_t, void_receiver&&) noexcept {}
-    friend void tag_invoke(ex::set_value_t, void_receiver&&) noexcept
+    using receiver_concept = ex::receiver_t;
+
+    void set_error(std::exception_ptr) && noexcept {}
+
+    void set_stopped() && noexcept {}
+
+    void set_value() && noexcept
     {
         ++void_receiver_set_value_calls;
     }

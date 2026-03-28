@@ -14,6 +14,11 @@
 #include <exception>
 #include <type_traits>
 
+#if defined(HPX_CLANG_VERSION)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 namespace ex = hpx::execution::experimental;
 
 static std::size_t friend_tag_invoke_schedule_calls = 0;
@@ -145,3 +150,7 @@ int main()
 
     return hpx::util::report_errors();
 }
+
+#if defined(HPX_CLANG_VERSION)
+#pragma clang diagnostic pop
+#endif

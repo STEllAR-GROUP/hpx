@@ -15,6 +15,7 @@
 #include <atomic>
 #include <exception>
 #include <functional>
+#include <optional>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
@@ -25,12 +26,38 @@
 template <typename Scheduler>
 struct env_with_scheduler
 {
-    template <typename CPO>
-    friend Scheduler tag_invoke(
-        hpx::execution::experimental::get_completion_scheduler_t<CPO>,
-        env_with_scheduler const&) noexcept
+    Scheduler const* scheduler = nullptr;
+
+    constexpr env_with_scheduler() noexcept = default;
+
+    constexpr explicit env_with_scheduler(Scheduler const* scheduler) noexcept
+      : scheduler(scheduler)
     {
-        return {};
+    }
+
+    constexpr explicit env_with_scheduler(Scheduler const& scheduler) noexcept
+      : scheduler(&scheduler)
+    {
+    }
+
+    template <typename CPO>
+    constexpr Scheduler query(
+        hpx::execution::experimental::get_completion_scheduler_t<CPO>)
+        const noexcept
+    {
+        if constexpr (std::is_default_constructible_v<Scheduler>)
+        {
+            if (scheduler == nullptr)
+            {
+                return {};
+            }
+        }
+        else
+        {
+            HPX_ASSERT(scheduler != nullptr);
+        }
+
+        return *scheduler;
     }
 };
 
@@ -88,31 +115,32 @@ struct void_sender
 {
     using is_sender = void;
     using sender_concept = hpx::execution::experimental::sender_t;
+
     template <typename R>
     struct operation_state
     {
         std::decay_t<R> r;
-        friend void tag_invoke(
-            hpx::execution::experimental::start_t, operation_state& os) noexcept
+
+        void start() & noexcept
         {
-            hpx::execution::experimental::set_value(std::move(os.r));
+            hpx::execution::experimental::set_value(std::move(r));
         }
     };
 
     template <typename R>
-    friend operation_state<R> tag_invoke(
-        hpx::execution::experimental::connect_t, void_sender, R&& r)
+    operation_state<R> connect(R&& r) && noexcept
     {
         return {std::forward<R>(r)};
     }
 
-    //    using completion_signatures = hpx::execution::experimental::
-    //    completion_signatures<hpx::execution::experimental::set_value_t()>;
+    template <typename R>
+    operation_state<R> connect(R&& r) & noexcept
+    {
+        return {std::forward<R>(r)};
+    }
 
-    template <typename Env>
-    friend auto tag_invoke(
-        hpx::execution::experimental::get_completion_signatures_t,
-        void_sender const&, Env)
+    template <typename Self, typename... Env>
+    static consteval auto get_completion_signatures() noexcept
         -> hpx::execution::experimental::completion_signatures<
             hpx::execution::experimental::set_value_t()>
     {
@@ -123,35 +151,39 @@ struct void_sender
 template <typename... Ts>
 struct error_sender
 {
+    using is_sender = void;
     using sender_concept = hpx::execution::experimental::sender_t;
 
     template <typename R>
     struct operation_state
     {
         std::decay_t<R> r;
-        friend void tag_invoke(
-            hpx::execution::experimental::start_t, operation_state& os) noexcept
+
+        void start() & noexcept
         {
             hpx::detail::try_catch_exception_ptr(
                 []() { throw std::runtime_error("error"); },
                 [&](std::exception_ptr ep) {
                     hpx::execution::experimental::set_error(
-                        std::move(os.r), std::move(ep));
+                        std::move(r), std::move(ep));
                 });
         }
     };
 
     template <typename R>
-    friend operation_state<R> tag_invoke(
-        hpx::execution::experimental::connect_t, error_sender, R&& r)
+    operation_state<R> connect(R&& r) && noexcept
     {
         return {std::forward<R>(r)};
     }
 
-    template <typename Env>
-    friend auto tag_invoke(
-        hpx::execution::experimental::get_completion_signatures_t,
-        error_sender const&, Env)
+    template <typename R>
+    operation_state<R> connect(R&& r) & noexcept
+    {
+        return {std::forward<R>(r)};
+    }
+
+    template <typename Self, typename... Env>
+    static consteval auto get_completion_signatures() noexcept
         -> hpx::execution::experimental::completion_signatures<
             hpx::execution::experimental::set_value_t(Ts...),
             hpx::execution::experimental::set_error_t(std::exception_ptr)>
@@ -162,31 +194,34 @@ struct error_sender
 
 struct stopped_sender
 {
-    struct is_sender
-    {
-    };
+    using is_sender = void;
+    using sender_concept = hpx::execution::experimental::sender_t;
+
     template <typename R>
     struct operation_state
     {
         std::decay_t<R> r;
-        friend void tag_invoke(
-            hpx::execution::experimental::start_t, operation_state& os) noexcept
+
+        void start() & noexcept
         {
-            hpx::execution::experimental::set_stopped(std::move(os.r));
+            hpx::execution::experimental::set_stopped(std::move(r));
         }
     };
 
     template <typename R>
-    friend operation_state<R> tag_invoke(
-        hpx::execution::experimental::connect_t, stopped_sender, R&& r)
+    operation_state<R> connect(R&& r) && noexcept
     {
         return {std::forward<R>(r)};
     }
 
-    template <typename Env>
-    friend auto tag_invoke(
-        hpx::execution::experimental::get_completion_signatures_t,
-        stopped_sender const&, Env)
+    template <typename R>
+    operation_state<R> connect(R&& r) & noexcept
+    {
+        return {std::forward<R>(r)};
+    }
+
+    template <typename Self, typename... Env>
+    static consteval auto get_completion_signatures() noexcept
         -> hpx::execution::experimental::completion_signatures<
             hpx::execution::experimental::set_stopped_t()>;
 };
@@ -200,25 +235,27 @@ struct stopped_sender_with_value_type
     struct operation_state
     {
         std::decay_t<R> r;
-        friend void tag_invoke(
-            hpx::execution::experimental::start_t, operation_state& os) noexcept
+
+        void start() & noexcept
         {
-            hpx::execution::experimental::set_stopped(std::move(os.r));
+            hpx::execution::experimental::set_stopped(std::move(r));
         }
     };
 
     template <typename R>
-    friend operation_state<R> tag_invoke(
-        hpx::execution::experimental::connect_t, stopped_sender_with_value_type,
-        R&& r)
+    operation_state<R> connect(R&& r) && noexcept
     {
         return {std::forward<R>(r)};
     }
 
-    template <typename Env>
-    friend auto tag_invoke(
-        hpx::execution::experimental::get_completion_signatures_t,
-        stopped_sender_with_value_type const&, Env)
+    template <typename R>
+    operation_state<R> connect(R&& r) & noexcept
+    {
+        return {std::forward<R>(r)};
+    }
+
+    template <typename Self, typename... Env>
+    static consteval auto get_completion_signatures() noexcept
         -> hpx::execution::experimental::completion_signatures<
             hpx::execution::experimental::set_stopped_t(),
             hpx::execution::experimental::set_value_t()>;
@@ -230,32 +267,25 @@ struct callback_receiver
     std::decay_t<F> f;
     std::atomic<bool>& set_value_called;
 
-    using is_receiver = void;
+    using receiver_concept = hpx::execution::experimental::receiver_t;
 
     template <typename E>
-    friend void tag_invoke(hpx::execution::experimental::set_error_t,
-        callback_receiver&&, E&&) noexcept
+    void set_error(E&&) && noexcept
     {
         HPX_TEST(false);
     }
 
-    friend void tag_invoke(hpx::execution::experimental::set_stopped_t,
-        callback_receiver&&) noexcept
+    void set_stopped() && noexcept
     {
         HPX_TEST(false);
-    };
+    }
 
-    // clang-format off
     template <typename... Ts>
-    friend auto tag_invoke(hpx::execution::experimental::set_value_t,
-        callback_receiver&& r,
-        Ts&&... ts) noexcept -> decltype(HPX_INVOKE(f, std::forward<Ts>(ts)...),
-                                 void())
+    void set_value(Ts&&... ts) && noexcept
     {
-        HPX_INVOKE(r.f, std::forward<Ts>(ts)...);
-        r.set_value_called = true;
+        HPX_INVOKE(f, std::forward<Ts>(ts)...);
+        set_value_called = true;
     }
-    // clang-format on
 };
 
 template <typename F>
@@ -265,49 +295,45 @@ struct error_callback_receiver
     std::atomic<bool>& set_error_called;
     bool expect_set_value = false;
 
-    using is_receiver = void;
+    using receiver_concept = hpx::execution::experimental::receiver_t;
 
     template <typename E>
-    friend void tag_invoke(hpx::execution::experimental::set_error_t,
-        error_callback_receiver&& r, E&& e) noexcept
+    void set_error(E&& e) && noexcept
     {
-        HPX_INVOKE(r.f, std::forward<E>(e));
-        r.set_error_called = true;
+        HPX_INVOKE(f, std::forward<E>(e));
+        set_error_called = true;
     }
 
-    friend void tag_invoke(hpx::execution::experimental::set_stopped_t,
-        error_callback_receiver&&) noexcept
+    void set_stopped() && noexcept
     {
         HPX_TEST(false);
-    };
+    }
 
     template <typename... Ts>
-    friend void tag_invoke(hpx::execution::experimental::set_value_t,
-        error_callback_receiver&& r, Ts&&...) noexcept
+    void set_value(Ts&&...) && noexcept
     {
-        HPX_TEST(r.expect_set_value);
+        HPX_TEST(expect_set_value);
     }
 };
 
 struct expect_stopped_receiver
 {
-    using is_receiver = void;
+    using receiver_concept = hpx::execution::experimental::receiver_t;
 
     std::atomic<bool>& set_stopped_called;
 
     template <typename... Ts>
-    friend void tag_invoke(hpx::execution::experimental::set_value_t,
-        expect_stopped_receiver&&, Ts...) noexcept
+    void set_value(Ts...) && noexcept
     {
         HPX_TEST(false);    // should not be called
     }
-    friend void tag_invoke(hpx::execution::experimental::set_stopped_t,
-        expect_stopped_receiver&& r) noexcept
+
+    void set_stopped() && noexcept
     {
-        r.set_stopped_called = true;
+        set_stopped_called = true;
     }
-    friend void tag_invoke(hpx::execution::experimental::set_error_t,
-        expect_stopped_receiver&&, std::exception_ptr) noexcept
+
+    void set_error(std::exception_ptr) && noexcept
     {
         HPX_TEST(false);    // should not be called
     }
@@ -335,37 +361,39 @@ struct void_callback_helper
 template <typename T>
 struct error_typed_sender
 {
-    struct is_sender
-    {
-    };
+    using is_sender = void;
+    using sender_concept = hpx::execution::experimental::sender_t;
+
     template <typename R>
     struct operation_state
     {
         std::decay_t<R> r;
 
-        friend void tag_invoke(
-            hpx::execution::experimental::start_t, operation_state& os) noexcept
+        void start() & noexcept
         {
             hpx::detail::try_catch_exception_ptr(
                 []() { throw std::runtime_error("error"); },
                 [&](std::exception_ptr ep) {
                     hpx::execution::experimental::set_error(
-                        std::move(os.r), std::move(ep));
+                        std::move(r), std::move(ep));
                 });
-        };
+        }
     };
 
     template <typename R>
-    friend auto tag_invoke(
-        hpx::execution::experimental::connect_t, error_typed_sender&&, R&& r)
+    auto connect(R&& r) && noexcept
     {
         return operation_state<R>{std::forward<R>(r)};
     }
 
-    template <typename Env>
-    friend auto tag_invoke(
-        hpx::execution::experimental::get_completion_signatures_t,
-        error_typed_sender const&, Env)
+    template <typename R>
+    auto connect(R&& r) & noexcept
+    {
+        return operation_state<R>{std::forward<R>(r)};
+    }
+
+    template <typename Self, typename... Env>
+    static consteval auto get_completion_signatures() noexcept
         -> hpx::execution::experimental::completion_signatures<
             hpx::execution::experimental::set_value_t(T),
             hpx::execution::experimental::set_error_t(std::exception_ptr)>;
@@ -374,9 +402,9 @@ struct error_typed_sender
 template <typename T>
 struct const_reference_sender
 {
-    struct is_sender
-    {
-    };
+    using is_sender = void;
+    using sender_concept = hpx::execution::experimental::sender_t;
+
     std::reference_wrapper<std::decay_t<T>> x;
 
     template <typename R>
@@ -385,25 +413,26 @@ struct const_reference_sender
         std::reference_wrapper<std::decay_t<T>> const x;
         std::decay_t<R> r;
 
-        friend void tag_invoke(
-            hpx::execution::experimental::start_t, operation_state& os) noexcept
+        void start() & noexcept
         {
-            hpx::execution::experimental::set_value(
-                std::move(os.r), os.x.get());
-        };
+            hpx::execution::experimental::set_value(std::move(r), x.get());
+        }
     };
 
     template <typename R>
-    friend auto tag_invoke(hpx::execution::experimental::connect_t,
-        const_reference_sender&& s, R&& r)
+    auto connect(R&& r) && noexcept
     {
-        return operation_state<R>{std::move(s.x), std::forward<R>(r)};
+        return operation_state<R>{std::move(x), std::forward<R>(r)};
     }
 
-    template <typename Env>
-    friend auto tag_invoke(
-        hpx::execution::experimental::get_completion_signatures_t,
-        const_reference_sender const&, Env)
+    template <typename R>
+    auto connect(R&& r) & noexcept
+    {
+        return operation_state<R>{x, std::forward<R>(r)};
+    }
+
+    template <typename Self, typename... Env>
+    static consteval auto get_completion_signatures() noexcept
         -> hpx::execution::experimental::completion_signatures<
             hpx::execution::experimental::set_value_t(std::decay_t<T>&),
             hpx::execution::experimental::set_error_t(std::exception_ptr)>;
@@ -411,34 +440,35 @@ struct const_reference_sender
 
 struct const_reference_error_sender
 {
-    struct is_sender
-    {
-    };
+    using is_sender = void;
+    using sender_concept = hpx::execution::experimental::sender_t;
+
     template <typename R>
     struct operation_state
     {
         std::decay_t<R> r;
 
-        friend void tag_invoke(
-            hpx::execution::experimental::start_t, operation_state& os) noexcept
+        void start() & noexcept
         {
             auto const e = std::make_exception_ptr(std::runtime_error("error"));
-            hpx::execution::experimental::set_error(std::move(os.r), e);
+            hpx::execution::experimental::set_error(std::move(r), e);
         }
     };
 
     template <typename R>
-    friend operation_state<R> tag_invoke(
-        hpx::execution::experimental::connect_t, const_reference_error_sender,
-        R&& r)
+    operation_state<R> connect(R&& r) && noexcept
     {
         return {std::forward<R>(r)};
     }
 
-    template <typename Env>
-    friend auto tag_invoke(
-        hpx::execution::experimental::get_completion_signatures_t,
-        const_reference_error_sender const&, Env)
+    template <typename R>
+    operation_state<R> connect(R&& r) & noexcept
+    {
+        return {std::forward<R>(r)};
+    }
+
+    template <typename Self, typename... Env>
+    static consteval auto get_completion_signatures() noexcept
         -> hpx::execution::experimental::completion_signatures<
             hpx::execution::experimental::set_value_t(),
             hpx::execution::experimental::set_error_t(
@@ -476,12 +506,6 @@ struct custom_sender_tag_invoke
     struct operation_state
     {
         std::decay_t<R> r;
-
-        friend void tag_invoke(
-            hpx::execution::experimental::start_t, operation_state& os) noexcept
-        {
-            os.start();
-        }
 
         void start() & noexcept
         {
@@ -526,12 +550,12 @@ struct custom_sender
     {
         std::atomic<bool>& start_called;
         std::decay_t<R> r;
-        friend void tag_invoke(
-            hpx::execution::experimental::start_t, operation_state& os) noexcept
+
+        void start() & noexcept
         {
-            os.start_called = true;
-            hpx::execution::experimental::set_value(std::move(os.r));
-        };
+            start_called = true;
+            hpx::execution::experimental::set_value(std::move(r));
+        }
     };
 
     template <typename R>
@@ -568,19 +592,19 @@ struct custom_sender_multi_tuple
         std::atomic<bool>& start_called;
         std::decay_t<R> r;
         bool expect_set_value = true;
-        friend void tag_invoke(
-            hpx::execution::experimental::start_t, operation_state& os) noexcept
+
+        void start() & noexcept
         {
-            os.start_called = true;
-            if (os.expect_set_value)
+            start_called = true;
+            if (expect_set_value)
             {
-                hpx::execution::experimental::set_value(std::move(os.r), 3);
+                hpx::execution::experimental::set_value(std::move(r), 3);
             }
             else
             {
-                hpx::execution::experimental::set_value(std::move(os.r), "err");
+                hpx::execution::experimental::set_value(std::move(r), "err");
             }
-        };
+        }
     };
 
     template <typename R>
@@ -609,13 +633,12 @@ struct custom_typed_sender
         std::decay_t<T> x;
         std::atomic<bool>& start_called;
         std::decay_t<R> r;
-        friend void tag_invoke(
-            hpx::execution::experimental::start_t, operation_state& os) noexcept
+
+        void start() & noexcept
         {
-            os.start_called = true;
-            hpx::execution::experimental::set_value(
-                std::move(os.r), std::move(os.x));
-        };
+            start_called = true;
+            hpx::execution::experimental::set_value(std::move(r), std::move(x));
+        }
     };
 
     template <typename R>
@@ -686,6 +709,9 @@ struct custom_type_non_default_constructible_non_copyable
 template <typename Derived>
 struct example_scheduler_template
 {
+    using scheduler_type = std::conditional_t<std::is_void_v<Derived>,
+        example_scheduler_template, Derived>;
+
     std::atomic<bool>& schedule_called;
     std::atomic<bool>& execute_called;
     std::atomic<bool>& tag_invoke_overload_called;
@@ -700,24 +726,21 @@ struct example_scheduler_template
     {
     }
 
-    template <typename F>
-    friend void tag_invoke(hpx::execution::experimental::execute_t,
-        example_scheduler_template s, F&& f)
-    {
-        s.execute_called = true;
-        HPX_INVOKE(std::forward<F>(f), );
-    }
-
     struct my_sender
     {
         using is_sender = void;
         using sender_concept = hpx::execution::experimental::sender_t;
-        friend env_with_scheduler<std::conditional_t<std::is_void_v<Derived>,
-            example_scheduler_template, Derived>>
-        tag_invoke(
-            hpx::execution::experimental::get_env_t, my_sender const&) noexcept
+
+        std::optional<scheduler_type> scheduler;
+
+        constexpr auto get_env() const noexcept
         {
-            return {};
+            if (scheduler)
+            {
+                return env_with_scheduler<scheduler_type>{&*scheduler};
+            }
+
+            return env_with_scheduler<scheduler_type>{};
         }
 
         template <typename R>
@@ -725,34 +748,35 @@ struct example_scheduler_template
         {
             std::decay_t<R> r;
 
-            friend void tag_invoke(hpx::execution::experimental::start_t,
-                operation_state& os) noexcept
+            void start() & noexcept
             {
-                hpx::execution::experimental::set_value(std::move(os.r));
-            };
+                hpx::execution::experimental::set_value(std::move(r));
+            }
         };
 
         template <typename R>
-        friend auto tag_invoke(
-            hpx::execution::experimental::connect_t, my_sender&&, R&& r)
+        auto connect(R&& r) && noexcept
         {
             return operation_state<R>{std::forward<R>(r)};
         }
 
-        template <typename Env>
-        friend auto tag_invoke(
-            hpx::execution::experimental::get_completion_signatures_t,
-            my_sender const&, Env)
+        template <typename R>
+        auto connect(R&& r) & noexcept
+        {
+            return operation_state<R>{std::forward<R>(r)};
+        }
+
+        template <typename Self, typename... Env>
+        static consteval auto get_completion_signatures() noexcept
             -> hpx::execution::experimental::completion_signatures<
                 hpx::execution::experimental::set_value_t(),
                 hpx::execution::experimental::set_error_t(std::exception_ptr)>;
     };
 
-    friend my_sender tag_invoke(
-        hpx::execution::experimental::schedule_t, example_scheduler_template s)
+    my_sender schedule() const noexcept
     {
-        s.schedule_called = true;
-        return {};
+        schedule_called = true;
+        return {scheduler_type{static_cast<scheduler_type const&>(*this)}};
     }
 
     bool operator==(example_scheduler_template const&) const noexcept
@@ -886,10 +910,10 @@ namespace my_namespace {
         struct operation_state
         {
             std::decay_t<R> r;
-            friend void tag_invoke(hpx::execution::experimental::start_t,
-                operation_state& os) noexcept
+
+            void start() & noexcept
             {
-                hpx::execution::experimental::set_value(std::move(os.r));
+                hpx::execution::experimental::set_value(std::move(r));
             }
         };
 

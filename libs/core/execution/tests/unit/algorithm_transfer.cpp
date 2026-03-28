@@ -17,6 +17,11 @@
 #include <type_traits>
 #include <utility>
 
+#if defined(HPX_CLANG_VERSION)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 namespace ex = hpx::execution::experimental;
 
 // schedule_from customization
@@ -35,7 +40,7 @@ template <typename Sender>
 auto tag_invoke(ex::schedule_from_t, scheduler_schedule_from sched, Sender&&)
 {
     sched.tag_invoke_overload_called = true;
-    return example_scheduler::my_sender{};
+    return scheduler_schedule_from::my_sender{std::move(sched)};
 }
 
 // transfer customization
@@ -72,18 +77,16 @@ struct sender_with_completion_scheduler : void_sender
     {
         scheduler_transfer const& sched;
 
-        friend scheduler_transfer const& tag_invoke(
-            ex::get_completion_scheduler_t<ex::set_value_t>,
-            my_env env) noexcept
+        scheduler_transfer const& query(
+            ex::get_completion_scheduler_t<ex::set_value_t>) const noexcept
         {
-            return env.sched;
+            return sched;
         }
     };
 
-    friend my_env tag_invoke(hpx::execution::experimental::get_env_t,
-        sender_with_completion_scheduler const& s) noexcept
+    my_env get_env() const noexcept
     {
-        return {s.sched};
+        return {sched};
     }
 
     template <typename Env>
@@ -394,3 +397,7 @@ int main()
 
     return hpx::util::report_errors();
 }
+
+#if defined(HPX_CLANG_VERSION)
+#pragma clang diagnostic pop
+#endif

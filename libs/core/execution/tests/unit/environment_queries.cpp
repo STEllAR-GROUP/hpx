@@ -72,37 +72,32 @@ namespace mylib {
     struct receiver_1
     {
         using receiver_concept = ex::receiver_t;
-        friend void tag_invoke(ex::set_stopped_t, receiver_1&&) noexcept {}
 
-        friend void tag_invoke(
-            ex::set_error_t, receiver_1&&, std::exception_ptr) noexcept
-        {
-        }
+        void set_stopped() && noexcept {}
 
-        friend void tag_invoke(ex::set_value_t, receiver_1&&, sched) noexcept
+        void set_error(std::exception_ptr) && noexcept {}
+
+        void set_value(sched) && noexcept
         {
             set_value_sched_called = true;
         }
 
-        friend void tag_invoke(
-            ex::set_value_t, receiver_1&&, delegatee_sched) noexcept
+        void set_value(delegatee_sched) && noexcept
         {
             set_value_delegatee_sched_called = true;
         }
 
-        friend void tag_invoke(
-            ex::set_value_t, receiver_1&&, allocator) noexcept
+        void set_value(allocator) && noexcept
         {
             set_value_allocator_called = true;
         }
 
-        friend void tag_invoke(
-            ex::set_value_t, receiver_1&&, stop_token) noexcept
+        void set_value(stop_token) && noexcept
         {
             set_value_stop_token_called = true;
         }
 
-        friend auto tag_invoke(ex::get_env_t, receiver_1) noexcept
+        auto get_env() const noexcept
         {
             auto sched_env = ex::prop(ex::get_scheduler_t{}, sched());
             static_assert(std::is_same_v<decltype(sched_env), sched_env_t>,
