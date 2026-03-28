@@ -22,7 +22,6 @@
 
 #pragma once
 
-#if defined(HPX_HAVE_STDEXEC)
 template <typename Scheduler>
 struct env_with_scheduler
 {
@@ -34,7 +33,6 @@ struct env_with_scheduler
         return {};
     }
 };
-#endif
 
 // Check that the value_types of a sender matches the expected type
 template <typename ExpectedValType,
@@ -79,16 +77,10 @@ template <bool Expected, typename Env = hpx::execution::experimental::empty_env,
     typename Sender>
 inline void check_sends_stopped(Sender&&)
 {
-#if defined(HPX_HAVE_STDEXEC)
     // See check_value_types
     using UnderlyingSender = std::remove_reference_t<Sender>;
     constexpr bool sends_stopped =
         hpx::execution::experimental::sends_stopped<UnderlyingSender, Env>;
-#else
-    constexpr bool sends_stopped =
-        hpx::execution::experimental::completion_signatures_of_t<Sender,
-            Env>::sends_stopped;
-#endif
     static_assert(sends_stopped == Expected);
 }
 
@@ -130,9 +122,7 @@ struct void_sender
 template <typename... Ts>
 struct error_sender
 {
-#if defined(HPX_HAVE_STDEXEC)
     using sender_concept = hpx::execution::experimental::sender_t;
-#endif
 
     template <typename R>
     struct operation_state
@@ -238,13 +228,7 @@ struct callback_receiver
     std::decay_t<F> f;
     std::atomic<bool>& set_value_called;
 
-#if defined(HPX_HAVE_STDEXEC)
     using is_receiver = void;
-#else
-    struct is_receiver
-    {
-    };
-#endif
 
     template <typename E>
     friend void tag_invoke(hpx::execution::experimental::set_error_t,
@@ -279,9 +263,7 @@ struct error_callback_receiver
     std::atomic<bool>& set_error_called;
     bool expect_set_value = false;
 
-#if defined(HPX_HAVE_STDEXEC)
     using is_receiver = void;
-#endif
 
     template <typename E>
     friend void tag_invoke(hpx::execution::experimental::set_error_t,
@@ -307,9 +289,7 @@ struct error_callback_receiver
 
 struct expect_stopped_receiver
 {
-#if defined(HPX_HAVE_STDEXEC)
     using is_receiver = void;
-#endif
 
     std::atomic<bool>& set_stopped_called;
 
@@ -537,17 +517,6 @@ struct custom_sender
             hpx::execution::experimental::set_value_t(),
             hpx::execution::experimental::set_error_t(std::exception_ptr)>;
 
-#if !defined(HPX_HAVE_STDEXEC)
-    template <template <class...> class Tuple,
-        template <class...> class Variant>
-    using value_types = Variant<Tuple<>>;
-
-    template <template <class...> class Variant>
-    using error_types = Variant<std::exception_ptr>;
-
-    static constexpr bool sends_stopped = false;
-#endif
-
     template <typename R>
     struct operation_state
     {
@@ -587,17 +556,6 @@ struct custom_sender_multi_tuple
             hpx::execution::experimental::set_value_t(int),
             hpx::execution::experimental::set_value_t(std::string),
             hpx::execution::experimental::set_error_t(std::exception_ptr)>;
-
-#if !defined(HPX_HAVE_STDEXEC)
-    template <template <class...> class Tuple,
-        template <class...> class Variant>
-    using value_types = Variant<Tuple<>>;
-
-    template <template <class...> class Variant>
-    using error_types = Variant<std::exception_ptr>;
-
-    static constexpr bool sends_stopped = false;
-#endif
 
     template <typename R>
     struct operation_state
@@ -747,7 +705,6 @@ struct example_scheduler_template
     struct my_sender
     {
         using is_sender = void;
-#if defined(HPX_HAVE_STDEXEC)
         friend env_with_scheduler<std::conditional_t<std::is_void_v<Derived>,
             example_scheduler_template, Derived>>
         tag_invoke(
@@ -755,7 +712,6 @@ struct example_scheduler_template
         {
             return {};
         }
-#endif
 
         template <typename R>
         struct operation_state
@@ -812,7 +768,6 @@ struct example_scheduler_template
 };
 
 using example_scheduler = example_scheduler_template<void>;
-#if defined(HPX_HAVE_STDEXEC)
 struct scheduler2 : example_scheduler_template<scheduler2>
 {
     explicit scheduler2(example_scheduler s)
@@ -820,15 +775,6 @@ struct scheduler2 : example_scheduler_template<scheduler2>
     {
     }
 };
-#else
-struct scheduler2 : example_scheduler
-{
-    explicit scheduler2(example_scheduler s)
-      : example_scheduler(std::move(s))
-    {
-    }
-};
-#endif
 
 namespace tag_namespace {
 
@@ -872,9 +818,7 @@ namespace my_namespace {
     {
         struct my_sender
         {
-#if defined(HPX_HAVE_STDEXEC)
             using sender_concept = hpx::execution::experimental::sender_t;
-#endif
             template <typename R>
             struct operation_state
             {
@@ -893,22 +837,12 @@ namespace my_namespace {
             {
                 return operation_state<R>{std::forward<R>(r)};
             }
-#if defined(HPX_HAVE_STDEXEC)
             friend env_with_scheduler<my_scheduler_template> tag_invoke(
                 hpx::execution::experimental::get_env_t,
                 my_sender const&) noexcept
             {
                 return {};
             }
-#else
-            friend my_scheduler_template tag_invoke(
-                hpx::execution::experimental::get_completion_scheduler_t<
-                    hpx::execution::experimental::set_value_t>,
-                my_sender const&) noexcept
-            {
-                return {};
-            }
-#endif
 
             template <typename Env>
             friend auto tag_invoke(

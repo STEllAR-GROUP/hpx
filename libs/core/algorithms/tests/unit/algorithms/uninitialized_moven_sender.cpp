@@ -19,7 +19,6 @@
 
 #include "test_utils.hpp"
 
-#if defined(HPX_HAVE_STDEXEC)
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
 void test_uninitialized_move_n_sender(
     LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
@@ -49,7 +48,6 @@ void test_uninitialized_move_n_sender(
         }));
     HPX_TEST_EQ(count, d.size());
 }
-#endif
 
 template <typename IteratorTag>
 void uninitialized_move_n_sender_test()
@@ -57,16 +55,8 @@ void uninitialized_move_n_sender_test()
     using namespace hpx::execution;
     test_uninitialized_move_n_sender(
         hpx::launch::sync, seq(task), IteratorTag());
-    test_uninitialized_move_n_sender(
-        hpx::launch::sync, unseq(task), IteratorTag());
-
-    test_uninitialized_move_n_sender(
-        hpx::launch::async, par(task), IteratorTag());
-    test_uninitialized_move_n_sender(
-        hpx::launch::async, par_unseq(task), IteratorTag());
 }
 
-#if defined(HPX_HAVE_STDEXEC)
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
 void test_uninitialized_move_n_exception_sender(
     LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
@@ -114,7 +104,6 @@ void test_uninitialized_move_n_exception_sender(
     HPX_TEST(caught_exception);
     HPX_TEST_EQ(test::count_instances::instance_count.load(), std::size_t(0));
 }
-#endif
 
 template <typename IteratorTag>
 void uninitialized_move_n_exception_sender_test()
@@ -122,16 +111,8 @@ void uninitialized_move_n_exception_sender_test()
     using namespace hpx::execution;
     test_uninitialized_move_n_exception_sender(
         hpx::launch::sync, seq(task), IteratorTag());
-    test_uninitialized_move_n_exception_sender(
-        hpx::launch::sync, unseq(task), IteratorTag());
-
-    test_uninitialized_move_n_exception_sender(
-        hpx::launch::async, par(task), IteratorTag());
-    test_uninitialized_move_n_exception_sender(
-        hpx::launch::async, par_unseq(task), IteratorTag());
 }
 
-#if defined(HPX_HAVE_STDEXEC)
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
 void test_uninitialized_move_n_bad_alloc_sender(
     LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
@@ -178,7 +159,6 @@ void test_uninitialized_move_n_bad_alloc_sender(
     HPX_TEST(caught_bad_alloc);
     HPX_TEST_EQ(test::count_instances::instance_count.load(), std::size_t(0));
 }
-#endif
 
 template <typename IteratorTag>
 void uninitialized_move_n_bad_alloc_sender_test()
@@ -186,13 +166,6 @@ void uninitialized_move_n_bad_alloc_sender_test()
     using namespace hpx::execution;
     test_uninitialized_move_n_bad_alloc_sender(
         hpx::launch::sync, seq(task), IteratorTag());
-    test_uninitialized_move_n_bad_alloc_sender(
-        hpx::launch::sync, unseq(task), IteratorTag());
-
-    test_uninitialized_move_n_bad_alloc_sender(
-        hpx::launch::async, par(task), IteratorTag());
-    test_uninitialized_move_n_bad_alloc_sender(
-        hpx::launch::async, par_unseq(task), IteratorTag());
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)

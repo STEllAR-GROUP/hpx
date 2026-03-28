@@ -9,8 +9,7 @@
 #include <hpx/config.hpp>
 #include <utility>
 
-#if defined(HPX_HAVE_STDEXEC)
-#include <hpx/modules/execution_base.hpp>
+#include <hpx/execution_base/stdexec_forward.hpp>
 
 int main()
 {
@@ -22,6 +21,3 @@ int main()
 
     return hpx::util::report_errors();
 }
-#else
-int main() {}
-#endif

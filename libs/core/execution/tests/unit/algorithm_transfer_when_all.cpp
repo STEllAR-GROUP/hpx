@@ -44,12 +44,8 @@ int main()
         static_assert(ex::is_sender_v<decltype(s)>,
             "transfer_when_all must return a sender");
 
-#if defined(HPX_HAVE_STDEXEC)
         auto csch =
             ex::get_completion_scheduler<ex::set_value_t>(ex::get_env(s));
-#else
-        auto csch = ex::get_completion_scheduler<ex::set_value_t>(s);
-#endif
         HPX_TEST(sched == csch);
 
         auto f = [](int x) { HPX_TEST_EQ(x, 42); };
@@ -75,12 +71,8 @@ int main()
         static_assert(ex::is_sender_v<decltype(s)>,
             "transfer_when_all must return a sender");
 
-#if defined(HPX_HAVE_STDEXEC)
         auto csch =
             ex::get_completion_scheduler<ex::set_value_t>(ex::get_env(s));
-#else
-        auto csch = ex::get_completion_scheduler<ex::set_value_t>(s);
-#endif
         HPX_TEST(sched == csch);
 
         auto f = [](int x, std::string y, double z) {
@@ -110,12 +102,8 @@ int main()
         static_assert(ex::is_sender_v<decltype(s)>,
             "transfer_when_all must return a sender");
 
-#if defined(HPX_HAVE_STDEXEC)
         auto csch =
             ex::get_completion_scheduler<ex::set_value_t>(ex::get_env(s));
-#else
-        auto csch = ex::get_completion_scheduler<ex::set_value_t>(s);
-#endif
         HPX_TEST(sched == csch);
 
         auto f = [](std::string y, double z) {
@@ -148,11 +136,7 @@ int main()
 
         HPX_TEST(set_error_called);
         HPX_TEST(!tag_invoke_overload_called);
-#if defined(HPX_HAVE_STDEXEC)
         HPX_TEST(scheduler_schedule_called);
-#else
-        HPX_TEST(!scheduler_schedule_called);
-#endif
         HPX_TEST(!scheduler_execute_called);
     }
 

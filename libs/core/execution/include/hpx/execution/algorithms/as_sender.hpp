@@ -20,7 +20,7 @@
 #include <utility>
 
 namespace hpx::execution::experimental {
-
+    namespace hpxexec = hpx::execution::experimental;
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////////
@@ -49,8 +49,8 @@ namespace hpx::execution::experimental {
             as_sender_operation_state& operator=(
                 as_sender_operation_state const&) = delete;
 
-            friend void tag_invoke(hpx::execution::experimental::start_t,
-                as_sender_operation_state& os) noexcept
+            friend void tag_invoke(
+                hpxexec::start_t, as_sender_operation_state& os) noexcept
             {
                 os.start_helper();
             }
@@ -74,19 +74,17 @@ namespace hpx::execution::experimental {
                             {
                                 if constexpr (std::is_void_v<result_type>)
                                 {
-                                    hpx::execution::experimental::set_value(
-                                        HPX_MOVE(receiver_));
+                                    hpxexec::set_value(HPX_MOVE(receiver_));
                                 }
                                 else
                                 {
-                                    hpx::execution::experimental::set_value(
+                                    hpxexec::set_value(
                                         HPX_MOVE(receiver_), future_.get());
                                 }
                             }
                             else if (future_.has_exception())
                             {
-                                hpx::execution::experimental::set_error(
-                                    HPX_MOVE(receiver_),
+                                hpxexec::set_error(HPX_MOVE(receiver_),
                                     future_.get_exception_ptr());
                             }
                         };
@@ -115,8 +113,7 @@ namespace hpx::execution::experimental {
                         }
                     },
                     [&](std::exception_ptr ep) {
-                        hpx::execution::experimental::set_error(
-                            HPX_MOVE(receiver_), HPX_MOVE(ep));
+                        hpxexec::set_error(HPX_MOVE(receiver_), HPX_MOVE(ep));
                     });
             }
 
@@ -131,53 +128,22 @@ namespace hpx::execution::experimental {
 
             std::decay_t<Future> future_;
 
-#if defined(HPX_HAVE_STDEXEC)
             template <bool IsVoid, typename _result_type>
             struct set_value_void_checked
             {
-                using type = hpx::execution::experimental::set_value_t(
-                    _result_type);
+                using type = hpxexec::set_value_t(_result_type);
             };
 
             template <typename _result_type>
             struct set_value_void_checked<true, _result_type>
             {
-                using type = hpx::execution::experimental::set_value_t();
+                using type = hpxexec::set_value_t();
             };
 
-            using completion_signatures =
-                hpx::execution::experimental::completion_signatures<
-                    typename set_value_void_checked<std::is_void_v<result_type>,
-                        result_type>::type,
-                    hpx::execution::experimental::set_error_t(
-                        std::exception_ptr)>;
-#else
-            // Sender compatibility
-            template <typename, typename T>
-            struct completion_signatures_base
-            {
-                template <template <typename...> typename Tuple,
-                    template <typename...> typename Variant>
-                using value_types = Variant<Tuple<result_type>>;
-            };
-
-            template <typename T>
-            struct completion_signatures_base<T, void>
-            {
-                template <template <typename...> typename Tuple,
-                    template <typename...> typename Variant>
-                using value_types = Variant<Tuple<>>;
-            };
-
-            struct completion_signatures
-              : completion_signatures_base<void, result_type>
-            {
-                template <template <typename...> typename Variant>
-                using error_types = Variant<std::exception_ptr>;
-
-                static constexpr bool sends_stopped = false;
-            };
-#endif
+            using completion_signatures = hpxexec::completion_signatures<
+                typename set_value_void_checked<std::is_void_v<result_type>,
+                    result_type>::type,
+                hpxexec::set_error_t(std::exception_ptr)>;
         };
 
         HPX_CXX_CORE_EXPORT template <typename Future>
@@ -187,11 +153,7 @@ namespace hpx::execution::experimental {
         struct as_sender_sender<hpx::future<T>>
           : public as_sender_sender_base<hpx::future<T>>
         {
-#if defined(HPX_HAVE_STDEXEC)
             using sender_concept = hpx::execution::experimental::sender_t;
-#else
-            using is_sender = void;
-#endif
             using future_type = hpx::future<T>;
             using base_type = as_sender_sender_base<hpx::future<T>>;
             using base_type::future_;
@@ -226,11 +188,7 @@ namespace hpx::execution::experimental {
         struct as_sender_sender<hpx::shared_future<T>>
           : as_sender_sender_base<hpx::shared_future<T>>
         {
-#if defined(HPX_HAVE_STDEXEC)
             using sender_concept = hpx::execution::experimental::sender_t;
-#else
-            using is_sender = void;
-#endif
             using future_type = hpx::shared_future<T>;
             using base_type = as_sender_sender_base<hpx::shared_future<T>>;
             using base_type::future_;

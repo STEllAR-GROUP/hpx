@@ -160,9 +160,8 @@ if(HPX_WITH_CXX17_STD_EXECUTION_POLICES)
   set(tests ${tests} foreach_std_policies)
 endif()
 
-if(HPX_WITH_STDEXEC)
-  set(tests
-      ${tests}
+set(tests
+    ${tests}
       adjacentdifference_sender
       adjacentfind_sender
       all_of_sender
@@ -235,8 +234,7 @@ if(HPX_WITH_STDEXEC)
       uninitialized_value_construct_sender
       uninitialized_value_constructn_sender
       unique_sender
-  )
-endif()
+)
 
 foreach(test ${tests})
   set(sources ${test}.cpp)

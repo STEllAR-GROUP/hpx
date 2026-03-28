@@ -623,10 +623,16 @@ hpx_option(
 
 hpx_option(
   HPX_WITH_STDEXEC BOOL
-  "Use STDEXEC executors instead of native HPX.(default: OFF)" OFF
+  "Use STDEXEC executors instead of native HPX.(default: ON)" ON
   CATEGORY "Executor"
   ADVANCED
 )
+
+if(NOT HPX_WITH_STDEXEC)
+  hpx_error(
+    "HPX_WITH_STDEXEC=OFF is no longer supported. HPX now requires stdexec."
+  )
+endif()
 
 hpx_option(
   HPX_WITH_FETCH_STDEXEC BOOL "Use FetchContent to fetch STDEXEC.(default: ON)"

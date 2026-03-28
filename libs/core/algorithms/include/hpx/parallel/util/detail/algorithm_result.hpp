@@ -15,10 +15,8 @@
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
 
-#if defined(HPX_HAVE_STDEXEC)
 // for is_sender
-#include <hpx/modules/execution_base.hpp>
-#endif
+#include <hpx/execution_base/completion_signatures.hpp>
 
 #include <type_traits>
 #include <utility>

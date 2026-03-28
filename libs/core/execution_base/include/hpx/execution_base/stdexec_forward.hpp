@@ -7,8 +7,6 @@
 #pragma once
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_STDEXEC)
-
 /* TODO: Find out what diagnostics should be disabled for stdexec to compile.
  * currently it seems to need at least "-Wgnu-zero-variadic-macro-arguments"
  * and "-Wmissing-braces" even though they are explicitly disabled inside
@@ -38,11 +36,19 @@
 #include <exec/start_detached.hpp>
 #include <stdexec/execution.hpp>
 
+#include <type_traits>
+
 #if defined(HPX_GCC_VERSION)
 #pragma GCC diagnostic pop
 #elif defined(HPX_CLANG_VERSION)
 #pragma clang diagnostic pop
 #endif
+
+namespace stdexec {
+    template <typename T>
+        requires requires { typename std::remove_cvref_t<T>::is_sender; }
+    inline constexpr bool enable_sender<T> = true;
+}    // namespace stdexec
 
 namespace hpx::execution::experimental {
     // Domain
@@ -112,6 +118,9 @@ namespace hpx::execution::experimental {
     // Operation State
     HPX_CXX_CORE_EXPORT using stdexec::operation_state_t;
 
+    // Operation State
+    using stdexec::operation_state_t;
+
     // Sender
     HPX_CXX_CORE_EXPORT using stdexec::connect;
     HPX_CXX_CORE_EXPORT using stdexec::connect_result_t;
@@ -149,11 +158,12 @@ namespace hpx::execution::experimental {
     HPX_CXX_CORE_EXPORT using stdexec::transfer_just;
     HPX_CXX_CORE_EXPORT using stdexec::transfer_just_t;
 
-    // Bulk operations
-    HPX_CXX_CORE_EXPORT using stdexec::bulk;
+    // Bulk (HPX provides its own bulk CPO, but still forwards chunked variants
+    // used by the thread pool scheduler domain customization on current master)
+    //    HPX_CXX_CORE_EXPORT using stdexec::bulk;
+    //    HPX_CXX_CORE_EXPORT using stdexec::bulk_t;
     HPX_CXX_CORE_EXPORT using stdexec::bulk_chunked;
     HPX_CXX_CORE_EXPORT using stdexec::bulk_chunked_t;
-    HPX_CXX_CORE_EXPORT using stdexec::bulk_t;
     HPX_CXX_CORE_EXPORT using stdexec::bulk_unchunked;
     HPX_CXX_CORE_EXPORT using stdexec::bulk_unchunked_t;
 
@@ -332,5 +342,3 @@ namespace hpx::execution::experimental {
 // Leaving this as a placeholder
 namespace hpx::this_thread {
 }
-
-#endif

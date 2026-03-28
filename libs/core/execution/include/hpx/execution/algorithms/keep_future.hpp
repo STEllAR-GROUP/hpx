@@ -19,6 +19,7 @@
 #include <utility>
 
 namespace hpx::execution::experimental {
+    namespace hpxexec = hpx::execution::experimental;
 
     namespace detail {
 
@@ -47,13 +48,12 @@ namespace hpx::execution::experimental {
                         // to move receiver and future into the on_completed
                         // callback.
                         state->set_on_completed([&os]() mutable {
-                            hpx::execution::experimental::set_value(
+                            hpxexec::set_value(
                                 HPX_MOVE(os.receiver), HPX_MOVE(os.future));
                         });
                     },
                     [&](std::exception_ptr ep) {
-                        hpx::execution::experimental::set_error(
-                            HPX_MOVE(os.receiver), HPX_MOVE(ep));
+                        hpxexec::set_error(HPX_MOVE(os.receiver), HPX_MOVE(ep));
                     });
             }
         };
@@ -62,26 +62,10 @@ namespace hpx::execution::experimental {
         struct keep_future_sender_base
         {
             std::decay_t<Future> future;
-#if defined(HPX_HAVE_STDEXEC)
             using completion_signatures =
-                hpx::execution::experimental::completion_signatures<
-                    hpx::execution::experimental::set_value_t(
-                        std::decay_t<Future>),
-                    hpx::execution::experimental::set_error_t(
-                        std::exception_ptr)>;
-#else
-            struct completion_signatures
-            {
-                template <template <typename...> class Tuple,
-                    template <typename...> class Variant>
-                using value_types = Variant<Tuple<std::decay_t<Future>>>;
-
-                template <template <typename...> class Variant>
-                using error_types = Variant<std::exception_ptr>;
-
-                static constexpr bool sends_stopped = false;
-            };
-#endif
+                hpxexec::completion_signatures<hpxexec::set_value_t(
+                                                   std::decay_t<Future>),
+                    hpxexec::set_error_t(std::exception_ptr)>;
         };
 
         HPX_CXX_CORE_EXPORT template <typename Future>
@@ -91,11 +75,7 @@ namespace hpx::execution::experimental {
         struct keep_future_sender<hpx::future<T>>
           : public keep_future_sender_base<hpx::future<T>>
         {
-#if defined(HPX_HAVE_STDEXEC)
             using sender_concept = hpx::execution::experimental::sender_t;
-#else
-            using is_sender = void;
-#endif
             using future_type = hpx::future<T>;
             using base_type = keep_future_sender_base<hpx::future<T>>;
             using base_type::future;
@@ -130,11 +110,7 @@ namespace hpx::execution::experimental {
         struct keep_future_sender<hpx::shared_future<T>>
           : keep_future_sender_base<hpx::shared_future<T>>
         {
-#if defined(HPX_HAVE_STDEXEC)
             using sender_concept = hpx::execution::experimental::sender_t;
-#else
-            using is_sender = void;
-#endif
             using future_type = hpx::shared_future<T>;
             using base_type = keep_future_sender_base<hpx::shared_future<T>>;
             using base_type::future;

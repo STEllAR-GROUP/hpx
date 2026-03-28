@@ -170,44 +170,4 @@ int hpx_main(hpx::program_options::variables_map& vm)
 // the normal int main function that is called at startup and runs on an OS
 // thread the user must call hpx::local::init to start the hpx runtime which
 // will execute hpx_main on an hpx thread
-int main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
-{
-#if !defined(HPX_HAVE_STDEXEC)
-    // if this test is run with distributed runtime, we need to make sure
-    // that all ranks run their main function
-    std::vector<std::string> cfg = {"hpx.run_hpx_main!=1"};
-
-    // Init MPI
-    int provided = MPI_THREAD_MULTIPLE;
-    MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
-    if (provided != MPI_THREAD_MULTIPLE)
-    {
-        std::cout << "Provided MPI is not : MPI_THREAD_MULTIPLE " << provided
-                  << std::endl;
-    }
-
-    // Configure application-specific options.
-    options_description cmdline("usage: " HPX_APPLICATION_STRING " [options]");
-
-    // clang-format off
-    cmdline.add_options()(
-        "iterations",
-        value<std::uint64_t>()->default_value(5000),
-        "number of iterations to test")
-
-        ("output", "display messages during test");
-    // clang-format on
-
-    // Initialize and run HPX.
-    hpx::local::init_params init_args;
-    init_args.desc_cmdline = cmdline;
-    init_args.cfg = cfg;
-
-    auto result = hpx::local::init(hpx_main, argc, argv, init_args);
-
-    // Finalize MPI
-    MPI_Finalize();
-
-    return result || hpx::util::report_errors();
-#endif
-}
+int main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]) {}

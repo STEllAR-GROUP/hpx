@@ -92,7 +92,6 @@ void test_uninitialized_default_construct_async(ExPolicy&& policy, IteratorTag)
     std::free(p);
 }
 
-#if defined(HPX_HAVE_STDEXEC)
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
 void test_uninitialized_default_construct_sender(
     LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
@@ -123,7 +122,6 @@ void test_uninitialized_default_construct_sender(
 
     std::free(p);
 }
-#endif
 
 template <typename ExPolicy, typename IteratorTag>
 void test_uninitialized_default_construct2(ExPolicy&& policy, IteratorTag)
@@ -177,7 +175,6 @@ void test_uninitialized_default_construct_async2(ExPolicy&& policy, IteratorTag)
     std::free(p);
 }
 
-#if defined(HPX_HAVE_STDEXEC)
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
 void test_uninitialized_default_construct_sender2(
     LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
@@ -208,7 +205,6 @@ void test_uninitialized_default_construct_sender2(
 
     std::free(p);
 }
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
@@ -314,7 +310,6 @@ void test_uninitialized_default_construct_exception_async(
     std::free(p);
 }
 
-#if defined(HPX_HAVE_STDEXEC)
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
 void test_uninitialized_default_construct_exception_sender(
     LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
@@ -371,7 +366,6 @@ void test_uninitialized_default_construct_exception_sender(
 
     std::free(p);
 }
-#endif
 
 //////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
@@ -476,7 +470,6 @@ void test_uninitialized_default_construct_bad_alloc_async(
     std::free(p);
 }
 
-#if defined(HPX_HAVE_STDEXEC)
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
 void test_uninitialized_default_construct_bad_alloc_sender(
     LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
@@ -532,4 +525,3 @@ void test_uninitialized_default_construct_bad_alloc_sender(
 
     std::free(p);
 }
-#endif

@@ -696,7 +696,6 @@ void test_remove_bad_alloc(bool test_for_remove_if = false)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#if defined(HPX_HAVE_STDEXEC)
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
 void test_remove_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 {
@@ -770,4 +769,3 @@ void test_remove_if_sender(
 
     HPX_TEST(equality);
 }
-#endif

@@ -63,17 +63,9 @@ void uninitialized_value_construct_n_sender_test()
     using namespace hpx::execution;
     test_uninitialized_value_construct_n_sender(
         hpx::launch::sync, seq(task), IteratorTag());
-    test_uninitialized_value_construct_n_sender(
-        hpx::launch::sync, unseq(task), IteratorTag());
-
-    test_uninitialized_value_construct_n_sender(
-        hpx::launch::async, par(task), IteratorTag());
-    test_uninitialized_value_construct_n_sender(
-        hpx::launch::async, par_unseq(task), IteratorTag());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-#if defined(HPX_HAVE_STDEXEC)
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
 void test_uninitialized_value_construct_n_exception_sender(
     LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
@@ -127,7 +119,6 @@ void test_uninitialized_value_construct_n_exception_sender(
 
     std::free(p);
 }
-#endif
 
 template <typename IteratorTag>
 void uninitialized_value_construct_n_exception_sender_test()
@@ -135,13 +126,6 @@ void uninitialized_value_construct_n_exception_sender_test()
     using namespace hpx::execution;
     test_uninitialized_value_construct_n_exception_sender(
         hpx::launch::sync, seq(task), IteratorTag());
-    test_uninitialized_value_construct_n_exception_sender(
-        hpx::launch::sync, unseq(task), IteratorTag());
-
-    test_uninitialized_value_construct_n_exception_sender(
-        hpx::launch::async, par(task), IteratorTag());
-    test_uninitialized_value_construct_n_exception_sender(
-        hpx::launch::async, par_unseq(task), IteratorTag());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -204,13 +188,6 @@ void uninitialized_value_construct_n_bad_alloc_sender_tests()
     using namespace hpx::execution;
     test_uninitialized_value_construct_n_bad_alloc_sender(
         hpx::launch::sync, seq(task), IteratorTag());
-    test_uninitialized_value_construct_n_bad_alloc_sender(
-        hpx::launch::sync, unseq(task), IteratorTag());
-
-    test_uninitialized_value_construct_n_bad_alloc_sender(
-        hpx::launch::async, par(task), IteratorTag());
-    test_uninitialized_value_construct_n_bad_alloc_sender(
-        hpx::launch::async, par_unseq(task), IteratorTag());
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)
