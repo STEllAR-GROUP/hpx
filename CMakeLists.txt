@@ -2071,6 +2071,13 @@ if(WIN32)
       # Make sure that __cplusplus is properly defined
       hpx_add_target_compile_option(-Zc:__cplusplus PUBLIC)
 
+      # stdexec requires the conforming MSVC preprocessor.
+      if(NOT (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang"
+              AND "x${CMAKE_CXX_SIMULATE_ID}" STREQUAL "xMSVC")
+      )
+        hpx_add_target_compile_option(-Zc:preprocessor PUBLIC)
+      endif()
+
       # Silence C++17 deprecation warnings
       hpx_add_config_cond_define(_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
 

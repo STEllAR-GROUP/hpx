@@ -30,13 +30,31 @@
 #pragma clang diagnostic ignored "-Weverything"
 #endif
 
-// NOLINTBEGIN(bugprone-crtp-constructor-accessibility,bugprone-unhandled-exception-at-new)
+// GCC advertises constexpr exceptions in C++26, but current stdexec main
+// selects a code path that is not accepted by GCC yet. Hide the feature-test
+// macro while including stdexec so it falls back to the pre-C++26 path.
+#if defined(HPX_GCC_VERSION) && defined(__cpp_constexpr_exceptions) &&         \
+    (__cpp_constexpr_exceptions >= 202411L)
+#define HPX_STDEXEC_RESTORE___cpp_constexpr_exceptions                         \
+    __cpp_constexpr_exceptions
+#undef __cpp_constexpr_exceptions
+#endif
+
+// NOLINTBEGIN(bugprone-crtp-constructor-accessibility)
+// NOLINTBEGIN(bugprone-unhandled-exception-at-new)
 #include <exec/ensure_started.hpp>
 #include <exec/execute.hpp>
 #include <exec/split.hpp>
 #include <exec/start_detached.hpp>
 #include <stdexec/execution.hpp>
-// NOLINTEND(bugprone-crtp-constructor-accessibility,bugprone-unhandled-exception-at-new)
+// NOLINTEND(bugprone-unhandled-exception-at-new)
+// NOLINTEND(bugprone-crtp-constructor-accessibility)
+
+#if defined(HPX_STDEXEC_RESTORE___cpp_constexpr_exceptions)
+#define __cpp_constexpr_exceptions                                             \
+    HPX_STDEXEC_RESTORE___cpp_constexpr_exceptions
+#undef HPX_STDEXEC_RESTORE___cpp_constexpr_exceptions
+#endif
 
 #if defined(HPX_GCC_VERSION)
 #pragma GCC diagnostic pop

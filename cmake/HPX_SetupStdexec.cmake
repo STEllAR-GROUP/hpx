@@ -21,58 +21,56 @@ if(HPX_WITH_FETCH_STDEXEC)
     "HPX_WITH_FETCH_STDEXEC=${HPX_WITH_FETCH_STDEXEC}, Stdexec will be fetched using CMake's FetchContent and installed alongside HPX (HPX_WITH_STDEXEC_TAG=${HPX_WITH_STDEXEC_TAG})"
   )
 
-  if(UNIX)
-    include(FetchContent)
-    fetchcontent_declare(
-      Stdexec
-      GIT_REPOSITORY https://github.com/NVIDIA/stdexec.git
-      GIT_TAG ${HPX_WITH_STDEXEC_TAG}
-    )
+  include(FetchContent)
+  fetchcontent_declare(
+    Stdexec
+    GIT_REPOSITORY https://github.com/NVIDIA/stdexec.git
+    GIT_TAG ${HPX_WITH_STDEXEC_TAG}
+  )
 
-    fetchcontent_getproperties(Stdexec)
-    if(NOT Stdexec_POPULATED)
-      fetchcontent_populate(Stdexec)
-    endif()
-    set(Stdexec_ROOT ${stdexec_SOURCE_DIR})
-
-    add_library(Stdexec INTERFACE)
-    target_include_directories(
-      Stdexec SYSTEM INTERFACE $<BUILD_INTERFACE:${stdexec_SOURCE_DIR}/include>
-                               $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-    )
-
-    install(
-      TARGETS Stdexec
-      EXPORT HPXStdexecTarget
-      COMPONENT core
-    )
-
-    install(
-      DIRECTORY ${Stdexec_ROOT}/include/
-      DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-      COMPONENT core
-      FILES_MATCHING
-      PATTERN "*.hpp"
-    )
-
-    export(
-      TARGETS Stdexec
-      NAMESPACE Stdexec::
-      FILE "${CMAKE_CURRENT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}/HPXStdexecTarget.cmake"
-    )
-
-    install(
-      EXPORT HPXStdexecTarget
-      NAMESPACE Stdexec::
-      FILE HPXStdexecTarget.cmake
-      DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}
-      COMPONENT cmake
-    )
-
-    # TODO: Enforce a single spelling
-    add_library(Stdexec::Stdexec ALIAS Stdexec)
-    add_library(STDEXEC::stdexec ALIAS Stdexec)
+  fetchcontent_getproperties(Stdexec)
+  if(NOT Stdexec_POPULATED)
+    fetchcontent_populate(Stdexec)
   endif()
+  set(Stdexec_ROOT ${stdexec_SOURCE_DIR})
+
+  add_library(Stdexec INTERFACE)
+  target_include_directories(
+    Stdexec SYSTEM INTERFACE $<BUILD_INTERFACE:${stdexec_SOURCE_DIR}/include>
+                             $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+  )
+
+  install(
+    TARGETS Stdexec
+    EXPORT HPXStdexecTarget
+    COMPONENT core
+  )
+
+  install(
+    DIRECTORY ${Stdexec_ROOT}/include/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    COMPONENT core
+    FILES_MATCHING
+    PATTERN "*.hpp"
+  )
+
+  export(
+    TARGETS Stdexec
+    NAMESPACE Stdexec::
+    FILE "${CMAKE_CURRENT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}/HPXStdexecTarget.cmake"
+  )
+
+  install(
+    EXPORT HPXStdexecTarget
+    NAMESPACE Stdexec::
+    FILE HPXStdexecTarget.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}
+    COMPONENT cmake
+  )
+
+  # TODO: Enforce a single spelling
+  add_library(Stdexec::Stdexec ALIAS Stdexec)
+  add_library(STDEXEC::stdexec ALIAS Stdexec)
 else()
   find_package(Stdexec)
 

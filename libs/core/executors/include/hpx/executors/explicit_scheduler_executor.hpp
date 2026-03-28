@@ -188,7 +188,8 @@ namespace hpx::execution::experimental {
             explicit_scheduler_executor const& exec, F&& f, S const& shape,
             Ts&&... ts)
         {
-            //            We are using HPX's bulk implementation for now, so this works for
+            //            We are using HPX's bulk implementation for now,
+            //            so this works for
             //            other types too.
             //            static_assert(
             //                std::is_integral_v<S>,
