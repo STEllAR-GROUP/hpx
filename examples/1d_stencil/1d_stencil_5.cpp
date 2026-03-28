@@ -20,8 +20,9 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/modules/type_support.hpp>
 #include <hpx/serialization.hpp>
+
+#include <memory>
 
 #include <cstddef>
 #include <cstdint>
@@ -54,7 +55,7 @@ inline std::size_t idx(std::size_t i, int dir, std::size_t size)
 struct partition_data
 {
 private:
-    typedef hpx::serialization::serialize_buffer<double> buffer_type;
+    typedef std::shared_ptr<double[]> buffer_type;
 
 public:
     partition_data()
@@ -63,13 +64,13 @@ public:
     }
 
     explicit partition_data(std::size_t size)
-      : data_(new double[size], size, buffer_type::take)
+      : data_(new double[size])
       , size_(size)
     {
     }
 
     partition_data(std::size_t size, double initial_value)
-      : data_(new double[size], size, buffer_type::take)
+      : data_(new double[size])
       , size_(size)
     {
         double base_value = initial_value * double(size);
@@ -98,10 +99,21 @@ private:
     friend class hpx::serialization::access;
 
     template <typename Archive>
-    void serialize(Archive& ar, unsigned int const)
+    void save(Archive& ar, unsigned int const) const
     {
-        ar & data_ & size_;
+        ar & size_;
+        ar& hpx::serialization::make_array(data_.get(), size_);
     }
+
+    template <typename Archive>
+    void load(Archive& ar, unsigned int const)
+    {
+        ar & size_;
+        data_.reset(new double[size_]);
+        ar& hpx::serialization::make_array(data_.get(), size_);
+    }
+
+    HPX_SERIALIZATION_SPLIT_MEMBER()
 
 private:
     buffer_type data_;
