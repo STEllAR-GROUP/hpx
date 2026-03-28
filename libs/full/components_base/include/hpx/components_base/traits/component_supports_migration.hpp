@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <hpx/components_base/components_base_fwd.hpp>
 #include <hpx/modules/type_support.hpp>
 
 namespace hpx::traits {

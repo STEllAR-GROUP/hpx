@@ -4,9 +4,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_COMPONENTS_BASE_TRAITS_IS_COMPONENT_HPP
-#define HPX_COMPONENTS_BASE_TRAITS_IS_COMPONENT_HPP
-
 #pragma once
 
 #include <hpx/config.hpp>
@@ -141,5 +138,3 @@ namespace hpx::traits {
         is_managed_component<Component>::value;
 
 }    // namespace hpx::traits
-
-#endif

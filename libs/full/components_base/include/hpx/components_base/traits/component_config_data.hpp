@@ -6,14 +6,13 @@
 
 #pragma once
 
-namespace hpx::traits {
+#include <hpx/components_base/components_base_fwd.hpp>
 
-    HPX_CXX_EXPORT template <typename Component, typename Enable = void>
-    struct component_config_data;
+namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
     // Customization point for component config data injection
-    template <typename Component, typename Enable>
+    template <typename Component, typename Enable = void>
     struct component_config_data
     {
         // by default no additional config data is injected into the factory

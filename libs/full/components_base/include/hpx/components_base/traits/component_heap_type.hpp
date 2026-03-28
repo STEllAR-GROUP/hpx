@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <hpx/components_base/components_base_fwd.hpp>
+
 namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////

@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/components_base/components_base_fwd.hpp>
 #include <hpx/modules/type_support.hpp>
 
 #include <cstdint>
@@ -22,8 +23,9 @@ namespace hpx::traits {
         struct pin_helper
         {
             template <typename Component>
-            static constexpr void call(wrap_int, Component*) noexcept
+            static constexpr bool call(wrap_int, Component*) noexcept
             {
+                return false;
             }
 
             // forward the call if the component implements the function

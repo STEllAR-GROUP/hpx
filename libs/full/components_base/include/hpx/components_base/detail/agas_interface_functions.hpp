@@ -73,10 +73,10 @@ namespace hpx::agas::detail {
     ///////////////////////////////////////////////////////////////////////////
     extern HPX_EXPORT future<std::uint32_t> (*get_num_overall_threads_async)();
 
-    extern std::uint32_t (*get_num_overall_threads)(error_code& ec);
+    extern HPX_EXPORT std::uint32_t (*get_num_overall_threads)(error_code& ec);
 
     ///////////////////////////////////////////////////////////////////////////
-    extern std::uint32_t (*get_locality_id)(error_code& ec);
+    extern HPX_EXPORT std::uint32_t (*get_locality_id)(error_code& ec);
 
     extern HPX_EXPORT std::vector<std::uint32_t> (*get_all_locality_ids)(
         naming::component_type type, error_code& ec);
@@ -104,7 +104,7 @@ namespace hpx::agas::detail {
             naming::address const&)>&& f,
         error_code& ec);
 
-    extern void (*update_cache_entry)(naming::gid_type const& gid,
+    extern HPX_EXPORT void (*update_cache_entry)(naming::gid_type const& gid,
         naming::address const& addr, std::uint64_t count, std::uint64_t offset,
         error_code& ec);
 
@@ -137,7 +137,7 @@ namespace hpx::agas::detail {
         naming::gid_type const& gid, naming::address const& addr,
         naming::gid_type const& locality_);
 
-    extern bool (*bind_locality)(naming::gid_type const& gid,
+    extern HPX_EXPORT bool (*bind_locality)(naming::gid_type const& gid,
         naming::address const& addr, naming::gid_type const& locality_,
         error_code& ec);
 
@@ -148,19 +148,19 @@ namespace hpx::agas::detail {
         naming::gid_type const& gid, std::uint64_t count, error_code& ec);
 
     ///////////////////////////////////////////////////////////////////////////
-    extern bool (*bind_gid_local)(naming::gid_type const& gid,
+    extern HPX_EXPORT bool (*bind_gid_local)(naming::gid_type const& gid,
         naming::address const& addr, error_code& ec);
     extern HPX_EXPORT void (*unbind_gid_local)(
         naming::gid_type const& gid, error_code& ec);
 
-    extern bool (*bind_range_local)(naming::gid_type const& gid,
+    extern HPX_EXPORT bool (*bind_range_local)(naming::gid_type const& gid,
         std::size_t count, naming::address const& addr, std::size_t offset,
         error_code& ec);
     extern HPX_EXPORT void (*unbind_range_local)(
         naming::gid_type const& gid, std::size_t count, error_code& ec);
 
     ///////////////////////////////////////////////////////////////////////////
-    extern void (*garbage_collect_non_blocking)(error_code& ec);
+    extern HPX_EXPORT void (*garbage_collect_non_blocking)(error_code& ec);
 
     extern HPX_EXPORT void (*garbage_collect)(error_code& ec);
 
@@ -171,7 +171,7 @@ namespace hpx::agas::detail {
         hpx::id_type const& id, error_code& ec);
 
     ///////////////////////////////////////////////////////////////////////////
-    extern hpx::id_type (*get_console_locality)(error_code& ec);
+    extern HPX_EXPORT hpx::id_type (*get_console_locality)(error_code& ec);
 
     ///////////////////////////////////////////////////////////////////////////
     extern HPX_EXPORT naming::gid_type (*get_next_id)(
@@ -187,7 +187,7 @@ namespace hpx::agas::detail {
         hpx::id_type const& keep_alive);
 
     ///////////////////////////////////////////////////////////////////////////
-    extern std::int64_t (*replenish_credits)(naming::gid_type& gid);
+    extern HPX_EXPORT std::int64_t (*replenish_credits)(naming::gid_type& gid);
 
     ///////////////////////////////////////////////////////////////////////////
     extern HPX_EXPORT hpx::future_or_value<id_type> (*get_colocation_id_async)(

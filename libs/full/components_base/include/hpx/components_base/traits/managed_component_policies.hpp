@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <hpx/components_base/components_base_fwd.hpp>
 #include <type_traits>
 
 ///////////////////////////////////////////////////////////////////////////////

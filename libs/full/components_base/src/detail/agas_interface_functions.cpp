@@ -7,6 +7,14 @@
 #include <hpx/config.hpp>
 #include <hpx/components_base/detail/agas_interface_functions.hpp>
 
+#include <cstddef>
+#include <cstdint>
+#include <map>
+#include <string>
+#include <system_error>
+#include <utility>
+#include <vector>
+
 namespace hpx::agas::detail {
 
     ///////////////////////////////////////////////////////////////////////////

@@ -74,6 +74,9 @@ namespace hpx::components {
         return static_cast<naming::component_type>(t);
     }
 
+    // Mask for the lower 10 bits (base component type)
+    inline constexpr component_type component_type_mask = 0x3FF;
+
 #define HPX_COMPONENT_ENUM_TYPE_ENUM_DEPRECATION_MSG                           \
     "The unscoped hpx::components::component_enum_type names are deprecated. " \
     "Please use hpx::components::component_enum_type::<value> instead."
@@ -170,13 +173,13 @@ namespace hpx::components {
     /// exposing the actions.
     constexpr component_type get_base_type(component_type t) noexcept
     {
-        return static_cast<component_type>(t & 0x3FF);
+        return static_cast<component_type>(t & component_type_mask);
     }
 
     /// The upper short word of the component is the actual component type
     constexpr component_type get_derived_type(component_type t) noexcept
     {
-        return static_cast<component_type>((t >> 10) & 0x3FF);
+        return static_cast<component_type>((t >> 10) & component_type_mask);
     }
 
     /// A component derived from a base component exposing the actions needs to

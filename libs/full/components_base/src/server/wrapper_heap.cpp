@@ -29,6 +29,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::components::detail {
 
+    namespace one_size_heap_allocators {
+        hpx::util::internal_allocator<char> fixed_mallocator::alloc_ = {};
+    }
+
 #if HPX_DEBUG_WRAPPER_HEAP != 0
 #define HPX_WRAPPER_HEAP_INITIALIZED_MEMORY 1
 

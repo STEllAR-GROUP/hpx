@@ -52,7 +52,7 @@ namespace hpx::components::detail {
                 return nullptr;
             }
 
-            inline static util::internal_allocator<char> alloc_ = {};
+            HPX_EXPORT static util::internal_allocator<char> alloc_;
         };
     }    // namespace one_size_heap_allocators
 
