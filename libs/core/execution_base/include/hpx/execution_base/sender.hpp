@@ -11,6 +11,8 @@
 
 #include <hpx/execution_base/stdexec_forward.hpp>
 
+#include <type_traits>
+
 namespace hpx::execution::experimental {
 
     HPX_CXX_CORE_EXPORT template <typename Scheduler>
