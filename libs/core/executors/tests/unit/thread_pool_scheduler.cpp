@@ -33,7 +33,6 @@
 #include <utility>
 #include <vector>
 
-
 struct custom_type_non_default_constructible_non_copyable
 {
     int x;
@@ -877,8 +876,7 @@ void test_future_sender()
     }
 
     {
-        auto f = ex::just(ex::thread_pool_scheduler{}, 3) |
-            ex::make_future();
+        auto f = ex::just(ex::thread_pool_scheduler{}, 3) | ex::make_future();
         HPX_TEST_EQ(f.get(), 3);
     }
 
@@ -892,11 +890,9 @@ void test_future_sender()
     }
 
     {
-        auto s1 =
-            ex::just(ex::thread_pool_scheduler{}, std::size_t(42));
+        auto s1 = ex::just(ex::thread_pool_scheduler{}, std::size_t(42));
         auto s2 = ex::just(ex::thread_pool_scheduler{}, 3.14);
-        auto s3 = ex::just(
-            ex::thread_pool_scheduler{}, std::string("hello"));
+        auto s3 = ex::just(ex::thread_pool_scheduler{}, std::string("hello"));
         auto f = ex::make_future(ex::then(
             ex::when_all(std::move(s1), std::move(s2), std::move(s3)),
             [](std::size_t x, double, std::string z) { return z.size() + x; }));
@@ -920,11 +916,9 @@ void test_future_sender()
     }
 
     {
-        auto s1 =
-            ex::just(ex::thread_pool_scheduler{}, std::size_t(42));
+        auto s1 = ex::just(ex::thread_pool_scheduler{}, std::size_t(42));
         auto s2 = ex::just(ex::thread_pool_scheduler{}, 3.14);
-        auto s3 = ex::just(
-            ex::thread_pool_scheduler{}, std::string("hello"));
+        auto s3 = ex::just(ex::thread_pool_scheduler{}, std::string("hello"));
         auto f = ex::make_future(ex::then(
             ex::when_all(std::move(s1), std::move(s2), std::move(s3)),
             [](std::size_t x, double, std::string z) { return z.size() + x; }));
@@ -962,8 +956,7 @@ void test_ensure_started()
     }
 
     {
-        auto s =
-            ex::just(sched, 42) | ex::ensure_started() | ex::split();
+        auto s = ex::just(sched, 42) | ex::ensure_started() | ex::split();
         HPX_TEST_EQ(hpx::get<0>(*tt::sync_wait(s)), 42);
         HPX_TEST_EQ(hpx::get<0>(*tt::sync_wait(s)), 42);
         HPX_TEST_EQ(hpx::get<0>(*tt::sync_wait(s)), 42);
@@ -1093,8 +1086,7 @@ void test_split()
     }
 
     {
-        auto s =
-            ex::just(sched, 42) | ex::split() | ex::continues_on(sched);
+        auto s = ex::just(sched, 42) | ex::split() | ex::continues_on(sched);
         HPX_TEST_EQ(hpx::get<0>(*tt::sync_wait(std::move(s))), 42);
     }
 
@@ -1211,23 +1203,20 @@ void test_let_value()
 
     {
         auto result = hpx::get<0>(*(tt::sync_wait(ex::just(sched, 43) |
-            ex::let_value(
-                [=](int&) { return ex::just(sched, 42); }))));
+            ex::let_value([=](int&) { return ex::just(sched, 42); }))));
         HPX_TEST_EQ(result, 42);
     }
 
     {
-        auto result =
-            hpx::get<0>(*(tt::sync_wait(ex::just(43) | ex::let_value([=](int&) {
-                return ex::just(sched, 42);
-            }))));
+        auto result = hpx::get<0>(*(tt::sync_wait(ex::just(43) |
+            ex::let_value([=](int&) { return ex::just(sched, 42); }))));
         HPX_TEST_EQ(result, 42);
     }
 
     // int predecessor, value used
     {
-        auto result = hpx::get<0>(*(tt::sync_wait(
-            ex::just(sched, 43) | ex::let_value([](int& x) {
+        auto result = hpx::get<0>(
+            *(tt::sync_wait(ex::just(sched, 43) | ex::let_value([](int& x) {
                 return ex::just(42) | ex::then([&](int y) { return x + y; });
             }))));
 
@@ -1235,8 +1224,8 @@ void test_let_value()
     }
 
     {
-        auto result = hpx::get<0>(*(tt::sync_wait(
-            ex::just(sched, 43) | ex::let_value([=](int& x) {
+        auto result = hpx::get<0>(
+            *(tt::sync_wait(ex::just(sched, 43) | ex::let_value([=](int& x) {
                 return ex::just(sched, 42) |
                     ex::then([&](int y) { return x + y; });
             }))));
@@ -1372,8 +1361,8 @@ void test_let_error()
 
     // predecessor doesn't throw, let sender is ignored
     {
-        auto result = hpx::get<0>(*(tt::sync_wait(ex::just(sched, 42) |
-            ex::let_error([](std::exception_ptr) {
+        auto result = hpx::get<0>(*(tt::sync_wait(
+            ex::just(sched, 42) | ex::let_error([](std::exception_ptr) {
                 HPX_TEST(false);
                 return ex::just(43);
             }))));
@@ -1381,8 +1370,8 @@ void test_let_error()
     }
 
     {
-        auto result = hpx::get<0>(*(tt::sync_wait(ex::just(sched, 42) |
-            ex::let_error([=](std::exception_ptr) {
+        auto result = hpx::get<0>(*(tt::sync_wait(
+            ex::just(sched, 42) | ex::let_error([=](std::exception_ptr) {
                 HPX_TEST(false);
                 return ex::just(sched, 43);
             }))));
@@ -1646,11 +1635,11 @@ void test_keep_future_sender()
 
         auto fun = hpx::unwrapping(
             [](int&& x, double const& y) { return x * 2 + (int(y) / 2); });
-        HPX_TEST_EQ(
-            hpx::get<0>(*(tt::sync_wait(
-                ex::when_all(
-                    ex::keep_future(std::move(f)), ex::keep_future(sf)) |
-                ex::continues_on(ex::thread_pool_scheduler{}) | ex::then(fun)))),
+        HPX_TEST_EQ(hpx::get<0>(*(tt::sync_wait(
+                        ex::when_all(ex::keep_future(std::move(f)),
+                            ex::keep_future(sf)) |
+                        ex::continues_on(ex::thread_pool_scheduler{}) |
+                        ex::then(fun)))),
             85);
     }
 }
@@ -1694,12 +1683,12 @@ void test_bulk()
         std::vector<int> v(n, -1);
         hpx::thread::id parent_id = hpx::this_thread::get_id();
 
-        auto v_out = hpx::get<0>(*(tt::sync_wait(
-            ex::just(ex::thread_pool_scheduler{}, std::move(v)) |
-            ex::bulk(n, [&parent_id](int i, std::vector<int>& v) {
-                v[i] = i;
-                HPX_TEST_NEQ(parent_id, hpx::this_thread::get_id());
-            }))));
+        auto v_out = hpx::get<0>(*(
+            tt::sync_wait(ex::just(ex::thread_pool_scheduler{}, std::move(v)) |
+                ex::bulk(n, [&parent_id](int i, std::vector<int>& v) {
+                    v[i] = i;
+                    HPX_TEST_NEQ(parent_id, hpx::this_thread::get_id());
+                }))));
 
         // In chunked mode, only chunk begin indices are processed
         // So we check that at least some elements were set correctly

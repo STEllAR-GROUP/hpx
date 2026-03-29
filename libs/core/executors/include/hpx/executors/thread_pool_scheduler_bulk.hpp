@@ -185,7 +185,6 @@ namespace hpx::execution::experimental::detail {
             }
         }
 
-
         template <hpx::concurrency::detail::queue_end Which, typename Ts>
         void do_work(Ts& ts) const
         {

@@ -201,12 +201,12 @@ namespace hpx::execution::experimental {
                 auto iota_shape = hpx::util::counting_shape(shape);
 
                 // For parallel policies, we want internal chunking for efficiency.
-                // Since bulk_t expects an unchunked function, we wrap f to 
+                // Since bulk_t expects an unchunked function, we wrap f to
                 // handle a range of indices in a loop.
                 if constexpr (!std::is_same_v<Policy, hpx::launch::sync_policy>)
                 {
-                    auto wrapped_f = [f = HPX_FORWARD(F, f)](
-                        auto start, auto end, auto&... ts) mutable {
+                    auto wrapped_f = [f = HPX_FORWARD(F, f)](auto start,
+                                         auto end, auto&... ts) mutable {
                         for (auto i = start; i != end; ++i)
                         {
                             HPX_INVOKE(f, i, ts...);
@@ -232,8 +232,8 @@ namespace hpx::execution::experimental {
             {
                 if constexpr (!std::is_same_v<Policy, hpx::launch::sync_policy>)
                 {
-                    auto wrapped_f = [f = HPX_FORWARD(F, f)](
-                        auto start, auto end, auto&... ts) mutable {
+                    auto wrapped_f = [f = HPX_FORWARD(F, f)](auto start,
+                                         auto end, auto&... ts) mutable {
                         for (auto i = start; i != end; ++i)
                         {
                             HPX_INVOKE(f, i, ts...);
@@ -255,8 +255,6 @@ namespace hpx::execution::experimental {
                 }
             }
         }
-
-
 
         template <typename Executor_>
             requires(
