@@ -16,7 +16,8 @@ namespace hpx::tracing {
     // region
 
     hpx::tracy::region region::create_tracy_region(
-        hpx::threads::thread_data* thrdptr, std::size_t num_thread) noexcept
+        hpx::threads::thread_data const* thrdptr,
+        std::size_t const num_thread) noexcept
     {
         char const* name = thrdptr->get_description().get_description();
         bool const enabled = name != nullptr && !thrdptr->is_stackless();
@@ -24,8 +25,8 @@ namespace hpx::tracing {
             name, num_thread, thrdptr->get_thread_phase(), enabled);
     }
 
-    region::region(
-        hpx::threads::thread_data* thrdptr, std::size_t num_thread) noexcept
+    region::region(hpx::threads::thread_data const* thrdptr,
+        std::size_t const num_thread) noexcept
       : impl(create_tracy_region(thrdptr, num_thread))
     {
     }
@@ -44,7 +45,8 @@ namespace hpx::tracing {
     // fiber_region
 
     hpx::tracy::fiber_region fiber_region::create_tracy_fiber_region(
-        hpx::threads::thread_data* thrdptr, std::size_t num_thread) noexcept
+        hpx::threads::thread_data const* thrdptr,
+        std::size_t const num_thread) noexcept
     {
         char const* name = thrdptr->get_description().get_description();
         bool const enabled = name != nullptr && !thrdptr->is_stackless();
@@ -57,8 +59,8 @@ namespace hpx::tracing {
         return hpx::tracy::fiber_region(fiber_name, name, color, enabled);
     }
 
-    fiber_region::fiber_region(
-        hpx::threads::thread_data* thrdptr, std::size_t num_thread) noexcept
+    fiber_region::fiber_region(hpx::threads::thread_data const* thrdptr,
+        std::size_t const num_thread) noexcept
       : impl(create_tracy_fiber_region(thrdptr, num_thread))
     {
     }

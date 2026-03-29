@@ -82,7 +82,7 @@ namespace hpx::parallel {
                 {
                     out = dispatch(traits2::get_id(sdest), algo, policy,
                         std::true_type(), beg, end, ldest, old_value, new_value,
-                        HPX_FORWARD(Proj, proj));
+                        proj);
                 }
 
                 // handle all of the full partitions
@@ -95,7 +95,7 @@ namespace hpx::parallel {
                     {
                         out = dispatch(traits2::get_id(sdest), algo, policy,
                             std::true_type(), beg, end, ldest, old_value,
-                            new_value, HPX_FORWARD(Proj, proj));
+                            new_value, proj);
                     }
                 }
 
@@ -171,7 +171,7 @@ namespace hpx::parallel {
                 {
                     segments.push_back(dispatch_async(traits2::get_id(sdest),
                         algo, policy, forced_seq(), beg, end, ldest, old_value,
-                        new_value, HPX_FORWARD(Proj, proj)));
+                        new_value, proj));
                 }
 
                 // handle all of the full partitions
@@ -182,10 +182,9 @@ namespace hpx::parallel {
                     ldest = traits2::begin(sdest);
                     if (beg != end)
                     {
-                        segments.push_back(
-                            dispatch_async(traits2::get_id(sdest), algo, policy,
-                                forced_seq(), beg, end, ldest, old_value,
-                                new_value, HPX_FORWARD(Proj, proj)));
+                        segments.push_back(dispatch_async(
+                            traits2::get_id(sdest), algo, policy, forced_seq(),
+                            beg, end, ldest, old_value, new_value, proj));
                     }
                 }
 
@@ -269,8 +268,7 @@ namespace hpx::parallel {
                 if (beg != end)
                 {
                     out = dispatch(traits2::get_id(sdest), algo, policy,
-                        std::true_type(), beg, end, ldest, f, new_value,
-                        HPX_FORWARD(Proj, proj));
+                        std::true_type(), beg, end, ldest, f, new_value, proj);
                 }
 
                 // handle all of the full partitions
@@ -283,7 +281,7 @@ namespace hpx::parallel {
                     {
                         out = dispatch(traits2::get_id(sdest), algo, policy,
                             std::true_type(), beg, end, ldest, f, new_value,
-                            HPX_FORWARD(Proj, proj));
+                            proj);
                     }
                 }
 
@@ -357,9 +355,9 @@ namespace hpx::parallel {
                 local_iterator_type2 ldest = traits2::local(dest);
                 if (beg != end)
                 {
-                    segments.push_back(dispatch_async(traits2::get_id(sdest),
-                        algo, policy, forced_seq(), beg, end, ldest, f,
-                        new_value, HPX_FORWARD(Proj, proj)));
+                    segments.push_back(
+                        dispatch_async(traits2::get_id(sdest), algo, policy,
+                            forced_seq(), beg, end, ldest, f, new_value, proj));
                 }
 
                 // handle all of the full partitions
@@ -370,10 +368,9 @@ namespace hpx::parallel {
                     ldest = traits2::begin(sdest);
                     if (beg != end)
                     {
-                        segments.push_back(
-                            dispatch_async(traits2::get_id(sdest), algo, policy,
-                                forced_seq(), beg, end, ldest, f, new_value,
-                                HPX_FORWARD(Proj, proj)));
+                        segments.push_back(dispatch_async(
+                            traits2::get_id(sdest), algo, policy, forced_seq(),
+                            beg, end, ldest, f, new_value, proj));
                     }
                 }
 

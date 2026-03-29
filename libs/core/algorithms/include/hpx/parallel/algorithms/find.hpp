@@ -1056,7 +1056,8 @@ namespace hpx::parallel {
                     }
                 }
 
-                difference_type count = detail::distance(first, last);
+                difference_type count =
+                    hpx::parallel::detail::distance(first, last);
 
                 decltype(auto) policy =
                     hpx::execution::experimental::adapt_placement_mode(
@@ -1139,7 +1140,8 @@ namespace hpx::parallel {
                     }
                 }
 
-                difference_type count = detail::distance(first, last);
+                difference_type count =
+                    hpx::parallel::detail::distance(first, last);
 
                 decltype(auto) policy =
                     hpx::execution::experimental::adapt_placement_mode(
@@ -1222,7 +1224,8 @@ namespace hpx::parallel {
                     }
                 }
 
-                difference_type count = detail::distance(first, last);
+                difference_type count =
+                    hpx::parallel::detail::distance(first, last);
 
                 decltype(auto) policy =
                     hpx::execution::experimental::adapt_placement_mode(
@@ -1311,8 +1314,10 @@ namespace hpx::parallel {
                     }
                 }
 
-                difference_type count = detail::distance(first1, last1);
-                difference_type diff = detail::distance(first2, last2);
+                difference_type count =
+                    hpx::parallel::detail::distance(first1, last1);
+                difference_type diff =
+                    hpx::parallel::detail::distance(first2, last2);
 
                 if constexpr (!has_scheduler_executor)
                 {
@@ -1416,7 +1421,8 @@ namespace hpx::parallel {
                         return result::get(HPX_MOVE(last));
                 }
 
-                difference_type count = detail::distance(first, last);
+                difference_type count =
+                    hpx::parallel::detail::distance(first, last);
 
                 if (s_first == s_last)
                 {
@@ -1844,7 +1850,8 @@ namespace hpx::parallel::detail {
                 }
             }
 
-            difference_type count = detail::distance(first, last);
+            difference_type count =
+                hpx::parallel::detail::distance(first, last);
 
             decltype(auto) policy =
                 hpx::execution::experimental::adapt_placement_mode(
@@ -1931,7 +1938,8 @@ namespace hpx::parallel::detail {
                 }
             }
 
-            difference_type count = detail::distance(first, last);
+            difference_type count =
+                hpx::parallel::detail::distance(first, last);
 
             decltype(auto) policy =
                 hpx::execution::experimental::adapt_placement_mode(
@@ -2019,7 +2027,8 @@ namespace hpx::parallel::detail {
                 }
             }
 
-            difference_type count = detail::distance(first, last);
+            difference_type count =
+                hpx::parallel::detail::distance(first, last);
 
             decltype(auto) policy =
                 hpx::execution::experimental::adapt_placement_mode(

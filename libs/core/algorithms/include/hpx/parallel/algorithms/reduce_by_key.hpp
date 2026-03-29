@@ -124,6 +124,8 @@ namespace hpx { namespace experimental {
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/iterator_support.hpp>
+#include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/algorithms/inclusive_scan.hpp>
 #include <hpx/parallel/container_algorithms/copy.hpp>
@@ -275,8 +277,9 @@ namespace hpx::parallel::detail {
         // the iterator we want is 'second' part of pair type (from copy_if)
         auto t = zipiter.out.get_iterator_tuple();
         iKey key_end = hpx::get<0>(t);
-        return util::in_out_result<iKey, iVal>{
-            key_end, std::next(val_start, std::distance(key_start, key_end))};
+        return util::in_out_result<iKey, iVal>{key_end,
+            std::next(val_start,
+                hpx::parallel::detail::distance(key_start, key_end))};
     }
 
     // async version that returns future<pair> from future<zip_iterator<blah>>
@@ -291,7 +294,8 @@ namespace hpx::parallel::detail {
                 auto t = zipiter.second.get_iterator_tuple();
                 iKey key_end = hpx::get<0>(t);
                 return result_type{key_end,
-                    std::next(val_start, std::distance(key_start, key_end))};
+                    std::next(val_start,
+                        hpx::parallel::detail::distance(key_start, key_end))};
             });
     }
 
