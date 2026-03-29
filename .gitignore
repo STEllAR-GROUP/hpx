@@ -25,3 +25,4 @@ cmake-build*
 vscode-build
 compile_commands.json
 
+build_inspect_local/
