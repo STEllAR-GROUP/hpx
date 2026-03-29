@@ -208,15 +208,12 @@ int main()
     // connect awaitable
 #if !defined(HPX_HAVE_STDEXEC)
     {
-        static_assert(std::is_same_v<decltype(ex::connect_awaitable(
-                                         awaitable_sender_1<awaiter>{},
-                                         recv_set_value{})),
-            ex::operation_t<recv_set_value>>);
-
-        static_assert(
-            std::is_same_v<decltype(ex::connect(awaitable_sender_1<awaiter>{},
-                               recv_set_value{})),
-                ex::operation_t<recv_set_value>>);
+        // Verify that connect_awaitable and connect return the same operation state type
+        static_assert(std::is_same_v<
+            decltype(ex::connect_awaitable(
+                awaitable_sender_1<awaiter>{}, recv_set_value{})),
+            decltype(ex::connect(
+                awaitable_sender_1<awaiter>{}, recv_set_value{}))>);
     }
 #endif
 
@@ -261,17 +258,20 @@ int main()
     // Operation base
 #if !defined(HPX_HAVE_STDEXEC)
     {
-        static_assert(
-            ex::is_operation_state_v<ex::operation_t<recv_set_value>>);
+        using operation_type = decltype(ex::connect(
+            awaitable_sender_1<awaiter>{}, recv_set_value{}));
+        static_assert(ex::is_operation_state_v<operation_type>);
     }
 #endif
 
     // Connect result type
 #if !defined(HPX_HAVE_STDEXEC)
     {
+        using operation_type = decltype(ex::connect(
+            awaitable_sender_1<awaiter>{}, recv_set_value{}));
         static_assert(std::is_same_v<
             ex::connect_result_t<awaitable_sender_1<awaiter>, recv_set_value>,
-            ex::operation_t<recv_set_value>>);
+            operation_type>);
     }
 #endif
 
