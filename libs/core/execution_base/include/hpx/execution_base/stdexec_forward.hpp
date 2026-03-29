@@ -28,6 +28,18 @@
 #elif defined(HPX_CLANG_VERSION)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Weverything"
+#elif defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable : 4996)    // deprecated API warnings from stdexec
+#pragma warning(disable : 4141)    // 'inline' used more than once
+#pragma warning(disable : 4244)    // conversion warnings
+// On MSVC x86/x64, _mm_pause is an intrinsic declared in <intrin.h>.  stdexec's
+// stop_token.hpp later declares `extern void _mm_pause();` without a calling
+// convention which would conflict (C2732).  Pre-including <intrin.h> ensures
+// the intrinsic definition wins before stdexec sees the header.
+#if defined(_M_IX86) || defined(_M_X64)
+#include <intrin.h>
+#endif
 #endif
 
 // GCC advertises constexpr exceptions in C++26, but current stdexec main
@@ -60,6 +72,8 @@
 #pragma GCC diagnostic pop
 #elif defined(HPX_CLANG_VERSION)
 #pragma clang diagnostic pop
+#elif defined(_MSC_VER)
+#pragma warning(pop)
 #endif
 
 namespace hpx::execution::experimental {
