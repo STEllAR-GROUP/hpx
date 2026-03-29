@@ -20,6 +20,7 @@
 #include <hpx/parallel/segmented_algorithms/generate.hpp>
 #include <hpx/parallel/segmented_algorithms/inclusive_scan.hpp>
 #include <hpx/parallel/segmented_algorithms/is_sorted.hpp>
+#include <hpx/parallel/segmented_algorithms/merge.hpp>
 #include <hpx/parallel/segmented_algorithms/minmax.hpp>
 #include <hpx/parallel/segmented_algorithms/reduce.hpp>
 #include <hpx/parallel/segmented_algorithms/replace.hpp>
