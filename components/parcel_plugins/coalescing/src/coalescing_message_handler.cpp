@@ -205,7 +205,8 @@ namespace hpx::plugins::parcel {
             timer_.start(interval);
             break;
 
-        case detail::message_buffer::message_buffer_append_state::buffer_now_full:
+        case detail::message_buffer::message_buffer_append_state::
+            buffer_now_full:
             flush_locked(l,
                 parcelset::policies::message_handler::flush_mode_buffer_full,
                 false, true);

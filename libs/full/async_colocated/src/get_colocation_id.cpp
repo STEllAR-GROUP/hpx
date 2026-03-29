@@ -7,8 +7,8 @@
 
 #include <hpx/assert.hpp>
 #include <hpx/async_colocated/get_colocation_id.hpp>
-#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/modules/async_base.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/naming_base.hpp>

@@ -11,7 +11,7 @@
 #include <hpx/agas_base/server/component_namespace.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/continuation.hpp>
-#include <hpx/components_base/agas_interface.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/timing.hpp>

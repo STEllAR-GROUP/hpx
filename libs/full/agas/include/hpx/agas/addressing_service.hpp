@@ -11,9 +11,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/agas/agas_fwd.hpp>
-#include <hpx/components_base/pinned_ptr.hpp>
 #include <hpx/modules/agas_base.hpp>
 #include <hpx/modules/cache.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>

@@ -12,8 +12,7 @@
 #include <hpx/actions_base/traits/is_distribution_policy.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/dataflow.hpp>
-#include <hpx/components_base/agas_interface.hpp>
-#include <hpx/components_base/component_type.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/naming_base.hpp>

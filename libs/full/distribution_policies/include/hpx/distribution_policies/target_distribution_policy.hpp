@@ -15,8 +15,8 @@
 #include <hpx/async_distributed/dataflow.hpp>
 #include <hpx/async_distributed/detail/async_implementations_fwd.hpp>
 #include <hpx/async_distributed/detail/post_implementations_fwd.hpp>
-#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/modules/async_base.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/serialization.hpp>
