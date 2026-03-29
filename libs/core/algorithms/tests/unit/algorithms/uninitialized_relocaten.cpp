@@ -478,8 +478,6 @@ void test_overlapping()
         {
         }
 
-        // Because we know the execution is sequenced:
-
         // K move constructors were called, and then the last one throws
         HPX_TEST(
             non_trivially_relocatable_struct_throwing_overlapping::moved == K);
@@ -491,6 +489,10 @@ void test_overlapping()
         HPX_TEST(
             non_trivially_relocatable_struct_throwing_overlapping::destroyed ==
             K - 1 + M + offset);
+
+        // All objects in the relocation range are cleaned up after exception
+        HPX_TEST(non_trivially_relocatable_struct_throwing_overlapping::made
+                     .size() == static_cast<std::size_t>(N - M - offset));
 
         // The objects in the end of ptr1 are still valid
         for (int i = M + offset; i < N; i++)
