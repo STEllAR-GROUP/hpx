@@ -126,7 +126,15 @@ else()
   include(HPX_SetupBoostFilesystem)
 endif()
 
+# Hwloc
+set(HPX_HWLOC_ROOT "@Hwloc_ROOT@")
+if(NOT Hwloc_ROOT AND NOT "$ENV{Hwloc_ROOT}")
+  set(Hwloc_ROOT ${HPX_HWLOC_ROOT})
+endif()
+include(HPX_SetupHwloc)
+
 include("${CMAKE_CURRENT_LIST_DIR}/HPXInternalTargets.cmake")
+
 include("${CMAKE_CURRENT_LIST_DIR}/HPXTargets.cmake")
 
 get_filename_component(
@@ -142,4 +150,19 @@ set(HPX_LIBRARY_DIR "@CMAKE_INSTALL_FULL_LIBDIR@")
 set(HPX_INCLUDE_DIR "@CMAKE_INSTALL_FULL_INCLUDEDIR@")
 set(HPX_PREFIX ${_hpx_root_dir})
 
+# If HPX was configured via configure_file instead of configure_package_config_file
+# we need to provide the check_required_components macro ourselves.
+if(NOT COMMAND check_required_components)
+  macro(check_required_components _NAME)
+    foreach(comp ${${_NAME}_FIND_COMPONENTS})
+      if(NOT ${_NAME}_${comp}_FOUND)
+        if(${_NAME}_FIND_REQUIRED_${comp})
+          set(${_NAME}_FOUND FALSE)
+        endif()
+      endif()
+    endforeach()
+  endmacro()
+endif()
+
 check_required_components("@HPX_PACKAGE_NAME@")
+
