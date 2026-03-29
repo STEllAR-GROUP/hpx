@@ -12,6 +12,7 @@
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/parallel/algorithms/detail/adjacent_find.hpp>
+#include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/datapar/iterator_helpers.hpp>
 #include <hpx/parallel/datapar/loop.hpp>
 #include <hpx/parallel/datapar/zip_iterator.hpp>
@@ -37,7 +38,8 @@ namespace hpx::parallel::detail {
             ++next;
 
             auto zip_iter = hpx::util::zip_iterator(first, next);
-            std::size_t const count = std::distance(first, last);
+            std::size_t const count =
+                hpx::parallel::detail::distance(first, last);
             util::cancellation_token<std::size_t> tok(count);
 
             call(0, zip_iter, count - 1, tok,
