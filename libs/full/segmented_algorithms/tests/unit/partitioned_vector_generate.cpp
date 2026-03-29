@@ -157,7 +157,8 @@ void generate_n_algo_tests_with_policy_async(std::size_t size, Count count,
     iota_vector(c, T(1234));
     std::iota(l.begin(), l.end(), T(1234));
 
-    hpx::future<void> f = hpx::generate_n(generate_policy, c.begin(), count, gen<T>{});
+    hpx::future<void> f =
+        hpx::generate_n(generate_policy, c.begin(), count, gen<T>{});
     f.wait();
     std::generate_n(l.begin(), count, gen<T>{});
     verify_against_std(c, l);
@@ -188,8 +189,10 @@ void generate_n_tests_with_policy(std::size_t size, std::size_t count_range,
         generate_n_algo_tests_with_policy<T>(size, count, policy, par);
 
         //async
-        generate_n_algo_tests_with_policy_async<T>(size, count, policy, seq(task));
-        generate_n_algo_tests_with_policy_async<T>(size, count, policy, par(task));
+        generate_n_algo_tests_with_policy_async<T>(
+            size, count, policy, seq(task));
+        generate_n_algo_tests_with_policy_async<T>(
+            size, count, policy, par(task));
     }
 }
 
@@ -206,7 +209,6 @@ void generate_tests()
     generate_tests_with_policy<T>(
         length, localities.size(), hpx::container_layout(localities));
 }
-
 
 template <typename T>
 void generate_n_tests()
