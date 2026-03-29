@@ -11,6 +11,7 @@
 #include <hpx/modules/type_support.hpp>
 
 #include <atomic>
+#include <cstddef>
 #include <random>
 #include <set>
 #include <utility>
@@ -513,6 +514,62 @@ void test_overlapping()
     return;
 }
 
+template <typename Ex>
+void test_right_overlapping()
+{
+    constexpr int offset = 4;
+
+    // relocating M objects `offset` positions forward (right-shift)
+    static_assert(M + offset <= N);
+
+    {    // Right-shift overlapping trivially-relocatable
+        auto [ptr, ___] = setup<trivially_relocatable_struct_overlapping>();
+
+        // Destroy objects just past source range to make dest end uninitialized
+        std::destroy(ptr + M, ptr + M + offset);
+        HPX_TEST(trivially_relocatable_struct_overlapping::destroyed == offset);
+
+        // Relocate M objects `offset` positions forward
+        uninitialized_relocate(Ex{}, ptr, ptr + M, ptr + offset);
+
+        // Manually update bookkeeping (memmove does no C++ ops)
+        for (int i = 0; i < M; i++)
+        {
+            trivially_relocatable_struct_overlapping::made.erase(ptr + i);
+        }
+        for (int i = 0; i < M; i++)
+        {
+            trivially_relocatable_struct_overlapping::made.insert(
+                ptr + offset + i);
+        }
+
+        // No move constructor or destructor called for trivially relocatable
+        HPX_TEST(trivially_relocatable_struct_overlapping::moved == 0);
+        HPX_TEST(trivially_relocatable_struct_overlapping::destroyed == offset);
+
+        // Objects relocated correctly
+        for (int i = 0; i < M; i++)
+        {
+            HPX_TEST(ptr[offset + i].data == i);
+        }
+
+        // Objects not in relocation range are untouched
+        for (int i = M + offset; i < N; i++)
+        {
+            HPX_TEST(ptr[i].data == i);
+        }
+
+        // Destroy within their lifetime
+        std::destroy(ptr + offset, ptr + M + offset);
+        std::destroy(ptr + M + offset, ptr + N);
+
+        HPX_TEST(trivially_relocatable_struct_overlapping::made.empty());
+
+        std::free(ptr);
+    }
+    clear();
+}
+
 int hpx_main()
 {
     test<hpx::execution::sequenced_policy>();
@@ -520,6 +577,9 @@ int hpx_main()
 
     test_overlapping<hpx::execution::sequenced_policy>();
     test_overlapping<hpx::execution::parallel_policy>();
+
+    test_right_overlapping<hpx::execution::sequenced_policy>();
+    test_right_overlapping<hpx::execution::parallel_policy>();
 
     return hpx::local::finalize();
 }

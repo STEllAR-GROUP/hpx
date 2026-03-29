@@ -1069,6 +1069,28 @@ namespace hpx::experimental {
                 }
             }
 
+            // right-shift overlap with trivially relocatable must use memmove
+            if constexpr (hpx::traits::is_contiguous_iterator_v<InIter> &&
+                hpx::traits::is_contiguous_iterator_v<FwdIter>)
+            {
+                constexpr bool is_trivially_relocatable =
+                    hpx::experimental::util::detail::relocation_traits<InIter,
+                        FwdIter>::is_memcpyable;
+                if constexpr (is_trivially_relocatable)
+                {
+                    auto last = std::next(first, count);
+                    if (first < dest && dest < last)
+                    {
+                        using value_type = std::iter_value_t<InIter>;
+                        std::memmove(static_cast<void*>(std::to_address(dest)),
+                            static_cast<void const*>(std::to_address(first)),
+                            count * sizeof(value_type));
+                        return parallel::util::detail::algorithm_result<
+                            ExPolicy, FwdIter>::get(std::next(dest, count));
+                    }
+                }
+            }
+
             if constexpr (!hpx::is_sequenced_execution_policy_v<ExPolicy>)
             {
                 bool has_overlap = false;
@@ -1246,6 +1268,29 @@ namespace hpx::experimental {
                 {
                     return parallel::util::detail::algorithm_result<ExPolicy,
                         FwdIter>::get(HPX_MOVE(dest));
+                }
+            }
+
+            // right-shift overlap with trivially relocatable must use memmove
+            if constexpr (hpx::traits::is_contiguous_iterator_v<InIter1> &&
+                hpx::traits::is_contiguous_iterator_v<InIter2> &&
+                hpx::traits::is_contiguous_iterator_v<FwdIter>)
+            {
+                constexpr bool is_trivially_relocatable =
+                    hpx::experimental::util::detail::relocation_traits<InIter1,
+                        FwdIter>::is_memcpyable;
+                if constexpr (is_trivially_relocatable)
+                {
+                    auto last = std::next(first, count);
+                    if (first < dest && dest < last)
+                    {
+                        using value_type = std::iter_value_t<InIter1>;
+                        std::memmove(static_cast<void*>(std::to_address(dest)),
+                            static_cast<void const*>(std::to_address(first)),
+                            count * sizeof(value_type));
+                        return parallel::util::detail::algorithm_result<
+                            ExPolicy, FwdIter>::get(std::next(dest, count));
+                    }
                 }
             }
 
