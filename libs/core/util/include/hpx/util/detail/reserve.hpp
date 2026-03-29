@@ -14,7 +14,6 @@
 
 #include <cstddef>
 #include <iterator>
-#include <ranges>
 #include <type_traits>
 
 namespace hpx::traits::detail {

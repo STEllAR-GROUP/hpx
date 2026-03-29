@@ -10,7 +10,6 @@
 #include <hpx/config.hpp>
 
 #include <iterator>
-#include <ranges>
 #include <utility>
 
 namespace hpx::parallel::detail {

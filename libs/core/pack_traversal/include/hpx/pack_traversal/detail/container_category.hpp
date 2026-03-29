@@ -9,7 +9,6 @@
 #include <hpx/config.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/iterator_support.hpp>
-#include <ranges>
 
 namespace hpx::util::detail {
 

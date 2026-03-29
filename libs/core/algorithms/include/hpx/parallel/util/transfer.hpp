@@ -22,7 +22,6 @@
 #include <cstring>    // for std::memmove
 #include <iterator>
 #include <memory>
-#include <ranges>
 #include <type_traits>
 #include <utility>
 

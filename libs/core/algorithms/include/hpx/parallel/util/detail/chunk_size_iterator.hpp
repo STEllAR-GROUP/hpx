@@ -17,7 +17,6 @@
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
-#include <ranges>
 #include <type_traits>
 
 ///////////////////////////////////////////////////////////////////////////////

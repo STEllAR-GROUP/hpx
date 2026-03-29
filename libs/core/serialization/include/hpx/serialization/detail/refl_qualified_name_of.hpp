@@ -17,7 +17,6 @@
 #include <vector>
 
 #include <meta>
-#include <ranges>
 
 namespace hpx::serialization::detail {
     // A simple wrapper around a char array that can be constructed

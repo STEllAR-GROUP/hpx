@@ -259,7 +259,6 @@ namespace hpx::ranges {
 #include <hpx/parallel/util/result_types.hpp>
 
 #include <iterator>
-#include <ranges>
 #include <type_traits>
 
 namespace hpx::ranges {
