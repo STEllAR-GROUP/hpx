@@ -70,6 +70,7 @@ int main()
 {
     using hpx::serialization::detail::qualified_name_of;
 
+    // Empty/Variadic Template Test
     {
         using type = empty_space::void_void<>;
         char const* name = qualified_name_of<type>::get();
@@ -77,6 +78,7 @@ int main()
         HPX_TEST_EQ(std::string(name), std::string("empty_space::void_void<>"));
     }
 
+    // Deep Namespace + High Arity
     {
         using type = a::b::c::d::pentagon<int, char, double, float, long,
             signed char const volatile* const, int&&, double&>;
@@ -87,12 +89,16 @@ int main()
                 "volatile signed char* const,int&&,double&>"));
     }
 
+    // Deeply Nested Custom Types as Template Args
     {
+        // City containing a Person from a different namespace
         using nested_type = world::continent::country::city<local::person>;
+        // Wrap that in ANOTHER layer
         using deeper_nested_type = world::continent::country::city<nested_type>;
 
         char const* name = qualified_name_of<deeper_nested_type>::get();
 
+        // Expected
         std::string expected =
             "world::continent::country::city<"
             "world::continent::country::city<local::person>>";
@@ -100,6 +106,7 @@ int main()
         HPX_TEST_EQ(std::string(name), expected);
     }
 
+    // Same Name in Different Namespaces
     {
         std::string server_req = qualified_name_of<server::request>::get();
         std::string client_req = qualified_name_of<client::request>::get();
@@ -109,6 +116,7 @@ int main()
         HPX_TEST_EQ(client_req, std::string("client::request"));
     }
 
+    // CRTP types
     {
         using base_type =
             crtp::base<crtp::derived<signed short int const volatile* const&&>,
@@ -123,8 +131,9 @@ int main()
         HPX_TEST_EQ(std::string(derived_name), "crtp::derived<wchar_t&>");
     }
 
+    // User defined names
     {
-        char const* name = hpx::serialization::detail::get_serialization_name<
+        char const* name = hpx::serialization::detail::get_serialization_name
             local::person>()();
         HPX_TEST_EQ(std::string(name), "heisenberg");
     }
