@@ -133,7 +133,7 @@ int main()
 
     // User defined names
     {
-        char const* name = hpx::serialization::detail::get_serialization_name
+        char const* name = hpx::serialization::detail::get_serialization_name<
             local::person>()();
         HPX_TEST_EQ(std::string(name), "heisenberg");
     }
