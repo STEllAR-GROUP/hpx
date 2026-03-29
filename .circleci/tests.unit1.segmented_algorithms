@@ -13,6 +13,7 @@ tests.unit.modules.segmented_algorithms.partitioned_vector_all_of2
 tests.unit.modules.segmented_algorithms.partitioned_vector_any_of1
 tests.unit.modules.segmented_algorithms.partitioned_vector_any_of2
 tests.unit.modules.segmented_algorithms.partitioned_vector_copy
+tests.unit.modules.segmented_algorithms.partitioned_vector_equal
 tests.unit.modules.segmented_algorithms.partitioned_vector_for_each
 tests.unit.modules.segmented_algorithms.partitioned_vector_for_each_double
 tests.unit.modules.segmented_algorithms.partitioned_vector_for_each_n

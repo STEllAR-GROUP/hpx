@@ -41,7 +41,7 @@ namespace hpx::threads {
 
         void set_get_locality_id(get_locality_id_type* f)
         {
-            get_locality_id_f = HPX_MOVE(f);
+            get_locality_id_f = f;
         }
 
         std::uint32_t get_locality_id(hpx::error_code& ec)
@@ -422,16 +422,6 @@ namespace hpx::threads {
         if (thread_self const* self = get_self_ptr();
             HPX_LIKELY(nullptr != self))
         {
-            return self->get_thread_id();
-        }
-        return threads::invalid_thread_id;
-    }
-
-    thread_id_type get_outer_self_id() noexcept
-    {
-        if (thread_self const* self = get_self_ptr();
-            HPX_LIKELY(nullptr != self))
-        {
             return self->get_outer_thread_id();
         }
         return threads::invalid_thread_id;
@@ -442,7 +432,7 @@ namespace hpx::threads {
         if (thread_self const* self = get_self_ptr();
             HPX_LIKELY(nullptr != self))
         {
-            return get_thread_id_data(self->get_thread_id());
+            return get_thread_id_data(self->get_outer_thread_id());
         }
         return nullptr;
     }
@@ -521,7 +511,7 @@ namespace hpx::threads {
         if (thread_data const* thrd_data = get_self_id_data();
             HPX_LIKELY(nullptr != thrd_data))
         {
-            return thrd_data->get_component_id();
+            return hpx::threads::thread_data::get_component_id();
         }
         return 0;
 #endif

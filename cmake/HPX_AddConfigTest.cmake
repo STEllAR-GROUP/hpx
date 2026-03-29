@@ -490,15 +490,6 @@ function(hpx_check_for_cxx20_coroutines)
 endfunction()
 
 # ##############################################################################
-function(hpx_check_for_cxx20_lambda_capture)
-  add_hpx_config_test(
-    HPX_WITH_CXX20_LAMBDA_CAPTURE
-    SOURCE cmake/tests/cxx20_lambda_capture.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
 function(hpx_check_for_pthread_setname_np)
   add_hpx_config_test(
     HPX_WITH_PTHREAD_SETNAME_NP
@@ -521,15 +512,6 @@ function(hpx_check_for_cxx20_no_unique_address_attribute)
   add_hpx_config_test(
     HPX_WITH_CXX20_NO_UNIQUE_ADDRESS_ATTRIBUTE
     SOURCE cmake/tests/cxx20_no_unique_address_attribute.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
-function(hpx_check_for_cxx20_std_endian)
-  add_hpx_config_test(
-    HPX_WITH_CXX20_STD_ENDIAN
-    SOURCE cmake/tests/cxx20_std_endian.cpp
     FILE ${ARGN}
   )
 endfunction()
