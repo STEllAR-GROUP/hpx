@@ -106,7 +106,7 @@ void verify_merge(hpx::partitioned_vector<T> const& D,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Test 1: Stability — A elements come before B on equal keys
+// Test 1: Stability: A elements come before B on equal keys
 template <typename ExPolicy>
 void test_merge_stability(ExPolicy&& policy)
 {
@@ -347,7 +347,7 @@ void test_merge_single_elements()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Test 7: All duplicate keys — heavy stability test
+// Test 7: All duplicate keys: heavy stability test
 void test_merge_all_duplicates()
 {
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
@@ -462,7 +462,7 @@ void test_merge_skewed_sizes()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Test 11: Default comparator (no custom comp — uses hpx::parallel::detail::less)
+// Test 11: Default comparator (no custom comp: uses hpx::parallel::detail::less)
 void test_merge_default_comp()
 {
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
@@ -478,7 +478,7 @@ void test_merge_default_comp()
     assign_vector(A, A_data);
     assign_vector(B, B_data);
 
-    // Call without explicit comparator — uses default less
+    // Call without explicit comparator: uses default less
     hpx::merge(
         hpx::execution::seq, A.begin(), A.end(), B.begin(), B.end(), D.begin());
 
@@ -502,7 +502,7 @@ void test_merge_noncontiguous_A()
     using vector_type = hpx::partitioned_vector<tagged_value>;
 
     // A: 12 elements in 3 partitions (4 each) -> [loc0, loc1, loc0]
-    // loc0 owns A[0..4) and A[8..12) — non-contiguous
+    // loc0 owns A[0..4) and A[8..12): non-contiguous
     std::vector<tagged_value> const A_data{
         {1, 0}, {3, 0}, {5, 0}, {7, 0},      // partition 0 on loc0
         {2, 0}, {4, 0}, {6, 0}, {8, 0},      // partition 1 on loc1
@@ -541,7 +541,7 @@ void test_merge_noncontiguous_A()
 ///////////////////////////////////////////////////////////////////////////////
 // Test 13: Non-contiguous D partitions on one locality
 // D has 3 partitions on 2 localities: [loc0, loc1, loc0]
-// So loc0 writes to dest[0..N/3) and dest[2*N/3..N) — non-contiguous.
+// So loc0 writes to dest[0..N/3) and dest[2*N/3..N): non-contiguous.
 void test_merge_noncontiguous_D()
 {
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
@@ -555,7 +555,7 @@ void test_merge_noncontiguous_D()
     std::vector<int> const B_data{2, 4, 6, 8, 10, 12};
 
     // D: 12 elements in 3 partitions (4 each) -> [loc0, loc1, loc0]
-    // loc0 owns D[0..4) and D[8..12) — non-contiguous destination
+    // loc0 owns D[0..4) and D[8..12): non-contiguous destination
     hpx::partitioned_vector<int> A(
         A_data.size(), hpx::container_layout(localities));
     hpx::partitioned_vector<int> B(
@@ -578,7 +578,7 @@ void test_merge_noncontiguous_D()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Test 14: Different ownership — A only on loc0, B only on loc1, D on both
+// Test 14: Different ownership: A only on loc0, B only on loc1, D on both
 // This forces remote co-rank probes: loc0 must probe B data on loc1,
 // and loc1 must probe A data on loc0.
 void test_merge_different_ownership()
@@ -637,7 +637,7 @@ void test_merge_A_and_D_on_loc0_B_on_loc1()
         A_data.size(), hpx::container_layout(loc0_only));
     hpx::partitioned_vector<int> B(
         B_data.size(), hpx::container_layout(loc1_only));
-    // D entirely on loc0 — loc0 must receive all B payload from loc1
+    // D entirely on loc0: loc0 must receive all B payload from loc1
     hpx::partitioned_vector<int> D(
         A_data.size() + B_data.size(), hpx::container_layout(loc0_only));
 
@@ -684,7 +684,7 @@ void test_merge_noncontiguous_A_and_D()
     };
 
     // D: 12 elements in 3 partitions (4 each) -> [loc0, loc1, loc0]
-    // loc0 has D partitions {0,2} — non-contiguous destination
+    // loc0 has D partitions {0,2}: non-contiguous destination
     vector_type A(A_data.size(), hpx::container_layout(4, localities));
     vector_type B(B_data.size(), hpx::container_layout(localities));
     vector_type D(
@@ -713,7 +713,7 @@ void test_merge_noncontiguous_A_and_D()
 // A on loc0, B on loc0, D on loc1
 // loc1 owns no A and no B slices, but owns all D slices.
 // It must receive all payload from loc0.
-// loc0 owns all input but no D slices — it sends everything, writes nothing.
+// loc0 owns all input but no D slices: it sends everything, writes nothing.
 void test_merge_participant_no_input_slices()
 {
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
@@ -757,7 +757,7 @@ void test_merge_boundary_duplicates()
 
     using vector_type = hpx::partitioned_vector<tagged_value>;
 
-    // Keys cluster at value 5 — tests co-rank probe behavior
+    // Keys cluster at value 5: tests co-rank probe behavior
     // around dense duplicate regions
     std::vector<tagged_value> const A_data{
         {1, 0}, {5, 0}, {5, 0}, {5, 0}, {5, 0}, {10, 0}};
@@ -787,7 +787,7 @@ void test_merge_boundary_duplicates()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Test 19: Larger data set — stress test with many elements
+// Test 19: Larger data set: stress test with many elements
 void test_merge_larger_data()
 {
     std::vector<hpx::id_type> localities = hpx::find_all_localities();

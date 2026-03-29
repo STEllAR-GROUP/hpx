@@ -107,7 +107,9 @@ foreach(test ${tests})
 endforeach()
 
 # Multi-locality merge test (requires 4 localities)
-set(partitioned_vector_merge_multi_FLAGS DEPENDENCIES partitioned_vector_component)
+set(partitioned_vector_merge_multi_FLAGS DEPENDENCIES
+                                         partitioned_vector_component
+)
 
 add_hpx_executable(
   partitioned_vector_merge_multi_test INTERNAL_FLAGS
@@ -119,6 +121,7 @@ add_hpx_executable(
 )
 
 add_hpx_unit_test(
-  "modules.segmented_algorithms" partitioned_vector_merge_multi LOCALITIES 4
-                                 THREADS_PER_LOCALITY 2
+  "modules.segmented_algorithms" partitioned_vector_merge_multi
+  LOCALITIES 4
+  THREADS_PER_LOCALITY 2
 )

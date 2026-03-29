@@ -22,6 +22,7 @@
 #include <hpx/modules/serialization.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 
+#include <hpx/modules/synchronization.hpp>
 #include <algorithm>
 #include <atomic>
 #include <cstddef>
@@ -31,7 +32,6 @@
 #include <limits>
 #include <list>
 #include <map>
-#include <mutex>
 #include <string>
 #include <type_traits>
 #include <unordered_map>
@@ -86,23 +86,11 @@ namespace hpx::parallel::detail {
     // of a segmented range (A, B, or D).
     struct distributed_merge_slice_metadata
     {
-        std::size_t slice_id = 0;
+        std::uint64_t slice_id = 0;
+        std::uint64_t site_index = 0;
+        std::uint64_t global_begin = 0;
+        std::uint64_t global_end = 0;
         std::uint32_t locality_id = naming::invalid_locality_id;
-        std::size_t site_index = 0;
-        std::size_t global_begin = 0;
-        std::size_t global_end = 0;
-
-    private:
-        friend class hpx::serialization::access;
-
-        template <typename Archive>
-        void serialize(Archive& ar, unsigned)
-        {
-            // clang-format off
-            ar & slice_id & locality_id & site_index
-               & global_begin & global_end;
-            // clang-format on
-        }
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -112,9 +100,9 @@ namespace hpx::parallel::detail {
     template <typename LocalIter>
     struct distributed_merge_owned_handle
     {
-        std::size_t slice_id = 0;
-        std::size_t global_begin = 0;
-        std::size_t global_end = 0;
+        std::uint64_t slice_id = 0;
+        std::uint64_t global_begin = 0;
+        std::uint64_t global_end = 0;
         LocalIter local_begin{};
     };
 
@@ -122,24 +110,12 @@ namespace hpx::parallel::detail {
     // interval: co-rank planning result for one destination slice.
     struct distributed_merge_interval
     {
-        std::size_t dest_slice_id = 0;
-        std::size_t site_index = 0;
-        std::size_t A_begin_rank = 0;
-        std::size_t A_end_rank = 0;
-        std::size_t B_begin_rank = 0;
-        std::size_t B_end_rank = 0;
-
-    private:
-        friend class hpx::serialization::access;
-
-        template <typename Archive>
-        void serialize(Archive& ar, unsigned)
-        {
-            // clang-format off
-            ar & dest_slice_id & site_index
-               & A_begin_rank & A_end_rank & B_begin_rank & B_end_rank;
-            // clang-format on
-        }
+        std::uint64_t dest_slice_id = 0;
+        std::uint64_t site_index = 0;
+        std::uint64_t A_begin_rank = 0;
+        std::uint64_t A_end_rank = 0;
+        std::uint64_t B_begin_rank = 0;
+        std::uint64_t B_end_rank = 0;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -148,20 +124,10 @@ namespace hpx::parallel::detail {
     // data pointer is resolved to point directly into the buffer.
     struct distributed_merge_fragment_desc
     {
-        std::size_t dest_slice_id = 0;
-        std::size_t input_global_begin = 0;
-        std::size_t value_offset = 0;
-        std::size_t value_count = 0;
-
-    private:
-        friend class hpx::serialization::access;
-
-        template <typename Archive>
-        void serialize(Archive& ar, unsigned)
-        {
-            ar & dest_slice_id & input_global_begin & value_offset &
-                value_count;
-        }
+        std::uint64_t dest_slice_id = 0;
+        std::uint64_t input_global_begin = 0;
+        std::uint64_t value_offset = 0;
+        std::uint64_t value_count = 0;
     };
 
     // Payload batch: all fragments destined for one peer, packed into a
@@ -188,7 +154,7 @@ namespace hpx::parallel::detail {
     struct distributed_merge_collective_ctx
     {
         std::string invocation_ns;
-        std::unordered_map<std::string, std::size_t> generations;
+        std::unordered_map<std::string, std::uint64_t> generations;
 
         explicit distributed_merge_collective_ctx(std::string ns)
           : invocation_ns(HPX_MOVE(ns))
@@ -200,7 +166,7 @@ namespace hpx::parallel::detail {
             return invocation_ns + "/" + phase;
         }
 
-        std::size_t next_gen(std::string const& phase)
+        std::uint64_t next_gen(std::string const& phase)
         {
             return ++generations[phase];
         }
@@ -226,16 +192,16 @@ namespace hpx::parallel::detail {
     {
         using handle_type = distributed_merge_owned_handle<LocalIter>;
 
-        static std::mutex& mtx()
+        static hpx::spinlock& mtx()
         {
-            static std::mutex m;
+            static hpx::spinlock m;
             return m;
         }
 
         static auto& map()
         {
             static std::unordered_map<std::string,
-                std::unordered_map<std::size_t, handle_type>>
+                std::unordered_map<std::uint64_t, handle_type>>
                 registry;
             return registry;
         }
@@ -254,20 +220,20 @@ namespace hpx::parallel::detail {
             std::string ns, std::vector<handle_type> const& handles)
           : invocation_ns_(HPX_MOVE(ns))
         {
-            std::unordered_map<std::size_t, handle_type> indexed;
+            std::unordered_map<std::uint64_t, handle_type> indexed;
             indexed.reserve(handles.size());
             for (auto const& h : handles)
             {
                 indexed.emplace(h.slice_id, h);
             }
 
-            std::lock_guard<std::mutex> lk(registry_type::mtx());
+            std::lock_guard<hpx::spinlock> lk(registry_type::mtx());
             registry_type::map().emplace(invocation_ns_, HPX_MOVE(indexed));
         }
 
         ~distributed_merge_registry_guard()
         {
-            std::lock_guard<std::mutex> lk(registry_type::mtx());
+            std::lock_guard<hpx::spinlock> lk(registry_type::mtx());
             registry_type::map().erase(invocation_ns_);
         }
 
@@ -300,10 +266,10 @@ namespace hpx::parallel::detail {
         using local_traits =
             hpx::traits::segmented_local_iterator_traits<LocalIter>;
 
-        static T call(std::string const& invocation_ns, std::size_t slice_id,
-            std::size_t offset)
+        static T call(std::string const& invocation_ns, std::uint64_t slice_id,
+            std::uint64_t offset)
         {
-            std::lock_guard<std::mutex> lk(registry_type::mtx());
+            std::lock_guard<hpx::spinlock> lk(registry_type::mtx());
 
             auto& reg = registry_type::map();
             auto ns_it = reg.find(invocation_ns);
@@ -340,12 +306,12 @@ namespace hpx::parallel::detail {
     ///////////////////////////////////////////////////////////////////////////
     // Helper: binary search a sorted layout to find the slice containing a
     // given global rank.
-    inline std::size_t distributed_merge_find_slice(
+    inline std::uint64_t distributed_merge_find_slice(
         std::vector<distributed_merge_slice_metadata> const& layout,
-        std::size_t global_rank)
+        std::uint64_t global_rank)
     {
         auto it = std::upper_bound(layout.begin(), layout.end(), global_rank,
-            [](std::size_t rank, distributed_merge_slice_metadata const& s) {
+            [](std::uint64_t rank, distributed_merge_slice_metadata const& s) {
                 return rank < s.global_end;
             });
 
@@ -356,7 +322,7 @@ namespace hpx::parallel::detail {
                 "global rank outside layout bounds");
         }
 
-        return static_cast<std::size_t>(std::distance(layout.begin(), it));
+        return static_cast<std::uint64_t>(std::distance(layout.begin(), it));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -392,12 +358,12 @@ namespace hpx::parallel::detail {
             return {HPX_MOVE(layout), HPX_MOVE(handles)};
         }
 
-        std::size_t next_id = 0;
-        std::size_t offset = 0;
+        std::uint64_t next_id = 0;
+        std::uint64_t offset = 0;
 
         auto add_slice = [&](segment_iterator const& seg, local_iterator lb,
                              local_iterator le) {
-            auto const len = static_cast<std::size_t>(std::distance(lb, le));
+            auto const len = static_cast<std::uint64_t>(std::distance(lb, le));
             if (len == 0)
                 return;
 
@@ -405,7 +371,7 @@ namespace hpx::parallel::detail {
             auto const loc_id = naming::get_locality_id_from_id(id);
 
             layout.push_back(distributed_merge_slice_metadata{
-                next_id, loc_id, 0, offset, offset + len});
+                next_id, 0, offset, offset + len, loc_id});
 
             handles[loc_id].push_back(
                 distributed_merge_owned_handle<local_iterator>{
@@ -446,7 +412,7 @@ namespace hpx::parallel::detail {
     {
         // Collect unique locality IDs and assign site indices.
         // std::map keeps keys sorted, giving deterministic site ordering.
-        std::map<std::uint32_t, std::size_t> loc_to_site;
+        std::map<std::uint32_t, std::uint64_t> loc_to_site;
         auto collect =
             [&loc_to_site](
                 std::vector<distributed_merge_slice_metadata> const& l) {
@@ -460,7 +426,7 @@ namespace hpx::parallel::detail {
         // Assign contiguous site indices and build participants.
         std::vector<hpx::id_type> participants;
         participants.reserve(loc_to_site.size());
-        std::size_t site = 0;
+        std::uint64_t site = 0;
         for (auto& [loc_id, idx] : loc_to_site)
         {
             idx = site++;
@@ -495,7 +461,7 @@ namespace hpx::parallel::detail {
     // Unique invocation namespace generator.
     inline std::string distributed_merge_make_ns()
     {
-        static std::atomic<std::size_t> counter{0};
+        static std::atomic<std::uint64_t> counter{0};
         return "/hpx/distributed_merge/" +
             std::to_string(hpx::agas::get_locality_id()) + "/" +
             std::to_string(++counter);
@@ -536,10 +502,11 @@ namespace hpx::parallel::detail {
         // Cached remote/local element fetch for co-rank probing.
         template <typename Val, typename LIter, typename FetchAction,
             typename HandleT>
-        static Val fetch_at_rank(std::size_t rank,
+        static Val fetch_at_rank(std::uint64_t rank,
             std::vector<distributed_merge_slice_metadata> const& layout,
-            std::unordered_map<std::size_t, HandleT const*> const& idx,
-            std::unordered_map<std::size_t, Val>& cache, std::size_t this_site,
+            std::unordered_map<std::uint64_t, HandleT const*> const& idx,
+            std::unordered_map<std::uint64_t, Val>& cache,
+            std::uint64_t this_site,
             std::vector<hpx::id_type> const& participants,
             std::string const& invocation_ns)
         {
@@ -547,9 +514,9 @@ namespace hpx::parallel::detail {
             if (cit != cache.end())
                 return cit->second;
 
-            std::size_t const si = distributed_merge_find_slice(layout, rank);
+            std::uint64_t const si = distributed_merge_find_slice(layout, rank);
             auto const& slice = layout[si];
-            std::size_t const off = rank - slice.global_begin;
+            std::uint64_t const off = rank - slice.global_begin;
 
             Val val;
             if (slice.site_index == this_site)
@@ -579,21 +546,21 @@ namespace hpx::parallel::detail {
         // on equal keys. [lo, hi] optionally narrow the search range on
         // the A-index (clamped to the feasible interval).
         template <typename AAt, typename BAt>
-        static std::pair<std::size_t, std::size_t> co_rank(std::size_t K,
-            std::size_t n1, std::size_t n2, AAt&& A_at, BAt&& B_at,
-            Comp const& comp, std::size_t lo = 0,
-            std::size_t hi = std::numeric_limits<std::size_t>::max())
+        static std::pair<std::uint64_t, std::uint64_t> co_rank(std::uint64_t K,
+            std::uint64_t n1, std::uint64_t n2, AAt&& A_at, BAt&& B_at,
+            Comp const& comp, std::uint64_t lo = 0,
+            std::uint64_t hi = (std::numeric_limits<std::uint64_t>::max)())
         {
-            std::size_t const feasible_lo = (K > n2) ? (K - n2) : 0;
-            std::size_t const feasible_hi = (std::min) (K, n1);
+            std::uint64_t const feasible_lo = (K > n2) ? (K - n2) : 0;
+            std::uint64_t const feasible_hi = (std::min) (K, n1);
 
             lo = (std::max) (lo, feasible_lo);
             hi = (std::min) (hi, feasible_hi);
 
             while (true)
             {
-                std::size_t const i = lo + (hi - lo) / 2;
-                std::size_t const j = K - i;
+                std::uint64_t const i = lo + (hi - lo) / 2;
+                std::uint64_t const j = K - i;
 
                 if (i > 0 && j < n2 && comp(B_at(j), A_at(i - 1)))
                 {
@@ -618,9 +585,9 @@ namespace hpx::parallel::detail {
         template <typename T>
         struct resolved_fragment
         {
-            std::size_t input_global_begin;
+            std::uint64_t input_global_begin;
             T const* data;
-            std::size_t count;
+            std::uint64_t count;
         };
 
         template <typename TA, typename TB>
@@ -637,8 +604,8 @@ namespace hpx::parallel::detail {
             std::sort(A_frags.begin(), A_frags.end(), by_rank);
             std::sort(B_frags.begin(), B_frags.end(), by_rank);
 
-            std::size_t a_fi = 0, a_off = 0;
-            std::size_t b_fi = 0, b_off = 0;
+            std::uint64_t a_fi = 0, a_off = 0;
+            std::uint64_t b_fi = 0, b_off = 0;
 
             auto a_done = [&]() { return a_fi >= A_frags.size(); };
             auto b_done = [&]() { return b_fi >= B_frags.size(); };
@@ -706,17 +673,17 @@ namespace hpx::parallel::detail {
             {
                 for (auto const& iv : intervals)
                 {
-                    std::size_t const ob =
+                    std::uint64_t const ob =
                         (std::max) (h.global_begin, begin_rank_of(iv));
-                    std::size_t const oe =
+                    std::uint64_t const oe =
                         (std::min) (h.global_end, end_rank_of(iv));
 
                     if (ob >= oe)
                         continue;
 
                     auto& batch = send[iv.site_index];
-                    std::size_t const off = batch.values.size();
-                    std::size_t const cnt = oe - ob;
+                    std::uint64_t const off = batch.values.size();
+                    std::uint64_t const cnt = oe - ob;
 
                     batch.fragments.push_back(distributed_merge_fragment_desc{
                         iv.dest_slice_id, ob, off, cnt});
@@ -724,7 +691,7 @@ namespace hpx::parallel::detail {
                     auto raw = lt::local(h.local_begin);
                     std::advance(
                         raw, static_cast<std::ptrdiff_t>(ob - h.global_begin));
-                    for (std::size_t k = 0; k != cnt; ++k, ++raw)
+                    for (std::uint64_t k = 0; k != cnt; ++k, ++raw)
                         batch.values.push_back(*raw);
                 }
             }
@@ -734,13 +701,13 @@ namespace hpx::parallel::detail {
         // The main kernel entry point, executed as an action on each
         // participating locality.
         static void call(std::string invocation_ns,
-            std::vector<hpx::id_type> participants, std::size_t this_site,
+            std::vector<hpx::id_type> participants, std::uint64_t this_site,
             std::vector<distributed_merge_slice_metadata> A_layout,
             std::vector<distributed_merge_slice_metadata> B_layout,
             std::vector<distributed_merge_slice_metadata> D_layout,
             std::vector<handle1_t> A_handles, std::vector<handle2_t> B_handles,
-            std::vector<handle_dest_t> D_handles, std::size_t n1,
-            std::size_t n2, Comp comp)
+            std::vector<handle_dest_t> D_handles, std::uint64_t n1,
+            std::uint64_t n2, Comp comp)
         {
             // --- Register local slice handles in static registries ---
             distributed_merge_registry_guard<distributed_merge_tag_A, Value1,
@@ -750,7 +717,7 @@ namespace hpx::parallel::detail {
                 LocalIter2>
                 guard_B(invocation_ns, B_handles);
 
-            std::size_t const P = participants.size();
+            std::uint64_t const P = participants.size();
             distributed_merge_collective_ctx ctx(HPX_MOVE(invocation_ns));
 
             // --- Phase 1: Startup barrier ---
@@ -768,24 +735,24 @@ namespace hpx::parallel::detail {
             }
 
             // --- Build indexed handle maps for O(1) lookup ---
-            std::unordered_map<std::size_t, handle1_t const*> A_idx;
+            std::unordered_map<std::uint64_t, handle1_t const*> A_idx;
             for (auto const& h : A_handles)
                 A_idx.emplace(h.slice_id, &h);
 
-            std::unordered_map<std::size_t, handle2_t const*> B_idx;
+            std::unordered_map<std::uint64_t, handle2_t const*> B_idx;
             for (auto const& h : B_handles)
                 B_idx.emplace(h.slice_id, &h);
 
             // --- Cached co-rank probe functions ---
-            std::unordered_map<std::size_t, Value1> A_cache;
-            std::unordered_map<std::size_t, Value2> B_cache;
+            std::unordered_map<std::uint64_t, Value1> A_cache;
+            std::unordered_map<std::uint64_t, Value2> B_cache;
 
-            auto A_at = [&](std::size_t rank) -> Value1 {
+            auto A_at = [&](std::uint64_t rank) -> Value1 {
                 return fetch_at_rank<Value1, LocalIter1, fetch_action1_t>(rank,
                     A_layout, A_idx, A_cache, this_site, participants,
                     ctx.invocation_ns);
             };
-            auto B_at = [&](std::size_t rank) -> Value2 {
+            auto B_at = [&](std::uint64_t rank) -> Value2 {
                 return fetch_at_rank<Value2, LocalIter2, fetch_action2_t>(rank,
                     B_layout, B_idx, B_cache, this_site, participants,
                     ctx.invocation_ns);
@@ -797,7 +764,7 @@ namespace hpx::parallel::detail {
             std::vector<distributed_merge_interval> local_intervals;
             local_intervals.reserve(D_handles.size());
 
-            std::size_t prev_i = 0, prev_j = 0;
+            std::uint64_t prev_i = 0, prev_j = 0;
 
             for (auto const& dh : D_handles)
             {
@@ -831,7 +798,7 @@ namespace hpx::parallel::detail {
             // Flatten gathered intervals
             std::vector<distributed_merge_interval> all_intervals;
             {
-                std::size_t total = 0;
+                std::uint64_t total = 0;
                 for (auto const& v : gathered)
                     total += v.size();
                 all_intervals.reserve(total);
@@ -882,8 +849,8 @@ namespace hpx::parallel::detail {
             using rfrag1_t = resolved_fragment<Value1>;
             using rfrag2_t = resolved_fragment<Value2>;
 
-            std::unordered_map<std::size_t, std::vector<rfrag1_t>> A_by_dest;
-            std::unordered_map<std::size_t, std::vector<rfrag2_t>> B_by_dest;
+            std::unordered_map<std::uint64_t, std::vector<rfrag1_t>> A_by_dest;
+            std::unordered_map<std::uint64_t, std::vector<rfrag2_t>> B_by_dest;
 
             for (auto& batch : recv_A)
             {
@@ -981,7 +948,7 @@ namespace hpx::parallel::detail {
             "distributed merge requires random-access local iterators "
             "for the destination");
 
-        // Both empty → nothing to do
+        // Both empty, nothing to do.
         if (first1 == last1 && first2 == last2)
         {
             return result_type::get(HPX_MOVE(dest));
@@ -993,8 +960,10 @@ namespace hpx::parallel::detail {
         auto [B_layout, B_handles] =
             distributed_merge_build_slices(first2, last2);
 
-        auto const n1 = static_cast<std::size_t>(std::distance(first1, last1));
-        auto const n2 = static_cast<std::size_t>(std::distance(first2, last2));
+        auto const n1 =
+            static_cast<std::uint64_t>(std::distance(first1, last1));
+        auto const n2 =
+            static_cast<std::uint64_t>(std::distance(first2, last2));
         auto const N = n1 + n2;
 
         auto dest_end = dest;
@@ -1025,7 +994,7 @@ namespace hpx::parallel::detail {
         std::vector<hpx::future<void>> futures;
         futures.reserve(participants.size());
 
-        for (std::size_t site = 0; site != participants.size(); ++site)
+        for (std::uint64_t site = 0; site != participants.size(); ++site)
         {
             auto const loc_id =
                 naming::get_locality_id_from_id(participants[site]);
@@ -1078,3 +1047,9 @@ namespace hpx::parallel::detail {
     }
 
 }    // namespace hpx::parallel::detail
+
+HPX_IS_BITWISE_SERIALIZABLE(
+    hpx::parallel::detail::distributed_merge_slice_metadata)
+HPX_IS_BITWISE_SERIALIZABLE(hpx::parallel::detail::distributed_merge_interval)
+HPX_IS_BITWISE_SERIALIZABLE(
+    hpx::parallel::detail::distributed_merge_fragment_desc)

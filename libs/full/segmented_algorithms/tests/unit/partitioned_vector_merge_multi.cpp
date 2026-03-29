@@ -154,7 +154,7 @@ void test_merge_disjoint_ownership()
 
 ///////////////////////////////////////////////////////////////////////////////
 // Test 2: Non-contiguous A and D across 4 localities
-// A: 8 partitions on 4 localities → each locality owns 2 non-adjacent
+// A: 8 partitions on 4 localities, each locality owns 2 non-adjacent
 // partitions (e.g. loc0 owns partitions {0, 4}).
 // D: also 8 partitions to test non-contiguous destination writes.
 void test_merge_noncontiguous_4loc()
@@ -291,7 +291,7 @@ void test_merge_stability_4loc()
         {13, 0}, {14, 0}, {15, 0}, {16, 0}    // loc3
     };
 
-    // B: 8 elements, 4 partitions (2 each) — duplicate keys with A
+    // B: 8 elements, 4 partitions (2 each): duplicate keys with A
     std::vector<tagged_value> B_data{
         {1, 1}, {2, 1},     // loc0
         {5, 1}, {6, 1},     // loc1
@@ -322,7 +322,7 @@ void test_merge_stability_4loc()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Test 6: Skewed — one locality has all the data, others have nothing
+// Test 6: Skewed: one locality has all the data, others have nothing
 // A on loc0 only, B on loc0 only, D spread across all 4.
 void test_merge_single_source_multi_dest()
 {
@@ -356,7 +356,7 @@ void test_merge_single_source_multi_dest()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Test 7: Reverse — D on one locality, A and B spread across 4.
+// Test 7: Reverse: D on one locality, A and B spread across 4.
 // loc0 is the sole dest owner, must receive payload from all others.
 void test_merge_multi_source_single_dest()
 {
@@ -395,7 +395,7 @@ void test_merge_multi_source_single_dest()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Test 8: par(task) with 4 localities — async path
+// Test 8: par(task) with 4 localities: async path
 void test_merge_async_4loc()
 {
     auto locs = hpx::find_all_localities();
@@ -432,7 +432,7 @@ void test_merge_async_4loc()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Test 9: Larger stress test — 200 elements, many partitions, 4 locs
+// Test 9: Larger stress test: 200 elements, many partitions, 4 locs
 void test_merge_stress_4loc()
 {
     auto locs = hpx::find_all_localities();
