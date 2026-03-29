@@ -24,6 +24,9 @@
 #include <type_traits>
 #include <utility>
 
+#include <hpx/execution/algorithms/bulk.hpp>
+#include <hpx/execution_base/stdexec_forward.hpp>
+
 #include <ranges>
 
 // Forward declaration
@@ -187,6 +190,73 @@ namespace hpx::execution::experimental {
         {
             return scheduler.get_num_cores();
         }
+
+        template <typename Sender, typename Shape, typename F>
+        friend auto tag_invoke(hpx::execution::experimental::bulk_t,
+            thread_pool_policy_scheduler const& scheduler, Sender&& sender,
+            Shape const& shape, F&& f)
+        {
+            if constexpr (std::is_integral_v<std::decay_t<Shape>>)
+            {
+                auto iota_shape = hpx::util::counting_shape(shape);
+
+                // For parallel policies, we want internal chunking for efficiency.
+                // Since bulk_t expects an unchunked function, we wrap f to 
+                // handle a range of indices in a loop.
+                if constexpr (!std::is_same_v<Policy, hpx::launch::sync_policy>)
+                {
+                    auto wrapped_f = [f = HPX_FORWARD(F, f)](
+                        auto start, auto end, auto&... ts) mutable {
+                        for (auto i = start; i != end; ++i)
+                        {
+                            HPX_INVOKE(f, i, ts...);
+                        }
+                    };
+
+                    return detail::thread_pool_bulk_sender<Policy,
+                        std::decay_t<Sender>, decltype(iota_shape),
+                        decltype(wrapped_f), true>{scheduler,
+                        HPX_FORWARD(Sender, sender), iota_shape,
+                        HPX_MOVE(wrapped_f)};
+                }
+                else
+                {
+                    return detail::thread_pool_bulk_sender<Policy,
+                        std::decay_t<Sender>, decltype(iota_shape),
+                        std::decay_t<F>, false>{scheduler,
+                        HPX_FORWARD(Sender, sender), iota_shape,
+                        HPX_FORWARD(F, f)};
+                }
+            }
+            else
+            {
+                if constexpr (!std::is_same_v<Policy, hpx::launch::sync_policy>)
+                {
+                    auto wrapped_f = [f = HPX_FORWARD(F, f)](
+                        auto start, auto end, auto&... ts) mutable {
+                        for (auto i = start; i != end; ++i)
+                        {
+                            HPX_INVOKE(f, i, ts...);
+                        }
+                    };
+
+                    return detail::thread_pool_bulk_sender<Policy,
+                        std::decay_t<Sender>, std::decay_t<Shape>,
+                        decltype(wrapped_f), true>{scheduler,
+                        HPX_FORWARD(Sender, sender), shape,
+                        HPX_MOVE(wrapped_f)};
+                }
+                else
+                {
+                    return detail::thread_pool_bulk_sender<Policy,
+                        std::decay_t<Sender>, std::decay_t<Shape>,
+                        std::decay_t<F>, false>{scheduler,
+                        HPX_FORWARD(Sender, sender), shape, HPX_FORWARD(F, f)};
+                }
+            }
+        }
+
+
 
         template <typename Executor_>
             requires(

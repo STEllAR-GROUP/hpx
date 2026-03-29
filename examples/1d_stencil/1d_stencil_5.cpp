@@ -22,6 +22,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/serialization.hpp>
+#include <hpx/serialization/serialize_buffer.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -256,7 +257,7 @@ struct stepper
         using hpx::dataflow;
         using hpx::unwrapping;
 
-        return dataflow(
+        return dataflow(hpx::launch::async,
             unwrapping([middle](partition_data const& l,
                            partition_data const& m, partition_data const& r) {
                 // The new partition_data will be allocated on the same

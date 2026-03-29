@@ -229,7 +229,6 @@ void test_uninitialized_default_construct_exception(
     data_type::max_instance_count.store(0);
 
     bool caught_exception = false;
-    bool returned_from_algorithm = false;
     try
     {
         hpx::uninitialized_default_construct(policy,
@@ -334,7 +333,6 @@ void test_uninitialized_default_construct_exception_sender(
     data_type::max_instance_count.store(0);
 
     bool caught_exception = false;
-    bool returned_from_algorithm = false;
     try
     {
         auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
@@ -391,7 +389,6 @@ void test_uninitialized_default_construct_bad_alloc(
     data_type::max_instance_count.store(0);
 
     bool caught_bad_alloc = false;
-    bool returned_from_algorithm = false;
     try
     {
         hpx::uninitialized_default_construct(policy,
@@ -495,7 +492,6 @@ void test_uninitialized_default_construct_bad_alloc_sender(
     data_type::max_instance_count.store(0);
 
     bool caught_bad_alloc = false;
-    bool returned_from_algorithm = false;
     try
     {
         auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));

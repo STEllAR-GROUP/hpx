@@ -179,13 +179,12 @@ namespace hpx::execution::experimental::detail {
                 // bulk_unchunked: f(index, values...) for each element
                 // In unchunked case, chunk_size is 1
                 // so each chunk will only have one element.
-                // The regular bulk invocation will go through the is_chunked case.
-                auto it = std::ranges::next(
-                    hpx::util::begin(op_state->shape), i_begin);
+                // The index used for invocation is i_begin.
                 bulk_scheduler_invoke_helper(
-                    index_pack_type{}, op_state->f, *it, ts);
+                    index_pack_type{}, op_state->f, i_begin, ts);
             }
         }
+
 
         template <hpx::concurrency::detail::queue_end Which, typename Ts>
         void do_work(Ts& ts) const

@@ -256,7 +256,7 @@ int hpx_main()
 
     {
         dummy::reset_counts();
-        auto s1 = ex::transfer_just(ex::thread_pool_scheduler{}, 1);
+        auto s1 = ex::just(1) | ex::continues_on(ex::thread_pool_scheduler{});
         auto s2 = ex::then(std::move(s1), dummy{});
         auto s3 = cu::transform_stream(std::move(s2), dummy{});
         auto s4 = cu::transform_stream(std::move(s3), dummy{});

@@ -155,20 +155,21 @@ namespace hpx::execution::experimental {
     HPX_CXX_CORE_EXPORT using stdexec::as_awaitable;
     HPX_CXX_CORE_EXPORT using stdexec::as_awaitable_t;
 
-    // Start on
+    // Starts on
+    HPX_CXX_CORE_EXPORT using stdexec::starts_on;
+    HPX_CXX_CORE_EXPORT using stdexec::starts_on_t;
+
+    // Start on (deprecated in P2300, replaced by starts_on)
     HPX_CXX_CORE_EXPORT using stdexec::start_on;
     HPX_CXX_CORE_EXPORT using stdexec::start_on_t;
 
+    // On (deprecated in P2300, replaced by starts_on)
     HPX_CXX_CORE_EXPORT using stdexec::on;
     HPX_CXX_CORE_EXPORT using stdexec::on_t;
 
     // Continues on
     HPX_CXX_CORE_EXPORT using stdexec::continues_on;
     HPX_CXX_CORE_EXPORT using stdexec::continues_on_t;
-
-    // Transfer just
-    HPX_CXX_CORE_EXPORT using stdexec::transfer_just;
-    HPX_CXX_CORE_EXPORT using stdexec::transfer_just_t;
 
     // Bulk (HPX provides its own bulk CPO, but still forwards chunked variants
     // used by the thread pool scheduler domain customization on current master)
@@ -197,20 +198,15 @@ namespace hpx::execution::experimental {
     HPX_CXX_CORE_EXPORT using exec::ensure_started;
     HPX_CXX_CORE_EXPORT using exec::ensure_started_t;
 
-    // Transfer
-    HPX_CXX_CORE_EXPORT using stdexec::transfer;
-    HPX_CXX_CORE_EXPORT using stdexec::transfer_t;
+    // Execute (moved to exec:: namespace in newer stdexec)
+    HPX_CXX_CORE_EXPORT using exec::execute;
+    HPX_CXX_CORE_EXPORT using exec::execute_t;
 
     // Tags
     namespace tags {
 
         HPX_CXX_CORE_EXPORT using namespace stdexec::tags;
     }
-
-    // Execute (moved to exec:: namespace in newer stdexec)
-    HPX_CXX_CORE_EXPORT using exec::execute;
-    HPX_CXX_CORE_EXPORT using exec::execute_t;
-
     // Into Variant
     HPX_CXX_CORE_EXPORT using stdexec::into_variant;
     HPX_CXX_CORE_EXPORT using stdexec::into_variant_t;

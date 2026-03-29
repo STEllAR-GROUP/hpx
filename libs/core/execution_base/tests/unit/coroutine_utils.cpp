@@ -209,9 +209,9 @@ int main()
 #if !defined(HPX_HAVE_STDEXEC)
     {
         // Verify that connect_awaitable and connect return the same operation state type
-        static_assert(std::is_same_v<
-            decltype(ex::connect_awaitable(
-                awaitable_sender_1<awaiter>{}, recv_set_value{})),
+        static_assert(std::is_same_v<decltype(ex::connect_awaitable(
+                                         awaitable_sender_1<awaiter>{},
+                                         recv_set_value{})),
             decltype(ex::connect(
                 awaitable_sender_1<awaiter>{}, recv_set_value{}))>);
     }
