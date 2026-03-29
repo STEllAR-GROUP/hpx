@@ -14,6 +14,7 @@ set(tests
     partitioned_vector_any_of1
     partitioned_vector_any_of2
     partitioned_vector_copy
+    partitioned_vector_equal
     partitioned_vector_for_each
     partitioned_vector_for_each_double
     partitioned_vector_for_each_n

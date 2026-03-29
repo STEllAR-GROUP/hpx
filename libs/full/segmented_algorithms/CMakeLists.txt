@@ -18,6 +18,7 @@ set(segmented_algorithms_headers
     hpx/parallel/segmented_algorithms/detail/reduce.hpp
     hpx/parallel/segmented_algorithms/detail/scan.hpp
     hpx/parallel/segmented_algorithms/detail/transfer.hpp
+    hpx/parallel/segmented_algorithms/equal.hpp
     hpx/parallel/segmented_algorithms/exclusive_scan.hpp
     hpx/parallel/segmented_algorithms/fill.hpp
     hpx/parallel/segmented_algorithms/find.hpp
