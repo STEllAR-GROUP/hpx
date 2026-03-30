@@ -15,7 +15,6 @@
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/datastructures/variant.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
-#include <hpx/execution/algorithms/then.hpp>
 #include <hpx/execution_base/completion_scheduler.hpp>
 #include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/receiver.hpp>

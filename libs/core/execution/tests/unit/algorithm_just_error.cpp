@@ -7,7 +7,7 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/execution/algorithms/just.hpp>
+#include <hpx/modules/execution.hpp>
 
 #include <hpx/modules/testing.hpp>
 

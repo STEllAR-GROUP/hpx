@@ -56,7 +56,7 @@ int main()
         auto f = [](int x) { HPX_TEST_EQ(x, 42); };
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
         auto os = ex::connect(std::move(s), std::move(r));
-        tag_invoke(ex::start, os);
+        ex::start(os);
         HPX_TEST(set_value_called);
         HPX_TEST(!tag_invoke_overload_called);
         HPX_TEST(scheduler_schedule_called);

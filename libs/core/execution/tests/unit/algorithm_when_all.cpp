@@ -17,7 +17,7 @@
 
 // TODO: Figure out why this is necessary for stdexec
 // but causes dataflow to be unresolvable without stdexec
-#include <hpx/execution/algorithms/when_all.hpp>
+#include <hpx/modules/execution.hpp>
 
 #include "algorithm_test_utils.hpp"
 
@@ -57,12 +57,12 @@ int main()
         check_value_types<hpx::variant<hpx::tuple<int>>>(s);
         // everything is noexcept and no errors can be made here
         check_error_types<hpx::variant<>>(s);
-        check_sends_stopped<true>(s);
+        check_sends_stopped<false>(s);
 
         auto f = [](int x) { HPX_TEST_EQ(x, 42); };
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
         auto os = ex::connect(std::move(s), std::move(r));
-        tag_invoke(ex::start, os);
+        ex::start(os);
         HPX_TEST(set_value_called);
     }
 
@@ -77,7 +77,7 @@ int main()
         check_value_types<hpx::variant<hpx::tuple<int, std::string, double>>>(
             s);
         check_error_types<hpx::variant<>>(s);
-        check_sends_stopped<true>(s);
+        check_sends_stopped<false>(s);
 
         auto f = [](int x, std::string y, double z) {
             HPX_TEST_EQ(x, 42);
@@ -100,7 +100,7 @@ int main()
 
         check_value_types<hpx::variant<hpx::tuple<std::string, double>>>(s);
         check_error_types<hpx::variant<>>(s);
-        check_sends_stopped<true>(s);
+        check_sends_stopped<false>(s);
 
         auto f = [](std::string y, double z) {
             HPX_TEST_EQ(y, std::string("hello"));
@@ -121,7 +121,7 @@ int main()
 
         check_value_types<hpx::variant<hpx::tuple<int, double>>>(s);
         check_error_types<hpx::variant<>>(s);
-        check_sends_stopped<true>(s);
+        check_sends_stopped<false>(s);
 
         auto f = [](int x, double z) {
             HPX_TEST_EQ(x, 42);
@@ -142,7 +142,7 @@ int main()
 
         check_value_types<hpx::variant<hpx::tuple<>>>(s);
         check_error_types<hpx::variant<>>(s);
-        check_sends_stopped<true>(s);
+        check_sends_stopped<false>(s);
 
         auto f = []() {};
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
@@ -161,7 +161,7 @@ int main()
 
         check_value_types<hpx::variant<hpx::tuple<int, std::string>>>(s);
         check_error_types<hpx::variant<>>(s);
-        check_sends_stopped<true>(s);
+        check_sends_stopped<false>(s);
 
         auto f = [](int x, std::string y) {
             HPX_TEST_EQ(x, 42);
@@ -183,7 +183,7 @@ int main()
         check_value_types<hpx::variant<hpx::tuple<int, std::string, double>>>(
             s);
         check_error_types<hpx::variant<>>(s);
-        check_sends_stopped<true>(s);
+        check_sends_stopped<false>(s);
 
         auto f = [](int x, std::string y, double z) {
             HPX_TEST_EQ(x, 42);
@@ -207,7 +207,7 @@ int main()
         check_value_types<hpx::variant<hpx::tuple<int, std::string, double>>>(
             s);
         check_error_types<hpx::variant<>>(s);
-        check_sends_stopped<true>(s);
+        check_sends_stopped<false>(s);
 
         auto f = [](int x, std::string y, double z) {
             HPX_TEST_EQ(x, 42);
@@ -230,7 +230,7 @@ int main()
         check_value_types<hpx::variant<hpx::tuple<int, std::string, double>>>(
             s);
         check_error_types<hpx::variant<>>(s);
-        check_sends_stopped<true>(s);
+        check_sends_stopped<false>(s);
 
         auto f = [](int x, std::string y, double z) {
             HPX_TEST_EQ(x, 42);
@@ -253,7 +253,7 @@ int main()
         check_value_types<
             hpx::variant<hpx::tuple<custom_type_non_default_constructible>>>(s);
         check_error_types<hpx::variant<>>(s);
-        check_sends_stopped<true>(s);
+        check_sends_stopped<false>(s);
 
         auto f = [](auto x) { HPX_TEST_EQ(x.x, 42); };
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
@@ -272,7 +272,7 @@ int main()
         check_value_types<hpx::variant<
             hpx::tuple<custom_type_non_default_constructible_non_copyable>>>(s);
         check_error_types<hpx::variant<>>(s);
-        check_sends_stopped<true>(s);
+        check_sends_stopped<false>(s);
 
         auto f = [](auto x) { HPX_TEST_EQ(x.x, 42); };
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
@@ -291,7 +291,7 @@ int main()
         static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
         check_value_types<hpx::variant<hpx::tuple<int>>>(s);
         check_error_types<hpx::variant<>>(s);
-        check_sends_stopped<true>(s);
+        check_sends_stopped<false>(s);
 
         auto f = [](int x) { HPX_TEST_EQ(x, 42); };
         auto r = callback_receiver<decltype(f)>{f, receiver_set_value_called};
@@ -310,7 +310,7 @@ int main()
         static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
         check_value_types<hpx::variant<hpx::tuple<double>>>(s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
-        check_sends_stopped<true>(s);
+        check_sends_stopped<false>(s);
 
         auto r = error_callback_receiver<check_exception_ptr>{
             check_exception_ptr{}, set_error_called};
@@ -328,7 +328,7 @@ int main()
 
         check_value_types<hpx::variant<hpx::tuple<int, double>>>(s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
-        check_sends_stopped<true>(s);
+        check_sends_stopped<false>(s);
 
         auto r = error_callback_receiver<check_exception_ptr>{
             check_exception_ptr{}, set_error_called};
@@ -346,7 +346,7 @@ int main()
 
         check_value_types<hpx::variant<hpx::tuple<double, int>>>(s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
-        check_sends_stopped<true>(s);
+        check_sends_stopped<false>(s);
 
         auto r = error_callback_receiver<check_exception_ptr>{
             check_exception_ptr{}, set_error_called};

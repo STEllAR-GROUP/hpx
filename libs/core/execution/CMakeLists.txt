@@ -16,7 +16,6 @@ set(execution_headers
     hpx/execution/algorithms/detail/single_result.hpp
     hpx/execution/algorithms/keep_future.hpp
     hpx/execution/algorithms/make_future.hpp
-    hpx/execution/algorithms/run_loop.hpp
     hpx/execution/algorithms/sync_wait.hpp
     hpx/execution/algorithms/when_all.hpp
     hpx/execution/algorithms/when_all_vector.hpp
@@ -88,7 +87,7 @@ set(execution_headers
 )
 
 set(execution_sources execution_parameter_callbacks.cpp
-                      polymorphic_executor.cpp run_loop.cpp
+                      polymorphic_executor.cpp
 )
 
 # cmake-format: off

@@ -9,7 +9,7 @@
 
 #include <hpx/modules/datastructures.hpp>
 
-#include <hpx/execution/algorithms/just.hpp>
+#include <hpx/modules/execution.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include "algorithm_test_utils.hpp"

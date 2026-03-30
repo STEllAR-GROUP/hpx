@@ -10,7 +10,7 @@
 #include <hpx/execution/algorithms/detail/inject_scheduler.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution/algorithms/detail/single_result.hpp>
-#include <hpx/execution/algorithms/run_loop.hpp>
+#include <hpx/execution_base/stdexec_forward.hpp>
 #include <hpx/modules/allocator_support.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution_base.hpp>

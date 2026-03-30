@@ -14,7 +14,6 @@
 
 #include <hpx/assert.hpp>
 #include <hpx/execution/algorithms/detail/single_result.hpp>
-#include <hpx/execution/queries/get_stop_token.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/execution_base.hpp>
