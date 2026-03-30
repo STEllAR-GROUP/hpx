@@ -22,8 +22,8 @@ namespace hpx::ranges {
     HPX_CXX_CORE_EXPORT template <typename Iter>
     // clang-format off
         requires (
-            hpx::traits::is_input_iterator_v<Iter> ||
-            hpx::traits::is_output_iterator_v<Iter>
+            std::input_iterator<Iter> ||
+            std::output_iterator<Iter, hpx::traits::iter_value_t<Iter>>
         )
     // clang-format on
     constexpr Iter next(
@@ -36,9 +36,9 @@ namespace hpx::ranges {
     HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent>
     // clang-format off
         requires(
-            hpx::traits::is_sentinel_for_v<Sent, Iter> &&
-            (hpx::traits::is_input_iterator_v<Iter> ||
-                hpx::traits::is_output_iterator_v<Iter>) )
+            std::sentinel_for<Sent, Iter> &&
+            (std::input_iterator<Iter> ||
+                std::output_iterator<Iter, hpx::traits::iter_value_t<Iter>>) )
     // clang-format on
     constexpr Iter next(Iter first, Sent bound)
     {
@@ -48,16 +48,16 @@ namespace hpx::ranges {
     HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent>
     // clang-format off
         requires (
-            hpx::traits::is_sentinel_for_v<Sent, Iter> &&
-            (hpx::traits::is_input_iterator_v<Iter> ||
-                hpx::traits::is_output_iterator_v<Iter>)
+            std::sentinel_for<Sent, Iter> &&
+            (std::input_iterator<Iter> ||
+                std::output_iterator<Iter, hpx::traits::iter_value_t<Iter>>)
         )
     // clang-format on
     constexpr Iter next(
         Iter first, hpx::traits::iter_difference_t<Iter> n, Sent bound)
     {
-        if constexpr (hpx::traits::is_sized_sentinel_for_v<Sent, Iter> &&
-            hpx::traits::is_random_access_iterator_v<Iter>)
+        if constexpr (std::sized_sentinel_for<Sent, Iter> &&
+            std::random_access_iterator<Iter>)
         {
             if (hpx::parallel::detail::distance(first, bound) <
                 static_cast<std::size_t>(n))

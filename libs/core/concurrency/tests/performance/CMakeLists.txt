@@ -4,10 +4,22 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(HPX_WITH_TESTS_BENCHMARKS)
+set(benchmarks concurrent_structure_performance)
+
+foreach(benchmark ${benchmarks})
+  set(sources ${benchmark}.cpp)
+
+  source_group("Source Files" FILES ${sources})
+
+  # add example executable
   add_hpx_executable(
-    concurrent_structure_performance
-    SOURCES concurrent_structure_performance.cpp
-    HPX_PREFIX ${HPX_BUILD_PREFIX}
+    ${benchmark}_test INTERNAL_FLAGS
+    SOURCES ${sources}
+    EXCLUDE_FROM_ALL ${${benchmark}_FLAGS}
+    FOLDER "Benchmarks/Modules/Core/Concurrency"
   )
-endif()
+
+  add_hpx_performance_test(
+    "modules.concurrency" ${benchmark} ${${benchmark}_PARAMETERS}
+  )
+endforeach()

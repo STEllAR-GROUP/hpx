@@ -34,7 +34,7 @@ jobs:
         if [[ $(wc -l /tmp/circular_deps.dot | awk '{print $1}') -gt 2 ]]; then exit 1; fi
 
     - name: Upload Circular Dependency Graph
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: circular-deps
         path: |

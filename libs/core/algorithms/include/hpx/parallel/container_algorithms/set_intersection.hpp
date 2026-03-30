@@ -234,8 +234,8 @@ namespace hpx { namespace ranges {
         typename Proj2 = hpx::identity>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         set_intersection_result<
-            hpx::traits::range_iterator_t<Rng1>,
-            hpx::traits::range_iterator_t<Rng2>, Iter3>>
+            std::ranges::iterator_t<Rng1>,
+            std::ranges::iterator_t<Rng2>, Iter3>>
     set_intersection(ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2, Iter3 dest,
         Pred&& op = Pred(), Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
 
@@ -410,8 +410,8 @@ namespace hpx { namespace ranges {
         typename Proj1 = hpx::identity,
         typename Proj2 = hpx::identity>
     set_intersection_result<
-        hpx::traits::range_iterator_t<Rng1>,
-        hpx::traits::range_iterator_t<Rng2>, Iter3>
+        std::ranges::iterator_t<Rng1>,
+        std::ranges::iterator_t<Rng2>, Iter3>
     set_intersection(Rng1&& rng1, Rng2&& rng2, Iter3 dest,
         Pred&& op = Pred(), Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
 
@@ -431,6 +431,8 @@ namespace hpx { namespace ranges {
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 
+#include <iterator>
+#include <ranges>
 #include <type_traits>
 #include <utility>
 
@@ -452,9 +454,9 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_sentinel_for_v<Sent1, Iter1> &&
+                std::sentinel_for<Sent1, Iter1> &&
                 hpx::parallel::traits::is_projected_v<Proj1, Iter1> &&
-                hpx::traits::is_sentinel_for_v<Sent2, Iter2> &&
+                std::sentinel_for<Sent2, Iter2> &&
                 hpx::parallel::traits::is_projected_v<Proj2, Iter2> &&
                 hpx::traits::is_iterator_v<Iter3> &&
                 hpx::parallel::traits::is_indirect_callable_v<
@@ -470,19 +472,20 @@ namespace hpx::ranges {
             Sent1 last1, Iter2 first2, Sent2 last2, Iter3 dest,
             Pred op = Pred(), Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<Iter1>,
+            static_assert(std::forward_iterator<Iter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<Iter2>,
+            static_assert(std::forward_iterator<Iter2>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<Iter3> ||
+            static_assert(std::forward_iterator<Iter3> ||
                     (hpx::is_sequenced_execution_policy_v<ExPolicy> &&
-                        hpx::traits::is_output_iterator_v<Iter3>),
+                        std::output_iterator<Iter3,
+                            hpx::traits::iter_value_t<Iter2>>),
                 "Requires at least forward iterator or sequential execution.");
 
             using is_seq = std::integral_constant<bool,
                 hpx::is_sequenced_execution_policy_v<ExPolicy> ||
-                    !hpx::traits::is_random_access_iterator_v<Iter1> ||
-                    !hpx::traits::is_random_access_iterator_v<Iter2>>;
+                    !std::random_access_iterator<Iter1> ||
+                    !std::random_access_iterator<Iter2>>;
 
             using result_type = set_intersection_result<Iter1, Iter2, Iter3>;
 
@@ -497,9 +500,9 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng1> &&
+                std::ranges::range<Rng1> &&
                 hpx::parallel::traits::is_projected_range_v<Proj1, Rng1> &&
-                hpx::traits::is_range_v<Rng2> &&
+                std::ranges::range<Rng2> &&
                 hpx::parallel::traits::is_projected_range_v<Proj2, Rng2> &&
                 hpx::traits::is_iterator_v<Iter3> &&
                 hpx::parallel::traits::is_indirect_callable_v<
@@ -510,28 +513,29 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            set_intersection_result<hpx::traits::range_iterator_t<Rng1>,
-                hpx::traits::range_iterator_t<Rng2>, Iter3>>
+            set_intersection_result<std::ranges::iterator_t<Rng1>,
+                std::ranges::iterator_t<Rng2>, Iter3>>
         tag_fallback_invoke(set_intersection_t, ExPolicy&& policy, Rng1&& rng1,
             Rng2&& rng2, Iter3 dest, Pred op = Pred(), Proj1 proj1 = Proj1(),
             Proj2 proj2 = Proj2())
         {
-            using iterator_type1 = hpx::traits::range_iterator_t<Rng1>;
-            using iterator_type2 = hpx::traits::range_iterator_t<Rng2>;
+            using iterator_type1 = std::ranges::iterator_t<Rng1>;
+            using iterator_type2 = std::ranges::iterator_t<Rng2>;
 
-            static_assert(hpx::traits::is_forward_iterator_v<iterator_type1>,
+            static_assert(std::forward_iterator<iterator_type1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<iterator_type2>,
+            static_assert(std::forward_iterator<iterator_type2>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<Iter3> ||
+            static_assert(std::forward_iterator<Iter3> ||
                     (hpx::is_sequenced_execution_policy_v<ExPolicy> &&
-                        hpx::traits::is_output_iterator_v<Iter3>),
+                        std::output_iterator<Iter3,
+                            hpx::traits::iter_value_t<iterator_type2>>),
                 "Requires at least forward iterator or sequential execution.");
 
             using is_seq = std::integral_constant<bool,
                 hpx::is_sequenced_execution_policy_v<ExPolicy> ||
-                    !hpx::traits::is_random_access_iterator_v<iterator_type1> ||
-                    !hpx::traits::is_random_access_iterator_v<iterator_type2>>;
+                    !std::random_access_iterator<iterator_type1> ||
+                    !std::random_access_iterator<iterator_type2>>;
 
             using result_type =
                 set_intersection_result<iterator_type1, iterator_type2, Iter3>;
@@ -549,9 +553,9 @@ namespace hpx::ranges {
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
             requires(
-                hpx::traits::is_sentinel_for_v<Sent1, Iter1> &&
+                std::sentinel_for<Sent1, Iter1> &&
                 hpx::parallel::traits::is_projected_v<Proj1, Iter1> &&
-                hpx::traits::is_sentinel_for_v<Sent2, Iter2> &&
+                std::sentinel_for<Sent2, Iter2> &&
                 hpx::parallel::traits::is_projected_v<Proj2, Iter2> &&
                 hpx::traits::is_iterator_v<Iter3> &&
                 hpx::parallel::traits::is_indirect_callable_v<
@@ -566,11 +570,12 @@ namespace hpx::ranges {
             Sent2 last2, Iter3 dest, Pred op = Pred(), Proj1 proj1 = Proj1(),
             Proj2 proj2 = Proj2())
         {
-            static_assert(hpx::traits::is_input_iterator_v<Iter1>,
+            static_assert(std::input_iterator<Iter1>,
                 "Requires at least input iterator.");
-            static_assert(hpx::traits::is_input_iterator_v<Iter2>,
+            static_assert(std::input_iterator<Iter2>,
                 "Requires at least input iterator.");
-            static_assert(hpx::traits::is_output_iterator_v<Iter3>,
+            static_assert(
+                std::output_iterator<Iter3, hpx::traits::iter_value_t<Iter2>>,
                 "Requires at least output iterator.");
 
             using result_type = set_intersection_result<Iter1, Iter2, Iter3>;
@@ -585,9 +590,9 @@ namespace hpx::ranges {
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity>
         // clang-format off
             requires(
-                hpx::traits::is_range_v<Rng1> &&
+                std::ranges::range<Rng1> &&
                 hpx::parallel::traits::is_projected_range_v<Proj1, Rng1> &&
-                hpx::traits::is_range_v<Rng2> &&
+                std::ranges::range<Rng2> &&
                 hpx::parallel::traits::is_projected_range_v<Proj2, Rng2> &&
                 hpx::traits::is_iterator_v<Iter3> &&
                 hpx::parallel::traits::is_indirect_callable_v<
@@ -597,20 +602,21 @@ namespace hpx::ranges {
                 >
             )
         // clang-format on
-        friend set_intersection_result<hpx::traits::range_iterator_t<Rng1>,
-            hpx::traits::range_iterator_t<Rng2>, Iter3>
+        friend set_intersection_result<std::ranges::iterator_t<Rng1>,
+            std::ranges::iterator_t<Rng2>, Iter3>
         tag_fallback_invoke(set_intersection_t, Rng1&& rng1, Rng2&& rng2,
             Iter3 dest, Pred op = Pred(), Proj1 proj1 = Proj1(),
             Proj2 proj2 = Proj2())
         {
-            using iterator_type1 = hpx::traits::range_iterator_t<Rng1>;
-            using iterator_type2 = hpx::traits::range_iterator_t<Rng2>;
+            using iterator_type1 = std::ranges::iterator_t<Rng1>;
+            using iterator_type2 = std::ranges::iterator_t<Rng2>;
 
-            static_assert(hpx::traits::is_input_iterator_v<iterator_type1>,
+            static_assert(std::input_iterator<iterator_type1>,
                 "Requires at least input iterator.");
-            static_assert(hpx::traits::is_input_iterator_v<iterator_type2>,
+            static_assert(std::input_iterator<iterator_type2>,
                 "Requires at least input iterator.");
-            static_assert(hpx::traits::is_output_iterator_v<Iter3>,
+            static_assert(std::output_iterator<Iter3,
+                              hpx::traits::iter_value_t<iterator_type2>>,
                 "Requires at least out iterator.");
 
             using result_type =

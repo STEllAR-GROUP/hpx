@@ -321,11 +321,8 @@ hpx_option(
   ADVANCED
 )
 if(HPX_WITH_CXX_MODULES)
-  if(NOT (CMAKE_VERSION VERSION_GREATER_EQUAL "3.29"))
-    hpx_fatal(
-      "Please use a version of CMake newer than V3.28 in order to enable C++ module support for HPX"
-    )
-  endif()
+  include(HPX_CXXModules)
+  hpx_check_cxx_modules_support()
 
   hpx_info(
     "HPX will build and install C++20 module interface units for downstream users."
@@ -1895,6 +1892,17 @@ hpx_option(
   "Enable the use of the [[no_unique_address]] attribute (default: ON)" ON
   ADVANCED
 )
+
+hpx_option(
+  HPX_WITH_CXX20_STD_EXECUTION_POLICES
+  BOOL
+  "Support using std execution policies for HPX parallel algorithms (default: ON)."
+  ON
+  ADVANCED
+)
+if(HPX_WITH_CXX20_STD_EXECUTION_POLICES)
+  hpx_add_config_define(HPX_HAVE_CXX20_STD_EXECUTION_POLICES)
+endif()
 
 # Need to include the CUDA setup before the config test to enable the CUDA
 # language

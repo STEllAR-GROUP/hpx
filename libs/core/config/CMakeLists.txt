@@ -7,7 +7,7 @@
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/config/include
-set(config_headers
+set(config_macro_headers
     hpx/config.hpp
     hpx/config/asio.hpp
     hpx/config/attributes.hpp
@@ -25,15 +25,15 @@ set(config_headers
     hpx/config/export_definitions.hpp
     hpx/config/forceinline.hpp
     hpx/config/forward.hpp
-    hpx/config/lambda_capture_this.hpp
     hpx/config/manual_profiling.hpp
     hpx/config/move.hpp
     hpx/config/threads_stack.hpp
     hpx/config/warnings_prefix.hpp
     hpx/config/warnings_suffix.hpp
     hpx/config/weak_symbol.hpp
-    hpx/modules/config.hpp
 )
+
+set(config_headers ${config_macro_headers})
 
 # Default location is $HPX_ROOT/libs/config/src
 set(config_sources version.cpp)
@@ -42,6 +42,7 @@ include(HPX_AddModule)
 add_hpx_module(
   core config CONFIG_FILES
   GLOBAL_HEADER_GEN OFF
+  GLOBAL_HEADER_MODULE_GEN OFF
   SOURCES ${config_sources}
   HEADERS ${config_headers}
   EXCLUDE_FROM_GLOBAL_HEADER hpx/modules/config.hpp

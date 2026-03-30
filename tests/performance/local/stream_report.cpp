@@ -310,7 +310,7 @@ void check_results(std::size_t iterations, Vector const& a_res,
 template <typename T>
 struct multiply_step
 {
-    explicit multiply_step(T factor)
+    explicit constexpr multiply_step(T factor) noexcept
       : factor_(factor)
     {
     }
@@ -320,7 +320,7 @@ struct multiply_step
     //         (used in invoke()) to get the return type
 
     template <typename U>
-    HPX_HOST_DEVICE HPX_FORCEINLINE T operator()(U val) const
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr T operator()(U val) const noexcept
     {
         return val * factor_;
     }
@@ -336,7 +336,8 @@ struct add_step
     //         (used in invoke()) to get the return type
 
     template <typename U>
-    HPX_HOST_DEVICE HPX_FORCEINLINE T operator()(U val1, U val2) const
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr T operator()(
+        U val1, U val2) const noexcept
     {
         return val1 + val2;
     }
@@ -345,7 +346,7 @@ struct add_step
 template <typename T>
 struct triad_step
 {
-    explicit triad_step(T factor)
+    explicit constexpr triad_step(T factor) noexcept
       : factor_(factor)
     {
     }
@@ -355,7 +356,8 @@ struct triad_step
     //         (used in invoke()) to get the return type
 
     template <typename U>
-    HPX_HOST_DEVICE HPX_FORCEINLINE T operator()(U val1, U val2) const
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr T operator()(
+        U val1, U val2) const noexcept
     {
         return val1 + val2 * factor_;
     }

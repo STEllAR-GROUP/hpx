@@ -58,8 +58,8 @@ namespace hpx { namespace parallel {
             {
                 // all elements are on the same partition
                 local_iterator_type1 beg = traits1::local(first);
-                local_iterator_type1 end = traits1::end(sit);
-                local_iterator_type2 ldest = traits2::begin(sdest);
+                local_iterator_type1 end = traits1::local(last);
+                local_iterator_type2 ldest = traits2::local(dest);
                 if (beg != end)
                 {
                     util::in_out_result<local_iterator_type1,
@@ -75,7 +75,7 @@ namespace hpx { namespace parallel {
                 // handle the remaining part of the first partition
                 local_iterator_type1 beg = traits1::local(first);
                 local_iterator_type1 end = traits1::end(sit);
-                local_iterator_type2 ldest = traits2::begin(sdest);
+                local_iterator_type2 ldest = traits2::local(dest);
                 util::in_out_result<local_iterator_type1, local_iterator_type2>
                     out;
                 if (beg != end)
@@ -133,7 +133,7 @@ namespace hpx { namespace parallel {
                 result;
 
             typedef std::integral_constant<bool,
-                !hpx::traits::is_forward_iterator_v<SegIter>>
+                !std::forward_iterator<SegIter>>
                 forced_seq;
 
             segment_iterator1 sit = traits1::segment(first);
@@ -151,7 +151,7 @@ namespace hpx { namespace parallel {
                 // all elements are on the same partition
                 local_iterator_type1 beg = traits1::local(first);
                 local_iterator_type1 end = traits1::local(last);
-                local_iterator_type2 ldest = traits2::begin(sdest);
+                local_iterator_type2 ldest = traits2::local(dest);
                 if (beg != end)
                 {
                     segments.push_back(dispatch_async(traits2::get_id(sdest),
@@ -163,7 +163,7 @@ namespace hpx { namespace parallel {
                 // handle the remaining part of the first partition
                 local_iterator_type1 beg = traits1::local(first);
                 local_iterator_type1 end = traits1::end(sit);
-                local_iterator_type2 ldest = traits2::begin(sdest);
+                local_iterator_type2 ldest = traits2::local(dest);
                 if (beg != end)
                 {
                     segments.push_back(dispatch_async(traits2::get_id(sdest),
@@ -249,7 +249,7 @@ namespace hpx { namespace parallel {
                 local_iterator_type1 beg1 = traits1::local(first1);
                 local_iterator_type1 end1 = traits1::local(last1);
                 local_iterator_type2 beg2 = traits2::local(first2);
-                local_iterator_type3 ldest = traits3::begin(sdest);
+                local_iterator_type3 ldest = traits3::local(dest);
                 if (beg1 != end1)
                 {
                     util::in_in_out_result<local_iterator_type1,
@@ -268,7 +268,7 @@ namespace hpx { namespace parallel {
                 local_iterator_type1 beg1 = traits1::local(first1);
                 local_iterator_type1 end1 = traits1::end(sit1);
                 local_iterator_type2 beg2 = traits2::local(first2);
-                local_iterator_type3 ldest = traits3::begin(sdest);
+                local_iterator_type3 ldest = traits3::local(dest);
                 util::in_in_out_result<local_iterator_type1,
                     local_iterator_type2, local_iterator_type3>
                     out;
@@ -340,8 +340,8 @@ namespace hpx { namespace parallel {
                 result;
 
             typedef std::integral_constant<bool,
-                !hpx::traits::is_forward_iterator_v<InIter1> ||
-                    !hpx::traits::is_forward_iterator_v<InIter2>>
+                !std::forward_iterator<InIter1> ||
+                    !std::forward_iterator<InIter2>>
                 forced_seq;
 
             auto last2 = first2;
@@ -366,7 +366,7 @@ namespace hpx { namespace parallel {
                 local_iterator_type1 beg1 = traits1::local(first1);
                 local_iterator_type1 end1 = traits1::local(last1);
                 local_iterator_type2 beg2 = traits2::local(first2);
-                local_iterator_type3 ldest = traits3::begin(sdest);
+                local_iterator_type3 ldest = traits3::local(dest);
                 if (beg1 != end1)
                 {
                     segments.push_back(dispatch_async(traits1::get_id(sit1),
@@ -380,7 +380,7 @@ namespace hpx { namespace parallel {
                 local_iterator_type1 beg1 = traits1::local(first1);
                 local_iterator_type1 end1 = traits1::end(sit1);
                 local_iterator_type2 beg2 = traits2::local(first2);
-                local_iterator_type3 ldest = traits3::begin(sdest);
+                local_iterator_type3 ldest = traits3::local(dest);
                 if (beg1 != end1)
                 {
                     segments.push_back(dispatch_async(traits1::get_id(sit1),
@@ -473,7 +473,7 @@ namespace hpx { namespace parallel {
                 local_iterator_type1 end1 = traits1::local(last1);
                 local_iterator_type2 beg2 = traits2::local(first2);
                 local_iterator_type2 end2 = traits2::local(last2);
-                local_iterator_type3 ldest = traits3::begin(sdest);
+                local_iterator_type3 ldest = traits3::local(dest);
                 if (beg1 != end1 && beg2 != end2)
                 {
                     util::in_in_out_result<local_iterator_type1,
@@ -493,7 +493,7 @@ namespace hpx { namespace parallel {
                 local_iterator_type1 end1 = traits1::end(sit1);
                 local_iterator_type2 beg2 = traits2::local(first2);
                 local_iterator_type2 end2 = traits2::end(sit2);
-                local_iterator_type3 ldest = traits3::begin(sdest);
+                local_iterator_type3 ldest = traits3::local(dest);
                 util::in_in_out_result<local_iterator_type1,
                     local_iterator_type2, local_iterator_type3>
                     out;
@@ -567,8 +567,8 @@ namespace hpx { namespace parallel {
                 result;
 
             typedef std::integral_constant<bool,
-                !hpx::traits::is_forward_iterator_v<InIter1> ||
-                    !hpx::traits::is_forward_iterator_v<InIter2>>
+                !std::forward_iterator<InIter1> ||
+                    !std::forward_iterator<InIter2>>
                 forced_seq;
 
             segment_iterator1 sit1 = traits1::segment(first1);
@@ -591,7 +591,7 @@ namespace hpx { namespace parallel {
                 local_iterator_type1 end1 = traits1::local(last1);
                 local_iterator_type2 beg2 = traits2::local(first2);
                 local_iterator_type2 end2 = traits2::local(last2);
-                local_iterator_type3 ldest = traits3::begin(sdest);
+                local_iterator_type3 ldest = traits3::local(dest);
                 if (beg1 != end1 && beg2 != end2)
                 {
                     segments.push_back(dispatch_async(traits1::get_id(sit1),
@@ -606,7 +606,7 @@ namespace hpx { namespace parallel {
                 local_iterator_type1 end1 = traits1::end(sit1);
                 local_iterator_type2 beg2 = traits2::local(first2);
                 local_iterator_type2 end2 = traits2::end(sit2);
-                local_iterator_type3 ldest = traits3::begin(sdest);
+                local_iterator_type3 ldest = traits3::local(dest);
                 if (beg1 != end1 && beg2 != end2)
                 {
                     segments.push_back(dispatch_async(traits1::get_id(sit1),
@@ -676,8 +676,8 @@ namespace hpx { namespace segmented {
     hpx::parallel::util::in_out_result<SegIter, OutIter> tag_invoke(
         hpx::transform_t, SegIter first, SegIter last, OutIter dest, F&& f)
     {
-        static_assert(hpx::traits::is_input_iterator_v<SegIter>,
-            "Requires at least input iterator.");
+        static_assert(
+            std::input_iterator<SegIter>, "Requires at least input iterator.");
 
         if (first == last)
         {
@@ -709,7 +709,7 @@ namespace hpx { namespace segmented {
     tag_invoke(hpx::transform_t, ExPolicy&& policy, SegIter first, SegIter last,
         OutIter dest, F&& f)
     {
-        static_assert(hpx::traits::is_forward_iterator_v<SegIter>,
+        static_assert(std::forward_iterator<SegIter>,
             "Requires at least forward iterator.");
 
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
@@ -747,8 +747,8 @@ namespace hpx { namespace segmented {
         hpx::transform_t, InIter1 first1, InIter1 last1, InIter2 first2,
         OutIter dest, F&& f)
     {
-        static_assert(hpx::traits::is_input_iterator_v<InIter1> &&
-                hpx::traits::is_input_iterator_v<InIter2>,
+        static_assert(
+            std::input_iterator<InIter1> && std::input_iterator<InIter2>,
             "Requires at least input iterator.");
 
         auto last2 = first2;
@@ -792,8 +792,8 @@ namespace hpx { namespace segmented {
     tag_invoke(hpx::transform_t, ExPolicy&& policy, InIter1 first1,
         InIter1 last1, InIter2 first2, OutIter dest, F&& f)
     {
-        static_assert(hpx::traits::is_forward_iterator_v<InIter1> &&
-                hpx::traits::is_forward_iterator_v<InIter2>,
+        static_assert(
+            std::forward_iterator<InIter1> && std::forward_iterator<InIter2>,
             "Requires at least forward iterator.");
 
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
@@ -839,8 +839,8 @@ namespace hpx { namespace segmented {
         hpx::transform_t, InIter1 first1, InIter1 last1, InIter2 first2,
         InIter2 last2, OutIter dest, F&& f)
     {
-        static_assert(hpx::traits::is_input_iterator_v<InIter1> &&
-                hpx::traits::is_input_iterator_v<InIter2>,
+        static_assert(
+            std::input_iterator<InIter1> && std::input_iterator<InIter2>,
             "Requires at least input iterator.");
 
         if (first1 == last1)
@@ -881,8 +881,8 @@ namespace hpx { namespace segmented {
     tag_invoke(hpx::transform_t, ExPolicy&& policy, InIter1 first1,
         InIter1 last1, InIter2 first2, InIter2 last2, OutIter dest, F&& f)
     {
-        static_assert(hpx::traits::is_forward_iterator_v<InIter1> &&
-                hpx::traits::is_forward_iterator_v<InIter2>,
+        static_assert(
+            std::forward_iterator<InIter1> && std::forward_iterator<InIter2>,
             "Requires at least forward iterator.");
 
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;

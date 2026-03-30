@@ -29,6 +29,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <functional>
+#include <iterator>
 #include <map>
 #include <memory>
 #include <set>
@@ -172,8 +173,7 @@ namespace hpx { namespace lcos {
         }
 
         template <typename Iterator>
-        typename std::enable_if<
-            traits::is_input_iterator<Iterator>::value>::type
+        typename std::enable_if<std::input_iterator<Iterator>>::type
         sync_images(Iterator begin, Iterator end) const
         {
             std::set<std::size_t> images(begin, end);
@@ -235,7 +235,7 @@ namespace hpx { namespace lcos {
         }
 
         template <typename Iterator>
-        typename std::enable_if<traits::is_input_iterator<Iterator>::value,
+        typename std::enable_if<std::input_iterator<Iterator>,
             hpx::future<void>>::type
         sync_images(hpx::launch::async_policy const& policy, Iterator begin,
             Iterator end) const
@@ -326,7 +326,8 @@ namespace hpx { namespace lcos {
                     hpx::threads::thread_sharing_hint::do_not_combine_tasks);
 
                 hpx::parallel::execution::bulk_sync_execute(
-                    hpx::execution::experimental::with_hint(exec, hint),
+                    hpx::execution::to_hierarchical_spawning(
+                        hpx::execution::experimental::with_hint(exec, hint)),
                     detail::spmd_block_helper<F>{
                         name, images_per_locality, num_images},
                     hpx::util::counting_shape(

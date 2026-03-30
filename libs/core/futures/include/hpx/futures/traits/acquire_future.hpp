@@ -53,7 +53,9 @@ namespace hpx::traits {
         struct acquire_future_impl
         {
             static_assert(!is_future_or_future_range_v<T>,
-                "!is_future_or_future_range_v<T>");
+                "T is a future or future range and must be acquired "
+                "using the hpx::traits::acquire_future<T> "
+                "specialization, not the default implementation.");
 
             using type = T;
 

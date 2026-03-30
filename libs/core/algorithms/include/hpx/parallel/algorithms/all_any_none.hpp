@@ -344,6 +344,8 @@ namespace hpx {
 
 #include <algorithm>
 #include <cstddef>
+#include <cstdint>
+#include <iterator>
 #include <type_traits>
 #include <utility>
 
@@ -389,8 +391,7 @@ namespace hpx::parallel {
                 }
 
                 using policy_type = std::decay_t<ExPolicy>;
-                using intermediate_result_t =
-                    std::conditional_t<has_scheduler_executor, char, bool>;
+                using intermediate_result_t = std::uint8_t;
 
                 util::cancellation_token<> tok;
                 auto f1 = [op = HPX_FORWARD(F, op), tok,
@@ -464,8 +465,7 @@ namespace hpx::parallel {
                 }
 
                 using policy_type = std::decay_t<ExPolicy>;
-                using intermediate_result_t =
-                    std::conditional_t<has_scheduler_executor, char, bool>;
+                using intermediate_result_t = std::uint8_t;
 
                 util::cancellation_token<> tok;
                 auto f1 = [op = HPX_FORWARD(F, op), tok,
@@ -538,8 +538,7 @@ namespace hpx::parallel {
                 }
 
                 using policy_type = std::decay_t<ExPolicy>;
-                using intermediate_result_t =
-                    std::conditional_t<has_scheduler_executor, char, bool>;
+                using intermediate_result_t = std::uint8_t;
 
                 util::cancellation_token<> tok;
                 auto f1 = [op = HPX_FORWARD(F, op), tok,
@@ -592,7 +591,7 @@ namespace hpx {
         friend decltype(auto) tag_fallback_invoke(
             none_of_t, ExPolicy&& policy, FwdIter first, FwdIter last, F f)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::none_of().call(
@@ -609,7 +608,7 @@ namespace hpx {
         friend bool tag_fallback_invoke(
             none_of_t, InIter first, InIter last, F f)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Required at least input iterator.");
 
             return hpx::parallel::detail::none_of().call(
@@ -633,7 +632,7 @@ namespace hpx {
         friend decltype(auto) tag_fallback_invoke(
             any_of_t, ExPolicy&& policy, FwdIter first, FwdIter last, F f)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::any_of().call(
@@ -650,7 +649,7 @@ namespace hpx {
         friend bool tag_fallback_invoke(
             any_of_t, InIter first, InIter last, F f)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Required at least input iterator.");
 
             return hpx::parallel::detail::any_of().call(
@@ -674,7 +673,7 @@ namespace hpx {
         friend decltype(auto) tag_fallback_invoke(
             all_of_t, ExPolicy&& policy, FwdIter first, FwdIter last, F f)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::all_of().call(
@@ -691,7 +690,7 @@ namespace hpx {
         friend bool tag_fallback_invoke(
             all_of_t, InIter first, InIter last, F f)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Required at least input iterator.");
 
             return hpx::parallel::detail::all_of().call(

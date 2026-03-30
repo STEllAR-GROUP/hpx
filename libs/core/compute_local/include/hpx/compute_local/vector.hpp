@@ -19,8 +19,11 @@
 #include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
+#include <exception>
 #include <initializer_list>
+#include <iterator>
 #include <memory>
+#include <stdexcept>
 #include <type_traits>
 #include <utility>
 
@@ -45,9 +48,8 @@ namespace hpx::compute {
         using const_pointer = typename alloc_traits::const_pointer;
         using iterator = detail::iterator<T, Allocator>;
         using const_iterator = detail::iterator<T const, Allocator>;
-        using reverse_iterator = detail::reverse_iterator<T, Allocator>;
-        using const_reverse_iterator =
-            detail::const_reverse_iterator<T, Allocator>;
+        using reverse_iterator = std::reverse_iterator<iterator>;
+        using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
         // Default constructor. Constructs an empty container
         explicit vector(Allocator const& alloc = Allocator())
@@ -83,11 +85,10 @@ namespace hpx::compute {
             alloc_traits::bulk_construct(alloc_, data_, size_);
         }
 
-        template <typename InIter,
-            typename Enable = typename std::enable_if<
-                hpx::traits::is_input_iterator<InIter>::value>::type>
-        vector(InIter first, InIter last, Allocator const& alloc)
-          : size_(std::distance(first, last))
+        template <typename InIter>
+            requires hpx::traits::is_input_iterator_v<InIter>
+        vector(InIter first, InIter last, Allocator const& alloc = Allocator())
+          : size_(static_cast<size_type>(std::distance(first, last)))
           , capacity_(size_)
           , alloc_(alloc)
           , data_(alloc_traits::allocate(alloc_, size_))
@@ -157,6 +158,9 @@ namespace hpx::compute {
             {
                 alloc_traits::bulk_destroy(alloc_, data_, size_);
                 alloc_traits::deallocate(alloc_, data_, capacity_);
+                data_ = nullptr;
+                size_ = 0;
+                capacity_ = 0;
             }
 #if !defined(__CUDA_ARCH__)
             catch (...)
@@ -197,6 +201,12 @@ namespace hpx::compute {
             if (this == &other)
                 return *this;
 
+            if (data_ != nullptr)
+            {
+                alloc_traits::bulk_destroy(alloc_, data_, size_);
+                alloc_traits::deallocate(alloc_, data_, capacity_);
+            }
+
             size_ = other.size_;
             capacity_ = other.capacity_;
             alloc_ = HPX_MOVE(other.alloc_);
@@ -209,8 +219,50 @@ namespace hpx::compute {
             return *this;
         }
 
-        // TODO: implement assign
+        void assign(size_type count, T const& value)
+        {
+            clear();
+            if (capacity_ < count)
+            {
+                alloc_traits::deallocate(alloc_, data_, capacity_);
+                data_ = nullptr;
+                size_ = 0;
+                capacity_ = 0;
 
+                pointer new_data = alloc_traits::allocate(alloc_, count);
+                data_ = new_data;
+                capacity_ = count;
+            }
+            size_ = count;
+            alloc_traits::bulk_construct(alloc_, data_, size_, value);
+        }
+
+        template <typename InIter>
+            requires hpx::traits::is_input_iterator_v<InIter>
+        void assign(InIter first, InIter last)
+        {
+            clear();
+            size_type count =
+                static_cast<size_type>(std::distance(first, last));
+            if (capacity_ < count)
+            {
+                alloc_traits::deallocate(alloc_, data_, capacity_);
+                data_ = nullptr;
+                size_ = 0;
+                capacity_ = 0;
+
+                pointer new_data = alloc_traits::allocate(alloc_, count);
+                data_ = new_data;
+                capacity_ = count;
+            }
+            size_ = count;
+            hpx::parallel::util::copy(first, last, begin());
+        }
+
+        void assign(std::initializer_list<T> ilist)
+        {
+            assign(ilist.begin(), ilist.end());
+        }
         /// Returns the allocator associated with the container
         allocator_type get_allocator() const noexcept
         {
@@ -219,7 +271,24 @@ namespace hpx::compute {
 
         ///////////////////////////////////////////////////////////////////////
         // Element access
-        // TODO: implement at()
+
+        reference at(size_type pos)
+        {
+            if (pos >= size_)
+            {
+                throw std::out_of_range("vector::at");
+            }
+            return *(data_ + pos);
+        }
+
+        const_reference at(size_type pos) const
+        {
+            if (pos >= size_)
+            {
+                throw std::out_of_range("vector::at");
+            }
+            return *(data_ + pos);
+        }
 
         HPX_HOST_DEVICE
         reference operator[](size_type pos)
@@ -239,8 +308,47 @@ namespace hpx::compute {
             return *(data_ + pos);
         }
 
-        // TODO: implement front()
-        // TODO: implement back()
+        /// Returns a reference to the first element in the container.
+        /// Calling front on an empty container is undefined.
+        HPX_HOST_DEVICE
+        reference front()
+        {
+#if !defined(__CUDA_ARCH__)
+            HPX_ASSERT(!empty());
+#endif
+            return *data_;
+        }
+
+        /// \copydoc front()
+        HPX_HOST_DEVICE
+        const_reference front() const
+        {
+#if !defined(__CUDA_ARCH__)
+            HPX_ASSERT(!empty());
+#endif
+            return *data_;
+        }
+
+        /// Returns a reference to the last element in the container.
+        /// Calling back on an empty container is undefined.
+        HPX_HOST_DEVICE
+        reference back()
+        {
+#if !defined(__CUDA_ARCH__)
+            HPX_ASSERT(!empty());
+#endif
+            return *(data_ + size_ - 1);
+        }
+
+        /// \copydoc back()
+        HPX_HOST_DEVICE
+        const_reference back() const
+        {
+#if !defined(__CUDA_ARCH__)
+            HPX_ASSERT(!empty());
+#endif
+            return *(data_ + size_ - 1);
+        }
 
         /// Returns pointer to the underlying array serving as element storage.
         /// The pointer is such that range [data(); data() + size()) is always a
@@ -268,7 +376,6 @@ namespace hpx::compute {
 #endif
         }
 
-        //
         std::size_t size() const noexcept
         {
             return size_;
@@ -295,7 +402,7 @@ namespace hpx::compute {
         /// Remarks: If an exception is thrown other than by the move
         /// constructor of a non-CopyInsertable T there are no effects.
         ///
-        static void resize(size_type /* size */)
+        void resize(size_type /* size */)
         {
             // TODO: implement this
         }
@@ -315,7 +422,6 @@ namespace hpx::compute {
 
         ///////////////////////////////////////////////////////////////////////
         // Iterators
-        // TODO: implement cbegin, cend, rbegin, crbegin, rend, crend
         // TODO: debug support
         iterator begin() noexcept
         {
@@ -345,6 +451,36 @@ namespace hpx::compute {
         const_iterator end() const noexcept
         {
             return const_iterator(data_, size_, alloc_traits::target(alloc_));
+        }
+
+        reverse_iterator rbegin() noexcept
+        {
+            return reverse_iterator(end());
+        }
+
+        reverse_iterator rend() noexcept
+        {
+            return reverse_iterator(begin());
+        }
+
+        const_reverse_iterator crbegin() const noexcept
+        {
+            return const_reverse_iterator(cend());
+        }
+
+        const_reverse_iterator crend() const noexcept
+        {
+            return const_reverse_iterator(cbegin());
+        }
+
+        const_reverse_iterator rbegin() const noexcept
+        {
+            return crbegin();
+        }
+
+        const_reverse_iterator rend() const noexcept
+        {
+            return crend();
         }
 
         /// Effects: Exchanges the contents and capacity() of *this with that

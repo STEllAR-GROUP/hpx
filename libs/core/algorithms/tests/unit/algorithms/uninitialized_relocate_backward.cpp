@@ -14,6 +14,7 @@
 #include <cstddef>
 #include <random>
 #include <set>
+#include <type_traits>
 #include <utility>
 
 constexpr int N = 500;    // number of objects to construct
@@ -477,6 +478,8 @@ void test_overlapping()
         catch (...)
         {
         }
+
+        // Because we know the execution is sequenced:
 
         // K move constructors were called, and then the last one throws
         HPX_TEST(

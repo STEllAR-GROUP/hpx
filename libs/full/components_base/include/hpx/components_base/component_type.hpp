@@ -166,17 +166,29 @@ namespace hpx::components {
     /// \brief Return the string representation for a given component type id
     HPX_EXPORT std::string get_component_type_name(component_type type);
 
+    inline constexpr int component_type_mask = 0x3FF;
+    inline constexpr int component_type_shift = 10;
+
     /// The lower short word of the component type is the type of the component
     /// exposing the actions.
     constexpr component_type get_base_type(component_type t) noexcept
     {
-        return static_cast<component_type>(t & 0x3FF);
+        if (t == to_int(component_enum_type::invalid))
+        {
+            return to_int(component_enum_type::invalid);
+        }
+        return static_cast<component_type>(t & component_type_mask);
     }
 
     /// The upper short word of the component is the actual component type
     constexpr component_type get_derived_type(component_type t) noexcept
     {
-        return static_cast<component_type>((t >> 10) & 0x3FF);
+        if (t == to_int(component_enum_type::invalid))
+        {
+            return to_int(component_enum_type::invalid);
+        }
+        return static_cast<component_type>(
+            (t >> component_type_shift) & component_type_mask);
     }
 
     /// A component derived from a base component exposing the actions needs to

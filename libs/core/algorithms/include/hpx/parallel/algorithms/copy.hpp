@@ -372,7 +372,7 @@ namespace hpx::parallel {
             template <typename ExPolicy, typename InIter, typename Sent,
                 typename OutIter>
             static constexpr std::enable_if_t<
-                !hpx::traits::is_random_access_iterator_v<InIter>,
+                !std::random_access_iterator<InIter>,
                 util::in_out_result<InIter, OutIter>>
             sequential(ExPolicy, InIter first, Sent last, OutIter dest)
             {
@@ -385,7 +385,7 @@ namespace hpx::parallel {
             template <typename ExPolicy, typename InIter, typename Sent,
                 typename OutIter>
             static constexpr std::enable_if_t<
-                hpx::traits::is_random_access_iterator_v<InIter>,
+                std::random_access_iterator<InIter>,
                 util::in_out_result<InIter, OutIter>>
             sequential(ExPolicy, InIter first, Sent last, OutIter dest)
             {
@@ -707,11 +707,12 @@ namespace hpx {
         friend decltype(auto) tag_fallback_invoke(hpx::copy_n_t,
             ExPolicy&& policy, FwdIter1 first, Size count, FwdIter2 dest)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Required at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2> ||
+            static_assert(std::forward_iterator<FwdIter2> ||
                     (hpx::is_sequenced_execution_policy_v<ExPolicy> &&
-                        hpx::traits::is_output_iterator_v<FwdIter2>),
+                        std::output_iterator<FwdIter2,
+                            hpx::traits::iter_value_t<FwdIter1>>),
                 "Requires at least forward iterator or sequential execution.");
 
             constexpr bool has_scheduler_executor =
@@ -748,9 +749,10 @@ namespace hpx {
         friend FwdIter2 tag_fallback_invoke(
             hpx::copy_n_t, FwdIter1 first, Size count, FwdIter2 dest)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Required at least forward iterator.");
-            static_assert(hpx::traits::is_output_iterator_v<FwdIter2>,
+            static_assert(std::output_iterator<FwdIter2,
+                              hpx::traits::iter_value_t<FwdIter1>>,
                 "Requires at least output iterator.");
 
             // if count is representing a negative value, we do nothing
@@ -792,11 +794,12 @@ namespace hpx {
         tag_fallback_invoke(hpx::copy_if_t, ExPolicy&& policy, FwdIter1 first,
             FwdIter1 last, FwdIter2 dest, Pred pred)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Required at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2> ||
+            static_assert(std::forward_iterator<FwdIter2> ||
                     (hpx::is_sequenced_execution_policy_v<ExPolicy> &&
-                        hpx::traits::is_output_iterator_v<FwdIter2>),
+                        std::output_iterator<FwdIter2,
+                            hpx::traits::iter_value_t<FwdIter1>>),
                 "Requires at least forward iterator or sequential execution.");
 
             return hpx::parallel::util::get_second_element(
@@ -819,9 +822,10 @@ namespace hpx {
         friend FwdIter2 tag_fallback_invoke(hpx::copy_if_t, FwdIter1 first,
             FwdIter1 last, FwdIter2 dest, Pred pred)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Required at least forward iterator.");
-            static_assert(hpx::traits::is_output_iterator_v<FwdIter2>,
+            static_assert(std::output_iterator<FwdIter2,
+                              hpx::traits::iter_value_t<FwdIter1>>,
                 "Requires at least output iterator.");
 
             return hpx::parallel::util::get_second_element(

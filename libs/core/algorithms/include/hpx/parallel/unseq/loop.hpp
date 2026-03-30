@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/executors.hpp>
+#include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/util/loop.hpp>
 
 #include <algorithm>
@@ -80,10 +81,11 @@ namespace hpx::parallel::util {
             HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Begin call(
                 Begin HPX_RESTRICT it, End HPX_RESTRICT end, F&& f)
             {
-                if constexpr (hpx::traits::is_random_access_iterator_v<Begin>)
+                if constexpr (std::random_access_iterator<Begin>)
                 {
-                    return unseq_loop_n::call(
-                        it, std::distance(it, end), HPX_FORWARD(F, f));
+                    return unseq_loop_n::call(it,
+                        hpx::parallel::detail::distance(it, end),
+                        HPX_FORWARD(F, f));
                 }
                 else
                 {
@@ -115,10 +117,11 @@ namespace hpx::parallel::util {
             HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Begin call(
                 Begin HPX_RESTRICT it, End HPX_RESTRICT end, F&& f)
             {
-                if constexpr (hpx::traits::is_random_access_iterator_v<Begin>)
+                if constexpr (std::random_access_iterator<Begin>)
                 {
-                    return unseq_loop_n_ind::call(
-                        it, std::distance(it, end), HPX_FORWARD(F, f));
+                    return unseq_loop_n_ind::call(it,
+                        hpx::parallel::detail::distance(it, end),
+                        HPX_FORWARD(F, f));
                 }
                 else
                 {
@@ -140,12 +143,13 @@ namespace hpx::parallel::util {
                 InIter2 HPX_RESTRICT it2, F&& f)
             {
                 constexpr bool iterators_are_random_access =
-                    hpx::traits::is_random_access_iterator_v<InIter1> &&
-                    hpx::traits::is_random_access_iterator_v<InIter2>;
+                    std::random_access_iterator<InIter1> &&
+                    std::random_access_iterator<InIter2>;
 
                 if constexpr (iterators_are_random_access)
                 {
-                    std::size_t const num = std::distance(it1, last1);
+                    std::size_t const num =
+                        hpx::parallel::detail::distance(it1, last1);
 
                     // clang-format off
                     HPX_IVDEP HPX_UNROLL HPX_VECTORIZE

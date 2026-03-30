@@ -439,7 +439,7 @@ namespace hpx {
         friend decltype(auto) tag_fallback_invoke(count_t, ExPolicy&& policy,
             FwdIter first, FwdIter last, T const& value)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Required at least forward iterator.");
 
             using difference_type =
@@ -460,7 +460,7 @@ namespace hpx {
         friend typename std::iterator_traits<InIter>::difference_type
         tag_fallback_invoke(count_t, InIter first, InIter last, T const& value)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Required at least input iterator.");
 
             using difference_type =
@@ -490,7 +490,7 @@ namespace hpx {
         friend decltype(auto) tag_fallback_invoke(
             count_if_t, ExPolicy&& policy, FwdIter first, FwdIter last, F f)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Required at least forward iterator.");
 
             using difference_type =
@@ -513,7 +513,7 @@ namespace hpx {
         friend typename std::iterator_traits<InIter>::difference_type
         tag_fallback_invoke(count_if_t, InIter first, InIter last, F f)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Required at least input iterator.");
 
             using difference_type =

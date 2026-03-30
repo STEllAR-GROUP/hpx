@@ -62,12 +62,13 @@ namespace hpx::parallel {
             {
                 // all elements are on the same partition
                 local_iterator_type1 beg = traits1::local(first);
-                local_iterator_type1 end = traits1::end(sit);
-                local_iterator_type2 ldest = traits2::begin(sdest);
+                local_iterator_type1 end = traits1::local(last);
+                local_iterator_type2 ldest = traits2::local(dest);
                 if (beg != end)
                 {
                     local_iterator_type2 out = dispatch(traits2::get_id(sdest),
                         algo, policy, std::true_type(), beg, end, ldest, op);
+                    dest = traits2::compose(sdest, out);
                 }
             }
             else
@@ -75,7 +76,7 @@ namespace hpx::parallel {
                 // handle the remaining part of the first partition
                 local_iterator_type1 beg = traits1::local(first);
                 local_iterator_type1 end = traits1::end(sit);
-                local_iterator_type2 ldest = traits2::begin(sdest);
+                local_iterator_type2 ldest = traits2::local(dest);
                 local_iterator_type2 out = traits2::local(dest);
                 if (beg != end)
                 {
@@ -151,8 +152,8 @@ namespace hpx::parallel {
                 hpx::parallel::util::detail::algorithm_result<ExPolicy,
                     FwdIter2>;
 
-            using forced_seq = std::integral_constant<bool,
-                !hpx::traits::is_forward_iterator_v<FwdIter1>>;
+            using forced_seq =
+                std::integral_constant<bool, !std::forward_iterator<FwdIter1>>;
 
             segment_iterator1 sit = traits1::segment(first);
             segment_iterator1 send = traits1::segment(last);
@@ -172,7 +173,7 @@ namespace hpx::parallel {
                 // all elements are on the same partition
                 local_iterator_type1 beg = traits1::local(first);
                 local_iterator_type1 end = traits1::local(last);
-                local_iterator_type2 ldest = traits2::begin(sdest);
+                local_iterator_type2 ldest = traits2::local(dest);
                 if (beg != end)
                 {
                     segments.push_back(dispatch_async(traits2::get_id(sdest),
@@ -184,7 +185,7 @@ namespace hpx::parallel {
                 // handle the remaining part of the first partition
                 local_iterator_type1 beg = traits1::local(first);
                 local_iterator_type1 end = traits1::end(sit);
-                local_iterator_type2 ldest = traits2::begin(sdest);
+                local_iterator_type2 ldest = traits2::local(dest);
                 if (beg != end)
                 {
                     segments.push_back(dispatch_async(traits2::get_id(sdest),
@@ -257,9 +258,9 @@ namespace hpx::segmented {
     tag_invoke(hpx::adjacent_difference_t, ExPolicy&& policy, FwdIter1 first,
         FwdIter1 last, FwdIter2 dest, Op&& op)
     {
-        static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+        static_assert(std::forward_iterator<FwdIter1>,
             "Requires at least forward iterator.");
-        static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+        static_assert(std::forward_iterator<FwdIter2>,
             "Requires at least forward iterator.");
 
         if (first == last)
@@ -288,10 +289,10 @@ namespace hpx::segmented {
     InIter2 tag_invoke(hpx::adjacent_difference_t, InIter1 first, InIter1 last,
         InIter2 dest, Op&& op)
     {
-        static_assert(hpx::traits::is_input_iterator_v<InIter1>,
-            "Requires at least input iterator.");
-        static_assert(hpx::traits::is_input_iterator_v<InIter2>,
-            "Requires at least input iterator.");
+        static_assert(
+            std::input_iterator<InIter1>, "Requires at least input iterator.");
+        static_assert(
+            std::input_iterator<InIter2>, "Requires at least input iterator.");
 
         if (first == last)
         {

@@ -10,6 +10,7 @@
 #include <hpx/modules/type_support.hpp>
 
 #include <exception>
+#include <type_traits>
 #include <utility>
 
 namespace ex = hpx::execution::experimental;

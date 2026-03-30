@@ -897,6 +897,7 @@ namespace hpx {
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
+#include <ranges>
 #include <type_traits>
 #include <utility>
 
@@ -913,7 +914,7 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
+                std::sentinel_for<Sent, Iter> &&
                 hpx::is_invocable_v<Convert,
                     typename std::iterator_traits<Iter>::value_type
                 > &&
@@ -931,7 +932,7 @@ namespace hpx::ranges {
         tag_fallback_invoke(transform_reduce_t, ExPolicy&& policy, Iter first,
             Sent last, T init, Reduce red_op, Convert conv_op)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<Iter>,
+            static_assert(std::forward_iterator<Iter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::transform_reduce<T>().call(
@@ -943,7 +944,7 @@ namespace hpx::ranges {
             typename Convert>
         // clang-format off
             requires(
-                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
+                std::sentinel_for<Sent, Iter> &&
                 hpx::is_invocable_v<Convert,
                    typename std::iterator_traits<Iter>::value_type
                 > &&
@@ -960,8 +961,8 @@ namespace hpx::ranges {
         friend T tag_fallback_invoke(transform_reduce_t, Iter first, Sent last,
             T init, Reduce red_op, Convert conv_op)
         {
-            static_assert(hpx::traits::is_input_iterator_v<Iter>,
-                "Requires at least input iterator.");
+            static_assert(
+                std::input_iterator<Iter>, "Requires at least input iterator.");
 
             return hpx::parallel::detail::transform_reduce<T>().call(
                 hpx::execution::seq, first, last, HPX_MOVE(init),
@@ -973,7 +974,7 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
+                std::sentinel_for<Sent, Iter> &&
                 hpx::traits::is_iterator_v<Iter2>
             )
         // clang-format on
@@ -981,9 +982,9 @@ namespace hpx::ranges {
         tag_fallback_invoke(transform_reduce_t, ExPolicy&& policy, Iter first,
             Sent last, Iter2 first2, T init)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<Iter>,
+            static_assert(std::forward_iterator<Iter>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<Iter2>,
+            static_assert(std::forward_iterator<Iter2>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::transform_reduce_binary<T>().call(
@@ -995,16 +996,16 @@ namespace hpx::ranges {
         template <typename Iter, typename Sent, typename Iter2, typename T>
         // clang-format off
             requires(
-                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
+                std::sentinel_for<Sent, Iter> &&
                 hpx::traits::is_iterator_v<Iter2>
             )
         // clang-format on
         friend T tag_fallback_invoke(
             transform_reduce_t, Iter first, Sent last, Iter2 first2, T init)
         {
-            static_assert(hpx::traits::is_input_iterator_v<Iter>,
-                "Requires at least input iterator.");
-            static_assert(hpx::traits::is_input_iterator_v<Iter2>,
+            static_assert(
+                std::input_iterator<Iter>, "Requires at least input iterator.");
+            static_assert(std::input_iterator<Iter2>,
                 "Requires at least input iterator.");
 
             return hpx::parallel::detail::transform_reduce_binary<T>().call(
@@ -1018,7 +1019,7 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
+                std::sentinel_for<Sent, Iter> &&
                 hpx::traits::is_iterator_v<Iter2> &&
                 hpx::is_invocable_v<Convert,
                     typename std::iterator_traits<Iter>::value_type,
@@ -1040,9 +1041,9 @@ namespace hpx::ranges {
         tag_fallback_invoke(transform_reduce_t, ExPolicy&& policy, Iter first,
             Sent last, Iter2 first2, T init, Reduce red_op, Convert conv_op)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<Iter>,
+            static_assert(std::forward_iterator<Iter>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<Iter2>,
+            static_assert(std::forward_iterator<Iter2>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::transform_reduce_binary<T>().call(
@@ -1054,7 +1055,7 @@ namespace hpx::ranges {
             typename Reduce, typename Convert>
         // clang-format off
             requires(
-                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
+                std::sentinel_for<Sent, Iter> &&
                 hpx::traits::is_iterator_v<Iter2> &&
                 hpx::is_invocable_v<Convert,
                     typename std::iterator_traits<Iter>::value_type,
@@ -1075,9 +1076,9 @@ namespace hpx::ranges {
         friend T tag_fallback_invoke(transform_reduce_t, Iter first, Sent last,
             Iter2 first2, T init, Reduce red_op, Convert conv_op)
         {
-            static_assert(hpx::traits::is_input_iterator_v<Iter>,
-                "Requires at least input iterator.");
-            static_assert(hpx::traits::is_input_iterator_v<Iter2>,
+            static_assert(
+                std::input_iterator<Iter>, "Requires at least input iterator.");
+            static_assert(std::input_iterator<Iter2>,
                 "Requires at least input iterator.");
 
             return hpx::parallel::detail::transform_reduce_binary<T>().call(
@@ -1092,7 +1093,7 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                std::ranges::range<Rng> &&
                 hpx::is_invocable_v<Convert,
                     typename hpx::traits::range_traits<Rng>::value_type
                 > &&
@@ -1110,9 +1111,9 @@ namespace hpx::ranges {
         tag_fallback_invoke(transform_reduce_t, ExPolicy&& policy, Rng&& rng,
             T init, Reduce red_op, Convert conv_op)
         {
-            using iterator_type = hpx::traits::range_iterator_t<Rng>;
+            using iterator_type = std::ranges::iterator_t<Rng>;
 
-            static_assert(hpx::traits::is_forward_iterator_v<iterator_type>,
+            static_assert(std::forward_iterator<iterator_type>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::transform_reduce<T>().call(
@@ -1124,7 +1125,7 @@ namespace hpx::ranges {
         template <typename Rng, typename T, typename Reduce, typename Convert>
         // clang-format off
             requires(
-                hpx::traits::is_range_v<Rng> &&
+                std::ranges::range<Rng> &&
                 hpx::is_invocable_v<Convert,
                     typename hpx::traits::range_traits<Rng>::value_type
                 > &&
@@ -1141,9 +1142,9 @@ namespace hpx::ranges {
         friend T tag_fallback_invoke(transform_reduce_t, Rng&& rng, T init,
             Reduce red_op, Convert conv_op)
         {
-            using iterator_type = hpx::traits::range_iterator_t<Rng>;
+            using iterator_type = std::ranges::iterator_t<Rng>;
 
-            static_assert(hpx::traits::is_input_iterator_v<iterator_type>,
+            static_assert(std::input_iterator<iterator_type>,
                 "Requires at least input iterator.");
 
             return hpx::parallel::detail::transform_reduce<T>().call(
@@ -1155,7 +1156,7 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                std::ranges::range<Rng> &&
                 hpx::traits::is_iterator_v<Iter2>
             )
         // clang-format on
@@ -1163,11 +1164,11 @@ namespace hpx::ranges {
         tag_fallback_invoke(transform_reduce_t, ExPolicy&& policy, Rng&& rng,
             Iter2 first2, T init)
         {
-            using iterator_type = hpx::traits::range_iterator_t<Rng>;
+            using iterator_type = std::ranges::iterator_t<Rng>;
 
-            static_assert(hpx::traits::is_forward_iterator_v<iterator_type>,
+            static_assert(std::forward_iterator<iterator_type>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<Iter2>,
+            static_assert(std::forward_iterator<Iter2>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::transform_reduce_binary<T>().call(
@@ -1180,18 +1181,18 @@ namespace hpx::ranges {
         template <typename Rng, typename Iter2, typename T>
         // clang-format off
             requires(
-                hpx::traits::is_range_v<Rng> &&
+                std::ranges::range<Rng> &&
                 hpx::traits::is_iterator_v<Iter2>
             )
         // clang-format on
         friend T tag_fallback_invoke(
             transform_reduce_t, Rng&& rng, Iter2 first2, T init)
         {
-            using iterator_type = hpx::traits::range_iterator_t<Rng>;
+            using iterator_type = std::ranges::iterator_t<Rng>;
 
-            static_assert(hpx::traits::is_input_iterator_v<iterator_type>,
+            static_assert(std::input_iterator<iterator_type>,
                 "Requires at least input iterator.");
-            static_assert(hpx::traits::is_input_iterator_v<Iter2>,
+            static_assert(std::input_iterator<Iter2>,
                 "Requires at least input iterator.");
 
             return hpx::parallel::detail::transform_reduce_binary<T>().call(
@@ -1205,7 +1206,7 @@ namespace hpx::ranges {
         // clang-format off
             requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
+                std::ranges::range<Rng> &&
                 hpx::traits::is_iterator_v<Iter2> &&
                 hpx::is_invocable_v<Convert,
                     typename hpx::traits::range_traits<Rng>::value_type,
@@ -1227,11 +1228,11 @@ namespace hpx::ranges {
         tag_fallback_invoke(transform_reduce_t, ExPolicy&& policy, Rng&& rng,
             Iter2 first2, T init, Reduce red_op, Convert conv_op)
         {
-            using iterator_type = hpx::traits::range_iterator_t<Rng>;
+            using iterator_type = std::ranges::iterator_t<Rng>;
 
-            static_assert(hpx::traits::is_forward_iterator_v<iterator_type>,
+            static_assert(std::forward_iterator<iterator_type>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<Iter2>,
+            static_assert(std::forward_iterator<Iter2>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::transform_reduce_binary<T>().call(
@@ -1244,7 +1245,7 @@ namespace hpx::ranges {
             typename Convert>
         // clang-format off
             requires(
-                hpx::traits::is_range_v<Rng> &&
+                std::ranges::range<Rng> &&
                 hpx::traits::is_iterator_v<Iter2> &&
                 hpx::is_invocable_v<Convert,
                     typename hpx::traits::range_traits<Rng>::value_type,
@@ -1265,11 +1266,11 @@ namespace hpx::ranges {
         friend T tag_fallback_invoke(transform_reduce_t, Rng&& rng,
             Iter2 first2, T init, Reduce red_op, Convert conv_op)
         {
-            using iterator_type = hpx::traits::range_iterator_t<Rng>;
+            using iterator_type = std::ranges::iterator_t<Rng>;
 
-            static_assert(hpx::traits::is_input_iterator_v<iterator_type>,
+            static_assert(std::input_iterator<iterator_type>,
                 "Requires at least input iterator.");
-            static_assert(hpx::traits::is_input_iterator_v<Iter2>,
+            static_assert(std::input_iterator<Iter2>,
                 "Requires at least input iterator.");
 
             return hpx::parallel::detail::transform_reduce_binary<T>().call(

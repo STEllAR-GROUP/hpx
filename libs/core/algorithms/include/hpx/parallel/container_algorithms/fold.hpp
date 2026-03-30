@@ -258,6 +258,7 @@ namespace hpx::ranges {
 #include <hpx/parallel/util/ranges_facilities.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 
+#include <iterator>
 #include <ranges>
 #include <type_traits>
 
@@ -281,7 +282,7 @@ namespace hpx::ranges {
         // clang-format off
         requires (
             std::input_iterator<InIter> &&
-            std::is_same_v<T, hpx::traits::iter_value_t<InIter>> &&
+            std::is_convertible_v<hpx::traits::iter_value_t<InIter>, T> &&
             std::sentinel_for<Sent, InIter> &&
             hpx::is_indirectly_binary_left_foldable<F, T, InIter>
         )
@@ -312,8 +313,8 @@ namespace hpx::ranges {
         // clang-format off
         requires (
             std::ranges::input_range<Rng> &&
-            std::is_same_v<T, hpx::traits::iter_value_t<
-                std::ranges::iterator_t<Rng>>> &&
+            std::is_convertible_v<hpx::traits::iter_value_t<
+                std::ranges::iterator_t<Rng>>, T> &&
             hpx::is_indirectly_binary_left_foldable<F, T,
                 std::ranges::iterator_t<Rng>>
         )
@@ -395,7 +396,7 @@ namespace hpx::ranges {
         requires (
             std::input_iterator<InIter> &&
             std::sentinel_for<Sent, InIter> &&
-            std::is_same_v<T, hpx::traits::iter_value_t<InIter>> &&
+            std::is_convertible_v<hpx::traits::iter_value_t<InIter>, T> &&
             hpx::is_indirectly_binary_left_foldable<F, T, InIter>
         )
         // clang-format on
@@ -411,8 +412,8 @@ namespace hpx::ranges {
         // clang-format off
         requires (
             std::ranges::input_range<Rng> &&
-            std::is_same_v<T, hpx::traits::iter_value_t<
-                std::ranges::iterator_t<Rng>>> &&
+            std::is_convertible_v<hpx::traits::iter_value_t<
+                std::ranges::iterator_t<Rng>>, T> &&
             hpx::is_indirectly_binary_left_foldable<F, T,
                 std::ranges::iterator_t<Rng>>
         )
@@ -476,8 +477,8 @@ namespace hpx::ranges {
         template <typename BidIter, typename Sent, typename T, typename F>
         // clang-format off
         requires (
-            hpx::traits::is_bidirectional_iterator_v<BidIter> &&
-            std::is_same_v<T, hpx::traits::iter_value_t<BidIter>> &&
+            std::bidirectional_iterator<BidIter> &&
+            std::is_convertible_v<hpx::traits::iter_value_t<BidIter>, T> &&
             std::sentinel_for<Sent, BidIter> &&
             hpx::is_indirectly_binary_right_foldable<F, T, BidIter>
         )
@@ -493,7 +494,7 @@ namespace hpx::ranges {
                 return U(HPX_MOVE(init));
             }
 
-            auto it = hpx::ranges::next(first, last);
+            auto it = hpx::parallel::detail::advance_to_sentinel(first, last);
             U result = HPX_MOVE(init);
 
             while (it != first)
@@ -507,8 +508,8 @@ namespace hpx::ranges {
         // clang-format off
         requires (
             std::ranges::bidirectional_range<Rng> &&
-            std::is_same_v<T, hpx::traits::iter_value_t<
-                std::ranges::iterator_t<Rng>>> &&
+            std::is_convertible_v<hpx::traits::iter_value_t<
+                std::ranges::iterator_t<Rng>>, T> &&
             hpx::is_indirectly_binary_right_foldable<F, T,
                 std::ranges::iterator_t<Rng>>
         )
@@ -531,7 +532,7 @@ namespace hpx::ranges {
         template <typename BidIter, typename Sent, typename F>
         // clang-format off
         requires (
-            hpx::traits::is_bidirectional_iterator_v<BidIter> &&
+            std::bidirectional_iterator<BidIter> &&
             std::sentinel_for<Sent, BidIter> &&
             hpx::is_indirectly_binary_right_foldable<F,
                 hpx::traits::iter_value_t<BidIter>, BidIter>
@@ -548,7 +549,7 @@ namespace hpx::ranges {
                 return result_type();
             }
 
-            auto it = hpx::ranges::next(first, last);
+            auto it = hpx::parallel::detail::advance_to_sentinel(first, last);
             U result = *--it;
 
             while (it != first)

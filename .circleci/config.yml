@@ -51,14 +51,14 @@ gh_pages_filter: &gh_pages_filter
       tags:
         ignore: stable
 
-docs_push_filter: &docs_push_filter
-    filters:
-      branches:
-        only:
-          - master
-          - /release.*/
-      tags:
-        ignore: stable
+#docs_push_filter: &docs_push_filter
+#    filters:
+#      branches:
+#        only:
+#          - master
+#          - /release.*/
+#      tags:
+#        ignore: stable
 
 core_dependency: &core_dependency
     requires:
@@ -454,18 +454,18 @@ jobs:
       - store_artifacts:
           path: /hpx/build/share/hpx/docs/latexpdf/latex/HPX.pdf
 
-  docs_push:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - <<: *add_github_to_known_hosts
-      - <<: *configure_local_git
-      - run:
-          name: Pushing Sphinx Documentation
-          command: |
-              ninja -j1 git_docs
-          no_output_timeout: 1h
+#  docs_push:
+#    <<: *defaults
+#    steps:
+#      - attach_workspace:
+#          at: /hpx
+#      - <<: *add_github_to_known_hosts
+#      - <<: *configure_local_git
+#      - run:
+#          name: Pushing Sphinx Documentation
+#          command: |
+#              ninja -j1 git_docs
+#          no_output_timeout: 1h
 
   core_local:
     <<: *defaults
@@ -743,7 +743,7 @@ jobs:
                 --no-compress-output \
                 --output-on-failure \
                 --tests-regex \
-                  `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit1.container_algorithms | sed ':b;N;$!bb;s/\n/|/g'` \
+                  "^(`grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit1.container_algorithms | sed 's/[][(){}.^$*+?|\\]/\\\\&/g' | sed ':b;N;$!bb;s/\n/|/g'`)$" \
                 --exclude-regex \
                   tests.unit.modules.algorithms.container_algorithms.for_loop_range_generator
       - run:
@@ -778,7 +778,7 @@ jobs:
                 --no-compress-output \
                 --output-on-failure \
                 --tests-regex \
-                  `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit2.container_algorithms | sed ':b;N;$!bb;s/\n/|/g'`
+                  "^(`grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit2.container_algorithms | sed 's/[][(){}.^$*+?|\\]/\\\\&/g' | sed ':b;N;$!bb;s/\n/|/g'`)$"
       - run:
           <<: *convert_xml
       - run:
@@ -1492,13 +1492,13 @@ workflows:
             # than example1. Making it depend on both causes workspace conflicts.
             - tests.examples2
           <<: *additional_docs_filter
-      - docs_push:
-          requires:
-            - docs-html
-            - docs-singlehtml
-            - docs-latexpdf
-            - depreport
-          <<: *docs_push_filter
+#      - docs_push:
+#          requires:
+#            - docs-html
+#            - docs-singlehtml
+#            - docs-latexpdf
+#            - depreport
+#          <<: *docs_push_filter
       - install:
           requires:
             - core

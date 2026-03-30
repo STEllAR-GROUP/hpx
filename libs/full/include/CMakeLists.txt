@@ -102,6 +102,7 @@ set(include_headers
     hpx/include/traits.hpp
     hpx/include/unseq.hpp
     hpx/include/util.hpp
+    hpx/experimental/sandbox.hpp
 )
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)

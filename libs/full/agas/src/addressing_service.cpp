@@ -294,7 +294,9 @@ namespace hpx::agas {
 
                 HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                     "addressing_service::resolve_locality", str);
-                return resolved_localities_[naming::invalid_gid];
+
+                static parcelset::endpoints_type const empty_endpoints;
+                return empty_endpoints;
             }
         }
 
@@ -312,7 +314,9 @@ namespace hpx::agas {
                     "addressing_service::resolve_locality",
                     "resolved locality insertion failed "
                     "due to a locking error or memory corruption");
-                return resolved_localities_[naming::invalid_gid];
+
+                static parcelset::endpoints_type const empty_endpoints;
+                return empty_endpoints;
             }
         }
         else if (it->second.empty() && !endpoints.empty())
@@ -1467,10 +1471,9 @@ namespace hpx::agas {
         {
             // reschedule this call as an HPX thread
             threads::thread_init_data data(
-                threads::make_thread_function_nullary(
-                    [HPX_CXX20_CAPTURE_THIS(=)]() -> void {
-                        return decref(raw, credit, throws);
-                    }),
+                threads::make_thread_function_nullary([=, this]() -> void {
+                    return decref(raw, credit, throws);
+                }),
                 "addressing_service::decref", threads::thread_priority::normal,
                 threads::thread_schedule_hint(),
                 threads::thread_stacksize::default_,
@@ -1724,10 +1727,9 @@ namespace hpx::agas {
             }
 
             threads::thread_init_data data(
-                threads::make_thread_function_nullary(
-                    [HPX_CXX20_CAPTURE_THIS(=)]() -> void {
-                        return update_cache_entry(id, g, throws);
-                    }),
+                threads::make_thread_function_nullary([=, this]() -> void {
+                    return update_cache_entry(id, g, throws);
+                }),
                 "addressing_service::update_cache_entry",
                 threads::thread_priority::normal,
                 threads::thread_schedule_hint(),

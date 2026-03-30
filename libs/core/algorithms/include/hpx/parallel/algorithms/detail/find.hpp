@@ -17,6 +17,7 @@
 #include <hpx/parallel/util/loop.hpp>
 
 #include <cstddef>
+#include <iterator>
 #include <type_traits>
 #include <utility>
 
@@ -34,8 +35,7 @@ namespace hpx::parallel::detail {
             sequential_find_t<ExPolicy>, Iterator first, Sentinel last,
             T const& value, Proj proj = Proj())
         {
-            return util::loop_pred<
-                std::decay_t<hpx::execution::sequenced_policy>>(
+            return util::loop_pred<std::decay_t<ExPolicy>>(
                 first, last, [&value, &proj](auto const& curr) {
                     return HPX_INVOKE(proj, *curr) == value;
                 });
@@ -479,7 +479,7 @@ namespace hpx::parallel::detail {
             T const& value, Proj&& proj = Proj())
         {
             auto u_last = detail::advance_to_sentinel(first, last);
-            if constexpr (hpx::traits::is_bidirectional_iterator_v<Iterator>)
+            if constexpr (std::bidirectional_iterator<Iterator>)
             {
                 auto it = u_last;
                 while (it != first)
@@ -562,7 +562,7 @@ namespace hpx::parallel::detail {
             Pred pred, Proj&& proj = Proj())
         {
             auto u_last = detail::advance_to_sentinel(first, last);
-            if constexpr (hpx::traits::is_bidirectional_iterator_v<Iterator>)
+            if constexpr (std::bidirectional_iterator<Iterator>)
             {
                 auto it = u_last;
                 while (it != first)
@@ -644,7 +644,7 @@ namespace hpx::parallel::detail {
             Sentinel last, Pred pred, Proj&& proj = Proj())
         {
             auto u_last = detail::advance_to_sentinel(first, last);
-            if constexpr (hpx::traits::is_bidirectional_iterator_v<Iterator>)
+            if constexpr (std::bidirectional_iterator<Iterator>)
             {
                 auto it = u_last;
                 while (it != first)

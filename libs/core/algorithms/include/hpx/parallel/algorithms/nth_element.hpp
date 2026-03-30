@@ -192,11 +192,7 @@ namespace hpx::parallel {
 
                 if (it != first)
                 {
-#if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
                     std::ranges::iter_swap(it, first);
-#else
-                    std::iter_swap(it, first);
-#endif
                 }
 
                 return;
@@ -308,11 +304,7 @@ namespace hpx::parallel {
 
                         // swap first element and partitionIter
                         // (ending element of first group)
-#if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
                         std::ranges::iter_swap(first, partition_iter);
-#else
-                        std::iter_swap(first, partition_iter);
-#endif
 
                         // if nth element < partitioned index,
                         // it lies in [first, partitionIter)
@@ -368,7 +360,7 @@ namespace hpx {
         friend void tag_fallback_invoke(hpx::nth_element_t, RandomIt first,
             RandomIt nth, RandomIt last, Pred pred = Pred())
         {
-            static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
+            static_assert(std::random_access_iterator<RandomIt>,
                 "Requires at least random iterator.");
 
             hpx::parallel::detail::nth_element<RandomIt>().call(
@@ -392,7 +384,7 @@ namespace hpx {
         tag_fallback_invoke(hpx::nth_element_t, ExPolicy&& policy,
             RandomIt first, RandomIt nth, RandomIt last, Pred pred = Pred())
         {
-            static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
+            static_assert(std::random_access_iterator<RandomIt>,
                 "Requires at least random iterator.");
 
             using result_type =

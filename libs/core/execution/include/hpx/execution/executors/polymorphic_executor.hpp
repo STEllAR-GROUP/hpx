@@ -11,9 +11,11 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/execution/detail/future_exec.hpp>
+#include <hpx/modules/async_combinators.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
+#include <hpx/modules/pack_traversal.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/type_support.hpp>
 
@@ -86,6 +88,7 @@ namespace hpx::parallel::execution {
             using pointer = std::size_t*;
             using reference = std::size_t&;
 
+            shape_iter() = default;
             template <typename Iterator>
             explicit shape_iter(Iterator it)
               : impl_(new shape_iter_impl<Iterator>(it))
@@ -137,7 +140,7 @@ namespace hpx::parallel::execution {
             }
 
         protected:
-            std::unique_ptr<shape_iter_impl_base> impl_;
+            std::unique_ptr<shape_iter_impl_base> impl_{};
         };
 
         struct range_proxy
@@ -488,14 +491,30 @@ namespace hpx::parallel::execution {
 
             // bulk_async_execute
             template <typename T>
-            static std::vector<hpx::future<R>> _bulk_async_execute(void* exec,
+            static hpx::future<std::vector<R>> _bulk_async_execute(void* exec,
                 bulk_async_execute_function_type&& f, range_proxy const& shape,
                 Ts&&... ts)
             {
-                return execution::bulk_async_execute(vtable_base::get<T>(exec),
-                    HPX_MOVE(f), shape, HPX_FORWARD(Ts, ts)...);
+                auto result =
+                    execution::bulk_async_execute(vtable_base::get<T>(exec),
+                        HPX_MOVE(f), shape, HPX_FORWARD(Ts, ts)...);
+
+                // bulk_async_execute returns either a future<vector<R>> or a
+                // vector<future<R>>
+                if constexpr (hpx::traits::is_future_v<decltype(result)>)
+                {
+                    return result;
+                }
+                else
+                {
+                    return hpx::make_future<std::vector<R>>(
+                        hpx::when_all(HPX_MOVE(result)), [](auto&& inner) {
+                            return hpx::unwrap(
+                                HPX_FORWARD(decltype(inner), inner));
+                        });
+                }
             }
-            std::vector<hpx::future<R>> (*bulk_async_execute)(void*,
+            hpx::future<std::vector<R>> (*bulk_async_execute)(void*,
                 bulk_async_execute_function_type&&, range_proxy const& shape,
                 Ts&&...);
 
@@ -521,7 +540,7 @@ namespace hpx::parallel::execution {
             {
             }
 
-            static std::vector<hpx::future<R>> _empty_bulk_async_execute(void*,
+            static hpx::future<std::vector<R>> _empty_bulk_async_execute(void*,
                 bulk_async_execute_function_type&&, range_proxy const&, Ts&&...)
             {
                 throw_bad_polymorphic_executor<R>();
@@ -843,11 +862,7 @@ namespace hpx::parallel::execution {
 
         // BulkOneWayExecutor interface
         template <typename F, typename Shape>
-        // clang-format off
-            requires (
-                !std::is_integral_v<Shape>
-            )
-        // clang-format on
+            requires(!std::is_integral_v<Shape>)
         HPX_FORCEINLINE friend std::vector<R> tag_invoke(
             hpx::parallel::execution::bulk_sync_execute_t,
             polymorphic_executor const& exec, F&& f, Shape const& s, Ts&&... ts)
@@ -865,12 +880,8 @@ namespace hpx::parallel::execution {
 
         // BulkTwoWayExecutor interface
         template <typename F, typename Shape>
-        // clang-format off
-            requires (
-                !std::is_integral_v<Shape>
-            )
-        // clang-format on
-        HPX_FORCEINLINE friend std::vector<hpx::future<R>> tag_invoke(
+            requires(!std::is_integral_v<Shape>)
+        HPX_FORCEINLINE friend hpx::future<std::vector<R>> tag_invoke(
             hpx::parallel::execution::bulk_async_execute_t,
             polymorphic_executor const& exec, F&& f, Shape const& s, Ts&&... ts)
         {
@@ -886,11 +897,7 @@ namespace hpx::parallel::execution {
         }
 
         template <typename F, typename Shape>
-        // clang-format off
-            requires (
-                !std::is_integral_v<Shape>
-            )
-        // clang-format on
+            requires(!std::is_integral_v<Shape>)
         HPX_FORCEINLINE friend hpx::future<std::vector<R>> tag_invoke(
             hpx::parallel::execution::bulk_then_execute_t,
             polymorphic_executor const& exec, F&& f, Shape const& s,

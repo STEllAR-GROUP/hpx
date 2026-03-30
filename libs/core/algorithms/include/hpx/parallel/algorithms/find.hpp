@@ -1012,6 +1012,7 @@ namespace hpx {
 #include <iterator>
 #include <type_traits>
 #include <utility>
+#include <iterator>
 
 namespace hpx::parallel {
 
@@ -1055,7 +1056,8 @@ namespace hpx::parallel {
                     }
                 }
 
-                difference_type count = detail::distance(first, last);
+                difference_type count =
+                    hpx::parallel::detail::distance(first, last);
 
                 decltype(auto) policy =
                     hpx::execution::experimental::adapt_placement_mode(
@@ -1073,7 +1075,7 @@ namespace hpx::parallel {
                         val, HPX_FORWARD(Proj, proj));
                 };
 
-                auto f2 = [tok, count, first, last](
+                auto f2 = [tok, first](
                               auto&&... data) mutable -> Iter {
                     static_assert(sizeof...(data) < 2);
 
@@ -1084,14 +1086,7 @@ namespace hpx::parallel {
                     auto find_res =
                         static_cast<difference_type>(tok.get_data());
 
-                    if (find_res != count)
-                    {
-                        std::advance(first, find_res);
-                    }
-                    else
-                    {
-                        first = detail::advance_to_sentinel(first, last);
-                    }
+                    std::advance(first, find_res);
                     return first;
                 };
 
@@ -1145,7 +1140,8 @@ namespace hpx::parallel {
                     }
                 }
 
-                difference_type count = detail::distance(first, last);
+                difference_type count =
+                    hpx::parallel::detail::distance(first, last);
 
                 decltype(auto) policy =
                     hpx::execution::experimental::adapt_placement_mode(
@@ -1164,7 +1160,7 @@ namespace hpx::parallel {
                         tok, HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
                 };
 
-                auto f2 = [tok, count, first, last](
+                auto f2 = [tok, first](
                               auto&&... data) mutable -> Iter {
                     static_assert(sizeof...(data) < 2);
 
@@ -1175,14 +1171,7 @@ namespace hpx::parallel {
                     auto find_res =
                         static_cast<difference_type>(tok.get_data());
 
-                    if (find_res != count)
-                    {
-                        std::advance(first, find_res);
-                    }
-                    else
-                    {
-                        first = detail::advance_to_sentinel(first, last);
-                    }
+                    std::advance(first, find_res);
                     return first;
                 };
 
@@ -1235,7 +1224,8 @@ namespace hpx::parallel {
                     }
                 }
 
-                difference_type count = detail::distance(first, last);
+                difference_type count =
+                    hpx::parallel::detail::distance(first, last);
 
                 decltype(auto) policy =
                     hpx::execution::experimental::adapt_placement_mode(
@@ -1254,7 +1244,7 @@ namespace hpx::parallel {
                         tok, HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
                 };
 
-                auto f2 = [tok, count, first, last](
+                auto f2 = [tok, first](
                               auto&&... data) mutable -> Iter {
                     static_assert(sizeof...(data) < 2);
 
@@ -1265,14 +1255,7 @@ namespace hpx::parallel {
                     auto find_res =
                         static_cast<difference_type>(tok.get_data());
 
-                    if (find_res != count)
-                    {
-                        std::advance(first, find_res);
-                    }
-                    else
-                    {
-                        first = detail::advance_to_sentinel(first, last);
-                    }
+                    std::advance(first, find_res);
                     return first;
                 };
 
@@ -1331,8 +1314,10 @@ namespace hpx::parallel {
                     }
                 }
 
-                difference_type count = detail::distance(first1, last1);
-                difference_type diff = detail::distance(first2, last2);
+                difference_type count =
+                    hpx::parallel::detail::distance(first1, last1);
+                difference_type diff =
+                    hpx::parallel::detail::distance(first2, last2);
 
                 if constexpr (!has_scheduler_executor)
                 {
@@ -1371,7 +1356,7 @@ namespace hpx::parallel {
                         HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
                 };
 
-                auto f2 = [tok, count, first1, last1](
+                auto f2 = [tok, first1](
                               auto&&... data) mutable -> Iter1 {
                     static_assert(sizeof...(data) < 2);
 
@@ -1381,14 +1366,7 @@ namespace hpx::parallel {
 
                     difference_type find_end_res = tok.get_data();
 
-                    if (find_end_res >= 0 && find_end_res != count)
-                    {
-                        std::advance(first1, find_end_res);
-                    }
-                    else
-                    {
-                        first1 = last1;
-                    }
+                    std::advance(first1, find_end_res);
                     return first1;
                 };
 
@@ -1443,7 +1421,8 @@ namespace hpx::parallel {
                         return result::get(HPX_MOVE(last));
                 }
 
-                difference_type count = std::distance(first, last);
+                difference_type count =
+                    hpx::parallel::detail::distance(first, last);
 
                 if (s_first == s_last)
                 {
@@ -1476,7 +1455,7 @@ namespace hpx::parallel {
                         HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
                 };
 
-                auto f2 = [tok, count, first, last](
+                auto f2 = [tok, first](
                               auto&&... data) mutable -> FwdIter {
                     static_assert(sizeof...(data) < 2);
 
@@ -1486,14 +1465,7 @@ namespace hpx::parallel {
 
                     difference_type find_first_of_res = tok.get_data();
 
-                    if (find_first_of_res != count)
-                    {
-                        std::advance(first, find_first_of_res);
-                    }
-                    else
-                    {
-                        first = last;
-                    }
+                    std::advance(first, find_first_of_res);
 
                     return first;
                 };
@@ -1526,7 +1498,7 @@ namespace hpx {
         friend constexpr InIter tag_fallback_invoke(
             find_t, InIter first, InIter last, T const& val)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Requires at least input iterator.");
 
             return hpx::parallel::detail::find<InIter>().call(
@@ -1544,7 +1516,7 @@ namespace hpx {
         friend decltype(auto) tag_fallback_invoke(find_t, ExPolicy&& policy,
             FwdIter first, FwdIter last, T const& val)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::find<FwdIter>().call(
@@ -1570,7 +1542,7 @@ namespace hpx {
         friend decltype(auto) tag_fallback_invoke(
             find_if_t, ExPolicy&& policy, FwdIter first, FwdIter last, F f)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::find_if<FwdIter>().call(
@@ -1588,7 +1560,7 @@ namespace hpx {
         friend InIter tag_fallback_invoke(
             find_if_t, InIter first, InIter last, F f)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Requires at least input iterator.");
 
             return hpx::parallel::detail::find_if<InIter>().call(
@@ -1613,7 +1585,7 @@ namespace hpx {
         friend decltype(auto) tag_fallback_invoke(
             find_if_not_t, ExPolicy&& policy, FwdIter first, FwdIter last, F f)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::find_if_not<FwdIter>().call(
@@ -1631,7 +1603,7 @@ namespace hpx {
         friend FwdIter tag_fallback_invoke(
             find_if_not_t, FwdIter first, FwdIter last, F f)
         {
-            static_assert(hpx::traits::is_input_iterator_v<FwdIter>,
+            static_assert(std::input_iterator<FwdIter>,
                 "Requires at least input iterator.");
 
             return hpx::parallel::detail::find_if_not<FwdIter>().call(
@@ -1661,9 +1633,9 @@ namespace hpx {
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2,
             Pred op)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::find_end<FwdIter1>().call(
@@ -1682,9 +1654,9 @@ namespace hpx {
         friend decltype(auto) tag_fallback_invoke(find_end_t, ExPolicy&& policy,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::find_end<FwdIter1>().call(
@@ -1706,9 +1678,9 @@ namespace hpx {
         friend FwdIter1 tag_fallback_invoke(find_end_t, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, Pred op)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::find_end<FwdIter1>().call(
@@ -1726,9 +1698,9 @@ namespace hpx {
         friend FwdIter1 tag_fallback_invoke(find_end_t, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, FwdIter2 last2)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::find_end<FwdIter1>().call(
@@ -1760,9 +1732,9 @@ namespace hpx {
             ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 s_first,
             FwdIter2 s_last, Pred op)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Subsequence requires at least forward iterator.");
 
             return hpx::parallel::detail::find_first_of<FwdIter1>().call(
@@ -1782,9 +1754,9 @@ namespace hpx {
             ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 s_first,
             FwdIter2 s_last)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Subsequence requires at least forward iterator.");
 
             return hpx::parallel::detail::find_first_of<FwdIter1>().call(
@@ -1806,9 +1778,9 @@ namespace hpx {
         friend FwdIter1 tag_fallback_invoke(find_first_of_t, FwdIter1 first,
             FwdIter1 last, FwdIter2 s_first, FwdIter2 s_last, Pred op)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Subsequence requires at least forward iterator.");
 
             return hpx::parallel::detail::find_first_of<FwdIter1>().call(
@@ -1826,9 +1798,9 @@ namespace hpx {
         friend FwdIter1 tag_fallback_invoke(find_first_of_t, FwdIter1 first,
             FwdIter1 last, FwdIter2 s_first, FwdIter2 s_last)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Subsequence requires at least forward iterator.");
 
             return hpx::parallel::detail::find_first_of<FwdIter1>().call(
@@ -1878,7 +1850,8 @@ namespace hpx::parallel::detail {
                 }
             }
 
-            difference_type count = detail::distance(first, last);
+            difference_type count =
+                hpx::parallel::detail::distance(first, last);
 
             decltype(auto) policy =
                 hpx::execution::experimental::adapt_placement_mode(
@@ -1965,7 +1938,8 @@ namespace hpx::parallel::detail {
                 }
             }
 
-            difference_type count = detail::distance(first, last);
+            difference_type count =
+                hpx::parallel::detail::distance(first, last);
 
             decltype(auto) policy =
                 hpx::execution::experimental::adapt_placement_mode(
@@ -2053,7 +2027,8 @@ namespace hpx::parallel::detail {
                 }
             }
 
-            difference_type count = detail::distance(first, last);
+            difference_type count =
+                hpx::parallel::detail::distance(first, last);
 
             decltype(auto) policy =
                 hpx::execution::experimental::adapt_placement_mode(
@@ -2120,7 +2095,7 @@ namespace hpx {
         friend constexpr InIter tag_fallback_invoke(
             find_last_t, InIter first, InIter last, T const& val)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Requires at least input iterator.");
 
             return hpx::parallel::detail::find_last<InIter>().call(
@@ -2138,7 +2113,7 @@ namespace hpx {
         friend decltype(auto) tag_fallback_invoke(find_last_t,
             ExPolicy&& policy, FwdIter first, FwdIter last, T const& val)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::find_last<FwdIter>().call(
@@ -2164,7 +2139,7 @@ namespace hpx {
         friend decltype(auto) tag_fallback_invoke(
             find_last_if_t, ExPolicy&& policy, FwdIter first, FwdIter last, F f)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::find_last_if<FwdIter>().call(
@@ -2182,7 +2157,7 @@ namespace hpx {
         friend InIter tag_fallback_invoke(
             find_last_if_t, InIter first, InIter last, F f)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Requires at least input iterator.");
 
             return hpx::parallel::detail::find_last_if<InIter>().call(
@@ -2207,7 +2182,7 @@ namespace hpx {
         friend decltype(auto) tag_fallback_invoke(find_last_if_not_t,
             ExPolicy&& policy, FwdIter first, FwdIter last, F f)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::find_last_if_not<FwdIter>().call(
@@ -2225,7 +2200,7 @@ namespace hpx {
         friend FwdIter tag_fallback_invoke(
             find_last_if_not_t, FwdIter first, FwdIter last, F f)
         {
-            static_assert(hpx::traits::is_input_iterator_v<FwdIter>,
+            static_assert(std::input_iterator<FwdIter>,
                 "Requires at least input iterator.");
 
             return hpx::parallel::detail::find_last_if_not<FwdIter>().call(

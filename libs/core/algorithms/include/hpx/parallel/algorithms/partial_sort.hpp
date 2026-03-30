@@ -200,11 +200,7 @@ namespace hpx::parallel {
             auto n2 = (last - first) / 2;
             Iter it_val =
                 mid3(first + 1, first + n2, last - 1, HPX_FORWARD(Comp, comp));
-#if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
             std::ranges::iter_swap(first, it_val);
-#else
-            std::iter_swap(first, it_val);
-#endif
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -231,41 +227,33 @@ namespace hpx::parallel {
                 pivot3(first, end, comp);
             }
 
-            typename std::iterator_traits<Iter>::value_type const& pivot =
+            typename std::iterator_traits<Iter>::value_type const pivot =
                 *first;
 
             Iter c_first = first + 1, c_last = end - 1;
-            while (HPX_INVOKE(comp, *c_first, pivot))
+            while (c_first < end && HPX_INVOKE(comp, *c_first, pivot))
             {
                 ++c_first;
             }
-            while (HPX_INVOKE(comp, pivot, *c_last))
+            while (c_last > first && HPX_INVOKE(comp, pivot, *c_last))
             {
                 --c_last;
             }
 
             while (c_first < c_last)
             {
-#if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
                 std::ranges::iter_swap(c_first++, c_last--);
-#else
-                std::iter_swap(c_first++, c_last--);
-#endif
-                while (HPX_INVOKE(comp, *c_first, pivot))
+                while (c_first < end && HPX_INVOKE(comp, *c_first, pivot))
                 {
                     ++c_first;
                 }
-                while (HPX_INVOKE(comp, pivot, *c_last))
+                while (c_last > first && HPX_INVOKE(comp, pivot, *c_last))
                 {
                     --c_last;
                 }
             }
 
-#if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
             std::ranges::iter_swap(first, c_last);
-#else
-            std::iter_swap(first, c_last);
-#endif
             return c_last;
         }
 
@@ -300,11 +288,7 @@ namespace hpx::parallel {
                 {
                     if (HPX_INVOKE(comp, *it, *first))
                     {
-#if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
                         std::ranges::iter_swap(it, first);
-#else
-                        std::iter_swap(it, first);
-#endif
                     }
                 }
                 return;
@@ -577,7 +561,7 @@ namespace hpx {
         friend RandIter tag_fallback_invoke(hpx::partial_sort_t, RandIter first,
             RandIter middle, RandIter last, Comp comp = Comp())
         {
-            static_assert(hpx::traits::is_random_access_iterator_v<RandIter>,
+            static_assert(std::random_access_iterator<RandIter>,
                 "Requires at least random access iterator.");
 
             return parallel::partial_sort<RandIter>().call(hpx::execution::seq,
@@ -600,7 +584,7 @@ namespace hpx {
         tag_fallback_invoke(hpx::partial_sort_t, ExPolicy&& policy,
             RandIter first, RandIter middle, RandIter last, Comp comp = Comp())
         {
-            static_assert(hpx::traits::is_random_access_iterator_v<RandIter>,
+            static_assert(std::random_access_iterator<RandIter>,
                 "Requires at least random access iterator.");
 
             using algorithm_result =

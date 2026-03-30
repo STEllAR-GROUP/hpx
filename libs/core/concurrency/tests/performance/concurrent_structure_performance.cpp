@@ -157,9 +157,6 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     // Test Vector
     {
-        std::cout << "\n--- Vector Benchmark (Total Ops: " << num_ops
-                  << ", Threads: " << num_threads << ") ---\n";
-
         auto run_vector_test = [&](auto& vec, std::string name) {
             std::vector<hpx::thread> threads;
             hpx::mutex mtx;
@@ -181,7 +178,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
                 for (std::uint64_t i = 0; i < num_threads; ++i)
                 {
-                    threads.emplace_back([&, i]() {
+                    threads.emplace_back([&]() {
                         {
                             std::unique_lock<hpx::mutex> l(mtx);
                             cv.wait(l, [&] { return ready; });
@@ -213,7 +210,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
                 for (std::uint64_t i = 0; i < num_threads; ++i)
                 {
-                    threads.emplace_back([&, i]() {
+                    threads.emplace_back([&]() {
                         {
                             std::unique_lock<hpx::mutex> l(mtx);
                             cv.wait(l, [&] { return ready; });
@@ -224,7 +221,6 @@ int hpx_main(hpx::program_options::variables_map& vm)
                         {
                             [[maybe_unused]] auto volatile val =
                                 vec[j % vec.size()];    // Read
-                            (void) val;
                         }
                     });
                 }
@@ -245,9 +241,11 @@ int hpx_main(hpx::program_options::variables_map& vm)
             double avg_read = total_elapsed_read / iterations;
 
             std::cout << name << " Push Back: " << avg_push << " s ("
-                      << (num_ops / avg_push / 1e6) << " Mops/s)\n";
+                      << (static_cast<double>(num_ops) / avg_push / 1e6)
+                      << " Mops/s)\n";
             std::cout << name << " Random Access: " << avg_read << " s ("
-                      << (num_ops / avg_read / 1e6) << " Mops/s)\n";
+                      << (static_cast<double>(num_ops) / avg_push / 1e6)
+                      << " Mops/s)\n";
         };
 
         {
@@ -333,7 +331,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
                             ++j)
                         {
                             // Access via operator[]
-                            [[maybe_unused]] int volatile val =
+                            [[maybe_unused]] auto volatile val =
                                 m[(int) (i * (num_ops / num_threads) + j)];
                         }
                     });
@@ -355,9 +353,11 @@ int hpx_main(hpx::program_options::variables_map& vm)
             double avg_lookup = total_elapsed_lookup / iterations;
 
             std::cout << name << " Insert: " << avg_insert << " s ("
-                      << (num_ops / avg_insert / 1e6) << " Mops/s)\n";
+                      << (static_cast<double>(num_ops) / avg_insert / 1e6)
+                      << " Mops/s)\n";
             std::cout << name << " Lookup: " << avg_lookup << " s ("
-                      << (num_ops / avg_lookup / 1e6) << " Mops/s)\n";
+                      << (static_cast<double>(num_ops) / avg_lookup / 1e6)
+                      << " Mops/s)\n";
         };
 
         {

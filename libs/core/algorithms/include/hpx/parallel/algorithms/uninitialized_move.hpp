@@ -323,7 +323,7 @@ namespace hpx::parallel {
             {
                 return hpx::parallel::util::uninit_move_n(
                     HPX_FORWARD(ExPolicy, policy), first,
-                    std::distance(first, last), dest);
+                    hpx::parallel::detail::distance(first, last), dest);
             }
 
             template <typename ExPolicy, typename Iter, typename Sent,
@@ -333,7 +333,7 @@ namespace hpx::parallel {
             {
                 return parallel_uninitialized_move_n(
                     HPX_FORWARD(ExPolicy, policy), first,
-                    detail::distance(first, last), dest);
+                    hpx::parallel::detail::distance(first, last), dest);
             }
         };
         /// \endcond
@@ -360,8 +360,10 @@ namespace hpx::parallel {
                 ExPolicy&& policy, InIter1 first, Sent1 last, FwdIter2 dest,
                 Sent2 last_d)
             {
-                std::size_t const dist1 = detail::distance(first, last);
-                std::size_t const dist2 = detail::distance(dest, last_d);
+                std::size_t const dist1 =
+                    hpx::parallel::detail::distance(first, last);
+                std::size_t const dist2 =
+                    hpx::parallel::detail::distance(dest, last_d);
                 std::size_t dist = dist1 <= dist2 ? dist1 : dist2;
 
                 return hpx::parallel::util::uninit_move_n(
@@ -373,8 +375,10 @@ namespace hpx::parallel {
             static decltype(auto) parallel(ExPolicy&& policy, Iter first,
                 Sent1 last, FwdIter2 dest, Sent2 last_d)
             {
-                std::size_t const dist1 = detail::distance(first, last);
-                std::size_t const dist2 = detail::distance(dest, last_d);
+                std::size_t const dist1 =
+                    hpx::parallel::detail::distance(first, last);
+                std::size_t const dist2 =
+                    hpx::parallel::detail::distance(dest, last_d);
                 std::size_t dist = dist1 <= dist2 ? dist1 : dist2;
 
                 return parallel_uninitialized_move_n(
@@ -430,15 +434,15 @@ namespace hpx {
         // clang-format off
             requires (
                 hpx::traits::is_iterator_v<InIter> &&
-                hpx::traits::is_forward_iterator_v<FwdIter>
+                std::forward_iterator<FwdIter>
             )
         // clang-format on
         friend FwdIter tag_fallback_invoke(
             hpx::uninitialized_move_t, InIter first, InIter last, FwdIter dest)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Required at least input iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             return parallel::util::get_second_element(
@@ -451,16 +455,16 @@ namespace hpx {
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_forward_iterator_v<FwdIter1> &&
-                hpx::traits::is_forward_iterator_v<FwdIter2>
+                std::forward_iterator<FwdIter1> &&
+                std::forward_iterator<FwdIter2>
             )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::uninitialized_move_t,
             ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Requires at least forward iterator.");
 
             return parallel::util::get_second_element(
@@ -478,15 +482,15 @@ namespace hpx {
         template <typename InIter, typename Size, typename FwdIter>
         // clang-format off
             requires(hpx::traits::is_iterator_v<InIter> &&
-                hpx::traits::is_forward_iterator_v<FwdIter> &&
+                std::forward_iterator<FwdIter> &&
                 std::is_integral_v<Size>)
         // clang-format on
         friend std::pair<InIter, FwdIter> tag_fallback_invoke(
             hpx::uninitialized_move_n_t, InIter first, Size count, FwdIter dest)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Required at least input iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             // if count is representing a negative value, we do nothing
@@ -507,17 +511,17 @@ namespace hpx {
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_forward_iterator_v<FwdIter1> &&
-                hpx::traits::is_forward_iterator_v<FwdIter2> &&
+                std::forward_iterator<FwdIter1> &&
+                std::forward_iterator<FwdIter2> &&
                 std::is_integral_v<Size>
             )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::uninitialized_move_n_t,
             ExPolicy&& policy, FwdIter1 first, Size count, FwdIter2 dest)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Requires at least forward iterator.");
 
             constexpr bool has_scheduler_executor =

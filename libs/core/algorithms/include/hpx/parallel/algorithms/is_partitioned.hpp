@@ -115,6 +115,7 @@ namespace hpx {
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
@@ -124,6 +125,7 @@ namespace hpx {
 
 #include <algorithm>
 #include <cstddef>
+#include <cstdint>
 #include <iterator>
 #include <type_traits>
 #include <utility>
@@ -187,7 +189,14 @@ namespace hpx::parallel {
                 constexpr bool has_scheduler_executor =
                     hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
-                difference_type count = std::distance(first, last);
+                if constexpr (!has_scheduler_executor)
+                {
+                    if (first == last)
+                        return result::get(true);
+                }
+
+                difference_type count =
+                    hpx::parallel::detail::distance(first, last);
 
                 if constexpr (!has_scheduler_executor)
                 {
@@ -198,8 +207,7 @@ namespace hpx::parallel {
                 util::invoke_projected<Pred, Proj> pred_projected(
                     HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
                 util::cancellation_token<> tok;
-                using intermediate_result_t =
-                    std::conditional_t<has_scheduler_executor, char, bool>;
+                using intermediate_result_t = std::uint8_t;
 
                 // Note: replacing the invoke() with HPX_INVOKE()
                 // below makes gcc generate errors
@@ -251,7 +259,7 @@ namespace hpx {
         template <typename FwdIter, typename Pred>
         // clang-format off
             requires (
-                hpx::traits::is_forward_iterator_v<FwdIter>
+                std::forward_iterator<FwdIter>
             )
         // clang-format on
         friend bool tag_fallback_invoke(
@@ -266,7 +274,7 @@ namespace hpx {
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_forward_iterator_v<FwdIter>
+                std::forward_iterator<FwdIter>
             )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::is_partitioned_t,

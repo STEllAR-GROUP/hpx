@@ -278,6 +278,7 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/executors.hpp>
@@ -298,6 +299,7 @@ namespace hpx {
 
 #include <algorithm>
 #include <cstddef>
+#include <iterator>
 #include <type_traits>
 #include <utility>
 
@@ -621,6 +623,12 @@ namespace hpx::parallel {
                     transform_binary_projected<F_, Proj1, Proj2>{
                         f_, proj1_, proj2_});
             }
+
+            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void operator()(
+                std::size_t) const noexcept
+            {
+                HPX_ASSERT(false);
+            }
         };
 
         HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename F>
@@ -677,6 +685,12 @@ namespace hpx::parallel {
                 return util::transform_binary_loop_ind_n<execution_policy_type>(
                     hpx::get<0>(iters), part_size, hpx::get<1>(iters),
                     hpx::get<2>(iters), f_);
+            }
+
+            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void operator()(
+                std::size_t) const noexcept
+            {
+                HPX_ASSERT(false);
             }
         };
 
@@ -942,7 +956,7 @@ namespace hpx {
         friend FwdIter2 tag_fallback_invoke(
             hpx::transform_t, FwdIter1 first, FwdIter1 last, FwdIter2 dest, F f)
         {
-            static_assert(hpx::traits::is_input_iterator_v<FwdIter1>,
+            static_assert(std::input_iterator<FwdIter1>,
                 "Requires at least input iterator.");
 
             return parallel::util::get_second_element(
@@ -965,7 +979,7 @@ namespace hpx {
             ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest,
             F f)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");
 
             return parallel::util::get_second_element(
@@ -984,8 +998,8 @@ namespace hpx {
         friend FwdIter3 tag_fallback_invoke(hpx::transform_t, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, FwdIter3 dest, F f)
         {
-            static_assert(hpx::traits::is_input_iterator_v<FwdIter1> &&
-                    hpx::traits::is_input_iterator_v<FwdIter2>,
+            static_assert(
+                std::input_iterator<FwdIter1> && std::input_iterator<FwdIter2>,
                 "Requires at least input iterator.");
 
             using proj_id = hpx::identity;
@@ -1012,8 +1026,8 @@ namespace hpx {
             ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2,
             FwdIter3 dest, F f)
         {
-            static_assert(hpx::traits::is_input_iterator_v<FwdIter1> &&
-                    hpx::traits::is_input_iterator_v<FwdIter2>,
+            static_assert(
+                std::input_iterator<FwdIter1> && std::input_iterator<FwdIter2>,
                 "Requires at least input iterator.");
 
             using proj_id = hpx::identity;
