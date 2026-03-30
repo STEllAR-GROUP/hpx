@@ -396,6 +396,7 @@ namespace hpx::execution::experimental {
     //
     //  Otherwise, no-completion-signatures{}.
     //
+#if !defined(HPX_HAVE_STDEXEC)
     HPX_CXX_CORE_EXPORT inline constexpr struct get_completion_signatures_t
         final
       : hpx::functional::detail::tag_fallback<get_completion_signatures_t>
@@ -453,6 +454,7 @@ namespace hpx::execution::experimental {
 #endif
         }
     } get_completion_signatures{};
+#endif    // !HPX_HAVE_STDEXEC
 
     // A sender is a type that is describing an asynchronous operation. The
     // operation itself might not have started yet. In order to get the result

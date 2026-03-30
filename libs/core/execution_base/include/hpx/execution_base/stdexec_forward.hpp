@@ -324,7 +324,19 @@ namespace hpx::execution::experimental {
         HPX_CXX_CORE_EXPORT using stdexec::__connect_awaitable_t;
 
         // Additional stdexec concepts and utilities needed for domain customization
-        HPX_CXX_CORE_EXPORT using stdexec::__completes_on;
+        // Note: These are concepts from stdexec for tracking scheduler queries
+        template <class _Sender, class _Scheduler, class _Env,
+            class _Tag = stdexec::set_value_t>
+        HPX_CXX_CORE_EXPORT concept __completes_on =
+            stdexec::__completes_on<_Sender, _Scheduler, _Env, _Tag>;
+
+        // __starts_on checks for start_on scheduler in the sender's attributes
+        template <class _Sender, class _Scheduler, class _Env>
+        HPX_CXX_CORE_EXPORT concept __starts_on = stdexec::__decays_to<
+            stdexec::__call_result_t<stdexec::get_scheduler_t,
+                stdexec::env_of_t<_Sender>>,
+            _Scheduler>;
+
         HPX_CXX_CORE_EXPORT using stdexec::__sender_for;
     }    // namespace stdexec_internal
 }    // namespace hpx::execution::experimental

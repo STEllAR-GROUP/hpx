@@ -139,7 +139,11 @@ struct receiver_2
 
 struct sender_1
 {
+#if defined(HPX_HAVE_STDEXEC)
+    using sender_concept = ex::sender_t;
+#else
     using is_sender = void;
+#endif
 #if defined(HPX_HAVE_STDEXEC)
     using completion_signatures =
         ex::completion_signatures<ex::set_value_t(int),
@@ -181,7 +185,11 @@ struct sender_1
 
 struct sender_2
 {
+#if defined(HPX_HAVE_STDEXEC)
+    using sender_concept = ex::sender_t;
+#else
     using is_sender = void;
+#endif
 #if defined(HPX_HAVE_STDEXEC)
     using completion_signatures =
         ex::completion_signatures<ex::set_value_t(int),
@@ -223,7 +231,11 @@ sender_2::operation_state tag_invoke(
 
 struct sender_3
 {
+#if defined(HPX_HAVE_STDEXEC)
+    using sender_concept = ex::sender_t;
+#else
     using is_sender = void;
+#endif
 
     using completion_signatures =
         ex::completion_signatures<ex::set_value_t(int),
@@ -253,7 +265,11 @@ struct sender_3
 template <bool val, typename T>
 struct sender_4
 {
+#if defined(HPX_HAVE_STDEXEC)
+    using sender_concept = ex::sender_t;
+#else
     using is_sender = void;
+#endif
 #if defined(HPX_HAVE_STDEXEC)
     using completion_signatures = std::conditional_t<val,
         ex::completion_signatures<ex::set_value_t(T),
