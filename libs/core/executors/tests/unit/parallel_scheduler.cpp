@@ -15,6 +15,7 @@
 #include <exception>
 #include <optional>
 #include <set>
+#include <span>
 #include <stdexcept>
 #include <string>
 #include <thread>
@@ -403,8 +404,7 @@ int hpx_main(int, char*[])
         ex::parallel_scheduler sched = ex::get_parallel_scheduler();
 
         auto bulk_snd = ex::bulk(
-            ex::schedule(sched), ex::par_unseq, num_tasks,
-            [&](std::size_t) {
+            ex::schedule(sched), ex::par_unseq, num_tasks, [&](std::size_t) {
                 count.fetch_add(1, std::memory_order_relaxed);
             });
 
@@ -569,8 +569,8 @@ int hpx_main(int, char*[])
         for (auto& f : flags)
             f.store(0, std::memory_order_relaxed);
 
-        auto snd = ex::bulk(
-            ex::schedule(sched), ex::par, n, [&](std::size_t i) {
+        auto snd =
+            ex::bulk(ex::schedule(sched), ex::par, n, [&](std::size_t i) {
                 flags[i].fetch_add(1, std::memory_order_relaxed);
             });
 
@@ -593,14 +593,12 @@ int hpx_main(int, char*[])
         for (auto& p : phase2)
             p.store(0, std::memory_order_relaxed);
 
-        auto snd = ex::bulk(
-                       ex::schedule(sched), ex::par, n,
+        auto snd = ex::bulk(ex::schedule(sched), ex::par, n,
                        [&](std::size_t i) {
                            phase1[i].store(1, std::memory_order_relaxed);
                        }) |
             ex::bulk(ex::par, n, [&](std::size_t i) {
-                phase2[i].store(
-                    phase1[i].load(std::memory_order_relaxed) + 1,
+                phase2[i].store(phase1[i].load(std::memory_order_relaxed) + 1,
                     std::memory_order_relaxed);
             });
 
@@ -621,13 +619,12 @@ int hpx_main(int, char*[])
         for (auto& r : results)
             r.store(0, std::memory_order_relaxed);
 
-        auto snd = ex::bulk_chunked(
-                       ex::schedule(sched), ex::par, n,
-                       [&](std::size_t begin, std::size_t end) {
-                           for (std::size_t i = begin; i < end; ++i)
-                               results[i].fetch_add(
-                                   10, std::memory_order_relaxed);
-                       }) |
+        auto snd =
+            ex::bulk_chunked(ex::schedule(sched), ex::par, n,
+                [&](std::size_t begin, std::size_t end) {
+                    for (std::size_t i = begin; i < end; ++i)
+                        results[i].fetch_add(10, std::memory_order_relaxed);
+                }) |
             ex::bulk_unchunked(ex::par, n, [&](std::size_t i) {
                 results[i].fetch_add(1, std::memory_order_relaxed);
             });
@@ -638,6 +635,314 @@ int hpx_main(int, char*[])
         {
             HPX_TEST_EQ(results[i].load(), 11);
         }
+    }
+
+    // P2079R10 Replaceability API tests
+
+    // Backend via shared_ptr: two schedulers from get_parallel_scheduler share backend
+    {
+        auto sched1 = ex::get_parallel_scheduler();
+        auto sched2 = ex::get_parallel_scheduler();
+        HPX_TEST(sched1 == sched2);
+
+        // Both share the same backend pointer
+        HPX_TEST(sched1.get_backend() == sched2.get_backend());
+    }
+
+    // Backend provides underlying scheduler (default HPX backend)
+    {
+        auto sched = ex::get_parallel_scheduler();
+        auto const* underlying = sched.get_underlying_scheduler();
+        HPX_TEST(underlying != nullptr);
+    }
+
+    // Backend provides PU mask (default HPX backend)
+    {
+        auto sched = ex::get_parallel_scheduler();
+        auto const* pu_mask = sched.get_pu_mask();
+        HPX_TEST(pu_mask != nullptr);
+    }
+
+    // query_parallel_scheduler_backend returns a valid backend
+    {
+        auto backend = ex::query_parallel_scheduler_backend();
+        HPX_TEST(backend != nullptr);
+    }
+
+    // Custom backend: schedule completes via proxy
+    {
+        struct counting_backend final : ex::parallel_scheduler_backend
+        {
+            std::atomic<int>& schedule_count;
+
+            explicit counting_backend(std::atomic<int>& count)
+              : schedule_count(count)
+            {
+            }
+
+            void schedule(std::span<std::byte>,
+                ex::parallel_scheduler_receiver_proxy& proxy) noexcept override
+            {
+                schedule_count.fetch_add(1, std::memory_order_relaxed);
+                proxy.set_value();
+            }
+
+            void schedule_bulk_chunked(std::span<std::byte>, std::size_t count,
+                ex::parallel_scheduler_bulk_item_receiver_proxy& proxy) noexcept
+                override
+            {
+                for (std::size_t b = 0; b < count; b += 64)
+                {
+                    auto e = (std::min) (b + std::size_t(64), count);
+                    proxy.execute(b, e);
+                }
+                proxy.set_value();
+            }
+
+            void schedule_bulk_unchunked(std::span<std::byte>,
+                std::size_t count,
+                ex::parallel_scheduler_bulk_item_receiver_proxy& proxy) noexcept
+                override
+            {
+                for (std::size_t i = 0; i < count; ++i)
+                    proxy.execute(i, i + 1);
+                proxy.set_value();
+            }
+
+            bool equal_to(ex::parallel_scheduler_backend const& other)
+                const noexcept override
+            {
+                return this == &other;
+            }
+        };
+
+        std::atomic<int> count{0};
+        auto backend = std::make_shared<counting_backend>(count);
+        ex::parallel_scheduler sched(backend);
+
+        // schedule through custom backend
+        auto snd = ex::schedule(sched) | ex::then([] { return 99; });
+        auto [val] = ex::sync_wait(std::move(snd)).value();
+        HPX_TEST_EQ(val, 99);
+        HPX_TEST(count.load() > 0);
+    }
+
+    // Custom backend equality: same pointer => equal
+    {
+        struct dummy_backend final : ex::parallel_scheduler_backend
+        {
+            void schedule(std::span<std::byte>,
+                ex::parallel_scheduler_receiver_proxy& proxy) noexcept override
+            {
+                proxy.set_value();
+            }
+            void schedule_bulk_chunked(std::span<std::byte>, std::size_t,
+                ex::parallel_scheduler_bulk_item_receiver_proxy& proxy) noexcept
+                override
+            {
+                proxy.set_value();
+            }
+            void schedule_bulk_unchunked(std::span<std::byte>, std::size_t,
+                ex::parallel_scheduler_bulk_item_receiver_proxy& proxy) noexcept
+                override
+            {
+                proxy.set_value();
+            }
+            bool equal_to(ex::parallel_scheduler_backend const& other)
+                const noexcept override
+            {
+                return this == &other;
+            }
+        };
+
+        auto b1 = std::make_shared<dummy_backend>();
+        auto b2 = std::make_shared<dummy_backend>();
+
+        ex::parallel_scheduler s1(b1);
+        ex::parallel_scheduler s2(b1);    // same backend
+        ex::parallel_scheduler s3(b2);    // different backend
+
+        HPX_TEST(s1 == s2);
+        HPX_TEST(!(s1 == s3));
+    }
+
+    // Default backend: schedulers from different get_parallel_scheduler() calls
+    // share the same backend and are equal
+    {
+        auto s1 = ex::get_parallel_scheduler();
+        auto s2 = ex::get_parallel_scheduler();
+        HPX_TEST(s1 == s2);
+        HPX_TEST(s1.get_backend().get() == s2.get_backend().get());
+    }
+
+    // set_parallel_scheduler_backend() actually replaces the live backend
+    {
+        struct marker_backend final : ex::parallel_scheduler_backend
+        {
+            std::atomic<int>& hit;
+            explicit marker_backend(std::atomic<int>& h)
+              : hit(h)
+            {
+            }
+
+            void schedule(std::span<std::byte>,
+                ex::parallel_scheduler_receiver_proxy& p) noexcept override
+            {
+                hit.fetch_add(1, std::memory_order_relaxed);
+                p.set_value();
+            }
+            void schedule_bulk_chunked(std::span<std::byte>, std::size_t,
+                ex::parallel_scheduler_bulk_item_receiver_proxy& p) noexcept
+                override
+            {
+                p.set_value();
+            }
+            void schedule_bulk_unchunked(std::span<std::byte>, std::size_t,
+                ex::parallel_scheduler_bulk_item_receiver_proxy& p) noexcept
+                override
+            {
+                p.set_value();
+            }
+            bool equal_to(
+                ex::parallel_scheduler_backend const& o) const noexcept override
+            {
+                return this == &o;
+            }
+        };
+
+        std::atomic<int> hit{0};
+        auto orig = ex::query_parallel_scheduler_backend();
+
+        // Install the marker backend
+        ex::set_parallel_scheduler_backend(
+            std::make_shared<marker_backend>(hit));
+
+        // get_parallel_scheduler() must now use the marker backend
+        auto sched = ex::get_parallel_scheduler();
+        ex::sync_wait(ex::schedule(sched));
+        HPX_TEST(hit.load() > 0);
+
+        // Restore the original backend so other tests are unaffected
+        ex::set_parallel_scheduler_backend(orig);
+        HPX_TEST(ex::get_parallel_scheduler() == ex::get_parallel_scheduler());
+    }
+
+    // Virtual bulk dispatch: custom backend that implements bulk via
+    // schedule_bulk_chunked. This verifies that the parallel_bulk_dispatch_sender
+    // correctly routes through the virtual path when get_underlying_scheduler()
+    // returns nullptr.
+    {
+        struct bulk_counting_backend final : ex::parallel_scheduler_backend
+        {
+            std::atomic<int>& schedule_hits;
+            std::atomic<int>& bulk_hits;
+
+            bulk_counting_backend(
+                std::atomic<int>& sched, std::atomic<int>& bulk)
+              : schedule_hits(sched)
+              , bulk_hits(bulk)
+            {
+            }
+
+            void schedule(std::span<std::byte>,
+                ex::parallel_scheduler_receiver_proxy& p) noexcept override
+            {
+                schedule_hits.fetch_add(1, std::memory_order_relaxed);
+                p.set_value();
+            }
+            void schedule_bulk_chunked(std::span<std::byte>, std::size_t count,
+                ex::parallel_scheduler_bulk_item_receiver_proxy& p) noexcept
+                override
+            {
+                bulk_hits.fetch_add(1, std::memory_order_relaxed);
+                // Execute all elements in one chunk
+                if (count > 0)
+                    p.execute(0, count);
+                p.set_value();
+            }
+            void schedule_bulk_unchunked(std::span<std::byte>,
+                std::size_t count,
+                ex::parallel_scheduler_bulk_item_receiver_proxy& p) noexcept
+                override
+            {
+                bulk_hits.fetch_add(1, std::memory_order_relaxed);
+                for (std::size_t i = 0; i < count; ++i)
+                    p.execute(i, i + 1);
+                p.set_value();
+            }
+            bool equal_to(
+                ex::parallel_scheduler_backend const& o) const noexcept override
+            {
+                return this == &o;
+            }
+            // Returns nullptr: triggers virtual dispatch path
+        };
+
+        std::atomic<int> sched_hits{0};
+        std::atomic<int> bulk_hits{0};
+        auto b = std::make_shared<bulk_counting_backend>(sched_hits, bulk_hits);
+        ex::parallel_scheduler sched(b);
+
+        // Bulk operation through virtual dispatch
+        std::vector<int> results(10, 0);
+        auto bulk_snd = ex::schedule(sched) |
+            stdexec::bulk(stdexec::par, 10,
+                [&results](std::size_t i) { results[i] = 42; });
+        ex::sync_wait(std::move(bulk_snd));
+
+        // Verify: schedule was called (for the child sender) and
+        // bulk was dispatched through the backend
+        HPX_TEST(sched_hits.load() > 0);
+        HPX_TEST(bulk_hits.load() > 0);
+        for (int i = 0; i < 10; ++i)
+        {
+            HPX_TEST_EQ(results[i], 42);
+        }
+    }
+
+    // stop_requested() on the proxy: returns false when no stop is in flight.
+    // The backend can call this to poll for cancellation during schedule().
+    {
+        bool proxy_saw_stop = false;
+
+        struct stop_check_backend final : ex::parallel_scheduler_backend
+        {
+            bool& saw_;
+            explicit stop_check_backend(bool& b)
+              : saw_(b)
+            {
+            }
+
+            void schedule(std::span<std::byte>,
+                ex::parallel_scheduler_receiver_proxy& p) noexcept override
+            {
+                // No stop has been requested; proxy must report false.
+                saw_ = p.stop_requested();
+                p.set_value();
+            }
+            void schedule_bulk_chunked(std::span<std::byte>, std::size_t,
+                ex::parallel_scheduler_bulk_item_receiver_proxy& p) noexcept
+                override
+            {
+                p.set_value();
+            }
+            void schedule_bulk_unchunked(std::span<std::byte>, std::size_t,
+                ex::parallel_scheduler_bulk_item_receiver_proxy& p) noexcept
+                override
+            {
+                p.set_value();
+            }
+            bool equal_to(
+                ex::parallel_scheduler_backend const& o) const noexcept override
+            {
+                return this == &o;
+            }
+        };
+
+        auto b = std::make_shared<stop_check_backend>(proxy_saw_stop);
+        ex::parallel_scheduler sched(b);
+        ex::sync_wait(ex::schedule(sched));
+        HPX_TEST(!proxy_saw_stop);
     }
 
     return hpx::local::finalize();

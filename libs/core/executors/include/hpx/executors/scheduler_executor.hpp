@@ -65,28 +65,28 @@ namespace hpx::execution::experimental {
         {
             static auto* pool(parallel_scheduler const& sched)
             {
-                return sched.get_underlying_scheduler().get_thread_pool();
+                return sched.get_underlying_scheduler()->get_thread_pool();
             }
             static std::size_t first_core(parallel_scheduler const& sched)
             {
                 return hpx::execution::experimental::get_first_core(
-                    sched.get_underlying_scheduler());
+                    *sched.get_underlying_scheduler());
             }
             static std::size_t num_cores(parallel_scheduler const& sched)
             {
                 return hpx::execution::experimental::processing_units_count(
                     hpx::execution::experimental::null_parameters,
-                    sched.get_underlying_scheduler(),
+                    *sched.get_underlying_scheduler(),
                     hpx::chrono::null_duration, 0);
             }
             static auto const& policy(parallel_scheduler const& sched)
             {
-                return sched.get_underlying_scheduler().policy();
+                return sched.get_underlying_scheduler()->policy();
             }
             static hpx::threads::mask_type pu_mask(
                 parallel_scheduler const& sched)
             {
-                return sched.get_pu_mask();
+                return *sched.get_pu_mask();
             }
         };
 

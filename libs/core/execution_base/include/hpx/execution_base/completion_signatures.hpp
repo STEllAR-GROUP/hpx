@@ -550,13 +550,13 @@ namespace hpx::execution::experimental {
     //    using with_awaitable_senders =
     //    hpx::execution::experimental::with_awaitable_senders<Promise>;
 
-    HPX_CXX_CORE_EXPORT template <typename ReceiverID>
+    HPX_CXX_CORE_EXPORT template <typename Awaitable, typename Receiver>
     using operation = hpx::execution::experimental::stdexec_internal::
-        __connect_await::__operation<ReceiverID>;
+        __connect_await::__opstate<Awaitable, Receiver>;
 
-    HPX_CXX_CORE_EXPORT template <typename ReceiverID>
+    HPX_CXX_CORE_EXPORT template <typename Awaitable, typename Receiver>
     using promise = hpx::execution::experimental::stdexec_internal::
-        __connect_await::__promise<ReceiverID>;
+        __connect_await::__promise<Awaitable, Receiver>;
 
     HPX_CXX_CORE_EXPORT using connect_awaitable_t =
         hpx::execution::experimental::stdexec_internal::__connect_awaitable_t;
