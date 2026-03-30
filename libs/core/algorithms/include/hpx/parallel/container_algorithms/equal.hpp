@@ -365,8 +365,8 @@ namespace hpx { namespace ranges {
 #include <hpx/parallel/util/detail/sender_util.hpp>
 
 #include <iterator>
-#include <type_traits>
 #include <ranges>
+#include <type_traits>
 #include <utility>
 
 namespace hpx::ranges {

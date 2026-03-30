@@ -2008,8 +2008,8 @@ namespace hpx {
 #include <hpx/parallel/algorithms/find.hpp>
 
 #include <iterator>
-#include <type_traits>
 #include <ranges>
+#include <type_traits>
 #include <utility>
 #include <iterator>
 

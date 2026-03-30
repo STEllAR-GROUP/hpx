@@ -449,8 +449,8 @@ namespace hpx { namespace ranges {
 #include <hpx/parallel/algorithms/count.hpp>
 
 #include <iterator>
-#include <type_traits>
 #include <ranges>
+#include <type_traits>
 #include <utility>
 
 namespace hpx::ranges {
