@@ -1099,9 +1099,8 @@ namespace hpx::experimental {
                     if (first < dest && dest < last)
                     {
                         using value_type = std::iter_value_t<InIter>;
-                        std::memmove(static_cast<void*>(std::to_address(dest)),
-                            static_cast<void const*>(std::to_address(first)),
-                            count * sizeof(value_type));
+                        std::memmove(std::to_address(dest),
+                            std::to_address(first), count * sizeof(value_type));
                         return parallel::util::detail::algorithm_result<
                             ExPolicy, FwdIter>::get(std::next(dest, count));
                     }
@@ -1303,9 +1302,8 @@ namespace hpx::experimental {
                     if (first < dest && dest < last)
                     {
                         using value_type = std::iter_value_t<InIter1>;
-                        std::memmove(static_cast<void*>(std::to_address(dest)),
-                            static_cast<void const*>(std::to_address(first)),
-                            count * sizeof(value_type));
+                        std::memmove(std::to_address(dest),
+                            std::to_address(first), count * sizeof(value_type));
                         return parallel::util::detail::algorithm_result<
                             ExPolicy, FwdIter>::get(std::next(dest, count));
                     }
