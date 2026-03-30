@@ -18,21 +18,7 @@ module;
 // violations.
 #include <hpx/config/std_headers.hpp>
 
-// MSVC on x86/x64: Pre-include <intrin.h> to prevent linkage conflict with
-// stdexec's stop_token.hpp which declares `extern void _mm_pause();` without
-// __cdecl calling convention (C2732 error). Including the intrinsic first
-// ensures MSVC's declaration wins.
-#if defined(_MSC_VER) && (defined(_M_IX86) || defined(_M_X64))
-#include <intrin.h>
-#endif
-
 export module HPX.@cap_libname@;
-
-// Import HPX.Core module if this is HPX.Full to avoid duplicate symbol definitions
-// from stdexec and other dependencies that are already exported by HPX.Core
-#if defined(HPX_COMPILE_FULL_WITH_MODULES)
-import HPX.Core;
-#endif
 
 // Make sure the exported symbols are name-mangled using standard C++ rules.
 // This is necessary as otherwise the symbols exported from the shared libraries

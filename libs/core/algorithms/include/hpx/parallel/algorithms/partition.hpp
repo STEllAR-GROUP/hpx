@@ -557,7 +557,32 @@ namespace hpx::parallel {
 
                 return hpx::dataflow(
                     policy.executor(),
-                    [mid](RandIter first_it, RandIter last_it) -> RandIter {
+                    [mid](hpx::future<RandIter>&& leftf,
+                        hpx::future<RandIter>&& rightf) -> RandIter {
+                        if (leftf.has_exception() || rightf.has_exception())
+                        {
+                            std::list<std::exception_ptr> errors;
+                            if (leftf.has_exception())
+                            {
+                                hpx::parallel::util::detail::
+                                    handle_local_exceptions<ExPolicy>::call(
+                                        leftf.get_exception_ptr(), errors);
+                            }
+                            if (rightf.has_exception())
+                            {
+                                hpx::parallel::util::detail::
+                                    handle_local_exceptions<ExPolicy>::call(
+                                        rightf.get_exception_ptr(), errors);
+                            }
+
+                            if (!errors.empty())
+                            {
+                                throw exception_list(HPX_MOVE(errors));
+                            }
+                        }
+                        RandIter first_it = leftf.get();
+                        RandIter last_it = rightf.get();
+
                         std::rotate(first_it, mid, last_it);
 
                         // for some library implementations std::rotate

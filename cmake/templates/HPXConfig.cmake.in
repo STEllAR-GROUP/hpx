@@ -9,8 +9,7 @@
 set(HPX_FIND_PACKAGE ON)
 cmake_policy(VERSION 3.18)
 
-# Reassure CMake that <PACKAGENAME>_ROOT variables are meant to be used by
-# find_package
+# Reassure CMake that <PACKAGENAME>_ROOT variables are meant to be used by find_package
 if(POLICY CMP0144)
   cmake_policy(SET CMP0144 NEW)
 endif()
@@ -36,11 +35,13 @@ endif()
 
 # Stdexec can be installed by HPX or externally installed. In the first case we
 # use exported targets, in the second we find Stdexec again using find_package.
-if(HPX_WITH_FETCH_STDEXEC)
-  include("${CMAKE_CURRENT_LIST_DIR}/HPXStdexecTarget.cmake")
-else()
-  set(Stdexec_ROOT "@Stdexec_ROOT@")
-  include(HPX_SetupStdexec)
+if(HPX_WITH_STDEXEC)
+  if(HPX_WITH_FETCH_STDEXEC)
+    include("${CMAKE_CURRENT_LIST_DIR}/HPXStdexecTarget.cmake")
+  else()
+    set(Stdexec_ROOT "@Stdexec_ROOT@")
+    include(HPX_SetupStdexec)
+  endif()
 endif()
 
 # NLohnmann JSON can be installed by HPX or externally installed. In the first
@@ -126,15 +127,7 @@ else()
   include(HPX_SetupBoostFilesystem)
 endif()
 
-# Hwloc
-set(HPX_HWLOC_ROOT "@Hwloc_ROOT@")
-if(NOT Hwloc_ROOT AND NOT "$ENV{Hwloc_ROOT}")
-  set(Hwloc_ROOT ${HPX_HWLOC_ROOT})
-endif()
-include(HPX_SetupHwloc)
-
 include("${CMAKE_CURRENT_LIST_DIR}/HPXInternalTargets.cmake")
-
 include("${CMAKE_CURRENT_LIST_DIR}/HPXTargets.cmake")
 
 get_filename_component(
@@ -146,23 +139,125 @@ set(HPX_VERSION_MAJOR @HPX_VERSION_MAJOR@)
 set(HPX_VERSION_MINOR @HPX_VERSION_MINOR@)
 set(HPX_VERSION_SUBMINOR @HPX_VERSION_SUBMINOR@)
 
-set(HPX_LIBRARY_DIR "@CMAKE_INSTALL_FULL_LIBDIR@")
-set(HPX_INCLUDE_DIR "@CMAKE_INSTALL_FULL_INCLUDEDIR@")
-set(HPX_PREFIX ${_hpx_root_dir})
+set(HPX_PREFIX "${_hpx_root_dir}")
+set(HPX_BUILD_TYPE "@CMAKE_BUILD_TYPE@")
+set(HPX_CXX_STANDARD "@HPX_CXX_STANDARD@")
+# We explicitly set the default to 98 to force CMake to emit a -std=c++XX flag.
+# Some compilers (clang) have a different default standard for cpp and cu files,
+# but CMake does not know about this difference. If the standard is set to the
+# .cpp default in CMake, CMake will omit the flag, resulting in the wrong
+# standard for .cu files.
+set(CMAKE_CXX_STANDARD_DEFAULT 98)
 
-# If HPX was configured via configure_file instead of configure_package_config_file
-# we need to provide the check_required_components macro ourselves.
-if(NOT COMMAND check_required_components)
-  macro(check_required_components _NAME)
-    foreach(comp ${${_NAME}_FIND_COMPONENTS})
-      if(NOT ${_NAME}_${comp}_FOUND)
-        if(${_NAME}_FIND_REQUIRED_${comp})
-          set(${_NAME}_FOUND FALSE)
-        endif()
-      endif()
-    endforeach()
-  endmacro()
+set(HPX_GIT_COMMIT
+    "@HPX_WITH_GIT_COMMIT@"
+    CACHE STRING "Revision of HPX from Git" FORCE
+)
+
+set(HPX_CXX_COMPILER
+    "@CMAKE_CXX_COMPILER@"
+    CACHE STRING "CXX compiler for HPX" FORCE
+)
+set(HPX_CXX_COMPILER_ID
+    "@CMAKE_CXX_COMPILER_ID@"
+    CACHE STRING "CXX compiler id for HPX" FORCE
+)
+set(HPX_CXX_COMPILER_VERSION
+    "@CMAKE_CXX_COMPILER_VERSION@"
+    CACHE STRING "CXX compiler version for HPX" FORCE
+)
+
+# ##############################################################################
+# Setup the imported libraries (publicly linked) #
+
+# Propagate Amplifier settings, if needed
+if(HPX_WITH_ITTNOTIFY)
+  set(Amplifier_INCLUDE_DIR "@Amplifier_INCLUDE_DIR@")
+  set(Amplifier_LIBRARY "@Amplifier_LIBRARY@")
+  set(Amplifier_ROOT "@Amplifier_ROOT@")
 endif()
 
-check_required_components("@HPX_PACKAGE_NAME@")
+# Allocator
+set(HPX_JEMALLOC_ROOT "@Jemalloc_ROOT@")
+set(HPX_TCMALLOC_ROOT "@Tcmalloc_ROOT@")
+set(HPX_TBBMALLOC_ROOT "@Tbbmalloc_ROOT@")
+# Special handle for mimalloc cause we can't specify HPX_MIMALLOC_ROOT as a HINT
+# to find_package
+set(HPX_MIMALLOC_ROOT "@Mimalloc_ROOT@")
+if(NOT Mimalloc_ROOT AND NOT DEFINED ENV{MIMALLOC_ROOT})
+  set(Mimalloc_ROOT ${HPX_MIMALLOC_ROOT})
+endif()
+include(HPX_SetupAllocator)
 
+include(HPX_SetupThreads)
+
+# HIP
+include(HPX_SetupHIP)
+
+# Hwloc
+if(HPX_WITH_FETCH_HWLOC)
+  if(EXISTS ${HPX_PREFIX}/_deps/hwloc_installed)
+    set(Hwloc_ROOT ${HPX_PREFIX}/_deps/hwloc_installed)
+  else()
+    set(Hwloc_ROOT "@HPX_HWLOC_INSTALL_PATH@")
+  endif()
+else()
+  set(Hwloc_ROOT "@Hwloc_ROOT@")
+endif()
+include(HPX_FindHwloc)
+
+# Papi
+set(HPX_PAPI_ROOT "@Papi_ROOT@")
+include(HPX_SetupPapi)
+
+# CUDA
+include(HPX_SetupCUDA)
+
+# LIKWID
+if(HPX_LIKWID_WITH_LIKWID)
+  set(HPX_LIKWID_ROOT "@LIKWID_ROOT@")
+  include(HPX_SetupLikwid)
+endif()
+
+include(HPX_SetupMPI)
+if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI) OR HPX_WITH_ASYNC_MPI)
+  hpx_setup_mpi()
+endif()
+
+# APEX
+set(APEX_WITH_MSR "@APEX_WITH_MSR@")
+set(Msr_ROOT "@Msr_ROOT@")
+set(APEX_WITH_ACTIVEHARMONY "@APEX_WITH_ACTIVEHARMONY@")
+set(Activeharmony_ROOT "@Activeharmony_ROOT@")
+set(APEX_WITH_OTF2 "@APEX_WITH_OTF2@")
+set(Otf2_ROOT "@Otf2_ROOT@")
+set(Apex_ROOT "@Apex_ROOT@")
+include(HPX_SetupApex)
+# ##############################################################################
+
+set(HPX_WITH_MALLOC_DEFAULT @HPX_WITH_MALLOC@)
+
+if(("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "VC") AND NOT Vc_DIR)
+  set(Vc_DIR "@Vc_DIR@")
+endif()
+include(HPX_SetupVc)
+
+if(NOT HPX_CMAKE_LOGLEVEL)
+  set(HPX_CMAKE_LOGLEVEL "WARN")
+endif()
+
+hpx_check_compiler_compatibility()
+hpx_check_boost_compatibility()
+hpx_check_allocator_compatibility()
+
+if(NOT DEFINED ${CMAKE_FIND_PACKAGE_NAME}_FOUND)
+  set(${CMAKE_FIND_PACKAGE_NAME}_FOUND true)
+endif()
+
+# Set legacy variables for linking and include directories
+set(HPX_LIBRARIES "HPX::hpx;")
+# All properties are propagated from HPX::hpx, so the following can be empty
+set(HPX_INCLUDE_DIRS "")
+set(HPX_LIBRARY_DIR "")
+set(HPX_LINK_LIBRARIES "")
+set(HPX_LINKER_FLAGS "")

@@ -20,9 +20,9 @@
 //        \ /   merge dependencies
 //         D  (merge)
 
+#include <hpx/assert.hpp>
 #include <hpx/execution.hpp>
 #include <hpx/init.hpp>
-#include <hpx/modules/assertion.hpp>
 
 #include <iostream>
 #include <utility>
