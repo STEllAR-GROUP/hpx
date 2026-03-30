@@ -49,10 +49,9 @@ namespace hpx::execution::experimental {
             as_sender_operation_state& operator=(
                 as_sender_operation_state const&) = delete;
 
-            friend void tag_invoke(
-                hpxexec::start_t, as_sender_operation_state& os) noexcept
+            void start() & noexcept
             {
-                os.start_helper();
+                start_helper();
             }
 
         private:
@@ -177,10 +176,10 @@ namespace hpx::execution::experimental {
                 typename base_type::completion_signatures;
 
             template <typename Receiver>
-            friend as_sender_operation_state<Receiver, future_type> tag_invoke(
-                connect_t, as_sender_sender&& s, Receiver&& receiver)
+            auto connect(Receiver&& receiver) &&
             {
-                return {HPX_FORWARD(Receiver, receiver), HPX_MOVE(s.future_)};
+                return as_sender_operation_state<Receiver, future_type>{
+                    HPX_FORWARD(Receiver, receiver), HPX_MOVE(future_)};
             }
         };
 
@@ -212,17 +211,17 @@ namespace hpx::execution::experimental {
                 typename base_type::completion_signatures;
 
             template <typename Receiver>
-            friend as_sender_operation_state<Receiver, future_type> tag_invoke(
-                connect_t, as_sender_sender&& s, Receiver&& receiver)
+            auto connect(Receiver&& receiver) &&
             {
-                return {HPX_FORWARD(Receiver, receiver), HPX_MOVE(s.future_)};
+                return as_sender_operation_state<Receiver, future_type>{
+                    HPX_FORWARD(Receiver, receiver), HPX_MOVE(future_)};
             }
 
             template <typename Receiver>
-            friend as_sender_operation_state<Receiver, future_type> tag_invoke(
-                connect_t, as_sender_sender& s, Receiver&& receiver)
+            auto connect(Receiver&& receiver) &
             {
-                return {HPX_FORWARD(Receiver, receiver), s.future_};
+                return as_sender_operation_state<Receiver, future_type>{
+                    HPX_FORWARD(Receiver, receiver), future_};
             }
         };
     }    // namespace detail

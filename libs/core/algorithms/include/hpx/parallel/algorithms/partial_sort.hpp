@@ -128,6 +128,7 @@ namespace hpx {
 #include <cstdint>
 #include <exception>
 #include <iterator>
+#include <list>
 #include <type_traits>
 #include <utility>
 
