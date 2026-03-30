@@ -268,6 +268,7 @@ namespace hpx { namespace ranges {
 #include <cstddef>
 #include <iterator>
 #include <type_traits>
+#include <ranges>
 #include <utility>
 
 namespace hpx::ranges {

@@ -50,6 +50,7 @@
 #include <exception>
 #include <iterator>
 #include <optional>
+#include <ranges>
 #include <string>
 #include <type_traits>
 #include <utility>

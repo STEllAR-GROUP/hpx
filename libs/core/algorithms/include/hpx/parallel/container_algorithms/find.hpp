@@ -2009,6 +2009,7 @@ namespace hpx {
 
 #include <iterator>
 #include <type_traits>
+#include <ranges>
 #include <utility>
 #include <iterator>
 

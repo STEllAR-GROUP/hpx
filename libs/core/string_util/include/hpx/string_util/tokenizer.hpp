@@ -20,6 +20,7 @@
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/string_util/token_iterator.hpp>
 
+#include <ranges>
 #include <string>
 #include <type_traits>
 
