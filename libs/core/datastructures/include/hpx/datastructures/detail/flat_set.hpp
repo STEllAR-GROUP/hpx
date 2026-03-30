@@ -33,6 +33,7 @@
 // clang-format on
 
 #if CPP20_CONCEPTS
+#include <ranges>
 #elif CMCSTL2_CONCEPTS
 #include <stl2/algorithm.hpp>
 #include <stl2/ranges.hpp>

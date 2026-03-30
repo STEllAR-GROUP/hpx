@@ -13,7 +13,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
-    extern HPX_CORE_EXPORT char const HPX_CHECK_VERSION[] =
+    HPX_CORE_EXPORT char const HPX_CHECK_VERSION[] =
         HPX_PP_STRINGIZE(HPX_CHECK_VERSION);
     extern HPX_CORE_EXPORT char const HPX_CHECK_BOOST_VERSION[] =
         HPX_PP_STRINGIZE(HPX_CHECK_BOOST_VERSION);
