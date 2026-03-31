@@ -32,7 +32,7 @@ namespace hpx::futures {
         requires(hpx::traits::is_future_v<std::decay_t<Future>>)
     auto transform(Future&& fut, F&& f)
     {
-        return fut.then([f = std::forward<F>(f)](auto&& f_inner) mutable {
+        return fut.then([f = HPX_FORWARD(F, f)](auto&& f_inner) mutable {
             if constexpr (std::is_void_v<R>)
             {
                 f_inner.get();
@@ -58,7 +58,7 @@ namespace hpx::futures {
         requires(hpx::traits::is_future_v<std::decay_t<Future>>)
     auto and_then(Future&& fut, F&& f)
     {
-        return fut.then(std::forward<F>(f));
+        return fut.then(HPX_FORWARD(F, f));
     }
 
     // -----------------------------------------------------------------
@@ -81,7 +81,7 @@ namespace hpx::futures {
         constexpr bool takes_eptr =
             std::is_invocable_v<std::decay_t<F>, std::exception_ptr>;
 
-        return fut.then([f = std::forward<F>(f)](auto&& f_inner) mutable {
+        return fut.then([f = HPX_FORWARD(F, f)](auto&& f_inner) mutable {
             if (f_inner.has_exception())
             {
                 if constexpr (takes_eptr)
