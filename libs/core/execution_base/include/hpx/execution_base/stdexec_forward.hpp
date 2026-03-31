@@ -48,6 +48,7 @@
 // NOLINTBEGIN(bugprone-crtp-constructor-accessibility)
 // NOLINTBEGIN(bugprone-unhandled-exception-at-new)
 #include <exec/ensure_started.hpp>
+#include <exec/env.hpp>
 #include <exec/execute.hpp>
 #include <exec/split.hpp>
 #include <exec/start_detached.hpp>
@@ -192,22 +193,22 @@ namespace hpx::execution::experimental {
     HPX_CXX_CORE_EXPORT using stdexec::is_execution_policy_v;
     // Note: Cannot export constexpr objects with internal linkage in C++ modules
     // Users should access these directly from stdexec namespace
-    using stdexec::par;
-    using stdexec::par_unseq;
-    using stdexec::seq;
-    using stdexec::unseq;
 
-    // Split (moved to exec:: namespace in newer stdexec)
     HPX_CXX_CORE_EXPORT using exec::split;
     HPX_CXX_CORE_EXPORT using exec::split_t;
 
-    // Ensure started (moved to exec:: namespace in newer stdexec)
-    HPX_CXX_CORE_EXPORT using exec::ensure_started;
-    HPX_CXX_CORE_EXPORT using exec::ensure_started_t;
-
-    // Execute (moved to exec:: namespace in newer stdexec)
     HPX_CXX_CORE_EXPORT using exec::execute;
     HPX_CXX_CORE_EXPORT using exec::execute_t;
+
+    // Environment queries
+    HPX_CXX_CORE_EXPORT using exec::make_env;
+    HPX_CXX_CORE_EXPORT using exec::make_env_t;
+    HPX_CXX_CORE_EXPORT using exec::read_with_default;
+    HPX_CXX_CORE_EXPORT using exec::with;
+    HPX_CXX_CORE_EXPORT using exec::with_t;
+    HPX_CXX_CORE_EXPORT using exec::without;
+    HPX_CXX_CORE_EXPORT using exec::write;
+    HPX_CXX_CORE_EXPORT using exec::write_env;
 
     // Tags
     namespace tags {
@@ -280,6 +281,7 @@ namespace hpx::execution::experimental {
 
     HPX_CXX_CORE_EXPORT using stdexec::transform_completion_signatures;
     HPX_CXX_CORE_EXPORT using stdexec::transform_completion_signatures_of;
+    HPX_CXX_CORE_EXPORT using exec::keep_completion;
 
     // Transform sender
     HPX_CXX_CORE_EXPORT using stdexec::transform_sender;

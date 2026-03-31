@@ -19,7 +19,6 @@
 #include <utility>
 
 namespace hpx::execution::experimental {
-    namespace hpxexec = hpx::execution::experimental;
 
     namespace detail {
 
@@ -48,12 +47,13 @@ namespace hpx::execution::experimental {
                         // to move receiver and future into the on_completed
                         // callback.
                         state->set_on_completed([this]() mutable {
-                            hpxexec::set_value(
+                            hpx::execution::experimental::set_value(
                                 HPX_MOVE(receiver), HPX_MOVE(future));
                         });
                     },
                     [&](std::exception_ptr ep) {
-                        hpxexec::set_error(HPX_MOVE(receiver), HPX_MOVE(ep));
+                        hpx::execution::experimental::set_error(
+                            HPX_MOVE(receiver), HPX_MOVE(ep));
                     });
             }
         };
@@ -63,9 +63,11 @@ namespace hpx::execution::experimental {
         {
             std::decay_t<Future> future;
             using completion_signatures =
-                hpxexec::completion_signatures<hpxexec::set_value_t(
-                                                   std::decay_t<Future>),
-                    hpxexec::set_error_t(std::exception_ptr)>;
+                hpx::execution::experimental::completion_signatures<
+                    hpx::execution::experimental::set_value_t(
+                        std::decay_t<Future>),
+                    hpx::execution::experimental::set_error_t(
+                        std::exception_ptr)>;
         };
 
         HPX_CXX_CORE_EXPORT template <typename Future>

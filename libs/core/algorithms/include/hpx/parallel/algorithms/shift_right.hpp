@@ -151,7 +151,9 @@ namespace hpx::parallel {
 
             detail::reverse<FwdIter> r;
             return dataflow(
-                [=](FwdIter /* ignored */) mutable -> hpx::future<FwdIter> {
+                [=](hpx::future<FwdIter>&& f1) mutable -> hpx::future<FwdIter> {
+                    f1.get();
+
                     hpx::future<FwdIter> f = r.call2(p, non_seq(), first, last);
                     return f.then(
                         [=](hpx::future<FwdIter>&& f) mutable -> FwdIter {

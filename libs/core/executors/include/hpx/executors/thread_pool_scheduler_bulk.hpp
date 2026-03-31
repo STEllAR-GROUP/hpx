@@ -854,5 +854,5 @@ namespace hpx::execution::experimental::detail {
 // Note: With stdexec integration, bulk operations are now customized
 // through the domain system in thread_pool_scheduler.hpp rather than
 // direct tag_invoke customizations. The thread_pool_domain<Policy>
-// intercepts stdexec::bulk_chunked_t operations and creates
+// intercepts hpx::execution::experimental::bulk_chunked_t operations and creates
 // thread_pool_bulk_sender instances for parallel execution.

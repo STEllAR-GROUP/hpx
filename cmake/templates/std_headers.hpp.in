@@ -9,8 +9,8 @@
 
 #pragma once
 
-#include <hpx/config/compiler_specific.hpp>
 #include <hpx/config/defines.hpp>
+#include <hpx/config/compiler_specific.hpp>
 #include <hpx/config/modules_enabled.hpp>
 
 @cxx_standard_headers@

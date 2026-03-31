@@ -14,14 +14,14 @@
 #include <utility>
 
 namespace hpx::execution::experimental { namespace detail {
-    namespace hpxexec = hpx::execution::experimental;
+
     // clang-format off
     template <typename CPO, typename Sender>
     concept has_completion_scheduler_v = requires(Sender&& s) {
         {
-            hpxexec::get_completion_scheduler<CPO>(
-                hpxexec::get_env(std::forward<Sender>(s)))
-        } -> hpxexec::scheduler;
+            hpx::execution::experimental::get_completion_scheduler<CPO>(
+                hpx::execution::experimental::get_env(std::forward<Sender>(s)))
+        } -> hpx::execution::experimental::scheduler;
     };
 
     HPX_CXX_CORE_EXPORT template <typename ReceiverCPO, typename Sender,
@@ -29,8 +29,8 @@ namespace hpx::execution::experimental { namespace detail {
     concept is_completion_scheduler_tag_invocable_v = requires(
         AlgorithmCPO alg, Sender&& snd, Ts&&... ts) {
         tag_invoke(alg,
-            hpxexec::get_completion_scheduler<ReceiverCPO>(
-                hpxexec::get_env(snd)),
+            hpx::execution::experimental::get_completion_scheduler<ReceiverCPO>(
+                hpx::execution::experimental::get_env(snd)),
             std::forward<Sender>(snd), std::forward<Ts>(ts)...);
     };
     // clang-format on

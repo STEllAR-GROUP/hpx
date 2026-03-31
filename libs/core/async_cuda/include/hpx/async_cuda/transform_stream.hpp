@@ -14,8 +14,6 @@
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
 
-#include <exec/completion_signatures.hpp>
-
 #include <exception>
 #include <string>
 #include <type_traits>
@@ -305,15 +303,18 @@ namespace hpx::cuda::experimental {
                         Args...>::type{};
                 };
 
-                return exec::transform_completion_signatures(
-                    stdexec::get_completion_signatures<std::decay_t<S>,
-                        Env...>(),
-                    transform_values,
-                    exec::keep_completion<stdexec::set_error_t>{},
-                    exec::keep_completion<stdexec::set_stopped_t>{},
-                    hpx::execution::experimental::completion_signatures<
-                        hpx::execution::experimental::set_error_t(
-                            std::exception_ptr)>{});
+                return hpx::execution::experimental::
+                    transform_completion_signatures(
+                        hpx::execution::experimental::get_completion_signatures<
+                            std::decay_t<S>, Env...>(),
+                        transform_values,
+                        hpx::execution::experimental::keep_completion<
+                            hpx::execution::experimental::set_error_t>{},
+                        hpx::execution::experimental::keep_completion<
+                            hpx::execution::experimental::set_stopped_t>{},
+                        hpx::execution::experimental::completion_signatures<
+                            hpx::execution::experimental::set_error_t(
+                                std::exception_ptr)>{});
             }
 
             constexpr auto get_env() const noexcept

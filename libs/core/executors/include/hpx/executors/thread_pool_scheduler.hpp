@@ -78,7 +78,7 @@ namespace hpx::execution::experimental {
     // Domain customization for stdexec bulk operations
     // Following the stdexec parallel_scheduler pattern (set_value_t tag-based).
     template <typename Policy>
-    struct thread_pool_domain : stdexec::default_domain
+    struct thread_pool_domain : hpx::execution::experimental::default_domain
     {
         // transform_sender for bulk operations
         // (following stdexec parallel_scheduler pattern)
@@ -429,9 +429,10 @@ namespace hpx::execution::experimental {
             {
                 std::decay_t<Scheduler> const& sched;
 
-                auto query(stdexec::get_domain_t) const noexcept
+                auto query(
+                    hpx::execution::experimental::get_domain_t) const noexcept
                 {
-                    return stdexec::get_domain(sched);
+                    return hpx::execution::experimental::get_domain(sched);
                 }
 
                 template <typename CPO>
@@ -540,7 +541,7 @@ namespace hpx::execution::experimental {
 #if defined(HPX_HAVE_STDEXEC)
         /// Returns the execution domain of this scheduler (following system_context.hpp pattern).
         [[nodiscard]]
-        auto query(stdexec::get_domain_t) const noexcept
+        auto query(hpx::execution::experimental::get_domain_t) const noexcept
             -> thread_pool_domain<Policy>
         {
             return {};
@@ -643,7 +644,7 @@ namespace hpx::execution::experimental {
 
     // Add get_domain query to the scheduler (following system_context.hpp pattern)
     template <typename Policy>
-    constexpr auto tag_invoke(stdexec::get_domain_t,
+    constexpr auto tag_invoke(hpx::execution::experimental::get_domain_t,
         thread_pool_policy_scheduler<Policy> const&) noexcept
     {
         return thread_pool_domain<Policy>{};
@@ -652,7 +653,7 @@ namespace hpx::execution::experimental {
     // Add stdexec-specific schedule customization
     // stdexec uses its own schedule tag type, so we need to provide tag_invoke for it
     template <typename Policy>
-    constexpr auto tag_invoke(stdexec::schedule_t,
+    constexpr auto tag_invoke(hpx::execution::experimental::schedule_t,
         thread_pool_policy_scheduler<Policy> const& sched) noexcept
     {
         // Return the same sender type as HPX's schedule
@@ -661,7 +662,7 @@ namespace hpx::execution::experimental {
     }
 
     template <typename Policy>
-    constexpr auto tag_invoke(stdexec::schedule_t,
+    constexpr auto tag_invoke(hpx::execution::experimental::schedule_t,
         thread_pool_policy_scheduler<Policy>&& sched) noexcept
     {
         return typename thread_pool_policy_scheduler<Policy>::template sender<

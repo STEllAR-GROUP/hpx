@@ -13,14 +13,12 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/futures.hpp>
-#include <hpx/modules/tag_invoke.hpp>
 
 #include <exception>
 #include <type_traits>
 #include <utility>
 
 namespace hpx::execution::experimental {
-    namespace hpxexec = hpx::execution::experimental;
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////////
@@ -73,17 +71,19 @@ namespace hpx::execution::experimental {
                             {
                                 if constexpr (std::is_void_v<result_type>)
                                 {
-                                    hpxexec::set_value(HPX_MOVE(receiver_));
+                                    hpx::execution::experimental::set_value(
+                                        HPX_MOVE(receiver_));
                                 }
                                 else
                                 {
-                                    hpxexec::set_value(
+                                    hpx::execution::experimental::set_value(
                                         HPX_MOVE(receiver_), future_.get());
                                 }
                             }
                             else if (future_.has_exception())
                             {
-                                hpxexec::set_error(HPX_MOVE(receiver_),
+                                hpx::execution::experimental::set_error(
+                                    HPX_MOVE(receiver_),
                                     future_.get_exception_ptr());
                             }
                         };
@@ -112,7 +112,8 @@ namespace hpx::execution::experimental {
                         }
                     },
                     [&](std::exception_ptr ep) {
-                        hpxexec::set_error(HPX_MOVE(receiver_), HPX_MOVE(ep));
+                        hpx::execution::experimental::set_error(
+                            HPX_MOVE(receiver_), HPX_MOVE(ep));
                     });
             }
 
@@ -130,19 +131,22 @@ namespace hpx::execution::experimental {
             template <bool IsVoid, typename _result_type>
             struct set_value_void_checked
             {
-                using type = hpxexec::set_value_t(_result_type);
+                using type = hpx::execution::experimental::set_value_t(
+                    _result_type);
             };
 
             template <typename _result_type>
             struct set_value_void_checked<true, _result_type>
             {
-                using type = hpxexec::set_value_t();
+                using type = hpx::execution::experimental::set_value_t();
             };
 
-            using completion_signatures = hpxexec::completion_signatures<
-                typename set_value_void_checked<std::is_void_v<result_type>,
-                    result_type>::type,
-                hpxexec::set_error_t(std::exception_ptr)>;
+            using completion_signatures =
+                hpx::execution::experimental::completion_signatures<
+                    typename set_value_void_checked<std::is_void_v<result_type>,
+                        result_type>::type,
+                    hpx::execution::experimental::set_error_t(
+                        std::exception_ptr)>;
         };
 
         HPX_CXX_CORE_EXPORT template <typename Future>

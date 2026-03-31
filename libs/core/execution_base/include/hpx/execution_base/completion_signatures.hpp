@@ -32,8 +32,6 @@
 
 namespace hpx::execution::experimental {
 
-    namespace hpxexec = hpx::execution::experimental;
-
     // empty_variant will be returned by execution::value_types_of_t and
     // execution::error_types_of_t if no signatures are provided.
     HPX_CXX_CORE_EXPORT struct empty_variant
@@ -137,7 +135,9 @@ namespace hpx::execution::experimental {
     // A sender's destructor shall not block pending completion of submitted
     // operations.
     template <typename Sender, typename... Env>
-    struct is_sender_in : std::bool_constant<hpxexec::sender_in<Sender, Env...>>
+    struct is_sender_in
+      : std::bool_constant<
+            hpx::execution::experimental::sender_in<Sender, Env...>>
     {
     };
 
@@ -145,7 +145,8 @@ namespace hpx::execution::experimental {
     inline constexpr bool is_sender_in_v = is_sender_in<Sender, Env...>::value;
 
     template <typename Sender>
-    struct is_sender : std::bool_constant<hpxexec::sender<Sender>>
+    struct is_sender
+      : std::bool_constant<hpx::execution::experimental::sender<Sender>>
     {
     };
 
@@ -155,7 +156,8 @@ namespace hpx::execution::experimental {
     // \see is_sender
     HPX_CXX_CORE_EXPORT template <typename Sender, typename Receiver>
     struct is_sender_to
-      : std::bool_constant<hpxexec::sender_to<Sender, Receiver>>
+      : std::bool_constant<
+            hpx::execution::experimental::sender_to<Sender, Receiver>>
     {
     };
 
@@ -166,14 +168,15 @@ namespace hpx::execution::experimental {
     // The sender_of concept defines the requirements for a sender type that on
     // successful completion sends the specified set of value types.
     template <typename Sender, typename Signal,
-        typename Env = hpxexec::empty_env>
+        typename Env = hpx::execution::experimental::empty_env>
     struct is_sender_of
-      : std::bool_constant<hpxexec::sender_of<Sender, Signal, Env>>
+      : std::bool_constant<
+            hpx::execution::experimental::sender_of<Sender, Signal, Env>>
     {
     };
 
     template <typename Sender, typename Signal,
-        typename Env = hpxexec::empty_env>
+        typename Env = hpx::execution::experimental::empty_env>
     inline constexpr bool is_sender_of_v =
         is_sender_of<Sender, Signal, Env>::value;
 
@@ -212,7 +215,8 @@ namespace hpx::execution::experimental {
         };
     }    // namespace detail
 
-    template <typename Sender, typename Env = hpxexec::empty_env>
+    template <typename Sender,
+        typename Env = hpx::execution::experimental::empty_env>
     using single_sender_value_t = typename detail::single_sender_value<
         value_types_of_t<Sender, Env, hpx::tuple, hpx::variant>>::type;
 
@@ -241,13 +245,13 @@ namespace hpx::execution::experimental {
         hpxexec::stdexec_internal::__connect_await::__operation<Rec>;
 
     using connect_awaitable_t =
-        hpxexec::stdexec_internal::__connect_awaitable_t;
+        hpx::execution::experimental::stdexec_internal::__connect_awaitable_t;
     inline constexpr connect_awaitable_t connect_awaitable{};
 
     HPX_CXX_CORE_EXPORT template <typename Sender, typename Receiver>
     struct has_nothrow_connect
       : std::integral_constant<bool,
-            noexcept(hpxexec::connect(
+            noexcept(hpx::execution::experimental::connect(
                 std::declval<Sender>(), std::declval<Receiver>()))>
     {
     };

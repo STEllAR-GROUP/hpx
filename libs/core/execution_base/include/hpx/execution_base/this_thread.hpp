@@ -87,7 +87,11 @@ namespace hpx::execution_base {
 #include <hpx/execution_base/stdexec_forward.hpp>
 namespace hpx::this_thread::experimental {
 
-    using namespace std::this_thread;
+    HPX_CXX_CORE_EXPORT using std::this_thread::get_id;
+    HPX_CXX_CORE_EXPORT using std::this_thread::sleep_for;
+    HPX_CXX_CORE_EXPORT using std::this_thread::sleep_until;
+    HPX_CXX_CORE_EXPORT using std::this_thread::yield;
+
     HPX_CXX_CORE_EXPORT using stdexec::execute_may_block_caller;
     HPX_CXX_CORE_EXPORT using stdexec::execute_may_block_caller_t;
 

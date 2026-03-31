@@ -7,6 +7,7 @@
 // sync_wait() did not compile when used with an lvalue sender involving bulk
 
 #include <hpx/execution.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <atomic>
@@ -14,15 +15,28 @@
 namespace ex = hpx::execution::experimental;
 namespace tt = hpx::this_thread::experimental;
 
-int main()
+int hpx_main()
 {
+#if defined(HPX_HAVE_STDEXEC)
     std::atomic<bool> called = false;
 
-    auto s = ex::just() | ex::bulk(1, [&called](auto) { called = true; });
+    ex::thread_pool_scheduler sch{};
+
+    auto s =
+        ex::starts_on(sch) | ex::bulk(1, [&called](auto) { called = true; });
 
     tt::sync_wait(s);
 
     HPX_TEST(called.load());
+#endif
+
+    return hpx::local::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    HPX_TEST_EQ_MSG(hpx::local::init(hpx_main, argc, argv), 0,
+        "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
 }
