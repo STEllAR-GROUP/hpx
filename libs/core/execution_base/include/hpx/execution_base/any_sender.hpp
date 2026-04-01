@@ -542,7 +542,7 @@ namespace hpx::execution::experimental::detail {
         }
 
         friend void tag_invoke(hpx::execution::experimental::set_error_t,
-            any_receiver&& r, std::exception_ptr ep) noexcept
+            any_receiver&& /*r*/, std::exception_ptr /*ep*/) noexcept
         {
         }
     };
