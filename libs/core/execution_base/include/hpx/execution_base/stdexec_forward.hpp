@@ -112,6 +112,7 @@ namespace hpx::execution::experimental {
     HPX_CXX_CORE_EXPORT using stdexec::get_allocator_t;
     HPX_CXX_CORE_EXPORT using stdexec::get_completion_scheduler_t;
     HPX_CXX_CORE_EXPORT using stdexec::get_delegatee_scheduler_t;
+    HPX_CXX_CORE_EXPORT using stdexec::get_domain_t;
     HPX_CXX_CORE_EXPORT using stdexec::get_forward_progress_guarantee_t;
     HPX_CXX_CORE_EXPORT using stdexec::get_scheduler_t;
     HPX_CXX_CORE_EXPORT using stdexec::get_stop_token_t;
@@ -121,6 +122,7 @@ namespace hpx::execution::experimental {
     HPX_CXX_CORE_EXPORT using stdexec::get_allocator;
     HPX_CXX_CORE_EXPORT using stdexec::get_completion_scheduler;
     HPX_CXX_CORE_EXPORT using stdexec::get_delegatee_scheduler;
+    HPX_CXX_CORE_EXPORT using stdexec::get_domain;
     HPX_CXX_CORE_EXPORT using stdexec::get_forward_progress_guarantee;
     HPX_CXX_CORE_EXPORT using stdexec::get_scheduler;
     HPX_CXX_CORE_EXPORT using stdexec::get_stop_token;
