@@ -13,9 +13,9 @@
 #include <hpx/assert.hpp>
 #include <hpx/components/client_base.hpp>
 #include <hpx/components/get_ptr.hpp>
-#include <hpx/components_base/component_type.hpp>
 #include <hpx/distribution_policies/container_distribution_policy.hpp>
 #include <hpx/modules/async_combinators.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/type_support.hpp>
@@ -490,7 +490,7 @@ namespace hpx {
                 {
                     ptrs.push_back(get_ptr<partition_unordered_map_server>(
                         partitions[i].partition_.get())
-                                       .then(get_ptr_helper{i, partitions}));
+                            .then(get_ptr_helper{i, partitions}));
                 }
             }
 

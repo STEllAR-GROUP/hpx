@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/components_base/get_lva.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/functional.hpp>

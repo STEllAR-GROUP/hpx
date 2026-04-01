@@ -15,9 +15,8 @@
 #include <hpx/assert.hpp>
 #include <hpx/components/basename_registration.hpp>
 #include <hpx/components/components_fwd.hpp>
-#include <hpx/components_base/agas_interface.hpp>
-#include <hpx/components_base/stub_base.hpp>
 #include <hpx/modules/async_base.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/memory.hpp>

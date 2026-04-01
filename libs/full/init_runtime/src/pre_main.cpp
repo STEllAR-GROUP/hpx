@@ -15,8 +15,8 @@
 #include <hpx/collectives/create_communicator.hpp>
 #include <hpx/collectives/detail/barrier_node.hpp>
 #include <hpx/collectives/latch.hpp>
-#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/init_runtime/pre_main.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>

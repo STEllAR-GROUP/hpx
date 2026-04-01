@@ -15,9 +15,7 @@
 #include <hpx/agas/agas_fwd.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
-#include <hpx/components_base/component_type.hpp>
-#include <hpx/components_base/server/create_component.hpp>
-#include <hpx/components_base/traits/is_component.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/parcelset_base.hpp>
 #include <hpx/modules/plugin.hpp>
