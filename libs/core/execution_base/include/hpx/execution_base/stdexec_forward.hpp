@@ -47,6 +47,7 @@
 
 // NOLINTBEGIN(bugprone-crtp-constructor-accessibility)
 // NOLINTBEGIN(bugprone-unhandled-exception-at-new)
+#include <exec/completion_signatures.hpp>
 #include <exec/ensure_started.hpp>
 #include <exec/env.hpp>
 #include <exec/execute.hpp>
