@@ -196,10 +196,10 @@ namespace hpx::execution::experimental {
     // Execution policies
     HPX_CXX_CORE_EXPORT using stdexec::is_execution_policy;
     HPX_CXX_CORE_EXPORT using stdexec::is_execution_policy_v;
-    HPX_CXX_CORE_EXPORT using stdexec::par;
-    HPX_CXX_CORE_EXPORT using stdexec::par_unseq;
-    HPX_CXX_CORE_EXPORT using stdexec::seq;
-    HPX_CXX_CORE_EXPORT using stdexec::unseq;
+    using stdexec::par;
+    using stdexec::par_unseq;
+    using stdexec::seq;
+    using stdexec::unseq;
 
     HPX_CXX_CORE_EXPORT using exec::split;
     HPX_CXX_CORE_EXPORT using exec::split_t;

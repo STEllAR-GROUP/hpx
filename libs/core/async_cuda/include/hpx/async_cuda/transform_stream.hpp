@@ -302,11 +302,7 @@ namespace hpx::cuda::experimental {
                         hpx::execution::experimental::completion_signatures<
                             hpx::execution::experimental::set_error_t(
                                 std::exception_ptr)>,
-                        invoke_function_transformation,
-                        hpx::execution::experimental::keep_completion<
-                            hpx::execution::experimental::set_error_t>,
-                        hpx::execution::experimental::keep_completion<
-                            hpx::execution::experimental::set_stopped_t>>
+                        invoke_function_transformation>
             {
                 return {};
             }
