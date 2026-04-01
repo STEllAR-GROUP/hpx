@@ -61,7 +61,9 @@ namespace hpx::execution::experimental {
 #endif
             friend auto tag_invoke(get_completion_signatures_t,
                 bulk_sender const&, Env) noexcept -> hpx::execution::
-                experimental::transform_completion_signatures_of<Sender, Env,
+                experimental::transform_completion_signatures<
+                    hpx::execution::experimental::completion_signatures_of_t<
+                        Sender, Env>,
                     hpx::execution::experimental::completion_signatures<
                         hpx::execution::experimental::set_error_t(
                             std::exception_ptr)>,

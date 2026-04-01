@@ -15,6 +15,13 @@ module;
 #include <hpx/config.hpp>
 #include <hpx/config/std_headers.hpp>
 
+// MSVC on x86/x64: pre-include <intrin.h> in the global module fragment
+// so that its declarations (with standard C linkage) are seen by everyone
+// before any module-purview declarations, avoiding error C2732.
+#if defined(_MSC_VER) && (defined(_M_IX86) || defined(_M_X64))
+#include <intrin.h>
+#endif
+
 // Include library headers in the global module fragment for non-core modules
 // to avoid redefinition of Core symbols already brought in via 'import'.
 #if defined(HPX_COMPILE_FULL_WITH_MODULES)
@@ -41,12 +48,9 @@ export import HPX.Core;
 // will be exported from the module using a differently encoded name.
 extern "C++" {
 
-// MSVC on x86/x64: pre-include <intrin.h> inside the purview extern block
-// so that MSVC's own declaration of _mm_pause (with C++ linkage) matches
-// stdexec/stop_token.hpp's declaration, avoiding error C2732.
-#if defined(_MSC_VER) && (defined(_M_IX86) || defined(_M_X64))
-#include <intrin.h>
-#endif
+// MSVC on x86/x64: headers included in the GMF (see above) already
+// provide <intrin.h>. We don't need to re-include it here in the purview
+// unless we want to control its linkage SPECIFICALLY, but that's risky.
 
 #if defined(HPX_MSVC)
 // disable warning C5244: '#include <filename>' in the purview of module

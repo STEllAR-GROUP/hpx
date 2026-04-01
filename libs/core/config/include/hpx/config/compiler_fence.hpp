@@ -35,9 +35,8 @@ extern "C" void _ReadWriteBarrier();
 #define HPX_COMPILER_FENCE _ReadWriteBarrier()
 
 #if defined(HPX_HAVE_MODULES)
-// Use the same linkage for _mm_pause as is used in the module purview (extern "C++")
-// to avoid contradiction with stdexec/stop_token.hpp (C2732 on MSVC).
-extern "C++" void _mm_pause();
+// Use the declaration from <intrin.h> provided by the Global Module Fragment
+// to avoid contradiction errors (C2732) in the module purview.
 #else
 extern "C" void _mm_pause();
 #endif

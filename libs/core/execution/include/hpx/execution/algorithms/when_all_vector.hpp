@@ -125,8 +125,9 @@ namespace hpx::when_all_vector_detail {
         friend auto tag_invoke(
             hpx::execution::experimental::get_completion_signatures_t,
             when_all_vector_sender_type const&, Env const&) noexcept
-            -> hpx::execution::experimental::transform_completion_signatures_of<
-                Sender, Env,
+            -> hpx::execution::experimental::transform_completion_signatures<
+                hpx::execution::experimental::completion_signatures_of_t<Sender,
+                    Env>,
                 hpx::execution::experimental::completion_signatures<
                     hpx::execution::experimental::set_error_t(
                         std::exception_ptr)>,
