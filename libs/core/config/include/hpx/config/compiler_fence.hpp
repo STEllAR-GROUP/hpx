@@ -34,7 +34,13 @@ extern "C" void _ReadWriteBarrier();
 
 #define HPX_COMPILER_FENCE _ReadWriteBarrier()
 
+#if defined(HPX_HAVE_MODULES)
+// Use the same linkage for _mm_pause as is used in the module purview (extern "C++")
+// to avoid contradiction with stdexec/stop_token.hpp (C2732 on MSVC).
+extern "C++" void _mm_pause();
+#else
 extern "C" void _mm_pause();
+#endif
 #define HPX_SMT_PAUSE _mm_pause()
 
 #elif defined(__GNUC__)

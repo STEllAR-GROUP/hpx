@@ -9,28 +9,29 @@
 
 module;
 
-// Define module-specific macros before including config
-#define HPX_COMPILE_BMI
-#define HPX_COMPILE_@uppercase_lib@_WITH_MODULES
+// Include standard library and configuration headers in the global module fragment.
+// These must be included without 'export' or module-specific definitions to
+// prevent purview errors.
 #include <hpx/config.hpp>
+#include <hpx/config/std_headers.hpp>
 
-// Include all library headers in the global module fragment for non-core modules
+// Include library headers in the global module fragment for non-core modules
 // to avoid redefinition of Core symbols already brought in via 'import'.
 #if defined(HPX_COMPILE_FULL_WITH_MODULES)
 @cxx_module_headers@
 #endif
 
-// Include all standard library headers in global module fragment to prevent ODR
-// violations.
-#include <hpx/config/std_headers.hpp>
-
-
-
 export module HPX.@cap_libname@;
+
+// Define module-specific macros AFTER entering the module purview.
+// This ensures that HPX_CXX_EXPORT expands to 'export' correctly
+// for symbols defined here.
+#define HPX_COMPILE_BMI
+#define HPX_COMPILE_@uppercase_lib@_WITH_MODULES
 
 // HPX.Full must import HPX.Core first so stdexec symbols (and other shared
 // dependencies) are satisfied from HPX.Core rather than being re-exported a
-// second time, which causes duplicate-symbol linker errors with lld.
+// second time.
 #if defined(HPX_COMPILE_FULL_WITH_MODULES)
 export import HPX.Core;
 #endif
