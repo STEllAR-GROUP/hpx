@@ -9,48 +9,36 @@
 
 module;
 
-// Include standard library and configuration headers in the global module fragment.
-// These must be included without 'export' or module-specific definitions to
-// prevent purview errors.
+// Define module-specific macros before including config
+#define HPX_COMPILE_BMI
+#define HPX_COMPILE_@uppercase_lib@_WITH_MODULES
 #include <hpx/config.hpp>
+
+// Include all standard library headers in global module fragment to prevent ODR
+// violations.
 #include <hpx/config/std_headers.hpp>
 
-// MSVC on x86/x64: pre-include <intrin.h> in the global module fragment
-// so that its declarations (with standard C linkage) are seen by everyone
-// before any module-purview declarations, avoiding error C2732.
+// MSVC on x86/x64: pre-include <intrin.h> in the global module fragment so
+// that MSVC's own declaration of _mm_pause (with __cdecl) is seen before
+// stdexec/stop_token.hpp declares it without __cdecl, which would trigger
+// error C2732 (linkage specification contradicts earlier specification).
 #if defined(_MSC_VER) && (defined(_M_IX86) || defined(_M_X64))
 #include <intrin.h>
 #endif
 
-// Include library headers in the global module fragment for non-core modules
-// to avoid redefinition of Core symbols already brought in via 'import'.
-#if defined(HPX_COMPILE_FULL_WITH_MODULES)
-@cxx_module_headers@
-#endif
-
 export module HPX.@cap_libname@;
-
-// Define module-specific macros AFTER entering the module purview.
-// This ensures that HPX_CXX_EXPORT expands to 'export' correctly
-// for symbols defined here.
-#define HPX_COMPILE_BMI
-#define HPX_COMPILE_@uppercase_lib@_WITH_MODULES
 
 // HPX.Full must import HPX.Core first so stdexec symbols (and other shared
 // dependencies) are satisfied from HPX.Core rather than being re-exported a
-// second time.
+// second time, which causes duplicate-symbol linker errors with lld.
 #if defined(HPX_COMPILE_FULL_WITH_MODULES)
-export import HPX.Core;
+import HPX.Core;
 #endif
 
 // Make sure the exported symbols are name-mangled using standard C++ rules.
 // This is necessary as otherwise the symbols exported from the shared libraries
 // will be exported from the module using a differently encoded name.
 extern "C++" {
-
-// MSVC on x86/x64: headers included in the GMF (see above) already
-// provide <intrin.h>. We don't need to re-include it here in the purview
-// unless we want to control its linkage SPECIFICALLY, but that's risky.
 
 #if defined(HPX_MSVC)
 // disable warning C5244: '#include <filename>' in the purview of module
@@ -70,12 +58,7 @@ extern "C++" {
 #endif
 
 // include HPX module files here that have been converted to C++ modules
-//
-// For non-core modules, we must ensure that any transitive Core dependencies
-// do NOT cause redefinitions. Moving them to the global fragment (see above)
-// or ensuring parity with the 'import HPX.Core' statement is critical.
 @cxx_module_headers@
-
 #if defined(HPX_CLANG_VERSION)
 #pragma clang diagnostic pop
 #endif
