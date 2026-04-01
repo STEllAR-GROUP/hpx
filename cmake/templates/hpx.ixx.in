@@ -20,6 +20,13 @@ module;
 
 export module HPX.@cap_libname@;
 
+// HPX.Full must import HPX.Core first so stdexec symbols (and other shared
+// dependencies) are satisfied from HPX.Core rather than being re-exported a
+// second time, which causes duplicate-symbol linker errors with lld.
+#if defined(HPX_COMPILE_FULL_WITH_MODULES)
+import HPX.Core;
+#endif
+
 // Make sure the exported symbols are name-mangled using standard C++ rules.
 // This is necessary as otherwise the symbols exported from the shared libraries
 // will be exported from the module using a differently encoded name.
