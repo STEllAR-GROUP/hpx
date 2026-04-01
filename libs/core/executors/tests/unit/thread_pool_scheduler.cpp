@@ -2203,11 +2203,11 @@ void test_stdexec_domain_queries()
     static_assert(std::is_base_of_v<ex::default_domain,
                       ex::thread_pool_domain<hpx::launch>>,
         "thread_pool_domain should derive from default_domain");
-    // 2. Verify domain is accessible via stdexec::get_domain
+    // 2. Verify domain is accessible via ex::get_domain (forwarded from stdexec)
     static_assert(
-        requires { stdexec::get_domain(scheduler); },
+        requires { ex::get_domain(scheduler); },
         "scheduler should support get_domain query");
-    auto domain = stdexec::get_domain(scheduler);
+    auto domain = ex::get_domain(scheduler);
 
     // 3. Verify the domain type is thread_pool_domain
     static_assert(
