@@ -83,7 +83,7 @@ jobs:
               shell: bash
               working-directory: /hpx/build
               run: |
-                ninja -j2 tools.inspect
+                ninja -j$(nproc) tools.inspect
 
             - name: Running Inspect Tool
               shell: bash
