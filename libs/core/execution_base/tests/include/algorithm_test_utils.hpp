@@ -770,8 +770,10 @@ struct example_scheduler_template
         template <typename Self, typename... Env>
         static consteval auto get_completion_signatures() noexcept
             -> hpx::execution::experimental::completion_signatures<
-                hpx::execution::experimental::set_value_t(),
-                hpx::execution::experimental::set_error_t(std::exception_ptr)>;
+                hpx::execution::experimental::set_value_t()>
+        {
+            return {};
+        }
     };
 
     my_sender schedule() const noexcept

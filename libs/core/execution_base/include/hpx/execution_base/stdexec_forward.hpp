@@ -141,9 +141,6 @@ namespace hpx::execution::experimental {
     // Operation State
     HPX_CXX_CORE_EXPORT using stdexec::operation_state_t;
 
-    // Operation State
-    using stdexec::operation_state_t;
-
     // Sender
     HPX_CXX_CORE_EXPORT using stdexec::connect;
     HPX_CXX_CORE_EXPORT using stdexec::connect_result_t;
@@ -182,6 +179,11 @@ namespace hpx::execution::experimental {
     HPX_CXX_CORE_EXPORT using stdexec::continues_on;
     HPX_CXX_CORE_EXPORT using stdexec::continues_on_t;
 
+    // Deprecated aliases retained for compatibility with existing code and
+    // tests while HPX transitions to stdexec-only internals.
+    HPX_CXX_CORE_EXPORT using stdexec::transfer;
+    HPX_CXX_CORE_EXPORT using stdexec::transfer_t;
+
     // Bulk (HPX provides its own bulk CPO, but still forwards chunked variants
     // used by the thread pool scheduler domain customization on current master)
     //    HPX_CXX_CORE_EXPORT using stdexec::bulk;
@@ -194,11 +196,16 @@ namespace hpx::execution::experimental {
     // Execution policies
     HPX_CXX_CORE_EXPORT using stdexec::is_execution_policy;
     HPX_CXX_CORE_EXPORT using stdexec::is_execution_policy_v;
-    // Note: Cannot export constexpr objects with internal linkage in C++ modules
-    // Users should access these directly from stdexec namespace
+    HPX_CXX_CORE_EXPORT using stdexec::par;
+    HPX_CXX_CORE_EXPORT using stdexec::par_unseq;
+    HPX_CXX_CORE_EXPORT using stdexec::seq;
+    HPX_CXX_CORE_EXPORT using stdexec::unseq;
 
     HPX_CXX_CORE_EXPORT using exec::split;
     HPX_CXX_CORE_EXPORT using exec::split_t;
+
+    HPX_CXX_CORE_EXPORT using exec::ensure_started;
+    HPX_CXX_CORE_EXPORT using exec::ensure_started_t;
 
     HPX_CXX_CORE_EXPORT using exec::execute;
     HPX_CXX_CORE_EXPORT using exec::execute_t;
@@ -250,6 +257,9 @@ namespace hpx::execution::experimental {
     // Start detached (moved to exec:: namespace in newer stdexec)
     HPX_CXX_CORE_EXPORT using exec::start_detached;
     HPX_CXX_CORE_EXPORT using exec::start_detached_t;
+
+    HPX_CXX_CORE_EXPORT using stdexec::transfer_just;
+    HPX_CXX_CORE_EXPORT using stdexec::transfer_just_t;
 
     // Stop token
     HPX_CXX_CORE_EXPORT using stdexec::stop_callback_for_t;

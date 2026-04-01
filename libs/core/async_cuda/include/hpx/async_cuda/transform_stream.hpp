@@ -297,24 +297,18 @@ namespace hpx::cuda::experimental {
 
             template <typename Self, typename... Env>
             static consteval auto get_completion_signatures()
-            {
-                auto transform_values = []<typename... Args>() {
-                    return typename invoke_function_transformation_helper<
-                        Args...>::type{};
-                };
-
-                return hpx::execution::experimental::
-                    transform_completion_signatures(
-                        hpx::execution::experimental::get_completion_signatures<
-                            std::decay_t<S>, Env...>(),
-                        transform_values,
-                        hpx::execution::experimental::keep_completion<
-                            hpx::execution::experimental::set_error_t>{},
-                        hpx::execution::experimental::keep_completion<
-                            hpx::execution::experimental::set_stopped_t>{},
+                -> hpx::execution::experimental::
+                    transform_completion_signatures_of<std::decay_t<S>, Env,
                         hpx::execution::experimental::completion_signatures<
                             hpx::execution::experimental::set_error_t(
-                                std::exception_ptr)>{});
+                                std::exception_ptr)>,
+                        invoke_function_transformation,
+                        hpx::execution::experimental::keep_completion<
+                            hpx::execution::experimental::set_error_t>,
+                        hpx::execution::experimental::keep_completion<
+                            hpx::execution::experimental::set_stopped_t>>
+            {
+                return {};
             }
 
             constexpr auto get_env() const noexcept

@@ -148,7 +148,8 @@ int main()
         HPX_TEST(set_value_called);
     }
 
-    // tag_invoke overload
+    // stdexec::ensure_started is an adaptor, so it should not dispatch through
+    // a sender-specific tag_invoke overload here.
     {
         std::atomic<bool> receiver_set_value_called{false};
         std::atomic<bool> tag_invoke_overload_called{false};
@@ -157,18 +158,18 @@ int main()
         static_assert(ex::is_sender_v<decltype(s)>);
         static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
 
-        // custom_sender_tag_invoke implements tag_invoke(split_t, ...)
-        // returning an instance of void_sender
+        // stdexec::ensure_started turns the sender into a shared sender that
+        // still reports the standard error and stopped channels.
         check_value_types<hpx::variant<hpx::tuple<>>>(s);
-        check_error_types<hpx::variant<>>(s);
-        check_sends_stopped<false>(s);
+        check_error_types<hpx::variant<std::exception_ptr>>(s);
+        check_sends_stopped<true>(s);
 
         auto f = [] {};
         auto r = callback_receiver<decltype(f)>{f, receiver_set_value_called};
         auto os = ex::connect(std::move(s), std::move(r));
         ex::start(os);
         HPX_TEST(receiver_set_value_called);
-        HPX_TEST(tag_invoke_overload_called);
+        HPX_TEST(!tag_invoke_overload_called);
     }
 
     // Failure path

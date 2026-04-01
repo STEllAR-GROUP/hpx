@@ -16,6 +16,34 @@ if(Stdexec_ROOT AND HPX_WITH_FETCH_STDEXEC)
   )
 endif()
 
+function(_hpx_patch_stdexec_header header)
+  file(READ "${header}" _content)
+  set(_patched_content "${_content}")
+
+  # clang-scan-deps used for C++ modules currently rejects apostrophe-separated
+  # pp-number literals in stdexec. Remove digit separators in the fetched copy
+  # so dependency scanning succeeds.
+  set(_previous_content "")
+  while(NOT _patched_content STREQUAL _previous_content)
+    set(_previous_content "${_patched_content}")
+    string(REGEX REPLACE "([0-9])'([0-9])" "\\1\\2" _patched_content
+                         "${_patched_content}"
+    )
+  endwhile()
+
+  if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    # stdexec's stop_token header currently declares _mm_pause without the C
+    # linkage used by MSVC's intrinsic headers, which breaks module builds.
+    string(REPLACE "extern void _mm_pause();" "extern \"C\" void _mm_pause();"
+                   _patched_content "${_patched_content}"
+    )
+  endif()
+
+  if(NOT _content STREQUAL _patched_content)
+    file(WRITE "${header}" "${_patched_content}")
+  endif()
+endfunction()
+
 if(HPX_WITH_FETCH_STDEXEC)
   hpx_info(
     "HPX_WITH_FETCH_STDEXEC=${HPX_WITH_FETCH_STDEXEC}, Stdexec will be fetched using CMake's FetchContent and installed alongside HPX (HPX_WITH_STDEXEC_TAG=${HPX_WITH_STDEXEC_TAG})"
@@ -33,6 +61,18 @@ if(HPX_WITH_FETCH_STDEXEC)
     fetchcontent_populate(Stdexec)
   endif()
   set(Stdexec_ROOT ${stdexec_SOURCE_DIR})
+
+  if(HPX_WITH_CXX_MODULES AND (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"
+                               OR CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+  )
+    hpx_info(
+      "Patching fetched stdexec headers for C++ modules dependency scanning"
+    )
+    file(GLOB_RECURSE stdexec_headers ${stdexec_SOURCE_DIR}/include/*.hpp)
+    foreach(stdexec_header IN LISTS stdexec_headers)
+      _hpx_patch_stdexec_header("${stdexec_header}")
+    endforeach()
+  endif()
 
   add_library(Stdexec INTERFACE)
   target_include_directories(
@@ -80,3 +120,5 @@ else()
     )
   endif()
 endif()
+
+hpx_add_config_define(HPX_HAVE_STDEXEC)
