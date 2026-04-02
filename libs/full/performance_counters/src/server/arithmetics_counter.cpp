@@ -6,8 +6,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_distributed/continuation.hpp>
-#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/modules/async_base.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/string_util.hpp>

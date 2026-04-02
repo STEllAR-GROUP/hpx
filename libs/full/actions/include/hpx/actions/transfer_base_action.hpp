@@ -24,7 +24,7 @@
 #include <hpx/actions_base/traits/action_stacksize.hpp>
 #include <hpx/actions_base/traits/action_trigger_continuation_fwd.hpp>
 #include <hpx/actions_base/traits/action_was_object_migrated.hpp>
-#include <hpx/components_base/pinned_ptr.hpp>
+#include <hpx/modules/components_base.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assert.hpp>

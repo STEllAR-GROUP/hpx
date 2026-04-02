@@ -13,6 +13,7 @@
 #include <hpx/parallel/segmented_algorithms/adjacent_find.hpp>
 #include <hpx/parallel/segmented_algorithms/all_any_none.hpp>
 #include <hpx/parallel/segmented_algorithms/count.hpp>
+#include <hpx/parallel/segmented_algorithms/equal.hpp>
 #include <hpx/parallel/segmented_algorithms/exclusive_scan.hpp>
 #include <hpx/parallel/segmented_algorithms/fill.hpp>
 #include <hpx/parallel/segmented_algorithms/find.hpp>
