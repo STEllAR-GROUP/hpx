@@ -179,7 +179,8 @@ namespace hpx::execution::experimental {
 
             if constexpr (std::is_void_v<result_type>)
             {
-                // hpx::execution::experimental::bulk requires integral shape and execution policy
+                // hpx::execution::experimental::bulk requires integral shape
+                // and execution policy
                 using size_type = decltype(hpx::util::size(shape));
                 size_type const n = hpx::util::size(shape);
                 return make_future(bulk(schedule(exec.sched_), n,
@@ -243,7 +244,8 @@ namespace hpx::execution::experimental {
             using result_type = hpx::util::detail::invoke_deferred_result_t<F,
                 shape_element, Ts...>;
 
-            // hpx::execution::experimental::bulk requires integral shape and execution policy
+            // hpx::execution::experimental::bulk requires integral shape
+            // and execution policy
             using size_type = decltype(hpx::util::size(shape));
             size_type const n = hpx::util::size(shape);
             return hpx::util::void_guard<result_type>(),

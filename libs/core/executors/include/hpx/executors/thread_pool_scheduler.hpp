@@ -374,10 +374,17 @@ namespace hpx::execution::experimental {
             {
                 hpx::detail::try_catch_exception_ptr(
                     [&]() {
+#if defined(HPX_CLANG_VERSION)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#endif
                         scheduler.execute([this]() mutable {
                             hpx::execution::experimental::set_value(
                                 HPX_MOVE(receiver));
                         });
+#if defined(HPX_CLANG_VERSION)
+#pragma clang diagnostic pop
+#endif
                     },
                     [&](std::exception_ptr ep) {
                         #if defined(HPX_CLANG_VERSION)
