@@ -10,7 +10,6 @@
 /// \headerfile hpx/algorithm.hpp
 
 #pragma once
-#include <ranges>
 
 #if defined(DOXYGEN)
 namespace hpx { namespace experimental {
@@ -758,6 +757,7 @@ namespace hpx { namespace experimental {
 #include <cstddef>
 #include <cstdint>
 #include <iterator>
+#include <ranges>
 #include <type_traits>
 #include <utility>
 

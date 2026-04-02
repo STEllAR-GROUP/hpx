@@ -751,7 +751,6 @@ namespace hpx::parallel {
                 !std::bidirectional_iterator<FwdIter>)
         constexpr FwdIter sequential_partition(
             FwdIter first, FwdIter last, Pred&& pred, Proj&& proj)
-        // clang-format on
         {
             while (first != last && HPX_INVOKE(pred, HPX_INVOKE(proj, *first)))
                 ++first;
