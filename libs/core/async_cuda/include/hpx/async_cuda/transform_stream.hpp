@@ -295,7 +295,7 @@ namespace hpx::cuda::experimental {
             using invoke_function_transformation =
                 invoke_function_transformation_helper<Args...>::type;
 
-            template <typename Self, typename... Env>
+            template <typename Self, typename Env>
             static consteval auto get_completion_signatures()
                 -> hpx::execution::experimental::
                     transform_completion_signatures_of<std::decay_t<S>, Env,
