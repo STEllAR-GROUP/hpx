@@ -34,15 +34,21 @@ namespace hpx::parallel::detail {
         HPX_HOST_DEVICE HPX_FORCEINLINE static void call(
             ZipIterator it, std::size_t part_count, Token& tok, F&& f)
         {
+            bool cancelled = false;
             util::loop_n<ExPolicy>(it, part_count, tok,
-                [&f, &tok](auto const& curr) mutable -> void {
-                    auto t = *curr;
-                    if (!hpx::parallel::traits::all_of(
-                            HPX_INVOKE(f, hpx::get<0>(t), hpx::get<1>(t))))
+                [&f, &cancelled](auto const& curr) mutable -> void {
+                    if (!cancelled)
                     {
-                        tok.cancel();
+                        auto t = *curr;
+                        if (!hpx::parallel::traits::all_of(
+                                HPX_INVOKE(f, hpx::get<0>(t), hpx::get<1>(t))))
+                        {
+                            cancelled = true;
+                        }
                     }
                 });
+            if (cancelled)
+                tok.cancel();
         }
 
         template <typename InIter1, typename InIter2, typename F>
@@ -115,16 +121,23 @@ namespace hpx::parallel::detail {
             std::size_t part_count, Token& tok, F&& f, Proj1&& proj1,
             Proj2&& proj2)
         {
+            bool cancelled = false;
             util::loop_n<ExPolicy>(it, part_count, tok,
-                [&f, &proj1, &proj2, &tok](auto const& curr) mutable -> void {
-                    auto t = *curr;
-                    if (!hpx::parallel::traits::all_of(
-                            hpx::invoke(f, hpx::invoke(proj1, hpx::get<0>(t)),
-                                hpx::invoke(proj2, hpx::get<1>(t)))))
+                [&f, &proj1, &proj2, &cancelled](
+                    auto const& curr) mutable -> void {
+                    if (!cancelled)
                     {
-                        tok.cancel();
+                        auto t = *curr;
+                        if (!hpx::parallel::traits::all_of(hpx::invoke(f,
+                                hpx::invoke(proj1, hpx::get<0>(t)),
+                                hpx::invoke(proj2, hpx::get<1>(t)))))
+                        {
+                            cancelled = true;
+                        }
                     }
                 });
+            if (cancelled)
+                tok.cancel();
         }
 
         template <typename InIter1, typename Sent1, typename InIter2,

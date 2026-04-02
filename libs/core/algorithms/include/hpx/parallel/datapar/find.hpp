@@ -48,14 +48,25 @@ namespace hpx::parallel::detail {
             FwdIter part_begin, std::size_t part_count, Token& tok,
             T const& val, Proj&& proj)
         {
+            bool cancelled = false;
+            std::size_t cancel_pos = 0;
             util::loop_idx_n<std::decay_t<ExPolicy>>(base_idx, part_begin,
                 part_count, tok,
-                [&val, &proj, &tok](auto&& v, std::size_t i) -> void {
-                    auto msk = HPX_INVOKE(proj, v) == val;
-                    int offset = hpx::parallel::traits::find_first_of(msk);
-                    if (offset != -1)
-                        tok.cancel(i + offset);
+                [&val, &proj, &cancelled, &cancel_pos](
+                    auto&& v, std::size_t i) -> void {
+                    if (!cancelled)
+                    {
+                        auto msk = HPX_INVOKE(proj, v) == val;
+                        int offset = hpx::parallel::traits::find_first_of(msk);
+                        if (offset != -1)
+                        {
+                            cancelled = true;
+                            cancel_pos = i + offset;
+                        }
+                    }
                 });
+            if (cancelled)
+                tok.cancel(cancel_pos);
         }
     };
 
@@ -111,14 +122,20 @@ namespace hpx::parallel::detail {
         static inline constexpr void call(FwdIter part_begin,
             std::size_t part_count, Token& tok, F&& op, Proj&& proj)
         {
+            bool cancelled = false;
             util::loop_n<std::decay_t<ExPolicy>>(part_begin, part_count, tok,
-                [&op, &tok, &proj](auto const& curr) {
-                    auto msk = HPX_INVOKE(op, HPX_INVOKE(proj, *curr));
-                    if (hpx::parallel::traits::any_of(msk))
+                [&op, &cancelled, &proj](auto const& curr) {
+                    if (!cancelled)
                     {
-                        tok.cancel();
+                        auto msk = HPX_INVOKE(op, HPX_INVOKE(proj, *curr));
+                        if (hpx::parallel::traits::any_of(msk))
+                        {
+                            cancelled = true;
+                        }
                     }
                 });
+            if (cancelled)
+                tok.cancel();
         }
 
         template <typename FwdIter, typename Token, typename F, typename Proj>
@@ -126,14 +143,25 @@ namespace hpx::parallel::detail {
             FwdIter part_begin, std::size_t part_count, Token& tok, F&& f,
             Proj&& proj)
         {
+            bool cancelled = false;
+            std::size_t cancel_pos = 0;
             util::loop_idx_n<std::decay_t<ExPolicy>>(base_idx, part_begin,
                 part_count, tok,
-                [&f, &proj, &tok](auto&& v, std::size_t i) -> void {
-                    auto msk = HPX_INVOKE(f, HPX_INVOKE(proj, v));
-                    int offset = hpx::parallel::traits::find_first_of(msk);
-                    if (offset != -1)
-                        tok.cancel(i + offset);
+                [&f, &proj, &cancelled, &cancel_pos](
+                    auto&& v, std::size_t i) -> void {
+                    if (!cancelled)
+                    {
+                        auto msk = HPX_INVOKE(f, HPX_INVOKE(proj, v));
+                        int offset = hpx::parallel::traits::find_first_of(msk);
+                        if (offset != -1)
+                        {
+                            cancelled = true;
+                            cancel_pos = i + offset;
+                        }
+                    }
                 });
+            if (cancelled)
+                tok.cancel(cancel_pos);
         }
     };
 
@@ -202,14 +230,20 @@ namespace hpx::parallel::detail {
         static inline constexpr void call(FwdIter part_begin,
             std::size_t part_count, Token& tok, F&& op, Proj&& proj)
         {
+            bool cancelled = false;
             util::loop_n<std::decay_t<ExPolicy>>(part_begin, part_count, tok,
-                [&op, &tok, &proj](auto const& curr) {
-                    auto msk = !HPX_INVOKE(op, HPX_INVOKE(proj, *curr));
-                    if (hpx::parallel::traits::any_of(msk))
+                [&op, &cancelled, &proj](auto const& curr) {
+                    if (!cancelled)
                     {
-                        tok.cancel();
+                        auto msk = !HPX_INVOKE(op, HPX_INVOKE(proj, *curr));
+                        if (hpx::parallel::traits::any_of(msk))
+                        {
+                            cancelled = true;
+                        }
                     }
                 });
+            if (cancelled)
+                tok.cancel();
         }
 
         template <typename FwdIter, typename Token, typename F, typename Proj>
@@ -217,14 +251,25 @@ namespace hpx::parallel::detail {
             FwdIter part_begin, std::size_t part_count, Token& tok, F&& f,
             Proj&& proj)
         {
+            bool cancelled = false;
+            std::size_t cancel_pos = 0;
             util::loop_idx_n<std::decay_t<ExPolicy>>(base_idx, part_begin,
                 part_count, tok,
-                [&f, &proj, &tok](auto&& v, std::size_t i) -> void {
-                    auto msk = !HPX_INVOKE(f, HPX_INVOKE(proj, v));
-                    int offset = hpx::parallel::traits::find_first_of(msk);
-                    if (offset != -1)
-                        tok.cancel(i + offset);
+                [&f, &proj, &cancelled, &cancel_pos](
+                    auto&& v, std::size_t i) -> void {
+                    if (!cancelled)
+                    {
+                        auto msk = !HPX_INVOKE(f, HPX_INVOKE(proj, v));
+                        int offset = hpx::parallel::traits::find_first_of(msk);
+                        if (offset != -1)
+                        {
+                            cancelled = true;
+                            cancel_pos = i + offset;
+                        }
+                    }
                 });
+            if (cancelled)
+                tok.cancel(cancel_pos);
         }
     };
 
@@ -316,18 +361,25 @@ namespace hpx::parallel::detail {
                     auto, std::size_t i) -> void {
                     auto begin = hpx::util::zip_iterator(it + idx, first2);
                     ++idx;
+                    bool local_cancelled = false;
                     util::cancellation_token<> local_tok;
                     util::loop_n<hpx::execution::simd_policy>(begin, diff,
                         local_tok,
-                        [&op, &proj1, &proj2, &local_tok](auto t) -> void {
-                            using hpx::get;
-                            if (!hpx::parallel::traits::all_of(hpx::invoke(op,
-                                    hpx::invoke(proj1, get<0>(*t)),
-                                    hpx::invoke(proj2, get<1>(*t)))))
+                        [&op, &proj1, &proj2, &local_cancelled](
+                            auto t) -> void {
+                            if (!local_cancelled)
                             {
-                                local_tok.cancel();
+                                using hpx::get;
+                                if (!hpx::parallel::traits::all_of(hpx::invoke(
+                                        op, hpx::invoke(proj1, get<0>(*t)),
+                                        hpx::invoke(proj2, get<1>(*t)))))
+                                {
+                                    local_cancelled = true;
+                                }
                             }
                         });
+                    if (local_cancelled)
+                        local_tok.cancel();
                     if (!local_tok.was_cancelled())
                         tok.cancel(i);
                 });
@@ -432,17 +484,24 @@ namespace hpx::parallel::detail {
                     auto, std::size_t i) {
                     auto val = *hpx::invoke(proj1, it + idx);
 
+                    bool local_cancelled = false;
                     util::cancellation_token<> local_tok;
                     util::loop_n<hpx::execution::simd_policy>(s_first,
                         hpx::parallel::detail::distance(s_first, s_last),
-                        local_tok, [&local_tok, &proj2, &op, &val](auto curr) {
-                            auto msk =
-                                HPX_INVOKE(op, val, HPX_INVOKE(proj2, *curr));
-                            if (hpx::parallel::traits::any_of(msk))
+                        local_tok,
+                        [&local_cancelled, &proj2, &op, &val](auto curr) {
+                            if (!local_cancelled)
                             {
-                                local_tok.cancel();
+                                auto msk = HPX_INVOKE(
+                                    op, val, HPX_INVOKE(proj2, *curr));
+                                if (hpx::parallel::traits::any_of(msk))
+                                {
+                                    local_cancelled = true;
+                                }
                             }
                         });
+                    if (local_cancelled)
+                        local_tok.cancel();
 
                     if (local_tok.was_cancelled())
                         tok.cancel(i);

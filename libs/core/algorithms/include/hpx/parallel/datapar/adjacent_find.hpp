@@ -58,15 +58,26 @@ namespace hpx::parallel::detail {
         static constexpr void call(std::size_t base_idx, ZipIter part_begin,
             std::size_t part_count, Token& tok, PredProj&& pred_projected)
         {
+            bool cancelled = false;
+            std::size_t cancel_pos = 0;
             util::loop_idx_n<ExPolicy>(base_idx, part_begin, part_count, tok,
-                [&pred_projected, &tok](auto&& t, std::size_t i) {
-                    using hpx::get;
-                    auto msk = pred_projected(get<0>(t), get<1>(t));
-                    int const offset =
-                        hpx::parallel::traits::find_first_of(msk);
-                    if (offset != -1)
-                        tok.cancel(i + offset);
+                [&pred_projected, &cancelled, &cancel_pos](
+                    auto&& t, std::size_t i) {
+                    if (!cancelled)
+                    {
+                        using hpx::get;
+                        auto msk = pred_projected(get<0>(t), get<1>(t));
+                        int const offset =
+                            hpx::parallel::traits::find_first_of(msk);
+                        if (offset != -1)
+                        {
+                            cancelled = true;
+                            cancel_pos = i + offset;
+                        }
+                    }
                 });
+            if (cancelled)
+                tok.cancel(cancel_pos);
         }
     };
 

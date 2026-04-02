@@ -49,19 +49,26 @@ namespace hpx::parallel::detail {
                     auto, std::size_t i) -> void {
                     auto begin = hpx::util::zip_iterator(it + idx, s_first);
                     ++idx;
+                    bool local_cancelled = false;
                     util::cancellation_token<> local_tok;
                     util::loop_n<
                         decltype(hpx::execution::experimental::to_non_task(
                             std::declval<ExPolicy>()))>(begin, diff, local_tok,
-                        [&op, &proj1, &proj2, &local_tok](auto t) -> void {
-                            using hpx::get;
-                            if (!hpx::parallel::traits::all_of(HPX_INVOKE(op,
-                                    HPX_INVOKE(proj1, get<0>(*t)),
-                                    HPX_INVOKE(proj2, get<1>(*t)))))
+                        [&op, &proj1, &proj2, &local_cancelled](
+                            auto t) -> void {
+                            if (!local_cancelled)
                             {
-                                local_tok.cancel();
+                                using hpx::get;
+                                if (!hpx::parallel::traits::all_of(HPX_INVOKE(
+                                        op, HPX_INVOKE(proj1, get<0>(*t)),
+                                        HPX_INVOKE(proj2, get<1>(*t)))))
+                                {
+                                    local_cancelled = true;
+                                }
                             }
                         });
+                    if (local_cancelled)
+                        local_tok.cancel();
                     if (!local_tok.was_cancelled())
                         tok.cancel(i);
                 });
@@ -100,18 +107,25 @@ namespace hpx::parallel::detail {
                         return;
                     auto start = it + static_cast<difference_type>(idx);
                     ++idx;
+                    bool local_cancelled = false;
                     util::cancellation_token<> local_tok;
                     util::loop_n<
                         decltype(hpx::execution::experimental::to_non_task(
                             std::declval<ExPolicy>()))>(start, count, local_tok,
-                        [&pred, &proj, &value_proj, &local_tok](
+                        [&pred, &proj, &value_proj, &local_cancelled](
                             auto curr) -> void {
-                            if (!hpx::parallel::traits::all_of(HPX_INVOKE(
-                                    pred, HPX_INVOKE(proj, *curr), value_proj)))
+                            if (!local_cancelled)
                             {
-                                local_tok.cancel();
+                                if (!hpx::parallel::traits::all_of(HPX_INVOKE(
+                                        pred, HPX_INVOKE(proj, *curr),
+                                        value_proj)))
+                                {
+                                    local_cancelled = true;
+                                }
                             }
                         });
+                    if (local_cancelled)
+                        local_tok.cancel();
                     if (!local_tok.was_cancelled())
                         tok.cancel(abs_idx);
                 });
