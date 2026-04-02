@@ -156,6 +156,23 @@ void test_shift_left_async(ExPolicy p, IteratorTag)
     f3.wait();
 }
 
+template <typename ExPolicy>
+void test_shift_left_task_policy_path(ExPolicy p)
+{
+    std::vector<std::size_t> c{1, 2, 3, 4, 5};
+    std::vector<std::size_t> expected = c;
+
+    auto f = hpx::shift_left(p, std::begin(c), std::end(c), 2);
+    auto it = f.get();
+
+    std::move(
+        std::begin(expected) + 2, std::end(expected), std::begin(expected));
+
+    HPX_TEST(it == std::begin(c) + 3);
+    HPX_TEST(
+        std::equal(std::begin(c), std::begin(c) + 3, std::begin(expected)));
+}
+
 template <typename IteratorTag>
 void test_shift_left()
 {
@@ -168,6 +185,9 @@ void test_shift_left()
 
     test_shift_left_async(seq(task), IteratorTag());
     test_shift_left_async(par(task), IteratorTag());
+
+    test_shift_left_task_policy_path(seq(task));
+    test_shift_left_task_policy_path(par(task));
 }
 
 void shift_left_test()

@@ -151,15 +151,12 @@ namespace hpx::parallel {
 
             detail::reverse<FwdIter> r;
             return dataflow(
-                [=](FwdIter /* ignored */) mutable -> hpx::future<FwdIter> {
+                [=](hpx::future<FwdIter>&& f1) mutable -> FwdIter {
+                    f1.get();
                     hpx::future<FwdIter> f = r.call2(p, non_seq(), first, last);
-                    return f.then(
-                        [=](hpx::future<FwdIter>&& f) mutable -> FwdIter {
-                            f.get();
-                            std::advance(
-                                first, detail::distance(new_first, last));
-                            return first;
-                        });
+                    f.get();
+                    std::advance(first, detail::distance(new_first, last));
+                    return first;
                 },
                 r.call2(p, non_seq(), first, new_first));
         }
