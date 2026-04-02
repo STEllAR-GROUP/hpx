@@ -10,10 +10,12 @@
 #include <hpx/modules/testing.hpp>
 
 #include <cstddef>
+#include <functional>
 #include <iostream>
 #include <iterator>
 #include <numeric>
 #include <random>
+#include <stdexcept>
 #include <string>
 #include <vector>
 

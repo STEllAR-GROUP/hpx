@@ -203,8 +203,6 @@ namespace hpx {
 #include <type_traits>
 #include <utility>
 
-#include <ranges>
-
 namespace hpx::parallel {
 
     ///////////////////////////////////////////////////////////////////////////
@@ -274,7 +272,7 @@ namespace hpx::parallel {
                             size / 2,
                             [](reference t) -> void {
                                 using hpx::get;
-                                std::swap(get<0>(t), get<1>(t));
+                                std::ranges::swap(get<0>(t), get<1>(t));
                             },
                             hpx::identity_v),
                         [last2](auto) -> BidirIter { return last2; });

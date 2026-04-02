@@ -525,7 +525,6 @@ function(hpx_check_for_cxx20_std_execution_policies)
   )
 endfunction()
 
-# ##############################################################################
 function(hpx_check_for_cxx23_std_generator)
   add_hpx_config_test(
     HPX_WITH_CXX23_STD_GENERATOR

@@ -24,7 +24,6 @@
 #include <utility>
 
 #if defined(HPX_HAVE_STDEXEC)
-#include <ranges>
 
 // Forward declaration
 namespace hpx::execution::experimental::detail {
