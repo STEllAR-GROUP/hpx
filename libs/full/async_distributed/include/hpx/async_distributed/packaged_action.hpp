@@ -16,10 +16,8 @@
 #include <hpx/async_distributed/detail/post_callback.hpp>
 #include <hpx/async_distributed/detail/post_implementations_fwd.hpp>
 #include <hpx/async_distributed/promise.hpp>
-#include <hpx/components_base/component_type.hpp>
-#include <hpx/components_base/traits/component_supports_migration.hpp>
-#include <hpx/components_base/traits/component_type_is_compatible.hpp>
 #include <hpx/modules/allocator_support.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/memory.hpp>
 

@@ -32,10 +32,9 @@ namespace hpx::parallel::detail {
             typename Reduce>
         friend constexpr T tag_fallback_invoke(
             sequential_reduce_deterministic_t, ExPolicy&&, InIterB first,
-            InIterE last, T init, Reduce&& r)
+            InIterE last, T init, [[maybe_unused]] Reduce&& r)
         {
             /// TODO: Put constraint on Reduce to be a binary plus operator
-            (void) r;
 
             // hpx_rfa_bin_host_buffer should be initialized by the frontend of
             // this method

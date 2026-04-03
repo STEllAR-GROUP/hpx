@@ -15,8 +15,8 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/dataflow.hpp>
 #include <hpx/async_distributed/detail/post.hpp>
-#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/modules/async_base.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/futures.hpp>
@@ -297,7 +297,7 @@ namespace hpx::components {
                     std::find(localities_->begin(), localities_->end(), loc);
                 std::size_t const num_loc =
                     std::distance(localities_->begin(), it);
-                return (items < num_loc) ? 1 : 0;
+                return (num_loc < items) ? 1 : 0;
             }
 
             std::size_t const items_per_loc = (items + locs - 1) / locs;

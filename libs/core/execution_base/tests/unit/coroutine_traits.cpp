@@ -8,6 +8,7 @@
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/type_support.hpp>
 
+#include <type_traits>
 #include <utility>
 
 struct awaiter_1

@@ -25,7 +25,6 @@
 #include <hpx/config/export_definitions.hpp>
 #include <hpx/config/forceinline.hpp>
 #include <hpx/config/forward.hpp>
-#include <hpx/config/lambda_capture_this.hpp>
 #include <hpx/config/manual_profiling.hpp>
 #include <hpx/config/modules_enabled.hpp>
 #include <hpx/config/move.hpp>
@@ -391,7 +390,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Maximum number of terminated threads to keep before cleaning them up.
 #if !defined(HPX_THREAD_QUEUE_MAX_TERMINATED_THREADS)
-#  define HPX_THREAD_QUEUE_MAX_TERMINATED_THREADS 1000
+#  define HPX_THREAD_QUEUE_MAX_TERMINATED_THREADS 100
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

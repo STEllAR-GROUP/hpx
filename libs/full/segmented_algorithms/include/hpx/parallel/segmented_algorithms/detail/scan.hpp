@@ -25,6 +25,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
+#include <memory>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -43,9 +44,10 @@ namespace hpx::parallel {
         T sequential_segmented_scan_T(
             InIter first, InIter last, Op&& op, Conv&& conv)
         {
-            T ret = HPX_INVOKE(conv, *first);
+            T ret = T();
             if (first != last)
             {
+                ret = HPX_INVOKE(conv, *first);
                 for (++first; first != last; ++first)
                 {
                     ret = hpx::invoke(op, ret, hpx::invoke(conv, *first));
@@ -192,7 +194,7 @@ namespace hpx::parallel {
             {
                 // all elements on the same partition
                 local_iterator_type_in beg_in = traits_in::local(first);
-                local_iterator_type_in end_in = traits_in::end(sit_in);
+                local_iterator_type_in end_in = traits_in::local(last);
 
                 local_iterator_type_out beg_out = traits_out::local(dest);
                 local_iterator_type_out end_out = traits_out::end(sit_out);
@@ -211,7 +213,7 @@ namespace hpx::parallel {
                     std::size_t const out_dist =
                         std::distance(beg_out, end_out);
 
-                    if (in_dist != out_dist)
+                    if (out_dist < in_dist)
                         return false;
                 }
             }
@@ -333,21 +335,23 @@ namespace hpx::parallel {
 
             std::vector<T> results;
             std::vector<local_iterator_in_tuple> in_iters;
-            std::vector<segment_iterator_out> out_iters;
+            std::vector<segment_iterator_out> out_segs;
+            std::vector<local_iterator_type_out> out_iters;
 
             // 1. Step: scan on each partition, push last T of scan into results
             if (sit_in == send_in)
             {
                 // all elements on the same partition
                 local_iterator_type_in beg = traits_in::local(first);
-                local_iterator_type_in end = traits_in::end(sit_in);
+                local_iterator_type_in end = traits_in::local(last);
                 if (beg != end)
                 {
                     results.push_back(dispatch(traits_in::get_id(sit_in),
                         segmented_scan_T<T>(), policy, std::true_type(), beg,
                         end, op, conv));
                     in_iters.push_back(hpx::make_tuple(beg, end));
-                    out_iters.push_back(sit_out);
+                    out_segs.push_back(sit_out);
+                    out_iters.push_back(traits_out::local(dest));
                 }
             }
             else
@@ -362,7 +366,8 @@ namespace hpx::parallel {
                         segmented_scan_T<T>(), policy, std::true_type(), beg,
                         end, op, conv));
                     in_iters.push_back(hpx::make_tuple(beg, end));
-                    out_iters.push_back(sit_out);
+                    out_segs.push_back(sit_out);
+                    out_iters.push_back(traits_out::local(dest));
                 }
 
                 // handle all partitions
@@ -377,7 +382,8 @@ namespace hpx::parallel {
                             segmented_scan_T<T>(), policy, std::true_type(),
                             beg, end, op, conv));
                         in_iters.push_back(hpx::make_tuple(beg, end));
-                        out_iters.push_back(sit_out);
+                        out_segs.push_back(sit_out);
+                        out_iters.push_back(traits_out::begin(sit_out));
                     }
                 }
 
@@ -390,7 +396,8 @@ namespace hpx::parallel {
                         segmented_scan_T<T>(), policy, std::true_type(), beg,
                         end, op, conv));
                     in_iters.push_back(hpx::make_tuple(beg, end));
-                    out_iters.push_back(sit_out);
+                    out_segs.push_back(sit_out);
+                    out_iters.push_back(traits_out::begin(sit_out));
                 }
             }
 
@@ -399,17 +406,17 @@ namespace hpx::parallel {
             for (std::size_t i = 0; i < results.size(); ++i)
             {
                 using hpx::get;
-                local_iterator_type_out out = traits_out::begin(out_iters[i]);
+                local_iterator_type_out out = out_iters[i];
 
                 // 2. Step: use the init values to dispatch final scan for each
                 // segment
-                dispatch(traits_out::get_id(out_iters[i]),
+                dispatch(traits_out::get_id(out_segs[i]),
                     segmented_scan_void<Algo>(), policy, std::true_type(),
                     get<0>(in_iters[i]), get<1>(in_iters[i]), out, conv,
                     last_value, op);
 
                 // 3. Step: compute new init values for the next segment
-                last_value = op(results[i], last_value);
+                last_value = op(last_value, results[i]);
             }
 
             OutIter final_dest = dest;
@@ -447,7 +454,7 @@ namespace hpx::parallel {
             {
                 // all elements on the same partition
                 local_iterator_type beg = traits::local(first);
-                local_iterator_type end = traits::end(sit);
+                local_iterator_type end = traits::local(last);
                 if (beg != end)
                 {
                     results.push_back(dispatch(traits::get_id(sit), Algo(),
@@ -547,7 +554,8 @@ namespace hpx::parallel {
 
             std::vector<hpx::shared_future<T>> results;
             std::vector<local_iterator_in_tuple> in_iters;
-            std::vector<segment_iterator_out> out_iters;
+            std::vector<segment_iterator_out> out_segs;
+            std::vector<local_iterator_type_out> out_iters;
 
             results.reserve(count);
             in_iters.reserve(count);
@@ -558,11 +566,12 @@ namespace hpx::parallel {
             {
                 // all elements on the same partition
                 local_iterator_type_in beg = traits_in::local(first);
-                local_iterator_type_in end = traits_in::end(sit_in);
+                local_iterator_type_in end = traits_in::local(last);
                 if (beg != end)
                 {
                     in_iters.push_back(hpx::make_tuple(beg, end));
-                    out_iters.push_back(sit_out);
+                    out_segs.push_back(sit_out);
+                    out_iters.push_back(traits_out::local(dest));
                     results.push_back(dispatch_async(traits_in::get_id(sit_in),
                         segmented_scan_T<T>(), policy, forced_seq(), beg, end,
                         op, conv));
@@ -577,7 +586,8 @@ namespace hpx::parallel {
                 if (beg != end)
                 {
                     in_iters.push_back(hpx::make_tuple(beg, end));
-                    out_iters.push_back(sit_out);
+                    out_segs.push_back(sit_out);
+                    out_iters.push_back(traits_out::local(dest));
                     results.push_back(dispatch_async(traits_in::get_id(sit_in),
                         segmented_scan_T<T>(), policy, forced_seq(), beg, end,
                         op, conv));
@@ -592,7 +602,8 @@ namespace hpx::parallel {
                     if (beg != end)
                     {
                         in_iters.push_back(hpx::make_tuple(beg, end));
-                        out_iters.push_back(sit_out);
+                        out_segs.push_back(sit_out);
+                        out_iters.push_back(traits_out::begin(sit_out));
                         results.push_back(dispatch_async(
                             traits_in::get_id(sit_in), segmented_scan_T<T>(),
                             policy, forced_seq(), beg, end, op, conv));
@@ -605,7 +616,8 @@ namespace hpx::parallel {
                 if (beg != end)
                 {
                     in_iters.push_back(hpx::make_tuple(beg, end));
-                    out_iters.push_back(sit_out);
+                    out_segs.push_back(sit_out);
+                    out_iters.push_back(traits_out::begin(sit_out));
                     results.push_back(dispatch_async(traits_in::get_id(sit_in),
                         segmented_scan_T<T>(), policy, forced_seq(), beg, end,
                         op, conv));
@@ -621,13 +633,19 @@ namespace hpx::parallel {
             // first init value is the given init value
             workitems.push_back(make_ready_future(init));
 
+            using op_type = std::decay_t<Op>;
+            using conv_type = std::decay_t<Conv>;
+            auto op_ptr = std::make_shared<op_type>(HPX_FORWARD(Op, op));
+            auto conv_ptr =
+                std::make_shared<conv_type>(HPX_FORWARD(Conv, conv));
+
             std::size_t i = 0;
 
             for (auto const& res : results)
             {
                 using hpx::get;
-                segment_iterator_out out_it = out_iters[i];
-                local_iterator_type_out out = traits_out::begin(out_it);
+                segment_iterator_out out_it = out_segs[i];
+                local_iterator_type_out out = out_iters[i];
                 local_iterator_in_tuple in_tuple = in_iters[i];
 
                 // 2. Step: use the init values to dispatch final scan for each
@@ -635,18 +653,22 @@ namespace hpx::parallel {
                 // wait for 1. step of current partition to prevent race condition
                 // when used in place
                 finalitems.push_back(hpx::dataflow(policy.executor(),
-                    hpx::unwrapping([=, &op, &conv](T last_value, T) -> void {
+                    hpx::unwrapping([=](T last_value, T) mutable -> void {
                         dispatch(traits_out::get_id(out_it),
                             segmented_scan_void<Algo>(), hpx::execution::seq,
                             std::true_type(), get<0>(in_tuple),
-                            get<1>(in_tuple), out, conv, last_value, op);
+                            get<1>(in_tuple), out, *conv_ptr, last_value,
+                            *op_ptr);
                     }),
                     workitems.back(), res));
 
                 // 3. Step: compute new init value for the next segment
                 // performed as soon as the needed results are ready
                 workitems.push_back(hpx::dataflow(policy.executor(),
-                    hpx::unwrapping(op), workitems.back(), res));
+                    hpx::unwrapping([=](T lhs, T rhs) {
+                        return hpx::invoke(*op_ptr, lhs, rhs);
+                    }),
+                    workitems.back(), res));
                 ++i;
             }
 
@@ -705,7 +727,7 @@ namespace hpx::parallel {
             {
                 // all elements on the same partition
                 local_iterator_type beg = traits::local(first);
-                local_iterator_type end = traits::end(sit);
+                local_iterator_type end = traits::local(last);
                 if (beg != end)
                 {
                     results.push_back(dispatch_async(traits::get_id(sit),
@@ -758,15 +780,23 @@ namespace hpx::parallel {
 
             workitems.push_back(make_ready_future(init));
 
+            using op_type = std::decay_t<Op>;
+            using f1_type = std::decay_t<F1>;
+            using f2_type = std::decay_t<F2>;
+            auto op_ptr = std::make_shared<op_type>(HPX_FORWARD(Op, op));
+            auto f1_ptr = std::make_shared<f1_type>(HPX_FORWARD(F1, f1));
+            auto f2_ptr = std::make_shared<f2_type>(HPX_FORWARD(F2, f2));
+
             std::size_t segment_index = 0;
 
             for (auto const& res : results)
             {
                 // collect all results with updated init values
                 finalitems.push_back(hpx::dataflow(policy.executor(),
-                    hpx::unwrapping([&, dest](T last_value, vector_type r) {
+                    hpx::unwrapping([=](T last_value, vector_type r) mutable {
                         // merge function
-                        f1(r.begin(), r.end(), dest, last_value, op);
+                        hpx::invoke(*f1_ptr, r.begin(), r.end(), dest,
+                            last_value, *op_ptr);
                     }),
                     workitems.back(), res));
 
@@ -775,9 +805,11 @@ namespace hpx::parallel {
                 // propagate results from left to right
                 // new init value is most right value combined with old init
                 workitems.push_back(hpx::dataflow(policy.executor(),
-                    hpx::unwrapping(op), workitems.back(),
-                    execution::async_execute(
-                        policy.executor(), hpx::unwrapping(f2), res)));
+                    hpx::unwrapping([=](T last_value, vector_type v) {
+                        return hpx::invoke(*op_ptr, last_value,
+                            hpx::invoke(*f2_ptr, HPX_MOVE(v)));
+                    }),
+                    workitems.back(), res));
             }
 
             // wait for all tasks to finish

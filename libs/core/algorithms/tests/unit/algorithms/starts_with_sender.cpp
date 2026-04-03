@@ -97,7 +97,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         seed = vm["seed"].as<unsigned int>();
 
     std::cout << "using seed: " << seed << std::endl;
-    std::srand(seed);
+    gen.seed(seed);
 
     starts_with_sender_test<std::forward_iterator_tag>();
     starts_with_sender_test<std::random_access_iterator_tag>();

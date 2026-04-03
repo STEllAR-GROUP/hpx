@@ -417,6 +417,29 @@ namespace hpx::parallel::util {
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    HPX_CXX_CORE_EXPORT template <typename O, typename T>
+    struct out_value_result
+    {
+        HPX_NO_UNIQUE_ADDRESS O out;
+        HPX_NO_UNIQUE_ADDRESS T value;
+
+        template <typename O2, typename T2>
+            requires(std::convertible_to<O const&, O2> &&
+                std::convertible_to<T const&, T2>)
+        constexpr operator out_value_result<O2, T2>() const&
+        {
+            return {out, value};
+        }
+
+        template <typename O2, typename T2>
+            requires(std::convertible_to<O, O2> && std::convertible_to<T, T2>)
+        constexpr operator out_value_result<O2, T2>() &&
+        {
+            return {HPX_MOVE(out), HPX_MOVE(value)};
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
         HPX_CXX_CORE_EXPORT template <typename ZipIter>
@@ -566,5 +589,6 @@ namespace hpx::ranges {
     HPX_CXX_CORE_EXPORT using hpx::parallel::util::in_out_result;
     HPX_CXX_CORE_EXPORT using hpx::parallel::util::min_max_result;
     HPX_CXX_CORE_EXPORT using hpx::parallel::util::in_value_result;
+    HPX_CXX_CORE_EXPORT using hpx::parallel::util::out_value_result;
 }    // namespace hpx::ranges
 // namespace hpx::ranges

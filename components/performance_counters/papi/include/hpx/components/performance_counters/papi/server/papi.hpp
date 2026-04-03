@@ -11,7 +11,7 @@
 
 #if defined(HPX_HAVE_PAPI)
 
-#include <hpx/components_base/server/component_base.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/performance_counters/server/base_performance_counter.hpp>
 
