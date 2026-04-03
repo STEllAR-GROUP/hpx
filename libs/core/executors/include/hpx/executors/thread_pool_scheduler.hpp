@@ -17,6 +17,7 @@
 #include <hpx/modules/timing.hpp>
 #include <hpx/modules/topology.hpp>
 
+#include <concepts>
 #include <cstddef>
 #include <exception>
 #include <string>
@@ -81,9 +82,9 @@ namespace hpx::execution::experimental {
         // transform_sender for bulk operations
         // (following stdexec parallel_scheduler pattern)
         template <bulk_chunked_or_unchunked_sender Sender, typename Env>
-            requires std::same_as<std::decay_t<decltype(
-                         hpx::execution::experimental::get_scheduler(
-                             std::declval<Env const&>()))>,
+            requires std::same_as<
+                std::decay_t<decltype(hpx::execution::experimental::
+                        get_scheduler(std::declval<Env const&>()))>,
                 thread_pool_policy_scheduler<Policy>>
         constexpr auto transform_sender(
             hpx::execution::experimental::set_value_t, Sender&& sndr,
@@ -397,8 +398,7 @@ namespace hpx::execution::experimental {
                 //              -> scheduler -> get_completion_domain<set_value_t>
                 //              -> thread_pool_domain
                 template <typename CPO>
-                auto query(
-                    stdexec::get_completion_domain_t<CPO>) const noexcept
+                auto query(stdexec::get_completion_domain_t<CPO>) const noexcept
                 {
                     return stdexec::get_domain(sched);
                 }
