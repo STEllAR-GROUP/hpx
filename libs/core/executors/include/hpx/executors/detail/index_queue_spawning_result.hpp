@@ -185,8 +185,8 @@ namespace hpx::parallel::execution::detail {
             }
 
             // tell the scheduler that this task has finished running
-            auto const* thread_data = hpx::threads::get_thread_id_data(
-                hpx::threads::get_outer_self_id());
+            auto const* thread_data =
+                hpx::threads::get_thread_id_data(hpx::threads::get_self_id());
             if (thread_data != nullptr)
             {
                 thread_data->get_scheduler_base()->do_some_work(

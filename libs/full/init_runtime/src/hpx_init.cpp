@@ -46,9 +46,9 @@
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 #include <hpx/actions_base/plain_action.hpp>
 #include <hpx/async_distributed/bind_action.hpp>
-#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/init_runtime/pre_main.hpp>
 #include <hpx/modules/async_distributed.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/naming.hpp>
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/modules/parcelset_base.hpp>

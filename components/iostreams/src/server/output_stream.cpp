@@ -96,12 +96,11 @@ namespace hpx::iostreams::server {
         ::asio::post(hpx::get_thread_pool("io_pool")->get_io_service(),
             hpx::bind_front(&output_stream::call_write_sync, this, locality_id,
                 count, std::ref(in),
-                threads::thread_id_ref_type(threads::get_outer_self_id())));
+                threads::thread_id_ref_type(threads::get_self_id())));
 #else
-        hpx::get_thread_pool("io_pool")->get_io_service().post(
-            hpx::bind_front(&output_stream::call_write_sync, this, locality_id,
-                count, std::ref(in),
-                threads::thread_id_ref_type(threads::get_outer_self_id())));
+        hpx::get_thread_pool("io_pool")->get_io_service().post(hpx::bind_front(
+            &output_stream::call_write_sync, this, locality_id, count,
+            std::ref(in), threads::thread_id_ref_type(threads::get_self_id())));
 #endif
         // Sleep until the worker thread wakes us up.
         this_thread::suspend(threads::thread_schedule_state::suspended,
