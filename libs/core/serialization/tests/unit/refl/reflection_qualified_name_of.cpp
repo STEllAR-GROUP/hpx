@@ -38,6 +38,18 @@ namespace local {
     };
 }    // namespace local
 
+namespace server {
+    struct request
+    {
+    };
+}    // namespace server
+
+namespace client {
+    struct request
+    {
+    };
+}    // namespace client
+
 namespace crtp {
     template <typename Derived, typename Value>
     struct base
@@ -81,7 +93,6 @@ int main()
     {
         // City containing a Person from a different namespace
         using nested_type = world::continent::country::city<local::person>;
-
         // Wrap that in ANOTHER layer
         using deeper_nested_type = world::continent::country::city<nested_type>;
 
@@ -93,6 +104,16 @@ int main()
             "world::continent::country::city<local::person>>";
 
         HPX_TEST_EQ(std::string(name), expected);
+    }
+
+    // Same Name in Different Namespaces
+    {
+        std::string server_req = qualified_name_of<server::request>::get();
+        std::string client_req = qualified_name_of<client::request>::get();
+
+        HPX_TEST_NEQ(server_req, client_req);
+        HPX_TEST_EQ(server_req, std::string("server::request"));
+        HPX_TEST_EQ(client_req, std::string("client::request"));
     }
 
     // CRTP types
