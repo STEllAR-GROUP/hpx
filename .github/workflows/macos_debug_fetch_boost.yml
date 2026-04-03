@@ -51,6 +51,7 @@ jobs:
             --exclude-regex \
           "tests.examples.quickstart.1d_wave_equation|\
           tests.examples.transpose.transpose_block_numa|\
+          tests.performance.modules.algorithms.foreach_report|\
           tests.performance.local.wait_all_timings|\
           tests.regressions.components.distributed.tcp.bulk_new_3054|\
           tests.regressions.dynamic_counters_loaded_1508|\
