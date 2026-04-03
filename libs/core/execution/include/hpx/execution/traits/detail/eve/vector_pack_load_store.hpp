@@ -14,6 +14,7 @@
 #include <eve/module/core.hpp>
 
 #include <memory>
+#include <type_traits>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::parallel::traits {
@@ -26,14 +27,28 @@ namespace hpx::parallel::traits {
         template <typename Iter>
         HPX_HOST_DEVICE HPX_FORCEINLINE static V aligned(Iter& iter)
         {
-            return V(
-                eve::as_aligned(std::addressof(*iter), eve::cardinal_t<V>{}));
+            if constexpr (std::is_class_v<V>)
+            {
+                return eve::load(eve::as_aligned(
+                    std::addressof(*iter), eve::cardinal_t<V>{}));
+            }
+            else
+            {
+                return *iter;
+            }
         }
 
         template <typename Iter>
         HPX_HOST_DEVICE HPX_FORCEINLINE static V unaligned(Iter& iter)
         {
-            return *iter;
+            if constexpr (std::is_class_v<V>)
+            {
+                return eve::load(std::addressof(*iter));
+            }
+            else
+            {
+                return *iter;
+            }
         }
     };
 
@@ -46,15 +61,30 @@ namespace hpx::parallel::traits {
         HPX_HOST_DEVICE HPX_FORCEINLINE static void aligned(
             V& value, Iter& iter)
         {
-            eve::store(value,
-                eve::as_aligned(std::addressof(*iter), eve::cardinal_t<V>{}));
+            if constexpr (std::is_class_v<V>)
+            {
+                eve::store(value,
+                    eve::as_aligned(
+                        std::addressof(*iter), eve::cardinal_t<V>{}));
+            }
+            else
+            {
+                *iter = value;
+            }
         }
 
         template <typename Iter>
         HPX_HOST_DEVICE HPX_FORCEINLINE static void unaligned(
             V& value, Iter& iter)
         {
-            eve::store(value, std::addressof(*iter));
+            if constexpr (std::is_class_v<V>)
+            {
+                eve::store(value, std::addressof(*iter));
+            }
+            else
+            {
+                *iter = value;
+            }
         }
     };
 }    // namespace hpx::parallel::traits
