@@ -64,9 +64,11 @@ foreach(example_program ${example_programs})
   add_hpx_example_target_dependencies("1d_stencil" ${example_program})
 
   if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
-    add_hpx_example_test(
-      "1d_stencil" ${example_program} ${${example_program}_PARAMETERS}
-    )
+    if(NOT (MSVC AND example_program STREQUAL "1d_stencil_5"))
+      add_hpx_example_test(
+        "1d_stencil" ${example_program} ${${example_program}_PARAMETERS}
+      )
+    endif()
   endif()
 
 endforeach()

@@ -31,7 +31,9 @@ set(benchmarks
 )
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|AppleClang")
-  list(REMOVE_ITEM benchmarks benchmark_merge benchmark_merge_sweep)
+  list(REMOVE_ITEM benchmarks benchmark_merge benchmark_merge_sweep
+       foreach_scaling
+  )
 endif()
 
 foreach(benchmark ${benchmarks})

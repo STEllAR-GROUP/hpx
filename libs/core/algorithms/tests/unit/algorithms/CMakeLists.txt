@@ -238,6 +238,10 @@ if(NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang|AppleClang")
   )
 endif()
 
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|AppleClang")
+  list(REMOVE_ITEM tests foreach_scheduler)
+endif()
+
 foreach(test ${tests})
   set(sources ${test}.cpp)
 

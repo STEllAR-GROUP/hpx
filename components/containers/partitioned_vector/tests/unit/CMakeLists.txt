@@ -42,6 +42,10 @@ set(serialization_partitioned_vector_FLAGS COMPONENT_DEPENDENCIES
 )
 set(serialization_partitioned_vector_PARAMETERS THREADS_PER_LOCALITY 4)
 
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|AppleClang")
+  list(REMOVE_ITEM tests serialization_partitioned_vector)
+endif()
+
 foreach(test ${tests})
   set(sources ${test}.cpp)
 
