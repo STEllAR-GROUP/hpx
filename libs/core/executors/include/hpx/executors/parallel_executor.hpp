@@ -259,7 +259,7 @@ namespace hpx::execution {
 #endif
 
             using allocator_type = hpx::util::thread_local_caching_allocator<
-                hpx::lockfree::variable_size_stack, char,
+                hpx::lockfree::variable_size_stack,
                 hpx::util::internal_allocator<>>;
             hpx::traits::detail::shared_state_ptr_t<result_type> p =
                 lcos::detail::make_continuation_alloc_nounwrap<result_type>(
