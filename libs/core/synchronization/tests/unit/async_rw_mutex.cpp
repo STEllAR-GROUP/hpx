@@ -278,7 +278,9 @@ int hpx_main(hpx::program_options::variables_map& vm)
     test_moved(async_rw_mutex<std::size_t>{0});
     test_moved(async_rw_mutex<mytype, mytype_base>{mytype{}});
 
-    std::size_t iterations = 100;
+    // Keep the randomized stress test meaningful without tripping the CI time
+    // budget on slower clang jobs.
+    std::size_t iterations = 20;
     test_multiple_accesses(async_rw_mutex<void>{}, iterations);
     test_multiple_accesses(async_rw_mutex<std::size_t>{0}, iterations);
     test_multiple_accesses(

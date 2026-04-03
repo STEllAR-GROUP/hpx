@@ -22,8 +22,8 @@ int hpx_main()
 
     ex::thread_pool_scheduler sch{};
 
-    auto s =
-        ex::starts_on(sch) | ex::bulk(1, [&called](auto) { called = true; });
+    auto s = ex::starts_on(
+        sch, ex::just() | ex::bulk(1, [&called](auto) { called = true; }));
 
     tt::sync_wait(s);
 
