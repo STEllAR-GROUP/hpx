@@ -85,19 +85,19 @@ jobs:
               shell: bash
               working-directory: build
               run: |
-                  ninja -j2 -k 0 hpx_core
+                  ninja -j$(nproc) -k 0 hpx_core
 
             - name: core (Building Core)
               shell: bash
               working-directory: build
               run: |
-                  ninja -j2 -k 0 core
+                  ninja -j$(nproc) -k 0 core
 
             - name: Components (Building Components)
               shell: bash
               working-directory: build
               run: |
-                  ninja -j2 -k 0 components
+                  ninja -j$(nproc) -k 0 components
 
             - name: Generate Test Matrix
               id: gen_matrix
@@ -145,7 +145,7 @@ jobs:
               shell: bash
               working-directory: build
               run: |
-                  ninja -j2 -k 0 ${{ matrix.targets }}
+                  ninja -j$(nproc) -k 0 ${{ matrix.targets }}
 
             - name: Running Tests (${{ matrix.name }})
               shell: bash
@@ -153,6 +153,7 @@ jobs:
               run: |
                   ulimit -c unlimited
                   ctest \
+                    -j $(nproc) \
                     --timeout 180 \
                     -T test \
                     --no-compress-output \
