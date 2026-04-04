@@ -9,4 +9,3 @@
 #pragma once
 
 #include <hpx/include_local/iostream.hpp>
-#include <hpx/modules/iostream.hpp>

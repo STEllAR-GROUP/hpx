@@ -65,8 +65,6 @@ set(include_local_compat_headers
     hpx/local/functional.hpp => hpx/functional.hpp
     hpx/local/future.hpp => hpx/future.hpp
     hpx/local/generator.hpp => hpx/generator.hpp
-    hpx/include/iostreams.hpp => hpx/iostream.hpp
-    hpx/local/iostream.hpp => hpx/iostream.hpp
     hpx/local/latch.hpp => hpx/latch.hpp
     hpx/local/memory.hpp => hpx/memory.hpp
     hpx/local/mutex.hpp => hpx/mutex.hpp
@@ -109,7 +107,6 @@ add_hpx_module(
     hpx_functional
     hpx_futures
     hpx_init_runtime_local
-    hpx_iostream
     hpx_lcos_local
     hpx_memory
     hpx_pack_traversal
