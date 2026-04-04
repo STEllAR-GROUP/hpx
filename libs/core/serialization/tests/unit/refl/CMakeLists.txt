@@ -13,6 +13,7 @@ set(tests
     reflection_simple
     reflection_nested_object
     reflection_nested_templ_object
+    reflection_function_names
     reflection_qualified_name_of
 )
 
