@@ -9,7 +9,6 @@
 #include <hpx/config.hpp>
 
 #include <hpx/actions_base/plain_action.hpp>
-#include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/collectives/all_gather.hpp>
 #include <hpx/collectives/all_to_all.hpp>
@@ -20,7 +19,6 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/serialization.hpp>
-#include <hpx/parallel/util/detail/algorithm_result.hpp>
 
 #include <hpx/modules/synchronization.hpp>
 #include <algorithm>
@@ -37,6 +35,18 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
+
+namespace hpx::collectives {
+    template <typename T>
+    std::vector<std::decay_t<T>> all_gather(hpx::launch::sync_policy,
+        char const*, T&&, num_sites_arg const, this_site_arg const,
+        generation_arg const, root_site_arg const);
+
+    template <typename T>
+    std::vector<T> all_to_all(hpx::launch::sync_policy, char const*,
+        std::vector<T>&&, num_sites_arg const, this_site_arg const,
+        generation_arg const, root_site_arg const);
+}    // namespace hpx::collectives
 
 namespace hpx::parallel::detail {
 
