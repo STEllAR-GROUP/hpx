@@ -11,13 +11,13 @@
 // primitives. A single sender (A) is shared between two independent continuations
 // (B and C) using split. Their results are then joined by when_all and merged
 // in a final step (D).
-//
+
 // Dependency structure:
 //
 //         A  (produce initial value)
-//        / \
+//        / \   split dependencies
 //       B   C  (independent transforms, dispatched to thread pool)
-//        \ /
+//        \ /   merge dependencies
 //         D  (merge)
 
 #include <hpx/assert.hpp>

@@ -23,9 +23,9 @@ namespace hpx { namespace collectives {
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
     /// \param  generation  The generational counter identifying the sequence
-    ///                     number of the all_gather operation performed on the
+    ///                     number of the scatter operation performed on the
     ///                     given base name. This is optional and needs to be
-    ///                     supplied only if the all_gather operation on the
+    ///                     supplied only if the scatter operation on the
     ///                     given base name has to be performed more than once.
     ///                     The generation number (if given) must be a positive
     ///                     number greater than zero.
@@ -53,9 +53,9 @@ namespace hpx { namespace collectives {
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
     /// \param  generation  The generational counter identifying the sequence
-    ///                     number of the all_gather operation performed on the
+    ///                     number of the scatter operation performed on the
     ///                     given base name. This is optional and needs to be
-    ///                     supplied only if the all_gather operation on the
+    ///                     supplied only if the scatter operation on the
     ///                     given base name has to be performed more than once.
     ///                     The generation number (if given) must be a positive
     ///                     number greater than zero.
@@ -80,9 +80,9 @@ namespace hpx { namespace collectives {
     ///
     /// \param  comm        A communicator object returned from \a create_communicator
     /// \param  generation  The generational counter identifying the sequence
-    ///                     number of the all_gather operation performed on the
+    ///                     number of the scatter operation performed on the
     ///                     given base name. This is optional and needs to be
-    ///                     supplied only if the all_gather operation on the
+    ///                     supplied only if the scatter operation on the
     ///                     given base name has to be performed more than once.
     ///                     The generation number (if given) must be a positive
     ///                     number greater than zero.
@@ -117,9 +117,9 @@ namespace hpx { namespace collectives {
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
     /// \param  generation  The generational counter identifying the sequence
-    ///                     number of the all_gather operation performed on the
+    ///                     number of the scatter operation performed on the
     ///                     given base name. This is optional and needs to be
-    ///                     supplied only if the all_gather operation on the
+    ///                     supplied only if the scatter operation on the
     ///                     given base name has to be performed more than once.
     ///                     The generation number (if given) must be a positive
     ///                     number greater than zero.
@@ -147,9 +147,9 @@ namespace hpx { namespace collectives {
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
     /// \param  generation  The generational counter identifying the sequence
-    ///                     number of the all_gather operation performed on the
+    ///                     number of the scatter operation performed on the
     ///                     given base name. This is optional and needs to be
-    ///                     supplied only if the all_gather operation on the
+    ///                     supplied only if the scatter operation on the
     ///                     given base name has to be performed more than once.
     ///                     The generation number (if given) must be a positive
     ///                     number greater than zero.
@@ -176,9 +176,9 @@ namespace hpx { namespace collectives {
     /// \param  result      The value to transmit to the central scatter point
     ///                     from this call site.
     /// \param  generation  The generational counter identifying the sequence
-    ///                     number of the all_gather operation performed on the
+    ///                     number of the scatter operation performed on the
     ///                     given base name. This is optional and needs to be
-    ///                     supplied only if the all_gather operation on the
+    ///                     supplied only if the scatter operation on the
     ///                     given base name has to be performed more than once.
     ///                     The generation number (if given) must be a positive
     ///                     number greater than zero.
@@ -210,9 +210,9 @@ namespace hpx { namespace collectives {
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
     /// \param  generation  The generational counter identifying the sequence
-    ///                     number of the all_gather operation performed on the
+    ///                     number of the scatter operation performed on the
     ///                     given base name. This is optional and needs to be
-    ///                     supplied only if the all_gather operation on the
+    ///                     supplied only if the scatter operation on the
     ///                     given base name has to be performed more than once.
     ///                     The generation number (if given) must be a positive
     ///                     number greater than zero.
@@ -240,9 +240,9 @@ namespace hpx { namespace collectives {
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
     /// \param  generation  The generational counter identifying the sequence
-    ///                     number of the all_gather operation performed on the
+    ///                     number of the scatter operation performed on the
     ///                     given base name. This is optional and needs to be
-    ///                     supplied only if the all_gather operation on the
+    ///                     supplied only if the scatter operation on the
     ///                     given base name has to be performed more than once.
     ///                     The generation number (if given) must be a positive
     ///                     number greater than zero.
@@ -266,9 +266,9 @@ namespace hpx { namespace collectives {
     /// \param  policy      The execution policy specifying synchronous execution.
     /// \param  comm        A communicator object returned from \a create_communicator
     /// \param  generation  The generational counter identifying the sequence
-    ///                     number of the all_gather operation performed on the
+    ///                     number of the scatter operation performed on the
     ///                     given base name. This is optional and needs to be
-    ///                     supplied only if the all_gather operation on the
+    ///                     supplied only if the scatter operation on the
     ///                     given base name has to be performed more than once.
     ///                     The generation number (if given) must be a positive
     ///                     number greater than zero.
@@ -301,9 +301,9 @@ namespace hpx { namespace collectives {
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
     /// \param  generation  The generational counter identifying the sequence
-    ///                     number of the all_gather operation performed on the
+    ///                     number of the scatter operation performed on the
     ///                     given base name. This is optional and needs to be
-    ///                     supplied only if the all_gather operation on the
+    ///                     supplied only if the scatter operation on the
     ///                     given base name has to be performed more than once.
     ///                     The generation number (if given) must be a positive
     ///                     number greater than zero.
@@ -331,9 +331,9 @@ namespace hpx { namespace collectives {
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
     /// \param  generation  The generational counter identifying the sequence
-    ///                     number of the all_gather operation performed on the
+    ///                     number of the scatter operation performed on the
     ///                     given base name. This is optional and needs to be
-    ///                     supplied only if the all_gather operation on the
+    ///                     supplied only if the scatter operation on the
     ///                     given base name has to be performed more than once.
     ///                     The generation number (if given) must be a positive
     ///                     number greater than zero.
@@ -360,9 +360,9 @@ namespace hpx { namespace collectives {
     /// \param  result      The value to transmit to the central scatter point
     ///                     from this call site.
     /// \param  generation  The generational counter identifying the sequence
-    ///                     number of the all_gather operation performed on the
+    ///                     number of the scatter operation performed on the
     ///                     given base name. This is optional and needs to be
-    ///                     supplied only if the all_gather operation on the
+    ///                     supplied only if the scatter operation on the
     ///                     given base name has to be performed more than once.
     ///                     The generation number (if given) must be a positive
     ///                     number greater than zero.
@@ -393,8 +393,8 @@ namespace hpx { namespace collectives {
 #include <hpx/async_distributed/async.hpp>
 #include <hpx/collectives/argument_types.hpp>
 #include <hpx/collectives/create_communicator.hpp>
-#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/modules/async_base.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/type_support.hpp>
 

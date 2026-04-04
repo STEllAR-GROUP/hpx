@@ -214,7 +214,7 @@ namespace hpx::parallel {
                                 HPX_MOVE(trail));
                             return result;
                         }
-                        std::iter_swap(mid, trail);
+                        std::ranges::iter_swap(mid, trail);
                     }
                 }
             }

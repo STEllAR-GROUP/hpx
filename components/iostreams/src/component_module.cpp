@@ -13,9 +13,7 @@
 
 #include <hpx/actions_base/basic_action.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
-#include <hpx/components_base/component_startup_shutdown.hpp>
-#include <hpx/components_base/component_type.hpp>
-#include <hpx/components_base/server/component.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/runtime_components/component_factory.hpp>

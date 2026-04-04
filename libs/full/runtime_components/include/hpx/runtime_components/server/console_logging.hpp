@@ -12,7 +12,7 @@
 #include <hpx/actions_base/plain_action.hpp>
 #include <hpx/actions_base/traits/action_does_termination_detection.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
-#include <hpx/components_base/component_type.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/serialization.hpp>
