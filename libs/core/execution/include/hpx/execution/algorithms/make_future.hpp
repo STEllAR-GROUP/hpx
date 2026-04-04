@@ -38,7 +38,14 @@ namespace hpx::execution::experimental {
             }
             else
             {
+#if defined(HPX_CLANG_VERSION)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#endif
                 hpx::execution::experimental::start(op_state);
+#if defined(HPX_CLANG_VERSION)
+#pragma clang diagnostic pop
+#endif
             }
         }
 

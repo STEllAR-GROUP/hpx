@@ -747,7 +747,7 @@ void test_remove_if_sender(
     namespace tt = hpx::this_thread::experimental;
     using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
 
-    int rand_base = g();
+    std::size_t rand_base = g();
     auto pred = [rand_base](int const a) -> bool { return a == rand_base; };
 
     std::size_t const size = 10007;

@@ -437,8 +437,15 @@ namespace hpx::when_all_vector_detail {
                 {
                     for (std::size_t i = 0; i < os.num_predecessors; ++i)
                     {
+#if defined(HPX_CLANG_VERSION)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#endif
                         hpx::execution::experimental::start(
                             os.op_states.get()[i].value());
+#if defined(HPX_CLANG_VERSION)
+#pragma clang diagnostic pop
+#endif
                     }
                 }
             }

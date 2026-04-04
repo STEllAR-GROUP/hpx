@@ -9,12 +9,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/async_base.hpp>
+#include <hpx/modules/futures.hpp>
 
 #include <hpx/execution_base/stdexec_forward.hpp>
 
 namespace hpx::execution::experimental {
 
     template <typename F, typename Sender, typename... Senders>
+        requires(!hpx::traits::is_future_any_v<Sender, Senders...>)
     constexpr HPX_FORCEINLINE auto tag_invoke(
         hpx::detail::dataflow_t, F&& f, Sender&& sender, Senders&&... senders)
         -> decltype(hpx::execution::experimental::then(
@@ -30,6 +32,7 @@ namespace hpx::execution::experimental {
 
     HPX_CXX_CORE_EXPORT template <typename F, typename Sender,
         typename... Senders>
+        requires(!hpx::traits::is_future_any_v<Sender, Senders...>)
     constexpr HPX_FORCEINLINE auto tag_invoke(hpx::detail::dataflow_t,
         hpx::launch, F&& f, Sender&& sender, Senders&&... senders)
         -> decltype(hpx::execution::experimental::then(
