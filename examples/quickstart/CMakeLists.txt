@@ -38,7 +38,10 @@ set(example_programs
     wait_composition
 )
 
-if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD" AND NOT HPX_WITH_STATIC_LINKING)
+if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD"
+   AND NOT HPX_WITH_STATIC_LINKING
+   AND HPX_WITH_DISTRIBUTED_RUNTIME
+)
   set(example_programs ${example_programs} init_globally)
 endif()
 
