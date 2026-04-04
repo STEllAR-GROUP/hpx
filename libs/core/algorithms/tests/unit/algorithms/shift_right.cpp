@@ -156,23 +156,6 @@ void test_shift_right_async(ExPolicy p, IteratorTag)
     f3.wait();
 }
 
-template <typename ExPolicy>
-void test_shift_right_task_policy_path(ExPolicy p)
-{
-    std::vector<std::size_t> c{1, 2, 3, 4, 5};
-    std::vector<std::size_t> expected = c;
-
-    auto f = hpx::shift_right(p, std::begin(c), std::end(c), 2);
-    auto it = f.get();
-
-    std::move_backward(
-        std::begin(expected), std::end(expected) - 2, std::end(expected));
-
-    HPX_TEST(it == std::begin(c) + 2);
-    HPX_TEST(
-        std::equal(std::begin(c) + 2, std::end(c), std::begin(expected) + 2));
-}
-
 template <typename IteratorTag>
 void test_shift_right()
 {
@@ -185,9 +168,6 @@ void test_shift_right()
 
     test_shift_right_async(seq(task), IteratorTag());
     test_shift_right_async(par(task), IteratorTag());
-
-    test_shift_right_task_policy_path(seq(task));
-    test_shift_right_task_policy_path(par(task));
 }
 
 void shift_right_test()

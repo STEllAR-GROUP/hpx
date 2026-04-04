@@ -333,6 +333,7 @@ void test_uninitialized_default_construct_exception_sender(
     data_type::max_instance_count.store(0);
 
     bool caught_exception = false;
+    bool returned_from_algorithm = false;
     try
     {
         auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
@@ -345,6 +346,7 @@ void test_uninitialized_default_construct_exception_sender(
                 }),
             decorated_iterator(p + data_size));
 
+        returned_from_algorithm = true;
         tt::sync_wait(HPX_MOVE(f));
 
         HPX_TEST(false);
@@ -360,6 +362,7 @@ void test_uninitialized_default_construct_exception_sender(
     }
 
     HPX_TEST(caught_exception);
+    HPX_TEST(returned_from_algorithm);
     HPX_TEST_EQ(data_type::instance_count.load(), std::size_t(0));
     HPX_TEST_LTE(throw_after_, data_type::max_instance_count.load());
 
@@ -492,6 +495,7 @@ void test_uninitialized_default_construct_bad_alloc_sender(
     data_type::max_instance_count.store(0);
 
     bool caught_bad_alloc = false;
+    bool returned_from_algorithm = false;
     try
     {
         auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
@@ -504,6 +508,7 @@ void test_uninitialized_default_construct_bad_alloc_sender(
                 }),
             decorated_iterator(p + data_size));
 
+        returned_from_algorithm = true;
         tt::sync_wait(HPX_MOVE(f));
 
         HPX_TEST(false);
@@ -518,6 +523,7 @@ void test_uninitialized_default_construct_bad_alloc_sender(
     }
 
     HPX_TEST(caught_bad_alloc);
+    HPX_TEST(returned_from_algorithm);
     HPX_TEST_EQ(data_type::instance_count.load(), std::size_t(0));
     HPX_TEST_LTE(throw_after_, data_type::max_instance_count.load());
 

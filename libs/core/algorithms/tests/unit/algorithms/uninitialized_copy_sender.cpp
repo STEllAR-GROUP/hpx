@@ -20,6 +20,13 @@ void uninitialized_copy_sender_test()
 {
     using namespace hpx::execution;
     test_uninitialized_copy_sender(hpx::launch::sync, seq(task), IteratorTag());
+    test_uninitialized_copy_sender(
+        hpx::launch::sync, unseq(task), IteratorTag());
+
+    test_uninitialized_copy_sender(
+        hpx::launch::async, par(task), IteratorTag());
+    test_uninitialized_copy_sender(
+        hpx::launch::async, par_unseq(task), IteratorTag());
 }
 
 template <typename IteratorTag>
@@ -28,6 +35,13 @@ void uninitialized_copy_exception_sender_test()
     using namespace hpx::execution;
     test_uninitialized_copy_exception_sender(
         hpx::launch::sync, seq(task), IteratorTag());
+    test_uninitialized_copy_exception_sender(
+        hpx::launch::sync, unseq(task), IteratorTag());
+
+    test_uninitialized_copy_exception_sender(
+        hpx::launch::async, par(task), IteratorTag());
+    test_uninitialized_copy_exception_sender(
+        hpx::launch::async, par_unseq(task), IteratorTag());
 }
 
 template <typename IteratorTag>
@@ -36,6 +50,13 @@ void uninitialized_copy_bad_alloc_sender_test()
     using namespace hpx::execution;
     test_uninitialized_copy_bad_alloc_sender(
         hpx::launch::sync, seq(task), IteratorTag());
+    test_uninitialized_copy_bad_alloc_sender(
+        hpx::launch::sync, unseq(task), IteratorTag());
+
+    test_uninitialized_copy_bad_alloc_sender(
+        hpx::launch::async, par(task), IteratorTag());
+    test_uninitialized_copy_bad_alloc_sender(
+        hpx::launch::async, par_unseq(task), IteratorTag());
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)

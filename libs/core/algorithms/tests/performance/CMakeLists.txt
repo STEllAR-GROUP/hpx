@@ -30,12 +30,6 @@ set(benchmarks
     transform_reduce_scaling
 )
 
-if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|AppleClang")
-  list(REMOVE_ITEM benchmarks benchmark_merge benchmark_merge_sweep
-       foreach_report foreach_scaling
-  )
-endif()
-
 foreach(benchmark ${benchmarks})
   set(sources ${benchmark}.cpp)
 
