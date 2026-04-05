@@ -236,13 +236,13 @@ namespace hpx::execution::experimental {
     using promise = hpx::execution::experimental::stdexec_internal::
         __connect_await::__promise<Awaitable, Receiver>;
 
-    template <typename Rec>
-    using promise_t =
-        hpxexec::stdexec_internal::__connect_await::__promise<Rec>;
+    template <typename Awaitable, typename Receiver>
+    using promise_t = hpx::execution::experimental::stdexec_internal::
+        __connect_await::__promise<Awaitable, Receiver>;
 
-    template <typename Rec>
-    using operation_t =
-        hpxexec::stdexec_internal::__connect_await::__operation<Rec>;
+    template <typename Awaitable, typename Receiver>
+    using operation_t = hpx::execution::experimental::stdexec_internal::
+        __connect_await::__opstate<Awaitable, Receiver>;
 
     using connect_awaitable_t =
         hpx::execution::experimental::stdexec_internal::__connect_awaitable_t;
