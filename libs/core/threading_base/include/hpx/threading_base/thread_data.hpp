@@ -24,8 +24,6 @@
 #if defined(HPX_HAVE_APEX)
 #include <hpx/threading_base/external_timer.hpp>
 #endif
-#if defined(HPX_HAVE_MODULE_TRACY)
-#endif
 
 #include <atomic>
 #include <cstddef>
@@ -674,9 +672,8 @@ namespace hpx::threads {
     }
 
 #if defined(HPX_HAVE_MODULE_TRACY)
-    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT
-        tracing::region_init_data get_region_init_data(
-            thread_data const* thrdptr);
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT tracing::region_init_data
+    get_region_init_data(thread_data const* thrdptr);
 
     HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT tracing::fiber_region_init_data
     get_fiber_region_init_data(thread_data const* thrdptr);
