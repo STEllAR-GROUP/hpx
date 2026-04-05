@@ -92,7 +92,7 @@ class manage_global_runtime
 
         init()
         {
-#if defined(HPX_WINDOWS)
+#if defined(HPX_WINDOWS) && defined(HPX_WITH_DISTRIBUTED_RUNTIME)
             hpx::detail::init_winsocket();
 #endif
 

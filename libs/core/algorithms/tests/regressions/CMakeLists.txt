@@ -11,6 +11,7 @@ set(tests
     findfirstof_more_searched_for
     find_proxy_support
     for_each_annotated_function
+    for_each_on_main_thread
     for_loop_2281
     for_loop_5735
     for_loop_with_auto_chunk_size
@@ -31,10 +32,6 @@ set(tests
     transform_inclusive_scan_4787
     ranges_facilities
 )
-
-if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  list(APPEND tests for_each_on_main_thread)
-endif()
 
 if(HPX_WITH_DATAPAR)
   list(APPEND tests for_each_datapar)
