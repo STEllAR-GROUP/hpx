@@ -474,7 +474,9 @@ namespace hpx::execution {
         parallel_policy_executor& operator=(
             parallel_policy_executor&&) = default;
 
-        ~parallel_policy_executor() = default;
+#if defined(__NVCC__) || defined(__CUDACC__)
+        constexpr ~parallel_policy_executor() {}
+#endif
 
     private:
         // property implementations
