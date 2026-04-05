@@ -49,7 +49,7 @@ void test_sender_with_tag_invoke_only()
     using sigs = ex::completion_signatures_of_t<sender_with_tag_invoke_only>;
     static_assert(std::is_same_v<sigs,
                       ex::completion_signatures<ex::set_value_t(int),
-                          ex::set_error_t(std::exception_ptr>>>,
+                          ex::set_error_t(std::exception_ptr)>>,
         "Should get completion signatures via tag_invoke");
 }
 
@@ -79,12 +79,12 @@ void test_sender_with_both()
     using sigs = ex::completion_signatures_of_t<sender_with_both>;
     static_assert(std::is_same_v<sigs,
                       ex::completion_signatures<ex::set_value_t(int),
-                          ex::set_error_t(std::exception_ptr>>>,
+                          ex::set_error_t(std::exception_ptr)>>,
         "tag_invoke should be used");
 
     // Verify it's NOT using a nested alias
     static_assert(!std::is_same_v<sigs,
-                      ex::completion_signatures<ex::set_value_t(double>>>,
+                      ex::completion_signatures<ex::set_value_t(double)>>,
         "Should not use nested completion_signatures alias");
 }
 
@@ -109,13 +109,13 @@ void test_template_sender()
     using sigs_int = ex::completion_signatures_of_t<template_sender<int>>;
     static_assert(std::is_same_v<sigs_int,
                       ex::completion_signatures<ex::set_value_t(int),
-                          ex::set_error_t(std::exception_ptr>>>,
+                          ex::set_error_t(std::exception_ptr)>>,
         "Template sender with int should work");
 
     using sigs_double = ex::completion_signatures_of_t<template_sender<double>>;
     static_assert(std::is_same_v<sigs_double,
                       ex::completion_signatures<ex::set_value_t(double),
-                          ex::set_error_t(std::exception_ptr>>>,
+                          ex::set_error_t(std::exception_ptr)>>,
         "Template sender with double should work");
 }
 
