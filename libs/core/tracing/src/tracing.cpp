@@ -67,6 +67,15 @@ namespace hpx::tracing {
 
     fiber_region::~fiber_region() = default;
 
+    // fiber_suspend_region
+
+    fiber_suspend_region::fiber_suspend_region(char const* desc) noexcept
+      : impl(desc)
+    {
+    }
+
+    fiber_suspend_region::~fiber_suspend_region() = default;
+
 }    // namespace hpx::tracing
 
 #endif
