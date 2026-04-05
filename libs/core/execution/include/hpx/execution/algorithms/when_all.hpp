@@ -17,8 +17,12 @@ namespace hpx::execution::experimental {
 
     template <typename F, typename Sender, typename... Senders>
         requires(!hpx::traits::is_future_any_v<Sender, Senders...>)
-    constexpr HPX_FORCEINLINE decltype(auto) tag_invoke(
+    constexpr HPX_FORCEINLINE auto tag_invoke(
         hpx::detail::dataflow_t, F&& f, Sender&& sender, Senders&&... senders)
+        -> decltype(hpx::execution::experimental::then(
+            hpx::execution::experimental::when_all(
+                HPX_FORWARD(Sender, sender), HPX_FORWARD(Senders, senders)...),
+            HPX_FORWARD(F, f)))
     {
         return hpx::execution::experimental::then(
             hpx::execution::experimental::when_all(
@@ -29,8 +33,12 @@ namespace hpx::execution::experimental {
     HPX_CXX_CORE_EXPORT template <typename F, typename Sender,
         typename... Senders>
         requires(!hpx::traits::is_future_any_v<Sender, Senders...>)
-    constexpr HPX_FORCEINLINE decltype(auto) tag_invoke(hpx::detail::dataflow_t,
+    constexpr HPX_FORCEINLINE auto tag_invoke(hpx::detail::dataflow_t,
         hpx::launch, F&& f, Sender&& sender, Senders&&... senders)
+        -> decltype(hpx::execution::experimental::then(
+            hpx::execution::experimental::when_all(
+                HPX_FORWARD(Sender, sender), HPX_FORWARD(Senders, senders)...),
+            HPX_FORWARD(F, f)))
     {
         return hpx::execution::experimental::then(
             hpx::execution::experimental::when_all(

@@ -228,45 +228,21 @@ namespace hpx::execution::experimental {
     //    using with_awaitable_senders =
     //    hpx::execution::experimental::with_awaitable_senders<Promise>;
 
-    namespace detail {
-
-        HPX_CXX_CORE_EXPORT template <typename Awaitable, typename Receiver>
-        struct connect_awaitable_promise
-        {
-            connect_awaitable_promise() = default;
-
-            template <typename T>
-            decltype(auto) await_transform(T&& value) noexcept(
-                noexcept(hpx::execution::experimental::as_awaitable(
-                    static_cast<T&&>(value), *this)))
-            {
-                return hpx::execution::experimental::as_awaitable(
-                    static_cast<T&&>(value), *this);
-            }
-
-            auto get_env() const noexcept
-            {
-                return hpx::execution::experimental::empty_env{};
-            }
-        };
-
-    }    // namespace detail
+    HPX_CXX_CORE_EXPORT template <typename Awaitable, typename Receiver>
+    using operation = hpx::execution::experimental::stdexec_internal::
+        __connect_await::__opstate<Awaitable, Receiver>;
 
     HPX_CXX_CORE_EXPORT template <typename Awaitable, typename Receiver>
-    using operation = decltype(std::declval<hpx::execution::experimental::
-            stdexec_internal::__connect_awaitable_t>()(
-        std::declval<Awaitable>(), std::declval<Receiver>()));
-
-    HPX_CXX_CORE_EXPORT template <typename Awaitable, typename Receiver>
-    using promise = detail::connect_awaitable_promise<Awaitable, Receiver>;
+    using promise = hpx::execution::experimental::stdexec_internal::
+        __connect_await::__promise<Awaitable, Receiver>;
 
     template <typename Awaitable, typename Receiver>
-    using promise_t = detail::connect_awaitable_promise<Awaitable, Receiver>;
+    using promise_t = hpx::execution::experimental::stdexec_internal::
+        __connect_await::__promise<Awaitable, Receiver>;
 
     template <typename Awaitable, typename Receiver>
-    using operation_t = decltype(std::declval<hpx::execution::experimental::
-            stdexec_internal::__connect_awaitable_t>()(
-        std::declval<Awaitable>(), std::declval<Receiver>()));
+    using operation_t = hpx::execution::experimental::stdexec_internal::
+        __connect_await::__opstate<Awaitable, Receiver>;
 
     using connect_awaitable_t =
         hpx::execution::experimental::stdexec_internal::__connect_awaitable_t;
