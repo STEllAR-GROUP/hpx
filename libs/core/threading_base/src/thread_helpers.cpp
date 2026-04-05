@@ -10,6 +10,7 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/timing.hpp>
+#include <hpx/modules/tracing.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/scheduler_state.hpp>
 #include <hpx/threading_base/set_thread_state.hpp>
@@ -493,7 +494,7 @@ namespace hpx::this_thread {
             hpx::likwid::suspend_region region;
 #endif
 #ifdef HPX_HAVE_MODULE_TRACY
-            hpx::tracy::fiber_suspend_region tracy_suspend(
+            hpx::tracing::fiber_suspend_region tracy_suspend(
                 get_tracy_suspend_reason(description));
 #endif
             // We might need to dispatch 'nextid' to it's correct scheduler only
@@ -577,7 +578,7 @@ namespace hpx::this_thread {
             hpx::likwid::suspend_region region;
 #endif
 #ifdef HPX_HAVE_MODULE_TRACY
-            hpx::tracy::fiber_suspend_region tracy_suspend(
+            hpx::tracing::fiber_suspend_region tracy_suspend(
                 get_tracy_suspend_reason(description));
 #endif
             std::atomic<bool> timer_started(false);

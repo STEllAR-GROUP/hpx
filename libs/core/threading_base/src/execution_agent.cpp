@@ -13,6 +13,7 @@
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/tracing.hpp>
 #include <hpx/threading_base/execution_agent.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/set_thread_state.hpp>
@@ -199,7 +200,7 @@ namespace hpx::threads {
             //   constructor: close running zone \u2192 open grey "suspended" zone
             //   self_.yield(): fiber parks, scheduler picks next task
             //   destructor:  close "suspended" zone \u2192 reopen running zone
-            hpx::tracy::fiber_suspend_region tracy_suspend(desc);
+            hpx::tracing::fiber_suspend_region tracy_suspend(desc);
 #endif
 
             HPX_ASSERT(thrd_data != nullptr &&

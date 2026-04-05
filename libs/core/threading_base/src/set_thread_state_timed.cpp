@@ -9,6 +9,7 @@
 #include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/tracing.hpp>
 #include <hpx/threading_base/create_thread.hpp>
 #include <hpx/threading_base/detail/get_default_timer_service.hpp>
 #include <hpx/threading_base/set_thread_state_timed.hpp>
@@ -141,7 +142,7 @@ namespace hpx::threads::detail {
             hpx::likwid::suspend_region region;
 #endif
 #ifdef HPX_HAVE_MODULE_TRACY
-            hpx::tracy::fiber_suspend_region tracy_suspend("timer_wait");
+            hpx::tracing::fiber_suspend_region tracy_suspend("timer_wait");
 #endif
             statex = get_self().yield(thread_result_type(
                 thread_schedule_state::suspended, invalid_thread_id));
