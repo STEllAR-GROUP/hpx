@@ -465,7 +465,8 @@ namespace hpx::execution::experimental {
                 friend constexpr auto tag_invoke(
                     stdexec::get_domain_t, env const& e) noexcept
                 {
-                    return stdexec::get_domain(e.sched);
+                    return e.sched.query(
+                        hpx::execution::experimental::get_domain_t{});
                 }
 
                 // P3826R5: get_completion_domain queries
@@ -476,7 +477,7 @@ namespace hpx::execution::experimental {
                 template <typename CPO>
                 auto query(stdexec::get_completion_domain_t<CPO>) const noexcept
                 {
-                    return stdexec::get_domain(sched);
+                    return sched.query(stdexec::get_completion_domain_t<CPO>{});
                 }
             };
 

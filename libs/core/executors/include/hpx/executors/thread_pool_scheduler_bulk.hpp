@@ -757,7 +757,7 @@ namespace hpx::execution::experimental::detail {
             template <typename CPO>
             auto query(stdexec::get_completion_domain_t<CPO>) const noexcept
             {
-                return stdexec::get_domain(sch);
+                return sch.query(stdexec::get_completion_domain_t<CPO>{});
             }
         };
 
