@@ -17,9 +17,6 @@
 #ifdef HPX_HAVE_MODULE_LIKWID
 #include <hpx/modules/likwid.hpp>
 #endif
-#ifdef HPX_HAVE_MODULE_TRACY
-#include <hpx/modules/tracy.hpp>
-#endif
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
 #include <winsock2.h>
@@ -141,9 +138,7 @@ namespace hpx::threads::detail {
 #ifdef HPX_HAVE_MODULE_LIKWID
             hpx::likwid::suspend_region region;
 #endif
-#ifdef HPX_HAVE_MODULE_TRACY
             hpx::tracing::fiber_suspend_region tracy_suspend("timer_wait");
-#endif
             statex = get_self().yield(thread_result_type(
                 thread_schedule_state::suspended, invalid_thread_id));
         }
