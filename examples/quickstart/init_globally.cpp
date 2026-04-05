@@ -92,7 +92,7 @@ class manage_global_runtime
 
         init()
         {
-#if defined(HPX_WINDOWS) && defined(HPX_WITH_DISTRIBUTED_RUNTIME)
+#if defined(HPX_WINDOWS) && defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
             hpx::detail::init_winsocket();
 #endif
 
@@ -105,7 +105,7 @@ class manage_global_runtime
                 // disable HPX' short options
                 "hpx.commandline.aliasing!=0",
             };
-#if defined(HPX_WITH_DISTRIBUTED_RUNTIME)
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
             init_args.mode = hpx::runtime_mode::default_;
 #endif
 
