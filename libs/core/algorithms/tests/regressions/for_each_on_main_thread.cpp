@@ -74,7 +74,9 @@ class manage_global_runtime
                 "hpx.commandline.aliasing!=0",
                 // run on two threads
                 "hpx.os_threads=2"};
+#if defined(HPX_WITH_DISTRIBUTED_RUNTIME)
             init_args.mode = hpx::runtime_mode::default_;
+#endif
 
             if (!rts.start(__argc, __argv, init_args))
             {
