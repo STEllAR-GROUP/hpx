@@ -228,21 +228,28 @@ namespace hpx::execution::experimental {
     //    using with_awaitable_senders =
     //    hpx::execution::experimental::with_awaitable_senders<Promise>;
 
-    HPX_CXX_CORE_EXPORT template <typename Awaitable, typename Receiver>
-    using operation = hpx::execution::experimental::stdexec_internal::
-        __connect_await::__opstate<Awaitable, Receiver>;
+    namespace detail {
+        template <typename Awaitable, typename Receiver>
+        using connect_await_operation_t = decltype(stdexec::__connect_awaitable(
+            std::declval<Awaitable>(), std::declval<Receiver>()));
+
+        template <typename Awaitable, typename Receiver>
+        using connect_await_promise_t =
+            typename connect_await_operation_t<Awaitable,
+                Receiver>::promise_type;
+    }    // namespace detail
 
     HPX_CXX_CORE_EXPORT template <typename Awaitable, typename Receiver>
-    using promise = hpx::execution::experimental::stdexec_internal::
-        __connect_await::__promise<Awaitable, Receiver>;
+    using operation = detail::connect_await_operation_t<Awaitable, Receiver>;
+
+    HPX_CXX_CORE_EXPORT template <typename Awaitable, typename Receiver>
+    using promise = detail::connect_await_promise_t<Awaitable, Receiver>;
 
     template <typename Awaitable, typename Receiver>
-    using promise_t = hpx::execution::experimental::stdexec_internal::
-        __connect_await::__promise<Awaitable, Receiver>;
+    using promise_t = detail::connect_await_promise_t<Awaitable, Receiver>;
 
     template <typename Awaitable, typename Receiver>
-    using operation_t = hpx::execution::experimental::stdexec_internal::
-        __connect_await::__opstate<Awaitable, Receiver>;
+    using operation_t = detail::connect_await_operation_t<Awaitable, Receiver>;
 
     using connect_awaitable_t =
         hpx::execution::experimental::stdexec_internal::__connect_awaitable_t;

@@ -30,6 +30,8 @@ set(benchmarks
     transform_reduce_scaling
 )
 
+set(foreach_report_PARAMETERS TIMEOUT 300)
+
 foreach(benchmark ${benchmarks})
   set(sources ${benchmark}.cpp)
 

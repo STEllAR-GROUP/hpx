@@ -39,8 +39,60 @@ function(_hpx_patch_stdexec_header header)
     )
   endif()
 
+  # C++20 module interface units can emit duplicate definitions for a few
+  # namespace-scope stdexec constants when both hpx_core and hpx_full consume
+  # the same headers. Mark them inline in the fetched copy so the module
+  # archives do not export strong duplicate symbols.
+  string(REPLACE "constexpr struct __catch_any_lvalue_t"
+                 "inline constexpr struct __catch_any_lvalue_t"
+                 _patched_content "${_patched_content}"
+  )
+  string(REPLACE "} __catch_any_lvalue{};" "} inline __catch_any_lvalue{};"
+                 _patched_content "${_patched_content}"
+  )
+  string(REPLACE "constexpr __none_such __no_default{};"
+                 "inline constexpr __none_such __no_default{};"
+                 _patched_content "${_patched_content}"
+  )
+  string(REPLACE "constexpr std::size_t __npos = ~0UL;"
+                 "inline constexpr std::size_t __npos = ~0UL;" _patched_content
+                 "${_patched_content}"
+  )
+  string(REPLACE "constexpr char __type_name_prefix[] = \"__xyzzy<\";"
+                 "inline constexpr char __type_name_prefix[] = \"__xyzzy<\";"
+                 _patched_content "${_patched_content}"
+  )
+  string(REPLACE "constexpr char __type_name_suffix[] = \">::__plugh\";"
+                 "inline constexpr char __type_name_suffix[] = \">::__plugh\";"
+                 _patched_content "${_patched_content}"
+  )
+  string(REPLACE "constexpr auto __start_next_fn ="
+                 "inline constexpr auto __start_next_fn =" _patched_content
+                 "${_patched_content}"
+  )
+  string(REPLACE "constexpr size_t      __default_buffer_size ="
+                 "inline constexpr size_t      __default_buffer_size ="
+                 _patched_content "${_patched_content}"
+  )
+  string(REPLACE "constexpr char const *__pure_virt_msg       ="
+                 "inline constexpr char const *__pure_virt_msg       ="
+                 _patched_content "${_patched_content}"
+  )
+
   if(NOT _content STREQUAL _patched_content)
     file(WRITE "${header}" "${_patched_content}")
+  endif()
+endfunction()
+
+function(_hpx_patch_stdexec_headers include_dir)
+  if(HPX_WITH_CXX_MODULES AND (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"
+                               OR CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+  )
+    hpx_info("Patching stdexec headers for C++ modules dependency scanning")
+    file(GLOB_RECURSE stdexec_headers "${include_dir}/*.hpp")
+    foreach(stdexec_header IN LISTS stdexec_headers)
+      _hpx_patch_stdexec_header("${stdexec_header}")
+    endforeach()
   endif()
 endfunction()
 
@@ -61,18 +113,7 @@ if(HPX_WITH_FETCH_STDEXEC)
     fetchcontent_populate(Stdexec)
   endif()
   set(Stdexec_ROOT ${stdexec_SOURCE_DIR})
-
-  if(HPX_WITH_CXX_MODULES AND (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"
-                               OR CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-  )
-    hpx_info(
-      "Patching fetched stdexec headers for C++ modules dependency scanning"
-    )
-    file(GLOB_RECURSE stdexec_headers ${stdexec_SOURCE_DIR}/include/*.hpp)
-    foreach(stdexec_header IN LISTS stdexec_headers)
-      _hpx_patch_stdexec_header("${stdexec_header}")
-    endforeach()
-  endif()
+  _hpx_patch_stdexec_headers("${stdexec_SOURCE_DIR}/include")
 
   add_library(Stdexec INTERFACE)
   target_include_directories(
@@ -118,5 +159,7 @@ else()
     hpx_error(
       "Stdexec could not be found, please specify Stdexec_ROOT to point to the correct location or enable HPX_WITH_FETCH_STDEXEC"
     )
+  elseif(Stdexec_INCLUDE_DIR)
+    _hpx_patch_stdexec_headers("${Stdexec_INCLUDE_DIR}")
   endif()
 endif()
