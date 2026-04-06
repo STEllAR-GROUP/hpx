@@ -431,7 +431,6 @@ namespace hpx::execution::experimental {
                 return {scheduler, HPX_FORWARD(Receiver, receiver)};
             }
 
-#if defined(HPX_HAVE_STDEXEC)
             struct env
             {
                 std::decay_t<Scheduler> const& sched;
@@ -485,7 +484,7 @@ namespace hpx::execution::experimental {
             {
                 return env{scheduler};
             }
-#else
+
             template <typename CPO>
                 requires(
                     meta::value<meta::one_of<CPO, set_value_t, set_stopped_t>>)
@@ -495,7 +494,6 @@ namespace hpx::execution::experimental {
             {
                 return s.scheduler;
             }
-#endif
         };
 
         friend constexpr hpx::execution::experimental::
@@ -546,7 +544,6 @@ namespace hpx::execution::experimental {
             return policy_;
         }
 
-#if defined(HPX_HAVE_STDEXEC)
         /// Returns the execution domain of this scheduler (following system_context.hpp pattern).
         [[nodiscard]]
         auto query(hpx::execution::experimental::get_domain_t) const noexcept
@@ -565,7 +562,6 @@ namespace hpx::execution::experimental {
         {
             return {};
         }
-#endif
         /// \endcond
 
     private:

@@ -120,5 +120,3 @@ else()
     )
   endif()
 endif()
-
-hpx_add_config_define(HPX_HAVE_STDEXEC)
