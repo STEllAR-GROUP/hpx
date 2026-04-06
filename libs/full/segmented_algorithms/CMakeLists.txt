@@ -27,6 +27,7 @@ set(segmented_algorithms_headers
     hpx/parallel/segmented_algorithms/generate.hpp
     hpx/parallel/segmented_algorithms/inclusive_scan.hpp
     hpx/parallel/segmented_algorithms/is_sorted.hpp
+    hpx/parallel/segmented_algorithms/is_partitioned.hpp
     hpx/parallel/segmented_algorithms/minmax.hpp
     hpx/parallel/segmented_algorithms/reduce.hpp
     hpx/parallel/segmented_algorithms/replace.hpp

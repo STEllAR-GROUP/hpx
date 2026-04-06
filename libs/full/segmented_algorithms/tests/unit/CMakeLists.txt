@@ -45,6 +45,7 @@ set(tests
     partitioned_vector_inclusive_scan
     partitioned_vector_inclusive_scan2
     partitioned_vector_is_sorted
+    partitioned_vector_is_partitioned
     partitioned_vector_exclusive_scan
     partitioned_vector_exclusive_scan2
     partitioned_vector_none1
