@@ -10,6 +10,9 @@ on:
   workflow_dispatch:
 
 name: CITATION.cff
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   Validate-CITATION-cff:
     runs-on: ubuntu-latest
