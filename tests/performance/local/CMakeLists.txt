@@ -35,10 +35,6 @@ if(NOT HPX_WITH_CUDA_COMPUTE)
   set(stream_FLAGS CUDA)
 endif()
 
-if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|AppleClang")
-  list(REMOVE_ITEM benchmarks stream_report)
-endif()
-
 if(NOT HPX_WITH_SANITIZERS)
   list(APPEND benchmarks start_stop)
 endif()

@@ -41,8 +41,7 @@ void test_nth_element_sent(IteratorTag)
     std::shuffle(c.begin(), c.end(), gen);
     std::vector<std::size_t> d = c;
 
-    // Keep nth inside [first, last) for the sentinel-based range.
-    auto rand_index = std::rand() % (SIZE - 1);
+    auto rand_index = std::rand() % SIZE;
 
     auto result = hpx::ranges::nth_element(iterator(std::begin(c)),
         iterator(std::begin(c) + rand_index),
@@ -81,8 +80,7 @@ void test_nth_element_sent(ExPolicy policy, IteratorTag)
     std::shuffle(c.begin(), c.end(), gen);
     std::vector<std::size_t> d = c;
 
-    // Keep nth inside [first, last) for the sentinel-based range.
-    auto rand_index = std::rand() % (SIZE - 1);
+    auto rand_index = std::rand() % SIZE;
 
     auto result = hpx::ranges::nth_element(policy, iterator(std::begin(c)),
         iterator(std::begin(c) + rand_index),
