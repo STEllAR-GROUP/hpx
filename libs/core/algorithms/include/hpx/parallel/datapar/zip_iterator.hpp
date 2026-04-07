@@ -29,14 +29,14 @@ namespace hpx::parallel::util::detail {
         template <std::size_t... Is>
         static HPX_FORCEINLINE constexpr bool call(
             hpx::util::zip_iterator<Iter...> const& it,
-            hpx::util::index_pack<Is...>)
+            hpx::util::index_pack<Is...>) noexcept
         {
             auto const& t = it.get_iterator_tuple();
             return (true && ... && is_data_aligned(hpx::get<Is>(t)));
         }
 
         static HPX_FORCEINLINE constexpr bool call(
-            hpx::util::zip_iterator<Iter...> const& it)
+            hpx::util::zip_iterator<Iter...> const& it) noexcept
         {
             return call(it, hpx::util::make_index_pack_t<sizeof...(Iter)>());
         }
@@ -61,7 +61,7 @@ namespace hpx::parallel::traits {
             std::size_t... Is>
         constexpr Tuple aligned_pack(
             hpx::util::zip_iterator<Iter...> const& iter,
-            hpx::util::index_pack<Is...>)
+            hpx::util::index_pack<Is...>) noexcept
         {
             auto const& t = iter.get_iterator_tuple();
             return hpx::make_tuple(
@@ -74,7 +74,7 @@ namespace hpx::parallel::traits {
             std::size_t... Is>
         constexpr Tuple unaligned_pack(
             hpx::util::zip_iterator<Iter...> const& iter,
-            hpx::util::index_pack<Is...>)
+            hpx::util::index_pack<Is...>) noexcept
         {
             auto const& t = iter.get_iterator_tuple();
             return hpx::make_tuple(
@@ -91,7 +91,7 @@ namespace hpx::parallel::traits {
 
         template <typename... Iter>
         static constexpr value_type aligned(
-            hpx::util::zip_iterator<Iter...> const& iter)
+            hpx::util::zip_iterator<Iter...> const& iter) noexcept
         {
             return traits::detail::aligned_pack<value_type>(
                 iter, hpx::util::make_index_pack_t<sizeof...(Iter)>());
@@ -99,7 +99,7 @@ namespace hpx::parallel::traits {
 
         template <typename... Iter>
         static constexpr value_type unaligned(
-            hpx::util::zip_iterator<Iter...> const& iter)
+            hpx::util::zip_iterator<Iter...> const& iter) noexcept
         {
             return traits::detail::unaligned_pack<value_type>(
                 iter, hpx::util::make_index_pack_t<sizeof...(Iter)>());
@@ -113,7 +113,7 @@ namespace hpx::parallel::traits {
             std::size_t... Is>
         constexpr void aligned_pack(Tuple& value,
             hpx::util::zip_iterator<Iter...> const& iter,
-            hpx::util::index_pack<Is...>)
+            hpx::util::index_pack<Is...>) noexcept
         {
             auto const& t = iter.get_iterator_tuple();
             (vector_pack_store<hpx::tuple_element_t<Is, Tuple>,
@@ -126,7 +126,7 @@ namespace hpx::parallel::traits {
             std::size_t... Is>
         constexpr void unaligned_pack(Tuple& value,
             hpx::util::zip_iterator<Iter...> const& iter,
-            hpx::util::index_pack<Is...>)
+            hpx::util::index_pack<Is...>) noexcept
         {
             auto const& t = iter.get_iterator_tuple();
             (vector_pack_store<hpx::tuple_element_t<Is, Tuple>,
@@ -141,7 +141,7 @@ namespace hpx::parallel::traits {
     {
         template <typename V, typename... Iter>
         static constexpr void aligned(
-            V& value, hpx::util::zip_iterator<Iter...> const& iter)
+            V& value, hpx::util::zip_iterator<Iter...> const& iter) noexcept
         {
             traits::detail::aligned_pack(
                 value, iter, hpx::util::make_index_pack_t<sizeof...(Iter)>());
@@ -149,7 +149,7 @@ namespace hpx::parallel::traits {
 
         template <typename V, typename... Iter>
         static constexpr void unaligned(
-            V& value, hpx::util::zip_iterator<Iter...> const& iter)
+            V& value, hpx::util::zip_iterator<Iter...> const& iter) noexcept
         {
             traits::detail::unaligned_pack(
                 value, iter, hpx::util::make_index_pack_t<sizeof...(Iter)>());
