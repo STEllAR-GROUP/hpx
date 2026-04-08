@@ -9,6 +9,10 @@ name: Windows CI (Debug, VS2022 toolset, C++20 Modules)
 
 on: [pull_request]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: windows-latest
