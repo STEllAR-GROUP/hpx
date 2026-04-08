@@ -360,6 +360,65 @@ target application with specific flags (``--hpx:print-counter-interval`` and
 ``--hpx:print-counter-format=csv-short``) and parses the standard output in a
 non-blocking background thread to update the TUI.
 
+.. _hpx_stat_viewer:
+
+HPX Smart Telemetry (hpx_stat_viewer)
+-------------------------------------
+
+**HPX Smart Telemetry** (``hpx_stat_viewer.py``) is an intelligent, lightweight
+performance dashboard designed to identify performance anomalies in real-time.
+While ``hpx-top`` provides a broad system overview, ``hpx_stat_viewer`` focuses on
+deep-dive analysis of specific metrics with built-in heuristic alerting.
+
+.. figure:: ../_static/images/hpx_stat_viewer.png
+   :alt: HPX Smart Telemetry Dashboard Screenshot
+   :align: center
+   :width: 100%
+
+   HPX Smart Telemetry Dashboard with Anomaly Detection
+
+Features
+~~~~~~~~
+
+* **Heuristic Anomaly Detection**: Uses an Exponential Moving Average (EMA) to
+  monitor counter trends. It automatically flags sudden spikes (+150%) or drops
+  (-60%) with prominent visual alerts like ``[⚡ SPIKE]`` and ``[⚠️ DROP]``.
+* **Live History Sparklines**: Displays 10-tick historical trend graphs next to
+  every metric, helping developers distinguish between momentary noise and
+  persistent bottlenecks.
+* **Smart Filtering and Grouping**: Supports regex-based counter filtering and
+  automatically groups metrics by locality for large-scale distributed runs.
+* **Zero-Dependency Core**: Requires no external TUI libraries, making it highly
+  portable for various terminal environments.
+
+Usage
+~~~~~
+
+``hpx_stat_viewer.py`` reads HPX counter data from standard input in ``csv-short``
+transient format. This allows it to be used for both live monitoring and
+post-mortem analysis of log files.
+
+To monitor a live application with smart filtering:
+
+.. code-block:: shell-session
+
+   $ ./your_hpx_app --hpx:print-counter-interval=500 --hpx:print-counter-format=csv-short ... | \
+     python3 tools/hpx_stat_viewer.py --filter "threads|utilization"
+
+To replay an offline performance log for analysis:
+
+.. code-block:: shell-session
+
+   $ python3 tools/hpx_stat_viewer.py --replay your_hpx_counters.csv --speed 0.5
+
+Technical Details
+~~~~~~~~~~~~~~~~~
+
+The dashboard implements a thread-safe parser that handles HPX's CSV-short format.
+The anomaly detection engine uses a smoothing factor of 0.4 for its EMA calculations,
+balancing responsiveness with stability. It is officially integrated into the HPX installation
+rules under the ``tools`` component.
+
 A simple example
 ----------------
 
