@@ -62,7 +62,7 @@ namespace hpx::parallel::util {
                     constexpr std::size_t size = traits::vector_pack_size_v<V>;
 
                     for (std::int64_t len_v =
-                             static_cast<std::int64_t>(len - (size + 1));
+                             static_cast<std::int64_t>(len - size + 1);
                         len_v > 0;
                         len_v -= static_cast<std::int64_t>(size), len -= size)
                     {
@@ -134,7 +134,7 @@ namespace hpx::parallel::util {
                     constexpr std::size_t size = traits::vector_pack_size_v<V>;
 
                     for (std::int64_t len_v =
-                             static_cast<std::int64_t>(len - (size + 1));
+                             static_cast<std::int64_t>(len - size + 1);
                         len_v > 0;
                         len_v -= static_cast<std::int64_t>(size), len -= size)
                     {
@@ -351,8 +351,7 @@ namespace hpx::parallel::util {
 
                     constexpr std::size_t size = traits::vector_pack_size_v<V>;
 
-                    for (auto len_v =
-                             static_cast<std::int64_t>(len - (size + 1));
+                    for (auto len_v = static_cast<std::int64_t>(len - size + 1);
                         len_v > 0;
                         len_v -= static_cast<std::int64_t>(size), len -= size)
                     {
@@ -552,8 +551,7 @@ namespace hpx::parallel::util {
 
                     constexpr std::size_t size = traits::vector_pack_size_v<V>;
 
-                    for (auto len_v =
-                             static_cast<std::int64_t>(len - (size + 1));
+                    for (auto len_v = static_cast<std::int64_t>(len - size + 1);
                         len_v > 0;
                         len_v -= static_cast<std::int64_t>(size), len -= size)
                     {
