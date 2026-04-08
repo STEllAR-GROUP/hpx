@@ -1132,7 +1132,8 @@ namespace hpx::experimental {
                                               value_type>)
                             {
                                 auto d = static_cast<std::size_t>(
-                                    std::distance(dest, first));
+                                    std::to_address(first) -
+                                    std::to_address(dest));
                                 if constexpr (has_scheduler_executor)
                                 {
                                     namespace ex = hpx::execution::experimental;
@@ -1337,7 +1338,8 @@ namespace hpx::experimental {
                                               value_type>)
                             {
                                 auto d = static_cast<std::size_t>(
-                                    std::distance(dest, first));
+                                    std::to_address(first) -
+                                    std::to_address(dest));
                                 if constexpr (has_scheduler_executor)
                                 {
                                     namespace ex = hpx::execution::experimental;
@@ -1511,7 +1513,8 @@ namespace hpx::experimental {
                                               value_type>)
                             {
                                 auto d = static_cast<std::size_t>(
-                                    std::distance(first, dest_first));
+                                    std::to_address(dest_first) -
+                                    std::to_address(first));
                                 if constexpr (has_scheduler_executor)
                                 {
                                     namespace ex = hpx::execution::experimental;
