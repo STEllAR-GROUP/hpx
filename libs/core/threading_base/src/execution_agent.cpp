@@ -13,6 +13,7 @@
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/tracing.hpp>
 #include <hpx/threading_base/execution_agent.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/set_thread_state.hpp>
@@ -29,9 +30,6 @@
 #endif
 #ifdef HPX_HAVE_MODULE_LIKWID
 #include <hpx/modules/likwid.hpp>
-#endif
-#ifdef HPX_HAVE_MODULE_TRACY
-#include <hpx/modules/tracy.hpp>
 #endif
 
 #include <cstddef>
@@ -191,7 +189,6 @@ namespace hpx::threads {
 #ifdef HPX_HAVE_MODULE_LIKWID
             hpx::likwid::suspend_region region;
 #endif
-#ifdef HPX_HAVE_MODULE_TRACY
             // fiber_suspend_region operates only on the fiber zone stack
             // (current_fiber_zone). It does NOT touch the OS-thread zone
             // (current_region / stop_region), so there is no zone-stack
@@ -199,8 +196,7 @@ namespace hpx::threads {
             //   constructor: close running zone \u2192 open grey "suspended" zone
             //   self_.yield(): fiber parks, scheduler picks next task
             //   destructor:  close "suspended" zone \u2192 reopen running zone
-            hpx::tracy::fiber_suspend_region tracy_suspend(desc);
-#endif
+            hpx::tracing::fiber_suspend_region tracy_suspend(desc);
 
             HPX_ASSERT(thrd_data != nullptr &&
                 thrd_data->get_state().state() ==
