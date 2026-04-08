@@ -401,6 +401,12 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+// Number of thread objects to cache.
+#if !defined(HPX_THREAD_QUEUE_CACHED_THREADS_COUNT)
+#  define HPX_THREAD_QUEUE_CACHED_THREADS_COUNT 1000
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 // Maximum sleep time for idle backoff in milliseconds (used only if
 // HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF is defined).
 #if !defined(HPX_IDLE_BACKOFF_TIME_MAX)
