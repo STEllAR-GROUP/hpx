@@ -646,8 +646,17 @@ namespace hpx::parallel::util::detail {
 
                     handle_local_exceptions::call(r);
 
-                    return hpx::util::void_guard<R>(),
-                           f(HPX_FORWARD(decltype(r), r));
+                    if constexpr (hpx::traits::is_future_v<decltype((r))> &&
+                        !std::is_void_v<
+                            hpx::traits::future_traits_t<decltype((r))>>)
+                    {
+                        return hpx::util::void_guard<R>(), f(r.get());
+                    }
+                    else
+                    {
+                        return hpx::util::void_guard<R>(),
+                               f(HPX_FORWARD(decltype(r), r));
+                    }
                 },
                 HPX_FORWARD(Items, workitems));
 #endif

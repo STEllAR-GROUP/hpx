@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/components_base/pinned_ptr.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/naming_base.hpp>
 

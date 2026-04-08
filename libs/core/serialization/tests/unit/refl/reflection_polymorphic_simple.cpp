@@ -5,9 +5,9 @@
 
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/testing.hpp>
-#include <experimental/meta>
 #include <iostream>
 #include <memory>
+#include <meta>
 #include <string>
 #include <vector>
 

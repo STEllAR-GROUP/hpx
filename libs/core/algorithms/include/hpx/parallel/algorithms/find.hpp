@@ -1056,7 +1056,8 @@ namespace hpx::parallel {
                     }
                 }
 
-                difference_type count = detail::distance(first, last);
+                difference_type count =
+                    hpx::parallel::detail::distance(first, last);
 
                 decltype(auto) policy =
                     hpx::execution::experimental::adapt_placement_mode(
@@ -1074,7 +1075,7 @@ namespace hpx::parallel {
                         val, HPX_FORWARD(Proj, proj));
                 };
 
-                auto f2 = [tok, count, first, last](
+                auto f2 = [tok, first](
                               auto&&... data) mutable -> Iter {
                     static_assert(sizeof...(data) < 2);
 
@@ -1085,14 +1086,7 @@ namespace hpx::parallel {
                     auto find_res =
                         static_cast<difference_type>(tok.get_data());
 
-                    if (find_res != count)
-                    {
-                        std::advance(first, find_res);
-                    }
-                    else
-                    {
-                        first = detail::advance_to_sentinel(first, last);
-                    }
+                    std::advance(first, find_res);
                     return first;
                 };
 
@@ -1146,7 +1140,8 @@ namespace hpx::parallel {
                     }
                 }
 
-                difference_type count = detail::distance(first, last);
+                difference_type count =
+                    hpx::parallel::detail::distance(first, last);
 
                 decltype(auto) policy =
                     hpx::execution::experimental::adapt_placement_mode(
@@ -1165,7 +1160,7 @@ namespace hpx::parallel {
                         tok, HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
                 };
 
-                auto f2 = [tok, count, first, last](
+                auto f2 = [tok, first](
                               auto&&... data) mutable -> Iter {
                     static_assert(sizeof...(data) < 2);
 
@@ -1176,14 +1171,7 @@ namespace hpx::parallel {
                     auto find_res =
                         static_cast<difference_type>(tok.get_data());
 
-                    if (find_res != count)
-                    {
-                        std::advance(first, find_res);
-                    }
-                    else
-                    {
-                        first = detail::advance_to_sentinel(first, last);
-                    }
+                    std::advance(first, find_res);
                     return first;
                 };
 
@@ -1236,7 +1224,8 @@ namespace hpx::parallel {
                     }
                 }
 
-                difference_type count = detail::distance(first, last);
+                difference_type count =
+                    hpx::parallel::detail::distance(first, last);
 
                 decltype(auto) policy =
                     hpx::execution::experimental::adapt_placement_mode(
@@ -1255,7 +1244,7 @@ namespace hpx::parallel {
                         tok, HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
                 };
 
-                auto f2 = [tok, count, first, last](
+                auto f2 = [tok, first](
                               auto&&... data) mutable -> Iter {
                     static_assert(sizeof...(data) < 2);
 
@@ -1266,14 +1255,7 @@ namespace hpx::parallel {
                     auto find_res =
                         static_cast<difference_type>(tok.get_data());
 
-                    if (find_res != count)
-                    {
-                        std::advance(first, find_res);
-                    }
-                    else
-                    {
-                        first = detail::advance_to_sentinel(first, last);
-                    }
+                    std::advance(first, find_res);
                     return first;
                 };
 
@@ -1332,8 +1314,10 @@ namespace hpx::parallel {
                     }
                 }
 
-                difference_type count = detail::distance(first1, last1);
-                difference_type diff = detail::distance(first2, last2);
+                difference_type count =
+                    hpx::parallel::detail::distance(first1, last1);
+                difference_type diff =
+                    hpx::parallel::detail::distance(first2, last2);
 
                 if constexpr (!has_scheduler_executor)
                 {
@@ -1372,7 +1356,7 @@ namespace hpx::parallel {
                         HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
                 };
 
-                auto f2 = [tok, count, first1, last1](
+                auto f2 = [tok, first1](
                               auto&&... data) mutable -> Iter1 {
                     static_assert(sizeof...(data) < 2);
 
@@ -1382,14 +1366,7 @@ namespace hpx::parallel {
 
                     difference_type find_end_res = tok.get_data();
 
-                    if (find_end_res >= 0 && find_end_res != count)
-                    {
-                        std::advance(first1, find_end_res);
-                    }
-                    else
-                    {
-                        first1 = last1;
-                    }
+                    std::advance(first1, find_end_res);
                     return first1;
                 };
 
@@ -1444,7 +1421,8 @@ namespace hpx::parallel {
                         return result::get(HPX_MOVE(last));
                 }
 
-                difference_type count = std::distance(first, last);
+                difference_type count =
+                    hpx::parallel::detail::distance(first, last);
 
                 if (s_first == s_last)
                 {
@@ -1477,7 +1455,7 @@ namespace hpx::parallel {
                         HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
                 };
 
-                auto f2 = [tok, count, first, last](
+                auto f2 = [tok, first](
                               auto&&... data) mutable -> FwdIter {
                     static_assert(sizeof...(data) < 2);
 
@@ -1487,14 +1465,7 @@ namespace hpx::parallel {
 
                     difference_type find_first_of_res = tok.get_data();
 
-                    if (find_first_of_res != count)
-                    {
-                        std::advance(first, find_first_of_res);
-                    }
-                    else
-                    {
-                        first = last;
-                    }
+                    std::advance(first, find_first_of_res);
 
                     return first;
                 };
@@ -1879,7 +1850,8 @@ namespace hpx::parallel::detail {
                 }
             }
 
-            difference_type count = detail::distance(first, last);
+            difference_type count =
+                hpx::parallel::detail::distance(first, last);
 
             decltype(auto) policy =
                 hpx::execution::experimental::adapt_placement_mode(
@@ -1966,7 +1938,8 @@ namespace hpx::parallel::detail {
                 }
             }
 
-            difference_type count = detail::distance(first, last);
+            difference_type count =
+                hpx::parallel::detail::distance(first, last);
 
             decltype(auto) policy =
                 hpx::execution::experimental::adapt_placement_mode(
@@ -2054,7 +2027,8 @@ namespace hpx::parallel::detail {
                 }
             }
 
-            difference_type count = detail::distance(first, last);
+            difference_type count =
+                hpx::parallel::detail::distance(first, last);
 
             decltype(auto) policy =
                 hpx::execution::experimental::adapt_placement_mode(

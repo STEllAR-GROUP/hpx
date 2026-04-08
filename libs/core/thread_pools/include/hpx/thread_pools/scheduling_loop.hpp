@@ -12,6 +12,7 @@
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/threading_base.hpp>
+#include <hpx/modules/tracing.hpp>
 #include <hpx/thread_pools/detail/background_thread.hpp>
 #include <hpx/thread_pools/detail/scheduling_callbacks.hpp>
 #include <hpx/thread_pools/detail/scheduling_counters.hpp>
@@ -20,9 +21,6 @@
 #if defined(HPX_HAVE_ITTNOTIFY) && HPX_HAVE_ITTNOTIFY != 0 &&                  \
     !defined(HPX_HAVE_APEX)
 #include <hpx/modules/itt_notify.hpp>
-#endif
-#if defined(HPX_HAVE_MODULE_TRACY)
-#include <hpx/modules/tracy.hpp>
 #endif
 
 #include <atomic>
@@ -231,12 +229,26 @@ namespace hpx::threads::detail {
                                 task.add_metadata(
                                     task_phase, thrdptr->get_thread_phase());
 #endif
-#if defined(HPX_HAVE_MODULE_TRACY)
-                                char const* name = thrdptr->get_description()
-                                                       .get_description();
-                                tracy::region rctx(name, num_thread,
-                                    thrdptr->get_thread_phase());
-#endif
+                                hpx::tracing::region rctx(thrdptr, num_thread);
+
+                                // Dual-view Tracy instrumentation:
+                                //
+                                // rctx declared FIRST -> constructed first ->
+                                //   ZoneBegin fires with NO active fiber,
+                                //   so Tracy attributes it to the OS worker
+                                //   thread row (utilization view).
+                                //
+                                // fctx declared SECOND -> constructed second ->
+                                //   TracyFiberEnter fires INSIDE the open zone,
+                                //   so Tracy also shows this slice on the fiber
+                                //   track (M:N migration view).
+                                //
+                                // Destruction is C++ reverse order:
+                                //   ~fctx first -> TracyFiberLeave
+                                //   ~rctx last  -> ZoneEnd
+                                // Zone outlives the fiber context - correct.
+                                hpx::tracing::fiber_region fctx(
+                                    thrdptr, num_thread);
 
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
                                 // Record time elapsed in thread changing state

@@ -256,7 +256,7 @@ namespace hpx::parallel {
                 for (Iter i = first; ++i != last;)
                     if (!HPX_INVOKE(pred, HPX_INVOKE(proj, *i)))
                     {
-                        *first++ = HPX_MOVE(*i);
+                        *first++ = std::ranges::iter_move(i);
                     }
             }
             return first;
@@ -334,7 +334,8 @@ namespace hpx::parallel {
                                 if (!get<1>(*it))
                                 {
                                     if (dest != get<0>(it.get_iterator_tuple()))
-                                        *dest++ = HPX_MOVE(get<0>(*it));
+                                        *dest++ = std::ranges::iter_move(
+                                            get<0>(it.get_iterator_tuple()));
                                     else
                                         ++dest;
                                 }
@@ -346,7 +347,8 @@ namespace hpx::parallel {
                         util::loop_n<execution_policy_type>(
                             part_begin, part_size, [&dest](zip_iterator it) {
                                 if (!get<1>(*it))
-                                    *dest++ = HPX_MOVE(get<0>(*it));
+                                    *dest++ = std::ranges::iter_move(
+                                        get<0>(it.get_iterator_tuple()));
                             });
                     }
                     return dest;

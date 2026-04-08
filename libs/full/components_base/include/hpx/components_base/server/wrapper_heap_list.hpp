@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/server/one_size_heap_list.hpp>
 #include <hpx/modules/naming_base.hpp>

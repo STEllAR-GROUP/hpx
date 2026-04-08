@@ -7,10 +7,8 @@
 
 |circleci_status| |codacy_quality| |codacy_coverage| |OpenSSF| |CFF| |JOSS| |zenodo_doi|
 
-Documentation: `latest
-<https://hpx-docs.stellar-group.org/latest/html/index.html>`_,
-`development (master)
-<https://hpx-docs.stellar-group.org/branches/master/html/index.html>`_
+Documentation: `latest <https://docs.hpx.dev/latest/html/index.html>`_,
+`development (master) <https://docs.hpx.dev/branches/master/html/index.html>`_
 
 |hpx_logo|
 
@@ -60,6 +58,7 @@ What's so special about HPX?
   model.
 * HPX is published under a liberal open-source license and has an open, active,
   and thriving developer community.
+* HPX is a member project of the `High-Performance Software Foundation <https://hpsf.io/>`_.
 
 Governance
 ==========
@@ -70,6 +69,7 @@ project design and participate in the decision making process.
 `This document <http://hpx.stellar-group.org/documents/governance/>`_ describes
 how that participation takes place and how to set about earning merit within
 the project community.
+
 
 Documentation
 =============
@@ -145,6 +145,8 @@ to check our code base.
 
 Past and current funding and support for HPX is listed `here
 <https://hpx.stellar-group.org/funding-acknowledgements>`_
+
+Copyright © 2026 HPX Project a Series of LF Projects, LLC
 
 .. |circleci_status| image:: https://circleci.com/gh/STEllAR-GROUP/hpx/tree/master.svg?style=svg
      :target: https://circleci.com/gh/STEllAR-GROUP/hpx/tree/master

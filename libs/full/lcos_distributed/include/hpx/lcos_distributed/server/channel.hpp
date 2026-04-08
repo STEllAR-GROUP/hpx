@@ -11,9 +11,7 @@
 #include <hpx/actions_base/component_action.hpp>
 #include <hpx/async_distributed/base_lco_with_value.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
-#include <hpx/components_base/component_type.hpp>
-#include <hpx/components_base/server/component_base.hpp>
-#include <hpx/components_base/traits/is_component.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/lcos_local.hpp>
 #include <hpx/modules/preprocessor.hpp>

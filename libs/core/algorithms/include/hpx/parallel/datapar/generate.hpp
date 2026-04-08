@@ -11,6 +11,7 @@
 #if defined(HPX_HAVE_DATAPAR)
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/tag_invoke.hpp>
+#include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/algorithms/detail/generate.hpp>
 #include <hpx/parallel/datapar/handle_local_exceptions.hpp>
 #include <hpx/parallel/datapar/iterator_helpers.hpp>
@@ -87,7 +88,7 @@ namespace hpx::parallel::detail {
         HPX_HOST_DEVICE HPX_FORCEINLINE static Iter call(
             ExPolicy&&, Iter first, Sent last, F&& f)
         {
-            std::size_t count = std::distance(first, last);
+            std::size_t count = hpx::parallel::detail::distance(first, last);
             return datapar_generate_helper<Iter>::call(
                 first, count, HPX_FORWARD(F, f));
         }

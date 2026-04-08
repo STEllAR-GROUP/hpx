@@ -14,13 +14,20 @@ on:
       - 'release**'
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   build-documentation:
     runs-on: ubuntu-latest
     container: stellargroup/build_env:17
+    permissions:
+      actions: read
 
     steps:
     - uses: actions/checkout@v6
+
     - name: Configure
       shell: bash
       run: |
@@ -33,17 +40,20 @@ jobs:
               -DHPX_WITH_EXAMPLES=ON \
               -DHPX_WITH_TESTS=OFF \
               -DHPX_WITH_DOCUMENTATION=ON \
-              -DHPX_WITH_DOCUMENTATION_OUTPUT_FORMATS="html;singlehtml;latexpdf" \
+              -DHPX_WITH_DOCUMENTATION_OUTPUT_FORMATS="html;singlehtml;latexpdf"
 
     - name: Build Documentation (HTML)
+      timeout-minutes: 120
       shell: bash
       run: cmake --build build --target docs-html
 
     - name: Build Documentation (Single HTML)
+      timeout-minutes: 120
       shell: bash
       run: cmake --build build --target docs-singlehtml
 
     - name: Build Documentation (PDF)
+      timeout-minutes: 120
       shell: bash
       run: cmake --build build --target docs-latexpdf
 
@@ -55,15 +65,3 @@ jobs:
           build/share/hpx/docs/html
           build/share/hpx/docs/singlehtml
           build/share/hpx/docs/latexpdf/latex/HPX.pdf
-
-    - name: Configure Local Git
-      shell: bash
-      run: |
-          git config --global user.name "StellarBot"
-          git config --global user.email "contact@stellar-group.org"
-
-    - name: Push Documentation
-      if: github.ref == 'refs/heads/master'
-      shell: bash
-      run: |
-        cmake --build build --target git_docs
