@@ -29,6 +29,8 @@ set(execution_headers
     hpx/execution/algorithms/sync_wait.hpp
     hpx/execution/algorithms/then.hpp
     hpx/execution/algorithms/transfer.hpp
+    hpx/execution/algorithms/upon_error.hpp
+    hpx/execution/algorithms/upon_stopped.hpp
     hpx/execution/algorithms/transfer_just.hpp
     hpx/execution/algorithms/when_all.hpp
     hpx/execution/algorithms/when_all_vector.hpp

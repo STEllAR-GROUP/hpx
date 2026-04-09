@@ -22,6 +22,8 @@ set(tests
     algorithm_sync_wait_with_variant
     algorithm_then
     algorithm_transfer
+    algorithm_upon_error
+    algorithm_upon_stopped
     algorithm_transfer_just
     algorithm_transfer_when_all
     algorithm_when_all
