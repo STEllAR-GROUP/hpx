@@ -415,13 +415,13 @@ namespace hpx::lockfree {
             }
         }
 
-        // Not thread-safe.
+        // Thread-safe and non-blocking.
         // Complexity: O(Processes)
-        // FIXME: Should we check both pointers here?
         [[nodiscard]] bool empty() const noexcept
         {
-            return anchor_.lrs(std::memory_order_relaxed).get_left_ptr() ==
-                nullptr;
+            anchor_pair lrs = anchor_.lrs(std::memory_order_acquire);
+            return lrs.get_left_ptr() == nullptr &&
+                lrs.get_right_ptr() == nullptr;
         }
 
         // Thread-safe and non-blocking.
@@ -449,8 +449,8 @@ namespace hpx::lockfree {
                 anchor_pair lrs = anchor_.lrs(std::memory_order_relaxed);
 
                 // Check if the deque is empty.
-                // FIXME: Should we check both pointers here?
-                if (lrs.get_left_ptr() == nullptr)
+                if (lrs.get_left_ptr() == nullptr &&
+                    lrs.get_right_ptr() == nullptr)
                 {
                     // If the deque is empty, we simply install a new anchor
                     // which points to the new node as both its leftmost and
@@ -506,8 +506,8 @@ namespace hpx::lockfree {
                 anchor_pair lrs = anchor_.lrs(std::memory_order_relaxed);
 
                 // Check if the deque is empty.
-                // FIXME: Should we check both pointers here?
-                if (lrs.get_right_ptr() == nullptr)
+                if (lrs.get_right_ptr() == nullptr &&
+                    lrs.get_left_ptr() == nullptr)
                 {
                     // If the deque is empty, we simply install a new anchor
                     // which points to the new node as both its leftmost and
@@ -557,8 +557,8 @@ namespace hpx::lockfree {
                 anchor_pair lrs = anchor_.lrs(std::memory_order_relaxed);
 
                 // Check if the deque is empty.
-                // FIXME: Should we check both pointers here?
-                if (lrs.get_left_ptr() == nullptr)
+                if (lrs.get_left_ptr() == nullptr &&
+                    lrs.get_right_ptr() == nullptr)
                     return false;
 
                 // Check if the deque has 1 element.
@@ -625,8 +625,8 @@ namespace hpx::lockfree {
                 anchor_pair lrs = anchor_.lrs(std::memory_order_relaxed);
 
                 // Check if the deque is empty.
-                // FIXME: Should we check both pointers here?
-                if (lrs.get_right_ptr() == nullptr)
+                if (lrs.get_right_ptr() == nullptr &&
+                    lrs.get_left_ptr() == nullptr)
                     return false;
 
                 // Check if the deque has 1 element.
