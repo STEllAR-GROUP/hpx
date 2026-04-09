@@ -43,19 +43,35 @@ int hpx_main()
 
     auto sched = ex::thread_pool_scheduler{};
 
+    // Keep the stable runtime behavior here and silence the local deprecation
+    // diagnostic so warning-as-error builds do not fail.
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
     // B. Double the value from A
-    auto b = a_shared | ex::continues_on(sched) | ex::then([](int x) {
+    auto b = a_shared | ex::transfer(sched) | ex::then([](int x) {
         int result = x * 2;
         std::cout << "B: " << x << " * 2 = " << result << "\n";
         return result;
     });
 
     // C. Triple the value from A
-    auto c = a_shared | ex::continues_on(sched) | ex::then([](int x) {
+    auto c = a_shared | ex::transfer(sched) | ex::then([](int x) {
         int result = x * 3;
         std::cout << "C: " << x << " * 3 = " << result << "\n";
         return result;
     });
+
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#elif defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
 
     // D. Join B and C, then sum their results
     auto d = ex::then(
