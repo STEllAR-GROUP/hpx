@@ -12,6 +12,7 @@
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/segmented_algorithms/detail/is_partitioned.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -42,7 +43,6 @@ namespace hpx::parallel { namespace detail {
         using segment_iterator = typename traits::segment_iterator;
         using local_iterator_type = typename traits::local_iterator;
         using result = util::detail::algorithm_result<ExPolicy, bool>;
-        util::invoke_projected<Pred, Proj> pred_projected{pred, proj};
 
         segment_iterator sit = traits::segment(first);
         segment_iterator send = traits::segment(last);
@@ -56,11 +56,12 @@ namespace hpx::parallel { namespace detail {
                 return result::get(true);
 
             return result::get(dispatch(traits::get_id(sit), algo, policy,
-                std::true_type(), beg, end, pred, proj));
+                std::true_type(), beg, end, pred, proj)
+                    .local_res);
         }
 
         // `false_found` becomes true as soon as any segment's last element
-        // fails pred.  After that, every subsequent segment's first element
+        // fails pred. After that, every subsequent segment's first element
         // must also fail pred (otherwise the global sequence is not
         // partitioned).
         bool false_found = false;
@@ -72,15 +73,15 @@ namespace hpx::parallel { namespace detail {
 
             if (beg != end)
             {
-                bool r = dispatch(traits::get_id(sit), algo, policy,
+                local_result r = dispatch(traits::get_id(sit), algo, policy,
                     std::true_type(), beg, end, pred, proj);
-                if (!r)
+
+                if (!r.local_res)
                     return result::get(false);
 
-                // If the last element of this segment fails pred
+                // If the last element of this segment fails pred,
                 // all subsequent elements must also fail.
-                SegIter seg_last = traits::compose(sit, std::prev(end));
-                if (!HPX_INVOKE(pred_projected, *seg_last))
+                if (!r.last_elem)
                     false_found = true;
             }
         }
@@ -93,29 +94,22 @@ namespace hpx::parallel { namespace detail {
 
             if (beg != end)
             {
-                // Cross-segment boundary check
-                // Once a false element is found in previous segments, all
-                // subsequent elements must be false.
-                if (false_found)
-                {
-                    SegIter seg_first = traits::compose(sit, beg);
-                    if (HPX_INVOKE(pred_projected, *seg_first))
-                        return result::get(false);
-                }
-
-                bool r = dispatch(traits::get_id(sit), algo, policy,
+                local_result r = dispatch(traits::get_id(sit), algo, policy,
                     std::true_type(), beg, end, pred, proj);
-                if (!r)
+
+                // Cross-segment boundary check.
+                // Once a false element is found in a previous segment, all
+                // subsequent elements must be false.
+                if (false_found && r.first_elem)
                     return result::get(false);
 
-                // if local is_partitioned returns true for this segment check
-                // the last element for false
-                if (!false_found)
-                {
-                    SegIter seg_last = traits::compose(sit, std::prev(end));
-                    if (!HPX_INVOKE(pred_projected, *seg_last))
-                        false_found = true;
-                }
+                if (!r.local_res)
+                    return result::get(false);
+
+                // If local is_partitioned returns true for this segment,
+                // check the last element to see if the false tail begins here.
+                if (!false_found && !r.last_elem)
+                    false_found = true;
             }
         }
 
@@ -126,16 +120,14 @@ namespace hpx::parallel { namespace detail {
 
             if (beg != end)
             {
-                if (false_found)
-                {
-                    SegIter seg_first = traits::compose(sit, beg);
-                    if (HPX_INVOKE(pred_projected, *seg_first))
-                        return result::get(false);
-                }
-
-                bool r = dispatch(traits::get_id(sit), algo, policy,
+                local_result r = dispatch(traits::get_id(sit), algo, policy,
                     std::true_type(), beg, end, pred, proj);
-                if (!r)
+
+                // Cross-segment boundary check for the last partition.
+                if (false_found && r.first_elem)
+                    return result::get(false);
+
+                if (!r.local_res)
                     return result::get(false);
             }
         }
@@ -159,9 +151,7 @@ namespace hpx::parallel { namespace detail {
         using forced_seq =
             std::integral_constant<bool, !std::forward_iterator<SegIter>>;
 
-        using segment_type = std::vector<hpx::future<bool>>;
-
-        util::invoke_projected<Pred, Proj> pred_projected{pred, proj};
+        using segment_type = std::vector<hpx::future<local_result>>;
 
         segment_iterator sit = traits::segment(first);
         segment_iterator send = traits::segment(last);
@@ -170,9 +160,6 @@ namespace hpx::parallel { namespace detail {
 
         segment_type segments;
         segments.reserve(size + 1);
-
-        std::vector<SegIter> between_segments;
-        between_segments.reserve(size);
 
         if (sit == send)
         {
@@ -205,7 +192,6 @@ namespace hpx::parallel { namespace detail {
 
                 if (beg != end)
                 {
-                    between_segments.push_back(traits::compose(sit, beg));
                     segments.push_back(dispatch_async(traits::get_id(sit), algo,
                         policy, forced_seq(), beg, end, pred, proj));
                 }
@@ -216,7 +202,6 @@ namespace hpx::parallel { namespace detail {
             end = traits::local(last);
             if (beg != end)
             {
-                between_segments.push_back(traits::compose(sit, beg));
                 segments.push_back(dispatch_async(traits::get_id(sit), algo,
                     policy, forced_seq(), beg, end, HPX_FORWARD(Pred, pred),
                     HPX_FORWARD(Proj, proj)));
@@ -225,33 +210,29 @@ namespace hpx::parallel { namespace detail {
 
         return result::get(dataflow(
             [=](segment_type&& r) mutable -> bool {
+                using local_result = hpx::parallel::detail::local_result;
+
                 std::list<std::exception_ptr> errors;
                 parallel::util::detail::handle_remote_exceptions<
                     ExPolicy>::call(r, errors);
-                std::vector<bool> res = hpx::unwrap(HPX_MOVE(r));
 
-                // Every segment must be locally is_partitioned.
-                for (bool b : res)
-                {
-                    if (!b)
-                        return false;
-                }
+                std::vector<local_result> res = hpx::unwrap(HPX_MOVE(r));
 
                 // Cross-segment boundary check.
-                // Check the last element of each segment, If its false
-                // then the first element of the next segments must be false.
+                // Once a false element is found, all subsequent elements must be false.
                 bool false_found = false;
-                for (auto const& seg_first : between_segments)
+                for (std::size_t i = 0; i < res.size(); ++i)
                 {
-                    SegIter prev_last = std::prev(seg_first);
-
-                    if (!HPX_INVOKE(pred_projected, *prev_last))
-                        false_found = true;
-
-                    if (false_found && HPX_INVOKE(pred_projected, *seg_first))
+                    if (!res[i].local_res)
                         return false;
+                    if (i + 1 < res.size())
+                    {
+                        if (!res[i].last_elem)
+                            false_found = true;
+                        if (false_found && res[i + 1].first_elem)
+                            return false;
+                    }
                 }
-
                 return true;
             },
             HPX_MOVE(segments)));
@@ -277,11 +258,10 @@ namespace hpx::segmented {
             return true;
 
         using iterator_traits = hpx::traits::segmented_iterator_traits<InIter>;
+        using local_iter = typename iterator_traits::local_iterator;
 
         return hpx::parallel::detail::segmented_is_partitioned(
-            hpx::parallel::detail::is_partitioned<
-                typename iterator_traits::local_iterator,
-                typename iterator_traits::local_iterator>(),
+            hpx::parallel::detail::seg_is_partitioned<local_iter>(),
             hpx::execution::seq, first, last, HPX_FORWARD(Pred, pred),
             hpx::identity_v, std::true_type());
     }
@@ -306,13 +286,11 @@ namespace hpx::segmented {
 
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
         using iterator_traits = hpx::traits::segmented_iterator_traits<SegIter>;
+        using local_iter = typename iterator_traits::local_iterator;
 
         return hpx::parallel::detail::segmented_is_partitioned(
-            hpx::parallel::detail::is_partitioned<
-                typename iterator_traits::local_iterator,
-                typename iterator_traits::local_iterator>(),
+            hpx::parallel::detail::seg_is_partitioned<local_iter>(),
             HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(Pred, pred),
             hpx::identity_v, is_seq());
     }
-
 }    // namespace hpx::segmented
