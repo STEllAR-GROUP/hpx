@@ -1,4 +1,5 @@
 //  Copyright (c) 2019-2025 Hartmut Kaiser
+//  Copyright (c) 2026 Anshuman Agrawal
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -453,7 +454,7 @@ namespace hpx::collectives {
                     "hierarchical all_gather requires an explicit generation "
                     "number for the 2k/2k+1 internal mapping"));
         }
-        
+
         std::size_t const k = generation;
         generation_arg const gather_gen(2 * k);
         generation_arg const broadcast_gen(2 * k + 1);
