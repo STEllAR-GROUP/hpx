@@ -408,6 +408,15 @@ namespace hpx::collectives {
         }
 
         // Map user generation k to internal generations 2k, 2k+1
+        if (generation == generation_arg())
+        {
+            return hpx::make_exceptional_future<std::vector<arg_type>>(
+                HPX_GET_EXCEPTION(hpx::error::bad_parameter,
+                    "hpx::collectives::all_gather (hierarchical)",
+                    "hierarchical all_gather requires an explicit generation "
+                    "number for the 2k/2k+1 internal mapping"));
+        }
+
         std::size_t const k = generation;
         generation_arg const gather_gen(2 * k);
         generation_arg const broadcast_gen(2 * k + 1);
@@ -436,6 +445,15 @@ namespace hpx::collectives {
             this_site = agas::get_locality_id();
         }
 
+        if (generation == generation_arg())
+        {
+            return hpx::make_exceptional_future<std::vector<arg_type>>(
+                HPX_GET_EXCEPTION(hpx::error::bad_parameter,
+                    "hpx::collectives::all_gather (hierarchical)",
+                    "hierarchical all_gather requires an explicit generation "
+                    "number for the 2k/2k+1 internal mapping"));
+        }
+        
         std::size_t const k = generation;
         generation_arg const gather_gen(2 * k);
         generation_arg const broadcast_gen(2 * k + 1);
