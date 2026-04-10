@@ -222,7 +222,10 @@ namespace hpx { namespace collectives {
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/async.hpp>
 #include <hpx/collectives/argument_types.hpp>
+#include <hpx/collectives/broadcast.hpp>
 #include <hpx/collectives/create_communicator.hpp>
+#include <hpx/collectives/reduce.hpp>
+#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/components_base.hpp>
@@ -232,6 +235,7 @@ namespace hpx { namespace collectives {
 #include <cstddef>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 namespace hpx::traits {
 
@@ -421,6 +425,182 @@ namespace hpx::collectives {
         return all_reduce(create_communicator(basename, num_sites, this_site,
                               generation, root_site),
             HPX_FORWARD(T, local_result), HPX_FORWARD(F, op), this_site)
+            .get();
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    // Helper: lift a scalar reduction op to work element-wise on vectors
+    namespace detail {
+
+        template <typename T, typename F>
+        struct vector_reduce_op
+        {
+            F op_;
+
+            std::vector<T> operator()(
+                std::vector<T> const& lhs, std::vector<T> const& rhs) const
+            {
+                HPX_ASSERT(lhs.size() == rhs.size());
+                std::vector<T> result;
+                result.reserve(lhs.size());
+                for (std::size_t i = 0; i != lhs.size(); ++i)
+                {
+                    result.push_back(op_(lhs[i], rhs[i]));
+                }
+                return result;
+            }
+        };
+    }    // namespace detail
+
+    ////////////////////////////////////////////////////////////////////////////
+    // Hierarchical all_reduce: reduce (bottom-up) + broadcast (top-down)
+    // Uses 2k/2k+1 generation mapping: user generation k maps to
+    // internal generation 2k (reduce phase) and 2k+1 (broadcast phase)
+
+    // Root site overload
+    template <typename T, typename F>
+    hpx::future<std::decay_t<T>> all_reduce(
+        hierarchical_communicator const& communicators, T&& local_result,
+        F&& op, this_site_arg this_site = this_site_arg(),
+        generation_arg const generation = generation_arg())
+    {
+        using arg_type = std::decay_t<T>;
+
+        if (this_site.is_default())
+        {
+            this_site = agas::get_locality_id();
+        }
+
+        // Map user generation k to internal generations 2k, 2k+1
+        std::size_t const k = generation;
+        generation_arg const reduce_gen(2 * k);
+        generation_arg const broadcast_gen(2 * k + 1);
+
+        // Phase 1: hierarchical reduce (bottom-up)
+        arg_type reduced = reduce_here(hpx::launch::sync, communicators,
+            HPX_FORWARD(T, local_result), HPX_FORWARD(F, op), this_site,
+            reduce_gen);
+
+        // Phase 2: hierarchical broadcast (top-down)
+        return broadcast_to(
+            communicators, HPX_MOVE(reduced), this_site, broadcast_gen);
+    }
+
+    // Non-root site overload
+    template <typename T, typename F>
+    hpx::future<std::decay_t<T>> all_reduce_there(
+        hierarchical_communicator const& communicators, T&& local_result,
+        F&& op, this_site_arg this_site = this_site_arg(),
+        generation_arg const generation = generation_arg())
+    {
+        using arg_type = std::decay_t<T>;
+
+        if (this_site.is_default())
+        {
+            this_site = agas::get_locality_id();
+        }
+
+        std::size_t const k = generation;
+        generation_arg const reduce_gen(2 * k);
+        generation_arg const broadcast_gen(2 * k + 1);
+
+        // Phase 1: hierarchical reduce (send up)
+        reduce_there(hpx::launch::sync, communicators,
+            HPX_FORWARD(T, local_result), HPX_FORWARD(F, op), this_site,
+            reduce_gen);
+
+        // Phase 2: hierarchical broadcast (receive down)
+        return broadcast_from<arg_type>(
+            communicators, this_site, broadcast_gen);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    // Hierarchical all_reduce for vector types
+    // Wraps a scalar op (e.g. std::plus<int>) to work element-wise on
+    // vector<T> before passing to reduce_here/reduce_there
+
+    // Root site, vector overload
+    template <typename T, typename F>
+    hpx::future<std::vector<T>> all_reduce(
+        hierarchical_communicator const& communicators,
+        std::vector<T>&& local_result, F&& op,
+        this_site_arg this_site = this_site_arg(),
+        generation_arg const generation = generation_arg())
+    {
+        if (this_site.is_default())
+        {
+            this_site = agas::get_locality_id();
+        }
+
+        std::size_t const k = generation;
+        generation_arg const reduce_gen(2 * k);
+        generation_arg const broadcast_gen(2 * k + 1);
+
+        // Lift scalar op to element-wise vector op
+        detail::vector_reduce_op<T, std::decay_t<F>> vec_op{
+            HPX_FORWARD(F, op)};
+
+        // Phase 1: hierarchical reduce (bottom-up) with vector op
+        std::vector<T> reduced = reduce_here(hpx::launch::sync,
+            communicators, HPX_MOVE(local_result), HPX_MOVE(vec_op),
+            this_site, reduce_gen);
+
+        // Phase 2: hierarchical broadcast (top-down)
+        return broadcast_to(
+            communicators, HPX_MOVE(reduced), this_site, broadcast_gen);
+    }
+
+    // Non-root site, vector overload
+    template <typename T, typename F>
+    hpx::future<std::vector<T>> all_reduce_there(
+        hierarchical_communicator const& communicators,
+        std::vector<T>&& local_result, F&& op,
+        this_site_arg this_site = this_site_arg(),
+        generation_arg const generation = generation_arg())
+    {
+        if (this_site.is_default())
+        {
+            this_site = agas::get_locality_id();
+        }
+
+        std::size_t const k = generation;
+        generation_arg const reduce_gen(2 * k);
+        generation_arg const broadcast_gen(2 * k + 1);
+
+        detail::vector_reduce_op<T, std::decay_t<F>> vec_op{
+            HPX_FORWARD(F, op)};
+
+        // Phase 1: hierarchical reduce (send up)
+        reduce_there(hpx::launch::sync, communicators,
+            HPX_MOVE(local_result), HPX_MOVE(vec_op), this_site,
+            reduce_gen);
+
+        // Phase 2: hierarchical broadcast (receive down)
+        return broadcast_from<std::vector<T>>(
+            communicators, this_site, broadcast_gen);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    // Sync versions of hierarchical all_reduce
+    template <typename T, typename F>
+    std::decay_t<T> all_reduce(hpx::launch::sync_policy,
+        hierarchical_communicator const& communicators, T&& local_result,
+        F&& op, this_site_arg const this_site = this_site_arg(),
+        generation_arg const generation = generation_arg())
+    {
+        return all_reduce(communicators, HPX_FORWARD(T, local_result),
+            HPX_FORWARD(F, op), this_site, generation)
+            .get();
+    }
+
+    template <typename T, typename F>
+    std::decay_t<T> all_reduce_there(hpx::launch::sync_policy,
+        hierarchical_communicator const& communicators, T&& local_result,
+        F&& op, this_site_arg const this_site = this_site_arg(),
+        generation_arg const generation = generation_arg())
+    {
+        return all_reduce_there(communicators, HPX_FORWARD(T, local_result),
+            HPX_FORWARD(F, op), this_site, generation)
             .get();
     }
 }    // namespace hpx::collectives
