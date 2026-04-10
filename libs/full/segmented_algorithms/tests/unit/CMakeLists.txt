@@ -23,6 +23,7 @@ set(tests
     partitioned_vector_iter
     partitioned_vector_max_element1
     partitioned_vector_max_element2
+    partitioned_vector_merge
     partitioned_vector_min_element1
     partitioned_vector_min_element2
     partitioned_vector_minmax_element1
@@ -105,3 +106,23 @@ foreach(test ${tests})
   )
 
 endforeach()
+
+# Multi-locality merge test (requires 4 localities)
+set(partitioned_vector_merge_multi_FLAGS DEPENDENCIES
+                                         partitioned_vector_component
+)
+
+add_hpx_executable(
+  partitioned_vector_merge_multi_test INTERNAL_FLAGS
+  SOURCES partitioned_vector_merge_multi.cpp
+          ${partitioned_vector_merge_multi_FLAGS}
+  EXCLUDE_FROM_ALL
+  HPX_PREFIX ${HPX_BUILD_PREFIX}
+  FOLDER "Tests/Unit/Modules/Full/SegmentedAlgorithms"
+)
+
+add_hpx_unit_test(
+  "modules.segmented_algorithms" partitioned_vector_merge_multi
+  LOCALITIES 4
+  THREADS_PER_LOCALITY 2
+)
