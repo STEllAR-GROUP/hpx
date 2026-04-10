@@ -7,8 +7,8 @@
 #include <hpx/config.hpp>
 #include <hpx/init.hpp>
 
-// Clang currently ICEs while compiling this file.
-#if !defined(HPX_CLANG_VERSION)
+// Clang 20 and earlier currently ICE while compiling this file.
+#if !defined(HPX_CLANG_VERSION) || (HPX_CLANG_VERSION / 10000) > 20
 
 #include <iostream>
 #include <iterator>

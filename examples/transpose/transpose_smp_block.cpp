@@ -59,7 +59,6 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::cout << "Number of iterations  = " << iterations << "\n";
 
     using hpx::execution::par;
-    using hpx::execution::seq;
     using hpx::execution::task;
     using hpx::ranges::for_each;
 
@@ -97,7 +96,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         std::vector<hpx::shared_future<void>> transpose_futures;
         transpose_futures.resize(num_blocks);
 
-        for_each(seq, range, [&](std::uint64_t b) {
+        for_each(par, range, [&](std::uint64_t b) {
             transpose_futures[b] =
                 for_each(par(task), range, [&, b](std::uint64_t phase) {
                     std::uint64_t const block_size = block_order * block_order;

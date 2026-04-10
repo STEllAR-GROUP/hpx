@@ -14,17 +14,15 @@
 #include <hpx/config/modules_enabled.hpp>
 
 @cxx_standard_headers@
-#if defined(HPX_HAVE_STDEXEC)
-# if defined(HPX_COMPILE_BMI) && defined(HPX_COMPILE_CORE_WITH_MODULES)
-#  pragma push_macro("HPX_CXX_CORE_EXPORT")
-#  undef HPX_CXX_CORE_EXPORT
-#  define HPX_CXX_CORE_EXPORT
-# endif
-# include <hpx/execution_base/stdexec_forward.hpp>
-# if defined(HPX_COMPILE_BMI) && defined(HPX_COMPILE_CORE_WITH_MODULES)
-#  undef HPX_CXX_CORE_EXPORT
-#  pragma pop_macro("HPX_CXX_CORE_EXPORT")
-# endif
+#if defined(HPX_COMPILE_BMI) && defined(HPX_COMPILE_CORE_WITH_MODULES)
+# pragma push_macro("HPX_CXX_CORE_EXPORT")
+# undef HPX_CXX_CORE_EXPORT
+# define HPX_CXX_CORE_EXPORT
+#endif
+#include <hpx/execution_base/stdexec_forward.hpp>
+#if defined(HPX_COMPILE_BMI) && defined(HPX_COMPILE_CORE_WITH_MODULES)
+# undef HPX_CXX_CORE_EXPORT
+# pragma pop_macro("HPX_CXX_CORE_EXPORT")
 #endif
 
 #if defined(HPX_HAVE_CXX20_COROUTINES)

@@ -250,7 +250,6 @@ namespace hpx::parallel {
                 policy, c_first, last, comp, chunk_size);
 
             return hpx::dataflow(
-                policy.executor(),
                 [last](hpx::future<RandomIt>&& leftf,
                     hpx::future<RandomIt>&& rightf) -> RandomIt {
                     if (leftf.has_exception() || rightf.has_exception())
