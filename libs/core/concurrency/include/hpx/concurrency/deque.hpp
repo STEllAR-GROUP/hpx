@@ -417,9 +417,10 @@ namespace hpx::lockfree {
 
         // Thread-safe and non-blocking.
         // Complexity: O(Processes)
-        [[nodiscard]] bool empty() const noexcept
+        [[nodiscard]] bool empty(
+            std::memory_order mo = std::memory_order_relaxed) const noexcept
         {
-            anchor_pair lrs = anchor_.lrs(std::memory_order_acquire);
+            anchor_pair lrs = anchor_.lrs(mo);
             return lrs.get_left_ptr() == nullptr &&
                 lrs.get_right_ptr() == nullptr;
         }
@@ -526,7 +527,7 @@ namespace hpx::lockfree {
                     n->left.store(node_pointer(lrs.get_right_ptr()));
 
                     // Now we want to make the anchor point to our new node as
-                    // the leftmost node. We change the state to lpush as the
+                    // the rightmost node. We change the state to rpush as the
                     // deque will become unstable if this operation succeeds.
                     anchor_pair new_anchor(lrs.get_left_ptr(), n,
                         deque_status_type::rpush, lrs.get_right_tag() + 1);
