@@ -226,7 +226,6 @@ namespace hpx { namespace collectives {
 #include <hpx/collectives/broadcast.hpp>
 #include <hpx/collectives/create_communicator.hpp>
 #include <hpx/collectives/reduce.hpp>
-#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/components_base.hpp>
