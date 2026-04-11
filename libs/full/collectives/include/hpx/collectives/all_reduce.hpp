@@ -589,8 +589,8 @@ namespace hpx::collectives {
         {
             if (generation.is_default())
             {
-                return hpx::make_exceptional_future
-                    std::vector<T>>(HPX_GET_EXCEPTION(hpx::error::bad_parameter,
+                return hpx::make_exceptional_future<std::vector<T>>(
+                    HPX_GET_EXCEPTION(hpx::error::bad_parameter,
                     "hpx::collectives::all_reduce_there (hierarchical, vector)",
                     "hierarchical all_reduce requires an explicit generation "
                     "number for the 2k/2k+1 internal mapping"));
