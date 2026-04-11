@@ -462,8 +462,7 @@ namespace hpx::collectives {
         if (this_site == root_site)
         {
             arg_type reduced = reduce_here(hpx::launch::sync, communicators,
-                HPX_FORWARD(T, local_result), HPX_FORWARD(F, op), this_site,
-                reduce_gen);
+                HPX_FORWARD(T, local_result), this_site, reduce_gen);
 
             return broadcast_to(
                 communicators, HPX_MOVE(reduced), this_site, broadcast_gen);
@@ -471,8 +470,7 @@ namespace hpx::collectives {
         else
         {
             reduce_there(hpx::launch::sync, communicators,
-                HPX_FORWARD(T, local_result), HPX_FORWARD(F, op), this_site,
-                reduce_gen);
+                HPX_FORWARD(T, local_result), this_site, reduce_gen);
 
             return broadcast_from<arg_type>(
                 communicators, this_site, broadcast_gen);
