@@ -409,7 +409,7 @@ namespace hpx::collectives {
         }
 
         // Map user generation k to internal generations 2k, 2k+1
-        if (generation == generation_arg())
+        if (generation.is_default())
         {
             return hpx::make_exceptional_future<std::vector<arg_type>>(
                 HPX_GET_EXCEPTION(hpx::error::bad_parameter,
@@ -446,7 +446,7 @@ namespace hpx::collectives {
             this_site = agas::get_locality_id();
         }
 
-        if (generation == generation_arg())
+        if (generation.is_default())
         {
             return hpx::make_exceptional_future<std::vector<arg_type>>(
                 HPX_GET_EXCEPTION(hpx::error::bad_parameter,

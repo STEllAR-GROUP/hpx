@@ -473,7 +473,7 @@ namespace hpx::collectives {
         }
 
         // Hierarchical all_reduce requires explicit generation for 2k/2k+1
-        if (generation == generation_arg())
+        if (generation.is_default())
         {
             return hpx::make_exceptional_future<arg_type>(HPX_GET_EXCEPTION(
                 hpx::error::bad_parameter,
@@ -511,7 +511,7 @@ namespace hpx::collectives {
             this_site = agas::get_locality_id();
         }
 
-        if (generation == generation_arg())
+        if (generation.is_default())
         {
             return hpx::make_exceptional_future<arg_type>(HPX_GET_EXCEPTION(
                 hpx::error::bad_parameter,
@@ -552,7 +552,7 @@ namespace hpx::collectives {
             this_site = agas::get_locality_id();
         }
 
-        if (generation == generation_arg())
+        if (generation.is_default())
         {
             return hpx::make_exceptional_future<std::vector<T>>(
                 HPX_GET_EXCEPTION(hpx::error::bad_parameter,
@@ -592,7 +592,7 @@ namespace hpx::collectives {
             this_site = agas::get_locality_id();
         }
 
-        if (generation == generation_arg())
+        if (generation.is_default())
         {
             return hpx::make_exceptional_future<std::vector<T>>(
                 HPX_GET_EXCEPTION(hpx::error::bad_parameter,
