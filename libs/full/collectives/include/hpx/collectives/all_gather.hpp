@@ -423,8 +423,7 @@ namespace hpx::collectives {
         generation_arg const broadcast_gen(2 * generation + 1);
 
         std::vector<arg_type> gathered = gather_here(hpx::launch::sync,
-            communicators, HPX_FORWARD(T, local_result), this_site,
-            gather_gen);
+            communicators, HPX_FORWARD(T, local_result), this_site, gather_gen);
 
         return broadcast_to(
             communicators, HPX_MOVE(gathered), this_site, broadcast_gen);
@@ -437,11 +436,10 @@ namespace hpx::collectives {
         this_site_arg const this_site = this_site_arg(),
         generation_arg const generation = generation_arg())
     {
-        return all_gather(communicators, HPX_FORWARD(T, local_result),
-            this_site, generation)
+        return all_gather(
+            communicators, HPX_FORWARD(T, local_result), this_site, generation)
             .get();
     }
-
 
     // --- INTERNAL API (Non-root site overloads) ---
     namespace detail {
@@ -457,11 +455,12 @@ namespace hpx::collectives {
 
             if (generation.is_default())
             {
-                return hpx::make_exceptional_future<std::vector<arg_type>>(
-                    HPX_GET_EXCEPTION(hpx::error::bad_parameter,
-                        "hpx::collectives::all_gather (hierarchical)",
-                        "hierarchical all_gather requires an explicit generation "
-                        "number for the 2k/2k+1 internal mapping"));
+                return hpx::make_exceptional_future<
+                    std::vector<arg_type>>(HPX_GET_EXCEPTION(
+                    hpx::error::bad_parameter,
+                    "hpx::collectives::all_gather (hierarchical)",
+                    "hierarchical all_gather requires an explicit generation "
+                    "number for the 2k/2k+1 internal mapping"));
             }
 
             if (this_site.is_default())

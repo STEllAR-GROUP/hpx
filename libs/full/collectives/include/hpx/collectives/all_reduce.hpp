@@ -471,11 +471,11 @@ namespace hpx::collectives {
 
         if (generation.is_default())
         {
-            return hpx::make_exceptional_future<arg_type>(HPX_GET_EXCEPTION(
-                hpx::error::bad_parameter,
-                "hpx::collectives::all_reduce (hierarchical)",
-                "hierarchical all_reduce requires an explicit generation "
-                "number for the 2k/2k+1 internal mapping"));
+            return hpx::make_exceptional_future<arg_type>(
+                HPX_GET_EXCEPTION(hpx::error::bad_parameter,
+                    "hpx::collectives::all_reduce (hierarchical)",
+                    "hierarchical all_reduce requires an explicit generation "
+                    "number for the 2k/2k+1 internal mapping"));
         }
 
         if (this_site.is_default())
@@ -521,9 +521,8 @@ namespace hpx::collectives {
 
         detail::vector_reduce_op<std::decay_t<F>> vec_op{HPX_FORWARD(F, op)};
 
-        std::vector<T> reduced = reduce_here(hpx::launch::sync,
-            communicators, HPX_MOVE(local_result), HPX_MOVE(vec_op),
-            this_site, reduce_gen);
+        std::vector<T> reduced = reduce_here(hpx::launch::sync, communicators,
+            HPX_MOVE(local_result), HPX_MOVE(vec_op), this_site, reduce_gen);
 
         return broadcast_to(
             communicators, HPX_MOVE(reduced), this_site, broadcast_gen);
@@ -540,7 +539,6 @@ namespace hpx::collectives {
             HPX_FORWARD(F, op), this_site, generation)
             .get();
     }
-
 
     // --- INTERNAL API (Non-root site overloads) ---
     namespace detail {
@@ -589,17 +587,17 @@ namespace hpx::collectives {
         {
             if (generation.is_default())
             {
-                return hpx::make_exceptional_future<std::vector<T>>(
-                    HPX_GET_EXCEPTION(hpx::error::bad_parameter,
+                return hpx::make_exceptional_future<
+                    std::vector<T>>(HPX_GET_EXCEPTION(hpx::error::bad_parameter,
                     "hpx::collectives::all_reduce_there (hierarchical, vector)",
                     "hierarchical all_reduce requires an explicit generation "
                     "number for the 2k/2k+1 internal mapping"));
             }
-            
+
             if (this_site.is_default())
             {
                 this_site = agas::get_locality_id();
-            } 
+            }
 
             generation_arg const reduce_gen(2 * generation);
             generation_arg const broadcast_gen(2 * generation + 1);
