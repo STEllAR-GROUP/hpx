@@ -418,9 +418,8 @@ namespace hpx::collectives {
                     "number for the 2k/2k+1 internal mapping"));
         }
 
-        std::size_t const k = generation;
-        generation_arg const gather_gen(2 * k);
-        generation_arg const broadcast_gen(2 * k + 1);
+        generation_arg const gather_gen(2 * generation);
+        generation_arg const broadcast_gen(2 * generation + 1);
 
         // Phase 1: hierarchical gather (bottom-up) — produces vector<T>
         std::vector<arg_type> gathered = gather_here(hpx::launch::sync,
@@ -455,9 +454,8 @@ namespace hpx::collectives {
                     "number for the 2k/2k+1 internal mapping"));
         }
 
-        std::size_t const k = generation;
-        generation_arg const gather_gen(2 * k);
-        generation_arg const broadcast_gen(2 * k + 1);
+        generation_arg const gather_gen(2 * generation);
+        generation_arg const broadcast_gen(2 * generation + 1);
 
         // Phase 1: hierarchical gather (send up)
         gather_there(hpx::launch::sync, communicators,

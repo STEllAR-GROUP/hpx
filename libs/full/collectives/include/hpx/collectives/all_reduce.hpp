@@ -484,9 +484,8 @@ namespace hpx::collectives {
         }
 
         // Map user generation k to internal generations 2k, 2k+1
-        std::size_t const k = generation;
-        generation_arg const reduce_gen(2 * k);
-        generation_arg const broadcast_gen(2 * k + 1);
+        generation_arg const reduce_gen(2 * generation);
+        generation_arg const broadcast_gen(2 * generation + 1);
 
         // Phase 1: hierarchical reduce (bottom-up)
         arg_type reduced = reduce_here(hpx::launch::sync, communicators,
@@ -521,9 +520,8 @@ namespace hpx::collectives {
                 "number for the 2k/2k+1 internal mapping"));
         }
 
-        std::size_t const k = generation;
-        generation_arg const reduce_gen(2 * k);
-        generation_arg const broadcast_gen(2 * k + 1);
+        generation_arg const reduce_gen(2 * generation);
+        generation_arg const broadcast_gen(2 * generation + 1);
 
         // Phase 1: hierarchical reduce (send up)
         reduce_there(hpx::launch::sync, communicators,
@@ -562,9 +560,8 @@ namespace hpx::collectives {
                     "number for the 2k/2k+1 internal mapping"));
         }
 
-        std::size_t const k = generation;
-        generation_arg const reduce_gen(2 * k);
-        generation_arg const broadcast_gen(2 * k + 1);
+        generation_arg const reduce_gen(2 * generation);
+        generation_arg const broadcast_gen(2 * generation + 1);
 
         // Lift scalar op to element-wise vector op
         detail::vector_reduce_op<std::decay_t<F>> vec_op{
@@ -602,9 +599,8 @@ namespace hpx::collectives {
                     "number for the 2k/2k+1 internal mapping"));
         }
 
-        std::size_t const k = generation;
-        generation_arg const reduce_gen(2 * k);
-        generation_arg const broadcast_gen(2 * k + 1);
+        generation_arg const reduce_gen(2 * generation);
+        generation_arg const broadcast_gen(2 * generation + 1);
 
         detail::vector_reduce_op<std::decay_t<F>> vec_op{
             HPX_FORWARD(F, op)};
