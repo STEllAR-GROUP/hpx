@@ -428,31 +428,6 @@ namespace hpx::collectives {
     }
 
     ////////////////////////////////////////////////////////////////////////////
-    // Helper: lift a scalar reduction op to work element-wise on vectors
-    namespace detail {
-
-        template <typename F>
-        struct vector_reduce_op
-        {
-            F op_;
-
-            template <typename T>
-            std::vector<T> operator()(
-                std::vector<T> const& lhs, std::vector<T> const& rhs) const
-            {
-                HPX_ASSERT(lhs.size() == rhs.size());
-                std::vector<T> result;
-                result.reserve(lhs.size());
-                for (std::size_t i = 0; i != lhs.size(); ++i)
-                {
-                    result.push_back(HPX_INVOKE(op_, lhs[i], rhs[i]));
-                }
-                return result;
-            }
-        };
-    }    // namespace detail
-
-    ////////////////////////////////////////////////////////////////////////////
     // Hierarchical all_reduce: reduce (bottom-up) + broadcast (top-down)
     // Uses 2k/2k+1 generation mapping: user generation k maps to
     // internal generation 2k (reduce phase) and 2k+1 (broadcast phase)
@@ -500,54 +475,6 @@ namespace hpx::collectives {
                 reduce_gen);
 
             return broadcast_from<arg_type>(
-                communicators, this_site, broadcast_gen);
-        }
-    }
-
-    // Vector overload
-    template <typename T, typename F>
-    hpx::future<std::vector<T>> all_reduce(
-        hierarchical_communicator const& communicators,
-        std::vector<T>&& local_result, F&& op,
-        this_site_arg this_site = this_site_arg(),
-        generation_arg const generation = generation_arg(),
-        root_site_arg root_site = root_site_arg())
-    {
-        if (generation.is_default())
-        {
-            return hpx::make_exceptional_future<std::vector<T>>(
-                HPX_GET_EXCEPTION(hpx::error::bad_parameter,
-                    "hpx::collectives::all_reduce (hierarchical, vector)",
-                    "hierarchical all_reduce requires an explicit generation "
-                    "number for the 2k/2k+1 internal mapping"));
-        }
-
-        if (this_site.is_default())
-        {
-            this_site = agas::get_locality_id();
-        }
-
-        generation_arg const reduce_gen(2 * generation);
-        generation_arg const broadcast_gen(2 * generation + 1);
-
-        detail::vector_reduce_op<std::decay_t<F>> vec_op{HPX_FORWARD(F, op)};
-
-        if (this_site == root_site)
-        {
-            std::vector<T> reduced = reduce_here(hpx::launch::sync,
-                communicators, HPX_MOVE(local_result), HPX_MOVE(vec_op),
-                this_site, reduce_gen);
-
-            return broadcast_to(
-                communicators, HPX_MOVE(reduced), this_site, broadcast_gen);
-        }
-        else
-        {
-            reduce_there(hpx::launch::sync, communicators,
-                HPX_MOVE(local_result), HPX_MOVE(vec_op), this_site,
-                reduce_gen);
-
-            return broadcast_from<std::vector<T>>(
                 communicators, this_site, broadcast_gen);
         }
     }
