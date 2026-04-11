@@ -29,6 +29,7 @@ set(include_local_headers
     hpx/tuple.hpp
     hpx/type_traits.hpp
     hpx/unwrap.hpp
+    hpx/include_local/iostream.hpp
     hpx/experimental/run_on_all.hpp
     hpx/experimental/scope.hpp
     hpx/experimental/task_group.hpp
@@ -42,6 +43,7 @@ if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
       hpx/compute.hpp
       hpx/future.hpp
       hpx/init.hpp
+      hpx/iostream.hpp
       hpx/latch.hpp
       hpx/runtime.hpp
   )
