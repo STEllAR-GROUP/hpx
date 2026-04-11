@@ -13,6 +13,7 @@
 #include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/testing.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <iostream>
 #include <iterator>
@@ -330,7 +331,7 @@ void test_find_first_of_bad_alloc_async(ExPolicy&& p, IteratorTag)
 //   * empty haystack / empty needle range (boundary conditions)
 //   * single-element haystack with / without a match
 //   * predicate invocation count (proves the inner search loop
-//     short-circuits after the first match — the bug this PR fixes)
+//     short-circuits after the first match - the bug this PR fixes)
 template <typename ExPolicy>
 void test_find_first_of_edge_cases(ExPolicy&& policy)
 {
@@ -399,12 +400,12 @@ void test_find_first_of_edge_cases(ExPolicy&& policy)
     //    Needles:  [7, 7]  (deliberate duplicates)
     //
     //    Per-element predicate call budget (correct behaviour):
-    //      index 0 (value 7)   → 1 call  (matches needles[0], exit inner loop)
-    //      index 1 (value 100) → 2 calls (no match against 7 twice)
-    //      index 2 (value 200) → 2 calls (no match against 7 twice)
+    //      index 0 (value 7)   -> 1 call  (matches needles[0], exit inner loop)
+    //      index 1 (value 100) -> 2 calls (no match against 7 twice)
+    //      index 2 (value 200) -> 2 calls (no match against 7 twice)
     //    Total: 5 calls.
     //
-    //    Before the fix, index 0 cost 2 calls → 6 total.
+    //    Before the fix, index 0 cost 2 calls -> 6 total.
     {
         std::atomic<int> call_count{0};
         auto counting_pred = [&call_count](int a, int b) -> bool {
