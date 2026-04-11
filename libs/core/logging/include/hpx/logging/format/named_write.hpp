@@ -29,14 +29,14 @@
 
 namespace hpx::util::logging::detail {
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct named
     {
         std::string name;
         T value;
     };
 
-    HPX_CXX_EXPORT template <typename C, typename S>
+    HPX_CXX_CORE_EXPORT template <typename C, typename S>
     typename C::iterator find_named(C& c, S const& name)
     {
         for (auto iter = c.begin(), end = c.end(); iter != end; ++iter)
@@ -91,7 +91,7 @@ You could have an output like this:
 @endcode
 
 */
-    HPX_CXX_EXPORT struct named_formatters
+    HPX_CXX_CORE_EXPORT struct named_formatters
     {
         named_formatters(named_formatters const&) = delete;
         named_formatters(named_formatters&&) = delete;
@@ -219,7 +219,7 @@ In the above example, I know that the available destinations are @c out_file,
 @c debug_window and @c console, but I'm not writing to @c debug_window.
 
 */
-    HPX_CXX_EXPORT struct named_destinations
+    HPX_CXX_CORE_EXPORT struct named_destinations
     {
         HPX_NON_COPYABLE(named_destinations);
 
@@ -359,7 +359,7 @@ namespace hpx::util::logging::writer {
     @param format_write_ the underlying format writer
 
 */
-    HPX_CXX_EXPORT struct named_write
+    HPX_CXX_CORE_EXPORT struct named_write
     {
         HPX_CORE_EXPORT named_write();
 

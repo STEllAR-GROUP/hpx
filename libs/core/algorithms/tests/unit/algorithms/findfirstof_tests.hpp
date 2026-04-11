@@ -10,9 +10,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/execution.hpp>
+#include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/parallel/algorithms/find.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <iostream>
 #include <iterator>
@@ -323,4 +324,105 @@ void test_find_first_of_bad_alloc_async(ExPolicy&& p, IteratorTag)
 
     HPX_TEST(caught_bad_alloc);
     HPX_TEST(returned_from_algorithm);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Edge-case and consistency tests added to cover:
+//   * empty haystack / empty needle range (boundary conditions)
+//   * single-element haystack with / without a match
+//   * predicate invocation count (proves the inner search loop
+//     short-circuits after the first match - the bug this PR fixes)
+template <typename ExPolicy>
+void test_find_first_of_edge_cases(ExPolicy&& policy)
+{
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
+
+    // -----------------------------------------------------------------------
+    // 1. Empty haystack: must return last
+    {
+        std::vector<int> haystack;
+        std::vector<int> needles = {1, 2, 3};
+
+        auto result = hpx::find_first_of(policy, haystack.begin(),
+            haystack.end(), needles.begin(), needles.end());
+
+        HPX_TEST(result == haystack.end());
+    }
+
+    // -----------------------------------------------------------------------
+    // 2. Empty needle range: nothing can match, must return last
+    {
+        std::vector<int> haystack = {1, 2, 3, 4, 5};
+        std::vector<int> needles;
+
+        auto result = hpx::find_first_of(policy, haystack.begin(),
+            haystack.end(), needles.begin(), needles.end());
+
+        HPX_TEST(result == haystack.end());
+    }
+
+    // -----------------------------------------------------------------------
+    // 3. Single-element haystack with a match
+    {
+        std::vector<int> haystack = {42};
+        std::vector<int> needles = {10, 42, 99};
+
+        auto result = hpx::find_first_of(policy, haystack.begin(),
+            haystack.end(), needles.begin(), needles.end());
+
+        HPX_TEST(result == haystack.begin());
+    }
+
+    // -----------------------------------------------------------------------
+    // 4. Single-element haystack with no match
+    {
+        std::vector<int> haystack = {7};
+        std::vector<int> needles = {1, 2, 3};
+
+        auto result = hpx::find_first_of(policy, haystack.begin(),
+            haystack.end(), needles.begin(), needles.end());
+
+        HPX_TEST(result == haystack.end());
+    }
+
+    // -----------------------------------------------------------------------
+    // 5. Predicate invocation-count consistency (key regression guard):
+    //
+    //    When the needle range contains duplicate values that match the same
+    //    haystack element, a correct implementation must stop testing the
+    //    remaining needles once the first match is found (inner loop must
+    //    short-circuit).  Before this fix the par/par_unseq partition kernel
+    //    was missing the early return, causing extra predicate calls that
+    //    are inconsistent with the seq behaviour.
+    //
+    //    Haystack: [7, 100, 200]
+    //    Needles:  [7, 7]  (deliberate duplicates)
+    //
+    //    Per-element predicate call budget (correct behaviour):
+    //      index 0 (value 7)   -> 1 call  (matches needles[0], exit inner loop)
+    //      index 1 (value 100) -> 2 calls (no match against 7 twice)
+    //      index 2 (value 200) -> 2 calls (no match against 7 twice)
+    //    Total: 5 calls.
+    //
+    //    Before the fix, index 0 cost 2 calls -> 6 total.
+    {
+        std::atomic<int> call_count{0};
+        auto counting_pred = [&call_count](int a, int b) -> bool {
+            ++call_count;
+            return a == b;
+        };
+
+        std::vector<int> haystack = {7, 100, 200};
+        std::vector<int> needles = {7, 7};    // deliberate duplicates
+
+        call_count.store(0);
+        auto result = hpx::find_first_of(policy, haystack.begin(),
+            haystack.end(), needles.begin(), needles.end(), counting_pred);
+
+        // Must point to haystack[0] (value 7)
+        HPX_TEST(result == haystack.begin());
+        // Inner loop must short-circuit: total calls must be <= 5
+        HPX_TEST_LTE(call_count.load(), 5);
+    }
 }

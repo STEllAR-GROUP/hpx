@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Hartmut Kaiser
+//  Copyright (c) 2017-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -18,13 +18,13 @@
 
 namespace hpx::util::detail {
 
-    template <typename Sample>
+    HPX_CXX_EXPORT template <typename Sample>
     struct rolling_max_impl : boost::accumulators::accumulator_base
     {
         using float_type = Sample;
 
         // for boost::result_of
-        typedef float_type result_type;
+        using result_type = float_type;
 
         template <typename Args>
         explicit rolling_max_impl(Args const& /* args */)
@@ -78,7 +78,7 @@ namespace boost::accumulators {
 
     namespace tag {
 
-        struct rolling_max : depends_on<rolling_window>
+        HPX_CXX_EXPORT struct rolling_max : depends_on<rolling_window>
         {
             struct impl
             {
@@ -95,8 +95,9 @@ namespace boost::accumulators {
     // extract::rolling_max
     namespace extract {
 
-        inline constexpr extractor<tag::rolling_max> rolling_max = {};
-    }
+        HPX_CXX_EXPORT inline constexpr extractor<tag::rolling_max>
+            rolling_max = {};
+    }    // namespace extract
 }    // namespace boost::accumulators
 // namespace boost::accumulators
 
@@ -104,9 +105,9 @@ namespace hpx::util {
 
     namespace tag {
 
-        using boost::accumulators::tag::rolling_max;
-    }
+        HPX_CXX_EXPORT using boost::accumulators::tag::rolling_max;
+    }    // namespace tag
 
-    using boost::accumulators::extract::rolling_max;
+    HPX_CXX_EXPORT using boost::accumulators::extract::rolling_max;
 }    // namespace hpx::util
 // namespace hpx::util

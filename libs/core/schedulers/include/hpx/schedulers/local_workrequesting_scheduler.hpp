@@ -89,10 +89,10 @@ namespace hpx::threads::policies {
 
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
-    HPX_CXX_EXPORT using default_local_workrequesting_scheduler_terminated_queue =
+    HPX_CXX_CORE_EXPORT using default_local_workrequesting_scheduler_terminated_queue =
         lockfree_lifo;
 #else
-    HPX_CXX_EXPORT using default_local_workrequesting_scheduler_terminated_queue =
+    HPX_CXX_CORE_EXPORT using default_local_workrequesting_scheduler_terminated_queue =
         lockfree_fifo;
 #endif
 
@@ -203,9 +203,9 @@ namespace hpx::threads::policies {
     // The local_workrequesting_scheduler maintains several queues of work
     // items (threads) per OS thread, where this OS thread pulls its next work
     // from.
-    HPX_CXX_EXPORT template <typename Mutex = std::mutex,
+    HPX_CXX_CORE_EXPORT template <typename Mutex = std::mutex,
         typename PendingQueuing = lockfree_fifo,
-        typename StagedQueuing = lockfree_fifo,
+        typename StagedQueuing = concurrentqueue_fifo,
         typename TerminatedQueuing =
             default_local_workrequesting_scheduler_terminated_queue>
     class local_workrequesting_scheduler final : public scheduler_base
@@ -648,7 +648,7 @@ namespace hpx::threads::policies {
         {
             auto& d = data_[num_thread].data_;
             bool empty = d.queue_->cleanup_terminated(delete_all);
-            empty = d.queue_->cleanup_terminated(delete_all) && empty;
+            empty = d.bound_queue_->cleanup_terminated(delete_all) && empty;
             if (!delete_all)
                 return empty;
 
@@ -689,8 +689,8 @@ namespace hpx::threads::policies {
 
             num_thread = select_active_pu(num_thread);
 
-            data.schedulehint.mode = thread_schedule_hint_mode::thread;
-            data.schedulehint.hint = static_cast<std::int16_t>(num_thread);
+            data.schedulehint.schedule_hint(
+                static_cast<std::int16_t>(num_thread));
 
             // now create the thread
             switch (data.priority)
@@ -1331,22 +1331,17 @@ namespace hpx::threads::policies {
         // Queries whether a given core is idle
         bool is_core_idle(std::size_t num_thread) const override
         {
+            auto& data = data_[num_thread].data_;
             if (num_thread < num_queues_)
             {
-                for (thread_queue_type* this_queue :
-                    {data_[num_thread].data_.bound_queue_,
-                        data_[num_thread].data_.queue_})
-                {
-                    if (this_queue->get_queue_length() != 0)
-                    {
-                        return false;
-                    }
-                }
+                if (data.bound_queue_->get_queue_length() != 0)
+                    return false;
+                if (data.queue_->get_queue_length() != 0)
+                    return false;
             }
 
             if (num_thread < num_high_priority_queues_ &&
-                data_[num_thread]
-                        .data_.high_priority_queue_->get_queue_length() != 0)
+                data.high_priority_queue_->get_queue_length() != 0)
             {
                 return false;
             }

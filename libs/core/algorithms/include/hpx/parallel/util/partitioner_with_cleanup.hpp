@@ -42,7 +42,8 @@ namespace hpx::parallel::util {
         // iterations for each available core. The number of iterations is
         // determined automatically based on the measured runtime of the
         // iterations.
-        HPX_CXX_EXPORT template <typename ExPolicy, typename R, typename Result>
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename R,
+            typename Result>
         struct static_partitioner_with_cleanup
         {
             using parameters_type = typename ExPolicy::executor_parameters_type;
@@ -66,9 +67,15 @@ namespace hpx::parallel::util {
 
                 try
                 {
-                    bool const has_scheduler_executor =
+                    constexpr bool has_scheduler_executor =
                         hpx::execution_policy_has_scheduler_executor_v<
                             ExPolicy_>;
+
+                    auto p =
+                        hpx::execution::experimental::create_rebound_policy(
+                            policy,
+                            hpx::execution::to_hierarchical_spawning(
+                                policy.executor()));
 
                     if constexpr (has_scheduler_executor)
                     {
@@ -112,9 +119,10 @@ namespace hpx::parallel::util {
                                 std::monostate, Result>;
                         using variant_result_type =
                             std::variant<nonvoid_result, std::exception_ptr>;
-                        auto&& items = detail::partition<variant_result_type>(
-                            HPX_FORWARD(ExPolicy_, policy), first, count,
-                            wrapped_f1);
+
+                        auto&& items =
+                            detail::partition<variant_result_type, false>(
+                                HPX_MOVE(p), first, count, wrapped_f1);
 
                         scoped_params.mark_end_of_scheduling();
 
@@ -123,9 +131,8 @@ namespace hpx::parallel::util {
                     }
                     else
                     {
-                        auto&& items = detail::partition<Result>(
-                            HPX_FORWARD(ExPolicy_, policy), first, count,
-                            HPX_FORWARD(F1, f1));
+                        auto&& items = detail::partition<Result, false>(
+                            HPX_MOVE(p), first, count, HPX_FORWARD(F1, f1));
 
                         scoped_params.mark_end_of_scheduling();
 
@@ -146,10 +153,15 @@ namespace hpx::parallel::util {
             static decltype(auto) reduce(
                 Items&& workitems, F&& f, Cleanup&& cleanup)
             {
+                using decayed_items = std::decay_t<Items>;
+                constexpr bool is_future =
+                    hpx::traits::is_future_v<decayed_items> ||
+                    hpx::traits::is_future_range_v<decayed_items>;
+
                 namespace ex = hpx::execution::experimental;
-                if constexpr (ex::is_sender_v<std::decay_t<Items>>)
+                if constexpr (ex::is_sender_v<decayed_items> && !is_future)
                 {
-                    return ex::let_value(workitems,
+                    return ex::let_value(HPX_FORWARD(Items, workitems),
                         [f = HPX_FORWARD(F, f),
                             cleanup = HPX_FORWARD(Cleanup, cleanup)](
                             auto&& all_parts) mutable {
@@ -204,6 +216,7 @@ namespace hpx::parallel::util {
                                     }
                                     catch (...)
                                     {
+                                        // NOLINT(bugprone-empty-catch)
                                         HPX_UNUSED(ex_list);
                                     }
                                 }
@@ -227,15 +240,18 @@ namespace hpx::parallel::util {
                 }
                 else
                 {
-                    // wait for all tasks to finish
-                    if (hpx::wait_all_nothrow(workitems))
+                    if constexpr (is_future)
                     {
-                        // always rethrow if 'errors' is not empty or workitems has
-                        // exceptional future
-                        handle_local_exceptions::call_with_cleanup(
-                            workitems, HPX_FORWARD(Cleanup, cleanup));
+                        // wait for all tasks to finish
+                        if (hpx::wait_all_nothrow(workitems))
+                        {
+                            // always rethrow if 'errors' is not empty or workitems has
+                            // exceptional future
+                            handle_local_exceptions::call_with_cleanup(
+                                workitems, HPX_FORWARD(Cleanup, cleanup));
+                        }
                     }
-                    return f(HPX_FORWARD(Items, workitems));
+                    return HPX_INVOKE(f, HPX_FORWARD(Items, workitems));
                 }
             }
 
@@ -267,7 +283,8 @@ namespace hpx::parallel::util {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename ExPolicy, typename R, typename Result>
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename R,
+            typename Result>
         struct task_static_partitioner_with_cleanup
         {
             using parameters_type = typename ExPolicy::executor_parameters_type;
@@ -292,9 +309,14 @@ namespace hpx::parallel::util {
 
                 try
                 {
-                    auto&& items = detail::partition<Result>(
-                        HPX_FORWARD(ExPolicy_, policy), first, count,
-                        HPX_FORWARD(F1, f1));
+                    auto p =
+                        hpx::execution::experimental::create_rebound_policy(
+                            policy,
+                            hpx::execution::to_hierarchical_spawning(
+                                policy.executor()));
+
+                    auto&& items = detail::partition<Result, false>(
+                        HPX_MOVE(p), first, count, HPX_FORWARD(F1, f1));
 
                     scoped_params->mark_end_of_scheduling();
 
@@ -372,7 +394,7 @@ namespace hpx::parallel::util {
     // ExPolicy: execution policy
     // R:        overall result type
     // Result:   intermediate result type of first step
-    HPX_CXX_EXPORT template <typename ExPolicy, typename R = void,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename R = void,
         typename Result = R>
     struct partitioner_with_cleanup
       : detail::select_partitioner<std::decay_t<ExPolicy>,

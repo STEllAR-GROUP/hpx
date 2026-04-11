@@ -9,7 +9,6 @@
 #include <hpx/config.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/modules/async_base.hpp>
-#include <hpx/modules/concepts.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/timing.hpp>
@@ -66,7 +65,7 @@ namespace hpx::execution::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     // define customization points
-    HPX_CXX_EXPORT inline constexpr struct null_parameters_t
+    HPX_CXX_CORE_EXPORT inline constexpr struct null_parameters_t
     {
     } null_parameters{};
 
@@ -95,17 +94,13 @@ namespace hpx::execution::experimental {
     /// \return         The size of the chunks (number of iterations per chunk)
     ///                 that should be used for parallel execution.
     ///
-    HPX_CXX_EXPORT inline constexpr struct get_chunk_size_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct get_chunk_size_t final
       : hpx::functional::detail::tag_priority<get_chunk_size_t>
     {
     private:
-        // clang-format off
-        template <typename Parameters, typename Executor,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_parameters_v<Parameters> &&
-                hpx::traits::is_executor_any_v<Executor>
-            )>
-        // clang-format on
+        template <typename Parameters, typename Executor>
+            requires(hpx::executor_parameters<Parameters> &&
+                hpx::executor_any<Executor>)
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             get_chunk_size_t, Parameters&& params, Executor&& exec,
             hpx::chrono::steady_duration const& iteration_duration,
@@ -118,13 +113,9 @@ namespace hpx::execution::experimental {
                 num_tasks);
         }
 
-        // clang-format off
-        template <typename Parameters, typename Executor,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_parameters_v<Parameters> &&
-                hpx::traits::is_executor_any_v<Executor>
-            )>
-        // clang-format on
+        template <typename Parameters, typename Executor>
+            requires(hpx::executor_parameters<Parameters> &&
+                hpx::executor_any<Executor>)
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             get_chunk_size_t tag, Parameters&& params, Executor&& exec,
             std::size_t cores, std::size_t num_tasks)
@@ -155,17 +146,13 @@ namespace hpx::execution::experimental {
     ///
     /// \return The execution time for one of the tasks.
     ///
-    HPX_CXX_EXPORT inline constexpr struct measure_iteration_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct measure_iteration_t final
       : hpx::functional::detail::tag_priority<measure_iteration_t>
     {
     private:
-        // clang-format off
-        template <typename Parameters, typename Executor, typename F,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_parameters_v<Parameters> &&
-                hpx::traits::is_executor_any_v<Executor>
-            )>
-        // clang-format on
+        template <typename Parameters, typename Executor, typename F>
+            requires(hpx::executor_parameters<Parameters> &&
+                hpx::executor_any<Executor>)
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             measure_iteration_t, Parameters&& params, Executor&& exec, F&& f,
             std::size_t num_tasks)
@@ -190,17 +177,13 @@ namespace hpx::execution::experimental {
     /// \param num_tasks [in] The number of tasks the chunk size should be
     ///                 determined for
     ///
-    HPX_CXX_EXPORT inline constexpr struct maximal_number_of_chunks_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct maximal_number_of_chunks_t final
       : hpx::functional::detail::tag_priority<maximal_number_of_chunks_t>
     {
     private:
-        // clang-format off
-        template <typename Parameters, typename Executor,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_parameters_v<Parameters> &&
-                hpx::traits::is_executor_any_v<Executor>
-            )>
-        // clang-format on
+        template <typename Parameters, typename Executor>
+            requires(hpx::executor_parameters<Parameters> &&
+                hpx::executor_any<Executor>)
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             maximal_number_of_chunks_t, Parameters&& params, Executor&& exec,
             std::size_t cores, std::size_t num_tasks)
@@ -222,17 +205,14 @@ namespace hpx::execution::experimental {
     /// \note This calls params.reset_thread_distribution(exec) if it exists;
     ///       otherwise it does nothing.
     ///
-    HPX_CXX_EXPORT inline constexpr struct reset_thread_distribution_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct reset_thread_distribution_t
+        final
       : hpx::functional::detail::tag_priority<reset_thread_distribution_t>
     {
     private:
-        // clang-format off
-        template <typename Parameters, typename Executor,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_parameters_v<Parameters> &&
-                hpx::traits::is_executor_any_v<Executor>
-            )>
-        // clang-format on
+        template <typename Parameters, typename Executor>
+            requires(hpx::executor_parameters<Parameters> &&
+                hpx::executor_any<Executor>)
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             reset_thread_distribution_t, Parameters&& params, Executor&& exec)
         {
@@ -260,17 +240,13 @@ namespace hpx::execution::experimental {
     ///
     /// \return The number of cores to use
     ///
-    HPX_CXX_EXPORT inline constexpr struct processing_units_count_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct processing_units_count_t final
       : hpx::functional::detail::tag_priority<processing_units_count_t>
     {
     private:
-        // clang-format off
-        template <typename Parameters, typename Executor,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_parameters_v<Parameters> &&
-                hpx::traits::is_executor_any_v<Executor>
-            )>
-        // clang-format on
+        template <typename Parameters, typename Executor>
+            requires(hpx::executor_parameters<Parameters> &&
+                hpx::executor_any<Executor>)
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             processing_units_count_t, Parameters&& params, Executor&& exec,
             hpx::chrono::steady_duration const& iteration_duration,
@@ -282,13 +258,9 @@ namespace hpx::execution::experimental {
                 HPX_FORWARD(Executor, exec), iteration_duration, num_tasks);
         }
 
-        // clang-format off
-        template <typename Parameters, typename Executor,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_parameters_v<Parameters> &&
-                hpx::traits::is_executor_any_v<Executor>
-            )>
-        // clang-format on
+        template <typename Parameters, typename Executor>
+            requires(hpx::executor_parameters<Parameters> &&
+                hpx::executor_any<Executor>)
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             processing_units_count_t tag, Parameters&& params, Executor&& exec,
             std::size_t num_tasks = 0)
@@ -298,12 +270,8 @@ namespace hpx::execution::experimental {
                 num_tasks);
         }
 
-        // clang-format off
-        template <typename Executor,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_any_v<Executor>
-            )>
-        // clang-format on
+        template <typename Executor>
+            requires(hpx::executor_any<Executor>)
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             processing_units_count_t, Executor&& exec,
             hpx::chrono::steady_duration const& iteration_duration,
@@ -314,12 +282,8 @@ namespace hpx::execution::experimental {
                 HPX_FORWARD(Executor, exec), iteration_duration, num_tasks);
         }
 
-        // clang-format off
-        template <typename Executor,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_any_v<Executor>
-            )>
-        // clang-format on
+        template <typename Executor>
+            requires(hpx::executor_any<Executor>)
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             processing_units_count_t tag, Executor&& exec,
             std::size_t num_tasks = 0)
@@ -331,7 +295,8 @@ namespace hpx::execution::experimental {
 
     /// Generate a policy that supports setting the number of cores for
     /// execution.
-    HPX_CXX_EXPORT inline constexpr struct with_processing_units_count_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct with_processing_units_count_t
+        final
       : hpx::functional::detail::tag_priority<with_processing_units_count_t>
     {
     } with_processing_units_count{};
@@ -346,17 +311,13 @@ namespace hpx::execution::experimental {
     /// \note This calls params.mark_begin_execution(exec) if it exists;
     ///       otherwise it does nothing.
     ///
-    HPX_CXX_EXPORT inline constexpr struct mark_begin_execution_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct mark_begin_execution_t final
       : hpx::functional::detail::tag_priority<mark_begin_execution_t>
     {
     private:
-        // clang-format off
-        template <typename Parameters, typename Executor,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_parameters_v<Parameters> &&
-                hpx::traits::is_executor_any_v<Executor>
-            )>
-        // clang-format on
+        template <typename Parameters, typename Executor>
+            requires(hpx::executor_parameters<Parameters> &&
+                hpx::executor_any<Executor>)
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             mark_begin_execution_t, Parameters&& params, Executor&& exec)
         {
@@ -377,17 +338,13 @@ namespace hpx::execution::experimental {
     /// \note This calls params.mark_begin_execution(exec) if it exists;
     ///       otherwise it does nothing.
     ///
-    HPX_CXX_EXPORT inline constexpr struct mark_end_of_scheduling_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct mark_end_of_scheduling_t final
       : hpx::functional::detail::tag_priority<mark_end_of_scheduling_t>
     {
     private:
-        // clang-format off
-        template <typename Parameters, typename Executor,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_parameters_v<Parameters> &&
-                hpx::traits::is_executor_any_v<Executor>
-            )>
-        // clang-format on
+        template <typename Parameters, typename Executor>
+            requires(hpx::executor_parameters<Parameters> &&
+                hpx::executor_any<Executor>)
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             mark_end_of_scheduling_t, Parameters&& params, Executor&& exec)
         {
@@ -408,17 +365,13 @@ namespace hpx::execution::experimental {
     /// \note This calls params.mark_end_execution(exec) if it exists;
     ///       otherwise it does nothing.
     ///
-    HPX_CXX_EXPORT inline constexpr struct mark_end_execution_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct mark_end_execution_t final
       : hpx::functional::detail::tag_priority<mark_end_execution_t>
     {
     private:
-        // clang-format off
-        template <typename Parameters, typename Executor,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_parameters_v<Parameters> &&
-                hpx::traits::is_executor_any_v<Executor>
-            )>
-        // clang-format on
+        template <typename Parameters, typename Executor>
+            requires(hpx::executor_parameters<Parameters> &&
+                hpx::executor_any<Executor>)
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             mark_end_execution_t, Parameters&& params, Executor&& exec)
         {
@@ -448,17 +401,14 @@ namespace hpx::execution::experimental {
     /// \note This calls params.mark_begin_execution(exec) if it exists;
     ///       otherwise it does nothing.
     ///
-    HPX_CXX_EXPORT inline constexpr struct collect_execution_parameters_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct collect_execution_parameters_t
+        final
       : hpx::functional::detail::tag_priority<collect_execution_parameters_t>
     {
     private:
-        // clang-format off
-        template <typename Parameters, typename Executor,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_parameters_v<Parameters> &&
-                hpx::traits::is_executor_any_v<Executor>
-            )>
-        // clang-format on
+        template <typename Parameters, typename Executor>
+            requires(hpx::executor_parameters<Parameters> &&
+                hpx::executor_any<Executor>)
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             collect_execution_parameters_t, Parameters&& params,
             Executor&& exec, std::size_t num_elements, std::size_t num_cores,

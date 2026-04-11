@@ -32,7 +32,7 @@ namespace hpx::experimental {
 
     /// A \c task_group represents concurrent execution of a group of tasks.
     /// Tasks can be dynamically added to the group while it is executing.
-    HPX_CXX_EXPORT class task_group
+    HPX_CXX_CORE_EXPORT class task_group
     {
     public:
         HPX_CORE_EXPORT task_group();
@@ -78,12 +78,12 @@ namespace hpx::experimental {
 
             hpx::parallel::execution::post(HPX_FORWARD(Executor, exec),
                 [this, on_exit = HPX_MOVE(on_exit), f = HPX_FORWARD(F, f),
-                    t = hpx::make_tuple(HPX_FORWARD(Ts, ts)...)]() mutable {
+                    ... ts = HPX_FORWARD(Ts, ts)]() mutable {
                     // latch needs to be released before the lambda exits
                     auto _(HPX_MOVE(on_exit));
 
                     hpx::detail::try_catch_exception_ptr(
-                        [&]() { hpx::invoke_fused(HPX_MOVE(f), HPX_MOVE(t)); },
+                        [&]() { HPX_INVOKE(f, ts...); },
                         [this](std::exception_ptr e) {
                             add_exception(HPX_MOVE(e));
                         });

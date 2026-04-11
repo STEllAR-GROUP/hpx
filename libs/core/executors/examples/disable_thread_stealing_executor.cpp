@@ -75,17 +75,17 @@ namespace executor_example {
 
     // support all properties exposed by the wrapped executor
     // clang-format off
-    template <typename Tag, typename BaseExecutor,typename Property,
+    template <typename Tag, typename BaseExecutor, typename Property,
         HPX_CONCEPT_REQUIRES_(
             hpx::execution::experimental::is_scheduling_property_v<Tag>
         )>
+    // clang-format on
     auto tag_invoke(Tag tag,
         disable_thread_stealing_executor<BaseExecutor> const& exec,
         Property&& prop)
         -> decltype(disable_thread_stealing_executor<BaseExecutor>(
-            std::declval<Tag>()(
-                std::declval<BaseExecutor>(), std::declval<Property>())))
-    // clang-format on
+            std::declval<Tag>()(std::declval<BaseExecutor const&>(),
+                std::declval<Property&&>())))
     {
         return disable_thread_stealing_executor<BaseExecutor>(
             tag(static_cast<BaseExecutor const&>(exec),
@@ -100,7 +100,7 @@ namespace executor_example {
     // clang-format on
     auto tag_invoke(
         Tag tag, disable_thread_stealing_executor<BaseExecutor> const& exec)
-        -> decltype(std::declval<Tag>()(std::declval<BaseExecutor>()))
+        -> decltype(std::declval<Tag>()(std::declval<BaseExecutor const&>()))
     {
         return tag(static_cast<BaseExecutor const&>(exec));
     }
@@ -160,7 +160,8 @@ int hpx_main()
 
     // The following for_loop will be executed while thread stealing is disabled
     auto exec = executor_example::make_disable_thread_stealing_executor(
-        hpx::execution::par.executor());
+        hpx::execution::to_hierarchical_spawning(
+            hpx::execution::par.executor()));
 
     // This may lead to deadlock situations if the main thread executes some of
     // the chunks synchronously.

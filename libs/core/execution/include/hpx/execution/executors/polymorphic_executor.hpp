@@ -11,9 +11,11 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/execution/detail/future_exec.hpp>
+#include <hpx/modules/async_combinators.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
+#include <hpx/modules/pack_traversal.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/type_support.hpp>
 
@@ -86,6 +88,7 @@ namespace hpx::parallel::execution {
             using pointer = std::size_t*;
             using reference = std::size_t&;
 
+            shape_iter() = default;
             template <typename Iterator>
             explicit shape_iter(Iterator it)
               : impl_(new shape_iter_impl<Iterator>(it))
@@ -137,7 +140,7 @@ namespace hpx::parallel::execution {
             }
 
         protected:
-            std::unique_ptr<shape_iter_impl_base> impl_;
+            std::unique_ptr<shape_iter_impl_base> impl_{};
         };
 
         struct range_proxy
@@ -488,14 +491,30 @@ namespace hpx::parallel::execution {
 
             // bulk_async_execute
             template <typename T>
-            static std::vector<hpx::future<R>> _bulk_async_execute(void* exec,
+            static hpx::future<std::vector<R>> _bulk_async_execute(void* exec,
                 bulk_async_execute_function_type&& f, range_proxy const& shape,
                 Ts&&... ts)
             {
-                return execution::bulk_async_execute(vtable_base::get<T>(exec),
-                    HPX_MOVE(f), shape, HPX_FORWARD(Ts, ts)...);
+                auto result =
+                    execution::bulk_async_execute(vtable_base::get<T>(exec),
+                        HPX_MOVE(f), shape, HPX_FORWARD(Ts, ts)...);
+
+                // bulk_async_execute returns either a future<vector<R>> or a
+                // vector<future<R>>
+                if constexpr (hpx::traits::is_future_v<decltype(result)>)
+                {
+                    return result;
+                }
+                else
+                {
+                    return hpx::make_future<std::vector<R>>(
+                        hpx::when_all(HPX_MOVE(result)), [](auto&& inner) {
+                            return hpx::unwrap(
+                                HPX_FORWARD(decltype(inner), inner));
+                        });
+                }
             }
-            std::vector<hpx::future<R>> (*bulk_async_execute)(void*,
+            hpx::future<std::vector<R>> (*bulk_async_execute)(void*,
                 bulk_async_execute_function_type&&, range_proxy const& shape,
                 Ts&&...);
 
@@ -521,7 +540,7 @@ namespace hpx::parallel::execution {
             {
             }
 
-            static std::vector<hpx::future<R>> _empty_bulk_async_execute(void*,
+            static hpx::future<std::vector<R>> _empty_bulk_async_execute(void*,
                 bulk_async_execute_function_type&&, range_proxy const&, Ts&&...)
             {
                 throw_bad_polymorphic_executor<R>();
@@ -671,10 +690,10 @@ namespace hpx::parallel::execution {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Sig>
+    HPX_CXX_CORE_EXPORT template <typename Sig>
     class polymorphic_executor;
 
-    HPX_CXX_EXPORT template <typename R, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename R, typename... Ts>
     class polymorphic_executor<R(Ts...)> : detail::polymorphic_executor_base
     {
         using base_type = detail::polymorphic_executor_base;
@@ -842,12 +861,8 @@ namespace hpx::parallel::execution {
         }
 
         // BulkOneWayExecutor interface
-        // clang-format off
-        template <typename F, typename Shape,
-            HPX_CONCEPT_REQUIRES_(
-                !std::is_integral_v<Shape>
-            )>
-        // clang-format on
+        template <typename F, typename Shape>
+            requires(!std::is_integral_v<Shape>)
         HPX_FORCEINLINE friend std::vector<R> tag_invoke(
             hpx::parallel::execution::bulk_sync_execute_t,
             polymorphic_executor const& exec, F&& f, Shape const& s, Ts&&... ts)
@@ -864,13 +879,9 @@ namespace hpx::parallel::execution {
         }
 
         // BulkTwoWayExecutor interface
-        // clang-format off
-        template <typename F, typename Shape,
-            HPX_CONCEPT_REQUIRES_(
-                !std::is_integral_v<Shape>
-            )>
-        // clang-format on
-        HPX_FORCEINLINE friend std::vector<hpx::future<R>> tag_invoke(
+        template <typename F, typename Shape>
+            requires(!std::is_integral_v<Shape>)
+        HPX_FORCEINLINE friend hpx::future<std::vector<R>> tag_invoke(
             hpx::parallel::execution::bulk_async_execute_t,
             polymorphic_executor const& exec, F&& f, Shape const& s, Ts&&... ts)
         {
@@ -885,12 +896,8 @@ namespace hpx::parallel::execution {
                 HPX_FORWARD(Ts, ts)...);
         }
 
-        // clang-format off
-        template <typename F, typename Shape,
-            HPX_CONCEPT_REQUIRES_(
-                !std::is_integral_v<Shape>
-            )>
-        // clang-format on
+        template <typename F, typename Shape>
+            requires(!std::is_integral_v<Shape>)
         HPX_FORCEINLINE friend hpx::future<std::vector<R>> tag_invoke(
             hpx::parallel::execution::bulk_then_execute_t,
             polymorphic_executor const& exec, F&& f, Shape const& s,
@@ -929,31 +936,31 @@ namespace hpx::parallel::execution {
 namespace hpx::execution::experimental {
 
     /// \cond NOINTERNAL
-    HPX_CXX_EXPORT template <typename Sig>
+    HPX_CXX_CORE_EXPORT template <typename Sig>
     struct is_never_blocking_one_way_executor<
         parallel::execution::polymorphic_executor<Sig>> : std::true_type
     {
     };
 
-    HPX_CXX_EXPORT template <typename Sig>
+    HPX_CXX_CORE_EXPORT template <typename Sig>
     struct is_one_way_executor<parallel::execution::polymorphic_executor<Sig>>
       : std::true_type
     {
     };
 
-    HPX_CXX_EXPORT template <typename Sig>
+    HPX_CXX_CORE_EXPORT template <typename Sig>
     struct is_two_way_executor<parallel::execution::polymorphic_executor<Sig>>
       : std::true_type
     {
     };
 
-    HPX_CXX_EXPORT template <typename Sig>
+    HPX_CXX_CORE_EXPORT template <typename Sig>
     struct is_bulk_one_way_executor<
         parallel::execution::polymorphic_executor<Sig>> : std::true_type
     {
     };
 
-    HPX_CXX_EXPORT template <typename Sig>
+    HPX_CXX_CORE_EXPORT template <typename Sig>
     struct is_bulk_two_way_executor<
         parallel::execution::polymorphic_executor<Sig>> : std::true_type
     {

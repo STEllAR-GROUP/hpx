@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/executors.hpp>
+#include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/util/loop.hpp>
 
 #include <algorithm>
@@ -23,7 +24,7 @@ namespace hpx::parallel::util {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT struct unseq_loop_n
+        HPX_CXX_CORE_EXPORT struct unseq_loop_n
         {
             template <typename InIter, typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE static InIter call(
@@ -54,7 +55,7 @@ namespace hpx::parallel::util {
             }
         };
 
-        HPX_CXX_EXPORT struct unseq_loop_n_ind
+        HPX_CXX_CORE_EXPORT struct unseq_loop_n_ind
         {
             template <typename InIter, typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE static InIter call(
@@ -74,16 +75,17 @@ namespace hpx::parallel::util {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT struct unseq_loop
+        HPX_CXX_CORE_EXPORT struct unseq_loop
         {
             template <typename Begin, typename End, typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Begin call(
                 Begin HPX_RESTRICT it, End HPX_RESTRICT end, F&& f)
             {
-                if constexpr (hpx::traits::is_random_access_iterator_v<Begin>)
+                if constexpr (std::random_access_iterator<Begin>)
                 {
-                    return unseq_loop_n::call(
-                        it, std::distance(it, end), HPX_FORWARD(F, f));
+                    return unseq_loop_n::call(it,
+                        hpx::parallel::detail::distance(it, end),
+                        HPX_FORWARD(F, f));
                 }
                 else
                 {
@@ -109,16 +111,17 @@ namespace hpx::parallel::util {
             }
         };
 
-        HPX_CXX_EXPORT struct unseq_loop_ind
+        HPX_CXX_CORE_EXPORT struct unseq_loop_ind
         {
             template <typename Begin, typename End, typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Begin call(
                 Begin HPX_RESTRICT it, End HPX_RESTRICT end, F&& f)
             {
-                if constexpr (hpx::traits::is_random_access_iterator_v<Begin>)
+                if constexpr (std::random_access_iterator<Begin>)
                 {
-                    return unseq_loop_n_ind::call(
-                        it, std::distance(it, end), HPX_FORWARD(F, f));
+                    return unseq_loop_n_ind::call(it,
+                        hpx::parallel::detail::distance(it, end),
+                        HPX_FORWARD(F, f));
                 }
                 else
                 {
@@ -132,7 +135,7 @@ namespace hpx::parallel::util {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT struct unseq_loop2
+        HPX_CXX_CORE_EXPORT struct unseq_loop2
         {
             template <typename InIter1, typename InIter2, typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE static std::pair<InIter1, InIter2>
@@ -140,12 +143,13 @@ namespace hpx::parallel::util {
                 InIter2 HPX_RESTRICT it2, F&& f)
             {
                 constexpr bool iterators_are_random_access =
-                    hpx::traits::is_random_access_iterator_v<InIter1> &&
-                    hpx::traits::is_random_access_iterator_v<InIter2>;
+                    std::random_access_iterator<InIter1> &&
+                    std::random_access_iterator<InIter2>;
 
                 if constexpr (iterators_are_random_access)
                 {
-                    std::size_t const num = std::distance(it1, last1);
+                    std::size_t const num =
+                        hpx::parallel::detail::distance(it1, last1);
 
                     // clang-format off
                     HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
@@ -168,7 +172,7 @@ namespace hpx::parallel::util {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT struct unseq_loop_idx_n
+        HPX_CXX_CORE_EXPORT struct unseq_loop_idx_n
         {
             template <typename Iter, typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE static Iter call(
@@ -200,7 +204,7 @@ namespace hpx::parallel::util {
             }
         };
 
-        HPX_CXX_EXPORT template <typename IterCat>
+        HPX_CXX_CORE_EXPORT template <typename IterCat>
         struct unseq_loop_with_cleanup_n
         {
             ///////////////////////////////////////////////////////////////////
@@ -311,7 +315,7 @@ namespace hpx::parallel::util {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Begin, typename End, typename F>
+    HPX_CXX_CORE_EXPORT template <typename Begin, typename End, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE Begin tag_invoke(
         hpx::parallel::util::loop_t, hpx::execution::unsequenced_policy,
         Begin HPX_RESTRICT begin, End HPX_RESTRICT end, F&& f)
@@ -319,7 +323,7 @@ namespace hpx::parallel::util {
         return detail::unseq_loop::call(begin, end, HPX_FORWARD(F, f));
     }
 
-    HPX_CXX_EXPORT template <typename Begin, typename End, typename F>
+    HPX_CXX_CORE_EXPORT template <typename Begin, typename End, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE Begin tag_invoke(
         hpx::parallel::util::loop_t, hpx::execution::unsequenced_task_policy,
         Begin HPX_RESTRICT begin, End HPX_RESTRICT end, F&& f)
@@ -328,8 +332,8 @@ namespace hpx::parallel::util {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Begin, typename End, typename CancelToken,
-        typename F>
+    HPX_CXX_CORE_EXPORT template <typename Begin, typename End,
+        typename CancelToken, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE Begin tag_invoke(
         hpx::parallel::util::loop_t, hpx::execution::unsequenced_policy,
         Begin HPX_RESTRICT begin, End HPX_RESTRICT end, CancelToken& tok, F&& f)
@@ -337,8 +341,8 @@ namespace hpx::parallel::util {
         return detail::unseq_loop::call(begin, end, tok, HPX_FORWARD(F, f));
     }
 
-    HPX_CXX_EXPORT template <typename Begin, typename End, typename CancelToken,
-        typename F>
+    HPX_CXX_CORE_EXPORT template <typename Begin, typename End,
+        typename CancelToken, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE Begin tag_invoke(
         hpx::parallel::util::loop_t, hpx::execution::unsequenced_task_policy,
         Begin HPX_RESTRICT begin, End HPX_RESTRICT end, CancelToken& tok, F&& f)
@@ -347,7 +351,7 @@ namespace hpx::parallel::util {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Begin, typename End, typename F>
+    HPX_CXX_CORE_EXPORT template <typename Begin, typename End, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE Begin tag_invoke(
         hpx::parallel::util::loop_ind_t<hpx::execution::unsequenced_policy>,
         Begin HPX_RESTRICT begin, End HPX_RESTRICT end, F&& f)
@@ -355,8 +359,8 @@ namespace hpx::parallel::util {
         return detail::unseq_loop_ind::call(begin, end, HPX_FORWARD(F, f));
     }
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename Begin, typename End,
-        typename F>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Begin,
+        typename End, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE Begin tag_invoke(
         hpx::parallel::util::loop_ind_t<
             hpx::execution::unsequenced_task_policy>,
@@ -366,8 +370,8 @@ namespace hpx::parallel::util {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename ExPolicy, typename Iter1, typename Iter2,
-        typename F>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter1,
+        typename Iter2, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::enable_if_t<
         hpx::is_unsequenced_execution_policy_v<ExPolicy>,
         std::pair<Iter1, Iter2>>
@@ -380,7 +384,7 @@ namespace hpx::parallel::util {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename ExPolicy, typename Iter, typename F>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::enable_if_t<
         hpx::is_unsequenced_execution_policy_v<ExPolicy>, Iter>
     tag_invoke(hpx::parallel::util::loop_n_t<ExPolicy>, Iter HPX_RESTRICT it,
@@ -390,7 +394,7 @@ namespace hpx::parallel::util {
             it, count, HPX_FORWARD(F, f));
     }
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename Iter,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter,
         typename CancelToken, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::enable_if_t<
         hpx::is_unsequenced_execution_policy_v<ExPolicy>, Iter>
@@ -402,7 +406,7 @@ namespace hpx::parallel::util {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename ExPolicy, typename Iter, typename F>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::enable_if_t<
         hpx::is_unsequenced_execution_policy_v<ExPolicy>, Iter>
     tag_invoke(hpx::parallel::util::loop_n_ind_t<ExPolicy>,
@@ -413,7 +417,7 @@ namespace hpx::parallel::util {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename ExPolicy, typename Iter, typename F>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::enable_if_t<
         hpx::is_unsequenced_execution_policy_v<ExPolicy>, Iter>
     tag_invoke(hpx::parallel::util::loop_idx_n_t<ExPolicy>,
@@ -423,7 +427,7 @@ namespace hpx::parallel::util {
             base_idx, it, count, HPX_FORWARD(F, f));
     }
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename Iter,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter,
         typename CancelToken, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::enable_if_t<
         hpx::is_unsequenced_execution_policy_v<ExPolicy>, Iter>

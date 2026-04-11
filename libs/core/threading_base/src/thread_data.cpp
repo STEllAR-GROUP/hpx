@@ -13,16 +13,22 @@
 #include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/thread_support.hpp>
+#include <hpx/modules/tracing.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #if defined(HPX_HAVE_APEX)
 #include <hpx/threading_base/external_timer.hpp>
 #endif
+#if defined(HPX_HAVE_MODULE_TRACY)
+#include <hpx/modules/tracy.hpp>
+#endif
 
 #include <cstddef>
 #include <cstdint>
+#include <cstdio>
 #include <limits>
 #include <memory>
+#include <utility>
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace hpx::threads {
@@ -36,7 +42,7 @@ namespace hpx::threads {
 
         void set_get_locality_id(get_locality_id_type* f)
         {
-            get_locality_id_f = HPX_MOVE(f);
+            get_locality_id_f = f;
         }
 
         std::uint32_t get_locality_id(hpx::error_code& ec)
@@ -52,7 +58,8 @@ namespace hpx::threads {
     }    // namespace detail
 
     thread_data::thread_data(thread_init_data& init_data, void* queue,
-        std::ptrdiff_t stacksize, bool is_stackless, thread_id_addref addref)
+        std::ptrdiff_t const stacksize, bool const is_stackless,
+        thread_id_addref const addref)
       : detail::thread_data_reference_counting(addref)
       , priority_(init_data.priority)
       , requested_interrupt_(false)
@@ -109,6 +116,9 @@ namespace hpx::threads {
 #if defined(HPX_HAVE_APEX)
         set_timer_data(init_data.timer_data);
 #endif
+#if defined(HPX_HAVE_MODULE_TRACY)
+        tracy_fiber_name_[0] = '\0';
+#endif
     }
 
     thread_data::~thread_data()
@@ -163,7 +173,7 @@ namespace hpx::threads {
 
     void thread_data::free_thread_exit_callbacks()
     {
-        std::lock_guard<hpx::util::detail::spinlock> l(
+        std::scoped_lock<hpx::util::detail::spinlock> l(
             spinlock_pool::spinlock_for(this));
 
         // Exit functions should have been executed.
@@ -172,7 +182,7 @@ namespace hpx::threads {
         exit_funcs_.clear();
     }
 
-    bool thread_data::interruption_point(bool throw_on_interrupt)
+    bool thread_data::interruption_point(bool const throw_on_interrupt)
     {
         // We do not protect enabled_interrupt_ and requested_interrupt_ from
         // concurrent access here (which creates a benign data race) in order to
@@ -250,6 +260,10 @@ namespace hpx::threads {
         backtrace_ = nullptr;
 #endif
 
+#if defined(HPX_HAVE_MODULE_TRACY)
+        tracy_fiber_name_[0] = '\0';
+#endif
+
         LTM_(debug).format("thread::thread({}), description({}), rebind", this,
             get_description());
 
@@ -273,6 +287,85 @@ namespace hpx::threads {
         set_timer_data(init_data.timer_data);
 #endif
     }
+
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+    threads::thread_description thread_data::get_description() const
+    {
+        std::scoped_lock<hpx::util::detail::spinlock> l(
+            spinlock_pool::spinlock_for(this));
+        return description_;
+    }
+
+    threads::thread_description thread_data::set_description(
+        threads::thread_description value)
+    {
+        std::scoped_lock<hpx::util::detail::spinlock> l(
+            spinlock_pool::spinlock_for(this));
+        std::swap(description_, value);
+
+#if defined(HPX_HAVE_MODULE_TRACY)
+        tracy::detail::rename_region(description_.get_description());
+#endif
+
+        return value;
+    }
+
+    threads::thread_description thread_data::get_lco_description() const
+    {
+        std::scoped_lock<hpx::util::detail::spinlock> l(
+            spinlock_pool::spinlock_for(this));
+        return lco_description_;
+    }
+
+    threads::thread_description thread_data::set_lco_description(
+        threads::thread_description value)
+    {
+        std::scoped_lock<hpx::util::detail::spinlock> l(
+            spinlock_pool::spinlock_for(this));
+        std::swap(lco_description_, value);
+        return value;
+    }
+#endif
+
+#if defined(HPX_HAVE_MODULE_TRACY)
+    char const* thread_data::get_tracy_description_name(
+        threads::thread_description const& description,
+        char const* fallback) noexcept
+    {
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+        if (description.kind() ==
+            threads::thread_description::data_type::description)
+        {
+            char const* description_name = description.get_description();
+            if (description_name != nullptr && description_name[0] != '\0')
+            {
+                return description_name;
+            }
+        }
+#else
+        char const* description_name = description.get_description();
+        if (description_name != nullptr && description_name[0] != '\0')
+        {
+            return description_name;
+        }
+#endif
+        return fallback;
+    }
+
+    char const* thread_data::get_tracy_fiber_name() const noexcept
+    {
+        if (tracy_fiber_name_[0] == '\0')
+        {
+            char const* name =
+                get_tracy_description_name(get_description(), "fiber");
+            // Use the HPX thread_id pointer as the unique numeric suffix
+            // so each HPX task gets its own fiber track in Tracy.
+            std::snprintf(tracy_fiber_name_, sizeof(tracy_fiber_name_), "%s_%p",
+                name, get_thread_id().get());
+        }
+        return tracy_fiber_name_;
+    }
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     thread_self& get_self()
@@ -330,16 +423,6 @@ namespace hpx::threads {
         if (thread_self const* self = get_self_ptr();
             HPX_LIKELY(nullptr != self))
         {
-            return self->get_thread_id();
-        }
-        return threads::invalid_thread_id;
-    }
-
-    thread_id_type get_outer_self_id() noexcept
-    {
-        if (thread_self const* self = get_self_ptr();
-            HPX_LIKELY(nullptr != self))
-        {
             return self->get_outer_thread_id();
         }
         return threads::invalid_thread_id;
@@ -350,7 +433,7 @@ namespace hpx::threads {
         if (thread_self const* self = get_self_ptr();
             HPX_LIKELY(nullptr != self))
         {
-            return get_thread_id_data(self->get_thread_id());
+            return get_thread_id_data(self->get_outer_thread_id());
         }
         return nullptr;
     }
@@ -429,7 +512,7 @@ namespace hpx::threads {
         if (thread_data const* thrd_data = get_self_id_data();
             HPX_LIKELY(nullptr != thrd_data))
         {
-            return thrd_data->get_component_id();
+            return hpx::threads::thread_data::get_component_id();
         }
         return 0;
 #endif
@@ -457,4 +540,20 @@ namespace hpx::threads {
         }
     }
 #endif
+
+#if defined(HPX_HAVE_MODULE_TRACY)
+    tracing::region_init_data get_region_init_data(thread_data const* thrdptr)
+    {
+        return {thrdptr->get_description().get_description(),
+            thrdptr->get_thread_phase(), thrdptr->is_stackless()};
+    }
+
+    tracing::fiber_region_init_data get_fiber_region_init_data(
+        thread_data const* thrdptr)
+    {
+        return {thrdptr->get_description().get_description(),
+            thrdptr->get_tracy_fiber_name(), thrdptr->is_stackless()};
+    }
+#endif
+
 }    // namespace hpx::threads

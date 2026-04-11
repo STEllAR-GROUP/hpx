@@ -23,7 +23,7 @@ namespace hpx::util {
     /// \param r  [in] The return value of a std::map insert operation.
     ///
     /// \returns  This function returns \b r.second.
-    HPX_CXX_EXPORT template <typename Iterator>
+    HPX_CXX_CORE_EXPORT template <typename Iterator>
     constexpr bool insert_checked(std::pair<Iterator, bool> const& r) noexcept
     {
         return r.second;
@@ -41,7 +41,7 @@ namespace hpx::util {
     ///        inserted element
     ///
     /// \returns  This function returns \b r.second.
-    HPX_CXX_EXPORT template <typename Iterator>
+    HPX_CXX_CORE_EXPORT template <typename Iterator>
     bool insert_checked(std::pair<Iterator, bool> const& r, Iterator& it)
     {
         it = r.first;

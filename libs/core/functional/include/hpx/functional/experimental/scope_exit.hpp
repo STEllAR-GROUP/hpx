@@ -22,7 +22,7 @@ namespace hpx::experimental {
 
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename F>
+        HPX_CXX_CORE_EXPORT template <typename F>
         struct scope_exit
         {
             explicit constexpr scope_exit(F&& f) noexcept(
@@ -51,7 +51,7 @@ namespace hpx::experimental {
             scope_exit& operator=(scope_exit const&) = delete;
             scope_exit& operator=(scope_exit&& rhs) = delete;
 
-            HPX_CONSTEXPR_DESTRUCTOR ~scope_exit() noexcept
+            constexpr ~scope_exit() noexcept
             {
                 if (active)
                 {
@@ -76,7 +76,7 @@ namespace hpx::experimental {
     /// \tparam F type of stored exit function
     ///
     /// \param f stored exit function
-    HPX_CXX_EXPORT template <typename F>
+    HPX_CXX_CORE_EXPORT template <typename F>
     auto scope_exit(F&& f)
     {
         return detail::scope_exit<std::decay_t<F>>(HPX_FORWARD(F, f));

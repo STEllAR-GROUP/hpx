@@ -17,7 +17,12 @@ if(NOT HPX_WITH_FETCH_ASIO)
   find_package(Asio 1.12.0)
   if(NOT Asio_FOUND)
     hpx_error(
-      "Could not find Asio. Set Asio_ROOT as a CMake or environment variable to point to the Asio root install directory. Alternatively, set HPX_WITH_FETCH_ASIO=ON to fetch Asio using CMake's FetchContent (when using this option Asio will be installed together with HPX, be careful about conflicts with separately installed versions of Asio)."
+      "Could not find Asio. Set Asio_ROOT as a CMake or environment variable to "
+      "point to the Asio root install directory. Alternatively, set "
+      "HPX_WITH_FETCH_ASIO=ON to fetch Asio using CMake's FetchContent (this is "
+      "currently the default, but might have failed or been disabled). Note that "
+      "Asio is installed together with HPX, be careful about conflicts with "
+      "separately installed versions of Asio."
     )
   endif()
 elseif(NOT TARGET Asio::asio AND NOT HPX_FIND_PACKAGE)
@@ -89,7 +94,7 @@ if(NOT HPX_FIND_PACKAGE)
   hpx_add_config_cond_define(ASIO_HAS_STD_INVOKE_RESULT 1)
 
   # Asio should not use Boost exceptions
-  hpx_add_config_cond_define(ASIO_HAS_BOOST_THROW_EXCEPTION 0)
+  # hpx_add_config_cond_define(ASIO_HAS_BOOST_THROW_EXCEPTION 0)
 
   # Disable concepts support in Asio as a workaround to
   # https://github.com/boostorg/asio/issues/312

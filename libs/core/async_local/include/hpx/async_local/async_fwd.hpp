@@ -19,7 +19,7 @@ namespace hpx {
     namespace detail {
 
         // dispatch point used for async<Action> implementations
-        HPX_CXX_EXPORT template <typename Action, typename Func,
+        HPX_CXX_CORE_EXPORT template <typename Action, typename Func,
             typename Enable = void>
         struct async_action_dispatch;
     }    // namespace detail
@@ -27,7 +27,7 @@ namespace hpx {
     //////////////////////////////////////////////////////////////////////////
     // different versions of clang-format disagree
     // clang-format off
-    HPX_CXX_EXPORT template <typename Action, typename F, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename Action, typename F, typename... Ts>
     HPX_FORCEINLINE auto async(F&& f, Ts&&... ts) -> decltype(
         detail::async_action_dispatch<Action, std::decay_t<F>>::call(
             HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));

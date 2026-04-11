@@ -33,10 +33,14 @@ namespace hpx::execution::experimental {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Warray-bounds"
 #endif
-        HPX_CXX_EXPORT template <typename Data>
+        HPX_CXX_CORE_EXPORT template <typename Data>
         struct future_receiver_base
         {
+#if defined(HPX_HAVE_STDEXEC)
+            using receiver_concept = hpx::execution::experimental::receiver_t;
+#else
             using is_receiver = void;
+#endif
             hpx::intrusive_ptr<Data> data;
 
         protected:
@@ -71,7 +75,7 @@ namespace hpx::execution::experimental {
 #pragma GCC diagnostic pop
 #endif
 
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         struct future_receiver
           : future_receiver_base<hpx::lcos::detail::future_data_base<T>>
         {
@@ -100,7 +104,7 @@ namespace hpx::execution::experimental {
 #pragma GCC diagnostic ignored "-Warray-bounds"
 #pragma GCC diagnostic ignored "-Wstringop-overflow"
 #endif
-        HPX_CXX_EXPORT template <typename T, typename Allocator,
+        HPX_CXX_CORE_EXPORT template <typename T, typename Allocator,
             typename OperationState, typename Derived = void>
         struct future_data
           : hpx::lcos::detail::future_data_allocator<T, Allocator,
@@ -139,7 +143,7 @@ namespace hpx::execution::experimental {
             // NOLINTEND(bugprone-crtp-constructor-accessibility)
         };
 
-        HPX_CXX_EXPORT template <typename T, typename Allocator,
+        HPX_CXX_CORE_EXPORT template <typename T, typename Allocator,
             typename OperationState>
         struct future_data_with_run_loop
           : future_data<T, Allocator, OperationState,
@@ -167,8 +171,9 @@ namespace hpx::execution::experimental {
               //TODO: Keep an eye on this, it is based on the internal impl of
               // stdexec, so it is subect to change. This is currently relying
               // on the env struct to expose __loop_ as a public member.
-              , loop(*hpx::execution::experimental::get_env(schedule(sched))
-                        .__loop_)
+              , loop(static_cast<hpx::execution::experimental::run_loop&>(
+                    *hpx::execution::experimental::get_env(schedule(sched))
+                        .__loop_))
 #else
               , loop(sched.get_run_loop())
 #endif
@@ -190,7 +195,7 @@ namespace hpx::execution::experimental {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename Sender, typename Allocator>
+        HPX_CXX_CORE_EXPORT template <typename Sender, typename Allocator>
         auto make_future(Sender&& sender, Allocator const& allocator)
         {
             using allocator_type = Allocator;
@@ -201,9 +206,15 @@ namespace hpx::execution::experimental {
 
             using result_type =
                 std::decay_t<detail::single_result_t<value_types>>;
+#if defined(HPX_HAVE_STDEXEC)
+            using operation_state_type =
+                hpx::execution::experimental::connect_result_t<Sender,
+                    detail::future_receiver<result_type>>;
+#else
             using operation_state_type = hpx::util::invoke_result_t<
                 hpx::execution::experimental::connect_t, Sender,
                 detail::future_receiver<result_type>>;
+#endif
 
             using shared_state =
                 future_data<result_type, allocator_type, operation_state_type>;
@@ -229,7 +240,7 @@ namespace hpx::execution::experimental {
 #endif
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename Sender, typename Allocator>
+        HPX_CXX_CORE_EXPORT template <typename Sender, typename Allocator>
         auto make_future_with_run_loop(
 #if defined(HPX_HAVE_STDEXEC)
             decltype(std::declval<hpx::execution::experimental::run_loop>()
@@ -247,9 +258,15 @@ namespace hpx::execution::experimental {
 
             using result_type =
                 std::decay_t<detail::single_result_t<value_types>>;
+#if defined(HPX_HAVE_STDEXEC)
+            using operation_state_type =
+                hpx::execution::experimental::connect_result_t<Sender,
+                    detail::future_receiver<result_type>>;
+#else
             using operation_state_type = hpx::util::invoke_result_t<
                 hpx::execution::experimental::connect_t, Sender,
                 detail::future_receiver<result_type>>;
+#endif
 
             using shared_state = future_data_with_run_loop<result_type,
                 allocator_type, operation_state_type>;
@@ -275,7 +292,7 @@ namespace hpx::execution::experimental {
 
 namespace hpx::traits::detail {
 
-    HPX_CXX_EXPORT template <typename T, typename Allocator,
+    HPX_CXX_CORE_EXPORT template <typename T, typename Allocator,
         typename OperationState, typename NewAllocator>
     struct shared_state_allocator<hpx::execution::experimental::detail::
                                       future_data<T, Allocator, OperationState>,
@@ -285,7 +302,7 @@ namespace hpx::traits::detail {
             NewAllocator, OperationState>;
     };
 
-    HPX_CXX_EXPORT template <typename T, typename Allocator,
+    HPX_CXX_CORE_EXPORT template <typename T, typename Allocator,
         typename OperationState, typename NewAllocator>
     struct shared_state_allocator<
         hpx::execution::experimental::detail::future_data_with_run_loop<T,
@@ -318,7 +335,7 @@ namespace hpx::execution::experimental {
     // If the provided sender sends the "stopped" signal instead of values,
     // make_future calls std::terminate.
     //
-    HPX_CXX_EXPORT inline constexpr struct make_future_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct make_future_t final
       : hpx::functional::detail::tag_priority<make_future_t>
     {
     private:

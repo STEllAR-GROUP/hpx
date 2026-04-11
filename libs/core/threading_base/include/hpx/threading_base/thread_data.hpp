@@ -17,6 +17,7 @@
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/tracing.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>
 #include <hpx/threading_base/threading_base_fwd.hpp>
@@ -27,6 +28,8 @@
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
+#include <cstdio>
+#include <cstring>
 #include <forward_list>
 #include <limits>
 #include <memory>
@@ -44,11 +47,11 @@ namespace hpx::threads {
 
     namespace detail {
 
-        HPX_CXX_EXPORT using get_locality_id_type =
+        HPX_CXX_CORE_EXPORT using get_locality_id_type =
             std::uint32_t(hpx::error_code&);
-        HPX_CXX_EXPORT HPX_CORE_EXPORT void set_get_locality_id(
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void set_get_locality_id(
             get_locality_id_type* f);
-        HPX_CXX_EXPORT HPX_CORE_EXPORT std::uint32_t get_locality_id(
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT std::uint32_t get_locality_id(
             hpx::error_code&);
     }    // namespace detail
 
@@ -68,7 +71,7 @@ namespace hpx::threads {
     /// Generally, \a threads are not created or executed directly. All
     /// functionality related to the management of \a threads is implemented by
     /// the thread-manager.
-    HPX_CXX_EXPORT class thread_data
+    HPX_CXX_CORE_EXPORT class thread_data
       : public detail::thread_data_reference_counting
     {
     public:
@@ -276,35 +279,29 @@ namespace hpx::threads {
             return {"<unknown>"};
         }
 #else
-        threads::thread_description get_description() const
-        {
-            std::lock_guard<hpx::util::detail::spinlock> l(
-                spinlock_pool::spinlock_for(this));
-            return description_;
-        }
+        threads::thread_description get_description() const;
         threads::thread_description set_description(
-            threads::thread_description value)
-        {
-            std::lock_guard<hpx::util::detail::spinlock> l(
-                spinlock_pool::spinlock_for(this));
-            std::swap(description_, value);
-            return value;
-        }
+            threads::thread_description value);
 
-        threads::thread_description get_lco_description() const
-        {
-            std::lock_guard<hpx::util::detail::spinlock> l(
-                spinlock_pool::spinlock_for(this));
-            return lco_description_;
-        }
+        threads::thread_description get_lco_description() const;
         threads::thread_description set_lco_description(
-            threads::thread_description value)
-        {
-            std::lock_guard<hpx::util::detail::spinlock> l(
-                spinlock_pool::spinlock_for(this));
-            std::swap(lco_description_, value);
-            return value;
-        }
+            threads::thread_description value);
+#endif
+
+#if defined(HPX_HAVE_MODULE_TRACY)
+    private:
+        mutable char tracy_fiber_name_[64];
+
+    public:
+        static char const* get_tracy_description_name(
+            threads::thread_description const& description,
+            char const* fallback) noexcept;
+
+        // Returns a unique, stable string identifying this HPX task as a Tracy
+        // fiber. Built lazily on first call and cached in tracy_fiber_name_.
+        // Format: "<description>_<thread_id_ptr>" so each HPX task gets its
+        // own fiber track in the Tracy profiler.
+        char const* get_tracy_fiber_name() const noexcept;
 #endif
 
 #if !defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
@@ -446,35 +443,31 @@ namespace hpx::threads {
         }
 
         // handle thread interruption
-        bool interruption_requested() const noexcept
+        constexpr bool interruption_requested() const noexcept
         {
-            std::lock_guard<hpx::util::detail::spinlock> l(
-                spinlock_pool::spinlock_for(this));
             return requested_interrupt_;
         }
 
-        bool interruption_enabled() const noexcept
+        constexpr bool interruption_enabled() const noexcept
         {
-            std::lock_guard<hpx::util::detail::spinlock> l(
-                spinlock_pool::spinlock_for(this));
             return enabled_interrupt_;
         }
 
         bool set_interruption_enabled(bool enable) noexcept
         {
-            std::lock_guard<hpx::util::detail::spinlock> l(
-                spinlock_pool::spinlock_for(this));
-            std::swap(enabled_interrupt_, enable);
+            using std::swap;
+            swap(enabled_interrupt_, enable);
             return enable;
         }
 
-        void interrupt(bool flag = true)
+        void interrupt(bool const flag = true)
         {
             std::unique_lock<hpx::util::detail::spinlock> l(
                 spinlock_pool::spinlock_for(this));
             if (flag && !enabled_interrupt_)
             {
                 l.unlock();
+
                 HPX_THROW_EXCEPTION(hpx::error::thread_not_interruptable,
                     "thread_data::interrupt",
                     "interrupts are disabled for this thread");
@@ -666,17 +659,37 @@ namespace hpx::threads {
 #endif
     };
 
-    HPX_CXX_EXPORT HPX_FORCEINLINE constexpr thread_data* get_thread_id_data(
-        thread_id_ref_type const& tid) noexcept
+    HPX_CXX_CORE_EXPORT HPX_FORCEINLINE constexpr thread_data*
+    get_thread_id_data(thread_id_ref_type const& tid) noexcept
     {
         return static_cast<thread_data*>(tid.get().get());
     }
 
-    HPX_CXX_EXPORT HPX_FORCEINLINE constexpr thread_data* get_thread_id_data(
-        thread_id_type const& tid) noexcept
+    HPX_CXX_CORE_EXPORT HPX_FORCEINLINE constexpr thread_data*
+    get_thread_id_data(thread_id_type const& tid) noexcept
     {
         return static_cast<thread_data*>(tid.get());
     }
+
+#if defined(HPX_HAVE_MODULE_TRACY)
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT tracing::region_init_data
+    get_region_init_data(thread_data const* thrdptr);
+
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT tracing::fiber_region_init_data
+    get_fiber_region_init_data(thread_data const* thrdptr);
+#else
+    HPX_CXX_CORE_EXPORT constexpr tracing::region_init_data
+    get_region_init_data(thread_data const*) noexcept
+    {
+        return {};
+    }
+
+    HPX_CXX_CORE_EXPORT constexpr tracing::fiber_region_init_data
+    get_fiber_region_init_data(thread_data const*) noexcept
+    {
+        return {};
+    }
+#endif
 }    // namespace hpx::threads
 
 #include <hpx/config/warnings_suffix.hpp>
@@ -694,8 +707,11 @@ namespace hpx::threads {
 
         if (is_stackless())
         {
+            HPX_ASSERT(dynamic_cast<thread_data_stackless*>(this) != nullptr);
             return static_cast<thread_data_stackless*>(this)->call();
         }
+
+        HPX_ASSERT(dynamic_cast<thread_data_stackful*>(this) != nullptr);
         return static_cast<thread_data_stackful*>(this)->call(agent_storage);
     }
 
@@ -705,8 +721,11 @@ namespace hpx::threads {
 
         if (is_stackless())
         {
+            HPX_ASSERT(dynamic_cast<thread_data_stackless*>(this) != nullptr);
             return static_cast<thread_data_stackless*>(this)->call();
         }
-        return static_cast<thread_data_stackful*>(this)->invoke_directly();
+
+        HPX_ASSERT(dynamic_cast<thread_data_stackful*>(this) != nullptr);
+        return static_cast<thread_data_stackful*>(this)->call_directly();
     }
 }    // namespace hpx::threads

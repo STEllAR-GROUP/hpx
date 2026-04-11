@@ -20,77 +20,78 @@ namespace hpx::execution::experimental {
 
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename, template <typename...> typename>
+        HPX_CXX_CORE_EXPORT template <typename, template <typename...> typename>
         inline constexpr bool is_instance_of_ = false;
 
-        HPX_CXX_EXPORT template <typename... As,
+        HPX_CXX_CORE_EXPORT template <typename... As,
             template <typename...> typename T>
         inline constexpr bool is_instance_of_<T<As...>, T> = true;
 
-        HPX_CXX_EXPORT template <typename T, template <typename...> typename F>
+        HPX_CXX_CORE_EXPORT template <typename T,
+            template <typename...> typename F>
         inline constexpr bool is_instance_of = is_instance_of_<T, F>;
 
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         inline constexpr bool is_await_suspend_result_t_v =
             meta::value<meta::one_of<T, void, bool>> ||
             is_instance_of<T, hpx::coroutine_handle>;
 
 #if defined(HPX_HAVE_STDEXEC)
         // In P2300R7+ await ready also needs to be contextually convertible to bool.
-        HPX_CXX_EXPORT template <typename, typename = void>
+        HPX_CXX_CORE_EXPORT template <typename, typename = void>
         inline constexpr bool has_await_ready_contextually_convertible_to_bool =
             false;
 
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         inline constexpr bool has_await_ready_contextually_convertible_to_bool<
             T, std::void_t<decltype(std::declval<T>().await_ready() ? 0 : 1)>> =
             true;
 #endif
 
-        HPX_CXX_EXPORT template <typename, typename = void>
+        HPX_CXX_CORE_EXPORT template <typename, typename = void>
         inline constexpr bool has_await_ready = false;
 
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         inline constexpr bool has_await_ready<T,
             std::void_t<decltype(std::declval<T>().await_ready())>> = true;
 
-        HPX_CXX_EXPORT template <typename, typename = void>
+        HPX_CXX_CORE_EXPORT template <typename, typename = void>
         inline constexpr bool has_await_resume = false;
 
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         inline constexpr bool has_await_resume<T,
             std::void_t<decltype(std::declval<T>().await_resume())>> = true;
 
-        HPX_HAS_MEMBER_XXX_TRAIT_DEF(HPX_CXX_EXPORT, await_suspend);
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(HPX_CXX_CORE_EXPORT, await_suspend);
 
         // clang-format off
-        HPX_CXX_EXPORT template <typename T, typename Ts>
+        HPX_CXX_CORE_EXPORT template <typename T, typename Ts>
         using await_suspend_coro_handle_t = decltype(
             std::declval<T>().await_suspend(hpx::coroutine_handle<Ts>{}));
         // clang-format on
 
-        HPX_CXX_EXPORT template <typename Awaiter, typename Promise>
+        HPX_CXX_CORE_EXPORT template <typename Awaiter, typename Promise>
         inline constexpr bool is_await_suspend_result_v =
             is_await_suspend_result_t_v<
                 await_suspend_coro_handle_t<Awaiter, Promise>>;
 
-        HPX_CXX_EXPORT template <typename Awaiter, typename Promise,
+        HPX_CXX_CORE_EXPORT template <typename Awaiter, typename Promise,
             typename = void>
         inline constexpr bool is_with_await_suspend_v = false;
 
-        HPX_CXX_EXPORT template <typename Awaiter, typename Promise>
+        HPX_CXX_CORE_EXPORT template <typename Awaiter, typename Promise>
         inline constexpr bool is_with_await_suspend_v<Awaiter, Promise,
             std::enable_if_t<has_await_suspend_v<Awaiter> &&
                 (!std::is_same_v<Promise, void>)>> =
             is_await_suspend_result_v<Awaiter, Promise>;
 
-        HPX_CXX_EXPORT template <typename Awaiter, typename Promise>
+        HPX_CXX_CORE_EXPORT template <typename Awaiter, typename Promise>
         inline constexpr bool is_with_await_suspend_v<Awaiter, Promise,
             std::enable_if_t<std::is_same_v<Promise, void>>> = true;
 #if defined(HPX_HAVE_STDEXEC)
         // In P2300R8 "T is bool" is a sufficient condition for T to be an
         // await suspend result type.
-        HPX_CXX_EXPORT template <typename Awaiter, typename Promise>
+        HPX_CXX_CORE_EXPORT template <typename Awaiter, typename Promise>
         inline constexpr bool is_with_await_suspend_v<Awaiter, Promise,
             std::enable_if_t<std::is_same_v<Promise, bool>>> = true;
 #endif
@@ -111,7 +112,7 @@ namespace hpx::execution::experimental {
     // is only awaitable within specific contexts and thus we don't consider it
     // to satisfy the Awaiter concept.
     //
-    HPX_CXX_EXPORT template <typename Awaiter, typename Promise = void>
+    HPX_CXX_CORE_EXPORT template <typename Awaiter, typename Promise = void>
     struct is_awaiter
       : std::integral_constant<bool,
 #if defined(HPX_HAVE_STDEXEC)
@@ -124,38 +125,38 @@ namespace hpx::execution::experimental {
     {
     };
 
-    HPX_CXX_EXPORT template <typename Awaiter, typename Promise = void>
+    HPX_CXX_CORE_EXPORT template <typename Awaiter, typename Promise = void>
     inline constexpr bool is_awaiter_v = is_awaiter<Awaiter, Promise>::value;
 
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename Awaitable, typename = void>
+        HPX_CXX_CORE_EXPORT template <typename Awaitable, typename = void>
         inline constexpr bool has_member_operator_co_await_v = false;
 
         // different versions of clang-format disagree
         // clang-format off
-        HPX_CXX_EXPORT template <typename Awaitable>
+        HPX_CXX_CORE_EXPORT template <typename Awaitable>
         inline constexpr bool has_member_operator_co_await_v<Awaitable,
             std::void_t<
                 decltype(std::declval<Awaitable>().operator co_await())>> =
             true;
         // clang-format on
 
-        HPX_CXX_EXPORT template <typename Awaitable, typename = void>
+        HPX_CXX_CORE_EXPORT template <typename Awaitable, typename = void>
         inline constexpr bool has_free_operator_co_await_v = false;
 
-        HPX_CXX_EXPORT template <typename Awaitable>
+        HPX_CXX_CORE_EXPORT template <typename Awaitable>
         inline constexpr bool has_free_operator_co_await_v<Awaitable,
             std::void_t<decltype(operator co_await(
                 std::declval<Awaitable>()))>> = true;
 
-        HPX_HAS_MEMBER_XXX_TRAIT_DEF(HPX_CXX_EXPORT, await_transform);
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(HPX_CXX_CORE_EXPORT, await_transform);
     }    // namespace detail
 
     // Returns the result of applying operator co_await() to the function's
     // argument, if the operator is defined, otherwise returns a reference to
     // the input argument.
-    HPX_CXX_EXPORT template <typename Awaitable>
+    HPX_CXX_CORE_EXPORT template <typename Awaitable>
     decltype(auto) get_awaiter(Awaitable&& await, void*)
     {
         if constexpr (detail::has_member_operator_co_await_v<Awaitable>)
@@ -172,7 +173,7 @@ namespace hpx::execution::experimental {
         }
     }
 
-    HPX_CXX_EXPORT template <typename Awaitable, typename Promise,
+    HPX_CXX_CORE_EXPORT template <typename Awaitable, typename Promise,
         typename = std::enable_if_t<detail::has_await_transform_v<Promise>>>
     decltype(auto) get_awaiter(Awaitable&& await, Promise* promise)
     {
@@ -213,7 +214,7 @@ namespace hpx::execution::experimental {
     // satisfy the Awaiter concept. Otherwise, the Awaitable object must satisfy
     // the Awaiter concept itself.
     //
-    HPX_CXX_EXPORT template <typename Awaitable, typename Promise = void>
+    HPX_CXX_CORE_EXPORT template <typename Awaitable, typename Promise = void>
     struct is_awaitable
       : is_awaiter<decltype(get_awaiter(std::declval<Awaitable>(),
                        static_cast<Promise*>(nullptr))),
@@ -221,13 +222,13 @@ namespace hpx::execution::experimental {
     {
     };
 
-    HPX_CXX_EXPORT template <typename Awaitable, typename Promise = void>
+    HPX_CXX_CORE_EXPORT template <typename Awaitable, typename Promise = void>
     inline constexpr bool is_awaitable_v =
         is_awaitable<Awaitable, Promise>::value;
 
     // different versions of clang-format disagree
     // clang-format off
-    HPX_CXX_EXPORT template <typename Awaitable, typename Promise = void,
+    HPX_CXX_CORE_EXPORT template <typename Awaitable, typename Promise = void,
         typename = std::enable_if_t<is_awaitable_v<Awaitable, Promise>>>
     using await_result_t = decltype((
         get_awaiter(std::declval<Awaitable>(), static_cast<Promise*>(nullptr))

@@ -17,18 +17,14 @@
 namespace hpx::parallel::detail {
 
     // provide implementation of std::rotate supporting iterators/sentinels
-    HPX_CXX_EXPORT template <typename Iter, typename Sent>
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent>
     constexpr void sequential_rotate_helper(
         Iter first, Iter new_first, Sent last)
     {
         Iter next = new_first;
         while (first != next)
         {
-#if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
             std::ranges::iter_swap(first++, next++);
-#else
-            std::iter_swap(first++, next++);
-#endif
             if (next == last)
             {
                 next = new_first;
@@ -40,7 +36,7 @@ namespace hpx::parallel::detail {
         }
     }
 
-    HPX_CXX_EXPORT template <typename Iter, typename Sent>
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent>
     constexpr util::in_out_result<Iter, Sent> sequential_rotate(
         Iter first, Iter new_first, Sent last)
     {

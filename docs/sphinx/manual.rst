@@ -21,6 +21,7 @@ information on how to build and use |hpx| in different scenarios.
    manual/getting_hpx
    manual/building_hpx
    manual/cmake_variables
+   manual/using_hpx_on_compiler_explorer
    manual/migration_guide
    manual/building_tests_examples
    manual/creating_hpx_projects
@@ -32,7 +33,9 @@ information on how to build and use |hpx| in different scenarios.
    manual/debugging_hpx_applications
    manual/optimizing_hpx_applications
    manual/using_the_lci_parcelport
+   manual/using_the_lcw_parcelport
    manual/hpx_runtime_and_resources
    manual/executors
-   manual/miscellaneous
+   manual/error_handling
+   manual/iostreams
    manual/troubleshooting

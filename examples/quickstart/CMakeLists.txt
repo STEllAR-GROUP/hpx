@@ -42,6 +42,10 @@ if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD" AND NOT HPX_WITH_STATIC_LINKING)
   set(example_programs ${example_programs} init_globally)
 endif()
 
+if(NOT (MSVC AND HPX_WITH_CXX_MODULES))
+  list(APPEND example_programs sender_diamond)
+endif()
+
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
   set(example_programs
       ${example_programs}
@@ -82,6 +86,9 @@ endif()
 set(disabled_tests error_handling fibonacci_await non_atomic_rma zerocopy_rdma)
 if(HPX_WITH_STATIC_LINKING)
   set(disabled_tests ${disabled_tests} hello_world_1)
+endif()
+if(HPX_WITH_DISTRIBUTED_RUNTIME)
+  set(disabled_tests ${disabled_tests} 1d_wave_equation)
 endif()
 
 set(1d_wave_equation_FLAGS COMPONENT_DEPENDENCIES iostreams)
@@ -131,6 +138,7 @@ set(hello_world_2_PARAMETERS THREADS_PER_LOCALITY 4)
 set(hello_world_distributed_PARAMETERS THREADS_PER_LOCALITY 4)
 set(interval_timer_PARAMETERS THREADS_PER_LOCALITY 4)
 set(local_channel_PARAMETERS THREADS_PER_LOCALITY 4)
+set(sender_diamond_PARAMETERS THREADS_PER_LOCALITY 4)
 set(sierpinski_PARAMETERS THREADS_PER_LOCALITY 4)
 set(partitioned_vector_spmd_foreach_PARAMETERS THREADS_PER_LOCALITY 4)
 set(pingpong_PARAMETERS THREADS_PER_LOCALITY 4)

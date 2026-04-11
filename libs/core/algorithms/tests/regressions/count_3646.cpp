@@ -23,9 +23,24 @@ struct bit_counting_iterator : public iterator<std::int64_t>
     using pointer = std::int64_t const*;
     using reference = std::int64_t const&;
 
+    bit_counting_iterator() = default;
+
     explicit bit_counting_iterator(int64_t initialState)
       : iterator<int64_t>(initialState)
     {
+    }
+
+    bit_counting_iterator& operator++()
+    {
+        iterator<int64_t>::operator++();
+        return *this;
+    }
+
+    bit_counting_iterator operator++(int)
+    {
+        auto copy = *this;
+        ++(*this);
+        return copy;
     }
 
 private:

@@ -12,10 +12,8 @@
 #include <hpx/actions_base/component_action.hpp>
 #include <hpx/async_distributed/lcos_fwd.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
-#include <hpx/components_base/component_type.hpp>
-#include <hpx/components_base/get_lva.hpp>
-#include <hpx/components_base/server/managed_component_base.hpp>
-#include <hpx/naming_base/id_type.hpp>
+#include <hpx/modules/components_base.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/parcelset/coalescing_message_handler_registration.hpp>
 
 #include <cstddef>

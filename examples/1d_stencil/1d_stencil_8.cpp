@@ -17,8 +17,6 @@
 #include <hpx/modules/type_support.hpp>
 #include <hpx/serialization.hpp>
 
-#include <boost/shared_array.hpp>
-
 #include "print_time_results.hpp"
 
 #include <cstddef>

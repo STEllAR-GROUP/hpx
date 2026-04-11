@@ -7,12 +7,12 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/components/basename_registration.hpp>
-#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/modules/async_combinators.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/futures.hpp>
-#include <hpx/naming_base/id_type.hpp>
+#include <hpx/modules/naming_base.hpp>
 
 #include <cstddef>
 #include <string>

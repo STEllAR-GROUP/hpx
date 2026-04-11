@@ -196,7 +196,7 @@ namespace hpx::parallel {
 
         // provide our own implementation of std::uninitialized_fill as some
         // versions of MSVC horribly fail at compiling it for some types T
-        HPX_CXX_EXPORT template <typename ExPolicy, typename InIter,
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename InIter,
             typename Sent, typename T>
         InIter sequential_uninitialized_fill(
             ExPolicy&& policy, InIter first, Sent last, T const& value)
@@ -211,7 +211,8 @@ namespace hpx::parallel {
                 });
         }
 
-        HPX_CXX_EXPORT template <typename ExPolicy, typename InIter, typename T>
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename InIter,
+            typename T>
         InIter sequential_uninitialized_fill_n(
             ExPolicy&& policy, InIter first, std::size_t count, T const& value)
         {
@@ -226,7 +227,8 @@ namespace hpx::parallel {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename ExPolicy, typename Iter, typename T>
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter,
+            typename T>
         decltype(auto) parallel_uninitialized_fill_n(
             ExPolicy&& policy, Iter first, std::size_t count, T const& value)
         {
@@ -256,10 +258,12 @@ namespace hpx::parallel {
                                 value));
                     },
                     // finalize, called once if no error occurred
-                    [first, count](auto&& data) mutable -> Iter {
+                    [first, count](auto&&... data) mutable -> Iter {
+                        static_assert(sizeof...(data) < 2);
+
                         // make sure iterators embedded in function object that
                         // is attached to futures are invalidated
-                        util::detail::clear_container(data);
+                        util::detail::clear_container(data...);
 
                         std::advance(first, count);
                         return first;
@@ -276,7 +280,7 @@ namespace hpx::parallel {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename Iter>
+        HPX_CXX_CORE_EXPORT template <typename Iter>
         struct uninitialized_fill
           : public algorithm<uninitialized_fill<Iter>, Iter>
         {
@@ -285,17 +289,19 @@ namespace hpx::parallel {
             {
             }
 
-            template <typename ExPolicy, typename Sent, typename T>
-            static Iter sequential(
-                ExPolicy&& policy, Iter first, Sent last, T const& value)
+            template <typename ExPolicy, typename FwdIter, typename Sent,
+                typename T>
+            static FwdIter sequential(
+                ExPolicy&& policy, FwdIter first, Sent last, T const& value)
             {
                 return sequential_uninitialized_fill(
                     HPX_FORWARD(ExPolicy, policy), first, last, value);
             }
 
-            template <typename ExPolicy, typename Sent, typename T>
+            template <typename ExPolicy, typename FwdIter, typename Sent,
+                typename T>
             static decltype(auto) parallel(
-                ExPolicy&& policy, Iter first, Sent last, T const& value)
+                ExPolicy&& policy, FwdIter first, Sent last, T const& value)
             {
                 bool const has_scheduler_executor =
                     hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
@@ -305,7 +311,7 @@ namespace hpx::parallel {
                     if (first == last)
                     {
                         return util::detail::algorithm_result<ExPolicy,
-                            Iter>::get(HPX_MOVE(first));
+                            FwdIter>::get(HPX_MOVE(first));
                     }
                 }
 
@@ -322,7 +328,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        HPX_CXX_EXPORT template <typename Iter>
+        HPX_CXX_CORE_EXPORT template <typename Iter>
         struct uninitialized_fill_n
           : public algorithm<uninitialized_fill_n<Iter>, Iter>
         {
@@ -331,16 +337,16 @@ namespace hpx::parallel {
             {
             }
 
-            template <typename ExPolicy, typename T>
-            static Iter sequential(ExPolicy&& policy, Iter first,
+            template <typename ExPolicy, typename FwdIter, typename T>
+            static FwdIter sequential(ExPolicy&& policy, FwdIter first,
                 std::size_t count, T const& value)
             {
                 return sequential_uninitialized_fill_n(
                     HPX_FORWARD(ExPolicy, policy), first, count, value);
             }
 
-            template <typename ExPolicy, typename T>
-            static decltype(auto) parallel(ExPolicy&& policy, Iter first,
+            template <typename ExPolicy, typename FwdIter, typename T>
+            static decltype(auto) parallel(ExPolicy&& policy, FwdIter first,
                 std::size_t count, T const& value)
             {
                 return parallel_uninitialized_fill_n(
@@ -355,19 +361,19 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::uninitialized_fill
-    HPX_CXX_EXPORT inline constexpr struct uninitialized_fill_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct uninitialized_fill_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_fill_t>
     {
         template <typename FwdIter, typename T>
         // clang-format off
             requires (
-                hpx::traits::is_forward_iterator_v<FwdIter>
+                std::forward_iterator<FwdIter>
             )
         // clang-format on
         friend void tag_fallback_invoke(hpx::uninitialized_fill_t,
             FwdIter first, FwdIter last, T const& value)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             hpx::parallel::detail::uninitialized_fill<FwdIter>().call(
@@ -378,13 +384,13 @@ namespace hpx {
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_forward_iterator_v<FwdIter>
+                std::forward_iterator<FwdIter>
             )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::uninitialized_fill_t,
             ExPolicy&& policy, FwdIter first, FwdIter last, T const& value)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             using result_type =
@@ -400,20 +406,20 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::uninitialized_fill_n
-    HPX_CXX_EXPORT inline constexpr struct uninitialized_fill_n_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct uninitialized_fill_n_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_fill_n_t>
     {
         template <typename FwdIter, typename Size, typename T>
         // clang-format off
             requires (
-                hpx::traits::is_forward_iterator_v<FwdIter> &&
+                std::forward_iterator<FwdIter> &&
                 std::is_integral_v<Size>
             )
         // clang-format on
         friend FwdIter tag_fallback_invoke(hpx::uninitialized_fill_n_t,
             FwdIter first, Size count, T const& value)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             // if count is representing a negative value, we do nothing
@@ -432,14 +438,14 @@ namespace hpx {
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_forward_iterator_v<FwdIter> &&
+                std::forward_iterator<FwdIter> &&
                 std::is_integral_v<Size>
             )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::uninitialized_fill_n_t,
             ExPolicy&& policy, FwdIter first, Size count, T const& value)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             constexpr bool has_scheduler_executor =

@@ -20,12 +20,8 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-
-#if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
-#include <boost/shared_array.hpp>
-#else
-#include <memory>
-#endif
+#include <hpx/modules/type_support.hpp>
+#include <hpx/serialization.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -58,11 +54,11 @@ inline std::size_t idx(std::size_t i, int dir, std::size_t size)
 struct partition_data
 {
 private:
-#if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
-    typedef std::shared_ptr<double[]> buffer_type;
-#else
-    typedef boost::shared_array<double> buffer_type;
-#endif
+    // This example runs on a single locality, so it does not actually exercise
+    // serialization at runtime. We still use serialize_buffer here because
+    // action arguments must remain serializable and the ownership semantics of
+    // the partition buffer are explicit with this type.
+    typedef hpx::serialization::serialize_buffer<double> buffer_type;
 
 public:
     partition_data()
@@ -71,13 +67,13 @@ public:
     }
 
     explicit partition_data(std::size_t size)
-      : data_(new double[size])
+      : data_(new double[size], size, buffer_type::take)
       , size_(size)
     {
     }
 
     partition_data(std::size_t size, double initial_value)
-      : data_(new double[size])
+      : data_(new double[size], size, buffer_type::take)
       , size_(size)
     {
         double base_value = initial_value * double(size);
@@ -100,14 +96,15 @@ public:
     }
 
 private:
-    // Serialization support: even if all of the code below runs on one
-    // locality only, we need to provide an (empty) implementation for the
-    // serialization as all arguments passed to actions have to support this.
+    // Serialization support is required even though 1d_stencil_5 itself is not
+    // a fully distributed example and does not rely on serialization during
+    // execution. Action arguments still need to provide serialization support.
     friend class hpx::serialization::access;
 
     template <typename Archive>
-    void serialize(Archive&, unsigned int const) const
+    void serialize(Archive& ar, unsigned int const)
     {
+        ar & data_ & size_;
     }
 
 private:
@@ -274,10 +271,10 @@ struct stepper
     space do_work(std::size_t np, std::size_t nx, std::size_t nt);
 };
 
-// Global functions can be exposed as actions as well. That allows to invoke
+// Static member functions can be exposed as actions as well. That allows to invoke
 // those remotely. The macro HPX_PLAIN_ACTION() defines a new action type
-// 'heat_part_action' which wraps the global function heat_part(). It can be
-// used to call that function on a given locality.
+// 'heat_part_action' which wraps the static member function
+// stepper::heat_part(). It can be used to call that function on a given locality.
 HPX_PLAIN_ACTION(stepper::heat_part, heat_part_action)
 
 ///////////////////////////////////////////////////////////////////////////////

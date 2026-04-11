@@ -13,6 +13,7 @@
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/tracing.hpp>
 #include <hpx/threading_base/execution_agent.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/set_thread_state.hpp>
@@ -26,6 +27,9 @@
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
 #include <hpx/modules/debugging.hpp>
 #include <hpx/threading_base/detail/reset_backtrace.hpp>
+#endif
+#ifdef HPX_HAVE_MODULE_LIKWID
+#include <hpx/modules/likwid.hpp>
 #endif
 
 #include <cstddef>
@@ -182,6 +186,18 @@ namespace hpx::threads {
                     hpx::util::set_held_locks_data(HPX_MOVE(data));
                 });
 #endif
+#ifdef HPX_HAVE_MODULE_LIKWID
+            hpx::likwid::suspend_region region;
+#endif
+            // fiber_suspend_region operates only on the fiber zone stack
+            // (current_fiber_zone). It does NOT touch the OS-thread zone
+            // (current_region / stop_region), so there is no zone-stack
+            // conflict. The sequence is:
+            //   constructor: close running zone \u2192 open grey "suspended" zone
+            //   self_.yield(): fiber parks, scheduler picks next task
+            //   destructor:  close "suspended" zone \u2192 reopen running zone
+            hpx::tracing::fiber_suspend_region tracy_suspend(desc);
+
             HPX_ASSERT(thrd_data != nullptr &&
                 thrd_data->get_state().state() ==
                     thread_schedule_state::active);

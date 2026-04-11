@@ -44,6 +44,34 @@ below:
 
       $ spack install hpx
 
+#. **Conan**
+
+   You can also use the `Conan <https://conan.io/>`_ package manager to build
+   and use |hpx| in your projects. First, export the |hpx| recipe from the |hpx|
+   repository to your local Conan cache:
+
+   .. code-block:: shell-session
+
+      $ git clone https://github.com/STEllAR-GROUP/hpx.git
+      $ cd hpx
+      $ conan create . --build=missing
+
+   This builds |hpx| and makes it available in your local Conan cache. You can
+   then use it in your Conan-based projects by adding it to your ``conanfile.txt``:
+
+   .. code-block:: ini
+
+      [requires]
+      hpx/2.0.0
+
+      [generators]
+      CMakeDeps
+      CMakeToolchain
+
+   Then use ``find_package(HPX REQUIRED)`` in your ``CMakeLists.txt`` as usual.
+   Conan will automatically handle building |hpx| with your chosen configuration
+   options and provide the necessary CMake integration files.
+
 #. **Fedora**
 
    Installation can be done with
@@ -78,7 +106,7 @@ build an executable using |cmake|_ and |hpx|:
    project(my_hpx_project CXX)
    find_package(HPX REQUIRED)
    add_executable(my_hpx_program main.cpp)
-   target_link_libraries(my_hpx_program HPX::hpx HPX::wrap_main HPX::iostreams_component)
+   target_link_libraries(my_hpx_program HPX::hpx HPX::wrap_main hpx::iostreams_component)
 
 The next step is to create a ``main.cpp`` with the contents below:
 
@@ -121,7 +149,7 @@ the two includes and ``hpx::cout``.
    * ``HPX::wrap_main`` is required if you are implicitly using ``main()`` as the
      runtime entry point. See :ref:`minimal` for more information.
 
-   * ``HPX::iostreams_component`` is optional for a minimal project but lets us
+   * ``hpx::iostreams_component`` is optional for a minimal project but lets us
      use the |hpx| equivalent of ``std::cout``, i.e., the |hpx| :ref:`iostreams`
      functionality in our application.
 

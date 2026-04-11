@@ -10,10 +10,8 @@
 #include <hpx/agas/addressing_service.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/post.hpp>
-#include <hpx/components_base/agas_interface.hpp>
-#include <hpx/components_base/server/component.hpp>
-#include <hpx/components_base/server/component_base.hpp>
 #include <hpx/modules/async_base.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution_base.hpp>
@@ -22,6 +20,7 @@
 #include <hpx/modules/io_service.hpp>
 #include <hpx/modules/itt_notify.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/static_reinit.hpp>
@@ -32,7 +31,6 @@
 #include <hpx/modules/timing.hpp>
 #include <hpx/modules/topology.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/naming_base/id_type.hpp>
 #include <hpx/parcelset/parcelhandler.hpp>
 #include <hpx/parcelset/parcelset_fwd.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>

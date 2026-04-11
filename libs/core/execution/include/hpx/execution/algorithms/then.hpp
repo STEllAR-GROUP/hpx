@@ -33,7 +33,7 @@ namespace hpx::execution::experimental {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Warray-bounds"
 #endif
-        HPX_CXX_EXPORT template <typename Receiver, typename F>
+        HPX_CXX_CORE_EXPORT template <typename Receiver, typename F>
         struct then_receiver
         {
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver> receiver;
@@ -99,7 +99,7 @@ namespace hpx::execution::experimental {
 #pragma GCC diagnostic pop
 #endif
 
-        HPX_CXX_EXPORT template <typename Sender, typename F>
+        HPX_CXX_CORE_EXPORT template <typename Sender, typename F>
         struct then_sender
         {
             using is_sender = void;
@@ -167,8 +167,6 @@ namespace hpx::execution::experimental {
                 return tag(s.sender);
             }
 
-            // TODO: add forwarding_sender_query
-
             template <typename Receiver>
             friend auto tag_invoke(
                 connect_t, then_sender&& s, Receiver&& receiver)
@@ -198,7 +196,7 @@ namespace hpx::execution::experimental {
     //
     // execution::then is guaranteed to not begin executing the function before
     // the returned sender is started.
-    HPX_CXX_EXPORT inline constexpr struct then_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct then_t final
       : hpx::functional::detail::tag_priority<then_t>
     {
     private:

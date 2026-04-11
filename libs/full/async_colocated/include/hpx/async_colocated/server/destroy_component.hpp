@@ -8,12 +8,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/components_base/agas_interface.hpp>
-#include <hpx/components_base/component_type.hpp>
-#include <hpx/components_base/server/component_heap.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/naming_base/address.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::components::server {

@@ -102,6 +102,7 @@ set(include_headers
     hpx/include/traits.hpp
     hpx/include/unseq.hpp
     hpx/include/util.hpp
+    hpx/experimental/sandbox.hpp
 )
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
@@ -109,6 +110,7 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
       hpx_agas
       hpx_async_colocated
       hpx_async_distributed
+      hpx_components_base
       hpx_runtime_components
       hpx_runtime_distributed
       hpx_lcos_distributed
@@ -123,7 +125,7 @@ add_hpx_module(
   GLOBAL_HEADER_GEN OFF
   HEADERS ${include_headers}
   DEPENDENCIES hpx_core
-  MODULE_DEPENDENCIES hpx_command_line_handling hpx_compute
-                      ${include_optional_module_dependencies}
+  MODULE_DEPENDENCIES hpx_command_line_handling hpx_compute hpx_naming_base
+                      hpx_parcelset_base ${include_optional_module_dependencies}
   CMAKE_SUBDIRS tests
 )

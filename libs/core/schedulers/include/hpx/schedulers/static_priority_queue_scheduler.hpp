@@ -23,10 +23,10 @@ namespace hpx::threads::policies {
 
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
-    HPX_CXX_EXPORT using default_static_priority_queue_scheduler_terminated_queue =
+    HPX_CXX_CORE_EXPORT using default_static_priority_queue_scheduler_terminated_queue =
         lockfree_lifo;
 #else
-    HPX_CXX_EXPORT using default_static_priority_queue_scheduler_terminated_queue =
+    HPX_CXX_CORE_EXPORT using default_static_priority_queue_scheduler_terminated_queue =
         lockfree_fifo;
 #endif
 
@@ -40,9 +40,9 @@ namespace hpx::threads::policies {
     // other work is executed. Low priority threads are executed by the last OS
     // thread whenever no other work is available. This scheduler does not do
     // any work stealing.
-    HPX_CXX_EXPORT template <typename Mutex = std::mutex,
+    HPX_CXX_CORE_EXPORT template <typename Mutex = std::mutex,
         typename PendingQueuing = lockfree_fifo,
-        typename StagedQueuing = lockfree_fifo,
+        typename StagedQueuing = concurrentqueue_fifo,
         typename TerminatedQueuing =
             default_static_priority_queue_scheduler_terminated_queue>
     class static_priority_queue_scheduler final

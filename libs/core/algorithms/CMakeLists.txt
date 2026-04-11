@@ -32,6 +32,7 @@ set(algorithms_headers
     hpx/parallel/algorithms/detail/generate.hpp
     hpx/parallel/algorithms/detail/indirect.hpp
     hpx/parallel/algorithms/detail/insertion_sort.hpp
+    hpx/parallel/algorithms/detail/iota.hpp
     hpx/parallel/algorithms/detail/is_sorted.hpp
     hpx/parallel/algorithms/detail/mismatch.hpp
     hpx/parallel/algorithms/detail/parallel_stable_sort.hpp
@@ -67,6 +68,7 @@ set(algorithms_headers
     hpx/parallel/algorithms/generate.hpp
     hpx/parallel/algorithms/includes.hpp
     hpx/parallel/algorithms/inclusive_scan.hpp
+    hpx/parallel/algorithms/iota.hpp
     hpx/parallel/algorithms/is_heap.hpp
     hpx/parallel/algorithms/is_partitioned.hpp
     hpx/parallel/algorithms/is_sorted.hpp
@@ -124,12 +126,14 @@ set(algorithms_headers
     hpx/parallel/container_algorithms/exclusive_scan.hpp
     hpx/parallel/container_algorithms/fill.hpp
     hpx/parallel/container_algorithms/find.hpp
+    hpx/parallel/container_algorithms/fold.hpp
     hpx/parallel/container_algorithms/for_each.hpp
     hpx/parallel/container_algorithms/for_loop.hpp
     hpx/parallel/container_algorithms/generate.hpp
     hpx/parallel/container_algorithms.hpp
     hpx/parallel/container_algorithms/includes.hpp
     hpx/parallel/container_algorithms/inclusive_scan.hpp
+    hpx/parallel/container_algorithms/iota.hpp
     hpx/parallel/container_algorithms/is_heap.hpp
     hpx/parallel/container_algorithms/is_partitioned.hpp
     hpx/parallel/container_algorithms/is_sorted.hpp
@@ -236,6 +240,7 @@ if(HPX_WITH_DATAPAR)
       hpx/parallel/datapar/mismatch.hpp
       hpx/parallel/datapar/reduce.hpp
       hpx/parallel/datapar/replace.hpp
+      hpx/parallel/datapar/search.hpp
       hpx/parallel/datapar/transfer.hpp
       hpx/parallel/datapar/transform_loop.hpp
       hpx/parallel/datapar/zip_iterator.hpp
@@ -262,20 +267,38 @@ add_hpx_module(
   GLOBAL_HEADER_MODULE_GEN ON
   HEADERS ${algorithms_headers}
   COMPAT_HEADERS ${algorithms_compat_headers}
-  ADD_TO_GLOBAL_HEADER "hpx/parallel/util/detail/handle_remote_exceptions.hpp"
+  ADD_TO_GLOBAL_HEADER
+    "hpx/parallel/util/detail/chunk_size.hpp"
+    "hpx/parallel/util/detail/chunk_size_iterator.hpp"
+    "hpx/parallel/util/detail/handle_remote_exceptions.hpp"
   SOURCES ${algorithms_sources}
   MODULE_DEPENDENCIES
+    hpx_async_base
     hpx_async_combinators
     hpx_async_local
+    hpx_concepts
+    hpx_concurrency
     hpx_config
+    hpx_coroutines
+    hpx_datastructures
+    hpx_errors
+    hpx_execution_base
     hpx_execution
     hpx_executors
+    hpx_functional
     hpx_futures
     hpx_iterator_support
+    hpx_itt_notify
     hpx_lcos_local
+    hpx_memory
     hpx_pack_traversal
     hpx_properties
     hpx_serialization
+    hpx_synchronization
+    hpx_tag_invoke
+    hpx_threading_base
+    hpx_tracing
+    hpx_type_support
     hpx_util
   CMAKE_SUBDIRS examples tests
 )

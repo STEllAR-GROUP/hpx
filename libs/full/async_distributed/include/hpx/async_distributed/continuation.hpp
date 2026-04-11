@@ -15,14 +15,14 @@
 #include <hpx/actions_base/traits/is_continuation.hpp>
 #include <hpx/async_distributed/continuation_fwd.hpp>
 #include <hpx/async_distributed/trigger_lco_fwd.hpp>
-#include <hpx/components_base/agas_interface.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/preprocessor.hpp>
 #include <hpx/modules/serialization.hpp>
-#include <hpx/naming_base/id_type.hpp>
 
 #include <exception>
 #include <type_traits>

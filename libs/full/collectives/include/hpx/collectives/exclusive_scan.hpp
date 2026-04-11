@@ -277,12 +277,13 @@ namespace hpx { namespace collectives {
 #include <hpx/async_distributed/async.hpp>
 #include <hpx/collectives/argument_types.hpp>
 #include <hpx/collectives/create_communicator.hpp>
-#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/async_base.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/type_support.hpp>
 
+#include <concepts>
 #include <cstddef>
 #include <type_traits>
 #include <utility>
@@ -292,7 +293,7 @@ namespace hpx::collectives::detail {
 
     template <typename T, typename InIter, typename Sent, typename OutIter,
         typename Op>
-    static constexpr void exclusive_scan(
+    constexpr void exclusive_scan(
         InIter first, Sent last, OutIter dest, Op&& op)
     {
         // the first value given goes to the second destination
@@ -301,8 +302,22 @@ namespace hpx::collectives::detail {
         for (/* */; first != last; (void) ++first, ++dest)
         {
             T next = HPX_INVOKE(op, temp, *first);
-            *dest = temp;
-            temp = next;
+            *dest = HPX_MOVE(temp);
+            temp = HPX_MOVE(next);
+        }
+    }
+
+    template <typename InIter, typename Sent, typename OutIter, typename T,
+        typename Op>
+    constexpr void exclusive_scan_init(
+        InIter first, Sent last, OutIter dest, T init, Op&& op)
+    {
+        T temp = init;
+        for (/* */; first != last; (void) ++first, ++dest)
+        {
+            init = HPX_INVOKE(op, HPX_MOVE(init), *first);
+            *dest = HPX_MOVE(temp);
+            temp = init;
         }
     }
 }    // namespace hpx::collectives::detail
@@ -356,7 +371,7 @@ namespace hpx::traits {
                         std::vector<T_> dest;
                         dest.resize(data.size());
 
-                        if constexpr (!std::is_same_v<T_, bool>)
+                        if constexpr (!std::same_as<T_, bool>)
                         {
                             collectives::detail::exclusive_scan<T_>(
                                 data.begin(), data.end(), dest.begin(),
@@ -409,16 +424,17 @@ namespace hpx::traits {
                         std::vector<T_> dest;
                         dest.resize(data.size());
 
-                        if constexpr (!std::is_same_v<T_, bool>)
+                        if constexpr (!std::same_as<T_, bool>)
                         {
-                            hpx::exclusive_scan(data.begin(), data.end(),
-                                dest.begin(), HPX_FORWARD(Init, init),
-                                HPX_FORWARD(F, op));
+                            collectives::detail::exclusive_scan_init(
+                                data.begin(), data.end(), dest.begin(),
+                                HPX_FORWARD(Init, init), HPX_FORWARD(F, op));
                         }
                         else
                         {
-                            hpx::exclusive_scan(data.begin(), data.end(),
-                                dest.begin(), static_cast<bool>(init),
+                            collectives::detail::exclusive_scan_init(
+                                data.begin(), data.end(), dest.begin(),
+                                static_cast<bool>(init),
                                 [&](auto lhs, auto rhs) {
                                     return HPX_FORWARD(F, op)(
                                         static_cast<bool>(lhs),
@@ -557,7 +573,7 @@ namespace hpx::collectives {
     ////////////////////////////////////////////////////////////////////////////
     // Version of exclusive scan that takes an initial value for element 0.
     template <typename T, typename Init, typename F>
-        requires(!std::is_same_v<this_site_arg, std::decay_t<F>>)
+        requires(!std::same_as<this_site_arg, std::decay_t<F>>)
     hpx::future<std::decay_t<T>> exclusive_scan(communicator fid,
         T&& local_result, Init&& init, F&& op,
         this_site_arg this_site = this_site_arg(),
@@ -621,7 +637,7 @@ namespace hpx::collectives {
     }
 
     template <typename T, typename Init, typename F>
-        requires(!std::is_same_v<generation_arg, std::decay_t<F>>)
+        requires(!std::same_as<generation_arg, std::decay_t<F>>)
     hpx::future<std::decay_t<T>> exclusive_scan(communicator fid,
         T&& local_result, Init&& init, F&& op, generation_arg generation,
         this_site_arg this_site = this_site_arg())
@@ -631,7 +647,7 @@ namespace hpx::collectives {
     }
 
     template <typename T, typename Init, typename F>
-        requires(!std::is_same_v<num_sites_arg, std::decay_t<F>>)
+        requires(!std::same_as<num_sites_arg, std::decay_t<F>>)
     hpx::future<std::decay_t<T>> exclusive_scan(char const* basename,
         T&& local_result, Init&& init, F&& op,
         num_sites_arg const num_sites = num_sites_arg(),
@@ -646,7 +662,7 @@ namespace hpx::collectives {
     }
 
     template <typename T, typename Init, typename F>
-        requires(!std::is_same_v<this_site_arg, std::decay_t<F>>)
+        requires(!std::same_as<this_site_arg, std::decay_t<F>>)
     decltype(auto) exclusive_scan(hpx::launch::sync_policy, communicator fid,
         T&& local_result, Init&& init, F&& op,
         this_site_arg const this_site = this_site_arg(),
@@ -658,7 +674,7 @@ namespace hpx::collectives {
     }
 
     template <typename T, typename Init, typename F>
-        requires(!std::is_same_v<generation_arg, std::decay_t<F>>)
+        requires(!std::same_as<generation_arg, std::decay_t<F>>)
     decltype(auto) exclusive_scan(hpx::launch::sync_policy, communicator fid,
         T&& local_result, Init&& init, F&& op, generation_arg const generation,
         this_site_arg const this_site = this_site_arg())
@@ -669,7 +685,7 @@ namespace hpx::collectives {
     }
 
     template <typename T, typename Init, typename F>
-        requires(!std::is_same_v<num_sites_arg, std::decay_t<F>>)
+        requires(!std::same_as<num_sites_arg, std::decay_t<F>>)
     decltype(auto) exclusive_scan(hpx::launch::sync_policy,
         char const* basename, T&& local_result, Init&& init, F&& op,
         num_sites_arg const num_sites = num_sites_arg(),

@@ -44,6 +44,9 @@ set(tests
     fill
     filln
     find
+    find_last
+    find_last_if
+    find_last_if_not
     findend
     findfirstof
     findfirstof_binary
@@ -69,6 +72,7 @@ set(tests
     generaten
     is_heap
     is_heap_until
+    iota
     includes
     inclusive_scan
     inclusive_scan_exception
@@ -111,7 +115,7 @@ set(tests
     rotate
     rotate_copy
     search
-    searchn
+    search_n
     set_difference
     set_intersection
     set_symmetric_difference

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2025 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,10 +14,10 @@
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/memory.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/threading_base.hpp>
-#include <hpx/naming_base/id_type.hpp>
 
 #include <atomic>
 #include <cstdint>
@@ -83,7 +83,8 @@ namespace hpx::components {
 
     /// This hook has to be inserted into the derivation chain of any component
     /// for it to support migration.
-    template <typename BaseComponent, typename Mutex = hpx::spinlock>
+    HPX_CXX_EXPORT template <typename BaseComponent,
+        typename Mutex = hpx::spinlock>
     struct migration_support : BaseComponent
     {
     private:
@@ -134,13 +135,12 @@ namespace hpx::components {
         }
 
         // Pinning functionality
-        void pin() noexcept
+        bool pin() noexcept
         {
             intrusive_ptr_add_ref(data_.get());    // keep alive
 
             std::unique_lock l(data_->mtx_);
 
-            HPX_ASSERT_LOCKED(l, data_->pin_count_ != ~0x0u);
             if (data_->pin_count_ != ~0x0u)
             {
                 // there shouldn't be any pinning happening once the pin-count
@@ -149,7 +149,12 @@ namespace hpx::components {
                     data_->pin_count_ != 0 ||
                         (!started_migration_ && !was_marked_for_migration_));
                 ++data_->pin_count_;
+                return true;
             }
+
+            intrusive_ptr_release(data_.get());    // release keep alive
+
+            return false;
         }
 
         bool unpin()

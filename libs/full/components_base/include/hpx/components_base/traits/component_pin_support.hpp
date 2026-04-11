@@ -1,4 +1,4 @@
-//  Copyright (c) 2018-2024 Hartmut Kaiser
+//  Copyright (c) 2018-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,8 +20,9 @@ namespace hpx::traits {
         struct pin_helper
         {
             template <typename Component>
-            static constexpr void call(wrap_int, Component*) noexcept
+            static constexpr bool call(wrap_int, Component*) noexcept
             {
+                return true;
             }
 
             // forward the call if the component implements the function
@@ -68,12 +69,12 @@ namespace hpx::traits {
         };
     }    // namespace detail
 
-    template <typename Component, typename Enable = void>
+    HPX_CXX_EXPORT template <typename Component, typename Enable = void>
     struct component_pin_support
     {
-        static constexpr void pin(Component* p) noexcept
+        static constexpr bool pin(Component* p) noexcept
         {
-            detail::pin_helper::call(0, p);
+            return detail::pin_helper::call(0, p);
         }
 
         static constexpr bool unpin(Component* p) noexcept

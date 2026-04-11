@@ -151,14 +151,14 @@ void test_f(hpx::future<void> f, int passed_through)
 template <typename Executor>
 void test_then(Executor&& executor)
 {
-    hpx::future<void> f = hpx::make_ready_future();
-
     std::string desc("test_then");
     {
+        hpx::future<void> f = hpx::make_ready_future();
         auto exec = hpx::experimental::prefer(
             hpx::execution::experimental::with_annotation, executor, desc);
 
-        hpx::parallel::execution::then_execute(exec, &test_f, f, 42).get();
+        hpx::parallel::execution::then_execute(exec, &test_f, std::move(f), 42)
+            .get();
 
         HPX_TEST_EQ(annotation, desc);
         HPX_TEST_EQ(annotation,
@@ -166,11 +166,13 @@ void test_then(Executor&& executor)
     }
 
     {
+        hpx::future<void> f = hpx::make_ready_future();
         annotation.clear();
         auto exec =
             hpx::execution::experimental::with_annotation(executor, desc);
 
-        hpx::parallel::execution::then_execute(exec, &test_f, f, 42).get();
+        hpx::parallel::execution::then_execute(exec, &test_f, std::move(f), 42)
+            .get();
 
         HPX_TEST_EQ(annotation, desc);
         HPX_TEST_EQ(annotation,
@@ -200,8 +202,9 @@ void test_bulk_sync(Executor&& executor)
     auto hint = hpx::execution::experimental::get_hint(executor);
     hint.sharing_mode(hpx::threads::thread_sharing_hint::do_not_share_function |
         hpx::threads::thread_sharing_hint::do_not_combine_tasks);
-    auto no_sharing_exec = hpx::experimental::prefer(
-        hpx::execution::experimental::with_hint, executor, hint);
+    auto no_sharing_exec =
+        hpx::execution::to_hierarchical_spawning(hpx::experimental::prefer(
+            hpx::execution::experimental::with_hint, executor, hint));
 
     std::string desc("test_bulk_sync");
     {

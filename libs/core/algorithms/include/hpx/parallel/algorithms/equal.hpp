@@ -465,6 +465,7 @@ namespace hpx {
 
 #include <algorithm>
 #include <cstddef>
+#include <cstdint>
 #include <iterator>
 #include <type_traits>
 #include <utility>
@@ -477,7 +478,7 @@ namespace hpx::parallel {
         /// \cond NOINTERNAL
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT struct equal_binary
+        HPX_CXX_CORE_EXPORT struct equal_binary
           : public algorithm<equal_binary, bool>
         {
             constexpr equal_binary() noexcept
@@ -554,8 +555,7 @@ namespace hpx::parallel {
 
                 using policy_type = decltype(policy);
                 using zip_iterator = hpx::util::zip_iterator<Iter1, Iter2>;
-                using intermediate_result_t =
-                    std::conditional_t<has_scheduler_executor, char, bool>;
+                using intermediate_result_t = std::uint8_t;
 
                 util::cancellation_token<> tok;
 
@@ -600,7 +600,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        HPX_CXX_EXPORT struct equal : public algorithm<equal, bool>
+        HPX_CXX_CORE_EXPORT struct equal : public algorithm<equal, bool>
         {
             constexpr equal() noexcept
               : algorithm("equal")
@@ -635,7 +635,7 @@ namespace hpx::parallel {
 
                 using difference_type =
                     typename std::iterator_traits<FwdIter1>::difference_type;
-                difference_type count = std::distance(first1, last1);
+                difference_type count = detail::distance(first1, last1);
 
                 decltype(auto) policy =
                     hpx::execution::experimental::adapt_placement_mode(
@@ -645,8 +645,7 @@ namespace hpx::parallel {
                 using policy_type = std::decay_t<decltype(policy)>;
                 using zip_iterator =
                     hpx::util::zip_iterator<FwdIter1, FwdIter2>;
-                using intermediate_result_t =
-                    std::conditional_t<has_scheduler_executor, char, bool>;
+                using intermediate_result_t = std::uint8_t;
 
                 util::cancellation_token<> tok;
                 auto f1 = [f, tok](
@@ -675,7 +674,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::equal
-    HPX_CXX_EXPORT inline constexpr struct equal_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct equal_t final
       : hpx::detail::tag_parallel_algorithm<equal_t>
     {
     private:
@@ -696,9 +695,9 @@ namespace hpx {
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2,
             Pred op)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::equal_binary().call(
@@ -717,9 +716,9 @@ namespace hpx {
         friend decltype(auto) tag_fallback_invoke(equal_t, ExPolicy&& policy,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::equal_binary().call(
@@ -744,9 +743,9 @@ namespace hpx {
         friend decltype(auto) tag_fallback_invoke(equal_t, ExPolicy&& policy,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, Pred op)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::equal().call(
@@ -765,9 +764,9 @@ namespace hpx {
         friend decltype(auto) tag_fallback_invoke(equal_t, ExPolicy&& policy,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::equal().call(
@@ -789,9 +788,9 @@ namespace hpx {
         friend bool tag_fallback_invoke(equal_t, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, Pred op)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::equal_binary().call(
@@ -809,9 +808,9 @@ namespace hpx {
         friend bool tag_fallback_invoke(equal_t, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, FwdIter2 last2)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::equal_binary().call(
@@ -834,9 +833,9 @@ namespace hpx {
         friend bool tag_fallback_invoke(
             equal_t, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, Pred op)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::equal().call(
@@ -853,9 +852,9 @@ namespace hpx {
         friend bool tag_fallback_invoke(
             equal_t, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::equal().call(hpx::execution::seq,

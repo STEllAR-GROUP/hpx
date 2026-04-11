@@ -1,5 +1,5 @@
 # Copyright (c) 2025 Agustin Berge
-# Copyright (c) 2007-2012 Hartmut Kaiser
+# Copyright (c) 2007-2026 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,7 +7,7 @@
 
 set(tests manage_runtime)
 
-if(NOT MSVC)
+if((NOT MSVC) AND HPX_WITH_DISTRIBUTED_RUNTIME)
   set(tests ${tests} auto_wrap_main)
   set(auto_wrap_main_FLAGS NOLIBS DEPENDENCIES HPX::hpx HPX::auto_wrap_main)
 endif()

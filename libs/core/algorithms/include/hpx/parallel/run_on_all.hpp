@@ -30,7 +30,7 @@ namespace hpx::experimental {
     /// \cond NOINTERNAL
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename ExPolicy, typename F,
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename F,
             typename... Reductions>
         decltype(auto) run_on_all(
             ExPolicy&& policy, F&& f, Reductions&&... reductions)
@@ -50,9 +50,6 @@ namespace hpx::experimental {
                         hpx::threads::thread_priority::bound,
                         hpx::threads::thread_stacksize::default_, hint),
                     cores);
-
-            // ensure scheduling is done using the index_queue
-            exec.set_hierarchical_threshold(0);
 
             // Execute based on policy type
             if constexpr (hpx::is_async_execution_policy_v<ExPolicy>)
@@ -107,7 +104,8 @@ namespace hpx::experimental {
             }
         }
 
-        template <typename ExPolicy, std::size_t... Is, typename... Ts>
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, std::size_t... Is,
+            typename... Ts>
         decltype(auto) run_on_all(
             ExPolicy&& policy, hpx::util::index_pack<Is...>, Ts&&... ts)
         {
@@ -133,7 +131,7 @@ namespace hpx::experimental {
     ///                  invoke (last argument)
     /// \param ts        The list of reductions and the function to invoke (last
     ///                  argument)
-    HPX_CXX_EXPORT template <typename ExPolicy, typename T, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename T, typename... Ts>
         requires(hpx::is_execution_policy_v<ExPolicy>)
     decltype(auto) run_on_all(ExPolicy&& policy, T&& t, Ts&&... ts)
     {
@@ -153,7 +151,7 @@ namespace hpx::experimental {
     ///                  invoke (last argument)
     /// \param ts        The list of reductions and the function to invoke (last
     ///                  argument)
-    HPX_CXX_EXPORT template <typename T, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename T, typename... Ts>
         requires(!hpx::is_execution_policy_v<T>)
     decltype(auto) run_on_all(T&& t, Ts&&... ts)
     {

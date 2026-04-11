@@ -22,7 +22,7 @@ namespace hpx::detail {
 
     ////////////////////////////////////////////////////////////////////////////
     // forward declaration
-    HPX_CXX_EXPORT template <typename Policy>
+    HPX_CXX_CORE_EXPORT template <typename Policy>
     struct post_policy_dispatch;
 
     template <>
@@ -35,12 +35,7 @@ namespace hpx::detail {
         {
             // run_as_child doesn't make sense if we _post_ a task
             auto hint = policy.hint();
-            if (hint.runs_as_child_mode() ==
-                hpx::threads::thread_execution_hint::run_as_child)
-            {
-                hint.runs_as_child_mode(
-                    hpx::threads::thread_execution_hint::none);
-            }
+            hint.runs_as_child_mode(hpx::threads::thread_execution_hint::none);
 
             threads::thread_init_data data(
                 threads::make_thread_function_nullary(
@@ -48,14 +43,7 @@ namespace hpx::detail {
                 desc, policy.priority(), hint, policy.stacksize(),
                 threads::thread_schedule_state::pending);
 
-            if (hint.mode == hpx::threads::thread_schedule_hint_mode::thread)
-            {
-                threads::register_thread(data, pool);
-            }
-            else
-            {
-                threads::register_work(data, pool);
-            }
+            threads::register_work(data, pool);
         }
 
         template <typename Policy, typename F, typename... Ts>
@@ -76,7 +64,6 @@ namespace hpx::detail {
             hpx::threads::thread_description const& desc,
             threads::thread_pool_base* pool, F&& f, Ts&&... ts)
         {
-            // run_as_child doesn't make sense if we _post_ a task
             auto hint = policy.hint();
             threads::thread_init_data data(
                 threads::make_thread_function_nullary(
@@ -163,7 +150,7 @@ namespace hpx::detail {
         }
     };
 
-    HPX_CXX_EXPORT template <typename Policy>
+    HPX_CXX_CORE_EXPORT template <typename Policy>
     struct post_policy_dispatch
     {
         template <typename F, typename... Ts>
@@ -173,7 +160,6 @@ namespace hpx::detail {
         {
             HPX_ASSERT(pool != nullptr);
 
-            // run_as_child doesn't make sense if we _post_ a tasks
             if (policy == launch::async)
             {
                 post_policy_dispatch<launch::async_policy>::call(

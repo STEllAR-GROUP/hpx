@@ -1,4 +1,4 @@
-//  Copyright (c) 1998-2024 Hartmut Kaiser
+//  Copyright (c) 1998-2026 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -13,8 +13,8 @@
 #include <hpx/modules/allocator_support.hpp>
 #include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/itt_notify.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/synchronization.hpp>
-#include <hpx/naming_base/id_type.hpp>
 
 #include <atomic>
 #include <cstddef>

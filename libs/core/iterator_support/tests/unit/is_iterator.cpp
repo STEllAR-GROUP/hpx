@@ -29,6 +29,9 @@ namespace test {
             IteratorTag>;
 
     public:
+        // disable use of brackets_proxy in iterator_facade
+        using use_brackets_proxy = std::false_type;
+
         test_iterator() = default;
 
         explicit constexpr test_iterator(BaseIterator base)
@@ -53,21 +56,22 @@ struct bidirectional_traversal_iterator
 {
     using difference_type = int;
     using value_type = int;
-    using iterator_category = std::input_iterator_tag;
+    using iterator_category = std::bidirectional_iterator_tag;
     using pointer = int const*;
-    using reference = void;
+    using reference = int;
 
     int state;
 
-    int operator*() const
+    reference operator*() const
     {
-        return this->state;
+        return state;
     }
-    int operator->() const = delete;
+
+    pointer operator->() const = delete;
 
     bidirectional_traversal_iterator& operator++()
     {
-        ++(this->state);
+        ++state;
         return *this;
     }
 
@@ -80,7 +84,7 @@ struct bidirectional_traversal_iterator
 
     bidirectional_traversal_iterator& operator--()
     {
-        --(this->state);
+        --state;
         return *this;
     }
 
@@ -93,32 +97,12 @@ struct bidirectional_traversal_iterator
 
     bool operator==(bidirectional_traversal_iterator const& that) const
     {
-        return this->state == that.state;
+        return state == that.state;
     }
 
     bool operator!=(bidirectional_traversal_iterator const& that) const
     {
-        return this->state != that.state;
-    }
-
-    bool operator<(bidirectional_traversal_iterator const& that) const
-    {
-        return this->state < that.state;
-    }
-
-    bool operator<=(bidirectional_traversal_iterator const& that) const
-    {
-        return this->state <= that.state;
-    }
-
-    bool operator>(bidirectional_traversal_iterator const& that) const
-    {
-        return this->state > that.state;
-    }
-
-    bool operator>=(bidirectional_traversal_iterator const& that) const
-    {
-        return this->state >= that.state;
+        return state != that.state;
     }
 };
 
@@ -126,21 +110,22 @@ struct random_access_traversal_iterator
 {
     using difference_type = int;
     using value_type = int;
-    using iterator_category = std::input_iterator_tag;
+    using iterator_category = std::random_access_iterator_tag;
     using pointer = int const*;
-    using reference = void;
+    using reference = int;
 
     int state;
 
-    int operator*() const
+    reference operator*() const
     {
-        return this->state;
+        return state;
     }
-    int operator->() const = delete;
+
+    pointer operator->() const = delete;
 
     random_access_traversal_iterator& operator++()
     {
-        ++(this->state);
+        ++state;
         return *this;
     }
 
@@ -153,7 +138,7 @@ struct random_access_traversal_iterator
 
     random_access_traversal_iterator& operator--()
     {
-        --(this->state);
+        --state;
         return *this;
     }
 
@@ -164,18 +149,18 @@ struct random_access_traversal_iterator
         return copy;
     }
 
-    int operator[](difference_type n) const
+    reference operator[](difference_type n) const
     {
-        return this->state + n;
+        return state + n;
     }
 
     random_access_traversal_iterator& operator+=(difference_type n)
     {
-        this->state += n;
+        state += n;
         return *this;
     }
 
-    random_access_traversal_iterator operator+(difference_type n)
+    random_access_traversal_iterator operator+(difference_type n) const
     {
         random_access_traversal_iterator copy = *this;
         return copy += n;
@@ -183,11 +168,11 @@ struct random_access_traversal_iterator
 
     random_access_traversal_iterator& operator-=(difference_type n)
     {
-        this->state -= n;
+        state -= n;
         return *this;
     }
 
-    random_access_traversal_iterator operator-(difference_type n)
+    random_access_traversal_iterator operator-(difference_type n) const
     {
         random_access_traversal_iterator copy = *this;
         return copy -= n;
@@ -196,39 +181,86 @@ struct random_access_traversal_iterator
     difference_type operator-(
         random_access_traversal_iterator const& that) const
     {
-        return this->state - that.state;
+        return state - that.state;
     }
 
     bool operator==(random_access_traversal_iterator const& that) const
     {
-        return this->state == that.state;
+        return state == that.state;
     }
 
     bool operator!=(random_access_traversal_iterator const& that) const
     {
-        return this->state != that.state;
+        return state != that.state;
     }
 
     bool operator<(random_access_traversal_iterator const& that) const
     {
-        return this->state < that.state;
+        return state < that.state;
     }
 
     bool operator<=(random_access_traversal_iterator const& that) const
     {
-        return this->state <= that.state;
+        return state <= that.state;
     }
 
     bool operator>(random_access_traversal_iterator const& that) const
     {
-        return this->state > that.state;
+        return state > that.state;
     }
 
     bool operator>=(random_access_traversal_iterator const& that) const
     {
-        return this->state >= that.state;
+        return state >= that.state;
+    }
+
+    friend random_access_traversal_iterator operator+(
+        difference_type n, random_access_traversal_iterator it)
+    {
+        return it += n;
     }
 };
+
+template <typename T, typename U>
+concept addition_result =
+    requires { typename hpx::traits::detail::addition_result_t<T, U>; };
+
+template <typename T>
+concept dereference_result =
+    requires { typename hpx::traits::detail::dereference_result_t<T>; };
+
+template <typename T, typename U>
+concept inplace_addition_result =
+    requires { typename hpx::traits::detail::inplace_addition_result_t<T, U>; };
+
+template <typename T, typename U>
+concept subtraction_result =
+    requires { typename hpx::traits::detail::subtraction_result_t<T, U>; };
+
+template <typename T, typename U>
+concept inplace_subtraction_result = requires {
+    typename hpx::traits::detail::inplace_subtraction_result_t<T, U>;
+};
+
+template <typename T>
+concept predecrement_result =
+    requires { typename hpx::traits::detail::predecrement_result_t<T>; };
+
+template <typename T>
+concept preincrement_result =
+    requires { typename hpx::traits::detail::preincrement_result_t<T>; };
+
+template <typename T>
+concept postdecrement_result =
+    requires { typename hpx::traits::detail::postdecrement_result_t<T>; };
+
+template <typename T>
+concept postincrement_result =
+    requires { typename hpx::traits::detail::postincrement_result_t<T>; };
+
+template <typename T, typename U>
+concept subscript_result =
+    requires { typename hpx::traits::detail::subscript_result_t<T, U>; };
 
 void addition_result_test()
 {
@@ -251,8 +283,7 @@ void addition_result_test()
 
     HPX_TEST_MSG((std::is_same_v<B, addition_result_t<C, A>>), "deduced type");
 
-    HPX_TEST_MSG(
-        (!has_nested_type<addition_result<B, A>>::value), "invalid operation");
+    HPX_TEST_MSG((!addition_result<B, A>), "invalid operation");
 }
 
 void dereference_result_test()
@@ -273,8 +304,7 @@ void dereference_result_test()
 
     HPX_TEST_MSG((std::is_same_v<A, dereference_result_t<B>>), "deduced type");
 
-    HPX_TEST_MSG(
-        (!has_nested_type<dereference_result<A>>::value), "invalid operation");
+    HPX_TEST_MSG((!dereference_result<A>), "invalid operation");
 }
 
 void equality_result_test()
@@ -350,8 +380,7 @@ void inplace_addition_result_test()
     HPX_TEST_MSG(
         (std::is_same_v<B, inplace_addition_result_t<C, A>>), "deduced type");
 
-    HPX_TEST_MSG((!has_nested_type<inplace_addition_result<B, A>>::value),
-        "invalid operation");
+    HPX_TEST_MSG((!inplace_addition_result<B, A>), "invalid operation");
 }
 
 void inplace_subtraction_result_test()
@@ -376,8 +405,7 @@ void inplace_subtraction_result_test()
     HPX_TEST_MSG((std::is_same_v<B, inplace_subtraction_result_t<C, A>>),
         "deduced type");
 
-    HPX_TEST_MSG((!has_nested_type<inplace_subtraction_result<B, A>>::value),
-        "invalid operation");
+    HPX_TEST_MSG((!inplace_subtraction_result<B, A>), "invalid operation");
 }
 
 void predecrement_result_test()
@@ -400,8 +428,7 @@ void predecrement_result_test()
     HPX_TEST_MSG(
         (std::is_same_v<A&, predecrement_result_t<B>>), "deduced type");
 
-    HPX_TEST_MSG(
-        (!has_nested_type<predecrement_result<A>>::value), "invalid operation");
+    HPX_TEST_MSG((!predecrement_result<A>), "invalid operation");
 }
 
 void preincrement_result_test()
@@ -424,8 +451,7 @@ void preincrement_result_test()
     HPX_TEST_MSG(
         (std::is_same_v<A&, preincrement_result_t<B>>), "deduced type");
 
-    HPX_TEST_MSG(
-        (!has_nested_type<preincrement_result<A>>::value), "invalid operation");
+    HPX_TEST_MSG((!preincrement_result<A>), "invalid operation");
 }
 
 void postdecrement_result_test()
@@ -447,8 +473,7 @@ void postdecrement_result_test()
     HPX_TEST_MSG(
         (std::is_same_v<A, postdecrement_result_t<B>>), "deduced type");
 
-    HPX_TEST_MSG((!has_nested_type<postdecrement_result<A>>::value),
-        "invalid operation");
+    HPX_TEST_MSG((!postdecrement_result<A>), "invalid operation");
 }
 
 void postincrement_result_test()
@@ -470,8 +495,7 @@ void postincrement_result_test()
     HPX_TEST_MSG(
         (std::is_same_v<A, postincrement_result_t<B>>), "deduced type");
 
-    HPX_TEST_MSG((!has_nested_type<postincrement_result<A>>::value),
-        "invalid operation");
+    HPX_TEST_MSG((!postincrement_result<A>), "invalid operation");
 }
 
 void subscript_result_test()
@@ -495,8 +519,7 @@ void subscript_result_test()
 
     HPX_TEST_MSG((std::is_same_v<B, subscript_result_t<C, A>>), "deduced type");
 
-    HPX_TEST_MSG(
-        (!has_nested_type<subscript_result<B, A>>::value), "invalid operation");
+    HPX_TEST_MSG((!subscript_result<B, A>), "invalid operation");
 }
 
 void subtraction_result_test()
@@ -521,47 +544,44 @@ void subtraction_result_test()
     HPX_TEST_MSG(
         (std::is_same_v<B, subtraction_result_t<C, A>>), "deduced type");
 
-    HPX_TEST_MSG((!has_nested_type<subtraction_result<B, A>>::value),
-        "invalid operation");
+    HPX_TEST_MSG((!subtraction_result<B, A>), "invalid operation");
 }
 
 void bidirectional_concept_test()
 {
-    using hpx::traits::detail::bidirectional_concept;
-
     {
         using iterator = std::ostream_iterator<int>;
         HPX_TEST_MSG(
-            (!bidirectional_concept<iterator>::value), "output iterator");
+            (!std::bidirectional_iterator<iterator>), "output iterator");
     }
     {
         using iterator = std::istream_iterator<int>;
         HPX_TEST_MSG(
-            (!bidirectional_concept<iterator>::value), "input iterator");
+            (!std::bidirectional_iterator<iterator>), "input iterator");
     }
     {
         using iterator = typename std::forward_list<int>::iterator;
         HPX_TEST_MSG(
-            (!bidirectional_concept<iterator>::value), "forward iterator");
+            (!std::bidirectional_iterator<iterator>), "forward iterator");
     }
     {
         using iterator = typename std::list<int>::iterator;
         HPX_TEST_MSG(
-            (bidirectional_concept<iterator>::value), "bidirectional iterator");
+            (std::bidirectional_iterator<iterator>), "bidirectional iterator");
     }
     {
         using iterator = typename std::vector<int>::iterator;
         HPX_TEST_MSG(
-            (bidirectional_concept<iterator>::value), "random access iterator");
+            (std::bidirectional_iterator<iterator>), "random access iterator");
     }
     {
         using iterator = bidirectional_traversal_iterator;
-        HPX_TEST_MSG((bidirectional_concept<iterator>::value),
+        HPX_TEST_MSG((std::bidirectional_iterator<iterator>),
             "bidirectional traversal input iterator");
     }
     {
         using iterator = random_access_traversal_iterator;
-        HPX_TEST_MSG((bidirectional_concept<iterator>::value),
+        HPX_TEST_MSG((std::bidirectional_iterator<iterator>),
             "random access traversal input iterator");
     }
 }
@@ -574,31 +594,31 @@ void random_access_concept_test()
     {
         using iterator = std::ostream_iterator<int>;
         HPX_TEST_MSG(
-            (!random_access_concept<iterator>::value), "output iterator");
+            (!std::random_access_iterator<iterator>), "output iterator");
     }
     {
         using iterator = std::istream_iterator<int>;
         HPX_TEST_MSG(
-            (!random_access_concept<iterator>::value), "input iterator");
+            (!std::random_access_iterator<iterator>), "input iterator");
     }
     {
         using iterator = typename std::forward_list<int>::iterator;
         HPX_TEST_MSG(
-            (!random_access_concept<iterator>::value), "forward iterator");
+            (!std::random_access_iterator<iterator>), "forward iterator");
     }
     {
         using iterator = typename std::list<int>::iterator;
-        HPX_TEST_MSG((!random_access_concept<iterator>::value),
-            "bidirectional iterator");
+        HPX_TEST_MSG(
+            (!std::random_access_iterator<iterator>), "bidirectional iterator");
     }
     {
         using iterator = typename std::vector<int>::iterator;
         HPX_TEST_MSG(
-            (random_access_concept<iterator>::value), "random access iterator");
+            (std::random_access_iterator<iterator>), "random access iterator");
     }
     {
         using iterator = bidirectional_traversal_iterator;
-        HPX_TEST_MSG((!random_access_concept<iterator>::value),
+        HPX_TEST_MSG((!std::random_access_iterator<iterator>),
             "bidirectional traversal input iterator");
     }
     {
@@ -618,7 +638,7 @@ void random_access_concept_test()
             inplace_subtraction_result_t<iterator,
                 iter_difference_t<iterator>>>);
 
-        HPX_TEST_MSG((random_access_concept<iterator>::value),
+        HPX_TEST_MSG((std::random_access_iterator<iterator>),
             "random access traversal input iterator");
     }
 }
@@ -1148,6 +1168,8 @@ int main()
         satisfy_traversal_concept_bidirectional_test();
         satisfy_traversal_concept_random_access_test();
         is_iterator_test();
+        is_input_iterator_test();
+        is_output_iterator_test();
         is_forward_iterator_test();
         is_bidirectional_iterator_test();
         is_random_access_iterator_test();

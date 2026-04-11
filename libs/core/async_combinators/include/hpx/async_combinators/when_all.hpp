@@ -221,7 +221,7 @@ namespace hpx::lcos::detail {
         using no_addref = typename frame_type::base_type::init_no_addref;
 
         using allocator_type = hpx::util::thread_local_caching_allocator<
-            hpx::lockfree::variable_size_stack, char,
+            hpx::lockfree::variable_size_stack,
             hpx::util::internal_allocator<>>;
         auto frame = hpx::util::traverse_pack_async_allocator(allocator_type{},
             hpx::util::async_traverse_in_place_tag<frame_type>{}, no_addref{},
@@ -235,7 +235,7 @@ namespace hpx::lcos::detail {
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT inline constexpr struct when_all_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct when_all_t final
       : hpx::functional::tag<when_all_t>
     {
     private:
@@ -269,7 +269,7 @@ namespace hpx {
     } when_all{};
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT inline constexpr struct when_all_n_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct when_all_n_t final
       : hpx::functional::tag<when_all_n_t>
     {
     private:

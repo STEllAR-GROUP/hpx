@@ -15,10 +15,10 @@
 #include <hpx/async_colocated/async_colocated.hpp>
 #include <hpx/async_distributed/async.hpp>
 #include <hpx/components/client_base.hpp>
-#include <hpx/components_base/traits/is_component.hpp>
 #include <hpx/distribution_policies/target_distribution_policy.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/futures.hpp>
-#include <hpx/naming_base/id_type.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/runtime_distributed/server/migrate_component.hpp>
 
 #include <type_traits>

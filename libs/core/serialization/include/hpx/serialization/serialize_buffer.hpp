@@ -15,10 +15,6 @@
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/serialize_buffer_fwd.hpp>
 
-#if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
-#include <boost/shared_array.hpp>
-#endif
-
 #include <cstddef>
 #include <memory>
 
@@ -26,7 +22,7 @@ namespace hpx::serialization {
 
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename Allocator>
+        HPX_CXX_CORE_EXPORT template <typename Allocator>
         struct array_allocator
         {
             auto* operator()(Allocator alloc, std::size_t size) const
@@ -37,7 +33,7 @@ namespace hpx::serialization {
             }
         };
 
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         struct array_allocator<std::allocator<T>>
         {
             T* operator()(std::allocator<T>, std::size_t size) const
@@ -46,7 +42,7 @@ namespace hpx::serialization {
             }
         };
 
-        HPX_CXX_EXPORT template <typename Deallocator>
+        HPX_CXX_CORE_EXPORT template <typename Deallocator>
         struct array_deleter
         {
             template <typename T>
@@ -58,7 +54,7 @@ namespace hpx::serialization {
             }
         };
 
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         struct array_deleter<std::allocator<T>>
         {
             void operator()(
@@ -70,16 +66,12 @@ namespace hpx::serialization {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T, typename Allocator>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Allocator>
     class serialize_buffer
     {
     private:
         using allocator_type = Allocator;
-#if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
         using buffer_type = std::shared_ptr<T[]>;
-#else
-        using buffer_type = boost::shared_array<T>;
-#endif
 
         static constexpr void no_deleter(T*) noexcept {}
 

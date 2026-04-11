@@ -15,9 +15,11 @@ set(segmented_algorithms_headers
     hpx/parallel/segmented_algorithms/all_any_none.hpp
     hpx/parallel/segmented_algorithms/count.hpp
     hpx/parallel/segmented_algorithms/detail/dispatch.hpp
+    hpx/parallel/segmented_algorithms/detail/is_partitioned.hpp
     hpx/parallel/segmented_algorithms/detail/reduce.hpp
     hpx/parallel/segmented_algorithms/detail/scan.hpp
     hpx/parallel/segmented_algorithms/detail/transfer.hpp
+    hpx/parallel/segmented_algorithms/equal.hpp
     hpx/parallel/segmented_algorithms/exclusive_scan.hpp
     hpx/parallel/segmented_algorithms/fill.hpp
     hpx/parallel/segmented_algorithms/find.hpp
@@ -25,8 +27,12 @@ set(segmented_algorithms_headers
     hpx/parallel/segmented_algorithms/for_each.hpp
     hpx/parallel/segmented_algorithms/generate.hpp
     hpx/parallel/segmented_algorithms/inclusive_scan.hpp
+    hpx/parallel/segmented_algorithms/is_sorted.hpp
+    hpx/parallel/segmented_algorithms/is_partitioned.hpp
     hpx/parallel/segmented_algorithms/minmax.hpp
     hpx/parallel/segmented_algorithms/reduce.hpp
+    hpx/parallel/segmented_algorithms/replace.hpp
+    hpx/parallel/segmented_algorithms/replace_copy.hpp
     hpx/parallel/segmented_algorithms/traits/zip_iterator.hpp
     hpx/parallel/segmented_algorithms/transform_exclusive_scan.hpp
     hpx/parallel/segmented_algorithms/transform.hpp
@@ -48,6 +54,6 @@ add_hpx_module(
   COMPAT_HEADERS ${segmented_algorithms_compat_headers}
   DEPENDENCIES hpx_core
   MODULE_DEPENDENCIES hpx_async_colocated hpx_async_distributed
-                      hpx_distribution_policies
+                      hpx_distribution_policies hpx_naming_base
   CMAKE_SUBDIRS examples tests
 )

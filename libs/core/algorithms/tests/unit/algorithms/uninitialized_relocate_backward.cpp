@@ -5,13 +5,16 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/init.hpp>
+#include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/executors.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/parallel/algorithms/uninitialized_relocate.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <atomic>
+#include <cstddef>
 #include <random>
 #include <set>
+#include <type_traits>
 #include <utility>
 
 constexpr int N = 500;    // number of objects to construct
@@ -489,6 +492,10 @@ void test_overlapping()
         HPX_TEST(
             non_trivially_relocatable_struct_throwing_overlapping::destroyed ==
             K - 1 + M + offset);
+
+        // All objects in the relocation range are cleaned up after exception
+        HPX_TEST(non_trivially_relocatable_struct_throwing_overlapping::made
+                     .size() == static_cast<std::size_t>(N - M - offset));
 
         // The objects in the end of ptr1 are still valid
         for (int i = M + offset; i < N; i++)

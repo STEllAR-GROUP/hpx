@@ -383,7 +383,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         struct reduce_deterministic
           : public algorithm<reduce_deterministic<T>, T>
         {
@@ -411,9 +411,8 @@ namespace hpx::parallel {
                 typename T_, typename Reduce>
             static util::detail::algorithm_result_t<ExPolicy, T> parallel(
                 ExPolicy&& policy, FwdIterB first, FwdIterE last, T_&& init,
-                Reduce&& r)
+                [[maybe_unused]] Reduce&& r)
             {
-                (void) r;
                 if (first == last)
                 {
                     return util::detail::algorithm_result<ExPolicy, T>::get(
@@ -468,7 +467,7 @@ namespace hpx::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::reduce
-    HPX_CXX_EXPORT inline constexpr struct reduce_deterministic_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct reduce_deterministic_t final
       : hpx::detail::tag_parallel_algorithm<reduce_deterministic_t>
     {
     private:
@@ -484,7 +483,7 @@ namespace hpx::experimental {
         tag_fallback_invoke(hpx::experimental::reduce_deterministic_t,
             ExPolicy&& policy, FwdIter first, FwdIter last, T init, F f)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::reduce_deterministic<T>().call(
@@ -504,7 +503,7 @@ namespace hpx::experimental {
         tag_fallback_invoke(hpx::experimental::reduce_deterministic_t,
             ExPolicy&& policy, FwdIter first, FwdIter last, T init)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::reduce_deterministic<T>().call(
@@ -524,7 +523,7 @@ namespace hpx::experimental {
         tag_fallback_invoke(hpx::experimental::reduce_deterministic_t,
             ExPolicy&& policy, FwdIter first, FwdIter last)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             using value_type =
@@ -541,7 +540,7 @@ namespace hpx::experimental {
         friend T tag_fallback_invoke(hpx::experimental::reduce_deterministic_t,
             InIter first, InIter last, T init, F f)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Requires at least input iterator.");
 
             return hpx::parallel::detail::reduce_deterministic<T>().call(
@@ -554,7 +553,7 @@ namespace hpx::experimental {
         friend T tag_fallback_invoke(hpx::experimental::reduce_deterministic_t,
             InIter first, InIter last, T init)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Requires at least input iterator.");
 
             return hpx::parallel::detail::reduce_deterministic<T>().call(
@@ -568,7 +567,7 @@ namespace hpx::experimental {
         tag_fallback_invoke(hpx::experimental::reduce_deterministic_t,
             InIter first, InIter last)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Requires at least input iterator.");
 
             using value_type =

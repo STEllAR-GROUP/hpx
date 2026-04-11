@@ -27,22 +27,28 @@
 namespace hpx::parallel::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
     struct datapar_equal
     {
         template <typename ZipIterator, typename Token, typename F>
         HPX_HOST_DEVICE HPX_FORCEINLINE static void call(
             ZipIterator it, std::size_t part_count, Token& tok, F&& f)
         {
+            bool cancelled = false;
             util::loop_n<ExPolicy>(it, part_count, tok,
-                [&f, &tok](auto const& curr) mutable -> void {
-                    auto t = *curr;
-                    if (!hpx::parallel::traits::all_of(
-                            HPX_INVOKE(f, hpx::get<0>(t), hpx::get<1>(t))))
+                [&f, &cancelled](auto const& curr) mutable -> void {
+                    if (!cancelled)
                     {
-                        tok.cancel();
+                        auto t = *curr;
+                        if (!hpx::parallel::traits::all_of(
+                                HPX_INVOKE(f, hpx::get<0>(t), hpx::get<1>(t))))
+                        {
+                            cancelled = true;
+                        }
                     }
                 });
+            if (cancelled)
+                tok.cancel();
         }
 
         template <typename InIter1, typename InIter2, typename F>
@@ -57,7 +63,7 @@ namespace hpx::parallel::detail {
         }
     };
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename ZipIterator,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename ZipIterator,
         typename Token, typename F>
         requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE void tag_invoke(
@@ -80,7 +86,7 @@ namespace hpx::parallel::detail {
         }
     }
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename InIter1,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename InIter1,
         typename InIter2, typename F>
         requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE bool tag_invoke(
@@ -106,7 +112,7 @@ namespace hpx::parallel::detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
     struct datapar_equal_binary
     {
         template <typename ZipIterator, typename Token, typename F,
@@ -115,16 +121,23 @@ namespace hpx::parallel::detail {
             std::size_t part_count, Token& tok, F&& f, Proj1&& proj1,
             Proj2&& proj2)
         {
+            bool cancelled = false;
             util::loop_n<ExPolicy>(it, part_count, tok,
-                [&f, &proj1, &proj2, &tok](auto const& curr) mutable -> void {
-                    auto t = *curr;
-                    if (!hpx::parallel::traits::all_of(
-                            hpx::invoke(f, hpx::invoke(proj1, hpx::get<0>(t)),
-                                hpx::invoke(proj2, hpx::get<1>(t)))))
+                [&f, &proj1, &proj2, &cancelled](
+                    auto const& curr) mutable -> void {
+                    if (!cancelled)
                     {
-                        tok.cancel();
+                        auto t = *curr;
+                        if (!hpx::parallel::traits::all_of(hpx::invoke(f,
+                                hpx::invoke(proj1, hpx::get<0>(t)),
+                                hpx::invoke(proj2, hpx::get<1>(t)))))
+                        {
+                            cancelled = true;
+                        }
                     }
                 });
+            if (cancelled)
+                tok.cancel();
         }
 
         template <typename InIter1, typename Sent1, typename InIter2,
@@ -141,7 +154,7 @@ namespace hpx::parallel::detail {
         }
     };
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename ZipIterator,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename ZipIterator,
         typename Token, typename F, typename Proj1, typename Proj2>
         requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
     HPX_HOST_DEVICE HPX_FORCEINLINE void tag_invoke(
@@ -166,7 +179,7 @@ namespace hpx::parallel::detail {
         }
     }
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename InIter1,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename InIter1,
         typename Sent1, typename InIter2, typename Sent2, typename F,
         typename Proj1, typename Proj2>
         requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)

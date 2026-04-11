@@ -15,6 +15,7 @@
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/threading/thread.hpp>
 
+#include <concepts>
 #include <type_traits>
 #include <utility>
 
@@ -46,7 +47,7 @@ namespace hpx {
     /// represent the same thread of execution; \a hpx::jthread is not \a
     /// CopyConstructible or \a CopyAssignable, although it is \a
     /// MoveConstructible and \a MoveAssignable.
-    HPX_CXX_EXPORT class jthread
+    HPX_CXX_CORE_EXPORT class jthread
     {
     private:
         template <typename F, typename... Ts>
@@ -128,7 +129,7 @@ namespace hpx {
         //          would be exceeded.
         //
         template <typename F, typename... Ts>
-            requires(!std::is_same_v<std::decay_t<F>, jthread>)
+            requires(!std::same_as<std::decay_t<F>, jthread>)
         explicit jthread(F&& f, Ts&&... ts)
           : ssource_{}    // initialize stop_source
           , thread_{
@@ -192,8 +193,9 @@ namespace hpx {
         /// \brief swaps two jthread objects
         void swap(jthread& t) noexcept
         {
-            std::swap(ssource_, t.ssource_);
-            std::swap(thread_, t.thread_);
+            using std::swap;
+            swap(ssource_, t.ssource_);
+            swap(thread_, t.thread_);
         }
 
         // Returns: get_id() != id().
@@ -306,7 +308,7 @@ namespace hpx {
     // 32.4.3.4, specialized algorithms
 
     // Effects: Equivalent to: x.swap(y).
-    HPX_CXX_EXPORT inline void swap(jthread& lhs, jthread& rhs) noexcept
+    HPX_CXX_CORE_EXPORT inline void swap(jthread& lhs, jthread& rhs) noexcept
     {
         lhs.swap(rhs);
     }

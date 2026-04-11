@@ -8,16 +8,16 @@
 #include <hpx/config.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/tag_invoke.hpp>
+#include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/util/loop.hpp>
 
-#include <algorithm>
 #include <cstddef>
 #include <type_traits>
 #include <utility>
 
 namespace hpx::parallel::detail {
 
-    HPX_CXX_EXPORT template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
     struct sequential_contains_t final
       : hpx::functional::detail::tag_fallback<sequential_contains_t<ExPolicy>>
     {
@@ -29,7 +29,8 @@ namespace hpx::parallel::detail {
         {
             using difference_type =
                 typename std::iterator_traits<Iterator>::difference_type;
-            difference_type distance = detail::distance(first, last);
+            difference_type distance =
+                hpx::parallel::detail::distance(first, last);
             if (distance <= 0)
                 return false;
 
@@ -58,7 +59,7 @@ namespace hpx::parallel::detail {
         }
     };
 
-    HPX_CXX_EXPORT template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
     inline constexpr sequential_contains_t<ExPolicy> sequential_contains =
         sequential_contains_t<ExPolicy>{};
 }    //namespace hpx::parallel::detail

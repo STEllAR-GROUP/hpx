@@ -27,7 +27,7 @@
 
 namespace hpx::util {
 
-    HPX_CXX_EXPORT struct HPX_EXPORT lci_environment
+    HPX_CXX_CORE_EXPORT struct HPX_EXPORT lci_environment
     {
         static bool check_lci_environment(runtime_configuration& cfg);
 
@@ -59,7 +59,7 @@ namespace hpx::util {
         static LCT_log_ctx_t log_ctx;
 #endif
         static void log(
-            log_level_t level, const char* tag, const char* format, ...);
+            log_level_t level, char const* tag, char const* format, ...);
 
         // performance counter
         // clang-format off
@@ -109,7 +109,7 @@ namespace hpx::util {
 
 namespace hpx::util {
 
-    HPX_CXX_EXPORT struct HPX_EXPORT lci_environment
+    HPX_CXX_CORE_EXPORT struct HPX_EXPORT lci_environment
     {
         static bool check_lci_environment(runtime_configuration& cfg);
     };

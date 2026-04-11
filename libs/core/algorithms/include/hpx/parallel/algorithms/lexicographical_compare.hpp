@@ -189,7 +189,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        HPX_CXX_EXPORT struct lexicographical_compare
+        HPX_CXX_CORE_EXPORT struct lexicographical_compare
           : public algorithm<lexicographical_compare, bool>
         {
             constexpr lexicographical_compare() noexcept
@@ -206,7 +206,7 @@ namespace hpx::parallel {
             {
                 // clang-format off
                 for (; first1 != last1 && first2 != last2;
-                    (void) ++first1, ++first2)
+                    ++first1, ++first2)
                 // clang-format on
                 {
                     if (HPX_INVOKE(pred, HPX_INVOKE(proj1, *first1),
@@ -287,13 +287,11 @@ namespace hpx::parallel {
 
                 auto f2 = [tok, first1, first2, last1, last2, pred, proj1,
                               proj2](auto&&... data) mutable -> bool {
+                    static_assert(sizeof...(data) < 2);
+
                     // make sure iterators embedded in function object that is
                     // attached to futures are invalidated
-                    static_assert(sizeof...(data) < 2);
-                    if constexpr (sizeof...(data) == 1)
-                    {
-                        util::detail::clear_container(data...);
-                    }
+                    util::detail::clear_container(data...);
 
                     std::size_t mismatched = tok.get_data();
 
@@ -326,7 +324,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::lexicographical_compare
-    HPX_CXX_EXPORT inline constexpr struct lexicographical_compare_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct lexicographical_compare_t final
       : hpx::detail::tag_parallel_algorithm<lexicographical_compare_t>
     {
         template <typename InIter1, typename InIter2,
@@ -345,9 +343,9 @@ namespace hpx {
             InIter1 first1, InIter1 last1, InIter2 first2, InIter2 last2,
             Pred pred = Pred())
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter1>,
+            static_assert(std::input_iterator<InIter1>,
                 "Requires at least input iterator.");
-            static_assert(hpx::traits::is_input_iterator_v<InIter2>,
+            static_assert(std::input_iterator<InIter2>,
                 "Requires at least input iterator.");
 
             return hpx::parallel::detail::lexicographical_compare().call(
@@ -372,9 +370,9 @@ namespace hpx {
             hpx::lexicographical_compare_t, ExPolicy&& policy, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, Pred pred = Pred())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::lexicographical_compare().call(

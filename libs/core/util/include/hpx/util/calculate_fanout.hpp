@@ -12,7 +12,7 @@
 
 namespace hpx::util {
 
-    HPX_CXX_EXPORT constexpr std::size_t calculate_fanout(
+    HPX_CXX_CORE_EXPORT constexpr std::size_t calculate_fanout(
         std::size_t size, std::size_t const local_fanout) noexcept
     {
         if (size == 0 || local_fanout == 0)

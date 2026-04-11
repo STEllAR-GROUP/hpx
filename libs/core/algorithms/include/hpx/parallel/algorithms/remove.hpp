@@ -229,10 +229,6 @@ namespace hpx {
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 
-#if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
-#include <boost/shared_array.hpp>
-#endif
-
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
@@ -247,8 +243,8 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        HPX_CXX_EXPORT template <typename Iter, typename Sent, typename Pred,
-            typename Proj>
+        HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent,
+            typename Pred, typename Proj>
         constexpr Iter sequential_remove_if(
             Iter first, Sent last, Pred pred, Proj proj)
         {
@@ -260,13 +256,13 @@ namespace hpx::parallel {
                 for (Iter i = first; ++i != last;)
                     if (!HPX_INVOKE(pred, HPX_INVOKE(proj, *i)))
                     {
-                        *first++ = HPX_MOVE(*i);
+                        *first++ = std::ranges::iter_move(i);
                     }
             }
             return first;
         }
 
-        HPX_CXX_EXPORT template <typename FwdIter>
+        HPX_CXX_CORE_EXPORT template <typename FwdIter>
         struct remove_if : public algorithm<remove_if<FwdIter>, FwdIter>
         {
             constexpr remove_if() noexcept
@@ -304,11 +300,7 @@ namespace hpx::parallel {
                         return algorithm_result::get(HPX_MOVE(first));
                 }
 
-#if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
                 std::shared_ptr<bool[]> flags(new bool[count]);
-#else
-                boost::shared_array<bool> flags(new bool[count]);
-#endif
 
                 using hpx::get;
 
@@ -342,7 +334,8 @@ namespace hpx::parallel {
                                 if (!get<1>(*it))
                                 {
                                     if (dest != get<0>(it.get_iterator_tuple()))
-                                        *dest++ = HPX_MOVE(get<0>(*it));
+                                        *dest++ = std::ranges::iter_move(
+                                            get<0>(it.get_iterator_tuple()));
                                     else
                                         ++dest;
                                 }
@@ -354,7 +347,8 @@ namespace hpx::parallel {
                         util::loop_n<execution_policy_type>(
                             part_begin, part_size, [&dest](zip_iterator it) {
                                 if (!get<1>(*it))
-                                    *dest++ = HPX_MOVE(get<0>(*it));
+                                    *dest++ = std::ranges::iter_move(
+                                        get<0>(it.get_iterator_tuple()));
                             });
                     }
                     return dest;
@@ -374,7 +368,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::remove_if
-    HPX_CXX_EXPORT inline constexpr struct remove_if_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct remove_if_t final
       : hpx::detail::tag_parallel_algorithm<remove_if_t>
     {
         template <typename FwdIter, typename Pred>
@@ -389,7 +383,7 @@ namespace hpx {
         friend FwdIter tag_fallback_invoke(
             hpx::remove_if_t, FwdIter first, FwdIter last, Pred pred)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::remove_if<FwdIter>().call(
@@ -410,7 +404,7 @@ namespace hpx {
         friend decltype(auto) tag_fallback_invoke(hpx::remove_if_t,
             ExPolicy&& policy, FwdIter first, FwdIter last, Pred pred)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::remove_if<FwdIter>().call(
@@ -421,7 +415,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::remove
-    HPX_CXX_EXPORT inline constexpr struct remove_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct remove_t final
       : hpx::detail::tag_parallel_algorithm<remove_t>
     {
     private:

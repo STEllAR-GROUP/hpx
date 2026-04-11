@@ -14,20 +14,20 @@
 
 namespace hpx::traits {
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct is_value_proxy : std::false_type
     {
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     inline constexpr bool is_value_proxy_v = is_value_proxy<T>::value;
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct proxy_value
     {
         using type = T;
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     using proxy_value_t = typename proxy_value<T>::type;
 }    // namespace hpx::traits

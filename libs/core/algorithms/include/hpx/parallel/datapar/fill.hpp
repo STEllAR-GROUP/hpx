@@ -23,7 +23,7 @@
 namespace hpx::parallel::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT struct datapar_fill
+    HPX_CXX_CORE_EXPORT struct datapar_fill
     {
         template <typename ExPolicy, typename Iter, typename Sent, typename T>
         HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
@@ -36,8 +36,8 @@ namespace hpx::parallel::detail {
         }
     };
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename Iter, typename Sent,
-        typename T>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter,
+        typename Sent, typename T>
     // clang-format off
         requires (
             hpx::is_vectorpack_execution_policy_v<ExPolicy> &&
@@ -52,7 +52,7 @@ namespace hpx::parallel::detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT struct datapar_fill_n
+    HPX_CXX_CORE_EXPORT struct datapar_fill_n
     {
         template <typename ExPolicy, typename Iter, typename T>
         HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
@@ -65,7 +65,7 @@ namespace hpx::parallel::detail {
         }
     };
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename Iter, typename T>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter, typename T>
     // clang-format off
         requires (
             hpx::is_vectorpack_execution_policy_v<ExPolicy> &&

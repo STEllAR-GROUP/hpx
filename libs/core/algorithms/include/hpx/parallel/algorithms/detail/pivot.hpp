@@ -26,7 +26,7 @@ namespace hpx::parallel::detail {
     /// \param iter_3 : iterator to the third value
     /// \param comp : object for comparing two values
     /// \return iterator to mid value
-    HPX_CXX_EXPORT template <typename Iter, typename Comp>
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Comp>
     constexpr Iter mid3(Iter iter_1, Iter iter_2, Iter iter_3, Comp&& comp)
     {
         return HPX_INVOKE(comp, *iter_1, *iter_2) ?
@@ -52,7 +52,7 @@ namespace hpx::parallel::detail {
     /// \param iter_9   iterator to the ninth value
     /// \param comp : object for comparing two values
     /// \return iterator to the mid value
-    HPX_CXX_EXPORT template <typename Iter, typename Comp>
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Comp>
     inline constexpr Iter mid9(Iter iter_1, Iter iter_2, Iter iter_3,
         Iter iter_4, Iter iter_5, Iter iter_6, Iter iter_7, Iter iter_8,
         Iter iter_9, Comp&& comp)
@@ -70,7 +70,7 @@ namespace hpx::parallel::detail {
     /// \param first    iterator to the first element
     /// \param last     iterator to the last element
     /// \param comp     object for to Comp two elements
-    HPX_CXX_EXPORT template <typename Iter, typename Comp>
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Comp>
     constexpr void pivot9(Iter first, Iter last, Comp&& comp)
     {
         std::size_t chunk = (last - first) >> 3;
@@ -78,10 +78,6 @@ namespace hpx::parallel::detail {
             first + 3 * chunk, first + 4 * chunk, first + 5 * chunk,
             first + 6 * chunk, first + 7 * chunk, last - 1, comp);
 
-#if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
         std::ranges::iter_swap(first, itaux);
-#else
-        std::iter_swap(first, itaux);
-#endif
     }
 }    // namespace hpx::parallel::detail

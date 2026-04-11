@@ -44,7 +44,7 @@ namespace hpx::threads {
     /// Generally, \a threads are not created or executed directly. All
     /// functionality related to the management of \a threads is implemented by
     /// the thread-manager.
-    HPX_CXX_EXPORT class HPX_CORE_EXPORT thread_data_stackful
+    HPX_CXX_CORE_EXPORT class HPX_CORE_EXPORT thread_data_stackful
       : public thread_data
     {
     private:
@@ -69,7 +69,7 @@ namespace hpx::threads {
             return coroutine_(set_state_ex(thread_restart_state::signaled));
         }
 
-        HPX_FORCEINLINE coroutine_type::result_type invoke_directly()
+        HPX_FORCEINLINE coroutine_type::result_type call_directly()
         {
             HPX_ASSERT(get_state().state() == thread_schedule_state::active);
             HPX_ASSERT(this == coroutine_.get_thread_id().get());

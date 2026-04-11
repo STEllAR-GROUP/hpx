@@ -14,11 +14,9 @@
 #include <hpx/async_distributed/detail/async_implementations.hpp>
 #include <hpx/async_distributed/detail/async_unwrap_result_implementations_fwd.hpp>
 #include <hpx/async_distributed/detail/sync_implementations.hpp>
-#include <hpx/components_base/pinned_ptr.hpp>
-#include <hpx/components_base/traits/component_supports_migration.hpp>
 #include <hpx/modules/async_base.hpp>
-#include <hpx/naming_base/address.hpp>
-#include <hpx/naming_base/id_type.hpp>
+#include <hpx/modules/components_base.hpp>
+#include <hpx/modules/naming_base.hpp>
 
 #include <utility>
 

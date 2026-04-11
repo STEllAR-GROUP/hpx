@@ -132,7 +132,7 @@ namespace hpx::parallel {
     // shift_right
     namespace detail {
 
-        HPX_CXX_EXPORT template <typename ExPolicy, typename FwdIter,
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename FwdIter,
             typename Sent>
         hpx::future<FwdIter> shift_right_helper(
             ExPolicy policy, FwdIter first, Sent last, FwdIter new_first)
@@ -161,23 +161,23 @@ namespace hpx::parallel {
         // Sequential shift_right implementation borrowed from
         // https://github.com/danra/shift_proposal
 
-        HPX_CXX_EXPORT template <typename I>
+        HPX_CXX_CORE_EXPORT template <typename I>
         using difference_type_t =
             typename std::iterator_traits<I>::difference_type;
 
-        HPX_CXX_EXPORT template <typename I>
+        HPX_CXX_CORE_EXPORT template <typename I>
         using iterator_category_t =
             typename std::iterator_traits<I>::iterator_category;
 
-        HPX_CXX_EXPORT template <typename I, typename Tag, typename = void>
+        HPX_CXX_CORE_EXPORT template <typename I, typename Tag, typename = void>
         inline constexpr bool is_category = false;
 
-        HPX_CXX_EXPORT template <typename I, typename Tag>
+        HPX_CXX_CORE_EXPORT template <typename I, typename Tag>
         inline constexpr bool is_category<I, Tag,
             std::enable_if_t<
                 std::is_convertible_v<iterator_category_t<I>, Tag>>> = true;
 
-        HPX_CXX_EXPORT template <typename FwdIter>
+        HPX_CXX_CORE_EXPORT template <typename FwdIter>
         constexpr FwdIter sequential_shift_right(FwdIter first, FwdIter last,
             difference_type_t<FwdIter> n, std::size_t dist)
         {
@@ -214,13 +214,13 @@ namespace hpx::parallel {
                                 HPX_MOVE(trail));
                             return result;
                         }
-                        std::iter_swap(mid, trail);
+                        std::ranges::iter_swap(mid, trail);
                     }
                 }
             }
         }
 
-        HPX_CXX_EXPORT template <typename FwdIter2>
+        HPX_CXX_CORE_EXPORT template <typename FwdIter2>
         struct shift_right : public algorithm<shift_right<FwdIter2>, FwdIter2>
         {
             constexpr shift_right() noexcept
@@ -271,7 +271,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::shift_right
-    HPX_CXX_EXPORT inline constexpr struct shift_right_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct shift_right_t final
       : hpx::functional::detail::tag_fallback<shift_right_t>
     {
     private:
@@ -285,7 +285,7 @@ namespace hpx {
         friend FwdIter tag_fallback_invoke(
             shift_right_t, FwdIter first, FwdIter last, Size n)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::shift_right<FwdIter>().call(
@@ -305,7 +305,7 @@ namespace hpx {
         tag_fallback_invoke(shift_right_t, ExPolicy&& policy, FwdIter first,
             FwdIter last, Size n)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::shift_right<FwdIter>().call(

@@ -18,6 +18,7 @@
 #include <hpx/parallel/container_algorithms/equal.hpp>
 #include <hpx/parallel/container_algorithms/fill.hpp>
 #include <hpx/parallel/container_algorithms/find.hpp>
+#include <hpx/parallel/container_algorithms/fold.hpp>
 #include <hpx/parallel/container_algorithms/for_each.hpp>
 #include <hpx/parallel/container_algorithms/for_loop.hpp>
 #include <hpx/parallel/container_algorithms/generate.hpp>

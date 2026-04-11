@@ -19,28 +19,23 @@
 namespace hpx::execution::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Tag>
+    HPX_CXX_CORE_EXPORT template <typename Tag>
     struct is_execution_policy_mapping : std::false_type
     {
     };
 
-    HPX_CXX_EXPORT template <typename Tag>
+    HPX_CXX_CORE_EXPORT template <typename Tag>
     inline constexpr bool is_execution_policy_mapping_v =
         is_execution_policy_mapping<Tag>::value;
 
     ///////////////////////////////////////////////////////////////////////////
     // Return the matching non-parallel (sequenced) execution policy
-    HPX_CXX_EXPORT inline constexpr struct to_non_par_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct to_non_par_t final
       : hpx::functional::detail::tag_fallback<to_non_par_t>
     {
     private:
         // any non-parallel policy just returns itself
-        // clang-format off
-        template <typename ExPolicy,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy_v<ExPolicy>
-            )>
-        // clang-format on
+        template <execution_policy ExPolicy>
         friend constexpr decltype(auto) tag_fallback_invoke(
             to_non_par_t, ExPolicy&& policy) noexcept
         {
@@ -56,17 +51,12 @@ namespace hpx::execution::experimental {
     };
 
     // Return the matching parallel execution policy
-    HPX_CXX_EXPORT inline constexpr struct to_par_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct to_par_t final
       : hpx::functional::detail::tag_fallback<to_par_t>
     {
     private:
         // any parallel policy just returns itself
-        // clang-format off
-        template <typename ExPolicy,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy_v<ExPolicy>
-            )>
-        // clang-format on
+        template <execution_policy ExPolicy>
         friend constexpr decltype(auto) tag_fallback_invoke(
             to_par_t, ExPolicy&& policy) noexcept
         {
@@ -83,17 +73,12 @@ namespace hpx::execution::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     // Return the matching non-task (synchronous) execution policy
-    HPX_CXX_EXPORT inline constexpr struct to_non_task_t
+    HPX_CXX_CORE_EXPORT inline constexpr struct to_non_task_t
       : hpx::functional::detail::tag_fallback<to_non_task_t>
     {
     private:
         // any non-task policy just returns itself
-        // clang-format off
-        template <typename ExPolicy,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy_v<ExPolicy>
-            )>
-        // clang-format on
+        template <execution_policy ExPolicy>
         friend constexpr decltype(auto) tag_fallback_invoke(
             to_non_task_t, ExPolicy&& policy) noexcept
         {
@@ -109,17 +94,12 @@ namespace hpx::execution::experimental {
     };
 
     // Return the matching task (asynchronous) execution policy
-    HPX_CXX_EXPORT inline constexpr struct to_task_t
+    HPX_CXX_CORE_EXPORT inline constexpr struct to_task_t
       : hpx::functional::detail::tag_fallback<to_task_t>
     {
     private:
         // any task policy just returns itself
-        // clang-format off
-        template <typename ExPolicy,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy_v<ExPolicy>
-            )>
-        // clang-format on
+        template <execution_policy ExPolicy>
         friend constexpr decltype(auto) tag_fallback_invoke(
             to_task_t, ExPolicy&& policy) noexcept
         {
@@ -136,17 +116,12 @@ namespace hpx::execution::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     // Return the matching non-unsequenced execution policy
-    HPX_CXX_EXPORT inline constexpr struct to_non_unseq_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct to_non_unseq_t final
       : hpx::functional::detail::tag_fallback<to_non_unseq_t>
     {
     private:
         // any non-unsequenced policy just returns itself
-        // clang-format off
-        template <typename ExPolicy,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy_v<ExPolicy>
-            )>
-        // clang-format on
+        template <execution_policy ExPolicy>
         friend constexpr decltype(auto) tag_fallback_invoke(
             to_non_unseq_t, ExPolicy&& policy) noexcept
         {
@@ -162,17 +137,12 @@ namespace hpx::execution::experimental {
     };
 
     // Return the matching unsequenced execution policy
-    HPX_CXX_EXPORT inline constexpr struct to_unseq_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct to_unseq_t final
       : hpx::functional::detail::tag_fallback<to_unseq_t>
     {
     private:
         // any unsequenced policy just returns itself
-        // clang-format off
-        template <typename ExPolicy,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy_v<ExPolicy>
-            )>
-        // clang-format on
+        template <execution_policy ExPolicy>
         friend constexpr decltype(auto) tag_fallback_invoke(
             to_unseq_t, ExPolicy&& policy) noexcept
         {

@@ -148,7 +148,8 @@ namespace hpx::parallel {
         ///
         /// \return Position of the first bit set
         ///
-        HPX_CXX_EXPORT constexpr unsigned nbits64(std::uint64_t num) noexcept
+        HPX_CXX_CORE_EXPORT constexpr unsigned nbits64(
+            std::uint64_t num) noexcept
         {
             unsigned nb = 0;
             if (num >= 1ull << 32)
@@ -193,17 +194,13 @@ namespace hpx::parallel {
         /// \param last     iterator to the last element
         /// \param comp     object to Comp two elements
         ///
-        HPX_CXX_EXPORT template <typename Iter, typename Comp>
+        HPX_CXX_CORE_EXPORT template <typename Iter, typename Comp>
         constexpr void pivot3(Iter first, Iter last, Comp&& comp) noexcept
         {
             auto n2 = (last - first) / 2;
             Iter it_val =
                 mid3(first + 1, first + n2, last - 1, HPX_FORWARD(Comp, comp));
-#if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
             std::ranges::iter_swap(first, it_val);
-#else
-            std::iter_swap(first, it_val);
-#endif
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -217,7 +214,7 @@ namespace hpx::parallel {
         ///
         /// \return iterator where is the pivot used in the filtering
         ///
-        HPX_CXX_EXPORT template <typename Iter, typename Comp>
+        HPX_CXX_CORE_EXPORT template <typename Iter, typename Comp>
         constexpr inline Iter filter(Iter first, Iter end, Comp&& comp)
         {
             std::int64_t const nelem = end - first;
@@ -230,41 +227,33 @@ namespace hpx::parallel {
                 pivot3(first, end, comp);
             }
 
-            typename std::iterator_traits<Iter>::value_type const& pivot =
+            typename std::iterator_traits<Iter>::value_type const pivot =
                 *first;
 
             Iter c_first = first + 1, c_last = end - 1;
-            while (HPX_INVOKE(comp, *c_first, pivot))
+            while (c_first < end && HPX_INVOKE(comp, *c_first, pivot))
             {
                 ++c_first;
             }
-            while (HPX_INVOKE(comp, pivot, *c_last))
+            while (c_last > first && HPX_INVOKE(comp, pivot, *c_last))
             {
                 --c_last;
             }
 
             while (c_first < c_last)
             {
-#if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
                 std::ranges::iter_swap(c_first++, c_last--);
-#else
-                std::iter_swap(c_first++, c_last--);
-#endif
-                while (HPX_INVOKE(comp, *c_first, pivot))
+                while (c_first < end && HPX_INVOKE(comp, *c_first, pivot))
                 {
                     ++c_first;
                 }
-                while (HPX_INVOKE(comp, pivot, *c_last))
+                while (c_last > first && HPX_INVOKE(comp, pivot, *c_last))
                 {
                     --c_last;
                 }
             }
 
-#if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
             std::ranges::iter_swap(first, c_last);
-#else
-            std::iter_swap(first, c_last);
-#endif
             return c_last;
         }
 
@@ -275,7 +264,7 @@ namespace hpx::parallel {
         // end : iterator to the element after the end in the range
         // level : level of depth from the top level call
         // comp : object for to Comp elements
-        HPX_CXX_EXPORT template <typename Iter, typename Comp>
+        HPX_CXX_CORE_EXPORT template <typename Iter, typename Comp>
         constexpr void recursive_partial_sort(
             Iter first, Iter middle, Iter end, std::uint32_t level, Comp&& comp)
         {
@@ -299,11 +288,7 @@ namespace hpx::parallel {
                 {
                     if (HPX_INVOKE(comp, *it, *first))
                     {
-#if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
                         std::ranges::iter_swap(it, first);
-#else
-                        std::iter_swap(it, first);
-#endif
                     }
                 }
                 return;
@@ -341,12 +326,12 @@ namespace hpx::parallel {
         // level : level of depth from the top level call
         // comp : object for to Comp elements
         //
-        HPX_CXX_EXPORT template <typename ExPolicy, typename Iter,
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter,
             typename Comp>
         hpx::future<Iter> parallel_partial_sort(ExPolicy&& policy, Iter first,
             Iter middle, Iter last, std::uint32_t level, Comp&& comp = Comp());
 
-        HPX_CXX_EXPORT struct sort_thread_helper
+        HPX_CXX_CORE_EXPORT struct sort_thread_helper
         {
             template <typename... Ts>
             decltype(auto) operator()(Ts&&... ts) const
@@ -355,7 +340,7 @@ namespace hpx::parallel {
             }
         };
 
-        HPX_CXX_EXPORT struct parallel_partial_sort_helper
+        HPX_CXX_CORE_EXPORT struct parallel_partial_sort_helper
         {
             template <typename... Ts>
             decltype(auto) operator()(Ts&&... ts) const
@@ -364,7 +349,7 @@ namespace hpx::parallel {
             }
         };
 
-        HPX_CXX_EXPORT template <typename ExPolicy, typename Iter,
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter,
             typename Comp>
         hpx::future<Iter> parallel_partial_sort(ExPolicy&& policy, Iter first,
             Iter middle, Iter last, std::uint32_t level, Comp&& comp)
@@ -416,6 +401,7 @@ namespace hpx::parallel {
                 }
 
                 return hpx::dataflow(
+                    policy.executor(),
                     [last](hpx::future<Iter>&& leftf,
                         hpx::future<Iter>&& rightf) -> Iter {
                         if (leftf.has_exception() || rightf.has_exception())
@@ -450,7 +436,7 @@ namespace hpx::parallel {
     /// \param end : iterator to the element after the end in the range
     /// \param comp : object for to Comp elements
     ///
-    HPX_CXX_EXPORT template <typename Iter, typename Sent, typename Comp>
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent, typename Comp>
     Iter sequential_partial_sort(Iter first, Iter middle, Sent end, Comp&& comp)
     {
         std::int64_t const nelem = parallel::detail::distance(first, end);
@@ -485,8 +471,8 @@ namespace hpx::parallel {
     /// \param end : iterator to the element after the end in the range
     /// \param comp : object for to Comp elements
     ///
-    HPX_CXX_EXPORT template <typename ExPolicy, typename Iter, typename Sent,
-        typename Comp>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter,
+        typename Sent, typename Comp>
     hpx::future<Iter> parallel_partial_sort(
         ExPolicy&& policy, Iter first, Iter middle, Sent end, Comp&& comp)
     {
@@ -511,7 +497,7 @@ namespace hpx::parallel {
 
     ///////////////////////////////////////////////////////////////////////
     // partial_sort
-    HPX_CXX_EXPORT template <typename RandIter>
+    HPX_CXX_CORE_EXPORT template <typename RandIter>
     struct partial_sort
       : public detail::algorithm<partial_sort<RandIter>, RandIter>
     {
@@ -575,7 +561,7 @@ namespace hpx::parallel {
 
 namespace hpx {
 
-    HPX_CXX_EXPORT inline constexpr struct partial_sort_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct partial_sort_t final
       : hpx::detail::tag_parallel_algorithm<partial_sort_t>
     {
     private:
@@ -593,7 +579,7 @@ namespace hpx {
         friend RandIter tag_fallback_invoke(hpx::partial_sort_t, RandIter first,
             RandIter middle, RandIter last, Comp comp = Comp())
         {
-            static_assert(hpx::traits::is_random_access_iterator_v<RandIter>,
+            static_assert(std::random_access_iterator<RandIter>,
                 "Requires at least random access iterator.");
 
             return parallel::partial_sort<RandIter>().call(hpx::execution::seq,
@@ -616,7 +602,7 @@ namespace hpx {
             ExPolicy&& policy, RandIter first, RandIter middle, RandIter last,
             Comp comp = Comp())
         {
-            static_assert(hpx::traits::is_random_access_iterator_v<RandIter>,
+            static_assert(std::random_access_iterator<RandIter>,
                 "Requires at least random access iterator.");
 
             using algorithm_result =

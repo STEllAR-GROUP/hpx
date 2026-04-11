@@ -51,13 +51,13 @@ namespace hpx::detail {
     using namespace std::experimental;
 #endif
 
-    HPX_CXX_EXPORT struct sorted_unique_t
+    HPX_CXX_CORE_EXPORT struct sorted_unique_t
     {
         explicit sorted_unique_t() = default;
     };
-    HPX_CXX_EXPORT inline constexpr sorted_unique_t sorted_unique{};
+    HPX_CXX_CORE_EXPORT inline constexpr sorted_unique_t sorted_unique{};
 
-    HPX_CXX_EXPORT template <typename KeyRef, typename KeyIter>
+    HPX_CXX_CORE_EXPORT template <typename KeyRef, typename KeyIter>
     struct flat_set_iterator
     {
         static_assert(std::is_reference_v<KeyRef>);
@@ -210,7 +210,8 @@ namespace hpx::detail {
         KeyIter key_it_;
     };
 
-    HPX_CXX_EXPORT template <typename Key, typename Compare = std::less<Key>,
+    HPX_CXX_CORE_EXPORT template <typename Key,
+        typename Compare = std::less<Key>,
         typename KeyContainer = std::vector<Key>>
     class flat_set
     {

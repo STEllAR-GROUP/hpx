@@ -22,7 +22,7 @@
 
 namespace hpx::parallel::detail {
 
-    HPX_CXX_EXPORT template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
     struct sequential_reduce_deterministic_t final
       : hpx::functional::detail::tag_fallback<
             sequential_reduce_deterministic_t<ExPolicy>>
@@ -32,10 +32,9 @@ namespace hpx::parallel::detail {
             typename Reduce>
         friend constexpr T tag_fallback_invoke(
             sequential_reduce_deterministic_t, ExPolicy&&, InIterB first,
-            InIterE last, T init, Reduce&& r)
+            InIterE last, T init, [[maybe_unused]] Reduce&& r)
         {
             /// TODO: Put constraint on Reduce to be a binary plus operator
-            (void) r;
 
             // hpx_rfa_bin_host_buffer should be initialized by the frontend of
             // this method
@@ -67,7 +66,7 @@ namespace hpx::parallel::detail {
         }
     };
 
-    HPX_CXX_EXPORT template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
     struct sequential_reduce_deterministic_rfa_t final
       : hpx::functional::detail::tag_fallback<
             sequential_reduce_deterministic_rfa_t<ExPolicy>>
@@ -132,12 +131,12 @@ namespace hpx::parallel::detail {
     };
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-    HPX_CXX_EXPORT template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
     inline constexpr sequential_reduce_deterministic_t<ExPolicy>
         sequential_reduce_deterministic =
             sequential_reduce_deterministic_t<ExPolicy>{};
 #else
-    HPX_CXX_EXPORT template <typename ExPolicy, typename... Args>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename... Args>
     HPX_HOST_DEVICE HPX_FORCEINLINE auto sequential_reduce_deterministic(
         Args&&... args)
     {
@@ -147,12 +146,12 @@ namespace hpx::parallel::detail {
 #endif
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-    HPX_CXX_EXPORT template <typename ExPolicy>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
     inline constexpr sequential_reduce_deterministic_rfa_t<ExPolicy>
         sequential_reduce_deterministic_rfa =
             sequential_reduce_deterministic_rfa_t<ExPolicy>{};
 #else
-    HPX_CXX_EXPORT template <typename ExPolicy, typename... Args>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename... Args>
     HPX_HOST_DEVICE HPX_FORCEINLINE auto sequential_reduce_deterministic_rfa(
         Args&&... args)
     {

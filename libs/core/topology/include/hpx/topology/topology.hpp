@@ -30,7 +30,7 @@
 
 namespace hpx::threads {
 
-    HPX_CXX_EXPORT struct hpx_hwloc_bitmap_wrapper
+    HPX_CXX_CORE_EXPORT struct hpx_hwloc_bitmap_wrapper
     {
         HPX_NON_COPYABLE(hpx_hwloc_bitmap_wrapper);
 
@@ -77,12 +77,12 @@ namespace hpx::threads {
         hwloc_bitmap_t bmp_;
     };
 
-    HPX_CXX_EXPORT using hwloc_bitmap_ptr =
+    HPX_CXX_CORE_EXPORT using hwloc_bitmap_ptr =
         std::shared_ptr<hpx_hwloc_bitmap_wrapper>;
 
     /// \brief Please see hwloc documentation for the corresponding
     /// enums HWLOC_MEMBIND_XXX
-    HPX_CXX_EXPORT enum hpx_hwloc_membind_policy : int {
+    HPX_CXX_CORE_EXPORT enum hpx_hwloc_membind_policy : int {
         membind_default = HWLOC_MEMBIND_DEFAULT,
         membind_firsttouch = HWLOC_MEMBIND_FIRSTTOUCH,
         membind_bind = HWLOC_MEMBIND_BIND,
@@ -98,7 +98,7 @@ namespace hpx::threads {
 
 #include <hpx/config/warnings_prefix.hpp>
 
-    HPX_CXX_EXPORT struct HPX_CORE_EXPORT topology
+    HPX_CXX_CORE_EXPORT struct HPX_CORE_EXPORT topology
     {
         topology();
 
@@ -133,6 +133,24 @@ namespace hpx::threads {
             [[maybe_unused]] error_code& ec = throws) const noexcept
         {
             return numa_node_numbers_[num_thread % num_of_pus_];
+        }
+
+        /// \brief Return the hardware latency distance between two NUMA nodes.
+        ///        Values are sourced from hwloc's distance matrix when
+        ///        available; otherwise a standard default (10 = local,
+        ///        20 = remote) is returned.
+        ///
+        /// \param node_a [in] logical index of the first NUMA node
+        /// \param node_b [in] logical index of the second NUMA node
+        std::size_t get_numa_distance(
+            std::size_t node_a, std::size_t node_b) const noexcept
+        {
+            if (node_a < numa_node_distances_.size() &&
+                node_b < numa_node_distances_[node_a].size())
+            {
+                return numa_node_distances_[node_a][node_b];
+            }
+            return node_a == node_b ? 10u : 20u;
         }
 
         /// \brief Return a bit mask where each set bit corresponds to a
@@ -421,15 +439,22 @@ namespace hpx::threads {
         std::vector<mask_type> numa_node_affinity_masks_;
         std::vector<mask_type> core_affinity_masks_;
         std::vector<mask_type> thread_affinity_masks_;
+
+        // numa_node_distances_[i][j] holds the hardware latency distance
+        // between NUMA node i and NUMA node j as reported by hwloc.
+        // Indexed by logical NUMA node number.
+        std::vector<std::vector<std::size_t>> numa_node_distances_;
+
+        void init_numa_node_distances();
     };
 
 #include <hpx/config/warnings_suffix.hpp>
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT HPX_CORE_EXPORT topology& create_topology();
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT topology& create_topology();
 
     /// Get the global topology instance
-    HPX_CXX_EXPORT inline topology const& get_topology()
+    HPX_CXX_CORE_EXPORT inline topology const& get_topology()
     {
         return create_topology();
     }
@@ -437,7 +462,7 @@ namespace hpx::threads {
     ///////////////////////////////////////////////////////////////////////////
     // abstract away memory page size, calls to system functions are
     // expensive, so return a value initialized at startup
-    HPX_CXX_EXPORT inline std::size_t get_memory_page_size()
+    HPX_CXX_CORE_EXPORT inline std::size_t get_memory_page_size()
     {
         return hpx::threads::topology::memory_page_size_;
     }

@@ -1,5 +1,5 @@
 //  Copyright (c) 2011      Bryce Lelbach
-//  Copyright (c) 2007-2025 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,8 +15,7 @@
 #include <hpx/components_base/traits/is_component.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
-#include <hpx/naming_base/address.hpp>
-#include <hpx/naming_base/id_type.hpp>
+#include <hpx/modules/naming_base.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -25,7 +24,7 @@
 namespace hpx::components {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Component>
+    HPX_CXX_EXPORT template <typename Component>
     // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
     class fixed_component_base : public traits::detail::fixed_component_tag
     {
@@ -180,7 +179,7 @@ namespace hpx::components {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Component>
+    HPX_CXX_EXPORT template <typename Component>
     class fixed_component : public Component
     {
     public:

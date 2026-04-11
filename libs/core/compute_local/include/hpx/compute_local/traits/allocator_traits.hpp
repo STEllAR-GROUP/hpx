@@ -19,19 +19,20 @@
 
 namespace hpx::compute::traits {
 
-    HPX_CXX_EXPORT template <typename Allocator>
+    HPX_CXX_CORE_EXPORT template <typename Allocator>
     struct allocator_traits;
 
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename Allocator, typename Enable = void>
+        HPX_CXX_CORE_EXPORT template <typename Allocator,
+            typename Enable = void>
         struct get_target_traits
         {
             using type = compute::traits::access_target<compute::host::target>;
         };
 
-        HPX_CXX_EXPORT template <typename Allocator>
+        HPX_CXX_CORE_EXPORT template <typename Allocator>
         struct get_target_traits<Allocator,
             std::void_t<typename Allocator::target_type>>
         {
@@ -39,7 +40,8 @@ namespace hpx::compute::traits {
                 compute::traits::access_target<typename Allocator::target_type>;
         };
 
-        HPX_CXX_EXPORT template <typename Allocator, typename Enable = void>
+        HPX_CXX_CORE_EXPORT template <typename Allocator,
+            typename Enable = void>
         struct get_reference_type
 #if defined(HPX_NATIVE_MIC)
             ;
@@ -49,14 +51,15 @@ namespace hpx::compute::traits {
         };
 #endif
 
-        HPX_CXX_EXPORT template <typename Allocator>
+        HPX_CXX_CORE_EXPORT template <typename Allocator>
         struct get_reference_type<Allocator,
             std::void_t<typename Allocator::reference>>
         {
             using type = typename Allocator::reference;
         };
 
-        HPX_CXX_EXPORT template <typename Allocator, typename Enable = void>
+        HPX_CXX_CORE_EXPORT template <typename Allocator,
+            typename Enable = void>
         struct get_const_reference_type
 #if defined(HPX_NATIVE_MIC)
             ;
@@ -67,20 +70,21 @@ namespace hpx::compute::traits {
         };
 #endif
 
-        HPX_CXX_EXPORT template <typename Allocator>
+        HPX_CXX_CORE_EXPORT template <typename Allocator>
         struct get_const_reference_type<Allocator,
             std::void_t<typename Allocator::const_reference>>
         {
             using type = typename Allocator::const_reference;
         };
 
-        HPX_CXX_EXPORT template <typename Allocator, typename Enable = void>
+        HPX_CXX_CORE_EXPORT template <typename Allocator,
+            typename Enable = void>
         struct target_helper_result
         {
             using type = compute::host::target;
         };
 
-        HPX_CXX_EXPORT template <typename Allocator>
+        HPX_CXX_CORE_EXPORT template <typename Allocator>
         struct target_helper_result<Allocator,
             std::void_t<typename Allocator::target_type>>
         {
@@ -88,7 +92,7 @@ namespace hpx::compute::traits {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT struct target_helper
+        HPX_CXX_CORE_EXPORT struct target_helper
         {
             template <typename Allocator>
             HPX_HOST_DEVICE static compute::host::target call(
@@ -105,7 +109,7 @@ namespace hpx::compute::traits {
             }
         };
 
-        HPX_CXX_EXPORT template <typename Allocator>
+        HPX_CXX_CORE_EXPORT template <typename Allocator>
         HPX_HOST_DEVICE typename target_helper_result<Allocator>::type
         call_target_helper(Allocator const& alloc)
         {
@@ -113,7 +117,7 @@ namespace hpx::compute::traits {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT struct bulk_construct
+        HPX_CXX_CORE_EXPORT struct bulk_construct
         {
             template <typename Allocator, typename... Ts>
             HPX_HOST_DEVICE static void call(hpx::traits::detail::wrap_int,
@@ -165,7 +169,7 @@ namespace hpx::compute::traits {
             }
         };
 
-        HPX_CXX_EXPORT template <typename Allocator, typename... Ts>
+        HPX_CXX_CORE_EXPORT template <typename Allocator, typename... Ts>
         HPX_HOST_DEVICE void call_bulk_construct(Allocator& alloc,
             typename std::allocator_traits<Allocator>::pointer p,
             typename std::allocator_traits<Allocator>::size_type count,
@@ -175,7 +179,7 @@ namespace hpx::compute::traits {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT struct bulk_destroy
+        HPX_CXX_CORE_EXPORT struct bulk_destroy
         {
             template <typename Allocator>
             HPX_HOST_DEVICE static void call(hpx::traits::detail::wrap_int,
@@ -203,7 +207,7 @@ namespace hpx::compute::traits {
             }
         };
 
-        HPX_CXX_EXPORT template <typename Allocator>
+        HPX_CXX_CORE_EXPORT template <typename Allocator>
         HPX_HOST_DEVICE void call_bulk_destroy(Allocator& alloc,
             typename std::allocator_traits<Allocator>::pointer p,
             typename std::allocator_traits<Allocator>::size_type count) noexcept
@@ -212,7 +216,7 @@ namespace hpx::compute::traits {
         }
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename Allocator>
+    HPX_CXX_CORE_EXPORT template <typename Allocator>
     struct allocator_traits
 #if !defined(HPX_NATIVE_MIC)
       : std::allocator_traits<Allocator>

@@ -13,12 +13,11 @@
 #include <hpx/agas_base/agas_fwd.hpp>
 #include <hpx/async_distributed/base_lco_with_value.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
-#include <hpx/components_base/component_type.hpp>
-#include <hpx/components_base/server/fixed_component_base.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/synchronization.hpp>
-#include <hpx/naming_base/id_type.hpp>
 
 #include <atomic>
 #include <cstdint>
@@ -60,7 +59,7 @@ namespace hpx::agas::server {
     private:
         // REVIEW: Separate mutexes might reduce contention here. This has to be
         // investigated carefully.
-        mutex_type mutex_;
+        mutex_type mutex_ = mutex_type("component_namespace");
         component_id_table_type component_ids_;
         factory_table_type factories_;
         component_id_type type_counter;

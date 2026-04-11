@@ -320,7 +320,7 @@ namespace hpx::parallel {
 
         ///////////////////////////////////////////////////////////////////////
         // Our own version of the sequential exclusive_scan.
-        HPX_CXX_EXPORT template <typename InIter, typename Sent,
+        HPX_CXX_CORE_EXPORT template <typename InIter, typename Sent,
             typename OutIter, typename T, typename Op>
         constexpr util::in_out_result<InIter, OutIter>
         sequential_exclusive_scan(
@@ -336,8 +336,8 @@ namespace hpx::parallel {
             return util::in_out_result<InIter, OutIter>{first, dest};
         }
 
-        HPX_CXX_EXPORT template <typename InIter, typename OutIter, typename T,
-            typename Op>
+        HPX_CXX_CORE_EXPORT template <typename InIter, typename OutIter,
+            typename T, typename Op>
         constexpr T sequential_exclusive_scan_n(
             InIter first, std::size_t count, OutIter dest, T init, Op&& op)
         {
@@ -352,7 +352,7 @@ namespace hpx::parallel {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename IterPair>
+        HPX_CXX_CORE_EXPORT template <typename IterPair>
         struct exclusive_scan
           : public algorithm<exclusive_scan<IterPair>, IterPair>
         {
@@ -458,7 +458,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::exclusive_scan
-    HPX_CXX_EXPORT inline constexpr struct exclusive_scan_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct exclusive_scan_t final
       : hpx::detail::tag_parallel_algorithm<exclusive_scan_t>
     {
         template <typename InIter, typename OutIter,
@@ -472,9 +472,10 @@ namespace hpx {
         friend OutIter tag_fallback_invoke(hpx::exclusive_scan_t, InIter first,
             InIter last, OutIter dest, T init)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Requires at least input iterator.");
-            static_assert(hpx::traits::is_output_iterator_v<OutIter>,
+            static_assert(std::output_iterator<OutIter,
+                              hpx::traits::iter_value_t<InIter>>,
                 "Requires at least output iterator.");
 
             using result_type = parallel::util::in_out_result<InIter, OutIter>;
@@ -499,9 +500,9 @@ namespace hpx {
         tag_fallback_invoke(hpx::exclusive_scan_t, ExPolicy&& policy,
             FwdIter1 first, FwdIter1 last, FwdIter2 dest, T init)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Requires at least forward iterator.");
 
             using result_type =
@@ -528,9 +529,10 @@ namespace hpx {
         friend OutIter tag_fallback_invoke(hpx::exclusive_scan_t, InIter first,
             InIter last, OutIter dest, T init, Op op)
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Requires at least input iterator.");
-            static_assert(hpx::traits::is_output_iterator_v<OutIter>,
+            static_assert(std::output_iterator<OutIter,
+                              hpx::traits::iter_value_t<InIter>>,
                 "Requires at least output iterator.");
 
             using result_type = parallel::util::in_out_result<InIter, OutIter>;
@@ -560,9 +562,9 @@ namespace hpx {
         tag_fallback_invoke(hpx::exclusive_scan_t, ExPolicy&& policy,
             FwdIter1 first, FwdIter1 last, FwdIter2 dest, T init, Op op)
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+            static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
+            static_assert(std::forward_iterator<FwdIter2>,
                 "Requires at least forward iterator.");
 
             using result_type =

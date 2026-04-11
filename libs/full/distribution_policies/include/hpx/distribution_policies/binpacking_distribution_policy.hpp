@@ -12,13 +12,12 @@
 #include <hpx/actions_base/traits/is_distribution_policy.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/dataflow.hpp>
-#include <hpx/components_base/agas_interface.hpp>
-#include <hpx/components_base/component_type.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/pack_traversal.hpp>
 #include <hpx/modules/serialization.hpp>
-#include <hpx/naming_base/id_type.hpp>
 #include <hpx/performance_counters/performance_counter.hpp>
 #include <hpx/runtime_components/create_component_helpers.hpp>
 
@@ -122,7 +121,7 @@ namespace hpx::components {
                 // consolidate all results
                 return hpx::dataflow(
                     hpx::launch::sync,
-                    [HPX_CXX20_CAPTURE_THIS(=)](
+                    [=, this](
                         std::vector<hpx::future<std::vector<hpx::id_type>>>&&
                             v) mutable -> std::vector<bulk_locality_result> {
                         HPX_ASSERT(localities_.size() == v.size());

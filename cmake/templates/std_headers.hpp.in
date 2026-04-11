@@ -44,12 +44,8 @@
 # endif
 #endif
 
-#if defined(HPX_HAVE_CXX20_STD_BIT_CAST) || defined(HPX_HAVE_CXX20_STD_ENDIAN)
-# include <bit>
-#endif
-#if defined(HPX_HAVE_CXX20_SOURCE_LOCATION)
-# include <source_location>
-#endif
+#include <bit>
+#include <source_location>
 
 #if defined(HPX_HAVE_CXX23_STD_GENERATOR)
 # include <generator>
@@ -66,6 +62,10 @@
 
 #include <asio.hpp>
 #include <hwloc.h>
+
+#if defined(HPX_HAVE_MODULE_LIKWID)
+# include <likwid.h>
+#endif
 
 // Include MPI headers if required
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)) ||      \
@@ -98,7 +98,6 @@
 
 #if defined(HPX_HAVE_MODULE_ASYNC_CUDA)
 # if defined(HPX_HAVE_CUDA) && defined(HPX_HAVE_GPUBLAS)
-#  include <cublas_api.h>
 #  include <cublas_v2.h>
 # elif defined(HPX_HAVE_HIP) && defined(HPX_HAVE_GPUBLAS)
 #  include <hipblas.h>
@@ -130,4 +129,8 @@
 #  include <Vc/Vc>
 #  include <Vc/global.h>
 # endif
+#endif
+
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+# include <boost/accumulators/accumulators.hpp>
 #endif

@@ -14,7 +14,7 @@
 namespace hpx::util::cache::statistics {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT enum class method {
+    HPX_CXX_CORE_EXPORT enum class method {
         get_entry = 0,
         insert_entry = 1,
         update_entry = 2,
@@ -22,7 +22,7 @@ namespace hpx::util::cache::statistics {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT class no_statistics
+    HPX_CXX_CORE_EXPORT class no_statistics
     {
     public:
         /// \brief  The function \a got_hit will be called by a cache instance

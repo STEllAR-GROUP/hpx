@@ -42,10 +42,6 @@ function(hpx_perform_cxx_feature_tests)
 
   hpx_check_for_cxx11_std_quick_exit(DEFINITIONS HPX_HAVE_CXX11_STD_QUICK_EXIT)
 
-  hpx_check_for_cxx11_std_shared_ptr_lwg3018(
-    DEFINITIONS HPX_HAVE_CXX11_STD_SHARED_PTR_LWG3018
-  )
-
   hpx_check_for_c11_aligned_alloc(DEFINITIONS HPX_HAVE_C11_ALIGNED_ALLOC)
 
   hpx_check_for_cxx14_delete_operator_with_size(
@@ -67,10 +63,6 @@ function(hpx_perform_cxx_feature_tests)
   )
 
   hpx_check_for_cxx17_aligned_new(DEFINITIONS HPX_HAVE_CXX17_ALIGNED_NEW)
-
-  hpx_check_for_cxx17_shared_ptr_array(
-    DEFINITIONS HPX_HAVE_CXX17_SHARED_PTR_ARRAY
-  )
 
   hpx_check_for_cxx17_std_transform_scan(
     DEFINITIONS HPX_HAVE_CXX17_STD_TRANSFORM_SCAN_ALGORITHMS
@@ -102,61 +94,17 @@ function(hpx_perform_cxx_feature_tests)
       DEFINITIONS HPX_HAVE_CXX20_EXPERIMENTAL_SIMD
     )
 
-    hpx_check_for_cxx20_lambda_capture(
-      DEFINITIONS HPX_HAVE_CXX20_LAMBDA_CAPTURE
-    )
-
-    hpx_check_for_cxx20_source_location(
-      DEFINITIONS HPX_HAVE_CXX20_SOURCE_LOCATION
-    )
-
-    hpx_check_for_cxx20_perfect_pack_capture(
-      DEFINITIONS HPX_HAVE_CXX20_PERFECT_PACK_CAPTURE
-    )
-
     if(HPX_WITH_SUPPORT_NO_UNIQUE_ADDRESS_ATTRIBUTE AND NOT MSVC) # see above
       hpx_check_for_cxx20_no_unique_address_attribute(
         DEFINITIONS HPX_HAVE_CXX20_NO_UNIQUE_ADDRESS_ATTRIBUTE
       )
     endif()
 
-    hpx_check_for_cxx20_paren_initialization_of_aggregates(
-      DEFINITIONS HPX_HAVE_CXX20_PAREN_INITIALIZATION_OF_AGGREGATES
-    )
-
-    hpx_check_for_cxx20_std_disable_sized_sentinel_for(
-      DEFINITIONS HPX_HAVE_CXX20_STD_DISABLE_SIZED_SENTINEL_FOR
-    )
-
-    hpx_check_for_cxx20_std_endian(DEFINITIONS HPX_HAVE_CXX20_STD_ENDIAN)
-
     hpx_check_for_cxx20_std_execution_policies(
       DEFINITIONS HPX_HAVE_CXX20_STD_EXECUTION_POLICES
     )
+    # hpx_check_for_cxx20_trivial_virtual_destructor was deleted
 
-    hpx_check_for_cxx20_std_ranges_iter_swap(
-      DEFINITIONS HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP
-    )
-
-    hpx_check_for_cxx20_trivial_virtual_destructor(
-      DEFINITIONS HPX_HAVE_CXX20_TRIVIAL_VIRTUAL_DESTRUCTOR
-    )
-
-    hpx_check_for_cxx20_std_construct_at(
-      DEFINITIONS HPX_HAVE_CXX20_STD_CONSTRUCT_AT
-    )
-
-    hpx_check_for_cxx20_std_default_sentinel(
-      DEFINITIONS HPX_HAVE_CXX20_STD_DEFAULT_SENTINEL
-    )
-
-    hpx_check_for_cxx20_std_bit_cast(DEFINITIONS HPX_HAVE_CXX20_STD_BIT_CAST)
-
-    hpx_check_for_cxx20_std_identity(DEFINITIONS HPX_HAVE_CXX20_STD_IDENTITY)
-
-    hpx_check_for_cxx20_constexpr_destructor(
-      DEFINITIONS HPX_HAVE_CXX20_CONSTEXPR_DESTRUCTOR
-    )
   endif()
 
   if(HPX_WITH_CXX20_COROUTINES)
@@ -173,10 +121,22 @@ function(hpx_perform_cxx_feature_tests)
     DEFINITIONS HPX_HAVE_CXX26_EXPERIMENTAL_SCOPE
   )
 
+  hpx_check_for_cxx26_experimental_meta(
+    DEFINITIONS HPX_HAVE_CXX26_EXPERIMENTAL_META
+  )
+
   hpx_check_for_cxx26_contracts(DEFINITIONS HPX_HAVE_CXX26_CONTRACTS)
 
   hpx_check_for_cxx_lambda_capture_decltype(
     DEFINITIONS HPX_HAVE_CXX_LAMBDA_CAPTURE_DECLTYPE
+  )
+
+  hpx_check_for_cxx23_std_unordered_transparent_erase(
+    DEFINITIONS HPX_HAVE_CXX23_STD_UNORDERED_TRANSPARENT_ERASE
+  )
+
+  hpx_check_for_cxx26_std_unordered_transparent_lookup(
+    DEFINITIONS HPX_HAVE_CXX26_STD_UNORDERED_TRANSPARENT_LOOKUP
   )
 
   hpx_check_for_builtin_forward_move(DEFINITIONS HPX_HAVE_BUILTIN_FORWARD_MOVE)

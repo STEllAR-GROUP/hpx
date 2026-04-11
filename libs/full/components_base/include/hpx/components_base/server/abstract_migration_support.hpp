@@ -1,4 +1,4 @@
-//  Copyright (c) 2019-2025 Hartmut Kaiser
+//  Copyright (c) 2019-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,8 +12,8 @@
 #include <hpx/components_base/traits/action_decorate_function.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/threading_base.hpp>
-#include <hpx/naming_base/id_type.hpp>
 
 #include <cstdint>
 #include <type_traits>
@@ -24,7 +24,8 @@ namespace hpx::components {
     ///////////////////////////////////////////////////////////////////////////
     /// This hook has to be inserted into the derivation chain of any
     /// abstract_component_base for it to support migration.
-    template <typename BaseComponent, typename Mutex = hpx::spinlock>
+    HPX_CXX_EXPORT template <typename BaseComponent,
+        typename Mutex = hpx::spinlock>
     // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
     struct abstract_base_migration_support : BaseComponent
     {
@@ -53,7 +54,7 @@ namespace hpx::components {
         }
 
         // Pinning functionality
-        virtual void pin() = 0;
+        virtual bool pin() = 0;
         virtual bool unpin() = 0;
         [[nodiscard]] virtual std::uint32_t pin_count() const = 0;
         virtual void mark_as_migrated() = 0;
@@ -107,7 +108,7 @@ namespace hpx::components {
     ///////////////////////////////////////////////////////////////////////////
     /// This hook has to be inserted into the derivation chain of any component
     /// for it to support migration.
-    template <typename Derived, typename Base>
+    HPX_CXX_EXPORT template <typename Derived, typename Base>
     struct abstract_migration_support
       : migration_support<Derived>
       , Base
@@ -172,9 +173,9 @@ namespace hpx::components {
             return this->base_type::pin_count();
         }
 
-        void pin() override
+        bool pin() override
         {
-            this->base_type::pin();
+            return this->base_type::pin();
         }
         bool unpin() override
         {

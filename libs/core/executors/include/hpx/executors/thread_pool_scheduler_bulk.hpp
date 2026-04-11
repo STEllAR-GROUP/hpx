@@ -9,20 +9,33 @@
 
 #include <hpx/config.hpp>
 #if defined(HPX_HAVE_STDEXEC)
-#include <hpx/modules/execution_base.hpp>
+#include <hpx/execution_base/stdexec_forward.hpp>
 #endif
 
 #include <hpx/assert.hpp>
+#include <hpx/concepts/concepts.hpp>
+#include <hpx/concurrency/cache_line_data.hpp>
+#include <hpx/concurrency/detail/non_contiguous_index_queue.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
+#include <hpx/datastructures/tuple.hpp>
+#include <hpx/datastructures/variant.hpp>
+#include <hpx/errors/exception.hpp>
+#include <hpx/errors/exception_list.hpp>
+#include <hpx/errors/try_catch_exception_ptr.hpp>
+#include <hpx/execution/algorithms/bulk.hpp>
+#include <hpx/execution/executors/execution_parameters.hpp>
+#include <hpx/execution_base/completion_scheduler.hpp>
+#include <hpx/execution_base/completion_signatures.hpp>
+#include <hpx/execution_base/receiver.hpp>
+#include <hpx/execution_base/sender.hpp>
 #include <hpx/executors/thread_pool_scheduler.hpp>
-#include <hpx/modules/concepts.hpp>
-#include <hpx/modules/concurrency.hpp>
-#include <hpx/modules/coroutines.hpp>
-#include <hpx/modules/datastructures.hpp>
+#include <hpx/functional/bind_front.hpp>
+#include <hpx/functional/detail/tag_fallback_invoke.hpp>
+#include <hpx/functional/tag_invoke.hpp>
+#include <hpx/iterator_support/counting_iterator.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/iterator_support/traits/is_range.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/modules/execution.hpp>
-#include <hpx/modules/execution_base.hpp>
-#include <hpx/modules/functional.hpp>
-#include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/threading_base.hpp>
@@ -31,10 +44,13 @@
 
 #include <algorithm>
 #include <atomic>
+#include <concepts>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
+#include <iterator>
 #include <optional>
+#include <ranges>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -44,9 +60,12 @@ namespace hpx::execution::experimental::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     // Compute a chunk size given a number of worker threads and a total number
-    // of items n. Returns a power-of-2 chunk size that produces at most 8 and
+    // of items. Returns a power-of-2 chunk size that results in at least 8
+    // chunks per worker thread and at least 4 chunks per worker thread.
+    // If items < num_threads, returns a power-of-2 chunk
+    // size that results in at most 8 and
     // at least 4 chunks per worker thread.
-    HPX_CXX_EXPORT constexpr std::uint32_t get_bulk_scheduler_chunk_size(
+    HPX_CXX_CORE_EXPORT constexpr std::uint32_t get_bulk_scheduler_chunk_size(
         std::uint32_t const num_threads, std::size_t const n) noexcept
     {
         std::uint64_t chunk_size = 1;
@@ -57,7 +76,8 @@ namespace hpx::execution::experimental::detail {
         return static_cast<std::uint32_t>(chunk_size);
     }
 
-    HPX_CXX_EXPORT template <std::size_t... Is, typename F, typename T,
+    // For bulk_unchunked: f(index, ...)
+    HPX_CXX_CORE_EXPORT template <std::size_t... Is, typename F, typename T,
         typename Ts>
     constexpr void bulk_scheduler_invoke_helper(
         hpx::util::index_pack<Is...>, F&& f, T&& t, Ts& ts)
@@ -65,7 +85,17 @@ namespace hpx::execution::experimental::detail {
         HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(T, t), hpx::get<Is>(ts)...);
     }
 
-    HPX_CXX_EXPORT inline hpx::threads::mask_type full_mask(
+    // For bulk_chunked: f(start, end, ...)
+    HPX_CXX_CORE_EXPORT template <std::size_t... Is, typename F, typename Start,
+        typename End, typename Ts>
+    constexpr void bulk_scheduler_invoke_helper_chunked(
+        hpx::util::index_pack<Is...>, F&& f, Start&& start, End&& end, Ts& ts)
+    {
+        HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(Start, start),
+            HPX_FORWARD(End, end), hpx::get<Is>(ts)...);
+    }
+
+    HPX_CXX_CORE_EXPORT inline hpx::threads::mask_type full_mask(
         std::size_t first_thread, std::size_t num_threads)
     {
         auto const& rp = hpx::resource::get_partitioner();
@@ -88,7 +118,7 @@ namespace hpx::execution::experimental::detail {
         return mask;
     }
 
-    HPX_CXX_EXPORT inline hpx::threads::mask_type limit_mask(
+    HPX_CXX_CORE_EXPORT inline hpx::threads::mask_type limit_mask(
         hpx::threads::mask_cref_type orgmask, std::size_t num_threads)
     {
         std::size_t const num_cores = hpx::threads::hardware_concurrency();
@@ -106,10 +136,10 @@ namespace hpx::execution::experimental::detail {
         return mask;
     }
 
-    HPX_CXX_EXPORT template <typename OperationState>
+    HPX_CXX_CORE_EXPORT template <typename OperationState>
     struct task_function;
 
-    HPX_CXX_EXPORT template <typename OperationState>
+    HPX_CXX_CORE_EXPORT template <typename OperationState>
     struct set_value_loop_visitor
     {
         OperationState* const op_state;
@@ -132,6 +162,7 @@ namespace hpx::execution::experimental::detail {
 
             hpx::util::itt::mark_event e(notify_event);
 #endif
+
             using index_pack_type = hpx::detail::fused_index_pack_t<Ts>;
 
             auto const i_begin =
@@ -139,9 +170,20 @@ namespace hpx::execution::experimental::detail {
             auto const i_end =
                 (std::min) (i_begin + task_f->chunk_size, task_f->size);
 
-            auto it = std::next(hpx::util::begin(op_state->shape), i_begin);
-            for (auto i = i_begin; i != i_end; (void) ++it, ++i)
+            if constexpr (OperationState::is_chunked)
             {
+                // bulk_chunked: f(start, end, values...)
+                bulk_scheduler_invoke_helper_chunked(
+                    index_pack_type{}, op_state->f, i_begin, i_end, ts);
+            }
+            else
+            {
+                // bulk_unchunked: f(index, values...) for each element
+                // In unchunked case, chunk_size is 1
+                // so each chunk will only have one element.
+                // The regular bulk invocation will go through the is_chunked case.
+                auto it = std::ranges::next(
+                    hpx::util::begin(op_state->shape), i_begin);
                 bulk_scheduler_invoke_helper(
                     index_pack_type{}, op_state->f, *it, ts);
             }
@@ -166,7 +208,7 @@ namespace hpx::execution::experimental::detail {
                 static constexpr auto opposite_end =
                     hpx::concurrency::detail::opposite_end_v<Which>;
 
-                for (std::size_t offset = 1;
+                for (std::uint32_t offset = 1;
                     offset != op_state->num_worker_threads; ++offset)
                 {
                     std::size_t neighbor_thread =
@@ -188,12 +230,8 @@ namespace hpx::execution::experimental::detail {
         // first tries to handle all chunks in the queue owned by worker_thread.
         // It then tries to steal chunks from neighboring threads.
         //
-        // clang-format off
-        template <typename Ts,
-            HPX_CONCEPT_REQUIRES_(
-                !std::is_same_v<std::decay_t<Ts>, hpx::monostate>
-            )>
-        // clang-format on
+        template <typename Ts>
+            requires(!std::same_as<std::decay_t<Ts>, hpx::monostate>)
         void operator()(Ts& ts) const
         {
             // schedule chunks from the end, if needed
@@ -208,7 +246,7 @@ namespace hpx::execution::experimental::detail {
         }
     };
 
-    HPX_CXX_EXPORT template <typename OperationState>
+    HPX_CXX_CORE_EXPORT template <typename OperationState>
     struct set_value_end_loop_visitor
     {
         OperationState* const op_state;
@@ -222,12 +260,8 @@ namespace hpx::execution::experimental::detail {
         // called once all worker threads have processed their chunks and the
         // connected receiver should be signaled.
         //
-        // clang-format off
-        template <typename Ts,
-            HPX_CONCEPT_REQUIRES_(
-                !std::is_same_v<std::decay_t<Ts>, hpx::monostate>
-            )>
-        // clang-format on
+        template <typename Ts>
+            requires(!std::same_as<std::decay_t<Ts>, hpx::monostate>)
         void operator()(Ts&& ts) const
         {
             hpx::invoke_fused(
@@ -238,7 +272,7 @@ namespace hpx::execution::experimental::detail {
     };
 
     // This struct encapsulates the work done by one worker thread.
-    HPX_CXX_EXPORT template <typename OperationState>
+    HPX_CXX_CORE_EXPORT template <typename OperationState>
     struct task_function
     {
         OperationState* const op_state;
@@ -326,7 +360,7 @@ namespace hpx::execution::experimental::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename OperationState, typename F,
+    HPX_CXX_CORE_EXPORT template <typename OperationState, typename F,
         typename Shape>
     struct bulk_receiver
     {
@@ -351,19 +385,25 @@ namespace hpx::execution::experimental::detail {
         }
 
         // Initialize a queue for a worker thread.
-        void init_queue_depth_first(std::uint32_t const worker_thread,
-            std::uint32_t const size, std::uint32_t num_threads) noexcept
+        void init_queue_depth_first(std::size_t const worker_thread,
+            std::size_t const size, std::size_t num_threads) noexcept
         {
             auto& queue = op_state->queues[worker_thread].data_;
-            auto const part_begin = static_cast<std::uint32_t>(
-                (worker_thread * size) / num_threads);
-            auto const part_end = static_cast<std::uint32_t>(
-                ((worker_thread + 1) * size) / num_threads);
-            queue.reset(part_begin, part_end);
+            auto const part_begin = (worker_thread * size) / num_threads;
+            auto const part_end = ((worker_thread + 1) * size) / num_threads;
+
+            HPX_ASSERT_MSG(
+                size <= static_cast<std::size_t>(
+                            (std::numeric_limits<std::uint32_t>::max)()),
+                "init_queue_depth_first: ranges larger than "
+                "UINT32_MAX are not supported");
+
+            queue.reset(static_cast<std::uint32_t>(part_begin),
+                static_cast<std::uint32_t>(part_end));
         }
 
-        void init_queue_breadth_first(std::uint32_t const worker_thread,
-            std::uint32_t const size, std::uint32_t num_threads) noexcept
+        void init_queue_breadth_first(std::size_t const worker_thread,
+            std::size_t const size, std::size_t num_threads) noexcept
         {
             auto& queue = op_state->queues[worker_thread].data_;
             auto const num_steps = size / num_threads + 1;
@@ -375,7 +415,16 @@ namespace hpx::execution::experimental::detail {
             {
                 part_end -= remainder;
             }
-            queue.reset(part_begin, part_end, num_threads);
+
+            HPX_ASSERT_MSG(
+                size <= static_cast<std::size_t>(
+                            (std::numeric_limits<std::uint32_t>::max)()),
+                "init_queue_breadth_first: ranges larger than "
+                "UINT32_MAX are not supported");
+
+            queue.reset(static_cast<std::uint32_t>(part_begin),
+                static_cast<std::uint32_t>(part_end),
+                static_cast<std::uint32_t>(num_threads));
         }
 
         // Spawn a task which will process a number of chunks. If the queue
@@ -399,9 +448,7 @@ namespace hpx::execution::experimental::detail {
                 hint.hint == -1)
             {
                 // apply hint if none was given
-                hint.mode = hpx::threads::thread_schedule_hint_mode::thread;
-                hint.hint = static_cast<std::int16_t>(
-                    worker_thread + op_state->first_thread);
+                hint.schedule_hint(worker_thread + op_state->first_thread);
 
                 auto policy = hpx::execution::experimental::with_hint(
                     op_state->scheduler.policy(), hint);
@@ -437,7 +484,7 @@ namespace hpx::execution::experimental::detail {
         }
 
         using range_value_type =
-            hpx::traits::iter_value_t<hpx::traits::range_iterator_t<Shape>>;
+            hpx::traits::iter_value_t<std::ranges::iterator_t<Shape>>;
 
         template <typename... Ts>
         void execute(Ts&&... ts)
@@ -452,10 +499,20 @@ namespace hpx::execution::experimental::detail {
                 return;
             }
 
-            // Calculate chunk size and number of chunks
-            std::uint32_t chunk_size = get_bulk_scheduler_chunk_size(
-                static_cast<std::uint32_t>(op_state->num_worker_threads), size);
-            std::uint32_t num_chunks = (size + chunk_size - 1) / chunk_size;
+            // Calculate chunk size based on execution mode
+            std::uint32_t chunk_size;
+            std::uint32_t num_chunks;
+            if constexpr (OperationState::is_chunked)
+            {
+                chunk_size = get_bulk_scheduler_chunk_size(
+                    op_state->num_worker_threads, size);
+                num_chunks = (size + chunk_size - 1) / chunk_size;
+            }
+            else
+            {
+                chunk_size = 1;
+                num_chunks = size;
+            }
 
             // launch only as many tasks as we have chunks
             std::size_t const num_pus = op_state->num_worker_threads;
@@ -490,15 +547,13 @@ namespace hpx::execution::experimental::detail {
                     hint.placement_mode() == placement::breadth_first_reverse)
                 {
                     init_queue_breadth_first(worker_thread, num_chunks,
-                        static_cast<std::uint32_t>(
-                            op_state->num_worker_threads));
+                        op_state->num_worker_threads);
                 }
                 else
                 {
                     // the default for this scheduler is depth-first placement
                     init_queue_depth_first(worker_thread, num_chunks,
-                        static_cast<std::uint32_t>(
-                            op_state->num_worker_threads));
+                        op_state->num_worker_threads);
                 }
             }
 
@@ -578,13 +633,9 @@ namespace hpx::execution::experimental::detail {
             }
         }
 
-        // clang-format off
-        template <typename... Ts,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::is_invocable_v<F, range_value_type,
-                    std::add_lvalue_reference_t<Ts>...>
-            )>
-        // clang-format on
+        template <typename... Ts>
+            requires(std::invocable<F, range_value_type,
+                std::add_lvalue_reference_t<Ts>...>)
         friend void tag_invoke(hpx::execution::experimental::set_value_t,
             bulk_receiver&& r, Ts&&... ts) noexcept
         {
@@ -613,8 +664,8 @@ namespace hpx::execution::experimental::detail {
     // in this file is not chosen) it will be reused as one of the worker
     // threads.
     //
-    HPX_CXX_EXPORT template <typename Policy, typename Sender, typename Shape,
-        typename F>
+    HPX_CXX_CORE_EXPORT template <typename Policy, typename Sender,
+        typename Shape, typename F, bool IsChunked = false>
     class thread_pool_bulk_sender
     {
     private:
@@ -676,16 +727,12 @@ namespace hpx::execution::experimental::detail {
             std::decay_t<Sender> const& pred_snd;
             thread_pool_policy_scheduler<Policy> const& sch;
 
-            // clang-format off
-            template <typename CPO,
-                HPX_CONCEPT_REQUIRES_(
-                    meta::value<meta::one_of<CPO,
-                        hpx::execution::experimental::set_error_t,
-                        hpx::execution::experimental::set_stopped_t>> &&
-                    hpx::execution::experimental::detail::has_completion_scheduler_v<
-                        CPO, std::decay_t<Sender>>
-                )>
-            // clang-format on
+            template <typename CPO>
+                requires(meta::value<meta::one_of<CPO,
+                             hpx::execution::experimental::set_error_t,
+                             hpx::execution::experimental::set_stopped_t>> &&
+                    hpx::execution::experimental::detail::
+                        has_completion_scheduler_v<CPO, std::decay_t<Sender>>)
             friend constexpr auto tag_invoke(
                 hpx::execution::experimental::get_completion_scheduler_t<CPO>
                     tag,
@@ -700,6 +747,13 @@ namespace hpx::execution::experimental::detail {
                 env const& e) noexcept
             {
                 return e.sch;
+            }
+
+            // P3826R5: report the completion domain for this bulk sender
+            template <typename CPO>
+            auto query(stdexec::get_completion_domain_t<CPO>) const noexcept
+            {
+                return stdexec::get_domain(sch);
             }
         };
 
@@ -728,22 +782,19 @@ namespace hpx::execution::experimental::detail {
                 sends_stopped_of_v<Sender, Env>;
         };
 
-        // clang-format off
         template <typename Env>
         friend auto tag_invoke(
             hpx::execution::experimental::get_completion_signatures_t,
-            thread_pool_bulk_sender const&,
-            Env) -> generate_completion_signatures<Env>;
+            thread_pool_bulk_sender const&, Env)
+            -> generate_completion_signatures<Env>;
 
-        template <typename CPO,
-            HPX_CONCEPT_REQUIRES_(
-                meta::value<meta::one_of<CPO,
-                    hpx::execution::experimental::set_error_t,
-                    hpx::execution::experimental::set_stopped_t>> &&
-                hpx::execution::experimental::detail::has_completion_scheduler_v<
-                    CPO, std::decay_t<Sender>>
-            )>
-        // clang-format on
+        template <typename CPO>
+            requires(
+                meta::value<
+                    meta::one_of<CPO, hpx::execution::experimental::set_error_t,
+                        hpx::execution::experimental::set_stopped_t>> &&
+                hpx::execution::experimental::detail::
+                    has_completion_scheduler_v<CPO, std::decay_t<Sender>>)
         friend constexpr auto tag_invoke(
             hpx::execution::experimental::get_completion_scheduler_t<CPO> tag,
             thread_pool_bulk_sender const& s)
@@ -764,6 +815,8 @@ namespace hpx::execution::experimental::detail {
         template <typename Receiver>
         struct operation_state
         {
+            static constexpr bool is_chunked = IsChunked;
+
             using operation_state_type =
                 hpx::execution::experimental::connect_result_t<Sender,
                     bulk_receiver<operation_state, F, Shape>>;
@@ -782,8 +835,9 @@ namespace hpx::execution::experimental::detail {
             hpx::util::cache_aligned_data<std::atomic<std::size_t>>
                 tasks_remaining;
 
-            using value_types = value_types_of_t<Sender, empty_env,
-                decayed_tuple, hpx::variant>;
+            using value_types = value_types_of_t<Sender,
+                hpx::execution::experimental::empty_env, decayed_tuple,
+                hpx::variant>;
             hpx::util::detail::prepend_t<value_types, hpx::monostate> ts;
             std::atomic<bool> bad_alloc_thrown{false};
             hpx::exception_list exceptions;
@@ -842,15 +896,12 @@ namespace hpx::execution::experimental::detail {
     };
 }    // namespace hpx::execution::experimental::detail
 
+#if !defined(HPX_HAVE_STDEXEC)
 namespace hpx::execution::experimental {
 
-    // clang-format off
-    HPX_CXX_EXPORT template <typename Policy, typename Sender, typename Shape,
-        typename F,
-        HPX_CONCEPT_REQUIRES_(
-            !std::is_integral_v<Shape>
-        )>
-    // clang-format on
+    HPX_CXX_CORE_EXPORT template <typename Policy, typename Sender,
+        typename Shape, typename F>
+        requires(!std::integral<Shape>)
     constexpr auto tag_invoke(bulk_t,
         thread_pool_policy_scheduler<Policy> scheduler, Sender&& sender,
         Shape const& shape, F&& f)
@@ -869,13 +920,9 @@ namespace hpx::execution::experimental {
         }
     }
 
-    // clang-format off
-    HPX_CXX_EXPORT template <typename Policy, typename Sender, typename Count,
-        typename F,
-        HPX_CONCEPT_REQUIRES_(
-            std::is_integral_v<Count>
-        )>
-    // clang-format on
+    HPX_CXX_CORE_EXPORT template <typename Policy, typename Sender,
+        typename Count, typename F>
+        requires(std::integral<Count>)
     constexpr decltype(auto) tag_invoke(bulk_t,
         thread_pool_policy_scheduler<Policy> scheduler, Sender&& sender,
         Count const& count, F&& f)
@@ -883,15 +930,9 @@ namespace hpx::execution::experimental {
         if constexpr (std::is_same_v<Policy, launch::sync_policy>)
         {
             // fall back to non-bulk scheduling if sync execution was requested
-#if defined(HPX_HAVE_STDEXEC)
-            return hpx::execution::experimental::bulk(
-                HPX_FORWARD(Sender, sender), hpx::util::counting_shape(count),
-                HPX_FORWARD(F, f));
-#else
             return detail::bulk_sender<Sender, hpx::util::counting_shape<Count>,
                 F>{HPX_FORWARD(Sender, sender),
                 hpx::util::counting_shape(count), HPX_FORWARD(F, f)};
-#endif
         }
         else
         {
@@ -902,3 +943,10 @@ namespace hpx::execution::experimental {
         }
     }
 }    // namespace hpx::execution::experimental
+#endif
+
+// Note: With stdexec integration, bulk operations are now customized
+// through the domain system in thread_pool_scheduler.hpp rather than
+// direct tag_invoke customizations. The thread_pool_domain<Policy>
+// intercepts stdexec::bulk_chunked_t operations and creates
+// thread_pool_bulk_sender instances for parallel execution.

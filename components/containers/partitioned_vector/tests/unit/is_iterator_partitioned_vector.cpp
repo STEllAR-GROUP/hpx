@@ -12,6 +12,7 @@
 #include <hpx/components/containers/partitioned_vector/partitioned_vector.hpp>
 #endif
 
+#include <iterator>
 #include <vector>
 
 void is_iterator()
@@ -26,12 +27,9 @@ void is_iterator()
 
 void is_forward_iterator()
 {
-    using hpx::traits::is_forward_iterator;
-
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
     using iterator = hpx::segmented::vector_iterator<int, std::vector<int>>;
-    HPX_TEST_MSG(
-        (is_forward_iterator<iterator>::value), "hpx-specific iterator");
+    HPX_TEST_MSG((std::forward_iterator<iterator>), "hpx-specific iterator");
 #endif
 }
 

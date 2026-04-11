@@ -18,9 +18,8 @@
 #include <hpx/async_distributed/detail/post_implementations_fwd.hpp>
 #include <hpx/async_distributed/lcos_fwd.hpp>
 #include <hpx/async_distributed/trigger_lco_fwd.hpp>
-#include <hpx/components_base/component_type.hpp>
-#include <hpx/naming_base/address.hpp>
-#include <hpx/naming_base/id_type.hpp>
+#include <hpx/modules/components_base.hpp>
+#include <hpx/modules/naming_base.hpp>
 
 #include <type_traits>
 #include <utility>

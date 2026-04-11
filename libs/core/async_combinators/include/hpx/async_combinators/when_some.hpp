@@ -205,7 +205,7 @@ namespace hpx {
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
 
-    HPX_CXX_EXPORT template <typename Sequence>
+    HPX_CXX_CORE_EXPORT template <typename Sequence>
     struct when_some_result
     {
         when_some_result() = default;
@@ -393,7 +393,7 @@ namespace hpx::lcos::detail {
             return HPX_MOVE(values_);
         }
 
-        mutable mutex_type mtx_;
+        mutable mutex_type mtx_ = mutex_type("when_some");
         when_some_result<Sequence> values_;
         std::atomic<std::size_t> count_;
         std::size_t needed_count_;
@@ -404,7 +404,7 @@ namespace hpx::lcos::detail {
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT inline constexpr struct when_some_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct when_some_t final
       : hpx::functional::tag<when_some_t>
     {
     private:
@@ -519,7 +519,7 @@ namespace hpx {
     } when_some{};
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT inline constexpr struct when_some_n_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct when_some_n_t final
       : hpx::functional::tag<when_some_n_t>
     {
     private:

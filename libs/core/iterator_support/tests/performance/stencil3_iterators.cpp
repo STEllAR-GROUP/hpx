@@ -8,6 +8,7 @@
 #include <hpx/init.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/modules/type_support.hpp>
 #include <hpx/tuple.hpp>
 
 #include <cstddef>
@@ -25,40 +26,17 @@ int partition_size = 10000;
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::experimental::detail {
-    template <typename Iterator>
-    HPX_FORCEINLINE Iterator previous(Iterator it, std::false_type)
-    {
-        return --it;
-    }
-
-    template <typename Iterator>
-    HPX_FORCEINLINE Iterator previous(Iterator const& it, std::true_type)
-    {
-        return it - 1;
-    }
 
     template <typename Iterator>
     HPX_FORCEINLINE Iterator previous(Iterator const& it)
     {
-        return previous(it, hpx::traits::is_random_access_iterator<Iterator>());
-    }
-
-    template <typename Iterator>
-    HPX_FORCEINLINE Iterator next(Iterator it, std::false_type)
-    {
-        return ++it;
-    }
-
-    template <typename Iterator>
-    HPX_FORCEINLINE Iterator next(Iterator const& it, std::true_type)
-    {
-        return it + 1;
+        return std::prev(it);
     }
 
     template <typename Iterator>
     HPX_FORCEINLINE Iterator next(Iterator const& it)
     {
-        return next(it, hpx::traits::is_random_access_iterator<Iterator>());
+        return std::next(it);
     }
 }    // namespace hpx::experimental::detail
 

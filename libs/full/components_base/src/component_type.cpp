@@ -9,10 +9,10 @@
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/static_reinit.hpp>
 #include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/thread_support.hpp>
-#include <hpx/naming_base/address.hpp>
 
 #include <cstdint>
 #include <map>
@@ -158,20 +158,24 @@ namespace hpx::components {
     {
         std::string result;
 
+        auto const base_type = get_base_type(type);
+        auto const derived_type = get_derived_type(type);
+
         if (type == to_int(hpx::components::component_enum_type::invalid))
         {
             result = "component_invalid";
         }
-        else if ((type < to_int(hpx::components::component_enum_type::last)) &&
-            (get_derived_type(type) == 0))
+        else if (type >= 0 &&
+            (type < to_int(hpx::components::component_enum_type::last)) &&
+            (derived_type == 0))
         {
             result = components::detail::names[type];
         }
-        else if (get_derived_type(type) <
-                to_int(hpx::components::component_enum_type::last) &&
-            (get_derived_type(type) != 0))
+        else if (derived_type >= 0 &&
+            derived_type < to_int(hpx::components::component_enum_type::last) &&
+            (derived_type != 0))
         {
-            result = components::detail::names[get_derived_type(type)];
+            result = components::detail::names[derived_type];
         }
         else
         {
@@ -182,16 +186,15 @@ namespace hpx::components {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wrestrict"
 #endif
-        if (type == get_base_type(type) ||
+        if (type == base_type ||
             to_int(hpx::components::component_enum_type::invalid) == type)
         {
             result += "[" + std::to_string(type) + "]";
         }
         else
         {
-            result += "[" +
-                std::to_string(static_cast<int>(get_derived_type(type))) + "(" +
-                std::to_string(static_cast<int>(get_base_type(type))) + ")]";
+            result += "[" + std::to_string(static_cast<int>(derived_type)) +
+                "(" + std::to_string(static_cast<int>(base_type)) + ")]";
         }
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
 #pragma GCC diagnostic pop

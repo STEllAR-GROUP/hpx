@@ -10,9 +10,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/components/client_base.hpp>
-#include <hpx/components_base/traits/is_component.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/futures.hpp>
-#include <hpx/naming_base/id_type.hpp>
+#include <hpx/modules/naming_base.hpp>
 
 #include <hpx/components/component_storage/component_storage.hpp>
 #include <hpx/components/component_storage/server/migrate_to_storage.hpp>

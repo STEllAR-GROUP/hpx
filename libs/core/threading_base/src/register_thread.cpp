@@ -41,17 +41,6 @@ namespace hpx::threads {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    threads::thread_id_ref_type register_thread(threads::thread_init_data& data,
-        threads::thread_pool_base* pool, error_code& ec)
-    {
-        HPX_ASSERT(pool);
-
-        threads::thread_id_ref_type id = threads::invalid_thread_id;
-        data.run_now = true;
-        pool->create_thread(data, id, ec);
-        return id;
-    }
-
     void register_thread(threads::thread_init_data& data,
         threads::thread_pool_base* pool, threads::thread_id_ref_type& id,
         error_code& ec)
@@ -62,25 +51,25 @@ namespace hpx::threads {
         pool->create_thread(data, id, ec);
     }
 
+    threads::thread_id_ref_type register_thread(threads::thread_init_data& data,
+        threads::thread_pool_base* pool, error_code& ec)
+    {
+        threads::thread_id_ref_type id = threads::invalid_thread_id;
+        register_thread(data, pool, id, ec);
+        return id;
+    }
+
     void register_thread(threads::thread_init_data& data,
         threads::thread_id_ref_type& id, error_code& ec)
     {
-        auto* pool = detail::get_self_or_default_pool();
-        HPX_ASSERT(pool);
-
-        data.run_now = true;
-        pool->create_thread(data, id, ec);
+        register_thread(data, detail::get_self_or_default_pool(), id, ec);
     }
 
     threads::thread_id_ref_type register_thread(
         threads::thread_init_data& data, error_code& ec)
     {
-        auto* pool = detail::get_self_or_default_pool();
-        HPX_ASSERT(pool);
-
         threads::thread_id_ref_type id = threads::invalid_thread_id;
-        data.run_now = true;
-        pool->create_thread(data, id, ec);
+        register_thread(data, detail::get_self_or_default_pool(), id, ec);
         return id;
     }
 
@@ -96,10 +85,6 @@ namespace hpx::threads {
     thread_id_ref_type register_work(
         threads::thread_init_data& data, error_code& ec)
     {
-        auto* pool = detail::get_self_or_default_pool();
-        HPX_ASSERT(pool);
-
-        data.run_now = false;
-        return pool->create_work(data, ec);
+        return register_work(data, detail::get_self_or_default_pool(), ec);
     }
 }    // namespace hpx::threads

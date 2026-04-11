@@ -9,6 +9,10 @@ name: Linux CI (Debug) with HWLoc fetch
 
 on: [pull_request]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -17,7 +21,9 @@ jobs:
     - uses: actions/checkout@v6
 
     - name: Install Boost
-      run: sudo apt install libboost-all-dev ninja-build
+      run: |
+          sudo apt update
+          sudo apt install libboost-all-dev ninja-build
 
     - name: Configure
       shell: bash

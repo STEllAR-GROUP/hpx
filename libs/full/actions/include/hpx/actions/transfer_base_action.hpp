@@ -24,7 +24,7 @@
 #include <hpx/actions_base/traits/action_stacksize.hpp>
 #include <hpx/actions_base/traits/action_trigger_continuation_fwd.hpp>
 #include <hpx/actions_base/traits/action_was_object_migrated.hpp>
-#include <hpx/components_base/pinned_ptr.hpp>
+#include <hpx/modules/components_base.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assert.hpp>
@@ -38,9 +38,7 @@
 #include <hpx/modules/itt_notify.hpp>
 #endif
 
-#include <hpx/parcelset_base/traits/action_get_embedded_parcel.hpp>
-#include <hpx/parcelset_base/traits/action_message_handler.hpp>
-#include <hpx/parcelset_base/traits/action_serialization_filter.hpp>
+#include <hpx/modules/parcelset_base.hpp>
 
 #include <atomic>
 #include <cstddef>

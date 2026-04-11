@@ -24,7 +24,7 @@ namespace hpx::parallel::detail {
     /// \remarks this is the comparison object for pointers. Receive an object
     ///          for to compare the objects pointed. The pointers can't be
     ///          nullptr
-    HPX_CXX_EXPORT template <typename Iter, typename Sent,
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent,
         typename Comp =
             std::less<typename std::iterator_traits<Iter>::value_type>>
     struct less_ptr_no_null
@@ -47,7 +47,7 @@ namespace hpx::parallel::detail {
     /// \param [in] first : iterator to the first element of the range
     /// \param [in] last : iterator to the element after the last of the range
     /// \param [in/out] v_iter : vector where store the iterators of the index
-    HPX_CXX_EXPORT template <typename Iter, typename Sent>
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent>
     void create_index(Iter first, Sent last, std::vector<Iter>& v_iter)
     {
         auto const nelem = detail::distance(first, last);
@@ -65,7 +65,7 @@ namespace hpx::parallel::detail {
     /// \tparam Iter : iterators of the index
     /// \param [in] first : iterator to the first element of the data
     /// \param [in] v_iter : vector sorted of the iterators
-    HPX_CXX_EXPORT template <typename Iter>
+    HPX_CXX_CORE_EXPORT template <typename Iter>
     void sort_index(Iter first, std::vector<Iter>& v_iter)
     {
         using value_type = typename std::iterator_traits<Iter>::value_type;
@@ -89,14 +89,14 @@ namespace hpx::parallel::detail {
 
             pos_dest = pos_src = pos_in_vector;
             Iter it_dest = std::next(first, pos_dest);
-            value_type Aux = HPX_MOVE(*it_dest);
+            value_type Aux = std::ranges::iter_move(it_dest);
 
             while ((pos_src = static_cast<std::size_t>(detail::distance(
                         first, v_iter[pos_dest]))) != pos_in_vector)
             {
                 v_iter[pos_dest] = it_dest;
                 Iter it_src = std::next(first, pos_src);
-                *it_dest = HPX_MOVE(*it_src);
+                *it_dest = std::ranges::iter_move(it_src);
                 it_dest = it_src;
                 pos_dest = pos_src;
             }

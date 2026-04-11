@@ -12,6 +12,7 @@
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/threading_base.hpp>
+#include <hpx/modules/tracing.hpp>
 #include <hpx/thread_pools/detail/background_thread.hpp>
 #include <hpx/thread_pools/detail/scheduling_callbacks.hpp>
 #include <hpx/thread_pools/detail/scheduling_counters.hpp>
@@ -228,6 +229,31 @@ namespace hpx::threads::detail {
                                 task.add_metadata(
                                     task_phase, thrdptr->get_thread_phase());
 #endif
+                                hpx::tracing::region rctx(
+                                    threads::get_region_init_data(thrdptr),
+                                    num_thread);
+
+                                // Dual-view Tracy instrumentation:
+                                //
+                                // rctx declared FIRST -> constructed first ->
+                                //   ZoneBegin fires with NO active fiber,
+                                //   so Tracy attributes it to the OS worker
+                                //   thread row (utilization view).
+                                //
+                                // fctx declared SECOND -> constructed second ->
+                                //   TracyFiberEnter fires INSIDE the open zone,
+                                //   so Tracy also shows this slice on the fiber
+                                //   track (M:N migration view).
+                                //
+                                // Destruction is C++ reverse order:
+                                //   ~fctx first -> TracyFiberLeave
+                                //   ~rctx last  -> ZoneEnd
+                                // Zone outlives the fiber context - correct.
+                                hpx::tracing::fiber_region fctx(
+                                    threads::get_fiber_region_init_data(
+                                        thrdptr),
+                                    num_thread);
+
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
                                 // Record time elapsed in thread changing state
                                 // and add to aggregate execution time.

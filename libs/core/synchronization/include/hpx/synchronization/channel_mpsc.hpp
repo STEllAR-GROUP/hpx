@@ -29,28 +29,38 @@ namespace hpx::lcos::local {
     // This channel is bounded to a size given at construction time and supports
     // a multiple producers and a single consumer. The data is stored in a
     // ring-buffer.
-    HPX_CXX_EXPORT template <typename T, typename Mutex = hpx::util::spinlock,
+    HPX_CXX_CORE_EXPORT template <typename T,
+        typename Mutex = hpx::util::spinlock,
         channel_mode = channel_mode::normal>
     class base_channel_mpsc
     {
     private:
         using mutex_type = Mutex;
 
-        [[nodiscard]] bool is_full(std::size_t tail) const noexcept
+        [[nodiscard]] HPX_FORCEINLINE bool is_full(
+            std::size_t tail) const noexcept
         {
-            std::size_t const num_items =
-                size_ + tail - head_.data_.load(std::memory_order_acquire);
-
-            if (num_items < size_)
+            std::size_t next_tail = tail + 1;
+            if (next_tail >= size_)
             {
-                return num_items == size_ - 1;
+                next_tail = 0;
             }
-            return (num_items - size_ == size_ - 1);
+            return next_tail == head_.data_.load(std::memory_order_acquire);
         }
 
-        [[nodiscard]] bool is_empty(std::size_t head) const noexcept
+        [[nodiscard]] HPX_FORCEINLINE bool is_empty(
+            std::size_t head) const noexcept
         {
-            return head == tail_.data_.tail_.load(std::memory_order_relaxed);
+            if (head == tail_cached_.data_) [[unlikely]]
+            {
+                tail_cached_.data_ =
+                    tail_.data_.tail_.load(std::memory_order_acquire);
+                if (head == tail_cached_.data_)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
     public:
@@ -63,6 +73,7 @@ namespace hpx::lcos::local {
 
             head_.data_.store(0, std::memory_order_relaxed);
             tail_.data_.tail_.store(0, std::memory_order_relaxed);
+            tail_cached_.data_ = 0;
         }
 
         base_channel_mpsc(base_channel_mpsc const& rhs) = delete;
@@ -78,6 +89,8 @@ namespace hpx::lcos::local {
                 rhs.tail_.data_.tail_.load(std::memory_order_acquire),
                 std::memory_order_relaxed);
 
+            tail_cached_.data_ = rhs.tail_cached_.data_;
+
             closed_.store(rhs.closed_.load(std::memory_order_acquire),
                 std::memory_order_relaxed);
             rhs.closed_.store(true, std::memory_order_release);
@@ -90,6 +103,8 @@ namespace hpx::lcos::local {
             tail_.data_.tail_.store(
                 rhs.tail_.data_.tail_.load(std::memory_order_acquire),
                 std::memory_order_relaxed);
+
+            tail_cached_.data_ = rhs.tail_cached_.data_;
 
             size_ = rhs.size_;
             buffer_ = HPX_MOVE(rhs.buffer_);
@@ -173,7 +188,7 @@ namespace hpx::lcos::local {
             {
                 tail = 0;
             }
-            tail_.data_.tail_.store(tail, std::memory_order_relaxed);
+            tail_.data_.tail_.store(tail, std::memory_order_release);
 
             return true;
         }
@@ -196,15 +211,16 @@ namespace hpx::lcos::local {
         }
 
     private:
-        // keep the mutex with the tail and the head pointer in separate cache
-        // lines
         struct tail_data
         {
             mutex_type mtx_;
             std::atomic<std::size_t> tail_;
         };
 
+        // keep the head, tail cache, and the mutex with the tail pointer
+        // each on separate cache lines
         mutable hpx::util::cache_aligned_data<std::atomic<std::size_t>> head_;
+        mutable hpx::util::cache_aligned_data<std::size_t> tail_cached_;
         hpx::util::cache_aligned_data<tail_data> tail_;
 
         // a channel of size n can buffer n-1 items
@@ -217,27 +233,36 @@ namespace hpx::lcos::local {
         std::atomic<bool> closed_;
     };
 
-    HPX_CXX_EXPORT template <typename T, typename Mutex>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Mutex>
     class base_channel_mpsc<T, Mutex, channel_mode::dont_support_close>
     {
     private:
         using mutex_type = Mutex;
 
-        [[nodiscard]] bool is_full(std::size_t tail) const noexcept
+        [[nodiscard]] HPX_FORCEINLINE bool is_full(
+            std::size_t tail) const noexcept
         {
-            std::size_t const numitems =
-                size_ + tail - head_.data_.load(std::memory_order_acquire);
-
-            if (numitems < size_)
+            std::size_t next_tail = tail + 1;
+            if (next_tail >= size_)
             {
-                return numitems == size_ - 1;
+                next_tail = 0;
             }
-            return (numitems - size_ == size_ - 1);
+            return next_tail == head_.data_.load(std::memory_order_acquire);
         }
 
-        [[nodiscard]] bool is_empty(std::size_t head) const noexcept
+        [[nodiscard]] HPX_FORCEINLINE bool is_empty(
+            std::size_t head) const noexcept
         {
-            return head == tail_.data_.tail_.load(std::memory_order_relaxed);
+            if (head == tail_cached_.data_) [[unlikely]]
+            {
+                tail_cached_.data_ =
+                    tail_.data_.tail_.load(std::memory_order_acquire);
+                if (head == tail_cached_.data_)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
     public:
@@ -249,6 +274,7 @@ namespace hpx::lcos::local {
 
             head_.data_.store(0, std::memory_order_relaxed);
             tail_.data_.tail_.store(0, std::memory_order_relaxed);
+            tail_cached_.data_ = 0;
         }
 
         base_channel_mpsc(base_channel_mpsc const& rhs) = delete;
@@ -263,6 +289,8 @@ namespace hpx::lcos::local {
             tail_.data_.tail_.store(
                 rhs.tail_.data_.tail_.load(std::memory_order_acquire),
                 std::memory_order_relaxed);
+
+            tail_cached_.data_ = rhs.tail_cached_.data_;
         }
 
         base_channel_mpsc& operator=(base_channel_mpsc&& rhs) noexcept
@@ -272,6 +300,8 @@ namespace hpx::lcos::local {
             tail_.data_.tail_.store(
                 rhs.tail_.data_.tail_.load(std::memory_order_acquire),
                 std::memory_order_relaxed);
+
+            tail_cached_.data_ = rhs.tail_cached_.data_;
 
             size_ = rhs.size_;
             buffer_ = HPX_MOVE(rhs.buffer_);
@@ -331,7 +361,7 @@ namespace hpx::lcos::local {
             {
                 tail = 0;
             }
-            tail_.data_.tail_.store(tail, std::memory_order_relaxed);
+            tail_.data_.tail_.store(tail, std::memory_order_release);
 
             return true;
         }
@@ -342,15 +372,16 @@ namespace hpx::lcos::local {
         }
 
     private:
-        // keep the mutex with the tail and the head pointer in separate cache
-        // lines
         struct tail_data
         {
             mutex_type mtx_;
             std::atomic<std::size_t> tail_;
         };
 
+        // keep the head, tail cache, and the mutex with the tail pointer
+        // each on separate cache lines
         mutable hpx::util::cache_aligned_data<std::atomic<std::size_t>> head_;
+        mutable hpx::util::cache_aligned_data<std::size_t> tail_cached_;
         hpx::util::cache_aligned_data<tail_data> tail_;
 
         // a channel of size n can buffer n-1 items
@@ -363,7 +394,7 @@ namespace hpx::lcos::local {
     ////////////////////////////////////////////////////////////////////////////
     // Using hpx::util::spinlock as the means of synchronization enables the use
     // of this channel with non-HPX threads.
-    HPX_CXX_EXPORT template <typename T,
+    HPX_CXX_CORE_EXPORT template <typename T,
         channel_mode Mode = channel_mode::normal>
     using channel_mpsc = base_channel_mpsc<T, hpx::spinlock, Mode>;
 }    // namespace hpx::lcos::local

@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/compute_local/host/numa_binding_allocator.hpp>
+#include <hpx/modules/compute_local.hpp>
 //
 #include <cstddef>
 #include <sstream>

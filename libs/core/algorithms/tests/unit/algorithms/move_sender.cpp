@@ -46,8 +46,8 @@ void test_move_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
                       std::begin(d)) |
         hpx::move(ex_policy.on(exec)));
 
-    //copy contents of d back into c for testing
-    std::copy(std::begin(d), std::end(d), std::begin(d));
+    // copy contents of d back into c for testing
+    std::copy(std::begin(d), std::end(d), std::begin(c));
 
     std::size_t count = 0;
     HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d),
@@ -77,7 +77,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         seed = vm["seed"].as<unsigned int>();
 
     std::cout << "using seed: " << seed << std::endl;
-    std::srand(seed);
+    gen.seed(seed);
 
     move_sender_test<std::forward_iterator_tag>();
     move_sender_test<std::random_access_iterator_tag>();

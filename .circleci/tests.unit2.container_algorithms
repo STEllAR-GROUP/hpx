@@ -4,6 +4,7 @@
 #  Distributed under the Boost Software License, Version 1.0. (See accompanying
 #  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+tests.unit.modules.algorithms.container_algorithms.is_sorted_until_range_exception
 tests.unit.modules.algorithms.container_algorithms.lexicographical_compare_range
 tests.unit.modules.algorithms.container_algorithms.make_heap_range
 tests.unit.modules.algorithms.container_algorithms.max_element_range
@@ -33,7 +34,7 @@ tests.unit.modules.algorithms.container_algorithms.reverse_copy_range
 tests.unit.modules.algorithms.container_algorithms.rotate_range
 tests.unit.modules.algorithms.container_algorithms.rotate_copy_range
 tests.unit.modules.algorithms.container_algorithms.search_range
-tests.unit.modules.algorithms.container_algorithms.searchn_range
+tests.unit.modules.algorithms.container_algorithms.search_n_range
 tests.unit.modules.algorithms.container_algorithms.set_difference_range
 tests.unit.modules.algorithms.container_algorithms.set_intersection_range
 tests.unit.modules.algorithms.container_algorithms.set_symmetric_difference_range

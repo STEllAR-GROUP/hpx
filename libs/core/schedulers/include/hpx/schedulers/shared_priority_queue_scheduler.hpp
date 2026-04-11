@@ -18,6 +18,7 @@
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/topology.hpp>
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
+#include <hpx/schedulers/macros.hpp>
 #include <hpx/schedulers/queue_holder_numa.hpp>
 #include <hpx/schedulers/queue_holder_thread.hpp>
 #include <hpx/schedulers/thread_queue_mc.hpp>
@@ -36,46 +37,36 @@
 #include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
-
-#if !defined(SHARED_PRIORITY_SCHEDULER_DEBUG)
-#if defined(HPX_DEBUG)
-#define SHARED_PRIORITY_SCHEDULER_DEBUG false
-#else
-#define SHARED_PRIORITY_SCHEDULER_DEBUG false
-#endif
-#endif
-
 #if defined(__linux) || defined(linux) || defined(__linux__)
 #include <linux/unistd.h>
 #include <sys/mman.h>
-#define SHARED_PRIORITY_SCHEDULER_LINUX
 #endif
 
 // #define SHARED_PRIORITY_SCHEDULER_DEBUG_NUMA
 
 namespace hpx {
 
-    using print_onoff =
+    HPX_CXX_CORE_EXPORT using print_onoff =
         hpx::debug::enable_print<SHARED_PRIORITY_SCHEDULER_DEBUG>;
-    using print_on = hpx::debug::enable_print<false>;
+    HPX_CXX_CORE_EXPORT using print_on = hpx::debug::enable_print<false>;
 
-    inline constexpr print_onoff spq_deb("SPQUEUE");
-    inline constexpr print_on spq_arr("SPQUEUE");
+    HPX_CXX_CORE_EXPORT inline constexpr print_onoff spq_deb("SPQUEUE");
+    HPX_CXX_CORE_EXPORT inline constexpr print_on spq_arr("SPQUEUE");
 }    // namespace hpx
 
 namespace hpx::threads::policies {
 
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
-    HPX_CXX_EXPORT using default_shared_priority_queue_scheduler_terminated_queue =
+    HPX_CXX_CORE_EXPORT using default_shared_priority_queue_scheduler_terminated_queue =
         lockfree_lifo;
 #else
-    HPX_CXX_EXPORT using default_shared_priority_queue_scheduler_terminated_queue =
+    HPX_CXX_CORE_EXPORT using default_shared_priority_queue_scheduler_terminated_queue =
         lockfree_fifo;
 #endif
 
     // Holds core/queue ratios used by schedulers.
-    HPX_CXX_EXPORT struct core_ratios
+    HPX_CXX_CORE_EXPORT struct core_ratios
     {
         constexpr core_ratios(std::size_t high_priority,
             std::size_t normal_priority, std::size_t low_priority) noexcept
@@ -100,7 +91,7 @@ namespace hpx::threads::policies {
     // scheduling hints into account when creating and scheduling work.
     //
     // Warning: PendingQueuing lifo causes lockup on termination
-    HPX_CXX_EXPORT template <typename Mutex = std::mutex,
+    HPX_CXX_CORE_EXPORT template <typename Mutex = std::mutex,
         typename PendingQueuing = concurrentqueue_fifo,
         typename TerminatedQueuing =
             default_shared_priority_queue_scheduler_terminated_queue>
@@ -377,9 +368,10 @@ namespace hpx::threads::policies {
             case thread_schedule_hint_mode::thread:
             {
                 spq_deb.set(msg, "HINT_THREAD");
-                // @TODO. We should check that the thread num is valid
                 // Create thread on requested worker thread
-                thread_num = select_active_pu(data.schedulehint.hint);
+                thread_num = select_active_pu(
+                    fast_mod(static_cast<std::size_t>(data.schedulehint.hint),
+                        num_workers_));
                 domain_num = d_lookup_[thread_num];
                 q_index = q_lookup_[thread_num];
                 break;
@@ -388,7 +380,6 @@ namespace hpx::threads::policies {
             {
                 // Create thread on requested NUMA domain
                 spq_deb.set(msg, "HINT_NUMA  ");
-                // TODO: This case does not handle suspended PUs.
                 domain_num = fast_mod(data.schedulehint.hint, num_domains_);
                 // if the thread creating the new task is on the domain
                 // assigned to the new task - try to reuse the core as well
@@ -396,7 +387,6 @@ namespace hpx::threads::policies {
                     d_lookup_[local_num] == domain_num)
                 {
                     thread_num = local_num;    //-V1048
-                    q_index = q_lookup_[thread_num];
                 }
                 else
                 {
@@ -406,8 +396,14 @@ namespace hpx::threads::policies {
                     thread_num +=
                         numa_holder_[domain_num].thread_queue(0)->worker_next(
                             q_counts_[domain_num]);
-                    q_index = q_lookup_[thread_num];
                 }
+                // Ensure the selected PU is active, consistent with the
+                // handling of thread and none scheduling hint modes.
+                thread_num = select_active_pu(thread_num);
+                // cppcheck-suppress redundantAssignment
+                domain_num = d_lookup_[thread_num];    //-V519
+                // cppcheck-suppress redundantAssignment
+                q_index = q_lookup_[thread_num];    //-V519
                 break;
             }
             default:
@@ -772,38 +768,46 @@ namespace hpx::threads::policies {
                         debug::threadinfo<threads::thread_id_ref_type*>(&thrd));
                 }
                 thread_num = select_active_pu(thread_num, allow_fallback);
+                // cppcheck-suppress redundantAssignment
+                domain_num = d_lookup_[thread_num];    //-V519
+                // cppcheck-suppress redundantAssignment
+                q_index = q_lookup_[thread_num];    //-V519
                 break;
             }
             case thread_schedule_hint_mode::thread:
             {
-                // @TODO. We should check that the thread num is valid
-                // Create thread on requested worker thread
                 spq_deb.set(msg, "HINT_THREAD");
                 spq_deb.debug(debug::str<>("schedule_thread"),
                     "received HINT_THREAD", debug::dec<3>(schedulehint.hint));
-                thread_num =
-                    select_active_pu(schedulehint.hint, allow_fallback);
+                thread_num = select_active_pu(
+                    fast_mod(static_cast<std::size_t>(schedulehint.hint),
+                        num_workers_),
+                    allow_fallback);
                 domain_num = d_lookup_[thread_num];
                 q_index = q_lookup_[thread_num];
                 break;
             }
             case thread_schedule_hint_mode::numa:
             {
-                // Create thread on requested NUMA domain
+                // Schedule thread on requested NUMA domain
                 spq_deb.set(msg, "HINT_NUMA  ");
-                // TODO: This case does not handle suspended PUs.
                 domain_num = fast_mod(schedulehint.hint, num_domains_);
-                // if the thread creating the new task is on the domain
-                // assigned to the new task - try to reuse the core as well
-                if (d_lookup_[thread_num] == domain_num)
+                // if the current thread is on the requested domain, reuse it;
+                // otherwise fall back to the first queue on that domain
+                if (d_lookup_[thread_num] != domain_num)
                 {
-                    q_index = q_lookup_[thread_num];
+                    thread_num = q_offset_[domain_num];
+                    thread_num +=
+                        numa_holder_[domain_num].thread_queue(0)->worker_next(
+                            q_counts_[domain_num]);
                 }
-                else
-                {
-                    throw std::runtime_error(
-                        "counter problem in thread scheduler");
-                }
+                // Ensure the selected PU is active, consistent with the
+                // handling of thread and none scheduling hint modes.
+                thread_num = select_active_pu(thread_num, allow_fallback);
+                // cppcheck-suppress redundantAssignment
+                domain_num = d_lookup_[thread_num];    //-V519
+                // cppcheck-suppress redundantAssignment
+                q_index = q_lookup_[thread_num];    //-V519
                 break;
             }
 

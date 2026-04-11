@@ -30,7 +30,7 @@ namespace hpx::parallel::util {
         ///////////////////////////////////////////////////////////////////////
         // Helper class to repeatedly call a function starting from a given
         // iterator position.
-        HPX_CXX_EXPORT template <typename Iterator>
+        HPX_CXX_CORE_EXPORT template <typename Iterator>
         struct datapar_loop
         {
             using iterator_type = std::decay_t<Iterator>;
@@ -55,7 +55,7 @@ namespace hpx::parallel::util {
 
                     constexpr std::size_t size = traits::vector_pack_size_v<V>;
 
-                    End const lastV = last - (size + 1);
+                    End const lastV = last - size + 1;
                     while (first < lastV)
                     {
                         datapar_loop_step<Begin>::callv(f, first);
@@ -94,7 +94,7 @@ namespace hpx::parallel::util {
         ///////////////////////////////////////////////////////////////////////
         // Helper class to repeatedly call a function starting from a given
         // iterator position till the predicate returns true.
-        HPX_CXX_EXPORT template <typename Iterator>
+        HPX_CXX_CORE_EXPORT template <typename Iterator>
         struct datapar_loop_pred
         {
             using iterator_type = std::decay_t<Iterator>;
@@ -116,7 +116,7 @@ namespace hpx::parallel::util {
 
                 constexpr std::size_t size = traits::vector_pack_size_v<V>;
 
-                End const lastV = last - (size + 1);
+                End const lastV = last - size + 1;
 
                 while (first < lastV)
                 {
@@ -142,7 +142,7 @@ namespace hpx::parallel::util {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename Iterator>
+        HPX_CXX_CORE_EXPORT template <typename Iterator>
         struct datapar_loop_ind
         {
             using iterator_type = std::decay_t<Iterator>;
@@ -167,7 +167,7 @@ namespace hpx::parallel::util {
 
                     constexpr std::size_t size = traits::vector_pack_size_v<V>;
 
-                    End const lastV = last - (size + 1);
+                    End const lastV = last - size + 1;
                     while (first < lastV)
                     {
                         datapar_loop_step_ind<Begin>::callv(f, first);
@@ -192,7 +192,7 @@ namespace hpx::parallel::util {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT struct datapar_loop2
+        HPX_CXX_CORE_EXPORT struct datapar_loop2
         {
             template <typename InIter1, typename InIter2, typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr std::enable_if_t<
@@ -217,7 +217,7 @@ namespace hpx::parallel::util {
 
                 constexpr std::size_t size = traits::vector_pack_size_v<V>;
 
-                InIter1 const last1V = last1 - (size + 1);
+                InIter1 const last1V = last1 - size + 1;
                 while (it1 < last1V)
                 {
                     datapar_loop_step2_ind<InIter1, InIter2>::callv(
@@ -235,10 +235,10 @@ namespace hpx::parallel::util {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename Iterator, typename Enable = void>
+        HPX_CXX_CORE_EXPORT template <typename Iterator, typename Enable = void>
         struct datapar_loop_n;
 
-        HPX_CXX_EXPORT template <typename Iterator>
+        HPX_CXX_CORE_EXPORT template <typename Iterator>
         struct datapar_loop_n<Iterator,
             std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
         {
@@ -269,7 +269,7 @@ namespace hpx::parallel::util {
                     constexpr std::size_t size = traits::vector_pack_size_v<V>;
 
                     for (auto len_v =
-                             static_cast<std::int64_t>(len - (size + 1));
+                             static_cast<std::int64_t>(len - size + 1);
                         len_v > 0;
                         len_v -= static_cast<std::int64_t>(size), len -= size)
                     {
@@ -306,7 +306,7 @@ namespace hpx::parallel::util {
             }
         };
 
-        HPX_CXX_EXPORT template <typename I>
+        HPX_CXX_CORE_EXPORT template <typename I>
         struct datapar_loop_n<I, std::enable_if_t<std::is_integral_v<I>>>
         {
             using V = traits::vector_pack_type_t<I>;
@@ -324,7 +324,7 @@ namespace hpx::parallel::util {
                 }
 
                 // clang-format off
-                for (auto len_v = static_cast<std::int64_t>(len - (size + 1));
+                for (auto len_v = static_cast<std::int64_t>(len - size + 1);
                     len_v > 0;
                     len_v -= static_cast<std::int64_t>(size), len -= size)
                 {
@@ -352,7 +352,7 @@ namespace hpx::parallel::util {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename Iterator>
+        HPX_CXX_CORE_EXPORT template <typename Iterator>
         struct datapar_loop_n_ind
         {
             using iterator_type = std::decay_t<Iterator>;
@@ -382,7 +382,7 @@ namespace hpx::parallel::util {
                     constexpr std::size_t size = traits::vector_pack_size_v<V>;
 
                     for (auto len_v =
-                             static_cast<std::int64_t>(len - (size + 1));
+                             static_cast<std::int64_t>(len - size + 1);
                         len_v > 0;
                         len_v -= static_cast<std::int64_t>(size), len -= size)
                     {
@@ -408,7 +408,7 @@ namespace hpx::parallel::util {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename Iterator>
+        HPX_CXX_CORE_EXPORT template <typename Iterator>
         struct datapar_loop_idx_n
         {
             using iterator_type = std::decay_t<Iterator>;
@@ -433,7 +433,7 @@ namespace hpx::parallel::util {
                 constexpr std::size_t size = traits::vector_pack_size_v<V>;
 
                 // clang-format off
-                for (auto len_v = static_cast<std::int64_t>(len - (size + 1));
+                for (auto len_v = static_cast<std::int64_t>(len - size + 1);
                     len_v > 0;
                     len_v -= static_cast<std::int64_t>(size), len -= size)
                 {
@@ -466,7 +466,7 @@ namespace hpx::parallel::util {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Begin, typename End, typename F>
+    HPX_CXX_CORE_EXPORT template <typename Begin, typename End, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Begin tag_invoke(
         hpx::parallel::util::loop_t, hpx::execution::simd_policy, Begin begin,
         End end, F&& f)
@@ -474,7 +474,7 @@ namespace hpx::parallel::util {
         return detail::datapar_loop<Begin>::call(begin, end, HPX_FORWARD(F, f));
     }
 
-    HPX_CXX_EXPORT template <typename Begin, typename End, typename F>
+    HPX_CXX_CORE_EXPORT template <typename Begin, typename End, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Begin tag_invoke(
         hpx::parallel::util::loop_t, hpx::execution::simd_task_policy,
         Begin begin, End end, F&& f)
@@ -482,8 +482,8 @@ namespace hpx::parallel::util {
         return detail::datapar_loop<Begin>::call(begin, end, HPX_FORWARD(F, f));
     }
 
-    HPX_CXX_EXPORT template <typename Begin, typename End, typename CancelToken,
-        typename F>
+    HPX_CXX_CORE_EXPORT template <typename Begin, typename End,
+        typename CancelToken, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Begin tag_invoke(
         hpx::parallel::util::loop_t, hpx::execution::simd_policy, Begin begin,
         End end, CancelToken& tok, F&& f)
@@ -492,8 +492,8 @@ namespace hpx::parallel::util {
             begin, end, tok, HPX_FORWARD(F, f));
     }
 
-    HPX_CXX_EXPORT template <typename Begin, typename End, typename CancelToken,
-        typename F>
+    HPX_CXX_CORE_EXPORT template <typename Begin, typename End,
+        typename CancelToken, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Begin tag_invoke(
         hpx::parallel::util::loop_t, hpx::execution::simd_task_policy,
         Begin begin, End end, CancelToken& tok, F&& f)
@@ -503,8 +503,8 @@ namespace hpx::parallel::util {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename ExPolicy, typename Begin, typename End,
-        typename Pred>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Begin,
+        typename End, typename Pred>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::enable_if_t<
         hpx::is_vectorpack_execution_policy_v<ExPolicy>, Begin>
     tag_invoke(hpx::parallel::util::loop_pred_t<ExPolicy>, Begin first, End end,
@@ -530,7 +530,7 @@ namespace hpx::parallel::util {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Begin, typename End, typename F>
+    HPX_CXX_CORE_EXPORT template <typename Begin, typename End, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE Begin tag_invoke(
         hpx::parallel::util::loop_ind_t<hpx::execution::simd_policy>,
         Begin begin, End end, F&& f)
@@ -539,7 +539,7 @@ namespace hpx::parallel::util {
             begin, end, HPX_FORWARD(F, f));
     }
 
-    HPX_CXX_EXPORT template <typename Begin, typename End, typename F>
+    HPX_CXX_CORE_EXPORT template <typename Begin, typename End, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE Begin tag_invoke(
         hpx::parallel::util::loop_ind_t<hpx::execution::simd_task_policy>,
         Begin begin, End end, F&& f)
@@ -549,8 +549,8 @@ namespace hpx::parallel::util {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename ExPolicy, typename Iter1, typename Iter2,
-        typename F>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter1,
+        typename Iter2, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE
         std::enable_if_t<hpx::is_vectorpack_execution_policy_v<ExPolicy>,
             std::pair<Iter1, Iter2>>
@@ -575,7 +575,7 @@ namespace hpx::parallel::util {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename ExPolicy, typename Iter, typename F>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::enable_if_t<
         hpx::is_vectorpack_execution_policy_v<ExPolicy>, Iter>
     tag_invoke(hpx::parallel::util::loop_n_t<ExPolicy>, Iter it,
@@ -585,7 +585,7 @@ namespace hpx::parallel::util {
             it, count, HPX_FORWARD(F, f));
     }
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename Iter,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter,
         typename CancelToken, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::enable_if_t<
         hpx::is_vectorpack_execution_policy_v<ExPolicy>, Iter>
@@ -597,7 +597,7 @@ namespace hpx::parallel::util {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename ExPolicy, typename Iter, typename F>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::enable_if_t<
         hpx::is_vectorpack_execution_policy_v<ExPolicy>, Iter>
     tag_invoke(hpx::parallel::util::loop_n_ind_t<ExPolicy>, Iter it,
@@ -608,7 +608,7 @@ namespace hpx::parallel::util {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename ExPolicy, typename Iter, typename F>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::enable_if_t<
         hpx::is_vectorpack_execution_policy_v<ExPolicy>, Iter>
     tag_invoke(hpx::parallel::util::loop_idx_n_t<ExPolicy>,
@@ -618,7 +618,7 @@ namespace hpx::parallel::util {
             base_idx, it, count, HPX_FORWARD(F, f));
     }
 
-    HPX_CXX_EXPORT template <typename ExPolicy, typename Iter,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter,
         typename CancelToken, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::enable_if_t<
         hpx::is_vectorpack_execution_policy_v<ExPolicy>, Iter>

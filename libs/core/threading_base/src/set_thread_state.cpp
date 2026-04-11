@@ -269,8 +269,20 @@ namespace hpx::threads::detail {
         {
             auto* thrd_data = get_thread_id_data(thrd);
             auto* scheduler = thrd_data->get_scheduler_base();
-            if (auto const current_priority = thrd_data->get_priority();
-                current_priority == thread_priority::bound)
+            auto const current_priority = thrd_data->get_priority();
+            if (priority == thread_priority::bound)
+            {
+                if (schedulehint.mode == thread_schedule_hint_mode::thread &&
+                    schedulehint.hint != -1)
+                {
+                    thrd_data->set_last_worker_thread_num(
+                        static_cast<std::uint16_t>(schedulehint.hint));
+                }
+                thrd_data->set_priority(thread_priority::bound);
+                scheduler->schedule_thread(
+                    thrd, schedulehint, false, thread_priority::bound);
+            }
+            else if (current_priority == thread_priority::bound)
             {
                 schedulehint.mode = thread_schedule_hint_mode::thread;
                 schedulehint.hint = static_cast<std::int16_t>(
@@ -278,16 +290,15 @@ namespace hpx::threads::detail {
                 scheduler->schedule_thread(
                     thrd, schedulehint, false, thread_priority::bound);
             }
-            else if (priority == thread_priority::bound)
-            {
-                thrd_data->set_priority(thread_priority::bound);
-                scheduler->schedule_thread(
-                    thrd, schedulehint, false, thread_priority::bound);
-            }
             else
             {
-                scheduler->schedule_thread(
-                    thrd, schedulehint, false, current_priority);
+                threads::thread_priority p =
+                    (priority == thread_priority::default_ ||
+                        priority == thread_priority::unknown) ?
+                    current_priority :
+                    priority;
+
+                scheduler->schedule_thread(thrd, schedulehint, false, p);
             }
 
             scheduler->do_some_work(schedulehint.mode ==

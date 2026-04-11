@@ -1,4 +1,5 @@
 //  Copyright (c) 2017 Ajai V George
+//  Copyright (c) 2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -56,7 +57,7 @@ namespace hpx::parallel {
             {
                 // all elements are on the same partition
                 local_iterator_type beg = traits::local(first);
-                local_iterator_type end = traits::end(sit);
+                local_iterator_type end = traits::local(last);
                 if (beg != end)
                 {
                     local_iterator_type out = dispatch(traits::get_id(sit),
@@ -149,8 +150,8 @@ namespace hpx::parallel {
 
             using result = util::detail::algorithm_result<ExPolicy, FwdIter>;
 
-            using forced_seq = std::integral_constant<bool,
-                !hpx::traits::is_forward_iterator<FwdIter>::value>;
+            using forced_seq =
+                std::integral_constant<bool, !std::forward_iterator<FwdIter>>;
 
             segment_iterator1 sit = traits::segment(first);
             segment_iterator1 send = traits::segment(last);
@@ -274,19 +275,14 @@ namespace hpx::parallel {
 // The segmented iterators we support all live in namespace hpx::segmented
 namespace hpx::segmented {
 
-    // clang-format off
-    template<typename InIter,
-        typename Pred,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::traits::is_iterator<InIter>::value &&
-            hpx::traits::is_segmented_iterator<InIter>::value
-        )>
-    // clang-format on
+    template <typename InIter, typename Pred>
+        requires(hpx::traits::is_iterator_v<InIter> &&
+            hpx::traits::is_segmented_iterator_v<InIter>)
     InIter tag_invoke(
         hpx::adjacent_find_t, InIter first, InIter last, Pred&& pred = Pred())
     {
-        static_assert((hpx::traits::is_input_iterator<InIter>::value),
-            "Requires at least input iterator.");
+        static_assert(
+            (std::input_iterator<InIter>), "Requires at least input iterator.");
 
         if (first == last)
         {
@@ -303,21 +299,15 @@ namespace hpx::segmented {
             hpx::identity_v, std::true_type());
     }
 
-    // clang-format off
-    template<typename ExPolicy, typename SegIter,
-        typename Pred,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy> &&
+    template <typename ExPolicy, typename SegIter, typename Pred>
+        requires(hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<SegIter> &&
-            hpx::traits::is_segmented_iterator_v<SegIter>
-        )>
-    // clang-format on
-    typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-        SegIter>::type
+            hpx::traits::is_segmented_iterator_v<SegIter>)
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, SegIter>
     tag_invoke(hpx::adjacent_find_t, ExPolicy&& policy, SegIter first,
         SegIter last, Pred&& pred)
     {
-        static_assert((hpx::traits::is_forward_iterator<SegIter>::value),
+        static_assert((std::forward_iterator<SegIter>),
             "Requires at least forward iterator.");
 
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;

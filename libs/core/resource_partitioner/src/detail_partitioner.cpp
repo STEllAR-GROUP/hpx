@@ -248,6 +248,7 @@ namespace hpx::resource::detail {
     partitioner::partitioner()
       : first_core_(static_cast<std::size_t>(-1))
       , pus_needed_(static_cast<std::size_t>(-1))
+      , mtx_("resource_partitioner")
       , mode_(partitioner_mode::default_)
       , topo_(threads::create_topology())
       , default_scheduler_mode_(threads::policies::scheduler_mode::default_)

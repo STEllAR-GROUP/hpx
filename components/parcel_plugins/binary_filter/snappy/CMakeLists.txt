@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2022 Hartmut Kaiser
+# Copyright (c) 2007-2026 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -40,9 +40,7 @@ target_include_directories(
 )
 target_link_directories(compression_snappy PRIVATE ${Snappy_LIBRARY_DIR})
 
-target_link_libraries(
-  compression_snappy PUBLIC Boost::iostreams ${SNAPPY_LIBRARY}
-)
+target_link_libraries(compression_snappy PUBLIC ${SNAPPY_LIBRARY})
 
 add_hpx_pseudo_dependencies(
   components.parcel_plugins.binary_filter.snappy compression_snappy

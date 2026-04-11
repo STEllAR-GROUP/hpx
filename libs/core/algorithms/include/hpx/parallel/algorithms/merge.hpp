@@ -288,6 +288,7 @@ namespace hpx {
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/itt_notify.hpp>
+#include <hpx/modules/tracing.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/copy.hpp>
 #include <hpx/parallel/algorithms/detail/advance_and_get_distance.hpp>
@@ -320,9 +321,9 @@ namespace hpx::parallel {
         /// \cond NOINTERNAL
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT struct lower_bound_helper;
+        HPX_CXX_CORE_EXPORT struct lower_bound_helper;
 
-        HPX_CXX_EXPORT struct upper_bound_helper
+        HPX_CXX_CORE_EXPORT struct upper_bound_helper
         {
             template <typename Iter, typename Sent, typename T, typename Comp,
                 typename Proj>
@@ -345,7 +346,7 @@ namespace hpx::parallel {
             using another_type = lower_bound_helper;
         };
 
-        HPX_CXX_EXPORT struct lower_bound_helper
+        HPX_CXX_CORE_EXPORT struct lower_bound_helper
         {
             template <typename Iter, typename Sent, typename T, typename Comp,
                 typename Proj>
@@ -368,7 +369,7 @@ namespace hpx::parallel {
             using another_type = upper_bound_helper;
         };
 
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         HPX_FORCEINLINE decltype(auto) init_value([[maybe_unused]] T&& val)
         {
             if constexpr (std::is_default_constructible_v<std::decay_t<T>>)
@@ -382,9 +383,9 @@ namespace hpx::parallel {
         }
 
         // sequential merge helper with projection function.
-        HPX_CXX_EXPORT template <typename Iter1, typename Sent1, typename Iter2,
-            typename Sent2, typename OutIter, typename Comp, typename Proj1,
-            typename Proj2>
+        HPX_CXX_CORE_EXPORT template <typename Iter1, typename Sent1,
+            typename Iter2, typename Sent2, typename OutIter, typename Comp,
+            typename Proj1, typename Proj2>
         constexpr util::in_in_out_result<Iter1, Iter2, OutIter>
         sequential_merge_helper(Iter1 first1, Sent1 last1, Iter2 first2,
             Sent2 last2, OutIter dest, Comp&& comp, Proj1&& proj1,
@@ -447,8 +448,8 @@ namespace hpx::parallel {
         }
 
         // sequential merge helper without projection function.
-        HPX_CXX_EXPORT template <typename Iter1, typename Sent1, typename Iter2,
-            typename Sent2, typename OutIter, typename Comp>
+        HPX_CXX_CORE_EXPORT template <typename Iter1, typename Sent1,
+            typename Iter2, typename Sent2, typename OutIter, typename Comp>
         constexpr util::in_in_out_result<Iter1, Iter2, OutIter>
         sequential_merge_helper(Iter1 first1, Sent1 last1, Iter2 first2,
             Sent2 last2, OutIter dest, Comp&& comp)
@@ -540,15 +541,15 @@ namespace hpx::parallel {
         }
 
         // sequential merge with projection function.
-        HPX_CXX_EXPORT template <typename Iter1, typename Sent1, typename Iter2,
-            typename Sent2, typename OutIter, typename Comp, typename Proj1,
-            typename Proj2>
+        HPX_CXX_CORE_EXPORT template <typename Iter1, typename Sent1,
+            typename Iter2, typename Sent2, typename OutIter, typename Comp,
+            typename Proj1, typename Proj2>
         constexpr util::in_in_out_result<Iter1, Iter2, OutIter>
         sequential_merge(Iter1 start1, Sent1 sent1, Iter2 start2, Sent2 sent2,
             OutIter out, Comp&& comp, Proj1&& proj1, Proj2&& proj2)
         {
-            if constexpr (hpx::traits::is_random_access_iterator_v<Iter1> &&
-                hpx::traits::is_random_access_iterator_v<Iter2>)
+            if constexpr (std::random_access_iterator<Iter1> &&
+                std::random_access_iterator<Iter2>)
             {
                 auto first1 = hpx::util::get_unwrapped(start1);
                 auto first2 = hpx::util::get_unwrapped(start2);
@@ -571,7 +572,7 @@ namespace hpx::parallel {
                 [[maybe_unused]] auto copy_result2 =
                     util::copy(merge_result.in2, last2, copy_result1.out);
 
-                if constexpr (!hpx::traits::is_input_iterator_v<OutIter>)
+                if constexpr (!std::input_iterator<OutIter>)
                 {
                     return {end1, end2, copy_result2.out};
                 }
@@ -596,14 +597,14 @@ namespace hpx::parallel {
         }
 
         // sequential merge without projection function.
-        HPX_CXX_EXPORT template <typename Iter1, typename Sent1, typename Iter2,
-            typename Sent2, typename OutIter, typename Comp>
+        HPX_CXX_CORE_EXPORT template <typename Iter1, typename Sent1,
+            typename Iter2, typename Sent2, typename OutIter, typename Comp>
         constexpr util::in_in_out_result<Iter1, Iter2, OutIter>
         sequential_merge(Iter1 start1, Sent1 sent1, Iter2 start2, Sent2 sent2,
             OutIter out, Comp&& comp, hpx::identity, hpx::identity)
         {
-            if constexpr (hpx::traits::is_random_access_iterator_v<Iter1> &&
-                hpx::traits::is_random_access_iterator_v<Iter2>)
+            if constexpr (std::random_access_iterator<Iter1> &&
+                std::random_access_iterator<Iter2>)
             {
                 auto first1 = hpx::util::get_unwrapped(start1);
                 auto first2 = hpx::util::get_unwrapped(start2);
@@ -625,7 +626,7 @@ namespace hpx::parallel {
                 [[maybe_unused]] auto copy_result2 =
                     util::copy(merge_result.in2, last2, copy_result1.out);
 
-                if constexpr (!hpx::traits::is_input_iterator_v<OutIter>)
+                if constexpr (!std::input_iterator<OutIter>)
                 {
                     return {end1, end2, copy_result2.out};
                 }
@@ -648,120 +649,212 @@ namespace hpx::parallel {
             }
         }
 
-        HPX_CXX_EXPORT template <typename Iter1, typename Iter2, typename Comp,
-            typename Proj1, typename Proj2, typename BinarySearchHelper>
-        auto get_reshape_chunks(std::size_t len1, Iter2 first2, Iter2 last2,
-            Comp&& comp, Proj1&& proj1, Proj2&& proj2, BinarySearchHelper)
+        class const_index_value_iterator
+          : public hpx::util::iterator_facade<
+                const_index_value_iterator,                    // Derived
+                hpx::tuple<std::size_t, std::size_t> const,    // Value type
+                std::random_access_iterator_tag>
         {
-            using merge_region =
-                hpx::tuple<Iter1, std::size_t, Iter2, std::size_t, std::size_t>;
+        private:
+            // current index and current value to be returned
+            hpx::tuple<std::size_t, std::size_t> data_ = hpx::make_tuple(0, 0);
 
-            auto reshape = [len1, first2, last2, comp, proj1, proj2](
-                               auto&& shape, std::size_t cores) {
+        public:
+            const_index_value_iterator() = default;
+            explicit constexpr const_index_value_iterator(
+                std::size_t value, std::size_t start = 0) noexcept
+              : data_(start, value)
+            {
+            }
+
+        private:
+            friend class hpx::util::iterator_core_access;
+
+            hpx::tuple<std::size_t, std::size_t> const& dereference()
+                const noexcept
+            {
+                return data_;
+            }
+
+            void increment() noexcept
+            {
+                ++hpx::get<0>(data_);
+            }
+            void decrement() noexcept
+            {
+                --hpx::get<0>(data_);
+            }
+
+            void advance(std::ptrdiff_t n) noexcept
+            {
+                hpx::get<0>(data_) = static_cast<std::size_t>(
+                    static_cast<std::ptrdiff_t>(hpx::get<0>(data_)) + n);
+            }
+
+            std::ptrdiff_t distance_to(
+                const_index_value_iterator const& other) const noexcept
+            {
+                return static_cast<std::ptrdiff_t>(hpx::get<0>(other.data_)) -
+                    static_cast<std::ptrdiff_t>(hpx::get<0>(data_));
+            }
+
+            bool equal(const_index_value_iterator const& other) const noexcept
+            {
+                // Two iterators are equal when indices match and they share
+                // the same value.
+                return data_ == other.data_;
+            }
+        };
+
+        HPX_CXX_CORE_EXPORT template <typename T>
+        auto get_diagonal_index(T const n)
+        {
+            auto diagonal_index = [n = static_cast<std::size_t>(n)](
+                                      auto&& shape, std::size_t cores) {
+
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-                static hpx::util::itt::event notify_event("reshape");
+                static hpx::util::itt::event notify_event("get diagonal index");
                 hpx::util::itt::mark_event e(notify_event);
 #endif
+                hpx::tracing::mark_event evt("get diagonal index");
+                auto const shape_size = std::size(shape);
 
-                auto shape_size = std::size(shape);
-                if (shape_size == 1 && cores == 1)
-                {
-                    // special case: one core, one chunk - the partitioner will
-                    // switch to sequential execution in this case
-                    auto [it1, size1, _] = *std::begin(shape);
-                    auto size2 = detail::distance(first2, last2);
-                    return std::vector<merge_region>(
-                        1, merge_region{it1, size1, first2, size2, 0});
-                }
+                if (n == 0)
+                    return hpx::util::iterator_range<
+                        const_index_value_iterator>();
 
-                std::vector<merge_region> reshaped;
-                reshaped.reserve(2 * shape_size);
+                if (cores == 1)
+                    return hpx::util::iterator_range{
+                        const_index_value_iterator(n),
+                        const_index_value_iterator(n, 1)};
 
-                Iter2 it2 = first2;
-                std::size_t dest_start = 0;
-                for (auto [it1, size1, base] : shape)
-                {
-                    Iter2 l2 = last2;
-                    if (base + size1 != len1)
-                    {
-                        // gcc complains about using HPX_INVOKE here
-                        l2 = BinarySearchHelper::call(it2, last2,
-                            std::invoke(proj1, *std::next(it1, size1)), comp,
-                            proj2);
-                    }
+                std::size_t seg = (cores == 0 ? 1 : shape_size);
+                seg = (std::min) (seg, n);
 
-                    std::size_t size2 = detail::distance(it2, l2);
+                std::size_t const chunk = (n + seg - 1) / seg;
 
-                    // prevent chunks from growing too large
-                    if (size2 <= static_cast<std::size_t>(
-                                     1.2 * static_cast<double>(size1)))
-                    {
-                        reshaped.emplace_back(
-                            it1, size1, it2, size2, dest_start);
+                auto begin = const_index_value_iterator(chunk);
+                auto end = const_index_value_iterator(chunk, seg);
 
-                        it2 = l2;
-                        dest_start += size1 + size2;
-                    }
-                    else
-                    {
-                        // split first sequence into smaller pieces based
-                        // on chunks of the second (sub-)sequence
-                        Iter1 begin1 = it1;
-                        std::size_t remainder1 = size1;
-
-                        std::size_t chunk_size2 = size1;
-                        std::size_t remainder2 = size2 - chunk_size2;
-
-                        Iter2 begin2 = it2;
-                        Iter2 end2 = std::next(begin2, chunk_size2);
-
-                        while (chunk_size2 != 0)
-                        {
-                            Iter1 end_chunk1;
-                            if (end2 != l2)
-                            {
-                                using binary_search =
-                                    typename BinarySearchHelper::another_type;
-
-                                // gcc complains about using HPX_INVOKE here
-                                end_chunk1 =
-                                    binary_search::call_n(begin1, remainder1,
-                                        std::invoke(proj2, *end2), comp, proj1);
-                            }
-                            else
-                            {
-                                end_chunk1 = std::next(it1, size1);
-                            }
-
-                            auto chunk_size1 =
-                                detail::distance(begin1, end_chunk1);
-
-                            reshaped.emplace_back(begin1, chunk_size1, begin2,
-                                chunk_size2, dest_start);
-
-                            dest_start += chunk_size1 + chunk_size2;
-
-                            chunk_size2 = (std::min) (size1, remainder2);
-                            remainder2 -= chunk_size2;
-
-                            begin1 = end_chunk1;
-                            remainder1 -= chunk_size1;
-
-                            begin2 = end2;
-                            end2 = std::next(begin2, chunk_size2);
-                        }
-
-                        it2 = l2;
-                    }
-                }
-                return reshaped;
+                return hpx::util::iterator_range{begin, end};
             };
 
-            return reshape;
+            return diagonal_index;
+        }
+
+        HPX_CXX_CORE_EXPORT template <typename Iter1, typename Iter2,
+            typename Comp, typename Proj1, typename Proj2>
+        std::pair<std::size_t, std::size_t> diagonal_intersection(Iter1 first1,
+            std::size_t len1, Iter2 first2, std::size_t len2, std::size_t k,
+            Comp&& comp, Proj1 proj1, Proj2 proj2)
+        {
+
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+            static hpx::util::itt::event notify_event(
+                "get diagonal intersection");
+            hpx::util::itt::mark_event e(notify_event);
+#endif
+            hpx::tracing::mark_event evt("get diagonal intersection");
+            if (len1 == 0)
+                return {0, (std::min) (k, len2)};
+            if (len2 == 0)
+                return {(std::min) (k, len1), 0};
+            auto a_low = (k > len2) ? (k - len2) : 0;
+            auto a_high = (k < len1) ? k : len1;
+            if (a_low == a_high)
+            {
+                auto a = a_low;
+                return {a, k - a};    // Only one valid position
+            }
+
+            while (a_low <= a_high)
+            {
+                auto a = (a_low + a_high) / 2;
+                auto b = k - a;
+
+                // cond1: a==0 || b==len2 || A[a-1] <= B[b]
+                bool cond1 = (a == 0) || (b == len2) ||
+                    !HPX_INVOKE(comp, HPX_INVOKE(proj2, *std::next(first2, b)),
+                        HPX_INVOKE(proj1, *std::next(first1, a - 1)));
+
+                // cond2: b==0 || a==len1 || B[b-1] < A[a]
+                bool cond2 = (b == 0) || (a == len1) ||
+                    HPX_INVOKE(comp,
+                        HPX_INVOKE(proj2, *std::next(first2, b - 1)),
+                        HPX_INVOKE(proj1, *std::next(first1, a)));
+
+                if (cond1 && cond2)
+                    return {a, b};
+
+                if (!cond1)
+                {
+                    a_high = a - 1;
+                }
+                else
+                {
+                    a_low = a + 1;
+                }
+            }
+            return {a_high, k - a_high};
+        }
+
+        HPX_CXX_CORE_EXPORT template <typename Iter1, typename Iter2,
+            typename Comp>
+        std::pair<std::size_t, std::size_t> diagonal_intersection(Iter1 first1,
+            std::size_t len1, Iter2 first2, std::size_t len2, std::size_t k,
+            Comp&& comp, hpx::identity, hpx::identity)
+        {
+
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+            static hpx::util::itt::event notify_event(
+                "get diagonal intersection");
+            hpx::util::itt::mark_event e(notify_event);
+#endif
+            hpx::tracing::mark_event evt("get diagonal intersection");
+            if (len1 == 0)
+                return {0, (std::min) (k, len2)};
+            if (len2 == 0)
+                return {(std::min) (k, len1), 0};
+            auto a_low = (k > len2) ? (k - len2) : 0;
+            auto a_high = (k < len1) ? k : len1;
+            if (a_low == a_high)
+            {
+                auto a = a_low;
+                return {a, k - a};    // Only one valid position
+            }
+
+            while (a_low <= a_high)
+            {
+                auto a = (a_low + a_high) / 2;
+                auto b = k - a;
+
+                // cond1: a==0 || b==len2 || A[a-1] <= B[b]
+                bool cond1 = (a == 0) || (b == len2) ||
+                    !HPX_INVOKE(
+                        comp, *std::next(first2, b), *std::next(first1, a - 1));
+
+                // cond2: b==0 || a==len1 || B[b-1] < A[a]
+                bool cond2 = (b == 0) || (a == len1) ||
+                    HPX_INVOKE(
+                        comp, *std::next(first2, b - 1), *std::next(first1, a));
+
+                if (cond1 && cond2)
+                    return {a, b};
+
+                if (!cond1)
+                {
+                    a_high = a - 1;
+                }
+                else
+                {
+                    a_low = a + 1;
+                }
+            }
+            return {a_high, k - a_high};
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename ExPolicy, typename Iter1,
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter1,
             typename Sent1, typename Iter2, typename Sent2, typename Iter3,
             typename Comp, typename Proj1, typename Proj2>
         decltype(auto) parallel_merge(ExPolicy&& policy, Iter1 first1,
@@ -776,13 +869,23 @@ namespace hpx::parallel {
 
             using result_type = util::in_in_out_result<Iter1, Iter2, Iter3>;
 
-            auto f1 = [dest, comp, proj1, proj2](Iter1 it1, std::size_t size1,
-                          Iter2 it2, std::size_t size2, std::size_t dest_base) {
-                if (size1 != 0 || size2 != 0)
+            auto f1 = [dest, comp, proj1, proj2, first1, first2, len1, len2](
+                          std::size_t idx, std::size_t chunk) {
+                if (len1 != 0 || len2 != 0)
                 {
-                    sequential_merge(it1, std::next(it1, size1), it2,
-                        std::next(it2, size2), std::next(dest, dest_base), comp,
-                        proj1, proj2);
+                    std::size_t N = len1 + len2;
+                    std::size_t k0 = (std::min) (idx * chunk, N);
+                    std::size_t k1 = (std::min) (k0 + chunk, N);
+
+                    auto [a0, b0] = diagonal_intersection(
+                        first1, len1, first2, len2, k0, comp, proj1, proj2);
+                    auto [a1, b1] = diagonal_intersection(
+                        first1, len1, first2, len2, k1, comp, proj1, proj2);
+
+                    sequential_merge(std::next(first1, a0),
+                        std::next(first1, a1), std::next(first2, b0),
+                        std::next(first2, b1), std::next(dest, k0), comp, proj1,
+                        proj2);
                 }
             };
 
@@ -793,12 +896,11 @@ namespace hpx::parallel {
                         std::next(dest, len1 + len2)};
                 };
 
-                auto reshape = get_reshape_chunks<Iter1>(len1, first2, end2,
-                    comp, proj1, proj2, lower_bound_helper{});
+                auto chunks = get_diagonal_index(len1 + len2);
 
                 return util::foreach_partitioner<std::decay_t<ExPolicy>>::call(
                     HPX_FORWARD(ExPolicy, policy), first1, len1, HPX_MOVE(f1),
-                    HPX_MOVE(f2), HPX_MOVE(reshape));
+                    HPX_MOVE(f2), HPX_MOVE(chunks));
             }
 
             auto f2 = [first1, len1, len2, dest](Iter2 l2) {
@@ -806,16 +908,15 @@ namespace hpx::parallel {
                     std::next(first1, len1), l2, std::next(dest, len1 + len2)};
             };
 
-            auto reshape = get_reshape_chunks<Iter2>(
-                len2, first1, end1, comp, proj2, proj1, upper_bound_helper{});
+            auto chunks = get_diagonal_index(len1 + len2);
 
             return util::foreach_partitioner<std::decay_t<ExPolicy>>::call(
                 HPX_FORWARD(ExPolicy, policy), first2, len2, HPX_MOVE(f1),
-                HPX_MOVE(f2), HPX_MOVE(reshape));
+                HPX_MOVE(f2), HPX_MOVE(chunks));
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename IterTuple>
+        HPX_CXX_CORE_EXPORT template <typename IterTuple>
         struct merge : public algorithm<merge<IterTuple>, IterTuple>
         {
             constexpr merge() noexcept
@@ -872,8 +973,8 @@ namespace hpx::parallel {
     namespace detail {
 
         // sequential inplace_merge with projection function.
-        HPX_CXX_EXPORT template <typename Iter, typename Sent, typename Comp,
-            typename Proj>
+        HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent,
+            typename Comp, typename Proj>
         constexpr Iter sequential_inplace_merge(
             Iter first, Iter middle, Sent last, Comp&& comp, Proj&& proj)
         {
@@ -884,7 +985,7 @@ namespace hpx::parallel {
             return last;
         }
 
-        HPX_CXX_EXPORT template <typename ExPolicy, typename Iter,
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter,
             typename Sent, typename Comp, typename Proj>
         void parallel_inplace_merge_helper(ExPolicy&& policy, Iter first,
             Iter middle, Sent last, Comp&& comp, Proj&& proj)
@@ -1016,7 +1117,7 @@ namespace hpx::parallel {
             }
         }
 
-        HPX_CXX_EXPORT template <typename ExPolicy, typename Iter,
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter,
             typename Sent, typename Comp, typename Proj>
         hpx::future<Iter> parallel_inplace_merge(ExPolicy&& policy, Iter first,
             Iter middle, Sent last, Comp&& comp, Proj&& proj)
@@ -1040,7 +1141,7 @@ namespace hpx::parallel {
                 });
         }
 
-        HPX_CXX_EXPORT template <typename Result>
+        HPX_CXX_CORE_EXPORT template <typename Result>
         struct inplace_merge : public algorithm<inplace_merge<Result>, Result>
         {
             constexpr inplace_merge() noexcept
@@ -1081,12 +1182,12 @@ namespace hpx::parallel {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename Iter>
+        HPX_CXX_CORE_EXPORT template <typename Iter>
         constexpr void get_void_result(Iter) noexcept
         {
         }
 
-        HPX_CXX_EXPORT template <typename Iter>
+        HPX_CXX_CORE_EXPORT template <typename Iter>
         hpx::future<void> get_void_result(hpx::future<Iter>&& f) noexcept
         {
             return hpx::future<void>(HPX_MOVE(f));
@@ -1098,7 +1199,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::merge
-    HPX_CXX_EXPORT inline constexpr struct merge_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct merge_t final
       : hpx::detail::tag_parallel_algorithm<merge_t>
     {
     private:
@@ -1115,18 +1216,18 @@ namespace hpx {
                     typename std::iterator_traits<RandIter2>::value_type
                 >
             )
-        // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
             RandIter3>
-        tag_fallback_invoke(merge_t, ExPolicy&& policy, RandIter1 first1,
-            RandIter1 last1, RandIter2 first2, RandIter2 last2, RandIter3 dest,
-            Comp comp = Comp())
+        tag_fallback_invoke(merge_t, ExPolicy&& policy,
+            RandIter1 first1, RandIter1 last1, RandIter2 first2,
+            RandIter2 last2, RandIter3 dest, Comp comp = Comp())
+        // clang-format on
         {
-            static_assert(hpx::traits::is_random_access_iterator_v<RandIter1>,
+            static_assert(std::random_access_iterator<RandIter1>,
                 "Required at least random access iterator.");
-            static_assert(hpx::traits::is_random_access_iterator_v<RandIter2>,
+            static_assert(std::random_access_iterator<RandIter2>,
                 "Requires at least random access iterator.");
-            static_assert(hpx::traits::is_random_access_iterator_v<RandIter3>,
+            static_assert(std::random_access_iterator<RandIter3>,
                 "Requires at least random access iterator.");
 
             using result_type = hpx::parallel::util::in_in_out_result<RandIter1,
@@ -1155,11 +1256,11 @@ namespace hpx {
             RandIter1 last1, RandIter2 first2, RandIter2 last2, RandIter3 dest,
             Comp comp = Comp())
         {
-            static_assert(hpx::traits::is_random_access_iterator_v<RandIter1>,
+            static_assert(std::random_access_iterator<RandIter1>,
                 "Required at least random access iterator.");
-            static_assert(hpx::traits::is_random_access_iterator_v<RandIter2>,
+            static_assert(std::random_access_iterator<RandIter2>,
                 "Requires at least random access iterator.");
-            static_assert(hpx::traits::is_random_access_iterator_v<RandIter3>,
+            static_assert(std::random_access_iterator<RandIter3>,
                 "Requires at least random access iterator.");
 
             using result_type = hpx::parallel::util::in_in_out_result<RandIter1,
@@ -1174,7 +1275,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::inplace_merge
-    HPX_CXX_EXPORT inline constexpr struct inplace_merge_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct inplace_merge_t final
       : hpx::detail::tag_parallel_algorithm<inplace_merge_t>
     {
     private:
@@ -1194,7 +1295,7 @@ namespace hpx {
         tag_fallback_invoke(inplace_merge_t, ExPolicy&& policy, RandIter first,
             RandIter middle, RandIter last, Comp comp = Comp())
         {
-            static_assert(hpx::traits::is_random_access_iterator_v<RandIter>,
+            static_assert(std::random_access_iterator<RandIter>,
                 "Required at least random access iterator.");
 
             return hpx::parallel::detail::get_void_result(
@@ -1217,7 +1318,7 @@ namespace hpx {
         friend void tag_fallback_invoke(inplace_merge_t, RandIter first,
             RandIter middle, RandIter last, Comp comp = Comp())
         {
-            static_assert(hpx::traits::is_random_access_iterator_v<RandIter>,
+            static_assert(std::random_access_iterator<RandIter>,
                 "Required at least random access iterator.");
 
             return hpx::parallel::detail::get_void_result(

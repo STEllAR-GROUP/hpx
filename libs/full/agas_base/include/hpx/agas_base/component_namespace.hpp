@@ -9,10 +9,9 @@
 #include <hpx/config.hpp>
 #include <hpx/agas_base/agas_fwd.hpp>
 #include <hpx/agas_base/server/component_namespace.hpp>
-#include <hpx/components_base/component_type.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/futures.hpp>
-#include <hpx/naming_base/address.hpp>
-#include <hpx/naming_base/id_type.hpp>
+#include <hpx/modules/naming_base.hpp>
 
 #include <cstdint>
 #include <string>

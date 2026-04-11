@@ -107,7 +107,7 @@ namespace hpx { namespace parallel {
             typedef typename traits::local_iterator local_iterator_type;
 
             typedef std::integral_constant<bool,
-                !hpx::traits::is_forward_iterator<SegIterB>::value>
+                !std::forward_iterator<SegIterB>>
                 forced_seq;
 
             typedef typename std::iterator_traits<SegIterB>::difference_type
@@ -261,7 +261,7 @@ namespace hpx { namespace parallel {
             typedef typename traits::local_iterator local_iterator_type;
 
             typedef std::integral_constant<bool,
-                !hpx::traits::is_forward_iterator<SegIterB>::value>
+                !std::forward_iterator<SegIterB>>
                 forced_seq;
 
             typedef typename std::iterator_traits<SegIterB>::difference_type
@@ -342,19 +342,14 @@ namespace hpx { namespace parallel {
 // The segmented iterators we support all live in namespace hpx::segmented
 namespace hpx { namespace segmented {
 
-    // clang-format off
-    template <typename InIter,
-        typename T,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::traits::is_iterator<InIter>::value &&
-            hpx::traits::is_segmented_iterator<InIter>::value
-        )>
-    // clang-format on
+    template <typename InIter, typename T>
+        requires(hpx::traits::is_iterator_v<InIter> &&
+            hpx::traits::is_segmented_iterator_v<InIter>)
     typename std::iterator_traits<InIter>::difference_type tag_invoke(
         hpx::count_t, InIter first, InIter last, T const& value)
     {
-        static_assert((hpx::traits::is_input_iterator<InIter>::value),
-            "Requires at least input iterator.");
+        static_assert(
+            (std::input_iterator<InIter>), "Requires at least input iterator.");
 
         using difference_type =
             typename std::iterator_traits<InIter>::difference_type;
@@ -370,21 +365,16 @@ namespace hpx { namespace segmented {
             std::true_type());
     }
 
-    // clang-format off
-    template <typename ExPolicy, typename SegIter,
-        typename T,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy> &&
+    template <typename ExPolicy, typename SegIter, typename T>
+        requires(hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<SegIter> &&
-            hpx::traits::is_segmented_iterator_v<SegIter>
-        )>
-    // clang-format on
+            hpx::traits::is_segmented_iterator_v<SegIter>)
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         typename std::iterator_traits<SegIter>::difference_type>::type
     tag_invoke(hpx::count_t, ExPolicy&& policy, SegIter first, SegIter last,
         T const& value)
     {
-        static_assert((hpx::traits::is_forward_iterator<SegIter>::value),
+        static_assert((std::forward_iterator<SegIter>),
             "Requires at least forward iterator.");
 
         using difference_type =
@@ -404,19 +394,14 @@ namespace hpx { namespace segmented {
             is_seq());
     }
 
-    // clang-format off
-    template <typename InIter,
-        typename F,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::traits::is_iterator<InIter>::value &&
-            hpx::traits::is_segmented_iterator<InIter>::value
-        )>
-    // clang-format on
+    template <typename InIter, typename F>
+        requires(hpx::traits::is_iterator_v<InIter> &&
+            hpx::traits::is_segmented_iterator_v<InIter>)
     typename std::iterator_traits<InIter>::difference_type tag_invoke(
         hpx::count_if_t, InIter first, InIter last, F&& f)
     {
-        static_assert((hpx::traits::is_input_iterator<InIter>::value),
-            "Requires at least input iterator.");
+        static_assert(
+            (std::input_iterator<InIter>), "Requires at least input iterator.");
 
         using difference_type =
             typename std::iterator_traits<InIter>::difference_type;
@@ -432,21 +417,16 @@ namespace hpx { namespace segmented {
             hpx::identity_v, std::true_type());
     }
 
-    // clang-format off
-    template <typename ExPolicy, typename SegIter,
-        typename F,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy> &&
+    template <typename ExPolicy, typename SegIter, typename F>
+        requires(hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<SegIter> &&
-            hpx::traits::is_segmented_iterator_v<SegIter>
-        )>
-    // clang-format on
+            hpx::traits::is_segmented_iterator_v<SegIter>)
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         typename std::iterator_traits<SegIter>::difference_type>::type
     tag_invoke(
         hpx::count_if_t, ExPolicy&& policy, SegIter first, SegIter last, F&& f)
     {
-        static_assert((hpx::traits::is_forward_iterator<SegIter>::value),
+        static_assert((std::forward_iterator<SegIter>),
             "Requires at least forward iterator.");
 
         using difference_type =

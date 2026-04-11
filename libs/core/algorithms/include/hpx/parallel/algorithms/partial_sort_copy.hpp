@@ -166,6 +166,8 @@ namespace hpx {
 
 #include <algorithm>
 #include <cstdint>
+#include <iterator>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -173,7 +175,7 @@ namespace hpx::parallel::detail {
 
     ///////////////////////////////////////////////////////////////////////
     // partial_sort_copy
-    HPX_CXX_EXPORT template <typename Iter>
+    HPX_CXX_CORE_EXPORT template <typename Iter>
     struct partial_sort_copy : public algorithm<partial_sort_copy<Iter>, Iter>
     {
         constexpr partial_sort_copy() noexcept
@@ -351,7 +353,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::partial_sort_copy
-    HPX_CXX_EXPORT inline constexpr struct partial_sort_copy_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct partial_sort_copy_t final
       : hpx::detail::tag_parallel_algorithm<partial_sort_copy_t>
     {
     private:
@@ -371,10 +373,10 @@ namespace hpx {
             InIter first, InIter last, RandIter d_first, RandIter d_last,
             Comp comp = Comp())
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+            static_assert(std::input_iterator<InIter>,
                 "Requires at least input iterator.");
 
-            static_assert(hpx::traits::is_random_access_iterator_v<RandIter>,
+            static_assert(std::random_access_iterator<RandIter>,
                 "Requires at least random access iterator.");
 
             using result_type = parallel::util::in_out_result<InIter, RandIter>;
@@ -403,10 +405,10 @@ namespace hpx {
             FwdIter first, FwdIter last, RandIter d_first, RandIter d_last,
             Comp comp = Comp())
         {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+            static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
 
-            static_assert(hpx::traits::is_random_access_iterator_v<RandIter>,
+            static_assert(std::random_access_iterator<RandIter>,
                 "Requires at least random access iterator.");
 
             using result_type =

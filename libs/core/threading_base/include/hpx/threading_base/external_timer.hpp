@@ -21,10 +21,10 @@
 
 namespace hpx::util {
 
-    HPX_CXX_EXPORT using enable_parent_task_handler_type =
+    HPX_CXX_CORE_EXPORT using enable_parent_task_handler_type =
         hpx::function<bool()>;
 
-    HPX_CXX_EXPORT HPX_CORE_EXPORT void set_enable_parent_task_handler(
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void set_enable_parent_task_handler(
         enable_parent_task_handler_type f);
 
     namespace external_timer {
@@ -32,12 +32,12 @@ namespace hpx::util {
         // HPX provides a smart pointer to a data object that maintains
         // information about an hpx_thread. Any library (i.e. APEX) that wants
         // to use this callback API needs to extend this class.
-        HPX_CXX_EXPORT struct task_wrapper
+        HPX_CXX_CORE_EXPORT struct task_wrapper
         {
         };
 
         // Enumeration of function type flags
-        HPX_CXX_EXPORT enum functions_t {
+        HPX_CXX_CORE_EXPORT enum functions_t {
             init_flag = 0,
             finalize_flag,
             register_thread_flag,
@@ -54,31 +54,33 @@ namespace hpx::util {
         };
 
         // Typedefs of function pointers
-        HPX_CXX_EXPORT using init_t =
+        HPX_CXX_CORE_EXPORT using init_t =
             std::uint64_t(char const*, uint64_t const, uint64_t const);
-        HPX_CXX_EXPORT using finalize_t = void(void);
-        HPX_CXX_EXPORT using register_thread_t = void(std::string const&);
-        HPX_CXX_EXPORT using new_task_string_t =
+        HPX_CXX_CORE_EXPORT using finalize_t = void(void);
+        HPX_CXX_CORE_EXPORT using register_thread_t = void(std::string const&);
+        HPX_CXX_CORE_EXPORT using new_task_string_t =
             std::shared_ptr<task_wrapper>(std::string const&, uint64_t const,
                 std::shared_ptr<task_wrapper> const);
-        HPX_CXX_EXPORT using new_task_address_t = std::shared_ptr<task_wrapper>(
-            uintptr_t, uint64_t const, std::shared_ptr<task_wrapper> const);
-        HPX_CXX_EXPORT using sample_value_t = void(std::string const&, double);
-        HPX_CXX_EXPORT using send_t = void(uint64_t, uint64_t, uint64_t);
-        HPX_CXX_EXPORT using recv_t =
+        HPX_CXX_CORE_EXPORT using new_task_address_t =
+            std::shared_ptr<task_wrapper>(
+                uintptr_t, uint64_t const, std::shared_ptr<task_wrapper> const);
+        HPX_CXX_CORE_EXPORT using sample_value_t =
+            void(std::string const&, double);
+        HPX_CXX_CORE_EXPORT using send_t = void(uint64_t, uint64_t, uint64_t);
+        HPX_CXX_CORE_EXPORT using recv_t =
             void(uint64_t, uint64_t, uint64_t, uint64_t);
-        HPX_CXX_EXPORT using update_task_string_t =
+        HPX_CXX_CORE_EXPORT using update_task_string_t =
             std::shared_ptr<task_wrapper>(
                 std::shared_ptr<task_wrapper>, std::string const&);
-        HPX_CXX_EXPORT using update_task_address_t =
+        HPX_CXX_CORE_EXPORT using update_task_address_t =
             std::shared_ptr<task_wrapper>(
                 std::shared_ptr<task_wrapper>, uintptr_t);
-        HPX_CXX_EXPORT using start_t = void(std::shared_ptr<task_wrapper>);
-        HPX_CXX_EXPORT using stop_t = void(std::shared_ptr<task_wrapper>);
-        HPX_CXX_EXPORT using yield_t = void(std::shared_ptr<task_wrapper>);
+        HPX_CXX_CORE_EXPORT using start_t = void(std::shared_ptr<task_wrapper>);
+        HPX_CXX_CORE_EXPORT using stop_t = void(std::shared_ptr<task_wrapper>);
+        HPX_CXX_CORE_EXPORT using yield_t = void(std::shared_ptr<task_wrapper>);
 
         // Structure for compiler type-checking of function pointer assignment
-        HPX_CXX_EXPORT struct registration
+        HPX_CXX_CORE_EXPORT struct registration
         {
             functions_t type;
             union
@@ -98,59 +100,60 @@ namespace hpx::util {
                 yield_t* yield;
             } record;
         };
-        HPX_CXX_EXPORT using registration_t = registration;
+        HPX_CXX_CORE_EXPORT using registration_t = registration;
 
         // The actual function pointers. Some of them need to be exported,
         // because through the miracle of chained headers they get referenced
         // outside of the HPX library.
-        HPX_CXX_EXPORT HPX_CORE_EXPORT extern init_t* init_function;
-        HPX_CXX_EXPORT HPX_CORE_EXPORT extern finalize_t* finalize_function;
-        HPX_CXX_EXPORT HPX_CORE_EXPORT extern register_thread_t*
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT extern init_t* init_function;
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT extern finalize_t*
+            finalize_function;
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT extern register_thread_t*
             register_thread_function;
-        HPX_CXX_EXPORT HPX_CORE_EXPORT extern new_task_string_t*
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT extern new_task_string_t*
             new_task_string_function;
-        HPX_CXX_EXPORT HPX_CORE_EXPORT extern new_task_address_t*
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT extern new_task_address_t*
             new_task_address_function;
-        HPX_CXX_EXPORT HPX_CORE_EXPORT extern sample_value_t*
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT extern sample_value_t*
             sample_value_function;
-        HPX_CXX_EXPORT HPX_CORE_EXPORT extern send_t* send_function;
-        HPX_CXX_EXPORT HPX_CORE_EXPORT extern recv_t* recv_function;
-        HPX_CXX_EXPORT HPX_CORE_EXPORT extern update_task_string_t*
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT extern send_t* send_function;
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT extern recv_t* recv_function;
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT extern update_task_string_t*
             update_task_string_function;
-        HPX_CXX_EXPORT HPX_CORE_EXPORT extern update_task_address_t*
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT extern update_task_address_t*
             update_task_address_function;
-        HPX_CXX_EXPORT HPX_CORE_EXPORT extern start_t* start_function;
-        HPX_CXX_EXPORT HPX_CORE_EXPORT extern stop_t* stop_function;
-        HPX_CXX_EXPORT HPX_CORE_EXPORT extern yield_t* yield_function;
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT extern start_t* start_function;
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT extern stop_t* stop_function;
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT extern yield_t* yield_function;
 
         // The function registration interface
-        HPX_CXX_EXPORT HPX_CORE_EXPORT void register_external_timer(
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void register_external_timer(
             registration& registration_record);
 
         // The actual API. For all cases, check if the function pointer is null,
         // and if not null call the registered function.
-        HPX_CXX_EXPORT inline std::uint64_t init(char const* thread_name,
+        HPX_CXX_CORE_EXPORT inline std::uint64_t init(char const* thread_name,
             std::uint64_t const comm_rank, uint64_t const comm_size)
         {
             return (init_function == nullptr) ?
                 0ULL :
                 init_function(thread_name, comm_rank, comm_size);
         }
-        HPX_CXX_EXPORT inline void finalize(void)
+        HPX_CXX_CORE_EXPORT inline void finalize(void)
         {
             if (finalize_function != nullptr)
             {
                 finalize_function();
             }
         }
-        HPX_CXX_EXPORT inline void register_thread(std::string const& name)
+        HPX_CXX_CORE_EXPORT inline void register_thread(std::string const& name)
         {
             if (register_thread_function != nullptr)
             {
                 register_thread_function(name);
             }
         }
-        HPX_CXX_EXPORT inline std::shared_ptr<task_wrapper> new_task(
+        HPX_CXX_CORE_EXPORT inline std::shared_ptr<task_wrapper> new_task(
             std::string const& name, uint64_t const task_id,
             std::shared_ptr<task_wrapper> const parent_task)
         {
@@ -158,7 +161,7 @@ namespace hpx::util {
                 0ULL :
                 new_task_string_function(name, task_id, parent_task);
         }
-        HPX_CXX_EXPORT inline std::shared_ptr<task_wrapper> new_task(
+        HPX_CXX_CORE_EXPORT inline std::shared_ptr<task_wrapper> new_task(
             uintptr_t address, uint64_t const task_id,
             std::shared_ptr<task_wrapper> const parent_task)
         {
@@ -166,7 +169,7 @@ namespace hpx::util {
                 0ULL :
                 new_task_address_function(address, task_id, parent_task);
         }
-        HPX_CXX_EXPORT inline void send(
+        HPX_CXX_CORE_EXPORT inline void send(
             uint64_t tag, uint64_t size, uint64_t target)
         {
             if (send_function != nullptr)
@@ -174,7 +177,7 @@ namespace hpx::util {
                 send_function(tag, size, target);
             }
         }
-        HPX_CXX_EXPORT inline void recv(uint64_t tag, uint64_t size,
+        HPX_CXX_CORE_EXPORT inline void recv(uint64_t tag, uint64_t size,
             uint64_t source_rank, uint64_t source_thread)
         {
             if (recv_function != nullptr)
@@ -182,21 +185,21 @@ namespace hpx::util {
                 recv_function(tag, size, source_rank, source_thread);
             }
         }
-        HPX_CXX_EXPORT inline std::shared_ptr<task_wrapper> update_task(
+        HPX_CXX_CORE_EXPORT inline std::shared_ptr<task_wrapper> update_task(
             std::shared_ptr<task_wrapper> wrapper, std::string const& name)
         {
             return (update_task_string_function == nullptr) ?
                 0ULL :
                 update_task_string_function(wrapper, name);
         }
-        HPX_CXX_EXPORT inline std::shared_ptr<task_wrapper> update_task(
+        HPX_CXX_CORE_EXPORT inline std::shared_ptr<task_wrapper> update_task(
             std::shared_ptr<task_wrapper> wrapper, uintptr_t address)
         {
             return (update_task_address_function == nullptr) ?
                 0ULL :
                 update_task_address_function(wrapper, address);
         }
-        HPX_CXX_EXPORT inline void start(
+        HPX_CXX_CORE_EXPORT inline void start(
             std::shared_ptr<task_wrapper> task_wrapper_ptr)
         {
             if (start_function != nullptr)
@@ -204,7 +207,7 @@ namespace hpx::util {
                 start_function(task_wrapper_ptr);
             }
         }
-        HPX_CXX_EXPORT inline void stop(
+        HPX_CXX_CORE_EXPORT inline void stop(
             std::shared_ptr<task_wrapper> task_wrapper_ptr)
         {
             if (stop_function != nullptr)
@@ -220,12 +223,12 @@ namespace hpx::util {
             }
         }
 
-        HPX_CXX_EXPORT HPX_CORE_EXPORT std::shared_ptr<task_wrapper> new_task(
-            threads::thread_description const& description,
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT std::shared_ptr<task_wrapper>
+        new_task(threads::thread_description const& description,
             std::uint32_t parent_locality_id,
             threads::thread_id_type parent_task);
 
-        HPX_CXX_EXPORT inline std::shared_ptr<task_wrapper> update_task(
+        HPX_CXX_CORE_EXPORT inline std::shared_ptr<task_wrapper> update_task(
             std::shared_ptr<task_wrapper> wrapper,
             threads::thread_description const& description)
         {
@@ -252,7 +255,7 @@ namespace hpx::util {
 
         // This is a scoped object around task scheduling to measure the time
         // spent executing hpx threads
-        HPX_CXX_EXPORT struct scoped_timer
+        HPX_CXX_CORE_EXPORT struct scoped_timer
         {
             explicit scoped_timer(std::shared_ptr<task_wrapper> data_ptr)
               : stopped(false)
@@ -314,25 +317,25 @@ namespace hpx::util {
 
 namespace hpx::util::external_timer {
 
-    HPX_CXX_EXPORT struct task_wrapper
+    HPX_CXX_CORE_EXPORT struct task_wrapper
     {
     };
 
-    HPX_CXX_EXPORT inline std::shared_ptr<task_wrapper> new_task(
+    HPX_CXX_CORE_EXPORT inline std::shared_ptr<task_wrapper> new_task(
         threads::thread_description const&, std::uint32_t,
         threads::thread_id_type) noexcept
     {
         return {};
     }
 
-    HPX_CXX_EXPORT inline std::shared_ptr<task_wrapper> update_task(
+    HPX_CXX_CORE_EXPORT inline std::shared_ptr<task_wrapper> update_task(
         std::shared_ptr<task_wrapper>,
         threads::thread_description const&) noexcept
     {
         return {};
     }
 
-    HPX_CXX_EXPORT struct scoped_timer
+    HPX_CXX_CORE_EXPORT struct scoped_timer
     {
         explicit scoped_timer(std::shared_ptr<task_wrapper>) noexcept {}
 

@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2025 Hartmut Kaiser
+# Copyright (c) 2007-2026 Hartmut Kaiser
 # Copyright (c)      2011 Bryce Lelbach
 # Copyright (c)      2018 Nikunj Gupta
 #
@@ -44,8 +44,12 @@ add_library(
 )
 
 set_target_properties(hpx_wrap PROPERTIES POSITION_INDEPENDENT_CODE ON)
-target_link_libraries(hpx_wrap PRIVATE hpx_full)
-target_link_libraries(hpx_wrap PRIVATE hpx_init)
+if(HPX_WITH_DISTRIBUTED_RUNTIME)
+  target_link_libraries(hpx_wrap PRIVATE hpx_full)
+  target_link_libraries(hpx_wrap PRIVATE hpx_init)
+else()
+  target_link_libraries(hpx_wrap PRIVATE hpx_core)
+endif()
 target_link_libraries(hpx_wrap PRIVATE hpx_private_flags)
 target_compile_definitions(hpx_wrap PRIVATE HPX_LIBRARY_EXPORTS)
 target_include_directories(
@@ -55,6 +59,9 @@ target_include_directories(
 
 if(HPX_WITH_CXX_MODULES)
   hpx_configure_module_consumer(hpx_wrap hpx_core_module_if)
+  if(TARGET hpx_full_module_if)
+    hpx_configure_module_consumer(hpx_wrap hpx_full_module_if)
+  endif()
 endif()
 
 set_property(TARGET hpx_wrap PROPERTY FOLDER "Core")
@@ -99,8 +106,12 @@ if(NOT MSVC)
                          ${config_header}
   )
   set_target_properties(hpx_auto_wrap PROPERTIES POSITION_INDEPENDENT_CODE ON)
-  target_link_libraries(hpx_auto_wrap PRIVATE hpx_full)
-  target_link_libraries(hpx_auto_wrap PRIVATE hpx_init)
+  if(HPX_WITH_DISTRIBUTED_RUNTIME)
+    target_link_libraries(hpx_auto_wrap PRIVATE hpx_full)
+    target_link_libraries(hpx_auto_wrap PRIVATE hpx_init)
+  else()
+    target_link_libraries(hpx_auto_wrap PRIVATE hpx_core)
+  endif()
   target_link_libraries(hpx_auto_wrap PRIVATE hpx_private_flags)
   target_compile_definitions(
     hpx_auto_wrap PRIVATE HPX_LIBRARY_EXPORTS HPX_AUTO_WRAP_MAIN_ACTIVATE
@@ -112,6 +123,9 @@ if(NOT MSVC)
 
   if(HPX_WITH_CXX_MODULES)
     hpx_configure_module_consumer(hpx_auto_wrap hpx_core_module_if)
+    if(TARGET hpx_full_module_if)
+      hpx_configure_module_consumer(hpx_auto_wrap hpx_full_module_if)
+    endif()
   endif()
 
   set_property(TARGET hpx_auto_wrap PROPERTY FOLDER "Core")

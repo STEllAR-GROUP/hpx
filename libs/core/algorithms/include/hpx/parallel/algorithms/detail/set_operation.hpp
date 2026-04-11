@@ -19,14 +19,11 @@
 #include <hpx/parallel/util/foreach_partitioner.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 
-#if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
-#include <boost/shared_array.hpp>
-#else
 #include <memory>
-#endif
 
 #include <algorithm>
 #include <cstddef>
+#include <iterator>
 #include <type_traits>
 #include <utility>
 
@@ -34,7 +31,7 @@ namespace hpx::parallel::detail {
     /// \cond NOINTERNAL
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename FwdIter>
+    HPX_CXX_CORE_EXPORT template <typename FwdIter>
     struct set_operations_buffer
     {
         template <typename T>
@@ -72,7 +69,7 @@ namespace hpx::parallel::detail {
             value_type, rewritable_ref<value_type>>;
     };
 
-    HPX_CXX_EXPORT struct set_chunk_data
+    HPX_CXX_CORE_EXPORT struct set_chunk_data
     {
         static constexpr std::size_t uninit_start =
             static_cast<std::size_t>(-1);
@@ -92,9 +89,10 @@ namespace hpx::parallel::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename ExPolicy, typename Iter1, typename Sent1,
-        typename Iter2, typename Sent2, typename Iter3, typename F,
-        typename Proj1, typename Proj2, typename Combiner, typename SetOp>
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter1,
+        typename Sent1, typename Iter2, typename Sent2, typename Iter3,
+        typename F, typename Proj1, typename Proj2, typename Combiner,
+        typename SetOp>
     util::detail::algorithm_result_t<ExPolicy,
         util::in_in_out_result<Iter1, Iter2, Iter3>>
     set_operation(ExPolicy&& policy, Iter1 first1, Sent1 last1, Iter2 first2,
@@ -121,15 +119,9 @@ namespace hpx::parallel::detail {
 
         std::size_t const step = (len1 + cores - 1) / cores;
 
-#if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
         std::shared_ptr<buffer_type[]> buffer(
             new buffer_type[combiner(len1, len2)]);
         std::shared_ptr<set_chunk_data[]> chunks(new set_chunk_data[cores]);
-#else
-        boost::shared_array<buffer_type> buffer(
-            new buffer_type[combiner(len1, len2)]);
-        boost::shared_array<set_chunk_data> chunks(new set_chunk_data[cores]);
-#endif
 
         // first step, is applied to all partitions
         auto f1 = [=](set_chunk_data* curr_chunk,
@@ -222,14 +214,13 @@ namespace hpx::parallel::detail {
         // second step, is executed after all partitions are done running
 
         // different versions of clang-format produce different formatting
-        // clang-format off
         auto f2 = [buffer, chunks, cores, first1, first2, dest](
-                      auto&& data) -> result_type {
-            // clang-format on
+                      auto&&... data) -> result_type {
+            static_assert(sizeof...(data) < 2);
 
             // make sure iterators embedded in function object that is attached
             // to futures are invalidated
-            util::detail::clear_container(data);
+            util::detail::clear_container(data...);
 
             // accumulate real length and rightmost positions in input sequences
             std::size_t first1_pos = 0;

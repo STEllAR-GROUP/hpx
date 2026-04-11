@@ -1,12 +1,12 @@
 //  Copyright (c) 2015-2017 Francisco Jose Tapia
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/parallel/util/merge_four.hpp>
 
 #include <algorithm>
 #include <cstdint>
@@ -99,7 +99,7 @@ void test1()
     for (std::uint32_t i = 0; i < 10; ++i)
         A.push_back(i * 2 + 1);
     for (std::uint32_t i = 0; i < 10; ++i)
-        D.push_back(i * 2);
+        D.push_back(static_cast<std::uint64_t>(i * 2));
     X.resize(20, 0);
     RA = range_t(A.begin(), A.end());
     RD = range_t(D.begin(), D.end());
@@ -123,7 +123,7 @@ void test1()
     for (std::uint32_t i = 0; i < 10; ++i)
         B.push_back(i * 3 + 1);
     for (std::uint32_t i = 0; i < 10; ++i)
-        D.push_back(i * 3);
+        D.push_back(static_cast<std::uint64_t>(i * 3));
     X.resize(30, 0);
     RA = range_t(A.begin(), A.end());
     RB = range_t(B.begin(), B.end());
@@ -152,7 +152,7 @@ void test1()
     for (std::uint32_t i = 0; i < 10; ++i)
         C.push_back(i * 4 + 1);
     for (std::uint32_t i = 0; i < 10; ++i)
-        D.push_back(i * 4);
+        D.push_back(static_cast<std::uint64_t>(i * 4));
 
     X.resize(40, 0);
     RA = range_t(A.begin(), A.end());
@@ -318,7 +318,7 @@ void test3()
     for (std::uint32_t i = 0; i < 10; ++i)
         A.push_back(i * 2 + 1);
     for (std::uint32_t i = 0; i < 10; ++i)
-        D.push_back(i * 2);
+        D.push_back(static_cast<std::uint64_t>(i * 2));
     //X.resize ( 20, 0);
     RA = range_t(A.begin(), A.end());
     RD = range_t(D.begin(), D.end());
@@ -342,7 +342,7 @@ void test3()
     for (std::uint32_t i = 0; i < 10; ++i)
         B.push_back(i * 3 + 1);
     for (std::uint32_t i = 0; i < 10; ++i)
-        D.push_back(i * 3);
+        D.push_back(static_cast<std::uint64_t>(i * 3));
     //X.resize ( 30 , 0);
     RA = range_t(A.begin(), A.end());
     RB = range_t(B.begin(), B.end());
@@ -371,7 +371,7 @@ void test3()
     for (std::uint32_t i = 0; i < 10; ++i)
         C.push_back(i * 4 + 1);
     for (std::uint32_t i = 0; i < 10; ++i)
-        D.push_back(i * 4);
+        D.push_back(static_cast<std::uint64_t>(i * 4));
 
     //X.resize ( 40 , 0);
     RA = range_t(A.begin(), A.end());

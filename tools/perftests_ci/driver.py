@@ -166,7 +166,7 @@ def plot():
 @args.arg('--references', required=True, nargs='+', help='List of \
     references for all corresponding results')
 @args.arg('--results', required=True, nargs='+', help='List of \
-    references for all corresponding results')
+    all results')
 def compare(output, references, results):
     mkdirp(output)
     from perftest import plot

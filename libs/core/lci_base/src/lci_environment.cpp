@@ -44,6 +44,9 @@ namespace hpx { namespace util {
                         get_entry_as(cfg, "hpx.parcel.lci.priority", 0))) ||
                 (get_entry_as(cfg, "hpx.parcel.mpi.enable", 1) &&
                     (get_entry_as(cfg, "hpx.parcel.mpi.priority", 1) >
+                        get_entry_as(cfg, "hpx.parcel.lci.priority", 0))) ||
+                (get_entry_as(cfg, "hpx.parcel.lcw.enable", 1) &&
+                    (get_entry_as(cfg, "hpx.parcel.lcw.priority", 1) >
                         get_entry_as(cfg, "hpx.parcel.lci.priority", 0))))
             {
                 LBT_(info)
@@ -135,7 +138,7 @@ namespace hpx { namespace util {
         rtcfg.add_entry("hpx.parcel.lci.rank", std::to_string(this_rank));
 
 #ifdef HPX_HAVE_PARCELPORT_LCI_LOG
-        const char* const log_levels[] = {"none", "profile", "debug"};
+        char const* const log_levels[] = {"none", "profile", "debug"};
         log_ctx = LCT_log_ctx_alloc(log_levels,
             sizeof(log_levels) / sizeof(log_levels[0]), 0, "hpx_lci",
             getenv("HPX_LCI_LOG_OUTFILE"), getenv("HPX_LCI_LOG_LEVEL"),

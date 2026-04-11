@@ -49,26 +49,24 @@ namespace hpx {
         // real function based API that dispatches to the CPO. Once
         // dataflow<Action>(...) has been removed, this CPO can be moved to
         // namespace hpx.
-        HPX_CXX_EXPORT inline constexpr struct dataflow_t final
+        HPX_CXX_CORE_EXPORT inline constexpr struct dataflow_t final
           : hpx::functional::detail::tag_fallback<dataflow_t>
         {
         private:
-            // clang-format off
             template <typename F, typename... Ts,
                 HPX_CONCEPT_REQUIRES_(
-                    !hpx::traits::is_allocator_v<std::decay_t<F>>
-                )>
-            // clang-format on
+                    !hpx::traits::is_allocator_v<std::decay_t<F>>)>
             friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
                 dataflow_t tag, F&& f, Ts&&... ts)
-                -> decltype(tag(hpx::util::thread_local_caching_allocator<
-                                    hpx::lockfree::variable_size_stack, char,
-                                    hpx::util::internal_allocator<>>{},
+                -> decltype(hpx::functional::tag_invoke(tag,
+                    hpx::util::thread_local_caching_allocator<
+                        hpx::lockfree::variable_size_stack,
+                        hpx::util::internal_allocator<>>{},
                     HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
             {
                 using allocator_type =
                     hpx::util::thread_local_caching_allocator<
-                        hpx::lockfree::variable_size_stack, char,
+                        hpx::lockfree::variable_size_stack,
                         hpx::util::internal_allocator<>>;
                 return hpx::functional::tag_invoke(tag, allocator_type{},
                     HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
@@ -76,7 +74,7 @@ namespace hpx {
         } dataflow{};
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename F, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename F, typename... Ts>
     HPX_FORCEINLINE decltype(auto) dataflow(F&& f, Ts&&... ts)
     {
         return hpx::detail::dataflow(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);

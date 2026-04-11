@@ -15,7 +15,7 @@
 namespace hpx::traits {
 
     // By default, we don't know anything about the function's name
-    HPX_CXX_EXPORT template <typename F, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename F, typename Enable = void>
     struct get_function_annotation
     {
         static constexpr char const* call(F const& /*f*/) noexcept
@@ -25,7 +25,7 @@ namespace hpx::traits {
     };
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-    HPX_CXX_EXPORT template <typename F, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename F, typename Enable = void>
     struct get_function_annotation_itt
     {
         static util::itt::string_handle call(F const& f)

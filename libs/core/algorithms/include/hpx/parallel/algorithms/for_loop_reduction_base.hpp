@@ -15,11 +15,7 @@
 #include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/execution.hpp>
 
-#if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
-#include <boost/shared_array.hpp>
-#else
 #include <memory>
-#endif
 
 #include <cstddef>
 #include <type_traits>
@@ -29,7 +25,7 @@
 namespace hpx::parallel::detail {
 
     ///////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename T, typename Op>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Op>
     struct reduction_helper
     {
         using needs_current_thread_num = void;
@@ -80,11 +76,7 @@ namespace hpx::parallel::detail {
     private:
         T& var_;
         Op op_;
-#if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
         std::shared_ptr<hpx::util::cache_line_data<T>[]> data_;
-#else
-        boost::shared_array<hpx::util::cache_line_data<T>> data_;
-#endif
     };
 }    // namespace hpx::parallel::detail
 /// \endcond
@@ -143,7 +135,7 @@ namespace hpx::experimental {
     ///          views are combined by invoking the copy of combiner, passing
     ///          it the two views to be combined.
     ///
-    HPX_CXX_EXPORT template <typename T, typename Op>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Op>
     HPX_FORCEINLINE constexpr hpx::parallel::detail::reduction_helper<T,
         std::decay_t<Op>>
     reduction(T& var, T const& identity, Op&& combiner)
@@ -152,7 +144,7 @@ namespace hpx::experimental {
             var, identity, HPX_FORWARD(Op, combiner));
     }
 
-    HPX_CXX_EXPORT template <typename T, typename Op>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Op>
     HPX_FORCEINLINE constexpr hpx::parallel::detail::reduction_helper<T,
         std::decay_t<Op>>
     reduction(T& var, Op&& combiner)

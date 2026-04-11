@@ -117,6 +117,7 @@ namespace hpx {
 
 #include <algorithm>
 #include <cstddef>
+#include <iterator>
 #include <type_traits>
 #include <utility>
 
@@ -127,7 +128,7 @@ namespace hpx::parallel {
     namespace detail {
         /// \cond NOINTERNAL
 
-        HPX_CXX_EXPORT template <typename IterPair>
+        HPX_CXX_CORE_EXPORT template <typename IterPair>
         struct move_pair : public algorithm<move_pair<IterPair>, IterPair>
         {
             move_pair()
@@ -138,7 +139,7 @@ namespace hpx::parallel {
             template <typename ExPolicy, typename InIter, typename Sent,
                 typename OutIter>
             static constexpr std::enable_if_t<
-                !hpx::traits::is_random_access_iterator_v<InIter>,
+                !std::random_access_iterator<InIter>,
                 util::in_out_result<InIter, OutIter>>
             sequential(ExPolicy, InIter first, Sent last, OutIter dest)
             {
@@ -148,7 +149,7 @@ namespace hpx::parallel {
             template <typename ExPolicy, typename InIter, typename Sent,
                 typename OutIter>
             static constexpr std::enable_if_t<
-                hpx::traits::is_random_access_iterator_v<InIter>,
+                std::random_access_iterator<InIter>,
                 util::in_out_result<InIter, OutIter>>
             sequential(ExPolicy, InIter first, Sent last, OutIter dest)
             {
@@ -180,11 +181,11 @@ namespace hpx::parallel {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_EXPORT template <typename FwdIter1, typename FwdIter2,
+        HPX_CXX_CORE_EXPORT template <typename FwdIter1, typename FwdIter2,
             typename Enable = void>
         struct move;
 
-        HPX_CXX_EXPORT template <typename FwdIter1, typename FwdIter2>
+        HPX_CXX_CORE_EXPORT template <typename FwdIter1, typename FwdIter2>
         struct move<FwdIter1, FwdIter2,
             std::enable_if_t<
                 iterators_are_segmented<FwdIter1, FwdIter2>::value>>
@@ -196,7 +197,7 @@ namespace hpx::parallel {
         {
         };
 
-        HPX_CXX_EXPORT template <typename FwdIter1, typename FwdIter2>
+        HPX_CXX_CORE_EXPORT template <typename FwdIter1, typename FwdIter2>
         struct move<FwdIter1, FwdIter2,
             std::enable_if_t<
                 iterators_are_not_segmented<FwdIter1, FwdIter2>::value>>
@@ -211,7 +212,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::move
-    HPX_CXX_EXPORT inline constexpr struct move_t
+    HPX_CXX_CORE_EXPORT inline constexpr struct move_t
       : hpx::detail::tag_parallel_algorithm<move_t>
     {
     private:

@@ -1,5 +1,6 @@
 //  Copyright (c) 2021 Srinivas Yadav
 //  copyright (c) 2014 Grant Mercer
+//  Copyright (c) 2024 Aneek Barman
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -78,6 +79,18 @@ void find_first_of_bad_alloc_test()
     test_find_first_of_bad_alloc<std::forward_iterator_tag>();
 }
 
+void find_first_of_edge_cases_test()
+{
+    using namespace hpx::execution;
+    // Run edge-case checks for all three standard policies.
+    // These verify empty-range boundary conditions and that the inner
+    // search loop short-circuits after the first needle match
+    // (regression guard for the missing `return;` fix).
+    test_find_first_of_edge_cases(seq);
+    test_find_first_of_edge_cases(par);
+    test_find_first_of_edge_cases(par_unseq);
+}
+
 int hpx_main(hpx::program_options::variables_map& vm)
 {
     if (vm.count("seed"))
@@ -89,6 +102,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     find_first_of_test();
     find_first_of_exception_test();
     find_first_of_bad_alloc_test();
+    find_first_of_edge_cases_test();
     return hpx::local::finalize();
 }
 

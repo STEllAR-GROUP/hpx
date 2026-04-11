@@ -103,6 +103,7 @@ namespace hpx {
 
 #include <algorithm>
 #include <array>
+#include <concepts>
 #include <cstddef>    // for size_t
 #include <tuple>
 #include <type_traits>
@@ -120,13 +121,14 @@ namespace hpx {
 
 namespace hpx {
 
-    HPX_CXX_EXPORT template <typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename... Ts>
     class tuple;
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct tuple_size;    // undefined
 
-    HPX_CXX_EXPORT template <std::size_t I, typename T, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <std::size_t I, typename T,
+        typename Enable = void>
     struct tuple_element;    // undefined
 
     // Hide implementations of get<> inside an internal namespace to be able to
@@ -134,28 +136,28 @@ namespace hpx {
     // hpx::util.
     namespace adl_barrier {
 
-        HPX_CXX_EXPORT template <std::size_t I, typename Tuple,
+        HPX_CXX_CORE_EXPORT template <std::size_t I, typename Tuple,
             typename Enable =
                 std::void_t<typename hpx::tuple_element<I, Tuple>::type>>
         constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
             typename hpx::tuple_element<I, Tuple>::type&
             get(Tuple& t) noexcept;
 
-        HPX_CXX_EXPORT template <std::size_t I, typename Tuple,
+        HPX_CXX_CORE_EXPORT template <std::size_t I, typename Tuple,
             typename Enable =
                 std::void_t<typename hpx::tuple_element<I, Tuple>::type>>
         constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
             typename hpx::tuple_element<I, Tuple>::type const&
             get(Tuple const& t) noexcept;
 
-        HPX_CXX_EXPORT template <std::size_t I, typename Tuple,
+        HPX_CXX_CORE_EXPORT template <std::size_t I, typename Tuple,
             typename Enable = std::void_t<
                 typename hpx::tuple_element<I, std::decay_t<Tuple>>::type>>
         constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
             typename hpx::tuple_element<I, Tuple>::type&&
             get(Tuple&& t) noexcept;
 
-        HPX_CXX_EXPORT template <std::size_t I, typename Tuple,
+        HPX_CXX_CORE_EXPORT template <std::size_t I, typename Tuple,
             typename Enable =
                 std::void_t<typename hpx::tuple_element<I, Tuple>::type>>
         constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
@@ -167,46 +169,61 @@ namespace hpx {
     // it can be injected into the std:: namespace
     namespace std_adl_barrier {
 
-        HPX_CXX_EXPORT template <std::size_t I, typename... Ts>
+        HPX_CXX_CORE_EXPORT template <std::size_t I, typename... Ts>
         constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
             typename hpx::tuple_element<I, hpx::tuple<Ts...>>::type&
             get(hpx::tuple<Ts...>& t) noexcept;
 
-        HPX_CXX_EXPORT template <std::size_t I, typename... Ts>
+        HPX_CXX_CORE_EXPORT template <std::size_t I, typename... Ts>
         constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
             typename hpx::tuple_element<I, hpx::tuple<Ts...>>::type const&
             get(hpx::tuple<Ts...> const& t) noexcept;
 
-        HPX_CXX_EXPORT template <std::size_t I, typename... Ts>
+        HPX_CXX_CORE_EXPORT template <std::size_t I, typename... Ts>
         constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
             typename hpx::tuple_element<I, hpx::tuple<Ts...>>::type&&
             get(hpx::tuple<Ts...>&& t) noexcept;
 
-        HPX_CXX_EXPORT template <std::size_t I, typename... Ts>
+        HPX_CXX_CORE_EXPORT template <std::size_t I, typename... Ts>
         constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
             typename hpx::tuple_element<I, hpx::tuple<Ts...>>::type const&&
             get(hpx::tuple<Ts...> const&& t) noexcept;
     }    // namespace std_adl_barrier
 
-    using hpx::adl_barrier::get;
-    using hpx::std_adl_barrier::get;
+    HPX_CXX_CORE_EXPORT using hpx::adl_barrier::get;
+    HPX_CXX_CORE_EXPORT using hpx::std_adl_barrier::get;
 }    // namespace hpx
 
 // Adapt hpx::tuple to be usable with structured binding contexts
 namespace std {
 
-    template <typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename... Ts>
     struct tuple_size<hpx::tuple<Ts...>> : hpx::tuple_size<hpx::tuple<Ts...>>
     {
     };
 
-    template <std::size_t I, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <std::size_t I, typename... Ts>
     struct tuple_element<I, hpx::tuple<Ts...>>
       : hpx::tuple_element<I, hpx::tuple<Ts...>>
     {
     };
 
-    using hpx::std_adl_barrier::get;
+    HPX_CXX_CORE_EXPORT using hpx::std_adl_barrier::get;
+
+    // Specialize basic_common_reference for hpx::tuple so that types like
+    // zip_iterator can satisfy std::indirectly_readable (which requires
+    // common_reference_with between iter_reference_t<I>&& and
+    // iter_value_t<I>&).
+    template <typename... Ts, typename... Us, template <class> class TQual,
+        template <class> class UQual>
+        requires(sizeof...(Ts) == sizeof...(Us)) && requires {
+            typename hpx::tuple<common_reference_t<TQual<Ts>, UQual<Us>>...>;
+        }
+    struct basic_common_reference<hpx::tuple<Ts...>, hpx::tuple<Us...>, TQual,
+        UQual>
+    {
+        using type = hpx::tuple<common_reference_t<TQual<Ts>, UQual<Us>>...>;
+    };
 }    // namespace std
 
 namespace hpx {
@@ -297,7 +314,7 @@ namespace hpx {
 #endif
     };
 
-    HPX_CXX_EXPORT template <typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename... Ts>
     class tuple    //-V690
     {
         using index_pack = util::make_index_pack_t<sizeof...(Ts)>;
@@ -556,83 +573,83 @@ namespace hpx {
 
     // template <class Tuple>
     // class tuple_size
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct tuple_size
     {
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct tuple_size<T const> : tuple_size<T>
     {
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct tuple_size<T volatile> : tuple_size<T>
     {
     };
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct tuple_size<T const volatile> : tuple_size<T>
     {
     };
 
-    HPX_CXX_EXPORT template <typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename... Ts>
     struct tuple_size<tuple<Ts...>>
       : std::integral_constant<std::size_t, sizeof...(Ts)>
     {
     };
 
-    HPX_CXX_EXPORT template <typename T0, typename T1>
+    HPX_CXX_CORE_EXPORT template <typename T0, typename T1>
     struct tuple_size<std::pair<T0, T1>>
       : std::integral_constant<std::size_t, 2>
     {
     };
 
-    HPX_CXX_EXPORT template <typename Type, std::size_t Size>
+    HPX_CXX_CORE_EXPORT template <typename Type, std::size_t Size>
     struct tuple_size<std::array<Type, Size>>
       : std::integral_constant<std::size_t, Size>
     {
     };
 
 #if defined(HPX_DATASTRUCTURES_HAVE_ADAPT_STD_TUPLE)
-    HPX_CXX_EXPORT template <typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename... Ts>
     struct tuple_size<std::tuple<Ts...>> : std::tuple_size<std::tuple<Ts...>>
     {
     };
 #endif
 
-    HPX_CXX_EXPORT template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     inline constexpr std::size_t tuple_size_v = tuple_size<T>::value;
 
     // template <size_t I, class Tuple>
     // class tuple_element
-    HPX_CXX_EXPORT template <std::size_t I, typename T, typename Enable>
+    HPX_CXX_CORE_EXPORT template <std::size_t I, typename T, typename Enable>
     struct tuple_element
     {
     };
 
-    HPX_CXX_EXPORT template <std::size_t I, typename T>
+    HPX_CXX_CORE_EXPORT template <std::size_t I, typename T>
     struct tuple_element<I, T const,
         std::void_t<typename tuple_element<I, T>::type>>
       : std::add_const<typename tuple_element<I, T>::type>
     {
     };
 
-    HPX_CXX_EXPORT template <std::size_t I, typename T>
+    HPX_CXX_CORE_EXPORT template <std::size_t I, typename T>
     struct tuple_element<I, T volatile,
         std::void_t<typename tuple_element<I, T>::type>>
       : std::add_volatile<typename tuple_element<I, T>::type>
     {
     };
 
-    HPX_CXX_EXPORT template <std::size_t I, typename T>
+    HPX_CXX_CORE_EXPORT template <std::size_t I, typename T>
     struct tuple_element<I, T const volatile,
         std::void_t<typename tuple_element<I, T>::type>>
       : std::add_cv<typename tuple_element<I, T>::type>
     {
     };
 
-    HPX_CXX_EXPORT template <std::size_t I, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <std::size_t I, typename... Ts>
     struct tuple_element<I, tuple<Ts...>>
     {
         using type = typename util::at_index<I, Ts...>::type;
@@ -650,7 +667,7 @@ namespace hpx {
         }
     };
 
-    HPX_CXX_EXPORT template <typename T0, typename T1>
+    HPX_CXX_CORE_EXPORT template <typename T0, typename T1>
     struct tuple_element<0, std::pair<T0, T1>>
     {
         using type = T0;
@@ -668,7 +685,7 @@ namespace hpx {
         }
     };
 
-    HPX_CXX_EXPORT template <typename T0, typename T1>
+    HPX_CXX_CORE_EXPORT template <typename T0, typename T1>
     struct tuple_element<1, std::pair<T0, T1>>
     {
         using type = T1;
@@ -686,7 +703,8 @@ namespace hpx {
         }
     };
 
-    HPX_CXX_EXPORT template <std::size_t I, typename Type, std::size_t Size>
+    HPX_CXX_CORE_EXPORT template <std::size_t I, typename Type,
+        std::size_t Size>
     struct tuple_element<I, std::array<Type, Size>>
     {
         using type = Type;
@@ -712,7 +730,7 @@ namespace hpx {
     };
 
 #if defined(HPX_DATASTRUCTURES_HAVE_ADAPT_STD_TUPLE)
-    HPX_CXX_EXPORT template <std::size_t I, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <std::size_t I, typename... Ts>
     struct tuple_element<I, std::tuple<Ts...>>
     {
         using type = std::tuple_element_t<I, std::tuple<Ts...>>;
@@ -743,7 +761,7 @@ namespace hpx {
     };
 #endif
 
-    HPX_CXX_EXPORT template <std::size_t I, typename T>
+    HPX_CXX_CORE_EXPORT template <std::size_t I, typename T>
     using tuple_element_t = typename tuple_element<I, T>::type;
 
     // 20.4.2.6, element access
@@ -752,7 +770,8 @@ namespace hpx {
         // template <size_t I, class... Types>
         // constexpr typename tuple_element<I, tuple<Types...> >::type&
         // get(tuple<Types...>& t) noexcept;
-        HPX_CXX_EXPORT template <std::size_t I, typename Tuple, typename Enable>
+        HPX_CXX_CORE_EXPORT template <std::size_t I, typename Tuple,
+            typename Enable>
         constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
             typename tuple_element<I, Tuple>::type&
             get(Tuple& t) noexcept
@@ -763,7 +782,8 @@ namespace hpx {
         // template <size_t I, class... Types>
         // constexpr typename tuple_element<I, tuple<Types...> >::type const&
         // get(const tuple<Types...>& t) noexcept;
-        HPX_CXX_EXPORT template <std::size_t I, typename Tuple, typename Enable>
+        HPX_CXX_CORE_EXPORT template <std::size_t I, typename Tuple,
+            typename Enable>
         constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
             typename tuple_element<I, Tuple>::type const&
             get(Tuple const& t) noexcept
@@ -774,7 +794,8 @@ namespace hpx {
         // template <size_t I, class... Types>
         // constexpr typename tuple_element<I, tuple<Types...> >::type&&
         // get(tuple<Types...>&& t) noexcept;
-        HPX_CXX_EXPORT template <std::size_t I, typename Tuple, typename Enable>
+        HPX_CXX_CORE_EXPORT template <std::size_t I, typename Tuple,
+            typename Enable>
         constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
             typename tuple_element<I, Tuple>::type&&
             get(Tuple&& t) noexcept
@@ -786,7 +807,8 @@ namespace hpx {
         // template <size_t I, class... Types>
         // constexpr typename tuple_element<I, tuple<Types...> >::type const&&
         // get(const tuple<Types...>&& t) noexcept;
-        HPX_CXX_EXPORT template <std::size_t I, typename Tuple, typename Enable>
+        HPX_CXX_CORE_EXPORT template <std::size_t I, typename Tuple,
+            typename Enable>
         constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
             typename tuple_element<I, Tuple>::type const&&
             get(Tuple const&& t) noexcept
@@ -798,7 +820,7 @@ namespace hpx {
 
     namespace std_adl_barrier {
 
-        HPX_CXX_EXPORT template <std::size_t I, typename... Ts>
+        HPX_CXX_CORE_EXPORT template <std::size_t I, typename... Ts>
         constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
             typename tuple_element<I, tuple<Ts...>>::type&
             get(tuple<Ts...>& t) noexcept
@@ -806,7 +828,7 @@ namespace hpx {
             return tuple_element<I, tuple<Ts...>>::get(t);
         }
 
-        HPX_CXX_EXPORT template <std::size_t I, typename... Ts>
+        HPX_CXX_CORE_EXPORT template <std::size_t I, typename... Ts>
         constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
             typename tuple_element<I, tuple<Ts...>>::type const&
             get(tuple<Ts...> const& t) noexcept
@@ -814,7 +836,7 @@ namespace hpx {
             return tuple_element<I, tuple<Ts...>>::get(t);
         }
 
-        HPX_CXX_EXPORT template <std::size_t I, typename... Ts>
+        HPX_CXX_CORE_EXPORT template <std::size_t I, typename... Ts>
         constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
             typename tuple_element<I, tuple<Ts...>>::type&&
             get(tuple<Ts...>&& t) noexcept
@@ -823,7 +845,7 @@ namespace hpx {
                 get<I>(t));
         }
 
-        HPX_CXX_EXPORT template <std::size_t I, typename... Ts>
+        HPX_CXX_CORE_EXPORT template <std::size_t I, typename... Ts>
         constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
             typename tuple_element<I, tuple<Ts...>>::type const&&
             get(tuple<Ts...> const&& t) noexcept
@@ -834,11 +856,11 @@ namespace hpx {
     }    // namespace std_adl_barrier
 
     // 20.4.2.4, tuple creation functions
-    HPX_CXX_EXPORT inline constexpr hpx::detail::ignore_type ignore = {};
+    HPX_CXX_CORE_EXPORT inline constexpr hpx::detail::ignore_type ignore = {};
 
     // template<class... Types>
     // constexpr tuple<VTypes...> make_tuple(Types&&... t);
-    HPX_CXX_EXPORT template <typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename... Ts>
     constexpr HPX_HOST_DEVICE HPX_FORCEINLINE tuple<util::decay_unwrap_t<Ts>...>
     make_tuple(Ts&&... ts)
     {
@@ -851,7 +873,7 @@ namespace hpx {
     // forwarding as arguments to a function. Because the result may contain
     // references to temporary variables, a program shall ensure that the
     // return value of this function does not outlive any of its arguments.
-    HPX_CXX_EXPORT template <typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename... Ts>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr tuple<Ts&&...> forward_as_tuple(
         Ts&&... ts) noexcept
     {
@@ -860,7 +882,7 @@ namespace hpx {
 
     // template<class... Types>
     // tuple<Types&...> tie(Types&... t) noexcept;
-    HPX_CXX_EXPORT template <typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename... Ts>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr tuple<Ts&...> tie(
         Ts&... ts) noexcept
     {
@@ -969,7 +991,7 @@ namespace hpx {
         }
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename... Tuples>
+    HPX_CXX_CORE_EXPORT template <typename... Tuples>
     constexpr HPX_HOST_DEVICE HPX_FORCEINLINE auto tuple_cat(Tuples&&... tuples)
         -> decltype(hpx::detail::tuple_cat_impl(
             util::make_index_pack_t<
@@ -1018,7 +1040,7 @@ namespace hpx {
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename... Ts, typename... Us>
+    HPX_CXX_CORE_EXPORT template <typename... Ts, typename... Us>
     constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
         std::enable_if_t<sizeof...(Ts) == sizeof...(Us), bool>
         operator==(tuple<Ts...> const& t, tuple<Us...> const& u)
@@ -1029,7 +1051,7 @@ namespace hpx {
     // template<class... TTypes, class... UTypes>
     // constexpr bool operator!=
     //     (const tuple<TTypes...>& t, const tuple<UTypes...>& u);
-    HPX_CXX_EXPORT template <typename... Ts, typename... Us>
+    HPX_CXX_CORE_EXPORT template <typename... Ts, typename... Us>
     constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
         std::enable_if_t<sizeof...(Ts) == sizeof...(Us), bool>
         operator!=(tuple<Ts...> const& t, tuple<Us...> const& u)
@@ -1071,7 +1093,7 @@ namespace hpx {
         };
     }    // namespace detail
 
-    HPX_CXX_EXPORT template <typename... Ts, typename... Us>
+    HPX_CXX_CORE_EXPORT template <typename... Ts, typename... Us>
     constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
         std::enable_if_t<sizeof...(Ts) == sizeof...(Us), bool>
         operator<(tuple<Ts...> const& t, tuple<Us...> const& u)
@@ -1082,7 +1104,7 @@ namespace hpx {
     // template<class... TTypes, class... UTypes>
     // constexpr bool operator>
     //     (const tuple<TTypes...>& t, const tuple<UTypes...>& u);
-    HPX_CXX_EXPORT template <typename... Ts, typename... Us>
+    HPX_CXX_CORE_EXPORT template <typename... Ts, typename... Us>
     constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
         std::enable_if_t<sizeof...(Ts) == sizeof...(Us), bool>
         operator>(tuple<Ts...> const& t, tuple<Us...> const& u)
@@ -1093,7 +1115,7 @@ namespace hpx {
     // template<class... TTypes, class... UTypes>
     // constexpr bool operator<=
     //     (const tuple<TTypes...>& t, const tuple<UTypes...>& u);
-    HPX_CXX_EXPORT template <typename... Ts, typename... Us>
+    HPX_CXX_CORE_EXPORT template <typename... Ts, typename... Us>
     constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
         std::enable_if_t<sizeof...(Ts) == sizeof...(Us), bool>
         operator<=(tuple<Ts...> const& t, tuple<Us...> const& u)
@@ -1104,7 +1126,7 @@ namespace hpx {
     // template<class... TTypes, class... UTypes>
     // constexpr bool operator>=
     //     (const tuple<TTypes...>& t, const tuple<UTypes...>& u);
-    HPX_CXX_EXPORT template <typename... Ts, typename... Us>
+    HPX_CXX_CORE_EXPORT template <typename... Ts, typename... Us>
     constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
         std::enable_if_t<sizeof...(Ts) == sizeof...(Us), bool>
         operator>=(tuple<Ts...> const& t, tuple<Us...> const& u)
@@ -1117,7 +1139,7 @@ namespace hpx {
     // template <class... Types>
     // void swap(tuple<Types...>& x, tuple<Types...>& y) noexcept(x.swap(y));
     // x.swap(y)
-    HPX_CXX_EXPORT template <typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename... Ts>
     HPX_HOST_DEVICE HPX_FORCEINLINE void swap(
         tuple<Ts...>& x, tuple<Ts...>& y) noexcept(noexcept(x.swap(y)))
     {
@@ -1133,7 +1155,7 @@ namespace hpx {
     // A real fix for this problem is proposed in PR0022R0
     // (http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0022r0.html)
     //
-    HPX_CXX_EXPORT template <typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename... Ts>
     HPX_HOST_DEVICE HPX_FORCEINLINE void swap(
         tuple<Ts&...>&& x, tuple<Ts&...>&& y) noexcept(noexcept(x.swap(y)))
     {

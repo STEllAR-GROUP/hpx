@@ -223,9 +223,9 @@ namespace hpx { namespace collectives {
 #include <hpx/async_distributed/async.hpp>
 #include <hpx/collectives/argument_types.hpp>
 #include <hpx/collectives/create_communicator.hpp>
-#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/async_base.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/type_support.hpp>
 
@@ -233,6 +233,26 @@ namespace hpx { namespace collectives {
 #include <type_traits>
 #include <utility>
 #include <vector>
+
+namespace hpx::collectives::detail {
+
+    template <typename T, typename InIter, typename Sent, typename OutIter,
+        typename Op>
+    constexpr void inclusive_scan(
+        InIter first, Sent last, OutIter dest, Op&& op)
+    {
+        if (first != last)
+        {
+            T init = *first++;
+            *dest++ = init;
+            for (/* */; first != last; (void) ++first, ++dest)
+            {
+                init = HPX_INVOKE(op, HPX_MOVE(init), *first);
+                *dest = init;
+            }
+        }
+    }
+}    // namespace hpx::collectives::detail
 
 namespace hpx::traits {
 
@@ -270,18 +290,22 @@ namespace hpx::traits {
                     std::size_t which) mutable {
                     if (!data_available)
                     {
-                        std::vector<std::decay_t<T>> dest;
+                        using T_ = std::decay_t<T>;
+
+                        std::vector<T_> dest;
                         dest.resize(data.size());
 
-                        if constexpr (!std::is_same_v<std::decay_t<T>, bool>)
+                        if constexpr (!std::is_same_v<T_, bool>)
                         {
-                            hpx::inclusive_scan(data.begin(), data.end(),
-                                dest.begin(), HPX_FORWARD(F, op));
+                            collectives::detail::inclusive_scan<T_>(
+                                data.begin(), data.end(), dest.begin(),
+                                HPX_FORWARD(F, op));
                         }
                         else
                         {
-                            hpx::inclusive_scan(data.begin(), data.end(),
-                                dest.begin(), [&](auto lhs, auto rhs) {
+                            collectives::detail::inclusive_scan<T_>(
+                                data.begin(), data.end(), dest.begin(),
+                                [&](auto lhs, auto rhs) {
                                     return HPX_FORWARD(F, op)(
                                         static_cast<bool>(lhs),
                                         static_cast<bool>(rhs));

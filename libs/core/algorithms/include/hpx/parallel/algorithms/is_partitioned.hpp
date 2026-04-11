@@ -115,6 +115,7 @@ namespace hpx {
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
@@ -124,6 +125,7 @@ namespace hpx {
 
 #include <algorithm>
 #include <cstddef>
+#include <cstdint>
 #include <iterator>
 #include <type_traits>
 #include <utility>
@@ -136,7 +138,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        HPX_CXX_EXPORT template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         inline bool sequential_is_partitioned(std::vector<T>&& res)
         {
             auto first = res.begin();
@@ -158,7 +160,7 @@ namespace hpx::parallel {
             return true;
         }
 
-        HPX_CXX_EXPORT template <typename Iter, typename Sent>
+        HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent>
         struct is_partitioned
           : public algorithm<is_partitioned<Iter, Sent>, bool>
         {
@@ -177,17 +179,25 @@ namespace hpx::parallel {
                         HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)));
             }
 
-            template <typename ExPolicy, typename Pred, typename Proj>
-            static decltype(auto) parallel(ExPolicy&& policy, Iter first,
-                Sent last, Pred&& pred, Proj&& proj)
+            template <typename ExPolicy, typename Iter_, typename Sent_,
+                typename Pred, typename Proj>
+            static decltype(auto) parallel(ExPolicy&& policy, Iter_ first,
+                Sent_ last, Pred&& pred, Proj&& proj)
             {
                 using difference_type =
-                    typename std::iterator_traits<Iter>::difference_type;
+                    typename std::iterator_traits<Iter_>::difference_type;
                 using result = util::detail::algorithm_result<ExPolicy, bool>;
                 constexpr bool has_scheduler_executor =
                     hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
-                difference_type count = std::distance(first, last);
+                if constexpr (!has_scheduler_executor)
+                {
+                    if (first == last)
+                        return result::get(true);
+                }
+
+                difference_type count =
+                    hpx::parallel::detail::distance(first, last);
 
                 if constexpr (!has_scheduler_executor)
                 {
@@ -198,13 +208,10 @@ namespace hpx::parallel {
                 util::invoke_projected<Pred, Proj> pred_projected(
                     HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
                 util::cancellation_token<> tok;
-                using intermediate_result_t =
-                    std::conditional_t<has_scheduler_executor, char, bool>;
+                using intermediate_result_t = std::uint8_t;
 
-                // Note: replacing the invoke() with HPX_INVOKE()
-                // below makes gcc generate errors
                 auto f1 = [tok, pred_projected = HPX_MOVE(pred_projected)](
-                              Iter part_begin, std::size_t part_count) mutable
+                              Iter_ part_begin, std::size_t part_count) mutable
                     -> intermediate_result_t {
                     bool fst_bool = HPX_INVOKE(pred_projected, *part_begin);
                     if (part_count == 1)
@@ -213,7 +220,7 @@ namespace hpx::parallel {
                     util::loop_n<std::decay_t<ExPolicy>>(++part_begin,
                         --part_count, tok,
                         [&fst_bool, &pred_projected, &tok](
-                            Iter const& a) mutable -> void {
+                            Iter_ const& a) mutable -> void {
                             if (fst_bool != hpx::invoke(pred_projected, *a))
                             {
                                 if (fst_bool)
@@ -244,14 +251,14 @@ namespace hpx::parallel {
 
 namespace hpx {
 
-    HPX_CXX_EXPORT inline constexpr struct is_partitioned_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct is_partitioned_t final
       : hpx::detail::tag_parallel_algorithm<is_partitioned_t>
     {
     private:
         template <typename FwdIter, typename Pred>
         // clang-format off
             requires (
-                hpx::traits::is_forward_iterator_v<FwdIter>
+                std::forward_iterator<FwdIter>
             )
         // clang-format on
         friend bool tag_fallback_invoke(
@@ -266,7 +273,7 @@ namespace hpx {
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_forward_iterator_v<FwdIter>
+                std::forward_iterator<FwdIter>
             )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::is_partitioned_t,

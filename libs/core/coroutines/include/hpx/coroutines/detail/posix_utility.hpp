@@ -76,7 +76,7 @@
  */
 namespace hpx::threads::coroutines::detail::posix {
 
-    HPX_CXX_EXPORT HPX_CORE_EXPORT extern bool use_guard_pages;
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT extern bool use_guard_pages;
 
 #if defined(HPX_HAVE_THREAD_STACK_MMAP) && defined(_POSIX_MAPPED_FILES) &&     \
     _POSIX_MAPPED_FILES > 0
@@ -122,7 +122,7 @@ namespace hpx::threads::coroutines::detail::posix {
 
             void** stack = static_cast<void**>(real_stack) +
                 (EXEC_PAGESIZE / sizeof(void*));
-            return static_cast<void*>(stack);
+            return reinterpret_cast<void*>(stack);
         }
         return real_stack;
 #else
@@ -165,7 +165,7 @@ namespace hpx::threads::coroutines::detail::posix {
         {
             void** real_stack =
                 static_cast<void**>(stack) - (EXEC_PAGESIZE / sizeof(void*));
-            ::munmap(static_cast<void*>(real_stack), size + EXEC_PAGESIZE);
+            ::munmap(reinterpret_cast<void*>(real_stack), size + EXEC_PAGESIZE);
         }
         else
         {

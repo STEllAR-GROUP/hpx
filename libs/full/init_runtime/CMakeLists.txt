@@ -31,8 +31,13 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
   set(init_runtime_sources ${init_runtime_sources} pre_main.cpp)
 
   set(init_runtime_optional_module_dependencies
-      hpx_async_distributed hpx_collectives hpx_naming hpx_parcelports
-      hpx_performance_counters hpx_runtime_distributed
+      hpx_async_distributed
+      hpx_collectives
+      hpx_components_base
+      hpx_naming
+      hpx_parcelports
+      hpx_performance_counters
+      hpx_runtime_distributed
   )
 endif()
 
@@ -43,7 +48,7 @@ add_hpx_module(
   HEADERS ${init_runtime_headers}
   SOURCES ${init_runtime_sources}
   DEPENDENCIES hpx_core
-  MODULE_DEPENDENCIES hpx_command_line_handling
+  MODULE_DEPENDENCIES hpx_command_line_handling hpx_parcelset_base
                       ${init_runtime_optional_module_dependencies}
   CMAKE_SUBDIRS examples tests
 )

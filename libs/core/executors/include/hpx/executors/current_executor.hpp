@@ -34,7 +34,7 @@ namespace hpx::threads {
     ///         running, it will throw an \a hpx#exception with an error code of
     ///         \a hpx#error#invalid_status.
     ///
-    HPX_CXX_EXPORT HPX_CORE_EXPORT hpx::execution::parallel_executor
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT hpx::execution::parallel_executor
     get_executor(thread_id_type const& id, error_code& ec = throws);
 }    // namespace hpx::threads
 
@@ -55,6 +55,6 @@ namespace hpx::this_thread {
     ///         running, it will throw an \a hpx#exception with an error code of
     ///         \a hpx#error#invalid_status.
     ///
-    HPX_CXX_EXPORT HPX_CORE_EXPORT hpx::execution::parallel_executor
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT hpx::execution::parallel_executor
     get_executor(error_code& ec = throws);
 }    // namespace hpx::this_thread

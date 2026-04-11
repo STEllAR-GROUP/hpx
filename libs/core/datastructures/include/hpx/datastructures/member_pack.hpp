@@ -108,10 +108,10 @@ namespace hpx::util {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Is, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename Is, typename... Ts>
     struct HPX_EMPTY_BASES member_pack;
 
-    HPX_CXX_EXPORT template <std::size_t... Is, typename... Ts>
+    HPX_CXX_CORE_EXPORT template <std::size_t... Is, typename... Ts>
     struct HPX_EMPTY_BASES member_pack<util::index_pack<Is...>, Ts...>
       : detail::member_leaf<Is, Ts>...
     {
@@ -151,7 +151,7 @@ namespace hpx::util {
         }
     };
 
-    HPX_CXX_EXPORT template <typename... Ts>
+    HPX_CXX_CORE_EXPORT template <typename... Ts>
     using member_pack_for =
         member_pack<util::make_index_pack_t<sizeof...(Ts)>, Ts...>;
 }    // namespace hpx::util
@@ -160,7 +160,7 @@ namespace hpx::util {
 namespace hpx::serialization {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Archive, std::size_t... Is,
+    HPX_CXX_CORE_EXPORT template <typename Archive, std::size_t... Is,
         typename... Ts>
     HPX_FORCEINLINE void serialize(Archive& ar,
         ::hpx::util::member_pack<util::index_pack<Is...>, Ts...>& mp,

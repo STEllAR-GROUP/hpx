@@ -12,11 +12,10 @@
 #include <hpx/config.hpp>
 #include <hpx/actions_base/basic_action.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/components_base/component_type.hpp>
-#include <hpx/components_base/traits/component_type_database.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/preprocessor.hpp>
-#include <hpx/naming_base/address.hpp>
 
 #include <cstdlib>
 #include <stdexcept>
