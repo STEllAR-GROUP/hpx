@@ -433,11 +433,12 @@ namespace hpx::collectives {
     // Helper: lift a scalar reduction op to work element-wise on vectors
     namespace detail {
 
-        template <typename T, typename F>
+        template <typename F>
         struct vector_reduce_op
         {
             F op_;
 
+            template <typename T>
             std::vector<T> operator()(
                 std::vector<T> const& lhs, std::vector<T> const& rhs) const
             {
@@ -446,7 +447,7 @@ namespace hpx::collectives {
                 result.reserve(lhs.size());
                 for (std::size_t i = 0; i != lhs.size(); ++i)
                 {
-                    result.push_back(op_(lhs[i], rhs[i]));
+                    result.push_back(HPX_INVOKE(op_, lhs[i], rhs[i]));
                 }
                 return result;
             }
@@ -566,7 +567,7 @@ namespace hpx::collectives {
         generation_arg const broadcast_gen(2 * k + 1);
 
         // Lift scalar op to element-wise vector op
-        detail::vector_reduce_op<T, std::decay_t<F>> vec_op{
+        detail::vector_reduce_op<std::decay_t<F>> vec_op{
             HPX_FORWARD(F, op)};
 
         // Phase 1: hierarchical reduce (bottom-up) with vector op
@@ -605,7 +606,7 @@ namespace hpx::collectives {
         generation_arg const reduce_gen(2 * k);
         generation_arg const broadcast_gen(2 * k + 1);
 
-        detail::vector_reduce_op<T, std::decay_t<F>> vec_op{
+        detail::vector_reduce_op<std::decay_t<F>> vec_op{
             HPX_FORWARD(F, op)};
 
         // Phase 1: hierarchical reduce (send up)
