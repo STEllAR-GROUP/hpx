@@ -455,28 +455,18 @@ void test_all_reduce_hierarchical(int arity, int lpn, std::size_t iterations,
 
         // Time collective
         hpx::chrono::high_resolution_timer const timer;
-        hpx::future<std::vector<int>> ft_data;
-        if (this_locality == 0)
-        {
-            // NOLINTNEXTLINE(bugprone-use-after-move)
-            ft_data =
-                all_reduce(communicators, std::move(send_data), vector_adder{},
-                    this_site_arg(this_locality), generation_arg(i + 1));
-        }
-        else
-        {
-            // NOLINTNEXTLINE(bugprone-use-after-move)
-            ft_data = all_reduce_there(communicators, std::move(send_data),
-                vector_adder{}, this_site_arg(this_locality),
-                generation_arg(i + 1));
-        }
+        // NOLINTNEXTLINE(bugprone-use-after-move)
+        hpx::future<std::vector<int>> ft_data =
+            all_reduce(communicators, std::move(send_data), vector_adder{},
+                this_site_arg(this_locality), generation_arg(i + 1));
         recv_data = ft_data.get();
+
         // Synchronize
         barrier.wait();
         // Write runtime into vector
         result[i] = timer.elapsed();
 
-        // Check for correctness — every site should have the sum
+        // Check for correctness: every site should have the sum
         HPX_TEST_EQ(i * num_localities, static_cast<std::size_t>(recv_data[0]));
     }
 

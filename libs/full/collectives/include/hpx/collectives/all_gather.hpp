@@ -393,14 +393,13 @@ namespace hpx::collectives {
     // Key difference from all_reduce: the gather phase produces vector<T>
     // (O(N) data), so the broadcast phase transfers O(N) instead of a scalar.
 
-    // --- PUBLIC API (Root site overloads) ---
-
-    // Root site overload
+    // Async overload
     template <typename T>
     hpx::future<std::vector<std::decay_t<T>>> all_gather(
         hierarchical_communicator const& communicators, T&& local_result,
         this_site_arg this_site = this_site_arg(),
-        generation_arg const generation = generation_arg())
+        generation_arg const generation = generation_arg(),
+        root_site_arg root_site = root_site_arg())
     {
         using arg_type = std::decay_t<T>;
 
@@ -421,75 +420,36 @@ namespace hpx::collectives {
         generation_arg const gather_gen(2 * generation);
         generation_arg const broadcast_gen(2 * generation + 1);
 
-        std::vector<arg_type> gathered = gather_here(hpx::launch::sync,
-            communicators, HPX_FORWARD(T, local_result), this_site, gather_gen);
-
-        return broadcast_to(
-            communicators, HPX_MOVE(gathered), this_site, broadcast_gen);
-    }
-
-    // Sync version (Root site)
-    template <typename T>
-    std::vector<std::decay_t<T>> all_gather(hpx::launch::sync_policy,
-        hierarchical_communicator const& communicators, T&& local_result,
-        this_site_arg const this_site = this_site_arg(),
-        generation_arg const generation = generation_arg())
-    {
-        return all_gather(
-            communicators, HPX_FORWARD(T, local_result), this_site, generation)
-            .get();
-    }
-
-    // --- INTERNAL API (Non-root site overloads) ---
-    namespace detail {
-
-        // Non-root site overload
-        template <typename T>
-        hpx::future<std::vector<std::decay_t<T>>> all_gather_there(
-            hierarchical_communicator const& communicators, T&& local_result,
-            this_site_arg this_site = this_site_arg(),
-            generation_arg const generation = generation_arg())
+        if (this_site.get() == root_site.get())
         {
-            using arg_type = std::decay_t<T>;
+            std::vector<arg_type> gathered = gather_here(hpx::launch::sync,
+                communicators, HPX_FORWARD(T, local_result), this_site, gather_gen);
 
-            if (generation.is_default())
-            {
-                return hpx::make_exceptional_future<
-                    std::vector<arg_type>>(HPX_GET_EXCEPTION(
-                    hpx::error::bad_parameter,
-                    "hpx::collectives::all_gather (hierarchical)",
-                    "hierarchical all_gather requires an explicit generation "
-                    "number for the 2k/2k+1 internal mapping"));
-            }
-
-            if (this_site.is_default())
-            {
-                this_site = agas::get_locality_id();
-            }
-
-            generation_arg const gather_gen(2 * generation);
-            generation_arg const broadcast_gen(2 * generation + 1);
-
+            return broadcast_to(
+                communicators, HPX_MOVE(gathered), this_site, broadcast_gen);
+        }
+        else
+        {
             gather_there(hpx::launch::sync, communicators,
                 HPX_FORWARD(T, local_result), this_site, gather_gen);
 
             return broadcast_from<std::vector<arg_type>>(
                 communicators, this_site, broadcast_gen);
         }
+    }
 
-        // Sync version (Non-root site)
-        template <typename T>
-        std::vector<std::decay_t<T>> all_gather_there(hpx::launch::sync_policy,
-            hierarchical_communicator const& communicators, T&& local_result,
-            this_site_arg const this_site = this_site_arg(),
-            generation_arg const generation = generation_arg())
-        {
-            return all_gather_there(communicators, HPX_FORWARD(T, local_result),
-                this_site, generation)
-                .get();
-        }
-
-    }    // namespace detail
+    // Sync version
+    template <typename T>
+    std::vector<std::decay_t<T>> all_gather(hpx::launch::sync_policy,
+        hierarchical_communicator const& communicators, T&& local_result,
+        this_site_arg const this_site = this_site_arg(),
+        generation_arg const generation = generation_arg(),
+        root_site_arg root_site = root_site_arg())
+    {
+        return all_gather(communicators, HPX_FORWARD(T, local_result),
+            this_site, generation, root_site)
+            .get();
+    }
 }    // namespace hpx::collectives
 
 ////////////////////////////////////////////////////////////////////////////////
