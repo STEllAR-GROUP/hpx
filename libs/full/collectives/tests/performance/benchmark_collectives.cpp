@@ -10,10 +10,10 @@
 #include <hpx/config.hpp>
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
+#include <hpx/collectives/all_reduce.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/modules/collectives.hpp>
-#include <hpx/collectives/all_reduce.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <filesystem>
@@ -459,9 +459,9 @@ void test_all_reduce_hierarchical(int arity, int lpn, std::size_t iterations,
         if (this_locality == 0)
         {
             // NOLINTNEXTLINE(bugprone-use-after-move)
-            ft_data = all_reduce(communicators, std::move(send_data),
-                vector_adder{}, this_site_arg(this_locality),
-                generation_arg(i + 1));
+            ft_data =
+                all_reduce(communicators, std::move(send_data), vector_adder{},
+                    this_site_arg(this_locality), generation_arg(i + 1));
         }
         else
         {
@@ -477,8 +477,7 @@ void test_all_reduce_hierarchical(int arity, int lpn, std::size_t iterations,
         result[i] = timer.elapsed();
 
         // Check for correctness — every site should have the sum
-        HPX_TEST_EQ(
-            i * num_localities, static_cast<std::size_t>(recv_data[0]));
+        HPX_TEST_EQ(i * num_localities, static_cast<std::size_t>(recv_data[0]));
     }
 
     if (this_locality == 0)
@@ -773,8 +772,7 @@ void test_one_shot_use_all_reduce(int lpn, std::size_t iterations,
         result[i] = timer.elapsed();
 
         // Check for correctness
-        HPX_TEST_EQ(
-            i * num_localities, static_cast<std::size_t>(recv_data[0]));
+        HPX_TEST_EQ(i * num_localities, static_cast<std::size_t>(recv_data[0]));
     }
 
     if (this_locality == 0)
@@ -1081,8 +1079,7 @@ void test_multiple_use_with_generation_all_reduce(int lpn,
         result[i] = timer.elapsed();
 
         // Check for correctness
-        HPX_TEST_EQ(
-            i * num_localities, static_cast<std::size_t>(recv_data[0]));
+        HPX_TEST_EQ(i * num_localities, static_cast<std::size_t>(recv_data[0]));
     }
 
     if (this_locality == 0)

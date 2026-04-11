@@ -232,7 +232,6 @@ namespace hpx { namespace collectives {
 #include <hpx/modules/components_base.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/functional/invoke.hpp>
 #include <cstddef>
 #include <type_traits>
 #include <utility>
@@ -459,7 +458,9 @@ namespace hpx::collectives {
     // Uses 2k/2k+1 generation mapping: user generation k maps to
     // internal generation 2k (reduce phase) and 2k+1 (broadcast phase)
 
-    // Root site overload
+    // --- PUBLIC API (Root site overloads) ---
+
+    // Root site overload (scalar)
     template <typename T, typename F>
     hpx::future<std::decay_t<T>> all_reduce(
         hierarchical_communicator const& communicators, T&& local_result,
@@ -468,7 +469,6 @@ namespace hpx::collectives {
     {
         using arg_type = std::decay_t<T>;
 
-        // Hierarchical all_reduce requires explicit generation for 2k/2k+1
         if (generation.is_default())
         {
             return hpx::make_exceptional_future<arg_type>(HPX_GET_EXCEPTION(
@@ -483,66 +483,18 @@ namespace hpx::collectives {
             this_site = agas::get_locality_id();
         }
 
-        // Map user generation k to internal generations 2k, 2k+1
         generation_arg const reduce_gen(2 * generation);
         generation_arg const broadcast_gen(2 * generation + 1);
 
-        // Phase 1: hierarchical reduce (bottom-up)
         arg_type reduced = reduce_here(hpx::launch::sync, communicators,
             HPX_FORWARD(T, local_result), HPX_FORWARD(F, op), this_site,
             reduce_gen);
 
-        // Phase 2: hierarchical broadcast (top-down)
         return broadcast_to(
             communicators, HPX_MOVE(reduced), this_site, broadcast_gen);
     }
 
-    namespace detail {
-
-        // Non-root site overload
-        template <typename T, typename F>
-        hpx::future<std::decay_t<T>> all_reduce_there(
-            hierarchical_communicator const& communicators, T&& local_result,
-            F&& op, this_site_arg this_site = this_site_arg(),
-            generation_arg const generation = generation_arg())
-        {
-            using arg_type = std::decay_t<T>;
-
-            if (generation.is_default())
-            {
-                return hpx::make_exceptional_future<arg_type>(HPX_GET_EXCEPTION(
-                    hpx::error::bad_parameter,
-                    "hpx::collectives::all_reduce_there (hierarchical)",
-                    "hierarchical all_reduce requires an explicit generation "
-                    "number for the 2k/2k+1 internal mapping"));
-            }
-
-            if (this_site.is_default())
-            {
-                this_site = agas::get_locality_id();
-            }
- 
-
-            generation_arg const reduce_gen(2 * generation);
-            generation_arg const broadcast_gen(2 * generation + 1);
-
-            // Phase 1: hierarchical reduce (send up)
-            reduce_there(hpx::launch::sync, communicators,
-                HPX_FORWARD(T, local_result), HPX_FORWARD(F, op), this_site,
-                reduce_gen);
-
-            // Phase 2: hierarchical broadcast (receive down)
-            return broadcast_from<arg_type>(
-                communicators, this_site, broadcast_gen);
-        }
-    }
-
-    ////////////////////////////////////////////////////////////////////////////
-    // Hierarchical all_reduce for vector types
-    // Wraps a scalar op (e.g. std::plus<int>) to work element-wise on
-    // vector<T> before passing to reduce_here/reduce_there
-
-    // Root site, vector overload
+    // Root site overload (vector)
     template <typename T, typename F>
     hpx::future<std::vector<T>> all_reduce(
         hierarchical_communicator const& communicators,
@@ -567,60 +519,17 @@ namespace hpx::collectives {
         generation_arg const reduce_gen(2 * generation);
         generation_arg const broadcast_gen(2 * generation + 1);
 
-        // Lift scalar op to element-wise vector op
-        detail::vector_reduce_op<std::decay_t<F>> vec_op{
-            HPX_FORWARD(F, op)};
+        detail::vector_reduce_op<std::decay_t<F>> vec_op{HPX_FORWARD(F, op)};
 
-        // Phase 1: hierarchical reduce (bottom-up) with vector op
         std::vector<T> reduced = reduce_here(hpx::launch::sync,
             communicators, HPX_MOVE(local_result), HPX_MOVE(vec_op),
             this_site, reduce_gen);
 
-        // Phase 2: hierarchical broadcast (top-down)
         return broadcast_to(
             communicators, HPX_MOVE(reduced), this_site, broadcast_gen);
     }
 
-    // Non-root site, vector overload
-    template <typename T, typename F>
-    hpx::future<std::vector<T>> all_reduce_there(
-        hierarchical_communicator const& communicators,
-        std::vector<T>&& local_result, F&& op,
-        this_site_arg this_site = this_site_arg(),
-        generation_arg const generation = generation_arg())
-    {
-        if (generation.is_default())
-        {
-            return hpx::make_exceptional_future<std::vector<T>>(
-                HPX_GET_EXCEPTION(hpx::error::bad_parameter,
-                    "hpx::collectives::all_reduce_there (hierarchical, vector)",
-                    "hierarchical all_reduce requires an explicit generation "
-                    "number for the 2k/2k+1 internal mapping"));
-        }
-        
-        if (this_site.is_default())
-        {
-            this_site = agas::get_locality_id();
-        } 
-
-        generation_arg const reduce_gen(2 * generation);
-        generation_arg const broadcast_gen(2 * generation + 1);
-
-        detail::vector_reduce_op<std::decay_t<F>> vec_op{
-            HPX_FORWARD(F, op)};
-
-        // Phase 1: hierarchical reduce (send up)
-        reduce_there(hpx::launch::sync, communicators,
-            HPX_MOVE(local_result), HPX_MOVE(vec_op), this_site,
-            reduce_gen);
-
-        // Phase 2: hierarchical broadcast (receive down)
-        return broadcast_from<std::vector<T>>(
-            communicators, this_site, broadcast_gen);
-    }
-
-    ////////////////////////////////////////////////////////////////////////////
-    // Sync versions of hierarchical all_reduce
+    // Sync version (Root site)
     template <typename T, typename F>
     std::decay_t<T> all_reduce(hpx::launch::sync_policy,
         hierarchical_communicator const& communicators, T&& local_result,
@@ -632,16 +541,92 @@ namespace hpx::collectives {
             .get();
     }
 
-    template <typename T, typename F>
-    std::decay_t<T> all_reduce_there(hpx::launch::sync_policy,
-        hierarchical_communicator const& communicators, T&& local_result,
-        F&& op, this_site_arg const this_site = this_site_arg(),
-        generation_arg const generation = generation_arg())
-    {
-        return all_reduce_there(communicators, HPX_FORWARD(T, local_result),
-            HPX_FORWARD(F, op), this_site, generation)
-            .get();
-    }
+
+    // --- INTERNAL API (Non-root site overloads) ---
+    namespace detail {
+
+        // Non-root site overload (scalar)
+        template <typename T, typename F>
+        hpx::future<std::decay_t<T>> all_reduce_there(
+            hierarchical_communicator const& communicators, T&& local_result,
+            F&& op, this_site_arg this_site = this_site_arg(),
+            generation_arg const generation = generation_arg())
+        {
+            using arg_type = std::decay_t<T>;
+
+            if (generation.is_default())
+            {
+                return hpx::make_exceptional_future<arg_type>(HPX_GET_EXCEPTION(
+                    hpx::error::bad_parameter,
+                    "hpx::collectives::all_reduce_there (hierarchical)",
+                    "hierarchical all_reduce requires an explicit generation "
+                    "number for the 2k/2k+1 internal mapping"));
+            }
+
+            if (this_site.is_default())
+            {
+                this_site = agas::get_locality_id();
+            }
+
+            generation_arg const reduce_gen(2 * generation);
+            generation_arg const broadcast_gen(2 * generation + 1);
+
+            reduce_there(hpx::launch::sync, communicators,
+                HPX_FORWARD(T, local_result), HPX_FORWARD(F, op), this_site,
+                reduce_gen);
+
+            return broadcast_from<arg_type>(
+                communicators, this_site, broadcast_gen);
+        }
+
+        // Non-root site overload (vector)
+        template <typename T, typename F>
+        hpx::future<std::vector<T>> all_reduce_there(
+            hierarchical_communicator const& communicators,
+            std::vector<T>&& local_result, F&& op,
+            this_site_arg this_site = this_site_arg(),
+            generation_arg const generation = generation_arg())
+        {
+            if (generation.is_default())
+            {
+                return hpx::make_exceptional_future<std::vector<T>>(
+                    HPX_GET_EXCEPTION(hpx::error::bad_parameter,
+                        "hpx::collectives::all_reduce_there (hierarchical, vector)",
+                        "hierarchical all_reduce requires an explicit generation "
+                        "number for the 2k/2k+1 internal mapping"));
+            }
+            
+            if (this_site.is_default())
+            {
+                this_site = agas::get_locality_id();
+            } 
+
+            generation_arg const reduce_gen(2 * generation);
+            generation_arg const broadcast_gen(2 * generation + 1);
+
+            detail::vector_reduce_op<std::decay_t<F>> vec_op{HPX_FORWARD(F, op)};
+
+            reduce_there(hpx::launch::sync, communicators,
+                HPX_MOVE(local_result), HPX_MOVE(vec_op), this_site,
+                reduce_gen);
+
+            return broadcast_from<std::vector<T>>(
+                communicators, this_site, broadcast_gen);
+        }
+
+        // Sync version (Non-root site)
+        template <typename T, typename F>
+        std::decay_t<T> all_reduce_there(hpx::launch::sync_policy,
+            hierarchical_communicator const& communicators, T&& local_result,
+            F&& op, this_site_arg const this_site = this_site_arg(),
+            generation_arg const generation = generation_arg())
+        {
+            return all_reduce_there(communicators, HPX_FORWARD(T, local_result),
+                HPX_FORWARD(F, op), this_site, generation)
+                .get();
+        }
+
+    }    // namespace detail
 }    // namespace hpx::collectives
 
 ////////////////////////////////////////////////////////////////////////////////
