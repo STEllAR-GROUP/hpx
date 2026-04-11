@@ -534,8 +534,8 @@ namespace hpx::collectives {
 
         if (this_site == root_site)
         {
-            std::vector<T> reduced = reduce_here(hpx::launch::sync, communicators,
-                HPX_MOVE(local_result), HPX_MOVE(vec_op),
+            std::vector<T> reduced = reduce_here(hpx::launch::sync,
+                communicators, HPX_MOVE(local_result), HPX_MOVE(vec_op),
                 this_site, reduce_gen);
 
             return broadcast_to(
