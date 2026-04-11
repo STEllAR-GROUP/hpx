@@ -484,7 +484,7 @@ namespace hpx::collectives {
         generation_arg const reduce_gen(2 * generation);
         generation_arg const broadcast_gen(2 * generation + 1);
 
-        if (this_site.get() == root_site.get())
+        if (this_site == root_site)
         {
             arg_type reduced = reduce_here(hpx::launch::sync, communicators,
                 HPX_FORWARD(T, local_result), HPX_FORWARD(F, op), this_site,
@@ -532,7 +532,7 @@ namespace hpx::collectives {
 
         detail::vector_reduce_op<std::decay_t<F>> vec_op{HPX_FORWARD(F, op)};
 
-        if (this_site.get() == root_site.get())
+        if (this_site == root_site)
         {
             std::vector<T> reduced = reduce_here(hpx::launch::sync, communicators,
                 HPX_MOVE(local_result), HPX_MOVE(vec_op),

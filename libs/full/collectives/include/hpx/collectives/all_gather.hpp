@@ -420,7 +420,7 @@ namespace hpx::collectives {
         generation_arg const gather_gen(2 * generation);
         generation_arg const broadcast_gen(2 * generation + 1);
 
-        if (this_site.get() == root_site.get())
+        if (this_site == root_site)
         {
             std::vector<arg_type> gathered = gather_here(hpx::launch::sync,
                 communicators, HPX_FORWARD(T, local_result), this_site, gather_gen);
