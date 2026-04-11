@@ -27,11 +27,6 @@ struct is_even
     {
         return val % T(2) == 0;
     }
-
-    template <typename Archive>
-    void serialize(Archive&, unsigned)
-    {
-    }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -128,7 +123,7 @@ void initialize_seg_boundary_false_then_true_in_last_seg(
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
-void test_is_partitioned(std::size_t num_localities,
+void test_is_partitioned(std::size_t /* num_localities */,
     hpx::partitioned_vector<T>& v_part, hpx::partitioned_vector<T>& v_odd,
     hpx::partitioned_vector<T>& v_even, hpx::partitioned_vector<T>& v_viol_beg,
     hpx::partitioned_vector<T>& v_viol_end,
@@ -150,7 +145,7 @@ void test_is_partitioned(std::size_t num_localities,
 }
 
 template <typename ExPolicy, typename T>
-void test_is_partitioned(ExPolicy&& policy, std::size_t num_localities,
+void test_is_partitioned(ExPolicy&& policy, std::size_t /* num_localities */,
     hpx::partitioned_vector<T>& v_part, hpx::partitioned_vector<T>& v_odd,
     hpx::partitioned_vector<T>& v_even, hpx::partitioned_vector<T>& v_viol_beg,
     hpx::partitioned_vector<T>& v_viol_end,
@@ -173,9 +168,10 @@ void test_is_partitioned(ExPolicy&& policy, std::size_t num_localities,
 }
 
 template <typename ExPolicy, typename T>
-void test_is_partitioned_async(ExPolicy&& policy, std::size_t num_localities,
-    hpx::partitioned_vector<T>& v_part, hpx::partitioned_vector<T>& v_odd,
-    hpx::partitioned_vector<T>& v_even, hpx::partitioned_vector<T>& v_viol_beg,
+void test_is_partitioned_async(ExPolicy&& policy,
+    std::size_t /* num_localities */, hpx::partitioned_vector<T>& v_part,
+    hpx::partitioned_vector<T>& v_odd, hpx::partitioned_vector<T>& v_even,
+    hpx::partitioned_vector<T>& v_viol_beg,
     hpx::partitioned_vector<T>& v_viol_end,
     hpx::partitioned_vector<T>& v_seg_valid)
 {

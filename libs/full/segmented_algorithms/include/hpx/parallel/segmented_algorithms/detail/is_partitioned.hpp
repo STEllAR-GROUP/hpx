@@ -20,12 +20,6 @@ namespace hpx::parallel::detail {
         bool local_res;     // local is_partitioned result
         bool first_elem;    // predicate value of first element in segment
         bool last_elem;     // predicate value of last element in segment
-
-        template <typename Archive>
-        void serialize(Archive& ar, unsigned)
-        {
-            ar & local_res & first_elem & last_elem;
-        }
     };
 
     template <typename Iter>
@@ -39,7 +33,7 @@ namespace hpx::parallel::detail {
 
         template <typename ExPolicy, typename FwdIter, typename Pred,
             typename Proj>
-        static local_result sequential(ExPolicy&& policy, FwdIter first,
+        static local_result sequential(ExPolicy&& /* policy */, FwdIter first,
             FwdIter last, Pred&& pred, Proj&& proj)
         {
             util::invoke_projected<Pred, Proj> pred_projected{pred, proj};
