@@ -468,11 +468,6 @@ namespace hpx::collectives {
     {
         using arg_type = std::decay_t<T>;
 
-        if (this_site.is_default())
-        {
-            this_site = agas::get_locality_id();
-        }
-
         // Hierarchical all_reduce requires explicit generation for 2k/2k+1
         if (generation.is_default())
         {
@@ -481,6 +476,11 @@ namespace hpx::collectives {
                 "hpx::collectives::all_reduce (hierarchical)",
                 "hierarchical all_reduce requires an explicit generation "
                 "number for the 2k/2k+1 internal mapping"));
+        }
+
+        if (this_site.is_default())
+        {
+            this_site = agas::get_locality_id();
         }
 
         // Map user generation k to internal generations 2k, 2k+1
@@ -508,11 +508,6 @@ namespace hpx::collectives {
         {
             using arg_type = std::decay_t<T>;
 
-            if (this_site.is_default())
-            {
-                this_site = agas::get_locality_id();
-            }
-
             if (generation.is_default())
             {
                 return hpx::make_exceptional_future<arg_type>(HPX_GET_EXCEPTION(
@@ -521,6 +516,12 @@ namespace hpx::collectives {
                     "hierarchical all_reduce requires an explicit generation "
                     "number for the 2k/2k+1 internal mapping"));
             }
+
+            if (this_site.is_default())
+            {
+                this_site = agas::get_locality_id();
+            }
+ 
 
             generation_arg const reduce_gen(2 * generation);
             generation_arg const broadcast_gen(2 * generation + 1);
@@ -549,11 +550,6 @@ namespace hpx::collectives {
         this_site_arg this_site = this_site_arg(),
         generation_arg const generation = generation_arg())
     {
-        if (this_site.is_default())
-        {
-            this_site = agas::get_locality_id();
-        }
-
         if (generation.is_default())
         {
             return hpx::make_exceptional_future<std::vector<T>>(
@@ -561,6 +557,11 @@ namespace hpx::collectives {
                     "hpx::collectives::all_reduce (hierarchical, vector)",
                     "hierarchical all_reduce requires an explicit generation "
                     "number for the 2k/2k+1 internal mapping"));
+        }
+
+        if (this_site.is_default())
+        {
+            this_site = agas::get_locality_id();
         }
 
         generation_arg const reduce_gen(2 * generation);
@@ -588,11 +589,6 @@ namespace hpx::collectives {
         this_site_arg this_site = this_site_arg(),
         generation_arg const generation = generation_arg())
     {
-        if (this_site.is_default())
-        {
-            this_site = agas::get_locality_id();
-        }
-
         if (generation.is_default())
         {
             return hpx::make_exceptional_future<std::vector<T>>(
@@ -601,6 +597,11 @@ namespace hpx::collectives {
                     "hierarchical all_reduce requires an explicit generation "
                     "number for the 2k/2k+1 internal mapping"));
         }
+        
+        if (this_site.is_default())
+        {
+            this_site = agas::get_locality_id();
+        } 
 
         generation_arg const reduce_gen(2 * generation);
         generation_arg const broadcast_gen(2 * generation + 1);

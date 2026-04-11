@@ -403,11 +403,6 @@ namespace hpx::collectives {
     {
         using arg_type = std::decay_t<T>;
 
-        if (this_site.is_default())
-        {
-            this_site = agas::get_locality_id();
-        }
-
         // Map user generation k to internal generations 2k, 2k+1
         if (generation.is_default())
         {
@@ -416,6 +411,11 @@ namespace hpx::collectives {
                     "hpx::collectives::all_gather (hierarchical)",
                     "hierarchical all_gather requires an explicit generation "
                     "number for the 2k/2k+1 internal mapping"));
+        }
+
+        if (this_site.is_default())
+        {
+            this_site = agas::get_locality_id();
         }
 
         generation_arg const gather_gen(2 * generation);
@@ -440,11 +440,6 @@ namespace hpx::collectives {
     {
         using arg_type = std::decay_t<T>;
 
-        if (this_site.is_default())
-        {
-            this_site = agas::get_locality_id();
-        }
-
         if (generation.is_default())
         {
             return hpx::make_exceptional_future<std::vector<arg_type>>(
@@ -452,6 +447,11 @@ namespace hpx::collectives {
                     "hpx::collectives::all_gather (hierarchical)",
                     "hierarchical all_gather requires an explicit generation "
                     "number for the 2k/2k+1 internal mapping"));
+        }
+
+        if (this_site.is_default())
+        {
+            this_site = agas::get_locality_id();
         }
 
         generation_arg const gather_gen(2 * generation);
