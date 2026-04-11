@@ -457,7 +457,7 @@ void test_all_reduce_hierarchical(int arity, int lpn, std::size_t iterations,
         hpx::chrono::high_resolution_timer const timer;
         // NOLINTNEXTLINE(bugprone-use-after-move)
         hpx::future<std::vector<int>> ft_data =
-            all_reduce(communicators, std::move(send_data), vector_adder{},
+            all_reduce(communicators, std::move(send_data), std::plus<int>{},
                 this_site_arg(this_locality), generation_arg(i + 1));
         recv_data = ft_data.get();
 
