@@ -445,6 +445,15 @@ namespace hpx::parcelset {
             case connection_cache_reclaims:
                 return connection_cache_.get_cache_reclaims(reset);
 
+            case connection_cache_reservation_failures:
+                return connection_cache_.get_reservation_failures(reset);
+
+            case connection_cache_num_connections:
+                return connection_cache_.get_num_connections();
+
+            case connection_cache_max_connections:
+                return connection_cache_.get_max_connections();
+
             default:
                 break;
             }

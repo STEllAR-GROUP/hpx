@@ -25,6 +25,7 @@
 #include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/util.hpp>
 
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <deque>
@@ -74,6 +75,8 @@ namespace hpx::util {
           , hits_(0)
           , misses_(0)
           , reclaims_(0)
+          , reservation_failures_(0)
+          , last_exhaustion_log_ns_(0)
         {
             if (max_connections_per_locality_ > max_connections_)
             {
@@ -280,6 +283,8 @@ namespace hpx::util {
                     {
                         // If we can't find or make space, give up.
                         ++misses_;
+                        ++reservation_failures_;
+                        maybe_log_exhaustion();
                         check_invariants();
                         return false;
                     }
@@ -301,6 +306,8 @@ namespace hpx::util {
                 // locality, and none of them are checked into the cache, so
                 // we have to give up.
                 ++misses_;
+                ++reservation_failures_;
+                maybe_log_exhaustion();
                 check_invariants();
                 return false;
             }
@@ -430,6 +437,7 @@ namespace hpx::util {
             hits_ = 0;
             misses_ = 0;
             reclaims_ = 0;
+            reservation_failures_ = 0;
 
             // FIXME: This should probably throw instead of asserting, as it
             // can be triggered by caller error.
@@ -525,7 +533,54 @@ namespace hpx::util {
             return util::get_and_reset_value(reclaims_, reset);
         }
 
+        // Returns the cumulative count of times get_or_reserve returned false
+        // because the connection pool was fully checked out (pool saturation).
+        // Unlike cache-misses, this counter is zero during normal operation and
+        // only increments when parcels must be deferred due to exhaustion.
+        std::int64_t get_reservation_failures(bool reset)
+        {
+            std::lock_guard<mutex_type> lock(mtx_);
+            return util::get_and_reset_value(reservation_failures_, reset);
+        }
+
+        // Returns the current number of connections tracked by the cache
+        // (both available and checked-out). Use together with
+        // get_max_connections() to compute the pool utilisation ratio.
+        std::int64_t get_num_connections() const
+        {
+            std::lock_guard<mutex_type> lock(mtx_);
+            return static_cast<std::int64_t>(connections_);
+        }
+
+        // Returns the configured maximum number of connections. This value is
+        // fixed at construction time (hpx.max_connections ini key).
+        std::int64_t get_max_connections() const
+        {
+            return static_cast<std::int64_t>(max_connections_);
+        }
+
     private:
+        // Emit a throttled LPT_(warning) when the pool is exhausted. Called
+        // while mtx_ is held; must not re-acquire it.  Logs at most once per
+        // 5 seconds to avoid flooding the log on sustained saturation.
+        void maybe_log_exhaustion()
+        {
+            using namespace std::chrono;
+            auto const now_ns = static_cast<std::int64_t>(
+                duration_cast<nanoseconds>(
+                    steady_clock::now().time_since_epoch())
+                    .count());
+            constexpr std::int64_t throttle_ns = 5'000'000'000LL;    // 5 s
+            if (now_ns - last_exhaustion_log_ns_ >= throttle_ns)
+            {
+                last_exhaustion_log_ns_ = now_ns;
+                LPT_(warning).format(
+                    "parcelport connection cache exhausted: {}/{} connections "
+                    "in use, {} deferred reservation(s) since last reset",
+                    connections_, max_connections_, reservation_failures_);
+            }
+        }
+
         /// Verify class invariants
         void check_invariants() const
         {
@@ -638,6 +693,14 @@ namespace hpx::util {
         std::int64_t hits_;
         std::int64_t misses_;
         std::int64_t reclaims_;
+
+        // Count of get_or_reserve() calls that returned false because every
+        // connection slot was checked out (pool exhaustion, not normal misses).
+        std::int64_t reservation_failures_;
+
+        // Timestamp of the last LPT_(warning) emission, in nanoseconds since
+        // epoch (std::chrono::steady_clock). Used for log throttling.
+        std::int64_t last_exhaustion_log_ns_;
     };
 }    // namespace hpx::util
 
