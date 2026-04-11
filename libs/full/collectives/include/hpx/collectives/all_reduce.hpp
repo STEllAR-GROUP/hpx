@@ -232,7 +232,7 @@ namespace hpx { namespace collectives {
 #include <hpx/modules/components_base.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/type_support.hpp>
-
+#include <hpx/functional/invoke.hpp>
 #include <cstddef>
 #include <type_traits>
 #include <utility>
