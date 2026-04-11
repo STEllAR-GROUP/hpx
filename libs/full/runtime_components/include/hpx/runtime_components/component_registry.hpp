@@ -10,8 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_colocated/server/destroy_component.hpp>
-#include <hpx/components_base/component_type.hpp>
-#include <hpx/components_base/traits/component_config_data.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/preprocessor.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 

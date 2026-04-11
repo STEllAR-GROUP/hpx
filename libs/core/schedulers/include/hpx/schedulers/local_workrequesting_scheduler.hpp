@@ -205,7 +205,7 @@ namespace hpx::threads::policies {
     // from.
     HPX_CXX_CORE_EXPORT template <typename Mutex = std::mutex,
         typename PendingQueuing = lockfree_fifo,
-        typename StagedQueuing = lockfree_fifo,
+        typename StagedQueuing = concurrentqueue_fifo,
         typename TerminatedQueuing =
             default_local_workrequesting_scheduler_terminated_queue>
     class local_workrequesting_scheduler final : public scheduler_base
@@ -689,8 +689,8 @@ namespace hpx::threads::policies {
 
             num_thread = select_active_pu(num_thread);
 
-            data.schedulehint.mode = thread_schedule_hint_mode::thread;
-            data.schedulehint.hint = static_cast<std::int16_t>(num_thread);
+            data.schedulehint.schedule_hint(
+                static_cast<std::int16_t>(num_thread));
 
             // now create the thread
             switch (data.priority)

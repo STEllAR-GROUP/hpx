@@ -72,7 +72,7 @@ int main()
     final_array_boss input;
     input.pod_array = {{{25, std::string(1000, 'a')}, {30, "Bob"}}};
     input.array_of_vectors = {{{1, 2, 3}, {4, 5, 6}}};
-    input.vector_of_arrays = {{{10, 20, 30}, {40, 50, 60}}};
+    input.vector_of_arrays = {{{10, 20, 30}}, {{40, 50, 60}}};
 
     // Serialize
     std::vector<char> buffer;

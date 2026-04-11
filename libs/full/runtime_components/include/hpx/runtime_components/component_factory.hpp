@@ -148,7 +148,6 @@
 
 #else    // COMPUTE DEVICE CODE
 
-#define HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(...)
 #define HPX_REGISTER_COMPONENT(...)
 #define HPX_REGISTER_ENABLED_COMPONENT_FACTORY(ComponentType, componentname)
 #define HPX_REGISTER_DISABLED_COMPONENT_FACTORY(ComponentType, componentname)

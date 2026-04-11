@@ -297,6 +297,128 @@ While the options ``--hpx:list-counters`` and ``--hpx:list-counter-infos`` give
 a short list of all available counters, the full documentation for those can
 be found in the section :ref:`counters`.
 
+.. _hpx_top:
+
+HPX-Top
+-------
+
+**HPX-Top** is a real-time, terminal-based dashboard designed for monitoring the
+health and performance of distributed |hpx| applications. Inspired by tools like
+``htop`` and ``btop``, it provides a high-level overview of system utilization,
+network flow, and internal runtime metrics.
+
+.. figure:: ../_static/images/hpx_top.png
+   :alt: HPX-Top Dashboard Screenshot
+   :align: center
+   :width: 100%
+
+   HPX-Top Real-time Performance Dashboard
+
+Features
+~~~~~~~~
+
+* **Locality-Aware Monitoring**: Automatically detects and displays metrics for
+  all localities in a running distributed application.
+* **Thread Pool Utilization**: Visualizes real-time usage of worker threads with
+  instantaneous counts and historical sparkline graphs.
+* **Parcel Throughput**: Tracks incoming and outgoing parcels, helping to identify
+  network-bound bottlenecks or communication hotspots.
+* **AGAS Health Monitor**: Displays cache hit and miss rates for the Application
+  Global Address Space (AGAS), crucial for diagnosing naming service bottlenecks.
+
+Usage
+~~~~~
+
+HPX-Top is implemented as a Python script that acts as a wrapper around your |hpx|
+application. It automatically configures the necessary performance counters and
+output formats.
+
+The tool requires the ``rich`` Python library for rendering the terminal UI:
+
+.. code-block:: shell-session
+
+   $ pip install rich
+
+To monitor an |hpx| application, launch it through ``hpx-top.py``:
+
+.. code-block:: shell-session
+
+   $ python3 tools/hpx-top.py ./your_application --hpx:threads=4 [other HPX flags]
+
+You can also run HPX-Top in mock mode to explore the interface without a running
+|hpx| application:
+
+.. code-block:: shell-session
+
+   $ python3 tools/hpx-top.py --mock
+
+Technical Details
+~~~~~~~~~~~~~~~~~
+
+The tool leverages |hpx|'s built-in performance counter framework. It launches the
+target application with specific flags (``--hpx:print-counter-interval`` and
+``--hpx:print-counter-format=csv-short``) and parses the standard output in a
+non-blocking background thread to update the TUI.
+
+.. _hpx_stat_viewer:
+
+HPX Smart Telemetry (hpx_stat_viewer)
+-------------------------------------
+
+**HPX Smart Telemetry** (``hpx_stat_viewer.py``) is an intelligent, lightweight
+performance dashboard designed to identify performance anomalies in real-time.
+While ``hpx-top`` provides a broad system overview, ``hpx_stat_viewer`` focuses on
+deep-dive analysis of specific metrics with built-in heuristic alerting.
+
+.. figure:: ../_static/images/hpx_stat_viewer.png
+   :alt: HPX Smart Telemetry Dashboard Screenshot
+   :align: center
+   :width: 100%
+
+   HPX Smart Telemetry Dashboard with Anomaly Detection
+
+Features
+~~~~~~~~
+
+* **Heuristic Anomaly Detection**: Uses an Exponential Moving Average (EMA) to
+  monitor counter trends. It automatically flags sudden spikes (+150%) or drops
+  (-60%) with prominent visual alerts like ``[⚡ SPIKE]`` and ``[⚠️ DROP]``.
+* **Live History Sparklines**: Displays 10-tick historical trend graphs next to
+  every metric, helping developers distinguish between momentary noise and
+  persistent bottlenecks.
+* **Smart Filtering and Grouping**: Supports regex-based counter filtering and
+  automatically groups metrics by locality for large-scale distributed runs.
+* **Zero-Dependency Core**: Requires no external TUI libraries, making it highly
+  portable for various terminal environments.
+
+Usage
+~~~~~
+
+``hpx_stat_viewer.py`` reads HPX counter data from standard input in ``csv-short``
+transient format. This allows it to be used for both live monitoring and
+post-mortem analysis of log files.
+
+To monitor a live application with smart filtering:
+
+.. code-block:: shell-session
+
+   $ ./your_hpx_app --hpx:print-counter-interval=500 --hpx:print-counter-format=csv-short ... | \
+     python3 tools/hpx_stat_viewer.py --filter "threads|utilization"
+
+To replay an offline performance log for analysis:
+
+.. code-block:: shell-session
+
+   $ python3 tools/hpx_stat_viewer.py --replay your_hpx_counters.csv --speed 0.5
+
+Technical Details
+~~~~~~~~~~~~~~~~~
+
+The dashboard implements a thread-safe parser that handles HPX's CSV-short format.
+The anomaly detection engine uses a smoothing factor of 0.4 for its EMA calculations,
+balancing responsiveness with stability. It is officially integrated into the HPX installation
+rules under the ``tools`` component.
+
 A simple example
 ----------------
 

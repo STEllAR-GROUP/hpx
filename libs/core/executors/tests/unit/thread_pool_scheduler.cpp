@@ -870,6 +870,7 @@ void test_future_sender()
         bool exception_thrown = false;
         try
         {
+            // NOLINTNEXTLINE(bugprone-use-after-move)
             tt::sync_wait(sfs);
             HPX_TEST(false);
         }
@@ -899,6 +900,7 @@ void test_future_sender()
         bool exception_thrown = false;
         try
         {
+            // NOLINTNEXTLINE(bugprone-use-after-move)
             tt::sync_wait(sfs);
             HPX_TEST(false);
         }
@@ -2203,11 +2205,11 @@ void test_stdexec_domain_queries()
     static_assert(std::is_base_of_v<ex::default_domain,
                       ex::thread_pool_domain<hpx::launch>>,
         "thread_pool_domain should derive from default_domain");
-    // 2. Verify domain is accessible via stdexec::get_domain
+    // 2. Verify domain is accessible via ex::get_domain (forwarded from stdexec)
     static_assert(
-        requires { stdexec::get_domain(scheduler); },
+        requires { ex::get_domain(scheduler); },
         "scheduler should support get_domain query");
-    auto domain = stdexec::get_domain(scheduler);
+    auto domain = ex::get_domain(scheduler);
 
     // 3. Verify the domain type is thread_pool_domain
     static_assert(
@@ -2227,8 +2229,8 @@ void test_stdexec_domain_queries()
             "bulk_chunked sender should satisfy "
             "bulk_chunked_or_unchunked_sender concept");
 
-        auto transformed =
-            domain.transform_sender(std::move(chunked_sndr), env);
+        auto transformed = domain.transform_sender(
+            ex::set_value_t{}, std::move(chunked_sndr), env);
 
         static_assert(is_thread_pool_bulk_sender<
                           std::decay_t<decltype(transformed)>>::value,
@@ -2250,8 +2252,8 @@ void test_stdexec_domain_queries()
             "bulk_unchunked sender should satisfy "
             "bulk_chunked_or_unchunked_sender concept");
 
-        auto transformed =
-            domain.transform_sender(std::move(unchunked_sndr), env);
+        auto transformed = domain.transform_sender(
+            ex::set_value_t{}, std::move(unchunked_sndr), env);
 
         static_assert(is_thread_pool_bulk_sender<
                           std::decay_t<decltype(transformed)>>::value,

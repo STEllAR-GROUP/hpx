@@ -18,7 +18,7 @@
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/timing.hpp>
 
-#include <hpx/components_base/agas_interface.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/parcelset_base.hpp>
 
 #if ASIO_HAS_BOOST_THROW_EXCEPTION != 0
