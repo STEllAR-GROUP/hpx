@@ -589,11 +589,11 @@ namespace hpx::collectives {
         {
             if (generation.is_default())
             {
-                return hpx::make_exceptional_future<std::vector<T>>(
-                    HPX_GET_EXCEPTION(hpx::error::bad_parameter,
-                        "hpx::collectives::all_reduce_there (hierarchical, vector)",
-                        "hierarchical all_reduce requires an explicit generation "
-                        "number for the 2k/2k+1 internal mapping"));
+                return hpx::make_exceptional_future
+                    std::vector<T>>(HPX_GET_EXCEPTION(hpx::error::bad_parameter,
+                    "hpx::collectives::all_reduce_there (hierarchical, vector)",
+                    "hierarchical all_reduce requires an explicit generation "
+                    "number for the 2k/2k+1 internal mapping"));
             }
             
             if (this_site.is_default())
@@ -604,7 +604,8 @@ namespace hpx::collectives {
             generation_arg const reduce_gen(2 * generation);
             generation_arg const broadcast_gen(2 * generation + 1);
 
-            detail::vector_reduce_op<std::decay_t<F>> vec_op{HPX_FORWARD(F, op)};
+            detail::vector_reduce_op<std::decay_t<F>> vec_op{
+                HPX_FORWARD(F, op)};
 
             reduce_there(hpx::launch::sync, communicators,
                 HPX_MOVE(local_result), HPX_MOVE(vec_op), this_site,
