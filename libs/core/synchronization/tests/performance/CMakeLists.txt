@@ -8,10 +8,11 @@ set(benchmarks channel_mpmc_throughput channel_mpsc_throughput
                channel_spsc_throughput
 )
 
-set(
-  HPX_WITH_ORBIT_ROOT ""
-  CACHE PATH
-        "Path to a local checkout of austin-hill/orbit used for optional synchronization comparison benchmarks"
+set(HPX_WITH_ORBIT_ROOT
+    ""
+    CACHE
+      PATH
+      "Path to a local checkout of austin-hill/orbit used for optional synchronization comparison benchmarks"
 )
 
 set(channel_mpmc_throughput_PARAMETERS THREADS_PER_LOCALITY 2)
@@ -49,7 +50,8 @@ if(HPX_WITH_ORBIT_ROOT)
     )
 
     target_include_directories(
-      channel_mpmc_comparison_test SYSTEM PRIVATE "${HPX_WITH_ORBIT_ROOT}/include"
+      channel_mpmc_comparison_test SYSTEM
+      PRIVATE "${HPX_WITH_ORBIT_ROOT}/include"
     )
 
     add_hpx_performance_test(

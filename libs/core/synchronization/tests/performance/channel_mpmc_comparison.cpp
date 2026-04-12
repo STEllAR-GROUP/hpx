@@ -79,9 +79,7 @@ namespace {
     class orbit_queue_adapter
     {
     public:
-        explicit orbit_queue_adapter(std::size_t)
-        {
-        }
+        explicit orbit_queue_adapter(std::size_t) {}
 
         bool try_push(data value)
         {
@@ -147,10 +145,9 @@ namespace {
 
         for (std::size_t i = 0; i != consumers; ++i)
         {
-            consumer_threads.emplace_back(
-                [&queue, &consumer_results, i]() {
-                    consumer_results[i] = consume_values(queue);
-                });
+            consumer_threads.emplace_back([&queue, &consumer_results, i]() {
+                consumer_results[i] = consume_values(queue);
+            });
         }
 
         std::uint64_t next_value = 1;
@@ -159,17 +156,17 @@ namespace {
 
         for (std::size_t i = 0; i != producers; ++i)
         {
-            std::uint64_t const chunk_size = base_chunk + (i < remainder ? 1 : 0);
+            std::uint64_t const chunk_size =
+                base_chunk + (i < remainder ? 1 : 0);
             std::uint64_t const first_value = next_value;
             next_value += chunk_size;
 
-            producer_threads.emplace_back(
-                [&queue, chunk_size, first_value]() {
-                    for (std::uint64_t j = 0; j != chunk_size; ++j)
-                    {
-                        push_value(queue, data(first_value + j));
-                    }
-                });
+            producer_threads.emplace_back([&queue, chunk_size, first_value]() {
+                for (std::uint64_t j = 0; j != chunk_size; ++j)
+                {
+                    push_value(queue, data(first_value + j));
+                }
+            });
         }
 
         for (auto& producer_thread : producer_threads)
@@ -252,8 +249,8 @@ namespace {
     }
 
     void print_csv_result(benchmark_result const& result, std::size_t capacity,
-        std::size_t producers, std::size_t consumers, std::uint64_t total_values,
-        std::size_t repetitions)
+        std::size_t producers, std::size_t consumers,
+        std::uint64_t total_values, std::size_t repetitions)
     {
         std::cout << result.name_ << ',' << capacity << ',' << producers << ','
                   << consumers << ',' << total_values << ',' << repetitions
@@ -275,16 +272,15 @@ namespace {
         std::vector<benchmark_result> results;
         results.reserve(3);
 
-        results.push_back(run_benchmark<hpx_channel_mpmc_adapter>(
-            "hpx_channel_mpmc", Capacity, producers, consumers, total_values,
-            repetitions));
+        results.push_back(
+            run_benchmark<hpx_channel_mpmc_adapter>("hpx_channel_mpmc",
+                Capacity, producers, consumers, total_values, repetitions));
         results.push_back(
             run_benchmark<orbit_queue_adapter<Capacity, true>>("orbit_default",
                 Capacity, producers, consumers, total_values, repetitions));
-        results.push_back(
-            run_benchmark<orbit_queue_adapter<Capacity, false>>(
-                "orbit_throughput", Capacity, producers, consumers, total_values,
-                repetitions));
+        results.push_back(run_benchmark<orbit_queue_adapter<Capacity, false>>(
+            "orbit_throughput", Capacity, producers, consumers, total_values,
+            repetitions));
 
         if (csv)
         {
@@ -357,8 +353,9 @@ int hpx_main(hpx::program_options::variables_map& vm)
     if (producers == 0 || consumers == 0 || total_values == 0 ||
         repetitions == 0)
     {
-        std::cerr << "producers, consumers, values, and repetitions must all be "
-                     "greater than zero\n";
+        std::cerr
+            << "producers, consumers, values, and repetitions must all be "
+               "greater than zero\n";
         return hpx::local::finalize();
     }
 
@@ -379,15 +376,14 @@ int main(int argc, char* argv[])
     desc_commandline.add_options()("capacity",
         value<std::size_t>()->default_value(2048),
         "Queue capacity. Must match one of the compiled-in power-of-two "
-        "capacities.")("producers",
-        value<std::size_t>()->default_value(2), "Number of producer threads.")(
-        "consumers", value<std::size_t>()->default_value(2),
-        "Number of consumer threads.")("values",
-        value<std::uint64_t>()->default_value(1000000),
-        "Total number of values produced across all producers.")(
-        "repetitions", value<std::size_t>()->default_value(5),
-        "Number of times to repeat each benchmark.")(
-        "csv", bool_switch()->default_value(false),
+        "capacities.")("producers", value<std::size_t>()->default_value(2),
+        "Number of producer threads.")("consumers",
+        value<std::size_t>()->default_value(2), "Number of consumer threads.")(
+        "values", value<std::uint64_t>()->default_value(1000000),
+        "Total number of values produced across all producers.")("repetitions",
+        value<std::size_t>()->default_value(5),
+        "Number of times to repeat each benchmark.")("csv",
+        bool_switch()->default_value(false),
         "Emit results as CSV instead of human-readable text.");
 
     hpx::local::init_params init_args;
