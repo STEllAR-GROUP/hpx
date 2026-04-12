@@ -52,7 +52,7 @@ below:
 
    .. code-block:: shell-session
 
-      $ git clone https://github.com/STEllAR-GROUP/hpx.git
+      $ git clone https://github.com/TheHPXProject/hpx.git
       $ cd hpx
       $ conan create . --build=missing
 

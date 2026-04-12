@@ -18,8 +18,8 @@ required_conan_version = ">=1.53.0"
 class HPXConan(ConanFile):
     name = "hpx"
     license = "BSL-1.0"
-    author = "STE||AR Group"
-    url = "https://github.com/STEllAR-GROUP/hpx"
+    author = "The HPX Project"
+    url = "https://github.com/TheHPXProject/hpx"
     homepage = "https://hpx.dev"
     description = "The C++ Standards Library for Parallelism and Concurrency"
     topics = ("hpx", "parallelism", "concurrency", "distributed-computing", "hpc", "runtime-system")
