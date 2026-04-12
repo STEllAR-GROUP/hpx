@@ -43,11 +43,11 @@ namespace hpx::lcos::local {
             {
                 next_tail = 0;
             }
-            if (next_tail == tail_.data_.head_cached_) [[unlikely]]
+            if (next_tail == tail_.data_.other_index_cached_) [[unlikely]]
             {
-                tail_.data_.head_cached_ =
-                    head_.data_.head_.load(std::memory_order_acquire);
-                if (next_tail == tail_.data_.head_cached_)
+                tail_.data_.other_index_cached_ =
+                    head_.data_.index_.load(std::memory_order_acquire);
+                if (next_tail == tail_.data_.other_index_cached_)
                 {
                     return true;
                 }
@@ -58,11 +58,11 @@ namespace hpx::lcos::local {
         [[nodiscard]] HPX_FORCEINLINE bool is_empty(
             std::size_t head) const noexcept
         {
-            if (head == head_.data_.tail_cached_) [[unlikely]]
+            if (head == head_.data_.other_index_cached_) [[unlikely]]
             {
-                head_.data_.tail_cached_ =
-                    tail_.data_.tail_.load(std::memory_order_acquire);
-                if (head == head_.data_.tail_cached_)
+                head_.data_.other_index_cached_ =
+                    tail_.data_.index_.load(std::memory_order_acquire);
+                if (head == head_.data_.other_index_cached_)
                 {
                     return true;
                 }
@@ -78,23 +78,25 @@ namespace hpx::lcos::local {
         {
             HPX_ASSERT(size != 0);
 
-            head_.data_.head_.store(0, std::memory_order_relaxed);
-            tail_.data_.tail_.store(0, std::memory_order_relaxed);
+            head_.data_.index_.store(0, std::memory_order_relaxed);
+            tail_.data_.index_.store(0, std::memory_order_relaxed);
         }
 
         channel_spsc(channel_spsc&& rhs) noexcept
           : size_(rhs.size_)
           , buffer_(HPX_MOVE(rhs.buffer_))
         {
-            head_.data_.head_.store(
-                rhs.head_.data_.head_.load(std::memory_order_acquire),
+            head_.data_.index_.store(
+                rhs.head_.data_.index_.load(std::memory_order_acquire),
                 std::memory_order_relaxed);
-            head_.data_.tail_cached_ = rhs.head_.data_.tail_cached_;
+            head_.data_.other_index_cached_ =
+                rhs.head_.data_.other_index_cached_;
 
-            tail_.data_.tail_.store(
-                rhs.tail_.data_.tail_.load(std::memory_order_acquire),
+            tail_.data_.index_.store(
+                rhs.tail_.data_.index_.load(std::memory_order_acquire),
                 std::memory_order_relaxed);
-            tail_.data_.head_cached_ = rhs.tail_.data_.head_cached_;
+            tail_.data_.other_index_cached_ =
+                rhs.tail_.data_.other_index_cached_;
 
             closed_.store(rhs.closed_.load(std::memory_order_acquire),
                 std::memory_order_relaxed);
@@ -106,15 +108,17 @@ namespace hpx::lcos::local {
 
         channel_spsc& operator=(channel_spsc&& rhs) noexcept
         {
-            head_.data_.head_.store(
-                rhs.head_.data_.head_.load(std::memory_order_acquire),
+            head_.data_.index_.store(
+                rhs.head_.data_.index_.load(std::memory_order_acquire),
                 std::memory_order_relaxed);
-            head_.data_.tail_cached_ = rhs.head_.data_.tail_cached_;
+            head_.data_.other_index_cached_ =
+                rhs.head_.data_.other_index_cached_;
 
-            tail_.data_.tail_.store(
-                rhs.tail_.data_.tail_.load(std::memory_order_acquire),
+            tail_.data_.index_.store(
+                rhs.tail_.data_.index_.load(std::memory_order_acquire),
                 std::memory_order_relaxed);
-            tail_.data_.head_cached_ = rhs.tail_.data_.head_cached_;
+            tail_.data_.other_index_cached_ =
+                rhs.tail_.data_.other_index_cached_;
 
             size_ = rhs.size_;
             buffer_ = HPX_MOVE(rhs.buffer_);
@@ -140,7 +144,7 @@ namespace hpx::lcos::local {
             {
                 return true;
             }
-            return is_empty(head_.data_.head_.load(std::memory_order_relaxed));
+            return is_empty(head_.data_.index_.load(std::memory_order_relaxed));
         }
 
         bool get(T* val = nullptr) const noexcept
@@ -151,7 +155,7 @@ namespace hpx::lcos::local {
             }
 
             std::size_t head =
-                head_.data_.head_.load(std::memory_order_relaxed);
+                head_.data_.index_.load(std::memory_order_relaxed);
 
             if (is_empty(head))
             {
@@ -168,7 +172,7 @@ namespace hpx::lcos::local {
             {
                 head = 0;
             }
-            head_.data_.head_.store(head, std::memory_order_release);
+            head_.data_.index_.store(head, std::memory_order_release);
 
             return true;
         }
@@ -181,7 +185,7 @@ namespace hpx::lcos::local {
             }
 
             std::size_t tail =
-                tail_.data_.tail_.load(std::memory_order_relaxed);
+                tail_.data_.index_.load(std::memory_order_relaxed);
 
             if (is_full(tail))
             {
@@ -193,7 +197,7 @@ namespace hpx::lcos::local {
             {
                 tail = 0;
             }
-            tail_.data_.tail_.store(tail, std::memory_order_release);
+            tail_.data_.index_.store(tail, std::memory_order_release);
 
             return true;
         }
@@ -218,21 +222,15 @@ namespace hpx::lcos::local {
     private:
         // Co-locate each cached index with the atomic owned by that thread
         // so each side's hot path touches exactly one cache line.
-        struct head_data
+        struct data
         {
-            std::atomic<std::size_t> head_{0};
-            std::size_t tail_cached_{0};
-        };
-
-        struct tail_data
-        {
-            std::atomic<std::size_t> tail_{0};
-            std::size_t head_cached_{0};
+            std::atomic<std::size_t> index_{0};
+            std::size_t other_index_cached_{0};
         };
 
         // keep the head and the tail pointer in separate cache lines
-        mutable hpx::util::cache_aligned_data<head_data> head_;
-        hpx::util::cache_aligned_data<tail_data> tail_;
+        mutable hpx::util::cache_aligned_data<data> head_;
+        hpx::util::cache_aligned_data<data> tail_;
 
         // a channel of size n can buffer n-1 items
         std::size_t size_;
@@ -258,11 +256,11 @@ namespace hpx::lcos::local {
             {
                 next_tail = 0;
             }
-            if (next_tail == tail_.data_.head_cached_) [[unlikely]]
+            if (next_tail == tail_.data_.other_index_cached_) [[unlikely]]
             {
-                tail_.data_.head_cached_ =
-                    head_.data_.head_.load(std::memory_order_acquire);
-                if (next_tail == tail_.data_.head_cached_)
+                tail_.data_.other_index_cached_ =
+                    head_.data_.index_.load(std::memory_order_acquire);
+                if (next_tail == tail_.data_.other_index_cached_)
                 {
                     return true;
                 }
@@ -273,11 +271,11 @@ namespace hpx::lcos::local {
         [[nodiscard]] HPX_FORCEINLINE bool is_empty(
             std::size_t head) const noexcept
         {
-            if (head == head_.data_.tail_cached_) [[unlikely]]
+            if (head == head_.data_.other_index_cached_) [[unlikely]]
             {
-                head_.data_.tail_cached_ =
-                    tail_.data_.tail_.load(std::memory_order_acquire);
-                if (head == head_.data_.tail_cached_)
+                head_.data_.other_index_cached_ =
+                    tail_.data_.index_.load(std::memory_order_acquire);
+                if (head == head_.data_.other_index_cached_)
                 {
                     return true;
                 }
@@ -292,8 +290,8 @@ namespace hpx::lcos::local {
         {
             HPX_ASSERT(size != 0);
 
-            head_.data_.head_.store(0, std::memory_order_relaxed);
-            tail_.data_.tail_.store(0, std::memory_order_relaxed);
+            head_.data_.index_.store(0, std::memory_order_relaxed);
+            tail_.data_.index_.store(0, std::memory_order_relaxed);
         }
 
         channel_spsc(channel_spsc const& rhs) = delete;
@@ -303,28 +301,32 @@ namespace hpx::lcos::local {
           : size_(rhs.size_)
           , buffer_(HPX_MOVE(rhs.buffer_))
         {
-            head_.data_.head_.store(
-                rhs.head_.data_.head_.load(std::memory_order_acquire),
+            head_.data_.index_.store(
+                rhs.head_.data_.index_.load(std::memory_order_acquire),
                 std::memory_order_relaxed);
-            head_.data_.tail_cached_ = rhs.head_.data_.tail_cached_;
+            head_.data_.other_index_cached_ =
+                rhs.head_.data_.other_index_cached_;
 
-            tail_.data_.tail_.store(
-                rhs.tail_.data_.tail_.load(std::memory_order_acquire),
+            tail_.data_.index_.store(
+                rhs.tail_.data_.index_.load(std::memory_order_acquire),
                 std::memory_order_relaxed);
-            tail_.data_.head_cached_ = rhs.tail_.data_.head_cached_;
+            tail_.data_.other_index_cached_ =
+                rhs.tail_.data_.other_index_cached_;
         }
 
         channel_spsc& operator=(channel_spsc&& rhs) noexcept
         {
-            head_.data_.head_.store(
-                rhs.head_.data_.head_.load(std::memory_order_acquire),
+            head_.data_.index_.store(
+                rhs.head_.data_.index_.load(std::memory_order_acquire),
                 std::memory_order_relaxed);
-            head_.data_.tail_cached_ = rhs.head_.data_.tail_cached_;
+            head_.data_.other_index_cached_ =
+                rhs.head_.data_.other_index_cached_;
 
-            tail_.data_.tail_.store(
-                rhs.tail_.data_.tail_.load(std::memory_order_acquire),
+            tail_.data_.index_.store(
+                rhs.tail_.data_.index_.load(std::memory_order_acquire),
                 std::memory_order_relaxed);
-            tail_.data_.head_cached_ = rhs.tail_.data_.head_cached_;
+            tail_.data_.other_index_cached_ =
+                rhs.tail_.data_.other_index_cached_;
 
             size_ = rhs.size_;
             buffer_ = HPX_MOVE(rhs.buffer_);
@@ -336,13 +338,13 @@ namespace hpx::lcos::local {
 
         [[nodiscard]] bool is_empty() const noexcept
         {
-            return is_empty(head_.data_.head_.load(std::memory_order_relaxed));
+            return is_empty(head_.data_.index_.load(std::memory_order_relaxed));
         }
 
         bool get(T* val = nullptr) const noexcept
         {
             std::size_t head =
-                head_.data_.head_.load(std::memory_order_relaxed);
+                head_.data_.index_.load(std::memory_order_relaxed);
 
             if (is_empty(head))
             {
@@ -359,7 +361,7 @@ namespace hpx::lcos::local {
             {
                 head = 0;
             }
-            head_.data_.head_.store(head, std::memory_order_release);
+            head_.data_.index_.store(head, std::memory_order_release);
 
             return true;
         }
@@ -367,7 +369,7 @@ namespace hpx::lcos::local {
         bool set(T&& t) noexcept
         {
             std::size_t tail =
-                tail_.data_.tail_.load(std::memory_order_relaxed);
+                tail_.data_.index_.load(std::memory_order_relaxed);
 
             if (is_full(tail))
             {
@@ -379,7 +381,7 @@ namespace hpx::lcos::local {
             {
                 tail = 0;
             }
-            tail_.data_.tail_.store(tail, std::memory_order_release);
+            tail_.data_.index_.store(tail, std::memory_order_release);
 
             return true;
         }
@@ -392,21 +394,15 @@ namespace hpx::lcos::local {
     private:
         // Co-locate each cached index with the atomic owned by that thread
         // so each side's hot path touches exactly one cache line.
-        struct head_data
+        struct data
         {
-            std::atomic<std::size_t> head_{0};
-            std::size_t tail_cached_{0};
-        };
-
-        struct tail_data
-        {
-            std::atomic<std::size_t> tail_{0};
-            std::size_t head_cached_{0};
+            std::atomic<std::size_t> index_{0};
+            std::size_t other_index_cached_{0};
         };
 
         // keep the head and the tail pointer in separate cache lines
-        mutable hpx::util::cache_aligned_data<head_data> head_;
-        hpx::util::cache_aligned_data<tail_data> tail_;
+        mutable hpx::util::cache_aligned_data<data> head_;
+        hpx::util::cache_aligned_data<data> tail_;
 
         // a channel of size n can buffer n-1 items
         std::size_t size_;
