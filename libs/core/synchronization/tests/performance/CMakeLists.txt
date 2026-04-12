@@ -8,6 +8,12 @@ set(benchmarks channel_mpmc_throughput channel_mpsc_throughput
                channel_spsc_throughput
 )
 
+set(
+  HPX_WITH_ORBIT_ROOT ""
+  CACHE PATH
+        "Path to a local checkout of austin-hill/orbit used for optional synchronization comparison benchmarks"
+)
+
 set(channel_mpmc_throughput_PARAMETERS THREADS_PER_LOCALITY 2)
 set(channel_mpsc_throughput_PARAMETERS THREADS_PER_LOCALITY 2)
 set(channel_spsc_throughputs_PARAMETERS THREADS_PER_LOCALITY 2)
@@ -32,3 +38,27 @@ foreach(benchmark ${benchmarks})
   )
 
 endforeach()
+
+if(HPX_WITH_ORBIT_ROOT)
+  if(EXISTS "${HPX_WITH_ORBIT_ROOT}/include/orbit/mpmc_queue.h")
+    add_hpx_executable(
+      channel_mpmc_comparison_test INTERNAL_FLAGS
+      SOURCES channel_mpmc_comparison.cpp
+      EXCLUDE_FROM_ALL
+      FOLDER "Benchmarks/Modules/Core/Synchronization"
+    )
+
+    target_include_directories(
+      channel_mpmc_comparison_test SYSTEM PRIVATE "${HPX_WITH_ORBIT_ROOT}/include"
+    )
+
+    add_hpx_performance_test(
+      "modules.synchronization" channel_mpmc_comparison THREADS_PER_LOCALITY 1
+    )
+  else()
+    message(
+      WARNING
+        "HPX_WITH_ORBIT_ROOT is set to '${HPX_WITH_ORBIT_ROOT}', but include/orbit/mpmc_queue.h was not found there. The optional channel_mpmc_comparison benchmark will not be added."
+    )
+  endif()
+endif()
