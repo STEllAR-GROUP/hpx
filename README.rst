@@ -1,5 +1,5 @@
 ..
-    Copyright (c) 2007-2025 Louisiana State University
+    Copyright (c) 2007-2026 Louisiana State University
 
     SPDX-License-Identifier: BSL-1.0
     Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -75,25 +75,25 @@ Documentation
 =============
 
 If you plan to use HPX we suggest to start with the latest released version
-which can be downloaded `here <https://github.com/STEllAR-GROUP/hpx/releases/>`_.
+which can be downloaded `here <https://github.com/TheHPXProject/hpx/releases/>`_.
 
 To quickly get started with HPX on most Linux distributions you can read the
 quick start guide `here
-<https://hpx-docs.stellar-group.org/latest/html/quickstart.html>`_.
+<https://docs.hpx.dev/latest/html/quickstart.html>`_.
 Detailed instructions on building and installing HPX on various platforms can be
 found `here
-<https://hpx-docs.stellar-group.org/latest/html/manual/building_hpx.html>`_.
+<https://docs.hpx.dev/latest/html/manual/building_hpx.html>`_.
 The full documentation for the latest release of HPX can always be found `here
-<https://hpx-docs.stellar-group.org/latest/html/index.html>`_.
+<https://docs.hpx.dev/latest/html/index.html>`_.
 
 If you would like to work with the cutting edge version of this repository
 (``master`` branch) the documentation can be found `here
-<https://hpx-docs.stellar-group.org/branches/master/html/index.html>`_.
+<https://docs.hpx.dev/branches/master/html/index.html>`_.
 We strongly recommend that you follow the current health status of the master
 branch by looking at our `continuous integration results website
 <https://cdash.rostam.cct.lsu.edu/index.php?project=HPX>`_. While we try to keep the
 master branch stable and usable, sometimes new bugs trick their way into the
-code base. The `CircleCI <https://circleci.com/gh/STEllAR-GROUP/hpx>`_
+code base. The `CircleCI <https://circleci.com/gh/TheHPXProject/hpx>`_
 continuous integration service additionally tracks the current build status for
 the master branch: |circleci_status|.
 
@@ -103,14 +103,14 @@ project: |codacy_quality|.
 If you can't find what you are looking for in the documentation or you suspect
 you've found a bug in HPX we very much encourage and appreciate any issue
 reports through the `issue tracker for this Github project
-<https://github.com/STEllAR-GROUP/hpx/issues>`_.
+<https://github.com/TheHPXProject/hpx/issues>`_.
 
 If you have any questions feel free to ask it over at `StackOverflow
 <https://stackoverflow.com>`_ and tag the question with `hpx
 <https://stackoverflow.com/questions/tagged/hpx>`_.
 
 For a full list of support options please see our `Support page
-<https://github.com/STEllAR-GROUP/hpx/blob/master/.github/SUPPORT.md>`_.
+<https://github.com/TheHPXProject/hpx/blob/master/.github/SUPPORT.md>`_.
 
 If you would like to read more about HPX, we recommend the `book <https://link.springer.com/book/10.1007/978-3-031-54369-2>`_ 
 "Parallel C++ -- Efficient and Scalable High-Performance Parallel Programming Using HPX" the code examples are available `here <https://github.com/ModernCPPBook/Examples>`_.
@@ -120,7 +120,7 @@ Code of conduct
 ===============
 
 We have adopted a `code of conduct
-<https://github.com/STEllAR-GROUP/hpx/blob/master/.github/CODE_OF_CONDUCT.md>`_
+<https://github.com/TheHPXProject/hpx/blob/master/.github/CODE_OF_CONDUCT.md>`_
 for this project. Please refer to this document if you would like to know more
 about the expectations for members of our community, with regard to how they
 will behave toward each other.
@@ -148,8 +148,8 @@ Past and current funding and support for HPX is listed `here
 
 Copyright © 2026 HPX Project a Series of LF Projects, LLC
 
-.. |circleci_status| image:: https://circleci.com/gh/STEllAR-GROUP/hpx/tree/master.svg?style=svg
-     :target: https://circleci.com/gh/STEllAR-GROUP/hpx/tree/master
+.. |circleci_status| image:: https://circleci.com/gh/TheHPXProject/hpx/tree/master.svg?style=svg
+     :target: https://circleci.com/gh/TheHPXProject/hpx/tree/master
      :alt: HPX master branch build status
 
 .. |zenodo_doi| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.598202.svg
@@ -157,19 +157,19 @@ Copyright © 2026 HPX Project a Series of LF Projects, LLC
      :alt: Latest software release of HPX
 
 .. |codacy_quality| image:: https://app.codacy.com/project/badge/Grade/0b8cd5a874914edaba67ce3bb711e688
-     :target: https://app.codacy.com/gh/STEllAR-GROUP/hpx/dashboard
+     :target: https://app.codacy.com/gh/TheHPXProject/hpx/dashboard
      :alt: HPX Code Quality Assessment
 
 .. |codacy_coverage| image:: https://app.codacy.com/project/badge/Coverage/0b8cd5a874914edaba67ce3bb711e688    
-     :target: https://app.codacy.com/gh/STEllAR-GROUP/hpx/coverage/dashboard
+     :target: https://app.codacy.com/gh/TheHPXProject/hpx/coverage/dashboard
      :alt: HPX coverage report
 
 .. |JOSS| image:: https://joss.theoj.org/papers/022e5917b95517dff20cd3742ab95eca/status.svg
     :target: https://joss.theoj.org/papers/022e5917b95517dff20cd3742ab95eca
     :alt: JOSS Paper about HPX
 
-.. |CFF| image:: https://github.com/STEllAR-GROUP/hpx/actions/workflows/cff-validator.yml/badge.svg
-    :target: https://github.com/STEllAR-GROUP/hpx/actions/workflows/cff-validator.yml
+.. |CFF| image:: https://github.com/TheHPXProject/hpx/actions/workflows/cff-validator.yml/badge.svg
+    :target: https://github.com/TheHPXProject/hpx/actions/workflows/cff-validator.yml
     :alt: Citations file for HPX
 
 .. |OpenSSF| image:: https://bestpractices.coreinfrastructure.org/projects/6093/badge

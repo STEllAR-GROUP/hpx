@@ -1096,7 +1096,7 @@ void print_output(std::ostream& out, inspector_list const& inspectors)
     if (display_format == display_text)
     {
         out << "HPX Inspection Report\nRun Date: " << run_date << "\nCommit: "
-            << "<a href = \"https://github.com/STEllAR-GROUP/hpx/commit/"
+            << "<a href = \"https://github.com/TheHPXProject/hpx/commit/"
             << HPX_HAVE_GIT_COMMIT << "\">"
             << std::string(HPX_HAVE_GIT_COMMIT, 10) << "</a>\n\n";
 
@@ -1123,9 +1123,9 @@ void print_output(std::ostream& out, inspector_list const& inspectors)
                "<table>\n"
                "<tr>\n"
                "<td>"
-               "<a href = \"https://github.com/STEllAR-GROUP/hpx\">"
-               "<img src=\"https://stellar-group.org/files/stellar100.png\""
-               " alt=\"STE||AR logo\" />"
+               "<a href = \"https://github.com/TheHPXProject/hpx\">"
+               "<img src=\"https://github.com/TheHPXProject/hpx/blob/master/docs/sphinx/_static/images/favicon.png\""
+               " alt=\"HPX logo\" />"
                "</a>\n"
                "</td>\n"
                "<td>\n"
@@ -1135,7 +1135,7 @@ void print_output(std::ostream& out, inspector_list const& inspectors)
             << "<br>\n"
                //"&nbsp;&nbsp;/ " << validator_link( "validate me" ) << " /\n"
                "<b>Commit:</b> "
-            << "<a href = \"https://github.com/STEllAR-GROUP/hpx/commit/"
+            << "<a href = \"https://github.com/TheHPXProject/hpx/commit/"
             << HPX_HAVE_GIT_COMMIT << "\">"
             << std::string(HPX_HAVE_GIT_COMMIT, 10)
             << "</a>\n"
