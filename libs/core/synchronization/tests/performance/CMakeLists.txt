@@ -8,11 +8,12 @@ set(benchmarks channel_mpmc_throughput channel_mpsc_throughput
                channel_spsc_throughput
 )
 
-set(HPX_WITH_ORBIT_ROOT
-    ""
-    CACHE
-      PATH
-      "Path to a local checkout of austin-hill/orbit used for optional synchronization comparison benchmarks"
+hpx_option(
+  HPX_WITH_ORBIT_ROOT
+  STRING
+  "Path to a local checkout of austin-hill/orbit used for optional synchronization comparison benchmarks."
+  ""
+  ADVANCED
 )
 
 set(channel_mpmc_throughput_PARAMETERS THREADS_PER_LOCALITY 2)

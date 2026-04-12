@@ -1,10 +1,11 @@
-//  Copyright (c) 2026
+//  Copyright (c) 2026 Arpit Kumar
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/init.hpp>
+#include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/synchronization.hpp>
 
@@ -25,18 +26,17 @@
 
 namespace {
 
-    struct data
+    struct queue_data
     {
-        data() = default;
-
-        explicit data(std::uint64_t value)
+        explicit queue_data(std::uint64_t value = 0)
           : value_(value)
         {
         }
 
         std::uint64_t value_ = 0;
-        std::uint64_t padding_[7] = {};
     };
+
+    using data = hpx::util::cache_line_data<queue_data>;
 
     struct consumer_result
     {
@@ -118,13 +118,13 @@ namespace {
                 continue;
             }
 
-            if (value.value_ == 0)
+            if (value.data_.value_ == 0)
             {
                 return result;
             }
 
             ++result.count_;
-            result.checksum_ += value.value_;
+            result.checksum_ += value.data_.value_;
         }
     }
 
