@@ -170,9 +170,9 @@ namespace hpx {
         constexpr char const* const copyright =
             "HPX - The C++ Standard Library for Parallelism and Concurrency\n"
             "(A general purpose parallel C++ runtime system for distributed "
-            "applications\n"
-            "of any scale).\n\n"
-            "Copyright (c) 2007-2026, The HPX Project, https://hpx.dev\n\n"
+            "applications\nof any scale).\n\n"
+            "Copyright (c) 2007-2026, HPX Project a Series of LF Projects, "
+            "LLC, (https://hpx.dev)\n\n"
             "Distributed under the Boost Software License, "
             "Version 1.0. (See accompanying\n"
             "file LICENSE_1_0.txt or copy at "
