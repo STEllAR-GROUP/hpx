@@ -426,3 +426,113 @@ void test_find_first_of_edge_cases(ExPolicy&& policy)
         HPX_TEST_LTE(call_count.load(), 5);
     }
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// Standard-compliance test: empty needle range must return first
+//
+// C++ standard [alg.find.first.of]:
+//   "Returns: first if [s_first, s_last) is empty or if no such iterator
+//    is found."
+// This is exercised independently for seq, par, and par_unseq because parallel
+// implementations must honor the same pre-condition check before any work.
+template <typename ExPolicy, typename IteratorTag>
+void test_find_first_of_empty_needle(ExPolicy&& policy, IteratorTag)
+{
+    static_assert(hpx::is_execution_policy_v<ExPolicy>,
+        "hpx::is_execution_policy_v<ExPolicy>");
+
+    using base_iterator = std::vector<int>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
+
+    std::vector<int> c = {1, 2, 3, 4, 5};
+    std::vector<int> needle;    // deliberately empty
+
+    iterator result = hpx::find_first_of(policy, iterator(c.begin()),
+        iterator(c.end()), needle.begin(), needle.end());
+
+    // Must return first (== c.begin()) when needle is empty
+    HPX_TEST(result == iterator(c.begin()));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Cross-policy consistency tests for hpx::find_first_of
+//
+// Verifies that seq, par, and par_unseq return the same iterator for the same
+// haystack and needle. This is a direct regression guard for bugs where the
+// parallel inner loop does not short-circuit correctly (see historical
+// find_first_of fix).
+//
+// Datasets covered:
+//   1. Empty haystack                -> all return end (== begin)
+//   2. No element in needle present  -> all return end
+//   3. Match at position 0           -> first partition boundary
+//   4. Match at last position        -> last partition boundary
+//   5. Multiple occurrences in needle -> any match, but FIRST in haystack
+//   6. Single-element haystack, match
+//   7. Single-element haystack, no match
+template <typename IteratorTag>
+void test_find_first_of_cross_policy(IteratorTag)
+{
+    using namespace hpx::execution;
+
+    using base_iterator = std::vector<int>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
+
+    auto check_policy = [&](std::vector<int>& haystack,
+                            std::vector<int>& needle, char const* scenario) {
+        auto rs = hpx::find_first_of(seq, iterator(haystack.begin()),
+            iterator(haystack.end()), needle.begin(), needle.end());
+        auto rp = hpx::find_first_of(par, iterator(haystack.begin()),
+            iterator(haystack.end()), needle.begin(), needle.end());
+        auto ru = hpx::find_first_of(par_unseq, iterator(haystack.begin()),
+            iterator(haystack.end()), needle.begin(), needle.end());
+        HPX_TEST_MSG(rs == rp, scenario);
+        HPX_TEST_MSG(rs == ru, scenario);
+    };
+
+    // 1. Empty haystack - all must return end (which equals begin)
+    {
+        std::vector<int> hay, ndl = {1, 2, 3};
+        check_policy(hay, ndl, "find_first_of: empty haystack");
+    }
+
+    // 2. No element in needle present anywhere
+    {
+        std::vector<int> hay(1013, 5), ndl = {99, 100};
+        check_policy(hay, ndl, "find_first_of: no match");
+    }
+
+    // 3. Match at position 0
+    {
+        std::vector<int> hay(1013, 5), ndl = {7, 8};
+        hay[0] = 7;
+        check_policy(hay, ndl, "find_first_of: match at index 0");
+    }
+
+    // 4. Match at last position
+    {
+        std::vector<int> hay(1013, 5), ndl = {7, 8};
+        hay[1012] = 8;
+        check_policy(hay, ndl, "find_first_of: match at last index");
+    }
+
+    // 5. First occurrence wins when multiple matches exist
+    {
+        std::vector<int> hay(1013, 5), ndl = {7, 8};
+        hay[200] = 7;
+        hay[800] = 8;
+        check_policy(hay, ndl, "find_first_of: multiple matches, return first");
+    }
+
+    // 6. Single-element haystack, needle matches it
+    {
+        std::vector<int> hay = {42}, ndl = {42};
+        check_policy(hay, ndl, "find_first_of: single element, match");
+    }
+
+    // 7. Single-element haystack, needle does not match it
+    {
+        std::vector<int> hay = {1}, ndl = {99};
+        check_policy(hay, ndl, "find_first_of: single element, no match");
+    }
+}
