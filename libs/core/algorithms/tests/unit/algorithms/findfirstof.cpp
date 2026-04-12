@@ -10,6 +10,7 @@
 
 #include <iostream>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 #include "findfirstof_tests.hpp"

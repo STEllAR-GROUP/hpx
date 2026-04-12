@@ -503,7 +503,7 @@ void test_reduce_by_key_empty()
         auto r = hpx::experimental::reduce_by_key(seq, keys.begin(), keys.end(),
             values.begin(), out_keys.begin(), out_vals.begin());
         // Nothing written - result iterators must equal the output begin
-        HPX_TEST(r.in == keys.end());
+        HPX_TEST(r.in == out_keys.begin());
         HPX_TEST(r.out == out_vals.begin());
     }
 
@@ -511,7 +511,7 @@ void test_reduce_by_key_empty()
     {
         auto r = hpx::experimental::reduce_by_key(par, keys.begin(), keys.end(),
             values.begin(), out_keys.begin(), out_vals.begin());
-        HPX_TEST(r.in == keys.end());
+        HPX_TEST(r.in == out_keys.begin());
         HPX_TEST(r.out == out_vals.begin());
     }
 }
