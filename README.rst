@@ -5,7 +5,7 @@
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-|circleci_status| |codacy_quality| |codacy_coverage| |OpenSSF| |CFF| |JOSS| |zenodo_doi|
+|github_status| |codacy_quality| |OpenSSF| |CFF| |JOSS| |zenodo_doi|
 
 Documentation: `latest <https://docs.hpx.dev/latest/html/index.html>`_,
 `development (master) <https://docs.hpx.dev/branches/master/html/index.html>`_
@@ -93,9 +93,8 @@ We strongly recommend that you follow the current health status of the master
 branch by looking at our `continuous integration results website
 <https://cdash.rostam.cct.lsu.edu/index.php?project=HPX>`_. While we try to keep the
 master branch stable and usable, sometimes new bugs trick their way into the
-code base. The `CircleCI <https://circleci.com/gh/TheHPXProject/hpx>`_
-continuous integration service additionally tracks the current build status for
-the master branch: |circleci_status|.
+code base. The Github continuous integration service additionally tracks the
+current build status for the master branch: |github_status|.
 
 We use `Codacy <https://www.codacy.com/>`_ to assess the code quality of this
 project: |codacy_quality|.
@@ -146,23 +145,19 @@ to check our code base.
 Past and current funding and support for HPX is listed `here
 <https://hpx.stellar-group.org/funding-acknowledgements>`_
 
-Copyright Â© 2026 HPX Project a Series of LF Projects, LLC
+Copyright © 2026 HPX Project a Series of LF Projects, LLC
 
-.. |circleci_status| image:: https://circleci.com/gh/TheHPXProject/hpx/tree/master.svg?style=svg
-     :target: https://circleci.com/gh/TheHPXProject/hpx/tree/master
+.. |github_status| image:: https://github.com/TheHPXProject/hpx/actions/workflows/build-and-test.yml/badge.svg
+     :target: https://github.com/TheHPXProject/hpx/actions/workflows/build-and-test.yml
      :alt: HPX master branch build status
 
 .. |zenodo_doi| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.598202.svg
      :target: https://doi.org/10.5281/zenodo.598202
      :alt: Latest software release of HPX
 
-.. |codacy_quality| image:: https://app.codacy.com/project/badge/Grade/0b8cd5a874914edaba67ce3bb711e688
+.. |codacy_quality| image:: https://app.codacy.com/project/badge/Grade/aa011ca3557846a5aa96f4cac9322374
      :target: https://app.codacy.com/gh/TheHPXProject/hpx/dashboard
      :alt: HPX Code Quality Assessment
-
-.. |codacy_coverage| image:: https://app.codacy.com/project/badge/Coverage/0b8cd5a874914edaba67ce3bb711e688    
-     :target: https://app.codacy.com/gh/TheHPXProject/hpx/coverage/dashboard
-     :alt: HPX coverage report
 
 .. |JOSS| image:: https://joss.theoj.org/papers/022e5917b95517dff20cd3742ab95eca/status.svg
     :target: https://joss.theoj.org/papers/022e5917b95517dff20cd3742ab95eca

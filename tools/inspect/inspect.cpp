@@ -1124,7 +1124,7 @@ void print_output(std::ostream& out, inspector_list const& inspectors)
                "<tr>\n"
                "<td>"
                "<a href = \"https://github.com/TheHPXProject/hpx\">"
-               "<img src=\"https://github.com/TheHPXProject/hpx/blob/master/docs/sphinx/_static/images/favicon.png\""
+               "<img src=\"https://docs.hpx.dev/branches/master/html/_static/favicon.png\""
                " alt=\"HPX logo\" />"
                "</a>\n"
                "</td>\n"
