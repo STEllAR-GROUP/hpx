@@ -14,16 +14,23 @@
 #include <hpx/config/modules_enabled.hpp>
 
 @cxx_standard_headers@
-#if defined(HPX_COMPILE_BMI) && defined(HPX_COMPILE_CORE_WITH_MODULES)
-# pragma push_macro("HPX_CXX_CORE_EXPORT")
-# undef HPX_CXX_CORE_EXPORT
-# define HPX_CXX_CORE_EXPORT
-#endif
-#include <hpx/execution_base/stdexec_forward.hpp>
-#if defined(HPX_COMPILE_BMI) && defined(HPX_COMPILE_CORE_WITH_MODULES)
-# undef HPX_CXX_CORE_EXPORT
-# pragma pop_macro("HPX_CXX_CORE_EXPORT")
-#endif
+# if defined(HPX_GCC_VERSION)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wall"
+#  pragma GCC diagnostic ignored "-Wextra"
+#  pragma GCC diagnostic ignored "-Wmissing-braces"
+# elif defined(HPX_CLANG_VERSION)
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Weverything"
+# endif
+
+# include <stdexec/execution.hpp>
+
+# if defined(HPX_GCC_VERSION)
+#  pragma GCC diagnostic pop
+# elif defined(HPX_CLANG_VERSION)
+#  pragma clang diagnostic pop
+# endif
 
 #if defined(HPX_HAVE_CXX20_COROUTINES)
 # if defined(__has_include)
