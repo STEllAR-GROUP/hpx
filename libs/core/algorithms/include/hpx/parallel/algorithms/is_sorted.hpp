@@ -403,6 +403,8 @@ namespace hpx::parallel {
                               pred_projected = HPX_MOVE(pred_projected)](
                               FwdIter_ part_begin, std::size_t part_size,
                               std::size_t base_idx) mutable -> void {
+                    std::size_t const cross_idx = base_idx + part_size;
+
                     FwdIter_ trail = part_begin++;
                     util::loop_idx_n<policy_type>(++base_idx, part_begin,
                         part_size - 1, tok,
@@ -419,12 +421,11 @@ namespace hpx::parallel {
                     // trail now points one past the current grouping unless
                     // canceled
 
-                    if (!tok.was_cancelled(base_idx + part_size) &&
-                        trail != last)
+                    if (!tok.was_cancelled(cross_idx) && trail != last)
                     {
                         if (HPX_INVOKE(pred_projected, *trail, *i))
                         {
-                            tok.cancel(base_idx + part_size);
+                            tok.cancel(cross_idx);
                         }
                     }
                 };
