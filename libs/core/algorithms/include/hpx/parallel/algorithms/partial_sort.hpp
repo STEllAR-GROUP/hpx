@@ -401,6 +401,7 @@ namespace hpx::parallel {
                 }
 
                 return hpx::dataflow(
+                    policy.executor(),
                     [last](hpx::future<Iter>&& leftf,
                         hpx::future<Iter>&& rightf) -> Iter {
                         if (leftf.has_exception() || rightf.has_exception())
