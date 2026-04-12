@@ -422,21 +422,26 @@ namespace hpx::collectives {
 
         if (this_site == root_site)
         {
-            std::vector<arg_type> gathered = gather_here(communicators,
-                HPX_FORWARD(T, local_result), this_site, gather_gen)
-                                                 .get();
+            auto gather_fut = gather_here(communicators,
+                HPX_FORWARD(T, local_result), this_site, gather_gen);
 
-            return broadcast_to(
-                communicators, HPX_MOVE(gathered), this_site, broadcast_gen);
+            return gather_fut.then(hpx::launch::sync,
+                [communicators, this_site, broadcast_gen](auto f) {
+                    return broadcast_to(
+                        communicators, f.get(), this_site, broadcast_gen);
+                });
         }
         else
         {
-            gather_there(communicators, HPX_FORWARD(T, local_result), this_site,
-                gather_gen)
-                .get();
+            auto gather_fut = gather_there(communicators,
+                HPX_FORWARD(T, local_result), this_site, gather_gen);
 
-            return broadcast_from<std::vector<arg_type>>(
-                communicators, this_site, broadcast_gen);
+            return gather_fut.then(hpx::launch::sync,
+                [communicators, this_site, broadcast_gen](auto f) {
+                    f.get();    // Propagate any exceptions from gather phase
+                    return broadcast_from<std::vector<arg_type>>(
+                        communicators, this_site, broadcast_gen);
+                });
         }
     }
 
