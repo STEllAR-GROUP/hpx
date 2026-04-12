@@ -15,6 +15,7 @@ set(segmented_algorithms_headers
     hpx/parallel/segmented_algorithms/all_any_none.hpp
     hpx/parallel/segmented_algorithms/count.hpp
     hpx/parallel/segmented_algorithms/detail/dispatch.hpp
+    hpx/parallel/segmented_algorithms/detail/is_partitioned.hpp
     hpx/parallel/segmented_algorithms/detail/reduce.hpp
     hpx/parallel/segmented_algorithms/detail/scan.hpp
     hpx/parallel/segmented_algorithms/detail/transfer.hpp
@@ -27,6 +28,7 @@ set(segmented_algorithms_headers
     hpx/parallel/segmented_algorithms/generate.hpp
     hpx/parallel/segmented_algorithms/inclusive_scan.hpp
     hpx/parallel/segmented_algorithms/is_sorted.hpp
+    hpx/parallel/segmented_algorithms/is_partitioned.hpp
     hpx/parallel/segmented_algorithms/minmax.hpp
     hpx/parallel/segmented_algorithms/reduce.hpp
     hpx/parallel/segmented_algorithms/replace.hpp
