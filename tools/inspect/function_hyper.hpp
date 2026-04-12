@@ -27,7 +27,7 @@ inline std::string linelink(path const& full_path, std::string const& linenumb)
     //be present in any full path this tool is used for (repeated in wordlink and
     // loclink)
     std::string total =
-        "<a href = \"https://github.com/STEllAR-GROUP/hpx/blob/" + commit +
+        "<a href = \"https://github.com/TheHPXProject/hpx/blob/" + commit +
         location + "#L" + linenumb + "\">";
     total = total + linenumb;
     total = total + "</a>";
@@ -42,7 +42,7 @@ inline std::string wordlink(
     std::string location = boost::inspect::relative_to(
         full_path, boost::inspect::search_root_path());
     std::string total =
-        "<a href = \"https://github.com/STEllAR-GROUP/hpx/blob/" + commit +
+        "<a href = \"https://github.com/TheHPXProject/hpx/blob/" + commit +
         location + "#L" + linenumb + "\">";
     total = total + word;
     total = total + "</a>";
@@ -56,7 +56,7 @@ inline std::string loclink(path const& full_path, std::string const& word)
     std::string location = boost::inspect::relative_to(
         full_path, boost::inspect::search_root_path());
     std::string total =
-        "<a href = \"https://github.com/STEllAR-GROUP/hpx/blob/" + commit +
+        "<a href = \"https://github.com/TheHPXProject/hpx/blob/" + commit +
         location + "\">";
     total = total + word;
     total = total + "</a>";

@@ -96,7 +96,7 @@
     HPX_ASSERT_(false,                                                         \
         "This code is meant to be unreachable. If you are seeing this error "  \
         "message it means that you have found a bug in HPX. Please report it " \
-        "on the issue tracker: https://github.com/STEllAR-GROUP/hpx/issues."); \
+        "on the issue tracker: https://github.com/TheHPXProject/hpx/issues."); \
     std::terminate()
 
 #define HPX_CURRENT_SOURCE_LOCATION() std::source_location::current()
