@@ -10,9 +10,9 @@ set(benchmarks channel_mpmc_throughput channel_mpsc_throughput
 
 hpx_option(
   HPX_WITH_ORBIT_ROOT
-  STRING
+  BOOL
   "Path to a local checkout of austin-hill/orbit used for optional synchronization comparison benchmarks."
-  ""
+  OFF
   ADVANCED
 )
 
@@ -42,6 +42,7 @@ foreach(benchmark ${benchmarks})
 endforeach()
 
 if(HPX_WITH_ORBIT_ROOT)
+  # Orbit can be found at https://github.com/austin-hill/orbit.
   if(EXISTS "${HPX_WITH_ORBIT_ROOT}/include/orbit/mpmc_queue.h")
     add_hpx_executable(
       channel_mpmc_comparison_test INTERNAL_FLAGS

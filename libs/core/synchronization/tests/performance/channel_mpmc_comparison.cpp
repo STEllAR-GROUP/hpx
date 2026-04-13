@@ -9,6 +9,7 @@
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/synchronization.hpp>
 
+// Orbit can be found at https://github.com/austin-hill/orbit.
 #include <orbit/mpmc_queue.h>
 
 #include <algorithm>
