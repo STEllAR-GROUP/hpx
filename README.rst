@@ -143,7 +143,7 @@ We have used a free open-source license of `PVS-Studio, a static analyzer for C+
 to check our code base.
 
 Past and current funding and support for HPX is listed `here
-<https://hpx.stellar-group.org/funding-acknowledgements>`_
+<https://hpx.stellar-group.org/funding-acknowledgements>`_.
 
 Copyright © 2026 HPX Project a Series of LF Projects, LLC
 

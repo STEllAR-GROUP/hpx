@@ -3047,7 +3047,8 @@ int main(int argc, char const* argv[])
     std::string html_prefix = R"(
     <table><tr>
         <td><a href="https://github.com/TheHPXProject/hpx">
-        <img src="https://docs.hpx.dev/branches/master/html/_static/favicon.png" alt="HPX logo" />
+        <img src="https://docs.hpx.dev/branches/master/html/_static/favicon.png"
+            alt="HPX logo" width="100" height="100"/>
         </a></td>
         <td><div class='logo'>
             <div class='upper'>HPX</div>
