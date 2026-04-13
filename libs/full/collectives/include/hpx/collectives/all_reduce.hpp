@@ -461,28 +461,22 @@ namespace hpx::collectives {
 
         if (this_site == root_site)
         {
-            auto reduce_fut =
+            arg_type reduced =
                 reduce_here(communicators, HPX_FORWARD(T, local_result),
-                    HPX_FORWARD(F, op), this_site, reduce_gen);
+                    HPX_FORWARD(F, op), this_site, reduce_gen)
+                    .get();
 
-            return reduce_fut.then(hpx::launch::sync,
-                [communicators, this_site, broadcast_gen](auto f) {
-                    return broadcast_to(
-                        communicators, f.get(), this_site, broadcast_gen);
-                });
+            return broadcast_to(
+                communicators, HPX_MOVE(reduced), this_site, broadcast_gen);
         }
         else
         {
-            auto reduce_fut =
-                reduce_there(communicators, HPX_FORWARD(T, local_result),
-                    HPX_FORWARD(F, op), this_site, reduce_gen);
+            reduce_there(communicators, HPX_FORWARD(T, local_result),
+                HPX_FORWARD(F, op), this_site, reduce_gen)
+                .get();
 
-            return reduce_fut.then(hpx::launch::sync,
-                [communicators, this_site, broadcast_gen](auto f) {
-                    f.get();    // Propagate any exceptions from reduce phase
-                    return broadcast_from<arg_type>(
-                        communicators, this_site, broadcast_gen);
-                });
+            return broadcast_from<arg_type>(
+                communicators, this_site, broadcast_gen);
         }
     }
 
