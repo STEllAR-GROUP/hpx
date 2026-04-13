@@ -7,8 +7,6 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_COMPRESSION_ZLIB)
-#include <boost/iostreams/filter/zlib.hpp>
-
 #include <hpx/modules/actions.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
