@@ -26,17 +26,7 @@
 
 namespace {
 
-    struct queue_data
-    {
-        explicit queue_data(std::uint64_t value = 0)
-          : value_(value)
-        {
-        }
-
-        std::uint64_t value_ = 0;
-    };
-
-    using data = hpx::util::cache_line_data<queue_data>;
+    using data = hpx::util::cache_line_data<std::uint64_t>;
 
     struct consumer_result
     {
@@ -118,13 +108,13 @@ namespace {
                 continue;
             }
 
-            if (value.data_.value_ == 0)
+            if (value.data_ == 0)
             {
                 return result;
             }
 
             ++result.count_;
-            result.checksum_ += value.data_.value_;
+            result.checksum_ += value.data_;
         }
     }
 
