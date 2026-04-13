@@ -21,7 +21,7 @@ namespace hpx::datapar::experimental {
     HPX_HOST_DEVICE HPX_FORCEINLINE auto set(
         Vector& vec, std::size_t index, T val) noexcept
     {
-        vec[index] = val;
+        vec.set(static_cast<int>(index), val);
     }
 
     HPX_CXX_CORE_EXPORT using simd_abi::native;

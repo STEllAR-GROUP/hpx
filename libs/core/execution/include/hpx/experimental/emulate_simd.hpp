@@ -11,13 +11,15 @@
 #if defined(HPX_HAVE_DATAPAR_EMULATION)
 
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
-#include <iostream>
 #include <numeric>
+#include <ostream>
 #include <type_traits>
+#include <utility>
 
 namespace hpx::datapar::experimental {
 
