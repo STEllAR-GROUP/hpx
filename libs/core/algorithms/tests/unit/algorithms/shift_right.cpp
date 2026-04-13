@@ -237,8 +237,7 @@ void test_shift_right_return_iterator(ExPolicy&& policy)
     // empty range: returns first
     {
         std::vector<std::size_t> empty;
-        auto result =
-            hpx::shift_right(policy, empty.begin(), empty.end(), 0);
+        auto result = hpx::shift_right(policy, empty.begin(), empty.end(), 0);
         HPX_TEST(result == empty.begin());
     }
 }
