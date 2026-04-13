@@ -1185,6 +1185,108 @@ namespace hpx { namespace components { namespace server {
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    // Static equivalent of load_plugin. Looks up the statically registered
+    // plugin_factory_base getter by instance name and inserts the resulting
+    // factory into plugins_. Commandline options and startup/shutdown
+    // functions are handled via the existing component-side static helpers,
+    // which are agnostic to whether the module is a component or a plugin.
+    bool runtime_support::load_plugin_static(util::section& ini,
+        std::string const& instance, std::string const& plugin, bool isenabled,
+        hpx::program_options::options_description& options,
+        std::set<std::string>& startup_handled)
+    {
+        try
+        {
+            util::section const* glob_ini = nullptr;
+            if (ini.has_section("settings"))
+                glob_ini = ini.get_section("settings");
+
+            util::section const* plugin_ini = nullptr;
+            std::string const plugin_section("hpx.plugins." + instance);
+            if (ini.has_section(plugin_section))
+                plugin_ini = ini.get_section(plugin_section);
+
+            error_code ec(throwmode::lightweight);
+            if (nullptr == plugin_ini ||
+                "0" == plugin_ini->get_entry("no_factory", "0"))
+            {
+                util::plugin::get_plugins_list_type get_factory;
+                if (!components::get_static_plugin_factory(
+                        instance, get_factory))
+                {
+                    LRT_(warning).format(
+                        "static loading of plugin factory failed: {}: "
+                        "couldn't find factory in global static plugin "
+                        "factory map",
+                        instance);
+                    return false;
+                }
+
+                hpx::util::plugin::static_plugin_factory<
+                    plugins::plugin_factory_base> const pf(get_factory);
+
+                std::shared_ptr<plugins::plugin_factory_base> const f(
+                    pf.create(instance, ec, glob_ini, plugin_ini, isenabled));
+                if (!ec)
+                {
+                    plugin_factory_type data(f, isenabled);
+                    std::pair<plugin_map_type::iterator, bool> const p =
+                        plugins_.insert(
+                            plugin_map_type::value_type(instance, data));
+
+                    if (!p.second)
+                    {
+                        LRT_(fatal).format(
+                            "duplicate plugin type: {}", instance);
+                        return false;
+                    }
+
+                    LRT_(info).format(
+                        "static loading of plugin succeeded: {}", instance);
+                }
+                else
+                {
+                    LRT_(warning).format(
+                        "static loading of plugin factory failed: {}: {}",
+                        instance, get_error_what(ec));
+                    return false;
+                }
+            }
+
+            // Module-scoped startup/shutdown + commandline registration runs
+            // at most once per module. Plugin modules feed the same static
+            // commandline/startup maps as components via the shared
+            // HPX_REGISTER_COMMANDLINE_OPTIONS / HPX_REGISTER_STARTUP_SHUTDOWN
+            // macros, so the component-side helpers work unchanged.
+            if (startup_handled.find(plugin) == startup_handled.end())
+            {
+                startup_handled.insert(plugin);
+                load_commandline_options_static(plugin, options, ec);
+                if (ec)
+                    ec = error_code(throwmode::lightweight);
+                load_startup_shutdown_functions_static(plugin, ec);
+            }
+        }
+        catch (hpx::exception const&)
+        {
+            throw;
+        }
+        catch (std::logic_error const& e)
+        {
+            LRT_(warning).format(
+                "static loading of plugin failed: {}: {}", instance, e.what());
+            return false;
+        }
+        catch (std::exception const& e)
+        {
+            LRT_(warning).format(
+                "static loading of plugin failed: {}: {}", instance, e.what());
+            return false;
+        }
+        return true;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     // Load all components from the ini files found in the configuration
     int runtime_support::load_components(util::section& ini,
         naming::gid_type const& prefix, agas::addressing_service& agas_client,
@@ -1776,12 +1878,8 @@ namespace hpx { namespace components { namespace server {
 
                 if (sect.get_entry("static", "0") == "1")
                 {
-                    // FIXME: implement statically linked plugins
-                    HPX_THROW_EXCEPTION(hpx::error::service_unavailable,
-                        "runtime_support::load_plugins",
-                        "static linking configuration does not support static "
-                        "loading of plugin '{}'",
-                        instance);
+                    load_plugin_static(ini, instance, component, isenabled,
+                        options, startup_handled);
                 }
                 else
                 {
@@ -1850,7 +1948,7 @@ namespace hpx { namespace components { namespace server {
                 if (!ec)
                 {
                     // store component factory and module for later use
-                    plugin_factory_type data(f, d, isenabled);
+                    plugin_factory_type data(f, isenabled);
                     std::pair<plugin_map_type::iterator, bool> p =
                         plugins_.insert(
                             plugin_map_type::value_type(instance, data));

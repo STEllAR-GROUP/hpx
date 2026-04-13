@@ -50,15 +50,25 @@ struct hpx::util::plugin::virtual_constructor<hpx::plugins::plugin_factory_base>
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-/// This macro is used to register the given component factory with
-/// Hpx.Plugin. This macro has to be used for each of the component factories.
+/// This macro is used to register the given plugin factory with Hpx.Plugin.
+/// This macro has to be used for each of the plugin factories. Ungated,
+/// matching the component analog (HPX_REGISTER_COMPONENT_FACTORY).
 #define HPX_REGISTER_PLUGIN_FACTORY_BASE(FactoryType, pluginname)              \
     HPX_PLUGIN_EXPORT(HPX_PLUGIN_PLUGIN_PREFIX,                                \
         hpx::plugins::plugin_factory_base, FactoryType, pluginname, factory)   \
+    HPX_INIT_REGISTRY_PLUGIN_FACTORY_STATIC(                                   \
+        HPX_PLUGIN_PLUGIN_PREFIX, pluginname, factory)                         \
 /**/
 
+////////////////////////////////////////////////////////////////////////////////
+// Mirror the component module gating pattern (macros.hpp lines 66-93):
+//   !APP_NAME && !STATIC_LINKING -> full expansion (dynamic build, library TU)
+//   STATIC_LINKING               -> full expansion (static build, any TU)
+//   APP_NAME only                -> nothing       (dynamic build, exe TU)
+#if !defined(HPX_APPLICATION_NAME) && !defined(HPX_HAVE_STATIC_LINKING)
+
 /// This macro is used to define the required Hpx.Plugin entry points. This
-/// macro has to be used in exactly one compilation unit of a component module.
+/// macro has to be used in exactly one compilation unit of a plugin module.
 #define HPX_REGISTER_PLUGIN_MODULE()                                           \
     HPX_PLUGIN_EXPORT_LIST(HPX_PLUGIN_PLUGIN_PREFIX, factory)                  \
     HPX_REGISTER_PLUGIN_REGISTRY_MODULE()                                      \
@@ -68,3 +78,17 @@ struct hpx::util::plugin::virtual_constructor<hpx::plugins::plugin_factory_base>
     HPX_PLUGIN_EXPORT_LIST(HPX_PLUGIN_PLUGIN_PREFIX, factory)                  \
     HPX_REGISTER_PLUGIN_REGISTRY_MODULE_DYNAMIC()                              \
     /**/
+
+#else
+
+#if defined(HPX_HAVE_STATIC_LINKING)
+#define HPX_REGISTER_PLUGIN_MODULE()                                           \
+    HPX_PLUGIN_EXPORT_LIST(HPX_PLUGIN_PLUGIN_PREFIX, factory)                  \
+    HPX_REGISTER_PLUGIN_REGISTRY_MODULE()                                      \
+    /**/
+#else
+#define HPX_REGISTER_PLUGIN_MODULE()
+#endif
+#define HPX_REGISTER_PLUGIN_MODULE_DYNAMIC()
+
+#endif

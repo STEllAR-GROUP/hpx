@@ -658,6 +658,25 @@ namespace hpx::util {
         load_component_paths(plugin_registries, component_registries,
             plugin_paths, "", component_paths, basenames);
 
+        // In static builds there are no shared libraries to dlopen, so
+        // pull in statically registered plugin modules instead. In dynamic
+        // builds the DLL scan above already loaded every plugin .so (whose
+        // file-scope constructors populate get_static_plugin_module_data()),
+        // so iterating the static map here would create duplicate registry
+        // objects and duplicate init() calls.
+#if defined(HPX_HAVE_STATIC_LINKING)
+        for (components::static_factory_load_data_type const& d :
+            components::get_static_plugin_module_data())
+        {
+            auto new_registries =
+                util::load_plugin_factory_static(*this, d.name, d.get_factory);
+            plugin_registries.reserve(
+                plugin_registries.size() + new_registries.size());
+            std::move(new_registries.begin(), new_registries.end(),
+                std::back_inserter(plugin_registries));
+        }
+#endif
+
         // read system and user ini files _again_, to allow the user to
         // overwrite the settings from the default component ini's.
         util::init_ini_data_base(*this, hpx_ini_file);
