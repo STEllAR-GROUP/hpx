@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/config/defines.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <exception>
 #include <memory>
@@ -63,6 +64,7 @@ namespace hpx::util {
                     is_nothrow_copy_constructible_v<Allocator>))
               : alloc(a)
               , data(0)
+              , cached(0)
               , capacity(cap)
             {
             }
@@ -131,7 +133,7 @@ namespace hpx::util {
 
             void deallocate(pointer p, size_type n)
             {
-                if (cached < capacity)
+                if (cached.load(std::memory_order_relaxed) < capacity)
                 {
                     try
                     {
@@ -166,13 +168,13 @@ namespace hpx::util {
                         // swallow all exceptions during thread shutdown
                     }
                 }
-                cached = 0;
+                cached.store(0, std::memory_order_relaxed);
             }
 
             HPX_NO_UNIQUE_ADDRESS Allocator alloc;
             Stack<cached_entry, Allocator> data;
-            std::size_t cached = 0;
-            std::size_t capacity = DefaultCapacity;
+            std::atomic<std::size_t> cached;
+            std::size_t const capacity = DefaultCapacity;
         };
 
         allocated_cache& cache()
