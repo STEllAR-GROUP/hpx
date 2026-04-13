@@ -428,6 +428,7 @@ namespace hpx::parallel::detail {
                     {
                         if (HPX_INVOKE(cmp, v, *iter))
                         {
+                            // short-circuit: no need to check remaining search elements
                             tok.cancel(i);
                             return;
                         }
