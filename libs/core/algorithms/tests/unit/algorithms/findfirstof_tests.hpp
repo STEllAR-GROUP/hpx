@@ -428,10 +428,10 @@ void test_find_first_of_edge_cases(ExPolicy&& policy)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Standard-compliance test: empty needle range must return first
+// Standard-compliance test: empty needle range must return last
 //
 // C++ standard [alg.find.first.of]:
-//   "Returns: first if [s_first, s_last) is empty or if no such iterator
+//   "Returns: last if [s_first, s_last) is empty or if no such iterator
 //    is found."
 // This is exercised independently for seq, par, and par_unseq because parallel
 // implementations must honor the same pre-condition check before any work.
@@ -450,8 +450,8 @@ void test_find_first_of_empty_needle(ExPolicy&& policy, IteratorTag)
     iterator result = hpx::find_first_of(policy, iterator(c.begin()),
         iterator(c.end()), needle.begin(), needle.end());
 
-    // Must return first (== c.begin()) when needle is empty
-    HPX_TEST(result == iterator(c.begin()));
+    // Must return last (== c.end()) when needle is empty
+    HPX_TEST(result == iterator(c.end()));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
