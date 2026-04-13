@@ -257,7 +257,7 @@ void test_shift_left_cross_policy()
 {
     using namespace hpx::execution;
 
-    auto check = [](std::vector<std::size_t> c, int n, char const* scenario) {
+    auto verify_consistency = [](std::vector<std::size_t> c, int n) {
         std::vector<std::size_t> c_par = c;
         std::vector<std::size_t> c_pu = c;
 
@@ -276,12 +276,12 @@ void test_shift_left_cross_policy()
     std::vector<std::size_t> base(50);
     std::iota(base.begin(), base.end(), std::size_t(1));
 
-    check(base, 0, "");
-    check(base, 50, "");
-    check(base, 99, "");
-    check(base, 25, "");
-    check(base, 1, "");
-    check(base, 49, "");
+    verify_consistency(base, 0);
+    verify_consistency(base, 50);
+    verify_consistency(base, 99);
+    verify_consistency(base, 25);
+    verify_consistency(base, 1);
+    verify_consistency(base, 49);
 }
 
 void shift_left_return_iterator_test()
