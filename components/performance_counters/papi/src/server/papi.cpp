@@ -19,8 +19,6 @@
 #include <hpx/modules/type_support.hpp>
 #include <hpx/runtime_components/derived_component_factory.hpp>
 
-#include <boost/version.hpp>
-
 #include <cstdint>
 #include <functional>
 #include <mutex>
