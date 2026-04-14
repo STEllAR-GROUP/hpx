@@ -27,6 +27,7 @@ set(tests
     partitioned_vector_min_element2
     partitioned_vector_minmax_element1
     partitioned_vector_minmax_element2
+    partitioned_vector_mismatch
     partitioned_vector_move
     partitioned_vector_target
     partitioned_vector_transform1
