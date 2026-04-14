@@ -566,10 +566,10 @@ namespace hpx::util {
         void maybe_log_exhaustion()
         {
             using namespace std::chrono;
-            auto const now_ns = static_cast<std::int64_t>(
-                duration_cast<nanoseconds>(
+            auto const now_ns =
+                static_cast<std::int64_t>(duration_cast<nanoseconds>(
                     steady_clock::now().time_since_epoch())
-                    .count());
+                        .count());
             constexpr std::int64_t throttle_ns = 5'000'000'000LL;    // 5 s
             if (now_ns - last_exhaustion_log_ns_ >= throttle_ns)
             {
