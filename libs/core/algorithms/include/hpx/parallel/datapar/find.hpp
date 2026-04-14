@@ -477,12 +477,11 @@ namespace hpx::parallel::detail {
             std::size_t base_idx, std::size_t part_size, Token& tok, Pred&& op,
             Proj1&& proj1, Proj2&& proj2)
         {
-            std::size_t idx = 0;
             util::loop_idx_n<hpx::execution::sequenced_policy>(base_idx, it,
                 part_size, tok,
-                [&it, &proj1, &s_first, &s_last, &proj2, &op, &tok, &idx](
-                    auto, std::size_t i) {
-                    auto val = *hpx::invoke(proj1, it + idx);
+                [&proj1, &s_first, &s_last, &proj2, &op, &tok](
+                    auto&& v, std::size_t i) {
+                    auto val = hpx::invoke(proj1, v);
 
                     bool local_cancelled = false;
                     util::cancellation_token<> local_tok;
@@ -505,7 +504,6 @@ namespace hpx::parallel::detail {
 
                     if (local_tok.was_cancelled())
                         tok.cancel(i);
-                    ++idx;
                 });
         }
     };
