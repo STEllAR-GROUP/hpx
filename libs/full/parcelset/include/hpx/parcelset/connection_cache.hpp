@@ -349,6 +349,18 @@ namespace hpx::util {
 
             if (ct != cache_.end())
             {
+                // Verify that there are actually outstanding (checked-out)
+                // connections for this locality. If all existing connections
+                // are already cached, this reclaim is a caller error.
+                if (cached_connections(ct->second).size() >=
+                    num_existing_connections(ct->second))
+                {
+                    HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                        "connection_cache::reclaim",
+                        "reclaiming a connection that was not "
+                        "properly checked out");
+                }
+
                 // Update LRU meta data.
                 key_tracker_.splice(key_tracker_.end(), key_tracker_,
                     lru_reference(ct->second));
@@ -381,8 +393,6 @@ namespace hpx::util {
 #endif
                 }
 
-                // FIXME: Again, this should probably throw instead of asserting,
-                // as invariants could be invalidated here due to caller error.
                 check_invariants();
             }
         }
@@ -421,6 +431,22 @@ namespace hpx::util {
         void clear()
         {
             std::lock_guard<mutex_type> lock(mtx_);
+
+            // Verify that no connections are currently checked out. Clearing
+            // the cache while connections are outstanding is a caller error
+            // that would silently corrupt connection counts.
+            for (auto const& entry : cache_)
+            {
+                if (cached_connections(entry.second).size() <
+                    num_existing_connections(entry.second))
+                {
+                    HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                        "connection_cache::clear",
+                        "clearing cache while connections are still "
+                        "checked out");
+                }
+            }
+
             key_tracker_.clear();
             cache_.clear();
             connections_ = 0;
@@ -431,8 +457,6 @@ namespace hpx::util {
             misses_ = 0;
             reclaims_ = 0;
 
-            // FIXME: This should probably throw instead of asserting, as it
-            // can be triggered by caller error.
             check_invariants();
         }
 
@@ -450,6 +474,18 @@ namespace hpx::util {
             typename cache_type::iterator it = cache_.find(l);
             if (it != cache_.end())
             {
+                // Verify that no connections are currently checked out for
+                // this locality. Clearing while connections are outstanding
+                // is a caller error that would corrupt connection counts.
+                if (cached_connections(it->second).size() <
+                    num_existing_connections(it->second))
+                {
+                    HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                        "connection_cache::clear",
+                        "clearing locality cache entry while connections "
+                        "are still checked out");
+                }
+
                 // Remove from LRU meta data.
                 key_tracker_.erase(lru_reference(it->second));
 
@@ -462,8 +498,6 @@ namespace hpx::util {
                 cache_.erase(it);
             }
 
-            // FIXME: This should probably throw instead of asserting, as it
-            // can be triggered by caller error.
             check_invariants();
         }
 
@@ -477,6 +511,18 @@ namespace hpx::util {
             typename cache_type::iterator const it = cache_.find(l);
             if (it != cache_.end())
             {
+                // Verify that there are actually outstanding (checked-out)
+                // connections for this locality. If all existing connections
+                // are already cached, this clear is a caller error.
+                if (cached_connections(it->second).size() >=
+                    num_existing_connections(it->second))
+                {
+                    HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                        "connection_cache::clear",
+                        "clearing a connection that was not "
+                        "properly checked out");
+                }
+
                 // Adjust the number of existing connections for this key.
                 decrement_connection_count(it->second);
 
