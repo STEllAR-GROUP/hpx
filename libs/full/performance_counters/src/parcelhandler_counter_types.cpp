@@ -573,7 +573,8 @@ namespace hpx::performance_counters {
                         HPX_MOVE(cache_reclaims), _2),
                     &performance_counters::locality_counter_discoverer, ""},
                 {hpx::util::format(
-                     "/parcelport/count/{}/cache-reservation-failures", pp_type),
+                     "/parcelport/count/{}/cache-reservation-failures",
+                     pp_type),
                     performance_counters::counter_type::raw,
                     hpx::util::format(
                         "returns the number of times a connection reservation "
