@@ -244,7 +244,7 @@ namespace hpx::parallel {
                 auto dist =
                     static_cast<std::size_t>(detail::distance(first, last));
                 // C++20 [alg.shift]: if n is 0, do nothing and return first.
-                if (n <= 0)
+                if (n == 0)
                 {
                     return first;
                 }
@@ -267,7 +267,7 @@ namespace hpx::parallel {
                 auto dist =
                     static_cast<std::size_t>(detail::distance(first, last));
                 // C++20 [alg.shift]: if n is 0, do nothing and return first.
-                if (n <= 0)
+                if (n == 0)
                 {
                     return parallel::util::detail::algorithm_result<ExPolicy,
                         FwdIter2>::get(HPX_MOVE(first));
