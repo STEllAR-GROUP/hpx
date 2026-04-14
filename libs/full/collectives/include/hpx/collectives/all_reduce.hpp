@@ -429,8 +429,8 @@ namespace hpx::collectives {
 
     ////////////////////////////////////////////////////////////////////////////
     // Hierarchical all_reduce: reduce (bottom-up) + broadcast (top-down)
-    // Uses 2k/2k+1 generation mapping: user generation k maps to
-    // internal generation 2k (reduce phase) and 2k+1 (broadcast phase)
+    // Uses 2k-1/2k generation mapping: user generation k maps to
+    // internal generation 2k-1 (reduce phase) and 2k (broadcast phase)
 
     // Scalar overload
     template <typename T, typename F>

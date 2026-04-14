@@ -387,8 +387,8 @@ namespace hpx::collectives {
 
     ////////////////////////////////////////////////////////////////////////////
     // Hierarchical all_gather: gather (bottom-up) + broadcast (top-down)
-    // Uses 2k/2k+1 generation mapping: user generation k maps to
-    // internal generation 2k (gather phase) and 2k+1 (broadcast phase)
+    // Uses 2k-1/2k generation mapping: user generation k maps to
+    // internal generation 2k-1 (gather phase) and 2k (broadcast phase)
     //
     // Key difference from all_reduce: the gather phase produces vector<T>
     // (O(N) data), so the broadcast phase transfers O(N) instead of a scalar.
