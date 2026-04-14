@@ -18,6 +18,7 @@
 #include <hpx/runtime_configuration/static_factory_data.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <map>
 #include <memory>
 #include <string>
