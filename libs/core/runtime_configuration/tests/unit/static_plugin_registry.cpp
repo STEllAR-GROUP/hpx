@@ -5,7 +5,14 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 // Unit tests for the static plugin registry infrastructure that supports
-// static linking of HPX plugins (binary filters, message handlers, etc.).
+// static linking of HPX plugins (binary filters, message handlers, etc.)
+// and plugins implemented directly inside the application executable.
+
+// HPX_PLUGIN_NAME must be defined before <hpx/config.hpp> so that
+// config.hpp can derive HPX_PLUGIN_PLUGIN_PREFIX from it. This stands in
+// for the target_compile_definition CMake adds for plugin targets; here
+// the "plugin" lives in the test executable itself.
+#define HPX_PLUGIN_NAME app_local_plugin
 
 #include <hpx/config.hpp>
 #include <hpx/modules/datastructures.hpp>
@@ -14,6 +21,7 @@
 #include <hpx/modules/plugin.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/runtime_configuration/init_ini_data.hpp>
+#include <hpx/runtime_configuration/macros.hpp>
 #include <hpx/runtime_configuration/plugin_registry_base.hpp>
 #include <hpx/runtime_configuration/static_factory_data.hpp>
 
@@ -137,6 +145,21 @@ static struct multi_plugin_exporter
         get_multi_plugin_map().insert({"fake_beta", hpx::any_nonser(wb)});
     }
 } multi_exporter_instance;
+
+struct app_local_plugin_registry : hpx::plugins::plugin_registry_base
+{
+    bool get_plugin_info(std::vector<std::string>& fillini) override
+    {
+        fillini.emplace_back("[hpx.plugins.app_local_plugin_instance]");
+        fillini.emplace_back("name = app_local_plugin_instance");
+        fillini.emplace_back("enabled = 1");
+        return true;
+    }
+};
+
+HPX_REGISTER_PLUGIN_BASE_REGISTRY(
+    app_local_plugin_registry, app_local_plugin_instance)
+HPX_REGISTER_PLUGIN_REGISTRY_MODULE()
 
 ///////////////////////////////////////////////////////////////////////////////
 // Test: init_registry_plugin_module stores a plugin module entry and
@@ -299,6 +322,49 @@ void test_load_plugin_factory_static_multi_section()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// End-to-end test for the macro-based in-app plugin registration above.
+// Finds the entry pushed by HPX_REGISTER_PLUGIN_REGISTRY_MODULE's static
+// ctor, then runs it through load_plugin_factory_static and asserts the
+// generated ini section matches what app_local_plugin_registry produced.
+void test_app_local_plugin_via_macros()
+{
+    hpx::util::plugin::get_plugins_list_type get_factory = nullptr;
+    for (auto const& entry : hpx::components::get_static_plugin_module_data())
+    {
+        if (std::string(entry.name) == "app_local_plugin")
+        {
+            get_factory = entry.get_factory;
+            break;
+        }
+    }
+    HPX_TEST(get_factory != nullptr);
+    if (get_factory == nullptr)
+        return;
+
+    hpx::util::section ini;
+    hpx::error_code ec(hpx::throwmode::lightweight);
+    auto registries = hpx::util::load_plugin_factory_static(
+        ini, "app_local_plugin", get_factory, ec);
+
+    HPX_TEST(!ec);
+    HPX_TEST(!registries.empty());
+
+    HPX_TEST(ini.has_section("hpx.plugins.app_local_plugin_instance"));
+    if (ini.has_section("hpx.plugins.app_local_plugin_instance"))
+    {
+        auto* sect = ini.get_section("hpx.plugins.app_local_plugin_instance");
+        HPX_TEST(sect != nullptr);
+        if (sect != nullptr)
+        {
+            HPX_TEST_EQ(sect->get_entry("static", "0"), std::string("1"));
+            HPX_TEST_EQ(sect->get_entry("name", ""),
+                std::string("app_local_plugin_instance"));
+            HPX_TEST_EQ(sect->get_entry("enabled", "0"), std::string("1"));
+        }
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
 int main()
 {
     test_init_registry_plugin_module();
@@ -307,6 +373,7 @@ int main()
     test_load_plugin_factory_static();
     test_load_plugin_factory_static_empty();
     test_load_plugin_factory_static_multi_section();
+    test_app_local_plugin_via_macros();
 
     return hpx::util::report_errors();
 }

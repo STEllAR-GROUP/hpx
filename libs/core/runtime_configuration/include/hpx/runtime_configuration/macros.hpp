@@ -149,15 +149,10 @@
         hpx::plugins::plugin_registry_base, PluginType, name, plugin)          \
     /**/
 
-////////////////////////////////////////////////////////////////////////////////
-// Mirror the component module gating pattern (lines 66-93 above):
-//   !APP_NAME && !STATIC_LINKING -> full expansion (dynamic build, library TU)
-//   STATIC_LINKING               -> full expansion (static build, any TU)
-//   APP_NAME only                -> nothing       (dynamic build, exe TU)
-#if !defined(HPX_APPLICATION_NAME) && !defined(HPX_HAVE_STATIC_LINKING)
-
 /// This macro is used to define the required Hpx.Plugin entry points. This
 /// macro has to be used in exactly one compilation unit of a plugin module.
+/// Ungated: a plugin may live in a shared library, in a statically linked
+/// build, or directly in the application executable.
 #define HPX_REGISTER_PLUGIN_REGISTRY_MODULE()                                  \
     HPX_PLUGIN_EXPORT_LIST(HPX_PLUGIN_PLUGIN_PREFIX, plugin)                   \
     HPX_INIT_REGISTRY_PLUGIN_MODULE_STATIC(HPX_PLUGIN_PLUGIN_PREFIX, plugin)   \
@@ -166,20 +161,6 @@
 #define HPX_REGISTER_PLUGIN_REGISTRY_MODULE_DYNAMIC()                          \
     HPX_PLUGIN_EXPORT_LIST_DYNAMIC(HPX_PLUGIN_PLUGIN_PREFIX, plugin)           \
     /**/
-
-#else
-
-#if defined(HPX_HAVE_STATIC_LINKING)
-#define HPX_REGISTER_PLUGIN_REGISTRY_MODULE()                                  \
-    HPX_PLUGIN_EXPORT_LIST(HPX_PLUGIN_PLUGIN_PREFIX, plugin)                   \
-    HPX_INIT_REGISTRY_PLUGIN_MODULE_STATIC(HPX_PLUGIN_PLUGIN_PREFIX, plugin)   \
-    /**/
-#else
-#define HPX_REGISTER_PLUGIN_REGISTRY_MODULE()
-#endif
-#define HPX_REGISTER_PLUGIN_REGISTRY_MODULE_DYNAMIC()
-
-#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // from hpx/runtime_configuration/static_factory_data.hpp
