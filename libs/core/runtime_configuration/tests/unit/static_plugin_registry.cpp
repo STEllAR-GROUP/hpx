@@ -19,11 +19,8 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/ini.hpp>
 #include <hpx/modules/plugin.hpp>
+#include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/runtime_configuration/init_ini_data.hpp>
-#include <hpx/runtime_configuration/macros.hpp>
-#include <hpx/runtime_configuration/plugin_registry_base.hpp>
-#include <hpx/runtime_configuration/static_factory_data.hpp>
 
 #include <algorithm>
 #include <cstddef>
