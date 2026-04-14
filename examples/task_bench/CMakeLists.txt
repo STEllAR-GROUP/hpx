@@ -53,6 +53,12 @@ if(COMMAND add_hpx_executable)
     SOURCES "${task_bench_SOURCE_DIR}/hpx/hpx_fork_join.cc"
     FOLDER "Examples/TaskBench"
   )
+  # hpx/hpx.hpp and hpx/hpx_init.hpp live in the hpx_include module
+  # (libs/full/include/include). Link it explicitly because the include path is
+  # not always propagated via HPX::hpx on all platforms.
+  if(TARGET hpx_include)
+    target_link_libraries(hpx_fork_join PRIVATE hpx_include)
+  endif()
 else()
   find_package(HPX REQUIRED)
   add_executable(hpx_fork_join "${task_bench_SOURCE_DIR}/hpx/hpx_fork_join.cc")
@@ -70,6 +76,9 @@ if(MPI_FOUND)
       SOURCES "${task_bench_SOURCE_DIR}/hpx/hpx_distributed.cc"
       FOLDER "Examples/TaskBench"
     )
+    if(TARGET hpx_include)
+      target_link_libraries(hpx_distributed PRIVATE hpx_include)
+    endif()
   else()
     add_executable(
       hpx_distributed "${task_bench_SOURCE_DIR}/hpx/hpx_distributed.cc"
