@@ -10,6 +10,7 @@
 
 #include <iostream>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 #include "findfirstof_tests.hpp"
@@ -79,16 +80,33 @@ void find_first_of_bad_alloc_test()
     test_find_first_of_bad_alloc<std::forward_iterator_tag>();
 }
 
-void find_first_of_edge_cases_test()
+////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_find_first_of_edge_cases()
 {
     using namespace hpx::execution;
-    // Run edge-case checks for all three standard policies.
-    // These verify empty-range boundary conditions and that the inner
-    // search loop short-circuits after the first needle match
-    // (regression guard for the missing `return;` fix).
-    test_find_first_of_edge_cases(seq);
-    test_find_first_of_edge_cases(par);
-    test_find_first_of_edge_cases(par_unseq);
+
+    // 1. Invocation count and simple boundary checks (random access only)
+    if constexpr (std::is_same_v<IteratorTag, std::random_access_iterator_tag>)
+    {
+        test_find_first_of_edge_cases(seq);
+        test_find_first_of_edge_cases(par);
+        test_find_first_of_edge_cases(par_unseq);
+    }
+
+    // 2. Empty needle: exercised individually per policy
+    test_find_first_of_empty_needle(seq, IteratorTag());
+    test_find_first_of_empty_needle(par, IteratorTag());
+    test_find_first_of_empty_needle(par_unseq, IteratorTag());
+
+    // 3. Cross-policy consistency
+    test_find_first_of_cross_policy(IteratorTag());
+}
+
+void find_first_of_edge_cases_test()
+{
+    test_find_first_of_edge_cases<std::random_access_iterator_tag>();
+    test_find_first_of_edge_cases<std::forward_iterator_tag>();
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)
@@ -103,6 +121,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     find_first_of_exception_test();
     find_first_of_bad_alloc_test();
     find_first_of_edge_cases_test();
+
     return hpx::local::finalize();
 }
 
