@@ -456,8 +456,8 @@ namespace hpx::collectives {
             this_site = agas::get_locality_id();
         }
 
-        generation_arg const reduce_gen(2 * generation);
-        generation_arg const broadcast_gen(2 * generation + 1);
+        generation_arg const reduce_gen(2 * generation - 1);
+        generation_arg const broadcast_gen(2 * generation);
 
         if (this_site == root_site)
         {
