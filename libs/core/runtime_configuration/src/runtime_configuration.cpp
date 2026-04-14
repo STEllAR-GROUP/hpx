@@ -1,11 +1,11 @@
-//  Copyright (c) 2005-2025 Hartmut Kaiser
+//  Copyright (c) 2005-2026 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Adelstein-Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config/endian.hpp>
+#include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
@@ -261,6 +261,9 @@ namespace hpx::util {
             "init_threads_count = "
             "${HPX_THREAD_QUEUE_INIT_THREADS_COUNT:" HPX_PP_STRINGIZE(
                 HPX_PP_EXPAND(HPX_THREAD_QUEUE_INIT_THREADS_COUNT)) "}",
+            "cached_threads_count = "
+            "${HPX_THREAD_QUEUE_CACHED_THREADS_COUNT:" HPX_PP_STRINGIZE(
+                HPX_PP_EXPAND(HPX_THREAD_QUEUE_CACHED_THREADS_COUNT)) "}",
 
             "[hpx.commandline]",
             // enable aliasing

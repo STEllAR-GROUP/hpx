@@ -26,10 +26,9 @@
 #include <hpx/actions_base/traits/action_stacksize.hpp>
 #include <hpx/actions_base/traits/action_trigger_continuation_fwd.hpp>
 #include <hpx/actions_base/traits/is_distribution_policy.hpp>
-#include <hpx/components_base/component_type.hpp>
-#include <hpx/components_base/traits/action_decorate_function.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/async_local.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>

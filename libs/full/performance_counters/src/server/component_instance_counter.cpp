@@ -5,8 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/components_base/agas_interface.hpp>
-#include <hpx/components_base/component_type.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>

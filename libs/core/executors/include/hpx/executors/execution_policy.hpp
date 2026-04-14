@@ -142,6 +142,9 @@ namespace hpx::execution {
             };
 
             constexpr execution_policy() = default;
+#if defined(__NVCC__) || defined(__CUDACC__)
+            constexpr ~execution_policy() {}
+#endif
 
             template <typename Executor_, typename Parameters_>
             constexpr execution_policy(Executor_&& exec, Parameters_&& params)
@@ -272,6 +275,9 @@ namespace hpx::execution {
         public:
             /// \cond NOINTERNAL
             constexpr sequenced_task_policy_shim() = default;
+#if defined(__NVCC__) || defined(__CUDACC__)
+            constexpr ~sequenced_task_policy_shim() {}
+#endif
 
             template <typename Executor_, typename Parameters_>
             constexpr sequenced_task_policy_shim(
@@ -339,6 +345,9 @@ namespace hpx::execution {
         public:
             /// \cond NOINTERNAL
             constexpr sequenced_policy_shim() = default;
+#if defined(__NVCC__) || defined(__CUDACC__)
+            constexpr ~sequenced_policy_shim() {}
+#endif
 
             template <typename Executor_, typename Parameters_>
             constexpr sequenced_policy_shim(
@@ -407,6 +416,9 @@ namespace hpx::execution {
         public:
             /// \cond NOINTERNAL
             constexpr parallel_task_policy_shim() = default;
+#if defined(__NVCC__) || defined(__CUDACC__)
+            constexpr ~parallel_task_policy_shim() {}
+#endif
 
             template <typename Executor_, typename Parameters_>
             constexpr parallel_task_policy_shim(
@@ -472,6 +484,9 @@ namespace hpx::execution {
         public:
             /// \cond NOINTERNAL
             constexpr parallel_policy_shim() = default;
+#if defined(__NVCC__) || defined(__CUDACC__)
+            constexpr ~parallel_policy_shim() {}
+#endif
 
             template <typename Executor_, typename Parameters_>
             constexpr parallel_policy_shim(
@@ -541,6 +556,9 @@ namespace hpx::execution {
         public:
             /// \cond NOINTERNAL
             constexpr parallel_unsequenced_task_policy_shim() = default;
+#if defined(__NVCC__) || defined(__CUDACC__)
+            constexpr ~parallel_unsequenced_task_policy_shim() {}
+#endif
 
             template <typename Executor_, typename Parameters_>
             constexpr parallel_unsequenced_task_policy_shim(
@@ -607,6 +625,9 @@ namespace hpx::execution {
         public:
             /// \cond NOINTERNAL
             constexpr parallel_unsequenced_policy_shim() = default;
+#if defined(__NVCC__) || defined(__CUDACC__)
+            constexpr ~parallel_unsequenced_policy_shim() {}
+#endif
 
             template <typename Executor_, typename Parameters_>
             constexpr parallel_unsequenced_policy_shim(
@@ -681,6 +702,9 @@ namespace hpx::execution {
         public:
             /// \cond NOINTERNAL
             constexpr unsequenced_task_policy_shim() = default;
+#if defined(__NVCC__) || defined(__CUDACC__)
+            constexpr ~unsequenced_task_policy_shim() {}
+#endif
 
             template <typename Executor_, typename Parameters_>
             constexpr unsequenced_task_policy_shim(
@@ -743,6 +767,9 @@ namespace hpx::execution {
         public:
             /// \cond NOINTERNAL
             constexpr unsequenced_policy_shim() = default;
+#if defined(__NVCC__) || defined(__CUDACC__)
+            constexpr ~unsequenced_policy_shim() {}
+#endif
 
             template <typename Executor_, typename Parameters_>
             constexpr unsequenced_policy_shim(

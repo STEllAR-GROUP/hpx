@@ -159,7 +159,7 @@ namespace hpx {
         };
 
         HPX_CXX_CORE_EXPORT template <typename E>
-        struct exception_with_info
+        struct HPX_ALWAYS_EXPORT exception_with_info
           : E
           , exception_with_info_base
         {

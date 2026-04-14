@@ -327,21 +327,7 @@ namespace hpx::execution::experimental {
 
     namespace detail {
 
-        HPX_CXX_CORE_EXPORT template <typename Sender, typename Enable = void>
-        struct has_completion_signatures : std::false_type
-        {
-        };
-
-        HPX_CXX_CORE_EXPORT template <typename Sender>
-        struct has_completion_signatures<Sender,
-            std::void_t<
-                typename remove_cv_ref_t<Sender>::completion_signatures>>
-          : std::true_type
-        {
-        };
-#if defined(HPX_HAVE_STDEXEC)
-    }
-#else
+#if !defined(HPX_HAVE_STDEXEC)
         HPX_CXX_CORE_EXPORT struct no_completion_signatures
         {
         };
@@ -372,6 +358,7 @@ namespace hpx::execution::experimental {
         HPX_CXX_CORE_EXPORT template <typename Sender>
         inline constexpr bool is_enable_sender_v = has_is_sender_v<Sender>;
 #endif    // HPX_HAVE_CXX20_COROUTINES
+#endif    // !HPX_HAVE_STDEXEC
     }    // namespace detail
 
     // execution::get_completion_signatures is a customization point object. Let
@@ -409,6 +396,7 @@ namespace hpx::execution::experimental {
     //
     //  Otherwise, no-completion-signatures{}.
     //
+#if !defined(HPX_HAVE_STDEXEC)
     HPX_CXX_CORE_EXPORT inline constexpr struct get_completion_signatures_t
         final
       : hpx::functional::detail::tag_fallback<get_completion_signatures_t>
@@ -423,14 +411,8 @@ namespace hpx::execution::experimental {
             static_assert(sizeof(Env),
                 "Incomplete type used with get_completion_signatures");
 
-            if constexpr (meta::value<
-                              detail::has_completion_signatures<Sender>>)
-            {
-                return typename detail::remove_cv_ref_t<
-                    Sender>::completion_signatures{};
-            }
 #if defined(HPX_HAVE_CXX20_COROUTINES)
-            else if constexpr (is_awaitable_v<Sender, detail::env_promise<Env>>)
+            if constexpr (is_awaitable_v<Sender, detail::env_promise<Env>>)
             {
                 using result_type =
                     await_result_t<Sender, detail::env_promise<Env>>;
@@ -450,7 +432,6 @@ namespace hpx::execution::experimental {
                         set_error_t(std::exception_ptr)>{};
                 }
             }
-#endif
             else if constexpr (std::is_same_v<Env, no_env> &&
                 detail::is_enable_sender_v<std::decay_t<Sender>>)
             {
@@ -460,9 +441,20 @@ namespace hpx::execution::experimental {
             {
                 return detail::no_completion_signatures{};
             }
+#else
+            if constexpr (std::is_same_v<Env, no_env> &&
+                detail::is_enable_sender_v<std::decay_t<Sender>>)
+            {
+                return detail::dependent_completion_signatures<no_env>{};
+            }
+            else
+            {
+                return detail::no_completion_signatures{};
+            }
+#endif
         }
     } get_completion_signatures{};
-#endif    // NOT HPX_HAVE_STDEXEC
+#endif    // !HPX_HAVE_STDEXEC
 
     // A sender is a type that is describing an asynchronous operation. The
     // operation itself might not have started yet. In order to get the result
@@ -550,13 +542,13 @@ namespace hpx::execution::experimental {
     //    using with_awaitable_senders =
     //    hpx::execution::experimental::with_awaitable_senders<Promise>;
 
-    HPX_CXX_CORE_EXPORT template <typename ReceiverID>
+    HPX_CXX_CORE_EXPORT template <typename Awaitable, typename Receiver>
     using operation = hpx::execution::experimental::stdexec_internal::
-        __connect_await::__operation<ReceiverID>;
+        __connect_await::__opstate<Awaitable, Receiver>;
 
-    HPX_CXX_CORE_EXPORT template <typename ReceiverID>
+    HPX_CXX_CORE_EXPORT template <typename Awaitable, typename Receiver>
     using promise = hpx::execution::experimental::stdexec_internal::
-        __connect_await::__promise<ReceiverID>;
+        __connect_await::__promise<Awaitable, Receiver>;
 
     HPX_CXX_CORE_EXPORT using connect_awaitable_t =
         hpx::execution::experimental::stdexec_internal::__connect_awaitable_t;

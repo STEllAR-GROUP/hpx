@@ -209,6 +209,11 @@ namespace hpx::execution::experimental {
             as_sender_sender(as_sender_sender const&) = delete;
             as_sender_sender& operator=(as_sender_sender const&) = delete;
 
+            template <typename Env>
+            friend auto tag_invoke(
+                get_completion_signatures_t, as_sender_sender const&, Env&&) ->
+                typename base_type::completion_signatures;
+
             template <typename Receiver>
             friend as_sender_operation_state<Receiver, future_type> tag_invoke(
                 connect_t, as_sender_sender&& s, Receiver&& receiver)
@@ -242,6 +247,11 @@ namespace hpx::execution::experimental {
             as_sender_sender& operator=(as_sender_sender&&) = default;
             as_sender_sender(as_sender_sender const&) = default;
             as_sender_sender& operator=(as_sender_sender const&) = default;
+
+            template <typename Env>
+            friend auto tag_invoke(
+                get_completion_signatures_t, as_sender_sender const&, Env&&) ->
+                typename base_type::completion_signatures;
 
             template <typename Receiver>
             friend as_sender_operation_state<Receiver, future_type> tag_invoke(

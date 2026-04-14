@@ -448,8 +448,7 @@ namespace hpx::execution::experimental::detail {
                 hint.hint == -1)
             {
                 // apply hint if none was given
-                hint.mode = hpx::threads::thread_schedule_hint_mode::thread;
-                hint.hint = worker_thread + op_state->first_thread;
+                hint.schedule_hint(worker_thread + op_state->first_thread);
 
                 auto policy = hpx::execution::experimental::with_hint(
                     op_state->scheduler.policy(), hint);
@@ -748,6 +747,13 @@ namespace hpx::execution::experimental::detail {
                 env const& e) noexcept
             {
                 return e.sch;
+            }
+
+            // P3826R5: report the completion domain for this bulk sender
+            template <typename CPO>
+            auto query(stdexec::get_completion_domain_t<CPO>) const noexcept
+            {
+                return stdexec::get_domain(sch);
             }
         };
 

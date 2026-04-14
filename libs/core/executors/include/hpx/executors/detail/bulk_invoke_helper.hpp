@@ -19,17 +19,17 @@
 namespace hpx::execution::experimental::detail {
 
     template <std::size_t... Is, typename F, typename T, typename Args>
-    HPX_FORCEINLINE constexpr void bulk_invoke_helper(
+    HPX_FORCEINLINE constexpr decltype(auto) bulk_invoke_helper(
         hpx::util::index_pack<Is...>, F&& f, T&& t, Args&& args)
     {
         // NOLINTBEGIN(bugprone-use-after-move)
-        HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(T, t),
+        return HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(T, t),
             hpx::get<Is>(HPX_FORWARD(Args, args))...);
         // NOLINTEND(bugprone-use-after-move)
     }
 
     template <std::size_t... Is, typename F, typename... Ts, typename Args>
-    HPX_FORCEINLINE constexpr void bulk_invoke_helper(
+    HPX_FORCEINLINE constexpr decltype(auto) bulk_invoke_helper(
         hpx::util::index_pack<Is...>, F&& f, hpx::tuple<Ts...>& t, Args&& args)
     {
         using embedded_index_pack_type =
@@ -40,19 +40,19 @@ namespace hpx::execution::experimental::detail {
                           hpx::tuple<Ts...>&,
                           decltype(hpx::get<Is>(HPX_FORWARD(Args, args)))...>)
         {
-            HPX_INVOKE(HPX_FORWARD(F, f), embedded_index_pack_type{}, t,
+            return HPX_INVOKE(HPX_FORWARD(F, f), embedded_index_pack_type{}, t,
                 hpx::get<Is>(HPX_FORWARD(Args, args))...);
         }
         else
         {
-            HPX_INVOKE(
+            return HPX_INVOKE(
                 HPX_FORWARD(F, f), t, hpx::get<Is>(HPX_FORWARD(Args, args))...);
         }
         // NOLINTEND(bugprone-use-after-move)
     }
 
     template <std::size_t... Is, typename F, typename... Ts, typename Args>
-    HPX_FORCEINLINE constexpr void bulk_invoke_helper(
+    HPX_FORCEINLINE constexpr decltype(auto) bulk_invoke_helper(
         hpx::util::index_pack<Is...>, F&& f, hpx::tuple<Ts...> const& t,
         Args&& args)
     {
@@ -64,19 +64,19 @@ namespace hpx::execution::experimental::detail {
                           hpx::tuple<Ts...> const&,
                           decltype(hpx::get<Is>(HPX_FORWARD(Args, args)))...>)
         {
-            HPX_INVOKE(HPX_FORWARD(F, f), embedded_index_pack_type{}, t,
+            return HPX_INVOKE(HPX_FORWARD(F, f), embedded_index_pack_type{}, t,
                 hpx::get<Is>(HPX_FORWARD(Args, args))...);
         }
         else
         {
-            HPX_INVOKE(
+            return HPX_INVOKE(
                 HPX_FORWARD(F, f), t, hpx::get<Is>(HPX_FORWARD(Args, args))...);
         }
         // NOLINTEND(bugprone-use-after-move)
     }
 
     template <std::size_t... Is, typename F, typename... Ts, typename Args>
-    HPX_FORCEINLINE constexpr void bulk_invoke_helper(
+    HPX_FORCEINLINE constexpr decltype(auto) bulk_invoke_helper(
         hpx::util::index_pack<Is...>, F&& f, hpx::tuple<Ts...>&& t, Args&& args)
     {
         using embedded_index_pack_type =
@@ -87,12 +87,12 @@ namespace hpx::execution::experimental::detail {
                           hpx::tuple<Ts...>&&,
                           decltype(hpx::get<Is>(HPX_FORWARD(Args, args)))...>)
         {
-            HPX_INVOKE(HPX_FORWARD(F, f), embedded_index_pack_type{},
+            return HPX_INVOKE(HPX_FORWARD(F, f), embedded_index_pack_type{},
                 HPX_MOVE(t), hpx::get<Is>(HPX_FORWARD(Args, args))...);
         }
         else
         {
-            HPX_INVOKE(HPX_FORWARD(F, f), HPX_MOVE(t),
+            return HPX_INVOKE(HPX_FORWARD(F, f), HPX_MOVE(t),
                 hpx::get<Is>(HPX_FORWARD(Args, args))...);
         }
         // NOLINTEND(bugprone-use-after-move)

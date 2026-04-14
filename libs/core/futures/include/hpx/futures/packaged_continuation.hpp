@@ -581,7 +581,7 @@ namespace hpx::lcos::detail {
         Future&& future, error_code& ec)
     {
         using allocator_type = hpx::util::thread_local_caching_allocator<
-            hpx::lockfree::variable_size_stack, char,
+            hpx::lockfree::variable_size_stack,
             hpx::util::internal_allocator<>>;
         return unwrap_impl_alloc(
             allocator_type{}, HPX_FORWARD(Future, future), ec);

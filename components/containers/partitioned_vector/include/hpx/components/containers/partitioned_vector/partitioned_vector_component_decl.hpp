@@ -21,9 +21,8 @@
 #include <hpx/actions_base/component_action.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
 #include <hpx/components/client_base.hpp>
-#include <hpx/components_base/server/component_base.hpp>
-#include <hpx/components_base/server/locking_hook.hpp>
 #include <hpx/modules/async_base.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/preprocessor.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 
