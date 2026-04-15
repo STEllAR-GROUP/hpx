@@ -41,7 +41,7 @@ add_hpx_module(
   DEPENDENCIES hpx_core hpx_gasnet_base PkgConfig::GASNET
                ${gasnet_additional_dependencies}
   MODULE_DEPENDENCIES hpx_actions hpx_command_line_handling hpx_parcelset_base
-                      hpx_parcelset
+                      hpx_parcelset hpx_plugin_factories
   CMAKE_SUBDIRS examples tests
 )
 

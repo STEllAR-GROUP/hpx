@@ -7,10 +7,10 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/actions_base/plain_action.hpp>
 #include <hpx/agas/addressing_service.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/continuation.hpp>
+#include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/async_combinators.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/command_line_handling.hpp>
@@ -22,6 +22,7 @@
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/ini.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/plugin_factories.hpp>
 #include <hpx/modules/prefix.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/runtime_local.hpp>
@@ -33,8 +34,6 @@
 #include <hpx/modules/timing.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/performance_counters/counters.hpp>
-#include <hpx/plugin_factories/binary_filter_factory_base.hpp>
-#include <hpx/plugin_factories/message_handler_factory_base.hpp>
 #include <hpx/runtime_components/console_logging.hpp>
 #include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime_distributed/find_localities.hpp>

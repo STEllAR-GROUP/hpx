@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,9 +9,9 @@
 #include <hpx/config.hpp>
 #include <hpx/modules/ini.hpp>
 #include <hpx/modules/plugin.hpp>
-#include <hpx/modules/type_support.hpp>
-
 #include <hpx/modules/runtime_configuration.hpp>
+#include <hpx/modules/type_support.hpp>
+#include <hpx/plugin_factories/macros.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::plugins {
@@ -19,7 +19,7 @@ namespace hpx::plugins {
     ///////////////////////////////////////////////////////////////////////////
     /// The \a plugin_factory_base has to be used as a base class for all
     /// plugin factories.
-    struct HPX_EXPORT plugin_factory_base
+    HPX_CXX_EXPORT struct HPX_EXPORT plugin_factory_base
     {
         virtual ~plugin_factory_base() = default;
     };
@@ -48,28 +48,3 @@ struct hpx::util::plugin::virtual_constructor<hpx::plugins::plugin_factory_base>
     using type = hpx::util::pack<hpx::util::section const*,
         hpx::util::section const*, bool>;
 };
-
-////////////////////////////////////////////////////////////////////////////////
-/// This macro is used to register the given plugin factory with Hpx.Plugin.
-/// This macro has to be used for each of the plugin factories. Ungated,
-/// matching the component analog (HPX_REGISTER_COMPONENT_FACTORY).
-#define HPX_REGISTER_PLUGIN_FACTORY_BASE(FactoryType, pluginname)              \
-    HPX_PLUGIN_EXPORT(HPX_PLUGIN_PLUGIN_PREFIX,                                \
-        hpx::plugins::plugin_factory_base, FactoryType, pluginname, factory)   \
-    HPX_INIT_REGISTRY_PLUGIN_FACTORY_STATIC(                                   \
-        HPX_PLUGIN_PLUGIN_PREFIX, pluginname, factory)                         \
-/**/
-
-/// This macro is used to define the required Hpx.Plugin entry points. This
-/// macro has to be used in exactly one compilation unit of a plugin module.
-/// Ungated: a plugin may live in a shared library, in a statically linked
-/// build, or directly in the application executable.
-#define HPX_REGISTER_PLUGIN_MODULE()                                           \
-    HPX_PLUGIN_EXPORT_LIST(HPX_PLUGIN_PLUGIN_PREFIX, factory)                  \
-    HPX_REGISTER_PLUGIN_REGISTRY_MODULE()                                      \
-    /**/
-
-#define HPX_REGISTER_PLUGIN_MODULE_DYNAMIC()                                   \
-    HPX_PLUGIN_EXPORT_LIST(HPX_PLUGIN_PLUGIN_PREFIX, factory)                  \
-    HPX_REGISTER_PLUGIN_REGISTRY_MODULE_DYNAMIC()                              \
-    /**/
