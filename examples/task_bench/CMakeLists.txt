@@ -10,6 +10,12 @@
 
 cmake_minimum_required(VERSION 3.17)
 
+# task-bench core uses POSIX APIs (clock_gettime, etc.) that are not available
+# on Windows. Skip the entire example on MSVC builds.
+if(MSVC)
+  return()
+endif()
+
 include(FetchContent)
 
 # Fetch task-bench from upstream. Pin to the commit that includes the HPX driver
