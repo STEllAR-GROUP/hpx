@@ -1,4 +1,5 @@
 //  Copyright (c) 2019-2025 Hartmut Kaiser
+//  Copyright (c) 2026 Anshuman Agrawal
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -212,7 +213,9 @@ namespace hpx { namespace collectives {
 
 #include <hpx/async_distributed/async.hpp>
 #include <hpx/collectives/argument_types.hpp>
+#include <hpx/collectives/broadcast.hpp>
 #include <hpx/collectives/create_communicator.hpp>
+#include <hpx/collectives/gather.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/components_base.hpp>
 #include <hpx/modules/futures.hpp>
@@ -379,6 +382,74 @@ namespace hpx::collectives {
         return all_gather(create_communicator(basename, num_sites, this_site,
                               generation, root_site),
             HPX_FORWARD(T, local_result), this_site)
+            .get();
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    // Hierarchical all_gather: gather (bottom-up) + broadcast (top-down)
+    // Uses 2k-1/2k generation mapping: user generation k maps to
+    // internal generation 2k-1 (gather phase) and 2k (broadcast phase)
+    //
+    // Key difference from all_reduce: the gather phase produces vector<T>
+    // (O(N) data), so the broadcast phase transfers O(N) instead of a scalar.
+
+    // Async overload
+    template <typename T>
+    hpx::future<std::vector<std::decay_t<T>>> all_gather(
+        hierarchical_communicator const& communicators, T&& local_result,
+        this_site_arg this_site = this_site_arg(),
+        generation_arg const generation = generation_arg(),
+        root_site_arg root_site = root_site_arg())
+    {
+        using arg_type = std::decay_t<T>;
+
+        if (generation.is_default())
+        {
+            return hpx::make_exceptional_future<std::vector<arg_type>>(
+                HPX_GET_EXCEPTION(hpx::error::bad_parameter,
+                    "hpx::collectives::all_gather (hierarchical)",
+                    "hierarchical all_gather requires an explicit generation "
+                    "number for the 2k/2k+1 internal mapping"));
+        }
+
+        if (this_site.is_default())
+        {
+            this_site = agas::get_locality_id();
+        }
+
+        generation_arg const gather_gen(2 * generation - 1);
+        generation_arg const broadcast_gen(2 * generation);
+
+        if (this_site == root_site)
+        {
+            std::vector<arg_type> gathered = gather_here(communicators,
+                HPX_FORWARD(T, local_result), this_site, gather_gen)
+                                                 .get();
+
+            return broadcast_to(
+                communicators, HPX_MOVE(gathered), this_site, broadcast_gen);
+        }
+        else
+        {
+            gather_there(communicators, HPX_FORWARD(T, local_result), this_site,
+                gather_gen)
+                .get();
+
+            return broadcast_from<std::vector<arg_type>>(
+                communicators, this_site, broadcast_gen);
+        }
+    }
+
+    // Sync version
+    template <typename T>
+    std::vector<std::decay_t<T>> all_gather(hpx::launch::sync_policy,
+        hierarchical_communicator const& communicators, T&& local_result,
+        this_site_arg const this_site = this_site_arg(),
+        generation_arg const generation = generation_arg(),
+        root_site_arg root_site = root_site_arg())
+    {
+        return all_gather(communicators, HPX_FORWARD(T, local_result),
+            this_site, generation, root_site)
             .get();
     }
 }    // namespace hpx::collectives
