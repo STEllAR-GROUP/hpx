@@ -8,11 +8,10 @@
 
 #pragma once
 
-#include <hpx/actions_base/traits/extract_action.hpp>
-#include <hpx/actions_base/traits/is_distribution_policy.hpp>
 #include <hpx/async_distributed/async_callback_fwd.hpp>
 #include <hpx/async_distributed/async_continue.hpp>
 #include <hpx/async_distributed/detail/post_callback.hpp>
+#include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/futures.hpp>
 
 #include <type_traits>

@@ -30,7 +30,8 @@
 // FIXME: this is pulled from the main library
 namespace hpx::detail {
 
-    HPX_EXPORT naming::gid_type get_next_id(std::size_t count = 1);
+    HPX_CXX_EXPORT HPX_EXPORT naming::gid_type get_next_id(
+        std::size_t count = 1);
 }    // namespace hpx::detail
 
 namespace hpx::agas {

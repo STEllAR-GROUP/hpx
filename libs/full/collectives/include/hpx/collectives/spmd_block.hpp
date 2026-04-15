@@ -8,9 +8,9 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/actions_base/plain_action.hpp>
 #include <hpx/collectives/barrier.hpp>
 #include <hpx/collectives/broadcast_direct.hpp>
+#include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/components_base.hpp>
 #include <hpx/modules/concepts.hpp>

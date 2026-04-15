@@ -9,11 +9,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/actions_base/traits/is_distribution_policy.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/components/client_base.hpp>
 #include <hpx/components/get_ptr.hpp>
 #include <hpx/distribution_policies/container_distribution_policy.hpp>
+#include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/async_combinators.hpp>
 #include <hpx/modules/components_base.hpp>
 #include <hpx/modules/functional.hpp>

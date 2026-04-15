@@ -10,8 +10,8 @@
 #include <hpx/components/iostreams/ostream.hpp>
 #include <hpx/components/iostreams/standard_streams.hpp>
 
-#include <hpx/actions_base/plain_action.hpp>
 #include <hpx/async_distributed/base_lco_with_value.hpp>
+#include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/components_base.hpp>
 #include <hpx/modules/errors.hpp>

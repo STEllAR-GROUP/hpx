@@ -43,7 +43,7 @@ jobs:
       shell: bash
       run: |
           cmake --build build --target all
-          # cmake --build build --target tests -- -k 0
+          cmake --build build --target tests -- -k 0
     - name: Test
       shell: bash
       run: |

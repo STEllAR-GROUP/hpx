@@ -15,15 +15,7 @@
 #include <hpx/actions/actions_fwd.hpp>
 #include <hpx/actions/base_action.hpp>
 #include <hpx/actions/register_action.hpp>
-#include <hpx/actions_base/actions_base_support.hpp>
-#include <hpx/actions_base/detail/invocation_count_registry.hpp>
-#include <hpx/actions_base/traits/action_continuation.hpp>
-#include <hpx/actions_base/traits/action_does_termination_detection.hpp>
-#include <hpx/actions_base/traits/action_priority.hpp>
-#include <hpx/actions_base/traits/action_schedule_thread.hpp>
-#include <hpx/actions_base/traits/action_stacksize.hpp>
-#include <hpx/actions_base/traits/action_trigger_continuation_fwd.hpp>
-#include <hpx/actions_base/traits/action_was_object_migrated.hpp>
+#include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/components_base.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
@@ -348,7 +340,7 @@ namespace hpx::actions {
 
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS) &&                                   \
     defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
-#include <hpx/actions_base/detail/per_action_data_counter_registry.hpp>
+#include <hpx/modules/actions_base.hpp>
 
 /// \cond NOINTERNAL
 template <typename Action>
