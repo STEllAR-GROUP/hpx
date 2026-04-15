@@ -60,8 +60,8 @@ void test_multiple_use_with_generation(int arity = 2)
     auto const elapsed = t.elapsed();
     if (this_locality == 0)
     {
-        std::cout << "remote timing (with generation): "
-                  << elapsed / ITERATIONS << "[s]\n"
+        std::cout << "remote timing (with generation): " << elapsed / ITERATIONS
+                  << "[s]\n"
                   << std::flush;
     }
 }
@@ -88,8 +88,7 @@ void test_local_use(std::uint32_t num_sites, int arity = 2)
                         this_site_arg(site), generation_arg(i + 1));
 
                 auto result = overall_result.get();
-                HPX_TEST_EQ(
-                    result.size(), static_cast<std::size_t>(num_sites));
+                HPX_TEST_EQ(result.size(), static_cast<std::size_t>(num_sites));
                 for (std::uint32_t j = 0; j != num_sites; ++j)
                 {
                     HPX_TEST_EQ(result[j], j + i);

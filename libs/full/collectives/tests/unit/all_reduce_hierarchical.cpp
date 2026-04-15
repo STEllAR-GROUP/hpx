@@ -45,10 +45,9 @@ void test_multiple_use_with_generation(int arity = 2)
     for (int i = 0; i != ITERATIONS; ++i)
     {
         std::uint32_t value = this_locality + i;
-        hpx::future<std::uint32_t> overall_result =
-            all_reduce(all_reduce_clients, std::move(value),
-                std::plus<std::uint32_t>{}, this_site_arg(this_locality),
-                generation_arg(i + 1));
+        hpx::future<std::uint32_t> overall_result = all_reduce(
+            all_reduce_clients, std::move(value), std::plus<std::uint32_t>{},
+            this_site_arg(this_locality), generation_arg(i + 1));
 
         std::uint32_t sum = 0;
         for (std::uint32_t j = 0; j != num_localities; ++j)
@@ -61,8 +60,8 @@ void test_multiple_use_with_generation(int arity = 2)
     auto const elapsed = t.elapsed();
     if (this_locality == 0)
     {
-        std::cout << "remote timing (with generation): "
-                  << elapsed / ITERATIONS << "[s]\n"
+        std::cout << "remote timing (with generation): " << elapsed / ITERATIONS
+                  << "[s]\n"
                   << std::flush;
     }
 }
