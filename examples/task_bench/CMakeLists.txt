@@ -46,6 +46,14 @@ target_include_directories(task_bench_core PUBLIC "${TASK_BENCH_CORE_DIR}")
 target_compile_features(task_bench_core PUBLIC cxx_std_17)
 set_target_properties(task_bench_core PROPERTIES OUTPUT_NAME "core_s")
 
+# The HPX drivers include hpx/hpx.hpp and hpx/hpx_init.hpp, which are only
+# available when the distributed runtime is enabled. Skip them otherwise.
+if(COMMAND add_hpx_executable)
+  if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
+    return()
+  endif()
+endif()
+
 # Build the HPX fork-join driver (intra-node parallelism, no MPI required).
 if(COMMAND add_hpx_executable)
   add_hpx_executable(
@@ -53,11 +61,11 @@ if(COMMAND add_hpx_executable)
     SOURCES "${task_bench_SOURCE_DIR}/hpx/hpx_fork_join.cc"
     FOLDER "Examples/TaskBench"
   )
-  # hpx/hpx.hpp and hpx/hpx_init.hpp live in libs/full/include/include which
-  # is not always on the compile path when building inside the HPX source tree.
-  target_include_directories(
-    hpx_fork_join PRIVATE "${CMAKE_SOURCE_DIR}/libs/full/include/include"
-  )
+  # hpx_include carries the libs/full/include/include path (and all its
+  # transitive module deps such as hpx_segmented_algorithms) that hpx/hpx.hpp
+  # requires. It is only defined when HPX_WITH_DISTRIBUTED_RUNTIME=ON, which is
+  # already guaranteed by the guard above.
+  target_link_libraries(hpx_fork_join PRIVATE hpx_include)
 else()
   find_package(HPX REQUIRED)
   add_executable(hpx_fork_join "${task_bench_SOURCE_DIR}/hpx/hpx_fork_join.cc")
@@ -75,9 +83,7 @@ if(MPI_FOUND)
       SOURCES "${task_bench_SOURCE_DIR}/hpx/hpx_distributed.cc"
       FOLDER "Examples/TaskBench"
     )
-    target_include_directories(
-      hpx_distributed PRIVATE "${CMAKE_SOURCE_DIR}/libs/full/include/include"
-    )
+    target_link_libraries(hpx_distributed PRIVATE hpx_include)
   else()
     add_executable(
       hpx_distributed "${task_bench_SOURCE_DIR}/hpx/hpx_distributed.cc"
