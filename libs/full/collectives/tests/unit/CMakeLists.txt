@@ -32,6 +32,8 @@ if(HPX_WITH_NETWORKING)
       exclusive_scan_
       exclusive_scan_sync
       gather
+      all_gather_hierarchical
+      all_reduce_hierarchical
       gather_hierarchical
       gather_sync
       inclusive_scan_
