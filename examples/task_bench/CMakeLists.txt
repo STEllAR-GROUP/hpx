@@ -73,6 +73,7 @@ else()
 endif()
 target_include_directories(hpx_fork_join PRIVATE "${TASK_BENCH_CORE_DIR}")
 target_link_libraries(hpx_fork_join PUBLIC task_bench_core)
+add_hpx_example_target_dependencies("task_bench" hpx_fork_join)
 
 # Optionally build the distributed driver if MPI is available.
 find_package(MPI)
@@ -92,6 +93,7 @@ if(MPI_FOUND)
   endif()
   target_include_directories(hpx_distributed PRIVATE "${TASK_BENCH_CORE_DIR}")
   target_link_libraries(hpx_distributed PUBLIC task_bench_core MPI::MPI_C)
+  add_hpx_example_target_dependencies("task_bench" hpx_distributed)
   # Suppress OpenMPI/MPICH C++ bindings header pulled in when <mpi.h> is
   # included from a C++ TU; hpx_distributed.cc only uses the C MPI API.
   target_compile_definitions(
