@@ -121,9 +121,9 @@ namespace hpx::detail {
 
         bool try_lock_shared()
         {
+            auto s = state.load(std::memory_order_acquire);
             while (true)
             {
-                auto s = state.load(std::memory_order_acquire);
                 if (s.data.exclusive || s.data.exclusive_waiting_blocked)
                 {
                     return false;
@@ -136,6 +136,7 @@ namespace hpx::detail {
                 {
                     break;
                 }
+                s = state.load(std::memory_order_acquire);
             }
             return true;
         }
@@ -163,9 +164,9 @@ namespace hpx::detail {
 
         void unlock_shared()
         {
+            auto s = state.load(std::memory_order_acquire);
             while (true)
             {
-                auto s = state.load(std::memory_order_acquire);
                 auto s1 = s;
 
                 if (--s.data.shared_count == 0)
@@ -205,14 +206,15 @@ namespace hpx::detail {
                 {
                     break;
                 }
+                s = state.load(std::memory_order_acquire);
             }
         }
 
         void lock()
         {
+            auto s = state.load(std::memory_order_acquire);
             while (true)
             {
-                auto s = state.load(std::memory_order_acquire);
                 while (s.data.shared_count != 0 || s.data.exclusive)
                 {
                     auto s1 = s;
@@ -235,14 +237,15 @@ namespace hpx::detail {
                 {
                     break;
                 }
+                s = state.load(std::memory_order_acquire);
             }
         }
 
         bool try_lock()
         {
+            auto s = state.load(std::memory_order_acquire);
             while (true)
             {
-                auto s = state.load(std::memory_order_acquire);
                 if (s.data.shared_count || s.data.exclusive)
                 {
                     return false;
@@ -255,15 +258,16 @@ namespace hpx::detail {
                 {
                     break;
                 }
+                s = state.load(std::memory_order_acquire);
             }
             return true;
         }
 
         void unlock()
         {
+            auto s = state.load(std::memory_order_acquire);
             while (true)
             {
-                auto s = state.load(std::memory_order_acquire);
                 auto s1 = s;
 
                 s.data.exclusive = false;
@@ -276,6 +280,7 @@ namespace hpx::detail {
                     release_waiters(lk);
                     break;
                 }
+                s = state.load(std::memory_order_acquire);
             }
         }
 
@@ -308,9 +313,9 @@ namespace hpx::detail {
 
         bool try_lock_upgrade()
         {
+            auto s = state.load(std::memory_order_acquire);
             while (true)
             {
-                auto s = state.load(std::memory_order_acquire);
                 if (s.data.exclusive || s.data.exclusive_waiting_blocked ||
                     s.data.upgrade)
                 {
@@ -325,15 +330,16 @@ namespace hpx::detail {
                 {
                     break;
                 }
+                s = state.load(std::memory_order_acquire);
             }
             return true;
         }
 
         void unlock_upgrade()
         {
+            auto s = state.load(std::memory_order_acquire);
             while (true)
             {
-                auto s = state.load(std::memory_order_acquire);
                 auto s1 = s;
 
                 bool release = false;
@@ -358,6 +364,7 @@ namespace hpx::detail {
                 {
                     break;
                 }
+                s = state.load(std::memory_order_acquire);
             }
         }
 
@@ -405,9 +412,9 @@ namespace hpx::detail {
 
         void unlock_and_lock_upgrade()
         {
+            auto s = state.load(std::memory_order_acquire);
             while (true)
             {
-                auto s = state.load(std::memory_order_acquire);
                 auto s1 = s;
 
                 s.data.exclusive = false;
@@ -422,14 +429,15 @@ namespace hpx::detail {
                     release_waiters(lk);
                     break;
                 }
+                s = state.load(std::memory_order_acquire);
             }
         }
 
         void unlock_and_lock_shared()
         {
+            auto s = state.load(std::memory_order_acquire);
             while (true)
             {
-                auto s = state.load(std::memory_order_acquire);
                 auto s1 = s;
 
                 s.data.exclusive = false;
@@ -443,14 +451,15 @@ namespace hpx::detail {
                     release_waiters(lk);
                     break;
                 }
+                s = state.load(std::memory_order_acquire);
             }
         }
 
         bool try_unlock_shared_and_lock()
         {
+            auto s = state.load(std::memory_order_acquire);
             while (true)
             {
-                auto s = state.load(std::memory_order_acquire);
                 if (s.data.exclusive || s.data.exclusive_waiting_blocked ||
                     s.data.upgrade || s.data.shared_count != 1)
                 {
@@ -465,15 +474,16 @@ namespace hpx::detail {
                 {
                     break;
                 }
+                s = state.load(std::memory_order_acquire);
             }
             return true;
         }
 
         void unlock_upgrade_and_lock_shared()
         {
+            auto s = state.load(std::memory_order_acquire);
             while (true)
             {
-                auto s = state.load(std::memory_order_acquire);
                 auto s1 = s;
 
                 s.data.exclusive_waiting_blocked = false;
@@ -486,6 +496,7 @@ namespace hpx::detail {
                     release_waiters(lk);
                     break;
                 }
+                s = state.load(std::memory_order_acquire);
             }
         }
 
