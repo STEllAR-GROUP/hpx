@@ -183,8 +183,9 @@ namespace hpx::parallel {
         constexpr void nth_element_seq(RandomIt first, RandomIt nth,
             RandomIt end, std::uint32_t level, Compare&& comp, Proj&& proj)
         {
-            using wrapped_comp_type = hpx::parallel::util::compare_projected<
-                std::decay_t<Compare>, std::decay_t<Proj>>;
+            using wrapped_comp_type =
+                hpx::parallel::util::compare_projected<std::decay_t<Compare>,
+                    std::decay_t<Proj>>;
 
             constexpr std::uint32_t nmin_sort = 24;
             auto nelem = end - first;
