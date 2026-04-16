@@ -547,6 +547,59 @@ namespace hpx::execution::experimental::detail {
 
     ///////////////////////////////////////////////////////////////////////
     // define member traits
+    HPX_HAS_MEMBER_XXX_TRAIT_DEF(mark_custom_point)
+
+    ///////////////////////////////////////////////////////////////////////
+    // default property implementation allowing to handle
+    // mark_custom_point
+    struct mark_custom_point_property
+    {
+        // default implementation
+        template <typename Target, typename... Args>
+        HPX_FORCEINLINE static constexpr void mark_custom_point(
+            Target, Args... args) noexcept
+        {
+        }
+    };
+
+    //////////////////////////////////////////////////////////////////////
+    // Generate a type that is guaranteed to support
+    // mark_custom_point
+    using get_mark_custom_point_t =
+        get_parameters_property_t<mark_custom_point_property,
+            has_mark_custom_point_t>;
+
+    inline constexpr get_mark_custom_point_t get_mark_custom_point{};
+
+    ///////////////////////////////////////////////////////////////////////
+    // customization point for interface mark_custom_point()
+    template <typename Parameters, typename Executor_>
+    struct mark_custom_point_fn_helper<Parameters, Executor_,
+        std::enable_if_t<hpx::traits::is_executor_any_v<Executor_>>>
+    {
+        template <typename Executor, typename... Args>
+        HPX_FORCEINLINE static constexpr void call(
+            Parameters& params, Executor&& exec, Args&&... args)
+        {
+            auto get_prop = get_mark_custom_point(HPX_FORWARD(Executor, exec),
+                params, mark_custom_point_property{});
+
+            get_prop.first.mark_custom_point(
+                HPX_FORWARD(decltype(get_prop.second), get_prop.second),
+                HPX_FORWARD(Args, args)...);
+        }
+
+        template <typename AnyParameters, typename Executor, typename... Args>
+        HPX_FORCEINLINE static constexpr void call(
+            AnyParameters params, Executor&& exec, Args&&... args)
+        {
+            call(static_cast<Parameters&>(params), HPX_FORWARD(Executor, exec),
+                HPX_FORWARD(Args, args)...);
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////
+    // define member traits
     HPX_HAS_MEMBER_XXX_TRAIT_DEF(collect_execution_parameters)
 
     ///////////////////////////////////////////////////////////////////////

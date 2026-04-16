@@ -200,6 +200,20 @@ namespace hpx::execution::experimental {
         hpx::functional::detail::is_tag_override_invocable_v<
             mark_end_execution_t, Params&&, InnerParams&&, Executor&&>;
 
+    // execution_markers: custom point
+    HPX_CXX_CORE_EXPORT template <typename Params, typename Executor,
+        typename... Args>
+    inline constexpr bool supports_mark_custom_point_v =
+        hpx::functional::detail::is_tag_override_invocable_v<
+            mark_custom_point_t, Params&&, Executor&&, Args&&...>;
+
+    HPX_CXX_CORE_EXPORT template <typename Params, typename InnerParams,
+        typename Executor, typename... Args>
+    inline constexpr bool supports_wrapping_mark_custom_point_v =
+        hpx::functional::detail::is_tag_override_invocable_v<
+            mark_custom_point_t, Params&&, InnerParams&&, Executor&&,
+            Args&&...>;
+
     // wrapping processing_units_count
     HPX_CXX_CORE_EXPORT template <typename Params, typename Executor>
     inline constexpr bool supports_processing_units_count_v =
@@ -488,6 +502,45 @@ namespace hpx::execution::experimental {
             {
                 mark_end_execution(detail::wrapped_forward<Params>(this_),
                     HPX_FORWARD(Executor, exec));
+            }
+        }
+
+        // execution_markers: custom_point
+
+        // clang-format off
+        template <typename Params, typename Executor, typename... Args>
+            requires(std::same_as<wrapped_params, std::decay_t<Params>> && (
+                supports_wrapping_mark_custom_point_v<
+                    detail::wrapping_t<Params>, detail::wrapped_t<Params>,
+                    Executor, Args...> ||
+                supports_mark_custom_point_v<
+                    detail::wrapping_t<Params>, Executor, Args...> ||
+                supports_mark_custom_point_v<
+                    detail::wrapped_t<Params>, Executor, Args...>
+            ))
+        // clang-format on
+        friend constexpr void tag_override_invoke(mark_custom_point_t,
+            Params&& this_, Executor&& exec, Args&&... args)
+        {
+            if constexpr (supports_wrapping_mark_custom_point_v<
+                              detail::wrapping_t<Params>,
+                              detail::wrapped_t<Params>, Executor, Args...>)
+            {
+                mark_custom_point(detail::wrapping_forward<Params>(this_),
+                    detail::wrapped_forward<Params>(this_),
+                    HPX_FORWARD(Executor, exec), HPX_FORWARD(Args, args)...);
+            }
+            else if constexpr (supports_mark_custom_point_v<
+                                   detail::wrapping_t<Params>, Executor,
+                                   Args...>)
+            {
+                mark_custom_point(detail::wrapping_forward<Params>(this_),
+                    HPX_FORWARD(Executor, exec), HPX_FORWARD(Args, args)...);
+            }
+            else
+            {
+                mark_custom_point(detail::wrapped_forward<Params>(this_),
+                    HPX_FORWARD(Executor, exec), HPX_FORWARD(Args, args)...);
             }
         }
 

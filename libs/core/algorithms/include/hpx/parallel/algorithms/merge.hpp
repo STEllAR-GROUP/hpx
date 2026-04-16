@@ -869,7 +869,9 @@ namespace hpx::parallel {
 
             using result_type = util::in_in_out_result<Iter1, Iter2, Iter3>;
 
-            auto f1 = [dest, comp, proj1, proj2, first1, first2, len1, len2](
+            auto f1 = [dest, comp, proj1, proj2, first1, first2, len1, len2,
+                          params = policy.parameters(),
+                          exec = policy.executor()](
                           std::size_t idx, std::size_t chunk) {
                 if (len1 != 0 || len2 != 0)
                 {
@@ -882,6 +884,8 @@ namespace hpx::parallel {
                     auto [a1, b1] = diagonal_intersection(
                         first1, len1, first2, len2, k1, comp, proj1, proj2);
 
+                    hpx::execution::experimental::mark_custom_point(
+                        params, exec, idx, a0, b0);
                     sequential_merge(std::next(first1, a0),
                         std::next(first1, a1), std::next(first2, b0),
                         std::next(first2, b1), std::next(dest, k0), comp, proj1,
