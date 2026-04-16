@@ -183,18 +183,18 @@ namespace hpx::parallel {
         constexpr void nth_element_seq(RandomIt first, RandomIt nth,
             RandomIt end, std::uint32_t level, Compare&& comp, Proj&& proj)
         {
+            using wrapped_comp_type = hpx::parallel::util::compare_projected<
+                std::decay_t<Compare>, std::decay_t<Proj>>;
+
             constexpr std::uint32_t nmin_sort = 24;
             auto nelem = end - first;
 
             // Check  the special conditions
             if (nth == first)
             {
-                using wrapped_comp_type =
-                    hpx::parallel::util::compare_projected<
-                        std::decay_t<Compare>, std::decay_t<Proj>>;
                 RandomIt it = detail::min_element<RandomIt>().call(
-                    hpx::execution::seq, first, end,
-                    wrapped_comp_type(comp, proj), hpx::identity_v);
+                    hpx::execution::seq, first, end, HPX_FORWARD(Compare, comp),
+                    HPX_FORWARD(Proj, proj));
 
                 if (it != first)
                 {
@@ -206,29 +206,18 @@ namespace hpx::parallel {
 
             if (nelem < nmin_sort)
             {
-                using wrapped_comp_type =
-                    hpx::parallel::util::compare_projected<
-                        std::decay_t<Compare>, std::decay_t<Proj>>;
                 detail::sort<RandomIt>().call(hpx::execution::seq, first, end,
                     wrapped_comp_type(comp, proj), hpx::identity_v);
                 return;
             }
             if (level == 0)
             {
-                using wrapped_comp_type =
-                    hpx::parallel::util::compare_projected<
-                        std::decay_t<Compare>, std::decay_t<Proj>>;
-                hpx::parallel::detail::make_heap<RandomIt>().call(
-                    hpx::execution::seq, first, end,
-                    wrapped_comp_type(comp, proj), hpx::identity_v);
+                std::make_heap(first, end, wrapped_comp_type(comp, proj));
                 std::sort_heap(first, nth, wrapped_comp_type(comp, proj));
                 return;
             }
 
             // Filter the range and check which part contains the nth element
-            using wrapped_comp_type =
-                hpx::parallel::util::compare_projected<std::decay_t<Compare>,
-                    std::decay_t<Proj>>;
             RandomIt c_last = filter(first, end, wrapped_comp_type(comp, proj));
 
             if (c_last == nth)
