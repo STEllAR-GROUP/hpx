@@ -139,11 +139,14 @@ namespace hpx {
 #include <hpx/modules/executors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/iterator_support.hpp>
+#include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/pivot.hpp>
+#include <hpx/parallel/algorithms/make_heap.hpp>
 #include <hpx/parallel/algorithms/minmax.hpp>
 #include <hpx/parallel/algorithms/partial_sort.hpp>
 #include <hpx/parallel/algorithms/partition.hpp>
+#include <hpx/parallel/util/compare_projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 
@@ -186,9 +189,11 @@ namespace hpx::parallel {
             // Check  the special conditions
             if (nth == first)
             {
+                using wrapped_comp_type = hpx::parallel::util::compare_projected<
+                    std::decay_t<Compare>, std::decay_t<Proj>>;
                 RandomIt it = detail::min_element<RandomIt>().call(
-                    hpx::execution::seq, first, end, HPX_FORWARD(Compare, comp),
-                    HPX_FORWARD(Proj, proj));
+                    hpx::execution::seq, first, end,
+                    wrapped_comp_type(comp, proj), hpx::identity_v);
 
                 if (it != first)
                 {
@@ -204,19 +209,27 @@ namespace hpx::parallel {
 
             if (nelem < nmin_sort)
             {
+                using wrapped_comp_type = hpx::parallel::util::compare_projected<
+                    std::decay_t<Compare>, std::decay_t<Proj>>;
                 detail::sort<RandomIt>().call(hpx::execution::seq, first, end,
-                    HPX_FORWARD(Compare, comp), HPX_FORWARD(Proj, proj));
+                    wrapped_comp_type(comp, proj), hpx::identity_v);
                 return;
             }
             if (level == 0)
             {
-                std::make_heap(first, end, comp);
-                std::sort_heap(first, nth, comp);
+                using wrapped_comp_type = hpx::parallel::util::compare_projected<
+                    std::decay_t<Compare>, std::decay_t<Proj>>;
+                hpx::parallel::detail::make_heap<RandomIt>().call(
+                    hpx::execution::seq, first, end,
+                    wrapped_comp_type(comp, proj), hpx::identity_v);
+                std::sort_heap(first, nth, wrapped_comp_type(comp, proj));
                 return;
             }
 
             // Filter the range and check which part contains the nth element
-            RandomIt c_last = filter(first, end, comp);
+            using wrapped_comp_type = hpx::parallel::util::compare_projected<
+                std::decay_t<Compare>, std::decay_t<Proj>>;
+            RandomIt c_last = filter(first, end, wrapped_comp_type(comp, proj));
 
             if (c_last == nth)
                 return;
@@ -267,8 +280,6 @@ namespace hpx::parallel {
             parallel(ExPolicy&& policy, RandomIt first, RandomIt nth, Sent last,
                 Pred&& pred, Proj&& proj)
             {
-                using value_type =
-                    typename std::iterator_traits<RandomIt>::value_type;
 
                 RandomIt partition_iter, return_last;
 
@@ -292,17 +303,21 @@ namespace hpx::parallel {
 
                     while (first != last_iter)
                     {
-                        detail::pivot9(first, last_iter, pred);
+                        detail::pivot9(first, last_iter,
+                            hpx::parallel::util::compare_projected<
+                                std::decay_t<Pred>, std::decay_t<Proj>>(
+                                pred, proj));
 
                         partition_iter =
                             hpx::parallel::detail::partition<RandomIt>().call(
                                 policy(hpx::execution::non_task), first + 1,
                                 last_iter,
-                                [val = HPX_INVOKE(proj, *first), &pred](
-                                    value_type const& elem) {
-                                    return HPX_INVOKE(pred, elem, val);
+                                [val = HPX_INVOKE(proj, *first), &pred,
+                                    &proj](auto const& elem) {
+                                    return HPX_INVOKE(
+                                        pred, HPX_INVOKE(proj, elem), val);
                                 },
-                                proj);
+                                hpx::identity_v);
 
                         --partition_iter;
 
@@ -355,42 +370,72 @@ namespace hpx {
       : hpx::detail::tag_parallel_algorithm<nth_element_t>
     {
         template <typename RandomIt,
-            typename Pred = hpx::parallel::detail::less>
+            typename Pred = hpx::parallel::detail::less,
+            typename Proj = hpx::identity>
         // clang-format off
             requires (
                 hpx::traits::is_iterator_v<RandomIt> &&
                 hpx::is_invocable_v<Pred,
-                    typename std::iterator_traits<RandomIt>::value_type,
-                    typename std::iterator_traits<RandomIt>::value_type
+                    typename hpx::parallel::traits::projected_result_of<Proj,
+                        RandomIt>::type,
+                    typename hpx::parallel::traits::projected_result_of<Proj,
+                        RandomIt>::type
                 >
             )
         // clang-format on
         friend void tag_fallback_invoke(hpx::nth_element_t, RandomIt first,
-            RandomIt nth, RandomIt last, Pred pred = Pred())
+            RandomIt nth, RandomIt last, Pred pred = Pred(), Proj proj = Proj())
         {
             static_assert(std::random_access_iterator<RandomIt>,
                 "Requires at least random iterator.");
 
             hpx::parallel::detail::nth_element<RandomIt>().call(
                 hpx::execution::seq, first, nth, last, HPX_MOVE(pred),
-                hpx::identity_v);
+                HPX_MOVE(proj));
+        }
+
+        template <typename RandomIt, typename Sent, typename Pred, typename Proj>
+        // clang-format off
+            requires (
+                hpx::traits::is_iterator_v<RandomIt> &&
+                hpx::is_invocable_v<Pred,
+                    typename hpx::parallel::traits::projected_result_of<Proj,
+                        RandomIt>::type,
+                    typename hpx::parallel::traits::projected_result_of<Proj,
+                        RandomIt>::type
+                >
+            )
+        // clang-format on
+        friend void tag_fallback_invoke(hpx::nth_element_t, RandomIt first,
+            RandomIt nth, Sent last, Pred pred = Pred(), Proj proj = Proj())
+        {
+            static_assert(std::random_access_iterator<RandomIt>,
+                "Requires at least random iterator.");
+
+            hpx::parallel::detail::nth_element<RandomIt>().call(
+                hpx::execution::seq, first, nth, last, HPX_MOVE(pred),
+                HPX_MOVE(proj));
         }
 
         template <typename ExPolicy, typename RandomIt,
-            typename Pred = hpx::parallel::detail::less>
+            typename Pred = hpx::parallel::detail::less,
+            typename Proj = hpx::identity>
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<RandomIt> &&
                 hpx::is_invocable_v<Pred,
-                    typename std::iterator_traits<RandomIt>::value_type,
-                    typename std::iterator_traits<RandomIt>::value_type
+                    typename hpx::parallel::traits::projected_result_of<Proj,
+                        RandomIt>::type,
+                    typename hpx::parallel::traits::projected_result_of<Proj,
+                        RandomIt>::type
                 >
             )
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy>
         tag_fallback_invoke(hpx::nth_element_t, ExPolicy&& policy,
-            RandomIt first, RandomIt nth, RandomIt last, Pred pred = Pred())
+            RandomIt first, RandomIt nth, RandomIt last, Pred pred = Pred(),
+            Proj proj = Proj())
         {
             static_assert(std::random_access_iterator<RandomIt>,
                 "Requires at least random iterator.");
@@ -401,7 +446,38 @@ namespace hpx {
             return hpx::util::void_guard<result_type>(),
                    hpx::parallel::detail::nth_element<RandomIt>().call(
                        HPX_FORWARD(ExPolicy, policy), first, nth, last,
-                       HPX_MOVE(pred), hpx::identity_v);
+                       HPX_MOVE(pred), HPX_MOVE(proj));
+        }
+
+        template <typename ExPolicy, typename RandomIt, typename Sent,
+            typename Pred, typename Proj>
+        // clang-format off
+            requires (
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_iterator_v<RandomIt> &&
+                hpx::is_invocable_v<Pred,
+                    typename hpx::parallel::traits::projected_result_of<Proj,
+                        RandomIt>::type,
+                    typename hpx::parallel::traits::projected_result_of<Proj,
+                        RandomIt>::type
+                >
+            )
+        // clang-format on
+        friend parallel::util::detail::algorithm_result_t<ExPolicy>
+        tag_fallback_invoke(hpx::nth_element_t, ExPolicy&& policy,
+            RandomIt first, RandomIt nth, Sent last, Pred pred = Pred(),
+            Proj proj = Proj())
+        {
+            static_assert(std::random_access_iterator<RandomIt>,
+                "Requires at least random iterator.");
+
+            using result_type =
+                hpx::parallel::util::detail::algorithm_result_t<ExPolicy>;
+
+            return hpx::util::void_guard<result_type>(),
+                   hpx::parallel::detail::nth_element<RandomIt>().call(
+                       HPX_FORWARD(ExPolicy, policy), first, nth, last,
+                       HPX_MOVE(pred), HPX_MOVE(proj));
         }
     } nth_element{};
 }    // namespace hpx

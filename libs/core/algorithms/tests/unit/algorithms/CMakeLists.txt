@@ -90,6 +90,7 @@ set(tests
     mismatch_binary
     move
     nth_element
+    nth_element_projection
     none_of
     parallel_sort
     partial_sort
