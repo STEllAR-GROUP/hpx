@@ -47,6 +47,13 @@
 namespace hpx::execution::experimental {
     // Domain
     HPX_CXX_CORE_EXPORT using stdexec::default_domain;
+    HPX_CXX_CORE_EXPORT using stdexec::get_domain;
+    HPX_CXX_CORE_EXPORT using stdexec::get_domain_t;
+
+    // Completion domain (P3826R5)
+    HPX_CXX_CORE_EXPORT using stdexec::get_completion_domain;
+    HPX_CXX_CORE_EXPORT using stdexec::get_completion_domain_t;
+    HPX_CXX_CORE_EXPORT using stdexec::indeterminate_domain;
 
     // Receiver
     HPX_CXX_CORE_EXPORT using stdexec::set_error_t;
@@ -176,9 +183,6 @@ namespace hpx::execution::experimental {
         HPX_CXX_CORE_EXPORT using namespace stdexec::tags;
     }
 
-    // Domain
-    HPX_CXX_CORE_EXPORT using stdexec::default_domain;
-
     // Execute (moved to exec:: namespace in newer stdexec)
     HPX_CXX_CORE_EXPORT using exec::execute;
     HPX_CXX_CORE_EXPORT using exec::execute_t;
@@ -240,10 +244,6 @@ namespace hpx::execution::experimental {
     // Then
     HPX_CXX_CORE_EXPORT using stdexec::then;
     HPX_CXX_CORE_EXPORT using stdexec::then_t;
-
-    // Transfer just
-    HPX_CXX_CORE_EXPORT using stdexec::transfer_just;
-    HPX_CXX_CORE_EXPORT using stdexec::transfer_just_t;
 
     // Completion signature manipulators
     HPX_CXX_CORE_EXPORT using stdexec::completion_signatures_of_t;

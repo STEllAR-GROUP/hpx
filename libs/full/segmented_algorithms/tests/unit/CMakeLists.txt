@@ -27,6 +27,7 @@ set(tests
     partitioned_vector_min_element2
     partitioned_vector_minmax_element1
     partitioned_vector_minmax_element2
+    partitioned_vector_mismatch
     partitioned_vector_move
     partitioned_vector_target
     partitioned_vector_transform1
@@ -45,6 +46,7 @@ set(tests
     partitioned_vector_inclusive_scan
     partitioned_vector_inclusive_scan2
     partitioned_vector_is_sorted
+    partitioned_vector_is_partitioned
     partitioned_vector_exclusive_scan
     partitioned_vector_exclusive_scan2
     partitioned_vector_none1

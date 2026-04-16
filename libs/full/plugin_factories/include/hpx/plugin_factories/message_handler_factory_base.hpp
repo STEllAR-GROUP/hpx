@@ -41,11 +41,14 @@ namespace hpx::plugins {
 }    // namespace hpx::plugins
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This macro is used to register the given component factory with
-/// Hpx.Plugin. This macro has to be used for each of the component factories.
+/// This macro is used to register the given message handler factory with
+/// Hpx.Plugin. This macro has to be used for each of the message handler
+/// factories.
 #define HPX_REGISTER_MESSAGE_HANDLER_FACTORY_BASE(FactoryType, pluginname)     \
     HPX_PLUGIN_EXPORT(HPX_PLUGIN_PLUGIN_PREFIX,                                \
         hpx::plugins::plugin_factory_base, FactoryType, pluginname, factory)   \
+    HPX_INIT_REGISTRY_PLUGIN_FACTORY_STATIC(                                   \
+        HPX_PLUGIN_PLUGIN_PREFIX, pluginname, factory)                         \
     /**/
 
 #endif

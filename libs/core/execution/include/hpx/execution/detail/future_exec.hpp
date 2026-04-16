@@ -60,7 +60,7 @@ namespace hpx::lcos::detail {
                 hpx::util::invoke_result_t<F, Future>;
 
             using allocator_type = hpx::util::thread_local_caching_allocator<
-                hpx::lockfree::variable_size_stack, char,
+                hpx::lockfree::variable_size_stack,
                 hpx::util::internal_allocator<>>;
 
             hpx::traits::detail::shared_state_ptr_t<result_type> p =

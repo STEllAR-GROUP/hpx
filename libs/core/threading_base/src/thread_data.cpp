@@ -13,6 +13,7 @@
 #include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/thread_support.hpp>
+#include <hpx/modules/tracing.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #if defined(HPX_HAVE_APEX)
@@ -539,4 +540,20 @@ namespace hpx::threads {
         }
     }
 #endif
+
+#if defined(HPX_HAVE_MODULE_TRACY)
+    tracing::region_init_data get_region_init_data(thread_data const* thrdptr)
+    {
+        return {thrdptr->get_description().get_description(),
+            thrdptr->get_thread_phase(), thrdptr->is_stackless()};
+    }
+
+    tracing::fiber_region_init_data get_fiber_region_init_data(
+        thread_data const* thrdptr)
+    {
+        return {thrdptr->get_description().get_description(),
+            thrdptr->get_tracy_fiber_name(), thrdptr->is_stackless()};
+    }
+#endif
+
 }    // namespace hpx::threads

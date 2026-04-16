@@ -20,8 +20,10 @@
 #include <hpx/parallel/segmented_algorithms/for_each.hpp>
 #include <hpx/parallel/segmented_algorithms/generate.hpp>
 #include <hpx/parallel/segmented_algorithms/inclusive_scan.hpp>
+#include <hpx/parallel/segmented_algorithms/is_partitioned.hpp>
 #include <hpx/parallel/segmented_algorithms/is_sorted.hpp>
 #include <hpx/parallel/segmented_algorithms/minmax.hpp>
+#include <hpx/parallel/segmented_algorithms/mismatch.hpp>
 #include <hpx/parallel/segmented_algorithms/reduce.hpp>
 #include <hpx/parallel/segmented_algorithms/replace.hpp>
 #include <hpx/parallel/segmented_algorithms/replace_copy.hpp>

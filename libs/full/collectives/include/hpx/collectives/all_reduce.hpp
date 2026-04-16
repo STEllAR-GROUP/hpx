@@ -1,4 +1,5 @@
 //  Copyright (c) 2019-2025 Hartmut Kaiser
+//  Copyright (c) 2026 Anshuman Agrawal
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -222,16 +223,18 @@ namespace hpx { namespace collectives {
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/async.hpp>
 #include <hpx/collectives/argument_types.hpp>
+#include <hpx/collectives/broadcast.hpp>
 #include <hpx/collectives/create_communicator.hpp>
+#include <hpx/collectives/reduce.hpp>
 #include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/components_base.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/type_support.hpp>
-
 #include <cstddef>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 namespace hpx::traits {
 
@@ -421,6 +424,72 @@ namespace hpx::collectives {
         return all_reduce(create_communicator(basename, num_sites, this_site,
                               generation, root_site),
             HPX_FORWARD(T, local_result), HPX_FORWARD(F, op), this_site)
+            .get();
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    // Hierarchical all_reduce: reduce (bottom-up) + broadcast (top-down)
+    // Uses 2k-1/2k generation mapping: user generation k maps to
+    // internal generation 2k-1 (reduce phase) and 2k (broadcast phase)
+
+    // Scalar overload
+    template <typename T, typename F>
+    hpx::future<std::decay_t<T>> all_reduce(
+        hierarchical_communicator const& communicators, T&& local_result,
+        F&& op, this_site_arg this_site = this_site_arg(),
+        generation_arg const generation = generation_arg(),
+        root_site_arg root_site = root_site_arg())
+    {
+        using arg_type = std::decay_t<T>;
+
+        if (generation.is_default())
+        {
+            return hpx::make_exceptional_future<arg_type>(
+                HPX_GET_EXCEPTION(hpx::error::bad_parameter,
+                    "hpx::collectives::all_reduce (hierarchical)",
+                    "hierarchical all_reduce requires an explicit generation "
+                    "number for the 2k/2k+1 internal mapping"));
+        }
+
+        if (this_site.is_default())
+        {
+            this_site = agas::get_locality_id();
+        }
+
+        generation_arg const reduce_gen(2 * generation - 1);
+        generation_arg const broadcast_gen(2 * generation);
+
+        if (this_site == root_site)
+        {
+            arg_type reduced =
+                reduce_here(communicators, HPX_FORWARD(T, local_result),
+                    HPX_FORWARD(F, op), this_site, reduce_gen)
+                    .get();
+
+            return broadcast_to(
+                communicators, HPX_MOVE(reduced), this_site, broadcast_gen);
+        }
+        else
+        {
+            reduce_there(communicators, HPX_FORWARD(T, local_result),
+                HPX_FORWARD(F, op), this_site, reduce_gen)
+                .get();
+
+            return broadcast_from<arg_type>(
+                communicators, this_site, broadcast_gen);
+        }
+    }
+
+    // Sync version
+    template <typename T, typename F>
+    std::decay_t<T> all_reduce(hpx::launch::sync_policy,
+        hierarchical_communicator const& communicators, T&& local_result,
+        F&& op, this_site_arg const this_site = this_site_arg(),
+        generation_arg const generation = generation_arg(),
+        root_site_arg root_site = root_site_arg())
+    {
+        return all_reduce(communicators, HPX_FORWARD(T, local_result),
+            HPX_FORWARD(F, op), this_site, generation, root_site)
             .get();
     }
 }    // namespace hpx::collectives

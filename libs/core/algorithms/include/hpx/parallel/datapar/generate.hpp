@@ -51,7 +51,7 @@ namespace hpx::parallel::detail {
                 *first++ = f.template operator()<value_type>();
             }
 
-            for (std::int64_t len_v = std::int64_t(len - (size + 1)); len_v > 0;
+            for (std::int64_t len_v = std::int64_t(len - size + 1); len_v > 0;
                 len_v -= size, len -= size)
             {
                 auto tmp = f.template operator()<V>();

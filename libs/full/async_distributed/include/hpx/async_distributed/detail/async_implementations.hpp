@@ -202,7 +202,7 @@ namespace hpx::detail {
 
                 using allocator_type =
                     hpx::util::thread_local_caching_allocator<
-                        hpx::lockfree::variable_size_stack, char,
+                        hpx::lockfree::variable_size_stack,
                         hpx::util::internal_allocator<>>;
                 lcos::packaged_action<Action, Result> p(
                     std::allocator_arg, allocator_type{});
@@ -231,7 +231,7 @@ namespace hpx::detail {
             handle_managed_target<result_type> hmt(id, f);
 
             using allocator_type = hpx::util::thread_local_caching_allocator<
-                hpx::lockfree::variable_size_stack, char,
+                hpx::lockfree::variable_size_stack,
                 hpx::util::internal_allocator<>>;
             lcos::packaged_action<action_type, result_type> p(
                 std::allocator_arg, allocator_type{});
@@ -257,7 +257,7 @@ namespace hpx::detail {
             handle_managed_target<result_type> hmt(id, f);
 
             using allocator_type = hpx::util::thread_local_caching_allocator<
-                hpx::lockfree::variable_size_stack, char,
+                hpx::lockfree::variable_size_stack,
                 hpx::util::internal_allocator<>>;
             lcos::packaged_action<action_type, result_type> p(
                 std::allocator_arg, allocator_type{});
@@ -283,7 +283,7 @@ namespace hpx::detail {
             handle_managed_target<result_type> hmt(id, f);
 
             using allocator_type = hpx::util::thread_local_caching_allocator<
-                hpx::lockfree::variable_size_stack, char,
+                hpx::lockfree::variable_size_stack,
                 hpx::util::internal_allocator<>>;
             lcos::packaged_action<action_type, result_type> p(
                 std::allocator_arg, allocator_type{});
@@ -547,7 +547,7 @@ namespace hpx::detail {
             {
                 using allocator_type =
                     hpx::util::thread_local_caching_allocator<
-                        hpx::lockfree::variable_size_stack, char,
+                        hpx::lockfree::variable_size_stack,
                         hpx::util::internal_allocator<>>;
                 lcos::packaged_action<action_type, result_type> p(
                     std::allocator_arg, allocator_type{});
@@ -562,7 +562,7 @@ namespace hpx::detail {
             {
                 using allocator_type =
                     hpx::util::thread_local_caching_allocator<
-                        hpx::lockfree::variable_size_stack, char,
+                        hpx::lockfree::variable_size_stack,
                         hpx::util::internal_allocator<>>;
                 lcos::packaged_action<action_type, result_type> p(
                     std::allocator_arg, allocator_type{});
@@ -631,7 +631,7 @@ namespace hpx::detail {
             handle_managed_target<result_type> hmt(id, f);
 
             using allocator_type = hpx::util::thread_local_caching_allocator<
-                hpx::lockfree::variable_size_stack, char,
+                hpx::lockfree::variable_size_stack,
                 hpx::util::internal_allocator<>>;
             lcos::packaged_action<action_type, result_type> p(
                 std::allocator_arg, allocator_type{});
@@ -711,7 +711,7 @@ namespace hpx::detail {
             handle_managed_target<result_type> hmt(id, f);
 
             using allocator_type = hpx::util::thread_local_caching_allocator<
-                hpx::lockfree::variable_size_stack, char,
+                hpx::lockfree::variable_size_stack,
                 hpx::util::internal_allocator<>>;
             lcos::packaged_action<action_type, result_type> p(
                 std::allocator_arg, allocator_type{});
@@ -740,7 +740,7 @@ namespace hpx::detail {
             handle_managed_target<result_type> hmt(id, f);
 
             using allocator_type = hpx::util::thread_local_caching_allocator<
-                hpx::lockfree::variable_size_stack, char,
+                hpx::lockfree::variable_size_stack,
                 hpx::util::internal_allocator<>>;
             lcos::packaged_action<action_type, result_type> p(
                 std::allocator_arg, allocator_type{});
