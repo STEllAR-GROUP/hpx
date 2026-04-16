@@ -140,8 +140,8 @@ namespace hpx::parallel {
 
         HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename FwdIter,
             typename Sent>
-        hpx::future<FwdIter> shift_right_helper(
-            ExPolicy policy, FwdIter first, Sent last, FwdIter new_first)
+        hpx::future<FwdIter> shift_right_helper(ExPolicy policy, FwdIter first,
+            Sent last, FwdIter new_first, FwdIter result_first)
         {
             using non_seq = std::false_type;
 
@@ -151,6 +151,7 @@ namespace hpx::parallel {
 
             detail::reverse<FwdIter> r;
             return dataflow(
+                p.executor(),
                 [=](hpx::future<FwdIter>&& f1) mutable -> hpx::future<FwdIter> {
                     f1.get();
 
@@ -158,7 +159,7 @@ namespace hpx::parallel {
                     return f.then(
                         [=](hpx::future<FwdIter>&& f) mutable -> FwdIter {
                             f.get();
-                            return new_first;
+                            return result_first;
                         });
                 },
                 r.call2(p, non_seq(), first, new_first));
@@ -278,8 +279,10 @@ namespace hpx::parallel {
                 }
 
                 auto new_first = std::next(first, dist - n);
+                auto result_first = std::next(first, n);
                 return util::detail::algorithm_result<ExPolicy, FwdIter2>::get(
-                    shift_right_helper(policy, first, last, new_first));
+                    shift_right_helper(
+                        policy, first, last, new_first, result_first));
             }
         };
         /// \endcond
