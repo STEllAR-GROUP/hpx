@@ -10,7 +10,6 @@
 #include <hpx/modules/testing.hpp>
 
 #include <cstddef>
-#include <iostream>
 #include <numeric>
 #include <string>
 #include <vector>
