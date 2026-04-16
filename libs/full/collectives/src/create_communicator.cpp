@@ -429,7 +429,8 @@ namespace hpx::collectives {
 
     hierarchical_communicator create_hierarchical_communicator(
         char const* basename, num_sites_arg num_sites, this_site_arg this_site,
-        arity_arg arity, generation_arg generation, root_site_arg root_site)
+        arity_arg arity, generation_arg generation, root_site_arg root_site,
+        flat_fallback_threshold_arg threshold)
     {
         if (num_sites.is_default())
         {
@@ -447,7 +448,6 @@ namespace hpx::collectives {
         {
             this_site = this_site - root_site % num_sites;
         }
-
         HPX_ASSERT(this_site < num_sites);
         HPX_ASSERT(
             root_site != static_cast<std::size_t>(-1) && root_site < num_sites);
@@ -456,6 +456,29 @@ namespace hpx::collectives {
         if (!generation.is_default())
         {
             name += std::to_string(generation) + "/";
+        }
+
+        // Flat fallback: below the threshold, hierarchical overhead exceeds
+        // its benefit. Produce a single-level communicator spanning all N
+        // sites; the tree walking loops in the hierarchical collective
+        // overloads collapse to a single flat call when size() == 1 (this is
+        // also the code path non-leader sites take in normal tree mode). Pass
+        // threshold == 0 to disable this fallback and always build a tree.
+        if (num_sites < threshold)
+        {
+            // Name the fallback communicator the same way the tree path would
+            // name a single top-level group, to avoid basename collisions with
+            // direct flat communicators using the bare basename.
+            std::string fallback_name(name);
+            fallback_name += "0-" +
+                std::to_string(static_cast<std::size_t>(num_sites) - 1) + "/";
+
+            auto c = create_communicator(fallback_name.c_str(), num_sites,
+                this_site, generation, root_site_arg(0));
+            std::vector<hpx::tuple<communicator, this_site_arg>> communicators;
+            communicators.emplace_back(HPX_MOVE(c), this_site);
+            return hierarchical_communicator(HPX_MOVE(communicators), arity,
+                root_site, num_sites, this_site);
         }
 
         std::vector<hpx::tuple<communicator, this_site_arg>> communicators;
