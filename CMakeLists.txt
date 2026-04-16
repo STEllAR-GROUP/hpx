@@ -1073,7 +1073,7 @@ hpx_option(
   ADVANCED
 )
 
-set(HPX_WITH_ASIO_TAG_DEFAULT "asio-1-21-0")
+set(HPX_WITH_ASIO_TAG_DEFAULT "asio-1-30-2")
 if(HPX_WITH_HIP)
   # newer versions of Asio currently fail when compiled with HIPCC
   set(HPX_WITH_ASIO_TAG_DEFAULT "asio-1-16-0")
@@ -1892,6 +1892,17 @@ hpx_option(
   "Enable the use of the [[no_unique_address]] attribute (default: ON)" ON
   ADVANCED
 )
+
+hpx_option(
+  HPX_WITH_CXX20_STD_EXECUTION_POLICES
+  BOOL
+  "Support using std execution policies for HPX parallel algorithms (default: ON)."
+  ON
+  ADVANCED
+)
+if(HPX_WITH_CXX20_STD_EXECUTION_POLICES)
+  hpx_add_config_define(HPX_HAVE_CXX20_STD_EXECUTION_POLICES)
+endif()
 
 # Need to include the CUDA setup before the config test to enable the CUDA
 # language

@@ -7,8 +7,6 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_COMPRESSION_BZIP2)
-#include <boost/iostreams/filter/bzip2.hpp>
-
 #include <hpx/modules/actions.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>

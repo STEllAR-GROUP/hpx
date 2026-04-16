@@ -767,7 +767,7 @@ namespace hpx::lcos::local {
         explicit futures_factory(F&& f)
           : task_(detail::create_task_object<Result, Cancelable>::call(
                 hpx::util::thread_local_caching_allocator<
-                    hpx::lockfree::variable_size_stack, char,
+                    hpx::lockfree::variable_size_stack,
                     hpx::util::internal_allocator<>>{},
                 HPX_FORWARD(F, f)))
         {
@@ -776,7 +776,7 @@ namespace hpx::lcos::local {
         explicit futures_factory(Result (*f)())
           : task_(detail::create_task_object<Result, Cancelable>::call(
                 hpx::util::thread_local_caching_allocator<
-                    hpx::lockfree::variable_size_stack, char,
+                    hpx::lockfree::variable_size_stack,
                     hpx::util::internal_allocator<>>{},
                 f))
         {

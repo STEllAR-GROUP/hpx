@@ -9,13 +9,17 @@ name: Windows CI (ClangCL, Release)
 
 on: [pull_request]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v6
-    - uses: jwlawson/actions-setup-cmake@v2.1
+    - uses: jwlawson/actions-setup-cmake@v2.2
       with:
         github-api-token: ${{ secrets.GITHUB_TOKEN }}
 

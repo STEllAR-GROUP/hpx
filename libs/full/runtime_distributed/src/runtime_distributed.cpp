@@ -10,10 +10,8 @@
 #include <hpx/agas/addressing_service.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/post.hpp>
-#include <hpx/components_base/agas_interface.hpp>
-#include <hpx/components_base/server/component.hpp>
-#include <hpx/components_base/server/component_base.hpp>
 #include <hpx/modules/async_base.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution_base.hpp>

@@ -495,6 +495,16 @@ namespace hpx::performance_counters {
         hpx::function<std::int64_t(bool)> cache_reclaims(
             hpx::bind_front(&parcelhandler::get_connection_cache_statistics,
                 &ph, pp_type, parcelport::connection_cache_reclaims));
+        hpx::function<std::int64_t(bool)> cache_reservation_failures(
+            hpx::bind_front(&parcelhandler::get_connection_cache_statistics,
+                &ph, pp_type,
+                parcelport::connection_cache_reservation_failures));
+        hpx::function<std::int64_t(bool)> cache_num_connections(
+            hpx::bind_front(&parcelhandler::get_connection_cache_statistics,
+                &ph, pp_type, parcelport::connection_cache_num_connections));
+        hpx::function<std::int64_t(bool)> cache_max_connections(
+            hpx::bind_front(&parcelhandler::get_connection_cache_statistics,
+                &ph, pp_type, parcelport::connection_cache_max_connections));
 
         performance_counters::generic_counter_type_data const
             connection_cache_types[] = {
@@ -561,6 +571,47 @@ namespace hpx::performance_counters {
                     hpx::bind(
                         &performance_counters::locality_raw_counter_creator, _1,
                         HPX_MOVE(cache_reclaims), _2),
+                    &performance_counters::locality_counter_discoverer, ""},
+                {hpx::util::format(
+                     "/parcelport/count/{}/cache-reservation-failures",
+                     pp_type),
+                    performance_counters::counter_type::raw,
+                    hpx::util::format(
+                        "returns the number of times a connection reservation "
+                        "failed because the {} connection cache was fully "
+                        "checked out (pool saturation); parcels are silently "
+                        "deferred on each such event",
+                        pp_type),
+                    HPX_PERFORMANCE_COUNTER_V1,
+                    hpx::bind(
+                        &performance_counters::locality_raw_counter_creator, _1,
+                        HPX_MOVE(cache_reservation_failures), _2),
+                    &performance_counters::locality_counter_discoverer, ""},
+                {hpx::util::format(
+                     "/parcelport/count/{}/cache-connections", pp_type),
+                    performance_counters::counter_type::raw,
+                    hpx::util::format(
+                        "returns the current number of connections tracked by "
+                        "the {} connection cache (in-use plus idle); compare "
+                        "with cache-max-connections to compute utilisation",
+                        pp_type),
+                    HPX_PERFORMANCE_COUNTER_V1,
+                    hpx::bind(
+                        &performance_counters::locality_raw_counter_creator, _1,
+                        HPX_MOVE(cache_num_connections), _2),
+                    &performance_counters::locality_counter_discoverer, ""},
+                {hpx::util::format(
+                     "/parcelport/count/{}/cache-max-connections", pp_type),
+                    performance_counters::counter_type::raw,
+                    hpx::util::format(
+                        "returns the configured maximum number of connections "
+                        "for the {} connection cache (hpx.max_connections ini "
+                        "key); fixed at startup",
+                        pp_type),
+                    HPX_PERFORMANCE_COUNTER_V1,
+                    hpx::bind(
+                        &performance_counters::locality_raw_counter_creator, _1,
+                        HPX_MOVE(cache_max_connections), _2),
                     &performance_counters::locality_counter_discoverer, ""}};
 
         performance_counters::install_counter_types(
