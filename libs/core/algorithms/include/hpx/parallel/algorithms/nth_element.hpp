@@ -189,8 +189,9 @@ namespace hpx::parallel {
             // Check  the special conditions
             if (nth == first)
             {
-                using wrapped_comp_type = hpx::parallel::util::compare_projected<
-                    std::decay_t<Compare>, std::decay_t<Proj>>;
+                using wrapped_comp_type =
+                    hpx::parallel::util::compare_projected<
+                        std::decay_t<Compare>, std::decay_t<Proj>>;
                 RandomIt it = detail::min_element<RandomIt>().call(
                     hpx::execution::seq, first, end,
                     wrapped_comp_type(comp, proj), hpx::identity_v);
@@ -209,16 +210,18 @@ namespace hpx::parallel {
 
             if (nelem < nmin_sort)
             {
-                using wrapped_comp_type = hpx::parallel::util::compare_projected<
-                    std::decay_t<Compare>, std::decay_t<Proj>>;
+                using wrapped_comp_type =
+                    hpx::parallel::util::compare_projected<
+                        std::decay_t<Compare>, std::decay_t<Proj>>;
                 detail::sort<RandomIt>().call(hpx::execution::seq, first, end,
                     wrapped_comp_type(comp, proj), hpx::identity_v);
                 return;
             }
             if (level == 0)
             {
-                using wrapped_comp_type = hpx::parallel::util::compare_projected<
-                    std::decay_t<Compare>, std::decay_t<Proj>>;
+                using wrapped_comp_type =
+                    hpx::parallel::util::compare_projected<
+                        std::decay_t<Compare>, std::decay_t<Proj>>;
                 hpx::parallel::detail::make_heap<RandomIt>().call(
                     hpx::execution::seq, first, end,
                     wrapped_comp_type(comp, proj), hpx::identity_v);
@@ -227,8 +230,9 @@ namespace hpx::parallel {
             }
 
             // Filter the range and check which part contains the nth element
-            using wrapped_comp_type = hpx::parallel::util::compare_projected<
-                std::decay_t<Compare>, std::decay_t<Proj>>;
+            using wrapped_comp_type =
+                hpx::parallel::util::compare_projected<std::decay_t<Compare>,
+                    std::decay_t<Proj>>;
             RandomIt c_last = filter(first, end, wrapped_comp_type(comp, proj));
 
             if (c_last == nth)
@@ -280,7 +284,6 @@ namespace hpx::parallel {
             parallel(ExPolicy&& policy, RandomIt first, RandomIt nth, Sent last,
                 Pred&& pred, Proj&& proj)
             {
-
                 RandomIt partition_iter, return_last;
 
                 if (first == last)
@@ -312,8 +315,8 @@ namespace hpx::parallel {
                             hpx::parallel::detail::partition<RandomIt>().call(
                                 policy(hpx::execution::non_task), first + 1,
                                 last_iter,
-                                [val = HPX_INVOKE(proj, *first), &pred,
-                                    &proj](auto const& elem) {
+                                [val = HPX_INVOKE(proj, *first), &pred, &proj](
+                                    auto const& elem) {
                                     return HPX_INVOKE(
                                         pred, HPX_INVOKE(proj, elem), val);
                                 },
@@ -394,7 +397,8 @@ namespace hpx {
                 HPX_MOVE(proj));
         }
 
-        template <typename RandomIt, typename Sent, typename Pred, typename Proj>
+        template <typename RandomIt, typename Sent, typename Pred,
+            typename Proj>
         // clang-format off
             requires (
                 hpx::traits::is_iterator_v<RandomIt> &&

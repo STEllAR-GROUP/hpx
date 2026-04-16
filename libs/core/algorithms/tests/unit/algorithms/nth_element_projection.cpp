@@ -29,7 +29,8 @@ void test_nth_element_projection(ExPolicy policy)
 
     auto nth = v.begin() + 50;
 
-    hpx::nth_element(policy, v.begin(), nth, v.end(), std::less<int>{}, &S::val);
+    hpx::nth_element(
+        policy, v.begin(), nth, v.end(), std::less<int>{}, &S::val);
 
     // After nth_element, the element at nth should be the 51st smallest element (which is 51)
     HPX_TEST_EQ(v[50].val, 51);
