@@ -76,16 +76,26 @@ namespace hpx::detail {
 
         bool set_state(shared_state& s1, shared_state& s) noexcept
         {
+            auto current_state = state.load(std::memory_order_relaxed);
+            if (s1.value != current_state.value)
+            {
+                s1 = current_state;
+                return false;
+            }
+
             ++s.data.tag;
-            return s1.value == state.load(std::memory_order_relaxed).value &&
-                state.compare_exchange_strong(s1, s, std::memory_order_release);
+            return state.compare_exchange_strong(s1, s, std::memory_order_release);
         }
 
         bool set_state(shared_state& s1, shared_state& s,
             std::unique_lock<mutex_type>& lk) noexcept
         {
-            if (s1.value != state.load(std::memory_order_relaxed).value)
+            auto current_state = state.load(std::memory_order_relaxed);
+            if (s1.value != current_state.value)
+            {
+                s1 = current_state;
                 return false;
+            }
 
             ++s.data.tag;
 
@@ -136,7 +146,7 @@ namespace hpx::detail {
                 {
                     break;
                 }
-                s = state.load(std::memory_order_acquire);
+                s = s1;
             }
             return true;
         }
@@ -206,7 +216,7 @@ namespace hpx::detail {
                 {
                     break;
                 }
-                s = state.load(std::memory_order_acquire);
+                s = s1;
             }
         }
 
@@ -237,7 +247,7 @@ namespace hpx::detail {
                 {
                     break;
                 }
-                s = state.load(std::memory_order_acquire);
+                s = s1;
             }
         }
 
@@ -258,7 +268,7 @@ namespace hpx::detail {
                 {
                     break;
                 }
-                s = state.load(std::memory_order_acquire);
+                s = s1;
             }
             return true;
         }
@@ -330,7 +340,7 @@ namespace hpx::detail {
                 {
                     break;
                 }
-                s = state.load(std::memory_order_acquire);
+                s = s1;
             }
             return true;
         }
@@ -364,7 +374,7 @@ namespace hpx::detail {
                 {
                     break;
                 }
-                s = state.load(std::memory_order_acquire);
+                s = s1;
             }
         }
 
@@ -474,7 +484,7 @@ namespace hpx::detail {
                 {
                     break;
                 }
-                s = state.load(std::memory_order_acquire);
+                s = s1;
             }
             return true;
         }
