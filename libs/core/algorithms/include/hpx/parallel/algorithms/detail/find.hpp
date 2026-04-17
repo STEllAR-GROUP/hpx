@@ -417,18 +417,20 @@ namespace hpx::parallel::detail {
             FwdIter2 s_last, std::size_t base_idx, std::size_t part_size,
             Token& tok, Pred&& op, Proj1&& proj1, Proj2&& proj2)
         {
-            util::loop_idx_n<ExPolicy>(base_idx, it, part_size, tok,
-                [&tok, &s_first, &s_last, &op, &proj1, &proj2](
-                    auto v, std::size_t i) -> void {
-                    util::compare_projected<Pred, Proj1, Proj2> cmp(
-                        HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
-                        HPX_FORWARD(Proj2, proj2));
+            util::compare_projected<Pred, Proj1, Proj2> cmp(
+                HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
+                HPX_FORWARD(Proj2, proj2));
 
+            util::loop_idx_n<ExPolicy>(base_idx, it, part_size, tok,
+                [cmp = HPX_MOVE(cmp), s_first, s_last, &tok](
+                    auto v, std::size_t i) mutable -> void {
                     for (FwdIter2 iter = s_first; iter != s_last; ++iter)
                     {
                         if (HPX_INVOKE(cmp, v, *iter))
                         {
+                            // short-circuit: no need to check remaining search elements
                             tok.cancel(i);
+                            return;
                         }
                     }
                 });

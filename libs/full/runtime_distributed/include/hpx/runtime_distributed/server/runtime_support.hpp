@@ -15,9 +15,7 @@
 #include <hpx/agas/agas_fwd.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
-#include <hpx/components_base/component_type.hpp>
-#include <hpx/components_base/server/create_component.hpp>
-#include <hpx/components_base/traits/is_component.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/parcelset_base.hpp>
 #include <hpx/modules/plugin.hpp>
@@ -58,15 +56,13 @@ namespace hpx::components::server {
         {
             plugin_factory(
                 std::shared_ptr<plugins::plugin_factory_base> const& f,
-                hpx::util::plugin::dll const& d, bool enabled)
+                bool enabled)
               : first(f)
-              , second(d)
               , isenabled(enabled)
             {
             }
 
             std::shared_ptr<plugins::plugin_factory_base> first;
-            hpx::util::plugin::dll const& second;
             bool isenabled;
         };
         using plugin_factory_type = plugin_factory;
@@ -321,6 +317,11 @@ namespace hpx::components::server {
             hpx::program_options::options_description& options,
             std::set<std::string>& startup_handled);
 #endif
+
+        bool load_plugin_static(util::section& ini, std::string const& instance,
+            std::string const& plugin, bool isenabled,
+            hpx::program_options::options_description& options,
+            std::set<std::string>& startup_handled);
 
         // the name says it all
         std::size_t dijkstra_termination_detection(

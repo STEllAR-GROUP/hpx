@@ -12,8 +12,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/base_lco.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
-#include <hpx/components_base/server/managed_component_base.hpp>
-#include <hpx/components_base/traits/managed_component_policies.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/synchronization.hpp>

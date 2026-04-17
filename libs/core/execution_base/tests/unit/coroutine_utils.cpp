@@ -29,8 +29,17 @@ auto signature_all(Error, Values...)
 template <typename Signatures>
 struct non_awaitable_sender
 {
+#if defined(HPX_HAVE_STDEXEC)
+    using sender_concept = hpx::execution::experimental::sender_t;
+#else
     using is_sender = void;
+#endif
     using completion_signatures = Signatures;
+
+    template <typename Env>
+    friend auto tag_invoke(
+        hpx::execution::experimental::get_completion_signatures_t,
+        non_awaitable_sender const&, Env&&) -> completion_signatures;
 };
 
 #if !defined(HPX_HAVE_STDEXEC)
@@ -199,6 +208,7 @@ int main()
     namespace ex = hpx::execution::experimental;
 
     // clang-format off
+#if !defined(HPX_HAVE_STDEXEC)
     {
         // clang-format off
         static_assert(
@@ -211,9 +221,11 @@ int main()
                 void>);
         // clang-format on
     }
+#endif
     // clang-format on
 
     // single sender value
+#if !defined(HPX_HAVE_STDEXEC)
     {
         static_assert(std::is_same_v<
             ex::single_sender_value_t<awaitable_sender_1<awaiter>>, bool>);
@@ -221,8 +233,10 @@ int main()
             ex::single_sender_value_t<awaitable_sender_1<hpx::suspend_always>>,
             void>);
     }
+#endif
 
     // connect awaitable
+#if !defined(HPX_HAVE_STDEXEC)
     {
         static_assert(std::is_same_v<decltype(ex::connect_awaitable(
                                          awaitable_sender_1<awaiter>{},
@@ -234,6 +248,7 @@ int main()
                                recv_set_value{})),
                 ex::operation_t<recv_set_value>>);
     }
+#endif
 
     // Promise env
     {
@@ -320,17 +335,21 @@ int main()
     }
 
     // Operation base
+#if !defined(HPX_HAVE_STDEXEC)
     {
         static_assert(
             ex::is_operation_state_v<ex::operation_t<recv_set_value>>);
     }
+#endif
 
     // Connect result type
+#if !defined(HPX_HAVE_STDEXEC)
     {
         static_assert(std::is_same_v<
             ex::connect_result_t<awaitable_sender_1<awaiter>, recv_set_value>,
             ex::operation_t<recv_set_value>>);
     }
+#endif
 
     // As awaitable
     {

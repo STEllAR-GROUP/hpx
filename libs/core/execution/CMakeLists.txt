@@ -153,6 +153,10 @@ if(TARGET SVE::sve)
   set(execution_optional_dependencies SVE::sve)
 endif()
 
+if("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "EMULATE")
+  set(execution_headers ${execution_headers} hpx/experimental/emulate_simd.hpp)
+endif()
+
 include(HPX_AddModule)
 add_hpx_module(
   core execution

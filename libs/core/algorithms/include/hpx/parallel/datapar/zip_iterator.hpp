@@ -29,14 +29,14 @@ namespace hpx::parallel::util::detail {
         template <std::size_t... Is>
         static HPX_FORCEINLINE constexpr bool call(
             hpx::util::zip_iterator<Iter...> const& it,
-            hpx::util::index_pack<Is...>)
+            hpx::util::index_pack<Is...>) noexcept
         {
             auto const& t = it.get_iterator_tuple();
             return (true && ... && is_data_aligned(hpx::get<Is>(t)));
         }
 
         static HPX_FORCEINLINE constexpr bool call(
-            hpx::util::zip_iterator<Iter...> const& it)
+            hpx::util::zip_iterator<Iter...> const& it) noexcept
         {
             return call(it, hpx::util::make_index_pack_t<sizeof...(Iter)>());
         }

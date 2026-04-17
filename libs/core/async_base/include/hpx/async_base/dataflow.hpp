@@ -60,13 +60,13 @@ namespace hpx {
                 dataflow_t tag, F&& f, Ts&&... ts)
                 -> decltype(hpx::functional::tag_invoke(tag,
                     hpx::util::thread_local_caching_allocator<
-                        hpx::lockfree::variable_size_stack, char,
+                        hpx::lockfree::variable_size_stack,
                         hpx::util::internal_allocator<>>{},
                     HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
             {
                 using allocator_type =
                     hpx::util::thread_local_caching_allocator<
-                        hpx::lockfree::variable_size_stack, char,
+                        hpx::lockfree::variable_size_stack,
                         hpx::util::internal_allocator<>>;
                 return hpx::functional::tag_invoke(tag, allocator_type{},
                     HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);

@@ -47,6 +47,9 @@ namespace hpx::execution {
         public:
             /// \cond NOINTERNAL
             constexpr simd_task_policy_shim() = default;
+#if defined(__NVCC__) || defined(__CUDACC__)
+            constexpr ~simd_task_policy_shim() {}
+#endif
 
             template <typename Executor_, typename Parameters_>
             constexpr simd_task_policy_shim(
@@ -114,6 +117,9 @@ namespace hpx::execution {
         public:
             /// \cond NOINTERNAL
             constexpr simd_policy_shim() = default;
+#if defined(__NVCC__) || defined(__CUDACC__)
+            constexpr ~simd_policy_shim() {}
+#endif
 
             template <typename Executor_, typename Parameters_>
             constexpr simd_policy_shim(Executor_&& exec, Parameters_&& params)
@@ -178,6 +184,9 @@ namespace hpx::execution {
         public:
             /// \cond NOINTERNAL
             constexpr par_simd_task_policy_shim() = default;
+#if defined(__NVCC__) || defined(__CUDACC__)
+            constexpr ~par_simd_task_policy_shim() {}
+#endif
 
             template <typename Executor_, typename Parameters_>
             constexpr par_simd_task_policy_shim(
@@ -244,6 +253,9 @@ namespace hpx::execution {
         public:
             /// \cond NOINTERNAL
             constexpr par_simd_policy_shim() = default;
+#if defined(__NVCC__) || defined(__CUDACC__)
+            constexpr ~par_simd_policy_shim() {}
+#endif
 
             template <typename Executor_, typename Parameters_>
             constexpr par_simd_policy_shim(

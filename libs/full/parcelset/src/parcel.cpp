@@ -20,8 +20,7 @@
 
 #include <hpx/actions/transfer_action.hpp>
 #include <hpx/actions_base/detail/action_factory.hpp>
-#include <hpx/components_base/agas_interface.hpp>
-#include <hpx/components_base/component_type.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/parcelset_base.hpp>
 #include <hpx/naming/detail/preprocess_gid_types.hpp>
 #include <hpx/parcelset/parcel.hpp>

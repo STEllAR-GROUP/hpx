@@ -139,7 +139,11 @@ struct receiver_2
 
 struct sender_1
 {
+#if defined(HPX_HAVE_STDEXEC)
+    using sender_concept = ex::sender_t;
+#else
     using is_sender = void;
+#endif
 #if defined(HPX_HAVE_STDEXEC)
     using completion_signatures =
         ex::completion_signatures<ex::set_value_t(int),
@@ -157,6 +161,10 @@ struct sender_1
         static constexpr bool sends_stopped = false;
     };
 #endif
+
+    template <typename Env>
+    friend auto tag_invoke(ex::get_completion_signatures_t, sender_1 const&,
+        Env&&) -> completion_signatures;
 
     struct operation_state : immovable
     {
@@ -177,7 +185,11 @@ struct sender_1
 
 struct sender_2
 {
+#if defined(HPX_HAVE_STDEXEC)
+    using sender_concept = ex::sender_t;
+#else
     using is_sender = void;
+#endif
 #if defined(HPX_HAVE_STDEXEC)
     using completion_signatures =
         ex::completion_signatures<ex::set_value_t(int),
@@ -195,6 +207,10 @@ struct sender_2
         static constexpr bool sends_stopped = false;
     };
 #endif
+
+    template <typename Env>
+    friend auto tag_invoke(ex::get_completion_signatures_t, sender_2 const&,
+        Env&&) -> completion_signatures;
 
     struct operation_state : immovable
     {
@@ -215,11 +231,19 @@ sender_2::operation_state tag_invoke(
 
 struct sender_3
 {
+#if defined(HPX_HAVE_STDEXEC)
+    using sender_concept = ex::sender_t;
+#else
     using is_sender = void;
+#endif
 
     using completion_signatures =
         ex::completion_signatures<ex::set_value_t(int),
             ex::set_error_t(std::exception_ptr)>;
+
+    template <typename Env>
+    friend auto tag_invoke(ex::get_completion_signatures_t, sender_3 const&,
+        Env&&) -> completion_signatures;
 
     struct operation_state : immovable
     {
@@ -241,7 +265,11 @@ struct sender_3
 template <bool val, typename T>
 struct sender_4
 {
+#if defined(HPX_HAVE_STDEXEC)
+    using sender_concept = ex::sender_t;
+#else
     using is_sender = void;
+#endif
 #if defined(HPX_HAVE_STDEXEC)
     using completion_signatures = std::conditional_t<val,
         ex::completion_signatures<ex::set_value_t(T),
@@ -261,6 +289,10 @@ struct sender_4
         static constexpr bool sends_stopped = val;
     };
 #endif
+
+    template <typename Env>
+    friend auto tag_invoke(ex::get_completion_signatures_t, sender_4 const&,
+        Env&&) -> completion_signatures;
 };
 
 static std::size_t void_receiver_set_value_calls = 0;
