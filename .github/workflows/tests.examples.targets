@@ -8,8 +8,6 @@
 #
 tests.examples.1d_stencil.1d_stencil_6
 tests.examples.1d_stencil.1d_stencil_7
-tests.examples.1d_stencil.1d_stencil_8
-tests.examples.transpose.transpose_smp_block
 tests.examples.async_io.async_io_simple
 tests.examples.modules.algorithms.run_on_all
 tests.examples.modules.checkpoint.1d_stencil_4_checkpoint
