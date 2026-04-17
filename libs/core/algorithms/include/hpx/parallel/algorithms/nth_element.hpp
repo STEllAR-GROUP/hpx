@@ -193,9 +193,13 @@ namespace hpx::parallel {
             // Check  the special conditions
             if (nth == first)
             {
+                // We use wrapped_comp_type here to avoid an issue in the
+                // underlying detail::min_element implementation which
+                // incorrectly fails when projections change types on some
+                // platforms.
                 RandomIt it = detail::min_element<RandomIt>().call(
-                    hpx::execution::seq, first, end, HPX_FORWARD(Compare, comp),
-                    HPX_FORWARD(Proj, proj));
+                    hpx::execution::seq, first, end,
+                    wrapped_comp_type(comp, proj), hpx::identity_v);
 
                 if (it != first)
                 {
