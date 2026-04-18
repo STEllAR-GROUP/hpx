@@ -153,9 +153,9 @@ namespace hpx::detail {
 
         bool try_unlock_shared_fast()
         {
+            auto s = state.load(std::memory_order_acquire);
             while (true)
             {
-                auto s = state.load(std::memory_order_acquire);
                 if (s.data.exclusive || s.data.exclusive_waiting_blocked ||
                     s.data.upgrade || s.data.shared_count <= 1)
                 {
@@ -290,7 +290,7 @@ namespace hpx::detail {
                     release_waiters(lk);
                     break;
                 }
-                s = state.load(std::memory_order_acquire);
+                s = s1;
             }
         }
 
@@ -439,7 +439,7 @@ namespace hpx::detail {
                     release_waiters(lk);
                     break;
                 }
-                s = state.load(std::memory_order_acquire);
+                s = s1;
             }
         }
 
@@ -461,7 +461,7 @@ namespace hpx::detail {
                     release_waiters(lk);
                     break;
                 }
-                s = state.load(std::memory_order_acquire);
+                s = s1;
             }
         }
 
@@ -506,7 +506,7 @@ namespace hpx::detail {
                     release_waiters(lk);
                     break;
                 }
-                s = state.load(std::memory_order_acquire);
+                s = s1;
             }
         }
 
