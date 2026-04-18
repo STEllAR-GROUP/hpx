@@ -84,7 +84,8 @@ namespace hpx::detail {
             }
 
             ++s.data.tag;
-            return state.compare_exchange_strong(s1, s, std::memory_order_release);
+            return state.compare_exchange_strong(
+                s1, s, std::memory_order_release);
         }
 
         bool set_state(shared_state& s1, shared_state& s,
