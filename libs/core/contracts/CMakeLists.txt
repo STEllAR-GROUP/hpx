@@ -24,11 +24,15 @@ if(HPX_WITH_CXX26_CONTRACTS)
 endif()
 
 # Default location is $HPX_ROOT/libs/contracts/include
-set(contracts_headers hpx/contracts.hpp hpx/contracts/macros.hpp)
+set(contracts_headers
+  hpx/contracts.hpp
+  hpx/contracts/macros.hpp
+  hpx/contracts/violation_handler.hpp
+)
 set(contracts_macro_headers hpx/contracts/macros.hpp)
 
 # Default location is $HPX_ROOT/libs/contracts/src
-set(contracts_sources)
+set(contracts_sources violation_handler.cpp)
 
 include(HPX_AddModule)
 add_hpx_module(
