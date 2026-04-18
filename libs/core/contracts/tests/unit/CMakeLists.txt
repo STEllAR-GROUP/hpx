@@ -1,4 +1,5 @@
 # Copyright (c) 2025 Alexandros Papadakis
+# Copyright (c) 2026 The STE||AR-Group
 # HPX Contracts Module Unit Tests
 #
 # SPDX-License-Identifier: BSL-1.0
@@ -15,6 +16,9 @@ set(contract_tests
     fallback_contracts_succeed
     fallback_contracts_fail
     disabled_contracts
+    violation_handler_invoked
+    default_handler_aborts
+    handler_receives_correct_info
 )
 
 foreach(test ${contract_tests})
@@ -54,4 +58,13 @@ else()
     tests.unit.modules.contracts.fallback_contracts_fail
     PROPERTIES WILL_FAIL $<$<CONFIG:Debug>:ON>
   )
+
+  # default_handler_aborts calls HPX_CONTRACT_ASSERT(false) with no custom
+  # handler; the default handler aborts in ENFORCE mode
+  if(HPX_WITH_CONTRACTS_MODE STREQUAL "ENFORCE" OR NOT HPX_WITH_CONTRACTS_MODE)
+    set_tests_properties(
+      tests.unit.modules.contracts.default_handler_aborts PROPERTIES WILL_FAIL
+                                                                      ON
+    )
+  endif()
 endif()
