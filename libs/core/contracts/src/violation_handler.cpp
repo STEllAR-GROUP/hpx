@@ -4,6 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/contracts/config/defines.hpp>
 #include <hpx/contracts/violation_handler.hpp>
 
 #include <cstdlib>
@@ -49,7 +50,10 @@ namespace hpx::contracts {
 
         std::cerr << info.location << ": Contract " << kind_str << " '"
                   << info.condition << "' violated\n";
+
+#if HPX_CONTRACTS_MODE != 1    // abort in ENFORCE; continue in OBSERVE
         std::abort();
+#endif
     }
 
     void invoke_violation_handler(violation_info const& info)

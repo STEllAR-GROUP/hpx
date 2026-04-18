@@ -21,13 +21,35 @@ if(HPX_WITH_CXX26_CONTRACTS)
       DEFINE HPX_CONTRACTS_HAVE_ASSERTS_AS_CONTRACT_ASSERTS NAMESPACE CONTRACTS
     )
   endif()
+else()
+  # Contract evaluation mode for pre-C++26 compilers
+  hpx_option(
+    HPX_WITH_CONTRACTS_MODE STRING
+    "Contract evaluation mode for pre-C++26 compilers (ENFORCE, OBSERVE, IGNORE). (default: ENFORCE)"
+    "ENFORCE"
+    STRINGS "ENFORCE;OBSERVE;IGNORE"
+    CATEGORY "Modules"
+    MODULE CONTRACTS
+  )
+
+  if(HPX_WITH_CONTRACTS_MODE STREQUAL "ENFORCE")
+    hpx_add_config_define_namespace(
+      DEFINE HPX_CONTRACTS_MODE VALUE 0 NAMESPACE CONTRACTS
+    )
+  elseif(HPX_WITH_CONTRACTS_MODE STREQUAL "OBSERVE")
+    hpx_add_config_define_namespace(
+      DEFINE HPX_CONTRACTS_MODE VALUE 1 NAMESPACE CONTRACTS
+    )
+  elseif(HPX_WITH_CONTRACTS_MODE STREQUAL "IGNORE")
+    hpx_add_config_define_namespace(
+      DEFINE HPX_CONTRACTS_MODE VALUE 2 NAMESPACE CONTRACTS
+    )
+  endif()
 endif()
 
 # Default location is $HPX_ROOT/libs/contracts/include
-set(contracts_headers
-  hpx/contracts.hpp
-  hpx/contracts/macros.hpp
-  hpx/contracts/violation_handler.hpp
+set(contracts_headers hpx/contracts.hpp hpx/contracts/macros.hpp
+                      hpx/contracts/violation_handler.hpp
 )
 set(contracts_macro_headers hpx/contracts/macros.hpp)
 

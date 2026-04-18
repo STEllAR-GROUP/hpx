@@ -25,9 +25,11 @@ namespace hpx::contracts {
         hpx::source_location location;
     };
 
-    HPX_CXX_CORE_EXPORT using violation_handler_t = void (*)(violation_info const&);
+    HPX_CXX_CORE_EXPORT using violation_handler_t =
+        void (*)(violation_info const&);
 
-    HPX_CORE_EXPORT void set_violation_handler(violation_handler_t handler) noexcept;
+    HPX_CORE_EXPORT void set_violation_handler(
+        violation_handler_t handler) noexcept;
     HPX_CORE_EXPORT violation_handler_t get_violation_handler() noexcept;
 
     HPX_CORE_EXPORT void default_violation_handler(violation_info const& info);
