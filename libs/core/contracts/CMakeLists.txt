@@ -27,8 +27,9 @@ else()
   # generation mechanism before add_hpx_module creates the build directory.
   set(HPX_WITH_CONTRACTS_MODE
       "ENFORCE"
-      CACHE STRING
-            "Contract evaluation mode for pre-C++26 compilers (ENFORCE, OBSERVE, IGNORE)."
+      CACHE
+        STRING
+        "Contract evaluation mode for pre-C++26 compilers (ENFORCE, OBSERVE, IGNORE)."
   )
   set_property(
     CACHE HPX_WITH_CONTRACTS_MODE PROPERTY STRINGS "ENFORCE;OBSERVE;IGNORE"

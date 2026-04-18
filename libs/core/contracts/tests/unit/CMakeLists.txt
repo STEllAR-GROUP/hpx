@@ -64,7 +64,7 @@ else()
   if(HPX_WITH_CONTRACTS_MODE STREQUAL "ENFORCE" OR NOT HPX_WITH_CONTRACTS_MODE)
     set_tests_properties(
       tests.unit.modules.contracts.default_handler_aborts PROPERTIES WILL_FAIL
-                                                                      ON
+                                                                     ON
     )
   endif()
 endif()
