@@ -1,6 +1,5 @@
-//  Copyright (c) 2025 The STE||AR-Group
+//  Copyright (c) 2025-2026 The STE||AR-Group
 //  Copyright (c) 2025 Alexandros Papadakis
-//  Copyright (c) 2026 The STE||AR-Group
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -54,7 +53,7 @@
 #define HPX_PRE(x)
 #define HPX_POST(x)
 
-#if HPX_CONTRACTS_MODE == 2    // IGNORE
+#if HPX_HAVE_CONTRACTS_MODE == 2    // IGNORE
 
 #define HPX_CONTRACT_ASSERT(x)
 
@@ -72,6 +71,6 @@
     } while (false)
 // clang-format on
 
-#endif    // HPX_CONTRACTS_MODE
+#endif    // HPX_HAVE_CONTRACTS_MODE
 
 #endif    // HPX_HAVE_CXX26_CONTRACTS

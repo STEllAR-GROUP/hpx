@@ -4,6 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config.hpp>
 #include <hpx/contracts/config/defines.hpp>
 #include <hpx/contracts/violation_handler.hpp>
 
@@ -22,9 +23,12 @@ namespace hpx::contracts {
 
     }    // namespace detail
 
-    void set_violation_handler(violation_handler_t handler) noexcept
+    violation_handler_t set_violation_handler(
+        violation_handler_t handler) noexcept
     {
+        violation_handler_t old = detail::get_handler();
         detail::get_handler() = handler;
+        return old;
     }
 
     violation_handler_t get_violation_handler() noexcept
@@ -51,7 +55,7 @@ namespace hpx::contracts {
         std::cerr << info.location << ": Contract " << kind_str << " '"
                   << info.condition << "' violated\n";
 
-#if HPX_CONTRACTS_MODE != 1    // abort in ENFORCE; continue in OBSERVE
+#if HPX_HAVE_CONTRACTS_MODE != 1    // abort in ENFORCE; continue in OBSERVE
         std::abort();
 #endif
     }

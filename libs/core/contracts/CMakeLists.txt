@@ -22,34 +22,29 @@ if(HPX_WITH_CXX26_CONTRACTS)
     )
   endif()
 else()
-  # Contract evaluation mode for pre-C++26 compilers. Not registered via
-  # hpx_option(MODULE CONTRACTS) to avoid triggering the config_entries.cpp
-  # generation mechanism before add_hpx_module creates the build directory.
-  set(HPX_WITH_CONTRACTS_MODE
-      "ENFORCE"
-      CACHE
-        STRING
-        "Contract evaluation mode for pre-C++26 compilers (ENFORCE, OBSERVE, IGNORE)."
-  )
-  set_property(
-    CACHE HPX_WITH_CONTRACTS_MODE PROPERTY STRINGS "ENFORCE;OBSERVE;IGNORE"
+  hpx_option(
+    HPX_WITH_CONTRACTS_MODE
+    STRING
+    "Contract evaluation mode for pre-C++26 compilers, options are: ENFORCE, OBSERVE, IGNORE"
+    "ENFORCE"
+    STRINGS "ENFORCE;OBSERVE;IGNORE"
   )
 
   if(HPX_WITH_CONTRACTS_MODE STREQUAL "ENFORCE")
     hpx_add_config_define_namespace(
-      DEFINE HPX_CONTRACTS_MODE
+      DEFINE HPX_HAVE_CONTRACTS_MODE
       VALUE 0
       NAMESPACE CONTRACTS
     )
   elseif(HPX_WITH_CONTRACTS_MODE STREQUAL "OBSERVE")
     hpx_add_config_define_namespace(
-      DEFINE HPX_CONTRACTS_MODE
+      DEFINE HPX_HAVE_CONTRACTS_MODE
       VALUE 1
       NAMESPACE CONTRACTS
     )
   elseif(HPX_WITH_CONTRACTS_MODE STREQUAL "IGNORE")
     hpx_add_config_define_namespace(
-      DEFINE HPX_CONTRACTS_MODE
+      DEFINE HPX_HAVE_CONTRACTS_MODE
       VALUE 2
       NAMESPACE CONTRACTS
     )
