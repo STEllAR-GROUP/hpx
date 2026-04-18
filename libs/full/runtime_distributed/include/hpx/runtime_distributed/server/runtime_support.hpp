@@ -10,20 +10,19 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions/transfer_action.hpp>
-#include <hpx/actions_base/component_action.hpp>
-#include <hpx/actions_base/traits/action_does_termination_detection.hpp>
 #include <hpx/agas/agas_fwd.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
+#include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/components_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/parcelset_base.hpp>
 #include <hpx/modules/plugin.hpp>
+#include <hpx/modules/plugin_factories.hpp>
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/synchronization.hpp>
 #include <hpx/performance_counters/counters.hpp>
-#include <hpx/plugin_factories/plugin_factory_base.hpp>
 #include <hpx/runtime_components/components_fwd.hpp>
 #include <hpx/runtime_distributed/find_here.hpp>
 

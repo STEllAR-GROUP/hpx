@@ -11,7 +11,7 @@
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS) &&                                   \
     defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS) &&                            \
     defined(HPX_HAVE_NETWORKING)
-#include <hpx/actions_base/detail/per_action_data_counter_registry.hpp>
+#include <hpx/modules/actions_base.hpp>
 #include <hpx/performance_counters/counters_fwd.hpp>
 
 namespace hpx { namespace performance_counters {

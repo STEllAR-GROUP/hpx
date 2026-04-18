@@ -9,7 +9,7 @@
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS) &&                                   \
     defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS) &&                            \
     defined(HPX_HAVE_NETWORKING)
-#include <hpx/actions_base/detail/invocation_count_registry.hpp>
+#include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/util.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>

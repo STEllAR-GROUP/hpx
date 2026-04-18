@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/actions_base/traits/is_client.hpp>
+#include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/naming_base.hpp>
 

@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/actions_base/component_action.hpp>
+#include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/components_base.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/performance_counters/counters.hpp>

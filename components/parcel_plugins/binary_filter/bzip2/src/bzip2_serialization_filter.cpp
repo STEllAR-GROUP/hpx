@@ -13,8 +13,7 @@
 #include <hpx/modules/iostream.hpp>
 
 #include <hpx/binary_filter/bzip2_serialization_filter.hpp>
-#include <hpx/plugin_factories/binary_filter_factory.hpp>
-#include <hpx/plugin_factories/plugin_registry.hpp>
+#include <hpx/modules/plugin_factories.hpp>
 
 #include <algorithm>
 #include <cstddef>

@@ -8,13 +8,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/actions_base/action_priority.hpp>
-#include <hpx/actions_base/basic_action_fwd.hpp>
-#include <hpx/actions_base/traits/action_continuation.hpp>
-#include <hpx/actions_base/traits/action_remote_result.hpp>
-#include <hpx/actions_base/traits/is_continuation.hpp>
 #include <hpx/async_distributed/continuation_fwd.hpp>
 #include <hpx/async_distributed/trigger_lco_fwd.hpp>
+#include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/components_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>

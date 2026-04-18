@@ -27,19 +27,14 @@
 #pragma once
 
 #include <hpx/config.hpp>
-
-#include <hpx/modules/execution.hpp>
-#include <hpx/modules/format.hpp>
-#include <hpx/runtime_local/runtime_local_fwd.hpp>
-#include <hpx/topology/topology.hpp>
+#include <hpx/modules/runtime_local.hpp>
 
 #include <chrono>
 #include <cstddef>
 #include <cstdlib>
-#include <ostream>
+#include <iosfwd>
 #include <string>
 #include <utility>
-#include <vector>
 
 namespace hpx::experimental::sandbox {
 
@@ -57,20 +52,7 @@ namespace hpx::experimental::sandbox {
         /// \brief Print a formatted environment report.
         ///
         /// \param os  Output stream.
-        void print(std::ostream& os) const
-        {
-            hpx::util::format_to(os, "\n");
-            hpx::util::format_to(os, "=== HPX Sandbox --- Environment {}\n",
-                std::string(25, '='));
-            hpx::util::format_to(os, "  Cores:           {}\n", cores);
-            hpx::util::format_to(os, "  PUs:             {}\n", pus);
-            hpx::util::format_to(os, "  NUMA domains:    {}\n", numa_nodes);
-            hpx::util::format_to(os, "  HPX workers:     {}\n", hpx_workers);
-            hpx::util::format_to(os, "  Sandbox:         {}\n",
-                is_sandbox ? "yes (constrained environment detected)" :
-                             "no (full hardware access)");
-            hpx::util::format_to(os, "{}\n", std::string(56, '='));
-        }
+        HPX_EXPORT void print(std::ostream& os) const;
     };
 
     /// \brief Holds the results of a comparative benchmark.
@@ -87,63 +69,18 @@ namespace hpx::experimental::sandbox {
         /// \brief Print a formatted benchmark report.
         ///
         /// \param os  Output stream.
-        void print(std::ostream& os) const
-        {
-            hpx::util::format_to(os, "\n");
-            hpx::util::format_to(
-                os, "=== HPX Sandbox --- Benchmark {}\n", std::string(26, '='));
-            hpx::util::format_to(os, "  Label:           \"{}\"\n", label);
-            hpx::util::format_to(os, "  Iterations:      {}\n", iterations);
-            hpx::util::format_to(os, "  Workers:         {}\n", num_workers);
-            hpx::util::format_to(os, "{}\n", std::string(56, '-'));
-            hpx::util::format_to(
-                os, "  Sequential:      {:.3f} ms\n", seq_mean_ms);
-            hpx::util::format_to(
-                os, "  Parallel:        {:.3f} ms\n", par_mean_ms);
-            hpx::util::format_to(os, "{}\n", std::string(56, '-'));
-            hpx::util::format_to(os, "  Speedup:         {:.2f}x\n", speedup);
-            hpx::util::format_to(
-                os, "  Efficiency:      {:.1f}%\n", efficiency_pct);
-            hpx::util::format_to(os, "{}\n", std::string(56, '-'));
-
-            // Verdict
-            hpx::util::format_to(os, "  Verdict:         ");
-            if (efficiency_pct >= 80.0)
-                hpx::util::format_to(os, "Excellent scaling\n");
-            else if (efficiency_pct >= 60.0)
-                hpx::util::format_to(os, "Good scaling\n");
-            else if (efficiency_pct >= 40.0)
-                hpx::util::format_to(
-                    os, "Moderate scaling (check granularity)\n");
-            else if (speedup > 1.0)
-                hpx::util::format_to(
-                    os, "Limited scaling (overhead-dominated)\n");
-            else
-                hpx::util::format_to(
-                    os, "No speedup (work too small or contention)\n");
-            hpx::util::format_to(os, "{}\n", std::string(56, '='));
-        }
+        HPX_EXPORT void print(std::ostream& os) const;
     };
 
     // --- Environment Detection ---
-
     namespace detail {
-
-        inline bool check_sandbox_heuristic()
-        {
-            if (std::getenv("COMPILER_EXPLORER") != nullptr)
-                return true;
-            if (std::getenv("HPX_SANDBOX") != nullptr)
-                return true;
-            return false;
-        }
 
         template <typename F>
         double time_once_ms(F&& fn)
         {
-            auto start = std::chrono::high_resolution_clock::now();
+            auto const start = std::chrono::high_resolution_clock::now();
             fn();
-            auto end = std::chrono::high_resolution_clock::now();
+            auto const end = std::chrono::high_resolution_clock::now();
             return std::chrono::duration<double, std::milli>(end - start)
                 .count();
         }
@@ -152,6 +89,7 @@ namespace hpx::experimental::sandbox {
         double mean_ms(F&& fn, std::size_t iterations)
         {
             fn();    // warmup
+
             double total = 0.0;
             for (std::size_t i = 0; i < iterations; ++i)
             {
@@ -159,23 +97,12 @@ namespace hpx::experimental::sandbox {
             }
             return total / static_cast<double>(iterations);
         }
-
     }    // namespace detail
 
     // --- Public API ---
 
     /// \brief Detect and return information about the current environment.
-    inline environment_info detect_environment()
-    {
-        environment_info info;
-        auto const& topo = hpx::threads::create_topology();
-        info.cores = topo.get_number_of_cores();
-        info.pus = topo.get_number_of_pus();
-        info.numa_nodes = topo.get_number_of_numa_nodes();
-        info.hpx_workers = hpx::get_num_worker_threads();
-        info.is_sandbox = detail::check_sandbox_heuristic();
-        return info;
-    }
+    HPX_EXPORT environment_info detect_environment();
 
     /// \brief Print a formatted environment report.
     inline void describe_environment(std::ostream& os)
@@ -187,7 +114,7 @@ namespace hpx::experimental::sandbox {
     template <typename F>
     double measure(F&& fn, std::size_t iterations = 5)
     {
-        return detail::mean_ms(std::forward<F>(fn), iterations);
+        return detail::mean_ms(HPX_FORWARD(F, fn), iterations);
     }
 
     /// \brief Compare sequential and parallel execution of the same work.
@@ -196,11 +123,13 @@ namespace hpx::experimental::sandbox {
         ParFn&& par_fn, std::size_t iterations = 5)
     {
         benchmark_report report;
-        report.label = std::move(label);
+        report.label = HPX_MOVE(label);
         report.iterations = iterations;
         report.num_workers = hpx::get_num_worker_threads();
-        report.seq_mean_ms = detail::mean_ms(seq_fn, iterations);
-        report.par_mean_ms = detail::mean_ms(par_fn, iterations);
+        report.seq_mean_ms =
+            detail::mean_ms(HPX_FORWARD(SeqFn, seq_fn), iterations);
+        report.par_mean_ms =
+            detail::mean_ms(HPX_FORWARD(ParFn, par_fn), iterations);
         if (report.par_mean_ms > 0.0)
         {
             report.speedup = report.seq_mean_ms / report.par_mean_ms;
@@ -213,5 +142,4 @@ namespace hpx::experimental::sandbox {
         }
         return report;
     }
-
 }    // namespace hpx::experimental::sandbox

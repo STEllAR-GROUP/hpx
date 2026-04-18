@@ -7,13 +7,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions/transfer_action.hpp>
-#include <hpx/actions_base/traits/action_priority.hpp>
-#include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/async_distributed/continuation.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
 #include <hpx/async_distributed/trigger_lco.hpp>
+#include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/naming/credit_handling.hpp>
+#include <hpx/modules/naming.hpp>
 
 #include <exception>
 #include <utility>

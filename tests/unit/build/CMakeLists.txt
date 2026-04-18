@@ -10,6 +10,12 @@ if(NOT HPX_WITH_TESTS_EXTERNAL_BUILD)
   return()
 endif()
 
+# If C++ modules are enabled, exit now (we don't know yet how to setup a
+# dependent HPX project to use the generated BMIs).
+if(HPX_WITH_CXX_MODULES)
+  return()
+endif()
+
 # Try building an external cmake based project ...
 function(
   create_cmake_test
@@ -55,6 +61,12 @@ function(
   if(HPX_WITH_CLANG_CUDA)
     set(cmake_cuda_compiler -DCMAKE_CUDA_COMPILER=${CMAKE_CUDA_COMPILER})
   endif()
+  if(HPX_WITH_CXX_MODULES)
+    set(ADDITIONAL_CMAKE_OPTIONS
+        ${ADDITIONAL_CMAKE_OPTIONS} -DHPX_WITH_CXX_MODULES=ON
+        -DHPX_CMAKE_LOGLEVEL=Debug
+    )
+  endif()
   add_custom_target(
     ${name}
     COMMAND
@@ -63,7 +75,7 @@ function(
       -DHPX_DIR=${hpx_dir} -DBOOST_ROOT=${BOOST_ROOT}
       ${ADDITIONAL_CMAKE_OPTIONS} -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS_SAFE}
       -DCMAKE_BUILD_TYPE=${build_type} ${cmake_cuda_compiler} --test-command
-      "${CMAKE_CTEST_COMMAND}" --output-on-failure
+      "${CMAKE_CTEST_COMMAND}" --output-on-failure --verbose
     VERBATIM
   )
   add_dependencies(${name} hpx hpx_init hpx_wrap)

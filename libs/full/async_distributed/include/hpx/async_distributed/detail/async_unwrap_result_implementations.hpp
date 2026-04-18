@@ -7,13 +7,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/actions_base/traits/action_select_direct_execution.hpp>
-#include <hpx/actions_base/traits/action_was_object_migrated.hpp>
-#include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/detail/async_implementations.hpp>
 #include <hpx/async_distributed/detail/async_unwrap_result_implementations_fwd.hpp>
 #include <hpx/async_distributed/detail/sync_implementations.hpp>
+#include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/components_base.hpp>
 #include <hpx/modules/naming_base.hpp>

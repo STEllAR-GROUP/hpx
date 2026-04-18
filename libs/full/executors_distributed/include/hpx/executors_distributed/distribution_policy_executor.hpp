@@ -10,8 +10,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions/invoke_function.hpp>
-#include <hpx/actions_base/traits/is_distribution_policy.hpp>
 #include <hpx/async_distributed/async.hpp>
+#include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>

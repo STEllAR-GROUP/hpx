@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/async_colocated/async_colocated_fwd.hpp>
+#include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/futures.hpp>
 
 namespace hpx { namespace detail {

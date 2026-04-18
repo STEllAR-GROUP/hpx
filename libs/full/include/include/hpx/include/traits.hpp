@@ -22,21 +22,7 @@
 #include <hpx/modules/timed_execution.hpp>
 #include <hpx/modules/type_support.hpp>
 
-#include <hpx/actions_base/traits/action_continuation.hpp>
-#include <hpx/actions_base/traits/action_decorate_continuation.hpp>
-#include <hpx/actions_base/traits/action_does_termination_detection.hpp>
-#include <hpx/actions_base/traits/action_is_target_valid.hpp>
-#include <hpx/actions_base/traits/action_priority.hpp>
-#include <hpx/actions_base/traits/action_remote_result.hpp>
-#include <hpx/actions_base/traits/action_schedule_thread.hpp>
-#include <hpx/actions_base/traits/action_select_direct_execution.hpp>
-#include <hpx/actions_base/traits/action_stacksize.hpp>
-#include <hpx/actions_base/traits/action_was_object_migrated.hpp>
-#include <hpx/actions_base/traits/extract_action.hpp>
-#include <hpx/actions_base/traits/is_client.hpp>
-#include <hpx/actions_base/traits/is_continuation.hpp>
-#include <hpx/actions_base/traits/is_distribution_policy.hpp>
-#include <hpx/actions_base/traits/is_valid_action.hpp>
 #include <hpx/async_distributed/traits/action_trigger_continuation.hpp>
+#include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/components_base.hpp>
 #include <hpx/modules/parcelset_base.hpp>

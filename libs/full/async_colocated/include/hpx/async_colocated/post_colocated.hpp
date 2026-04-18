@@ -9,8 +9,6 @@
 #include <hpx/config.hpp>
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/actions_base/actions_base_support.hpp>
-#include <hpx/actions_base/traits/is_continuation.hpp>
 #include <hpx/agas_base/primary_namespace.hpp>
 #include <hpx/agas_base/server/primary_namespace.hpp>
 #include <hpx/async_colocated/functional/colocated_helpers.hpp>
@@ -18,6 +16,7 @@
 #include <hpx/async_colocated/register_post_colocated.hpp>
 #include <hpx/async_distributed/bind_action.hpp>
 #include <hpx/async_distributed/detail/post_continue.hpp>
+#include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/functional.hpp>
 
 #include <type_traits>

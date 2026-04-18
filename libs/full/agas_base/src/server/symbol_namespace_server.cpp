@@ -11,11 +11,10 @@
 #include <hpx/assert.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/naming.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/modules/util.hpp>
-#include <hpx/naming/credit_handling.hpp>
-#include <hpx/naming/split_gid.hpp>
 
 #include <atomic>
 #include <cstdint>
