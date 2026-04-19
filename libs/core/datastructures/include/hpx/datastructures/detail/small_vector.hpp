@@ -1036,8 +1036,8 @@ namespace hpx::detail {
             return const_reverse_iterator{begin()};
         }
 
-        [[nodiscard]] auto front() const noexcept
-            HPX_PRE(!this->empty()) -> T const&
+        [[nodiscard]] auto front() const noexcept HPX_PRE(!this->empty())
+            -> T const&
         {
             return *data();
         }
@@ -1047,8 +1047,8 @@ namespace hpx::detail {
             return *data();
         }
 
-        [[nodiscard]] auto back() const noexcept
-            HPX_PRE(!this->empty()) -> T const&
+        [[nodiscard]] auto back() const noexcept HPX_PRE(!this->empty())
+            -> T const&
         {
             if (is_direct())
             {
