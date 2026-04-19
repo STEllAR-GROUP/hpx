@@ -60,12 +60,11 @@ jobs:
           cmake --install build --config Debug
     - name: Test
       run: |
-          Set-Alias -Name grep -Value 'C:\Program Files\Git\usr\bin\grep.exe'
-          Set-Alias -Name sed -Value 'C:\Program Files\Git\usr\bin\sed.exe'
+          $exclude_regex = & "$env:GITHUB_WORKSPACE/.github/ci-scripts/generate_ctest_exclude_regex.ps1" `
+            "$env:GITHUB_WORKSPACE/.github/workflows/tests.examples.targets"
           cd build
           ctest `
           --output-on-failure `
             --build-config Debug `
             --tests-regex tests.examples `
-            --exclude-regex `
-                 $(grep -v  -e ^# -e ^$ D:/a/hpx/hpx/.github/workflows/tests.examples.targets | sed ':b;N;$!bb;s/\n/|/g')
+            --exclude-regex $exclude_regex
