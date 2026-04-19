@@ -539,76 +539,90 @@ namespace hpx::detail {
 
         void lock_shared()
         {
-            if (data_->try_lock_shared())
+            auto data = data_;
+            if (data->try_lock_shared())
                 return;
-            data_->lock_shared();
+            data->lock_shared();
         }
 
         bool try_lock_shared()
         {
-            return data_->try_lock_shared();
+            auto data = data_;
+            return data->try_lock_shared();
         }
 
         void unlock_shared()
         {
-            if (data_->try_unlock_shared_fast())
+            auto data = data_;
+            if (data->try_unlock_shared_fast())
                 return;
-            data_->unlock_shared();
+            data->unlock_shared();
         }
 
         void lock()
         {
-            data_->lock();
+            auto data = data_;
+            data->lock();
         }
 
         bool try_lock()
         {
-            return data_->try_lock();
+            auto data = data_;
+            return data->try_lock();
         }
 
         void unlock()
         {
-            data_->unlock();
+            auto data = data_;
+            data->unlock();
         }
 
         void lock_upgrade()
         {
-            data_->lock_upgrade();
+            auto data = data_;
+            data->lock_upgrade();
         }
 
         bool try_lock_upgrade()
         {
-            return data_->try_lock_upgrade();
+            auto data = data_;
+            return data->try_lock_upgrade();
         }
 
         void unlock_upgrade()
         {
-            data_->unlock_upgrade();
+            auto data = data_;
+            data->unlock_upgrade();
         }
 
         void unlock_upgrade_and_lock()
         {
-            data_->unlock_upgrade_and_lock();
+            auto data = data_;
+            data->unlock_upgrade_and_lock();
         }
 
         void unlock_and_lock_upgrade()
         {
-            data_->unlock_and_lock_upgrade();
+            auto data = data_;
+            data->unlock_and_lock_upgrade();
         }
 
         void unlock_and_lock_shared()
         {
-            data_->unlock_and_lock_shared();
+            auto data = data_;
+            data->unlock_and_lock_shared();
         }
 
         bool try_unlock_shared_and_lock()
         {
-            return data_->try_unlock_shared_and_lock();
+            auto data = data_;
+            return data->try_unlock_shared_and_lock();
         }
 
         void unlock_upgrade_and_lock_shared()
         {
-            data_->unlock_upgrade_and_lock_shared();
+            auto data = data_;
+            data->unlock_upgrade_and_lock_shared();
         }
     };
 }    // namespace hpx::detail
