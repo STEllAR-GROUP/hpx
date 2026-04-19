@@ -50,9 +50,9 @@ if(HPX_HAVE_CXX26_CONTRACTS)
     PROPERTIES WILL_FAIL $<$<CONFIG:Debug>:ON>
   )
 else()
-  # Fallback mode: HPX_PRE / HPX_POST are no-ops so fail_pre / fail_post succeed.
-  # HPX_CONTRACT_ASSERT routes through invoke_violation_handler, whose default
-  # handler aborts unless HPX_WITH_CONTRACTS_MODE=OBSERVE.
+  # Fallback mode: HPX_PRE / HPX_POST are no-ops so fail_pre / fail_post
+  # succeed. HPX_CONTRACT_ASSERT routes through invoke_violation_handler, whose
+  # default handler aborts unless HPX_WITH_CONTRACTS_MODE=OBSERVE.
   if(NOT HPX_WITH_CONTRACTS_MODE STREQUAL "OBSERVE"
      AND NOT HPX_WITH_CONTRACTS_MODE STREQUAL "IGNORE"
   )
