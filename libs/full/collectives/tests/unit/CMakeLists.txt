@@ -34,6 +34,7 @@ if(HPX_WITH_NETWORKING)
       gather
       gather_hierarchical
       gather_sync
+      hierarchical_flat_fallback
       inclusive_scan_
       inclusive_scan_sync
       reduce
