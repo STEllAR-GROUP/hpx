@@ -55,7 +55,8 @@ namespace hpx::contracts {
         std::cerr << info.location << ": Contract " << kind_str << " '"
                   << info.condition << "' violated\n";
 
-#if HPX_HAVE_CONTRACTS_MODE != 1    // abort in ENFORCE; continue in OBSERVE
+#if !defined(HPX_HAVE_CONTRACTS_MODE) || HPX_HAVE_CONTRACTS_MODE != 2
+        // abort in ENFORCE (and by default); continue in OBSERVE
         std::abort();
 #endif
     }

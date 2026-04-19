@@ -33,16 +33,8 @@ foreach(test ${contract_tests})
   add_hpx_unit_test("modules.contracts" ${test})
 endforeach()
 
-# Set failure expectation for fallback failure test Fallback only fails in Debug
-# mode (HPX_ASSERT or HPX_CONTRACT_ASSERT behavior)
-set_tests_properties(
-  tests.unit.modules.contracts.declaration_contracts_fail_contract_assert
-  PROPERTIES WILL_FAIL $<$<CONFIG:Debug>:ON>
-)
-
 if(HPX_HAVE_CXX26_CONTRACTS)
-  # Set failure expectations for declaration contract failure tests Native
-  # contracts should fail when violated
+  # Native C++26 contracts always fail when violated, regardless of build config
   set_tests_properties(
     tests.unit.modules.contracts.declaration_contracts_fail_pre
     PROPERTIES WILL_FAIL ON
@@ -51,20 +43,32 @@ if(HPX_HAVE_CXX26_CONTRACTS)
     tests.unit.modules.contracts.declaration_contracts_fail_post
     PROPERTIES WILL_FAIL ON
   )
-else()
-  # Set failure expectation for fallback failure test Fallback only fails in
-  # Debug mode (HPX_ASSERT behavior)
+  # HPX_CONTRACT_ASSERT still routes through HPX_ASSERT in native mode — Debug
+  # only
   set_tests_properties(
-    tests.unit.modules.contracts.fallback_contracts_fail
+    tests.unit.modules.contracts.declaration_contracts_fail_contract_assert
     PROPERTIES WILL_FAIL $<$<CONFIG:Debug>:ON>
   )
-
-  # default_handler_aborts calls HPX_CONTRACT_ASSERT(false) with no custom
-  # handler; the default handler aborts in ENFORCE mode
-  if(HPX_WITH_CONTRACTS_MODE STREQUAL "ENFORCE" OR NOT HPX_WITH_CONTRACTS_MODE)
+else()
+  # Fallback mode: HPX_PRE / HPX_POST are no-ops so fail_pre / fail_post succeed.
+  # HPX_CONTRACT_ASSERT routes through invoke_violation_handler, whose default
+  # handler aborts unless HPX_WITH_CONTRACTS_MODE=OBSERVE.
+  if(NOT HPX_WITH_CONTRACTS_MODE STREQUAL "OBSERVE"
+     AND NOT HPX_WITH_CONTRACTS_MODE STREQUAL "IGNORE"
+  )
+    set_tests_properties(
+      tests.unit.modules.contracts.declaration_contracts_fail_contract_assert
+      PROPERTIES WILL_FAIL ON
+    )
     set_tests_properties(
       tests.unit.modules.contracts.default_handler_aborts PROPERTIES WILL_FAIL
                                                                      ON
     )
   endif()
+
+  # fallback_contracts_fail uses HPX_ASSERT directly, so it only fails in Debug
+  set_tests_properties(
+    tests.unit.modules.contracts.fallback_contracts_fail
+    PROPERTIES WILL_FAIL $<$<CONFIG:Debug>:ON>
+  )
 endif()

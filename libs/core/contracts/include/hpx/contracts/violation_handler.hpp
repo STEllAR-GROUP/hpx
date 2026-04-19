@@ -11,12 +11,7 @@
 
 namespace hpx::contracts {
 
-    HPX_CXX_CORE_EXPORT enum class contract_kind
-    {
-        pre,
-        post,
-        assertion
-    };
+    HPX_CXX_CORE_EXPORT enum class contract_kind { pre, post, assertion };
 
     HPX_CXX_CORE_EXPORT struct violation_info
     {
