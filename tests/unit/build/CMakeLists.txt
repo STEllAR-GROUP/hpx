@@ -10,12 +10,6 @@ if(NOT HPX_WITH_TESTS_EXTERNAL_BUILD)
   return()
 endif()
 
-# If C++ modules are enabled, exit now (we don't know yet how to setup a
-# dependent HPX project to use the generated BMIs).
-if(HPX_WITH_CXX_MODULES)
-  return()
-endif()
-
 # Try building an external cmake based project ...
 function(
   create_cmake_test
