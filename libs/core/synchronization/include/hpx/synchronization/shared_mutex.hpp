@@ -77,8 +77,8 @@ namespace hpx::detail {
         bool set_state(shared_state& s1, shared_state& s) noexcept
         {
             ++s.data.tag;
-            return state.compare_exchange_strong(s1, s, std::memory_order_release,
-                std::memory_order_relaxed);
+            return state.compare_exchange_strong(
+                s1, s, std::memory_order_release, std::memory_order_relaxed);
         }
 
         bool set_state(shared_state& s1, shared_state& s,
@@ -87,8 +87,8 @@ namespace hpx::detail {
             ++s.data.tag;
 
             lk = std::unique_lock<mutex_type>(state_change);
-            if (state.compare_exchange_strong(s1, s, std::memory_order_release,
-                    std::memory_order_relaxed))
+            if (state.compare_exchange_strong(
+                    s1, s, std::memory_order_release, std::memory_order_relaxed))
                 return true;
 
             lk.unlock();
