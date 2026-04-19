@@ -12,7 +12,7 @@
 
 namespace hpx::experimental {
 
-#if defined(__cpp_lib_trivially_relocatable)
+#if defined(__cpp_trivial_relocatability)
     template <typename T>
     struct is_trivially_relocatable : std::is_trivially_relocatable<T>
     {

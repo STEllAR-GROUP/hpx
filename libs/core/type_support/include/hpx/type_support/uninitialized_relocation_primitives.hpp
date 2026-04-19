@@ -505,6 +505,6 @@ namespace hpx::experimental::util {
             first, last, dst_last, iterators_are_contiguous_default_t{});
     }
 
-#endif    // defined(__cpp_lib_trivially_relocatable)
+#endif    // defined(HPX_HAVE_P1144_RELOCATE_AT)
 
 }    // namespace hpx::experimental::util

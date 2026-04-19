@@ -16,7 +16,7 @@
 #include <type_traits>
 
 #if defined(HPX_HAVE_P1144_STD_RELOCATE_AT) ||                                 \
-    defined(__cpp_lib_trivially_relocatable)
+    defined(__cpp_trivial_relocatability)
 #include <memory>
 #endif
 
