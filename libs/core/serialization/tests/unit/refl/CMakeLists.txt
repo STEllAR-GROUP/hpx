@@ -14,6 +14,7 @@ set(tests
     reflection_nested_object
     reflection_nested_templ_object
     reflection_function_names
+    reflection_static_member_functions
     reflection_qualified_name_of
 )
 
