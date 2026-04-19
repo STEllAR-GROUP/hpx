@@ -76,32 +76,19 @@ namespace hpx::detail {
 
         bool set_state(shared_state& s1, shared_state& s) noexcept
         {
-            auto current_state = state.load(std::memory_order_relaxed);
-            if (s1.value != current_state.value)
-            {
-                s1 = current_state;
-                return false;
-            }
-
             ++s.data.tag;
             return state.compare_exchange_strong(
-                s1, s, std::memory_order_release);
+                s1, s, std::memory_order_release, std::memory_order_relaxed);
         }
 
         bool set_state(shared_state& s1, shared_state& s,
             std::unique_lock<mutex_type>& lk) noexcept
         {
-            auto current_state = state.load(std::memory_order_relaxed);
-            if (s1.value != current_state.value)
-            {
-                s1 = current_state;
-                return false;
-            }
-
             ++s.data.tag;
 
             lk = std::unique_lock<mutex_type>(state_change);
-            if (state.compare_exchange_strong(s1, s, std::memory_order_release))
+            if (state.compare_exchange_strong(
+                    s1, s, std::memory_order_release, std::memory_order_relaxed))
                 return true;
 
             lk.unlock();
@@ -552,90 +539,76 @@ namespace hpx::detail {
 
         void lock_shared()
         {
-            auto data = data_;
-            if (data->try_lock_shared())
+            if (data_->try_lock_shared())
                 return;
-            data->lock_shared();
+            data_->lock_shared();
         }
 
         bool try_lock_shared()
         {
-            auto data = data_;
-            return data->try_lock_shared();
+            return data_->try_lock_shared();
         }
 
         void unlock_shared()
         {
-            auto data = data_;
-            if (data->try_unlock_shared_fast())
+            if (data_->try_unlock_shared_fast())
                 return;
-            data->unlock_shared();
+            data_->unlock_shared();
         }
 
         void lock()
         {
-            auto data = data_;
-            data->lock();
+            data_->lock();
         }
 
         bool try_lock()
         {
-            auto data = data_;
-            return data->try_lock();
+            return data_->try_lock();
         }
 
         void unlock()
         {
-            auto data = data_;
-            data->unlock();
+            data_->unlock();
         }
 
         void lock_upgrade()
         {
-            auto data = data_;
-            data->lock_upgrade();
+            data_->lock_upgrade();
         }
 
         bool try_lock_upgrade()
         {
-            auto data = data_;
-            return data->try_lock_upgrade();
+            return data_->try_lock_upgrade();
         }
 
         void unlock_upgrade()
         {
-            auto data = data_;
-            data->unlock_upgrade();
+            data_->unlock_upgrade();
         }
 
         void unlock_upgrade_and_lock()
         {
-            auto data = data_;
-            data->unlock_upgrade_and_lock();
+            data_->unlock_upgrade_and_lock();
         }
 
         void unlock_and_lock_upgrade()
         {
-            auto data = data_;
-            data->unlock_and_lock_upgrade();
+            data_->unlock_and_lock_upgrade();
         }
 
         void unlock_and_lock_shared()
         {
-            auto data = data_;
-            data->unlock_and_lock_shared();
+            data_->unlock_and_lock_shared();
         }
 
         bool try_unlock_shared_and_lock()
         {
-            auto data = data_;
-            return data->try_unlock_shared_and_lock();
+            return data_->try_unlock_shared_and_lock();
         }
 
         void unlock_upgrade_and_lock_shared()
         {
-            auto data = data_;
-            data->unlock_upgrade_and_lock_shared();
+            data_->unlock_upgrade_and_lock_shared();
         }
     };
 }    // namespace hpx::detail
