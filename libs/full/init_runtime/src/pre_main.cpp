@@ -13,7 +13,6 @@
 #include <hpx/collectives/barrier.hpp>
 #include <hpx/collectives/channel_communicator.hpp>
 #include <hpx/collectives/create_communicator.hpp>
-#include <hpx/collectives/detail/barrier_node.hpp>
 #include <hpx/collectives/latch.hpp>
 #include <hpx/init_runtime/pre_main.hpp>
 #include <hpx/modules/components_base.hpp>
