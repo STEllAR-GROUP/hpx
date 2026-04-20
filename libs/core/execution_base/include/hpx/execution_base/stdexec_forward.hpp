@@ -220,11 +220,6 @@ namespace hpx::execution::experimental {
     HPX_CXX_CORE_EXPORT using exec::write;
     HPX_CXX_CORE_EXPORT using exec::write_env;
 
-    // Tags
-    namespace tags {
-
-        HPX_CXX_CORE_EXPORT using namespace stdexec::tags;
-    }
     // Into Variant
     HPX_CXX_CORE_EXPORT using stdexec::into_variant;
     HPX_CXX_CORE_EXPORT using stdexec::into_variant_t;
