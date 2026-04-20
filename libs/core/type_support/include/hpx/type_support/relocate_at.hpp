@@ -15,11 +15,6 @@
 #include <cstring>
 #include <type_traits>
 
-#if defined(HPX_HAVE_P1144_STD_RELOCATE_AT) ||                                 \
-    defined(__cpp_trivial_relocatability)
-#include <memory>
-#endif
-
 namespace hpx::detail {
 
     // since c++20 std::destroy_at can be used on array types, destructing each

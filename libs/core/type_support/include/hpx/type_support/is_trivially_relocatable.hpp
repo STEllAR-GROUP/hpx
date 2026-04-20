@@ -12,6 +12,12 @@
 
 namespace hpx::experimental {
 
+// P2786R13 defines a single feature-test macro __cpp_trivial_relocatability
+// that covers both the core-language keyword and the associated library traits
+// (std::is_trivially_relocatable, std::is_replaceable, std::relocate_at).
+// The language and library features are bundled in one proposal, so guarding on
+// this macro is sufficient to confirm that std::is_trivially_relocatable is
+// available.
 #if defined(__cpp_trivial_relocatability)
     template <typename T>
     struct is_trivially_relocatable : std::is_trivially_relocatable<T>
