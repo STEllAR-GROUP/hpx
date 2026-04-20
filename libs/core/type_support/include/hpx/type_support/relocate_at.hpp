@@ -13,6 +13,7 @@
 
 #include <concepts>
 #include <cstring>
+#include <memory>
 #include <type_traits>
 
 namespace hpx::detail {
