@@ -547,54 +547,54 @@ namespace hpx::execution::experimental::detail {
 
     ///////////////////////////////////////////////////////////////////////
     // define member traits
-    HPX_HAS_MEMBER_XXX_TRAIT_DEF(mark_custom_point)
+    HPX_HAS_MEMBER_XXX_TRAIT_DEF(mark_partition)
 
     ///////////////////////////////////////////////////////////////////////
     // default property implementation allowing to handle
-    // mark_custom_point
-    struct mark_custom_point_property
+    // mark_partition
+    struct mark_partition_property
     {
         // default implementation
         template <typename Target, typename... Args>
-        HPX_FORCEINLINE static constexpr void mark_custom_point(
-            Target, Args... args) noexcept
+        HPX_FORCEINLINE static constexpr void mark_partition(
+            Target, std::size_t, Args...) noexcept
         {
         }
     };
 
     //////////////////////////////////////////////////////////////////////
     // Generate a type that is guaranteed to support
-    // mark_custom_point
-    using get_mark_custom_point_t =
-        get_parameters_property_t<mark_custom_point_property,
-            has_mark_custom_point_t>;
+    // mark_partition
+    using get_mark_partition_t =
+        get_parameters_property_t<mark_partition_property,
+            has_mark_partition_t>;
 
-    inline constexpr get_mark_custom_point_t get_mark_custom_point{};
+    inline constexpr get_mark_partition_t get_mark_partition{};
 
     ///////////////////////////////////////////////////////////////////////
-    // customization point for interface mark_custom_point()
+    // customization point for interface mark_partition()
     template <typename Parameters, typename Executor_>
-    struct mark_custom_point_fn_helper<Parameters, Executor_,
+    struct mark_partition_fn_helper<Parameters, Executor_,
         std::enable_if_t<hpx::traits::is_executor_any_v<Executor_>>>
     {
         template <typename Executor, typename... Args>
-        HPX_FORCEINLINE static constexpr void call(
-            Parameters& params, Executor&& exec, Args&&... args)
+        HPX_FORCEINLINE static constexpr void call(Parameters& params,
+            Executor&& exec, std::size_t partition, Args&&... args)
         {
-            auto get_prop = get_mark_custom_point(HPX_FORWARD(Executor, exec),
-                params, mark_custom_point_property{});
+            auto get_prop = get_mark_partition(
+                HPX_FORWARD(Executor, exec), params, mark_partition_property{});
 
-            get_prop.first.mark_custom_point(
+            get_prop.first.mark_partition(
                 HPX_FORWARD(decltype(get_prop.second), get_prop.second),
-                HPX_FORWARD(Args, args)...);
+                partition, HPX_FORWARD(Args, args)...);
         }
 
         template <typename AnyParameters, typename Executor, typename... Args>
-        HPX_FORCEINLINE static constexpr void call(
-            AnyParameters params, Executor&& exec, Args&&... args)
+        HPX_FORCEINLINE static constexpr void call(AnyParameters params,
+            Executor&& exec, std::size_t partition, Args&&... args)
         {
             call(static_cast<Parameters&>(params), HPX_FORWARD(Executor, exec),
-                HPX_FORWARD(Args, args)...);
+                partition, HPX_FORWARD(Args, args)...);
         }
     };
 
@@ -815,6 +815,27 @@ namespace hpx::execution::experimental::detail {
 
     ///////////////////////////////////////////////////////////////////////
     template <typename T, typename Wrapper, typename Enable = void>
+    struct mark_partition_call_helper
+    {
+    };
+
+    template <typename T, typename Wrapper>
+    struct mark_partition_call_helper<T, Wrapper,
+        std::enable_if_t<has_mark_partition_v<T>>>
+    {
+        template <typename Executor, typename... Args>
+        HPX_FORCEINLINE void mark_partition(
+            Executor&& exec, std::size_t partition, Args&&... args)
+        {
+            auto& wrapped =
+                static_cast<unwrapper<Wrapper>*>(this)->member_.get();
+            wrapped.mark_partition(HPX_FORWARD(Executor, exec), partition,
+                HPX_FORWARD(Args, args)...);
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////
+    template <typename T, typename Wrapper, typename Enable = void>
     struct processing_units_count_call_helper
     {
     };
@@ -896,6 +917,7 @@ namespace hpx::execution::experimental::detail {
       , mark_begin_execution_call_helper<T, std::reference_wrapper<T>>
       , mark_end_of_scheduling_call_helper<T, std::reference_wrapper<T>>
       , mark_end_execution_call_helper<T, std::reference_wrapper<T>>
+      , mark_partition_call_helper<T, std::reference_wrapper<T>>
       , processing_units_count_call_helper<T, std::reference_wrapper<T>>
       , reset_thread_distribution_call_helper<T, std::reference_wrapper<T>>
       , collect_execution_parameters_call_helper<T, std::reference_wrapper<T>>
@@ -934,6 +956,7 @@ namespace hpx::execution::experimental::detail {
         HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(mark_begin_execution);
         HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(mark_end_of_scheduling);
         HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(mark_end_execution);
+        HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(mark_partition);
         HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(processing_units_count);
         HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(maximal_number_of_chunks);
         HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(reset_thread_distribution);

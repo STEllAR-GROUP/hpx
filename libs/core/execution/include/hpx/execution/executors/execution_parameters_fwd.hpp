@@ -59,7 +59,7 @@ namespace hpx::execution::experimental {
 
         template <typename Parameters, typename Executor,
             typename Enable = void>
-        struct mark_custom_point_fn_helper;
+        struct mark_partition_fn_helper;
 
         template <typename Parameters, typename Executor,
             typename Enable = void>
@@ -393,26 +393,27 @@ namespace hpx::execution::experimental {
     /// \param exec   [in] The executor object which will be used
     ///               for scheduling of the loop iterations.
     ///
-    /// \note This calls params.mark_custom_point(exec) if it exists;
+    /// \note This calls params.mark_partition(exec, partition, args...) if it exists;
     ///       otherwise it does nothing.
     ///
-    HPX_CXX_CORE_EXPORT inline constexpr struct mark_custom_point_t final
-      : hpx::functional::detail::tag_priority<mark_custom_point_t>
+    HPX_CXX_CORE_EXPORT inline constexpr struct mark_partition_t final
+      : hpx::functional::detail::tag_priority<mark_partition_t>
     {
     private:
         template <typename Parameters, typename Executor, typename... Args>
             requires(hpx::executor_parameters<Parameters> &&
                 hpx::executor_any<Executor>)
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
-            mark_custom_point_t, Parameters&& params, Executor&& exec,
-            Args&&... args)
+            mark_partition_t, Parameters&& params, Executor&& exec,
+            std::size_t partition, Args&&... args)
         {
-            return detail::mark_custom_point_fn_helper<
+            return detail::mark_partition_fn_helper<
                 hpx::util::decay_unwrap_t<Parameters>,
                 std::decay_t<Executor>>::call(HPX_FORWARD(Parameters, params),
-                HPX_FORWARD(Executor, exec), HPX_FORWARD(Args, args)...);
+                HPX_FORWARD(Executor, exec), partition,
+                HPX_FORWARD(Args, args)...);
         }
-    } mark_custom_point{};
+    } mark_partition{};
 
     /// Collect various parameters of the chunking for this parallel algorithm
     /// execution
