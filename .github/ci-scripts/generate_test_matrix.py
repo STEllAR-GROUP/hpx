@@ -66,15 +66,24 @@ def generate_matrix(ctest_output, num_buckets):
             bucket_targets.append(target)
 
         unique_targets = sorted(list(set(bucket_targets)))
-        targets_str = " ".join(unique_targets)
+        if len(unique_targets) != 0:
+            first_name_parts = unique_targets[0].split('.')
+            last_name_parts = unique_targets[-1].split('.')
 
-        matrix["include"].append({
-            "id": i + 1,
-            "name": f"tests-{i+1:02d}",
-            "tests": test_regex,
-            "targets": targets_str,
-            "count": len(bucket_tests)
-        })
+            first_name_index = -2 if len(first_name_parts) > 1 else -1
+            last_name_index = -2 if len(last_name_parts) > 1 else -1
+
+            first_name = first_name_parts[first_name_index]
+            last_name = last_name_parts[last_name_index]
+
+            targets_str = " ".join(unique_targets)
+            matrix["include"].append({
+                "id": i + 1,
+                "name": f"{i+1:02d}-{first_name}-{last_name}",
+                "tests": test_regex,
+                "targets": targets_str,
+                "count": len(bucket_tests)
+            })
 
     return matrix
 

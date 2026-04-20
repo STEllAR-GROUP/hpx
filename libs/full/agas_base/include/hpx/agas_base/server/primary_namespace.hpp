@@ -12,11 +12,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions/transfer_action.hpp>
-#include <hpx/actions_base/component_action.hpp>
 #include <hpx/agas_base/agas_fwd.hpp>
 #include <hpx/agas_base/gva.hpp>
 #include <hpx/async_distributed/base_lco_with_value.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
+#include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/allocator_support.hpp>
 #include <hpx/modules/components_base.hpp>
 #include <hpx/modules/datastructures.hpp>

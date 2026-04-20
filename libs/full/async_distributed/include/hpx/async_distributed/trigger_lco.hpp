@@ -10,14 +10,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions/actions_fwd.hpp>
-#include <hpx/actions_base/action_priority.hpp>
-#include <hpx/actions_base/action_stacksize.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/continuation_fwd.hpp>
 #include <hpx/async_distributed/detail/post_continue_fwd.hpp>
 #include <hpx/async_distributed/detail/post_implementations_fwd.hpp>
 #include <hpx/async_distributed/lcos_fwd.hpp>
 #include <hpx/async_distributed/trigger_lco_fwd.hpp>
+#include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/components_base.hpp>
 #include <hpx/modules/naming_base.hpp>
 

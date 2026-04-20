@@ -8,9 +8,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/actions_base/plain_action.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/distribution_policies/colocating_distribution_policy.hpp>
+#include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/executors.hpp>
 #include <hpx/modules/naming_base.hpp>

@@ -5,12 +5,12 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/actions/transfer_action.hpp>
-#include <hpx/actions_base/detail/action_factory.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/continuation.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
 #include <hpx/collectives/latch.hpp>
 #include <hpx/components/client_base.hpp>
+#include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/runtime_local.hpp>

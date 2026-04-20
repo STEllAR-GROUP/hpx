@@ -54,5 +54,6 @@ add_hpx_module(
   SOURCES ${parcelports_sources}
   HEADERS ${parcelports_headers}
   DEPENDENCIES hpx_core
-  MODULE_DEPENDENCIES hpx_parcelset ${parcelport_module_dependencies}
+  MODULE_DEPENDENCIES hpx_parcelset hpx_plugin_factories
+                      ${parcelport_module_dependencies}
 )

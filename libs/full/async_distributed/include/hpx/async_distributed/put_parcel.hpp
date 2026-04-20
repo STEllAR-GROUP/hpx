@@ -11,19 +11,18 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assert.hpp>
+#include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/naming.hpp>
+#include <hpx/modules/naming_base.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/type_support.hpp>
 
 #include <hpx/actions/actions_fwd.hpp>
 #include <hpx/actions/transfer_action.hpp>
-#include <hpx/actions_base/traits/is_continuation.hpp>
 #include <hpx/async_distributed/put_parcel_fwd.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
-#include <hpx/modules/functional.hpp>
-#include <hpx/modules/naming_base.hpp>
-#include <hpx/modules/runtime_local.hpp>
-#include <hpx/naming/credit_handling.hpp>
-#include <hpx/naming/split_gid.hpp>
 #include <hpx/parcelset/parcel.hpp>
 #include <hpx/parcelset/parcelhandler.hpp>
 #include <hpx/parcelset/parcelset_fwd.hpp>

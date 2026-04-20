@@ -6,10 +6,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/actions_base/traits/action_was_object_migrated.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_colocated/post_colocated.hpp>
 #include <hpx/async_distributed/post.hpp>
+#include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/components_base.hpp>

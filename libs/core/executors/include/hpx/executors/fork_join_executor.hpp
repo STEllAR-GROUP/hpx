@@ -1398,7 +1398,7 @@ namespace hpx::execution::experimental {
         }
     }    // namespace detail
 
-    template <typename Policy, bool HierarchicalSpawning>
+    HPX_CXX_CORE_EXPORT template <typename Policy, bool HierarchicalSpawning>
     decltype(auto) fork_join_executor_from(
         hpx::execution::parallel_policy_executor<Policy, HierarchicalSpawning>&
             exec)
@@ -1406,7 +1406,7 @@ namespace hpx::execution::experimental {
         return detail::fork_join_executor_from(exec);
     }
 
-    template <typename Policy, bool HierarchicalSpawning>
+    HPX_CXX_CORE_EXPORT template <typename Policy, bool HierarchicalSpawning>
     decltype(auto) fork_join_executor_from(
         hpx::execution::parallel_policy_executor<Policy,
             HierarchicalSpawning> const& exec)
@@ -1414,7 +1414,7 @@ namespace hpx::execution::experimental {
         return detail::fork_join_executor_from(exec);
     }
 
-    template <typename Policy, bool HierarchicalSpawning>
+    HPX_CXX_CORE_EXPORT template <typename Policy, bool HierarchicalSpawning>
     decltype(auto) fork_join_executor_from(
         hpx::execution::parallel_policy_executor<Policy, HierarchicalSpawning>&&
             exec)
@@ -1423,7 +1423,7 @@ namespace hpx::execution::experimental {
     }
 
     // fallback for everything but parallel_executor
-    template <typename Executor>
+    HPX_CXX_CORE_EXPORT template <typename Executor>
     decltype(auto) fork_join_executor_from(Executor&& exec)
     {
         return HPX_FORWARD(Executor, exec);

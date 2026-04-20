@@ -342,7 +342,10 @@ foreach(lib ${HPX_LIBS})
     set_target_properties(
       hpx_${lib}_module PROPERTIES POSITION_INDEPENDENT_CODE ON
     )
-    hpx_configure_module_producer(hpx_${lib}_module)
+    hpx_configure_module_producer(
+      hpx_${lib}_module
+      MODULE_OUT_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}/${lib}
+    )
 
     target_link_libraries(
       hpx_${lib}_module
@@ -448,9 +451,9 @@ foreach(lib ${HPX_LIBS})
       ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime
       RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT runtime
       FILE_SET hpx_${lib}_public_sources
-          DESTINATION ${CMAKE_INSTALL_LIBDIR}/cxx
+          DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}/${lib}
       CXX_MODULES_BMI
-          DESTINATION ${CMAKE_INSTALL_LIBDIR}/cxx
+          DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}/${lib}
           COMPONENT runtime
     )
     hpx_export_internal_targets(hpx_${lib}_module hpx_${lib}_module_if)

@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/actions_base/traits/extract_action.hpp>
+#include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/async_local.hpp>
 #include <hpx/modules/naming_base.hpp>
 

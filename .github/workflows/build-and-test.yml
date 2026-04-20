@@ -83,24 +83,24 @@ jobs:
       - name: core_local (Building Core Local)
         shell: bash
         working-directory: build
-        run: ninja -j"$(nproc)" -k 0 hpx_core
+        run: ninja -k 0 hpx_core
 
       - name: core (Building Core)
         shell: bash
         working-directory: build
-        run: ninja -j"$(nproc)" -k 0 core
+        run: ninja -k 0 core
 
       - name: Components (Building Components)
         shell: bash
         working-directory: build
-        run: ninja -j"$(nproc)" -k 0 components
+        run: ninja -k 0 components
 
       - name: Generate Test Matrix
         id: gen_matrix
         shell: bash
         working-directory: build
         run: |
-          ctest -N | python3 ../.github/ci-scripts/generate_test_matrix.py 18 > test_matrix.json
+          ctest -N | python3 ../.github/ci-scripts/generate_test_matrix.py 20 > test_matrix.json
           printf 'matrix=%s\n' "$(cat test_matrix.json)" >> "$GITHUB_OUTPUT"
 
       - name: Package Build Artifacts

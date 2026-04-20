@@ -11,8 +11,8 @@
 #include <hpx/components/iostreams/server/output_stream.hpp>
 #include <hpx/components/iostreams/standard_streams.hpp>
 
-#include <hpx/actions_base/basic_action.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
+#include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/components_base.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/runtime_local.hpp>

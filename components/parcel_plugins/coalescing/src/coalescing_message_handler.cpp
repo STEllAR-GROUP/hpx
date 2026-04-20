@@ -25,9 +25,9 @@
 #include <hpx/modules/timing.hpp>
 #include <hpx/modules/util.hpp>
 
+#include <hpx/modules/plugin_factories.hpp>
 #include <hpx/parcel_coalescing/counter_registry.hpp>
 #include <hpx/parcel_coalescing/message_handler.hpp>
-#include <hpx/plugin_factories/message_handler_factory.hpp>
 
 #include <chrono>
 #include <cstddef>

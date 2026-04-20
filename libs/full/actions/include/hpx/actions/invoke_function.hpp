@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/actions_base/basic_action.hpp>
+#include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/tag_invoke.hpp>
 
 #include <utility>

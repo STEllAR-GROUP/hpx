@@ -9,8 +9,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/actions_base/traits/extract_action.hpp>
-#include <hpx/actions_base/traits/is_distribution_policy.hpp>
 #include <hpx/async_colocated/async_colocated.hpp>
 #include <hpx/async_colocated/async_colocated_callback.hpp>
 #include <hpx/async_colocated/post_colocated_callback_fwd.hpp>
@@ -18,6 +16,7 @@
 #include <hpx/async_distributed/detail/async_implementations.hpp>
 #include <hpx/async_distributed/detail/post.hpp>
 #include <hpx/components/client_base.hpp>
+#include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/components_base.hpp>
 #include <hpx/modules/futures.hpp>
