@@ -1,4 +1,4 @@
-//  Copyright (c) 2024 The STE||AR-Group
+//  Copyright (c) 2024-2026 STE||AR-Group
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,10 +11,10 @@
 // path to ensure the parallel aggregation returns an iterator (not a copy).
 
 #include <hpx/algorithm.hpp>
-#include <hpx/parallel/container_algorithms/minmax.hpp>
 #include <hpx/execution.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/parallel/container_algorithms/minmax.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -40,8 +40,8 @@ void test_min_element_parallel_projection(ExPolicy policy)
 
     auto proj = [](std::pair<int, int> const& p) { return p.second; };
 
-    auto it =
-        hpx::ranges::min_element(policy, c.begin(), c.end(), std::less<int>{}, proj);
+    auto it = hpx::ranges::min_element(
+        policy, c.begin(), c.end(), std::less<int>{}, proj);
 
     HPX_TEST(it != c.end());
     // Minimum second value is 1, belonging to {20, 1}
@@ -63,8 +63,8 @@ void test_max_element_parallel_projection(ExPolicy policy)
 
     auto proj = [](std::pair<int, int> const& p) { return p.second; };
 
-    auto it =
-        hpx::ranges::max_element(policy, c.begin(), c.end(), std::less<int>{}, proj);
+    auto it = hpx::ranges::max_element(
+        policy, c.begin(), c.end(), std::less<int>{}, proj);
 
     HPX_TEST(it != c.end());
     // Maximum second value is 8, belonging to {30, 8}
@@ -86,8 +86,8 @@ void test_minmax_element_parallel_projection(ExPolicy policy)
 
     auto proj = [](std::pair<int, int> const& p) { return p.second; };
 
-    auto result =
-        hpx::ranges::minmax_element(policy, c.begin(), c.end(), std::less<int>{}, proj);
+    auto result = hpx::ranges::minmax_element(
+        policy, c.begin(), c.end(), std::less<int>{}, proj);
 
     HPX_TEST(result.min != c.end());
     HPX_TEST(result.max != c.end());
@@ -120,8 +120,8 @@ void test_min_element_parallel_projection_large(ExPolicy policy)
     auto ref_it = std::min_element(c.begin(), c.end(),
         [&proj](auto const& a, auto const& b) { return proj(a) < proj(b); });
 
-    auto it =
-        hpx::ranges::min_element(policy, c.begin(), c.end(), std::less<int>{}, proj);
+    auto it = hpx::ranges::min_element(
+        policy, c.begin(), c.end(), std::less<int>{}, proj);
 
     HPX_TEST(it != c.end());
     HPX_TEST_EQ(it->second, ref_it->second);
@@ -140,8 +140,8 @@ void test_max_element_parallel_projection_large(ExPolicy policy)
     auto ref_it = std::max_element(c.begin(), c.end(),
         [&proj](auto const& a, auto const& b) { return proj(a) < proj(b); });
 
-    auto it =
-        hpx::ranges::max_element(policy, c.begin(), c.end(), std::less<int>{}, proj);
+    auto it = hpx::ranges::max_element(
+        policy, c.begin(), c.end(), std::less<int>{}, proj);
 
     HPX_TEST(it != c.end());
     HPX_TEST_EQ(it->second, ref_it->second);
@@ -163,8 +163,8 @@ void test_minmax_element_parallel_projection_large(ExPolicy policy)
     auto ref_max = std::max_element(c.begin(), c.end(),
         [&proj](auto const& a, auto const& b) { return proj(a) < proj(b); });
 
-    auto result =
-        hpx::ranges::minmax_element(policy, c.begin(), c.end(), std::less<int>{}, proj);
+    auto result = hpx::ranges::minmax_element(
+        policy, c.begin(), c.end(), std::less<int>{}, proj);
 
     HPX_TEST(result.min != c.end());
     HPX_TEST(result.max != c.end());
