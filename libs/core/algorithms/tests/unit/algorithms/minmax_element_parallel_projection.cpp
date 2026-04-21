@@ -11,6 +11,7 @@
 // path to ensure the parallel aggregation returns an iterator (not a copy).
 
 #include <hpx/algorithm.hpp>
+#include <hpx/parallel/container_algorithms/minmax.hpp>
 #include <hpx/execution.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
@@ -26,7 +27,7 @@
 
 // ---------------------------------------------------------------------------
 // test_min_element_parallel_projection
-// Verifies that hpx::min_element with par and a projection correctly
+// Verifies that hpx::ranges::min_element with par and a projection correctly
 // identifies the minimum by projected value, exercising the parallel
 // reduction path (sequential_minmax_element_ind returns Iter).
 // ---------------------------------------------------------------------------
@@ -40,7 +41,7 @@ void test_min_element_parallel_projection(ExPolicy policy)
     auto proj = [](std::pair<int, int> const& p) { return p.second; };
 
     auto it =
-        hpx::min_element(policy, c.begin(), c.end(), std::less<int>{}, proj);
+        hpx::ranges::min_element(policy, c.begin(), c.end(), std::less<int>{}, proj);
 
     HPX_TEST(it != c.end());
     // Minimum second value is 1, belonging to {20, 1}
@@ -50,7 +51,7 @@ void test_min_element_parallel_projection(ExPolicy policy)
 
 // ---------------------------------------------------------------------------
 // test_max_element_parallel_projection
-// Verifies that hpx::max_element with par and a projection correctly
+// Verifies that hpx::ranges::max_element with par and a projection correctly
 // identifies the maximum by projected value, exercising the parallel
 // reduction path (sequential_minmax_element_ind returns Iter, not value_type).
 // ---------------------------------------------------------------------------
@@ -63,7 +64,7 @@ void test_max_element_parallel_projection(ExPolicy policy)
     auto proj = [](std::pair<int, int> const& p) { return p.second; };
 
     auto it =
-        hpx::max_element(policy, c.begin(), c.end(), std::less<int>{}, proj);
+        hpx::ranges::max_element(policy, c.begin(), c.end(), std::less<int>{}, proj);
 
     HPX_TEST(it != c.end());
     // Maximum second value is 8, belonging to {30, 8}
@@ -73,7 +74,7 @@ void test_max_element_parallel_projection(ExPolicy policy)
 
 // ---------------------------------------------------------------------------
 // test_minmax_element_parallel_projection
-// Verifies that hpx::minmax_element with par and a projection correctly
+// Verifies that hpx::ranges::minmax_element with par and a projection correctly
 // identifies both min and max by projected value, exercising the parallel
 // reduction path (sequential_minmax_element_ind returns minmax_element_result<Iter>).
 // ---------------------------------------------------------------------------
@@ -86,7 +87,7 @@ void test_minmax_element_parallel_projection(ExPolicy policy)
     auto proj = [](std::pair<int, int> const& p) { return p.second; };
 
     auto result =
-        hpx::minmax_element(policy, c.begin(), c.end(), std::less<int>{}, proj);
+        hpx::ranges::minmax_element(policy, c.begin(), c.end(), std::less<int>{}, proj);
 
     HPX_TEST(result.min != c.end());
     HPX_TEST(result.max != c.end());
@@ -120,7 +121,7 @@ void test_min_element_parallel_projection_large(ExPolicy policy)
         [&proj](auto const& a, auto const& b) { return proj(a) < proj(b); });
 
     auto it =
-        hpx::min_element(policy, c.begin(), c.end(), std::less<int>{}, proj);
+        hpx::ranges::min_element(policy, c.begin(), c.end(), std::less<int>{}, proj);
 
     HPX_TEST(it != c.end());
     HPX_TEST_EQ(it->second, ref_it->second);
@@ -140,7 +141,7 @@ void test_max_element_parallel_projection_large(ExPolicy policy)
         [&proj](auto const& a, auto const& b) { return proj(a) < proj(b); });
 
     auto it =
-        hpx::max_element(policy, c.begin(), c.end(), std::less<int>{}, proj);
+        hpx::ranges::max_element(policy, c.begin(), c.end(), std::less<int>{}, proj);
 
     HPX_TEST(it != c.end());
     HPX_TEST_EQ(it->second, ref_it->second);
@@ -163,7 +164,7 @@ void test_minmax_element_parallel_projection_large(ExPolicy policy)
         [&proj](auto const& a, auto const& b) { return proj(a) < proj(b); });
 
     auto result =
-        hpx::minmax_element(policy, c.begin(), c.end(), std::less<int>{}, proj);
+        hpx::ranges::minmax_element(policy, c.begin(), c.end(), std::less<int>{}, proj);
 
     HPX_TEST(result.min != c.end());
     HPX_TEST(result.max != c.end());
