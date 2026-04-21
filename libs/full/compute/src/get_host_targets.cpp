@@ -7,9 +7,9 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
-#include <hpx/actions_base/plain_action.hpp>
 #include <hpx/compute/host/distributed_target.hpp>
 #include <hpx/compute/host/get_targets.hpp>
+#include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/naming_base.hpp>

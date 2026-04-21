@@ -25,7 +25,6 @@
 #include <hpx/config/export_definitions.hpp>
 #include <hpx/config/forceinline.hpp>
 #include <hpx/config/forward.hpp>
-#include <hpx/config/lambda_capture_this.hpp>
 #include <hpx/config/manual_profiling.hpp>
 #include <hpx/config/modules_enabled.hpp>
 #include <hpx/config/move.hpp>
@@ -399,6 +398,12 @@
 // initializing a thread queue.
 #if !defined(HPX_THREAD_QUEUE_INIT_THREADS_COUNT)
 #  define HPX_THREAD_QUEUE_INIT_THREADS_COUNT 10
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+// Number of thread objects to cache.
+#if !defined(HPX_THREAD_QUEUE_CACHED_THREADS_COUNT)
+#  define HPX_THREAD_QUEUE_CACHED_THREADS_COUNT 1000
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

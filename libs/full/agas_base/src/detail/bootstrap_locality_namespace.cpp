@@ -11,7 +11,7 @@
 #include <hpx/agas_base/detail/bootstrap_locality_namespace.hpp>
 #include <hpx/agas_base/server/locality_namespace.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/components_base/agas_interface.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/parcelset_base.hpp>
 

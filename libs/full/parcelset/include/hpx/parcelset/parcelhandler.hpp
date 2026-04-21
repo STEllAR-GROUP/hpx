@@ -20,11 +20,11 @@
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/modules/timing.hpp>
 
-#include <hpx/components_base/component_type.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/parcelset_base.hpp>
+#include <hpx/modules/plugin_factories.hpp>
 #include <hpx/parcelset/parcelset_fwd.hpp>
-#include <hpx/plugin_factories/parcelport_factory_base.hpp>
 
 #include <algorithm>
 #include <atomic>

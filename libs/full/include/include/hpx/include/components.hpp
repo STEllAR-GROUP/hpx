@@ -25,18 +25,7 @@
 #include <hpx/components/executor_component.hpp>
 #include <hpx/components/get_ptr.hpp>
 
-#include <hpx/components_base/component_commandline.hpp>
-#include <hpx/components_base/component_startup_shutdown.hpp>
-#include <hpx/components_base/component_type.hpp>
-#include <hpx/components_base/pinned_ptr.hpp>
-#include <hpx/components_base/server/abstract_component_base.hpp>
-#include <hpx/components_base/server/abstract_migration_support.hpp>
-#include <hpx/components_base/server/component.hpp>
-#include <hpx/components_base/server/component_base.hpp>
-#include <hpx/components_base/server/create_component.hpp>
-#include <hpx/components_base/server/locking_hook.hpp>
-#include <hpx/components_base/server/managed_component_base.hpp>
-#include <hpx/components_base/server/migration_support.hpp>
+#include <hpx/modules/components_base.hpp>
 
 #include <hpx/runtime_distributed/copy_component.hpp>
 #include <hpx/runtime_distributed/migrate_component.hpp>

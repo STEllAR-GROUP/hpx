@@ -8,10 +8,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/actions_base/traits/is_distribution_policy.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/distribution_policies/default_distribution_policy.hpp>
+#include <hpx/modules/actions_base.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/serialization.hpp>
 
 #include <algorithm>

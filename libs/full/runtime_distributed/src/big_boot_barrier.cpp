@@ -9,16 +9,14 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/actions_base/actions_base_support.hpp>
-#include <hpx/actions_base/plain_action.hpp>
 #include <hpx/agas/addressing_service.hpp>
 #include <hpx/agas_base/detail/hosted_component_namespace.hpp>
 #include <hpx/agas_base/detail/hosted_locality_namespace.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/put_parcel.hpp>
-#include <hpx/components_base/agas_interface.hpp>
-#include <hpx/components_base/server/managed_component_base.hpp>
+#include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/agas_base.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/format.hpp>

@@ -1,4 +1,4 @@
-//  Copyright (c) 2015-2024 Hartmut Kaiser
+//  Copyright (c) 2015-2026 Hartmut Kaiser
 //  Copyright (c) 2015-2016 Thomas Heller
 //  Copyright (c) 2024 Hartmut Kaiser
 //
@@ -30,7 +30,7 @@ namespace hpx::serialization::detail {
     ///////////////////////////////////////////////////////////////////////////
     // This class allows to handle credit splitting for gid_types during
     // serialization.
-    class preprocess_gid_types
+    HPX_CXX_EXPORT class preprocess_gid_types
     {
         using mutex_type = hpx::spinlock;
 

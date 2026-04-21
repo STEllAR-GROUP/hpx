@@ -11,12 +11,10 @@
 #include <hpx/modules/executors.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
 
-#include <algorithm>
 #include <exception>
 #include <iterator>
 #include <list>
 #include <type_traits>
-#include <utility>
 #include <vector>
 
 namespace hpx { namespace parallel {
@@ -199,6 +197,31 @@ namespace hpx { namespace segmented {
             std::true_type{});
     }
 
+    template <typename SegIter, typename Size, typename F>
+        requires(hpx::traits::is_iterator_v<SegIter> &&
+            hpx::traits::is_segmented_iterator_v<SegIter> &&
+            std::is_integral_v<Size>)
+    SegIter tag_invoke(hpx::generate_n_t, SegIter first, Size count, F&& f)
+    {
+        static_assert(std::forward_iterator<SegIter>,
+            "Requires at least forward iterator.");
+
+        if (hpx::parallel::detail::is_negative(count) || count == 0)
+        {
+            return HPX_MOVE(first);
+        }
+
+        typedef hpx::traits::segmented_iterator_traits<SegIter> iterator_traits;
+
+        SegIter last = first;
+        hpx::parallel::detail::advance(last, count);
+        return hpx::parallel::detail::segmented_generate(
+            hpx::parallel::detail::generate<
+                typename iterator_traits::local_iterator>(),
+            hpx::execution::seq, first, last, HPX_FORWARD(F, f),
+            std::true_type{});
+    }
+
     template <typename ExPolicy, typename SegIter, typename F>
         requires(hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<SegIter> &&
@@ -220,6 +243,37 @@ namespace hpx { namespace segmented {
 
         typedef hpx::traits::segmented_iterator_traits<SegIter> iterator_traits;
 
+        return hpx::parallel::detail::segmented_generate(
+            hpx::parallel::detail::generate<
+                typename iterator_traits::local_iterator>(),
+            HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
+            is_seq());
+    }
+
+    template <typename ExPolicy, typename SegIter, typename Size, typename F>
+        requires(hpx::is_execution_policy_v<ExPolicy> &&
+            hpx::traits::is_iterator_v<SegIter> &&
+            hpx::traits::is_segmented_iterator_v<SegIter> &&
+            std::is_integral_v<Size>)
+    typename parallel::util::detail::algorithm_result<ExPolicy, SegIter>::type
+    tag_invoke(
+        hpx::generate_n_t, ExPolicy&& policy, SegIter first, Size count, F&& f)
+    {
+        static_assert(std::forward_iterator<SegIter>,
+            "Requires at least forward iterator.");
+
+        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
+
+        if (hpx::parallel::detail::is_negative(count) || count == 0)
+        {
+            return parallel::util::detail::algorithm_result<ExPolicy,
+                SegIter>::get(HPX_MOVE(first));
+        }
+
+        typedef hpx::traits::segmented_iterator_traits<SegIter> iterator_traits;
+
+        SegIter last = first;
+        hpx::parallel::detail::advance(last, count);
         return hpx::parallel::detail::segmented_generate(
             hpx::parallel::detail::generate<
                 typename iterator_traits::local_iterator>(),

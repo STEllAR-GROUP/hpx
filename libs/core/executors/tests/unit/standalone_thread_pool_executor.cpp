@@ -1,5 +1,5 @@
 //  Copyright (c)      2019 Mikael Simberg
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -72,7 +72,17 @@ void test_then(Executor& exec)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void bulk_test(int, hpx::thread::id tid, int passed_through)    //-V813
+template <typename Executor>
+decltype(auto) disable_run_as_child(Executor&& exec)
+{
+    auto hint = hpx::execution::experimental::get_hint(exec);
+    hint.runs_as_child_mode(hpx::threads::thread_execution_hint::none);
+
+    return hpx::experimental::prefer(hpx::execution::experimental::with_hint,
+        HPX_FORWARD(Executor, exec), hint);
+}
+
+void bulk_test(int, hpx::thread::id const& tid, int passed_through)    //-V813
 {
     HPX_TEST_NEQ(tid, hpx::this_thread::get_id());
     HPX_TEST_EQ(passed_through, 42);
@@ -92,7 +102,8 @@ void test_bulk_sync(Executor& exec)
     auto hint = hpx::execution::experimental::get_hint(exec);
     hint.sharing_mode(hpx::threads::thread_sharing_hint::do_not_share_function |
         hpx::threads::thread_sharing_hint::do_not_combine_tasks);
-    auto no_sharing_exec = hpx::execution::experimental::with_hint(exec, hint);
+    auto no_sharing_exec = hpx::execution::to_hierarchical_spawning(
+        hpx::execution::experimental::with_hint(exec, hint));
 
     hpx::parallel::execution::bulk_sync_execute(
         no_sharing_exec, hpx::bind(&bulk_test, _1, tid, _2), v, 42);
@@ -111,16 +122,18 @@ void test_bulk_async(Executor& exec)
     using hpx::placeholders::_1;
     using hpx::placeholders::_2;
 
-    hpx::when_all(hpx::parallel::execution::bulk_async_execute(
-                      exec, hpx::bind(&bulk_test, _1, tid, _2), v, 42))
+    hpx::when_all(
+        hpx::parallel::execution::bulk_async_execute(disable_run_as_child(exec),
+            hpx::bind(&bulk_test, _1, tid, _2), v, 42))
         .get();
     hpx::when_all(hpx::parallel::execution::bulk_async_execute(
-                      exec, &bulk_test, v, tid, 42))
+                      disable_run_as_child(exec), &bulk_test, v, tid, 42))
         .get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void bulk_test_f(int, hpx::shared_future<void> f, hpx::thread::id tid,
+void bulk_test_f(int, hpx::shared_future<void> const& f,
+    hpx::thread::id const& tid,
     int passed_through)    //-V813
 {
     HPX_TEST(f.is_ready());    // make sure, future is ready

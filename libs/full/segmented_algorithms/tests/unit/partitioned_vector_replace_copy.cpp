@@ -13,6 +13,7 @@
 #include <hpx/modules/testing.hpp>
 
 #include <cstddef>
+#include <iterator>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -212,6 +213,67 @@ void replace_copy_tests_with_policy(
     replace_copy_if_algo_tests_with_policy_async<T>(size, policy, par(task));
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// regressions for subrange handling
+///////////////////////////////////////////////////////////////////////////////
+template <typename T>
+void replace_copy_subrange_regressions()
+{
+    using namespace hpx::execution;
+
+    // replace_copy subrange regression in a single segment (sit == send path)
+    {
+        constexpr std::size_t n = 16;
+        constexpr std::size_t first_offset = 3;
+        constexpr std::size_t range_size = 8;
+        constexpr std::size_t dest_offset = 2;
+
+        hpx::partitioned_vector<T> src(n, hpx::container_layout(1));
+        hpx::partitioned_vector<T> out(n, T(-1), hpx::container_layout(1));
+
+        iota_vector(src, T(0));
+
+        auto first = src.begin();
+        std::advance(first, first_offset);
+        auto last = first;
+        std::advance(last, range_size);
+        auto dest = out.begin();
+        std::advance(dest, dest_offset);
+
+        auto verify_subrange_result = [&]() {
+            std::vector<T> expected(n, T(-1));
+            for (std::size_t i = 0; i < range_size; ++i)
+            {
+                T v = T(first_offset + i);
+                expected[dest_offset + i] = (v == T(5)) ? T(50) : v;
+            }
+
+            std::size_t idx = 0;
+            for (auto oit = out.begin(); oit != out.end(); ++oit, ++idx)
+            {
+                HPX_TEST_EQ(*oit, expected[idx]);
+            }
+            HPX_TEST_EQ(idx, n);
+        };
+
+        hpx::fill(seq, out.begin(), out.end(), T(-1));
+        hpx::replace_copy(seq, first, last, dest, T(5), T(50));
+        verify_subrange_result();
+
+        hpx::fill(seq, out.begin(), out.end(), T(-1));
+        hpx::replace_copy(par, first, last, dest, T(5), T(50));
+        verify_subrange_result();
+
+        hpx::fill(seq, out.begin(), out.end(), T(-1));
+        hpx::replace_copy(seq(task), first, last, dest, T(5), T(50)).get();
+        verify_subrange_result();
+
+        hpx::fill(seq, out.begin(), out.end(), T(-1));
+        hpx::replace_copy(par(task), first, last, dest, T(5), T(50)).get();
+        verify_subrange_result();
+    }
+}
+
 template <typename T>
 void replace_copy_empty_tests()
 {
@@ -272,6 +334,8 @@ int main()
 {
     replace_copy_tests<int>();
     replace_copy_tests<double>();
+
+    replace_copy_subrange_regressions<int>();
 
     return hpx::util::report_errors();
 }

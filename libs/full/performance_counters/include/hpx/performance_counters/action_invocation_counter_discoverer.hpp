@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/actions_base/detail/invocation_count_registry.hpp>
+#include <hpx/modules/actions_base.hpp>
 #include <hpx/performance_counters/counters_fwd.hpp>
 
 namespace hpx { namespace performance_counters {

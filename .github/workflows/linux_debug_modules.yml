@@ -9,6 +9,10 @@ name: Linux CI (Debug, C++20 Modules)
 
 on: [pull_request]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -39,7 +43,7 @@ jobs:
       shell: bash
       run: |
           cmake --build build --target all
-          # cmake --build build --target tests -- -k 0
+          cmake --build build --target tests -- -k 0
     - name: Test
       shell: bash
       run: |

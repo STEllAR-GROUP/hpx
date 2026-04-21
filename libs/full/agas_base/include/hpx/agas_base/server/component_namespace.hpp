@@ -9,12 +9,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions/transfer_action.hpp>
-#include <hpx/actions_base/component_action.hpp>
 #include <hpx/agas_base/agas_fwd.hpp>
 #include <hpx/async_distributed/base_lco_with_value.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
-#include <hpx/components_base/component_type.hpp>
-#include <hpx/components_base/server/fixed_component_base.hpp>
+#include <hpx/modules/actions_base.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/naming_base.hpp>
