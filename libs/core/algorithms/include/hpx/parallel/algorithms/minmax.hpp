@@ -431,9 +431,8 @@ namespace hpx::parallel {
             // generically from the segmented algorithms
             template <typename ExPolicy, typename FwdIter, typename F,
                 typename Proj>
-            static constexpr Iter
-            sequential_minmax_element_ind(ExPolicy&&, FwdIter it,
-                std::size_t count, F const& f, Proj const& proj)
+            static constexpr Iter sequential_minmax_element_ind(ExPolicy&&,
+                FwdIter it, std::size_t count, F const& f, Proj const& proj)
             {
                 HPX_ASSERT(count != 0);
 
