@@ -17,7 +17,7 @@
 void test_min_element_projection()
 {
     using namespace hpx::execution;
-    typedef std::pair<int, int> element;
+    using element = std::pair<int, int>;
     std::vector<element> c = {{1, 10}, {2, 5}, {3, 15}};
 
     auto proj = [](element const& p) { return p.second; };
@@ -38,7 +38,7 @@ void test_min_element_projection()
 void test_max_element_projection()
 {
     using namespace hpx::execution;
-    typedef std::pair<int, int> element;
+    using element = std::pair<int, int>;
     std::vector<element> c = {{1, 10}, {2, 5}, {3, 15}};
 
     auto proj = [](element const& p) { return p.second; };
@@ -59,7 +59,7 @@ void test_max_element_projection()
 void test_minmax_element_projection()
 {
     using namespace hpx::execution;
-    typedef std::pair<int, int> element;
+    using element = std::pair<int, int>;
     std::vector<element> c = {{1, 10}, {2, 5}, {3, 15}};
 
     auto proj = [](element const& p) { return p.second; };
