@@ -16,38 +16,6 @@ if(Stdexec_ROOT AND HPX_WITH_FETCH_STDEXEC)
   )
 endif()
 
-function(_hpx_patch_stdexec_header header)
-  file(READ "${header}" _content)
-  set(_patched_content "${_content}")
-
-  # clang-scan-deps used for C++ modules currently rejects apostrophe-separated
-  # pp-number literals in stdexec. Remove digit separators in the fetched copy
-  # so dependency scanning succeeds.
-  set(_previous_content "")
-  while(NOT _patched_content STREQUAL _previous_content)
-    set(_previous_content "${_patched_content}")
-    string(REGEX REPLACE "([0-9])'([0-9])" "\\1\\2" _patched_content
-                         "${_patched_content}"
-    )
-  endwhile()
-
-  if(NOT _content STREQUAL _patched_content)
-    file(WRITE "${header}" "${_patched_content}")
-  endif()
-endfunction()
-
-function(_hpx_patch_stdexec_headers include_dir)
-  if(HPX_WITH_CXX_MODULES AND (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"
-                               OR CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-  )
-    hpx_info("Patching stdexec headers for C++ modules dependency scanning")
-    file(GLOB_RECURSE stdexec_headers "${include_dir}/*.hpp")
-    foreach(stdexec_header IN LISTS stdexec_headers)
-      _hpx_patch_stdexec_header("${stdexec_header}")
-    endforeach()
-  endif()
-endfunction()
-
 if(HPX_WITH_FETCH_STDEXEC)
   hpx_info(
     "HPX_WITH_FETCH_STDEXEC=${HPX_WITH_FETCH_STDEXEC}, Stdexec will be fetched using CMake's FetchContent and installed alongside HPX (HPX_WITH_STDEXEC_TAG=${HPX_WITH_STDEXEC_TAG})"
@@ -65,7 +33,6 @@ if(HPX_WITH_FETCH_STDEXEC)
     fetchcontent_populate(Stdexec)
   endif()
   set(Stdexec_ROOT ${stdexec_SOURCE_DIR})
-  _hpx_patch_stdexec_headers("${stdexec_SOURCE_DIR}/include")
 
   add_library(Stdexec INTERFACE)
   target_include_directories(
@@ -111,7 +78,5 @@ else()
     hpx_error(
       "Stdexec could not be found, please specify Stdexec_ROOT to point to the correct location or enable HPX_WITH_FETCH_STDEXEC"
     )
-  elseif(Stdexec_INCLUDE_DIR)
-    _hpx_patch_stdexec_headers("${Stdexec_INCLUDE_DIR}")
   endif()
 endif()
