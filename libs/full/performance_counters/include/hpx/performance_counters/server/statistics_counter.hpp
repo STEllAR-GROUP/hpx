@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/components_base/server/component_base.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/synchronization.hpp>

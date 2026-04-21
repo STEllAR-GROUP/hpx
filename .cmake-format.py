@@ -585,6 +585,8 @@ with section("parse"):
     'hpx_extract_includes_from_file': { 'kwargs': { 'SOURCE': 1,
                                                     'INCLUDE_DIRS': '+',
                                                     'FOUND_HEADERS': 1},
+                          'pargs': { 'flags': [], 'nargs': '1+'}},
+    'hpx_configure_module_producer': { 'kwargs': { 'MODULE_OUT_DIR': 1},
                           'pargs': { 'flags': [], 'nargs': '1+'}}
   }
 

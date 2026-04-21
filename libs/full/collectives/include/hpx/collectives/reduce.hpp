@@ -18,7 +18,7 @@ namespace hpx { namespace collectives {
     /// This function receives a set of values from all call sites operating on
     /// the given base name.
     ///
-    /// \param  basename    The base name identifying the all_reduce operation
+    /// \param  basename    The base name identifying the reduce operation
     /// \param  result      A value to reduce on the central reduction point
     ///                     from this call site.
     /// \param  op          Reduction operation to apply to all values supplied
@@ -29,9 +29,9 @@ namespace hpx { namespace collectives {
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
     /// \param  generation  The generational counter identifying the sequence
-    ///                     number of the all_reduce operation performed on the
+    ///                     number of the reduce operation performed on the
     ///                     given base name. This is optional and needs to be
-    ///                     supplied only if the all_reduce operation on the
+    ///                     supplied only if the reduce operation on the
     ///                     given base name has to be performed more than once.
     ///                     The generation number (if given) must be a positive
     ///                     number greater than zero.
@@ -60,9 +60,9 @@ namespace hpx { namespace collectives {
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
     /// \param  generation  The generational counter identifying the sequence
-    ///                     number of the all_reduce operation performed on the
+    ///                     number of the reduce operation performed on the
     ///                     given base name. This is optional and needs to be
-    ///                     supplied only if the all_reduce operation on the
+    ///                     supplied only if the reduce operation on the
     ///                     given base name has to be performed more than once.
     ///                     The generation number (if given) must be a positive
     ///                     number greater than zero.
@@ -91,9 +91,9 @@ namespace hpx { namespace collectives {
     /// \param  op          Reduction operation to apply to all values supplied
     ///                     from all participating sites
     /// \param  generation  The generational counter identifying the sequence
-    ///                     number of the all_reduce operation performed on the
+    ///                     number of the reduce operation performed on the
     ///                     given base name. This is optional and needs to be
-    ///                     supplied only if the all_reduce operation on the
+    ///                     supplied only if the reduce operation on the
     ///                     given base name has to be performed more than once.
     ///                     The generation number (if given) must be a positive
     ///                     number greater than zero.
@@ -126,9 +126,9 @@ namespace hpx { namespace collectives {
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
     /// \param  generation  The generational counter identifying the sequence
-    ///                     number of the all_reduce operation performed on the
+    ///                     number of the reduce operation performed on the
     ///                     given base name. This is optional and needs to be
-    ///                     supplied only if the all_reduce operation on the
+    ///                     supplied only if the reduce operation on the
     ///                     given base name has to be performed more than once.
     ///                     The generation number (if given) must be a positive
     ///                     number greater than zero.
@@ -157,9 +157,9 @@ namespace hpx { namespace collectives {
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
     /// \param  generation  The generational counter identifying the sequence
-    ///                     number of the all_reduce operation performed on the
+    ///                     number of the reduce operation performed on the
     ///                     given base name. This is optional and needs to be
-    ///                     supplied only if the all_reduce operation on the
+    ///                     supplied only if the reduce operation on the
     ///                     given base name has to be performed more than once.
     ///                     The generation number (if given) must be a positive
     ///                     number greater than zero.
@@ -186,9 +186,9 @@ namespace hpx { namespace collectives {
     /// \param  result      A value to reduce on the central reduction point
     ///                     from this call site.
     /// \param  generation  The generational counter identifying the sequence
-    ///                     number of the all_reduce operation performed on the
+    ///                     number of the reduce operation performed on the
     ///                     given base name. This is optional and needs to be
-    ///                     supplied only if the all_reduce operation on the
+    ///                     supplied only if the reduce operation on the
     ///                     given base name has to be performed more than once.
     ///                     The generation number (if given) must be a positive
     ///                     number greater than zero.
@@ -215,7 +215,7 @@ namespace hpx { namespace collectives {
     /// the given base name.
     ///
     /// \param  policy      The execution policy specifying synchronous execution.
-    /// \param  basename    The base name identifying the all_reduce operation
+    /// \param  basename    The base name identifying the reduce operation
     /// \param  result      A value to reduce on the central reduction point
     ///                     from this call site.
     /// \param  op          Reduction operation to apply to all values supplied
@@ -226,9 +226,9 @@ namespace hpx { namespace collectives {
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
     /// \param  generation  The generational counter identifying the sequence
-    ///                     number of the all_reduce operation performed on the
+    ///                     number of the reduce operation performed on the
     ///                     given base name. This is optional and needs to be
-    ///                     supplied only if the all_reduce operation on the
+    ///                     supplied only if the reduce operation on the
     ///                     given base name has to be performed more than once.
     ///                     The generation number (if given) must be a positive
     ///                     number greater than zero.
@@ -256,9 +256,9 @@ namespace hpx { namespace collectives {
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
     /// \param  generation  The generational counter identifying the sequence
-    ///                     number of the all_reduce operation performed on the
+    ///                     number of the reduce operation performed on the
     ///                     given base name. This is optional and needs to be
-    ///                     supplied only if the all_reduce operation on the
+    ///                     supplied only if the reduce operation on the
     ///                     given base name has to be performed more than once.
     ///                     The generation number (if given) must be a positive
     ///                     number greater than zero.
@@ -285,9 +285,9 @@ namespace hpx { namespace collectives {
     /// \param  op          Reduction operation to apply to all values supplied
     ///                     from all participating sites
     /// \param  generation  The generational counter identifying the sequence
-    ///                     number of the all_reduce operation performed on the
+    ///                     number of the reduce operation performed on the
     ///                     given base name. This is optional and needs to be
-    ///                     supplied only if the all_reduce operation on the
+    ///                     supplied only if the reduce operation on the
     ///                     given base name has to be performed more than once.
     ///                     The generation number (if given) must be a positive
     ///                     number greater than zero.
@@ -318,9 +318,9 @@ namespace hpx { namespace collectives {
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
     /// \param  generation  The generational counter identifying the sequence
-    ///                     number of the all_reduce operation performed on the
+    ///                     number of the reduce operation performed on the
     ///                     given base name. This is optional and needs to be
-    ///                     supplied only if the all_reduce operation on the
+    ///                     supplied only if the reduce operation on the
     ///                     given base name has to be performed more than once.
     ///                     The generation number (if given) must be a positive
     ///                     number greater than zero.
@@ -347,9 +347,9 @@ namespace hpx { namespace collectives {
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
     /// \param  generation  The generational counter identifying the sequence
-    ///                     number of the all_reduce operation performed on the
+    ///                     number of the reduce operation performed on the
     ///                     given base name. This is optional and needs to be
-    ///                     supplied only if the all_reduce operation on the
+    ///                     supplied only if the reduce operation on the
     ///                     given base name has to be performed more than once.
     ///                     The generation number (if given) must be a positive
     ///                     number greater than zero.
@@ -372,9 +372,9 @@ namespace hpx { namespace collectives {
     /// \param  result      A value to reduce on the central reduction point
     ///                     from this call site.
     /// \param  generation  The generational counter identifying the sequence
-    ///                     number of the all_reduce operation performed on the
+    ///                     number of the reduce operation performed on the
     ///                     given base name. This is optional and needs to be
-    ///                     supplied only if the all_reduce operation on the
+    ///                     supplied only if the reduce operation on the
     ///                     given base name has to be performed more than once.
     ///                     The generation number (if given) must be a positive
     ///                     number greater than zero.
@@ -402,9 +402,9 @@ namespace hpx { namespace collectives {
 #include <hpx/async_distributed/async.hpp>
 #include <hpx/collectives/argument_types.hpp>
 #include <hpx/collectives/create_communicator.hpp>
-#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/async_base.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/type_support.hpp>
 
@@ -426,7 +426,7 @@ namespace hpx::traits {
     }    // namespace communication
 
     ///////////////////////////////////////////////////////////////////////////
-    // support for all_reduce
+    // support for reduce
     template <typename Communicator>
     struct communication_operation<Communicator, communication::reduce_tag>
     {

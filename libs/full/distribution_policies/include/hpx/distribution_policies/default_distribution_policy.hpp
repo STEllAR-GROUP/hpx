@@ -9,14 +9,12 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/actions_base/actions_base_support.hpp>
-#include <hpx/actions_base/traits/extract_action.hpp>
-#include <hpx/actions_base/traits/is_distribution_policy.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/dataflow.hpp>
 #include <hpx/async_distributed/detail/post.hpp>
-#include <hpx/components_base/agas_interface.hpp>
+#include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/async_base.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/futures.hpp>

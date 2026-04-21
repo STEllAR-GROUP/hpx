@@ -14,7 +14,7 @@
 #include <hpx/format.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
-#include <hpx/naming/credit_handling.hpp>
+#include <hpx/modules/naming.hpp>
 #include <hpx/performance_counters/agas_namespace_action_code.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>

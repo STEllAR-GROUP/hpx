@@ -10,22 +10,19 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions/transfer_action.hpp>
-#include <hpx/actions_base/component_action.hpp>
-#include <hpx/actions_base/traits/action_does_termination_detection.hpp>
 #include <hpx/agas/agas_fwd.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
-#include <hpx/components_base/component_type.hpp>
-#include <hpx/components_base/server/create_component.hpp>
-#include <hpx/components_base/traits/is_component.hpp>
+#include <hpx/modules/actions_base.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/parcelset_base.hpp>
 #include <hpx/modules/plugin.hpp>
+#include <hpx/modules/plugin_factories.hpp>
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/synchronization.hpp>
 #include <hpx/performance_counters/counters.hpp>
-#include <hpx/plugin_factories/plugin_factory_base.hpp>
 #include <hpx/runtime_components/components_fwd.hpp>
 #include <hpx/runtime_distributed/find_here.hpp>
 
@@ -58,15 +55,13 @@ namespace hpx::components::server {
         {
             plugin_factory(
                 std::shared_ptr<plugins::plugin_factory_base> const& f,
-                hpx::util::plugin::dll const& d, bool enabled)
+                bool enabled)
               : first(f)
-              , second(d)
               , isenabled(enabled)
             {
             }
 
             std::shared_ptr<plugins::plugin_factory_base> first;
-            hpx::util::plugin::dll const& second;
             bool isenabled;
         };
         using plugin_factory_type = plugin_factory;
@@ -321,6 +316,11 @@ namespace hpx::components::server {
             hpx::program_options::options_description& options,
             std::set<std::string>& startup_handled);
 #endif
+
+        bool load_plugin_static(util::section& ini, std::string const& instance,
+            std::string const& plugin, bool isenabled,
+            hpx::program_options::options_description& options,
+            std::set<std::string>& startup_handled);
 
         // the name says it all
         std::size_t dijkstra_termination_detection(

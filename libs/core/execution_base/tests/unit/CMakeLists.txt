@@ -16,6 +16,7 @@ set(tests
     get_env
     execute_may_block_caller
     stdexec
+    test_tag_invoke_only_completion_signatures
 )
 
 if(HPX_WITH_CXX20_COROUTINES)

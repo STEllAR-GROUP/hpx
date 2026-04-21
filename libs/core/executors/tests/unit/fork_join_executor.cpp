@@ -509,9 +509,7 @@ int hpx_main()
     // Call regression test for #6922
     test_fork_join_static_large_range();
 
-    // thread_stacksize::nostack cannot be used with the fork_join_executor
-    // because it prevents other work from running when yielding. Using
-    // thread_priority::low hangs for unknown reasons.
+    // Using thread_priority::low hangs for unknown reasons.
     for (auto const priority : {
              // hpx::threads::thread_priority::low,
              hpx::threads::thread_priority::normal,
@@ -520,7 +518,7 @@ int hpx_main()
          })
     {
         for (auto const stacksize : {
-                 // hpx::threads::thread_stacksize::nostack,
+                 hpx::threads::thread_stacksize::nostack,
                  hpx::threads::thread_stacksize::small_,
              })
         {

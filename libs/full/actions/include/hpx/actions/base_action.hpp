@@ -22,11 +22,8 @@
 #endif
 
 #include <hpx/actions/actions_fwd.hpp>
-#include <hpx/actions_base/actions_base_fwd.hpp>
-#include <hpx/actions_base/actions_base_support.hpp>
-#include <hpx/actions_base/detail/action_factory.hpp>
-#include <hpx/actions_base/traits/action_continuation.hpp>
-#include <hpx/components_base/pinned_ptr.hpp>
+#include <hpx/modules/actions_base.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/parcelset_base.hpp>
 

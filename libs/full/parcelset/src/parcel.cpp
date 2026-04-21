@@ -9,21 +9,20 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assert.hpp>
+#include <hpx/modules/actions_base.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/itt_notify.hpp>
+#include <hpx/modules/naming.hpp>
+#include <hpx/modules/parcelset_base.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/timing.hpp>
 
 #include <hpx/actions/transfer_action.hpp>
-#include <hpx/actions_base/detail/action_factory.hpp>
-#include <hpx/components_base/agas_interface.hpp>
-#include <hpx/components_base/component_type.hpp>
-#include <hpx/modules/parcelset_base.hpp>
-#include <hpx/naming/detail/preprocess_gid_types.hpp>
 #include <hpx/parcelset/parcel.hpp>
 #include <hpx/parcelset/parcelhandler.hpp>
 

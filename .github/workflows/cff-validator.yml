@@ -10,6 +10,10 @@ on:
   workflow_dispatch:
 
 name: CITATION.cff
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   Validate-CITATION-cff:
     runs-on: ubuntu-latest

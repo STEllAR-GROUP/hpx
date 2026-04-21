@@ -16,6 +16,8 @@ set(executors_headers
     hpx/executors/detail/bulk_invoke_helper.hpp
     hpx/executors/detail/hierarchical_spawning.hpp
     hpx/executors/detail/index_queue_spawning.hpp
+    hpx/executors/detail/index_queue_spawning_result.hpp
+    hpx/executors/detail/index_queue_spawning_void.hpp
     hpx/executors/execute_on.hpp
     hpx/executors/exception_list.hpp
     hpx/executors/execution_policy_annotation.hpp
@@ -55,9 +57,6 @@ endif()
 if(HPX_LIKWID_WITH_LIKWID)
   set(executors_headers ${executors_headers} hpx/executors/likwid_executor.hpp)
   set(additional_dependencies hpx_likwid)
-endif()
-if(HPX_TRACY_WITH_TRACY)
-  set(additional_dependencies hpx_tracy)
 endif()
 
 # Default location is $HPX_ROOT/libs/executors/include_compatibility
@@ -110,6 +109,7 @@ add_hpx_module(
   MODULE_DEPENDENCIES
     hpx_allocator_support
     hpx_async_base
+    hpx_async_combinators
     hpx_concepts
     hpx_concurrency
     hpx_config
@@ -136,6 +136,7 @@ add_hpx_module(
     hpx_timing
     hpx_threading
     hpx_threading_base
+    hpx_tracing
     hpx_topology
     hpx_type_support
     ${additional_dependencies}

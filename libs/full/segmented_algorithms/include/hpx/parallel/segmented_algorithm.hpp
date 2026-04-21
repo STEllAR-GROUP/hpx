@@ -13,13 +13,17 @@
 #include <hpx/parallel/segmented_algorithms/adjacent_find.hpp>
 #include <hpx/parallel/segmented_algorithms/all_any_none.hpp>
 #include <hpx/parallel/segmented_algorithms/count.hpp>
+#include <hpx/parallel/segmented_algorithms/equal.hpp>
 #include <hpx/parallel/segmented_algorithms/exclusive_scan.hpp>
 #include <hpx/parallel/segmented_algorithms/fill.hpp>
 #include <hpx/parallel/segmented_algorithms/find.hpp>
 #include <hpx/parallel/segmented_algorithms/for_each.hpp>
 #include <hpx/parallel/segmented_algorithms/generate.hpp>
 #include <hpx/parallel/segmented_algorithms/inclusive_scan.hpp>
+#include <hpx/parallel/segmented_algorithms/is_partitioned.hpp>
+#include <hpx/parallel/segmented_algorithms/is_sorted.hpp>
 #include <hpx/parallel/segmented_algorithms/minmax.hpp>
+#include <hpx/parallel/segmented_algorithms/mismatch.hpp>
 #include <hpx/parallel/segmented_algorithms/reduce.hpp>
 #include <hpx/parallel/segmented_algorithms/replace.hpp>
 #include <hpx/parallel/segmented_algorithms/replace_copy.hpp>

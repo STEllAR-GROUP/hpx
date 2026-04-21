@@ -14,16 +14,15 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assert.hpp>
+#include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/naming.hpp>
+#include <hpx/modules/parcelset_base.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/timing.hpp>
 
-#include <hpx/actions_base/basic_action.hpp>
-#include <hpx/modules/parcelset_base.hpp>
-#include <hpx/naming/detail/preprocess_gid_types.hpp>
-#include <hpx/naming/split_gid.hpp>
 #include <hpx/parcelset/parcel.hpp>
 #include <hpx/parcelset/parcelset_fwd.hpp>
 
