@@ -365,6 +365,7 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/is_value_proxy.hpp>
+#include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/executors.hpp>
@@ -583,9 +584,8 @@ namespace hpx::parallel {
             // generically from the segmented algorithms
             template <typename ExPolicy, typename FwdIter, typename F,
                 typename Proj>
-            static constexpr typename std::iterator_traits<FwdIter>::value_type
-            sequential_minmax_element_ind(ExPolicy&&, FwdIter it,
-                std::size_t count, F const& f, Proj const& proj)
+            static constexpr Iter sequential_minmax_element_ind(ExPolicy&&,
+                FwdIter it, std::size_t count, F const& f, Proj const& proj)
             {
                 HPX_ASSERT(count != 0);
 
@@ -594,9 +594,9 @@ namespace hpx::parallel {
 
                 auto largest = *it;
 
-                using element_type =
-                    hpx::traits::proxy_value_t<typename std::iterator_traits<
-                        decltype(largest)>::value_type>;
+                using element_type = hpx::traits::proxy_value_t<std::decay_t<
+                    typename hpx::parallel::traits::projected_result_of<Proj,
+                        Iter>::type>>;
 
                 element_type value = HPX_INVOKE(proj, *largest);
                 util::loop_n<std::decay_t<ExPolicy>>(
@@ -742,7 +742,7 @@ namespace hpx::parallel {
             // generically from the segmented algorithms
             template <typename ExPolicy, typename PairIter, typename F,
                 typename Proj>
-            static typename std::iterator_traits<PairIter>::value_type
+            static constexpr minmax_element_result<Iter>
             sequential_minmax_element_ind(ExPolicy&&, PairIter it,
                 std::size_t count, F const& f, Proj const& proj)
             {
@@ -751,8 +751,9 @@ namespace hpx::parallel {
                 if (count == 1)
                     return *it;
 
-                using element_type = hpx::traits::proxy_value_t<
-                    typename std::iterator_traits<Iter>::value_type>;
+                using element_type = hpx::traits::proxy_value_t<std::decay_t<
+                    typename hpx::parallel::traits::projected_result_of<Proj,
+                        Iter>::type>>;
 
                 auto result = *it;
 
