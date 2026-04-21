@@ -206,7 +206,8 @@ void for_each_test_execute_on()
 
 void for_each_test_execute_on_sender()
 {
-#if !defined(HPX_CLANG_VERSION)
+    // Clang 21 and earlier fail on this execute-on-sender path.
+#if !defined(HPX_CLANG_VERSION) || (HPX_CLANG_VERSION / 10000) > 21
     test_for_each_execute_on_sender<std::random_access_iterator_tag>();
     test_for_each_execute_on_sender<std::forward_iterator_tag>();
 #endif
