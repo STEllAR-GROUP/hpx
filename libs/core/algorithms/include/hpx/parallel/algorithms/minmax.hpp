@@ -403,8 +403,9 @@ namespace hpx::parallel {
             if (count == 0 || count == 1)
                 return it;
 
-            using element_type = hpx::traits::proxy_value_t<std::decay_t<
-                hpx::util::invoke_result_t<Proj, hpx::traits::iter_reference_t<FwdIter>>>>;
+            using element_type = hpx::traits::proxy_value_t<
+                std::decay_t<hpx::util::invoke_result_t<Proj,
+                    hpx::traits::iter_reference_t<FwdIter>>>>;
 
             auto smallest = it;
 
@@ -441,8 +442,9 @@ namespace hpx::parallel {
 
                 auto smallest = *it;
 
-                using element_type = hpx::traits::proxy_value_t<std::decay_t<
-                    hpx::util::invoke_result_t<Proj, hpx::traits::iter_reference_t<Iter>>>>;
+                using element_type = hpx::traits::proxy_value_t<
+                    std::decay_t<hpx::util::invoke_result_t<Proj,
+                        hpx::traits::iter_reference_t<Iter>>>>;
 
                 element_type value = HPX_INVOKE(proj, *smallest);
                 util::loop_n<std::decay_t<ExPolicy>>(
@@ -555,8 +557,9 @@ namespace hpx::parallel {
             if (count == 0 || count == 1)
                 return it;
 
-            using element_type = hpx::traits::proxy_value_t<std::decay_t<
-                hpx::util::invoke_result_t<Proj, hpx::traits::iter_reference_t<FwdIter>>>>;
+            using element_type = hpx::traits::proxy_value_t<
+                std::decay_t<hpx::util::invoke_result_t<Proj,
+                    hpx::traits::iter_reference_t<FwdIter>>>>;
 
             auto largest = it;
 
@@ -593,8 +596,9 @@ namespace hpx::parallel {
 
                 auto largest = *it;
 
-                using element_type = hpx::traits::proxy_value_t<std::decay_t<
-                    hpx::util::invoke_result_t<Proj, hpx::traits::iter_reference_t<Iter>>>>;
+                using element_type = hpx::traits::proxy_value_t<
+                    std::decay_t<hpx::util::invoke_result_t<Proj,
+                        hpx::traits::iter_reference_t<Iter>>>>;
 
                 element_type value = HPX_INVOKE(proj, *largest);
                 util::loop_n<std::decay_t<ExPolicy>>(
@@ -709,8 +713,9 @@ namespace hpx::parallel {
             if (count == 0 || count == 1)
                 return result;
 
-            using element_type = hpx::traits::proxy_value_t<std::decay_t<
-                hpx::util::invoke_result_t<Proj, hpx::traits::iter_reference_t<FwdIter>>>>;
+            using element_type = hpx::traits::proxy_value_t<
+                std::decay_t<hpx::util::invoke_result_t<Proj,
+                    hpx::traits::iter_reference_t<FwdIter>>>>;
 
             element_type min_value = HPX_INVOKE(proj, *it);
             element_type max_value = min_value;
@@ -750,8 +755,9 @@ namespace hpx::parallel {
                 if (count == 1)
                     return *it;
 
-                using element_type = hpx::traits::proxy_value_t<std::decay_t<
-                    hpx::util::invoke_result_t<Proj, hpx::traits::iter_reference_t<Iter>>>>;
+                using element_type = hpx::traits::proxy_value_t<
+                    std::decay_t<hpx::util::invoke_result_t<Proj,
+                        hpx::traits::iter_reference_t<Iter>>>>;
 
                 auto result = *it;
 
