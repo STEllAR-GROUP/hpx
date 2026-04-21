@@ -34,8 +34,7 @@ namespace hpx::parallel::util {
         struct datapar_loop
         {
             using iterator_type = std::decay_t<Iterator>;
-            using value_type =
-                typename std::iterator_traits<iterator_type>::value_type;
+            using value_type = std::iterator_traits<iterator_type>::value_type;
 
             using V = traits::vector_pack_type_t<value_type>;
 
@@ -43,10 +42,12 @@ namespace hpx::parallel::util {
             HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Begin call(
                 Begin first, End last, F&& f)
             {
+                constexpr bool is_contiguous =
+                    hpx::traits::is_contiguous_iterator_v<Begin>;
                 constexpr bool datapar_compatible =
                     iterator_datapar_compatible_v<Begin>;
 
-                if constexpr (datapar_compatible)
+                if constexpr (is_contiguous && datapar_compatible)
                 {
                     while (!is_data_aligned(first) && first != last)
                     {
@@ -65,7 +66,22 @@ namespace hpx::parallel::util {
                     {
                         datapar_loop_step<Begin>::call1(f, first);
                     }
+                    return first;
+                }
+                else if constexpr (datapar_compatible)
+                {
+                    constexpr std::size_t size = traits::vector_pack_size_v<V>;
 
+                    End const lastV = last - size + 1;
+                    while (first < lastV)
+                    {
+                        datapar_loop_step<Begin>::calls(f, first);
+                    }
+
+                    while (first != last)
+                    {
+                        datapar_loop_step<Begin>::call1(f, first);
+                    }
                     return first;
                 }
                 else
@@ -98,8 +114,7 @@ namespace hpx::parallel::util {
         struct datapar_loop_pred
         {
             using iterator_type = std::decay_t<Iterator>;
-            using value_type =
-                typename std::iterator_traits<iterator_type>::value_type;
+            using value_type = std::iterator_traits<iterator_type>::value_type;
 
             using V = traits::vector_pack_type_t<value_type>;
 
@@ -146,8 +161,7 @@ namespace hpx::parallel::util {
         struct datapar_loop_ind
         {
             using iterator_type = std::decay_t<Iterator>;
-            using value_type =
-                typename std::iterator_traits<iterator_type>::value_type;
+            using value_type = std::iterator_traits<iterator_type>::value_type;
 
             using V = traits::vector_pack_type_t<value_type>;
 
@@ -155,10 +169,12 @@ namespace hpx::parallel::util {
             HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Begin call(
                 Begin first, End last, F&& f)
             {
+                constexpr bool is_contiguous =
+                    hpx::traits::is_contiguous_iterator_v<Begin>;
                 constexpr bool datapar_compatible =
                     iterator_datapar_compatible_v<Begin>;
 
-                if constexpr (datapar_compatible)
+                if constexpr (is_contiguous && datapar_compatible)
                 {
                     while (!is_data_aligned(first) && first != last)
                     {
@@ -171,6 +187,23 @@ namespace hpx::parallel::util {
                     while (first < lastV)
                     {
                         datapar_loop_step_ind<Begin>::callv(f, first);
+                    }
+
+                    while (first != last)
+                    {
+                        datapar_loop_step_ind<Begin>::call1(f, first);
+                    }
+
+                    return first;
+                }
+                else if constexpr (datapar_compatible)
+                {
+                    constexpr std::size_t size = traits::vector_pack_size_v<V>;
+
+                    End const lastV = last - size + 1;
+                    while (first < lastV)
+                    {
+                        datapar_loop_step_ind<Begin>::calls(f, first);
                     }
 
                     while (first != last)
@@ -204,7 +237,7 @@ namespace hpx::parallel::util {
             {
                 using iterator_type = std::decay_t<InIter1>;
                 using value_type =
-                    typename std::iterator_traits<iterator_type>::value_type;
+                    std::iterator_traits<iterator_type>::value_type;
 
                 using V = traits::vector_pack_type_t<value_type>;
 
@@ -243,8 +276,7 @@ namespace hpx::parallel::util {
             std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
         {
             using iterator_type = std::decay_t<Iterator>;
-            using value_type =
-                typename std::iterator_traits<iterator_type>::value_type;
+            using value_type = std::iterator_traits<iterator_type>::value_type;
 
             using V = traits::vector_pack_type_t<value_type>;
 
@@ -252,10 +284,12 @@ namespace hpx::parallel::util {
             HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr InIter call(
                 InIter first, std::size_t count, F&& f)
             {
+                constexpr bool is_contiguous =
+                    hpx::traits::is_contiguous_iterator_v<InIter>;
                 constexpr bool datapar_compatible =
                     iterator_datapar_compatible_v<InIter>;
 
-                if constexpr (datapar_compatible)
+                if constexpr (is_contiguous && datapar_compatible)
                 {
                     std::size_t len = count;
 
@@ -278,6 +312,27 @@ namespace hpx::parallel::util {
                     // clang-format on
 
                     for (/* */; len != 0; --len)
+                    {
+                        datapar_loop_step<InIter>::call1(f, first);
+                    }
+
+                    return first;
+                }
+                else if constexpr (datapar_compatible)
+                {
+                    constexpr std::size_t size = traits::vector_pack_size_v<V>;
+
+                    // clang-format off
+                    for (auto len_v =
+                             static_cast<std::int64_t>(count - size + 1);
+                        len_v > 0;
+                        len_v -= static_cast<std::int64_t>(size), count -= size)
+                    {
+                        datapar_loop_step<InIter>::calls(f, first);
+                    }
+                    // clang-format on
+
+                    for (/* */; count != 0; --count)
                     {
                         datapar_loop_step<InIter>::call1(f, first);
                     }
@@ -356,8 +411,7 @@ namespace hpx::parallel::util {
         struct datapar_loop_n_ind
         {
             using iterator_type = std::decay_t<Iterator>;
-            using value_type =
-                typename std::iterator_traits<iterator_type>::value_type;
+            using value_type = std::iterator_traits<iterator_type>::value_type;
 
             using V = traits::vector_pack_type_t<value_type>;
 
@@ -365,10 +419,12 @@ namespace hpx::parallel::util {
             HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr InIter call(
                 InIter first, std::size_t count, F&& f)
             {
+                constexpr bool is_contiguous =
+                    hpx::traits::is_contiguous_iterator_v<InIter>;
                 constexpr bool datapar_compatible =
                     iterator_datapar_compatible_v<InIter>;
 
-                if constexpr (datapar_compatible)
+                if constexpr (is_contiguous && datapar_compatible)
                 {
                     std::size_t len = count;
 
@@ -396,6 +452,26 @@ namespace hpx::parallel::util {
                     }
                     return first;
                 }
+                else if constexpr (datapar_compatible)
+                {
+                    constexpr std::size_t size = traits::vector_pack_size_v<V>;
+
+                    // clang-format off
+                    for (auto len_v =
+                             static_cast<std::int64_t>(count - size + 1);
+                        len_v > 0;
+                        len_v -= static_cast<std::int64_t>(size), count -= size)
+                    {
+                        datapar_loop_step_ind<InIter>::calls(f, first);
+                    }
+                    // clang-format on
+
+                    for (/* */; count != 0; --count)
+                    {
+                        datapar_loop_step_ind<InIter>::call1(f, first);
+                    }
+                    return first;
+                }
                 else
                 {
                     for (/* */; count != 0; --count)
@@ -412,8 +488,7 @@ namespace hpx::parallel::util {
         struct datapar_loop_idx_n
         {
             using iterator_type = std::decay_t<Iterator>;
-            using value_type =
-                typename std::iterator_traits<iterator_type>::value_type;
+            using value_type = std::iterator_traits<iterator_type>::value_type;
 
             using V = traits::vector_pack_type_t<value_type>;
 

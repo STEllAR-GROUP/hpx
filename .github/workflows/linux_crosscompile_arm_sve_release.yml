@@ -50,6 +50,7 @@ jobs:
           cmake --build build --target core
           cmake --build build --target tests.unit.modules.algorithms.datapar_algorithms
           cmake --build build --target tests.regressions.modules.algorithms.for_each_datapar
+          cmake --build build --target tests.regressions.modules.algorithms.counting_iterator_datapar
     - name: Test
       shell: bash
       run: |
