@@ -77,6 +77,16 @@ namespace hpx::tracing {
 
     fiber_suspend_region::~fiber_suspend_region() = default;
 
+    ////////////////////////////////////////////////////////////////////////////
+    // set_thread_name
+
+    set_thread_name::set_thread_name(char const* name) noexcept
+    {
+        hpx::tracy::set_thread_name(name);
+    }
+
+    set_thread_name::~set_thread_name() = default;
+
 }    // namespace hpx::tracing
 
 #endif

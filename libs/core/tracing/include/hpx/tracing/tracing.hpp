@@ -81,6 +81,13 @@ namespace hpx::tracing {
         hpx::tracy::fiber_suspend_region impl;
     };
 
+    ////////////////////////////////////////////////////////////////////////////
+    HPX_CXX_CORE_EXPORT struct HPX_CORE_EXPORT set_thread_name
+    {
+        explicit set_thread_name(char const* name) noexcept;
+        ~set_thread_name();
+    };
+
 }    // namespace hpx::tracing
 
 #else
@@ -122,6 +129,12 @@ namespace hpx::tracing {
     HPX_CXX_CORE_EXPORT struct [[maybe_unused]] fiber_suspend_region
     {
         constexpr explicit fiber_suspend_region(char const*) noexcept {}
+    };
+
+    ////////////////////////////////////////////////////////////////////////////
+    HPX_CXX_CORE_EXPORT struct [[maybe_unused]] set_thread_name
+    {
+        constexpr explicit set_thread_name(char const*) noexcept {}
     };
 
 }    // namespace hpx::tracing
