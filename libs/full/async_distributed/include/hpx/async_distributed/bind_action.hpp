@@ -9,9 +9,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/actions_base/traits/extract_action.hpp>
-#include <hpx/actions_base/traits/is_continuation.hpp>
 #include <hpx/async_distributed/detail/post.hpp>
+#include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/async_local.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/functional.hpp>

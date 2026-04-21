@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/hpx_init.hpp>
+#include <hpx/init.hpp>
 
 // The following implementation has been divided for Linux and Mac OSX
 #if defined(HPX_HAVE_DYNAMIC_HPX_MAIN) &&                                      \
@@ -43,7 +43,6 @@ namespace hpx_start {
     HPX_SYMBOL_EXPORT bool is_linked = true;
 }    // namespace hpx_start
 
-#include <hpx/hpx_finalize.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 

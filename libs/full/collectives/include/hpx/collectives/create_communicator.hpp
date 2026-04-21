@@ -136,8 +136,8 @@ namespace hpx { namespace collectives {
         this_site_arg this_site = this_site_arg(),
         arity_arg arity = arity_arg(),
         generation_arg generation = generation_arg(),
-        root_site_arg root_site = root_site_arg());
-
+        root_site_arg root_site = root_site_arg(),
+        flat_fallback_threshold_arg threshold = flat_fallback_threshold_arg());
 }}
 // clang-format on
 
@@ -279,13 +279,13 @@ namespace hpx::collectives {
 
     ///////////////////////////////////////////////////////////////////////////
     struct hierarchical_communicator;
-
     HPX_EXPORT hierarchical_communicator create_hierarchical_communicator(
         char const* basename, num_sites_arg num_sites = num_sites_arg(),
         this_site_arg this_site = this_site_arg(),
         arity_arg arity = arity_arg(),
         generation_arg generation = generation_arg(),
-        root_site_arg root_site = root_site_arg());
+        root_site_arg root_site = root_site_arg(),
+        flat_fallback_threshold_arg threshold = flat_fallback_threshold_arg());
 
     struct hierarchical_communicator
     {
@@ -305,7 +305,8 @@ namespace hpx::collectives {
         friend HPX_EXPORT hierarchical_communicator
         create_hierarchical_communicator(char const* basename,
             num_sites_arg num_sites, this_site_arg this_site, arity_arg arity,
-            generation_arg generation, root_site_arg root_site);
+            generation_arg generation, root_site_arg root_site,
+            flat_fallback_threshold_arg threshold);
 
     public:
         hpx::tuple<communicator, this_site_arg>& operator[](std::size_t idx)

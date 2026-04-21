@@ -25,9 +25,9 @@
 #include <hpx/modules/timing.hpp>
 #include <hpx/modules/util.hpp>
 
+#include <hpx/modules/plugin_factories.hpp>
 #include <hpx/parcel_coalescing/counter_registry.hpp>
 #include <hpx/parcel_coalescing/message_handler.hpp>
-#include <hpx/plugin_factories/message_handler_factory.hpp>
 
 #include <chrono>
 #include <cstddef>
@@ -205,7 +205,8 @@ namespace hpx::plugins::parcel {
             timer_.start(interval);
             break;
 
-        case detail::message_buffer::message_buffer_append_state::buffer_now_full:
+        case detail::message_buffer::message_buffer_append_state::
+            buffer_now_full:
             flush_locked(l,
                 parcelset::policies::message_handler::flush_mode_buffer_full,
                 false, true);

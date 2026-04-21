@@ -13,10 +13,9 @@
 #include <hpx/collectives/argument_types.hpp>
 #include <hpx/collectives/create_communicator.hpp>
 #include <hpx/components/basename_registration.hpp>
-#include <hpx/components_base/agas_interface.hpp>
-#include <hpx/components_base/server/component.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/async_distributed.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/lock_registration.hpp>
@@ -395,9 +394,19 @@ namespace hpx::collectives {
             }
 
             std::size_t division_steps = (right - left + 1) / arity;
+            std::size_t remainder = (right - left + 1) % arity;
+            std::size_t offset = 0;
+
             for (std::size_t i = 0; i != arity; ++i)
             {
-                std::size_t current_left = left + division_steps * i;
+                std::size_t const current_group_size =
+                    division_steps + (i < remainder ? 1 : 0);
+
+                std::size_t const current_left = left + offset;
+                std::size_t const current_right =
+                    current_left + current_group_size - 1;
+                offset += current_group_size;
+
                 if (this_site == current_left)
                 {
                     auto c = create_communicator(name.c_str(),
@@ -407,8 +416,6 @@ namespace hpx::collectives {
                     communicators.emplace_back(HPX_MOVE(c), this_site_arg(i));
                 }
 
-                std::size_t current_right =
-                    (std::min) (current_left + division_steps - 1, right);
                 if (this_site >= current_left && this_site < current_right + 1)
                 {
                     recursively_fill_communicators(communicators, current_left,
@@ -422,7 +429,8 @@ namespace hpx::collectives {
 
     hierarchical_communicator create_hierarchical_communicator(
         char const* basename, num_sites_arg num_sites, this_site_arg this_site,
-        arity_arg arity, generation_arg generation, root_site_arg root_site)
+        arity_arg arity, generation_arg generation, root_site_arg root_site,
+        flat_fallback_threshold_arg threshold)
     {
         if (num_sites.is_default())
         {
@@ -440,7 +448,6 @@ namespace hpx::collectives {
         {
             this_site = this_site - root_site % num_sites;
         }
-
         HPX_ASSERT(this_site < num_sites);
         HPX_ASSERT(
             root_site != static_cast<std::size_t>(-1) && root_site < num_sites);
@@ -449,6 +456,29 @@ namespace hpx::collectives {
         if (!generation.is_default())
         {
             name += std::to_string(generation) + "/";
+        }
+
+        // Flat fallback: below the threshold, hierarchical overhead exceeds
+        // its benefit. Produce a single-level communicator spanning all N
+        // sites; the tree walking loops in the hierarchical collective
+        // overloads collapse to a single flat call when size() == 1 (this is
+        // also the code path non-leader sites take in normal tree mode). Pass
+        // threshold == 0 to disable this fallback and always build a tree.
+        if (num_sites < threshold)
+        {
+            // Name the fallback communicator the same way the tree path would
+            // name a single top-level group, to avoid basename collisions with
+            // direct flat communicators using the bare basename.
+            std::string fallback_name(name);
+            fallback_name += "0-" +
+                std::to_string(static_cast<std::size_t>(num_sites) - 1) + "/";
+
+            auto c = create_communicator(fallback_name.c_str(), num_sites,
+                this_site, generation, root_site_arg(0));
+            std::vector<hpx::tuple<communicator, this_site_arg>> communicators;
+            communicators.emplace_back(HPX_MOVE(c), this_site);
+            return hierarchical_communicator(HPX_MOVE(communicators), arity,
+                root_site, num_sites, this_site);
         }
 
         std::vector<hpx::tuple<communicator, this_site_arg>> communicators;

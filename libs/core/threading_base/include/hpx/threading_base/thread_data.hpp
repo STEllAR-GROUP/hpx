@@ -17,6 +17,7 @@
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/tracing.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>
 #include <hpx/threading_base/threading_base_fwd.hpp>
@@ -27,6 +28,8 @@
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
+#include <cstdio>
+#include <cstring>
 #include <forward_list>
 #include <limits>
 #include <memory>
@@ -283,6 +286,22 @@ namespace hpx::threads {
         threads::thread_description get_lco_description() const;
         threads::thread_description set_lco_description(
             threads::thread_description value);
+#endif
+
+#if defined(HPX_HAVE_MODULE_TRACY)
+    private:
+        mutable char tracy_fiber_name_[64];
+
+    public:
+        static char const* get_tracy_description_name(
+            threads::thread_description const& description,
+            char const* fallback) noexcept;
+
+        // Returns a unique, stable string identifying this HPX task as a Tracy
+        // fiber. Built lazily on first call and cached in tracy_fiber_name_.
+        // Format: "<description>_<thread_id_ptr>" so each HPX task gets its
+        // own fiber track in the Tracy profiler.
+        char const* get_tracy_fiber_name() const noexcept;
 #endif
 
 #if !defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
@@ -651,6 +670,26 @@ namespace hpx::threads {
     {
         return static_cast<thread_data*>(tid.get());
     }
+
+#if defined(HPX_HAVE_MODULE_TRACY)
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT tracing::region_init_data
+    get_region_init_data(thread_data const* thrdptr);
+
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT tracing::fiber_region_init_data
+    get_fiber_region_init_data(thread_data const* thrdptr);
+#else
+    HPX_CXX_CORE_EXPORT constexpr tracing::region_init_data
+    get_region_init_data(thread_data const*) noexcept
+    {
+        return {};
+    }
+
+    HPX_CXX_CORE_EXPORT constexpr tracing::fiber_region_init_data
+    get_fiber_region_init_data(thread_data const*) noexcept
+    {
+        return {};
+    }
+#endif
 }    // namespace hpx::threads
 
 #include <hpx/config/warnings_suffix.hpp>
@@ -668,8 +707,11 @@ namespace hpx::threads {
 
         if (is_stackless())
         {
+            HPX_ASSERT(dynamic_cast<thread_data_stackless*>(this) != nullptr);
             return static_cast<thread_data_stackless*>(this)->call();
         }
+
+        HPX_ASSERT(dynamic_cast<thread_data_stackful*>(this) != nullptr);
         return static_cast<thread_data_stackful*>(this)->call(agent_storage);
     }
 
@@ -679,8 +721,11 @@ namespace hpx::threads {
 
         if (is_stackless())
         {
+            HPX_ASSERT(dynamic_cast<thread_data_stackless*>(this) != nullptr);
             return static_cast<thread_data_stackless*>(this)->call();
         }
-        return static_cast<thread_data_stackful*>(this)->invoke_directly();
+
+        HPX_ASSERT(dynamic_cast<thread_data_stackful*>(this) != nullptr);
+        return static_cast<thread_data_stackful*>(this)->call_directly();
     }
 }    // namespace hpx::threads

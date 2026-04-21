@@ -30,13 +30,13 @@
 #include <hpx/modules/type_support.hpp>
 #include <hpx/modules/util.hpp>
 
-#include <hpx/components_base/agas_interface.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/parcelset_base.hpp>
+#include <hpx/modules/plugin_factories.hpp>
 #include <hpx/parcelset/init_parcelports.hpp>
 #include <hpx/parcelset/message_handler_fwd.hpp>
 #include <hpx/parcelset/parcelhandler.hpp>
-#include <hpx/plugin_factories/parcelport_factory_base.hpp>
 
 #include <asio/error.hpp>
 

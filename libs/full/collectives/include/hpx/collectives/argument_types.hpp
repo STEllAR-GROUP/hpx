@@ -54,6 +54,7 @@ namespace hpx::collectives {
         struct root_site_tag;
         struct tag_tag;
         struct arity_tag;
+        struct flat_fallback_threshold_tag;
     }    // namespace detail
 
     /// The number of participating sites (default: all localities)
@@ -81,4 +82,12 @@ namespace hpx::collectives {
     /// The number of children each of the communication nodes is connected
     /// to (default: picked based on num_sites).
     using arity_arg = detail::argument_type<detail::arity_tag, 2>;
+
+    /// The site-count threshold below which a hierarchical_communicator
+    /// collapses to a single flat communicator spanning all sites. At small
+    /// site counts, flat collectives outperform hierarchical composition
+    /// because tree-walking overhead exceeds the synchronization-depth
+    /// benefit. Pass 0 to disable the fallback and always build a tree.
+    using flat_fallback_threshold_arg =
+        detail::argument_type<detail::flat_fallback_threshold_tag, 16>;
 }    // namespace hpx::collectives

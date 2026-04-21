@@ -11,14 +11,14 @@
 #include <hpx/agas_base/server/primary_namespace.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/continuation.hpp>
-#include <hpx/components_base/component_type.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/naming.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/modules/util.hpp>
-#include <hpx/naming/credit_handling.hpp>
 
 #include <atomic>
 #include <cstddef>

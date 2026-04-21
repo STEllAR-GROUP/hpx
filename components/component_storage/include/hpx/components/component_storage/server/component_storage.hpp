@@ -8,9 +8,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions/transfer_action.hpp>
-#include <hpx/actions_base/basic_action.hpp>
-#include <hpx/actions_base/component_action.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
+#include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/synchronization.hpp>
 

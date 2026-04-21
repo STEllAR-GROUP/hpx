@@ -8,11 +8,11 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/actions_base/plain_action.hpp>
 #include <hpx/collectives/barrier.hpp>
 #include <hpx/collectives/broadcast_direct.hpp>
-#include <hpx/components_base/agas_interface.hpp>
+#include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/async_base.hpp>
+#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/execution_base.hpp>
@@ -326,7 +326,8 @@ namespace hpx { namespace lcos {
                     hpx::threads::thread_sharing_hint::do_not_combine_tasks);
 
                 hpx::parallel::execution::bulk_sync_execute(
-                    hpx::execution::experimental::with_hint(exec, hint),
+                    hpx::execution::to_hierarchical_spawning(
+                        hpx::execution::experimental::with_hint(exec, hint)),
                     detail::spmd_block_helper<F>{
                         name, images_per_locality, num_images},
                     hpx::util::counting_shape(

@@ -14,6 +14,7 @@
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/tag_invoke.hpp>
+#include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/util/adapt_placement_mode.hpp>
@@ -238,15 +239,7 @@ namespace hpx::parallel::detail {
                 util::detail::clear_container(data...);
 
                 difference_type search_res = tok.get_data();
-                if (search_res != count)
-                {
-                    std::advance(first, search_res);
-                }
-                else
-                {
-                    std::advance(
-                        first, hpx::parallel::detail::distance(first, last));
-                }
+                std::advance(first, search_res);
 
                 return HPX_MOVE(first);
             };
@@ -278,10 +271,12 @@ namespace hpx::parallel::detail {
             if (count <= 0)
                 return first;
             if (first == last)
-                return last;
-            difference_type n = std::distance(first, last);
+                return first;
+            difference_type n = hpx::parallel::detail::distance(first, last);
             if (static_cast<difference_type>(count) > n)
-                return last;
+            {
+                return hpx::parallel::detail::advance_to_sentinel(first, last);
+            }
 
             auto value_proj = proj(value);
 
@@ -304,7 +299,7 @@ namespace hpx::parallel::detail {
                     return it;
             }
 
-            return last;
+            return hpx::parallel::detail::advance_to_sentinel(first, last);
         }
         template <typename ExPolicy, typename Size, typename T, typename Pred,
             typename Proj>
@@ -321,11 +316,14 @@ namespace hpx::parallel::detail {
                 return result_type::get(HPX_MOVE(first));
 
             if (first == last)
-                return result_type::get(HPX_MOVE(last));
+                return result_type::get(HPX_MOVE(first));
 
-            difference_type n = std::distance(first, last);
+            difference_type n = hpx::parallel::detail::distance(first, last);
             if (static_cast<difference_type>(count) > n)
-                return result_type::get(HPX_MOVE(last));
+            {
+                return result_type::get(
+                    hpx::parallel::detail::advance_to_sentinel(first, last));
+            }
 
             // Number of valid starting positions
             difference_type max_start =
@@ -360,7 +358,10 @@ namespace hpx::parallel::detail {
 
                 difference_type idx = tok.get_data();
                 if (idx == max_start)
-                    return HPX_MOVE(last);
+                {
+                    return HPX_MOVE(hpx::parallel::detail::advance_to_sentinel(
+                        first, last));
+                }
 
                 std::advance(first, idx);
                 return HPX_MOVE(first);
