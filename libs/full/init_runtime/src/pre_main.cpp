@@ -169,7 +169,6 @@ namespace hpx { namespace detail {
             {
                 hpx::collectives::detail::create_global_communicator();
             }
-#endif
 
             // create our global barrier...
             hpx::distributed::barrier::get_global_barrier() =
@@ -210,6 +209,7 @@ namespace hpx { namespace detail {
             // component tables are populated.
             distributed::barrier::synchronize();
             lbt_ << "(5th stage) pre_main: passed 5th stage boot barrier";
+#endif
         }
 
         // Enable logging. Even if we terminate at this point we will see all
@@ -257,12 +257,10 @@ namespace hpx { namespace detail {
         hpx::collectives::detail::reset_global_communicator();
         hpx::collectives::detail::reset_local_communicator();
         hpx::collectives::detail::reset_world_channel_communicator();
-#endif
 
         // simply destroy global barrier
-        auto& b = hpx::distributed::barrier::get_global_barrier();
-        b[0].detach();
-        b[1].detach();
+        hpx::distributed::barrier::get_global_barrier().detach();
+#endif
     }
 }}    // namespace hpx::detail
 

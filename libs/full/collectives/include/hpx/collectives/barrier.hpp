@@ -102,9 +102,7 @@ namespace hpx { namespace distributed {
 #include <hpx/modules/components_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/futures.hpp>
-#include <hpx/modules/memory.hpp>
 
-#include <array>
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
@@ -263,12 +261,17 @@ namespace hpx::collectives {
                 HPX_GET_EXCEPTION(hpx::error::bad_parameter,
                     "hpx::collectives::barrier (hierarchical)",
                     "hierarchical barrier requires an explicit generation "
-                    "number for the 2k/2k+1 internal mapping"));
+                    "number for the 2k-1/2k internal mapping"));
         }
 
         if (this_site.is_default())
         {
             this_site = agas::get_locality_id();
+        }
+
+        if (communicators.size() == 0)
+        {
+            return hpx::make_ready_future();
         }
 
         generation_arg const reduce_gen(2 * generation - 1);
@@ -287,10 +290,6 @@ namespace hpx::collectives {
 
         // Broadcast phase: walk sub-communicators from shallowest to deepest.
         // Returning the final future lets the caller chain on completion.
-        if (communicators.size() == 0)
-        {
-            return hpx::make_ready_future();
-        }
 
         for (std::size_t i = 0; i + 1 < communicators.size(); ++i)
         {
@@ -343,8 +342,8 @@ namespace hpx::distributed {
         void detach();
 
         // Get the instance of the global barrier
-        static std::array<barrier, 2>& get_global_barrier();
-        static std::array<barrier, 2> create_global_barrier();
+        static barrier& get_global_barrier();
+        static barrier create_global_barrier();
 
         static void synchronize();
 

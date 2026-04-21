@@ -20,11 +20,11 @@
 #include <hpx/modules/type_support.hpp>
 
 #include <algorithm>
-#include <array>
 #include <atomic>
 #include <cstddef>
 #include <iterator>
 #include <string>
+#include <type_traits>
 #include <utility>
 #include <variant>
 #include <vector>
@@ -227,7 +227,7 @@ namespace hpx::distributed {
             {
                 wait(hpx::launch::async).get();
             }
-            catch (...)
+            catch (...)    // NOLINT(bugprone-empty-catch)
             {
             }
         }
@@ -242,28 +242,26 @@ namespace hpx::distributed {
         comm_ = std::monostate{};
     }
 
-    std::array<barrier, 2> barrier::create_global_barrier()
+    barrier barrier::create_global_barrier()
     {
         runtime& rt = get_runtime();
         util::runtime_configuration const& cfg = rt.get_config();
         auto const num = static_cast<std::size_t>(cfg.get_num_localities());
         auto const rank = static_cast<std::size_t>(hpx::get_locality_id());
-        barrier b1("/0/hpx/global_barrier0", num, rank, force_flat_tag::tag);
-        barrier b2("/0/hpx/global_barrier1", num, rank, force_flat_tag::tag);
-        return {{std::move(b1), std::move(b2)}};
+        return barrier("/0/hpx/global_barrier", num, rank, force_flat_tag::tag);
     }
 
-    std::array<barrier, 2>& barrier::get_global_barrier()
+    barrier& barrier::get_global_barrier()
     {
-        static std::array<barrier, 2> bs = {};
-        return bs;
+        static barrier b;
+        return b;
     }
 
     void barrier::synchronize()
     {
-        std::array<barrier, 2>& b = get_global_barrier();
-        HPX_ASSERT(!std::holds_alternative<std::monostate>(b[0].comm_));
-        b[0].wait();
+        barrier& b = get_global_barrier();
+        HPX_ASSERT(!std::holds_alternative<std::monostate>(b.comm_));
+        b.wait();
     }
 }    // namespace hpx::distributed
 
