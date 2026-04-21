@@ -59,6 +59,7 @@ set(tests
     foreachn
     foreachn_exception
     foreachn_bad_alloc
+    for_each_index
     for_loop
     for_loop_exception
     for_loop_induction
