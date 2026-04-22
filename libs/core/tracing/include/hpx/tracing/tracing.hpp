@@ -82,11 +82,8 @@ namespace hpx::tracing {
     };
 
     ////////////////////////////////////////////////////////////////////////////
-    HPX_CXX_CORE_EXPORT struct HPX_CORE_EXPORT set_thread_name
-    {
-        explicit set_thread_name(char const* name) noexcept;
-        ~set_thread_name();
-    };
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void set_thread_name(
+        char const* name) noexcept;
 
 }    // namespace hpx::tracing
 
@@ -132,10 +129,7 @@ namespace hpx::tracing {
     };
 
     ////////////////////////////////////////////////////////////////////////////
-    HPX_CXX_CORE_EXPORT struct [[maybe_unused]] set_thread_name
-    {
-        constexpr explicit set_thread_name(char const*) noexcept {}
-    };
+    HPX_CXX_CORE_EXPORT constexpr void set_thread_name(char const*) noexcept {}
 
 }    // namespace hpx::tracing
 

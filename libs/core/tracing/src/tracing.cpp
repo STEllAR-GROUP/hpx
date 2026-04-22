@@ -80,12 +80,10 @@ namespace hpx::tracing {
     ////////////////////////////////////////////////////////////////////////////
     // set_thread_name
 
-    set_thread_name::set_thread_name(char const* name) noexcept
+    void set_thread_name(char const* name) noexcept
     {
         hpx::tracy::set_thread_name(name);
     }
-
-    set_thread_name::~set_thread_name() = default;
 
 }    // namespace hpx::tracing
 

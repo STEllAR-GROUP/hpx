@@ -89,7 +89,7 @@ namespace hpx::util {
     void set_thread_name(char const* thread_name) noexcept
     {
         detail::set_thread_name(thread_name);
-        hpx::tracing::set_thread_name{thread_name};
+        hpx::tracing::set_thread_name(thread_name);
     }
 }    // namespace hpx::util
 
@@ -101,7 +101,7 @@ namespace hpx::util {
     void set_thread_name(char const* thread_name) noexcept
     {
         pthread_setname_np(pthread_self(), thread_name);
-        hpx::tracing::set_thread_name{thread_name};
+        hpx::tracing::set_thread_name(thread_name);
     }
 }    // namespace hpx::util
 
@@ -111,7 +111,7 @@ namespace hpx::util {
 
     void set_thread_name(char const* thread_name) noexcept
     {
-        hpx::tracing::set_thread_name{thread_name};
+        hpx::tracing::set_thread_name(thread_name);
     }
 }    // namespace hpx::util
 
