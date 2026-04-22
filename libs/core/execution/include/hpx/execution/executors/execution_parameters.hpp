@@ -646,8 +646,7 @@ namespace hpx::execution::experimental::detail {
     };
 
     template <typename T, typename Wrapper>
-    struct maximal_number_of_chunks_call_helper<T, Wrapper,
-        std::enable_if_t<has_maximal_number_of_chunks_v<T>>>
+    struct maximal_number_of_chunks_call_helper<T, Wrapper>
     {
         template <typename Executor>
         HPX_FORCEINLINE std::size_t maximal_number_of_chunks(
@@ -655,8 +654,8 @@ namespace hpx::execution::experimental::detail {
         {
             auto& wrapped =
                 static_cast<unwrapper<Wrapper> const*>(this)->member_.get();
-            return wrapped.maximal_number_of_chunks(
-                HPX_FORWARD(Executor, exec), cores, num_tasks);
+            return hpx::execution::experimental::maximal_number_of_chunks(
+                wrapped, HPX_FORWARD(Executor, exec), cores, num_tasks);
         }
     };
 
@@ -667,8 +666,7 @@ namespace hpx::execution::experimental::detail {
     };
 
     template <typename T, typename Wrapper>
-    struct get_chunk_size_call_helper<T, Wrapper,
-        std::enable_if_t<has_get_chunk_size_v<T>>>
+    struct get_chunk_size_call_helper<T, Wrapper>
     {
         template <typename Executor>
         HPX_FORCEINLINE std::size_t get_chunk_size(Executor&& exec,
@@ -677,8 +675,9 @@ namespace hpx::execution::experimental::detail {
         {
             auto& wrapped =
                 static_cast<unwrapper<Wrapper> const*>(this)->member_.get();
-            return wrapped.get_chunk_size(HPX_FORWARD(Executor, exec),
-                iteration_duration, cores, num_tasks);
+            return hpx::execution::experimental::get_chunk_size(wrapped,
+                HPX_FORWARD(Executor, exec), iteration_duration, cores,
+                num_tasks);
         }
     };
 
@@ -689,8 +688,7 @@ namespace hpx::execution::experimental::detail {
     };
 
     template <typename T, typename Wrapper>
-    struct measure_iteration_call_helper<T, Wrapper,
-        std::enable_if_t<has_measure_iteration_v<T>>>
+    struct measure_iteration_call_helper<T, Wrapper>
     {
         template <typename Executor, typename F>
         HPX_FORCEINLINE std::size_t measure_iteration(Executor&& exec, F&& f,
@@ -698,8 +696,9 @@ namespace hpx::execution::experimental::detail {
         {
             auto& wrapped =
                 static_cast<unwrapper<Wrapper> const*>(this)->member_.get();
-            return wrapped.measure_iteration(HPX_FORWARD(Executor, exec),
-                HPX_FORWARD(F, f), cores, num_tasks);
+            return hpx::execution::experimental::measure_iteration(wrapped,
+                HPX_FORWARD(Executor, exec), HPX_FORWARD(F, f), cores,
+                num_tasks);
         }
     };
 
@@ -710,15 +709,15 @@ namespace hpx::execution::experimental::detail {
     };
 
     template <typename T, typename Wrapper>
-    struct mark_begin_execution_call_helper<T, Wrapper,
-        std::enable_if_t<has_mark_begin_execution_v<T>>>
+    struct mark_begin_execution_call_helper<T, Wrapper>
     {
         template <typename Executor>
         HPX_FORCEINLINE void mark_begin_execution(Executor&& exec)
         {
             auto& wrapped =
                 static_cast<unwrapper<Wrapper>*>(this)->member_.get();
-            wrapped.mark_begin_execution(HPX_FORWARD(Executor, exec));
+            hpx::execution::experimental::mark_begin_execution(
+                wrapped, HPX_FORWARD(Executor, exec));
         }
     };
 
@@ -729,15 +728,15 @@ namespace hpx::execution::experimental::detail {
     };
 
     template <typename T, typename Wrapper>
-    struct mark_end_of_scheduling_call_helper<T, Wrapper,
-        std::enable_if_t<has_mark_begin_execution_v<T>>>
+    struct mark_end_of_scheduling_call_helper<T, Wrapper>
     {
         template <typename Executor>
         HPX_FORCEINLINE void mark_end_of_scheduling(Executor&& exec)
         {
             auto& wrapped =
                 static_cast<unwrapper<Wrapper>*>(this)->member_.get();
-            wrapped.mark_end_of_scheduling(HPX_FORWARD(Executor, exec));
+            hpx::execution::experimental::mark_end_of_scheduling(
+                wrapped, HPX_FORWARD(Executor, exec));
         }
     };
 
@@ -748,15 +747,15 @@ namespace hpx::execution::experimental::detail {
     };
 
     template <typename T, typename Wrapper>
-    struct mark_end_execution_call_helper<T, Wrapper,
-        std::enable_if_t<has_mark_begin_execution_v<T>>>
+    struct mark_end_execution_call_helper<T, Wrapper>
     {
         template <typename Executor>
         HPX_FORCEINLINE void mark_end_execution(Executor&& exec)
         {
             auto& wrapped =
                 static_cast<unwrapper<Wrapper>*>(this)->member_.get();
-            wrapped.mark_end_execution(HPX_FORWARD(Executor, exec));
+            hpx::execution::experimental::mark_end_execution(
+                wrapped, HPX_FORWARD(Executor, exec));
         }
     };
 
@@ -767,8 +766,7 @@ namespace hpx::execution::experimental::detail {
     };
 
     template <typename T, typename Wrapper>
-    struct processing_units_count_call_helper<T, Wrapper,
-        std::enable_if_t<has_processing_units_count_v<T>>>
+    struct processing_units_count_call_helper<T, Wrapper>
     {
         template <typename Executor>
         HPX_FORCEINLINE std::size_t processing_units_count(
@@ -776,7 +774,8 @@ namespace hpx::execution::experimental::detail {
         {
             auto& wrapped =
                 static_cast<unwrapper<Wrapper> const*>(this)->member_.get();
-            return wrapped.processing_units_count(HPX_FORWARD(Executor, exec));
+            return hpx::execution::experimental::processing_units_count(
+                wrapped, HPX_FORWARD(Executor, exec));
         }
     };
 
@@ -787,15 +786,15 @@ namespace hpx::execution::experimental::detail {
     };
 
     template <typename T, typename Wrapper>
-    struct reset_thread_distribution_call_helper<T, Wrapper,
-        std::enable_if_t<has_reset_thread_distribution_v<T>>>
+    struct reset_thread_distribution_call_helper<T, Wrapper>
     {
         template <typename Executor>
         HPX_FORCEINLINE void reset_thread_distribution(Executor&& exec)
         {
             auto& wrapped =
                 static_cast<unwrapper<Wrapper>*>(this)->member_.get();
-            wrapped.reset_thread_distribution(HPX_FORWARD(Executor, exec));
+            hpx::execution::experimental::reset_thread_distribution(
+                wrapped, HPX_FORWARD(Executor, exec));
         }
     };
 
@@ -806,8 +805,7 @@ namespace hpx::execution::experimental::detail {
     };
 
     template <typename T, typename Wrapper>
-    struct collect_execution_parameters_call_helper<T, Wrapper,
-        std::enable_if_t<has_collect_execution_parameters_v<T>>>
+    struct collect_execution_parameters_call_helper<T, Wrapper>
     {
         template <typename Executor>
         HPX_FORCEINLINE void collect_execution_parameters(Executor&& exec,
@@ -816,8 +814,9 @@ namespace hpx::execution::experimental::detail {
         {
             auto& wrapped =
                 static_cast<unwrapper<Wrapper>*>(this)->member_.get();
-            wrapped.collect_execution_parameters(HPX_FORWARD(Executor, exec),
-                num_elements, num_cores, num_chunks, chunk_size);
+            hpx::execution::experimental::collect_execution_parameters(wrapped,
+                HPX_FORWARD(Executor, exec), num_elements, num_cores,
+                num_chunks, chunk_size);
         }
     };
 
