@@ -111,6 +111,7 @@ namespace hpx {
 #else
 
 #include <hpx/config.hpp>
+#include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/modules/executors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/iterator_support.hpp>
@@ -120,6 +121,7 @@ namespace hpx {
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/invoke_projected.hpp>
+
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 
@@ -282,6 +284,40 @@ namespace hpx {
             return hpx::parallel::detail::is_partitioned<FwdIter, FwdIter>()
                 .call(HPX_FORWARD(ExPolicy, policy), first, last,
                     HPX_MOVE(pred), hpx::identity_v);
+        }
+
+        template <typename FwdIter, typename Pred,
+            typename Proj = hpx::identity>
+        // clang-format off
+            requires (
+                std::forward_iterator<FwdIter> &&
+                hpx::parallel::traits::is_projected_v<Proj, FwdIter>
+            )
+        // clang-format on
+        friend bool tag_fallback_invoke(hpx::is_partitioned_t, FwdIter first,
+            FwdIter last, Pred pred, Proj proj)
+        {
+            return hpx::parallel::detail::is_partitioned<FwdIter, FwdIter>()
+                .call(hpx::execution::seq, first, last, HPX_MOVE(pred),
+                    HPX_MOVE(proj));
+        }
+
+        template <typename ExPolicy, typename FwdIter, typename Pred,
+            typename Proj = hpx::identity>
+        // clang-format off
+            requires (
+                hpx::is_execution_policy_v<ExPolicy> &&
+                std::forward_iterator<FwdIter> &&
+                hpx::parallel::traits::is_projected_v<Proj, FwdIter>
+            )
+        // clang-format on
+        friend decltype(auto) tag_fallback_invoke(hpx::is_partitioned_t,
+            ExPolicy&& policy, FwdIter first, FwdIter last, Pred pred,
+            Proj proj)
+        {
+            return hpx::parallel::detail::is_partitioned<FwdIter, FwdIter>()
+                .call(HPX_FORWARD(ExPolicy, policy), first, last,
+                    HPX_MOVE(pred), HPX_MOVE(proj));
         }
     } is_partitioned{};
 }    // namespace hpx

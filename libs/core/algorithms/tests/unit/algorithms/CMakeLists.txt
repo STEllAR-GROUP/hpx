@@ -79,6 +79,7 @@ set(tests
     inplace_merge
     is_partitioned
     is_sorted
+    is_sorted_projection
     is_sorted_until
     lexicographical_compare
     make_heap
