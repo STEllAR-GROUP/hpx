@@ -23,14 +23,14 @@ void test_min_element_projection()
     auto proj = [](element const& p) { return p.second; };
 
     // Test sequential
-    auto r_seq =
-        hpx::min_element(seq, c.begin(), c.end(), std::less<int>{}, proj);
+    auto r_seq = hpx::ranges::min_element(
+        seq, c.begin(), c.end(), std::less<int>{}, proj);
     HPX_TEST(r_seq != c.end());
     HPX_TEST_EQ(r_seq->second, 5);
 
     // Test parallel
-    auto r_par =
-        hpx::min_element(par, c.begin(), c.end(), std::less<int>{}, proj);
+    auto r_par = hpx::ranges::min_element(
+        par, c.begin(), c.end(), std::less<int>{}, proj);
     HPX_TEST(r_par != c.end());
     HPX_TEST_EQ(r_par->second, 5);
 }
@@ -44,14 +44,14 @@ void test_max_element_projection()
     auto proj = [](element const& p) { return p.second; };
 
     // Test sequential
-    auto r_seq =
-        hpx::max_element(seq, c.begin(), c.end(), std::less<int>{}, proj);
+    auto r_seq = hpx::ranges::max_element(
+        seq, c.begin(), c.end(), std::less<int>{}, proj);
     HPX_TEST(r_seq != c.end());
     HPX_TEST_EQ(r_seq->second, 15);
 
     // Test parallel
-    auto r_par =
-        hpx::max_element(par, c.begin(), c.end(), std::less<int>{}, proj);
+    auto r_par = hpx::ranges::max_element(
+        par, c.begin(), c.end(), std::less<int>{}, proj);
     HPX_TEST(r_par != c.end());
     HPX_TEST_EQ(r_par->second, 15);
 }
@@ -65,16 +65,16 @@ void test_minmax_element_projection()
     auto proj = [](element const& p) { return p.second; };
 
     // Test sequential
-    auto r_seq =
-        hpx::minmax_element(seq, c.begin(), c.end(), std::less<int>{}, proj);
+    auto r_seq = hpx::ranges::minmax_element(
+        seq, c.begin(), c.end(), std::less<int>{}, proj);
     HPX_TEST(r_seq.min != c.end());
     HPX_TEST(r_seq.max != c.end());
     HPX_TEST_EQ(r_seq.min->second, 5);
     HPX_TEST_EQ(r_seq.max->second, 15);
 
     // Test parallel
-    auto r_par =
-        hpx::minmax_element(par, c.begin(), c.end(), std::less<int>{}, proj);
+    auto r_par = hpx::ranges::minmax_element(
+        par, c.begin(), c.end(), std::less<int>{}, proj);
     HPX_TEST(r_par.min != c.end());
     HPX_TEST(r_par.max != c.end());
     HPX_TEST_EQ(r_par.min->second, 5);
