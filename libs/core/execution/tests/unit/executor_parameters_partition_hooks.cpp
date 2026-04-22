@@ -17,7 +17,7 @@
 struct partition_hooks_parameters
 {
     explicit partition_hooks_parameters(std::size_t max_partitions)
-      : values_(max_partitions, std::pair<std::size_t, std::size_t>{0, 0})
+      : values_(max_partitions, {0, 0})
       , seen_(max_partitions, 0)
     {
     }
@@ -60,19 +60,18 @@ void test_mark_partition_sync()
 
     std::iota(left.begin(), left.end(), std::uint64_t(0));
     std::iota(right.begin(), right.end(), std::uint64_t(left.size()));
-    hpx::execution::experimental::chunking_parameters exec_params{};
-    hpx::execution::experimental::collect_chunking_parameters collect_params(
-        exec_params);
 
     partition_hooks_parameters params(left.size() + right.size());
+    hpx::execution::experimental::chunking_parameters param{};
+    hpx::execution::experimental::collect_chunking_parameters ccp(param);
 
-    auto policy =
-        hpx::execution::par.with(std::ref(collect_params), std::ref(params));
+    auto policy = hpx::execution::par.with(std::ref(params), ccp);
     hpx::merge(policy, left.begin(), left.end(), right.begin(), right.end(),
         out.begin());
 
     HPX_TEST(std::is_sorted(out.begin(), out.end()));
-    HPX_TEST_EQ(params.count_seen(), exec_params.num_chunks);
+    HPX_TEST_LT(std::size_t(0), param.num_chunks);
+    HPX_TEST_EQ(params.count_seen(), param.num_chunks);
 }
 
 void test_mark_partition_async()
@@ -84,21 +83,20 @@ void test_mark_partition_async()
     std::iota(left.begin(), left.end(), std::uint64_t(0));
     std::iota(right.begin(), right.end(), std::uint64_t(left.size()));
 
-    hpx::execution::experimental::chunking_parameters exec_params{};
-    hpx::execution::experimental::collect_chunking_parameters collect_params(
-        exec_params);
-
+    hpx::execution::experimental::chunking_parameters param{};
+    hpx::execution::experimental::collect_chunking_parameters ccp(param);
     partition_hooks_parameters params(left.size() + right.size());
 
-    auto policy = hpx::execution::par(hpx::execution::task)
-                      .with(std::ref(params), std::ref(collect_params));
+    auto policy =
+        hpx::execution::par(hpx::execution::task).with(std::ref(params), ccp);
     auto f = hpx::merge(policy, left.begin(), left.end(), right.begin(),
         right.end(), out.begin());
     auto result_iter = f.get();
     HPX_UNUSED(result_iter);
 
     HPX_TEST(std::is_sorted(out.begin(), out.end()));
-    HPX_TEST_EQ(params.count_seen(), exec_params.num_chunks);
+    HPX_TEST_LT(std::size_t(0), param.num_chunks);
+    HPX_TEST_EQ(params.count_seen(), param.num_chunks);
 }
 
 int hpx_main(hpx::program_options::variables_map&)

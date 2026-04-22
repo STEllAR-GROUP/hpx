@@ -557,7 +557,7 @@ namespace hpx::execution::experimental::detail {
         // default implementation
         template <typename Target, typename... Args>
         HPX_FORCEINLINE static constexpr void mark_partition(
-            Target, std::size_t, Args...) noexcept
+            Target, std::size_t, Args&&...) noexcept
         {
         }
     };
@@ -820,8 +820,7 @@ namespace hpx::execution::experimental::detail {
     };
 
     template <typename T, typename Wrapper>
-    struct mark_partition_call_helper<T, Wrapper,
-        std::enable_if_t<has_mark_partition_v<T>>>
+    struct mark_partition_call_helper<T, Wrapper>
     {
         template <typename Executor, typename... Args>
         HPX_FORCEINLINE void mark_partition(
@@ -829,7 +828,8 @@ namespace hpx::execution::experimental::detail {
         {
             auto& wrapped =
                 static_cast<unwrapper<Wrapper>*>(this)->member_.get();
-            wrapped.mark_partition(HPX_FORWARD(Executor, exec), partition,
+            hpx::execution::experimental::mark_partition(wrapped,
+                HPX_FORWARD(Executor, exec), partition,
                 HPX_FORWARD(Args, args)...);
         }
     };
