@@ -446,8 +446,8 @@ namespace hpx::parallel {
 
                 using source_iter_type =
                     typename std::iterator_traits<FwdIter>::value_type;
-                using element_type = hpx::traits::proxy_value_t<std::decay_t<
-                    hpx::util::invoke_result_t<Proj,
+                using element_type = hpx::traits::proxy_value_t<
+                    std::decay_t<hpx::util::invoke_result_t<Proj,
                         hpx::traits::iter_reference_t<source_iter_type>>>>;
 
                 element_type value = HPX_INVOKE(proj, *smallest);
@@ -602,8 +602,8 @@ namespace hpx::parallel {
 
                 using source_iter_type =
                     typename std::iterator_traits<FwdIter>::value_type;
-                using element_type = hpx::traits::proxy_value_t<std::decay_t<
-                    hpx::util::invoke_result_t<Proj,
+                using element_type = hpx::traits::proxy_value_t<
+                    std::decay_t<hpx::util::invoke_result_t<Proj,
                         hpx::traits::iter_reference_t<source_iter_type>>>>;
 
                 element_type value = HPX_INVOKE(proj, *largest);
@@ -763,12 +763,11 @@ namespace hpx::parallel {
 
                 auto result = *it;
 
-                using source_iter_type = decltype(
-                    std::declval<typename std::iterator_traits<PairIter>::
-                            value_type>()
+                using source_iter_type = decltype(std::declval<
+                    typename std::iterator_traits<PairIter>::value_type>()
                         .min);
-                using element_type = hpx::traits::proxy_value_t<std::decay_t<
-                    hpx::util::invoke_result_t<Proj,
+                using element_type = hpx::traits::proxy_value_t<
+                    std::decay_t<hpx::util::invoke_result_t<Proj,
                         hpx::traits::iter_reference_t<source_iter_type>>>>;
 
                 element_type min_value = HPX_INVOKE(proj, *result.min);
