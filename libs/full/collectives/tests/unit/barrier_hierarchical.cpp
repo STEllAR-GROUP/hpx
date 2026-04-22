@@ -91,7 +91,7 @@ void test_local_use(std::uint32_t num_sites, int arity)
 
             hpx::chrono::high_resolution_timer const t;
 
-            for (std::uint32_t i = 0; i != 10 * ITERATIONS; ++i)
+            for (std::uint32_t i = 0; i != ITERATIONS; ++i)
             {
                 hpx::collectives::barrier(
                     barrier_clients, this_site_arg(site), generation_arg(i + 1))
@@ -102,7 +102,7 @@ void test_local_use(std::uint32_t num_sites, int arity)
             if (site == 0)
             {
                 std::cout << "local timing (" << num_sites << "/" << arity
-                          << "): " << elapsed / (10 * ITERATIONS) << "[s]\n"
+                          << "): " << elapsed / ITERATIONS << "[s]\n"
                           << std::flush;
             }
         }));

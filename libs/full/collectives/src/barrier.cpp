@@ -150,7 +150,7 @@ namespace hpx::distributed {
       , generation_(other.generation_.load(std::memory_order_relaxed))
       , comm_(std::move(other.comm_))
     {
-        other.comm_ = std::monostate{};
+        other.comm_ = hpx::collectives::communicator{};
     }
 
     barrier& barrier::operator=(barrier&& other) noexcept
@@ -165,7 +165,7 @@ namespace hpx::distributed {
             generation_.store(other.generation_.load(std::memory_order_relaxed),
                 std::memory_order_relaxed);
             comm_ = std::move(other.comm_);
-            other.comm_ = std::monostate{};
+            other.comm_ = hpx::collectives::communicator{};
         }
         return *this;
     }
@@ -181,20 +181,21 @@ namespace hpx::distributed {
         return std::visit(
             [&](auto& c) -> hpx::future<void> {
                 using T = std::decay_t<decltype(c)>;
-                if constexpr (std::is_same_v<T, std::monostate>)
+                if constexpr (std::is_same_v<T, hpx::collectives::communicator>)
                 {
-                    return hpx::make_exceptional_future<void>(
-                        HPX_GET_EXCEPTION(hpx::error::invalid_status,
-                            "hpx::distributed::barrier::wait",
-                            "wait() called on a released, detached, or "
-                            "moved-from barrier instance"));
+                    if (!c.valid())
+                    {
+                        return hpx::make_exceptional_future<void>(
+                            HPX_GET_EXCEPTION(hpx::error::invalid_status,
+                                "hpx::distributed::barrier::wait",
+                                "wait() called on a released, detached, or "
+                                "moved-from barrier instance"));
+                    }
                 }
-                else
-                {
-                    return hpx::collectives::barrier(c,
-                        hpx::collectives::this_site_arg(rank_),
-                        hpx::collectives::generation_arg(gen));
-                }
+
+                return hpx::collectives::barrier(c,
+                    hpx::collectives::this_site_arg(rank_),
+                    hpx::collectives::generation_arg(gen));
             },
             comm_);
     }
@@ -206,8 +207,11 @@ namespace hpx::distributed {
 
     void barrier::release()
     {
-        if (std::holds_alternative<std::monostate>(comm_))
+        if (auto const* c = std::get_if<hpx::collectives::communicator>(&comm_);
+            c && !c->valid())
+        {
             return;
+        }
 
         if (hpx::get_runtime_ptr() != nullptr &&
             hpx::threads::threadmanager_is(hpx::state::running) &&
@@ -234,12 +238,12 @@ namespace hpx::distributed {
 
         // Auto-unregister happens synchronously via the communicator's
         // shared-state dtor.
-        comm_ = std::monostate{};
+        comm_ = hpx::collectives::communicator{};
     }
 
     void barrier::detach()
     {
-        comm_ = std::monostate{};
+        comm_ = hpx::collectives::communicator{};
     }
 
     barrier barrier::create_global_barrier()
@@ -260,7 +264,9 @@ namespace hpx::distributed {
     void barrier::synchronize()
     {
         barrier& b = get_global_barrier();
-        HPX_ASSERT(!std::holds_alternative<std::monostate>(b.comm_));
+        HPX_ASSERT(
+            !std::holds_alternative<hpx::collectives::communicator>(b.comm_) ||
+            std::get<hpx::collectives::communicator>(b.comm_).valid());
         b.wait();
     }
 }    // namespace hpx::distributed

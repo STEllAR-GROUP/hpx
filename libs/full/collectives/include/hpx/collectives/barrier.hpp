@@ -164,7 +164,7 @@ namespace hpx::collectives {
         {
             this_site = agas::get_locality_id();
         }
-        if (generation == 0)
+        if (generation.is_default())
         {
             return hpx::make_exceptional_future<void>(HPX_GET_EXCEPTION(
                 hpx::error::bad_parameter, "hpx::collectives::barrier",
@@ -172,7 +172,7 @@ namespace hpx::collectives {
         }
 
         // Handle operation right away if there is only one site.
-        if (auto const [num_sites, comm_site] = fid.get_info(); num_sites == 1)
+        if (auto const [num_sites, _] = fid.get_info(); num_sites == 1)
         {
             return hpx::make_ready_future();
         }
@@ -366,7 +366,7 @@ namespace hpx::distributed {
         std::size_t cut_off_ = 0;
         mutable std::atomic<std::size_t> generation_{0};
 
-        std::variant<std::monostate, hpx::collectives::communicator,
+        std::variant<hpx::collectives::communicator,
             hpx::collectives::hierarchical_communicator>
             comm_;
     };
