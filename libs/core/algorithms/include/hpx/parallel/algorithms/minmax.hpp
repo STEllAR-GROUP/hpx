@@ -1,4 +1,5 @@
-//  Copyright (c) 2014-2025 Hartmut Kaiser
+//  Copyright (c) 2014-2026 Hartmut Kaiser
+//  Copyright (c) 2024-2026 STE||AR-Group
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -443,10 +444,11 @@ namespace hpx::parallel {
 
                 auto smallest = *it;
 
-                using element_type = hpx::traits::proxy_value_t<
-                    std::decay_t<hpx::util::invoke_result_t<Proj,
-                        hpx::traits::iter_reference_t<typename std::
-                                iterator_traits<FwdIter>::value_type>>>>;
+                using source_iter_type =
+                    typename std::iterator_traits<FwdIter>::value_type;
+                using element_type = hpx::traits::proxy_value_t<std::decay_t<
+                    hpx::util::invoke_result_t<Proj,
+                        hpx::traits::iter_reference_t<source_iter_type>>>>;
 
                 element_type value = HPX_INVOKE(proj, *smallest);
                 util::loop_n<std::decay_t<ExPolicy>>(
@@ -598,10 +600,11 @@ namespace hpx::parallel {
 
                 auto largest = *it;
 
-                using element_type = hpx::traits::proxy_value_t<
-                    std::decay_t<hpx::util::invoke_result_t<Proj,
-                        hpx::traits::iter_reference_t<typename std::
-                                iterator_traits<FwdIter>::value_type>>>>;
+                using source_iter_type =
+                    typename std::iterator_traits<FwdIter>::value_type;
+                using element_type = hpx::traits::proxy_value_t<std::decay_t<
+                    hpx::util::invoke_result_t<Proj,
+                        hpx::traits::iter_reference_t<source_iter_type>>>>;
 
                 element_type value = HPX_INVOKE(proj, *largest);
                 util::loop_n<std::decay_t<ExPolicy>>(
@@ -760,9 +763,13 @@ namespace hpx::parallel {
 
                 auto result = *it;
 
-                using element_type = hpx::traits::proxy_value_t<
-                    std::decay_t<hpx::util::invoke_result_t<Proj,
-                        hpx::traits::iter_reference_t<Iter>>>>;
+                using source_iter_type = decltype(
+                    std::declval<typename std::iterator_traits<PairIter>::
+                            value_type>()
+                        .min);
+                using element_type = hpx::traits::proxy_value_t<std::decay_t<
+                    hpx::util::invoke_result_t<Proj,
+                        hpx::traits::iter_reference_t<source_iter_type>>>>;
 
                 element_type min_value = HPX_INVOKE(proj, *result.min);
                 element_type max_value = HPX_INVOKE(proj, *result.max);
