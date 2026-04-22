@@ -432,8 +432,7 @@ namespace hpx::parallel {
             // generically from the segmented algorithms
             template <typename ExPolicy, typename FwdIter, typename F,
                 typename Proj>
-            static constexpr hpx::traits::proxy_value_t<
-                typename std::iterator_traits<FwdIter>::value_type>
+            static constexpr typename std::iterator_traits<FwdIter>::value_type
             sequential_minmax_element_ind(ExPolicy&&, FwdIter it,
                 std::size_t count, F const& f, Proj const& proj)
             {
@@ -588,8 +587,7 @@ namespace hpx::parallel {
             // generically from the segmented algorithms
             template <typename ExPolicy, typename FwdIter, typename F,
                 typename Proj>
-            static constexpr hpx::traits::proxy_value_t<
-                typename std::iterator_traits<FwdIter>::value_type>
+            static constexpr typename std::iterator_traits<FwdIter>::value_type
             sequential_minmax_element_ind(ExPolicy&&, FwdIter it,
                 std::size_t count, F const& f, Proj const& proj)
             {
@@ -751,8 +749,7 @@ namespace hpx::parallel {
             // generically from the segmented algorithms
             template <typename ExPolicy, typename PairIter, typename F,
                 typename Proj>
-            static constexpr hpx::traits::proxy_value_t<
-                typename std::iterator_traits<PairIter>::value_type>
+            static constexpr typename std::iterator_traits<PairIter>::value_type
             sequential_minmax_element_ind(ExPolicy&&, PairIter it,
                 std::size_t count, F const& f, Proj const& proj)
             {
