@@ -70,16 +70,16 @@ void test_is_sorted_until_projection()
     HPX_TEST(it_seq2 != c.end());
     HPX_TEST_EQ(it_seq2->second, 5);
 
-    auto it_par =
-        hpx::is_sorted_until(par, c.begin(), c.end(), std::less<int>{}, proj);
-    HPX_TEST(it_par != c.end());
-    HPX_TEST_EQ(it_par->second, 5);
+    auto it_par = hpx::is_sorted_until(
+        hpx::execution::par, c.begin(), c.end(), std::less<int>{}, proj);
+    HPX_TEST(it_par != c.end() && it_par->second == 5);
 
     auto it_task = hpx::is_sorted_until(
-        par(task), c.begin(), c.end(), std::less<int>{}, proj)
+        hpx::execution::par(hpx::execution::task), c.begin(), c.end(),
+        std::less<int>{}, proj)
                        .get();
-    HPX_TEST(it_task != c.end());
-    HPX_TEST_EQ(it_task->second, 5);
+    HPX_TEST(it_task != c.end() && it_task->second == 5);
+
 
     std::vector<element> fully_sorted = {{10, 1}, {20, 3}, {30, 5}};
     auto it_end = hpx::is_sorted_until(
