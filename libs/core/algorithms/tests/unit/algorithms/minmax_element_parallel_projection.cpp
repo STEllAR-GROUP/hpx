@@ -1,4 +1,3 @@
-
 // Regression test for: incorrect return types in
 // max_element::sequential_minmax_element_ind and
 // minmax_element::sequential_minmax_element_ind, which are called exclusively
