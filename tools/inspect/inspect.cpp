@@ -166,7 +166,7 @@ namespace {
     typedef std::vector<lib_error_count> lib_error_count_vector;
     lib_error_count_vector libs;
 
-    std::string trim(std::string value)
+    std::string trim(std::string const& value)
     {
         std::string whitespace = " \t\r\n";
         std::string::size_type begin = value.find_first_not_of(whitespace);
