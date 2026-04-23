@@ -202,7 +202,7 @@ namespace hpx::parallel {
                         --part_count, tok,
                         [&fst_bool, &is_mixed, &pred_projected, &tok](
                             auto const& a) mutable -> void {
-                            if (fst_bool != hpx::invoke(pred_projected, a))
+                            if (fst_bool != hpx::invoke(pred_projected, *a))
                             {
                                 if (fst_bool)
                                 {

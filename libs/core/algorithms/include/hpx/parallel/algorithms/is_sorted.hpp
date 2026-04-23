@@ -95,7 +95,7 @@ namespace hpx::parallel {
                         part_size - 1,
                         [&trail, &tok, &pred_projected](
                             auto const& it) mutable -> void {
-                            if (hpx::invoke(pred_projected, it, *trail++))
+                            if (hpx::invoke(pred_projected, *it, *trail++))
                             {
                                 tok.cancel();
                             }
