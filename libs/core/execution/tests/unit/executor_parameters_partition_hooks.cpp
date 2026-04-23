@@ -99,7 +99,7 @@ void test_mark_partition_async()
     HPX_TEST_EQ(params.count_seen(), param.num_chunks);
 }
 
-int hpx_main(hpx::program_options::variables_map&)
+int hpx_main()
 {
     test_mark_partition_sync();
     test_mark_partition_async();
