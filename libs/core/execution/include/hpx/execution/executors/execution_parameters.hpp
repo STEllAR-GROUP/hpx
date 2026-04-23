@@ -820,7 +820,8 @@ namespace hpx::execution::experimental::detail {
     };
 
     template <typename T, typename Wrapper>
-    struct mark_partition_call_helper<T, Wrapper>
+    struct mark_partition_call_helper<T, Wrapper,
+        std::enable_if_t<has_mark_partition_v<T>>>
     {
         template <typename Executor, typename... Args>
         HPX_FORCEINLINE void mark_partition(
@@ -828,8 +829,7 @@ namespace hpx::execution::experimental::detail {
         {
             auto& wrapped =
                 static_cast<unwrapper<Wrapper>*>(this)->member_.get();
-            hpx::execution::experimental::mark_partition(wrapped,
-                HPX_FORWARD(Executor, exec), partition,
+            wrapped.mark_partition(HPX_FORWARD(Executor, exec), partition,
                 HPX_FORWARD(Args, args)...);
         }
     };
@@ -910,7 +910,7 @@ namespace hpx::execution::experimental::detail {
     ///////////////////////////////////////////////////////////////////////
     template <typename T>
     struct unwrapper<::std::reference_wrapper<T>>
-      : base_member_helper<std::reference_wrapper<T>>
+      : base_member_helper<::std::reference_wrapper<T>>
       , maximal_number_of_chunks_call_helper<T, std::reference_wrapper<T>>
       , get_chunk_size_call_helper<T, std::reference_wrapper<T>>
       , measure_iteration_call_helper<T, std::reference_wrapper<T>>

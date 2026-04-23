@@ -16,10 +16,18 @@
 
 struct partition_hooks_parameters
 {
-    explicit partition_hooks_parameters(std::size_t max_partitions)
-      : values_(max_partitions, {0, 0})
-      , seen_(max_partitions, 0)
+    explicit partition_hooks_parameters() = default;
+
+    template <typename Executor>
+    friend void tag_override_invoke(
+        hpx::execution::experimental::collect_execution_parameters_t,
+        partition_hooks_parameters& self, Executor&&, std::size_t const,
+        std::size_t const, std::size_t const num_chunks,
+        std::size_t const) noexcept
     {
+        self.num_chunks_ = num_chunks;
+        self.values_.resize(num_chunks);
+        self.seen_.resize(num_chunks);
     }
 
     template <typename Executor>
@@ -43,6 +51,7 @@ struct partition_hooks_parameters
 
     std::vector<std::pair<std::size_t, std::size_t>> values_;
     std::vector<unsigned char> seen_;
+    std::size_t num_chunks_ = 0;
 };
 
 namespace hpx::execution::experimental {
@@ -61,17 +70,15 @@ void test_mark_partition_sync()
     std::iota(left.begin(), left.end(), std::uint64_t(0));
     std::iota(right.begin(), right.end(), std::uint64_t(left.size()));
 
-    partition_hooks_parameters params(left.size() + right.size());
-    hpx::execution::experimental::chunking_parameters param{};
-    hpx::execution::experimental::collect_chunking_parameters ccp(param);
+    partition_hooks_parameters params;
 
-    auto policy = hpx::execution::par.with(std::ref(params), ccp);
+    auto policy = hpx::execution::par.with(std::ref(params));
     hpx::merge(policy, left.begin(), left.end(), right.begin(), right.end(),
         out.begin());
 
     HPX_TEST(std::is_sorted(out.begin(), out.end()));
-    HPX_TEST_LT(std::size_t(0), param.num_chunks);
-    HPX_TEST_EQ(params.count_seen(), param.num_chunks);
+    HPX_TEST_LT(std::size_t(0), params.num_chunks_);
+    HPX_TEST_EQ(params.count_seen(), params.num_chunks_);
 }
 
 void test_mark_partition_async()
@@ -83,20 +90,18 @@ void test_mark_partition_async()
     std::iota(left.begin(), left.end(), std::uint64_t(0));
     std::iota(right.begin(), right.end(), std::uint64_t(left.size()));
 
-    hpx::execution::experimental::chunking_parameters param{};
-    hpx::execution::experimental::collect_chunking_parameters ccp(param);
-    partition_hooks_parameters params(left.size() + right.size());
+    partition_hooks_parameters params;
 
     auto policy =
-        hpx::execution::par(hpx::execution::task).with(std::ref(params), ccp);
+        hpx::execution::par(hpx::execution::task).with(std::ref(params));
     auto f = hpx::merge(policy, left.begin(), left.end(), right.begin(),
         right.end(), out.begin());
     auto result_iter = f.get();
     HPX_UNUSED(result_iter);
 
     HPX_TEST(std::is_sorted(out.begin(), out.end()));
-    HPX_TEST_LT(std::size_t(0), param.num_chunks);
-    HPX_TEST_EQ(params.count_seen(), param.num_chunks);
+    HPX_TEST_LT(std::size_t(0), params.num_chunks_);
+    HPX_TEST_EQ(params.count_seen(), params.num_chunks_);
 }
 
 int hpx_main()
