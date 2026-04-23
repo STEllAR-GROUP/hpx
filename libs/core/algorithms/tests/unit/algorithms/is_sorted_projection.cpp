@@ -74,12 +74,11 @@ void test_is_sorted_until_projection()
         hpx::execution::par, c.begin(), c.end(), std::less<int>{}, proj);
     HPX_TEST(it_par != c.end() && it_par->second == 5);
 
-    auto it_task = hpx::is_sorted_until(
-        hpx::execution::par(hpx::execution::task), c.begin(), c.end(),
-        std::less<int>{}, proj)
-                       .get();
+    auto it_task =
+        hpx::is_sorted_until(hpx::execution::par(hpx::execution::task),
+            c.begin(), c.end(), std::less<int>{}, proj)
+            .get();
     HPX_TEST(it_task != c.end() && it_task->second == 5);
-
 
     std::vector<element> fully_sorted = {{10, 1}, {20, 3}, {30, 5}};
     auto it_end = hpx::is_sorted_until(
