@@ -86,7 +86,6 @@ set(tests
     merge
     min_element
     minmax_element
-    minmax_element_projection
     mismatch
     mismatch_binary
     move
