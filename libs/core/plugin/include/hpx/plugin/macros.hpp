@@ -12,14 +12,7 @@
 #include <hpx/config.hpp>
 #include <hpx/plugin/config.hpp>
 #include <hpx/plugin/config/defines.hpp>
-//#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/preprocessor.hpp>
-
-//#if !defined(HPX_HAVE_CXX_MODULES) || defined(HPX_CORE_EXPORTS) ||             \
-//    (defined(HPX_COMPILE_BMI) && defined(HPX_COMPILE_CORE_WITH_MODULES))
-//#include <hpx/plugin/abstract_factory.hpp>
-//#include <hpx/plugin/concrete_factory.hpp>
-//#endif
 
 #include <algorithm>
 #include <cctype>
