@@ -953,7 +953,7 @@ namespace hpx::parallel {
                 B part_begin, std::size_t part_steps)
             {
                 HPX_ASSERT(stride_ == 1);
-                parallel::util::loop_n<std::decay_t<ExPolicy>>(
+                parallel::util::const_loop_n<std::decay_t<ExPolicy>>(
                     part_begin, part_steps, f_);
             }
 
@@ -1079,7 +1079,7 @@ namespace hpx::parallel {
                     detail::init_iteration(
                         args_, pack, part_index, current_thread);
 
-                    parallel::util::loop_n<std::decay_t<ExPolicy>>(
+                    parallel::util::const_loop_n<std::decay_t<ExPolicy>>(
                         part_begin, part_steps, [&](auto it) {
                             detail::invoke_iteration(
                                 args_, pack, f_, it, current_thread);
@@ -1139,7 +1139,7 @@ namespace hpx::parallel {
                 {
                     static_assert(hpx::traits::is_iterator_v<IterOrR> ||
                         std::is_integral_v<IterOrR>);
-                    parallel::util::loop_n<std::decay_t<ExPolicy>>(
+                    parallel::util::const_loop_n<std::decay_t<ExPolicy>>(
                         part_begin, part_steps, f_);
                 }
             }
@@ -1285,7 +1285,7 @@ namespace hpx::parallel {
             {
                 if (stride == 1)
                 {
-                    parallel::util::loop_n<std::decay_t<ExPolicy>>(
+                    parallel::util::const_loop_n<std::decay_t<ExPolicy>>(
                         first, count, HPX_FORWARD(F, f));
                 }
                 else if (stride > 0)

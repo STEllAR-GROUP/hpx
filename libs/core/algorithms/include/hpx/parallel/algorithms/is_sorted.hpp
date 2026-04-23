@@ -304,7 +304,7 @@ namespace hpx::parallel {
                         FwdIter_ part_begin, std::size_t part_size) mutable
                     -> intermediate_result_t {
                     FwdIter_ trail = part_begin++;
-                    util::loop_n<std::decay_t<ExPolicy>>(part_begin,
+                    util::const_loop_n<std::decay_t<ExPolicy>>(part_begin,
                         part_size - 1,
                         [&trail, &tok, &pred_projected](
                             FwdIter_ it) mutable -> void {

@@ -48,7 +48,7 @@ namespace hpx::parallel::detail {
             Iterator first, T const& val, std::size_t count, Token& tok,
             Proj&& proj)
         {
-            util::loop_n<ExPolicy>(
+            util::const_loop_n<ExPolicy>(
                 first, count, tok, [&val, &tok, &proj](auto const& cur) {
                     if (HPX_INVOKE(proj, *cur) == val)
                     {

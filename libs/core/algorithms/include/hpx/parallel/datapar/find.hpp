@@ -123,8 +123,8 @@ namespace hpx::parallel::detail {
             std::size_t part_count, Token& tok, F&& op, Proj&& proj)
         {
             bool cancelled = false;
-            util::loop_n<std::decay_t<ExPolicy>>(part_begin, part_count, tok,
-                [&op, &cancelled, &proj](auto const& curr) {
+            util::const_loop_n<std::decay_t<ExPolicy>>(part_begin, part_count,
+                tok, [&op, &cancelled, &proj](auto const& curr) {
                     if (!cancelled)
                     {
                         auto msk = HPX_INVOKE(op, HPX_INVOKE(proj, *curr));
@@ -231,8 +231,8 @@ namespace hpx::parallel::detail {
             std::size_t part_count, Token& tok, F&& op, Proj&& proj)
         {
             bool cancelled = false;
-            util::loop_n<std::decay_t<ExPolicy>>(part_begin, part_count, tok,
-                [&op, &cancelled, &proj](auto const& curr) {
+            util::const_loop_n<std::decay_t<ExPolicy>>(part_begin, part_count,
+                tok, [&op, &cancelled, &proj](auto const& curr) {
                     if (!cancelled)
                     {
                         auto msk = !HPX_INVOKE(op, HPX_INVOKE(proj, *curr));
@@ -363,7 +363,7 @@ namespace hpx::parallel::detail {
                     ++idx;
                     bool local_cancelled = false;
                     util::cancellation_token<> local_tok;
-                    util::loop_n<hpx::execution::simd_policy>(begin, diff,
+                    util::const_loop_n<hpx::execution::simd_policy>(begin, diff,
                         local_tok,
                         [&op, &proj1, &proj2, &local_cancelled](
                             auto t) -> void {
@@ -485,7 +485,7 @@ namespace hpx::parallel::detail {
 
                     bool local_cancelled = false;
                     util::cancellation_token<> local_tok;
-                    util::loop_n<hpx::execution::simd_policy>(s_first,
+                    util::const_loop_n<hpx::execution::simd_policy>(s_first,
                         hpx::parallel::detail::distance(s_first, s_last),
                         local_tok,
                         [&local_cancelled, &proj2, &op, &val](auto curr) {
