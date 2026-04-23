@@ -214,6 +214,8 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
+#include <hpx/algorithms/traits/projected.hpp>
+#include <hpx/execution/traits/vector_pack_conditionals.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/executors.hpp>
@@ -223,6 +225,7 @@ namespace hpx {
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/algorithms/detail/find.hpp>
+#include <hpx/parallel/algorithms/detail/remove.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/loop.hpp>
@@ -243,25 +246,6 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent,
-            typename Pred, typename Proj>
-        constexpr Iter sequential_remove_if(
-            Iter first, Sent last, Pred pred, Proj proj)
-        {
-            first = hpx::parallel::detail::sequential_find_if<
-                hpx::execution::sequenced_policy>(first, last, pred, proj);
-
-            if (first != last)
-            {
-                for (Iter i = first; ++i != last;)
-                    if (!HPX_INVOKE(pred, HPX_INVOKE(proj, *i)))
-                    {
-                        *first++ = std::ranges::iter_move(i);
-                    }
-            }
-            return first;
-        }
-
         HPX_CXX_CORE_EXPORT template <typename FwdIter>
         struct remove_if : public algorithm<remove_if<FwdIter>, FwdIter>
         {
@@ -272,10 +256,11 @@ namespace hpx::parallel {
 
             template <typename ExPolicy, typename Iter, typename Sent,
                 typename Pred, typename Proj>
-            static constexpr Iter sequential(
-                ExPolicy, Iter first, Sent last, Pred&& pred, Proj&& proj)
+            static constexpr Iter sequential(ExPolicy&& policy, Iter first,
+                Sent last, Pred&& pred, Proj&& proj)
             {
-                return sequential_remove_if(first, last,
+                return sequential_remove_if<ExPolicy>(
+                    HPX_FORWARD(ExPolicy, policy), first, last,
                     HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
             }
 
@@ -284,6 +269,17 @@ namespace hpx::parallel {
             static decltype(auto) parallel(ExPolicy&& policy, Iter first,
                 Sent last, Pred&& pred, Proj&& proj)
             {
+                using inner_policy_type = std::decay_t<ExPolicy>;
+                constexpr bool vectorpack_policy =
+                    hpx::is_vectorpack_execution_policy_v<inner_policy_type>;
+
+                if constexpr (vectorpack_policy)
+                {
+                    return sequential_remove_if<ExPolicy>(
+                        HPX_FORWARD(ExPolicy, policy), first, last,
+                        HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
+                }
+
                 using zip_iterator = hpx::util::zip_iterator<Iter, bool*>;
                 using algorithm_result =
                     util::detail::algorithm_result<ExPolicy, Iter>;
@@ -299,7 +295,6 @@ namespace hpx::parallel {
                     if (count == 0)
                         return algorithm_result::get(HPX_MOVE(first));
                 }
-
                 std::shared_ptr<bool[]> flags(new bool[count]);
 
                 using hpx::get;
@@ -311,12 +306,10 @@ namespace hpx::parallel {
                               zip_iterator part_begin,
                               std::size_t part_size) -> void {
                     // MSVC complains if pred or proj is captured by ref below
-                    util::loop_n<std::decay_t<ExPolicy>>(part_begin, part_size,
+                    util::loop_n<inner_policy_type>(part_begin, part_size,
                         [pred, proj](zip_iterator it) mutable {
-                            bool f = hpx::invoke(
+                            get<1>(*it) = hpx::invoke(
                                 pred, hpx::invoke(proj, get<0>(*it)));
-
-                            get<1>(*it) = f;
                         });
                 };
 
@@ -325,11 +318,10 @@ namespace hpx::parallel {
                     auto dest = first;
                     auto part_size = count;
 
-                    using execution_policy_type = std::decay_t<ExPolicy>;
                     if (dest == get<0>(part_begin.get_iterator_tuple()))
                     {
                         // Self-assignment must be detected.
-                        util::loop_n<execution_policy_type>(
+                        util::loop_n<hpx::execution::sequenced_policy>(
                             part_begin, part_size, [&dest](zip_iterator it) {
                                 if (!get<1>(*it))
                                 {
@@ -344,7 +336,7 @@ namespace hpx::parallel {
                     else
                     {
                         // Self-assignment can't be performed.
-                        util::loop_n<execution_policy_type>(
+                        util::loop_n<hpx::execution::sequenced_policy>(
                             part_begin, part_size, [&dest](zip_iterator it) {
                                 if (!get<1>(*it))
                                     *dest++ = std::ranges::iter_move(
@@ -396,9 +388,15 @@ namespace hpx {
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
-                hpx::is_invocable_v<Pred,
-                    typename std::iterator_traits<FwdIter>::value_type
-                >
+                (
+                    hpx::parallel::traits::is_indirect_callable_v<ExPolicy,
+                        Pred, hpx::parallel::traits::projected<hpx::identity,
+                                  FwdIter>
+                    > ||
+                    hpx::is_invocable_v<Pred,
+                        typename std::iterator_traits<FwdIter>::value_type
+                    >
+                )
             )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::remove_if_t,
@@ -446,10 +444,8 @@ namespace hpx {
         friend decltype(auto) tag_fallback_invoke(hpx::remove_t,
             ExPolicy&& policy, FwdIter first, FwdIter last, T const& value)
         {
-            using Type = typename std::iterator_traits<FwdIter>::value_type;
-
             return hpx::remove_if(HPX_FORWARD(ExPolicy, policy), first, last,
-                [value](Type const& a) -> bool { return value == a; });
+                [value](auto const& a) { return value == a; });
         }
     } remove{};
 }    // namespace hpx
