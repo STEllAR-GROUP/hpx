@@ -164,7 +164,7 @@ void test_local_use(std::uint32_t num_sites, int arity = 2)
             if (site == 0)
             {
                 std::cout << "local timing (" << num_sites << "/" << arity
-                          << "): " << elapsed / (10 * ITERATIONS) << "[s]\n"
+                          << "): " << elapsed / ITERATIONS << "[s]\n"
                           << std::flush;
             }
         }));
