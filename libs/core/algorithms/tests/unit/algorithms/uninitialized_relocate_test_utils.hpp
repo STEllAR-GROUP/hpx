@@ -52,7 +52,7 @@ void simple_mutex_operation(F&& f)
 }
 
 // ---------------------------------------------------------------------------
-// counted_struct – tracks constructions, moves, and destructions
+// counted_struct - tracks constructions, moves, and destructions
 // ---------------------------------------------------------------------------
 enum relocation_category
 {
@@ -173,7 +173,7 @@ static_assert(!is_trivially_relocatable_v<
     non_trivially_relocatable_struct_throwing_overlapping>);
 
 // ---------------------------------------------------------------------------
-// clear() – resets all static state between tests
+// clear() - resets all static state between tests
 // ---------------------------------------------------------------------------
 inline void clear()
 {
@@ -203,7 +203,7 @@ inline void clear()
 }
 
 // ---------------------------------------------------------------------------
-// setup<T>() – allocates two buffers for non-overlapping tests
+// setup<T>() - allocates two buffers for non-overlapping tests
 // ---------------------------------------------------------------------------
 template <typename T>
 std::pair<T*, T*> setup()
@@ -238,7 +238,7 @@ std::pair<T*, T*> setup()
 }
 
 // ---------------------------------------------------------------------------
-// setup_single<T>() – allocates one buffer for overlapping tests
+// setup_single<T>() - allocates one buffer for overlapping tests
 // ---------------------------------------------------------------------------
 template <typename T>
 T* setup_single()
