@@ -1,6 +1,6 @@
 //  Copyright (c) 2020 ETH Zurich
 //  Copyright (c) 2015 Daniel Bourgeois
-//  Copyright (c) 2017-2025 Hartmut Kaiser
+//  Copyright (c) 2017-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -260,7 +260,10 @@ namespace hpx {
         template <typename FwdIter, typename Pred>
         // clang-format off
             requires (
-                std::forward_iterator<FwdIter>
+                std::forward_iterator<FwdIter> &&
+                hpx::is_invocable_v<Pred,
+                    hpx::traits::iter_value_t<FwdIter>
+                >
             )
         // clang-format on
         friend bool tag_fallback_invoke(
@@ -275,7 +278,10 @@ namespace hpx {
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                std::forward_iterator<FwdIter>
+                std::forward_iterator<FwdIter> &&
+                hpx::is_invocable_v<Pred,
+                    hpx::traits::iter_value_t<FwdIter>
+                >
             )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::is_partitioned_t,
@@ -291,7 +297,11 @@ namespace hpx {
         // clang-format off
             requires (
                 std::forward_iterator<FwdIter> &&
-                hpx::parallel::traits::is_projected_v<Proj, FwdIter>
+                hpx::parallel::traits::is_projected_v<Proj, FwdIter> &&
+                hpx::is_invocable_v<Pred,
+                    hpx::util::invoke_result_t<Proj,
+                        hpx::traits::iter_value_t<FwdIter>>
+                >
             )
         // clang-format on
         friend bool tag_fallback_invoke(hpx::is_partitioned_t, FwdIter first,
@@ -308,7 +318,11 @@ namespace hpx {
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 std::forward_iterator<FwdIter> &&
-                hpx::parallel::traits::is_projected_v<Proj, FwdIter>
+                hpx::parallel::traits::is_projected_v<Proj, FwdIter> &&
+                hpx::is_invocable_v<Pred,
+                    hpx::util::invoke_result_t<Proj,
+                        hpx::traits::iter_value_t<FwdIter>>
+                >
             )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::is_partitioned_t,
