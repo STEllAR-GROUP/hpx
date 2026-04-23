@@ -140,29 +140,8 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        HPX_CXX_CORE_EXPORT template <typename T>
-        inline bool sequential_is_partitioned(std::vector<T>&& res)
-        {
-            auto first = res.begin();
-            auto const last = res.end();
-            while (first != last && hpx::unwrap(*first))
-            {
-                ++first;
-            }
-            if (first != last)
-            {
-                ++first;
-                while (first != last)
-                {
-                    if (hpx::unwrap(*first))
-                        return false;
-                    ++first;
-                }
-            }
-            return true;
-        }
 
-        HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent>
+        template <typename Iter, typename Sent>
         struct is_partitioned
           : public algorithm<is_partitioned<Iter, Sent>, bool>
         {
@@ -186,8 +165,7 @@ namespace hpx::parallel {
             static decltype(auto) parallel(ExPolicy&& policy, Iter_ first,
                 Sent_ last, Pred&& pred, Proj&& proj)
             {
-                using difference_type =
-                    typename std::iterator_traits<Iter_>::difference_type;
+                using difference_type = hpx::traits::iter_difference_t<Iter_>;
                 using result = util::detail::algorithm_result<ExPolicy, bool>;
                 constexpr bool has_scheduler_executor =
                     hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
@@ -217,29 +195,49 @@ namespace hpx::parallel {
                     -> intermediate_result_t {
                     bool fst_bool = HPX_INVOKE(pred_projected, *part_begin);
                     if (part_count == 1)
-                        return fst_bool;
+                        return fst_bool ? 1 : 0;
 
+                    bool is_mixed = false;
                     util::loop_n<std::decay_t<ExPolicy>>(++part_begin,
                         --part_count, tok,
-                        [&fst_bool, &pred_projected, &tok](
-                            Iter_ const& a) mutable -> void {
-                            if (fst_bool != hpx::invoke(pred_projected, *a))
+                        [&fst_bool, &is_mixed, &pred_projected, &tok](
+                            auto const& a) mutable -> void {
+                            if (fst_bool != hpx::invoke(pred_projected, a))
                             {
                                 if (fst_bool)
+                                {
                                     fst_bool = false;
+                                    is_mixed = true;
+                                }
                                 else
+                                {
                                     tok.cancel();
+                                }
                             }
                         });
 
-                    return fst_bool;
+                    if (tok.was_cancelled())
+                        return 3;
+
+                    return is_mixed ? 2 : (fst_bool ? 1 : 0);
                 };
 
                 auto f2 = [tok](auto&& results) -> bool {
                     if (tok.was_cancelled())
                         return false;
-                    return sequential_is_partitioned(
-                        HPX_FORWARD(decltype(results), results));
+
+                    auto it = std::find_if(hpx::util::begin(results),
+                        hpx::util::end(results),
+                        [](intermediate_result_t x) { return x != 1; });
+
+                    if (it == hpx::util::end(results))
+                        return true;
+
+                    if (*it == 2)
+                        ++it;
+
+                    return std::all_of(it, hpx::util::end(results),
+                        [](intermediate_result_t x) { return x == 0; });
                 };
 
                 return util::partitioner<ExPolicy, bool,

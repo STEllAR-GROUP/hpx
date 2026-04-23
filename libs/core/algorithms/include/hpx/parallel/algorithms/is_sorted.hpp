@@ -42,7 +42,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        HPX_CXX_CORE_EXPORT template <typename FwdIter, typename Sent>
+        template <typename FwdIter, typename Sent>
         struct is_sorted : public algorithm<is_sorted<FwdIter, Sent>, bool>
         {
             constexpr is_sorted() noexcept
@@ -94,8 +94,8 @@ namespace hpx::parallel {
                     util::loop_n<std::decay_t<ExPolicy>>(part_begin,
                         part_size - 1,
                         [&trail, &tok, &pred_projected](
-                            FwdIter_ it) mutable -> void {
-                            if (hpx::invoke(pred_projected, *it, *trail++))
+                            auto const& it) mutable -> void {
+                            if (hpx::invoke(pred_projected, it, *trail++))
                             {
                                 tok.cancel();
                             }
@@ -116,7 +116,7 @@ namespace hpx::parallel {
 
                 auto f2 = [](auto&& results) {
                     return std::all_of(hpx::util::begin(results),
-                        hpx::util::end(results), hpx::functional::unwrap{});
+                        hpx::util::end(results), [](auto x) { return x; });
                 };
 
                 return util::partitioner<ExPolicy, bool,
@@ -132,7 +132,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        HPX_CXX_CORE_EXPORT template <typename FwdIter, typename Sent>
+        template <typename FwdIter, typename Sent>
         struct is_sorted_until
           : public algorithm<is_sorted_until<FwdIter, Sent>, FwdIter>
         {
@@ -195,7 +195,7 @@ namespace hpx::parallel {
                     util::loop_idx_n<policy_type>(++base_idx, part_begin,
                         part_size - 1, tok,
                         [&trail, &tok, &pred_projected](
-                            reference& v, std::size_t ind) -> void {
+                            auto& v, std::size_t ind) -> void {
                             if (hpx::invoke(pred_projected, v, *trail++))
                             {
                                 tok.cancel(ind);
@@ -234,6 +234,9 @@ namespace hpx::parallel {
         };
         /// \endcond
     }    // namespace detail
+}    // namespace hpx::parallel
+
+namespace hpx {
 
     HPX_CXX_CORE_EXPORT inline constexpr struct is_sorted_t final
       : hpx::detail::tag_parallel_algorithm<is_sorted_t>
@@ -410,4 +413,4 @@ namespace hpx::parallel {
                     HPX_MOVE(pred), HPX_MOVE(proj));
         }
     } is_sorted_until{};
-}    // namespace hpx::parallel
+}    // namespace hpx

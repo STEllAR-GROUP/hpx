@@ -13,7 +13,6 @@
 
 #if defined(DOXYGEN)
 namespace hpx { namespace ranges {
-    // clang-format off
 
     /// Determines if the range [first, last) is partitioned.
     ///
@@ -57,8 +56,7 @@ namespace hpx { namespace ranges {
     ///           false. If the range [first, last) contains less than two
     ///           elements, the function is always true.
     ///
-    template <typename FwdIter, typename Sent,
-        typename Pred,
+    template <typename FwdIter, typename Sent, typename Pred,
         typename Proj = hpx::identity>
     bool is_partitioned(
         FwdIter first, Sent last, Pred&& pred, Proj&& proj = Proj());
@@ -124,8 +122,7 @@ namespace hpx { namespace ranges {
     ///           false. If the range [first, last) contains less than two
     ///           elements, the function is always true.
     ///
-    template <typename ExPolicy, typename FwdIter, typename Sent,
-        typename Pred,
+    template <typename ExPolicy, typename FwdIter, typename Sent, typename Pred,
         typename Proj = hpx::identity>
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
     is_partitioned(ExPolicy&& policy, FwdIter first, Sent last, Pred&& pred,
@@ -169,9 +166,7 @@ namespace hpx { namespace ranges {
     ///           false. If the range rng contains less than two
     ///           elements, the function is always true.
     ///
-    template <typename Rng,
-        typename Pred,
-        typename Proj = hpx::identity>
+    template <typename Rng, typename Pred, typename Proj = hpx::identity>
     bool is_partitioned(Rng&& rng, Pred&& pred, Proj&& proj = Proj());
 
     /// Determines if the range [first, last) is partitioned.
@@ -231,13 +226,11 @@ namespace hpx { namespace ranges {
     ///           false. If the range rng contains less than two
     ///           elements, the function is always true.
     ///
-    template <typename ExPolicy, typename Rng,
-        typename Pred,
+    template <typename ExPolicy, typename Rng, typename Pred,
         typename Proj = hpx::identity>
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
     is_partitioned(
         ExPolicy&& policy, Rng&& rng, Pred&& pred, Proj&& proj = Proj());
-    // clang-format on
 }}    // namespace hpx::ranges
 #else
 
@@ -265,7 +258,7 @@ namespace hpx::ranges {
         template <typename FwdIter, typename Sent, typename Pred,
             typename Proj = hpx::identity>
         // clang-format off
-            requires(
+            requires (
                 std::forward_iterator<FwdIter> &&
                 std::sentinel_for<Sent, FwdIter> &&
                 hpx::parallel::traits::is_projected_v<Proj, FwdIter> &&
@@ -286,7 +279,7 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename FwdIter, typename Sent,
             typename Pred, typename Proj = hpx::identity>
         // clang-format off
-            requires(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 std::forward_iterator<FwdIter> &&
                 hpx::parallel::traits::is_projected_v<Proj, FwdIter> &&
@@ -308,7 +301,7 @@ namespace hpx::ranges {
 
         template <typename Rng, typename Pred, typename Proj = hpx::identity>
         // clang-format off
-            requires(
+            requires (
                 std::ranges::range<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable_v<
@@ -325,14 +318,14 @@ namespace hpx::ranges {
 
             return hpx::parallel::detail::is_partitioned<iterator_type,
                 iterator_type>()
-                .call(hpx::execution::seq, std::begin(rng), std::end(rng),
-                    HPX_MOVE(pred), HPX_MOVE(proj));
+                .call(hpx::execution::seq, hpx::util::begin(rng),
+                    hpx::util::end(rng), HPX_MOVE(pred), HPX_MOVE(proj));
         }
 
         template <typename ExPolicy, typename Rng, typename Pred,
             typename Proj = hpx::identity>
         // clang-format off
-            requires(
+            requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
                 std::ranges::range<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
@@ -351,8 +344,8 @@ namespace hpx::ranges {
 
             return hpx::parallel::detail::is_partitioned<iterator_type,
                 iterator_type>()
-                .call(HPX_FORWARD(ExPolicy, policy), std::begin(rng),
-                    std::end(rng), HPX_MOVE(pred), HPX_MOVE(proj));
+                .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                    hpx::util::end(rng), HPX_MOVE(pred), HPX_MOVE(proj));
         }
     } is_partitioned{};
 }    // namespace hpx::ranges
