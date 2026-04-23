@@ -105,7 +105,6 @@ namespace hpx { namespace distributed {
 
 #include <atomic>
 #include <cstddef>
-#include <cstdint>
 #include <string>
 #include <utility>
 #include <variant>
@@ -136,18 +135,10 @@ namespace hpx::traits {
         static Result get(Communicator& communicator, std::size_t which,
             std::size_t generation)
         {
-            return communicator.template handle_data<std::uint8_t>(
+            return communicator.template handle_data<void>(
                 communication::communicator_data<
                     communication::barrier_tag>::name(),
-                which, generation,
-                // step function: must touch the data vector so the
-                // communicator's reinitialize_data / invalidate_data
-                // cycle resets on_ready_count_ between generations.
-                [](auto& data, std::size_t which) {
-                    data[which] = std::uint8_t{};
-                },
-                // no finalizer
-                nullptr);
+                which, generation, nullptr, nullptr);
         }
     };
 }    // namespace hpx::traits
@@ -172,7 +163,8 @@ namespace hpx::collectives {
         }
 
         // Handle operation right away if there is only one site.
-        if (auto const [num_sites, _] = fid.get_info(); num_sites == 1)
+        if ([[maybe_unused]] auto const [num_sites, _] = fid.get_info();
+            num_sites == 1)
         {
             return hpx::make_ready_future();
         }
