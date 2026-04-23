@@ -15,6 +15,7 @@
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/type_support.hpp>
 
+#include <algorithm>
 #include <atomic>
 #include <cstddef>
 #include <cstdlib>
