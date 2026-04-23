@@ -91,7 +91,7 @@ namespace hpx::parallel {
                         FwdIter_ part_begin, std::size_t part_size) mutable
                     -> intermediate_result_t {
                     FwdIter_ trail = part_begin++;
-                    util::loop_n<std::decay_t<ExPolicy>>(part_begin,
+                    util::loop_n<hpx::execution::sequenced_policy>(part_begin,
                         part_size - 1,
                         [&trail, &tok, &pred_projected](
                             auto const& it) mutable -> void {
@@ -192,8 +192,8 @@ namespace hpx::parallel {
                     std::size_t const cross_idx = base_idx + part_size;
 
                     FwdIter_ trail = part_begin++;
-                    util::loop_idx_n<policy_type>(++base_idx, part_begin,
-                        part_size - 1, tok,
+                    util::loop_idx_n<hpx::execution::sequenced_policy>(
+                        ++base_idx, part_begin, part_size - 1, tok,
                         [&trail, &tok, &pred_projected](
                             auto& v, std::size_t ind) -> void {
                             if (hpx::invoke(pred_projected, v, *trail++))

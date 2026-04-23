@@ -198,7 +198,7 @@ namespace hpx::parallel {
                         return fst_bool ? 1 : 0;
 
                     bool is_mixed = false;
-                    util::loop_n<std::decay_t<ExPolicy>>(++part_begin,
+                    util::loop_n<hpx::execution::sequenced_policy>(++part_begin,
                         --part_count, tok,
                         [&fst_bool, &is_mixed, &pred_projected, &tok](
                             auto const& a) mutable -> void {
