@@ -2,6 +2,7 @@
 //  Copyright (c) 2025 Alexander Strack
 //  Copyright (c) 2025 Hartmut Kaiser
 //  Copyright (c) 2026 Anshuman Agrawal
+//  Copyright (c) 2026 Abhishek Bansal
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,6 +13,7 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/collectives/all_gather.hpp>
 #include <hpx/collectives/all_reduce.hpp>
+#include <hpx/collectives/barrier.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/modules/collectives.hpp>
@@ -31,6 +33,7 @@ constexpr char const* broadcast_direct_basename = "/test/broadcast_direct/";
 constexpr char const* gather_direct_basename = "/test/gather_direct/";
 constexpr char const* all_reduce_direct_basename = "/test/all_reduce_direct/";
 constexpr char const* all_gather_direct_basename = "/test/all_gather_direct/";
+constexpr char const* barrier_bench_basename = "/test/barrier_bench/";
 
 struct vector_adder
 {
@@ -502,6 +505,45 @@ void test_all_reduce_hierarchical(int arity, int lpn, std::size_t iterations,
 
         // Check for correctness: every site should have the sum
         HPX_TEST_EQ(i * num_localities, static_cast<std::size_t>(recv_data[0]));
+    }
+
+    if (this_locality == 0)
+    {
+        std::string const mod_name = fallback_threshold < 0 ?
+            std::string("hierarchical") :
+            "hierarchical_t" + std::to_string(fallback_threshold);
+        write_to_file(operation, mod_name, arity, num_localities, lpn,
+            test_size, iterations, result);
+    }
+}
+
+void test_barrier_hierarchical(int arity, int lpn, std::size_t iterations,
+    int test_size, std::string const& operation, int fallback_threshold)
+{
+    std::size_t const num_localities =
+        hpx::get_num_localities(hpx::launch::sync);
+    std::size_t const this_locality = hpx::get_locality_id();
+    HPX_TEST_LTE(static_cast<std::size_t>(2), num_localities);
+    auto communicators =
+        create_hierarchical_communicator(barrier_bench_basename,
+            num_sites_arg(num_localities), this_site_arg(this_locality),
+            arity_arg(arity), generation_arg(1), root_site_arg(0),
+            fallback_threshold < 0 ?
+                flat_fallback_threshold_arg() :
+                flat_fallback_threshold_arg(
+                    static_cast<std::size_t>(fallback_threshold)));
+    char const* const barrier_sync_name = "/test/barrier/hierarchical";
+    hpx::distributed::barrier sync(barrier_sync_name);
+    std::vector<double> result(iterations, 0.0);
+
+    for (std::size_t i = 0; i != iterations; ++i)
+    {
+        hpx::chrono::high_resolution_timer const timer;
+        hpx::collectives::barrier(
+            communicators, this_site_arg(this_locality), generation_arg(i + 1))
+            .get();
+        sync.wait();
+        result[i] = timer.elapsed();
     }
 
     if (this_locality == 0)
@@ -1116,6 +1158,36 @@ void test_multiple_use_with_generation_all_reduce(int lpn,
     }
 }
 
+void test_multiple_use_with_generation_barrier(int lpn, std::size_t iterations,
+    int test_size, std::string const& operation)
+{
+    std::size_t const num_localities =
+        hpx::get_num_localities(hpx::launch::sync);
+    std::size_t const this_locality = hpx::get_locality_id();
+    HPX_TEST_LTE(static_cast<std::size_t>(2), num_localities);
+    auto const barrier_client = create_communicator(barrier_bench_basename,
+        num_sites_arg(num_localities), this_site_arg(this_locality));
+    char const* const barrier_sync_name = "/test/barrier/generation";
+    hpx::distributed::barrier sync(barrier_sync_name);
+    std::vector<double> result(iterations, 0.0);
+
+    for (std::size_t i = 0; i != iterations; ++i)
+    {
+        hpx::chrono::high_resolution_timer const timer;
+        hpx::collectives::barrier(
+            barrier_client, this_site_arg(), generation_arg(i + 1))
+            .get();
+        sync.wait();
+        result[i] = timer.elapsed();
+    }
+
+    if (this_locality == 0)
+    {
+        write_to_file(operation, "multi_use", -1, num_localities, lpn,
+            test_size, iterations, result);
+    }
+}
+
 void test_all_gather_hierarchical(int arity, int lpn, std::size_t iterations,
     int test_size, std::string const& operation, int fallback_threshold)
 {
@@ -1367,6 +1439,19 @@ int hpx_main(hpx::program_options::variables_map& vm)
                     operation, fallback_threshold);
             }
         }
+        else if (operation == "barrier")
+        {
+            if (arity == -1)
+            {
+                test_multiple_use_with_generation_barrier(
+                    lpn, iterations, test_size, operation);
+            }
+            else
+            {
+                test_barrier_hierarchical(arity, lpn, iterations, test_size,
+                    operation, fallback_threshold);
+            }
+        }
     }
 
     return hpx::finalize();
@@ -1388,7 +1473,7 @@ int main(int argc, char* argv[])
             "Number of Iteration the collective is executed")
         ("operation", value<std::string>()->default_value("scatter"),
             "Collective Operation (scatter, reduce, broadcast, gather, "
-            "all_reduce, all_gather)")
+            "all_reduce, all_gather, barrier)")
         ("fallback_threshold", value<int>()->default_value(-1),
             "Flat fallback threshold for hierarchical mode. -1 uses library "
             "default (16). Set to 0 to force tree construction. Only meaningful "

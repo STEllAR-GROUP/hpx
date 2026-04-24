@@ -21,7 +21,6 @@ set(collectives_headers
     hpx/collectives/broadcast_direct.hpp
     hpx/collectives/channel_communicator.hpp
     hpx/collectives/create_communicator.hpp
-    hpx/collectives/detail/barrier_node.hpp
     hpx/collectives/detail/channel_communicator.hpp
     hpx/collectives/detail/communicator.hpp
     hpx/collectives/detail/latch.hpp
@@ -34,7 +33,6 @@ set(collectives_headers
     hpx/collectives/reduce_direct.hpp
     hpx/collectives/scatter.hpp
     hpx/collectives/spmd_block.hpp
-    hpx/collectives/detail/barrier_node.hpp
     hpx/collectives/detail/latch.hpp
 )
 
@@ -61,7 +59,6 @@ set(collectives_sources
     broadcast.cpp
     channel_communicator.cpp
     create_communicator.cpp
-    detail/barrier_node.cpp
     detail/channel_communicator_server.cpp
     exclusive_scan.cpp
     gather.cpp
