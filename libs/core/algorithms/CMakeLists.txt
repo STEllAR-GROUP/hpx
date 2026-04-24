@@ -54,6 +54,7 @@ set(algorithms_headers
     hpx/parallel/algorithms/fill.hpp
     hpx/parallel/algorithms/find.hpp
     hpx/parallel/algorithms/for_each.hpp
+    hpx/parallel/algorithms/for_each_index.hpp
     hpx/parallel/algorithms/for_loop.hpp
     hpx/parallel/algorithms/for_loop_induction.hpp
     hpx/parallel/algorithms/for_loop_reduction.hpp
