@@ -39,22 +39,30 @@ namespace hpx::execution::experimental {
     // The receiver_proxy / bulk_item_receiver_proxy interfaces allow the backend
     // to complete operations without knowing the concrete receiver type.
 
-    // P2079R10 receiver_proxy: type-erased completion interface.
+    // P2079R10 / P3804R2 receiver_proxy: type-erased completion interface.
     // The backend calls these to signal completion back to the frontend.
     // stop_requested() allows the backend to poll for cancellation during
     // execution (partial substitute for try_query<inplace_stop_token>).
+    //
+    // P3804R2: No virtual destructor - objects are never destroyed polymorphically.
+    // The frontend knows the concrete type and destroys it directly.
     struct parallel_scheduler_receiver_proxy
     {
-        virtual ~parallel_scheduler_receiver_proxy() = default;
         virtual void set_value() noexcept = 0;
         virtual void set_error(std::exception_ptr) noexcept = 0;
         virtual void set_stopped() noexcept = 0;
-        // P2079R10 4.2: backends can poll this to check if work should stop.
+        // P2079R10 4.2 / P3804R2: backends can poll this to check if work should stop.
         // Returns true if the associated stop token has been signalled.
+        // const-qualified per P3804R2 (aligns with try_query being const).
         virtual bool stop_requested() const noexcept
         {
             return false;
         }
+
+    protected:
+        // P3804R2: Protected non-virtual destructor.
+        // Prevents polymorphic deletion while allowing derived classes to clean up.
+        ~parallel_scheduler_receiver_proxy() = default;
     };
 
     // P2079R10 bulk_item_receiver_proxy: extends receiver_proxy with

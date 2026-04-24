@@ -943,6 +943,147 @@ int hpx_main(int, char*[])
         HPX_TEST(!proxy_saw_stop);
     }
 
+    // ========================================================================
+    // P3804R2 VERIFICATION TESTS
+    // ========================================================================
+    // These tests verify the P3804R2 specification for execution policy
+    // handling in bulk operations. P3804R2 clarifies that:
+    // - seq policy: Backend receives count=1, executes all work sequentially
+    // - par policy: Backend receives count=shape, distributes work in parallel
+
+    // P3804R2: bulk_chunked with seq policy calls f(0, shape) exactly once
+    {
+        constexpr std::size_t num_tasks = 200;
+        std::atomic<int> execution_count{0};
+        std::size_t observed_begin = 999;
+        std::size_t observed_end = 999;
+        ex::parallel_scheduler sched = ex::get_parallel_scheduler();
+
+        auto bulk_snd = ex::bulk_chunked(ex::schedule(sched), ex::seq,
+            num_tasks, [&](std::size_t b, std::size_t e) {
+                observed_begin = b;
+                observed_end = e;
+                execution_count++;
+            });
+
+        ex::sync_wait(std::move(bulk_snd));
+
+        // P3804R2 3.7: seq policy should produce exactly 1 call
+        // with f(0, shape, args...)
+        HPX_TEST_EQ(execution_count.load(), 1);
+        HPX_TEST_EQ(observed_begin, std::size_t(0));
+        HPX_TEST_EQ(observed_end, num_tasks);
+    }
+
+    // P3804R2: bulk_chunked with par policy creates multiple chunks
+    {
+        constexpr std::size_t num_tasks = 10000;
+        std::atomic<int> chunk_count{0};
+        std::atomic<bool> has_chunking{false};
+        ex::parallel_scheduler sched = ex::get_parallel_scheduler();
+
+        auto bulk_snd = ex::bulk_chunked(ex::schedule(sched), ex::par,
+            num_tasks, [&](std::size_t b, std::size_t e) {
+                chunk_count++;
+                if ((e - b) > 1)
+                    has_chunking = true;
+            });
+
+        ex::sync_wait(std::move(bulk_snd));
+
+        // P3804R2 3.7: par policy should create multiple chunks
+        HPX_TEST(chunk_count.load() > 1);
+        HPX_TEST(has_chunking.load());
+    }
+
+    // P3804R2: bulk_unchunked with seq executes all items on same thread
+    {
+        constexpr std::size_t num_tasks = 50;
+        std::thread::id pool_ids[num_tasks];
+        std::atomic<int> execution_count{0};
+        ex::parallel_scheduler sched = ex::get_parallel_scheduler();
+
+        auto bulk_snd = ex::bulk_unchunked(
+            ex::schedule(sched), ex::seq, num_tasks, [&](std::size_t id) {
+                pool_ids[id] = std::this_thread::get_id();
+                execution_count++;
+            });
+
+        ex::sync_wait(std::move(bulk_snd));
+
+        // P3804R2 3.7: seq policy should execute sequentially
+        // All items should execute on the same thread
+        HPX_TEST_EQ(execution_count.load(), static_cast<int>(num_tasks));
+        std::thread::id first_thread = pool_ids[0];
+        for (std::size_t i = 1; i < num_tasks; ++i)
+        {
+            HPX_TEST_EQ(pool_ids[i], first_thread);
+        }
+    }
+
+    // P3804R2: bulk_unchunked with par uses multiple threads
+    {
+        constexpr std::size_t num_tasks = 200;
+        std::thread::id pool_ids[num_tasks];
+        ex::parallel_scheduler sched = ex::get_parallel_scheduler();
+
+        auto bulk_snd = ex::bulk_unchunked(ex::schedule(sched), ex::par,
+            num_tasks,
+            [&](std::size_t id) { pool_ids[id] = std::this_thread::get_id(); });
+
+        ex::sync_wait(std::move(bulk_snd));
+
+        // P3804R2 3.7: par policy should use multiple threads
+        std::set<std::thread::id> unique_threads;
+        for (auto tid : pool_ids)
+        {
+            unique_threads.insert(tid);
+        }
+        HPX_TEST(unique_threads.size() > 1);
+    }
+
+    // P3804R2: Verify all elements are processed exactly once with seq
+    {
+        constexpr std::size_t num_tasks = 100;
+        std::atomic<int> counters[num_tasks];
+        for (auto& c : counters)
+            c.store(0);
+
+        ex::parallel_scheduler sched = ex::get_parallel_scheduler();
+
+        auto bulk_snd = ex::bulk_unchunked(ex::schedule(sched), ex::seq,
+            num_tasks, [&](std::size_t id) { counters[id]++; });
+
+        ex::sync_wait(std::move(bulk_snd));
+
+        // Every element should be processed exactly once
+        for (std::size_t i = 0; i < num_tasks; ++i)
+        {
+            HPX_TEST_EQ(counters[i].load(), 1);
+        }
+    }
+
+    // P3804R2: Verify all elements are processed exactly once with par
+    {
+        constexpr std::size_t num_tasks = 1000;
+        std::atomic<int> counters[num_tasks];
+        for (auto& c : counters)
+            c.store(0);
+
+        ex::parallel_scheduler sched = ex::get_parallel_scheduler();
+
+        auto bulk_snd = ex::bulk_unchunked(ex::schedule(sched), ex::par,
+            num_tasks, [&](std::size_t id) { counters[id]++; });
+
+        ex::sync_wait(std::move(bulk_snd));
+
+        // Every element should be processed exactly once
+        for (std::size_t i = 0; i < num_tasks; ++i)
+        {
+            HPX_TEST_EQ(counters[i].load(), 1);
+        }
+    }
+
     return hpx::local::finalize();
 }
 #else

@@ -78,12 +78,13 @@ namespace hpx::execution::experimental {
         // receiver. When the child completes with values, creates a
         // bulk_item_proxy and calls backend->schedule_bulk_chunked()
         // or schedule_bulk_unchunked().
-        template <typename F, bool IsChunked, typename ChildSender,
-            typename Receiver>
+        template <typename F, bool IsChunked, bool IsParallel,
+            typename ChildSender, typename Receiver>
         struct virtual_parallel_bulk_op final : base_parallel_bulk_op
         {
             std::shared_ptr<parallel_scheduler_backend> backend_;
-            std::size_t count_;
+            std::size_t count_;          // Count passed to backend (1 for seq, shape for par)
+            std::size_t actual_shape_;   // P3804R2: Actual shape for proxy execution
             F f_;
             std::decay_t<Receiver> receiver_;
 
@@ -143,9 +144,11 @@ namespace hpx::execution::experimental {
 
             virtual_parallel_bulk_op(
                 std::shared_ptr<parallel_scheduler_backend> b,
-                std::size_t count, F f, ChildSender&& child, Receiver&& rcvr)
+                std::size_t count, std::size_t shape, F f, ChildSender&& child,
+                Receiver&& rcvr)
               : backend_(HPX_MOVE(b))
               , count_(count)
+              , actual_shape_(shape)
               , f_(HPX_MOVE(f))
               , receiver_(HPX_FORWARD(Receiver, rcvr))
               , child_op_(hpx::execution::experimental::connect(
@@ -182,23 +185,49 @@ namespace hpx::execution::experimental {
                     void execute(
                         std::size_t begin, std::size_t end) noexcept override
                     {
+                        // P3804R2: Handle sequential vs parallel execution
                         if constexpr (IsChunked)
                         {
                             // Chunked: f expects (begin, end, ...vals)
-                            std::apply(
-                                [&](auto&... vals) {
-                                    op_.f_(begin, end, vals...);
-                                },
-                                values_);
+                            if constexpr (IsParallel)
+                            {
+                                std::apply(
+                                    [&](auto&... vals) {
+                                        op_.f_(begin, end, vals...);
+                                    },
+                                    values_);
+                            }
+                            else
+                            {
+                                // P3804R2: seq policy -> f(0, shape, args...)
+                                std::apply(
+                                    [&](auto&... vals) {
+                                        op_.f_(0, op_.actual_shape_, vals...);
+                                    },
+                                    values_);
+                            }
                         }
                         else
                         {
                             // Unchunked: f expects (index, ...vals)
-                            for (std::size_t i = begin; i < end; ++i)
+                            if constexpr (IsParallel)
                             {
-                                std::apply(
-                                    [&](auto&... vals) { op_.f_(i, vals...); },
-                                    values_);
+                                for (std::size_t i = begin; i < end; ++i)
+                                {
+                                    std::apply(
+                                        [&](auto&... vals) { op_.f_(i, vals...); },
+                                        values_);
+                                }
+                            }
+                            else
+                            {
+                                // P3804R2: seq policy -> for(i=0; i<shape; ++i) f(i, args...)
+                                for (std::size_t i = 0; i < op_.actual_shape_; ++i)
+                                {
+                                    std::apply(
+                                        [&](auto&... vals) { op_.f_(i, vals...); },
+                                        values_);
+                                }
                             }
                         }
                     }
@@ -264,7 +293,7 @@ namespace hpx::execution::experimental {
         // transform_sender. Holds either the fast-path
         // thread_pool_bulk_sender or virtual dispatch data.
         template <typename FastSender, typename ChildSender, typename F,
-            bool IsChunked>
+            bool IsChunked, bool IsParallel>
         struct parallel_bulk_dispatch_sender
         {
             using sender_concept = stdexec::sender_t;
@@ -277,7 +306,8 @@ namespace hpx::execution::experimental {
             struct virtual_path_data
             {
                 std::shared_ptr<parallel_scheduler_backend> backend_;
-                std::size_t count_;
+                std::size_t count_;          // P3804R2: 1 for seq, shape for par
+                std::size_t actual_shape_;   // P3804R2: Actual shape value
                 F f_;
                 ChildSender child_;
             };
@@ -339,9 +369,10 @@ namespace hpx::execution::experimental {
                     auto& vp = std::get<virtual_path_data>(self.data_);
                     return dispatch_op<std::decay_t<Receiver>>{
                         std::make_unique<virtual_parallel_bulk_op<F, IsChunked,
-                            ChildSender, std::decay_t<Receiver>>>(
-                            HPX_MOVE(vp.backend_), vp.count_, HPX_MOVE(vp.f_),
-                            HPX_MOVE(vp.child_), HPX_FORWARD(Receiver, rcvr))};
+                            IsParallel, ChildSender, std::decay_t<Receiver>>>(
+                            HPX_MOVE(vp.backend_), vp.count_, vp.actual_shape_,
+                            HPX_MOVE(vp.f_), HPX_MOVE(vp.child_),
+                            HPX_FORWARD(Receiver, rcvr))};
                 }
             }
         };
@@ -431,7 +462,7 @@ namespace hpx::execution::experimental {
                 using dispatch_sender_t =
                     detail::parallel_bulk_dispatch_sender<fast_sender_t,
                         std::decay_t<decltype(child)>,
-                        std::decay_t<decltype(f)>, is_chunked>;
+                        std::decay_t<decltype(f)>, is_chunked, is_parallel>;
 
                 // Fast path: default HPX backend with underlying scheduler
                 // available. Create optimized thread_pool_bulk_sender
@@ -454,9 +485,16 @@ namespace hpx::execution::experimental {
                 // Virtual dispatch path: custom backend without an
                 // underlying thread_pool_policy_scheduler. Routes
                 // through backend->schedule_bulk_chunked/unchunked().
+                //
+                // P3804R2: Pass (is_parallel ? shape : 1) to backend.
+                // When seq policy, backend receives count=1 and proxy
+                // will execute all work in a single call:
+                //   - chunked: proxy.execute(0, shape) -> f(0, shape, args...)
+                //   - unchunked: proxy.execute(0, shape) -> for(i=0; i<shape; ++i) f(i, args...)
                 return dispatch_sender_t{
                     typename dispatch_sender_t::virtual_path_data{
                         par_sched.get_backend(),
+                        static_cast<std::size_t>(is_parallel ? shape : 1),
                         static_cast<std::size_t>(shape),
                         HPX_FORWARD(decltype(f), f),
                         HPX_FORWARD(decltype(child), child)}};
