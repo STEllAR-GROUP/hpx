@@ -31,11 +31,11 @@ set(benchmarks
 )
 
 # foreach_report uses tag_invoke-based sender patterns that do not compile with
-# Clang <= 21 / AppleClang <= 17 against the current stdexec.
+# Clang < 22 / AppleClang < 18 against the current stdexec.
 if((CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_CXX_COMPILER_VERSION
-                                               VERSION_LESS_EQUAL "21")
+                                               VERSION_LESS "22")
    OR (CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang"
-       AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS_EQUAL "17")
+       AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "18")
 )
   list(REMOVE_ITEM benchmarks foreach_report)
 endif()
