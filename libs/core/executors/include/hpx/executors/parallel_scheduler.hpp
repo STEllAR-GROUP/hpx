@@ -83,8 +83,10 @@ namespace hpx::execution::experimental {
         struct virtual_parallel_bulk_op final : base_parallel_bulk_op
         {
             std::shared_ptr<parallel_scheduler_backend> backend_;
-            std::size_t count_;          // Count passed to backend (1 for seq, shape for par)
-            std::size_t actual_shape_;   // P3804R2: Actual shape for proxy execution
+            std::size_t
+                count_;    // Count passed to backend (1 for seq, shape for par)
+            std::size_t
+                actual_shape_;    // P3804R2: Actual shape for proxy execution
             F f_;
             std::decay_t<Receiver> receiver_;
 
@@ -215,17 +217,22 @@ namespace hpx::execution::experimental {
                                 for (std::size_t i = begin; i < end; ++i)
                                 {
                                     std::apply(
-                                        [&](auto&... vals) { op_.f_(i, vals...); },
+                                        [&](auto&... vals) {
+                                            op_.f_(i, vals...);
+                                        },
                                         values_);
                                 }
                             }
                             else
                             {
                                 // P3804R2: seq policy -> for(i=0; i<shape; ++i) f(i, args...)
-                                for (std::size_t i = 0; i < op_.actual_shape_; ++i)
+                                for (std::size_t i = 0; i < op_.actual_shape_;
+                                    ++i)
                                 {
                                     std::apply(
-                                        [&](auto&... vals) { op_.f_(i, vals...); },
+                                        [&](auto&... vals) {
+                                            op_.f_(i, vals...);
+                                        },
                                         values_);
                                 }
                             }
@@ -306,8 +313,8 @@ namespace hpx::execution::experimental {
             struct virtual_path_data
             {
                 std::shared_ptr<parallel_scheduler_backend> backend_;
-                std::size_t count_;          // P3804R2: 1 for seq, shape for par
-                std::size_t actual_shape_;   // P3804R2: Actual shape value
+                std::size_t count_;    // P3804R2: 1 for seq, shape for par
+                std::size_t actual_shape_;    // P3804R2: Actual shape value
                 F f_;
                 ChildSender child_;
             };
