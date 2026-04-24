@@ -198,11 +198,14 @@ namespace hpx::collectives::detail {
                 needs_initialization_ = false;
                 data_available_ = false;
 
-                auto const new_size = get_num_sites(num_values);
-                auto const* data = hpx::any_cast<std::vector<T>>(&data_);
-                if (data == nullptr || data->size() < new_size)
+                if constexpr (!std::is_void_v<T>)
                 {
-                    data_ = std::vector<T>(new_size);
+                    auto const new_size = get_num_sites(num_values);
+                    auto const* data = hpx::any_cast<std::vector<T>>(&data_);
+                    if (data == nullptr || data->size() < new_size)
+                    {
+                        data_ = std::vector<T>(new_size);
+                    }
                 }
             }
         }
@@ -344,9 +347,17 @@ namespace hpx::collectives::detail {
                 if constexpr (!std::is_same_v<std::nullptr_t,
                                   std::decay_t<Finalizer>>)
                 {
-                    // call provided finalizer
-                    return HPX_FORWARD(Finalizer, finalizer)(
-                        access_data<Data>(num_values), data_available_, which);
+                    if constexpr (std::is_void_v<Data>)
+                    {
+                        return HPX_FORWARD(Finalizer, finalizer)(
+                            data_available_, which);
+                    }
+                    else
+                    {
+                        return HPX_FORWARD(Finalizer, finalizer)(
+                            access_data<Data>(num_values), data_available_,
+                            which);
+                    }
                 }
                 else
                 {
@@ -382,10 +393,22 @@ namespace hpx::collectives::detail {
                     generation);
             }
 
+            if constexpr (std::is_void_v<Data>)
+            {
+                reinitialize_data<void>(num_values);
+            }
+
             if constexpr (!std::is_same_v<std::nullptr_t, std::decay_t<Step>>)
             {
-                // Call provided step function for each invocation site.
-                HPX_FORWARD(Step, step)(access_data<Data>(num_values), which);
+                if constexpr (std::is_void_v<Data>)
+                {
+                    HPX_FORWARD(Step, step)(which);
+                }
+                else
+                {
+                    HPX_FORWARD(Step, step)(
+                        access_data<Data>(num_values), which);
+                }
             }
 
             // Make sure next generation is enabled only after previous
