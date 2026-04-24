@@ -146,7 +146,7 @@ namespace hpx::parallel {
           : public algorithm<is_partitioned<Iter, Sent>, bool>
         {
             constexpr is_partitioned() noexcept
-              : algorithm<is_partitioned, bool>("is_partitioned")
+              : algorithm<is_partitioned<Iter, Sent>, bool>("is_partitioned")
             {
             }
 

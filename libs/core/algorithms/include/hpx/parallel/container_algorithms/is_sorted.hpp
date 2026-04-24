@@ -1,5 +1,4 @@
 //  Copyright (c) 2020 ETH Zurich
-//  Copyright (c) 2017-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,6 +12,7 @@
 #if defined(DOXYGEN)
 
 namespace hpx { namespace ranges {
+    // clang-format off
 
     /// Determines if the range [first, last) is sorted. Uses pred to
     /// compare elements.
@@ -134,8 +134,8 @@ namespace hpx { namespace ranges {
     template <typename ExPolicy, typename FwdIter, typename Sent,
         typename Pred = hpx::parallel::detail::less,
         typename Proj = hpx::identity>
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool> is_sorted(
-        ExPolicy&& policy, FwdIter first, Sent last, Pred&& pred = Pred(),
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
+    is_sorted(ExPolicy&& policy, FwdIter first, Sent last, Pred&& pred = Pred(),
         Proj&& proj = Proj());
 
     /// Determines if the range rng is sorted. Uses pred to
@@ -248,8 +248,8 @@ namespace hpx { namespace ranges {
     template <typename ExPolicy, typename Rng,
         typename Pred = hpx::parallel::detail::less,
         typename Proj = hpx::identity>
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool> is_sorted(
-        ExPolicy&& policy, Rng&& rng, Pred&& pred = Pred(),
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
+    is_sorted(ExPolicy&& policy, Rng&& rng, Pred&& pred = Pred(),
         Proj&& proj = Proj());
 
     /// Returns the first element in the range [first, last) that is not sorted.
@@ -420,8 +420,8 @@ namespace hpx { namespace ranges {
     ///
     template <typename Rng, typename Pred = hpx::parallel::detail::less,
         typename Proj = hpx::identity>
-    std::ranges::iterator_t<Rng> is_sorted_until(
-        Rng&& rng, Pred&& pred = Pred(), Proj&& proj = Proj());
+    std::ranges::iterator_t<Rng>
+    is_sorted_until(Rng&& rng, Pred&& pred = Pred(), Proj&& proj = Proj());
 
     /// Returns the first element in the range rng that is not sorted.
     /// Uses a predicate to compare elements or the less than operator.
@@ -491,6 +491,7 @@ namespace hpx { namespace ranges {
         std::ranges::iterator_t<Rng>>
     is_sorted_until(ExPolicy&& policy, Rng&& rng, Pred&& pred = Pred(),
         Proj&& proj = Proj());
+    // clang-format on
 }}    // namespace hpx::ranges
 
 #else
@@ -519,7 +520,7 @@ namespace hpx::ranges {
             typename Pred = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 std::forward_iterator<FwdIter> &&
                 std::sentinel_for<Sent, FwdIter> &&
                 hpx::parallel::traits::is_projected_v<Proj, FwdIter> &&
@@ -542,7 +543,7 @@ namespace hpx::ranges {
             typename Pred = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 std::forward_iterator<FwdIter> &&
                 std::sentinel_for<Sent, FwdIter> &&
@@ -566,7 +567,7 @@ namespace hpx::ranges {
         template <typename Rng, typename Pred = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 std::ranges::range<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable_v<
@@ -589,7 +590,7 @@ namespace hpx::ranges {
             typename Pred = hpx::parallel::detail::less,
             typename Proj = hpx::identity>
         // clang-format off
-            requires (
+            requires(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 std::ranges::range<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
@@ -655,9 +656,9 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            FwdIter> tag_fallback_invoke(hpx::ranges::is_sorted_until_t,
-            ExPolicy&& policy, FwdIter first, Sent last, Pred pred = Pred(),
-            Proj proj = Proj())
+            FwdIter>
+        tag_fallback_invoke(hpx::ranges::is_sorted_until_t, ExPolicy&& policy,
+            FwdIter first, Sent last, Pred pred = Pred(), Proj proj = Proj())
         {
             return hpx::parallel::detail::is_sorted_until<FwdIter, Sent>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(pred),

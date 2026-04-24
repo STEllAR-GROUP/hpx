@@ -46,7 +46,7 @@ namespace hpx::parallel {
         struct is_sorted : public algorithm<is_sorted<FwdIter, Sent>, bool>
         {
             constexpr is_sorted() noexcept
-              : algorithm<is_sorted, bool>("is_sorted")
+              : algorithm<is_sorted<FwdIter, Sent>, bool>("is_sorted")
             {
             }
 
@@ -137,7 +137,8 @@ namespace hpx::parallel {
           : public algorithm<is_sorted_until<FwdIter, Sent>, FwdIter>
         {
             constexpr is_sorted_until() noexcept
-              : algorithm<is_sorted_until, FwdIter>("is_sorted_until")
+              : algorithm<is_sorted_until<FwdIter, Sent>, FwdIter>(
+                    "is_sorted_until")
             {
             }
 
@@ -155,7 +156,6 @@ namespace hpx::parallel {
             static decltype(auto) parallel(ExPolicy&& orgpolicy, FwdIter_ first,
                 Sent_ last, Pred&& pred, Proj&& proj)
             {
-                using reference = hpx::traits::iter_reference_t<FwdIter_>;
                 using difference_type =
                     hpx::traits::iter_difference_t<FwdIter_>;
                 using result =
@@ -219,16 +219,14 @@ namespace hpx::parallel {
                 auto f2 = [first, tok](auto&&... data) mutable -> FwdIter_ {
                     static_assert(sizeof...(data) < 2);
 
-                    difference_type cancelled_at = tok.get_data();
-                    if (cancelled_at != count)
-                    {
-                        return detail::advance(first, cancelled_at);
-                    }
-                    return detail::advance(first, count);
+                    difference_type loc = tok.get_data();
+                    std::advance(first, loc);
+                    return first;
                 };
 
-                return util::partitioner<ExPolicy, FwdIter_>::call_with_index(
-                    HPX_FORWARD(decltype(policy), policy), first, count, 1,
+                using policy_type = std::decay_t<decltype(policy)>;
+                return util::partitioner<policy_type, FwdIter_, void>::call_with_index(
+                    HPX_FORWARD(policy_type, policy), first, count, 1,
                     HPX_MOVE(f1), HPX_MOVE(f2));
             }
         };
