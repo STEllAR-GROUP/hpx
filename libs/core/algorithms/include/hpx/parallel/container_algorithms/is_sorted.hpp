@@ -6,20 +6,6 @@
 
 /// \page hpx::ranges::is_sorted, hpx::ranges::is_sorted_until
 /// \headerfile hpx/algorithm.hpp
-#include <hpx/modules/execution.hpp>
-#include <hpx/modules/executors.hpp>
-#include <hpx/modules/functional.hpp>
-#include <hpx/modules/iterator_support.hpp>
-#include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/algorithms/detail/distance.hpp>
-#include <hpx/parallel/algorithms/detail/is_sorted.hpp>
-#include <hpx/parallel/util/detail/algorithm_result.hpp>
-#include <hpx/parallel/util/detail/sender_util.hpp>
-#include <hpx/parallel/util/invoke_projected.hpp>
-
-#include <hpx/parallel/util/loop.hpp>
-#include <hpx/parallel/util/partitioner.hpp>
-
 
 #pragma once
 
@@ -510,18 +496,18 @@ namespace hpx { namespace ranges {
 
 #else
 
+#include <hpx/config.hpp>
+#include <hpx/algorithms/traits/projected_range.hpp>
 #include <hpx/modules/executors.hpp>
-#include <hpx/modules/functional.hpp>
 #include <hpx/modules/iterator_support.hpp>
-#include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/algorithms/detail/distance.hpp>
-#include <hpx/parallel/util/cancellation_token.hpp>
+#include <hpx/parallel/algorithms/is_sorted.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
-#include <hpx/parallel/util/invoke_projected.hpp>
 
-#include <hpx/parallel/util/loop.hpp>
-#include <hpx/parallel/util/partitioner.hpp>
+#include <cstddef>
+#include <iterator>
+#include <ranges>
+#include <type_traits>
 #include <utility>
 
 namespace hpx::ranges {

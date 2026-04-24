@@ -1,6 +1,6 @@
 //  Copyright (c) 2020 ETH Zurich
 //  Copyright (c) 2015 Daniel Bourgeois
-//  Copyright (c) 2017-2026 Hartmut Kaiser
+//  Copyright (c) 2017-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -111,24 +111,19 @@ namespace hpx {
 #else
 
 #include <hpx/config.hpp>
-#include <hpx/algorithms/traits/projected.hpp>
-#include <hpx/modules/execution.hpp>
 #include <hpx/modules/executors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/invoke_projected.hpp>
-
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 
 #include <algorithm>
 #include <cstddef>
-#include <cstdint>
 #include <iterator>
 #include <type_traits>
 #include <utility>
@@ -139,22 +134,43 @@ namespace hpx::parallel {
     ////////////////////////////////////////////////////////////////////////////
     // is_partitioned
     namespace detail {
-        enum class partition_status : std::uint8_t
+        enum class partition_status
         {
-            false_ = 0,
-            true_ = 1,
+            true_ = 0,
+            false_ = 1,
             mixed = 2,
             cancelled = 3
         };
 
         /// \cond NOINTERNAL
+        template <typename T>
+        inline bool sequential_is_partitioned(std::vector<T>&& res)
+        {
+            auto first = res.begin();
+            auto const last = res.end();
+            while (first != last && hpx::unwrap(*first))
+            {
+                ++first;
+            }
+            if (first != last)
+            {
+                ++first;
+                while (first != last)
+                {
+                    if (hpx::unwrap(*first))
+                        return false;
+                    ++first;
+                }
+            }
+            return true;
+        }
 
         template <typename Iter, typename Sent>
         struct is_partitioned
           : public algorithm<is_partitioned<Iter, Sent>, bool>
         {
             constexpr is_partitioned() noexcept
-              : algorithm<is_partitioned<Iter, Sent>, bool>("is_partitioned")
+              : algorithm<is_partitioned, bool>("is_partitioned")
             {
             }
 
@@ -177,12 +193,6 @@ namespace hpx::parallel {
                 using result = util::detail::algorithm_result<ExPolicy, bool>;
                 constexpr bool has_scheduler_executor =
                     hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
-
-                if constexpr (!has_scheduler_executor)
-                {
-                    if (first == last)
-                        return result::get(true);
-                }
 
                 difference_type count =
                     hpx::parallel::detail::distance(first, last);
@@ -278,10 +288,7 @@ namespace hpx {
         template <typename FwdIter, typename Pred>
         // clang-format off
             requires (
-                std::forward_iterator<FwdIter> &&
-                hpx::is_invocable_v<Pred,
-                    hpx::traits::iter_value_t<FwdIter>
-                >
+                std::forward_iterator<FwdIter>
             )
         // clang-format on
         friend bool tag_fallback_invoke(
@@ -296,10 +303,7 @@ namespace hpx {
         // clang-format off
             requires (
                 hpx::is_execution_policy_v<ExPolicy> &&
-                std::forward_iterator<FwdIter> &&
-                hpx::is_invocable_v<Pred,
-                    hpx::traits::iter_value_t<FwdIter>
-                >
+                std::forward_iterator<FwdIter>
             )
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::is_partitioned_t,
@@ -308,48 +312,6 @@ namespace hpx {
             return hpx::parallel::detail::is_partitioned<FwdIter, FwdIter>()
                 .call(HPX_FORWARD(ExPolicy, policy), first, last,
                     HPX_MOVE(pred), hpx::identity_v);
-        }
-
-        template <typename FwdIter, typename Pred,
-            typename Proj = hpx::identity>
-        // clang-format off
-            requires (
-                std::forward_iterator<FwdIter> &&
-                hpx::parallel::traits::is_projected_v<Proj, FwdIter> &&
-                hpx::is_invocable_v<Pred,
-                    hpx::util::invoke_result_t<Proj,
-                        hpx::traits::iter_value_t<FwdIter>>
-                >
-            )
-        // clang-format on
-        friend bool tag_fallback_invoke(hpx::is_partitioned_t, FwdIter first,
-            FwdIter last, Pred pred, Proj proj)
-        {
-            return hpx::parallel::detail::is_partitioned<FwdIter, FwdIter>()
-                .call(hpx::execution::seq, first, last, HPX_MOVE(pred),
-                    HPX_MOVE(proj));
-        }
-
-        template <typename ExPolicy, typename FwdIter, typename Pred,
-            typename Proj = hpx::identity>
-        // clang-format off
-            requires (
-                hpx::is_execution_policy_v<ExPolicy> &&
-                std::forward_iterator<FwdIter> &&
-                hpx::parallel::traits::is_projected_v<Proj, FwdIter> &&
-                hpx::is_invocable_v<Pred,
-                    hpx::util::invoke_result_t<Proj,
-                        hpx::traits::iter_value_t<FwdIter>>
-                >
-            )
-        // clang-format on
-        friend decltype(auto) tag_fallback_invoke(hpx::is_partitioned_t,
-            ExPolicy&& policy, FwdIter first, FwdIter last, Pred pred,
-            Proj proj)
-        {
-            return hpx::parallel::detail::is_partitioned<FwdIter, FwdIter>()
-                .call(HPX_FORWARD(ExPolicy, policy), first, last,
-                    HPX_MOVE(pred), HPX_MOVE(proj));
         }
     } is_partitioned{};
 }    // namespace hpx
