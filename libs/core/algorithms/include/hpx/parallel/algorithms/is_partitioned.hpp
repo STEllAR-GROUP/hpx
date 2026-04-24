@@ -112,6 +112,7 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/projected.hpp>
+#include <hpx/modules/execution.hpp>
 #include <hpx/modules/executors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/iterator_support.hpp>
@@ -138,6 +139,13 @@ namespace hpx::parallel {
     ////////////////////////////////////////////////////////////////////////////
     // is_partitioned
     namespace detail {
+        enum class partition_status : std::uint8_t
+        {
+            false_ = 0,
+            true_ = 1,
+            mixed = 2,
+            cancelled = 3
+        };
 
         /// \cond NOINTERNAL
 
@@ -188,18 +196,25 @@ namespace hpx::parallel {
                 util::invoke_projected<Pred, Proj> pred_projected(
                     HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
                 util::cancellation_token<> tok;
-                using intermediate_result_t = std::uint8_t;
+                using intermediate_result_t = partition_status;
 
                 auto f1 = [tok, pred_projected = HPX_MOVE(pred_projected)](
                               Iter_ part_begin, std::size_t part_count) mutable
                     -> intermediate_result_t {
                     bool fst_bool = HPX_INVOKE(pred_projected, *part_begin);
                     if (part_count == 1)
-                        return fst_bool ? 1 : 0;
+                        return fst_bool ? partition_status::true_ :
+                                          partition_status::false_;
 
                     bool is_mixed = false;
-                    util::loop_n<hpx::execution::sequenced_policy>(++part_begin,
-                        --part_count, tok,
+
+                    using local_policy = std::conditional_t<
+                        hpx::is_unsequenced_execution_policy_v<
+                            std::decay_t<ExPolicy>>,
+                        hpx::execution::unsequenced_policy,
+                        hpx::execution::sequenced_policy>;
+
+                    util::loop_n<local_policy>(++part_begin, --part_count, tok,
                         [&fst_bool, &is_mixed, &pred_projected, &tok](
                             auto const& a) mutable -> void {
                             if (fst_bool != hpx::invoke(pred_projected, *a))
@@ -217,9 +232,11 @@ namespace hpx::parallel {
                         });
 
                     if (tok.was_cancelled())
-                        return 3;
+                        return partition_status::cancelled;
 
-                    return is_mixed ? 2 : (fst_bool ? 1 : 0);
+                    return is_mixed ? partition_status::mixed :
+                                      (fst_bool ? partition_status::true_ :
+                                                  partition_status::false_);
                 };
 
                 auto f2 = [tok](auto&& results) -> bool {
@@ -227,17 +244,20 @@ namespace hpx::parallel {
                         return false;
 
                     auto it = std::find_if(hpx::util::begin(results),
-                        hpx::util::end(results),
-                        [](intermediate_result_t x) { return x != 1; });
+                        hpx::util::end(results), [](partition_status x) {
+                            return x != partition_status::true_;
+                        });
 
                     if (it == hpx::util::end(results))
                         return true;
 
-                    if (*it == 2)
+                    if (*it == partition_status::mixed)
                         ++it;
 
                     return std::all_of(it, hpx::util::end(results),
-                        [](intermediate_result_t x) { return x == 0; });
+                        [](partition_status x) {
+                            return x == partition_status::false_;
+                        });
                 };
 
                 return util::partitioner<ExPolicy, bool,

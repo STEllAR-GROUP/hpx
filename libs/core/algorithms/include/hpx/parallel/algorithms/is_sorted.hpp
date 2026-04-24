@@ -13,12 +13,11 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/algorithms/traits/projected.hpp>
-#include <hpx/execution/algorithms/detail/is_negative.hpp>
-#include <hpx/execution/algorithms/detail/predicates.hpp>
-#include <hpx/executors/execution_policy.hpp>
-#include <hpx/functional/invoke.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/executors.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/iterator_support.hpp>
+#include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/algorithms/detail/is_sorted.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
@@ -91,8 +90,13 @@ namespace hpx::parallel {
                         FwdIter_ part_begin, std::size_t part_size) mutable
                     -> intermediate_result_t {
                     FwdIter_ trail = part_begin++;
-                    util::loop_n<hpx::execution::sequenced_policy>(part_begin,
-                        part_size - 1,
+                    using local_policy = std::conditional_t<
+                        hpx::is_unsequenced_execution_policy_v<
+                            std::decay_t<ExPolicy>>,
+                        hpx::execution::unsequenced_policy,
+                        hpx::execution::sequenced_policy>;
+
+                    util::loop_n<local_policy>(part_begin, part_size - 1,
                         [&trail, &tok, &pred_projected](
                             auto const& it) mutable -> void {
                             if (hpx::invoke(pred_projected, *it, *trail++))
@@ -116,7 +120,7 @@ namespace hpx::parallel {
 
                 auto f2 = [](auto&& results) {
                     return std::all_of(hpx::util::begin(results),
-                        hpx::util::end(results), [](auto x) { return x; });
+                        hpx::util::end(results), hpx::unwrap());
                 };
 
                 return util::partitioner<ExPolicy, bool,
@@ -192,8 +196,14 @@ namespace hpx::parallel {
                     std::size_t const cross_idx = base_idx + part_size;
 
                     FwdIter_ trail = part_begin++;
-                    util::loop_idx_n<hpx::execution::sequenced_policy>(
-                        ++base_idx, part_begin, part_size - 1, tok,
+
+                    using local_policy = std::conditional_t<
+                        hpx::is_unsequenced_execution_policy_v<policy_type>,
+                        hpx::execution::unsequenced_policy,
+                        hpx::execution::sequenced_policy>;
+
+                    util::loop_idx_n<local_policy>(++base_idx, part_begin,
+                        part_size - 1, tok,
                         [&trail, &tok, &pred_projected](
                             auto& v, std::size_t ind) -> void {
                             if (hpx::invoke(pred_projected, v, *trail++))
@@ -219,12 +229,15 @@ namespace hpx::parallel {
                 auto f2 = [first, tok](auto&&... data) mutable -> FwdIter_ {
                     static_assert(sizeof...(data) < 2);
 
+                    // make sure iterators embedded in function object that is
+                    // attached to futures are invalidated
+                    util::detail::clear_container(data...);
+
                     difference_type loc = tok.get_data();
                     std::advance(first, loc);
                     return first;
                 };
 
-                using policy_type = std::decay_t<decltype(policy)>;
                 return util::partitioner<policy_type, FwdIter_, void>::call_with_index(
                     HPX_FORWARD(policy_type, policy), first, count, 1,
                     HPX_MOVE(f1), HPX_MOVE(f2));
