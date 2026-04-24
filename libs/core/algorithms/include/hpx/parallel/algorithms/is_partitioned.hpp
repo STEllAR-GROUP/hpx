@@ -115,6 +115,7 @@ namespace hpx {
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
@@ -264,8 +265,8 @@ namespace hpx::parallel {
                     if (*it == partition_status::mixed)
                         ++it;
 
-                    return std::all_of(it, hpx::util::end(results),
-                        [](partition_status x) {
+                    return std::all_of(
+                        it, hpx::util::end(results), [](partition_status x) {
                             return x == partition_status::false_;
                         });
                 };

@@ -582,8 +582,8 @@ namespace hpx::ranges {
         {
             return hpx::parallel::detail::is_sorted<
                 std::ranges::iterator_t<Rng>, std::ranges::iterator_t<Rng>>()
-                .call(hpx::execution::seq, std::begin(rng),
-                    std::end(rng), HPX_MOVE(pred), HPX_MOVE(proj));
+                .call(hpx::execution::seq, hpx::util::begin(rng),
+                    hpx::util::end(rng), HPX_MOVE(pred), HPX_MOVE(proj));
         }
 
         template <typename ExPolicy, typename Rng,
@@ -607,8 +607,8 @@ namespace hpx::ranges {
         {
             return hpx::parallel::detail::is_sorted<
                 std::ranges::iterator_t<Rng>, std::ranges::iterator_t<Rng>>()
-                .call(HPX_FORWARD(ExPolicy, policy), std::begin(rng),
-                    std::end(rng), HPX_MOVE(pred), HPX_MOVE(proj));
+                .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                    hpx::util::end(rng), HPX_MOVE(pred), HPX_MOVE(proj));
         }
     } is_sorted{};
 
@@ -656,9 +656,9 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            FwdIter>
-        tag_fallback_invoke(hpx::ranges::is_sorted_until_t, ExPolicy&& policy,
-            FwdIter first, Sent last, Pred pred = Pred(), Proj proj = Proj())
+            FwdIter> tag_fallback_invoke(hpx::ranges::is_sorted_until_t,
+            ExPolicy&& policy, FwdIter first, Sent last, Pred pred = Pred(),
+            Proj proj = Proj())
         {
             return hpx::parallel::detail::is_sorted_until<FwdIter, Sent>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(pred),
@@ -684,8 +684,8 @@ namespace hpx::ranges {
         {
             return hpx::parallel::detail::is_sorted_until<
                 std::ranges::iterator_t<Rng>, std::ranges::iterator_t<Rng>>()
-                .call(hpx::execution::seq, std::begin(rng),
-                    std::end(rng), HPX_MOVE(pred), HPX_MOVE(proj));
+                .call(hpx::execution::seq, hpx::util::begin(rng),
+                    hpx::util::end(rng), HPX_MOVE(pred), HPX_MOVE(proj));
         }
 
         template <typename ExPolicy, typename Rng,
@@ -710,8 +710,8 @@ namespace hpx::ranges {
         {
             return hpx::parallel::detail::is_sorted_until<
                 std::ranges::iterator_t<Rng>, std::ranges::iterator_t<Rng>>()
-                .call(HPX_FORWARD(ExPolicy, policy), std::begin(rng),
-                    std::end(rng), HPX_MOVE(pred), HPX_MOVE(proj));
+                .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                    hpx::util::end(rng), HPX_MOVE(pred), HPX_MOVE(proj));
         }
     } is_sorted_until{};
 }    // namespace hpx::ranges
