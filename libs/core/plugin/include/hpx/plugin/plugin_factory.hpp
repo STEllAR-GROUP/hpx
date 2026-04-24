@@ -14,7 +14,7 @@
 #include <hpx/modules/functional.hpp>
 #include <hpx/plugin/abstract_factory.hpp>
 #include <hpx/plugin/dll.hpp>
-#include <hpx/plugin/export_plugin.hpp>
+#include <hpx/plugin/macros.hpp>
 #include <hpx/plugin/virtual_constructor.hpp>
 
 #include <algorithm>

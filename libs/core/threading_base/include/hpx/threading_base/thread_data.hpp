@@ -17,6 +17,7 @@
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/tracing.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>
 #include <hpx/threading_base/threading_base_fwd.hpp>
@@ -669,6 +670,26 @@ namespace hpx::threads {
     {
         return static_cast<thread_data*>(tid.get());
     }
+
+#if defined(HPX_HAVE_MODULE_TRACY)
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT tracing::region_init_data
+    get_region_init_data(thread_data const* thrdptr);
+
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT tracing::fiber_region_init_data
+    get_fiber_region_init_data(thread_data const* thrdptr);
+#else
+    HPX_CXX_CORE_EXPORT constexpr tracing::region_init_data
+    get_region_init_data(thread_data const*) noexcept
+    {
+        return {};
+    }
+
+    HPX_CXX_CORE_EXPORT constexpr tracing::fiber_region_init_data
+    get_fiber_region_init_data(thread_data const*) noexcept
+    {
+        return {};
+    }
+#endif
 }    // namespace hpx::threads
 
 #include <hpx/config/warnings_suffix.hpp>
@@ -686,8 +707,11 @@ namespace hpx::threads {
 
         if (is_stackless())
         {
+            HPX_ASSERT(dynamic_cast<thread_data_stackless*>(this) != nullptr);
             return static_cast<thread_data_stackless*>(this)->call();
         }
+
+        HPX_ASSERT(dynamic_cast<thread_data_stackful*>(this) != nullptr);
         return static_cast<thread_data_stackful*>(this)->call(agent_storage);
     }
 
@@ -697,8 +721,11 @@ namespace hpx::threads {
 
         if (is_stackless())
         {
+            HPX_ASSERT(dynamic_cast<thread_data_stackless*>(this) != nullptr);
             return static_cast<thread_data_stackless*>(this)->call();
         }
-        return static_cast<thread_data_stackful*>(this)->invoke_directly();
+
+        HPX_ASSERT(dynamic_cast<thread_data_stackful*>(this) != nullptr);
+        return static_cast<thread_data_stackful*>(this)->call_directly();
     }
 }    // namespace hpx::threads

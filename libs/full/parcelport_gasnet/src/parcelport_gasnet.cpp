@@ -23,11 +23,11 @@
 #include <hpx/modules/util.hpp>
 
 #include <hpx/modules/parcelset_base.hpp>
+#include <hpx/modules/plugin_factories.hpp>
 #include <hpx/parcelport_gasnet/locality.hpp>
 #include <hpx/parcelport_gasnet/receiver.hpp>
 #include <hpx/parcelport_gasnet/sender.hpp>
 #include <hpx/parcelset/parcelport_impl.hpp>
-#include <hpx/plugin_factories/parcelport_factory.hpp>
 
 #include <atomic>
 #include <cstddef>

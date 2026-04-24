@@ -48,6 +48,13 @@
 namespace hpx::execution::experimental {
     // Domain
     HPX_CXX_CORE_EXPORT using stdexec::default_domain;
+    HPX_CXX_CORE_EXPORT using stdexec::get_domain;
+    HPX_CXX_CORE_EXPORT using stdexec::get_domain_t;
+
+    // Completion domain (P3826R5)
+    HPX_CXX_CORE_EXPORT using stdexec::get_completion_domain;
+    HPX_CXX_CORE_EXPORT using stdexec::get_completion_domain_t;
+    HPX_CXX_CORE_EXPORT using stdexec::indeterminate_domain;
 
     // Receiver
     HPX_CXX_CORE_EXPORT using stdexec::set_error_t;

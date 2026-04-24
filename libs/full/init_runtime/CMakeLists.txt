@@ -31,8 +31,14 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
   set(init_runtime_sources ${init_runtime_sources} pre_main.cpp)
 
   set(init_runtime_optional_module_dependencies
-      hpx_async_distributed hpx_collectives hpx_naming hpx_parcelports
-      hpx_performance_counters hpx_runtime_distributed
+      hpx_actions_base
+      hpx_async_distributed
+      hpx_collectives
+      hpx_components_base
+      hpx_naming
+      hpx_parcelports
+      hpx_performance_counters
+      hpx_runtime_distributed
   )
 endif()
 

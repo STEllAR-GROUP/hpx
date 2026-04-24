@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/actions_base/actions_base_fwd.hpp>
+#include <hpx/modules/actions_base.hpp>
 
 namespace hpx::actions {
 

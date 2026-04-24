@@ -8,7 +8,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/modules/threading_base.hpp>
 
 #include <cstddef>
 
@@ -17,21 +16,29 @@
 
 namespace hpx::tracing {
 
+    ////////////////////////////////////////////////////////////////////////////
+    HPX_CXX_CORE_EXPORT struct region_init_data
+    {
+        char const* name = nullptr;
+        std::size_t thread_phase = 0;
+        bool is_stackless = false;
+    };
+
     HPX_CXX_CORE_EXPORT struct HPX_CORE_EXPORT region
     {
-        explicit region(hpx::threads::thread_data const* thrdptr,
-            std::size_t num_thread) noexcept;
+        explicit region(
+            region_init_data const& init_data, std::size_t num_thread) noexcept;
 
         ~region();
 
     private:
         static hpx::tracy::region create_tracy_region(
-            hpx::threads::thread_data const* thrdptr,
-            std::size_t num_thread) noexcept;
+            region_init_data const& data, std::size_t num_thread) noexcept;
 
         hpx::tracy::region impl;
     };
 
+    ////////////////////////////////////////////////////////////////////////////
     HPX_CXX_CORE_EXPORT struct HPX_CORE_EXPORT mark_event
     {
         explicit mark_event(char const* name) noexcept;
@@ -41,20 +48,42 @@ namespace hpx::tracing {
         hpx::tracy::mark_event impl;
     };
 
+    ////////////////////////////////////////////////////////////////////////////
+    HPX_CXX_CORE_EXPORT struct fiber_region_init_data
+    {
+        char const* name = nullptr;
+        char const* fiber_name = nullptr;
+        bool is_stackless = false;
+    };
+
     HPX_CXX_CORE_EXPORT struct HPX_CORE_EXPORT fiber_region
     {
-        explicit fiber_region(hpx::threads::thread_data const* thrdptr,
+        explicit fiber_region(fiber_region_init_data const& data,
             std::size_t num_thread) noexcept;
 
         ~fiber_region();
 
     private:
         static hpx::tracy::fiber_region create_tracy_fiber_region(
-            hpx::threads::thread_data const* thrdptr,
+            fiber_region_init_data const& data,
             std::size_t num_thread) noexcept;
 
         hpx::tracy::fiber_region impl;
     };
+
+    ////////////////////////////////////////////////////////////////////////////
+    HPX_CXX_CORE_EXPORT struct HPX_CORE_EXPORT fiber_suspend_region
+    {
+        explicit fiber_suspend_region(char const* desc) noexcept;
+        ~fiber_suspend_region();
+
+    private:
+        hpx::tracy::fiber_suspend_region impl;
+    };
+
+    ////////////////////////////////////////////////////////////////////////////
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void set_thread_name(
+        char const* name) noexcept;
 
 }    // namespace hpx::tracing
 
@@ -62,26 +91,45 @@ namespace hpx::tracing {
 
 namespace hpx::tracing {
 
+    ////////////////////////////////////////////////////////////////////////////
+    HPX_CXX_CORE_EXPORT struct region_init_data
+    {
+    };
+
     HPX_CXX_CORE_EXPORT struct [[maybe_unused]] region
     {
-        constexpr explicit region(
-            hpx::threads::thread_data const*, std::size_t) noexcept
+        constexpr explicit region(region_init_data const&, std::size_t) noexcept
         {
         }
     };
 
+    ////////////////////////////////////////////////////////////////////////////
     HPX_CXX_CORE_EXPORT struct [[maybe_unused]] mark_event
     {
         constexpr explicit mark_event(char const*) noexcept {}
     };
 
+    ////////////////////////////////////////////////////////////////////////////
+    HPX_CXX_CORE_EXPORT struct fiber_region_init_data
+    {
+    };
+
     HPX_CXX_CORE_EXPORT struct [[maybe_unused]] fiber_region
     {
         constexpr explicit fiber_region(
-            hpx::threads::thread_data const*, std::size_t) noexcept
+            fiber_region_init_data const&, std::size_t) noexcept
         {
         }
     };
+
+    ////////////////////////////////////////////////////////////////////////////
+    HPX_CXX_CORE_EXPORT struct [[maybe_unused]] fiber_suspend_region
+    {
+        constexpr explicit fiber_suspend_region(char const*) noexcept {}
+    };
+
+    ////////////////////////////////////////////////////////////////////////////
+    HPX_CXX_CORE_EXPORT constexpr void set_thread_name(char const*) noexcept {}
 
 }    // namespace hpx::tracing
 

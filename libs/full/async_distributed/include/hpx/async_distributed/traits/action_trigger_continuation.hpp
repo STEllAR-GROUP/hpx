@@ -6,9 +6,9 @@
 
 #pragma once
 
-#include <hpx/actions_base/traits/action_trigger_continuation_fwd.hpp>
 #include <hpx/async_distributed/continuation_fwd.hpp>
 #include <hpx/async_distributed/trigger.hpp>
+#include <hpx/modules/actions_base.hpp>
 
 #include <utility>
 

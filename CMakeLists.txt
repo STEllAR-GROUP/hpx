@@ -1073,7 +1073,7 @@ hpx_option(
   ADVANCED
 )
 
-set(HPX_WITH_ASIO_TAG_DEFAULT "asio-1-21-0")
+set(HPX_WITH_ASIO_TAG_DEFAULT "asio-1-30-2")
 if(HPX_WITH_HIP)
   # newer versions of Asio currently fail when compiled with HIPCC
   set(HPX_WITH_ASIO_TAG_DEFAULT "asio-1-16-0")

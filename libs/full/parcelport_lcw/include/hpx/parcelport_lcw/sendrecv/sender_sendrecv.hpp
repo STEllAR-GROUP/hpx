@@ -27,10 +27,10 @@
 #include <hpx/modules/command_line_handling.hpp>
 #include <hpx/modules/parcelset_base.hpp>
 
+#include <hpx/modules/plugin_factories.hpp>
 #include <hpx/parcelset/parcelport_connection.hpp>
 #include <hpx/parcelset/parcelport_impl.hpp>
 #include <hpx/parcelset/parcelset_fwd.hpp>
-#include <hpx/plugin_factories/parcelport_factory.hpp>
 
 #include <hpx/parcelset/parcelport_connection.hpp>
 #include <hpx/parcelset_base/detail/gatherer.hpp>

@@ -15,6 +15,7 @@ set(futures_headers
     hpx/futures/futures_factory.hpp
     hpx/futures/future_or_value.hpp
     hpx/futures/macros.hpp
+    hpx/futures/monadic_operations.hpp
     hpx/futures/packaged_continuation.hpp
     hpx/futures/packaged_task.hpp
     hpx/futures/promise.hpp

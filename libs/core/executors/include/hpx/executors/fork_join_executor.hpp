@@ -164,7 +164,7 @@ namespace hpx::execution::experimental {
             template <typename Op>
             static thread_state wait_state_this_thread_while(
                 std::atomic<thread_state> const& tstate, thread_state state,
-                std::uint64_t const yield_delay, Op&& op)
+                std::uint64_t const yield_delay, Op&& op, bool allow_yielding)
             {
                 auto const context = hpx::execution_base::this_thread::agent();
 
@@ -193,7 +193,7 @@ namespace hpx::execution::experimental {
                             }
                         }
 
-                        if (HPX_UNLIKELY(!continue_outer))
+                        if (allow_yielding && HPX_UNLIKELY(!continue_outer))
                         {
                             std::uint64_t const base_time2 =
                                 util::hardware::timestamp();
@@ -247,6 +247,7 @@ namespace hpx::execution::experimental {
 
                 // The threads are bound to the current core.
                 bool const priority_bound_;
+                bool const allow_yielding_;
 
                 static void set_state_this_thread(
                     region_data& data, thread_state const state) noexcept
@@ -271,7 +272,7 @@ namespace hpx::execution::experimental {
                     // wait as long the state is 'idle'
                     auto state = shared_data::wait_state_this_thread_while(
                         data.state_, thread_state::idle, yield_delay_,
-                        std::equal_to<>());
+                        std::equal_to<>(), allow_yielding_);
 
                     HPX_ASSERT(!priority_bound_ ||
                         thread_index_ == hpx::get_worker_thread_num());
@@ -292,7 +293,7 @@ namespace hpx::execution::experimental {
                         // wait as long the state is 'idle'
                         state = shared_data::wait_state_this_thread_while(
                             data.state_, thread_state::idle, yield_delay_,
-                            std::equal_to<>());
+                            std::equal_to<>(), allow_yielding_);
 
                         HPX_ASSERT(!priority_bound_ ||
                             thread_index_ == hpx::get_worker_thread_num());
@@ -322,6 +323,8 @@ namespace hpx::execution::experimental {
 
             void wait_state_all(thread_state const state) const noexcept
             {
+                bool const allow_yielding =
+                    stacksize_ != threads::thread_stacksize::nostack;
                 for (std::size_t t = 0; t != region_data_.size(); ++t)
                 {
                     if (t != main_thread_)
@@ -329,7 +332,7 @@ namespace hpx::execution::experimental {
                         // wait for thread-state to be equal to 'state'
                         wait_state_this_thread_while(
                             region_data_[t].data_.state_, state, yield_delay_,
-                            std::not_equal_to<>());
+                            std::not_equal_to<>(), allow_yielding);
                     }
                     else
                     {
@@ -484,7 +487,9 @@ namespace hpx::execution::experimental {
                                 .yield_delay_ = yield_delay_,
                                 .region_data_ = region_data_,
                                 .queues_ = queues_,
-                                .priority_bound_ = priority_bound});
+                                .priority_bound_ = priority_bound,
+                                .allow_yielding_ = stacksize_ !=
+                                    threads::thread_stacksize::nostack});
 
                         ++t;
                     }
@@ -1150,8 +1155,8 @@ namespace hpx::execution::experimental {
                     // them in this parallel region.
                     wait_state_this_thread_while(
                         region_data_[worker_thread].data_.state_,
-                        thread_state::idle, yield_delay_,
-                        std::not_equal_to<>());
+                        thread_state::idle, yield_delay_, std::not_equal_to<>(),
+                        stacksize_ != threads::thread_stacksize::nostack);
                 }
                 else
                 {
@@ -1278,15 +1283,6 @@ namespace hpx::execution::experimental {
             std::chrono::nanoseconds yield_delay = std::chrono::microseconds(
                 300))
         {
-            if (stacksize == threads::thread_stacksize::nostack)
-            {
-                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
-                    "fork_join_executor::fork_join_executor",
-                    "The fork_join_executor does not support using "
-                    "thread_stacksize::nostack as the stacksize (stackful "
-                    "threads are required to yield correctly when idle)");
-            }
-
             shared_data_ = std::make_shared<shared_data>(
                 priority, stacksize, sched, yield_delay);
         }
@@ -1308,15 +1304,6 @@ namespace hpx::execution::experimental {
             std::chrono::nanoseconds yield_delay = std::chrono::microseconds(
                 300))
         {
-            if (stacksize == threads::thread_stacksize::nostack)
-            {
-                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
-                    "fork_join_executor::fork_join_executor",
-                    "The fork_join_executor does not support using "
-                    "thread_stacksize::nostack as the stacksize (stackful "
-                    "threads are required to yield correctly when idle)");
-            }
-
             shared_data_ = std::make_shared<shared_data>(
                 priority, stacksize, sched, yield_delay, pu_mask);
         }
@@ -1398,10 +1385,8 @@ namespace hpx::execution::experimental {
             hpx::launch const policy = exec.policy();
             hpx::threads::thread_priority const priority =
                 policy.get_priority();
-
-            hpx::threads::thread_stacksize stacksize = policy.get_stacksize();
-            if (stacksize == hpx::threads::thread_stacksize::nostack)
-                stacksize = hpx::threads::thread_stacksize::small_;
+            hpx::threads::thread_stacksize const stacksize =
+                policy.get_stacksize();
 
             fork_join_executor result(pu_mask, priority, stacksize);
 
@@ -1413,7 +1398,7 @@ namespace hpx::execution::experimental {
         }
     }    // namespace detail
 
-    template <typename Policy, bool HierarchicalSpawning>
+    HPX_CXX_CORE_EXPORT template <typename Policy, bool HierarchicalSpawning>
     decltype(auto) fork_join_executor_from(
         hpx::execution::parallel_policy_executor<Policy, HierarchicalSpawning>&
             exec)
@@ -1421,7 +1406,7 @@ namespace hpx::execution::experimental {
         return detail::fork_join_executor_from(exec);
     }
 
-    template <typename Policy, bool HierarchicalSpawning>
+    HPX_CXX_CORE_EXPORT template <typename Policy, bool HierarchicalSpawning>
     decltype(auto) fork_join_executor_from(
         hpx::execution::parallel_policy_executor<Policy,
             HierarchicalSpawning> const& exec)
@@ -1429,7 +1414,7 @@ namespace hpx::execution::experimental {
         return detail::fork_join_executor_from(exec);
     }
 
-    template <typename Policy, bool HierarchicalSpawning>
+    HPX_CXX_CORE_EXPORT template <typename Policy, bool HierarchicalSpawning>
     decltype(auto) fork_join_executor_from(
         hpx::execution::parallel_policy_executor<Policy, HierarchicalSpawning>&&
             exec)
@@ -1438,7 +1423,7 @@ namespace hpx::execution::experimental {
     }
 
     // fallback for everything but parallel_executor
-    template <typename Executor>
+    HPX_CXX_CORE_EXPORT template <typename Executor>
     decltype(auto) fork_join_executor_from(Executor&& exec)
     {
         return HPX_FORWARD(Executor, exec);

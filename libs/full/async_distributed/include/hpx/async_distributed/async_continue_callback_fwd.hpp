@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include <hpx/actions_base/traits/is_distribution_policy.hpp>
 #include <hpx/async_distributed/async_continue_fwd.hpp>
+#include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/futures.hpp>
 
 #ifndef HPX_MSVC

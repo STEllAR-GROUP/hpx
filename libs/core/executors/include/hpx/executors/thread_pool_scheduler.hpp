@@ -17,6 +17,7 @@
 #include <hpx/modules/timing.hpp>
 #include <hpx/modules/topology.hpp>
 
+#include <concepts>
 #include <cstddef>
 #include <exception>
 #include <string>
@@ -24,7 +25,6 @@
 #include <utility>
 
 #if defined(HPX_HAVE_STDEXEC)
-#include <ranges>
 
 // Forward declaration
 namespace hpx::execution::experimental::detail {
@@ -69,6 +69,9 @@ namespace hpx::execution::experimental {
     template <typename Sender>
     concept bulk_chunked_or_unchunked_sender =
         stdexec::__sender_for<Sender,
+        hpx::execution::experimental::stdexec_internal::__sender_for<Sender,
+            hpx::execution::experimental::bulk_t> ||
+        hpx::execution::experimental::stdexec_internal::__sender_for<Sender,
             hpx::execution::experimental::bulk_chunked_t> ||
         stdexec::__sender_for<Sender,
             hpx::execution::experimental::bulk_unchunked_t>;
@@ -111,6 +114,13 @@ namespace hpx::execution::experimental {
         template <bulk_chunked_or_unchunked_sender Sender, typename Env>
         auto transform_sender(hpx::execution::experimental::set_value_t,
             Sender&& sndr, Env const& env) const noexcept
+            requires std::same_as<
+                std::decay_t<decltype(hpx::execution::experimental::
+                        get_scheduler(std::declval<Env const&>()))>,
+                thread_pool_policy_scheduler<Policy>>
+        constexpr auto transform_sender(
+            hpx::execution::experimental::set_value_t, Sender&& sndr,
+            Env const& env) const noexcept
         {
             auto sched = [&]() {
                 if constexpr (stdexec::__completes_on<Sender,
@@ -152,6 +162,11 @@ namespace hpx::execution::experimental {
             // operation.
             auto pu_mask =
                 hpx::execution::experimental::get_processing_units_mask(sched);
+            // bulk_t and bulk_unchunked_t use unchunked mode (f(index, ...values))
+            // bulk_chunked_t uses chunked mode (f(begin, end, ...values))
+            constexpr bool is_chunked =
+                hpx::execution::experimental::stdexec_internal::__sender_for<
+                    Sender, hpx::execution::experimental::bulk_chunked_t>;
 
             return hpx::execution::experimental::detail::
                 thread_pool_bulk_sender<Policy, std::decay_t<decltype(child)>,
@@ -160,6 +175,9 @@ namespace hpx::execution::experimental {
                     is_unsequenced>{HPX_MOVE(sched),
                     HPX_FORWARD(decltype(child), child), HPX_MOVE(iota_shape),
                     HPX_FORWARD(decltype(f), f), HPX_MOVE(pu_mask)};
+                    std::decay_t<decltype(f)>, is_chunked>(HPX_MOVE(sched),
+                    HPX_FORWARD(decltype(child), child), HPX_MOVE(iota_shape),
+                    HPX_FORWARD(decltype(f), f));
         }
     };
 
@@ -450,6 +468,17 @@ namespace hpx::execution::experimental {
                 {
                     return stdexec::get_domain(e.sched);
                 }
+
+                // P3826R5: get_completion_domain queries
+                // The completing domain is resolved via:
+                //   sender env -> get_completion_scheduler<set_value_t>
+                //              -> scheduler -> get_completion_domain<set_value_t>
+                //              -> thread_pool_domain
+                template <typename CPO>
+                auto query(stdexec::get_completion_domain_t<CPO>) const noexcept
+                {
+                    return stdexec::get_domain(sched);
+                }
             };
 
             friend constexpr auto tag_invoke(
@@ -523,6 +552,17 @@ namespace hpx::execution::experimental {
         /// Returns the execution domain of this scheduler (following system_context.hpp pattern).
         [[nodiscard]]
         auto query(stdexec::get_domain_t) const noexcept
+            -> thread_pool_domain<Policy>
+        {
+            return {};
+        }
+
+        /// P3826R5: Returns the completion domain for this scheduler.
+        /// The domain resolution chain uses this to determine which domains
+        /// transform_sender to invoke for bulk operations.
+        template <typename CPO>
+        [[nodiscard]]
+        auto query(stdexec::get_completion_domain_t<CPO>) const noexcept
             -> thread_pool_domain<Policy>
         {
             return {};

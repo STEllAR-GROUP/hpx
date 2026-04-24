@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2025 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -142,25 +142,25 @@ namespace hpx::threads::policies {
 #if !defined(HPX_HAVE_ADDRESS_SANITIZER)
             thread_heap_type* heap = nullptr;
 
-            if (stacksize == parameters_.small_stacksize_)
+            if (stacksize == parameters_.nostack_stacksize_)
+            {
+                heap = &thread_heap_nostack_;
+            }
+            else if (stacksize <= parameters_.small_stacksize_)
             {
                 heap = &thread_heap_small_;
             }
-            else if (stacksize == parameters_.medium_stacksize_)
+            else if (stacksize <= parameters_.medium_stacksize_)
             {
                 heap = &thread_heap_medium_;
             }
-            else if (stacksize == parameters_.large_stacksize_)
+            else if (stacksize <= parameters_.large_stacksize_)
             {
                 heap = &thread_heap_large_;
             }
-            else if (stacksize == parameters_.huge_stacksize_)
+            else if (stacksize <= parameters_.huge_stacksize_)
             {
                 heap = &thread_heap_huge_;
-            }
-            else if (stacksize == parameters_.nostack_stacksize_)
-            {
-                heap = &thread_heap_nostack_;
             }
             HPX_ASSERT(heap);
 #endif
@@ -340,36 +340,85 @@ namespace hpx::threads::policies {
             return added_new != 0;
         }
 
-        void recycle_thread(thread_id_type const& thrd)
+        constexpr threads::thread_stacksize get_stacksize_enum_from_size(
+            std::ptrdiff_t const size) const
         {
-            std::ptrdiff_t const stacksize =
-                get_thread_id_data(thrd)->get_stack_size();
+            if (size == parameters_.nostack_stacksize_)
+                return threads::thread_stacksize::nostack;
 
-            if (stacksize == parameters_.small_stacksize_)
+            if (size <= parameters_.small_stacksize_)
+                return threads::thread_stacksize::small_;
+            if (size <= parameters_.medium_stacksize_)
+                return threads::thread_stacksize::medium;
+            if (size <= parameters_.large_stacksize_)
+                return threads::thread_stacksize::large;
+
+            return threads::thread_stacksize::huge;
+        }
+
+        template <typename Lock>
+        void recycle_thread(thread_id_type&& thrd, Lock& lk)
+        {
+            HPX_ASSERT_OWNS_LOCK(lk);
+
+            auto* thrd_data = get_thread_id_data(thrd);
+            HPX_ASSERT_MSG(thrd_data != nullptr, "invalid thread id");
+
+            switch (std::ptrdiff_t const size = thrd_data->get_stack_size();
+                get_stacksize_enum_from_size(size))
             {
-                thread_heap_small_.push_back(thrd);
-            }
-            else if (stacksize == parameters_.medium_stacksize_)
-            {
-                thread_heap_medium_.push_back(thrd);
-            }
-            else if (stacksize == parameters_.large_stacksize_)
-            {
-                thread_heap_large_.push_back(thrd);
-            }
-            else if (stacksize == parameters_.huge_stacksize_)
-            {
-                thread_heap_huge_.push_back(thrd);
-            }
-            else if (stacksize == parameters_.nostack_stacksize_)
-            {
-                thread_heap_nostack_.push_back(thrd);
-            }
-            else
-            {
+            case threads::thread_stacksize::small_:
+                if (thread_heap_small_.size() <
+                    parameters_.cached_threads_count_)
+                {
+                    thread_heap_small_.emplace_back(HPX_MOVE(thrd));
+                    return;
+                }
+                break;
+
+            case threads::thread_stacksize::medium:
+                if (thread_heap_medium_.size() <
+                    parameters_.cached_threads_count_)
+                {
+                    thread_heap_medium_.emplace_back(HPX_MOVE(thrd));
+                    return;
+                }
+                break;
+
+            case threads::thread_stacksize::large:
+                if (thread_heap_large_.size() <
+                    parameters_.cached_threads_count_)
+                {
+                    thread_heap_large_.emplace_back(HPX_MOVE(thrd));
+                    return;
+                }
+                break;
+
+            case threads::thread_stacksize::huge:
+                if (thread_heap_huge_.size() <
+                    parameters_.cached_threads_count_)
+                {
+                    thread_heap_huge_.emplace_back(HPX_MOVE(thrd));
+                    return;
+                }
+                break;
+
+            case threads::thread_stacksize::nostack:
+                if (thread_heap_nostack_.size() <
+                    parameters_.cached_threads_count_)
+                {
+                    thread_heap_nostack_.emplace_back(HPX_MOVE(thrd));
+                    return;
+                }
+                break;
+
+            default:
                 HPX_ASSERT_MSG(
-                    false, util::format("Invalid stack size {1}", stacksize));
+                    false, util::format("Invalid stack size {1}", size));
+                return;
             }
+
+            deallocate(thrd_data);
         }
 
     public:
@@ -378,8 +427,11 @@ namespace hpx::threads::policies {
         //
         // This returns 'true' if there are no more terminated threads waiting
         // to be deleted.
-        bool cleanup_terminated_locked(bool delete_all = false)
+        template <typename Lock>
+        bool cleanup_terminated_locked(Lock& lk, bool delete_all = false)
         {
+            HPX_ASSERT_OWNS_LOCK(lk);
+
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
             util::tick_counter tc(cleanup_terminated_time_);
 #endif
@@ -390,11 +442,13 @@ namespace hpx::threads::policies {
             if (delete_all)
             {
                 // delete all threads
+                std::int64_t term_delta = 0;
+                std::int64_t map_delta = 0;
                 thread_data* to_delete;
                 while (terminated_items_.pop(to_delete))
                 {
+                    ++term_delta;
                     thread_id_type tid(to_delete);
-                    --terminated_items_count_;
 
                     // this thread has to be managed by this queue, it may have
                     // ended up on the terminate threads list more than once,
@@ -405,11 +459,16 @@ namespace hpx::threads::policies {
 
                     if (thread_map_.erase(tid) != 0)
                     {
-                        recycle_thread(tid);
-                        --thread_map_count_;
-                        HPX_ASSERT(thread_map_count_ >= 0);
+                        recycle_thread(HPX_MOVE(tid), lk);
+                        ++map_delta;
                     }
                 }
+                terminated_items_count_.fetch_sub(
+                    term_delta, std::memory_order_acq_rel);
+                [[maybe_unused]] std::int64_t remaining =
+                    thread_map_count_.fetch_sub(
+                        map_delta, std::memory_order_acq_rel);
+                HPX_ASSERT(remaining - map_delta >= 0);
             }
             else
             {
@@ -424,11 +483,13 @@ namespace hpx::threads::policies {
                 delete_count = (std::max) (delete_count,
                     static_cast<std::int64_t>(parameters_.min_delete_count_));
 
+                std::int64_t term_delta = 0;
+                std::int64_t map_delta = 0;
                 thread_data* to_delete;
                 while (delete_count && terminated_items_.pop(to_delete))
                 {
+                    ++term_delta;
                     thread_id_type tid(to_delete);
-                    --terminated_items_count_;
 
                     // this thread has to be managed by this queue, it may have
                     // ended up on the terminate threads list more than once,
@@ -439,12 +500,17 @@ namespace hpx::threads::policies {
 
                     if (thread_map_.erase(tid) != 0)
                     {
-                        recycle_thread(tid);
-                        --thread_map_count_;
-                        HPX_ASSERT(thread_map_count_ >= 0);
+                        recycle_thread(HPX_MOVE(tid), lk);
+                        ++map_delta;
                     }
                     --delete_count;
                 }
+                terminated_items_count_.fetch_sub(
+                    term_delta, std::memory_order_acq_rel);
+                [[maybe_unused]] std::int64_t remaining =
+                    thread_map_count_.fetch_sub(
+                        map_delta, std::memory_order_acq_rel);
+                HPX_ASSERT(remaining - map_delta >= 0);
             }
             return terminated_items_count_.load(std::memory_order_acquire) == 0;
         }
@@ -464,7 +530,7 @@ namespace hpx::threads::policies {
                     if (!lk.owns_lock())
                         break;    // avoid long wait on lock
 
-                    if (cleanup_terminated_locked(false))
+                    if (cleanup_terminated_locked(lk, false))
                     {
                         return true;
                     }
@@ -476,7 +542,7 @@ namespace hpx::threads::policies {
             if (!lk.owns_lock())
                 return false;    // avoid long wait on lock
 
-            return cleanup_terminated_locked(false);
+            return cleanup_terminated_locked(lk, false);
         }
 
         explicit thread_queue(thread_queue_init_parameters const& parameters =
@@ -760,7 +826,8 @@ namespace hpx::threads::policies {
             {
                 HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "thread_queue::create_thread",
-                    "staged tasks must have 'pending' as their initial state");
+                    "staged tasks must have 'pending' as their initial "
+                    "state");
             }
 
             // do not execute the work, but register a task description for
@@ -1151,10 +1218,11 @@ namespace hpx::threads::policies {
                 {
                     if (new_tasks_count != 0)
                     {
-                        LTM_(debug).format(
-                            "thread_queue::wait_or_add_new: not enough threads "
-                            "to steal from queue {} to queue {}, have {} but "
-                            "need at least {}",
+                        LTM_(debug).format("thread_queue::wait_or_add_new: "
+                                           "not enough threads "
+                                           "to steal from queue {} to "
+                                           "queue {}, have {} but "
+                                           "need at least {}",
                             add_from, this, new_tasks_count,
                             parameters_.min_tasks_to_steal_staged_);
                     }
@@ -1184,7 +1252,7 @@ namespace hpx::threads::policies {
                     // Before exiting each of the OS threads deletes the
                     // remaining terminated HPX threads
                     // REVIEW: Should we be doing this if we are stealing?
-                    bool const can_exit = cleanup_terminated_locked(true);
+                    bool const can_exit = cleanup_terminated_locked(lk, true);
                     if (!running && can_exit)
                     {
                         // we don't have any registered work items anymore
@@ -1195,7 +1263,7 @@ namespace hpx::threads::policies {
                 }
                 else
                 {
-                    cleanup_terminated_locked();
+                    cleanup_terminated_locked(lk);
                     return false;
                 }
             }
@@ -1241,13 +1309,13 @@ namespace hpx::threads::policies {
             // with the default stack size
             static_assert(
                 thread_stacksize::default_ == thread_stacksize::small_,
-                "This assumes that the default stacksize is \"small_\". If the "
-                "default changes, so should this code. If this static_assert "
-                "fails you've most likely changed the default without changing "
-                "the code here.");
+                "This assumes that the default stacksize is \"small_\". If "
+                "the default changes, so should this code. If this "
+                "static_assert fails you've most likely changed the default "
+                "without changing the code here.");
 
             std::lock_guard<mutex_type> lk(mtx_);
-            for (std::int64_t i = 0; i < parameters_.init_threads_count_; ++i)
+            for (std::uint64_t i = 0; i < parameters_.init_threads_count_; ++i)
             {
                 // We don't care about the init parameters since this thread
                 // will be rebound once it is actually used

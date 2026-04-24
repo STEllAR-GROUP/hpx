@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/actions_base/actions_base_fwd.hpp>
+#include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/naming_base.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
