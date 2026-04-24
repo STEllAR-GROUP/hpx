@@ -399,8 +399,14 @@ namespace hpx::execution::experimental {
                     par_sched.get_underlying_scheduler();
                 auto const* pu_mask_ptr = par_sched.get_pu_mask();
 
-                constexpr bool is_chunked = !stdexec::__sender_for<Sender,
-                    hpx::execution::experimental::bulk_unchunked_t>;
+                // Only bulk_chunked_t uses the chunked f(begin, end, ...)
+                // signature. Both bulk_t (P3481R5 high-level) and
+                // bulk_unchunked_t use the unchunked f(index, ...) signature
+                // that HPX's bulk users pass. Treating bulk_t as chunked here
+                // would force f(begin, end, ...) on user lambdas that take a
+                // single index, causing a template instantiation failure.
+                constexpr bool is_chunked = stdexec::__sender_for<Sender,
+                    hpx::execution::experimental::bulk_chunked_t>;
 
                 // Determine parallelism at compile time from policy type
                 // (pol is a __policy_wrapper, use __get() to unwrap)

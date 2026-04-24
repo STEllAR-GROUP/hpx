@@ -181,11 +181,7 @@ namespace hpx::execution::experimental {
     HPX_CXX_CORE_EXPORT using stdexec::transfer;
     HPX_CXX_CORE_EXPORT using stdexec::transfer_t;
 
-    // Tags
-    namespace tags {
-
-        HPX_CXX_CORE_EXPORT using namespace stdexec::tags;
-    }
+    // Tags namespace removed - not present in P3826R5 stdexec
 
     // Execute (moved to exec:: namespace in newer stdexec)
     HPX_CXX_CORE_EXPORT using exec::execute;
