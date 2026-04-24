@@ -680,16 +680,16 @@ int hpx_main(int, char*[])
             {
             }
 
-            void schedule(std::span<std::byte>,
-                ex::parallel_scheduler_receiver_proxy& proxy) noexcept override
+            void schedule(ex::parallel_scheduler_receiver_proxy& proxy,
+                std::span<std::byte>) noexcept override
             {
                 schedule_count.fetch_add(1, std::memory_order_relaxed);
                 proxy.set_value();
             }
 
-            void schedule_bulk_chunked(std::span<std::byte>, std::size_t count,
-                ex::parallel_scheduler_bulk_item_receiver_proxy& proxy) noexcept
-                override
+            void schedule_bulk_chunked(std::size_t count,
+                ex::parallel_scheduler_bulk_item_receiver_proxy& proxy,
+                std::span<std::byte>) noexcept override
             {
                 for (std::size_t b = 0; b < count; b += 64)
                 {
@@ -699,10 +699,9 @@ int hpx_main(int, char*[])
                 proxy.set_value();
             }
 
-            void schedule_bulk_unchunked(std::span<std::byte>,
-                std::size_t count,
-                ex::parallel_scheduler_bulk_item_receiver_proxy& proxy) noexcept
-                override
+            void schedule_bulk_unchunked(std::size_t count,
+                ex::parallel_scheduler_bulk_item_receiver_proxy& proxy,
+                std::span<std::byte>) noexcept override
             {
                 for (std::size_t i = 0; i < count; ++i)
                     proxy.execute(i, i + 1);
@@ -731,20 +730,20 @@ int hpx_main(int, char*[])
     {
         struct dummy_backend final : ex::parallel_scheduler_backend
         {
-            void schedule(std::span<std::byte>,
-                ex::parallel_scheduler_receiver_proxy& proxy) noexcept override
+            void schedule(ex::parallel_scheduler_receiver_proxy& proxy,
+                std::span<std::byte>) noexcept override
             {
                 proxy.set_value();
             }
-            void schedule_bulk_chunked(std::span<std::byte>, std::size_t,
-                ex::parallel_scheduler_bulk_item_receiver_proxy& proxy) noexcept
-                override
+            void schedule_bulk_chunked(std::size_t,
+                ex::parallel_scheduler_bulk_item_receiver_proxy& proxy,
+                std::span<std::byte>) noexcept override
             {
                 proxy.set_value();
             }
-            void schedule_bulk_unchunked(std::span<std::byte>, std::size_t,
-                ex::parallel_scheduler_bulk_item_receiver_proxy& proxy) noexcept
-                override
+            void schedule_bulk_unchunked(std::size_t,
+                ex::parallel_scheduler_bulk_item_receiver_proxy& proxy,
+                std::span<std::byte>) noexcept override
             {
                 proxy.set_value();
             }
@@ -785,21 +784,21 @@ int hpx_main(int, char*[])
             {
             }
 
-            void schedule(std::span<std::byte>,
-                ex::parallel_scheduler_receiver_proxy& p) noexcept override
+            void schedule(ex::parallel_scheduler_receiver_proxy& p,
+                std::span<std::byte>) noexcept override
             {
                 hit.fetch_add(1, std::memory_order_relaxed);
                 p.set_value();
             }
-            void schedule_bulk_chunked(std::span<std::byte>, std::size_t,
-                ex::parallel_scheduler_bulk_item_receiver_proxy& p) noexcept
-                override
+            void schedule_bulk_chunked(std::size_t,
+                ex::parallel_scheduler_bulk_item_receiver_proxy& p,
+                std::span<std::byte>) noexcept override
             {
                 p.set_value();
             }
-            void schedule_bulk_unchunked(std::span<std::byte>, std::size_t,
-                ex::parallel_scheduler_bulk_item_receiver_proxy& p) noexcept
-                override
+            void schedule_bulk_unchunked(std::size_t,
+                ex::parallel_scheduler_bulk_item_receiver_proxy& p,
+                std::span<std::byte>) noexcept override
             {
                 p.set_value();
             }
@@ -844,15 +843,15 @@ int hpx_main(int, char*[])
             {
             }
 
-            void schedule(std::span<std::byte>,
-                ex::parallel_scheduler_receiver_proxy& p) noexcept override
+            void schedule(ex::parallel_scheduler_receiver_proxy& p,
+                std::span<std::byte>) noexcept override
             {
                 schedule_hits.fetch_add(1, std::memory_order_relaxed);
                 p.set_value();
             }
-            void schedule_bulk_chunked(std::span<std::byte>, std::size_t count,
-                ex::parallel_scheduler_bulk_item_receiver_proxy& p) noexcept
-                override
+            void schedule_bulk_chunked(std::size_t count,
+                ex::parallel_scheduler_bulk_item_receiver_proxy& p,
+                std::span<std::byte>) noexcept override
             {
                 bulk_hits.fetch_add(1, std::memory_order_relaxed);
                 // Execute all elements in one chunk
@@ -860,10 +859,9 @@ int hpx_main(int, char*[])
                     p.execute(0, count);
                 p.set_value();
             }
-            void schedule_bulk_unchunked(std::span<std::byte>,
-                std::size_t count,
-                ex::parallel_scheduler_bulk_item_receiver_proxy& p) noexcept
-                override
+            void schedule_bulk_unchunked(std::size_t count,
+                ex::parallel_scheduler_bulk_item_receiver_proxy& p,
+                std::span<std::byte>) noexcept override
             {
                 bulk_hits.fetch_add(1, std::memory_order_relaxed);
                 for (std::size_t i = 0; i < count; ++i)
@@ -913,22 +911,22 @@ int hpx_main(int, char*[])
             {
             }
 
-            void schedule(std::span<std::byte>,
-                ex::parallel_scheduler_receiver_proxy& p) noexcept override
+            void schedule(ex::parallel_scheduler_receiver_proxy& p,
+                std::span<std::byte>) noexcept override
             {
                 // No stop has been requested; proxy must report false.
                 saw_ = p.stop_requested();
                 p.set_value();
             }
-            void schedule_bulk_chunked(std::span<std::byte>, std::size_t,
-                ex::parallel_scheduler_bulk_item_receiver_proxy& p) noexcept
-                override
+            void schedule_bulk_chunked(std::size_t,
+                ex::parallel_scheduler_bulk_item_receiver_proxy& p,
+                std::span<std::byte>) noexcept override
             {
                 p.set_value();
             }
-            void schedule_bulk_unchunked(std::span<std::byte>, std::size_t,
-                ex::parallel_scheduler_bulk_item_receiver_proxy& p) noexcept
-                override
+            void schedule_bulk_unchunked(std::size_t,
+                ex::parallel_scheduler_bulk_item_receiver_proxy& p,
+                std::span<std::byte>) noexcept override
             {
                 p.set_value();
             }

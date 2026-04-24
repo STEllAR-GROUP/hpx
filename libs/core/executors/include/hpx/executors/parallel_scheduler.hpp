@@ -245,12 +245,12 @@ namespace hpx::execution::experimental {
                         if constexpr (IsChunked)
                         {
                             backend_->schedule_bulk_chunked(
-                                span, count_, proxy_ref);
+                                count_, proxy_ref, span);
                         }
                         else
                         {
                             backend_->schedule_bulk_unchunked(
-                                span, count_, proxy_ref);
+                                count_, proxy_ref, span);
                         }
                     },
                     [&](std::exception_ptr ep) {
@@ -603,9 +603,9 @@ namespace hpx::execution::experimental {
                 }
 
                 // Delegate to the backend via the member proxy,
-                // passing pre-allocated storage per P2079R10.
+                // passing pre-allocated storage per P2079R10 / P3927R2.
                 os.backend_->schedule(
-                    std::span<std::byte>(os.storage_), os.proxy_);
+                    os.proxy_, std::span<std::byte>(os.storage_));
             }
         };
 

@@ -73,7 +73,7 @@ namespace hpx::execution::experimental {
     static constexpr std::size_t parallel_scheduler_storage_alignment =
         alignof(std::max_align_t);
 
-    // P2079R10: Abstract backend interface
+    // P2079R10 / P3927R2: Abstract backend interface
     struct parallel_scheduler_backend
     {
         virtual ~parallel_scheduler_backend() = default;
@@ -81,22 +81,25 @@ namespace hpx::execution::experimental {
         // Schedule a single unit of work. On completion, call proxy.set_value().
         // storage: pre-allocated scratch space from the frontend's
         //          operation_state (parallel_scheduler_storage_size bytes).
-        virtual void schedule(std::span<std::byte> storage,
-            parallel_scheduler_receiver_proxy& proxy) noexcept = 0;
+        // P3927R2: parameter order is (receiver, storage)
+        virtual void schedule(parallel_scheduler_receiver_proxy& proxy,
+            std::span<std::byte> storage) noexcept = 0;
 
         // Schedule chunked bulk work of size count.
         // The backend partitions [0, count) into subranges and calls
         // proxy.execute(begin, end) for each subrange, then proxy.set_value().
-        virtual void schedule_bulk_chunked(std::span<std::byte> storage,
-            std::size_t count,
-            parallel_scheduler_bulk_item_receiver_proxy& proxy) noexcept = 0;
+        // P3927R2: parameter order is (shape, receiver, storage)
+        virtual void schedule_bulk_chunked(std::size_t count,
+            parallel_scheduler_bulk_item_receiver_proxy& proxy,
+            std::span<std::byte> storage) noexcept = 0;
 
         // Schedule unchunked bulk work of size count.
         // The backend calls proxy.execute(i, i+1) for each i in [0, count),
         // then proxy.set_value().
-        virtual void schedule_bulk_unchunked(std::span<std::byte> storage,
-            std::size_t count,
-            parallel_scheduler_bulk_item_receiver_proxy& proxy) noexcept = 0;
+        // P3927R2: parameter order is (shape, receiver, storage)
+        virtual void schedule_bulk_unchunked(std::size_t count,
+            parallel_scheduler_bulk_item_receiver_proxy& proxy,
+            std::span<std::byte> storage) noexcept = 0;
 
         // Equality: two backends are equal if they share the same execution
         // context. Used by parallel_scheduler::operator==.
@@ -142,8 +145,8 @@ namespace hpx::execution::experimental {
             {
             }
 
-            void schedule(std::span<std::byte>,
-                parallel_scheduler_receiver_proxy& proxy) noexcept override
+            void schedule(parallel_scheduler_receiver_proxy& proxy,
+                std::span<std::byte>) noexcept override
             {
                 hpx::detail::try_catch_exception_ptr(
                     [&]() {
@@ -155,9 +158,9 @@ namespace hpx::execution::experimental {
                     });
             }
 
-            void schedule_bulk_chunked(std::span<std::byte>, std::size_t count,
-                parallel_scheduler_bulk_item_receiver_proxy& proxy) noexcept
-                override
+            void schedule_bulk_chunked(std::size_t count,
+                parallel_scheduler_bulk_item_receiver_proxy& proxy,
+                std::span<std::byte>) noexcept override
             {
                 hpx::detail::try_catch_exception_ptr(
                     [&]() {
@@ -188,10 +191,9 @@ namespace hpx::execution::experimental {
                     });
             }
 
-            void schedule_bulk_unchunked(std::span<std::byte>,
-                std::size_t count,
-                parallel_scheduler_bulk_item_receiver_proxy& proxy) noexcept
-                override
+            void schedule_bulk_unchunked(std::size_t count,
+                parallel_scheduler_bulk_item_receiver_proxy& proxy,
+                std::span<std::byte>) noexcept override
             {
                 hpx::detail::try_catch_exception_ptr(
                     [&]() {
