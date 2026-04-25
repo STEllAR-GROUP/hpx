@@ -857,7 +857,7 @@ namespace hpx {
     // 20.4.2.4, tuple creation functions
     HPX_CXX_CORE_EXPORT inline constexpr hpx::detail::ignore_type ignore = {};
 
-    // template<class... Types>
+    // template <class... Types>
     // constexpr tuple<VTypes...> make_tuple(Types&&... t);
     HPX_CXX_CORE_EXPORT template <typename... Ts>
     constexpr HPX_HOST_DEVICE HPX_FORCEINLINE tuple<util::decay_unwrap_t<Ts>...>
@@ -866,7 +866,7 @@ namespace hpx {
         return tuple<util::decay_unwrap_t<Ts>...>(HPX_FORWARD(Ts, ts)...);
     }
 
-    // template<class... Types>
+    // template <class... Types>
     // tuple<Types&&...> forward_as_tuple(Types&&... t) noexcept;
     // Constructs a tuple of references to the arguments in t suitable for
     // forwarding as arguments to a function. Because the result may contain
@@ -879,7 +879,7 @@ namespace hpx {
         return tuple<Ts&&...>(HPX_FORWARD(Ts, ts)...);
     }
 
-    // template<class... Types>
+    // template <class... Types>
     // tuple<Types&...> tie(Types&... t) noexcept;
     HPX_CXX_CORE_EXPORT template <typename... Ts>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr tuple<Ts&...> tie(
@@ -1007,7 +1007,7 @@ namespace hpx {
 
     // 20.4.2.7, relational operators
 
-    // template<class... TTypes, class... UTypes>
+    // template <class... TTypes, class... UTypes>
     // constexpr bool operator==
     //     (const tuple<TTypes...>& t, const tuple<UTypes...>& u);
     // The elementary comparisons are performed in order from the zeroth index
@@ -1047,7 +1047,7 @@ namespace hpx {
         return hpx::detail::tuple_equal_to<0, sizeof...(Ts)>::call(t, u);
     }
 
-    // template<class... TTypes, class... UTypes>
+    // template <class... TTypes, class... UTypes>
     // constexpr bool operator!=
     //     (const tuple<TTypes...>& t, const tuple<UTypes...>& u);
     HPX_CXX_CORE_EXPORT template <typename... Ts, typename... Us>
@@ -1058,7 +1058,7 @@ namespace hpx {
         return !(t == u);
     }
 
-    // template<class... TTypes, class... UTypes>
+    // template <class... TTypes, class... UTypes>
     // constexpr bool operator<
     //     (const tuple<TTypes...>& t, const tuple<UTypes...>& u);
     // The result is defined as: (bool)(get<0>(t) < get<0>(u)) ||
@@ -1100,7 +1100,7 @@ namespace hpx {
         return hpx::detail::tuple_less_than<0, sizeof...(Ts)>::call(t, u);
     }
 
-    // template<class... TTypes, class... UTypes>
+    // template <class... TTypes, class... UTypes>
     // constexpr bool operator>
     //     (const tuple<TTypes...>& t, const tuple<UTypes...>& u);
     HPX_CXX_CORE_EXPORT template <typename... Ts, typename... Us>
@@ -1111,7 +1111,7 @@ namespace hpx {
         return u < t;
     }
 
-    // template<class... TTypes, class... UTypes>
+    // template <class... TTypes, class... UTypes>
     // constexpr bool operator<=
     //     (const tuple<TTypes...>& t, const tuple<UTypes...>& u);
     HPX_CXX_CORE_EXPORT template <typename... Ts, typename... Us>
@@ -1122,7 +1122,7 @@ namespace hpx {
         return !(u < t);
     }
 
-    // template<class... TTypes, class... UTypes>
+    // template <class... TTypes, class... UTypes>
     // constexpr bool operator>=
     //     (const tuple<TTypes...>& t, const tuple<UTypes...>& u);
     HPX_CXX_CORE_EXPORT template <typename... Ts, typename... Us>

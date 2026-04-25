@@ -45,8 +45,7 @@ namespace hpx::util {
     };
 
     // clang-format off
-    HPX_CXX_EXPORT template <
-        typename Case1 = std::true_type, typename Type1 = void_t,
+    HPX_CXX_EXPORT template <typename Case1 = std::true_type, typename Type1 = void_t,
         typename Case2 = std::true_type, typename Type2 = void_t,
         typename Case3 = std::true_type, typename Type3 = void_t,
         typename Case4 = std::true_type, typename Type4 = void_t,
@@ -86,8 +85,7 @@ namespace hpx::util {
             >::type;
     };
 
-    HPX_CXX_EXPORT template <
-        typename Case1 = std::true_type, typename Type1 = void_t,
+    HPX_CXX_EXPORT template <typename Case1 = std::true_type, typename Type1 = void_t,
         typename Case2 = std::true_type, typename Type2 = void_t,
         typename Case3 = std::true_type, typename Type3 = void_t,
         typename Case4 = std::true_type, typename Type4 = void_t,

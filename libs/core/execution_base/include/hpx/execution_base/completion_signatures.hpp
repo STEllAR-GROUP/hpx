@@ -538,7 +538,7 @@ namespace hpx::execution::experimental {
     inline constexpr bool is_derived_from_v = std::derived_from<A, B>;
 
     // Does not exist in P2300
-    //    template<typename Promise>
+    //    template <typename Promise>
     //    using with_awaitable_senders =
     //    hpx::execution::experimental::with_awaitable_senders<Promise>;
 

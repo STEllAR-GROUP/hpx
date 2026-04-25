@@ -42,7 +42,7 @@
    A ContextImpl holds a context plus its stack.
    - ContextImpl must have constructor with the following signature:
 
-     template<typename Functor>
+     template <typename Functor>
      ContextImpl(Functor f, std::ptrdiff_t stack_size);
 
      Preconditions:

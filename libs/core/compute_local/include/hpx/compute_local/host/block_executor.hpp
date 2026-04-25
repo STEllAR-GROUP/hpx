@@ -31,8 +31,7 @@ namespace hpx::compute::host {
     /// It will distribute work evenly across the passed targets
     ///
     /// \tparam Executor The underlying executor to use
-    HPX_CXX_CORE_EXPORT template <
-        typename Executor =
+    HPX_CXX_CORE_EXPORT template <typename Executor =
             hpx::execution::experimental::restricted_thread_pool_executor>
     struct block_executor
     {
