@@ -27,6 +27,7 @@ if(HPX_WITH_NETWORKING)
       ${tests}
       all_gather_hierarchical
       all_reduce_hierarchical
+      barrier_hierarchical
       broadcast_direct
       concurrent_collectives
       exclusive_scan_
@@ -34,6 +35,7 @@ if(HPX_WITH_NETWORKING)
       gather
       gather_hierarchical
       gather_sync
+      hierarchical_flat_fallback
       inclusive_scan_
       inclusive_scan_sync
       reduce

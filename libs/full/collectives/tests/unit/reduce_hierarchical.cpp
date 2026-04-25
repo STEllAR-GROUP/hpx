@@ -164,13 +164,35 @@ void test_local_use(std::uint32_t num_sites, int arity = 2)
             if (site == 0)
             {
                 std::cout << "local timing (" << num_sites << "/" << arity
-                          << "): " << elapsed / (10 * ITERATIONS) << "[s]\n"
+                          << "): " << elapsed / ITERATIONS << "[s]\n"
                           << std::flush;
             }
         }));
     }
 
     hpx::wait_all(std::move(sites));
+}
+
+// Non-power-of-arity coverage. The hierarchical tree construction in
+// create_communicator.cpp handles uneven partitioning via the
+// division_steps + remainder logic and degenerate single-site leaves.
+// This test exercises site counts that are not clean multiples of the
+// arity, including cases where recursion produces size-1 subgroups.
+void test_non_power_of_arity()
+{
+    // arity=2 with site counts that force uneven splits and odd-sized
+    // subtrees at multiple levels of recursion.
+    for (std::uint32_t num_sites : {3u, 5u, 6u, 7u, 9u, 10u, 11u, 15u})
+    {
+        test_local_use(num_sites, 2);
+    }
+
+    // arity=4 with site counts not divisible by 4, exercising top-level
+    // partitioning into unequal subtrees.
+    for (std::uint32_t num_sites : {5u, 6u, 7u, 9u, 10u, 11u, 13u, 15u})
+    {
+        test_local_use(num_sites, 4);
+    }
 }
 
 int hpx_main()
@@ -201,6 +223,8 @@ int hpx_main()
                 }
             }
         }
+
+        test_non_power_of_arity();
     }
 
     return hpx::finalize();

@@ -63,10 +63,10 @@
 /**/
 
 ////////////////////////////////////////////////////////////////////////////////
-#if !defined(HPX_APPLICATION_NAME) && !defined(HPX_HAVE_STATIC_LINKING)
-
 /// This macro is used to define the required Hpx.Plugin entry points. This
 /// macro has to be used in exactly one compilation unit of a component module.
+/// Ungated: a component may live in a shared library, in a statically linked
+/// build, or directly in the application executable.
 #define HPX_REGISTER_COMPONENT_MODULE()                                        \
     HPX_PLUGIN_EXPORT_LIST(HPX_PLUGIN_COMPONENT_PREFIX, factory)               \
     HPX_REGISTER_REGISTRY_MODULE()                                             \
@@ -75,22 +75,6 @@
     HPX_PLUGIN_EXPORT_LIST_DYNAMIC(HPX_PLUGIN_COMPONENT_PREFIX, factory)       \
     HPX_REGISTER_REGISTRY_MODULE_DYNAMIC()                                     \
     /**/
-
-#else
-
-// in executables (when HPX_APPLICATION_NAME is defined) this needs to expand to
-// nothing
-#if defined(HPX_HAVE_STATIC_LINKING)
-#define HPX_REGISTER_COMPONENT_MODULE()                                        \
-    HPX_PLUGIN_EXPORT_LIST(HPX_PLUGIN_COMPONENT_PREFIX, factory)               \
-    HPX_REGISTER_REGISTRY_MODULE()                                             \
-/**/
-#else
-#define HPX_REGISTER_COMPONENT_MODULE()
-#endif
-#define HPX_REGISTER_COMPONENT_MODULE_DYNAMIC()
-
-#endif
 
 #else    // COMPUTE DEVICE CODE
 
@@ -117,10 +101,9 @@
 /**/
 
 ///////////////////////////////////////////////////////////////////////////////
-#if !defined(HPX_APPLICATION_NAME)
-
 /// This macro is used to define the required Hpx.Plugin entry points. This
 /// macro has to be used in exactly one compilation unit of a component module.
+/// Ungated: see HPX_REGISTER_COMPONENT_MODULE.
 #define HPX_REGISTER_REGISTRY_MODULE()                                         \
     HPX_PLUGIN_EXPORT_LIST(HPX_PLUGIN_COMPONENT_PREFIX, registry)              \
     HPX_INIT_REGISTRY_MODULE_STATIC(HPX_PLUGIN_COMPONENT_PREFIX, registry)     \
@@ -128,15 +111,6 @@
 #define HPX_REGISTER_REGISTRY_MODULE_DYNAMIC()                                 \
     HPX_PLUGIN_EXPORT_LIST_DYNAMIC(HPX_PLUGIN_COMPONENT_PREFIX, registry)      \
     /**/
-
-#else
-
-// in executables (when HPX_APPLICATION_NAME is defined) this needs to expand
-// to nothing
-#define HPX_REGISTER_REGISTRY_MODULE()
-#define HPX_REGISTER_REGISTRY_MODULE_DYNAMIC()
-
-#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // from hpx/runtime_configuration/plugin_registry_base.hpp
