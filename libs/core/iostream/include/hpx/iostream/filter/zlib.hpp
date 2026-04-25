@@ -34,7 +34,7 @@ namespace hpx::iostream {
 
         // Prefix 'x' prevents symbols from being redefined when Z_PREFIX is defined
         HPX_CXX_CORE_EXPORT using xalloc_func =
-            void * (*) (void*, zlib::uint, zlib::uint);
+            void* (*) (void*, zlib::uint, zlib::uint);
         HPX_CXX_CORE_EXPORT using xfree_func = void (*)(void*, void*);
 
         // Compression levels

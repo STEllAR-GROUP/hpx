@@ -627,9 +627,9 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            std::ranges::iterator_t<Rng>>
-        tag_fallback_invoke(is_heap_until_t, ExPolicy&& policy, Rng&& rng,
-            Comp comp = Comp(), Proj proj = Proj())
+            std::ranges::iterator_t<Rng>> tag_fallback_invoke(is_heap_until_t,
+            ExPolicy&& policy, Rng&& rng, Comp comp = Comp(),
+            Proj proj = Proj())
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;

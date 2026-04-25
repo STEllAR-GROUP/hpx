@@ -596,9 +596,9 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            FwdIter>
-        tag_fallback_invoke(hpx::ranges::for_each_n_t, ExPolicy&& policy,
-            FwdIter first, Size count, F f, Proj proj = Proj())
+            FwdIter> tag_fallback_invoke(hpx::ranges::for_each_n_t,
+            ExPolicy&& policy, FwdIter first, Size count, F f,
+            Proj proj = Proj())
         {
             static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");

@@ -1178,10 +1178,9 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            Iter>::type
-        tag_fallback_invoke(hpx::ranges::replace_if_t, ExPolicy&& policy,
-            Iter first, Sent sent, Pred pred, T const& new_value,
-            Proj proj = Proj())
+            Iter>::type tag_fallback_invoke(hpx::ranges::replace_if_t,
+            ExPolicy&& policy, Iter first, Sent sent, Pred pred,
+            T const& new_value, Proj proj = Proj())
         {
             static_assert(std::forward_iterator<Iter>,
                 "Required at least forward iterator.");
@@ -1293,10 +1292,9 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            Iter>::type
-        tag_fallback_invoke(hpx::ranges::replace_t, ExPolicy&& policy,
-            Iter first, Sent sent, T1 const& old_value, T2 const& new_value,
-            Proj proj = Proj())
+            Iter>::type tag_fallback_invoke(hpx::ranges::replace_t,
+            ExPolicy&& policy, Iter first, Sent sent, T1 const& old_value,
+            T2 const& new_value, Proj proj = Proj())
         {
             static_assert(std::forward_iterator<Iter>,
                 "Required at least forward iterator.");

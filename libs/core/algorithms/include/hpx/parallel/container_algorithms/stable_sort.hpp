@@ -342,9 +342,8 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            RandomIt>::type
-        tag_fallback_invoke(hpx::ranges::stable_sort_t, ExPolicy&& policy,
-            RandomIt first, Sent last, Comp&& comp = Comp(),
+            RandomIt>::type tag_fallback_invoke(hpx::ranges::stable_sort_t,
+            ExPolicy&& policy, RandomIt first, Sent last, Comp&& comp = Comp(),
             Proj&& proj = Proj())
         {
             static_assert(std::random_access_iterator<RandomIt>,

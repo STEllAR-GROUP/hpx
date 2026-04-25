@@ -28,7 +28,7 @@ namespace hpx::iostream {
 
         // Typedefs.
 
-        HPX_CXX_CORE_EXPORT using alloc_func = void * (*) (void*, int, int);
+        HPX_CXX_CORE_EXPORT using alloc_func = void* (*) (void*, int, int);
         HPX_CXX_CORE_EXPORT using free_func = void (*)(void*, void*);
 
         // Status codes
