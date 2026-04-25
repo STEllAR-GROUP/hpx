@@ -680,4 +680,3 @@ namespace hpx::this_thread {
 }    // namespace hpx::this_thread
 
 #include <hpx/config/warnings_suffix.hpp>
-pp>
