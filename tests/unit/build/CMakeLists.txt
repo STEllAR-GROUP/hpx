@@ -194,7 +194,10 @@ foreach(build_type ${build_types})
 endforeach()
 add_hpx_pseudo_dependencies(tests.unit.build tests.unit.build.cmake)
 
-if(HPX_WITH_PKGCONFIG AND HPX_WITH_DISTRIBUTED_RUNTIME AND NOT HPX_WITH_CXX_MODULES)
+if(HPX_WITH_PKGCONFIG
+   AND HPX_WITH_DISTRIBUTED_RUNTIME
+   AND NOT HPX_WITH_CXX_MODULES
+)
   find_package(PkgConfig)
   if(PKGCONFIG_FOUND)
     create_pkgconfig_test(

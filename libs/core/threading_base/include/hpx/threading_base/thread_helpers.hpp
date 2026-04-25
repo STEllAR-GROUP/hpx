@@ -191,9 +191,9 @@ namespace hpx::threads {
         hpx::error_code& ec = hpx::throws);
 #else
 #if !defined(DOXYGEN)
-    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT
-        util::backtrace const* get_thread_backtrace(
-            thread_id_type const& id, hpx::error_code& ec = hpx::throws);
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT util::backtrace const*
+    get_thread_backtrace(
+        thread_id_type const& id, hpx::error_code& ec = hpx::throws);
     HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT util::backtrace const*
     set_thread_backtrace(thread_id_type const& id,
         util::backtrace const* bt = nullptr, hpx::error_code& ec = hpx::throws);
@@ -680,3 +680,4 @@ namespace hpx::this_thread {
 }    // namespace hpx::this_thread
 
 #include <hpx/config/warnings_suffix.hpp>
+pp>

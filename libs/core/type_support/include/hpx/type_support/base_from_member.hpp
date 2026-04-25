@@ -67,7 +67,7 @@ namespace hpx::util {
         template <typename... T>
             requires(detail::is_unrelated<base_from_member, T...>::value)
         explicit constexpr base_from_member(T&&... x) noexcept(
-            noexcept(::new (nullptr) MemberType(static_cast<T&&>(x)...)))
+            noexcept(::new(nullptr) MemberType(static_cast<T&&>(x)...)))
           : member(static_cast<T&&>(x)...)
         {
         }
