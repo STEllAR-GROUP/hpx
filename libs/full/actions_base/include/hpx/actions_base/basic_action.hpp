@@ -211,7 +211,8 @@ namespace hpx::actions {
     }    // namespace detail
 
     template <typename Component, typename R, typename... Args,
-        typename Derived> struct basic_action<Component, R(Args...), Derived>
+        typename Derived>
+    struct basic_action<Component, R(Args...), Derived>
     {
 #if !defined(HPX_SERIALIZATION_HAVE_ALLOW_RAW_POINTER_SERIALIZATION)
         // Flag the use of raw pointer types as action arguments
@@ -461,7 +462,8 @@ namespace hpx::actions {
             using type = Derived;
         };
 
-        template <typename Action> struct action_type<Action, void>
+        template <typename Action>
+        struct action_type<Action, void>
         {
             using type = Action;
         };
@@ -504,7 +506,8 @@ namespace hpx::actions {
         using type = action<TF, F, Derived>;
     };
 
-    template <typename TF, TF F, typename Derived> struct make_action<TF, F, Derived, std::true_type>
+    template <typename TF, TF F, typename Derived>
+    struct make_action<TF, F, Derived, std::true_type>
     {
         using type = direct_action<TF, F, Derived>;
     };

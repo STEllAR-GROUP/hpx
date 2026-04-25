@@ -76,7 +76,8 @@ namespace hpx::parallel::util::detail {
         }
     };
 
-    template <> struct handle_remote_exceptions<hpx::execution::parallel_unsequenced_policy>
+    template <>
+    struct handle_remote_exceptions<hpx::execution::parallel_unsequenced_policy>
     {
         [[noreturn]] static void call(
             std::exception_ptr const&, std::list<std::exception_ptr>&)
@@ -107,7 +108,8 @@ namespace hpx::parallel::util::detail {
         }
     };
 
-    template <> struct handle_remote_exceptions<hpx::execution::unsequenced_policy>
+    template <>
+    struct handle_remote_exceptions<hpx::execution::unsequenced_policy>
     {
         [[noreturn]] static void call(
             std::exception_ptr const&, std::list<std::exception_ptr>&)

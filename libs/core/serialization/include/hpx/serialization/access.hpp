@@ -173,7 +173,8 @@ namespace hpx::traits {
 
     // the case when hpx::serialization::access::has_serialize_v<T> is true has
     // to be handled separately to avoid circular dependencies
-    template <typename T> struct is_not_bitwise_serializable<T,
+    template <typename T>
+    struct is_not_bitwise_serializable<T,
         std::enable_if_t<!std::is_abstract_v<T> &&
             !hpx::traits::has_serialize_adl_v<T> &&
             hpx::serialization::access::has_serialize_v<T>>> : std::true_type

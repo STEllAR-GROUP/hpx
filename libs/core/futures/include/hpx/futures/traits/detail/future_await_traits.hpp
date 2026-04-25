@@ -213,7 +213,8 @@ namespace hpx::lcos::detail {
 namespace HPX_COROUTINE_NAMESPACE_STD {
 
     // Allow for functions that use co_await to return a hpx::future<T>
-    template <typename T, typename... Ts> struct coroutine_traits<hpx::future<T>, Ts...>
+    template <typename T, typename... Ts>
+    struct coroutine_traits<hpx::future<T>, Ts...>
     {
         using allocator_type = hpx::util::internal_allocator<coroutine_traits>;
 
@@ -250,7 +251,8 @@ namespace HPX_COROUTINE_NAMESPACE_STD {
         };
     };
 
-    template <typename... Ts> struct coroutine_traits<hpx::future<void>, Ts...>
+    template <typename... Ts>
+    struct coroutine_traits<hpx::future<void>, Ts...>
     {
         using allocator_type = hpx::util::internal_allocator<coroutine_traits>;
 
@@ -287,7 +289,8 @@ namespace HPX_COROUTINE_NAMESPACE_STD {
     };
 
     // Allow for functions that use co_await to return an hpx::shared_future<T>
-    template <typename T, typename... Ts> struct coroutine_traits<hpx::shared_future<T>, Ts...>
+    template <typename T, typename... Ts>
+    struct coroutine_traits<hpx::shared_future<T>, Ts...>
     {
         using allocator_type = hpx::util::internal_allocator<coroutine_traits>;
 
@@ -324,7 +327,8 @@ namespace HPX_COROUTINE_NAMESPACE_STD {
         };
     };
 
-    template <typename... Ts> struct coroutine_traits<hpx::shared_future<void>, Ts...>
+    template <typename... Ts>
+    struct coroutine_traits<hpx::shared_future<void>, Ts...>
     {
         using allocator_type = hpx::util::internal_allocator<coroutine_traits>;
 

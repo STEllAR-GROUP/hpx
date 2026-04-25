@@ -55,8 +55,8 @@ namespace hpx::actions {
     //  Specialized generic plain (free) action types allowing to hold a
     //  different number of arguments
     ///////////////////////////////////////////////////////////////////////////
-    template <typename R, typename... Ps, R (*F)(Ps...),
-        typename Derived> struct action<R (*)(Ps...), F, Derived>
+    template <typename R, typename... Ps, R (*F)(Ps...), typename Derived>
+    struct action<R (*)(Ps...), F, Derived>
       : basic_action<detail::plain_function, R(Ps...),
             detail::action_type_t<action<R (*)(Ps...), F, Derived>, Derived>>
     {
@@ -81,7 +81,8 @@ namespace hpx::actions {
     };
 
     template <typename R, typename... Ps, R (*F)(Ps...) noexcept,
-        typename Derived> struct action<R (*)(Ps...) noexcept, F, Derived>
+        typename Derived>
+    struct action<R (*)(Ps...) noexcept, F, Derived>
       : basic_action<detail::plain_function, R(Ps...),
             detail::action_type_t<action<R (*)(Ps...) noexcept, F, Derived>,
                 Derived>>

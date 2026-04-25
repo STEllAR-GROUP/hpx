@@ -238,7 +238,8 @@ namespace hpx::parallel::util {
         HPX_CXX_CORE_EXPORT template <typename Iterator, typename Enable = void>
         struct datapar_loop_n;
 
-        template <typename Iterator> struct datapar_loop_n<Iterator,
+        template <typename Iterator>
+        struct datapar_loop_n<Iterator,
             std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
         {
             using iterator_type = std::decay_t<Iterator>;
@@ -305,7 +306,8 @@ namespace hpx::parallel::util {
             }
         };
 
-        template <typename I> struct datapar_loop_n<I, std::enable_if_t<std::is_integral_v<I>>>
+        template <typename I>
+        struct datapar_loop_n<I, std::enable_if_t<std::is_integral_v<I>>>
         {
             using V = traits::vector_pack_type_t<I>;
 

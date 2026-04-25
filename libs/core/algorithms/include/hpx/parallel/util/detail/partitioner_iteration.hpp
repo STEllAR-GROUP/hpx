@@ -93,7 +93,8 @@ namespace hpx::parallel::util::detail {
 
 namespace hpx::traits {
 
-    template <typename Result, typename F> struct get_function_address<
+    template <typename Result, typename F>
+    struct get_function_address<
         parallel::util::detail::partitioner_iteration<Result, F>>
     {
         [[nodiscard]] static constexpr std::size_t call(
@@ -104,7 +105,8 @@ namespace hpx::traits {
         }
     };
 
-    template <typename Result, typename F> struct get_function_annotation<
+    template <typename Result, typename F>
+    struct get_function_annotation<
         parallel::util::detail::partitioner_iteration<Result, F>>
     {
         [[nodiscard]] static constexpr char const* call(
@@ -116,7 +118,8 @@ namespace hpx::traits {
     };
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-    template <typename Result, typename F> struct get_function_annotation_itt<
+    template <typename Result, typename F>
+    struct get_function_annotation_itt<
         parallel::util::detail::partitioner_iteration<Result, F>>
     {
         [[nodiscard]] static util::itt::string_handle call(

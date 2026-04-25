@@ -121,7 +121,8 @@ public:
     }
 };
 
-template <> class test_allocator<void> : public test_alloc_base
+template <>
+class test_allocator<void> : public test_alloc_base
 {
     int data_;
 

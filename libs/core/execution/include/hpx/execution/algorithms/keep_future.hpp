@@ -87,7 +87,8 @@ namespace hpx::execution::experimental {
         HPX_CXX_CORE_EXPORT template <typename Future>
         struct keep_future_sender;
 
-        template <typename T> struct keep_future_sender<hpx::future<T>>
+        template <typename T>
+        struct keep_future_sender<hpx::future<T>>
           : public keep_future_sender_base<hpx::future<T>>
         {
 #if defined(HPX_HAVE_STDEXEC)
@@ -125,7 +126,8 @@ namespace hpx::execution::experimental {
             }
         };
 
-        template <typename T> struct keep_future_sender<hpx::shared_future<T>>
+        template <typename T>
+        struct keep_future_sender<hpx::shared_future<T>>
           : keep_future_sender_base<hpx::shared_future<T>>
         {
 #if defined(HPX_HAVE_STDEXEC)

@@ -389,7 +389,8 @@ namespace hpx {
         using base_type::set_exception;
     };
 
-    template <typename R> class promise<R&> : public detail::promise_base<R&>
+    template <typename R>
+    class promise<R&> : public detail::promise_base<R&>
     {
         using base_type = detail::promise_base<R&>;
 
@@ -484,7 +485,8 @@ namespace hpx {
         using base_type::set_exception;
     };
 
-    template <> class promise<void> : public detail::promise_base<void>
+    template <>
+    class promise<void> : public detail::promise_base<void>
     {
         using base_type = detail::promise_base<void>;
 
@@ -585,7 +587,8 @@ namespace hpx {
 namespace std {
 
     // Requires: Allocator shall be an allocator (17.6.3.5)
-    template <typename R, typename Allocator> struct uses_allocator<hpx::promise<R>, Allocator> : std::true_type
+    template <typename R, typename Allocator>
+    struct uses_allocator<hpx::promise<R>, Allocator> : std::true_type
     {
     };
 

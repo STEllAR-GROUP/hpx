@@ -72,7 +72,8 @@ namespace hpx::cuda::experimental {
     namespace detail {
 
         // specialization for return type of cublasStatus_t
-        template <typename... Args> struct dispatch_helper<cublasStatus_t, Args...>
+        template <typename... Args>
+        struct dispatch_helper<cublasStatus_t, Args...>
         {
             inline cublasStatus_t operator()(
                 cublasStatus_t (*f)(Args...), Args... args) const
@@ -236,13 +237,15 @@ namespace hpx::cuda::experimental {
 namespace hpx::execution::experimental {
 
     /// \cond NOINTERNAL
-    template <> struct is_one_way_executor<hpx::cuda::experimental::cublas_executor>
+    template <>
+    struct is_one_way_executor<hpx::cuda::experimental::cublas_executor>
       : std::true_type
     {
         // we support fire and forget without returning a waitable/future
     };
 
-    template <> struct is_two_way_executor<hpx::cuda::experimental::cublas_executor>
+    template <>
+    struct is_two_way_executor<hpx::cuda::experimental::cublas_executor>
       : std::true_type
     {
         // we support returning a waitable/future

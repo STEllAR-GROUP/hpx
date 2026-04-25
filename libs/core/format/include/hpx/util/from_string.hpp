@@ -70,7 +70,8 @@ namespace hpx::util {
             }
         }
 
-        template <typename T> struct from_string<T, std::enable_if_t<std::is_integral_v<T>>>
+        template <typename T>
+        struct from_string<T, std::enable_if_t<std::is_integral_v<T>>>
         {
             template <typename Char>
             static void call(std::basic_string<Char> const& value, int& target)
@@ -137,7 +138,8 @@ namespace hpx::util {
             }
         };
 
-        template <typename T> struct from_string<T, std::enable_if_t<std::is_floating_point_v<T>>>
+        template <typename T>
+        struct from_string<T, std::enable_if_t<std::is_floating_point_v<T>>>
         {
             template <typename Char>
             static void call(

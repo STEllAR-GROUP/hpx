@@ -39,7 +39,8 @@ namespace hpx {
     HPX_CXX_CORE_EXPORT template <typename Sig, bool Serializable = false>
     class function;
 
-    template <typename R, typename... Ts, bool Serializable> class function<R(Ts...), Serializable>
+    template <typename R, typename... Ts, bool Serializable>
+    class function<R(Ts...), Serializable>
       : public util::detail::basic_function<R(Ts...), true, Serializable>
     {
         using base_type =
@@ -97,7 +98,8 @@ namespace hpx {
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::traits {
 
-    template <typename Sig, bool Serializable> struct get_function_address<hpx::function<Sig, Serializable>>
+    template <typename Sig, bool Serializable>
+    struct get_function_address<hpx::function<Sig, Serializable>>
     {
         [[nodiscard]] static constexpr std::size_t call(
             hpx::function<Sig, Serializable> const& f) noexcept
@@ -106,7 +108,8 @@ namespace hpx::traits {
         }
     };
 
-    template <typename Sig, bool Serializable> struct get_function_annotation<hpx::function<Sig, Serializable>>
+    template <typename Sig, bool Serializable>
+    struct get_function_annotation<hpx::function<Sig, Serializable>>
     {
         [[nodiscard]] static constexpr char const* call(
             hpx::function<Sig, Serializable> const& f) noexcept
@@ -116,7 +119,8 @@ namespace hpx::traits {
     };
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-    template <typename Sig, bool Serializable> struct get_function_annotation_itt<hpx::function<Sig, Serializable>>
+    template <typename Sig, bool Serializable>
+    struct get_function_annotation_itt<hpx::function<Sig, Serializable>>
     {
         [[nodiscard]] static util::itt::string_handle call(
             hpx::function<Sig, Serializable> const& f) noexcept

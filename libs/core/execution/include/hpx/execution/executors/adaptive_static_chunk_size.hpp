@@ -119,7 +119,8 @@ namespace hpx::execution::experimental {
     };
 
     /// \cond NOINTERNAL
-    template <> struct is_executor_parameters<
+    template <>
+    struct is_executor_parameters<
         hpx::execution::experimental::adaptive_static_chunk_size>
       : std::true_type
     {

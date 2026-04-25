@@ -65,7 +65,8 @@ namespace hpx::traits {
         {
         };
 
-        template <typename T, typename U> struct is_weakly_equality_comparable_with<T, U,
+        template <typename T, typename U>
+        struct is_weakly_equality_comparable_with<T, U,
             std::void_t<detail::equality_result_t<T, U>,
                 detail::equality_result_t<U, T>,
                 detail::inequality_result_t<T, U>,

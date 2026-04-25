@@ -197,11 +197,13 @@ namespace hpx {
 // Adapt hpx::tuple to be usable with structured binding contexts
 namespace std {
 
-    template <typename... Ts> struct tuple_size<hpx::tuple<Ts...>> : hpx::tuple_size<hpx::tuple<Ts...>>
+    template <typename... Ts>
+    struct tuple_size<hpx::tuple<Ts...>> : hpx::tuple_size<hpx::tuple<Ts...>>
     {
     };
 
-    template <std::size_t I, typename... Ts> struct tuple_element<I, hpx::tuple<Ts...>>
+    template <std::size_t I, typename... Ts>
+    struct tuple_element<I, hpx::tuple<Ts...>>
       : hpx::tuple_element<I, hpx::tuple<Ts...>>
     {
     };
@@ -235,7 +237,8 @@ namespace hpx {
         {
         };
 
-        template <std::size_t... Is, typename... Ts, typename UTuple> struct are_tuples_compatible_impl<util::index_pack<Is...>, tuple<Ts...>,
+        template <std::size_t... Is, typename... Ts, typename UTuple>
+        struct are_tuples_compatible_impl<util::index_pack<Is...>, tuple<Ts...>,
             UTuple,
             std::enable_if_t<tuple_size<std::remove_reference_t<UTuple>>::
                                  value == util::pack<Ts...>::size>>
@@ -247,7 +250,8 @@ namespace hpx {
         template <typename TTuple, typename UTuple>
         struct are_tuples_compatible;
 
-        template <typename... Ts, typename UTuple> struct are_tuples_compatible<tuple<Ts...>, UTuple>
+        template <typename... Ts, typename UTuple>
+        struct are_tuples_compatible<tuple<Ts...>, UTuple>
           : are_tuples_compatible_impl<util::make_index_pack_t<sizeof...(Ts)>,
                 hpx::tuple<Ts...>, UTuple>
         {
@@ -264,7 +268,8 @@ namespace hpx {
     }    // namespace detail
 
     // 20.4.2, class template tuple
-    template <> class tuple<>
+    template <>
+    class tuple<>
     {
     public:
         // 20.4.2.1, tuple construction
@@ -573,35 +578,42 @@ namespace hpx {
     {
     };
 
-    template <typename T> struct tuple_size<T const> : tuple_size<T>
+    template <typename T>
+    struct tuple_size<T const> : tuple_size<T>
     {
     };
 
-    template <typename T> struct tuple_size<T volatile> : tuple_size<T>
+    template <typename T>
+    struct tuple_size<T volatile> : tuple_size<T>
     {
     };
 
-    template <typename T> struct tuple_size<T const volatile> : tuple_size<T>
+    template <typename T>
+    struct tuple_size<T const volatile> : tuple_size<T>
     {
     };
 
-    template <typename... Ts> struct tuple_size<tuple<Ts...>>
+    template <typename... Ts>
+    struct tuple_size<tuple<Ts...>>
       : std::integral_constant<std::size_t, sizeof...(Ts)>
     {
     };
 
-    template <typename T0, typename T1> struct tuple_size<std::pair<T0, T1>>
+    template <typename T0, typename T1>
+    struct tuple_size<std::pair<T0, T1>>
       : std::integral_constant<std::size_t, 2>
     {
     };
 
-    template <typename Type, std::size_t Size> struct tuple_size<std::array<Type, Size>>
+    template <typename Type, std::size_t Size>
+    struct tuple_size<std::array<Type, Size>>
       : std::integral_constant<std::size_t, Size>
     {
     };
 
 #if defined(HPX_DATASTRUCTURES_HAVE_ADAPT_STD_TUPLE)
-    template <typename... Ts> struct tuple_size<std::tuple<Ts...>> : std::tuple_size<std::tuple<Ts...>>
+    template <typename... Ts>
+    struct tuple_size<std::tuple<Ts...>> : std::tuple_size<std::tuple<Ts...>>
     {
     };
 #endif
@@ -616,25 +628,29 @@ namespace hpx {
     {
     };
 
-    template <std::size_t I, typename T> struct tuple_element<I, T const,
+    template <std::size_t I, typename T>
+    struct tuple_element<I, T const,
         std::void_t<typename tuple_element<I, T>::type>>
       : std::add_const<typename tuple_element<I, T>::type>
     {
     };
 
-    template <std::size_t I, typename T> struct tuple_element<I, T volatile,
+    template <std::size_t I, typename T>
+    struct tuple_element<I, T volatile,
         std::void_t<typename tuple_element<I, T>::type>>
       : std::add_volatile<typename tuple_element<I, T>::type>
     {
     };
 
-    template <std::size_t I, typename T> struct tuple_element<I, T const volatile,
+    template <std::size_t I, typename T>
+    struct tuple_element<I, T const volatile,
         std::void_t<typename tuple_element<I, T>::type>>
       : std::add_cv<typename tuple_element<I, T>::type>
     {
     };
 
-    template <std::size_t I, typename... Ts> struct tuple_element<I, tuple<Ts...>>
+    template <std::size_t I, typename... Ts>
+    struct tuple_element<I, tuple<Ts...>>
     {
         using type = typename util::at_index<I, Ts...>::type;
 
@@ -651,7 +667,8 @@ namespace hpx {
         }
     };
 
-    template <typename T0, typename T1> struct tuple_element<0, std::pair<T0, T1>>
+    template <typename T0, typename T1>
+    struct tuple_element<0, std::pair<T0, T1>>
     {
         using type = T0;
 
@@ -668,7 +685,8 @@ namespace hpx {
         }
     };
 
-    template <typename T0, typename T1> struct tuple_element<1, std::pair<T0, T1>>
+    template <typename T0, typename T1>
+    struct tuple_element<1, std::pair<T0, T1>>
     {
         using type = T1;
 
@@ -685,8 +703,8 @@ namespace hpx {
         }
     };
 
-    template <std::size_t I, typename Type,
-        std::size_t Size> struct tuple_element<I, std::array<Type, Size>>
+    template <std::size_t I, typename Type, std::size_t Size>
+    struct tuple_element<I, std::array<Type, Size>>
     {
         using type = Type;
 
@@ -711,7 +729,8 @@ namespace hpx {
     };
 
 #if defined(HPX_DATASTRUCTURES_HAVE_ADAPT_STD_TUPLE)
-    template <std::size_t I, typename... Ts> struct tuple_element<I, std::tuple<Ts...>>
+    template <std::size_t I, typename... Ts>
+    struct tuple_element<I, std::tuple<Ts...>>
     {
         using type = std::tuple_element_t<I, std::tuple<Ts...>>;
 
@@ -877,12 +896,14 @@ namespace hpx {
         template <std::size_t Size, typename Tuples>
         struct tuple_cat_size_impl;
 
-        template <std::size_t Size> struct tuple_cat_size_impl<Size, util::pack<>>
+        template <std::size_t Size>
+        struct tuple_cat_size_impl<Size, util::pack<>>
           : std::integral_constant<std::size_t, Size>
         {
         };
 
-        template <std::size_t Size, typename Head, typename... Tail> struct tuple_cat_size_impl<Size, util::pack<Head, Tail...>>
+        template <std::size_t Size, typename Head, typename... Tail>
+        struct tuple_cat_size_impl<Size, util::pack<Head, Tail...>>
           : tuple_cat_size_impl<(Size + tuple_size<Head>::value),
                 util::pack<Tail...>>
         {
@@ -897,7 +918,8 @@ namespace hpx {
         template <std::size_t I, typename Tuples, typename Enable = void>
         struct tuple_cat_element;
 
-        template <std::size_t I, typename Head, typename... Tail> struct tuple_cat_element<I, util::pack<Head, Tail...>,
+        template <std::size_t I, typename Head, typename... Tail>
+        struct tuple_cat_element<I, util::pack<Head, Tail...>,
             std::enable_if_t<(I < tuple_size<Head>::value)>>
           : tuple_element<I, Head>
         {
@@ -910,7 +932,8 @@ namespace hpx {
             }
         };
 
-        template <std::size_t I, typename Head, typename... Tail> struct tuple_cat_element<I, util::pack<Head, Tail...>,
+        template <std::size_t I, typename Head, typename... Tail>
+        struct tuple_cat_element<I, util::pack<Head, Tail...>,
             std::enable_if_t<(I >= tuple_size<Head>::value)>>
           : tuple_cat_element<I - tuple_size<Head>::value, util::pack<Tail...>>
         {
@@ -930,7 +953,8 @@ namespace hpx {
         template <typename Indices, typename Tuples>
         struct tuple_cat_result_impl;
 
-        template <std::size_t... Is, typename... Tuples> struct tuple_cat_result_impl<util::index_pack<Is...>,
+        template <std::size_t... Is, typename... Tuples>
+        struct tuple_cat_result_impl<util::index_pack<Is...>,
             util::pack<Tuples...>>
         {
             using type = tuple<
@@ -1003,7 +1027,8 @@ namespace hpx {
             }
         };
 
-        template <std::size_t Size> struct tuple_equal_to<Size, Size>
+        template <std::size_t Size>
+        struct tuple_equal_to<Size, Size>
         {
             template <typename TTuple, typename UTuple>
             static constexpr HPX_HOST_DEVICE HPX_FORCEINLINE bool call(
@@ -1055,7 +1080,8 @@ namespace hpx {
             }
         };
 
-        template <std::size_t Size> struct tuple_less_than<Size, Size>
+        template <std::size_t Size>
+        struct tuple_less_than<Size, Size>
         {
             template <typename TTuple, typename UTuple>
             static constexpr HPX_HOST_DEVICE HPX_FORCEINLINE bool call(

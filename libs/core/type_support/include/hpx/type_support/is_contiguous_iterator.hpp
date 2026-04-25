@@ -37,7 +37,8 @@ namespace hpx::traits {
         {
         };
 
-        template <typename Iter> struct is_std_array_iterator<Iter,
+        template <typename Iter>
+        struct is_std_array_iterator<Iter,
             std::enable_if_t<has_valid_array_v<iter_value_type_t<Iter>>>>
           : std::bool_constant<(
                 std::is_same_v<
@@ -60,7 +61,8 @@ namespace hpx::traits {
         {
         };
 
-        template <typename Iter> struct is_std_vector_iterator<Iter,
+        template <typename Iter>
+        struct is_std_vector_iterator<Iter,
             std::enable_if_t<has_valid_vector_v<iter_value_type_t<Iter>>>>
           : std::bool_constant<
                 std::is_same_v<
@@ -78,26 +80,31 @@ namespace hpx::traits {
         {
         };
 
-        template <> struct is_valid_char_type<char> : std::true_type
+        template <>
+        struct is_valid_char_type<char> : std::true_type
         {
         };
 
-        template <> struct is_valid_char_type<wchar_t> : std::true_type
+        template <>
+        struct is_valid_char_type<wchar_t> : std::true_type
         {
         };
 
 #if __cpp_char8_t
-        template <> struct is_valid_char_type<char8_t> : std::true_type
+        template <>
+        struct is_valid_char_type<char8_t> : std::true_type
         {
         };
 #endif
 
 #if __cpp_unicode_characters
-        template <> struct is_valid_char_type<char16_t> : std::true_type
+        template <>
+        struct is_valid_char_type<char16_t> : std::true_type
         {
         };
 
-        template <> struct is_valid_char_type<char32_t> : std::true_type
+        template <>
+        struct is_valid_char_type<char32_t> : std::true_type
         {
         };
 #endif
@@ -131,7 +138,8 @@ namespace hpx::traits {
         {
         };
 
-        template <typename Iter> struct is_std_basic_string_iterator<Iter,
+        template <typename Iter>
+        struct is_std_basic_string_iterator<Iter,
             std::enable_if_t<has_value_type_helper<Iter>::value &&
                 is_valid_char_type<iter_value_type_t<Iter>>::value>>
           : std::bool_constant<
@@ -152,7 +160,8 @@ namespace hpx::traits {
         {
         };
 
-        template <typename Iter> struct is_known_contiguous_iterator<Iter,
+        template <typename Iter>
+        struct is_known_contiguous_iterator<Iter,
             std::enable_if_t<std::is_pointer_v<Iter>>> : std::true_type
         {
         };

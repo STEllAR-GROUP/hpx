@@ -617,7 +617,8 @@ namespace hpx::components::server {
     {
     };
 
-    template <typename Component> struct create_component_action<Component>
+    template <typename Component>
+    struct create_component_action<Component>
       : ::hpx::actions::action<naming::gid_type (runtime_support::*)(),
             &runtime_support::create_component<Component>,
             create_component_action<Component>>
@@ -633,7 +634,8 @@ namespace hpx::components::server {
     {
     };
 
-    template <typename Component> struct create_component_direct_action<Component>
+    template <typename Component>
+    struct create_component_direct_action<Component>
       : ::hpx::actions::direct_action<naming::gid_type (runtime_support::*)(),
             &runtime_support::create_component<Component>,
             create_component_direct_action<Component>>
@@ -650,7 +652,8 @@ namespace hpx::components::server {
     {
     };
 
-    template <typename Component, typename... Ts> struct bulk_create_component_action<true, Component, Ts...>
+    template <typename Component, typename... Ts>
+    struct bulk_create_component_action<true, Component, Ts...>
       : ::hpx::actions::action<std::vector<naming::gid_type> (
                                    runtime_support::*)(std::size_t, Ts...),
             &runtime_support::bulk_create_component_with_count<Component,
@@ -669,7 +672,8 @@ namespace hpx::components::server {
     {
     };
 
-    template <typename Component, typename... Ts> struct bulk_create_component_direct_action<true, Component, Ts...>
+    template <typename Component, typename... Ts>
+    struct bulk_create_component_direct_action<true, Component, Ts...>
       : ::hpx::actions::direct_action<std::vector<naming::gid_type> (
                                           runtime_support::*)(
                                           std::size_t, Ts...),

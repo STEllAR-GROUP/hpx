@@ -193,7 +193,8 @@ namespace hpx {
     {
     };
 
-    template <typename T> struct execution_policy_has_scheduler_executor<T,
+    template <typename T>
+    struct execution_policy_has_scheduler_executor<T,
         std::void_t<typename std::decay_t<T>::executor_type>>
       : hpx::traits::is_scheduler_executor<
             typename std::decay_t<T>::executor_type>

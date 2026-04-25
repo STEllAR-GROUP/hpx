@@ -100,7 +100,8 @@ namespace hpx::detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action> struct post_helper<Action, /*DirectExecute=*/false>
+    template <typename Action>
+    struct post_helper<Action, /*DirectExecute=*/false>
     {
         template <typename... Ts>
         static void call(threads::thread_init_data&& data,
@@ -148,7 +149,8 @@ namespace hpx::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action> struct post_helper<Action, /*DirectExecute=*/true>
+    template <typename Action>
+    struct post_helper<Action, /*DirectExecute=*/true>
     {
         // If local and to be directly executed, just call the function
         template <typename... Ts>

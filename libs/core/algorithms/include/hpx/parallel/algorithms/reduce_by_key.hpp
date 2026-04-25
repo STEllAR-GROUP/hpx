@@ -161,7 +161,8 @@ namespace hpx::parallel::detail {
         struct result;
 
         // specialize result for iterator type
-        template <typename This, typename Iterator> struct result<This(Iterator)>
+        template <typename This, typename Iterator>
+        struct result<This(Iterator)>
         {
             using element_type =
                 typename std::iterator_traits<Iterator>::reference;

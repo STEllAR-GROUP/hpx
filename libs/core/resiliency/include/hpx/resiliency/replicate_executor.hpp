@@ -251,14 +251,14 @@ namespace hpx::resiliency::experimental {
 
 namespace hpx::execution::experimental {
 
-    template <typename BaseExecutor, typename Voter,
-        typename Validator> struct is_two_way_executor<hpx::resiliency::experimental::
+    template <typename BaseExecutor, typename Voter, typename Validator>
+    struct is_two_way_executor<hpx::resiliency::experimental::
             replicate_executor<BaseExecutor, Voter, Validator>> : std::true_type
     {
     };
 
-    template <typename BaseExecutor, typename Voter,
-        typename Validator> struct is_bulk_two_way_executor<hpx::resiliency::experimental::
+    template <typename BaseExecutor, typename Voter, typename Validator>
+    struct is_bulk_two_way_executor<hpx::resiliency::experimental::
             replicate_executor<BaseExecutor, Voter, Validator>> : std::true_type
     {
     };

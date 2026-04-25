@@ -76,7 +76,8 @@ namespace hpx::actions {
     //  a different number of arguments
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, typename R, typename... Ps,
-        R (Component::*F)(Ps...), typename Derived> struct action<R (Component::*)(Ps...), F, Derived>
+        R (Component::*F)(Ps...), typename Derived>
+    struct action<R (Component::*)(Ps...), F, Derived>
       : basic_action<Component, R(Ps...),
             detail::action_type_t<action<R (Component::*)(Ps...), F, Derived>,
                 Derived>>
@@ -107,7 +108,8 @@ namespace hpx::actions {
     //  different number of arguments
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, typename R, typename... Ps,
-        R (Component::*F)(Ps...) const, typename Derived> struct action<R (Component::*)(Ps...) const, F, Derived>
+        R (Component::*F)(Ps...) const, typename Derived>
+    struct action<R (Component::*)(Ps...) const, F, Derived>
       : basic_action<Component const, R(Ps...),
             detail::action_type_t<
                 action<R (Component::*)(Ps...) const, F, Derived>, Derived>>
@@ -138,7 +140,8 @@ namespace hpx::actions {
     //  to hold a different number of arguments
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, typename R, typename... Ps,
-        R (Component::*F)(Ps...) noexcept, typename Derived> struct action<R (Component::*)(Ps...) noexcept, F, Derived>
+        R (Component::*F)(Ps...) noexcept, typename Derived>
+    struct action<R (Component::*)(Ps...) noexcept, F, Derived>
       : basic_action<Component, R(Ps...),
             detail::action_type_t<
                 action<R (Component::*)(Ps...) noexcept, F, Derived>, Derived>>
@@ -168,7 +171,8 @@ namespace hpx::actions {
     //  Specialized generic const noexcept component action types allowing to
     //  hold a different number of arguments
     template <typename Component, typename R, typename... Ps,
-        R (Component::*F)(Ps...) const noexcept, typename Derived> struct action<R (Component::*)(Ps...) const noexcept, F, Derived>
+        R (Component::*F)(Ps...) const noexcept, typename Derived>
+    struct action<R (Component::*)(Ps...) const noexcept, F, Derived>
       : basic_action<Component const, R(Ps...),
             detail::action_type_t<
                 action<R (Component::*)(Ps...) const noexcept, F, Derived>,

@@ -52,7 +52,8 @@ namespace hpx::execution::experimental {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Property> struct is_scheduling_property<Property,
+    template <typename Property>
+    struct is_scheduling_property<Property,
         std::enable_if_t<
             std::is_base_of_v<detail::property_base<Property>, Property>>>
       : std::true_type
@@ -65,7 +66,8 @@ namespace hpx::execution::experimental {
     {
     } with_priority{};
 
-    template <> struct is_scheduling_property<with_priority_t> : std::true_type
+    template <>
+    struct is_scheduling_property<with_priority_t> : std::true_type
     {
     };
 
@@ -82,7 +84,8 @@ namespace hpx::execution::experimental {
         }
     } get_priority{};
 
-    template <> struct is_scheduling_property<get_priority_t> : std::true_type
+    template <>
+    struct is_scheduling_property<get_priority_t> : std::true_type
     {
     };
 
@@ -92,7 +95,8 @@ namespace hpx::execution::experimental {
     {
     } with_stacksize{};
 
-    template <> struct is_scheduling_property<with_stacksize_t> : std::true_type
+    template <>
+    struct is_scheduling_property<with_stacksize_t> : std::true_type
     {
     };
 
@@ -109,7 +113,8 @@ namespace hpx::execution::experimental {
         }
     } get_stacksize{};
 
-    template <> struct is_scheduling_property<get_stacksize_t> : std::true_type
+    template <>
+    struct is_scheduling_property<get_stacksize_t> : std::true_type
     {
     };
 
@@ -119,7 +124,8 @@ namespace hpx::execution::experimental {
     {
     } with_hint{};
 
-    template <> struct is_scheduling_property<with_hint_t> : std::true_type
+    template <>
+    struct is_scheduling_property<with_hint_t> : std::true_type
     {
     };
 
@@ -136,7 +142,8 @@ namespace hpx::execution::experimental {
         }
     } get_hint{};
 
-    template <> struct is_scheduling_property<get_hint_t> : std::true_type
+    template <>
+    struct is_scheduling_property<get_hint_t> : std::true_type
     {
     };
 
@@ -146,7 +153,8 @@ namespace hpx::execution::experimental {
     {
     } with_annotation{};
 
-    template <> struct is_scheduling_property<with_annotation_t> : std::true_type
+    template <>
+    struct is_scheduling_property<with_annotation_t> : std::true_type
     {
     };
 
@@ -163,7 +171,8 @@ namespace hpx::execution::experimental {
         }
     } get_annotation{};
 
-    template <> struct is_scheduling_property<get_annotation_t> : std::true_type
+    template <>
+    struct is_scheduling_property<get_annotation_t> : std::true_type
     {
     };
 
@@ -186,7 +195,8 @@ namespace hpx::execution::experimental {
         }
     } get_first_core{};
 
-    template <> struct is_scheduling_property<get_first_core_t> : std::true_type
+    template <>
+    struct is_scheduling_property<get_first_core_t> : std::true_type
     {
     };
 }    // namespace hpx::execution::experimental

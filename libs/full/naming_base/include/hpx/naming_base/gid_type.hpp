@@ -758,7 +758,8 @@ namespace hpx::naming {
 namespace std {
 
     // specialize std::hash for hpx::naming::gid_type
-    template <> struct hash<hpx::naming::gid_type>
+    template <>
+    struct hash<hpx::naming::gid_type>
     {
         std::size_t operator()(::hpx::naming::gid_type const& gid) const
         {

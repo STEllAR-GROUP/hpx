@@ -23,7 +23,8 @@ namespace hpx::traits {
     ///////////////////////////////////////////////////////////////////////////
     // Customization point for streaming with util::any, we don't want
     // serialization::serialize_buffer to be streamable
-    template <typename T, typename Allocator> struct supports_streaming_with_any<
+    template <typename T, typename Allocator>
+    struct supports_streaming_with_any<
         serialization::serialize_buffer<T, Allocator>> : std::false_type
     {
     };

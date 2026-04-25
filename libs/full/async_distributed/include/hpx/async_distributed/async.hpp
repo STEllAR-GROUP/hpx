@@ -77,7 +77,8 @@ namespace hpx::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     // launch
-    template <typename Action, typename Policy> struct async_action_dispatch<Action, Policy,
+    template <typename Action, typename Policy>
+    struct async_action_dispatch<Action, Policy,
         std::enable_if_t<traits::is_launch_policy_v<Policy>>>
     {
         using result_type =
@@ -133,7 +134,8 @@ namespace hpx::detail {
     };
 
     // hpx::id_type
-    template <typename Action> struct async_action_dispatch<Action, hpx::id_type>
+    template <typename Action>
+    struct async_action_dispatch<Action, hpx::id_type>
     {
         template <typename... Ts>
         HPX_FORCEINLINE static hpx::future<
@@ -148,7 +150,8 @@ namespace hpx::detail {
     };
 
     // component::client
-    template <typename Action, typename Client> struct async_action_dispatch<Action, Client,
+    template <typename Action, typename Client>
+    struct async_action_dispatch<Action, Client,
         std::enable_if_t<traits::is_client<Client>::value>>
     {
         template <typename Client_, typename Stub, typename Data,
@@ -165,7 +168,8 @@ namespace hpx::detail {
     };
 
     // distribution policy
-    template <typename Action, typename Policy> struct async_action_dispatch<Action, Policy,
+    template <typename Action, typename Policy>
+    struct async_action_dispatch<Action, Policy,
         std::enable_if_t<traits::is_distribution_policy_v<Policy>>>
     {
         template <typename DistPolicy, typename... Ts>
@@ -179,7 +183,8 @@ namespace hpx::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action> struct async_launch_policy_dispatch<Action,
+    template <typename Action>
+    struct async_launch_policy_dispatch<Action,
         std::enable_if_t<traits::is_action<Action>::value>>
     {
         using result_type = typename traits::promise_local_result<typename hpx::
@@ -219,7 +224,8 @@ namespace hpx::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     // any action
-    template <typename Action> struct async_dispatch<Action,
+    template <typename Action>
+    struct async_dispatch<Action,
         std::enable_if_t<traits::is_action<Action>::value>>
     {
         template <typename Component, typename Signature, typename Derived,
@@ -267,7 +273,8 @@ namespace hpx::detail {
     };
 
     // launch with any action
-    template <typename Func> struct async_dispatch_launch_policy_helper<Func,
+    template <typename Func>
+    struct async_dispatch_launch_policy_helper<Func,
         std::enable_if_t<traits::is_action<Func>::value>>
     {
         // clang-format off

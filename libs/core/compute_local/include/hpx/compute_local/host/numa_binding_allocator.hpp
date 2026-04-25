@@ -50,7 +50,8 @@ namespace hpx::execution::experimental {
     {
     };
 
-    template <> struct HPX_EXPORT pool_numa_hint<numa_binding_allocator_tag>
+    template <>
+    struct HPX_EXPORT pool_numa_hint<numa_binding_allocator_tag>
     {
         // The call operator () must return an int type
         // The arguments must be const ref versions of the equivalent task arguments

@@ -37,13 +37,15 @@ namespace hpx {
         template <typename F, typename Tuple, typename Is>
         struct invoke_fused_result_impl;
 
-        template <typename F, typename Tuple, std::size_t... Is> struct invoke_fused_result_impl<F, Tuple&, util::index_pack<Is...>>
+        template <typename F, typename Tuple, std::size_t... Is>
+        struct invoke_fused_result_impl<F, Tuple&, util::index_pack<Is...>>
           : hpx::util::invoke_result<F,
                 typename hpx::tuple_element<Is, Tuple>::type&...>
         {
         };
 
-        template <typename F, typename Tuple, std::size_t... Is> struct invoke_fused_result_impl<F, Tuple&&, util::index_pack<Is...>>
+        template <typename F, typename Tuple, std::size_t... Is>
+        struct invoke_fused_result_impl<F, Tuple&&, util::index_pack<Is...>>
           : hpx::util::invoke_result<F,
                 typename hpx::tuple_element<Is, Tuple>::type&&...>
         {

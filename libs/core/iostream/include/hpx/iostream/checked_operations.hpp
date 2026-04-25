@@ -76,7 +76,8 @@ namespace hpx::iostream {
     namespace detail {
 
         //------------------Specializations of read_write_if_impl---------------------//
-        template <> struct read_write_if_impl<input>
+        template <>
+        struct read_write_if_impl<input>
         {
             template <typename T>
             static int_type_of_t<T> get(T& t)
@@ -105,7 +106,8 @@ namespace hpx::iostream {
             }
         };
 
-        template <> struct read_write_if_impl<output>
+        template <>
+        struct read_write_if_impl<output>
         {
             template <typename T>
             static int_type_of_t<T> get(T&)
@@ -134,7 +136,8 @@ namespace hpx::iostream {
         };
 
         //------------------Specializations of seek_if_impl---------------------------//
-        template <> struct seek_if_impl<random_access>
+        template <>
+        struct seek_if_impl<random_access>
         {
             template <typename T>
             static std::streampos seek(T& t, stream_offset off,
@@ -144,7 +147,8 @@ namespace hpx::iostream {
             }
         };
 
-        template <> struct seek_if_impl<any_tag>
+        template <>
+        struct seek_if_impl<any_tag>
         {
             template <typename T>
             static std::streampos seek(T&, stream_offset,

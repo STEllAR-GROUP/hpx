@@ -124,7 +124,8 @@ namespace hpx::util::detail {
     template <typename Sig, bool Copyable, bool Serializable>
     class basic_function;
 
-    template <bool Copyable, typename R, typename... Ts> class basic_function<R(Ts...), Copyable, /*Serializable*/ false>
+    template <bool Copyable, typename R, typename... Ts>
+    class basic_function<R(Ts...), Copyable, /*Serializable*/ false>
       : public function_base
     {
         using base_type = function_base;

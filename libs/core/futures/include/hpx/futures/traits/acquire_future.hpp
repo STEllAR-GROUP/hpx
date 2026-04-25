@@ -67,7 +67,8 @@ namespace hpx::traits {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename R> struct acquire_future_impl<hpx::future<R>>
+        template <typename R>
+        struct acquire_future_impl<hpx::future<R>>
         {
             using type = hpx::future<R>;
 
@@ -84,7 +85,8 @@ namespace hpx::traits {
             }
         };
 
-        template <typename R> struct acquire_future_impl<hpx::shared_future<R>>
+        template <typename R>
+        struct acquire_future_impl<hpx::shared_future<R>>
         {
             using type = hpx::shared_future<R>;
 
@@ -105,7 +107,8 @@ namespace hpx::traits {
         HPX_HAS_MEMBER_XXX_TRAIT_DEF(push_back)
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Range> struct acquire_future_impl<Range,
+        template <typename Range>
+        struct acquire_future_impl<Range,
             std::enable_if_t<hpx::traits::is_future_range_v<Range>>>
         {
             using future_type =

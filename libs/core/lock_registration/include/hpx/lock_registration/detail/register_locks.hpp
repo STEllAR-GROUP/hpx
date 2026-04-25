@@ -187,7 +187,8 @@ namespace hpx::util {
         bool owns_registration_;
     };
 
-    template <typename Lock> struct ignore_while_checking<Lock,
+    template <typename Lock>
+    struct ignore_while_checking<Lock,
         std::enable_if_t<detail::has_mutex_v<Lock> &&
             !detail::has_owns_lock_v<Lock>>>
     {

@@ -157,7 +157,8 @@ namespace hpx::traits {
         }
     };
 
-    template <typename Container> struct serialization_access_data<Container const>
+    template <typename Container>
+    struct serialization_access_data<Container const>
       : serialization_access_data<Container>
     {
     };

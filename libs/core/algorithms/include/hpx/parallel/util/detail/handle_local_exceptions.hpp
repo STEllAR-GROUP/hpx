@@ -771,7 +771,8 @@ namespace hpx::parallel::util::detail {
     };
 
     // unseq et.al. need to terminate on exceptions
-    template <typename ExPolicy> struct handle_local_exceptions<ExPolicy,
+    template <typename ExPolicy>
+    struct handle_local_exceptions<ExPolicy,
         std::enable_if_t<hpx::is_unsequenced_execution_policy_v<ExPolicy>>>
       : terminate_on_local_exceptions
     {

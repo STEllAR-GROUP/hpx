@@ -23,7 +23,8 @@ namespace hpx::detail {
     struct sync_launch_policy_dispatch;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <> struct sync_launch_policy_dispatch<launch::sync_policy>
+    template <>
+    struct sync_launch_policy_dispatch<launch::sync_policy>
     {
         // launch::sync execute inline
         template <typename Policy, typename F, typename... Ts>
@@ -44,7 +45,8 @@ namespace hpx::detail {
         }
     };
 
-    template <> struct sync_launch_policy_dispatch<launch::deferred_policy>
+    template <>
+    struct sync_launch_policy_dispatch<launch::deferred_policy>
     {
         // launch::deferred execute inline
         template <typename Policy, typename F, typename... Ts>
@@ -65,7 +67,8 @@ namespace hpx::detail {
         }
     };
 
-    template <typename Action> struct sync_launch_policy_dispatch<Action,
+    template <typename Action>
+    struct sync_launch_policy_dispatch<Action,
         std::enable_if_t<!traits::is_action_v<Action>>>
     {
         // general case execute on separate thread (except launch::sync)

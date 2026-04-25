@@ -82,7 +82,8 @@ namespace hpx::execution::experimental {
             {
             };
 
-            template <typename... Args> struct apply<hpx::functional::enable_tag_invoke_t, Args...>
+            template <typename... Args>
+            struct apply<hpx::functional::enable_tag_invoke_t, Args...>
               : std::is_invocable_r<bool,
                     hpx::functional::tag_t<hpx::functional::tag_invoke>, CPO,
                     Args...>
@@ -256,8 +257,8 @@ namespace hpx::execution::experimental {
     // 2. Otherwise, false.
     //
     HPX_CXX_CORE_EXPORT
-    HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct forwarding_env_query_t
-        final
+    HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct
+        forwarding_env_query_t final
       : hpx::functional::detail::tag_fallback_noexcept<forwarding_env_query_t,
             detail::contextually_convertible_to_bool<forwarding_env_query_t>>
     {

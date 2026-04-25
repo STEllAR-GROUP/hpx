@@ -61,7 +61,8 @@ namespace hpx::actions {
 
         // Specialization for lambdas
         template <typename F, typename ClassType, typename ReturnType,
-            typename... Args> struct extract_lambda_action<F,
+            typename... Args>
+        struct extract_lambda_action<F,
             ReturnType (ClassType::*)(Args...) const>
         {
             using type = lambda_action<F, ReturnType, Args...>;

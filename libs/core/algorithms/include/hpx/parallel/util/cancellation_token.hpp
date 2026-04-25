@@ -63,7 +63,8 @@ namespace hpx::parallel::util {
 
     // special case for when no additional data needs to be stored at the
     // cancellation point
-    template <> class cancellation_token<detail::no_data, std::less_equal<>>
+    template <>
+    class cancellation_token<detail::no_data, std::less_equal<>>
     {
     private:
         using flag_type = std::atomic<bool>;

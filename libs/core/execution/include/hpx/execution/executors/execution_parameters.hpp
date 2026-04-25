@@ -113,7 +113,8 @@ namespace hpx::execution::experimental::detail {
 
     //////////////////////////////////////////////////////////////////////
     // customization point for interface get_chunk_size()
-    template <typename Parameters, typename Executor_> struct get_chunk_size_fn_helper<Parameters, Executor_,
+    template <typename Parameters, typename Executor_>
+    struct get_chunk_size_fn_helper<Parameters, Executor_,
         std::enable_if_t<hpx::traits::is_executor_any_v<Executor_>>>
     {
         template <typename Executor>
@@ -173,7 +174,8 @@ namespace hpx::execution::experimental::detail {
 
     //////////////////////////////////////////////////////////////////////
     // customization point for interface measure_iteration()
-    template <typename Parameters, typename Executor_> struct measure_iteration_fn_helper<Parameters, Executor_,
+    template <typename Parameters, typename Executor_>
+    struct measure_iteration_fn_helper<Parameters, Executor_,
         std::enable_if_t<hpx::traits::is_executor_any_v<Executor_>>>
     {
         template <typename Executor, typename F>
@@ -234,7 +236,8 @@ namespace hpx::execution::experimental::detail {
 
     ///////////////////////////////////////////////////////////////////////
     // customization point for interface maximal_number_of_chunks()
-    template <typename Parameters, typename Executor_> struct maximal_number_of_chunks_fn_helper<Parameters, Executor_,
+    template <typename Parameters, typename Executor_>
+    struct maximal_number_of_chunks_fn_helper<Parameters, Executor_,
         std::enable_if_t<hpx::traits::is_executor_any_v<Executor_>>>
     {
         template <typename Executor>
@@ -288,7 +291,8 @@ namespace hpx::execution::experimental::detail {
 
     ///////////////////////////////////////////////////////////////////////
     // customization point for interface reset_thread_distribution()
-    template <typename Parameters, typename Executor_> struct reset_thread_distribution_fn_helper<Parameters, Executor_,
+    template <typename Parameters, typename Executor_>
+    struct reset_thread_distribution_fn_helper<Parameters, Executor_,
         std::enable_if_t<hpx::traits::is_executor_any_v<Executor_>>>
     {
         template <typename Executor>
@@ -342,7 +346,8 @@ namespace hpx::execution::experimental::detail {
 
     ///////////////////////////////////////////////////////////////////////
     // customization point for interface processing_units_count()
-    template <typename Parameters, typename Executor_> struct processing_units_count_fn_helper<Parameters, Executor_,
+    template <typename Parameters, typename Executor_>
+    struct processing_units_count_fn_helper<Parameters, Executor_,
         std::enable_if_t<hpx::traits::is_executor_any_v<Executor_>>>
     {
         template <typename Executor>
@@ -371,7 +376,8 @@ namespace hpx::execution::experimental::detail {
         }
     };
 
-    template <typename Executor_> struct processing_units_count_fn_helper<void, Executor_,
+    template <typename Executor_>
+    struct processing_units_count_fn_helper<void, Executor_,
         std::enable_if_t<hpx::traits::is_executor_any_v<Executor_>>>
     {
         template <typename Executor>
@@ -412,7 +418,8 @@ namespace hpx::execution::experimental::detail {
 
     ///////////////////////////////////////////////////////////////////////
     // customization point for interface mark_begin_execution()
-    template <typename Parameters, typename Executor_> struct mark_begin_execution_fn_helper<Parameters, Executor_,
+    template <typename Parameters, typename Executor_>
+    struct mark_begin_execution_fn_helper<Parameters, Executor_,
         std::enable_if_t<hpx::traits::is_executor_any_v<Executor_>>>
     {
         template <typename Executor>
@@ -463,7 +470,8 @@ namespace hpx::execution::experimental::detail {
 
     ///////////////////////////////////////////////////////////////////////
     // customization point for interface mark_end_of_scheduling()
-    template <typename Parameters, typename Executor_> struct mark_end_of_scheduling_fn_helper<Parameters, Executor_,
+    template <typename Parameters, typename Executor_>
+    struct mark_end_of_scheduling_fn_helper<Parameters, Executor_,
         std::enable_if_t<hpx::traits::is_executor_any_v<Executor_>>>
     {
         template <typename Executor>
@@ -514,7 +522,8 @@ namespace hpx::execution::experimental::detail {
 
     ///////////////////////////////////////////////////////////////////////
     // customization point for interface mark_end_execution()
-    template <typename Parameters, typename Executor_> struct mark_end_execution_fn_helper<Parameters, Executor_,
+    template <typename Parameters, typename Executor_>
+    struct mark_end_execution_fn_helper<Parameters, Executor_,
         std::enable_if_t<hpx::traits::is_executor_any_v<Executor_>>>
     {
         template <typename Executor>
@@ -565,7 +574,8 @@ namespace hpx::execution::experimental::detail {
 
     ///////////////////////////////////////////////////////////////////////
     // customization point for interface collect_execution_parameters()
-    template <typename Parameters, typename Executor_> struct collect_execution_parameters_fn_helper<Parameters, Executor_,
+    template <typename Parameters, typename Executor_>
+    struct collect_execution_parameters_fn_helper<Parameters, Executor_,
         std::enable_if_t<hpx::traits::is_executor_any_v<Executor_>>>
     {
         template <typename Executor>
@@ -595,13 +605,15 @@ namespace hpx::execution::experimental::detail {
     template <bool... Flags>
     struct parameters_type_counter;
 
-    template <> struct parameters_type_counter<>
+    template <>
+    struct parameters_type_counter<>
     {
         static constexpr int value = 0;
     };
 
     /// Return the number of parameters which are true
-    template <bool Flag1, bool... Flags> struct parameters_type_counter<Flag1, Flags...>
+    template <bool Flag1, bool... Flags>
+    struct parameters_type_counter<Flag1, Flags...>
     {
         static constexpr int value =
             Flag1 + parameters_type_counter<Flags...>::value;
@@ -633,7 +645,8 @@ namespace hpx::execution::experimental::detail {
     {
     };
 
-    template <typename T, typename Wrapper> struct maximal_number_of_chunks_call_helper<T, Wrapper,
+    template <typename T, typename Wrapper>
+    struct maximal_number_of_chunks_call_helper<T, Wrapper,
         std::enable_if_t<has_maximal_number_of_chunks_v<T>>>
     {
         template <typename Executor>
@@ -653,7 +666,8 @@ namespace hpx::execution::experimental::detail {
     {
     };
 
-    template <typename T, typename Wrapper> struct get_chunk_size_call_helper<T, Wrapper,
+    template <typename T, typename Wrapper>
+    struct get_chunk_size_call_helper<T, Wrapper,
         std::enable_if_t<has_get_chunk_size_v<T>>>
     {
         template <typename Executor>
@@ -674,7 +688,8 @@ namespace hpx::execution::experimental::detail {
     {
     };
 
-    template <typename T, typename Wrapper> struct measure_iteration_call_helper<T, Wrapper,
+    template <typename T, typename Wrapper>
+    struct measure_iteration_call_helper<T, Wrapper,
         std::enable_if_t<has_measure_iteration_v<T>>>
     {
         template <typename Executor, typename F>
@@ -694,7 +709,8 @@ namespace hpx::execution::experimental::detail {
     {
     };
 
-    template <typename T, typename Wrapper> struct mark_begin_execution_call_helper<T, Wrapper,
+    template <typename T, typename Wrapper>
+    struct mark_begin_execution_call_helper<T, Wrapper,
         std::enable_if_t<has_mark_begin_execution_v<T>>>
     {
         template <typename Executor>
@@ -712,7 +728,8 @@ namespace hpx::execution::experimental::detail {
     {
     };
 
-    template <typename T, typename Wrapper> struct mark_end_of_scheduling_call_helper<T, Wrapper,
+    template <typename T, typename Wrapper>
+    struct mark_end_of_scheduling_call_helper<T, Wrapper,
         std::enable_if_t<has_mark_begin_execution_v<T>>>
     {
         template <typename Executor>
@@ -730,7 +747,8 @@ namespace hpx::execution::experimental::detail {
     {
     };
 
-    template <typename T, typename Wrapper> struct mark_end_execution_call_helper<T, Wrapper,
+    template <typename T, typename Wrapper>
+    struct mark_end_execution_call_helper<T, Wrapper,
         std::enable_if_t<has_mark_begin_execution_v<T>>>
     {
         template <typename Executor>
@@ -748,7 +766,8 @@ namespace hpx::execution::experimental::detail {
     {
     };
 
-    template <typename T, typename Wrapper> struct processing_units_count_call_helper<T, Wrapper,
+    template <typename T, typename Wrapper>
+    struct processing_units_count_call_helper<T, Wrapper,
         std::enable_if_t<has_processing_units_count_v<T>>>
     {
         template <typename Executor>
@@ -767,7 +786,8 @@ namespace hpx::execution::experimental::detail {
     {
     };
 
-    template <typename T, typename Wrapper> struct reset_thread_distribution_call_helper<T, Wrapper,
+    template <typename T, typename Wrapper>
+    struct reset_thread_distribution_call_helper<T, Wrapper,
         std::enable_if_t<has_reset_thread_distribution_v<T>>>
     {
         template <typename Executor>
@@ -785,7 +805,8 @@ namespace hpx::execution::experimental::detail {
     {
     };
 
-    template <typename T, typename Wrapper> struct collect_execution_parameters_call_helper<T, Wrapper,
+    template <typename T, typename Wrapper>
+    struct collect_execution_parameters_call_helper<T, Wrapper,
         std::enable_if_t<has_collect_execution_parameters_v<T>>>
     {
         template <typename Executor>
@@ -813,7 +834,8 @@ namespace hpx::execution::experimental::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////
-    template <typename T> struct unwrapper<::std::reference_wrapper<T>>
+    template <typename T>
+    struct unwrapper<::std::reference_wrapper<T>>
       : base_member_helper<std::reference_wrapper<T>>
       , maximal_number_of_chunks_call_helper<T, std::reference_wrapper<T>>
       , get_chunk_size_call_helper<T, std::reference_wrapper<T>>
@@ -898,7 +920,8 @@ namespace hpx::execution::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     // specialize trait for the type-combiner
-    template <typename... Parameters> struct is_executor_parameters<detail::executor_parameters<Parameters...>>
+    template <typename... Parameters>
+    struct is_executor_parameters<detail::executor_parameters<Parameters...>>
       : hpx::util::all_of<hpx::traits::is_executor_parameters<Parameters>...>
     {
     };
@@ -919,7 +942,8 @@ namespace hpx::execution::experimental {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Param> struct executor_parameters_join<Param>
+    template <typename Param>
+    struct executor_parameters_join<Param>
     {
         using type = Param;
     };

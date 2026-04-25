@@ -93,7 +93,8 @@ namespace hpx::iostream {
         {
         };
 
-        template <> struct read_device_impl<istream_tag>
+        template <>
+        struct read_device_impl<istream_tag>
         {
             template <typename T>
             static int_type_of<T>::type get(T& t)
@@ -119,7 +120,8 @@ namespace hpx::iostream {
             }
         };
 
-        template <> struct read_device_impl<streambuf_tag>
+        template <>
+        struct read_device_impl<streambuf_tag>
         {
             template <typename T>
             static int_type_of_t<T> get(T& t)
@@ -154,7 +156,8 @@ namespace hpx::iostream {
             }
         };
 
-        template <> struct read_device_impl<input>
+        template <>
+        struct read_device_impl<input>
         {
             template <typename T>
             static int_type_of<T>::type get(T& t)
@@ -193,7 +196,8 @@ namespace hpx::iostream {
         {
         };
 
-        template <> struct read_filter_impl<multichar_tag>
+        template <>
+        struct read_filter_impl<multichar_tag>
         {
             template <typename T, typename Source>
             static std::streamsize read(
@@ -203,7 +207,8 @@ namespace hpx::iostream {
             }
         };
 
-        template <> struct read_filter_impl<any_tag>
+        template <>
+        struct read_filter_impl<any_tag>
         {
             template <typename T, typename Source>
             static std::streamsize read(

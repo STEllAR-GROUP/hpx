@@ -138,7 +138,8 @@ namespace hpx::parallel::util {
             }
         };
 
-        template <typename Dummy> struct copy_helper<hpx::traits::trivially_copyable_pointer_tag, Dummy>
+        template <typename Dummy>
+        struct copy_helper<hpx::traits::trivially_copyable_pointer_tag, Dummy>
         {
             template <typename InIter, typename Sent, typename OutIter>
             HPX_FORCEINLINE static constexpr in_out_result<InIter, OutIter>
@@ -200,7 +201,8 @@ namespace hpx::parallel::util {
             }
         };
 
-        template <typename Dummy> struct copy_n_helper<hpx::traits::trivially_copyable_pointer_tag, Dummy>
+        template <typename Dummy>
+        struct copy_n_helper<hpx::traits::trivially_copyable_pointer_tag, Dummy>
         {
             template <typename InIter, typename OutIter>
             HPX_FORCEINLINE static in_out_result<InIter, OutIter> call(
@@ -291,7 +293,8 @@ namespace hpx::parallel::util {
             }
         };
 
-        template <typename Dummy> struct move_helper<hpx::traits::trivially_copyable_pointer_tag, Dummy>
+        template <typename Dummy>
+        struct move_helper<hpx::traits::trivially_copyable_pointer_tag, Dummy>
         {
             template <typename InIter, typename Sent, typename OutIter>
             HPX_FORCEINLINE static in_out_result<InIter, OutIter> call(
@@ -346,7 +349,8 @@ namespace hpx::parallel::util {
             }
         };
 
-        template <typename Dummy> struct move_n_helper<hpx::traits::trivially_copyable_pointer_tag, Dummy>
+        template <typename Dummy>
+        struct move_n_helper<hpx::traits::trivially_copyable_pointer_tag, Dummy>
         {
             template <typename InIter, typename OutIter>
             HPX_FORCEINLINE static in_out_result<InIter, OutIter> call(
@@ -390,7 +394,8 @@ namespace hpx::parallel::util {
             }
         };
 
-        template <typename Dummy> struct uninit_copy_n_helper<hpx::traits::trivially_copyable_pointer_tag,
+        template <typename Dummy>
+        struct uninit_copy_n_helper<hpx::traits::trivially_copyable_pointer_tag,
             Dummy>
         {
             template <typename ExPolicy, typename InIter, typename OutIter>
@@ -449,7 +454,8 @@ namespace hpx::parallel::util {
             }
         };
 
-        template <typename Dummy> struct uninit_move_n_helper<hpx::traits::trivially_copyable_pointer_tag,
+        template <typename Dummy>
+        struct uninit_move_n_helper<hpx::traits::trivially_copyable_pointer_tag,
             Dummy>
         {
             template <typename ExPolicy, typename InIter, typename OutIter>

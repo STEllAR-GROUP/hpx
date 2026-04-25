@@ -241,13 +241,15 @@ namespace hpx::sycl::experimental {
 namespace hpx::execution::experimental {
 
     /// \cond NOINTERNAL
-    template <> struct is_one_way_executor<hpx::sycl::experimental::sycl_executor>
+    template <>
+    struct is_one_way_executor<hpx::sycl::experimental::sycl_executor>
       : std::true_type
     {
         // support for fire and forget without returning a waitable/future
     };
 
-    template <> struct is_two_way_executor<hpx::sycl::experimental::sycl_executor>
+    template <>
+    struct is_two_way_executor<hpx::sycl::experimental::sycl_executor>
       : std::true_type
     {
         // support for a waitable/future

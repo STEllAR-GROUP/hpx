@@ -34,7 +34,8 @@ namespace hpx::parallel::detail {
         }
     };
 
-    template <> struct algorithm_result_helper<future<void>>
+    template <>
+    struct algorithm_result_helper<future<void>>
     {
         HPX_FORCEINLINE static future<void> call(future<void>&& f)
         {
@@ -42,7 +43,8 @@ namespace hpx::parallel::detail {
         }
     };
 
-    template <typename Iterator> struct algorithm_result_helper<Iterator,
+    template <typename Iterator>
+    struct algorithm_result_helper<Iterator,
         std::enable_if_t<hpx::traits::is_segmented_local_iterator_v<Iterator>>>
     {
         using traits = hpx::traits::segmented_local_iterator_traits<Iterator>;
@@ -54,7 +56,8 @@ namespace hpx::parallel::detail {
         }
     };
 
-    template <typename Iterator1, typename Iterator2> struct algorithm_result_helper<util::in_out_result<Iterator1, Iterator2>,
+    template <typename Iterator1, typename Iterator2>
+    struct algorithm_result_helper<util::in_out_result<Iterator1, Iterator2>,
         std::enable_if_t<
             hpx::traits::is_segmented_local_iterator_v<Iterator1> ||
             hpx::traits::is_segmented_local_iterator_v<Iterator2>>>
@@ -74,7 +77,8 @@ namespace hpx::parallel::detail {
         }
     };
 
-    template <typename Iterator> struct algorithm_result_helper<util::min_max_result<Iterator>,
+    template <typename Iterator>
+    struct algorithm_result_helper<util::min_max_result<Iterator>,
         std::enable_if_t<hpx::traits::is_segmented_local_iterator_v<Iterator>>>
     {
         using traits1 = hpx::traits::segmented_local_iterator_traits<Iterator>;
@@ -89,7 +93,8 @@ namespace hpx::parallel::detail {
         }
     };
 
-    template <typename Iterator1, typename Iterator2, typename Iterator3> struct algorithm_result_helper<
+    template <typename Iterator1, typename Iterator2, typename Iterator3>
+    struct algorithm_result_helper<
         util::in_in_out_result<Iterator1, Iterator2, Iterator3>,
         std::enable_if_t<
             hpx::traits::is_segmented_local_iterator_v<Iterator1> ||
@@ -116,7 +121,8 @@ namespace hpx::parallel::detail {
         }
     };
 
-    template <typename Iterator> struct algorithm_result_helper<future<Iterator>,
+    template <typename Iterator>
+    struct algorithm_result_helper<future<Iterator>,
         std::enable_if_t<hpx::traits::is_segmented_local_iterator_v<Iterator>>>
     {
         using traits = hpx::traits::segmented_local_iterator_traits<Iterator>;
@@ -131,7 +137,8 @@ namespace hpx::parallel::detail {
         }
     };
 
-    template <typename Iterator1, typename Iterator2> struct algorithm_result_helper<
+    template <typename Iterator1, typename Iterator2>
+    struct algorithm_result_helper<
         future<util::in_out_result<Iterator1, Iterator2>>,
         std::enable_if_t<
             hpx::traits::is_segmented_local_iterator_v<Iterator1> ||
@@ -156,7 +163,8 @@ namespace hpx::parallel::detail {
         }
     };
 
-    template <typename Iterator> struct algorithm_result_helper<future<util::min_max_result<Iterator>>,
+    template <typename Iterator>
+    struct algorithm_result_helper<future<util::min_max_result<Iterator>>,
         std::enable_if_t<hpx::traits::is_segmented_local_iterator_v<Iterator>>>
     {
         using traits = hpx::traits::segmented_local_iterator_traits<Iterator>;
@@ -175,7 +183,8 @@ namespace hpx::parallel::detail {
         }
     };
 
-    template <typename Iterator1, typename Iterator2, typename Iterator3> struct algorithm_result_helper<
+    template <typename Iterator1, typename Iterator2, typename Iterator3>
+    struct algorithm_result_helper<
         future<util::in_in_out_result<Iterator1, Iterator2, Iterator3>>,
         std::enable_if_t<
             hpx::traits::is_segmented_local_iterator_v<Iterator1> ||
@@ -261,7 +270,8 @@ namespace hpx::parallel::detail {
     struct algorithm_invoker_action;
 
     // sequential
-    template <typename Algo, typename ExPolicy, typename R, typename... Args> struct algorithm_invoker_action<Algo, ExPolicy, std::true_type, R(Args...)>
+    template <typename Algo, typename ExPolicy, typename R, typename... Args>
+    struct algorithm_invoker_action<Algo, ExPolicy, std::true_type, R(Args...)>
       : hpx::actions::make_action<R (*)(Algo const&, ExPolicy, Args...),
             &dispatcher<Algo, ExPolicy, Args...>::sequential,
             algorithm_invoker_action<Algo, ExPolicy, std::true_type,
@@ -270,7 +280,8 @@ namespace hpx::parallel::detail {
     };
 
     // parallel
-    template <typename Algo, typename ExPolicy, typename R, typename... Args> struct algorithm_invoker_action<Algo, ExPolicy, std::false_type, R(Args...)>
+    template <typename Algo, typename ExPolicy, typename R, typename... Args>
+    struct algorithm_invoker_action<Algo, ExPolicy, std::false_type, R(Args...)>
       : hpx::actions::make_action<R (*)(Algo const&, ExPolicy, Args...),
             &dispatcher<Algo, ExPolicy, Args...>::parallel,
             algorithm_invoker_action<Algo, ExPolicy, std::false_type,

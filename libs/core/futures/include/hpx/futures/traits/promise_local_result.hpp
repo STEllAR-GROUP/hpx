@@ -17,7 +17,8 @@ namespace hpx::traits {
         using type = Result;
     };
 
-    template <> struct promise_local_result<util::unused_type>
+    template <>
+    struct promise_local_result<util::unused_type>
     {
         using type = void;
     };

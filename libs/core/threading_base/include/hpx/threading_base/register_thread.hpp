@@ -52,8 +52,8 @@ namespace hpx::threads {
             typename Is = util::index_pack<>, typename... Ts>
         struct thread_function_nullary;
 
-        template <typename F, std::size_t... Is,
-            typename... Ts> struct thread_function_nullary<F, util::index_pack<Is...>, Ts...>
+        template <typename F, std::size_t... Is, typename... Ts>
+        struct thread_function_nullary<F, util::index_pack<Is...>, Ts...>
         {
             HPX_NO_UNIQUE_ADDRESS F f;
             HPX_NO_UNIQUE_ADDRESS util::member_pack_for<Ts...> args;

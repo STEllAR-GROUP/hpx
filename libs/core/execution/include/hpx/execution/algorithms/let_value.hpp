@@ -50,7 +50,8 @@ namespace hpx::execution::experimental {
                 template <typename Func, typename Pack, typename Enable = void>
                 struct successor_sender_types_helper;
 
-                template <typename Func, typename... Ts> struct successor_sender_types_helper<Func, meta::pack<Ts...>,
+                template <typename Func, typename... Ts>
+                struct successor_sender_types_helper<Func, meta::pack<Ts...>,
                     std::enable_if_t<std::is_invocable_v<Func,
                         std::add_lvalue_reference_t<std::decay_t<Ts>>...>>>
                 {

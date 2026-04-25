@@ -41,13 +41,15 @@ namespace hpx::parallel::execution::detail {
         typename... Ts>
     struct bulk_then_execute_result_impl;
 
-    template <typename F, typename Shape, typename Future, typename... Ts> struct bulk_then_execute_result_impl<F, Shape, Future, false, Ts...>
+    template <typename F, typename Shape, typename Future, typename... Ts>
+    struct bulk_then_execute_result_impl<F, Shape, Future, false, Ts...>
     {
         using type =
             std::vector<then_bulk_function_result_t<F, Shape, Future, Ts...>>;
     };
 
-    template <typename F, typename Shape, typename Future, typename... Ts> struct bulk_then_execute_result_impl<F, Shape, Future, true, Ts...>
+    template <typename F, typename Shape, typename Future, typename... Ts>
+    struct bulk_then_execute_result_impl<F, Shape, Future, true, Ts...>
     {
         using type = void;
     };
@@ -85,7 +87,8 @@ namespace hpx::parallel::execution::detail {
     template <typename Executor, typename F, typename Shape, typename Args>
     struct fused_bulk_sync_execute_helper;
 
-    template <typename Executor, typename F, typename Shape, typename... Ts> struct fused_bulk_sync_execute_helper<Executor, F, Shape, hpx::tuple<Ts...>>
+    template <typename Executor, typename F, typename Shape, typename... Ts>
+    struct fused_bulk_sync_execute_helper<Executor, F, Shape, hpx::tuple<Ts...>>
     {
         Executor exec_;
         F f_;
@@ -132,7 +135,8 @@ namespace hpx::parallel::execution::detail {
     template <typename Executor, typename F, typename Shape, typename Args>
     struct fused_bulk_async_execute_helper;
 
-    template <typename Executor, typename F, typename Shape, typename... Ts> struct fused_bulk_async_execute_helper<Executor, F, Shape,
+    template <typename Executor, typename F, typename Shape, typename... Ts>
+    struct fused_bulk_async_execute_helper<Executor, F, Shape,
         hpx::tuple<Ts...>>
     {
         Executor exec_;

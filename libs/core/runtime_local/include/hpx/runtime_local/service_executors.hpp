@@ -68,78 +68,96 @@ namespace hpx::execution::experimental {
     };
 
     ///  \cond NOINTERNAL
-    template <> struct is_one_way_executor<parallel::execution::detail::service_executor>
+    template <>
+    struct is_one_way_executor<parallel::execution::detail::service_executor>
       : std::true_type
     {
     };
 
-    template <> struct is_two_way_executor<parallel::execution::detail::service_executor>
+    template <>
+    struct is_two_way_executor<parallel::execution::detail::service_executor>
       : std::true_type
     {
     };
 
-    template <> struct is_bulk_two_way_executor<
+    template <>
+    struct is_bulk_two_way_executor<
         parallel::execution::detail::service_executor> : std::true_type
     {
     };
 
-    template <> struct is_one_way_executor<service_executor> : std::true_type
+    template <>
+    struct is_one_way_executor<service_executor> : std::true_type
     {
     };
 
-    template <> struct is_two_way_executor<service_executor> : std::true_type
+    template <>
+    struct is_two_way_executor<service_executor> : std::true_type
     {
     };
 
-    template <> struct is_bulk_two_way_executor<service_executor> : std::true_type
+    template <>
+    struct is_bulk_two_way_executor<service_executor> : std::true_type
     {
     };
 
-    template <> struct is_one_way_executor<io_pool_executor> : std::true_type
+    template <>
+    struct is_one_way_executor<io_pool_executor> : std::true_type
     {
     };
 
-    template <> struct is_two_way_executor<io_pool_executor> : std::true_type
+    template <>
+    struct is_two_way_executor<io_pool_executor> : std::true_type
     {
     };
 
-    template <> struct is_bulk_two_way_executor<io_pool_executor> : std::true_type
+    template <>
+    struct is_bulk_two_way_executor<io_pool_executor> : std::true_type
     {
     };
 
-    template <> struct is_one_way_executor<parcel_pool_executor> : std::true_type
+    template <>
+    struct is_one_way_executor<parcel_pool_executor> : std::true_type
     {
     };
 
-    template <> struct is_two_way_executor<parcel_pool_executor> : std::true_type
+    template <>
+    struct is_two_way_executor<parcel_pool_executor> : std::true_type
     {
     };
 
-    template <> struct is_bulk_two_way_executor<parcel_pool_executor> : std::true_type
+    template <>
+    struct is_bulk_two_way_executor<parcel_pool_executor> : std::true_type
     {
     };
 
-    template <> struct is_one_way_executor<timer_pool_executor> : std::true_type
+    template <>
+    struct is_one_way_executor<timer_pool_executor> : std::true_type
     {
     };
 
-    template <> struct is_two_way_executor<timer_pool_executor> : std::true_type
+    template <>
+    struct is_two_way_executor<timer_pool_executor> : std::true_type
     {
     };
 
-    template <> struct is_bulk_two_way_executor<timer_pool_executor> : std::true_type
+    template <>
+    struct is_bulk_two_way_executor<timer_pool_executor> : std::true_type
     {
     };
 
-    template <> struct is_one_way_executor<main_pool_executor> : std::true_type
+    template <>
+    struct is_one_way_executor<main_pool_executor> : std::true_type
     {
     };
 
-    template <> struct is_two_way_executor<main_pool_executor> : std::true_type
+    template <>
+    struct is_two_way_executor<main_pool_executor> : std::true_type
     {
     };
 
-    template <> struct is_bulk_two_way_executor<main_pool_executor> : std::true_type
+    template <>
+    struct is_bulk_two_way_executor<main_pool_executor> : std::true_type
     {
     };
     /// \endcond

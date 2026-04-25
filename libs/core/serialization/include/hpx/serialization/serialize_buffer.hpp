@@ -33,7 +33,8 @@ namespace hpx::serialization {
             }
         };
 
-        template <typename T> struct array_allocator<std::allocator<T>>
+        template <typename T>
+        struct array_allocator<std::allocator<T>>
         {
             T* operator()(std::allocator<T>, std::size_t size) const
             {
@@ -53,7 +54,8 @@ namespace hpx::serialization {
             }
         };
 
-        template <typename T> struct array_deleter<std::allocator<T>>
+        template <typename T>
+        struct array_deleter<std::allocator<T>>
         {
             void operator()(
                 T const* p, std::allocator<T>, std::size_t) const noexcept

@@ -184,11 +184,13 @@ namespace hpx::execution::experimental {
             typename E>
         struct is_receiver_impl;
 
-        template <typename T, typename E> struct is_receiver_impl<false, T, E> : std::false_type
+        template <typename T, typename E>
+        struct is_receiver_impl<false, T, E> : std::false_type
         {
         };
 
-        template <typename T, typename E> struct is_receiver_impl<true, T, E>
+        template <typename T, typename E>
+        struct is_receiver_impl<true, T, E>
           : std::integral_constant<bool,
                 hpx::is_invocable_v<set_stopped_t, std::decay_t<T>&&> &&
                     hpx::is_invocable_v<set_error_t, std::decay_t<T>&&, E>>
@@ -215,7 +217,8 @@ namespace hpx::execution::experimental {
             typename CS>
         struct is_receiver_of_impl;
 
-        template <typename T, typename CS> struct is_receiver_of_impl<false, T, CS> : std::false_type
+        template <typename T, typename CS>
+        struct is_receiver_of_impl<false, T, CS> : std::false_type
         {
         };
 
@@ -224,7 +227,8 @@ namespace hpx::execution::experimental {
         {
         };
 
-        template <typename F, typename T, typename... Ts> struct is_invocable_variant_of_tuples<F, T,
+        template <typename F, typename T, typename... Ts>
+        struct is_invocable_variant_of_tuples<F, T,
             meta::pack<meta::pack<Ts...>>>
           : hpx::is_invocable<F, std::decay_t<T>&&, Ts...>
         {
@@ -235,12 +239,14 @@ namespace hpx::execution::experimental {
         {
         };
 
-        template <typename F, typename T, typename... Ts> struct is_invocable_variant<F, T, meta::pack<Ts...>>
+        template <typename F, typename T, typename... Ts>
+        struct is_invocable_variant<F, T, meta::pack<Ts...>>
           : hpx::is_invocable<F, std::decay_t<T>&&, Ts...>
         {
         };
 
-        template <typename T, typename CS> struct is_receiver_of_impl<true, T, CS>
+        template <typename T, typename CS>
+        struct is_receiver_of_impl<true, T, CS>
           : std::integral_constant<bool,
                 is_invocable_variant_of_tuples<set_value_t, T,
                     typename CS::template value_types<meta::pack,
@@ -268,7 +274,8 @@ namespace hpx::execution::experimental {
         {
         };
 
-        template <typename F, typename T, typename... Ts> struct is_nothrow_invocable_variant_of_tuples<F, T,
+        template <typename F, typename T, typename... Ts>
+        struct is_nothrow_invocable_variant_of_tuples<F, T,
             meta::pack<meta::pack<Ts...>>>
           : hpx::functional::is_nothrow_tag_invocable<F, std::decay_t<T>&&,
                 Ts...>
@@ -280,7 +287,8 @@ namespace hpx::execution::experimental {
         {
         };
 
-        template <typename F, typename T, typename... Ts> struct is_nothrow_invocable_variant<F, T, meta::pack<Ts...>>
+        template <typename F, typename T, typename... Ts>
+        struct is_nothrow_invocable_variant<F, T, meta::pack<Ts...>>
           : hpx::functional::is_nothrow_tag_invocable<F, std::decay_t<T>&&,
                 Ts...>
         {
@@ -290,11 +298,13 @@ namespace hpx::execution::experimental {
             typename CS>
         struct is_nothrow_receiver_of_impl;
 
-        template <typename T, typename CS> struct is_nothrow_receiver_of_impl<false, T, CS> : std::false_type
+        template <typename T, typename CS>
+        struct is_nothrow_receiver_of_impl<false, T, CS> : std::false_type
         {
         };
 
-        template <typename T, typename CS> struct is_nothrow_receiver_of_impl<true, T, CS>
+        template <typename T, typename CS>
+        struct is_nothrow_receiver_of_impl<true, T, CS>
           : std::integral_constant<bool,
                 is_nothrow_invocable_variant_of_tuples<set_value_t, T,
                     typename CS::template value_types<meta::pack,
@@ -324,15 +334,18 @@ namespace hpx::execution::experimental {
         {
         };
 
-        template <> struct is_receiver_cpo<set_value_t> : std::true_type
+        template <>
+        struct is_receiver_cpo<set_value_t> : std::true_type
         {
         };
 
-        template <> struct is_receiver_cpo<set_error_t> : std::true_type
+        template <>
+        struct is_receiver_cpo<set_error_t> : std::true_type
         {
         };
 
-        template <> struct is_receiver_cpo<set_stopped_t> : std::true_type
+        template <>
+        struct is_receiver_cpo<set_stopped_t> : std::true_type
         {
         };
 

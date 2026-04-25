@@ -83,8 +83,8 @@ namespace hpx::util::detail::any {
     };
 
     ////////////////////////////////////////////////////////////////////////////
-    template <typename IArch, typename OArch,
-        typename Vtable, typename Char> struct fxn_ptr<IArch, OArch, Vtable, Char, std::true_type>
+    template <typename IArch, typename OArch, typename Vtable, typename Char>
+    struct fxn_ptr<IArch, OArch, Vtable, Char, std::true_type>
       : fxn_ptr_table<IArch, OArch, Char, std::true_type>
     {
         using base_type = fxn_ptr_table<IArch, OArch, Char, std::true_type>;
@@ -133,7 +133,8 @@ namespace hpx::util::detail::any {
 namespace hpx::util {
 
     ////////////////////////////////////////////////////////////////////////////
-    template <typename IArch, typename OArch, typename Char> class basic_any<IArch, OArch, Char, std::true_type>
+    template <typename IArch, typename OArch, typename Char>
+    class basic_any<IArch, OArch, Char, std::true_type>
     {
     public:
         // constructors

@@ -29,7 +29,8 @@ namespace hpx::traits {
         using type = construct_without_back_ptr;
     };
 
-    template <typename Component> struct managed_component_ctor_policy<Component,
+    template <typename Component>
+    struct managed_component_ctor_policy<Component,
         std::void_t<typename Component::has_managed_component_base>>
     {
         using type = typename Component::ctor_policy;
@@ -55,7 +56,8 @@ namespace hpx::traits {
         using type = managed_object_controls_lifetime;
     };
 
-    template <typename Component> struct managed_component_dtor_policy<Component,
+    template <typename Component>
+    struct managed_component_dtor_policy<Component,
         std::void_t<typename Component::has_managed_component_base>>
     {
         using type = typename Component::dtor_policy;

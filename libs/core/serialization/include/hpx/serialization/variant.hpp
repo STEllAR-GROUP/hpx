@@ -48,7 +48,8 @@ namespace hpx::serialization {
         HPX_CXX_CORE_EXPORT template <typename... Ts>
         struct std_variant_impl;
 
-        template <typename T, typename... Ts> struct std_variant_impl<T, Ts...>
+        template <typename T, typename... Ts>
+        struct std_variant_impl<T, Ts...>
         {
             template <typename V>
             static void load(input_archive& ar, std::size_t which, V& v)
@@ -64,7 +65,8 @@ namespace hpx::serialization {
             }
         };
 
-        template <> struct std_variant_impl<>
+        template <>
+        struct std_variant_impl<>
         {
             template <typename V>
             static constexpr void load(input_archive&, std::size_t, V&) noexcept

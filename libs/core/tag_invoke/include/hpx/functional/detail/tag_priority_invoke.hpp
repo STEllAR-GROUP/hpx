@@ -175,11 +175,13 @@ namespace hpx::functional::detail {
     HPX_CXX_CORE_EXPORT template <typename Sig, bool Invocable>
     struct is_nothrow_tag_override_invocable_impl;
 
-    template <typename Sig> struct is_nothrow_tag_override_invocable_impl<Sig, false> : std::false_type
+    template <typename Sig>
+    struct is_nothrow_tag_override_invocable_impl<Sig, false> : std::false_type
     {
     };
 
-    template <typename Tag, typename... Args> struct is_nothrow_tag_override_invocable_impl<
+    template <typename Tag, typename... Args>
+    struct is_nothrow_tag_override_invocable_impl<
         decltype(tag_override_invoke_ns::tag_override_invoke)(Tag, Args...),
         true>
       : std::integral_constant<bool,

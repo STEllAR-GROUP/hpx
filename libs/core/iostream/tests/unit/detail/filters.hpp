@@ -31,7 +31,8 @@ namespace hpx::iostream::test {
     template <typename Mode>
     struct toupper_filter;
 
-    template <> struct toupper_filter<input> : input_filter
+    template <>
+    struct toupper_filter<input> : input_filter
     {
         template <typename Source>
         int get(Source& s)
@@ -43,7 +44,8 @@ namespace hpx::iostream::test {
         }
     };
 
-    template <> struct toupper_filter<output> : output_filter
+    template <>
+    struct toupper_filter<output> : output_filter
     {
         template <typename Sink>
         bool put(Sink& s, char c)
@@ -56,7 +58,8 @@ namespace hpx::iostream::test {
     template <typename Mode>
     struct tolower_filter;
 
-    template <> struct tolower_filter<input> : input_filter
+    template <>
+    struct tolower_filter<input> : input_filter
     {
         template <typename Source>
         int get(Source& s)
@@ -68,7 +71,8 @@ namespace hpx::iostream::test {
         }
     };
 
-    template <> struct tolower_filter<output> : output_filter
+    template <>
+    struct tolower_filter<output> : output_filter
     {
         template <typename Sink>
         bool put(Sink& s, char c)
@@ -81,7 +85,8 @@ namespace hpx::iostream::test {
     template <typename Mode>
     struct toupper_multichar_filter;
 
-    template <> struct toupper_multichar_filter<input> : multichar_input_filter
+    template <>
+    struct toupper_multichar_filter<input> : multichar_input_filter
     {
         template <typename Source>
         std::streamsize read(Source& s, char* buf, std::streamsize n)
@@ -95,7 +100,8 @@ namespace hpx::iostream::test {
         }
     };
 
-    template <> struct toupper_multichar_filter<output> : multichar_output_filter
+    template <>
+    struct toupper_multichar_filter<output> : multichar_output_filter
     {
         template <typename Sink>
         std::streamsize write(Sink& s, char const* buf, std::streamsize n)
@@ -114,7 +120,8 @@ namespace hpx::iostream::test {
     template <typename Mode>
     struct tolower_multichar_filter;
 
-    template <> struct tolower_multichar_filter<input> : multichar_input_filter
+    template <>
+    struct tolower_multichar_filter<input> : multichar_input_filter
     {
         template <typename Source>
         std::streamsize read(Source& s, char* buf, std::streamsize n)
@@ -128,7 +135,8 @@ namespace hpx::iostream::test {
         }
     };
 
-    template <> struct tolower_multichar_filter<output> : multichar_output_filter
+    template <>
+    struct tolower_multichar_filter<output> : multichar_output_filter
     {
         template <typename Sink>
         std::streamsize write(Sink& s, char const* buf, std::streamsize n)

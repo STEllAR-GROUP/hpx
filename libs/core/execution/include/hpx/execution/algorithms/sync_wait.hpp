@@ -91,8 +91,7 @@ namespace hpx::execution::experimental::detail {
     HPX_CXX_CORE_EXPORT template <typename Pack>
     struct make_decayed_pack;
 
-    template <template <typename...> typename Pack,
-        typename... Ts>
+    template <template <typename...> typename Pack, typename... Ts>
     struct make_decayed_pack<Pack<Ts...>>
     {
         using type = Pack<std::decay_t<Ts>...>;
@@ -105,12 +104,14 @@ namespace hpx::execution::experimental::detail {
     HPX_CXX_CORE_EXPORT template <sync_wait_type Type, typename T>
     struct select_result;
 
-    template <typename T> struct select_result<sync_wait_type::single, T>
+    template <typename T>
+    struct select_result<sync_wait_type::single, T>
     {
         using type = hpx::variant<make_decayed_pack_t<single_variant_t<T>>>;
     };
 
-    template <typename T> struct select_result<sync_wait_type::variant, T>
+    template <typename T>
+    struct select_result<sync_wait_type::variant, T>
     {
         using type = T;
     };

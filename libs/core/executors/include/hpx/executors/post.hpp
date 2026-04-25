@@ -41,7 +41,8 @@ namespace hpx::detail {
 
     // The overload for hpx::post taking an executor simply forwards to the
     // corresponding executor customization point.
-    template <typename Executor> struct post_dispatch<Executor,
+    template <typename Executor>
+    struct post_dispatch<Executor,
         std::enable_if_t<traits::is_one_way_executor_v<Executor> ||
             traits::is_two_way_executor_v<Executor>>>
     {

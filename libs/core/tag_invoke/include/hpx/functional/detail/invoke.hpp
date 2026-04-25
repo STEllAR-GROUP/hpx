@@ -127,7 +127,8 @@ namespace hpx::util::detail {
         using type = F&&;
     };
 
-    template <typename F, typename T, typename C> struct dispatch_invoke<F, T C::*>
+    template <typename F, typename T, typename C>
+    struct dispatch_invoke<F, T C::*>
     {
         using type = std::conditional_t<std::is_function_v<T>,
             invoke_mem_fun<T, C>, invoke_mem_obj<T, C>>;

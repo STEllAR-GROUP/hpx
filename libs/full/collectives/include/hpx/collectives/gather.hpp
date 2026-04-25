@@ -426,13 +426,15 @@ namespace hpx::traits {
 
         struct gather_tag;
 
-        template <> struct communicator_data<gather_tag>
+        template <>
+        struct communicator_data<gather_tag>
         {
             HPX_EXPORT static char const* name() noexcept;
         };
     }    // namespace communication
 
-    template <typename Communicator> struct communication_operation<Communicator, communication::gather_tag>
+    template <typename Communicator>
+    struct communication_operation<Communicator, communication::gather_tag>
     {
         template <typename Result, typename T>
         static Result get(Communicator& communicator, std::size_t which,

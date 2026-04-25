@@ -21,7 +21,8 @@ namespace hpx::traits {
     {
     };
 
-    template <typename R> struct is_future_range<R, std::enable_if_t<std::ranges::range<R>>>
+    template <typename R>
+    struct is_future_range<R, std::enable_if_t<std::ranges::range<R>>>
       : is_future<typename range_traits<R>::value_type>
     {
     };
@@ -37,7 +38,8 @@ namespace hpx::traits {
     {
     };
 
-    template <typename R> struct is_ref_wrapped_future_range<::std::reference_wrapper<R>>
+    template <typename R>
+    struct is_ref_wrapped_future_range<::std::reference_wrapper<R>>
       : is_future_range<R>
     {
     };
@@ -57,7 +59,8 @@ namespace hpx::traits {
     {
     };
 
-    template <typename R> struct future_range_traits<R, true>
+    template <typename R>
+    struct future_range_traits<R, true>
     {
         using future_type = typename range_traits<R>::value_type;
     };

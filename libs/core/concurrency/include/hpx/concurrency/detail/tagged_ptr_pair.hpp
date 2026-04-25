@@ -57,12 +57,14 @@ namespace hpx::lockfree {
         template <std::size_t Size>
         struct ptr_mask;    // intentionally left unimplemented
 
-        template <> struct ptr_mask<4>
+        template <>
+        struct ptr_mask<4>
         {
             static constexpr std::uint32_t value = 0xffffffff;
         };
 
-        template <> struct ptr_mask<8>
+        template <>
+        struct ptr_mask<8>
         {
             static constexpr std::uint64_t value = 0xffffffffffff;
         };

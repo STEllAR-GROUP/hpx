@@ -132,7 +132,8 @@ namespace hpx::traits::detail {
 
     // specialize for promise_data to extract corresponding, allocator-
     // based shared state type
-    template <typename R, typename Allocator> struct shared_state_allocator<lcos::detail::promise_data<R>, Allocator>
+    template <typename R, typename Allocator>
+    struct shared_state_allocator<lcos::detail::promise_data<R>, Allocator>
     {
         using type = lcos::detail::promise_data_allocator<R, Allocator>;
     };

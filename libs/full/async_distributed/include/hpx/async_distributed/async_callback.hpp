@@ -22,7 +22,8 @@
 namespace hpx::detail {
 
     // launch
-    template <typename Action, typename Policy> struct async_cb_action_dispatch<Action, Policy,
+    template <typename Action, typename Policy>
+    struct async_cb_action_dispatch<Action, Policy,
         std::enable_if_t<traits::is_launch_policy_v<Policy>>>
     {
         // id_type
@@ -75,7 +76,8 @@ namespace hpx::detail {
     };
 
     // hpx::id_type
-    template <typename Action> struct async_cb_action_dispatch<Action, hpx::id_type>
+    template <typename Action>
+    struct async_cb_action_dispatch<Action, hpx::id_type>
     {
         template <typename Callback, typename... Ts>
         HPX_FORCEINLINE static hpx::future<
@@ -90,7 +92,8 @@ namespace hpx::detail {
     };
 
     // component::client
-    template <typename Action, typename Client> struct async_cb_action_dispatch<Action, Client,
+    template <typename Action, typename Client>
+    struct async_cb_action_dispatch<Action, Client,
         std::enable_if_t<traits::is_client<Client>::value>>
     {
         template <typename Client_, typename Stub, typename Data,
@@ -114,7 +117,8 @@ namespace hpx::detail {
     };
 
     // distribution policy
-    template <typename Action, typename Policy> struct async_cb_action_dispatch<Action, Policy,
+    template <typename Action, typename Policy>
+    struct async_cb_action_dispatch<Action, Policy,
         std::enable_if_t<traits::is_distribution_policy_v<Policy>>>
     {
         template <typename DistPolicy, typename Callback, typename... Ts>
@@ -148,7 +152,8 @@ namespace hpx {
 namespace hpx::detail {
 
     // any action
-    template <typename Action> struct async_cb_dispatch<Action,
+    template <typename Action>
+    struct async_cb_dispatch<Action,
         std::enable_if_t<traits::is_action<Action>::value>>
     {
         template <typename Component, typename Signature, typename Derived,
@@ -196,7 +201,8 @@ namespace hpx::detail {
         }
     };
 
-    template <typename Policy> struct async_cb_dispatch<Policy,
+    template <typename Policy>
+    struct async_cb_dispatch<Policy,
         std::enable_if_t<traits::is_launch_policy_v<Policy>>>
     {
         template <typename Policy_, typename Component, typename Signature,

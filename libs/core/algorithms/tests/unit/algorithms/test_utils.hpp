@@ -28,7 +28,8 @@ namespace test {
     {
     };
 
-    template <> struct maybe_disable_proxy<std::random_access_iterator_tag>
+    template <>
+    struct maybe_disable_proxy<std::random_access_iterator_tag>
     {
         using use_brackets_proxy = std::false_type;
     };
@@ -164,7 +165,8 @@ namespace test {
         }
     };
 
-    template <typename IteratorTag> struct test_num_exceptions<hpx::execution::sequenced_policy, IteratorTag>
+    template <typename IteratorTag>
+    struct test_num_exceptions<hpx::execution::sequenced_policy, IteratorTag>
     {
         static void call(hpx::execution::sequenced_policy const&,
             hpx::exception_list const& e)
@@ -173,7 +175,8 @@ namespace test {
         }
     };
 
-    template <typename ExPolicy> struct test_num_exceptions<ExPolicy, std::input_iterator_tag>
+    template <typename ExPolicy>
+    struct test_num_exceptions<ExPolicy, std::input_iterator_tag>
     {
         static void call(ExPolicy, hpx::exception_list const& e)
         {
@@ -181,7 +184,8 @@ namespace test {
         }
     };
 
-    template <> struct test_num_exceptions<hpx::execution::sequenced_policy,
+    template <>
+    struct test_num_exceptions<hpx::execution::sequenced_policy,
         std::input_iterator_tag>
     {
         static void call(hpx::execution::sequenced_policy const&,
