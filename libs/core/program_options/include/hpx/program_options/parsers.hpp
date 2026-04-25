@@ -65,8 +65,7 @@ namespace hpx::program_options {
         - provides convenient conversion from basic_parsed_options<char>
         - stores the passed char-based options for later use.
     */
-    template <>
-    class HPX_CORE_EXPORT basic_parsed_options<wchar_t>
+    template <> class HPX_CORE_EXPORT basic_parsed_options<wchar_t>
     {
     public:
         /** Constructs wrapped options from options in UTF8 encoding. */

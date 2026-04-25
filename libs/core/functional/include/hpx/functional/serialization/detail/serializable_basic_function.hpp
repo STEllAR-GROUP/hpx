@@ -22,8 +22,7 @@
 
 namespace hpx::util::detail {
 
-    template <bool Copyable, typename R, typename... Ts>
-    class basic_function<R(Ts...), Copyable, /*Serializable*/ true>
+    template <bool Copyable, typename R, typename... Ts> class basic_function<R(Ts...), Copyable, /*Serializable*/ true>
       : public basic_function<R(Ts...), Copyable, /*Serializable*/ false>
     {
         using vtable = function_vtable<R(Ts...), Copyable>;

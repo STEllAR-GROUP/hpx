@@ -811,9 +811,8 @@ namespace hpx::parallel {
             typename S = void, typename Tuple = hpx::tuple<>>
         struct part_iterations;
 
-        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename F, typename S,
-            typename... Ts>
-        struct part_iterations<ExPolicy, F, S, hpx::tuple<Ts...>>
+        template <typename ExPolicy, typename F, typename S,
+            typename... Ts> struct part_iterations<ExPolicy, F, S, hpx::tuple<Ts...>>
         {
             using fun_type = std::decay_t<F>;
 
@@ -915,8 +914,7 @@ namespace hpx::parallel {
             }
         };
 
-        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename F, typename S>
-        struct part_iterations<ExPolicy, F, S, hpx::tuple<>>
+        template <typename ExPolicy, typename F, typename S> struct part_iterations<ExPolicy, F, S, hpx::tuple<>>
         {
             using fun_type = std::decay_t<F>;
 
@@ -1016,9 +1014,8 @@ namespace hpx::parallel {
             }
         };
 
-        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename F,
-            typename... Ts>
-        struct part_iterations<ExPolicy, F, void, hpx::tuple<Ts...>>
+        template <typename ExPolicy, typename F,
+            typename... Ts> struct part_iterations<ExPolicy, F, void, hpx::tuple<Ts...>>
         {
             using fun_type = std::decay_t<F>;
 
@@ -1097,8 +1094,7 @@ namespace hpx::parallel {
             }
         };
 
-        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename F>
-        struct part_iterations<ExPolicy, F, void, hpx::tuple<>>
+        template <typename ExPolicy, typename F> struct part_iterations<ExPolicy, F, void, hpx::tuple<>>
         {
             using fun_type = std::decay_t<F>;
 
@@ -1845,9 +1841,8 @@ namespace hpx::experimental {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 namespace hpx::traits {
 
-    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename F, typename S,
-        typename Tuple>
-    struct get_function_address<
+    template <typename ExPolicy, typename F, typename S,
+        typename Tuple> struct get_function_address<
         hpx::parallel::detail::part_iterations<ExPolicy, F, S, Tuple>>
     {
         static constexpr std::size_t call(
@@ -1858,9 +1853,8 @@ namespace hpx::traits {
         }
     };
 
-    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename F, typename S,
-        typename Tuple>
-    struct get_function_annotation<
+    template <typename ExPolicy, typename F, typename S,
+        typename Tuple> struct get_function_annotation<
         hpx::parallel::detail::part_iterations<ExPolicy, F, S, Tuple>>
     {
         static constexpr char const* call(
@@ -1872,9 +1866,8 @@ namespace hpx::traits {
     };
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename F, typename S,
-        typename Tuple>
-    struct get_function_annotation_itt<
+    template <typename ExPolicy, typename F, typename S,
+        typename Tuple> struct get_function_annotation_itt<
         hpx::parallel::detail::part_iterations<ExPolicy, F, S, Tuple>>
     {
         static util::itt::string_handle call(

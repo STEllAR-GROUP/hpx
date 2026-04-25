@@ -327,8 +327,7 @@ namespace hpx::parallel {
             }
         };
 
-        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename F>
-        struct for_each_iteration<ExPolicy, F, hpx::identity>
+        template <typename ExPolicy, typename F> struct for_each_iteration<ExPolicy, F, hpx::identity>
         {
             using execution_policy_type = std::decay_t<ExPolicy>;
             using fun_type = std::decay_t<F>;
@@ -660,8 +659,7 @@ namespace hpx {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 namespace hpx::traits {
 
-    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename F, typename Proj>
-    struct get_function_address<
+    template <typename ExPolicy, typename F, typename Proj> struct get_function_address<
         parallel::detail::for_each_iteration<ExPolicy, F, Proj>>
     {
         [[nodiscard]] static constexpr std::size_t call(
@@ -672,8 +670,7 @@ namespace hpx::traits {
         }
     };
 
-    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename F, typename Proj>
-    struct get_function_annotation<
+    template <typename ExPolicy, typename F, typename Proj> struct get_function_annotation<
         parallel::detail::for_each_iteration<ExPolicy, F, Proj>>
     {
         [[nodiscard]] static constexpr char const* call(
@@ -685,8 +682,7 @@ namespace hpx::traits {
     };
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename F, typename Proj>
-    struct get_function_annotation_itt<
+    template <typename ExPolicy, typename F, typename Proj> struct get_function_annotation_itt<
         parallel::detail::for_each_iteration<ExPolicy, F, Proj>>
     {
         [[nodiscard]] static util::itt::string_handle call(

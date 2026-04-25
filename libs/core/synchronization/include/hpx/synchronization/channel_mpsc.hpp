@@ -233,8 +233,7 @@ namespace hpx::lcos::local {
         std::atomic<bool> closed_;
     };
 
-    HPX_CXX_CORE_EXPORT template <typename T, typename Mutex>
-    class base_channel_mpsc<T, Mutex, channel_mode::dont_support_close>
+    template <typename T, typename Mutex> class base_channel_mpsc<T, Mutex, channel_mode::dont_support_close>
     {
     private:
         using mutex_type = Mutex;

@@ -41,8 +41,7 @@ namespace hpx::traits {
             using type = std::underlying_type_t<T>;
         };
 
-        HPX_CXX_CORE_EXPORT template <typename T>
-        struct unwrap_enum<T, false>
+        template <typename T> struct unwrap_enum<T, false>
         {
             using type = T;
         };
@@ -69,28 +68,24 @@ namespace hpx::traits {
         };
 
         // every type is layout-compatible with itself
-        HPX_CXX_CORE_EXPORT template <typename T>
-        struct pointer_category_helper<T, T>
+        template <typename T> struct pointer_category_helper<T, T>
         {
             using type = std::conditional_t<std::is_trivially_copyable_v<T>,
                 trivially_copyable_pointer_tag, general_pointer_tag>;
         };
 
         // pointers are layout compatible
-        HPX_CXX_CORE_EXPORT template <typename T>
-        struct pointer_category_helper<T*, T const*>
+        template <typename T> struct pointer_category_helper<T*, T const*>
         {
             using type = trivially_copyable_pointer_tag;
         };
 
-        HPX_CXX_CORE_EXPORT template <typename T>
-        struct pointer_category_helper<T*, T volatile*>
+        template <typename T> struct pointer_category_helper<T*, T volatile*>
         {
             using type = trivially_copyable_pointer_tag;
         };
 
-        HPX_CXX_CORE_EXPORT template <typename T>
-        struct pointer_category_helper<T*, T const volatile*>
+        template <typename T> struct pointer_category_helper<T*, T const volatile*>
         {
             using type = trivially_copyable_pointer_tag;
         };
@@ -116,8 +111,7 @@ namespace hpx::traits {
                 general_pointer_tag>;
         };
 
-        HPX_CXX_CORE_EXPORT template <typename Source, typename Dest>
-        struct pointer_move_category<Source, Dest, false>
+        template <typename Source, typename Dest> struct pointer_move_category<Source, Dest, false>
         {
             using type = general_pointer_tag;
         };
@@ -134,8 +128,7 @@ namespace hpx::traits {
                 general_pointer_tag>;
         };
 
-        HPX_CXX_CORE_EXPORT template <typename Source, typename Dest>
-        struct pointer_copy_category<Source, Dest, false>
+        template <typename Source, typename Dest> struct pointer_copy_category<Source, Dest, false>
         {
             using type = general_pointer_tag;
         };
@@ -150,8 +143,7 @@ namespace hpx::traits {
                 relocatable_pointer_tag, general_pointer_tag>;
         };
 
-        HPX_CXX_CORE_EXPORT template <typename Source, typename Dest>
-        struct pointer_relocate_category<Source, Dest, false>
+        template <typename Source, typename Dest> struct pointer_relocate_category<Source, Dest, false>
         {
             using type = general_pointer_tag;
         };

@@ -21,9 +21,8 @@ namespace hpx::execution::experimental::detail {
     HPX_CXX_CORE_EXPORT template <typename Tag, typename IsPack, typename... Ts>
     struct partial_algorithm_base;
 
-    HPX_CXX_CORE_EXPORT template <typename Tag, std::size_t... Is,
-        typename... Ts>
-    struct partial_algorithm_base<Tag, hpx::util::index_pack<Is...>, Ts...>
+    template <typename Tag, std::size_t... Is,
+        typename... Ts> struct partial_algorithm_base<Tag, hpx::util::index_pack<Is...>, Ts...>
     {
     private:
         HPX_NO_UNIQUE_ADDRESS hpx::util::member_pack_for<std::decay_t<Ts>...>

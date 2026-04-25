@@ -27,14 +27,12 @@ namespace hpx::concurrency::detail {
     HPX_CXX_CORE_EXPORT template <queue_end Which>
     struct opposite_end;
 
-    template <>
-    struct opposite_end<queue_end::left>
+    template <> struct opposite_end<queue_end::left>
     {
         static constexpr queue_end value = queue_end::right;
     };
 
-    template <>
-    struct opposite_end<queue_end::right>
+    template <> struct opposite_end<queue_end::right>
     {
         static constexpr queue_end value = queue_end::left;
     };

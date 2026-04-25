@@ -820,8 +820,7 @@ namespace hpx::parallel {
             class block_manager;
 
             // block manager for random access iterator.
-            template <typename RandIter>
-            class block_manager<RandIter,
+            template <typename RandIter> class block_manager<RandIter,
                 std::enable_if_t<std::random_access_iterator<RandIter>>>
             {
             public:
@@ -900,8 +899,7 @@ namespace hpx::parallel {
             };
 
             // block manager for forward access iterator.
-            template <typename FwdIter>
-            class block_manager<FwdIter,
+            template <typename FwdIter> class block_manager<FwdIter,
                 std::enable_if_t<std::forward_iterator<FwdIter> &&
                     !std::random_access_iterator<FwdIter>>>
             {

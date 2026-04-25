@@ -439,8 +439,7 @@ namespace hpx::parallel {
             typename Enable = void>
         struct copy_iter;
 
-        HPX_CXX_CORE_EXPORT template <typename FwdIter1, typename FwdIter2>
-        struct copy_iter<FwdIter1, FwdIter2,
+        template <typename FwdIter1, typename FwdIter2> struct copy_iter<FwdIter1, FwdIter2,
             std::enable_if_t<
                 iterators_are_segmented<FwdIter1, FwdIter2>::value>>
           : public copy<util::in_out_result<
@@ -451,8 +450,7 @@ namespace hpx::parallel {
         {
         };
 
-        HPX_CXX_CORE_EXPORT template <typename FwdIter1, typename FwdIter2>
-        struct copy_iter<FwdIter1, FwdIter2,
+        template <typename FwdIter1, typename FwdIter2> struct copy_iter<FwdIter1, FwdIter2,
             std::enable_if_t<
                 iterators_are_not_segmented<FwdIter1, FwdIter2>::value>>
           : public copy<util::in_out_result<FwdIter1, FwdIter2>>

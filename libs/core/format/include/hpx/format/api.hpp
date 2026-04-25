@@ -100,8 +100,7 @@ namespace hpx::util {
             }
         };
 
-        template <>
-        struct formatter<bool> : formatter<int>
+        template <> struct formatter<bool> : formatter<int>
         {
             static void call(
                 std::ostream& os, std::string_view spec, void const* ptr)
@@ -111,8 +110,7 @@ namespace hpx::util {
             }
         };
 
-        template <>
-        struct formatter<void const*, /*IsFundamental=*/false>
+        template <> struct formatter<void const*, /*IsFundamental=*/false>
         {
             static void call(
                 std::ostream& os, std::string_view /*spec*/, void const* ptr)
@@ -121,14 +119,12 @@ namespace hpx::util {
             }
         };
 
-        template <typename T>
-        struct formatter<T const*, /*IsFundamental=*/false>
+        template <typename T> struct formatter<T const*, /*IsFundamental=*/false>
           : formatter<void const*>
         {
         };
 
-        template <>
-        struct formatter<char const*, /*IsFundamental=*/false>
+        template <> struct formatter<char const*, /*IsFundamental=*/false>
         {
             static void call(
                 std::ostream& os, std::string_view spec, void const* ptr)
@@ -164,8 +160,7 @@ namespace hpx::util {
             }
         };
 
-        template <>
-        struct formatter<std::string, /*IsFundamental=*/false>
+        template <> struct formatter<std::string, /*IsFundamental=*/false>
           : formatter<char const*>
         {
             static void call(
@@ -186,8 +181,7 @@ namespace hpx::util {
             }
         };
 
-        template <>
-        struct formatter<std::tm, /*IsFundamental=*/false>
+        template <> struct formatter<std::tm, /*IsFundamental=*/false>
         {
             static void call(
                 std::ostream& os, std::string_view spec, void const* ptr)
@@ -226,8 +220,7 @@ namespace hpx::util {
             os << value;
         }
 
-        template <typename T>
-        struct formatter<T, /*IsFundamental=*/false>
+        template <typename T> struct formatter<T, /*IsFundamental=*/false>
         {
             static void call(
                 std::ostream& os, std::string_view spec, void const* value)

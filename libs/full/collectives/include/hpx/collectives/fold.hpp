@@ -195,8 +195,7 @@ namespace hpx { namespace lcos {
         {
         };
 
-        template <typename Action>
-        struct fold_result<fold_with_index<Action>> : fold_result<Action>
+        template <typename Action> struct fold_result<fold_with_index<Action>> : fold_result<Action>
         {
         };
 
@@ -240,8 +239,7 @@ namespace hpx { namespace lcos {
         template <typename Action, typename Is>
         struct make_fold_action_impl;
 
-        template <typename Action, std::size_t... Is>
-        struct make_fold_action_impl<Action, util::index_pack<Is...>>
+        template <typename Action, std::size_t... Is> struct make_fold_action_impl<Action, util::index_pack<Is...>>
         {
             using action_result = typename fold_result<Action>::type;
 
@@ -267,8 +265,7 @@ namespace hpx { namespace lcos {
         {
         };
 
-        template <typename Action>
-        struct make_fold_action<fold_with_index<Action>>
+        template <typename Action> struct make_fold_action<fold_with_index<Action>>
           : make_fold_action_impl<fold_with_index<Action>,
                 typename util::make_index_pack<Action::arity - 1>::type>
         {

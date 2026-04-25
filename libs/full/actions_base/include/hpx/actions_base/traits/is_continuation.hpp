@@ -20,8 +20,7 @@ namespace hpx::traits {
         {
         };
 
-        template <typename Continuation>
-        struct is_continuation_impl<Continuation,
+        template <typename Continuation> struct is_continuation_impl<Continuation,
             std::void_t<typename Continuation::continuation_tag>>
           : std::true_type
         {

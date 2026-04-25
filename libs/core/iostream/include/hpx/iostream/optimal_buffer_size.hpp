@@ -36,8 +36,7 @@ namespace hpx::iostream {
         {
         };
 
-        template <>
-        struct optimal_buffer_size_impl<optimally_buffered_tag>
+        template <> struct optimal_buffer_size_impl<optimally_buffered_tag>
         {
             template <typename T>
             static constexpr std::streamsize optimal_buffer_size(
@@ -47,8 +46,7 @@ namespace hpx::iostream {
             }
         };
 
-        template <>
-        struct optimal_buffer_size_impl<device_tag>
+        template <> struct optimal_buffer_size_impl<device_tag>
         {
             template <typename T>
             static constexpr std::streamsize optimal_buffer_size(
@@ -58,8 +56,7 @@ namespace hpx::iostream {
             }
         };
 
-        template <>
-        struct optimal_buffer_size_impl<filter_tag>
+        template <> struct optimal_buffer_size_impl<filter_tag>
         {
             template <typename T>
             static constexpr std::streamsize optimal_buffer_size(

@@ -23,8 +23,7 @@ namespace hpx::traits {
         };
 
         // If an action returns void, we need to do special things
-        template <>
-        struct action_remote_result_customization_point<void>
+        template <> struct action_remote_result_customization_point<void>
         {
             using type = util::unused_type;
         };

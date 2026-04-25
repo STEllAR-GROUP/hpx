@@ -896,8 +896,7 @@ namespace hpx::execution::experimental {
 
 namespace hpx::detail {
 
-    HPX_CXX_CORE_EXPORT template <typename... Ts>
-    struct empty_vtable_type<
+    template <typename... Ts> struct empty_vtable_type<
         hpx::execution::experimental::detail::unique_any_sender_base<Ts...>>
     {
         using type =
@@ -905,8 +904,7 @@ namespace hpx::detail {
                 Ts...>;
     };
 
-    HPX_CXX_CORE_EXPORT template <typename... Ts>
-    struct empty_vtable_type<
+    template <typename... Ts> struct empty_vtable_type<
         hpx::execution::experimental::detail::any_sender_base<Ts...>>
     {
         using type =

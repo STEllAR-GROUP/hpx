@@ -98,6 +98,8 @@ set(STANDARD_LIBRARY_HEADERS
     "<cstdint>"
     "<cstdio>"
     "<cstdlib>"
+    "<dlfcn.h>"
+    "<link.h>"
     "<cstring>"
     "<ctime>"
     "<cuchar>"

@@ -176,8 +176,7 @@ namespace hpx { namespace lcos {
                 std::vector<action_result>>::type type;
         };
 
-        template <typename Action>
-        struct broadcast_result<broadcast_with_index<Action>>
+        template <typename Action> struct broadcast_result<broadcast_with_index<Action>>
           : broadcast_result<Action>
         {
         };
@@ -276,8 +275,7 @@ namespace hpx { namespace lcos {
         template <typename Action, typename Is>
         struct make_broadcast_action_impl;
 
-        template <typename Action, std::size_t... Is>
-        struct make_broadcast_action_impl<Action, util::index_pack<Is...>>
+        template <typename Action, std::size_t... Is> struct make_broadcast_action_impl<Action, util::index_pack<Is...>>
         {
             typedef
                 typename broadcast_result<Action>::action_result action_result;
@@ -299,8 +297,7 @@ namespace hpx { namespace lcos {
         {
         };
 
-        template <typename Action>
-        struct make_broadcast_action<broadcast_with_index<Action>>
+        template <typename Action> struct make_broadcast_action<broadcast_with_index<Action>>
           : make_broadcast_action_impl<broadcast_with_index<Action>,
                 typename util::make_index_pack<Action::arity - 1>::type>
         {
@@ -309,8 +306,7 @@ namespace hpx { namespace lcos {
         template <typename Action, typename Is>
         struct make_broadcast_post_action_impl;
 
-        template <typename Action, std::size_t... Is>
-        struct make_broadcast_post_action_impl<Action, util::index_pack<Is...>>
+        template <typename Action, std::size_t... Is> struct make_broadcast_post_action_impl<Action, util::index_pack<Is...>>
         {
             typedef
                 typename broadcast_result<Action>::action_result action_result;
@@ -331,8 +327,7 @@ namespace hpx { namespace lcos {
         {
         };
 
-        template <typename Action>
-        struct make_broadcast_post_action<broadcast_with_index<Action>>
+        template <typename Action> struct make_broadcast_post_action<broadcast_with_index<Action>>
           : make_broadcast_post_action_impl<broadcast_with_index<Action>,
                 typename util::make_index_pack<Action::arity - 1>::type>
         {

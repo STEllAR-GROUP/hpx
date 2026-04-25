@@ -24,7 +24,8 @@
 
 namespace hpx::detail {
 
-    HPX_CORE_EXPORT char const* store_function_annotation(std::string name);
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT char const*
+    store_function_annotation(std::string name);
 }    // namespace hpx::detail
 
 namespace hpx::threads {

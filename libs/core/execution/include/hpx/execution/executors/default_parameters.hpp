@@ -76,8 +76,7 @@ namespace hpx::execution::experimental {
     };
 
     /// \cond NOINTERNAL
-    template <>
-    struct is_executor_parameters<default_parameters> : std::true_type
+    template <> struct is_executor_parameters<default_parameters> : std::true_type
     {
     };
     /// \endcond

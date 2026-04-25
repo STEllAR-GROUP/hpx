@@ -52,8 +52,7 @@ namespace hpx::util {
         template <typename F, typename Is, typename... Ts>
         class deferred;
 
-        template <typename F, std::size_t... Is, typename... Ts>
-        class deferred<F, index_pack<Is...>, Ts...>
+        template <typename F, std::size_t... Is, typename... Ts> class deferred<F, index_pack<Is...>, Ts...>
         {
         public:
             deferred() = default;    // needed for serialization
@@ -163,8 +162,7 @@ namespace hpx::util {
 namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_CORE_EXPORT template <typename F, typename... Ts>
-    struct get_function_address<util::detail::deferred<F, Ts...>>
+    template <typename F, typename... Ts> struct get_function_address<util::detail::deferred<F, Ts...>>
     {
         [[nodiscard]] static constexpr std::size_t call(
             util::detail::deferred<F, Ts...> const& f) noexcept
@@ -174,8 +172,7 @@ namespace hpx::traits {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_CORE_EXPORT template <typename F, typename... Ts>
-    struct get_function_annotation<util::detail::deferred<F, Ts...>>
+    template <typename F, typename... Ts> struct get_function_annotation<util::detail::deferred<F, Ts...>>
     {
         [[nodiscard]] static constexpr char const* call(
             util::detail::deferred<F, Ts...> const& f) noexcept
@@ -185,8 +182,7 @@ namespace hpx::traits {
     };
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-    HPX_CXX_CORE_EXPORT template <typename F, typename... Ts>
-    struct get_function_annotation_itt<util::detail::deferred<F, Ts...>>
+    template <typename F, typename... Ts> struct get_function_annotation_itt<util::detail::deferred<F, Ts...>>
     {
         [[nodiscard]] static util::itt::string_handle call(
             util::detail::deferred<F, Ts...> const& f) noexcept

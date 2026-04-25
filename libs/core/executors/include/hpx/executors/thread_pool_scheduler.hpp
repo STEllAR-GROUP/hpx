@@ -47,8 +47,7 @@ namespace hpx::execution::experimental {
             }
         };
 
-        template <>
-        struct get_default_scheduler_policy<hpx::launch>
+        template <> struct get_default_scheduler_policy<hpx::launch>
         {
             static constexpr hpx::launch::async_policy call() noexcept
             {

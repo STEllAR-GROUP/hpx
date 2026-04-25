@@ -451,8 +451,7 @@ namespace hpx::parallel::util {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_CORE_EXPORT template <typename Itr, typename... Ts>
-        struct loop<prefetching::prefetching_iterator<Itr, Ts...>>
+        template <typename Itr, typename... Ts> struct loop<prefetching::prefetching_iterator<Itr, Ts...>>
         {
             using iterator_type = prefetching::prefetching_iterator<Itr, Ts...>;
             using type = typename iterator_type::base_iterator;
@@ -511,8 +510,7 @@ namespace hpx::parallel::util {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_CXX_CORE_EXPORT template <typename Itr, typename... Ts>
-        struct loop_ind<prefetching::prefetching_iterator<Itr, Ts...>>
+        template <typename Itr, typename... Ts> struct loop_ind<prefetching::prefetching_iterator<Itr, Ts...>>
         {
             using iterator_type = prefetching::prefetching_iterator<Itr, Ts...>;
             using type = typename iterator_type::base_iterator;

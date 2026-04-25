@@ -29,8 +29,7 @@ namespace hpx::detail {
     template <typename F, typename Ts, typename... Us>
     struct invoke_bound_back_result;
 
-    template <typename F, typename... Ts, typename... Us>
-    struct invoke_bound_back_result<F, util::pack<Ts...>, Us...>
+    template <typename F, typename... Ts, typename... Us> struct invoke_bound_back_result<F, util::pack<Ts...>, Us...>
       : util::invoke_result<F, Us..., Ts...>
     {
     };
@@ -43,8 +42,7 @@ namespace hpx::detail {
     template <typename F, typename Is, typename... Ts>
     class bound_back;
 
-    template <typename F, std::size_t... Is, typename... Ts>
-    class bound_back<F, util::index_pack<Is...>, Ts...>
+    template <typename F, std::size_t... Is, typename... Ts> class bound_back<F, util::index_pack<Is...>, Ts...>
     {
     public:
         bound_back() = default;    // needed for serialization
@@ -198,8 +196,7 @@ namespace hpx {
 namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_CORE_EXPORT template <typename F, typename... Ts>
-    struct get_function_address<hpx::detail::bound_back<F, Ts...>>
+    template <typename F, typename... Ts> struct get_function_address<hpx::detail::bound_back<F, Ts...>>
     {
         [[nodiscard]] static constexpr std::size_t call(
             hpx::detail::bound_back<F, Ts...> const& f) noexcept
@@ -209,8 +206,7 @@ namespace hpx::traits {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_CORE_EXPORT template <typename F, typename... Ts>
-    struct get_function_annotation<hpx::detail::bound_back<F, Ts...>>
+    template <typename F, typename... Ts> struct get_function_annotation<hpx::detail::bound_back<F, Ts...>>
     {
         [[nodiscard]] static constexpr char const* call(
             hpx::detail::bound_back<F, Ts...> const& f) noexcept
@@ -220,8 +216,7 @@ namespace hpx::traits {
     };
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-    HPX_CXX_CORE_EXPORT template <typename F, typename... Ts>
-    struct get_function_annotation_itt<hpx::detail::bound_back<F, Ts...>>
+    template <typename F, typename... Ts> struct get_function_annotation_itt<hpx::detail::bound_back<F, Ts...>>
     {
         [[nodiscard]] static util::itt::string_handle call(
             hpx::detail::bound_back<F, Ts...> const& f) noexcept

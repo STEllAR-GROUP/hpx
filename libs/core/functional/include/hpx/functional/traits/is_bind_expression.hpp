@@ -33,8 +33,7 @@ namespace hpx {
     {
     };
 
-    HPX_CXX_CORE_EXPORT template <typename T>
-    struct is_bind_expression<T const> : is_bind_expression<T>
+    template <typename T> struct is_bind_expression<T const> : is_bind_expression<T>
     {
     };
 

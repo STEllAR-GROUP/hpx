@@ -260,8 +260,7 @@ namespace hpx::traits {
 
         struct inclusive_scan_tag;
 
-        template <>
-        struct communicator_data<inclusive_scan_tag>
+        template <> struct communicator_data<inclusive_scan_tag>
         {
             HPX_EXPORT static char const* name() noexcept;
         };
@@ -269,8 +268,7 @@ namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
     // support for inclusive_scan
-    template <typename Communicator>
-    struct communication_operation<Communicator,
+    template <typename Communicator> struct communication_operation<Communicator,
         communication::inclusive_scan_tag>
     {
         template <typename Result, typename T, typename F>

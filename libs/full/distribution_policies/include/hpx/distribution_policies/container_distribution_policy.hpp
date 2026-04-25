@@ -141,14 +141,12 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     namespace traits {
 
-        template <>
-        struct is_distribution_policy<container_distribution_policy>
+        template <> struct is_distribution_policy<container_distribution_policy>
           : std::true_type
         {
         };
 
-        template <>
-        struct num_container_partitions<container_distribution_policy>
+        template <> struct num_container_partitions<container_distribution_policy>
         {
             static std::size_t call(container_distribution_policy const& policy)
             {

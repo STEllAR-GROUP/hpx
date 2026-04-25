@@ -30,35 +30,35 @@ namespace hpx::util::detail {
 
     /// A tag which is passed to the `operator()` of the visitor if an element
     /// is visited synchronously.
-    struct async_traverse_visit_tag
+    HPX_CXX_CORE_EXPORT struct async_traverse_visit_tag
     {
     };
 
     /// A tag which is passed to the `operator()` of the visitor if an element
     /// is visited after the traversal was detached.
-    struct async_traverse_detach_tag
+    HPX_CXX_CORE_EXPORT struct async_traverse_detach_tag
     {
     };
 
     /// A tag which is passed to the `operator()` of the visitor if the
     /// asynchronous pack traversal was finished.
-    struct async_traverse_complete_tag
+    HPX_CXX_CORE_EXPORT struct async_traverse_complete_tag
     {
     };
 
     /// A tag to identify that a mapper shall be constructed in-place from the
     /// first argument passed.
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct async_traverse_in_place_tag
     {
     };
+
 
     /// Relocates the given pack with the given offset
     template <std::size_t Offset, typename Pack>
     struct relocate_index_pack;
 
-    template <std::size_t Offset, std::size_t... Sequence>
-    struct relocate_index_pack<Offset, index_pack<Sequence...>>
+    template <std::size_t Offset, std::size_t... Sequence> struct relocate_index_pack<Offset, index_pack<Sequence...>>
       : std::common_type<index_pack<(Sequence + Offset)...>>
     {
     };
@@ -229,9 +229,8 @@ namespace hpx::util::detail {
 
 namespace hpx::traits::detail {
 
-    HPX_CXX_CORE_EXPORT template <typename Visitor, typename... Args,
-        typename Allocator>
-    struct shared_state_allocator<
+    template <typename Visitor, typename... Args,
+        typename Allocator> struct shared_state_allocator<
         util::detail::async_traversal_frame<Visitor, Args...>, Allocator>
     {
         using type = util::detail::async_traversal_frame_allocator<Allocator,
@@ -296,8 +295,7 @@ namespace hpx::util::detail {
 
     /// Specialization for the end marker which doesn't provide a particular
     /// element dereference
-    template <typename Target, std::size_t Begin>
-    struct static_async_range<Target, Begin, Begin>
+    template <typename Target, std::size_t Begin> struct static_async_range<Target, Begin, Begin>
     {
         explicit constexpr static_async_range(Target*) {}
 
@@ -650,8 +648,7 @@ namespace hpx::util::detail {
         using visitor_pointer_type = hpx::intrusive_ptr<Visitor>;
     };
 
-    template <typename Visitor, typename VisitorArg, typename... Args>
-    struct async_traversal_types<async_traverse_in_place_tag<Visitor>,
+    template <typename Visitor, typename VisitorArg, typename... Args> struct async_traversal_types<async_traverse_in_place_tag<Visitor>,
         VisitorArg, Args...> : async_traversal_types<Visitor, Args...>
     {
     };

@@ -115,42 +115,36 @@ namespace hpx::serialization {
 
 namespace hpx::traits {
 
-    HPX_CXX_CORE_EXPORT template <typename T, typename Abi>
-    struct is_bitwise_serializable<Vc::Vector<T, Abi>>
+    template <typename T, typename Abi> struct is_bitwise_serializable<Vc::Vector<T, Abi>>
       : is_bitwise_serializable<std::remove_const_t<T>>
     {
     };
 
-    HPX_CXX_CORE_EXPORT template <typename T>
-    struct is_bitwise_serializable<Vc::Scalar::Vector<T>>
+    template <typename T> struct is_bitwise_serializable<Vc::Scalar::Vector<T>>
       : is_bitwise_serializable<std::remove_const_t<T>>
     {
     };
 
-    HPX_CXX_CORE_EXPORT template <typename T, std::size_t N, typename V,
-        std::size_t W>
-    struct is_bitwise_serializable<Vc::SimdArray<T, N, V, W>>
+    template <typename T, std::size_t N, typename V,
+        std::size_t W> struct is_bitwise_serializable<Vc::SimdArray<T, N, V, W>>
       : is_bitwise_serializable<std::remove_const_t<T>>
     {
     };
 
-    HPX_CXX_CORE_EXPORT template <typename T, typename Abi>
-    struct is_not_bitwise_serializable<Vc::Vector<T, Abi>>
+    template <typename T, typename Abi> struct is_not_bitwise_serializable<Vc::Vector<T, Abi>>
       : std::integral_constant<bool,
             !is_bitwise_serializable_v<Vc::Vector<T, Abi>>>
     {
     };
 
-    HPX_CXX_CORE_EXPORT template <typename T>
-    struct is_not_bitwise_serializable<Vc::Scalar::Vector<T>>
+    template <typename T> struct is_not_bitwise_serializable<Vc::Scalar::Vector<T>>
       : std::integral_constant<bool,
             !is_bitwise_serializable_v<Vc::Scalar::Vector<T>>>
     {
     };
 
-    HPX_CXX_CORE_EXPORT template <typename T, std::size_t N, typename V,
-        std::size_t W>
-    struct is_not_bitwise_serializable<Vc::SimdArray<T, N, V, W>>
+    template <typename T, std::size_t N, typename V,
+        std::size_t W> struct is_not_bitwise_serializable<Vc::SimdArray<T, N, V, W>>
       : std::integral_constant<bool,
             !is_bitwise_serializable_v<Vc::SimdArray<T, N, V, W>>>
     {

@@ -55,8 +55,7 @@ namespace hpx::util::detail {
         }
     };
 
-    template <>
-    struct future_unwrap_until_depth<1U>
+    template <> struct future_unwrap_until_depth<1U>
     {
         /// This piece of code can't be refactored out using inheritance and
         /// `using Base::operator()` because this isn't taken into account when
@@ -82,8 +81,7 @@ namespace hpx::util::detail {
         }
     };
 
-    template <>
-    struct future_unwrap_until_depth<0U>
+    template <> struct future_unwrap_until_depth<0U>
     {
         /// This piece of code can't be refactored out using inheritance and
         /// `using Base::operator()` because this isn't taken into account when
@@ -137,8 +135,7 @@ namespace hpx::util::detail {
                 HPX_FORWARD(C, callable), HPX_FORWARD(T, unwrapped));
         }
     };
-    template <>
-    struct invoke_wrapped_invocation_select<false /*IsFusedInvoke*/>
+    template <> struct invoke_wrapped_invocation_select<false /*IsFusedInvoke*/>
     {
         /// Invoke the callable with the plain argument through invoke, also
         /// when the result is a tuple like type, when we received a single
@@ -194,8 +191,7 @@ namespace hpx::util::detail {
         // clang-format on
     };
 
-    template <std::size_t Depth>
-    struct invoke_wrapped_decorate_select<Depth, void>
+    template <std::size_t Depth> struct invoke_wrapped_decorate_select<Depth, void>
     {
         template <typename C, typename... Args>
         static auto apply(C&& callable, Args&&... args)

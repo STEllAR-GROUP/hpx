@@ -18,12 +18,12 @@ module;
 // violations.
 #include <hpx/config/std_headers.hpp>
 
-export module HPX.@cap_libname@;
+#if !defined(__ANDROID__) && !defined(ANDROID) && !defined(__APPLE__)
+#include <link.h>
+#endif
+#include <dlfcn.h>
 
-// Make sure the exported symbols are name-mangled using standard C++ rules.
-// This is necessary as otherwise the symbols exported from the shared libraries
-// will be exported from the module using a differently encoded name.
-extern "C++" {
+export module HPX.@cap_libname@;
 
 #if defined(HPX_MSVC)
 // disable warning C5244: '#include <filename>' in the purview of module
@@ -51,5 +51,3 @@ extern "C++" {
 #if defined(HPX_MSVC)
 #pragma warning(pop)
 #endif
-
-}   // extern "C++"

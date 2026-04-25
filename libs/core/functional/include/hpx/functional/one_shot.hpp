@@ -138,8 +138,7 @@ namespace hpx::util {
 namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_CORE_EXPORT template <typename F>
-    struct get_function_address<util::detail::one_shot_wrapper<F>>
+    template <typename F> struct get_function_address<util::detail::one_shot_wrapper<F>>
     {
         [[nodiscard]] static constexpr std::size_t call(
             util::detail::one_shot_wrapper<F> const& f) noexcept
@@ -149,8 +148,7 @@ namespace hpx::traits {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_CORE_EXPORT template <typename F>
-    struct get_function_annotation<util::detail::one_shot_wrapper<F>>
+    template <typename F> struct get_function_annotation<util::detail::one_shot_wrapper<F>>
     {
         [[nodiscard]] static constexpr char const* call(
             util::detail::one_shot_wrapper<F> const& f) noexcept
@@ -160,8 +158,7 @@ namespace hpx::traits {
     };
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-    HPX_CXX_CORE_EXPORT template <typename F>
-    struct get_function_annotation_itt<util::detail::one_shot_wrapper<F>>
+    template <typename F> struct get_function_annotation_itt<util::detail::one_shot_wrapper<F>>
     {
         [[nodiscard]] static util::itt::string_handle call(
             util::detail::one_shot_wrapper<F> const& f) noexcept

@@ -16,8 +16,7 @@ namespace hpx { namespace traits {
 
     ///////////////////////////////////////////////////////////////////////////
     // Trait to determine the continuation type for an action
-    template <typename Result, typename RemoteResult>
-    struct action_trigger_continuation<
+    template <typename Result, typename RemoteResult> struct action_trigger_continuation<
         actions::typed_continuation<Result, RemoteResult>>
     {
         template <typename F, typename... Ts>

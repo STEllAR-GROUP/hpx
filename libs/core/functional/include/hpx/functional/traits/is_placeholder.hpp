@@ -54,8 +54,7 @@ namespace hpx {
     };
 #endif
 
-    HPX_CXX_CORE_EXPORT template <typename T>
-    struct is_placeholder<T const> : is_placeholder<T>
+    template <typename T> struct is_placeholder<T const> : is_placeholder<T>
     {
     };
 

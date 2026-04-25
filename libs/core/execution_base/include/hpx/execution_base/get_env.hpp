@@ -82,8 +82,7 @@ namespace hpx::execution::experimental {
             {
             };
 
-            template <typename... Args>
-            struct apply<hpx::functional::enable_tag_invoke_t, Args...>
+            template <typename... Args> struct apply<hpx::functional::enable_tag_invoke_t, Args...>
               : std::is_invocable_r<bool,
                     hpx::functional::tag_t<hpx::functional::tag_invoke>, CPO,
                     Args...>

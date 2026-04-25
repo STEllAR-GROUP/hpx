@@ -43,8 +43,7 @@ namespace hpx::iostream {
         {
         };
 
-        template <>
-        struct output_sequence_impl<direct_tag>
+        template <> struct output_sequence_impl<direct_tag>
         {
             template <typename U>
             static decltype(auto) output_sequence(U& u)

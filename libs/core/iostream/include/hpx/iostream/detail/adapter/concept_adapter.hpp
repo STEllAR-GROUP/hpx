@@ -167,8 +167,7 @@ namespace hpx::iostream::detail {
     };
 
     //------------------Specializations of device_wrapper_impl--------------------//
-    template <>
-    struct device_wrapper_impl<any_tag>
+    template <> struct device_wrapper_impl<any_tag>
     {
         template <typename Device, typename Dummy>
         static std::streampos seek(Device& dev, Dummy*, stream_offset off,
@@ -206,8 +205,7 @@ namespace hpx::iostream::detail {
         }
     };
 
-    template <>
-    struct device_wrapper_impl<input> : device_wrapper_impl<any_tag>
+    template <> struct device_wrapper_impl<input> : device_wrapper_impl<any_tag>
     {
         template <typename Device, typename Dummy>
         static std::streamsize read(
@@ -224,8 +222,7 @@ namespace hpx::iostream::detail {
         }
     };
 
-    template <>
-    struct device_wrapper_impl<output>
+    template <> struct device_wrapper_impl<output>
     {
         template <typename Device, typename Dummy>
         static std::streamsize read(
@@ -243,8 +240,7 @@ namespace hpx::iostream::detail {
     };
 
     //------------------Specializations of flt_wrapper_impl--------------------//
-    template <>
-    struct flt_wrapper_impl<any_tag>
+    template <> struct flt_wrapper_impl<any_tag>
     {
         template <typename Filter, typename Device>
         static std::streampos seek(Filter& f, Device* dev, stream_offset off,
@@ -299,8 +295,7 @@ namespace hpx::iostream::detail {
         }
     };
 
-    template <>
-    struct flt_wrapper_impl<input>
+    template <> struct flt_wrapper_impl<input>
     {
         template <typename Filter, typename Source>
         static std::streamsize read(Filter& f, Source* src,
@@ -317,8 +312,7 @@ namespace hpx::iostream::detail {
         }
     };
 
-    template <>
-    struct flt_wrapper_impl<output>
+    template <> struct flt_wrapper_impl<output>
     {
         template <typename Filter, typename Source>
         static std::streamsize read(

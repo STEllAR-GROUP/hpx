@@ -124,9 +124,8 @@ namespace hpx::util {
         }
     };
 
-    HPX_CXX_CORE_EXPORT template <typename Incrementable,
-        typename CategoryOrTraversal, typename Difference>
-    class counting_iterator<Incrementable, CategoryOrTraversal, Difference,
+    template <typename Incrementable,
+        typename CategoryOrTraversal, typename Difference> class counting_iterator<Incrementable, CategoryOrTraversal, Difference,
         std::enable_if_t<std::is_integral_v<Incrementable>>>
       : public detail::counting_iterator_base<Incrementable,
             CategoryOrTraversal, Difference>::type

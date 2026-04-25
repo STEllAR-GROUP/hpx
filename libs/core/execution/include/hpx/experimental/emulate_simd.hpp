@@ -99,12 +99,10 @@ namespace hpx::datapar::experimental {
     struct is_simd_flag_type : std::false_type
     {
     };
-    template <>
-    struct is_simd_flag_type<element_aligned_tag> : std::true_type
+    template <> struct is_simd_flag_type<element_aligned_tag> : std::true_type
     {
     };
-    template <>
-    struct is_simd_flag_type<vector_aligned_tag> : std::true_type
+    template <> struct is_simd_flag_type<vector_aligned_tag> : std::true_type
     {
     };
     HPX_CXX_CORE_EXPORT template <typename T>
@@ -153,8 +151,7 @@ namespace hpx::datapar::experimental {
     {
     };
 
-    HPX_CXX_CORE_EXPORT template <typename T, typename Abi>
-    struct is_simd<simd<T, Abi>> : std::true_type
+    template <typename T, typename Abi> struct is_simd<simd<T, Abi>> : std::true_type
     {
     };
 
@@ -163,8 +160,7 @@ namespace hpx::datapar::experimental {
     {
     };
 
-    HPX_CXX_CORE_EXPORT template <typename T, typename Abi>
-    struct is_simd_mask<simd_mask<T, Abi>> : std::true_type
+    template <typename T, typename Abi> struct is_simd_mask<simd_mask<T, Abi>> : std::true_type
     {
     };
 

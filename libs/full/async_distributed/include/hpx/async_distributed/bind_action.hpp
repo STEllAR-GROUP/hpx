@@ -30,8 +30,7 @@ namespace hpx {
         template <typename Action, typename Is, typename... Ts>
         class bound_action;
 
-        template <typename Action, std::size_t... Is, typename... Ts>
-        class bound_action<Action, util::index_pack<Is...>, Ts...>
+        template <typename Action, std::size_t... Is, typename... Ts> class bound_action<Action, util::index_pack<Is...>, Ts...>
         {
         public:
             using result_type = traits::promise_local_result_t<typename hpx::
@@ -167,14 +166,12 @@ namespace hpx {
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename Is, typename... Ts>
-    struct is_bind_expression<hpx::detail::bound_action<Action, Is, Ts...>>
+    template <typename Action, typename Is, typename... Ts> struct is_bind_expression<hpx::detail::bound_action<Action, Is, Ts...>>
       : std::true_type
     {
     };
 
-    template <typename Action, typename Is, typename... Ts>
-    struct is_bound_action<hpx::detail::bound_action<Action, Is, Ts...>>
+    template <typename Action, typename Is, typename... Ts> struct is_bound_action<hpx::detail::bound_action<Action, Is, Ts...>>
       : std::true_type
     {
     };

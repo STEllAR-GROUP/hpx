@@ -22,8 +22,7 @@ namespace hpx::traits {
         {
         };
 
-        HPX_CXX_CORE_EXPORT template <typename R>
-        struct is_unique_future<hpx::future<R>> : std::true_type
+        template <typename R> struct is_unique_future<hpx::future<R>> : std::true_type
         {
         };
 
@@ -35,13 +34,11 @@ namespace hpx::traits {
         {
         };
 
-        HPX_CXX_CORE_EXPORT template <typename R>
-        struct is_future_customization_point<hpx::future<R>> : std::true_type
+        template <typename R> struct is_future_customization_point<hpx::future<R>> : std::true_type
         {
         };
 
-        HPX_CXX_CORE_EXPORT template <typename R>
-        struct is_future_customization_point<hpx::shared_future<R>>
+        template <typename R> struct is_future_customization_point<hpx::shared_future<R>>
           : std::true_type
         {
         };
@@ -69,8 +66,7 @@ namespace hpx::traits {
     {
     };
 
-    HPX_CXX_CORE_EXPORT template <typename Future>
-    struct is_ref_wrapped_future<std::reference_wrapper<Future>>
+    template <typename Future> struct is_ref_wrapped_future<std::reference_wrapper<Future>>
       : is_future<Future>
     {
     };

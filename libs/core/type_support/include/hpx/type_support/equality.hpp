@@ -25,8 +25,7 @@ namespace hpx::traits {
 
         // different versions of clang-format disagree
         // clang-format off
-        HPX_CXX_CORE_EXPORT template <typename T, typename U>
-        struct equality_result<T, U,
+        template <typename T, typename U> struct equality_result<T, U,
             std::void_t<decltype(
                 std::declval<T const&>() == std::declval<U const&>())>>
         {
@@ -47,8 +46,7 @@ namespace hpx::traits {
 
         // different versions of clang-format disagree
         // clang-format off
-        HPX_CXX_CORE_EXPORT template <typename T, typename U>
-        struct inequality_result<T, U,
+        template <typename T, typename U> struct inequality_result<T, U,
             std::void_t<decltype(
                 std::declval<T const&>() != std::declval<U const&>())>>
         {
@@ -67,8 +65,7 @@ namespace hpx::traits {
         {
         };
 
-        HPX_CXX_CORE_EXPORT template <typename T, typename U>
-        struct is_weakly_equality_comparable_with<T, U,
+        template <typename T, typename U> struct is_weakly_equality_comparable_with<T, U,
             std::void_t<detail::equality_result_t<T, U>,
                 detail::equality_result_t<U, T>,
                 detail::inequality_result_t<T, U>,

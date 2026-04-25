@@ -33,8 +33,7 @@ namespace hpx { namespace distributed { namespace detail {
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace traits {
-    template <>
-    struct managed_component_dtor_policy<hpx::distributed::detail::barrier_node>
+    template <> struct managed_component_dtor_policy<hpx::distributed::detail::barrier_node>
     {
         typedef managed_object_is_lifetime_controlled type;
     };

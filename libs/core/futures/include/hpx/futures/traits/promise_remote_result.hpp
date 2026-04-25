@@ -16,8 +16,7 @@ namespace hpx::traits {
         using type = Result;
     };
 
-    template <>
-    struct promise_remote_result<void>
+    template <> struct promise_remote_result<void>
     {
         using type = hpx::util::unused_type;
     };

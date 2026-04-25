@@ -337,14 +337,12 @@ namespace hpx {
 namespace std {
 
     // make sure our errors get recognized by the Boost.System library
-    template <>
-    struct is_error_code_enum<hpx::error>
+    template <> struct is_error_code_enum<hpx::error>
     {
         static constexpr bool value = true;
     };
 
-    template <>
-    struct is_error_condition_enum<hpx::error>
+    template <> struct is_error_condition_enum<hpx::error>
     {
         static constexpr bool value = true;
     };

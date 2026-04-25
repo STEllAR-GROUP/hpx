@@ -30,8 +30,7 @@ namespace hpx::parallel::util::detail {
         typename Enable = void>
     struct algorithm_result_impl;
 
-    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename T>
-    struct algorithm_result_impl<ExPolicy, T,
+    template <typename ExPolicy, typename T> struct algorithm_result_impl<ExPolicy, T,
         std::enable_if_t<!hpx::is_async_execution_policy_v<ExPolicy> &&
             !hpx::execution_policy_has_scheduler_executor_v<ExPolicy>>>
     {
@@ -58,8 +57,7 @@ namespace hpx::parallel::util::detail {
         }
     };
 
-    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
-    struct algorithm_result_impl<ExPolicy, void,
+    template <typename ExPolicy> struct algorithm_result_impl<ExPolicy, void,
         std::enable_if_t<!hpx::is_async_execution_policy_v<ExPolicy> &&
             !hpx::execution_policy_has_scheduler_executor_v<ExPolicy>>>
     {
@@ -83,8 +81,7 @@ namespace hpx::parallel::util::detail {
         }
     };
 
-    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename T>
-    struct algorithm_result_impl<ExPolicy, T,
+    template <typename ExPolicy, typename T> struct algorithm_result_impl<ExPolicy, T,
         std::enable_if_t<hpx::is_async_execution_policy_v<ExPolicy> &&
             !hpx::execution_policy_has_scheduler_executor_v<ExPolicy>>>
     {
@@ -103,8 +100,7 @@ namespace hpx::parallel::util::detail {
         }
     };
 
-    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
-    struct algorithm_result_impl<ExPolicy, void,
+    template <typename ExPolicy> struct algorithm_result_impl<ExPolicy, void,
         std::enable_if_t<hpx::is_async_execution_policy_v<ExPolicy> &&
             !hpx::execution_policy_has_scheduler_executor_v<ExPolicy>>>
     {
@@ -134,8 +130,7 @@ namespace hpx::parallel::util::detail {
         }
     };
 
-    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename T>
-    struct algorithm_result_impl<ExPolicy, T,
+    template <typename ExPolicy, typename T> struct algorithm_result_impl<ExPolicy, T,
         std::enable_if_t<!hpx::is_async_execution_policy_v<ExPolicy> &&
             hpx::execution_policy_has_scheduler_executor_v<ExPolicy>>>
     {
@@ -174,8 +169,7 @@ namespace hpx::parallel::util::detail {
         }
     };
 
-    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
-    struct algorithm_result_impl<ExPolicy, void,
+    template <typename ExPolicy> struct algorithm_result_impl<ExPolicy, void,
         std::enable_if_t<!hpx::is_async_execution_policy_v<ExPolicy> &&
             hpx::execution_policy_has_scheduler_executor_v<ExPolicy>>>
     {
@@ -196,8 +190,7 @@ namespace hpx::parallel::util::detail {
         }
     };
 
-    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename T>
-    struct algorithm_result_impl<ExPolicy, T,
+    template <typename ExPolicy, typename T> struct algorithm_result_impl<ExPolicy, T,
         std::enable_if_t<hpx::is_async_execution_policy_v<ExPolicy> &&
             hpx::execution_policy_has_scheduler_executor_v<ExPolicy>>>
     {
@@ -220,8 +213,7 @@ namespace hpx::parallel::util::detail {
         }
     };
 
-    HPX_CXX_CORE_EXPORT template <typename ExPolicy>
-    struct algorithm_result_impl<ExPolicy, void,
+    template <typename ExPolicy> struct algorithm_result_impl<ExPolicy, void,
         std::enable_if_t<hpx::is_async_execution_policy_v<ExPolicy> &&
             hpx::execution_policy_has_scheduler_executor_v<ExPolicy>>>
     {

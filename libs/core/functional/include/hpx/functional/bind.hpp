@@ -37,8 +37,7 @@ namespace hpx {
             static constexpr std::size_t value = I;
         };
 
-        template <>
-        struct placeholder<0>;    // not a valid placeholder
+        template <> struct placeholder<0>;    // not a valid placeholder
 
     }    // namespace detail
 
@@ -96,9 +95,8 @@ namespace hpx {
             }
         };
 
-        HPX_CXX_CORE_EXPORT template <typename T, std::size_t NumUs,
-            typename TD>
-        struct bind_eval<T, NumUs, TD,
+        template <typename T, std::size_t NumUs,
+            typename TD> struct bind_eval<T, NumUs, TD,
             std::enable_if_t<hpx::is_placeholder_v<TD> != 0 &&
                 (hpx::is_placeholder_v<TD> <= NumUs)>>
           : bind_eval_placeholder<
@@ -106,9 +104,8 @@ namespace hpx {
         {
         };
 
-        HPX_CXX_CORE_EXPORT template <typename T, std::size_t NumUs,
-            typename TD>
-        struct bind_eval<T, NumUs, TD,
+        template <typename T, std::size_t NumUs,
+            typename TD> struct bind_eval<T, NumUs, TD,
             std::enable_if_t<hpx::is_bind_expression_v<TD>>>
         {
             template <typename... Us>
@@ -123,9 +120,8 @@ namespace hpx {
         HPX_CXX_CORE_EXPORT template <typename F, typename Ts, typename... Us>
         struct invoke_bound_result;
 
-        HPX_CXX_CORE_EXPORT template <typename F, typename... Ts,
-            typename... Us>
-        struct invoke_bound_result<F, util::pack<Ts...>, Us...>
+        template <typename F, typename... Ts,
+            typename... Us> struct invoke_bound_result<F, util::pack<Ts...>, Us...>
           : util::invoke_result<F,
                 decltype(bind_eval<Ts, sizeof...(Us)>::call(
                     std::declval<Ts>(), std::declval<Us>()...))...>
@@ -140,9 +136,8 @@ namespace hpx {
         HPX_CXX_CORE_EXPORT template <typename F, typename Is, typename... Ts>
         class bound;
 
-        HPX_CXX_CORE_EXPORT template <typename F, std::size_t... Is,
-            typename... Ts>
-        class bound<F, util::index_pack<Is...>, Ts...>
+        template <typename F, std::size_t... Is,
+            typename... Ts> class bound<F, util::index_pack<Is...>, Ts...>
         {
         public:
             bound() = default;    // needed for serialization
@@ -304,14 +299,12 @@ namespace hpx {
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_CORE_EXPORT template <typename F, typename... Ts>
-    struct is_bind_expression<hpx::detail::bound<F, Ts...>> : std::true_type
+    template <typename F, typename... Ts> struct is_bind_expression<hpx::detail::bound<F, Ts...>> : std::true_type
     {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_CORE_EXPORT template <std::size_t I>
-    struct is_placeholder<hpx::detail::placeholder<I>>
+    template <std::size_t I> struct is_placeholder<hpx::detail::placeholder<I>>
       : std::integral_constant<int, I>
     {
     };
@@ -321,8 +314,7 @@ namespace hpx {
 namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_CORE_EXPORT template <typename F, typename... Ts>
-    struct get_function_address<hpx::detail::bound<F, Ts...>>
+    template <typename F, typename... Ts> struct get_function_address<hpx::detail::bound<F, Ts...>>
     {
         [[nodiscard]] static constexpr std::size_t call(
             hpx::detail::bound<F, Ts...> const& f) noexcept
@@ -332,8 +324,7 @@ namespace hpx::traits {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_CORE_EXPORT template <typename F, typename... Ts>
-    struct get_function_annotation<hpx::detail::bound<F, Ts...>>
+    template <typename F, typename... Ts> struct get_function_annotation<hpx::detail::bound<F, Ts...>>
     {
         [[nodiscard]] static constexpr char const* call(
             hpx::detail::bound<F, Ts...> const& f) noexcept
@@ -343,8 +334,7 @@ namespace hpx::traits {
     };
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-    HPX_CXX_CORE_EXPORT template <typename F, typename... Ts>
-    struct get_function_annotation_itt<hpx::detail::bound<F, Ts...>>
+    template <typename F, typename... Ts> struct get_function_annotation_itt<hpx::detail::bound<F, Ts...>>
     {
         [[nodiscard]] static util::itt::string_handle call(
             hpx::detail::bound<F, Ts...> const& f) noexcept

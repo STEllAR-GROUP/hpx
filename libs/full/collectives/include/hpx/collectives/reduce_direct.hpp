@@ -116,8 +116,7 @@ namespace hpx { namespace lcos {
         {
         };
 
-        template <typename Action>
-        struct reduce_result<reduce_with_index<Action>> : reduce_result<Action>
+        template <typename Action> struct reduce_result<reduce_with_index<Action>> : reduce_result<Action>
         {
         };
 
@@ -159,8 +158,7 @@ namespace hpx { namespace lcos {
         template <typename Action, typename Is>
         struct make_reduce_action_impl;
 
-        template <typename Action, std::size_t... Is>
-        struct make_reduce_action_impl<Action, util::index_pack<Is...>>
+        template <typename Action, std::size_t... Is> struct make_reduce_action_impl<Action, util::index_pack<Is...>>
         {
             typedef typename reduce_result<Action>::type action_result;
 
@@ -186,8 +184,7 @@ namespace hpx { namespace lcos {
         {
         };
 
-        template <typename Action>
-        struct make_reduce_action<reduce_with_index<Action>>
+        template <typename Action> struct make_reduce_action<reduce_with_index<Action>>
           : make_reduce_action_impl<reduce_with_index<Action>,
                 typename util::make_index_pack<Action::arity - 1>::type>
         {

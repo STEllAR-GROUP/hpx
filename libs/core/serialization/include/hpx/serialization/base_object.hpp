@@ -88,8 +88,7 @@ namespace hpx::serialization {
 
     // we need another specialization to explicitly specify non-virtual calls of
     // virtual functions in intrusively serialized base classes.
-    HPX_CXX_CORE_EXPORT template <typename Derived, typename Base>
-    struct base_object_type<Derived, Base,
+    template <typename Derived, typename Base> struct base_object_type<Derived, Base,
         std::enable_if_t<hpx::traits::is_intrusive_polymorphic_v<Derived>>>
     {
         explicit constexpr base_object_type(Derived& d) noexcept

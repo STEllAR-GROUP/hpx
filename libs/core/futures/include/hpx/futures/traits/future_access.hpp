@@ -34,14 +34,12 @@ namespace hpx::traits {
             using type = Result;
         };
 
-        HPX_CXX_CORE_EXPORT template <typename Result>
-        struct shared_state_ptr_result<Result&>
+        template <typename Result> struct shared_state_ptr_result<Result&>
         {
             using type = Result&;
         };
 
-        template <>
-        struct shared_state_ptr_result<void>
+        template <> struct shared_state_ptr_result<void>
         {
             using type = future_data_void;
         };
@@ -70,25 +68,21 @@ namespace hpx::traits {
         {
         };
 
-        HPX_CXX_CORE_EXPORT template <typename Future>
-        struct shared_state_ptr_for<Future&> : shared_state_ptr_for<Future>
+        template <typename Future> struct shared_state_ptr_for<Future&> : shared_state_ptr_for<Future>
         {
         };
 
-        HPX_CXX_CORE_EXPORT template <typename Future>
-        struct shared_state_ptr_for<Future&&> : shared_state_ptr_for<Future>
+        template <typename Future> struct shared_state_ptr_for<Future&&> : shared_state_ptr_for<Future>
         {
         };
 
-        HPX_CXX_CORE_EXPORT template <typename Future>
-        struct shared_state_ptr_for<std::vector<Future>>
+        template <typename Future> struct shared_state_ptr_for<std::vector<Future>>
         {
             using type =
                 std::vector<typename shared_state_ptr_for<Future>::type>;
         };
 
-        HPX_CXX_CORE_EXPORT template <typename Future, std::size_t N>
-        struct shared_state_ptr_for<std::array<Future, N>>
+        template <typename Future, std::size_t N> struct shared_state_ptr_for<std::array<Future, N>>
         {
             using type =
                 std::array<typename shared_state_ptr_for<Future>::type, N>;
@@ -109,8 +103,7 @@ namespace hpx::traits {
     {
     };
 
-    HPX_CXX_CORE_EXPORT template <typename R>
-    struct is_shared_state<
+    template <typename R> struct is_shared_state<
         hpx::intrusive_ptr<lcos::detail::future_data_base<R>>> : std::true_type
     {
     };
@@ -130,8 +123,7 @@ namespace hpx::traits {
     {
     };
 
-    HPX_CXX_CORE_EXPORT template <typename R>
-    struct future_access<hpx::future<R>>
+    template <typename R> struct future_access<hpx::future<R>>
     {
         template <typename SharedState>
         static hpx::future<R> create(
@@ -200,8 +192,7 @@ namespace hpx::traits {
         }
     };
 
-    HPX_CXX_CORE_EXPORT template <typename R>
-    struct future_access<hpx::shared_future<R>>
+    template <typename R> struct future_access<hpx::shared_future<R>>
     {
         template <typename SharedState>
         static hpx::shared_future<R> create(

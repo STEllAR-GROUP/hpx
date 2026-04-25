@@ -233,8 +233,7 @@ namespace hpx::meta {
             using apply = TrueCase;
         };
 
-        template <>
-        struct if_<false>
+        template <> struct if_<false>
         {
             template <typename, typename FalseCase>
             using apply = FalseCase;
@@ -291,8 +290,7 @@ namespace hpx::meta {
         {
         };
 
-        template <typename F>
-        struct compose_args_helper<F, pack<>>
+        template <typename F> struct compose_args_helper<F, pack<>>
           : compose_args_helper<F, pack<pack<>>>
         {
         };
@@ -423,15 +421,13 @@ namespace hpx::meta {
         {
         };
 
-        template <typename F, typename State, typename Head, typename... Tail>
-        struct right_fold_helper<F, pack<State, Head, Tail...>,
+        template <typename F, typename State, typename Head, typename... Tail> struct right_fold_helper<F, pack<State, Head, Tail...>,
             std::enable_if_t<value<is_invocable2<F, State, Head>>>>
           : right_fold_helper<F, pack<invoke2<F, State, Head>, Tail...>>
         {
         };
 
-        template <typename F, typename State>
-        struct right_fold_helper<F, pack<State>>
+        template <typename F, typename State> struct right_fold_helper<F, pack<State>>
         {
             using type = State;
         };
@@ -514,8 +510,7 @@ namespace hpx::meta {
         using apply = typename T::id;
     };
 
-    template <>
-    struct get_id_func<false>
+    template <> struct get_id_func<false>
     {
         template <typename T>
         using apply = type_identity<T>;

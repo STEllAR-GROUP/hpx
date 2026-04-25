@@ -27,8 +27,7 @@ namespace hpx::execution::experimental {
         {
         };
 
-        template <>
-        struct wrapped_params_has_variable_chunk_size<true>
+        template <> struct wrapped_params_has_variable_chunk_size<true>
         {
             using has_variable_chunk_size = void;
         };
@@ -38,8 +37,7 @@ namespace hpx::execution::experimental {
         {
         };
 
-        template <>
-        struct wrapped_params_invokes_testing_function<true>
+        template <> struct wrapped_params_invokes_testing_function<true>
         {
             using invokes_testing_function = void;
         };
@@ -62,20 +60,17 @@ namespace hpx::execution::experimental {
             using type = U;
         };
 
-        template <typename T, typename U>
-        struct propagate_reference_type<T&, U>
+        template <typename T, typename U> struct propagate_reference_type<T&, U>
         {
             using type = U&;
         };
 
-        template <typename T, typename U>
-        struct propagate_reference_type<T const&, U>
+        template <typename T, typename U> struct propagate_reference_type<T const&, U>
         {
             using type = U const&;
         };
 
-        template <typename T, typename U>
-        struct propagate_reference_type<T&&, U>
+        template <typename T, typename U> struct propagate_reference_type<T&&, U>
         {
             using type = U&&;
         };
@@ -626,8 +621,7 @@ namespace hpx::execution::experimental {
         Wrapping wrapping;
     };
 
-    HPX_CXX_CORE_EXPORT template <typename Wrapped, typename Wrapping>
-    struct is_executor_parameters<wrapped_params<Wrapped, Wrapping>>
+    template <typename Wrapped, typename Wrapping> struct is_executor_parameters<wrapped_params<Wrapped, Wrapping>>
       : std::true_type
     {
     };

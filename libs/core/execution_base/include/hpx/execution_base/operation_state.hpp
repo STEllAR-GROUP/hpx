@@ -77,8 +77,7 @@ namespace hpx::execution::experimental {
             {
             };
 
-            template <typename EnableTag, typename State>
-            struct apply<EnableTag, State> : std::is_lvalue_reference<State>
+            template <typename EnableTag, typename State> struct apply<EnableTag, State> : std::is_lvalue_reference<State>
             {
             };
         };
@@ -94,13 +93,11 @@ namespace hpx::execution::experimental {
         HPX_CXX_CORE_EXPORT template <bool IsOperationState, typename O>
         struct is_operation_state_impl;
 
-        HPX_CXX_CORE_EXPORT template <typename O>
-        struct is_operation_state_impl<false, O> : std::false_type
+        template <typename O> struct is_operation_state_impl<false, O> : std::false_type
         {
         };
 
-        HPX_CXX_CORE_EXPORT template <typename O>
-        struct is_operation_state_impl<true, O>
+        template <typename O> struct is_operation_state_impl<true, O>
           : std::integral_constant<bool, noexcept(start(std::declval<O&>()))>
         {
         };

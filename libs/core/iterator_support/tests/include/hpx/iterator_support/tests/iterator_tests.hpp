@@ -118,8 +118,7 @@ namespace tests {
         {
         };
 
-        template <typename T>
-        struct is_incrementable<T, std::void_t<decltype(++std::declval<T&>())>>
+        template <typename T> struct is_incrementable<T, std::void_t<decltype(++std::declval<T&>())>>
           : std::true_type
         {
         };
@@ -129,8 +128,7 @@ namespace tests {
         {
         };
 
-        template <typename T>
-        struct is_postfix_incrementable<T,
+        template <typename T> struct is_postfix_incrementable<T,
             std::void_t<decltype(std::declval<T&>()++)>> : std::true_type
         {
         };

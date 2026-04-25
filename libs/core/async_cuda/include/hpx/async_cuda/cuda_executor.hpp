@@ -45,8 +45,7 @@ namespace hpx::cuda::experimental {
         };
 
         // specialization for return type void
-        HPX_CXX_CORE_EXPORT template <typename... Args>
-        struct dispatch_helper<void, Args...>
+        template <typename... Args> struct dispatch_helper<void, Args...>
         {
             inline void operator()(void (*f)(Args...), Args... args) const
             {
@@ -55,8 +54,7 @@ namespace hpx::cuda::experimental {
         };
 
         // specialization for return type of cudaError_t
-        HPX_CXX_CORE_EXPORT template <typename... Args>
-        struct dispatch_helper<cudaError_t, Args...>
+        template <typename... Args> struct dispatch_helper<cudaError_t, Args...>
         {
             inline void operator()(
                 cudaError_t (*f)(Args...), Args... args) const
@@ -187,15 +185,13 @@ namespace hpx::cuda::experimental {
 namespace hpx::execution::experimental {
 
     /// \cond NOINTERNAL
-    template <>
-    struct is_one_way_executor<hpx::cuda::experimental::cuda_executor>
+    template <> struct is_one_way_executor<hpx::cuda::experimental::cuda_executor>
       : std::true_type
     {
         // we support fire and forget without returning a waitable/future
     };
 
-    template <>
-    struct is_two_way_executor<hpx::cuda::experimental::cuda_executor>
+    template <> struct is_two_way_executor<hpx::cuda::experimental::cuda_executor>
       : std::true_type
     {
         // we support returning a waitable/future

@@ -88,8 +88,7 @@ namespace hpx::execution::experimental {
             }
         };
 
-        template <>
-        struct future_receiver<void>
+        template <> struct future_receiver<void>
           : future_receiver_base<hpx::lcos::detail::future_data_base<void>>
         {
         private:
@@ -292,9 +291,8 @@ namespace hpx::execution::experimental {
 
 namespace hpx::traits::detail {
 
-    HPX_CXX_CORE_EXPORT template <typename T, typename Allocator,
-        typename OperationState, typename NewAllocator>
-    struct shared_state_allocator<hpx::execution::experimental::detail::
+    template <typename T, typename Allocator,
+        typename OperationState, typename NewAllocator> struct shared_state_allocator<hpx::execution::experimental::detail::
                                       future_data<T, Allocator, OperationState>,
         NewAllocator>
     {
@@ -302,9 +300,8 @@ namespace hpx::traits::detail {
             NewAllocator, OperationState>;
     };
 
-    HPX_CXX_CORE_EXPORT template <typename T, typename Allocator,
-        typename OperationState, typename NewAllocator>
-    struct shared_state_allocator<
+    template <typename T, typename Allocator,
+        typename OperationState, typename NewAllocator> struct shared_state_allocator<
         hpx::execution::experimental::detail::future_data_with_run_loop<T,
             Allocator, OperationState>,
         NewAllocator>

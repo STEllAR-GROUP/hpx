@@ -29,8 +29,7 @@ namespace hpx { namespace detail {
     template <typename Action, typename Ts = typename Action::arguments_type>
     struct async_colocated_bound_action;
 
-    template <typename Action, typename... Ts>
-    struct async_colocated_bound_action<Action, hpx::tuple<Ts...>>
+    template <typename Action, typename... Ts> struct async_colocated_bound_action<Action, hpx::tuple<Ts...>>
     {
         using type = hpx::detail::bound_action<Action,
             hpx::util::make_index_pack<1 + sizeof...(Ts)>,

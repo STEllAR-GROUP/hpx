@@ -25,8 +25,7 @@ namespace hpx::execution::experimental {
         {
         };
 
-        HPX_CXX_CORE_EXPORT template <typename Scheduler>
-        struct exposes_policy_aware_scheduler_types<Scheduler,
+        template <typename Scheduler> struct exposes_policy_aware_scheduler_types<Scheduler,
             std::void_t<typename Scheduler::policy_type,
                 typename Scheduler::base_scheduler_type>> : std::true_type
         {
@@ -39,8 +38,7 @@ namespace hpx::execution::experimental {
         };
 
         // clang-format off
-        HPX_CXX_CORE_EXPORT template <typename Scheduler>
-        struct exposes_get_policy<Scheduler,
+        template <typename Scheduler> struct exposes_get_policy<Scheduler,
             std::enable_if_t<hpx::is_execution_policy_v<
                 decltype(std::declval<Scheduler>().get_policy())>>>
           : std::true_type
@@ -150,8 +148,7 @@ namespace hpx::execution::experimental {
         {
         };
 
-        HPX_CXX_CORE_EXPORT template <typename Scheduler>
-        struct is_policy_aware_scheduler<Scheduler,
+        template <typename Scheduler> struct is_policy_aware_scheduler<Scheduler,
             std::enable_if_t<is_scheduler_v<Scheduler> &&
                 detail::exposes_policy_aware_scheduler_types<
                     std::decay_t<Scheduler>>::value &&

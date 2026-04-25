@@ -417,30 +417,26 @@ namespace hpx {
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::traits {
 
-    template <>
-    struct get_remote_result<hpx::id_type, naming::gid_type>
+    template <> struct get_remote_result<hpx::id_type, naming::gid_type>
     {
         HPX_EXPORT static hpx::id_type call(naming::gid_type const& rhs);
     };
 
-    template <>
-    struct promise_local_result<naming::gid_type>
+    template <> struct promise_local_result<naming::gid_type>
     {
         using type = hpx::id_type;
     };
 
     // we need to specialize this template to allow for automatic conversion of
     // the vector<naming::gid_type> to a vector<hpx::id_type>
-    template <>
-    struct get_remote_result<std::vector<hpx::id_type>,
+    template <> struct get_remote_result<std::vector<hpx::id_type>,
         std::vector<naming::gid_type>>
     {
         HPX_EXPORT static std::vector<hpx::id_type> call(
             std::vector<naming::gid_type> const& rhs);
     };
 
-    template <>
-    struct promise_local_result<std::vector<naming::gid_type>>
+    template <> struct promise_local_result<std::vector<naming::gid_type>>
     {
         using type = std::vector<hpx::id_type>;
     };

@@ -28,8 +28,7 @@ namespace hpx::traits {
         HPX_ALWAYS_EXPORT static void set(components::component_type);
     };
 
-    HPX_CXX_EXPORT template <typename Component, typename Enable>
-    struct component_type_database<Component const, Enable>
+    template <typename Component, typename Enable> struct component_type_database<Component const, Enable>
       : component_type_database<Component, Enable>
     {
     };

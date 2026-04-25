@@ -79,8 +79,7 @@ namespace hpx::util::detail {
     template <typename Sig>
     struct callable_vtable;
 
-    template <typename R, typename... Ts>
-    struct callable_vtable<R(Ts...)>
+    template <typename R, typename... Ts> struct callable_vtable<R(Ts...)>
     {
         template <typename T>
         HPX_FORCEINLINE static R _invoke(void* f, Ts&&... vs)

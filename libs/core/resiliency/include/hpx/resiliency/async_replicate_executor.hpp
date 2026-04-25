@@ -151,8 +151,7 @@ namespace hpx::resiliency::experimental {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <>
-        struct async_replicate_vote_validate_executor<void>
+        template <> struct async_replicate_vote_validate_executor<void>
         {
             template <typename Executor, typename Vote, typename Pred,
                 typename F, typename... Ts>

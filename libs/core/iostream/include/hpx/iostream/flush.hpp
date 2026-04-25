@@ -55,8 +55,7 @@ namespace hpx::iostream {
         {
         };
 
-        template <>
-        struct flush_device_impl<ostream_tag>
+        template <> struct flush_device_impl<ostream_tag>
         {
             template <typename T>
             static bool flush(T& t)
@@ -65,8 +64,7 @@ namespace hpx::iostream {
             }
         };
 
-        template <>
-        struct flush_device_impl<streambuf_tag>
+        template <> struct flush_device_impl<streambuf_tag>
         {
             template <typename T>
             static bool flush(T& t)
@@ -75,8 +73,7 @@ namespace hpx::iostream {
             }
         };
 
-        template <>
-        struct flush_device_impl<flushable_tag>
+        template <> struct flush_device_impl<flushable_tag>
         {
             template <typename T>
             static bool flush(T& t)
@@ -85,8 +82,7 @@ namespace hpx::iostream {
             }
         };
 
-        template <>
-        struct flush_device_impl<any_tag>
+        template <> struct flush_device_impl<any_tag>
         {
             template <typename T>
             static bool flush(T&)
@@ -103,8 +99,7 @@ namespace hpx::iostream {
         {
         };
 
-        template <>
-        struct flush_filter_impl<flushable_tag>
+        template <> struct flush_filter_impl<flushable_tag>
         {
             template <typename T, typename Sink>
             static bool flush(T& t, Sink& snk)
@@ -113,8 +108,7 @@ namespace hpx::iostream {
             }
         };
 
-        template <>
-        struct flush_filter_impl<any_tag>
+        template <> struct flush_filter_impl<any_tag>
         {
             template <typename T, typename Sink>
             static bool flush(T&, Sink&)

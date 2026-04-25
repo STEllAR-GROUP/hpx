@@ -81,8 +81,7 @@ namespace std {
   template <class T> struct variant_size<volatile T>;
   template <class T> struct variant_size<const volatile T>;
 
-  template <class... Types>
-  struct variant_size<variant<Types...>>;
+  template <class... Types> struct variant_size<variant<Types...>>;
 
   template <size_t I, class T> struct variant_alternative; // undefined
 
@@ -93,8 +92,7 @@ namespace std {
   template <size_t I, class T> struct variant_alternative<I, volatile T>;
   template <size_t I, class T> struct variant_alternative<I, const volatile T>;
 
-  template <size_t I, class... Types>
-  struct variant_alternative<I, variant<Types...>>;
+  template <size_t I, class... Types> struct variant_alternative<I, variant<Types...>>;
 
   constexpr size_t variant_npos = -1;
 
@@ -419,8 +417,7 @@ namespace hpx::variant_ns::lib {
       HPX_CXX_CORE_EXPORT template <typename Lhs, typename Rhs>
       struct make_index_sequence_concat;
 
-      HPX_CXX_CORE_EXPORT template <std::size_t... Lhs, std::size_t... Rhs>
-      struct make_index_sequence_concat<index_sequence<Lhs...>,
+      template <std::size_t... Lhs, std::size_t... Rhs> struct make_index_sequence_concat<index_sequence<Lhs...>,
                                         index_sequence<Rhs...>>
           : identity<index_sequence<Lhs..., (sizeof...(Lhs) + Rhs)...>> {};
 
@@ -435,11 +432,9 @@ namespace hpx::variant_ns::lib {
           : make_index_sequence_concat<make_index_sequence<N / 2>,
                                        make_index_sequence<N - (N / 2)>> {};
 
-      template <>
-      struct make_index_sequence_impl<0> : identity<index_sequence<>> {};
+      template <> struct make_index_sequence_impl<0> : identity<index_sequence<>> {};
 
-      template <>
-      struct make_index_sequence_impl<1> : identity<index_sequence<0>> {};
+      template <> struct make_index_sequence_impl<1> : identity<index_sequence<0>> {};
 
       HPX_CXX_CORE_EXPORT template <typename... Ts>
       using index_sequence_for = make_index_sequence<sizeof...(Ts)>;
@@ -544,8 +539,7 @@ namespace hpx::variant_ns::lib {
                 noexcept(swap(std::declval<T &>(), std::declval<T &>()));
           };
 
-          HPX_CXX_CORE_EXPORT template <typename T>
-          struct is_nothrow_swappable<false, T> : std::false_type {};
+          template <typename T> struct is_nothrow_swappable<false, T> : std::false_type {};
 
         }
 
@@ -561,50 +555,43 @@ namespace hpx::variant_ns::lib {
         HPX_CXX_CORE_EXPORT template <typename T>
         struct is_reference_wrapper : std::false_type {};
 
-        HPX_CXX_CORE_EXPORT template <typename T>
-        struct is_reference_wrapper<std::reference_wrapper<T>>
+        template <typename T> struct is_reference_wrapper<std::reference_wrapper<T>>
             : std::true_type {};
 
         HPX_CXX_CORE_EXPORT template <bool, int>
         struct Invoke;
 
-        template <>
-        struct Invoke<true /* pmf */, 0 /* is_base_of */> {
+        template <> struct Invoke<true /* pmf */, 0 /* is_base_of */> {
           template <typename R, typename T, typename Arg, typename... Args>
           inline static constexpr auto invoke(R T::*pmf, Arg &&arg, Args &&... args)
             HPX_VARIANT_RETURN((lib::forward<Arg>(arg).*pmf)(lib::forward<Args>(args)...))
         };
 
-        template <>
-        struct Invoke<true /* pmf */, 1 /* is_reference_wrapper */> {
+        template <> struct Invoke<true /* pmf */, 1 /* is_reference_wrapper */> {
           template <typename R, typename T, typename Arg, typename... Args>
           inline static constexpr auto invoke(R T::*pmf, Arg &&arg, Args &&... args)
             HPX_VARIANT_RETURN((lib::forward<Arg>(arg).get().*pmf)(lib::forward<Args>(args)...))
         };
 
-        template <>
-        struct Invoke<true /* pmf */, 2 /* otherwise */> {
+        template <> struct Invoke<true /* pmf */, 2 /* otherwise */> {
           template <typename R, typename T, typename Arg, typename... Args>
           inline static constexpr auto invoke(R T::*pmf, Arg &&arg, Args &&... args)
             HPX_VARIANT_RETURN(((*lib::forward<Arg>(arg)).*pmf)(lib::forward<Args>(args)...))
         };
 
-        template <>
-        struct Invoke<false /* pmo */, 0 /* is_base_of */> {
+        template <> struct Invoke<false /* pmo */, 0 /* is_base_of */> {
           template <typename R, typename T, typename Arg>
           inline static constexpr auto invoke(R T::*pmo, Arg &&arg)
             HPX_VARIANT_RETURN(lib::forward<Arg>(arg).*pmo)
         };
 
-        template <>
-        struct Invoke<false /* pmo */, 1 /* is_reference_wrapper */> {
+        template <> struct Invoke<false /* pmo */, 1 /* is_reference_wrapper */> {
           template <typename R, typename T, typename Arg>
           inline static constexpr auto invoke(R T::*pmo, Arg &&arg)
             HPX_VARIANT_RETURN(lib::forward<Arg>(arg).get().*pmo)
         };
 
-        template <>
-        struct Invoke<false /* pmo */, 2 /* otherwise */> {
+        template <> struct Invoke<false /* pmo */, 2 /* otherwise */> {
           template <typename R, typename T, typename Arg>
           inline static constexpr auto invoke(R T::*pmo, Arg &&arg)
               HPX_VARIANT_RETURN((*lib::forward<Arg>(arg)).*pmo)
@@ -644,8 +631,7 @@ namespace hpx::variant_ns::lib {
         HPX_CXX_CORE_EXPORT template <typename Void, typename, typename...>
         struct invoke_result {};
 
-        HPX_CXX_CORE_EXPORT template <typename F, typename... Args>
-        struct invoke_result<void_t<decltype(lib::invoke(
+        template <typename F, typename... Args> struct invoke_result<void_t<decltype(lib::invoke(
                                  std::declval<F>(), std::declval<Args>()...))>,
                              F,
                              Args...>
@@ -665,15 +651,13 @@ namespace hpx::variant_ns::lib {
         HPX_CXX_CORE_EXPORT template <typename Void, typename, typename...>
         struct is_invocable : std::false_type {};
 
-        HPX_CXX_CORE_EXPORT template <typename F, typename... Args>
-        struct is_invocable<void_t<invoke_result_t<F, Args...>>, F, Args...>
+        template <typename F, typename... Args> struct is_invocable<void_t<invoke_result_t<F, Args...>>, F, Args...>
             : std::true_type {};
 
         HPX_CXX_CORE_EXPORT template <typename Void, typename, typename, typename...>
         struct is_invocable_r : std::false_type {};
 
-        HPX_CXX_CORE_EXPORT template <typename R, typename F, typename... Args>
-        struct is_invocable_r<void_t<invoke_result_t<F, Args...>>,
+        template <typename R, typename F, typename... Args> struct is_invocable_r<void_t<invoke_result_t<F, Args...>>,
                               R,
                               F,
                               Args...>
@@ -695,8 +679,7 @@ namespace hpx::variant_ns::lib {
               noexcept(lib::invoke(std::declval<F>(), std::declval<Args>()...));
         };
 
-        HPX_CXX_CORE_EXPORT template <typename F, typename... Args>
-        struct is_nothrow_invocable<false, F, Args...> : std::false_type {};
+        template <typename F, typename... Args> struct is_nothrow_invocable<false, F, Args...> : std::false_type {};
 
         HPX_CXX_CORE_EXPORT template <bool Invocable, typename R, typename F, typename... Args>
         struct is_nothrow_invocable_r {
@@ -709,8 +692,7 @@ namespace hpx::variant_ns::lib {
           static constexpr bool value = noexcept(impl());
         };
 
-        HPX_CXX_CORE_EXPORT template <typename R, typename F, typename... Args>
-        struct is_nothrow_invocable_r<false, R, F, Args...> : std::false_type {};
+        template <typename R, typename F, typename... Args> struct is_nothrow_invocable_r<false, R, F, Args...> : std::false_type {};
 
       }  // namespace detail
 
@@ -778,8 +760,7 @@ namespace hpx::variant_ns::lib {
     HPX_CXX_CORE_EXPORT template <typename T>
     struct remove_all_extents : identity<T> {};
 
-    HPX_CXX_CORE_EXPORT template <typename T, std::size_t N>
-    struct remove_all_extents<array<T, N>> : remove_all_extents<T> {};
+    template <typename T, std::size_t N> struct remove_all_extents<array<T, N>> : remove_all_extents<T> {};
 
     HPX_CXX_CORE_EXPORT template <typename T>
     using remove_all_extents_t = typename remove_all_extents<T>::type;
@@ -804,8 +785,7 @@ namespace hpx::variant_ns::lib {
       template <typename>
       struct set;
 
-      template <std::size_t... Is>
-      struct set<index_sequence<Is...>> : indexed_type<Is, Ts>... {};
+      template <std::size_t... Is> struct set<index_sequence<Is...>> : indexed_type<Is, Ts>... {};
 
       template <typename T>
       inline static std::enable_if<true, T> impl(indexed_type<I, T>);
@@ -855,8 +835,7 @@ namespace hpx::variant_ns::lib {
     HPX_CXX_CORE_EXPORT template <typename Is, std::size_t J>
     using push_back_t = typename push_back<Is, J>::type;
 
-    HPX_CXX_CORE_EXPORT template <std::size_t... Is, std::size_t J>
-    struct push_back<index_sequence<Is...>, J> {
+    template <std::size_t... Is, std::size_t J> struct push_back<index_sequence<Is...>, J> {
       using type = index_sequence<Is..., J>;
     };
 
@@ -922,17 +901,13 @@ namespace hpx::variant_ns {
   constexpr std::size_t variant_size_v = variant_size<T>::value;
 #endif
 
-  HPX_CXX_CORE_EXPORT template <typename T>
-  struct variant_size<const T> : variant_size<T> {};
+  template <typename T> struct variant_size<const T> : variant_size<T> {};
 
-  HPX_CXX_CORE_EXPORT template <typename T>
-  struct variant_size<volatile T> : variant_size<T> {};
+  template <typename T> struct variant_size<volatile T> : variant_size<T> {};
 
-  HPX_CXX_CORE_EXPORT template <typename T>
-  struct variant_size<const volatile T> : variant_size<T> {};
+  template <typename T> struct variant_size<const volatile T> : variant_size<T> {};
 
-  HPX_CXX_CORE_EXPORT template <typename... Ts>
-  struct variant_size<variant<Ts...>> : lib::size_constant<sizeof...(Ts)> {};
+  template <typename... Ts> struct variant_size<variant<Ts...>> : lib::size_constant<sizeof...(Ts)> {};
 
   HPX_CXX_CORE_EXPORT template <std::size_t I, typename T>
   struct variant_alternative;
@@ -940,20 +915,16 @@ namespace hpx::variant_ns {
   HPX_CXX_CORE_EXPORT template <std::size_t I, typename T>
   using variant_alternative_t = typename variant_alternative<I, T>::type;
 
-  HPX_CXX_CORE_EXPORT template <std::size_t I, typename T>
-  struct variant_alternative<I, const T>
+  template <std::size_t I, typename T> struct variant_alternative<I, const T>
       : std::add_const<variant_alternative_t<I, T>> {};
 
-  HPX_CXX_CORE_EXPORT template <std::size_t I, typename T>
-  struct variant_alternative<I, volatile T>
+  template <std::size_t I, typename T> struct variant_alternative<I, volatile T>
       : std::add_volatile<variant_alternative_t<I, T>> {};
 
-  HPX_CXX_CORE_EXPORT template <std::size_t I, typename T>
-  struct variant_alternative<I, const volatile T>
+  template <std::size_t I, typename T> struct variant_alternative<I, const volatile T>
       : std::add_cv<variant_alternative_t<I, T>> {};
 
-  HPX_CXX_CORE_EXPORT template <std::size_t I, typename... Ts>
-  struct variant_alternative<I, variant<Ts...>> {
+  template <std::size_t I, typename... Ts> struct variant_alternative<I, variant<Ts...>> {
     static_assert(I < sizeof...(Ts),
                   "index out of bounds in `std::variant_alternative<>`");
     using type = lib::type_pack_element_t<I, Ts...>;
@@ -1118,8 +1089,7 @@ namespace hpx::variant_ns {
             AUTO_REFREF_RETURN(get_alt_impl<I - 1>{}(lib::forward<V>(v).tail_))
         };
 
-        template <bool Dummy>
-        struct get_alt_impl<0, Dummy> {
+        template <bool Dummy> struct get_alt_impl<0, Dummy> {
           template <typename V>
           inline constexpr AUTO_REFREF operator()(V &&v) const
             AUTO_REFREF_RETURN(lib::forward<V>(v).head_)
@@ -1188,8 +1158,7 @@ namespace hpx::variant_ns {
         template <bool B, typename R, typename... ITs>
         struct dispatcher;
 
-        template <typename R, typename... ITs>
-        struct dispatcher<false, R, ITs...> {
+        template <typename R, typename... ITs> struct dispatcher<false, R, ITs...> {
           template <std::size_t B, typename F, typename... Vs>
           HPX_VARIANT_ALWAYS_INLINE static constexpr R dispatch(
               F &&, typename ITs::type &&..., Vs &&...) {
@@ -1209,8 +1178,7 @@ namespace hpx::variant_ns {
           }
         };
 
-        template <typename R, typename... ITs>
-        struct dispatcher<true, R, ITs...> {
+        template <typename R, typename... ITs> struct dispatcher<true, R, ITs...> {
           template <std::size_t B, typename F>
           HPX_VARIANT_ALWAYS_INLINE static constexpr R dispatch(
               F &&f, typename ITs::type &&... visited_vs) {
@@ -1402,14 +1370,12 @@ namespace hpx::variant_ns {
           template <typename...>
           struct impl;
 
-          template <std::size_t... Is>
-          struct impl<lib::index_sequence<Is...>> {
+          template <std::size_t... Is> struct impl<lib::index_sequence<Is...>> {
             inline constexpr AUTO operator()() const
               AUTO_RETURN(&dispatch<Is...>)
           };
 
-          template <typename Is, std::size_t... Js, typename... Ls>
-          struct impl<Is, lib::index_sequence<Js...>, Ls...> {
+          template <typename Is, std::size_t... Js, typename... Ls> struct impl<Is, lib::index_sequence<Js...>, Ls...> {
             inline constexpr AUTO operator()() const
               AUTO_RETURN(
                   make_farray(impl<lib::push_back_t<Is, Js>, Ls...>{}()...))
@@ -1649,8 +1615,7 @@ namespace hpx::variant_ns {
     HPX_CXX_CORE_EXPORT template <Trait DestructibleTrait, std::size_t Index, typename... Ts>
     union recursive_union;
 
-    HPX_CXX_CORE_EXPORT template <Trait DestructibleTrait, std::size_t Index>
-    union recursive_union<DestructibleTrait, Index> {};
+    template <Trait DestructibleTrait, std::size_t Index> union recursive_union<DestructibleTrait, Index> {};
 
 #define HPX_VARIANT_VARIANT_RECURSIVE_UNION(destructible_trait, destructor)      \
   HPX_CXX_CORE_EXPORT template <std::size_t Index, typename T, typename... Ts>        \
@@ -2201,8 +2166,7 @@ namespace hpx::variant_ns {
       template <typename>
       struct impl;
 
-      template <std::size_t... Is>
-      struct impl<lib::index_sequence<Is...>> : overload_leaf<Is, Ts>... {};
+      template <std::size_t... Is> struct impl<lib::index_sequence<Is...>> : overload_leaf<Is, Ts>... {};
 
       public:
       using type = impl<lib::index_sequence_for<Ts...>>;
@@ -2217,14 +2181,12 @@ namespace hpx::variant_ns {
     HPX_CXX_CORE_EXPORT template <typename T>
     struct is_in_place_index : std::false_type {};
 
-    HPX_CXX_CORE_EXPORT template <std::size_t I>
-    struct is_in_place_index<in_place_index_t<I>> : std::true_type {};
+    template <std::size_t I> struct is_in_place_index<in_place_index_t<I>> : std::true_type {};
 
     HPX_CXX_CORE_EXPORT template <typename T>
     struct is_in_place_type : std::false_type {};
 
-    HPX_CXX_CORE_EXPORT template <typename T>
-    struct is_in_place_type<in_place_type_t<T>> : std::true_type {};
+    template <typename T> struct is_in_place_type<in_place_type_t<T>> : std::true_type {};
 
   }  // detail
 
@@ -2784,8 +2746,7 @@ namespace hpx::variant_ns {
 
 namespace std {
 
-  template <typename... Ts>
-  struct hash<hpx::variant_ns::detail::enabled_type<
+  template <typename... Ts> struct hash<hpx::variant_ns::detail::enabled_type<
       hpx::variant_ns::variant<Ts...>,
       hpx::variant_ns::lib::enable_if_t<
           hpx::variant_ns::lib::all<
@@ -2833,8 +2794,7 @@ namespace std {
     }
   };
 
-  template <>
-  struct hash<hpx::variant_ns::monostate> {
+  template <> struct hash<hpx::variant_ns::monostate> {
     using argument_type = hpx::variant_ns::monostate;
     using result_type = std::size_t;
 

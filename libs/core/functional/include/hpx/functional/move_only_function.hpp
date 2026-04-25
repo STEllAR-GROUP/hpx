@@ -47,8 +47,7 @@ namespace hpx {
     HPX_CXX_CORE_EXPORT template <typename Sig, bool Serializable = false>
     class move_only_function;
 
-    HPX_CXX_CORE_EXPORT template <typename R, typename... Ts, bool Serializable>
-    class move_only_function<R(Ts...), Serializable>
+    template <typename R, typename... Ts, bool Serializable> class move_only_function<R(Ts...), Serializable>
       : public util::detail::basic_function<R(Ts...), false, Serializable>
     {
         using base_type =
@@ -109,8 +108,7 @@ namespace hpx {
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::traits {
 
-    HPX_CXX_CORE_EXPORT template <typename Sig, bool Serializable>
-    struct get_function_address<hpx::move_only_function<Sig, Serializable>>
+    template <typename Sig, bool Serializable> struct get_function_address<hpx::move_only_function<Sig, Serializable>>
     {
         [[nodiscard]] static constexpr std::size_t call(
             hpx::move_only_function<Sig, Serializable> const& f) noexcept
@@ -119,8 +117,7 @@ namespace hpx::traits {
         }
     };
 
-    HPX_CXX_CORE_EXPORT template <typename Sig, bool Serializable>
-    struct get_function_annotation<hpx::move_only_function<Sig, Serializable>>
+    template <typename Sig, bool Serializable> struct get_function_annotation<hpx::move_only_function<Sig, Serializable>>
     {
         [[nodiscard]] static constexpr char const* call(
             hpx::move_only_function<Sig, Serializable> const& f) noexcept
@@ -130,8 +127,7 @@ namespace hpx::traits {
     };
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-    HPX_CXX_CORE_EXPORT template <typename Sig, bool Serializable>
-    struct get_function_annotation_itt<
+    template <typename Sig, bool Serializable> struct get_function_annotation_itt<
         hpx::move_only_function<Sig, Serializable>>
     {
         [[nodiscard]] static util::itt::string_handle call(

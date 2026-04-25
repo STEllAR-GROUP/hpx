@@ -20,26 +20,22 @@
 namespace hpx::parallel::traits {
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_CORE_EXPORT template <typename T>
-    struct is_vector_pack<datapar::experimental::native_simd<T>>
+    template <typename T> struct is_vector_pack<datapar::experimental::native_simd<T>>
       : std::true_type
     {
     };
 
-    HPX_CXX_CORE_EXPORT template <typename T>
-    struct is_vector_pack<T> : std::false_type
+    template <typename T> struct is_vector_pack<T> : std::false_type
     {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_CORE_EXPORT template <typename T>
-    struct is_scalar_vector_pack<datapar::experimental::native_simd<T>>
+    template <typename T> struct is_scalar_vector_pack<datapar::experimental::native_simd<T>>
       : std::false_type
     {
     };
 
-    HPX_CXX_CORE_EXPORT template <typename T>
-    struct is_scalar_vector_pack<T> : std::true_type
+    template <typename T> struct is_scalar_vector_pack<T> : std::true_type
     {
     };
 
@@ -50,8 +46,7 @@ namespace hpx::parallel::traits {
         static constexpr std::size_t const value = sizeof(T);
     };
 
-    HPX_CXX_CORE_EXPORT template <typename T, typename Abi>
-    struct vector_pack_alignment<datapar::experimental::simd<T, Abi>>
+    template <typename T, typename Abi> struct vector_pack_alignment<datapar::experimental::simd<T, Abi>>
     {
         static constexpr std::size_t const value =
             datapar::experimental::memory_alignment_v<
@@ -65,8 +60,7 @@ namespace hpx::parallel::traits {
         static constexpr std::size_t const value = 1;
     };
 
-    HPX_CXX_CORE_EXPORT template <typename T, typename Abi>
-    struct vector_pack_size<datapar::experimental::simd<T, Abi>>
+    template <typename T, typename Abi> struct vector_pack_size<datapar::experimental::simd<T, Abi>>
     {
         static constexpr std::size_t const value =
             datapar::experimental::simd<T, Abi>::size();

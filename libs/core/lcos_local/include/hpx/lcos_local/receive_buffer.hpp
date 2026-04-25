@@ -243,8 +243,7 @@ namespace hpx::lcos::local {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_CORE_EXPORT template <typename Mutex>
-    struct receive_buffer<void, Mutex>
+    template <typename Mutex> struct receive_buffer<void, Mutex>
     {
     protected:
         using mutex_type = Mutex;

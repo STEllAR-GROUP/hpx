@@ -157,8 +157,7 @@ namespace hpx::traits {
         }
     };
 
-    HPX_CXX_CORE_EXPORT template <typename Container>
-    struct serialization_access_data<Container const>
+    template <typename Container> struct serialization_access_data<Container const>
       : serialization_access_data<Container>
     {
     };
