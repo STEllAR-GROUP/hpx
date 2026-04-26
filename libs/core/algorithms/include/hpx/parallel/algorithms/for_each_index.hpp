@@ -73,7 +73,6 @@ namespace hpx { namespace experimental {
 #else
 
 #include <hpx/config.hpp>
-#include <hpx/functional/invoke.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/executors.hpp>
@@ -110,7 +109,7 @@ namespace hpx::parallel::detail {
     {
         if constexpr (RankIdx == Mapping::rank())
         {
-            HPX_INVOKE(f, idx...);
+            hpx::invoke(f, idx...);
         }
         else if constexpr (RankIdx == Mapping::rank() - 1)
         {
@@ -121,7 +120,7 @@ namespace hpx::parallel::detail {
             hpx::util::counting_iterator<std::size_t> first(std::size_t{0});
             hpx::parallel::util::loop_n<std::decay_t<ExPolicy>>(
                 first, bound, [&](auto const& it) {
-                    HPX_INVOKE(f, idx..., static_cast<index_type>(*it));
+                    hpx::invoke(f, idx..., static_cast<index_type>(*it));
                 });
         }
         else
@@ -227,7 +226,7 @@ namespace hpx::parallel::detail {
             hpx::util::counting_iterator<std::size_t> first(std::size_t{0});
             hpx::parallel::util::loop_n<std::decay_t<ExPolicy>>(
                 first, bound, [&](auto const& it) {
-                    HPX_INVOKE(f, static_cast<index_type>(*it), idx...);
+                    hpx::invoke(f, static_cast<index_type>(*it), idx...);
                 });
         }
         else
@@ -345,7 +344,7 @@ namespace hpx::parallel::detail {
             // rank-0: exactly one invocation - execute sequentially.
             if constexpr (Mapping::rank() == 0)
             {
-                HPX_INVOKE(f);
+                hpx::invoke(f);
                 return util::detail::algorithm_result<ExPolicy>::get();
             }
             else
