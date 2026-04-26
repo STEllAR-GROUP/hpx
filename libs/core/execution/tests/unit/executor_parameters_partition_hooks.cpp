@@ -5,13 +5,17 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/algorithm.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/execution.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 
-#include <cstddef>
 #include <cstdint>
+#include <functional>
 #include <numeric>
+#include <string>
+#include <type_traits>
+#include <utility>
 #include <vector>
 
 struct partition_hooks_parameters
@@ -34,7 +38,7 @@ struct partition_hooks_parameters
     friend void tag_override_invoke(
         hpx::execution::experimental::mark_partition_t,
         partition_hooks_parameters& self, Executor&&, std::size_t partition,
-        std::size_t a, std::size_t b) noexcept
+        std::size_t a, std::size_t b, auto) noexcept
     {
         HPX_ASSERT(partition < self.values_.size());
         self.values_[partition] = {a, b};

@@ -885,12 +885,15 @@ namespace hpx::parallel {
                     auto [a1, b1] = diagonal_intersection(
                         first1, len1, first2, len2, k1, comp, proj1, proj2);
 
+                    auto tid = hpx::this_thread::get_id();
                     hpx::execution::experimental::mark_partition(
-                        params, exec, idx, a0, b0);
+                        params, exec, idx, a0, b0, tid);
                     sequential_merge(std::next(first1, a0),
                         std::next(first1, a1), std::next(first2, b0),
                         std::next(first2, b1), std::next(dest, k0), comp, proj1,
                         proj2);
+                    hpx::execution::experimental::mark_partition(
+                        params, exec, idx, a0, b0, tid, std::size_t(2));
                 }
             };
 
