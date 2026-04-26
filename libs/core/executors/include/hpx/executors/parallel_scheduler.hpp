@@ -75,9 +75,9 @@ namespace hpx::execution::experimental {
         };
 
         // Virtual dispatch path: connects child sender to an internal
-        // receiver. When the child completes with values, creates a
-        // bulk_item_proxy and calls backend->schedule_bulk_chunked()
-        // or schedule_bulk_unchunked().
+        // receiver. When the child completes with values, constructs a
+        // concrete_proxy in inline aligned storage (no heap allocation) and
+        // calls backend->schedule_bulk_chunked() or schedule_bulk_unchunked().
         template <typename F, bool IsChunked, bool IsParallel,
             typename ChildSender, typename Receiver>
         struct virtual_parallel_bulk_op final : base_parallel_bulk_op
@@ -90,17 +90,152 @@ namespace hpx::execution::experimental {
             F f_;
             std::decay_t<Receiver> receiver_;
 
-            // Pre-allocated storage for the backend.
+            // Pre-allocated storage passed to the backend as scratch space.
             alignas(parallel_scheduler_storage_alignment)
                 std::byte storage_[parallel_scheduler_storage_size];
 
-            // Heap-allocated proxy (created when child completes).
-            // Must be a member so it survives async backend execution.
-            std::unique_ptr<parallel_scheduler_bulk_item_receiver_proxy>
-                active_proxy_;
+            // ---- Nested concrete proxy template -------------------------
+            // Lifted out of do_bulk() so that sizeof/alignof are computable
+            // for the inline storage below.  Ts... are the decayed value types
+            // types forwarded by the child sender.
+            template <typename... Ts>
+            struct concrete_proxy final
+              : parallel_scheduler_bulk_item_receiver_proxy
+            {
+                virtual_parallel_bulk_op& op_;
+                std::tuple<Ts...> values_;
 
-            // Internal receiver that catches child's completion and
-            // triggers the backend bulk dispatch.
+                // Takes values by value so both lvalue and rvalue arguments
+                // from the child sender are handled uniformly.
+                concrete_proxy(virtual_parallel_bulk_op& o, Ts... ts)
+                  : op_(o)
+                  , values_(HPX_MOVE(ts)...)
+                {
+                }
+
+                void execute(
+                    std::size_t begin, std::size_t end) noexcept override
+                {
+                    if constexpr (IsChunked)
+                    {
+                        if constexpr (IsParallel)
+                        {
+                            std::apply(
+                                [&](auto&... vals) {
+                                    op_.f_(begin, end, vals...);
+                                },
+                                values_);
+                        }
+                        else
+                        {
+                            // P3804R2: seq policy -> f(0, shape, args...)
+                            std::apply(
+                                [&](auto&... vals) {
+                                    op_.f_(0, op_.actual_shape_, vals...);
+                                },
+                                values_);
+                        }
+                    }
+                    else
+                    {
+                        if constexpr (IsParallel)
+                        {
+                            for (std::size_t i = begin; i < end; ++i)
+                            {
+                                std::apply(
+                                    [&](auto&... vals) { op_.f_(i, vals...); },
+                                    values_);
+                            }
+                        }
+                        else
+                        {
+                            // P3804R2: seq -> for(i=0; i<shape; ++i) f(i,...)
+                            for (std::size_t i = 0; i < op_.actual_shape_; ++i)
+                            {
+                                std::apply(
+                                    [&](auto&... vals) { op_.f_(i, vals...); },
+                                    values_);
+                            }
+                        }
+                    }
+                }
+
+                void set_value() noexcept override
+                {
+                    std::apply(
+                        [&](auto&&... vals) {
+                            hpx::execution::experimental::set_value(
+                                HPX_MOVE(op_.receiver_), HPX_MOVE(vals)...);
+                        },
+                        std::move(values_));
+                }
+
+                void set_error(std::exception_ptr ep) noexcept override
+                {
+                    hpx::execution::experimental::set_error(
+                        HPX_MOVE(op_.receiver_), HPX_MOVE(ep));
+                }
+
+                void set_stopped() noexcept override
+                {
+                    hpx::execution::experimental::set_stopped(
+                        HPX_MOVE(op_.receiver_));
+                }
+
+                bool stop_requested() const noexcept override
+                {
+                    return stdexec::get_stop_token(
+                        stdexec::get_env(op_.receiver_))
+                        .stop_requested();
+                }
+            };
+
+            // ---- Proxy type computation ----------------------------------
+            // Derive the concrete_proxy specialisation from ChildSender's
+            // value completion type.  Bulk chains always have exactly one
+            // value completion signature (static_assert below enforces this).
+            using value_env_t = stdexec::env_of_t<std::decay_t<Receiver>>;
+
+            // mk_decayed_tuple<T1,T2,...> = std::tuple<decay_t<T1>,...>
+            template <typename... Ts>
+            using mk_decayed_tuple = std::tuple<std::decay_t<Ts>...>;
+
+            // std::variant<std::tuple<decay_t<Ts>...>> for each value sig
+            using value_variant_t = stdexec::value_types_of_t<ChildSender,
+                value_env_t, mk_decayed_tuple, std::variant>;
+
+            static_assert(std::variant_size_v<value_variant_t> == 1,
+                "virtual_parallel_bulk_op: child sender must have exactly "
+                "one value completion signature");
+
+            // std::tuple<decay_t<T1>, decay_t<T2>, ...>
+            using value_tuple_t =
+                std::variant_alternative_t<0, value_variant_t>;
+
+            // concrete_proxy<T1, T2, ...> from std::tuple<T1, T2, ...>
+            template <typename Tuple>
+            struct proxy_for_tuple;
+            template <typename... Ts>
+            struct proxy_for_tuple<std::tuple<Ts...>>
+            {
+                using type = concrete_proxy<Ts...>;
+            };
+            using proxy_t = typename proxy_for_tuple<value_tuple_t>::type;
+
+            // ---- Inline proxy storage ------------------------------------
+            // Eliminates the second heap allocation that make_unique<proxy>
+            // would require.  Valid from do_bulk() until the first completion
+            // signal is delivered, after which the operation state is
+            // released and this destructor runs.
+            alignas(proxy_t) std::byte proxy_buf_[sizeof(proxy_t)];
+            bool proxy_active_ = false;
+
+            proxy_t& active_proxy() noexcept
+            {
+                return *std::launder(reinterpret_cast<proxy_t*>(proxy_buf_));
+            }
+
+            // ---- Child receiver -----------------------------------------
             struct child_receiver
             {
                 using receiver_concept =
@@ -158,135 +293,39 @@ namespace hpx::execution::experimental {
             {
             }
 
+            ~virtual_parallel_bulk_op()
+            {
+                if (proxy_active_)
+                    active_proxy().~proxy_t();
+            }
+
             void start() noexcept override
             {
                 hpx::execution::experimental::start(child_op_);
             }
 
-            // Called by child_receiver::set_value when the child
-            // sender completes. Creates a type-erased bulk proxy
-            // that captures the values and calls f(i, values...)
-            // in execute(), then dispatches to the backend.
+            // Called by child_receiver::set_value when the child sender
+            // completes. Constructs the proxy via placement new into the
+            // inline buffer (no heap allocation) then dispatches to the
+            // backend.
             template <typename... Vs>
             void do_bulk(Vs&&... vs) noexcept
             {
-                // Concrete proxy that captures values from the
-                // child sender and invokes the bulk function.
-                struct concrete_proxy final
-                  : parallel_scheduler_bulk_item_receiver_proxy
-                {
-                    virtual_parallel_bulk_op& op_;
-                    std::tuple<std::decay_t<Vs>...> values_;
-
-                    concrete_proxy(virtual_parallel_bulk_op& o, Vs&&... vs)
-                      : op_(o)
-                      , values_(HPX_FORWARD(Vs, vs)...)
-                    {
-                    }
-
-                    void execute(
-                        std::size_t begin, std::size_t end) noexcept override
-                    {
-                        // P3804R2: Handle sequential vs parallel execution
-                        if constexpr (IsChunked)
-                        {
-                            // Chunked: f expects (begin, end, ...vals)
-                            if constexpr (IsParallel)
-                            {
-                                std::apply(
-                                    [&](auto&... vals) {
-                                        op_.f_(begin, end, vals...);
-                                    },
-                                    values_);
-                            }
-                            else
-                            {
-                                // P3804R2: seq policy -> f(0, shape, args...)
-                                std::apply(
-                                    [&](auto&... vals) {
-                                        op_.f_(0, op_.actual_shape_, vals...);
-                                    },
-                                    values_);
-                            }
-                        }
-                        else
-                        {
-                            // Unchunked: f expects (index, ...vals)
-                            if constexpr (IsParallel)
-                            {
-                                for (std::size_t i = begin; i < end; ++i)
-                                {
-                                    std::apply(
-                                        [&](auto&... vals) {
-                                            op_.f_(i, vals...);
-                                        },
-                                        values_);
-                                }
-                            }
-                            else
-                            {
-                                // P3804R2: seq policy -> for(i=0; i<shape; ++i) f(i, args...)
-                                for (std::size_t i = 0; i < op_.actual_shape_;
-                                    ++i)
-                                {
-                                    std::apply(
-                                        [&](auto&... vals) {
-                                            op_.f_(i, vals...);
-                                        },
-                                        values_);
-                                }
-                            }
-                        }
-                    }
-
-                    void set_value() noexcept override
-                    {
-                        // Bulk passes child values through to receiver.
-                        std::apply(
-                            [&](auto&&... vals) {
-                                hpx::execution::experimental::set_value(
-                                    HPX_MOVE(op_.receiver_), HPX_MOVE(vals)...);
-                            },
-                            std::move(values_));
-                    }
-
-                    void set_error(std::exception_ptr ep) noexcept override
-                    {
-                        hpx::execution::experimental::set_error(
-                            HPX_MOVE(op_.receiver_), HPX_MOVE(ep));
-                    }
-
-                    void set_stopped() noexcept override
-                    {
-                        hpx::execution::experimental::set_stopped(
-                            HPX_MOVE(op_.receiver_));
-                    }
-
-                    bool stop_requested() const noexcept override
-                    {
-                        return stdexec::get_stop_token(
-                            stdexec::get_env(op_.receiver_))
-                            .stop_requested();
-                    }
-                };
-
                 hpx::detail::try_catch_exception_ptr(
                     [&]() {
-                        active_proxy_ = std::make_unique<concrete_proxy>(
-                            *this, HPX_FORWARD(Vs, vs)...);
-                        auto& proxy_ref =
-                            static_cast<concrete_proxy&>(*active_proxy_);
+                        new (proxy_buf_) proxy_t(*this, HPX_FORWARD(Vs, vs)...);
+                        proxy_active_ = true;
 
                         std::span<std::byte> span(storage_);
                         if constexpr (IsChunked)
                         {
                             backend_->schedule_bulk_chunked(
-                                count_, proxy_ref, span);
+                                count_, active_proxy(), span);
                         }
                         else
                         {
                             backend_->schedule_bulk_unchunked(
-                                count_, proxy_ref, span);
+                                count_, active_proxy(), span);
                         }
                     },
                     [&](std::exception_ptr ep) {
@@ -544,15 +583,16 @@ namespace hpx::execution::experimental {
             parallel_scheduler const&) noexcept = default;
         parallel_scheduler& operator=(parallel_scheduler&&) noexcept = default;
 
-        // P2079R10: equality means same backend implementation.
+        // P2079R10 6.4: two schedulers compare equal iff BACKEND-OF(lhs)
+        // and BACKEND-OF(rhs) refer to the same object, i.e., their
+        // shared_ptr targets are identical.  Pointer equality is the only
+        // comparison mandated by the standard; equal_to() on the backend
+        // interface is an HPX-specific extension that custom backends may
+        // implement for their own purposes but is not used here.
         friend bool operator==(parallel_scheduler const& lhs,
             parallel_scheduler const& rhs) noexcept
         {
-            if (lhs.backend_ == rhs.backend_)
-                return true;
-            if (!lhs.backend_ || !rhs.backend_)
-                return false;
-            return lhs.backend_->equal_to(*rhs.backend_);
+            return lhs.backend_.get() == rhs.backend_.get();
         }
 
         // P2079R10: query() member for forward progress guarantee

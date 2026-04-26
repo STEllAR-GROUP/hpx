@@ -17,6 +17,7 @@
 #include <hpx/executors/thread_pool_scheduler_bulk.hpp>
 #include <hpx/threading_base/detail/get_default_pool.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <exception>
 #include <functional>
@@ -109,8 +110,11 @@ namespace hpx::execution::experimental {
             parallel_scheduler_bulk_item_receiver_proxy& proxy,
             std::span<std::byte> storage) noexcept = 0;
 
-        // Equality: two backends are equal if they share the same execution
-        // context. Used by parallel_scheduler::operator==.
+        // custom equality for backends.
+        // P2079R10 §6.4 defines parallel_scheduler equality purely by
+        // shared_ptr target identity (pointer equality), so this method is
+        // NOT called by parallel_scheduler::operator==.
+        // Custom backends may implement it for their own comparisons.
         virtual bool equal_to(
             parallel_scheduler_backend const& other) const noexcept = 0;
 
@@ -172,29 +176,67 @@ namespace hpx::execution::experimental {
             {
                 hpx::detail::try_catch_exception_ptr(
                     [&]() {
-                        auto num_threads = static_cast<std::uint32_t>(hpx::
-                                execution::experimental::processing_units_count(
+                        if (count == 0)
+                        {
+                            proxy.set_value();
+                            return;
+                        }
+
+                        auto const num_threads = static_cast<std::uint32_t>(
+                            hpx::execution::experimental::
+                                processing_units_count(
                                     hpx::execution::experimental::
                                         null_parameters,
                                     scheduler_, hpx::chrono::null_duration, 0));
-                        auto chunk_size = hpx::execution::experimental::detail::
-                            get_bulk_scheduler_chunk_size_chunked(
-                                num_threads, count);
+                        auto const chunk_size = static_cast<std::size_t>(
+                            hpx::execution::experimental::detail::
+                                get_bulk_scheduler_chunk_size_chunked(
+                                    num_threads, count));
+                        auto const n_chunks =
+                            (count + chunk_size - 1) / chunk_size;
 
-                        // Execute chunks sequentially on the thread pool
-                        scheduler_.execute([&proxy, count, chunk_size]() {
-                            for (std::size_t begin = 0; begin < count;
-                                begin += chunk_size)
-                            {
-                                auto end = (std::min) (begin +
-                                        static_cast<std::size_t>(chunk_size),
-                                    count);
-                                proxy.execute(begin, end);
-                            }
-                            proxy.set_value();
-                        });
+                        auto sync = std::make_shared<bulk_sync_state>(n_chunks);
+                        std::size_t chunks_posted = 0;
+
+                        for (std::size_t c = 0; c < n_chunks; ++c)
+                        {
+                            auto const begin = c * chunk_size;
+                            auto const end =
+                                (std::min) (begin + chunk_size, count);
+
+                            bool post_ok = true;
+                            hpx::detail::try_catch_exception_ptr(
+                                [&]() {
+                                    // Each task owns a copy of the shared_ptr,
+                                    // keeping sync alive until the last task
+                                    // finishes (i.e., until set_value/set_error
+                                    // is called).
+                                    scheduler_.execute(
+                                        [&proxy, sync, begin, end]() noexcept {
+                                            proxy.execute(begin, end);
+                                            if (sync->decrement())
+                                                sync->signal(proxy);
+                                        });
+                                    ++chunks_posted;
+                                },
+                                [&](std::exception_ptr ep) {
+                                    post_ok = false;
+                                    sync->try_set_error(HPX_MOVE(ep));
+                                });
+
+                            if (!post_ok)
+                                break;
+                        }
+
+                        // Retire any chunks that were never posted so the
+                        // countdown can reach zero even when posting failed.
+                        auto const not_posted = n_chunks - chunks_posted;
+                        if (not_posted > 0 && sync->decrement(not_posted))
+                            sync->signal(proxy);
                     },
                     [&](std::exception_ptr ep) {
+                        // Setup (make_shared / chunk size computation) threw;
+                        // no tasks have been posted yet.
                         proxy.set_error(HPX_MOVE(ep));
                     });
             }
@@ -205,13 +247,63 @@ namespace hpx::execution::experimental {
             {
                 hpx::detail::try_catch_exception_ptr(
                     [&]() {
-                        scheduler_.execute([&proxy, count]() {
-                            for (std::size_t i = 0; i < count; ++i)
-                            {
-                                proxy.execute(i, i + 1);
-                            }
+                        if (count == 0)
+                        {
                             proxy.set_value();
-                        });
+                            return;
+                        }
+
+                        auto const num_threads = static_cast<std::uint32_t>(
+                            hpx::execution::experimental::
+                                processing_units_count(
+                                    hpx::execution::experimental::
+                                        null_parameters,
+                                    scheduler_, hpx::chrono::null_duration, 0));
+                        // Reuse the chunked helper: ceil(count / num_threads)
+                        // elements per task, giving roughly one task per thread.
+                        auto const chunk_size = static_cast<std::size_t>(
+                            hpx::execution::experimental::detail::
+                                get_bulk_scheduler_chunk_size_chunked(
+                                    num_threads, count));
+                        auto const n_chunks =
+                            (count + chunk_size - 1) / chunk_size;
+
+                        auto sync = std::make_shared<bulk_sync_state>(n_chunks);
+                        std::size_t chunks_posted = 0;
+
+                        for (std::size_t c = 0; c < n_chunks; ++c)
+                        {
+                            auto const begin = c * chunk_size;
+                            auto const end =
+                                (std::min) (begin + chunk_size, count);
+
+                            bool post_ok = true;
+                            hpx::detail::try_catch_exception_ptr(
+                                [&]() {
+                                    scheduler_.execute(
+                                        [&proxy, sync, begin, end]() noexcept {
+                                            // Call execute(i, i+1) for every
+                                            // element in this task's slice.
+                                            for (std::size_t i = begin; i < end;
+                                                ++i)
+                                                proxy.execute(i, i + 1);
+                                            if (sync->decrement())
+                                                sync->signal(proxy);
+                                        });
+                                    ++chunks_posted;
+                                },
+                                [&](std::exception_ptr ep) {
+                                    post_ok = false;
+                                    sync->try_set_error(HPX_MOVE(ep));
+                                });
+
+                            if (!post_ok)
+                                break;
+                        }
+
+                        auto const not_posted = n_chunks - chunks_posted;
+                        if (not_posted > 0 && sync->decrement(not_posted))
+                            sync->signal(proxy);
                     },
                     [&](std::exception_ptr ep) {
                         proxy.set_error(HPX_MOVE(ep));
@@ -240,6 +332,70 @@ namespace hpx::execution::experimental {
         private:
             thread_pool_policy_scheduler<hpx::launch> scheduler_;
             hpx::threads::mask_type pu_mask_;
+
+            // Shared synchronization state for a single parallel bulk dispatch.
+            // One instance is created per schedule_bulk_* call and shared among
+            // all chunk tasks via shared_ptr.
+            //
+            // Lifetime guarantee: the shared_ptr keeps this object alive until
+            // the last task drops its copy, which only happens after one of the
+            // completion signals (set_value / set_error) has been called on the
+            // proxy. The proxy itself is guaranteed alive until that point by the
+            // P2079R10 precondition on schedule_bulk_chunked/unchunked.
+            struct bulk_sync_state
+            {
+                // Counts down from n_chunks to 0. The task that observes 0 is
+                // responsible for calling the completion signal on the proxy.
+                std::atomic<std::size_t> remaining;
+
+                // Set to true by the first task that encounters an error.
+                // Written before remaining reaches 0, so the acq_rel fence on
+                // remaining guarantees visibility for the completing task.
+                std::atomic<bool> has_error{false};
+
+                // Stores the first error. Protected by the has_error CAS:
+                // only one thread writes it, and it is read after acquiring
+                // has_error with memory_order_acquire.
+                std::exception_ptr first_error;
+
+                explicit bulk_sync_state(std::size_t n) noexcept
+                  : remaining(n)
+                {
+                }
+
+                // Record ep as the first error (thread-safe; first caller wins).
+                void try_set_error(std::exception_ptr ep) noexcept
+                {
+                    bool expected = false;
+                    if (has_error.compare_exchange_strong(
+                            expected, true, std::memory_order_acq_rel))
+                    {
+                        first_error = HPX_MOVE(ep);
+                    }
+                }
+
+                // Subtract n from remaining. Returns true iff remaining was
+                // exactly n before the subtraction (i.e., it is now 0).
+                // Uses acq_rel so all prior writes (e.g. to first_error) are
+                // visible to the caller that observes remaining == 0.
+                bool decrement(std::size_t n = 1) noexcept
+                {
+                    return remaining.fetch_sub(n, std::memory_order_acq_rel) ==
+                        n;
+                }
+
+                // Call set_value or set_error on proxy based on error state.
+                // Must only be called by the single task for which decrement()
+                // returned true (i.e., the task that made remaining reach 0).
+                void signal(
+                    parallel_scheduler_bulk_item_receiver_proxy& proxy) noexcept
+                {
+                    if (has_error.load(std::memory_order_acquire))
+                        proxy.set_error(HPX_MOVE(first_error));
+                    else
+                        proxy.set_value();
+                }
+            };
         };
 
         // Singleton-like shared thread pool for parallel_scheduler
