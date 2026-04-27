@@ -10,6 +10,7 @@
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <numeric>
