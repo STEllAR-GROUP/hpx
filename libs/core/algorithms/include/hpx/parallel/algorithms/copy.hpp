@@ -590,7 +590,8 @@ namespace hpx::parallel {
                     // below makes gcc generate errors
 
                     // MSVC complains if proj is captured by ref below
-                    util::loop_n<std::decay_t<ExPolicy>>(part_begin, part_size,
+                    util::const_loop_n<std::decay_t<ExPolicy>>(part_begin,
+                        part_size,
                         [&pred, proj, &curr](zip_iterator it) mutable -> void {
                             bool f = hpx::invoke(
                                 pred, hpx::invoke(proj, get<0>(*it)));
@@ -606,8 +607,8 @@ namespace hpx::parallel {
                               std::size_t part_size, std::size_t val) mutable {
                     HPX_UNUSED(flags);
                     std::advance(dest, val);
-                    util::loop_n<std::decay_t<ExPolicy>>(part_begin, part_size,
-                        [&dest](zip_iterator it) mutable {
+                    util::const_loop_n<std::decay_t<ExPolicy>>(part_begin,
+                        part_size, [&dest](zip_iterator it) mutable {
                             if (get<1>(*it))
                                 *dest++ = get<0>(*it);
                         });
@@ -789,8 +790,7 @@ namespace hpx {
                 >
             )
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter2>::type
+        friend parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter2>
         tag_fallback_invoke(hpx::copy_if_t, ExPolicy&& policy, FwdIter1 first,
             FwdIter1 last, FwdIter2 dest, Pred pred)
         {
