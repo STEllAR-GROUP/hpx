@@ -62,6 +62,7 @@ set(tests
     is_partitioned_async_range
     is_partitioned_range
     is_partitioned_projection_range
+    is_sorted_projection
     is_sorted_range
     is_sorted_range2
     is_sorted_range3
@@ -74,6 +75,8 @@ set(tests
     merge_range
     min_element_range
     minmax_element_range
+    minmax_element_parallel_projection
+    minmax_element_projection
     mismatch_binary_range
     mismatch_range
     move_range

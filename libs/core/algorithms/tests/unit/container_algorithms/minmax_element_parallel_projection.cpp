@@ -1,4 +1,4 @@
-//  Copyright (c) 2024-2026 STE||AR-Group
+//  Copyright (c) 2024-2026 The STE||AR Group
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,7 +12,6 @@
 
 #include <hpx/algorithm.hpp>
 #include <hpx/execution.hpp>
-#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <algorithm>
