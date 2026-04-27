@@ -51,7 +51,7 @@ namespace hpx::parallel::detail {
                     ++idx;
                     bool local_cancelled = false;
                     util::cancellation_token<> local_tok;
-                    util::loop_n<
+                    util::const_loop_n<
                         decltype(hpx::execution::experimental::to_non_task(
                             std::declval<ExPolicy>()))>(begin, diff, local_tok,
                         [&op, &proj1, &proj2, &local_cancelled](
@@ -109,7 +109,7 @@ namespace hpx::parallel::detail {
                     ++idx;
                     bool local_cancelled = false;
                     util::cancellation_token<> local_tok;
-                    util::loop_n<
+                    util::const_loop_n<
                         decltype(hpx::execution::experimental::to_non_task(
                             std::declval<ExPolicy>()))>(start, count, local_tok,
                         [&pred, &proj, &value_proj, &local_cancelled](

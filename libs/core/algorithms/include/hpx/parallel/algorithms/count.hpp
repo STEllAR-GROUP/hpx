@@ -277,7 +277,7 @@ namespace hpx::parallel {
             operator()(Iter part_begin, std::size_t part_size)
             {
                 typename std::iterator_traits<Iter>::difference_type ret = 0;
-                util::loop_n<execution_policy_type>(part_begin, part_size,
+                util::const_loop_n<execution_policy_type>(part_begin, part_size,
                     hpx::bind_back(*this, std::ref(ret)));
                 return ret;
             }
@@ -313,7 +313,7 @@ namespace hpx::parallel {
 
                 typename std::iterator_traits<InIterB>::difference_type ret = 0;
 
-                util::loop(HPX_FORWARD(ExPolicy, policy), first, last,
+                util::const_loop(HPX_FORWARD(ExPolicy, policy), first, last,
                     hpx::bind_back(HPX_MOVE(f1), std::ref(ret)));
 
                 return ret;
@@ -379,7 +379,7 @@ namespace hpx::parallel {
 
                 typename std::iterator_traits<InIterB>::difference_type ret = 0;
 
-                util::loop(HPX_FORWARD(ExPolicy, policy), first, last,
+                util::const_loop(HPX_FORWARD(ExPolicy, policy), first, last,
                     hpx::bind_back(HPX_MOVE(f1), std::ref(ret)));
 
                 return ret;

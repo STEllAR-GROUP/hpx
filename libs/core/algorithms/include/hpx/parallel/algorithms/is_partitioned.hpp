@@ -217,7 +217,7 @@ namespace hpx::parallel {
                     if (part_count == 1)
                         return fst_bool;
 
-                    util::loop_n<std::decay_t<ExPolicy>>(++part_begin,
+                    util::const_loop_n<std::decay_t<ExPolicy>>(++part_begin,
                         --part_count, tok,
                         [&fst_bool, &pred_projected, &tok](
                             Iter_ const& a) mutable -> void {
