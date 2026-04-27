@@ -349,6 +349,17 @@ namespace hpx::parallel::util {
                 it, count, HPX_FORWARD(F, f), std::true_type());
         }
 
+        HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Itr,
+            typename... Ts, typename F>
+        HPX_HOST_DEVICE
+            HPX_FORCEINLINE constexpr prefetching_iterator<Itr, Ts...>
+            tag_invoke(hpx::parallel::util::const_loop_n_t<ExPolicy>,
+                prefetching_iterator<Itr, Ts...> it, std::size_t count, F&& f)
+        {
+            return loop_n_helper::call(
+                it, count, HPX_FORWARD(F, f), std::true_type());
+        }
+
         ///////////////////////////////////////////////////////////////////////
         HPX_CXX_CORE_EXPORT struct loop_n_ind_helper
         {

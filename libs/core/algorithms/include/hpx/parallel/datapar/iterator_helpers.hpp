@@ -117,7 +117,8 @@ namespace hpx::parallel::util::detail {
         iterator_datapar_compatible<Iter>::value;
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_CORE_EXPORT template <typename Iter, typename Enable = void>
+    HPX_CXX_CORE_EXPORT template <typename Iter, bool IsConst = false,
+        typename Enable = void>
     struct datapar_loop_step
     {
         using value_type = std::iterator_traits<Iter>::value_type;
@@ -130,10 +131,18 @@ namespace hpx::parallel::util::detail {
             F&& f, Iter& it)
         {
             V1 tmp(traits::vector_pack_load<V1, value_type>::unaligned(it));
-            HPX_INVOKE(f, &tmp);
-            if constexpr (dereference_is_lvalue_ref_v<Iter>)
+            if constexpr (IsConst)
             {
-                traits::vector_pack_store<V1, value_type>::unaligned(tmp, it);
+                HPX_INVOKE(f, static_cast<V1 const*>(&tmp));
+            }
+            else
+            {
+                HPX_INVOKE(f, &tmp);
+                if constexpr (dereference_is_lvalue_ref_v<Iter>)
+                {
+                    traits::vector_pack_store<V1, value_type>::unaligned(
+                        tmp, it);
+                }
             }
             ++it;
         }
@@ -143,10 +152,17 @@ namespace hpx::parallel::util::detail {
             F&& f, Iter& it)
         {
             V tmp(traits::vector_pack_load<V, value_type>::aligned(it));
-            HPX_INVOKE(f, &tmp);
-            if constexpr (dereference_is_lvalue_ref_v<Iter>)
+            if constexpr (IsConst)
             {
-                traits::vector_pack_store<V, value_type>::aligned(tmp, it);
+                HPX_INVOKE(f, static_cast<V const*>(&tmp));
+            }
+            else
+            {
+                HPX_INVOKE(f, &tmp);
+                if constexpr (dereference_is_lvalue_ref_v<Iter>)
+                {
+                    traits::vector_pack_store<V, value_type>::aligned(tmp, it);
+                }
             }
             std::advance(it, traits::vector_pack_size_v<V>);
         }
@@ -163,22 +179,31 @@ namespace hpx::parallel::util::detail {
             for (std::size_t e = 0; e != size; (void) ++it1, ++e)
                 traits::set(tmp, e, *it1);
 
-            HPX_INVOKE(f, &tmp);
-
-            if constexpr (dereference_is_lvalue_ref_v<Iter>)
+            if constexpr (IsConst)
             {
-                for (std::size_t e = 0; e != size; (void) ++it, ++e)
-                    *it = traits::get(tmp, e);
+                HPX_INVOKE(f, static_cast<V const*>(&tmp));
+                std::advance(it, size);
             }
             else
             {
-                std::advance(it, size);
+                HPX_INVOKE(f, &tmp);
+
+                if constexpr (dereference_is_lvalue_ref_v<Iter>)
+                {
+                    for (std::size_t e = 0; e != size; (void) ++it, ++e)
+                        *it = traits::get(tmp, e);
+                }
+                else
+                {
+                    std::advance(it, size);
+                }
             }
         }
     };
 
-    HPX_CXX_CORE_EXPORT template <typename I>
-    struct datapar_loop_step<I, std::enable_if_t<std::is_integral_v<I>>>
+    HPX_CXX_CORE_EXPORT template <typename I, bool IsConst>
+    struct datapar_loop_step<I, IsConst,
+        std::enable_if_t<std::is_integral_v<I>>>
     {
         using V1 = traits::vector_pack_type_t<I, 1>;
         using V = traits::vector_pack_type_t<I>;
