@@ -35,7 +35,7 @@ set(tests
 )
 
 if(HPX_WITH_DATAPAR)
-  list(APPEND tests for_each_datapar)
+  list(APPEND tests counting_iterator_datapar for_each_datapar)
 endif()
 
 foreach(test ${tests})
