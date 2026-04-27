@@ -94,8 +94,7 @@ namespace hpx::traits {
         HPX_CXX_CORE_EXPORT template <typename T, typename U>
         struct is_paren_constructible;
 
-        template <typename T, std::size_t... I>
-        struct is_paren_constructible<T, std::index_sequence<I...>>
+        template <typename T, std::size_t... I> struct is_paren_constructible<T, std::index_sequence<I...>>
           : std::is_constructible<T, decltype(_wildcard<I>)...>
         {
         };

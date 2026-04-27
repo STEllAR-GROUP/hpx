@@ -139,8 +139,7 @@ namespace hpx::execution::experimental {
                     _result_type);
             };
 
-            template <typename _result_type>
-            struct set_value_void_checked<true, _result_type>
+            template <typename _result_type> struct set_value_void_checked<true, _result_type>
             {
                 using type = hpx::execution::experimental::set_value_t();
             };
@@ -161,8 +160,7 @@ namespace hpx::execution::experimental {
                 using value_types = Variant<Tuple<result_type>>;
             };
 
-            template <typename T>
-            struct completion_signatures_base<T, void>
+            template <typename T> struct completion_signatures_base<T, void>
             {
                 template <template <typename...> typename Tuple,
                     template <typename...> typename Variant>
@@ -183,8 +181,7 @@ namespace hpx::execution::experimental {
         HPX_CXX_CORE_EXPORT template <typename Future>
         struct as_sender_sender;
 
-        template <typename T>
-        struct as_sender_sender<hpx::future<T>>
+        template <typename T> struct as_sender_sender<hpx::future<T>>
           : public as_sender_sender_base<hpx::future<T>>
         {
 #if defined(HPX_HAVE_STDEXEC)
@@ -222,8 +219,7 @@ namespace hpx::execution::experimental {
             }
         };
 
-        template <typename T>
-        struct as_sender_sender<hpx::shared_future<T>>
+        template <typename T> struct as_sender_sender<hpx::shared_future<T>>
           : as_sender_sender_base<hpx::shared_future<T>>
         {
 #if defined(HPX_HAVE_STDEXEC)

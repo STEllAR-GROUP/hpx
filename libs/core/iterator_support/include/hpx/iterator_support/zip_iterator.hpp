@@ -35,14 +35,12 @@ namespace hpx::util {
             using type = hpx::traits::iter_value_t<T>;
         };
 
-        template <>
-        struct zip_iterator_element_value<hpx::default_sentinel_t>
+        template <> struct zip_iterator_element_value<hpx::default_sentinel_t>
         {
             using type = hpx::util::unused_type;
         };
 
-        template <typename... Ts>
-        struct zip_iterator_value<hpx::tuple<Ts...>>
+        template <typename... Ts> struct zip_iterator_value<hpx::tuple<Ts...>>
         {
             using type =
                 hpx::tuple<typename zip_iterator_element_value<Ts>::type...>;
@@ -58,14 +56,12 @@ namespace hpx::util {
             using type = hpx::traits::iter_reference_t<T>;
         };
 
-        template <>
-        struct zip_iterator_reference_value<hpx::default_sentinel_t>
+        template <> struct zip_iterator_reference_value<hpx::default_sentinel_t>
         {
             using type = hpx::util::unused_type;
         };
 
-        template <typename... Ts>
-        struct zip_iterator_reference<hpx::tuple<Ts...>>
+        template <typename... Ts> struct zip_iterator_reference<hpx::tuple<Ts...>>
         {
             using type =
                 hpx::tuple<typename zip_iterator_reference_value<Ts>::type...>;
@@ -82,29 +78,25 @@ namespace hpx::util {
             using type = hpx::traits::iter_category_t<T>;
         };
 
-        template <>
-        struct zip_iterator_element_category<hpx::default_sentinel_t>
+        template <> struct zip_iterator_element_category<hpx::default_sentinel_t>
         {
             using type = std::random_access_iterator_tag;
         };
 
-        template <typename T>
-        struct zip_iterator_category<hpx::tuple<T>,
+        template <typename T> struct zip_iterator_category<hpx::tuple<T>,
             std::enable_if_t<hpx::tuple_size<hpx::tuple<T>>::value == 1>>
         {
             using type = typename zip_iterator_element_category<T>::type;
         };
 
-        template <typename T, typename U>
-        struct zip_iterator_category<hpx::tuple<T, U>,
+        template <typename T, typename U> struct zip_iterator_category<hpx::tuple<T, U>,
             std::enable_if_t<hpx::tuple_size<hpx::tuple<T, U>>::value == 2>>
           : minimum_category<typename zip_iterator_element_category<T>::type,
                 typename zip_iterator_element_category<U>::type>
         {
         };
 
-        template <typename T, typename U, typename... Tail>
-        struct zip_iterator_category<hpx::tuple<T, U, Tail...>,
+        template <typename T, typename U, typename... Tail> struct zip_iterator_category<hpx::tuple<T, U, Tail...>,
             std::enable_if_t<(
                 hpx::tuple_size<hpx::tuple<T, U, Tail...>>::value > 2)>>
           : minimum_category<
@@ -119,8 +111,7 @@ namespace hpx::util {
         HPX_CXX_CORE_EXPORT template <typename IteratorTuple>
         struct dereference_iterator;
 
-        template <typename... Ts>
-        struct dereference_iterator<hpx::tuple<Ts...>>
+        template <typename... Ts> struct dereference_iterator<hpx::tuple<Ts...>>
         {
             template <std::size_t... Is>
             HPX_HOST_DEVICE static constexpr
@@ -176,8 +167,7 @@ namespace hpx::util {
         {
         };
 
-        template <typename... Ts>
-        struct has_default_sentinel<hpx::tuple<Ts...>>
+        template <typename... Ts> struct has_default_sentinel<hpx::tuple<Ts...>>
           : util::any_of<has_default_sentinel<Ts>...>
         {
         };
@@ -199,8 +189,7 @@ namespace hpx::util {
             }
         };
 
-        template <std::size_t I, std::size_t Size>
-        struct one_tuple_element_equal_to<I, Size,
+        template <std::size_t I, std::size_t Size> struct one_tuple_element_equal_to<I, Size,
             std::enable_if_t<I + 1 == Size>>
         {
             template <typename TTuple, typename UTuple>
@@ -443,8 +432,7 @@ namespace hpx::util {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename... Ts>
-    class zip_iterator<hpx::tuple<Ts...>>
+    template <typename... Ts> class zip_iterator<hpx::tuple<Ts...>>
       : public detail::zip_iterator_base<hpx::tuple<Ts...>,
             zip_iterator<hpx::tuple<Ts...>>>
     {
@@ -526,8 +514,7 @@ namespace hpx::traits {
         HPX_CXX_CORE_EXPORT template <typename F, typename Iter>
         struct lift_zipped_iterators;
 
-        template <typename F, typename... Ts>
-        struct lift_zipped_iterators<F, util::zip_iterator<Ts...>>
+        template <typename F, typename... Ts> struct lift_zipped_iterators<F, util::zip_iterator<Ts...>>
         {
             using tuple_type =
                 typename util::zip_iterator<Ts...>::iterator_tuple_type;
@@ -553,8 +540,7 @@ namespace hpx::traits {
     }    // namespace functional
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename... Iter>
-    struct is_zip_iterator<hpx::util::zip_iterator<Iter...>> : std::true_type
+    template <typename... Iter> struct is_zip_iterator<hpx::util::zip_iterator<Iter...>> : std::true_type
     {
     };
 }    // namespace hpx::traits

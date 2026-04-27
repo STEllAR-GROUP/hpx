@@ -70,8 +70,7 @@ namespace hpx::execution::experimental {
     } null_parameters{};
 
     /// \cond NOINTERNAL
-    template <>
-    struct is_executor_parameters<null_parameters_t> : std::true_type
+    template <> struct is_executor_parameters<null_parameters_t> : std::true_type
     {
     };
     /// \endcond
@@ -205,8 +204,8 @@ namespace hpx::execution::experimental {
     /// \note This calls params.reset_thread_distribution(exec) if it exists;
     ///       otherwise it does nothing.
     ///
-    HPX_CXX_CORE_EXPORT inline constexpr struct
-        reset_thread_distribution_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct reset_thread_distribution_t
+        final
       : hpx::functional::detail::tag_priority<reset_thread_distribution_t>
     {
     private:
@@ -295,8 +294,8 @@ namespace hpx::execution::experimental {
 
     /// Generate a policy that supports setting the number of cores for
     /// execution.
-    HPX_CXX_CORE_EXPORT inline constexpr struct
-        with_processing_units_count_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct with_processing_units_count_t
+        final
       : hpx::functional::detail::tag_priority<with_processing_units_count_t>
     {
     } with_processing_units_count{};
@@ -401,8 +400,8 @@ namespace hpx::execution::experimental {
     /// \note This calls params.mark_begin_execution(exec) if it exists;
     ///       otherwise it does nothing.
     ///
-    HPX_CXX_CORE_EXPORT inline constexpr struct
-        collect_execution_parameters_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct collect_execution_parameters_t
+        final
       : hpx::functional::detail::tag_priority<collect_execution_parameters_t>
     {
     private:
@@ -422,8 +421,7 @@ namespace hpx::execution::experimental {
         }
     } collect_execution_parameters{};
 
-    template <>
-    struct is_scheduling_property<with_processing_units_count_t>
+    template <> struct is_scheduling_property<with_processing_units_count_t>
       : std::true_type
     {
     };

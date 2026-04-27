@@ -38,8 +38,7 @@ namespace hpx::execution::experimental {
         }
     } to_non_simd{};
 
-    template <>
-    struct is_execution_policy_mapping<to_non_simd_t> : std::true_type
+    template <> struct is_execution_policy_mapping<to_non_simd_t> : std::true_type
     {
     };
 
@@ -60,8 +59,7 @@ namespace hpx::execution::experimental {
         }
     } to_simd{};
 
-    template <>
-    struct is_execution_policy_mapping<to_simd_t> : std::true_type
+    template <> struct is_execution_policy_mapping<to_simd_t> : std::true_type
     {
     };
 }    // namespace hpx::execution::experimental

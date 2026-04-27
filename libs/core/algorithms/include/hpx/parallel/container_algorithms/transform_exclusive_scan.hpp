@@ -581,10 +581,11 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            transform_exclusive_scan_result<std::ranges::iterator_t<Rng>, O>>::
-            type tag_fallback_invoke(hpx::ranges::transform_exclusive_scan_t,
-                ExPolicy&& policy, Rng&& rng, O dest, T init, BinOp binary_op,
-                UnOp unary_op)
+            transform_exclusive_scan_result<std::ranges::iterator_t<Rng>,
+                O>>::type
+        tag_fallback_invoke(hpx::ranges::transform_exclusive_scan_t,
+            ExPolicy&& policy, Rng&& rng, O dest, T init, BinOp binary_op,
+            UnOp unary_op)
         {
             using iterator_type = std::ranges::iterator_t<Rng>;
 

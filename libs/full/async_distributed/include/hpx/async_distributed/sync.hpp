@@ -86,8 +86,7 @@ namespace hpx::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     // launch
-    template <typename Action, typename Policy>
-    struct sync_action_dispatch<Action, Policy,
+    template <typename Action, typename Policy> struct sync_action_dispatch<Action, Policy,
         std::enable_if_t<traits::is_launch_policy_v<Policy>>>
     {
         // id_type
@@ -130,8 +129,7 @@ namespace hpx::detail {
     };
 
     // hpx::id_type
-    template <typename Action>
-    struct sync_action_dispatch<Action, hpx::id_type>
+    template <typename Action> struct sync_action_dispatch<Action, hpx::id_type>
     {
         template <typename... Ts>
         HPX_FORCEINLINE static decltype(auto) call(
@@ -143,8 +141,7 @@ namespace hpx::detail {
     };
 
     // component::client
-    template <typename Action, typename Client>
-    struct sync_action_dispatch<Action, Client,
+    template <typename Action, typename Client> struct sync_action_dispatch<Action, Client,
         std::enable_if_t<traits::is_client_v<Client>>>
     {
         template <typename Client_, typename Stub, typename Data,
@@ -158,8 +155,7 @@ namespace hpx::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action>
-    struct sync_launch_policy_dispatch<Action,
+    template <typename Action> struct sync_launch_policy_dispatch<Action,
         std::enable_if_t<traits::is_action_v<Action>>>
     {
         template <typename Policy, typename... Ts>
@@ -192,8 +188,7 @@ namespace hpx::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     // any action
-    template <typename Action>
-    struct sync_dispatch<Action, std::enable_if_t<traits::is_action_v<Action>>>
+    template <typename Action> struct sync_dispatch<Action, std::enable_if_t<traits::is_action_v<Action>>>
     {
         template <typename Component, typename Signature, typename Derived,
             typename... Ts>
@@ -222,8 +217,7 @@ namespace hpx::detail {
     };
 
     // launch with any action
-    template <typename Func>
-    struct sync_dispatch_launch_policy_helper<Func,
+    template <typename Func> struct sync_dispatch_launch_policy_helper<Func,
         std::enable_if_t<traits::is_action_v<Func>>>
     {
         template <typename Policy_, typename F, typename... Ts>
@@ -258,8 +252,7 @@ namespace hpx::detail {
     };
 
     // bound action
-    template <typename Bound>
-    struct sync_dispatch<Bound, std::enable_if_t<hpx::is_bound_action_v<Bound>>>
+    template <typename Bound> struct sync_dispatch<Bound, std::enable_if_t<hpx::is_bound_action_v<Bound>>>
     {
         template <typename Action, typename Is, typename... Ts, typename... Us>
         HPX_FORCEINLINE static decltype(auto) call(

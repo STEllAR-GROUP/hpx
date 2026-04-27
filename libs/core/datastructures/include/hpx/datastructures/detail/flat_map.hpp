@@ -343,8 +343,7 @@ namespace hpx::detail {
         struct has_begin_end : std::false_type
         {
         };
-        template <typename Container>
-        struct has_begin_end<Container,
+        template <typename Container> struct has_begin_end<Container,
             std::void_t<decltype(std::begin(std::declval<Container>())),
                 decltype(std::end(std::declval<Container>()))>> : std::true_type
         {

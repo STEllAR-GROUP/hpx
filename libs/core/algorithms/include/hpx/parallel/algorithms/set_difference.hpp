@@ -343,7 +343,8 @@ namespace hpx {
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            FwdIter3> tag_fallback_invoke(set_difference_t, ExPolicy&& policy,
+            FwdIter3>
+        tag_fallback_invoke(set_difference_t, ExPolicy&& policy,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2,
             FwdIter3 dest, Pred op = Pred())
         {

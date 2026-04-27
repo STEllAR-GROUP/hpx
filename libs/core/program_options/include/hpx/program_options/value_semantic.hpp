@@ -84,9 +84,7 @@ namespace hpx::program_options {
         to parse is ascii or UTF8, will pass it to xparse unmodified,
         or with UTF8->ascii conversion.
     */
-    template <>
-    class HPX_CORE_EXPORT
-        value_semantic_codecvt_helper<char> : public value_semantic
+    template <> class HPX_CORE_EXPORT value_semantic_codecvt_helper<char> : public value_semantic
     {
     private:    // base overrides
         void parse(hpx::any_nonser& value_store,
@@ -105,9 +103,7 @@ namespace hpx::program_options {
         to parse is ascii or UTF8, will recode input to Unicode, or
         pass it unmodified.
     */
-    template <>
-    class HPX_CORE_EXPORT
-        value_semantic_codecvt_helper<wchar_t> : public value_semantic
+    template <> class HPX_CORE_EXPORT value_semantic_codecvt_helper<wchar_t> : public value_semantic
     {
     private:    // base overrides
         void parse(hpx::any_nonser& value_store,

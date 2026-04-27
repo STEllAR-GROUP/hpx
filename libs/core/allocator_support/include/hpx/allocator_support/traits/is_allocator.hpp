@@ -66,8 +66,7 @@ namespace hpx::traits {
                 std::declval<T>(), std::declval<pointer>()))::value;
         };
 
-        template <typename T>
-        struct has_deallocate<T, false>
+        template <typename T> struct has_deallocate<T, false>
         {
             static constexpr bool value = false;
         };

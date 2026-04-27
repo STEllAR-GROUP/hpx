@@ -34,8 +34,7 @@ namespace hpx::parcelset {
         class HPX_EXPORT parcelport;
     }    // namespace policies::lcw
 
-    template <>
-    struct connection_handler_traits<policies::lcw::parcelport>
+    template <> struct connection_handler_traits<policies::lcw::parcelport>
     {
         using connection_type = policies::lcw::sender_connection_base;
         using send_early_parcel = std::true_type;
@@ -171,8 +170,7 @@ namespace hpx::traits {
     //      ...
     //      priority = 200
     //
-    template <>
-    struct plugin_config_data<hpx::parcelset::policies::lcw::parcelport>
+    template <> struct plugin_config_data<hpx::parcelset::policies::lcw::parcelport>
     {
         static constexpr char const* priority() noexcept
         {

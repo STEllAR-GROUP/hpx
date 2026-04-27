@@ -58,8 +58,7 @@ namespace hpx::parallel::detail {
         T curr_;
     };
 
-    template <typename T>
-    struct induction_helper<T&>
+    template <typename T> struct induction_helper<T&>
     {
         explicit constexpr induction_helper(T& var) noexcept
           : live_out_var_(var)
@@ -138,8 +137,7 @@ namespace hpx::parallel::detail {
         std::size_t stride_;
     };
 
-    template <typename T>
-    struct induction_stride_helper<T&>
+    template <typename T> struct induction_stride_helper<T&>
     {
         constexpr induction_stride_helper(T& var, std::size_t stride) noexcept
           : live_out_var_(var)

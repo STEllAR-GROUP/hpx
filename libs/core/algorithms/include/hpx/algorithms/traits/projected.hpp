@@ -28,8 +28,7 @@ namespace hpx::traits {
 
     // For segmented iterators, we consider the local_raw_iterator instead of
     // the given one.
-    template <typename Iterator>
-    struct projected_iterator<Iterator,
+    template <typename Iterator> struct projected_iterator<Iterator,
         std::enable_if_t<is_segmented_iterator_v<Iterator>>>
     {
         using local_iterator =
@@ -39,8 +38,7 @@ namespace hpx::traits {
             local_iterator>::local_raw_iterator;
     };
 
-    template <typename Iterator>
-    struct projected_iterator<Iterator,
+    template <typename Iterator> struct projected_iterator<Iterator,
         std::void_t<typename std::decay_t<Iterator>::proxy_type>>
     {
         using type = typename std::decay_t<Iterator>::proxy_type;
@@ -59,8 +57,7 @@ namespace hpx::parallel::traits {
             typename Enable = void>
         struct projected_result_of;
 
-        template <typename Proj, typename Iter>
-        struct projected_result_of<Proj, Iter,
+        template <typename Proj, typename Iter> struct projected_result_of<Proj, Iter,
             std::enable_if_t<hpx::traits::is_iterator_v<Iter>>>
           : hpx::util::invoke_result<Proj, hpx::traits::iter_reference_t<Iter>>
         {
@@ -92,8 +89,7 @@ namespace hpx::parallel::traits {
             typename Enable = void>
         struct projected_result_of_vector_pack;
 
-        template <typename Projected>
-        struct projected_result_of_vector_pack<Projected,
+        template <typename Projected> struct projected_result_of_vector_pack<Projected,
             std::void_t<typename Projected::iterator_type>>
           : projected_result_of_vector_pack_<typename Projected::projector_type,
                 hpx::traits::iter_value_t<typename Projected::iterator_type>>
@@ -141,8 +137,7 @@ namespace hpx::parallel::traits {
         {
         };
 
-        template <typename Projected>
-        struct is_projected_indirect<Projected,
+        template <typename Projected> struct is_projected_indirect<Projected,
             std::void_t<typename Projected::projector_type>>
           : detail::is_projected<typename Projected::projector_type,
                 typename Projected::iterator_type>
@@ -179,8 +174,7 @@ namespace hpx::parallel::traits {
     {
     };
 
-    template <typename Projected>
-    struct is_projected_zip_iterator<Projected,
+    template <typename Projected> struct is_projected_zip_iterator<Projected,
         std::void_t<typename Projected::iterator_type>>
       : hpx::traits::is_zip_iterator<typename Projected::iterator_type>
     {
@@ -200,8 +194,8 @@ namespace hpx::parallel::traits {
         {
         };
 
-        template <typename ExPolicy, typename F, typename... Projected>
-        struct is_indirect_callable<ExPolicy, F, hpx::util::pack<Projected...>,
+        template <typename ExPolicy, typename F,
+            typename... Projected> struct is_indirect_callable<ExPolicy, F, hpx::util::pack<Projected...>,
             std::enable_if_t<
                 hpx::util::all_of_v<is_projected_indirect<Projected>...> &&
                 (!hpx::is_vectorpack_execution_policy_v<ExPolicy> ||
@@ -216,8 +210,8 @@ namespace hpx::parallel::traits {
         // Vector pack execution policies used with zip-iterators require
         // special handling because zip_iterator<>::reference is not a real
         // reference type.
-        template <typename ExPolicy, typename F, typename... Projected>
-        struct is_indirect_callable<ExPolicy, F, hpx::util::pack<Projected...>,
+        template <typename ExPolicy, typename F,
+            typename... Projected> struct is_indirect_callable<ExPolicy, F, hpx::util::pack<Projected...>,
             std::enable_if_t<
                 hpx::util::all_of_v<is_projected_indirect<Projected>...> &&
                 hpx::is_vectorpack_execution_policy_v<ExPolicy> &&

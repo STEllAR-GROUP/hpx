@@ -29,8 +29,8 @@ namespace hpx::detail {
     HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void registered_locks_error_handler();
     HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT bool register_locks_predicate();
 #endif
-    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT
-        threads::thread_pool_base* get_default_pool();
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT threads::thread_pool_base*
+    get_default_pool();
     HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT threads::mask_type get_pu_mask(
         threads::topology& topo, std::size_t thread_num);
     HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT ::asio::io_context&

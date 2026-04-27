@@ -25,25 +25,21 @@ namespace hpx::execution::experimental {
         {
         };
 
-        template <typename Category>
-        struct is_not_weaker<Category, Category> : std::true_type
+        template <typename Category> struct is_not_weaker<Category, Category> : std::true_type
         {
         };
 
-        template <>
-        struct is_not_weaker<hpx::execution::parallel_execution_tag,
+        template <> struct is_not_weaker<hpx::execution::parallel_execution_tag,
             hpx::execution::unsequenced_execution_tag> : std::true_type
         {
         };
 
-        template <>
-        struct is_not_weaker<hpx::execution::sequenced_execution_tag,
+        template <> struct is_not_weaker<hpx::execution::sequenced_execution_tag,
             hpx::execution::unsequenced_execution_tag> : std::true_type
         {
         };
 
-        template <>
-        struct is_not_weaker<hpx::execution::sequenced_execution_tag,
+        template <> struct is_not_weaker<hpx::execution::sequenced_execution_tag,
             hpx::execution::parallel_execution_tag> : std::true_type
         {
         };

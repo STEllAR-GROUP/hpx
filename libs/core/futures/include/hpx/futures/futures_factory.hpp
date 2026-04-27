@@ -38,8 +38,7 @@ namespace hpx::lcos::local {
             typename Base = lcos::detail::task_base<Result>>
         struct task_object;
 
-        template <typename Result, typename F, typename Base>
-        struct task_object<Result, F, void, Base> : Base
+        template <typename Result, typename F, typename Base> struct task_object<Result, F, void, Base> : Base
         {
             using base_type = Base;
             using result_type = typename Base::result_type;
@@ -326,8 +325,7 @@ namespace hpx::lcos::local {
         template <typename Result, typename F, typename Executor>
         struct cancelable_task_object;
 
-        template <typename Result, typename F>
-        struct cancelable_task_object<Result, F, void>
+        template <typename Result, typename F> struct cancelable_task_object<Result, F, void>
           : task_object<Result, F, void,
                 lcos::detail::cancelable_task_base<Result>>
         {
@@ -495,16 +493,16 @@ namespace hpx::lcos::local {
 
 namespace hpx::traits::detail {
 
-    template <typename Result, typename F, typename Base, typename Allocator>
-    struct shared_state_allocator<
+    template <typename Result, typename F, typename Base,
+        typename Allocator> struct shared_state_allocator<
         lcos::local::detail::task_object<Result, F, void, Base>, Allocator>
     {
         using type = lcos::local::detail::task_object_allocator<Allocator,
             Result, F, Base>;
     };
 
-    template <typename Result, typename F, typename Allocator>
-    struct shared_state_allocator<
+    template <typename Result, typename F,
+        typename Allocator> struct shared_state_allocator<
         lcos::local::detail::cancelable_task_object<Result, F, void>, Allocator>
     {
         using type =
@@ -530,8 +528,7 @@ namespace hpx::lcos::local {
         template <typename Result, bool Cancelable, typename Executor = void>
         struct create_task_object;
 
-        template <typename Result>
-        struct create_task_object<Result, false, void>
+        template <typename Result> struct create_task_object<Result, false, void>
         {
             using return_type =
                 hpx::intrusive_ptr<lcos::detail::task_base<Result>>;
@@ -602,8 +599,7 @@ namespace hpx::lcos::local {
             }
         };
 
-        template <typename Result, typename Executor>
-        struct create_task_object<Result, false, Executor>
+        template <typename Result, typename Executor> struct create_task_object<Result, false, Executor>
           : create_task_object<Result, false, void>
         {
             using return_type =
@@ -630,8 +626,7 @@ namespace hpx::lcos::local {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Result>
-        struct create_task_object<Result, true, void>
+        template <typename Result> struct create_task_object<Result, true, void>
         {
             using return_type =
                 hpx::intrusive_ptr<lcos::detail::task_base<Result>>;
@@ -704,8 +699,7 @@ namespace hpx::lcos::local {
             }
         };
 
-        template <typename Result, typename Executor>
-        struct create_task_object<Result, true, Executor>
+        template <typename Result, typename Executor> struct create_task_object<Result, true, Executor>
           : create_task_object<Result, true, void>
         {
             using return_type =
@@ -733,8 +727,7 @@ namespace hpx::lcos::local {
         };
     }    // namespace detail
 
-    template <typename Result, bool Cancelable>
-    class futures_factory<Result(), Cancelable>
+    template <typename Result, bool Cancelable> class futures_factory<Result(), Cancelable>
     {
     protected:
         using task_impl_type = lcos::detail::task_base<Result>;

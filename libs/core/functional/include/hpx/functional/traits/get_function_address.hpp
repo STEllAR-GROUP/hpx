@@ -25,8 +25,7 @@ namespace hpx::traits {
     };
 
     // For global (and static) functions we return the function address itself
-    template <typename R, typename... Ts>
-    struct get_function_address<R (*)(Ts...)>
+    template <typename R, typename... Ts> struct get_function_address<R (*)(Ts...)>
     {
         static std::size_t call(R (*f)(Ts...)) noexcept
         {

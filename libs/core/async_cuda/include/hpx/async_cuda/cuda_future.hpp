@@ -49,8 +49,7 @@ namespace hpx::cuda::experimental {
         HPX_CXX_CORE_EXPORT template <typename Allocator, typename Mode>
         struct future_data;
 
-        template <typename Allocator>
-        struct future_data<Allocator, event_mode>
+        template <typename Allocator> struct future_data<Allocator, event_mode>
           : lcos::detail::future_data_allocator<void, Allocator,
                 future_data<Allocator, event_mode>>
         {
@@ -96,8 +95,7 @@ namespace hpx::cuda::experimental {
             }
         };
 
-        template <typename Allocator>
-        struct future_data<Allocator, callback_mode>
+        template <typename Allocator> struct future_data<Allocator, callback_mode>
           : lcos::detail::future_data_allocator<void, Allocator,
                 future_data<Allocator, callback_mode>>
         {

@@ -20,15 +20,13 @@
 
 namespace hpx::traits {
 
-    template <typename... Ts>
-    struct is_bitwise_serializable<::hpx::tuple<Ts...>>
+    template <typename... Ts> struct is_bitwise_serializable<::hpx::tuple<Ts...>>
       : ::hpx::util::all_of<
             hpx::traits::is_bitwise_serializable<std::remove_const_t<Ts>>...>
     {
     };
 
-    template <typename... Ts>
-    struct is_not_bitwise_serializable<::hpx::tuple<Ts...>>
+    template <typename... Ts> struct is_not_bitwise_serializable<::hpx::tuple<Ts...>>
       : std::integral_constant<bool,
             !is_bitwise_serializable_v<::hpx::tuple<Ts...>>>
     {
@@ -46,8 +44,8 @@ namespace hpx::util::detail {
     HPX_CXX_CORE_EXPORT template <typename Archive, typename Is, typename... Ts>
     struct save_construct_data_with_index_pack;
 
-    template <typename Archive, std::size_t... Is, typename... Ts>
-    struct serialize_with_index_pack<Archive, hpx::util::index_pack<Is...>,
+    template <typename Archive, std::size_t... Is,
+        typename... Ts> struct serialize_with_index_pack<Archive, hpx::util::index_pack<Is...>,
         Ts...>
     {
         template <typename T>
@@ -64,8 +62,8 @@ namespace hpx::util::detail {
         }
     };
 
-    template <typename Archive, std::size_t... Is, typename... Ts>
-    struct load_construct_data_with_index_pack<Archive,
+    template <typename Archive, std::size_t... Is,
+        typename... Ts> struct load_construct_data_with_index_pack<Archive,
         hpx::util::index_pack<Is...>, Ts...>
     {
         template <typename T>
@@ -111,8 +109,8 @@ namespace hpx::util::detail {
         }
     };
 
-    template <typename Archive, std::size_t... Is, typename... Ts>
-    struct save_construct_data_with_index_pack<Archive,
+    template <typename Archive, std::size_t... Is,
+        typename... Ts> struct save_construct_data_with_index_pack<Archive,
         hpx::util::index_pack<Is...>, Ts...>
     {
         template <typename T>

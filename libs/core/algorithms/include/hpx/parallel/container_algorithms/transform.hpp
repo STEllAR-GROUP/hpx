@@ -850,8 +850,9 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend ranges::unary_transform_result<std::ranges::iterator_t<Rng>,
-            FwdIter> tag_fallback_invoke(hpx::ranges::transform_t, Rng&& rng,
-            FwdIter dest, F f, Proj proj = Proj())
+            FwdIter>
+        tag_fallback_invoke(hpx::ranges::transform_t, Rng&& rng, FwdIter dest,
+            F f, Proj proj = Proj())
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;

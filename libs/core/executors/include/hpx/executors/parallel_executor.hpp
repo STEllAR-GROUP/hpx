@@ -45,8 +45,7 @@ namespace hpx::parallel::execution::detail {
         }
     };
 
-    template <>
-    struct get_default_policy<hpx::launch>
+    template <> struct get_default_policy<hpx::launch>
     {
         static constexpr hpx::launch::async_policy call() noexcept
         {
@@ -728,8 +727,7 @@ namespace hpx::execution {
 
     ////////////////////////////////////////////////////////////////////////////
     // parallel executor that spawns threads hierarchically
-    template <typename Policy>
-    struct parallel_policy_executor<Policy, true>
+    template <typename Policy> struct parallel_policy_executor<Policy, true>
       : parallel_policy_executor_base<Policy>
     {
         using base_type = parallel_policy_executor_base<Policy>;
@@ -1174,36 +1172,31 @@ namespace hpx::execution {
 namespace hpx::execution::experimental {
 
     /// \cond NOINTERNAL
-    template <typename Policy, bool HierarchicalSpawning>
-    struct is_one_way_executor<
+    template <typename Policy, bool HierarchicalSpawning> struct is_one_way_executor<
         hpx::execution::parallel_policy_executor<Policy, HierarchicalSpawning>>
       : std::true_type
     {
     };
 
-    template <typename Policy, bool HierarchicalSpawning>
-    struct is_never_blocking_one_way_executor<
+    template <typename Policy, bool HierarchicalSpawning> struct is_never_blocking_one_way_executor<
         hpx::execution::parallel_policy_executor<Policy, HierarchicalSpawning>>
       : std::true_type
     {
     };
 
-    template <typename Policy, bool HierarchicalSpawning>
-    struct is_two_way_executor<
+    template <typename Policy, bool HierarchicalSpawning> struct is_two_way_executor<
         hpx::execution::parallel_policy_executor<Policy, HierarchicalSpawning>>
       : std::true_type
     {
     };
 
-    template <typename Policy, bool HierarchicalSpawning>
-    struct is_bulk_one_way_executor<
+    template <typename Policy, bool HierarchicalSpawning> struct is_bulk_one_way_executor<
         hpx::execution::parallel_policy_executor<Policy, HierarchicalSpawning>>
       : std::true_type
     {
     };
 
-    template <typename Policy, bool HierarchicalSpawning>
-    struct is_bulk_two_way_executor<
+    template <typename Policy, bool HierarchicalSpawning> struct is_bulk_two_way_executor<
         hpx::execution::parallel_policy_executor<Policy, HierarchicalSpawning>>
       : std::true_type
     {

@@ -69,15 +69,13 @@ namespace hpx {
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace detail {
 
-    template <typename Policy, typename Action, typename Args>
-    struct dataflow_return_impl</*IsAction=*/true, Policy, Action, Args>
+    template <typename Policy, typename Action, typename Args> struct dataflow_return_impl</*IsAction=*/true, Policy, Action, Args>
     {
         using type = hpx::future<typename Action::result_type>;
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Policy>
-    struct dataflow_dispatch_impl<true, Policy,
+    template <typename Policy> struct dataflow_dispatch_impl<true, Policy,
         std::enable_if_t<traits::is_launch_policy_v<Policy>>>
     {
         template <typename Allocator, typename Policy_, typename Component,
@@ -93,8 +91,7 @@ namespace hpx { namespace lcos { namespace detail {
         }
     };
 
-    template <typename FD>
-    struct dataflow_dispatch_impl<true, FD,
+    template <typename FD> struct dataflow_dispatch_impl<true, FD,
         std::enable_if_t<!traits::is_launch_policy_v<FD> &&
             !traits::is_one_way_executor_v<FD> &&
             !traits::is_two_way_executor_v<FD>>>

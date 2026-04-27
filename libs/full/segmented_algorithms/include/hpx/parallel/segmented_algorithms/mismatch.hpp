@@ -45,12 +45,10 @@ namespace hpx { namespace parallel {
             struct is_future : std::false_type
             {
             };
-            template <typename R>
-            struct is_future<hpx::future<R>> : std::true_type
+            template <typename R> struct is_future<hpx::future<R>> : std::true_type
             {
             };
-            template <typename R>
-            struct is_future<hpx::shared_future<R>> : std::true_type
+            template <typename R> struct is_future<hpx::shared_future<R>> : std::true_type
             {
             };
 

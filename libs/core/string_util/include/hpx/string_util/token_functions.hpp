@@ -237,8 +237,7 @@ namespace hpx::string_util {
             }
         };
 
-        template <typename Traits>
-        struct traits_extension_details<Traits, 1> : public Traits
+        template <typename Traits> struct traits_extension_details<Traits, 1> : public Traits
         {
             using char_type = typename Traits::char_type;
 
@@ -304,8 +303,7 @@ namespace hpx::string_util {
             }
         };
 
-        template <>
-        struct assign_or_plus_equal<std::input_iterator_tag>
+        template <> struct assign_or_plus_equal<std::input_iterator_tag>
         {
             template <class Iterator, class Token>
             static constexpr void assign(Iterator, Iterator, Token&) noexcept

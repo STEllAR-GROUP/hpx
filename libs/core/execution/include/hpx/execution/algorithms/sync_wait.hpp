@@ -91,7 +91,8 @@ namespace hpx::execution::experimental::detail {
     HPX_CXX_CORE_EXPORT template <typename Pack>
     struct make_decayed_pack;
 
-    template <template <typename...> typename Pack, typename... Ts>
+    template <template <typename...> typename Pack,
+        typename... Ts>
     struct make_decayed_pack<Pack<Ts...>>
     {
         using type = Pack<std::decay_t<Ts>...>;
@@ -104,14 +105,12 @@ namespace hpx::execution::experimental::detail {
     HPX_CXX_CORE_EXPORT template <sync_wait_type Type, typename T>
     struct select_result;
 
-    template <typename T>
-    struct select_result<sync_wait_type::single, T>
+    template <typename T> struct select_result<sync_wait_type::single, T>
     {
         using type = hpx::variant<make_decayed_pack_t<single_variant_t<T>>>;
     };
 
-    template <typename T>
-    struct select_result<sync_wait_type::variant, T>
+    template <typename T> struct select_result<sync_wait_type::variant, T>
     {
         using type = T;
     };
@@ -321,11 +320,11 @@ namespace hpx::this_thread::experimental {
     // expression get_env(r) where r is an instance of the receiver created by
     // the default implementation of sync_wait. Then:
     //
-    // template <sender<sync-wait-env> S> using sync-wait-type =
+    // template<sender<sync-wait-env> S> using sync-wait-type =
     //  optional<execution::value_types_of_t< S, sync-wait-env, decayed-tuple,
     //  type_identity_t>>;
     //
-    //  template <sender<sync-wait-env> S> using sync-wait-with-variant-type =
+    //  template<sender<sync-wait-env> S> using sync-wait-with-variant-type =
     //  optional<execution::into-variant-type<S, sync-wait-env>>;
     //
     // The name this_thread::sync_wait denotes a customization point object. For

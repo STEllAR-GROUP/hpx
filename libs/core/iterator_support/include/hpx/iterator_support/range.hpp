@@ -121,7 +121,8 @@ namespace hpx::util {
 
             HPX_CXX_CORE_EXPORT template <typename C,
                 typename R = decltype(end(std::declval<C&>()))>
-            [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE R end_impl(
+            [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE R
+            end_impl(
                 C& c, int) noexcept(noexcept(end(c)))
             {
                 return end(c);
@@ -156,7 +157,8 @@ namespace hpx::util {
 
             HPX_CXX_CORE_EXPORT template <typename C,
                 typename R = decltype(size(std::declval<C&>()))>
-            [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE R size_impl(
+            [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE R
+            size_impl(
                 C& c) noexcept(noexcept(size(c)))
             {
                 return size(c);
@@ -235,8 +237,7 @@ namespace hpx::util {
             using type = Iter;
         };
 
-        template <typename T>
-        struct iterator<T, range_impl::fallback>
+        template <typename T> struct iterator<T, range_impl::fallback>
         {
         };
 
@@ -254,8 +255,7 @@ namespace hpx::util {
             using type = Iter;
         };
 
-        template <typename T>
-        struct sentinel<T, range_impl::fallback>
+        template <typename T> struct sentinel<T, range_impl::fallback>
         {
         };
 
@@ -275,8 +275,7 @@ namespace hpx::util {
             using type = R;
         };
 
-        template <typename T>
-        struct subrange<T, range_impl::fallback>
+        template <typename T> struct subrange<T, range_impl::fallback>
         {
         };
 
@@ -294,8 +293,7 @@ namespace hpx::util {
             using type = R;
         };
 
-        template <typename T>
-        struct iterate<T, range_impl::fallback>
+        template <typename T> struct iterate<T, range_impl::fallback>
         {
         };
 
@@ -389,8 +387,7 @@ namespace hpx::util {
 
     HPX_CXX_CORE_EXPORT using namespace range_adl;
     namespace detail {
-        template <typename T>
-        struct is_range_generator<T,
+        template <typename T> struct is_range_generator<T,
             std::enable_if_t<std::ranges::range<decltype(hpx::util::iterate(
                 std::declval<T&>()))>>> : std::true_type
         {

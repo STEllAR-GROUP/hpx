@@ -19,8 +19,7 @@ namespace hpx::traits {
         {
         };
 
-        template <typename T>
-        struct is_tuple_like_impl<T,
+        template <typename T> struct is_tuple_like_impl<T,
             std::void_t<decltype(hpx::tuple_size<T>::value)>> : std::true_type
         {
         };

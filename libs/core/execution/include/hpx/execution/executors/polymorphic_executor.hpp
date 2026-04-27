@@ -291,8 +291,7 @@ namespace hpx::parallel::execution {
         template <typename Sig>
         struct never_blocking_oneway_vtable;
 
-        template <typename R, typename... Ts>
-        struct never_blocking_oneway_vtable<R(Ts...)>
+        template <typename R, typename... Ts> struct never_blocking_oneway_vtable<R(Ts...)>
         {
             using post_function_type = hpx::move_only_function<R(Ts...)>;
 
@@ -329,8 +328,7 @@ namespace hpx::parallel::execution {
         template <typename Sig>
         struct oneway_vtable;
 
-        template <typename R, typename... Ts>
-        struct oneway_vtable<R(Ts...)>
+        template <typename R, typename... Ts> struct oneway_vtable<R(Ts...)>
         {
             using sync_execute_function_type =
                 hpx::move_only_function<R(Ts...)>;
@@ -370,8 +368,7 @@ namespace hpx::parallel::execution {
         template <typename Sig>
         struct twoway_vtable;
 
-        template <typename R, typename... Ts>
-        struct twoway_vtable<R(Ts...)>
+        template <typename R, typename... Ts> struct twoway_vtable<R(Ts...)>
         {
             using async_execute_function_type =
                 hpx::move_only_function<R(Ts...)>;
@@ -436,8 +433,7 @@ namespace hpx::parallel::execution {
         template <typename Sig>
         struct bulk_oneway_vtable;
 
-        template <typename R, typename... Ts>
-        struct bulk_oneway_vtable<R(Ts...)>
+        template <typename R, typename... Ts> struct bulk_oneway_vtable<R(Ts...)>
         {
             using bulk_sync_execute_function_type =
                 hpx::function<R(std::size_t, Ts...)>;
@@ -481,8 +477,7 @@ namespace hpx::parallel::execution {
         template <typename Sig>
         struct bulk_twoway_vtable;
 
-        template <typename R, typename... Ts>
-        struct bulk_twoway_vtable<R(Ts...)>
+        template <typename R, typename... Ts> struct bulk_twoway_vtable<R(Ts...)>
         {
             using bulk_async_execute_function_type =
                 hpx::function<R(std::size_t, Ts...)>;
@@ -693,8 +688,7 @@ namespace hpx::parallel::execution {
     HPX_CXX_CORE_EXPORT template <typename Sig>
     class polymorphic_executor;
 
-    template <typename R, typename... Ts>
-    class polymorphic_executor<R(Ts...)> : detail::polymorphic_executor_base
+    template <typename R, typename... Ts> class polymorphic_executor<R(Ts...)> : detail::polymorphic_executor_base
     {
         using base_type = detail::polymorphic_executor_base;
         using vtable = detail::polymorphic_executor_vtable<R(Ts...)>;
@@ -936,32 +930,27 @@ namespace hpx::parallel::execution {
 namespace hpx::execution::experimental {
 
     /// \cond NOINTERNAL
-    template <typename Sig>
-    struct is_never_blocking_one_way_executor<
+    template <typename Sig> struct is_never_blocking_one_way_executor<
         parallel::execution::polymorphic_executor<Sig>> : std::true_type
     {
     };
 
-    template <typename Sig>
-    struct is_one_way_executor<parallel::execution::polymorphic_executor<Sig>>
+    template <typename Sig> struct is_one_way_executor<parallel::execution::polymorphic_executor<Sig>>
       : std::true_type
     {
     };
 
-    template <typename Sig>
-    struct is_two_way_executor<parallel::execution::polymorphic_executor<Sig>>
+    template <typename Sig> struct is_two_way_executor<parallel::execution::polymorphic_executor<Sig>>
       : std::true_type
     {
     };
 
-    template <typename Sig>
-    struct is_bulk_one_way_executor<
+    template <typename Sig> struct is_bulk_one_way_executor<
         parallel::execution::polymorphic_executor<Sig>> : std::true_type
     {
     };
 
-    template <typename Sig>
-    struct is_bulk_two_way_executor<
+    template <typename Sig> struct is_bulk_two_way_executor<
         parallel::execution::polymorphic_executor<Sig>> : std::true_type
     {
     };

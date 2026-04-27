@@ -31,8 +31,8 @@ namespace hpx::execution::experimental {
         HPX_CXX_CORE_EXPORT template <typename CPO, typename Is, typename... Ts>
         struct just_sender;
 
-        template <typename CPO, std::size_t... Is, typename... Ts>
-        struct just_sender<CPO, hpx::util::index_pack<Is...>, Ts...>
+        template <typename CPO, std::size_t... Is,
+            typename... Ts> struct just_sender<CPO, hpx::util::index_pack<Is...>, Ts...>
         {
             using is_sender = void;
 

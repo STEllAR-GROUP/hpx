@@ -29,8 +29,7 @@ namespace hpx::parallel::traits {
             using type = Vc::SimdArray<T, N>;
         };
 
-        template <typename T, typename Abi>
-        struct vector_pack_type<T, 0, Abi>
+        template <typename T, typename Abi> struct vector_pack_type<T, 0, Abi>
         {
             using abi_type = std::conditional_t<std::is_void_v<Abi>,
                 Vc::VectorAbi::Best<T>, Abi>;
@@ -38,8 +37,7 @@ namespace hpx::parallel::traits {
             using type = Vc::Vector<T, abi_type>;
         };
 
-        template <typename T, typename Abi>
-        struct vector_pack_type<T, 1, Abi>
+        template <typename T, typename Abi> struct vector_pack_type<T, 1, Abi>
         {
             using type = Vc::Scalar::Vector<T>;
         };
@@ -52,28 +50,25 @@ namespace hpx::parallel::traits {
     };
 
     // don't wrap types twice
-    template <typename T, std::size_t N, typename Abi1, typename Abi2>
-    struct vector_pack_type<Vc::Vector<T, Abi1>, N, Abi2>
+    template <typename T, std::size_t N, typename Abi1,
+        typename Abi2> struct vector_pack_type<Vc::Vector<T, Abi1>, N, Abi2>
     {
         using type = Vc::Vector<T, Abi1>;
     };
 
-    template <typename T, std::size_t N1, typename V, std::size_t W,
-        std::size_t N2, typename Abi>
-    struct vector_pack_type<Vc::SimdArray<T, N1, V, W>, N2, Abi>
+    template <typename T, std::size_t N1, typename V,
+        std::size_t W, std::size_t N2, typename Abi> struct vector_pack_type<Vc::SimdArray<T, N1, V, W>, N2, Abi>
     {
         using type = Vc::SimdArray<T, N1, V, W>;
     };
 
-    template <typename T, std::size_t N, typename Abi>
-    struct vector_pack_type<Vc::Scalar::Vector<T>, N, Abi>
+    template <typename T, std::size_t N, typename Abi> struct vector_pack_type<Vc::Scalar::Vector<T>, N, Abi>
     {
         using type = Vc::Scalar::Vector<T>;
     };
 
     ////////////////////////////////////////////////////////////////////
-    template <typename T>
-    struct vector_pack_mask_type<T,
+    template <typename T> struct vector_pack_mask_type<T,
         std::enable_if_t<Vc::Traits::is_simd_vector<T>::value>>
     {
         using type = typename T::mask_type;

@@ -31,8 +31,7 @@ namespace hpx::execution::experimental {
         }
     } get_processing_units_mask{};
 
-    template <>
-    struct is_scheduling_property<get_processing_units_mask_t> : std::true_type
+    template <> struct is_scheduling_property<get_processing_units_mask_t> : std::true_type
     {
     };
 
@@ -51,8 +50,7 @@ namespace hpx::execution::experimental {
         }
     } get_cores_mask{};
 
-    template <>
-    struct is_scheduling_property<get_cores_mask_t> : std::true_type
+    template <> struct is_scheduling_property<get_cores_mask_t> : std::true_type
     {
     };
 }    // namespace hpx::execution::experimental

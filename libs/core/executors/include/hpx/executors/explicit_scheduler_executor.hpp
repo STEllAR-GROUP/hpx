@@ -407,38 +407,32 @@ namespace hpx::execution::experimental {
 namespace hpx::execution::experimental {
 
     /// \cond NOINTERNAL
-    template <typename BaseScheduler>
-    struct is_one_way_executor<hpx::execution::experimental::
+    template <typename BaseScheduler> struct is_one_way_executor<hpx::execution::experimental::
             explicit_scheduler_executor<BaseScheduler>> : std::true_type
     {
     };
 
-    template <typename BaseScheduler>
-    struct is_never_blocking_one_way_executor<hpx::execution::experimental::
+    template <typename BaseScheduler> struct is_never_blocking_one_way_executor<hpx::execution::experimental::
             explicit_scheduler_executor<BaseScheduler>> : std::true_type
     {
     };
 
-    template <typename BaseScheduler>
-    struct is_bulk_one_way_executor<hpx::execution::experimental::
+    template <typename BaseScheduler> struct is_bulk_one_way_executor<hpx::execution::experimental::
             explicit_scheduler_executor<BaseScheduler>> : std::true_type
     {
     };
 
-    template <typename BaseScheduler>
-    struct is_two_way_executor<hpx::execution::experimental::
+    template <typename BaseScheduler> struct is_two_way_executor<hpx::execution::experimental::
             explicit_scheduler_executor<BaseScheduler>> : std::true_type
     {
     };
 
-    template <typename BaseScheduler>
-    struct is_bulk_two_way_executor<hpx::execution::experimental::
+    template <typename BaseScheduler> struct is_bulk_two_way_executor<hpx::execution::experimental::
             explicit_scheduler_executor<BaseScheduler>> : std::true_type
     {
     };
 
-    template <typename BaseScheduler>
-    struct is_scheduler_executor<hpx::execution::experimental::
+    template <typename BaseScheduler> struct is_scheduler_executor<hpx::execution::experimental::
             explicit_scheduler_executor<BaseScheduler>> : std::true_type
     {
     };

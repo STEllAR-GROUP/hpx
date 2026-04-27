@@ -706,8 +706,9 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            T>::type tag_fallback_invoke(hpx::ranges::reduce_t,
-            ExPolicy&& policy, FwdIter first, Sent last, T init, F f)
+            T>::type
+        tag_fallback_invoke(hpx::ranges::reduce_t, ExPolicy&& policy,
+            FwdIter first, Sent last, T init, F f)
         {
             static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
@@ -727,8 +728,9 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            T>::type tag_fallback_invoke(hpx::ranges::reduce_t,
-            ExPolicy&& policy, Rng&& rng, T init, F f)
+            T>::type
+        tag_fallback_invoke(
+            hpx::ranges::reduce_t, ExPolicy&& policy, Rng&& rng, T init, F f)
         {
             static_assert(
                 std::forward_iterator<
@@ -749,8 +751,9 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            T>::type tag_fallback_invoke(hpx::ranges::reduce_t,
-            ExPolicy&& policy, FwdIter first, Sent last, T init)
+            T>::type
+        tag_fallback_invoke(hpx::ranges::reduce_t, ExPolicy&& policy,
+            FwdIter first, Sent last, T init)
         {
             static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
@@ -770,8 +773,9 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            T>::type tag_fallback_invoke(hpx::ranges::reduce_t,
-            ExPolicy&& policy, Rng&& rng, T init)
+            T>::type
+        tag_fallback_invoke(
+            hpx::ranges::reduce_t, ExPolicy&& policy, Rng&& rng, T init)
         {
             static_assert(
                 std::forward_iterator<

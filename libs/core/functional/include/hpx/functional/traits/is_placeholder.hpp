@@ -54,8 +54,7 @@ namespace hpx {
     };
 #endif
 
-    template <typename T>
-    struct is_placeholder<T const> : is_placeholder<T>
+    template <typename T> struct is_placeholder<T const> : is_placeholder<T>
     {
     };
 

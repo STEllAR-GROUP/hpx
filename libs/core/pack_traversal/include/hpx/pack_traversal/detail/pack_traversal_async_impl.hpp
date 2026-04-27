@@ -53,12 +53,12 @@ namespace hpx::util::detail {
     {
     };
 
+
     /// Relocates the given pack with the given offset
     template <std::size_t Offset, typename Pack>
     struct relocate_index_pack;
 
-    template <std::size_t Offset, std::size_t... Sequence>
-    struct relocate_index_pack<Offset, index_pack<Sequence...>>
+    template <std::size_t Offset, std::size_t... Sequence> struct relocate_index_pack<Offset, index_pack<Sequence...>>
       : std::common_type<index_pack<(Sequence + Offset)...>>
     {
     };
@@ -229,8 +229,8 @@ namespace hpx::util::detail {
 
 namespace hpx::traits::detail {
 
-    template <typename Visitor, typename... Args, typename Allocator>
-    struct shared_state_allocator<
+    template <typename Visitor, typename... Args,
+        typename Allocator> struct shared_state_allocator<
         util::detail::async_traversal_frame<Visitor, Args...>, Allocator>
     {
         using type = util::detail::async_traversal_frame_allocator<Allocator,
@@ -295,8 +295,7 @@ namespace hpx::util::detail {
 
     /// Specialization for the end marker which doesn't provide a particular
     /// element dereference
-    template <typename Target, std::size_t Begin>
-    struct static_async_range<Target, Begin, Begin>
+    template <typename Target, std::size_t Begin> struct static_async_range<Target, Begin, Begin>
     {
         explicit constexpr static_async_range(Target*) {}
 
@@ -649,8 +648,7 @@ namespace hpx::util::detail {
         using visitor_pointer_type = hpx::intrusive_ptr<Visitor>;
     };
 
-    template <typename Visitor, typename VisitorArg, typename... Args>
-    struct async_traversal_types<async_traverse_in_place_tag<Visitor>,
+    template <typename Visitor, typename VisitorArg, typename... Args> struct async_traversal_types<async_traverse_in_place_tag<Visitor>,
         VisitorArg, Args...> : async_traversal_types<Visitor, Args...>
     {
     };

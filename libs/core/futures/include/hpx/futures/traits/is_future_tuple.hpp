@@ -19,8 +19,7 @@ namespace hpx::traits {
     {
     };
 
-    template <typename... Ts>
-    struct is_future_tuple<hpx::tuple<Ts...>> : util::all_of<is_future<Ts>...>
+    template <typename... Ts> struct is_future_tuple<hpx::tuple<Ts...>> : util::all_of<is_future<Ts>...>
     {
     };
 

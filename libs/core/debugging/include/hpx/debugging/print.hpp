@@ -140,8 +140,7 @@ namespace hpx::debug {
         template <int N = 4, typename T = int, typename Enable = void>
         struct hex;
 
-        template <int N, typename T>
-        struct hex<N, T, std::enable_if_t<!std::is_pointer_v<T>>>
+        template <int N, typename T> struct hex<N, T, std::enable_if_t<!std::is_pointer_v<T>>>
         {
             explicit constexpr hex(T const& v) noexcept
               : data_(v)
@@ -160,8 +159,7 @@ namespace hpx::debug {
 
         HPX_CORE_EXPORT void print_ptr(std::ostream& os, void const* v, int n);
 
-        template <int N, typename T>
-        struct hex<N, T, std::enable_if_t<std::is_pointer_v<T>>>
+        template <int N, typename T> struct hex<N, T, std::enable_if_t<std::is_pointer_v<T>>>
         {
             explicit constexpr hex(T const& v) noexcept
               : data_(v)
@@ -458,8 +456,7 @@ namespace hpx::debug {
     struct enable_print;
 
     // when false, debug statements should produce no code
-    template <>
-    struct enable_print<false>
+    template <> struct enable_print<false>
     {
         explicit constexpr enable_print(char const*) noexcept {}
 
@@ -552,8 +549,7 @@ namespace hpx::debug {
     }
 
     // when true, debug statements produce valid output
-    template <>
-    struct enable_print<true>
+    template <> struct enable_print<true>
     {
     private:
         char const* prefix_;

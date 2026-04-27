@@ -220,8 +220,7 @@ namespace hpx {
         };
 
         // type-erased allocator
-        template <>
-        class promise_allocator<void>
+        template <> class promise_allocator<void>
         {
             using dealloc_fn = void (*)(void*, std::size_t);
 

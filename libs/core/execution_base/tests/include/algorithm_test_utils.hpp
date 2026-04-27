@@ -803,7 +803,7 @@ struct example_scheduler_template
     }
 
     template <typename D>
-    example_scheduler_template(example_scheduler_template <D> const& other)
+    example_scheduler_template(example_scheduler_template<D> const& other)
       : schedule_called(other.schedule_called)
       , execute_called(other.execute_called)
       , tag_invoke_overload_called(other.tag_invoke_overload_called)
@@ -811,12 +811,12 @@ struct example_scheduler_template
     }
 };
 
-using example_scheduler = example_scheduler_template <void>;
+using example_scheduler = example_scheduler_template<void>;
 #if defined(HPX_HAVE_STDEXEC)
-struct scheduler2 : example_scheduler_template <scheduler2>
+struct scheduler2 : example_scheduler_template<scheduler2>
 {
     explicit scheduler2(example_scheduler s)
-      : example_scheduler_template <scheduler2>(std::move(s))
+      : example_scheduler_template<scheduler2>(std::move(s))
     {
     }
 };
@@ -935,7 +935,7 @@ namespace my_namespace {
         }
     };
 
-    using my_scheduler = my_scheduler_template <>;
+    using my_scheduler = my_scheduler_template<>;
 
     struct my_sender
     {

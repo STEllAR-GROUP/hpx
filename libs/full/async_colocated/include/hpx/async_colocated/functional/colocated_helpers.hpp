@@ -90,8 +90,7 @@ namespace hpx::util::functional {
             continuation_type cont_;
         };
 
-        template <typename Bound>
-        struct post_continuation_impl<Bound, hpx::util::unused_type>
+        template <typename Bound> struct post_continuation_impl<Bound, hpx::util::unused_type>
         {
             using bound_type = std::decay_t<Bound>;
 
@@ -211,8 +210,7 @@ namespace hpx::util::functional {
             continuation_type cont_;
         };
 
-        template <typename Bound>
-        struct async_continuation_impl<Bound, hpx::util::unused_type>
+        template <typename Bound> struct async_continuation_impl<Bound, hpx::util::unused_type>
         {
             using bound_type = std::decay_t<Bound>;
 

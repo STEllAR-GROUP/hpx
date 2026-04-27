@@ -889,9 +889,9 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            FwdIter> tag_fallback_invoke(hpx::ranges::min_element_t,
-            ExPolicy&& policy, FwdIter first, Sent last, F f = F(),
-            Proj proj = Proj())
+            FwdIter>
+        tag_fallback_invoke(hpx::ranges::min_element_t, ExPolicy&& policy,
+            FwdIter first, Sent last, F f = F(), Proj proj = Proj())
         {
             static_assert(std::forward_iterator<FwdIter>,
                 "Required at least forward iterator.");
@@ -1005,9 +1005,9 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            FwdIter> tag_fallback_invoke(hpx::ranges::max_element_t,
-            ExPolicy&& policy, FwdIter first, Sent last, F f = F(),
-            Proj proj = Proj())
+            FwdIter>
+        tag_fallback_invoke(hpx::ranges::max_element_t, ExPolicy&& policy,
+            FwdIter first, Sent last, F f = F(), Proj proj = Proj())
         {
             static_assert(std::forward_iterator<FwdIter>,
                 "Required at least forward iterator.");

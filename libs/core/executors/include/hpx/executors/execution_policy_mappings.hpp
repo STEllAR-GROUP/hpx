@@ -45,8 +45,7 @@ namespace hpx::execution::experimental {
         }
     } to_non_par{};
 
-    template <>
-    struct is_execution_policy_mapping<to_non_par_t> : std::true_type
+    template <> struct is_execution_policy_mapping<to_non_par_t> : std::true_type
     {
     };
 
@@ -66,8 +65,7 @@ namespace hpx::execution::experimental {
         }
     } to_par{};
 
-    template <>
-    struct is_execution_policy_mapping<to_par_t> : std::true_type
+    template <> struct is_execution_policy_mapping<to_par_t> : std::true_type
     {
     };
 
@@ -88,8 +86,7 @@ namespace hpx::execution::experimental {
         }
     } to_non_task{};
 
-    template <>
-    struct is_execution_policy_mapping<to_non_task_t> : std::true_type
+    template <> struct is_execution_policy_mapping<to_non_task_t> : std::true_type
     {
     };
 
@@ -109,8 +106,7 @@ namespace hpx::execution::experimental {
         }
     } to_task{};
 
-    template <>
-    struct is_execution_policy_mapping<to_task_t> : std::true_type
+    template <> struct is_execution_policy_mapping<to_task_t> : std::true_type
     {
     };
 
@@ -131,8 +127,7 @@ namespace hpx::execution::experimental {
         }
     } to_non_unseq{};
 
-    template <>
-    struct is_execution_policy_mapping<to_non_unseq_t> : std::true_type
+    template <> struct is_execution_policy_mapping<to_non_unseq_t> : std::true_type
     {
     };
 
@@ -152,8 +147,7 @@ namespace hpx::execution::experimental {
         }
     } to_unseq{};
 
-    template <>
-    struct is_execution_policy_mapping<to_unseq_t> : std::true_type
+    template <> struct is_execution_policy_mapping<to_unseq_t> : std::true_type
     {
     };
 }    // namespace hpx::execution::experimental

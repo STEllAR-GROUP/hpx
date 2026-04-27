@@ -82,8 +82,7 @@ namespace hpx::parallel::detail {
         }
     };
 
-    template <typename Iterable>
-    struct calculate_distance<Iterable,
+    template <typename Iterable> struct calculate_distance<Iterable,
         std::enable_if_t<hpx::traits::is_iterator_v<Iterable>>>
     {
         template <typename Iter1, typename Iter2>
@@ -142,8 +141,7 @@ namespace hpx::parallel::detail {
         }
     };
 
-    template <typename Iterable>
-    struct calculate_next<Iterable,
+    template <typename Iterable> struct calculate_next<Iterable,
         std::enable_if_t<hpx::traits::is_iterator_v<Iterable> &&
             !std::bidirectional_iterator<Iterable>>>
     {
@@ -179,8 +177,7 @@ namespace hpx::parallel::detail {
         }
     };
 
-    template <typename Iterable>
-    struct calculate_next<Iterable,
+    template <typename Iterable> struct calculate_next<Iterable,
         std::enable_if_t<std::bidirectional_iterator<Iterable>>>
     {
         template <typename Iter, typename Stride>

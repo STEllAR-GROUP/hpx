@@ -452,9 +452,10 @@ namespace hpx {
                     typename std::iterator_traits<FwdIter>::value_type, T>)
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter>::type tag_fallback_invoke(hpx::search_n_t,
-            ExPolicy&& policy, FwdIter first, FwdIter last, Size count,
-            T const& value, Pred pred = Pred(), Proj proj = Proj())
+            FwdIter>::type
+        tag_fallback_invoke(hpx::search_n_t, ExPolicy&& policy, FwdIter first,
+            FwdIter last, Size count, T const& value, Pred pred = Pred(),
+            Proj proj = Proj())
         {
             return hpx::parallel::detail::search_n<FwdIter, FwdIter>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, count, value,

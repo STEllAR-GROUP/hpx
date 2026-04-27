@@ -1242,8 +1242,7 @@ namespace hpx::parallel::util {
             }
         };
 
-        template <>
-        struct loop_idx_n<std::random_access_iterator_tag>
+        template <> struct loop_idx_n<std::random_access_iterator_tag>
         {
             ///////////////////////////////////////////////////////////////////
             // handle sequences of non-futures

@@ -20,8 +20,7 @@ namespace hpx::compute::detail {
         using type = T;
     };
 
-    template <typename T>
-    struct get_proxy_type_impl<T,
+    template <typename T> struct get_proxy_type_impl<T,
         std::void_t<typename std::decay_t<T>::proxy_type>>
     {
         using proxy_type = typename std::decay_t<T>::proxy_type;

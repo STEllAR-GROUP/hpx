@@ -146,8 +146,7 @@ namespace hpx::execution::experimental {
         {
         };
 
-        template <typename Signature>
-        struct is_completion_signature<Signature,
+        template <typename Signature> struct is_completion_signature<Signature,
             std::void_t<decltype(test_signature(
                 static_cast<Signature*>(nullptr)))>> : std::true_type
         {
@@ -206,8 +205,7 @@ namespace hpx::execution::experimental {
         {
         };
 
-        template <typename... Signatures>
-        struct generate_completion_signatures<meta::pack<Signatures...>,
+        template <typename... Signatures> struct generate_completion_signatures<meta::pack<Signatures...>,
             std::enable_if_t<
                 util::all_of_v<is_completion_signature<Signatures>...>>>
           : meta::invoke<meta::func<compose_signatures>, Signatures...>
@@ -305,8 +303,7 @@ namespace hpx::execution::experimental {
 #endif
         };
 
-        template <>
-        struct dependent_completion_signatures<no_env>
+        template <> struct dependent_completion_signatures<no_env>
         {
 #if defined(HPX_HAVE_CXX20_COROUTINES)
             bool await_ready();
@@ -397,8 +394,8 @@ namespace hpx::execution::experimental {
     //  Otherwise, no-completion-signatures{}.
     //
 #if !defined(HPX_HAVE_STDEXEC)
-    HPX_CXX_CORE_EXPORT inline constexpr struct
-        get_completion_signatures_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct get_completion_signatures_t
+        final
       : hpx::functional::detail::tag_fallback<get_completion_signatures_t>
     {
     private:
@@ -538,7 +535,7 @@ namespace hpx::execution::experimental {
     inline constexpr bool is_derived_from_v = std::derived_from<A, B>;
 
     // Does not exist in P2300
-    //    template <typename Promise>
+    //    template<typename Promise>
     //    using with_awaitable_senders =
     //    hpx::execution::experimental::with_awaitable_senders<Promise>;
 
@@ -627,8 +624,7 @@ namespace hpx::execution::experimental {
         };
 
         // leave undefined
-        template <>
-        struct valid_completion_signatures<no_completion_signatures>;
+        template <> struct valid_completion_signatures<no_completion_signatures>;
 
         HPX_CXX_CORE_EXPORT template <typename Sender, typename Env = no_env>
         using completion_signatures_of = meta::type<valid_completion_signatures<
@@ -646,15 +642,13 @@ namespace hpx::execution::experimental {
         {
         };
 
-        template <typename Sender, typename Env>
-        struct completion_signatures_of_is_valid<Sender, Env,
+        template <typename Sender, typename Env> struct completion_signatures_of_is_valid<Sender, Env,
             std::void_t<decltype(get_completion_signatures(
                 std::declval<Sender>(), std::declval<Env>()))>> : std::true_type
         {
         };
 
-        template <typename Sender, typename Env>
-        struct provides_completion_signatures_impl<Sender, Env, true,
+        template <typename Sender, typename Env> struct provides_completion_signatures_impl<Sender, Env, true,
             std::enable_if_t<
                 meta::value<completion_signatures_of_is_valid<Sender, Env>> &&
                 has_sender_types_v<completion_signatures_of<Sender, Env>>>>
@@ -768,13 +762,11 @@ namespace hpx::execution::experimental {
             typename Receiver>
         struct is_sender_to_impl;
 
-        template <typename Sender, typename Receiver>
-        struct is_sender_to_impl<false, Sender, Receiver> : std::false_type
+        template <typename Sender, typename Receiver> struct is_sender_to_impl<false, Sender, Receiver> : std::false_type
         {
         };
 
-        template <typename Sender, typename Receiver>
-        struct is_sender_to_impl<true, Sender, Receiver>
+        template <typename Sender, typename Receiver> struct is_sender_to_impl<true, Sender, Receiver>
           : std::integral_constant<bool,
                 hpx::is_invocable_v<connect_t, Sender&&, Receiver&&> ||
                     hpx::is_invocable_v<connect_t, Sender&&, Receiver&> ||
@@ -817,8 +809,7 @@ namespace hpx::execution::experimental {
             typename... Ts>
         struct is_sender_of_impl;
 
-        template <typename S, typename E, typename... Ts>
-        struct is_sender_of_impl<false, S, E, Ts...> : std::false_type
+        template <typename S, typename E, typename... Ts> struct is_sender_of_impl<false, S, E, Ts...> : std::false_type
         {
         };
 
@@ -827,8 +818,7 @@ namespace hpx::execution::experimental {
             typename CS::template value_types<meta::pack, meta::pack>,
             meta::pack<meta::pack<Ts...>>>;
 
-        template <class S, class E, class... Ts>
-        struct is_sender_of_impl<true, S, E, Ts...>
+        template <class S, class E, class... Ts> struct is_sender_of_impl<true, S, E, Ts...>
           : std::integral_constant<bool,
                 is_same_types<completion_signatures_of_t<S, E>, Ts...>>
         {
@@ -1722,9 +1712,8 @@ namespace hpx::execution::experimental {
                 SetValue, SetError, meta::bool_<SendsStopped>>;
         };
 
-        template <typename Sender, typename Signatures, typename SetValue,
-            typename SetError, bool SendsStopped>
-        struct make_helper<Sender, no_env, Signatures, SetValue, SetError,
+        template <typename Sender, typename Signatures,
+            typename SetValue, typename SetError, bool SendsStopped> struct make_helper<Sender, no_env, Signatures, SetValue, SetError,
             SendsStopped>
         {
             using type = dependent_completion_signatures<no_env>;

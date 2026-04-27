@@ -2205,7 +2205,8 @@ namespace hpx::variant_ns {
                   "variant can not have a void type as an alternative.");
 
     public:
-    template <typename Front = lib::type_pack_element_t<0, Ts...>,
+    template <
+        typename Front = lib::type_pack_element_t<0, Ts...>,
         lib::enable_if_t<std::is_default_constructible<Front>::value, int> = 0>
     inline constexpr variant() noexcept(
         std::is_nothrow_default_constructible<Front>::value)
@@ -2214,7 +2215,8 @@ namespace hpx::variant_ns {
     variant(const variant &) = default;
     variant(variant &&) = default;
 
-    template <typename Arg,
+    template <
+        typename Arg,
         typename Decayed = lib::decay_t<Arg>,
         lib::enable_if_t<!std::is_same<Decayed, variant>::value, int> = 0,
         lib::enable_if_t<!detail::is_in_place_index<Decayed>::value, int> = 0,
@@ -2227,7 +2229,8 @@ namespace hpx::variant_ns {
         std::is_nothrow_constructible<T, Arg>::value)
         : impl_(in_place_index_t<I>{}, lib::forward<Arg>(arg)) {}
 
-    template <std::size_t I,
+    template <
+        std::size_t I,
         typename... Args,
         typename T = lib::type_pack_element_t<I, Ts...>,
         lib::enable_if_t<std::is_constructible<T, Args...>::value, int> = 0>
@@ -2237,7 +2240,8 @@ namespace hpx::variant_ns {
                                                                 Args...>::value)
         : impl_(in_place_index_t<I>{}, lib::forward<Args>(args)...) {}
 
-    template <std::size_t I,
+    template <
+        std::size_t I,
         typename Up,
         typename... Args,
         typename T = lib::type_pack_element_t<I, Ts...>,
@@ -2255,7 +2259,8 @@ namespace hpx::variant_ns {
                                           Args...>::value)
         : impl_(in_place_index_t<I>{}, il, lib::forward<Args>(args)...) {}
 
-    template <typename T,
+    template <
+        typename T,
         typename... Args,
         std::size_t I = detail::find_index_sfinae<T, Ts...>::value,
         lib::enable_if_t<std::is_constructible<T, Args...>::value, int> = 0>
@@ -2265,7 +2270,8 @@ namespace hpx::variant_ns {
                                                                 Args...>::value)
         : impl_(in_place_index_t<I>{}, lib::forward<Args>(args)...) {}
 
-    template <typename T,
+    template <
+        typename T,
         typename Up,
         typename... Args,
         std::size_t I = detail::find_index_sfinae<T, Ts...>::value,
@@ -2303,7 +2309,8 @@ namespace hpx::variant_ns {
       return *this;
     }
 
-    template <std::size_t I,
+    template <
+        std::size_t I,
         typename... Args,
         typename T = lib::type_pack_element_t<I, Ts...>,
         lib::enable_if_t<std::is_constructible<T, Args...>::value, int> = 0>
@@ -2311,7 +2318,8 @@ namespace hpx::variant_ns {
       return impl_.template emplace<I>(lib::forward<Args>(args)...);
     }
 
-    template <std::size_t I,
+    template <
+        std::size_t I,
         typename Up,
         typename... Args,
         typename T = lib::type_pack_element_t<I, Ts...>,
@@ -2323,7 +2331,8 @@ namespace hpx::variant_ns {
       return impl_.template emplace<I>(il, lib::forward<Args>(args)...);
     }
 
-    template <typename T,
+    template <
+        typename T,
         typename... Args,
         std::size_t I = detail::find_index_sfinae<T, Ts...>::value,
         lib::enable_if_t<std::is_constructible<T, Args...>::value, int> = 0>
@@ -2332,7 +2341,8 @@ namespace hpx::variant_ns {
     }
 
 #if !defined(HPX_HAVE_CXX17_COPY_ELISION)
-    template <typename T,
+    template <
+        typename T,
         typename... Args,
         std::size_t I = detail::find_index_sfinae<T, Ts...>::value>
     inline T &emplace_f(Args &&... args) {
@@ -2340,7 +2350,8 @@ namespace hpx::variant_ns {
     }
 #endif
 
-    template <typename T,
+    template <
+        typename T,
         typename Up,
         typename... Args,
         std::size_t I = detail::find_index_sfinae<T, Ts...>::value,

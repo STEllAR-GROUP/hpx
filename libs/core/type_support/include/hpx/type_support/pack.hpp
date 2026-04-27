@@ -37,8 +37,7 @@ namespace hpx::util {
         template <typename Left, typename Right>
         struct make_index_pack_join;
 
-        template <std::size_t... Left, std::size_t... Right>
-        struct make_index_pack_join<index_pack<Left...>, index_pack<Right...>>
+        template <std::size_t... Left, std::size_t... Right> struct make_index_pack_join<index_pack<Left...>, index_pack<Right...>>
           : index_pack<Left..., (sizeof...(Left) + Right)...>
         {
         };
@@ -51,13 +50,11 @@ namespace hpx::util {
     {
     };
 
-    template <>
-    struct make_index_pack<0> : pack_c<std::size_t>
+    template <> struct make_index_pack<0> : pack_c<std::size_t>
     {
     };
 
-    template <>
-    struct make_index_pack<1> : index_pack<0>
+    template <> struct make_index_pack<1> : index_pack<0>
     {
     };
 
@@ -107,8 +104,7 @@ namespace hpx::util {
     {
     };
 
-    template <>
-    struct all_of<>    // <fake-type>
+    template <> struct all_of<>    // <fake-type>
       : std::true_type
     {
     };
@@ -131,8 +127,7 @@ namespace hpx::util {
     {
     };
 
-    template <>
-    struct any_of<>    // <fake-type>
+    template <> struct any_of<>    // <fake-type>
       : std::false_type
     {
     };
@@ -169,8 +164,7 @@ namespace hpx::util {
         template <typename Ts, typename Is>
         struct indexer;
 
-        template <typename... Ts, std::size_t... Is>
-        struct indexer<pack<Ts...>, pack_c<std::size_t, Is...>>
+        template <typename... Ts, std::size_t... Is> struct indexer<pack<Ts...>, pack_c<std::size_t, Is...>>
           : indexed<Is, Ts>...
         {
         };

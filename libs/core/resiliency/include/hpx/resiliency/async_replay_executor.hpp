@@ -127,8 +127,7 @@ namespace hpx::resiliency::experimental {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Pred, typename F, typename Tuple>
-        struct async_replay_executor_helper<void, Pred, F, Tuple>
+        template <typename Pred, typename F, typename Tuple> struct async_replay_executor_helper<void, Pred, F, Tuple>
           : std::enable_shared_from_this<
                 async_replay_executor_helper<void, Pred, F, Tuple>>
         {

@@ -329,14 +329,12 @@ namespace hpx::traits {
         struct exclusive_scan_tag;
         struct exclusive_scan_init_tag;
 
-        template <>
-        struct communicator_data<exclusive_scan_tag>
+        template <> struct communicator_data<exclusive_scan_tag>
         {
             HPX_EXPORT static char const* name() noexcept;
         };
 
-        template <>
-        struct communicator_data<exclusive_scan_init_tag>
+        template <> struct communicator_data<exclusive_scan_init_tag>
         {
             HPX_EXPORT static char const* name() noexcept;
         };
@@ -344,8 +342,7 @@ namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
     // support for exclusive_scan
-    template <typename Communicator>
-    struct communication_operation<Communicator,
+    template <typename Communicator> struct communication_operation<Communicator,
         communication::exclusive_scan_tag>
     {
         template <typename Result, typename T, typename F>
@@ -396,8 +393,7 @@ namespace hpx::traits {
         }
     };
 
-    template <typename Communicator>
-    struct communication_operation<Communicator,
+    template <typename Communicator> struct communication_operation<Communicator,
         communication::exclusive_scan_init_tag>
     {
         template <typename Result, typename T, typename Init, typename F>

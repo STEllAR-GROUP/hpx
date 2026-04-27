@@ -56,7 +56,7 @@ namespace hpx::iostream {
         //        typedef xxx client_type;
         //        typedef xxx mode;
         //        bool is_complete() const;                  // Ready for i/o.
-        //        template <typename T>
+        //        template<typename T>
         //        void push( const T& t,                     // Adds a stream buffer to
         //                   streamsize,                     // chain, based on t, with
         //                   streamsize );                   // given buffer and putback

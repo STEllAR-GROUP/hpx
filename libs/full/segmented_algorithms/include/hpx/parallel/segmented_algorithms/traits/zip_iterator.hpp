@@ -56,8 +56,7 @@ namespace hpx::traits {
     ///////////////////////////////////////////////////////////////////////////
     // A zip_iterator represents a segmented iterator if all zipped iterators
     // are segmented iterators themselves.
-    template <typename... Ts>
-    struct segmented_iterator_traits<util::zip_iterator<Ts...>,
+    template <typename... Ts> struct segmented_iterator_traits<util::zip_iterator<Ts...>,
         std::enable_if_t<util::all_of_v<
             typename segmented_iterator_traits<Ts>::is_segmented_iterator...>>>
     {
@@ -140,8 +139,7 @@ namespace hpx::traits {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename... Ts>
-    struct segmented_local_iterator_traits<util::zip_iterator<Ts...>,
+    template <typename... Ts> struct segmented_local_iterator_traits<util::zip_iterator<Ts...>,
         std::enable_if_t<
             util::all_of_v<typename segmented_local_iterator_traits<
                 Ts>::is_segmented_local_iterator...>>>

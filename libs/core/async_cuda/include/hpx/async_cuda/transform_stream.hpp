@@ -123,8 +123,7 @@ namespace hpx::cuda::experimental {
         {
         };
 
-        template <typename R, typename F>
-        struct is_transform_stream_receiver<transform_stream_receiver<R, F>>
+        template <typename R, typename F> struct is_transform_stream_receiver<transform_stream_receiver<R, F>>
           : std::true_type
         {
         };
@@ -303,8 +302,7 @@ namespace hpx::cuda::experimental {
                     using type = hpx::execution::experimental::set_value_t(T);
                 };
 
-                template <typename T>
-                struct set_value_void_checked<true, T>
+                template <typename T> struct set_value_void_checked<true, T>
                 {
                     using type = hpx::execution::experimental::set_value_t();
                 };

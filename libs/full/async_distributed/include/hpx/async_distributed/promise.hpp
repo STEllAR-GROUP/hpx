@@ -144,8 +144,7 @@ namespace hpx::distributed {
         using base_type::set_exception;
     };
 
-    template <>
-    class promise<void, hpx::util::unused_type>
+    template <> class promise<void, hpx::util::unused_type>
       : public lcos::detail::promise_base<void, hpx::util::unused_type,
             lcos::detail::promise_data<void>>
     {
@@ -246,8 +245,7 @@ namespace hpx::distributed {
 namespace std {
 
     /// Requires: Allocator shall be an allocator (17.6.3.5)
-    template <typename R, typename Allocator>
-    struct uses_allocator<hpx::distributed::promise<R>, Allocator>
+    template <typename R, typename Allocator> struct uses_allocator<hpx::distributed::promise<R>, Allocator>
       : std::true_type
     {
     };

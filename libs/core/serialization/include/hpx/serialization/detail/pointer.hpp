@@ -44,8 +44,7 @@ namespace hpx::util {
 
     // This is explicitly instantiated to ensure that the id is stable across
     // shared libraries.
-    template <>
-    struct extra_data_helper<serialization::detail::input_pointer_tracker>
+    template <> struct extra_data_helper<serialization::detail::input_pointer_tracker>
     {
         HPX_CORE_EXPORT static extra_data_id_type id() noexcept;
         static constexpr void reset(
@@ -54,8 +53,7 @@ namespace hpx::util {
         }
     };
 
-    template <>
-    struct extra_data_helper<serialization::detail::output_pointer_tracker>
+    template <> struct extra_data_helper<serialization::detail::output_pointer_tracker>
     {
         HPX_CORE_EXPORT static extra_data_id_type id() noexcept;
         HPX_CORE_EXPORT static void reset(

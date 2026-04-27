@@ -71,8 +71,7 @@ namespace hpx::detail {
     template <typename Tuple>
     struct variant_from_tuple;
 
-    template <typename... Ts>
-    struct variant_from_tuple<hpx::tuple<Ts...>>
+    template <typename... Ts> struct variant_from_tuple<hpx::tuple<Ts...>>
     {
         using type =
             hpx::meta::invoke<hpx::meta::unique<hpx::meta::func<hpx::variant>>,

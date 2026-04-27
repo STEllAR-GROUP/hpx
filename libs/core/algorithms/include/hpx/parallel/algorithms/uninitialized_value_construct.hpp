@@ -343,8 +343,8 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::uninitialized_value_construct
-    HPX_CXX_CORE_EXPORT inline constexpr struct
-        uninitialized_value_construct_t final
+    HPX_CXX_CORE_EXPORT inline constexpr struct uninitialized_value_construct_t
+        final
       : hpx::detail::tag_parallel_algorithm<uninitialized_value_construct_t>
     {
         template <typename FwdIter>

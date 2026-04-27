@@ -56,8 +56,7 @@ namespace hpx::when_all_vector_detail {
     using when_all_vector_sender = typename when_all_vector_sender_impl<
         Sender>::when_all_vector_sender_type;
 
-    template <typename Sender>
-    struct when_all_vector_sender_impl<Sender>::when_all_vector_sender_type
+    template <typename Sender> struct when_all_vector_sender_impl<Sender>::when_all_vector_sender_type
     {
         using is_sender = void;
 #if defined(HPX_HAVE_STDEXEC)
@@ -105,8 +104,7 @@ namespace hpx::when_all_vector_detail {
                 std::vector<T>);
         };
 
-        template <typename Dummy>
-        struct set_value_completion_helper<void, Dummy>
+        template <typename Dummy> struct set_value_completion_helper<void, Dummy>
         {
             using type = hpx::execution::experimental::set_value_t();
         };

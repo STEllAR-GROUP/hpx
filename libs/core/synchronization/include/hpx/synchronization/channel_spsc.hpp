@@ -245,8 +245,7 @@ namespace hpx::lcos::local {
     // Same as above, except that the channel doesn't support close(). This is
     // an optimization that can be applied in use cases where the surrounding
     // code ensures that the channel is always in proper state.
-    template <typename T>
-    class channel_spsc<T, channel_mode::dont_support_close>
+    template <typename T> class channel_spsc<T, channel_mode::dont_support_close>
     {
     private:
         [[nodiscard]] HPX_FORCEINLINE bool is_full(std::size_t tail) noexcept

@@ -28,8 +28,7 @@ namespace hpx::util {
             }
         };
 
-        template <typename T>
-        struct to_string<T,
+        template <typename T> struct to_string<T,
             std::enable_if_t<std::is_integral_v<T> ||
                 std::is_floating_point_v<T>>>
         {

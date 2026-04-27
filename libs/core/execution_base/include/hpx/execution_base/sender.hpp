@@ -129,8 +129,7 @@ namespace hpx::execution::experimental {
             using type = dummy_operation_state;
         };
 
-        template <typename S, typename R>
-        struct connect_result_helper<S, R,
+        template <typename S, typename R> struct connect_result_helper<S, R,
             std::enable_if_t<hpx::is_invocable<connect_t, S, R>::value>>
           : hpx::util::invoke_result<connect_t, S, R>
         {
@@ -193,8 +192,7 @@ namespace hpx::execution::experimental {
     {
     };
 
-    template <typename Scheduler>
-    struct is_scheduler<Scheduler,
+    template <typename Scheduler> struct is_scheduler<Scheduler,
         std::enable_if_t<
             hpx::is_invocable_v<schedule_t, std::decay_t<Scheduler>> &&
             std::is_copy_constructible_v<std::decay_t<Scheduler>> &&

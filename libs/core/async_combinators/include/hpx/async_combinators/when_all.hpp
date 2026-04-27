@@ -157,8 +157,7 @@ namespace hpx::lcos::detail {
         }
     };
 
-    template <typename T>
-    struct when_all_result<hpx::tuple<T>,
+    template <typename T> struct when_all_result<hpx::tuple<T>,
         std::enable_if_t<hpx::traits::is_future_range_v<T>>>
     {
         using type = T;

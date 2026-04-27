@@ -157,8 +157,7 @@ namespace hpx::execution::experimental {
     };
 
     /// \cond NOINTERNAL
-    template <>
-    struct is_executor_parameters<hpx::execution::experimental::auto_chunk_size>
+    template <> struct is_executor_parameters<hpx::execution::experimental::auto_chunk_size>
       : std::true_type
     {
     };

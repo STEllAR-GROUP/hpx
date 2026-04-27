@@ -21,8 +21,7 @@ namespace hpx::detail {
     HPX_CXX_CORE_EXPORT template <typename Func, typename Enable = void>
     struct async_dispatch_launch_policy_helper;
 
-    template <typename Func>
-    struct async_dispatch_launch_policy_helper<Func,
+    template <typename Func> struct async_dispatch_launch_policy_helper<Func,
         std::enable_if_t<!traits::is_action_v<Func>>>
     {
         template <typename Policy_, typename F, typename... Ts>
@@ -38,8 +37,7 @@ namespace hpx::detail {
         }
     };
 
-    template <typename Policy>
-    struct async_dispatch<Policy,
+    template <typename Policy> struct async_dispatch<Policy,
         std::enable_if_t<traits::is_launch_policy_v<Policy>>>
     {
         // different versions of clang-format disagree
@@ -80,8 +78,7 @@ namespace hpx::detail {
     //
     // parallel::execution::executor
     // threads::executor
-    template <typename Executor>
-    struct async_dispatch<Executor,
+    template <typename Executor> struct async_dispatch<Executor,
         std::enable_if_t<traits::is_one_way_executor_v<Executor> ||
             traits::is_two_way_executor_v<Executor>>>
     {

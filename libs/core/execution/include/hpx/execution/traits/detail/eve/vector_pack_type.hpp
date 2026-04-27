@@ -27,8 +27,7 @@ namespace hpx::parallel::traits {
             using type = eve::wide<T, eve::fixed<N>>;
         };
 
-        template <typename T, typename Abi>
-        struct vector_pack_type<T, 0, Abi>
+        template <typename T, typename Abi> struct vector_pack_type<T, 0, Abi>
         {
             using abi_type = std::conditional_t<std::is_void_v<Abi>,
                 eve::expected_cardinal_t<T>, Abi>;
@@ -36,8 +35,7 @@ namespace hpx::parallel::traits {
             using type = eve::wide<T, abi_type>;
         };
 
-        template <typename T, typename Abi>
-        struct vector_pack_type<T, 1, Abi>
+        template <typename T, typename Abi> struct vector_pack_type<T, 1, Abi>
         {
             using type = T;
         };
@@ -50,8 +48,7 @@ namespace hpx::parallel::traits {
     };
 
     ////////////////////////////////////////////////////////////////////
-    template <typename T>
-    struct vector_pack_mask_type<T,
+    template <typename T> struct vector_pack_mask_type<T,
         typename std::enable_if_t<eve::is_simd_value<T>{}>>
     {
         using type = eve::logical<T>;

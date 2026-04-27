@@ -17,8 +17,7 @@ namespace hpx::parallel::detail {
     struct is_negative_helper;
 
     // signed integral values may be negative
-    template <typename T>
-    struct is_negative_helper<T, std::enable_if_t<std::is_signed_v<T>>>
+    template <typename T> struct is_negative_helper<T, std::enable_if_t<std::is_signed_v<T>>>
     {
         HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr bool call(
             T const& size) noexcept
@@ -39,8 +38,7 @@ namespace hpx::parallel::detail {
     };
 
     // unsigned integral values are never negative
-    template <typename T>
-    struct is_negative_helper<T, std::enable_if_t<std::is_unsigned_v<T>>>
+    template <typename T> struct is_negative_helper<T, std::enable_if_t<std::is_unsigned_v<T>>>
     {
         HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr bool call(
             T const&) noexcept

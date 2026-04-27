@@ -934,18 +934,14 @@ namespace hpx::lcos::local {
 
     ///////////////////////////////////////////////////////////////////////////
     // forward declare specializations
-    template <>
-    class channel<void>;
+    template <> class channel<void>;
 
-    template <>
-    class receive_channel<void>;
+    template <> class receive_channel<void>;
 
-    template <>
-    class send_channel<void>;
+    template <> class send_channel<void>;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <>
-    class channel_iterator<void>
+    template <> class channel_iterator<void>
       : public hpx::util::iterator_facade<channel_iterator<void>,
             util::unused_type const, std::input_iterator_tag>
     {
@@ -1004,8 +1000,7 @@ namespace hpx::lcos::local {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        template <>
-        class channel_base<void>
+        template <> class channel_base<void>
         {
         public:
             explicit channel_base(
@@ -1094,8 +1089,7 @@ namespace hpx::lcos::local {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    template <>
-    class channel<void> : protected detail::channel_base<void>
+    template <> class channel<void> : protected detail::channel_base<void>
     {
         using base_type = detail::channel_base<void>;
 
@@ -1120,8 +1114,7 @@ namespace hpx::lcos::local {
         using base_type::set;
     };
 
-    template <>
-    class one_element_channel<void> : protected detail::channel_base<void>
+    template <> class one_element_channel<void> : protected detail::channel_base<void>
     {
         using base_type = detail::channel_base<void>;
 
@@ -1147,8 +1140,7 @@ namespace hpx::lcos::local {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <>
-    class receive_channel<void> : protected detail::channel_base<void>
+    template <> class receive_channel<void> : protected detail::channel_base<void>
     {
         using base_type = detail::channel_base<void>;
 
@@ -1173,8 +1165,7 @@ namespace hpx::lcos::local {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <>
-    class send_channel<void> : private detail::channel_base<void>
+    template <> class send_channel<void> : private detail::channel_base<void>
     {
         using base_type = detail::channel_base<void>;
 

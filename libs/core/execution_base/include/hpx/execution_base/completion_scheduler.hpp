@@ -130,8 +130,7 @@ namespace hpx::execution::experimental {
         {
         };
 
-        template <typename CPO, typename Sender>
-        struct has_completion_scheduler_impl<true, CPO, Sender>
+        template <typename CPO, typename Sender> struct has_completion_scheduler_impl<true, CPO, Sender>
           : hpx::execution::experimental::is_scheduler<hpx::functional::
                     tag_invoke_result_t<get_completion_scheduler_t<CPO>,
                         std::decay_t<Sender> const&>>
@@ -158,9 +157,8 @@ namespace hpx::execution::experimental {
         {
         };
 
-        template <typename ReceiverCPO, typename Sender, typename AlgorithmCPO,
-            typename... Ts>
-        struct is_completion_scheduler_tag_invocable_impl<true, ReceiverCPO,
+        template <typename ReceiverCPO, typename Sender,
+            typename AlgorithmCPO, typename... Ts> struct is_completion_scheduler_tag_invocable_impl<true, ReceiverCPO,
             Sender, AlgorithmCPO, Ts...>
           : std::integral_constant<bool,
                 hpx::functional::is_tag_invocable_v<AlgorithmCPO,

@@ -34,8 +34,7 @@
 namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Derived>
-    struct is_client<Derived, std::void_t<typename Derived::is_client_tag>>
+    template <typename Derived> struct is_client<Derived, std::void_t<typename Derived::is_client_tag>>
       : std::true_type
     {
     };
@@ -44,15 +43,13 @@ namespace hpx::traits {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Derived>
-        struct is_future_customization_point<Derived,
+        template <typename Derived> struct is_future_customization_point<Derived,
             std::enable_if_t<is_client_v<Derived>>> : std::true_type
         {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Derived>
-        struct future_traits_customization_point<Derived,
+        template <typename Derived> struct future_traits_customization_point<Derived,
             std::enable_if_t<is_client_v<Derived>>>
         {
             using type = id_type;
@@ -60,8 +57,7 @@ namespace hpx::traits {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Derived>
-        struct future_access_customization_point<Derived,
+        template <typename Derived> struct future_access_customization_point<Derived,
             std::enable_if_t<is_client_v<Derived>>>
         {
             template <typename SharedState>
@@ -132,8 +128,7 @@ namespace hpx::traits {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Derived>
-        struct acquire_future_impl<Derived,
+        template <typename Derived> struct acquire_future_impl<Derived,
             std::enable_if_t<is_client_v<Derived>>>
         {
             using type = Derived;
@@ -146,8 +141,7 @@ namespace hpx::traits {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Derived>
-        struct shared_state_ptr_for<Derived,
+        template <typename Derived> struct shared_state_ptr_for<Derived,
             std::enable_if_t<is_client_v<Derived>>>
           : shared_state_ptr<traits::future_traits_t<Derived>>
         {
@@ -157,16 +151,14 @@ namespace hpx::traits {
 
 namespace hpx::lcos::detail {
 
-    template <typename Derived>
-    struct future_unwrap_result<Derived,
+    template <typename Derived> struct future_unwrap_result<Derived,
         std::enable_if_t<traits::is_client_v<Derived>>>
     {
         using type = id_type;
         using wrapped_type = Derived;
     };
 
-    template <typename Derived>
-    struct future_unwrap_result<hpx::future<Derived>,
+    template <typename Derived> struct future_unwrap_result<hpx::future<Derived>,
         std::enable_if_t<traits::is_client_v<Derived>>>
     {
         using type = id_type;
@@ -272,8 +264,7 @@ namespace hpx::components {
 
         // This specialization is chosen whenever the argument Stub is a (or
         // derived from a) stub_base.
-        template <typename Stub>
-        struct make_stub<Stub,
+        template <typename Stub> struct make_stub<Stub,
             std::void_t<typename Stub::server_component_type>>
         {
             using type = Stub;

@@ -72,23 +72,19 @@ namespace hpx::iostream {
             }
         };
 
-        template <>
-        struct seek_device_impl<iostream_tag> : seek_impl_basic_ios
+        template <> struct seek_device_impl<iostream_tag> : seek_impl_basic_ios
         {
         };
 
-        template <>
-        struct seek_device_impl<istream_tag> : seek_impl_basic_ios
+        template <> struct seek_device_impl<istream_tag> : seek_impl_basic_ios
         {
         };
 
-        template <>
-        struct seek_device_impl<ostream_tag> : seek_impl_basic_ios
+        template <> struct seek_device_impl<ostream_tag> : seek_impl_basic_ios
         {
         };
 
-        template <>
-        struct seek_device_impl<streambuf_tag>
+        template <> struct seek_device_impl<streambuf_tag>
         {
             template <typename T>
             static std::streampos seek(T& t, stream_offset off,
@@ -98,8 +94,7 @@ namespace hpx::iostream {
             }
         };
 
-        template <>
-        struct seek_device_impl<two_head>
+        template <> struct seek_device_impl<two_head>
         {
             template <typename T>
             static std::streampos seek(T& t, stream_offset off,
@@ -109,8 +104,7 @@ namespace hpx::iostream {
             }
         };
 
-        template <>
-        struct seek_device_impl<any_tag>
+        template <> struct seek_device_impl<any_tag>
         {
             template <typename T>
             static std::streampos seek(T& t, stream_offset off,
@@ -128,8 +122,7 @@ namespace hpx::iostream {
         {
         };
 
-        template <>
-        struct seek_filter_impl<two_head>
+        template <> struct seek_filter_impl<two_head>
         {
             template <typename T, typename Device>
             static std::streampos seek(T& t, Device& d, stream_offset off,
@@ -139,8 +132,7 @@ namespace hpx::iostream {
             }
         };
 
-        template <>
-        struct seek_filter_impl<any_tag>
+        template <> struct seek_filter_impl<any_tag>
         {
             template <typename T, typename Device>
             static std::streampos seek(T& t, Device& d, stream_offset off,

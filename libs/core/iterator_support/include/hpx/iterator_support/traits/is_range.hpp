@@ -37,8 +37,7 @@ namespace hpx::traits {
     {
     };
 
-    template <typename R>
-    struct range_traits<R, true>
+    template <typename R> struct range_traits<R, true>
       : std::iterator_traits<typename util::detail::iterator<R>::type>
     {
         using iterator_type = typename util::detail::iterator<R>::type;

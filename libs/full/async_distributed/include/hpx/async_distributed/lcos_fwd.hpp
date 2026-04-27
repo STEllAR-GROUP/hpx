@@ -28,8 +28,7 @@ namespace hpx {
             typename ComponentType = traits::detail::managed_component_tag>
         class base_lco_with_value;
 
-        template <typename ComponentType>
-        class base_lco_with_value<void, void, ComponentType>;
+        template <typename ComponentType> class base_lco_with_value<void, void, ComponentType>;
 
         template <typename Action,
             typename Result = typename traits::promise_local_result<

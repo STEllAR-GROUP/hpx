@@ -48,8 +48,7 @@ namespace hpx {
             }
         };
 
-        template <typename T>
-        struct make_rvalue_impl<T const>
+        template <typename T> struct make_rvalue_impl<T const>
         {
             using type = T;
 
@@ -60,8 +59,7 @@ namespace hpx {
             }
         };
 
-        template <typename T>
-        struct make_rvalue_impl<T&>
+        template <typename T> struct make_rvalue_impl<T&>
         {
             using type = T;
 
@@ -71,8 +69,7 @@ namespace hpx {
             }
         };
 
-        template <typename T>
-        struct make_rvalue_impl<T const&>
+        template <typename T> struct make_rvalue_impl<T const&>
         {
             using type = T;
 

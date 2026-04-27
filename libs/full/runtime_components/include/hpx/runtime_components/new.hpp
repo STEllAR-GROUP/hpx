@@ -270,8 +270,7 @@ namespace hpx::components {
         };
 
         // create multiple component instances
-        template <typename Component>
-        struct new_component<Component[]>
+        template <typename Component> struct new_component<Component[]>
         {
             using type = hpx::future<std::vector<hpx::id_type>>;
 
@@ -328,8 +327,7 @@ namespace hpx::components {
             }
         };
 
-        template <typename Component>
-        struct local_new_component<Component[]>
+        template <typename Component> struct local_new_component<Component[]>
         {
             using type = hpx::future<std::vector<hpx::id_type>>;
 
@@ -371,8 +369,7 @@ namespace hpx::components {
             }
         };
 
-        template <typename Component>
-        struct local_new_component_sync<Component[]>
+        template <typename Component> struct local_new_component_sync<Component[]>
         {
             using type = std::vector<hpx::id_type>;
 
@@ -453,8 +450,7 @@ namespace hpx::components {
         };
 
         // create multiple client instances
-        template <typename Client>
-        struct new_client<Client[]>
+        template <typename Client> struct new_client<Client[]>
         {
             using type = hpx::future<std::vector<Client>>;
             using component_type = typename Client::server_component_type;
@@ -490,8 +486,7 @@ namespace hpx::components {
             }
         };
 
-        template <typename Client>
-        struct local_new_client<Client[]>
+        template <typename Client> struct local_new_client<Client[]>
         {
             using type = hpx::future<std::vector<Client>>;
             using component_type =

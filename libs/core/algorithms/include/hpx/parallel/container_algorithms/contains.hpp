@@ -86,8 +86,7 @@ namespace hpx::parallel::detail {
         typename Enable = void>
     struct contains_subrange_helper;
 
-    template <typename ExPolicy, typename T>
-    struct contains_subrange_helper<ExPolicy, T,
+    template <typename ExPolicy, typename T> struct contains_subrange_helper<ExPolicy, T,
         std::enable_if_t<!hpx::is_async_execution_policy_v<ExPolicy>>>
     {
         static bool get_result(T& itr, T& last)
@@ -96,8 +95,7 @@ namespace hpx::parallel::detail {
         }
     };
 
-    template <typename ExPolicy, typename T>
-    struct contains_subrange_helper<ExPolicy, T,
+    template <typename ExPolicy, typename T> struct contains_subrange_helper<ExPolicy, T,
         std::enable_if_t<hpx::is_async_execution_policy_v<ExPolicy>>>
     {
         static hpx::future<bool> get_result(hpx::future<T>& itr, T& last)
@@ -201,9 +199,9 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            bool>::type tag_fallback_invoke(hpx::ranges::contains_t,
-            ExPolicy&& policy, Iterator first, Sentinel last, T const& val,
-            Proj&& proj = Proj())
+            bool>::type
+        tag_fallback_invoke(hpx::ranges::contains_t, ExPolicy&& policy,
+            Iterator first, Sentinel last, T const& val, Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_iterator_v<Iterator>,
                 "Required at least iterator.");
@@ -226,8 +224,9 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            bool>::type tag_fallback_invoke(hpx::ranges::contains_t,
-            ExPolicy&& policy, Rng&& rng, T const& t, Proj proj = Proj())
+            bool>::type
+        tag_fallback_invoke(hpx::ranges::contains_t, ExPolicy&& policy,
+            Rng&& rng, T const& t, Proj proj = Proj())
         {
             return parallel::detail::contains().call(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
@@ -318,9 +317,10 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            bool>::type tag_fallback_invoke(hpx::ranges::contains_subrange_t,
-            ExPolicy&& policy, FwdIter1 first1, Sent1 last1, FwdIter2 first2,
-            Sent2 last2, Pred pred = Pred(), Proj1&& proj1 = Proj1(),
+            bool>::type
+        tag_fallback_invoke(hpx::ranges::contains_subrange_t, ExPolicy&& policy,
+            FwdIter1 first1, Sent1 last1, FwdIter2 first2, Sent2 last2,
+            Pred pred = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
             static_assert(std::forward_iterator<FwdIter1>,
@@ -351,9 +351,10 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            bool>::type tag_fallback_invoke(hpx::ranges::contains_subrange_t,
-            ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2, Pred pred = Pred(),
-            Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
+            bool>::type
+        tag_fallback_invoke(hpx::ranges::contains_subrange_t, ExPolicy&& policy,
+            Rng1&& rng1, Rng2&& rng2, Pred pred = Pred(), Proj1 proj1 = Proj1(),
+            Proj2 proj2 = Proj2())
         {
             return hpx::parallel::detail::contains_subrange().call(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng1),

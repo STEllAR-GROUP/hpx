@@ -30,8 +30,8 @@ namespace hpx::traits {
             using type = typename continuation_not_callable<Future, F>::type;
         };
 
-        template <typename Executor, typename Future, typename F>
-        struct future_then_executor_result<Executor, Future, F,
+        template <typename Executor, typename Future,
+            typename F> struct future_then_executor_result<Executor, Future, F,
             std::void_t<hpx::util::invoke_result_t<F&, Future>>>
         {
             using func_result_type = hpx::util::invoke_result_t<F&, Future>;

@@ -21,8 +21,7 @@ namespace hpx::util {
     {
     };
 
-    template <>
-    struct void_guard<void>
+    template <> struct void_guard<void>
     {
         template <typename T>
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void operator,(

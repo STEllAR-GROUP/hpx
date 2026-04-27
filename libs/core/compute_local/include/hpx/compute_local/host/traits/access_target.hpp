@@ -16,8 +16,7 @@
 
 namespace hpx::compute::traits {
 
-    template <>
-    struct access_target<host::target>
+    template <> struct access_target<host::target>
     {
         using target_type = host::target;
 
@@ -34,8 +33,7 @@ namespace hpx::compute::traits {
         }
     };
 
-    template <>
-    struct access_target<std::vector<host::target>>
+    template <> struct access_target<std::vector<host::target>>
     {
         using target_type = std::vector<host::target>;
 

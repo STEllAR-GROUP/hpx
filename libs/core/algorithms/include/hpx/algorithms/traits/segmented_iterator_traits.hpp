@@ -63,8 +63,7 @@ namespace hpx::traits {
     };
 
     // MSVC needs this for whatever reason
-    template <>
-    struct segmented_local_iterator_traits<void>
+    template <> struct segmented_local_iterator_traits<void>
     {
         using is_segmented_local_iterator = std::false_type;
     };

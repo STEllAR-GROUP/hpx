@@ -431,8 +431,8 @@ namespace hpx::threads {
         std::size_t data, hpx::error_code& ec = hpx::throws);
 #endif
 
-    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT
-        std::size_t& get_continuation_recursion_count() noexcept;
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT std::size_t&
+    get_continuation_recursion_count() noexcept;
     HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void
     reset_continuation_recursion_count() noexcept;
     /// \endcond

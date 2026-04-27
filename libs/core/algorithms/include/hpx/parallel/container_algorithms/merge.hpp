@@ -791,9 +791,9 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend hpx::ranges::merge_result<std::ranges::iterator_t<Rng1>,
-            std::ranges::iterator_t<Rng2>, Iter3> tag_fallback_invoke(merge_t,
-            Rng1&& rng1, Rng2&& rng2, Iter3 dest, Comp comp = Comp(),
-            Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
+            std::ranges::iterator_t<Rng2>, Iter3>
+        tag_fallback_invoke(merge_t, Rng1&& rng1, Rng2&& rng2, Iter3 dest,
+            Comp comp = Comp(), Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
         {
             using iterator_type1 = std::ranges::iterator_t<Rng1>;
             using iterator_type2 = std::ranges::iterator_t<Rng2>;

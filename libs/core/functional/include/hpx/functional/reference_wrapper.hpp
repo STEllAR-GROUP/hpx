@@ -71,8 +71,7 @@ namespace hpx {
         {
         };
 
-        template <typename T>
-        struct needs_reference_semantics<T const> : needs_reference_semantics<T>
+        template <typename T> struct needs_reference_semantics<T const> : needs_reference_semantics<T>
         {
         };
 
@@ -81,8 +80,7 @@ namespace hpx {
             needs_reference_semantics<T>::value;
     }    // namespace traits
 
-    template <typename T>
-    struct reference_wrapper<T,
+    template <typename T> struct reference_wrapper<T,
         std::enable_if_t<traits::needs_reference_semantics_v<T>>>
     {
         using type = T;
@@ -136,14 +134,12 @@ namespace hpx {
 
     namespace util {
 
-        template <typename T>
-        struct unwrap_reference<::hpx::reference_wrapper<T>>
+        template <typename T> struct unwrap_reference<::hpx::reference_wrapper<T>>
         {
             using type = T;
         };
 
-        template <typename T>
-        struct unwrap_reference<::hpx::reference_wrapper<T> const>
+        template <typename T> struct unwrap_reference<::hpx::reference_wrapper<T> const>
         {
             using type = T;
         };
