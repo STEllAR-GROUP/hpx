@@ -56,7 +56,9 @@ function(
     "${test_name}.build" PROPERTIES DEPENDS "${test_name}.configure"
   )
 
-  add_hpx_pseudo_dependencies(tests.unit.build "${test_name}.build")
+  add_hpx_pseudo_target("${test_name}")
+  add_hpx_pseudo_dependencies("${test_name}" "${test_name}.build")
+  add_hpx_pseudo_dependencies(tests.unit.build "${test_name}")
 endfunction()
 
 set(build_types "Debug")
@@ -70,10 +72,6 @@ foreach(build_type ${build_types})
   create_cmake_test(
     "cmake_dir_${build_type_lc}_test" FALSE
     "${PROJECT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}" "DIR" "${build_type}"
-  )
-
-  add_hpx_pseudo_dependencies(
-    tests.unit.build tests.unit.build.cmake_dir_${build_type_lc}_test
   )
 endforeach()
 
