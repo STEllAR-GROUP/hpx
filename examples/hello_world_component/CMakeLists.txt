@@ -31,6 +31,25 @@ if(EXISTS "${HPX_DIR}")
       target_link_libraries(hello_world_client PRIVATE hello_world_component)
     endif()
     target_link_libraries(hello_world_client PRIVATE HPX::hpx HPX::wrap_main)
+    if(HPX_WITH_CXX_MODULES)
+      if(TARGET hpx_core_module_if)
+        if(TARGET hello_world_component)
+          target_link_libraries(
+            hello_world_component PRIVATE hpx_core_module_if
+          )
+        endif()
+        target_link_libraries(hello_world_client PRIVATE hpx_core_module_if)
+      elseif(TARGET HPXInternal::hpx_core_module_if)
+        if(TARGET hello_world_component)
+          target_link_libraries(
+            hello_world_component PRIVATE HPXInternal::hpx_core_module_if
+          )
+        endif()
+        target_link_libraries(
+          hello_world_client PRIVATE HPXInternal::hpx_core_module_if
+        )
+      endif()
+    endif()
 
     # We still support not linking to HPX::wrap_main when
     # HPX_WITH_DYNAMIC_HPX_MAIN=OFF for legacy use. This can only be done using
@@ -53,10 +72,15 @@ if(EXISTS "${HPX_DIR}")
         COMPONENT_DEPENDENCIES iostreams
         DEPENDENCIES HPX::wrap_main
         TYPE COMPONENT
+        SCAN_FOR_MODULES ON
       )
-      hpx_setup_target(hello_world_client DEPENDENCIES hello_world_component)
+      hpx_setup_target(
+        hello_world_client
+        DEPENDENCIES hello_world_component
+        SCAN_FOR_MODULES ON
+      )
     else()
-      hpx_setup_target(hello_world_client)
+      hpx_setup_target(hello_world_client SCAN_FOR_MODULES ON)
     endif()
   else()
     message(FATAL_ERROR "Unknown SETUP_TYPE=\"${SETUP_TYPE}\"")
