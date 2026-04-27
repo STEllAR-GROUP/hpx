@@ -297,9 +297,9 @@ namespace hpx::ranges {
             )
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            bool>::type
-        tag_fallback_invoke(hpx::ranges::is_partitioned_t, ExPolicy&& policy,
-            FwdIter first, Sent last, Pred pred, Proj proj = Proj())
+            bool>::type tag_fallback_invoke(hpx::ranges::is_partitioned_t,
+            ExPolicy&& policy, FwdIter first, Sent last, Pred pred,
+            Proj proj = Proj())
         {
             return hpx::parallel::detail::is_partitioned<FwdIter, Sent>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(pred),
@@ -325,8 +325,8 @@ namespace hpx::ranges {
 
             return hpx::parallel::detail::is_partitioned<iterator_type,
                 iterator_type>()
-                .call(hpx::execution::seq, std::begin(rng), std::end(rng),
-                    HPX_MOVE(pred), HPX_MOVE(proj));
+                .call(hpx::execution::seq, hpx::util::begin(rng),
+                    hpx::util::end(rng), HPX_MOVE(pred), HPX_MOVE(proj));
         }
 
         template <typename ExPolicy, typename Rng, typename Pred,
@@ -351,8 +351,8 @@ namespace hpx::ranges {
 
             return hpx::parallel::detail::is_partitioned<iterator_type,
                 iterator_type>()
-                .call(HPX_FORWARD(ExPolicy, policy), std::begin(rng),
-                    std::end(rng), HPX_MOVE(pred), HPX_MOVE(proj));
+                .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                    hpx::util::end(rng), HPX_MOVE(pred), HPX_MOVE(proj));
         }
     } is_partitioned{};
 }    // namespace hpx::ranges

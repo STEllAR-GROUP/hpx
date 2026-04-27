@@ -231,6 +231,7 @@ namespace hpx {
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/algorithms/detail/is_sorted.hpp>
 #include <hpx/parallel/util/adapt_placement_mode.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
@@ -240,10 +241,10 @@ namespace hpx {
 #include <hpx/parallel/util/invoke_projected.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
+#include <hpx/type_support/identity.hpp>
 
 #include <algorithm>
 #include <cstddef>
-#include <cstdint>
 #include <iterator>
 #include <type_traits>
 #include <utility>
@@ -255,7 +256,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        HPX_CXX_CORE_EXPORT template <typename FwdIter, typename Sent>
+        template <typename FwdIter, typename Sent>
         struct is_sorted : public algorithm<is_sorted<FwdIter, Sent>, bool>
         {
             constexpr is_sorted() noexcept
@@ -278,13 +279,14 @@ namespace hpx::parallel {
                 Sent_ last, Pred&& pred, Proj&& proj)
             {
                 using difference_type =
-                    typename std::iterator_traits<FwdIter_>::difference_type;
+                    hpx::traits::iter_difference_t<FwdIter_>;
                 using result =
                     typename util::detail::algorithm_result<ExPolicy, bool>;
                 constexpr bool has_scheduler_executor =
                     hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
-                difference_type count = detail::distance(first, last);
+                difference_type count =
+                    hpx::parallel::detail::distance(first, last);
 
                 if constexpr (!has_scheduler_executor)
                 {
@@ -295,33 +297,39 @@ namespace hpx::parallel {
                 util::invoke_projected<Pred, Proj> pred_projected{
                     HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)};
                 hpx::parallel::util::cancellation_token<> tok;
-                using intermediate_result_t = std::uint8_t;
+                using intermediate_result_t =
+                    std::conditional_t<has_scheduler_executor, char, bool>;
 
                 // Note: replacing the invoke() with HPX_INVOKE()
                 // below makes gcc generate errors
                 auto f1 =
-                    [tok, last, pred_projected = HPX_MOVE(pred_projected)](
-                        FwdIter_ part_begin, std::size_t part_size) mutable
-                    -> intermediate_result_t {
-                    FwdIter_ trail = part_begin++;
-                    util::loop_n<std::decay_t<ExPolicy>>(part_begin,
+                    [tok, first, count,
+                        pred_projected = HPX_MOVE(pred_projected)](
+                        auto part_begin, std::size_t part_size,
+                        std::size_t base_idx) mutable -> intermediate_result_t {
+                    auto trail_iter = part_begin++;
+                    util::loop_n<hpx::execution::sequenced_policy>(part_begin,
                         part_size - 1,
-                        [&trail, &tok, &pred_projected](
-                            FwdIter_ it) mutable -> void {
-                            if (hpx::invoke(pred_projected, *it, *trail++))
+                        [&trail_iter, &tok, &pred_projected](
+                            auto const& it) mutable -> void {
+                            if (hpx::invoke(pred_projected, *it, *trail_iter++))
                             {
                                 tok.cancel();
                             }
                         });
 
-                    FwdIter_ i = trail++;
+                    auto i = trail_iter++;
 
-                    // trail now points one past the current grouping unless
+                    // trail_iter now points one past the current grouping unless
                     // canceled
 
-                    if (!tok.was_cancelled() && trail != last)
+                    if (!tok.was_cancelled() &&
+                        (base_idx + part_size) <
+                            static_cast<std::size_t>(count))
                     {
-                        return !hpx::invoke(pred_projected, *trail, *i);
+                        auto next_it = first;
+                        std::advance(next_it, base_idx + part_size);
+                        return !hpx::invoke(pred_projected, *next_it, *i);
                     }
 
                     return !tok.was_cancelled();
@@ -329,12 +337,14 @@ namespace hpx::parallel {
 
                 auto f2 = [](auto&& results) {
                     return std::all_of(hpx::util::begin(results),
-                        hpx::util::end(results), hpx::functional::unwrap{});
+                        hpx::util::end(results),
+                        [](auto const& res) { return hpx::unwrap(res); });
                 };
 
                 return util::partitioner<ExPolicy, bool,
-                    intermediate_result_t>::call(HPX_FORWARD(ExPolicy, policy),
-                    first, count, HPX_MOVE(f1), HPX_MOVE(f2));
+                    intermediate_result_t>::
+                    call_with_index(HPX_FORWARD(ExPolicy, policy), first, count,
+                        1, HPX_MOVE(f1), HPX_MOVE(f2));
             }
         };
         /// \endcond
@@ -345,12 +355,13 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        HPX_CXX_CORE_EXPORT template <typename FwdIter, typename Sent>
+        template <typename FwdIter, typename Sent>
         struct is_sorted_until
           : public algorithm<is_sorted_until<FwdIter, Sent>, FwdIter>
         {
             constexpr is_sorted_until() noexcept
-              : algorithm<is_sorted_until, FwdIter>("is_sorted_until")
+              : algorithm<is_sorted_until<FwdIter, Sent>, FwdIter>(
+                    "is_sorted_until")
             {
             }
 
@@ -368,16 +379,15 @@ namespace hpx::parallel {
             static decltype(auto) parallel(ExPolicy&& orgpolicy, FwdIter_ first,
                 Sent_ last, Pred&& pred, Proj&& proj)
             {
-                using reference =
-                    typename std::iterator_traits<FwdIter_>::reference;
                 using difference_type =
-                    typename std::iterator_traits<FwdIter_>::difference_type;
+                    hpx::traits::iter_difference_t<FwdIter_>;
                 using result =
                     typename util::detail::algorithm_result<ExPolicy, FwdIter_>;
                 constexpr bool has_scheduler_executor =
                     hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
-                difference_type count = detail::distance(first, last);
+                difference_type count =
+                    hpx::parallel::detail::distance(first, last);
                 if constexpr (!has_scheduler_executor)
                 {
                     if (count <= 1)
@@ -399,40 +409,40 @@ namespace hpx::parallel {
 
                 // Note: replacing the invoke() with HPX_INVOKE() below makes
                 // gcc generate errors
-                auto f1 = [tok, last,
+                auto f1 = [tok, first, count,
                               pred_projected = HPX_MOVE(pred_projected)](
-                              FwdIter_ part_begin, std::size_t part_size,
+                              auto part_begin, std::size_t part_size,
                               std::size_t base_idx) mutable -> void {
-                    std::size_t const cross_idx = base_idx + part_size;
-
-                    FwdIter_ trail = part_begin++;
-                    util::loop_idx_n<policy_type>(++base_idx, part_begin,
-                        part_size - 1, tok,
-                        [&trail, &tok, &pred_projected](
-                            reference& v, std::size_t ind) -> void {
-                            if (hpx::invoke(pred_projected, v, *trail++))
+                    auto trail_iter = part_begin++;
+                    util::loop_idx_n<hpx::execution::sequenced_policy>(
+                        ++base_idx, part_begin, part_size - 1, tok,
+                        [&trail_iter, &tok, &pred_projected](
+                            auto& v, std::size_t ind) mutable -> void {
+                            if (hpx::invoke(pred_projected, v, *trail_iter++))
                             {
                                 tok.cancel(ind);
                             }
                         });
 
-                    FwdIter_ i = trail++;
+                    auto i = trail_iter++;
 
-                    // trail now points one past the current grouping unless
+                    // trail_iter now points one past the current grouping unless
                     // canceled
 
-                    if (!tok.was_cancelled(cross_idx) && trail != last)
+                    if (!tok.was_cancelled(base_idx + part_size) &&
+                        (base_idx + part_size) <
+                            static_cast<std::size_t>(count))
                     {
-                        if (HPX_INVOKE(pred_projected, *trail, *i))
+                        auto next_it = first;
+                        std::advance(next_it, base_idx + part_size);
+                        if (HPX_INVOKE(pred_projected, *next_it, *i))
                         {
-                            tok.cancel(cross_idx);
+                            tok.cancel(base_idx + part_size);
                         }
                     }
                 };
 
                 auto f2 = [first, tok](auto&&... data) mutable -> FwdIter_ {
-                    static_assert(sizeof...(data) < 2);
-
                     // make sure iterators embedded in function object that is
                     // attached to futures are invalidated
                     util::detail::clear_container(data...);
