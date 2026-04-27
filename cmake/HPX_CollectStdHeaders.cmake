@@ -105,6 +105,10 @@ set(STANDARD_LIBRARY_HEADERS
     "<cwctype>"
 )
 
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  list(APPEND STANDARD_LIBRARY_HEADERS "<link.h>" "<dlfcn.h>")
+endif()
+
 # Function to extract #includes from a file recursively
 function(hpx_extract_includes_from_file module)
 
@@ -139,9 +143,9 @@ function(hpx_extract_includes_from_file module)
       if(${filename} IN_LIST STANDARD_LIBRARY_HEADERS)
         list(APPEND found_includes "${filename}")
       endif()
-    elseif(filename STREQUAL "link.h" OR filename STREQUAL "dlfcn.h")
-      # Also collect these POSIX headers as they must be in the Global Module Fragment
-      list(APPEND found_includes "<${filename}>")
+    elseif(${filename} IN_LIST STANDARD_LIBRARY_HEADERS)
+      # Handle headers with extensions (like link.h) that were added to the list
+      list(APPEND found_includes "${filename}")
     endif()
   endforeach()
 
