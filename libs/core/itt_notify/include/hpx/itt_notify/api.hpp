@@ -136,7 +136,7 @@ HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void itt_metadata_add(
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::threads {
 
-    HPX_CXX_CORE_EXPORT struct thread_description;
+    struct thread_description;
 }    // namespace hpx::threads
 
 namespace hpx::util::itt {
@@ -692,7 +692,7 @@ HPX_CXX_CORE_EXPORT constexpr void itt_metadata_add(
 //////////////////////////////////////////////////////////////////////////////
 namespace hpx::threads {
 
-    HPX_CXX_CORE_EXPORT struct thread_description;
+    struct thread_description;
 }    // namespace hpx::threads
 
 namespace hpx::util::itt {

@@ -173,7 +173,8 @@ namespace hpx {
             }
         };
 
-        template <> struct policy_holder<void> : policy_holder_base
+        template <>
+        struct policy_holder<void> : policy_holder_base
         {
             // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
             constexpr explicit policy_holder(launch_policy const p,

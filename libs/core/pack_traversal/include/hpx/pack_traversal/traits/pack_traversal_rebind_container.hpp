@@ -77,8 +77,9 @@ namespace hpx::traits {
     // gcc reports an ambiguity for any standard container that has a defaulted
     // allocator template argument as it believes both specializations above are
     // viable. This works around by explicitly specializing the trait.
-    template <typename NewType, typename OldType,
-        typename OldAllocator> struct pack_traversal_rebind_container<NewType,
+    HPX_CXX_CORE_EXPORT template <typename NewType, typename OldType,
+        typename OldAllocator>
+    struct pack_traversal_rebind_container<NewType,
         std::vector<OldType, OldAllocator>>
     {
         using NewAllocator = typename std::allocator_traits<
@@ -94,8 +95,9 @@ namespace hpx::traits {
         }
     };
 
-    template <typename NewType, typename OldType,
-        typename OldAllocator> struct pack_traversal_rebind_container<NewType,
+    HPX_CXX_CORE_EXPORT template <typename NewType, typename OldType,
+        typename OldAllocator>
+    struct pack_traversal_rebind_container<NewType,
         std::list<OldType, OldAllocator>>
     {
         using NewAllocator = typename std::allocator_traits<
@@ -111,8 +113,9 @@ namespace hpx::traits {
         }
     };
 
-    template <typename NewType, typename OldType,
-        std::size_t N> struct pack_traversal_rebind_container<NewType, std::array<OldType, N>>
+    HPX_CXX_CORE_EXPORT template <typename NewType, typename OldType,
+        std::size_t N>
+    struct pack_traversal_rebind_container<NewType, std::array<OldType, N>>
     {
         static std::array<NewType, N> call(
             std::array<OldType, N> const& /*container*/)

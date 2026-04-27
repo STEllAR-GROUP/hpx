@@ -27,7 +27,8 @@ namespace hpx::parallel::execution::detail {
     /// \cond NOINTERNAL
 
     ///////////////////////////////////////////////////////////////////////
-    template <typename Executor> struct timed_async_execute_fn_helper<Executor,
+    template <typename Executor>
+    struct timed_async_execute_fn_helper<Executor,
         std::enable_if_t<hpx::traits::is_two_way_executor_v<Executor>>>
     {
         template <typename TwoWayExecutor, typename F, typename... Ts>
@@ -64,7 +65,8 @@ namespace hpx::parallel::execution::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////
-    template <typename Executor> struct timed_post_fn_helper<Executor,
+    template <typename Executor>
+    struct timed_post_fn_helper<Executor,
         std::enable_if_t<hpx::traits::is_one_way_executor_v<Executor> ||
             hpx::traits::is_two_way_executor_v<Executor> ||
             hpx::traits::is_never_blocking_one_way_executor_v<Executor>>>
@@ -114,7 +116,8 @@ namespace hpx::parallel::execution::detail {
     /// \cond NOINTERNAL
 
     ///////////////////////////////////////////////////////////////////////
-    template <typename Executor> struct timed_sync_execute_fn_helper<Executor,
+    template <typename Executor>
+    struct timed_sync_execute_fn_helper<Executor,
         std::enable_if_t<hpx::traits::is_one_way_executor_v<Executor> ||
             hpx::traits::is_two_way_executor_v<Executor>>>
     {

@@ -30,7 +30,8 @@ namespace hpx::util {
             }
         };
 
-        template <typename X> struct decay_unwrap_impl<::std::reference_wrapper<X>>
+        HPX_CXX_CORE_EXPORT template <typename X>
+        struct decay_unwrap_impl<::std::reference_wrapper<X>>
         {
             using type = X&;
 

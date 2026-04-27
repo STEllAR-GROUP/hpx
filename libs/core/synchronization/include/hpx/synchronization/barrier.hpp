@@ -39,7 +39,7 @@ namespace hpx {
             constexpr void operator()() const noexcept {}
         };
 
-        HPX_CXX_CORE_EXPORT struct barrier_data;
+        struct barrier_data;
 
         HPX_CORE_EXPORT void intrusive_ptr_add_ref(barrier_data* p) noexcept;
         HPX_CORE_EXPORT void intrusive_ptr_release(barrier_data* p) noexcept;

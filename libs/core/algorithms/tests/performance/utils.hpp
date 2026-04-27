@@ -22,7 +22,8 @@ template <typename IterTag, typename DataType = int,
     typename Alloc = std::allocator<DataType>, typename Enable = void>
 struct test_container;
 
-template <typename RandIterTag, typename DataType> struct test_container<RandIterTag, DataType, std::allocator<DataType>,
+template <typename RandIterTag, typename DataType>
+struct test_container<RandIterTag, DataType, std::allocator<DataType>,
     std::enable_if_t<
         std::is_same_v<RandIterTag, std::random_access_iterator_tag>>>
 {
@@ -35,7 +36,8 @@ template <typename RandIterTag, typename DataType> struct test_container<RandIte
     }
 };
 
-template <typename RandIterTag, typename DataType, typename Alloc> struct test_container<RandIterTag, DataType, Alloc,
+template <typename RandIterTag, typename DataType, typename Alloc>
+struct test_container<RandIterTag, DataType, Alloc,
     std::enable_if_t<
         std::is_same_v<RandIterTag, std::random_access_iterator_tag>>>
 {
@@ -47,7 +49,8 @@ template <typename RandIterTag, typename DataType, typename Alloc> struct test_c
     }
 };
 
-template <typename BidirIterTag, typename DataType, typename Alloc> struct test_container<BidirIterTag, DataType, Alloc,
+template <typename BidirIterTag, typename DataType, typename Alloc>
+struct test_container<BidirIterTag, DataType, Alloc,
     std::enable_if_t<
         std::is_same_v<BidirIterTag, std::bidirectional_iterator_tag>>>
 {
@@ -59,7 +62,8 @@ template <typename BidirIterTag, typename DataType, typename Alloc> struct test_
     }
 };
 
-template <typename FwdIterTag, typename DataType, typename Alloc> struct test_container<FwdIterTag, DataType, Alloc,
+template <typename FwdIterTag, typename DataType, typename Alloc>
+struct test_container<FwdIterTag, DataType, Alloc,
     std::enable_if_t<std::is_same_v<FwdIterTag, std::forward_iterator_tag>>>
 {
     using type = std::forward_list<DataType, Alloc>;

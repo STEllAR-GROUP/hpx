@@ -126,7 +126,8 @@ namespace hpx::serialization::detail {
         friend struct hpx::util::static_<polymorphic_id_factory>;
     };
 
-    template <typename T> struct register_class_name<T,
+    HPX_CXX_CORE_EXPORT template <typename T>
+    struct register_class_name<T,
         std::enable_if_t<traits::is_serialized_with_id_v<T>>>
     {
         register_class_name()

@@ -57,7 +57,8 @@ namespace hpx::detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <> struct async_launch_policy_dispatch<hpx::launch::sync_policy>
+    template <>
+    struct async_launch_policy_dispatch<hpx::launch::sync_policy>
     {
         template <typename Policy, typename F, typename... Ts>
         HPX_FORCEINLINE static std::enable_if_t<
@@ -91,7 +92,8 @@ namespace hpx::detail {
         }
     };
 
-    template <> struct async_launch_policy_dispatch<hpx::launch::deferred_policy>
+    template <>
+    struct async_launch_policy_dispatch<hpx::launch::deferred_policy>
     {
         template <typename Policy, typename F, typename... Ts>
         HPX_FORCEINLINE static std::enable_if_t<
@@ -134,7 +136,8 @@ namespace hpx::detail {
         }
     };
 
-    template <> struct async_launch_policy_dispatch<hpx::launch::async_policy>
+    template <>
+    struct async_launch_policy_dispatch<hpx::launch::async_policy>
     {
         template <typename Policy, typename F, typename... Ts>
         HPX_FORCEINLINE static std::enable_if_t<
@@ -213,7 +216,8 @@ namespace hpx::detail {
         }
     };
 
-    template <> struct async_launch_policy_dispatch<hpx::launch::fork_policy>
+    template <>
+    struct async_launch_policy_dispatch<hpx::launch::fork_policy>
     {
         template <typename Policy, typename F, typename... Ts>
         HPX_FORCEINLINE static std::enable_if_t<
@@ -303,7 +307,8 @@ namespace hpx::detail {
         }
     };
 
-    template <typename Action> struct async_launch_policy_dispatch<Action,
+    HPX_CXX_CORE_EXPORT template <typename Action>
+    struct async_launch_policy_dispatch<Action,
         std::enable_if_t<!traits::is_action_v<Action>>>
     {
         template <typename F, typename... Ts>

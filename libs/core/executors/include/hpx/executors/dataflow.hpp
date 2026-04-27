@@ -98,7 +98,8 @@ namespace hpx::lcos::detail {
         using type = typename dataflow_not_callable<F, Args>::type;
     };
 
-    template <typename Policy, typename F, typename Args> struct dataflow_return_impl<false, Policy, F, Args,
+    HPX_CXX_CORE_EXPORT template <typename Policy, typename F, typename Args>
+    struct dataflow_return_impl<false, Policy, F, Args,
         std::enable_if_t<traits::is_launch_policy_v<Policy>>>
     {
         using type = hpx::future<hpx::detail::invoke_fused_result_t<F, Args>>;
@@ -107,7 +108,8 @@ namespace hpx::lcos::detail {
     HPX_CXX_CORE_EXPORT template <typename Executor, typename F, typename Args>
     struct dataflow_return_impl_executor;
 
-    template <typename Executor, typename F, typename... Ts> struct dataflow_return_impl_executor<Executor, F, hpx::tuple<Ts...>>
+    HPX_CXX_CORE_EXPORT template <typename Executor, typename F, typename... Ts>
+    struct dataflow_return_impl_executor<Executor, F, hpx::tuple<Ts...>>
     {
         // clang-format off
         using type = decltype(hpx::parallel::execution::async_execute(
@@ -116,7 +118,8 @@ namespace hpx::lcos::detail {
         // clang-format on
     };
 
-    template <typename Policy, typename F, typename Args> struct dataflow_return_impl<false, Policy, F, Args,
+    HPX_CXX_CORE_EXPORT template <typename Policy, typename F, typename Args>
+    struct dataflow_return_impl<false, Policy, F, Args,
         std::enable_if_t<traits::is_one_way_executor_v<Policy> ||
             traits::is_two_way_executor_v<Policy>>>
       : dataflow_return_impl_executor<Policy, F, Args>
@@ -140,8 +143,9 @@ namespace hpx::lcos::detail {
     };
 
     // clang-format off
-    template <typename Executor, typename Frame, typename Func,
-        typename Futures> struct has_dataflow_finalize<Executor, Frame, Func, Futures,
+    HPX_CXX_CORE_EXPORT template <typename Executor, typename Frame, typename Func,
+        typename Futures>
+    struct has_dataflow_finalize<Executor, Frame, Func, Futures,
         std::void_t<decltype(
             std::declval<Executor>().dataflow_finalize(std::declval<Frame>(),
                 std::declval<Func>(), std::declval<Futures>()))>>
@@ -420,7 +424,8 @@ namespace hpx::lcos::detail {
     struct dataflow_dispatch_impl;
 
     // launch
-    template <typename Policy> struct dataflow_dispatch_impl<false, Policy,
+    HPX_CXX_CORE_EXPORT template <typename Policy>
+    struct dataflow_dispatch_impl<false, Policy,
         std::enable_if_t<traits::is_launch_policy_v<Policy>>>
     {
         template <typename Allocator, typename Policy_, typename F,
@@ -435,7 +440,8 @@ namespace hpx::lcos::detail {
     };
 
     // any action, plain function, or function object
-    template <typename FD> struct dataflow_dispatch_impl<false, FD,
+    HPX_CXX_CORE_EXPORT template <typename FD>
+    struct dataflow_dispatch_impl<false, FD,
         std::enable_if_t<!traits::is_launch_policy_v<FD> &&
             !traits::is_one_way_executor_v<FD> &&
             !traits::is_two_way_executor_v<FD>>>

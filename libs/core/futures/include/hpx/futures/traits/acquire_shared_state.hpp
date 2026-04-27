@@ -71,7 +71,8 @@ namespace hpx::traits {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Future> struct acquire_shared_state_impl<Future,
+        template <typename Future>
+        struct acquire_shared_state_impl<Future,
             std::enable_if_t<is_future_v<Future>>>
         {
             using type = traits::detail::shared_state_ptr_t<
@@ -89,11 +90,13 @@ namespace hpx::traits {
         {
         };
 
-        template <typename T, std::size_t N> struct is_static_array<std::array<T, N>> : std::true_type
+        template <typename T, std::size_t N>
+        struct is_static_array<std::array<T, N>> : std::true_type
         {
         };
 
-        template <typename Range> struct acquire_shared_state_impl<Range,
+        template <typename Range>
+        struct acquire_shared_state_impl<Range,
             std::enable_if_t<traits::is_future_range_v<Range>>>
         {
             using type = traits::detail::shared_state_ptr_for_t<Range>;
@@ -121,7 +124,8 @@ namespace hpx::traits {
             }
         };
 
-        template <typename Iterator> struct acquire_shared_state_impl<Iterator,
+        template <typename Iterator>
+        struct acquire_shared_state_impl<Iterator,
             std::enable_if_t<traits::is_iterator_v<Iterator>>>
         {
             using future_type =

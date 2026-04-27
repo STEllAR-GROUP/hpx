@@ -37,20 +37,23 @@ namespace hpx::traits {
     {
     };
 
-    template <typename Component> struct is_component<Component const> : is_component<Component>
+    HPX_CXX_EXPORT template <typename Component>
+    struct is_component<Component const> : is_component<Component>
     {
     };
 
     ///////////////////////////////////////////////////////////////////////////
     // Simple components are components
-    template <typename Component> struct is_component<Component,
+    HPX_CXX_EXPORT template <typename Component>
+    struct is_component<Component,
         std::enable_if_t<std::is_base_of_v<detail::component_tag, Component>>>
       : std::true_type
     {
     };
 
     // Fixed components are components
-    template <typename Component> struct is_component<Component,
+    HPX_CXX_EXPORT template <typename Component>
+    struct is_component<Component,
         std::enable_if_t<
             std::is_base_of_v<detail::fixed_component_tag, Component>>>
       : std::true_type
@@ -58,7 +61,8 @@ namespace hpx::traits {
     };
 
     // Managed components are components
-    template <typename Component> struct is_component<Component,
+    HPX_CXX_EXPORT template <typename Component>
+    struct is_component<Component,
         std::enable_if_t<
             std::is_base_of_v<detail::managed_component_tag, Component>>>
       : std::true_type
@@ -74,11 +78,13 @@ namespace hpx::traits {
     {
     };
 
-    template <typename T> struct is_component_or_component_array<T[]> : is_component<T>
+    HPX_CXX_EXPORT template <typename T>
+    struct is_component_or_component_array<T[]> : is_component<T>
     {
     };
 
-    template <typename T, std::size_t N> struct is_component_or_component_array<T[N]> : is_component<T>
+    HPX_CXX_EXPORT template <typename T, std::size_t N>
+    struct is_component_or_component_array<T[N]> : is_component<T>
     {
     };
 
@@ -93,7 +99,8 @@ namespace hpx::traits {
     {
     };
 
-    template <typename Component> struct is_fixed_component<Component const> : is_fixed_component<Component>
+    HPX_CXX_EXPORT template <typename Component>
+    struct is_fixed_component<Component const> : is_fixed_component<Component>
     {
     };
 
@@ -108,7 +115,8 @@ namespace hpx::traits {
     {
     };
 
-    template <typename Component> struct is_managed_component<Component const>
+    HPX_CXX_EXPORT template <typename Component>
+    struct is_managed_component<Component const>
       : is_managed_component<Component>
     {
     };

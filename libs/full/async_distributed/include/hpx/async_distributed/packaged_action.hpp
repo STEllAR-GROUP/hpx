@@ -122,7 +122,8 @@ namespace hpx::lcos {
     class packaged_action;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename Result> class packaged_action<Action, Result, /*DirectExecute=*/false>
+    template <typename Action, typename Result>
+    class packaged_action<Action, Result, /*DirectExecute=*/false>
       : public hpx::distributed::promise<Result,
             typename hpx::traits::extract_action<Action>::remote_result_type>
     {
@@ -400,7 +401,8 @@ namespace hpx::lcos {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename Result> class packaged_action<Action, Result, /*DirectExecute=*/true>
+    template <typename Action, typename Result>
+    class packaged_action<Action, Result, /*DirectExecute=*/true>
       : public packaged_action<Action, Result, /*DirectExecute=*/false>
     {
         using action_type = typename packaged_action<Action, Result,

@@ -22,42 +22,50 @@ namespace hpx::detail {
     // versions
 
     /// \cond NOINTERNAL
-    template <> struct is_execution_policy<std::execution::sequenced_policy>
+    template <>
+    struct is_execution_policy<std::execution::sequenced_policy>
       : std::true_type
     {
     };
 
-    template <> struct is_execution_policy<std::execution::parallel_policy> : std::true_type
+    template <>
+    struct is_execution_policy<std::execution::parallel_policy> : std::true_type
     {
     };
 
-    template <> struct is_execution_policy<std::execution::parallel_unsequenced_policy>
+    template <>
+    struct is_execution_policy<std::execution::parallel_unsequenced_policy>
       : std::true_type
     {
     };
 
-    template <> struct is_parallel_execution_policy<std::execution::parallel_policy>
+    template <>
+    struct is_parallel_execution_policy<std::execution::parallel_policy>
       : std::true_type
     {
     };
 
-    template <> struct is_parallel_execution_policy<
+    template <>
+    struct is_parallel_execution_policy<
         std::execution::parallel_unsequenced_policy> : std::true_type
     {
     };
 
-    template <> struct is_sequenced_execution_policy<std::execution::sequenced_policy>
+    template <>
+    struct is_sequenced_execution_policy<std::execution::sequenced_policy>
       : std::true_type
     {
     };
 
 #if defined(HPX_HAVE_CXX20_STD_EXECUTION_POLICES)
-    template <> struct is_execution_policy<std::execution::unsequenced_policy>
+    template <>
+    struct is_execution_policy<std::execution::unsequenced_policy>
       : std::true_type
     {
     };
 
-    template <> struct is_sequenced_execution_policy<std::execution::unsequenced_policy>
+    template <>
+    struct is_sequenced_execution_policy<std::execution::unsequenced_policy>
       : std::true_type
     {
     };

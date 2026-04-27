@@ -158,7 +158,8 @@ namespace hpx::mpi::experimental {
                     using type = hpx::execution::experimental::set_value_t(T);
                 };
 
-                template <typename T> struct set_value_void_checked<true, T>
+                template <typename T>
+                struct set_value_void_checked<true, T>
                 {
                     using type = hpx::execution::experimental::set_value_t();
                 };

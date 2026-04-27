@@ -20,46 +20,56 @@ namespace hpx::experimental {
     };
 
     // References are not trivially relocatable
-    template <typename T> struct is_trivially_relocatable<T&> : std::false_type
+    HPX_CXX_CORE_EXPORT template <typename T>
+    struct is_trivially_relocatable<T&> : std::false_type
     {
     };
 
     // Temporary objects are not trivially relocatable
-    template <typename T> struct is_trivially_relocatable<T&&> : std::false_type
+    HPX_CXX_CORE_EXPORT template <typename T>
+    struct is_trivially_relocatable<T&&> : std::false_type
     {
     };
 
     // Constness, Volatility, Arrays are ignored
-    template <typename T> struct is_trivially_relocatable<T const> : is_trivially_relocatable<T>
+    HPX_CXX_CORE_EXPORT template <typename T>
+    struct is_trivially_relocatable<T const> : is_trivially_relocatable<T>
     {
     };
 
-    template <typename T> struct is_trivially_relocatable<T volatile> : is_trivially_relocatable<T>
+    HPX_CXX_CORE_EXPORT template <typename T>
+    struct is_trivially_relocatable<T volatile> : is_trivially_relocatable<T>
     {
     };
 
-    template <typename T> struct is_trivially_relocatable<T const volatile>
+    HPX_CXX_CORE_EXPORT template <typename T>
+    struct is_trivially_relocatable<T const volatile>
       : is_trivially_relocatable<T>
     {
     };
 
-    template <typename T> struct is_trivially_relocatable<T[]> : is_trivially_relocatable<T>
+    HPX_CXX_CORE_EXPORT template <typename T>
+    struct is_trivially_relocatable<T[]> : is_trivially_relocatable<T>
     {
     };
 
-    template <typename T, int N> struct is_trivially_relocatable<T[N]> : is_trivially_relocatable<T>
+    HPX_CXX_CORE_EXPORT template <typename T, int N>
+    struct is_trivially_relocatable<T[N]> : is_trivially_relocatable<T>
     {
     };
 
-    template <typename T, int N> struct is_trivially_relocatable<T const[N]> : is_trivially_relocatable<T>
+    HPX_CXX_CORE_EXPORT template <typename T, int N>
+    struct is_trivially_relocatable<T const[N]> : is_trivially_relocatable<T>
     {
     };
 
-    template <typename T, int N> struct is_trivially_relocatable<T volatile[N]> : is_trivially_relocatable<T>
+    HPX_CXX_CORE_EXPORT template <typename T, int N>
+    struct is_trivially_relocatable<T volatile[N]> : is_trivially_relocatable<T>
     {
     };
 
-    template <typename T, int N> struct is_trivially_relocatable<T const volatile[N]>
+    HPX_CXX_CORE_EXPORT template <typename T, int N>
+    struct is_trivially_relocatable<T const volatile[N]>
       : is_trivially_relocatable<T>
     {
     };

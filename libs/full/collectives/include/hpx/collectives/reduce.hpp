@@ -418,7 +418,8 @@ namespace hpx::traits {
 
         struct reduce_tag;
 
-        template <> struct communicator_data<reduce_tag>
+        template <>
+        struct communicator_data<reduce_tag>
         {
             HPX_EXPORT static char const* name() noexcept;
         };
@@ -426,7 +427,8 @@ namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
     // support for reduce
-    template <typename Communicator> struct communication_operation<Communicator, communication::reduce_tag>
+    template <typename Communicator>
+    struct communication_operation<Communicator, communication::reduce_tag>
     {
         template <typename Result, typename T, typename F>
         static Result get(Communicator& communicator, std::size_t which,

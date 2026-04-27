@@ -158,7 +158,8 @@ namespace hpx::iostream {
         {
         };
 
-        template <> struct close_impl<any_tag>
+        template <>
+        struct close_impl<any_tag>
         {
             template <typename T>
             static void close(T& t, std::ios_base::openmode const which)
@@ -179,7 +180,8 @@ namespace hpx::iostream {
             }
         };
 
-        template <> struct close_impl<close_stream>
+        template <>
+        struct close_impl<close_stream>
         {
             template <typename T>
             static void close(T& t)
@@ -195,7 +197,8 @@ namespace hpx::iostream {
             }
         };
 
-        template <> struct close_impl<close_filtering_stream>
+        template <>
+        struct close_impl<close_filtering_stream>
         {
             template <typename T>
             static void close(T& t, std::ios_base::openmode const which)
@@ -209,7 +212,8 @@ namespace hpx::iostream {
             }
         };
 
-        template <> struct close_impl<closable_tag>
+        template <>
+        struct close_impl<closable_tag>
         {
             template <typename T>
             static void close(T& t, std::ios_base::openmode const which)
@@ -238,7 +242,8 @@ namespace hpx::iostream {
             }
         };
 
-        template <> struct close_impl<two_sequence>
+        template <>
+        struct close_impl<two_sequence>
         {
             template <typename T>
             static void close(T& t, std::ios_base::openmode which)

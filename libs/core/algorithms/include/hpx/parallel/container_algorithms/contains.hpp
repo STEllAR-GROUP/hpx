@@ -86,7 +86,8 @@ namespace hpx::parallel::detail {
         typename Enable = void>
     struct contains_subrange_helper;
 
-    template <typename ExPolicy, typename T> struct contains_subrange_helper<ExPolicy, T,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename T>
+    struct contains_subrange_helper<ExPolicy, T,
         std::enable_if_t<!hpx::is_async_execution_policy_v<ExPolicy>>>
     {
         static bool get_result(T& itr, T& last)
@@ -95,7 +96,8 @@ namespace hpx::parallel::detail {
         }
     };
 
-    template <typename ExPolicy, typename T> struct contains_subrange_helper<ExPolicy, T,
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename T>
+    struct contains_subrange_helper<ExPolicy, T,
         std::enable_if_t<hpx::is_async_execution_policy_v<ExPolicy>>>
     {
         static hpx::future<bool> get_result(hpx::future<T>& itr, T& last)

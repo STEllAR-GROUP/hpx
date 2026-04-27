@@ -89,7 +89,8 @@ namespace hpx {
     }    // namespace util::detail
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename R, typename... Ts> class function_ref<R(Ts...)>
+    HPX_CXX_CORE_EXPORT template <typename R, typename... Ts>
+    class function_ref<R(Ts...)>
     {
         using VTable = util::detail::function_ref_vtable<R(Ts...)>;
 
@@ -229,7 +230,8 @@ namespace hpx {
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::traits {
 
-    template <typename Sig> struct get_function_address<hpx::function_ref<Sig>>
+    HPX_CXX_CORE_EXPORT template <typename Sig>
+    struct get_function_address<hpx::function_ref<Sig>>
     {
         [[nodiscard]] static constexpr std::size_t call(
             hpx::function_ref<Sig> const& f) noexcept
@@ -238,7 +240,8 @@ namespace hpx::traits {
         }
     };
 
-    template <typename Sig> struct get_function_annotation<hpx::function_ref<Sig>>
+    HPX_CXX_CORE_EXPORT template <typename Sig>
+    struct get_function_annotation<hpx::function_ref<Sig>>
     {
         [[nodiscard]] static constexpr char const* call(
             hpx::function_ref<Sig> const& f) noexcept
@@ -248,7 +251,8 @@ namespace hpx::traits {
     };
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-    template <typename Sig> struct get_function_annotation_itt<hpx::function_ref<Sig>>
+    HPX_CXX_CORE_EXPORT template <typename Sig>
+    struct get_function_annotation_itt<hpx::function_ref<Sig>>
     {
         [[nodiscard]] static util::itt::string_handle call(
             hpx::function_ref<Sig> const& f) noexcept

@@ -265,7 +265,8 @@ namespace hpx::execution::experimental {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Warray-bounds"
 #endif
-            template <typename Receiver, typename SendersPack> struct operation_state<Receiver, SendersPack, 0>
+            template <typename Receiver, typename SendersPack>
+            struct operation_state<Receiver, SendersPack, 0>
             {
                 using receiver_type = std::decay_t<Receiver>;
 

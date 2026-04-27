@@ -18,12 +18,14 @@ namespace hpx::util {
         using type = T;
     };
 
-    template <typename T> struct unwrap_reference<::std::reference_wrapper<T>>
+    HPX_CXX_CORE_EXPORT template <typename T>
+    struct unwrap_reference<::std::reference_wrapper<T>>
     {
         using type = T;
     };
 
-    template <typename T> struct unwrap_reference<::std::reference_wrapper<T> const>
+    HPX_CXX_CORE_EXPORT template <typename T>
+    struct unwrap_reference<::std::reference_wrapper<T> const>
     {
         using type = T;
     };

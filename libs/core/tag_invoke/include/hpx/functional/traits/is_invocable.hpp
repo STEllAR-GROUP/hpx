@@ -31,7 +31,8 @@ namespace hpx {
                 std::is_function_v<T>, "Argument must be of the form F(Ts...)");
         };
 
-        template <typename F, typename... Ts> struct is_invocable_impl<F(Ts...),
+        template <typename F, typename... Ts>
+        struct is_invocable_impl<F(Ts...),
             std::void_t<decltype(HPX_INVOKE(
                 std::declval<F>(), std::declval<Ts>()...))>> : std::true_type
         {
@@ -44,7 +45,8 @@ namespace hpx {
         };
 
         // clang-format off
-        template <typename F, typename... Ts, typename R> struct is_invocable_r_impl<F(Ts...), R,
+        template <typename F, typename... Ts, typename R>
+        struct is_invocable_r_impl<F(Ts...), R,
             std::void_t<decltype(
                 HPX_INVOKE(std::declval<F>(), std::declval<Ts>()...))>>
           : std::integral_constant<bool,
@@ -106,7 +108,8 @@ namespace hpx {
         {
         };
 
-        template <typename F, typename... Ts> struct is_nothrow_invocable_impl<F(Ts...), true>
+        HPX_CXX_CORE_EXPORT template <typename F, typename... Ts>
+        struct is_nothrow_invocable_impl<F(Ts...), true>
           : std::integral_constant<bool,
                 noexcept(std::declval<F>()(std::declval<Ts>()...))>
         {

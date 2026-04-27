@@ -42,7 +42,8 @@ namespace hpx::util {
         {
         };
 
-        template <typename T, typename U, typename... U2> struct is_unrelated<T, U, U2...> : std::negation<is_related<T, U>>
+        HPX_CXX_EXPORT template <typename T, typename U, typename... U2>
+        struct is_unrelated<T, U, U2...> : std::negation<is_related<T, U>>
         {
         };
     }    // namespace detail
@@ -72,7 +73,8 @@ namespace hpx::util {
         }
     };
 
-    template <typename MemberType, int UniqueId> class base_from_member<MemberType&, UniqueId>
+    HPX_CXX_EXPORT template <typename MemberType, int UniqueId>
+    class base_from_member<MemberType&, UniqueId>
     {
     protected:
         MemberType& member;

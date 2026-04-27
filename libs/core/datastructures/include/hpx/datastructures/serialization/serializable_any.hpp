@@ -45,7 +45,7 @@ namespace hpx::util::detail::any {
 
     ////////////////////////////////////////////////////////////////////////////
     // serializable function pointer table
-    template <typename IArch, typename OArch, typename Char>
+    HPX_CXX_CORE_EXPORT template <typename IArch, typename OArch, typename Char>
         requires(!std::is_void_v<IArch> && !std::is_void_v<OArch>)
     struct fxn_ptr_table<IArch, OArch, Char, std::true_type>
     {
@@ -83,8 +83,9 @@ namespace hpx::util::detail::any {
     };
 
     ////////////////////////////////////////////////////////////////////////////
-    template <typename IArch, typename OArch,
-        typename Vtable, typename Char> struct fxn_ptr<IArch, OArch, Vtable, Char, std::true_type>
+    HPX_CXX_CORE_EXPORT template <typename IArch, typename OArch,
+        typename Vtable, typename Char>
+    struct fxn_ptr<IArch, OArch, Vtable, Char, std::true_type>
       : fxn_ptr_table<IArch, OArch, Char, std::true_type>
     {
         using base_type = fxn_ptr_table<IArch, OArch, Char, std::true_type>;
@@ -133,7 +134,8 @@ namespace hpx::util::detail::any {
 namespace hpx::util {
 
     ////////////////////////////////////////////////////////////////////////////
-    template <typename IArch, typename OArch, typename Char> class basic_any<IArch, OArch, Char, std::true_type>
+    HPX_CXX_CORE_EXPORT template <typename IArch, typename OArch, typename Char>
+    class basic_any<IArch, OArch, Char, std::true_type>
     {
     public:
         // constructors

@@ -20,7 +20,8 @@ namespace hpx::lcos::detail {
     {
     };
 
-    template <typename Iterator> struct future_iterator_traits<Iterator,
+    template <typename Iterator>
+    struct future_iterator_traits<Iterator,
         std::void_t<typename std::iterator_traits<Iterator>::value_type>>
     {
         using type = typename std::iterator_traits<Iterator>::value_type;

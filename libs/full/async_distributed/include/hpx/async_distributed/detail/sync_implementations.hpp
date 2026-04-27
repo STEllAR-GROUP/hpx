@@ -37,7 +37,8 @@ namespace hpx::detail {
         }
     };
 
-    template <typename Action> struct sync_local_invoke_direct<Action, void>
+    template <typename Action>
+    struct sync_local_invoke_direct<Action, void>
     {
         template <typename... Ts>
         HPX_FORCEINLINE static void call(

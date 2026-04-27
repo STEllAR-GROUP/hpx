@@ -254,27 +254,32 @@ namespace hpx::execution {
 namespace hpx::execution::experimental {
 
     /// \cond NOINTERNAL
-    template <> struct is_one_way_executor<hpx::execution::sequenced_executor>
+    template <>
+    struct is_one_way_executor<hpx::execution::sequenced_executor>
       : std::true_type
     {
     };
 
-    template <> struct is_bulk_one_way_executor<hpx::execution::sequenced_executor>
+    template <>
+    struct is_bulk_one_way_executor<hpx::execution::sequenced_executor>
       : std::true_type
     {
     };
 
-    template <> struct is_never_blocking_one_way_executor<
+    template <>
+    struct is_never_blocking_one_way_executor<
         hpx::execution::sequenced_executor> : std::true_type
     {
     };
 
-    template <> struct is_two_way_executor<hpx::execution::sequenced_executor>
+    template <>
+    struct is_two_way_executor<hpx::execution::sequenced_executor>
       : std::true_type
     {
     };
 
-    template <> struct is_bulk_two_way_executor<hpx::execution::sequenced_executor>
+    template <>
+    struct is_bulk_two_way_executor<hpx::execution::sequenced_executor>
       : std::true_type
     {
     };

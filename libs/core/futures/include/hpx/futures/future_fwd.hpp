@@ -14,13 +14,13 @@ namespace hpx {
     /// \namespace lcos
     namespace lcos::detail {
 
-        HPX_CXX_CORE_EXPORT template <typename Result>
+        template <typename Result>
         struct future_data;
 
-        HPX_CXX_CORE_EXPORT template <typename Result>
+        template <typename Result>
         struct future_data_base;
 
-        HPX_CXX_CORE_EXPORT struct future_data_refcnt_base;
+        struct future_data_refcnt_base;
     }    // namespace lcos::detail
 
     /// The class template hpx::future provides a mechanism to access the result

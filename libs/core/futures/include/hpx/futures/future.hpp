@@ -53,14 +53,15 @@ namespace hpx::lcos::detail {
     HPX_CXX_CORE_EXPORT template <typename Future, typename Enable = void>
     struct future_unwrap_result;
 
-    template <template <typename> class Future, typename R>
+    HPX_CXX_CORE_EXPORT template <template <typename> class Future, typename R>
     struct future_unwrap_result<Future<Future<R>>>
     {
         using type = R;
         using wrapped_type = Future<type>;
     };
 
-    template <typename R> struct future_unwrap_result<hpx::future<hpx::shared_future<R>>>
+    HPX_CXX_CORE_EXPORT template <typename R>
+    struct future_unwrap_result<hpx::future<hpx::shared_future<R>>>
     {
         using type = R;
         using wrapped_type = hpx::future<type>;
@@ -85,7 +86,8 @@ namespace hpx::lcos::detail {
         }
     };
 
-    template <typename T> struct future_value<T&> : future_data_result<T&>
+    HPX_CXX_CORE_EXPORT template <typename T>
+    struct future_value<T&> : future_data_result<T&>
     {
         HPX_FORCEINLINE static T& get(T* u) noexcept
         {
@@ -99,7 +101,8 @@ namespace hpx::lcos::detail {
         }
     };
 
-    template <> struct future_value<void> : future_data_result<void>
+    template <>
+    struct future_value<void> : future_data_result<void>
     {
         HPX_FORCEINLINE static constexpr void get(
             hpx::util::unused_type) noexcept
@@ -121,7 +124,8 @@ namespace hpx::lcos::detail {
         }
     };
 
-    template <> struct future_get_result<util::unused_type>
+    template <>
+    struct future_get_result<util::unused_type>
     {
         template <typename SharedState>
         HPX_FORCEINLINE static util::unused_type* call(
@@ -146,7 +150,8 @@ namespace hpx::lcos::detail {
     using continuation_result_t =
         typename continuation_result<ContResult>::type;
 
-    template <typename ContResult> struct continuation_result<hpx::future<ContResult>>
+    HPX_CXX_CORE_EXPORT template <typename ContResult>
+    struct continuation_result<hpx::future<ContResult>>
     {
         using type = ContResult;
     };

@@ -45,7 +45,8 @@ namespace hpx::actions::detail {
 
     // If the static Priority is default, a dynamically specified default
     // priority results in using the normal priority.
-    template <> struct thread_priority<threads::thread_priority::default_>
+    template <>
+    struct thread_priority<threads::thread_priority::default_>
     {
         constexpr static threads::thread_priority call(
             threads::thread_priority priority) noexcept
@@ -76,7 +77,8 @@ namespace hpx::actions::detail {
 
     // If the static Stacksize is default, a dynamically specified default
     // stacksize results in using the normal stacksize.
-    template <> struct thread_stacksize<threads::thread_stacksize::default_>
+    template <>
+    struct thread_stacksize<threads::thread_stacksize::default_>
     {
         constexpr static threads::thread_stacksize call(
             threads::thread_stacksize stacksize) noexcept

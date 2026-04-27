@@ -97,7 +97,8 @@ namespace hpx::lcos {
         std::pair<T, bool> data_;
     };
 
-    template <typename Channel> class channel_iterator<void, Channel>
+    template <typename Channel>
+    class channel_iterator<void, Channel>
       : public hpx::util::iterator_facade<channel_iterator<void, Channel>,
             util::unused_type const, std::input_iterator_tag>
     {

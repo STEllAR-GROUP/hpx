@@ -37,12 +37,14 @@ namespace hpx::lcos {
         template <typename ComponentTag, typename BaseLco>
         struct base_lco_wrapping_type;
 
-        template <typename BaseLco> struct base_lco_wrapping_type<traits::detail::component_tag, BaseLco>
+        template <typename BaseLco>
+        struct base_lco_wrapping_type<traits::detail::component_tag, BaseLco>
         {
             using type = components::component<BaseLco>;
         };
 
-        template <typename BaseLco> struct base_lco_wrapping_type<traits::detail::managed_component_tag,
+        template <typename BaseLco>
+        struct base_lco_wrapping_type<traits::detail::managed_component_tag,
             BaseLco>
         {
             using type = components::managed_component<BaseLco>;
@@ -176,7 +178,8 @@ namespace hpx::lcos {
     ///
     /// \tparam void This specialization expects no result value and is almost
     ///              completely equivalent to the plain \a base_lco.
-    template <typename ComponentTag> class base_lco_with_value<void, void, ComponentTag>
+    template <typename ComponentTag>
+    class base_lco_with_value<void, void, ComponentTag>
       : public base_lco
       , public ComponentTag
     {
@@ -210,7 +213,8 @@ namespace hpx::lcos {
 namespace hpx::traits {
 
     // define component type data base entry generator
-    template <typename Result, typename RemoteResult, typename Enable> struct component_type_database<
+    template <typename Result, typename RemoteResult, typename Enable>
+    struct component_type_database<
         hpx::lcos::base_lco_with_value<Result, RemoteResult,
             traits::detail::managed_component_tag>,
         Enable>
@@ -227,7 +231,8 @@ namespace hpx::traits {
         }
     };
 
-    template <typename Result, typename RemoteResult, typename Enable> struct component_type_database<
+    template <typename Result, typename RemoteResult, typename Enable>
+    struct component_type_database<
         hpx::lcos::base_lco_with_value<Result, RemoteResult,
             traits::detail::component_tag>,
         Enable>
@@ -247,7 +252,8 @@ namespace hpx::traits {
 
 namespace hpx::components::detail {
 
-    template <typename Result, typename RemoteResult> struct component_heap_impl<
+    template <typename Result, typename RemoteResult>
+    struct component_heap_impl<
         hpx::components::managed_component<hpx::lcos::base_lco_with_value<
             Result, RemoteResult, traits::detail::managed_component_tag>>>
     {
@@ -264,7 +270,8 @@ namespace hpx::components::detail {
         }
     };
 
-    template <typename Result, typename RemoteResult> struct component_heap_impl<
+    template <typename Result, typename RemoteResult>
+    struct component_heap_impl<
         hpx::components::managed_component<hpx::lcos::base_lco_with_value<
             Result, RemoteResult, traits::detail::component_tag>>>
     {

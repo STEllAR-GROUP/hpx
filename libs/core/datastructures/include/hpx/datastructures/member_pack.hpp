@@ -64,7 +64,8 @@ namespace hpx::util {
             }
         };
 
-        template <std::size_t I, typename T> struct member_leaf<I, T, /*Empty*/ true> : T
+        template <std::size_t I, typename T>
+        struct member_leaf<I, T, /*Empty*/ true> : T
         {
             member_leaf() = default;
 
@@ -110,7 +111,8 @@ namespace hpx::util {
     HPX_CXX_CORE_EXPORT template <typename Is, typename... Ts>
     struct HPX_EMPTY_BASES member_pack;
 
-    template <std::size_t... Is, typename... Ts> struct HPX_EMPTY_BASES member_pack<util::index_pack<Is...>, Ts...>
+    HPX_CXX_CORE_EXPORT template <std::size_t... Is, typename... Ts>
+    struct HPX_EMPTY_BASES member_pack<util::index_pack<Is...>, Ts...>
       : detail::member_leaf<Is, Ts>...
     {
         member_pack() = default;

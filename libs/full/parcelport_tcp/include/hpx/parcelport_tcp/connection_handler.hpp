@@ -42,7 +42,8 @@ namespace hpx::parcelset {
         class HPX_EXPORT connection_handler;
     }    // namespace policies::tcp
 
-    template <> struct connection_handler_traits<policies::tcp::connection_handler>
+    template <>
+    struct connection_handler_traits<policies::tcp::connection_handler>
     {
         using connection_type = policies::tcp::sender;
         using send_early_parcel = std::true_type;

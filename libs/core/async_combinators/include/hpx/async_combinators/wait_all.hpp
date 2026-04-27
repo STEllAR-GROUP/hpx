@@ -177,13 +177,15 @@ namespace hpx::detail {
     {
     };
 
-    template <typename R> struct is_future_or_shared_state<
+    template <typename R>
+    struct is_future_or_shared_state<
         hpx::intrusive_ptr<hpx::lcos::detail::future_data_base<R>>>
       : std::true_type
     {
     };
 
-    template <typename R> struct is_future_or_shared_state<std::reference_wrapper<R>>
+    template <typename R>
+    struct is_future_or_shared_state<std::reference_wrapper<R>>
       : is_future_or_shared_state<R>
     {
     };
@@ -198,12 +200,14 @@ namespace hpx::detail {
     {
     };
 
-    template <typename T> struct is_future_or_shared_state_range<std::vector<T>>
+    template <typename T>
+    struct is_future_or_shared_state_range<std::vector<T>>
       : is_future_or_shared_state<T>
     {
     };
 
-    template <typename T, std::size_t N> struct is_future_or_shared_state_range<std::array<T, N>>
+    template <typename T, std::size_t N>
+    struct is_future_or_shared_state_range<std::array<T, N>>
       : is_future_or_shared_state<T>
     {
     };
@@ -216,13 +220,15 @@ namespace hpx::detail {
     template <typename Future, typename Enable = void>
     struct future_or_shared_state_result;
 
-    template <typename Future> struct future_or_shared_state_result<Future,
+    template <typename Future>
+    struct future_or_shared_state_result<Future,
         std::enable_if_t<hpx::traits::is_future_v<Future>>>
       : hpx::traits::future_traits<Future>
     {
     };
 
-    template <typename R> struct future_or_shared_state_result<
+    template <typename R>
+    struct future_or_shared_state_result<
         hpx::intrusive_ptr<hpx::lcos::detail::future_data_base<R>>>
     {
         using type = R;

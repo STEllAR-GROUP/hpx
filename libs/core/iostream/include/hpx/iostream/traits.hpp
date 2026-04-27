@@ -47,7 +47,8 @@ namespace hpx::iostream {
     {
     };
 
-    template <typename Iter> struct char_type_of<util::iterator_range<Iter>>
+    HPX_CXX_CORE_EXPORT template <typename Iter>
+    struct char_type_of<util::iterator_range<Iter>>
     {
         using type = typename std::iterator_traits<Iter>::value_type;
     };

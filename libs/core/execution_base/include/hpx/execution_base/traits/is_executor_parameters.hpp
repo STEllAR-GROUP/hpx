@@ -36,7 +36,8 @@ namespace hpx::execution::experimental {
         using type = sequential_executor_parameters;
     };
 
-    template <typename Executor> struct extract_executor_parameters<Executor,
+    HPX_CXX_CORE_EXPORT template <typename Executor>
+    struct extract_executor_parameters<Executor,
         std::void_t<typename Executor::executor_parameters_type>>
     {
         using type = typename Executor::executor_parameters_type;
@@ -56,13 +57,15 @@ namespace hpx::execution::experimental {
         // by default, assume equally sized chunks
     };
 
-    template <typename Parameters> struct extract_has_variable_chunk_size<Parameters,
+    HPX_CXX_CORE_EXPORT template <typename Parameters>
+    struct extract_has_variable_chunk_size<Parameters,
         std::void_t<typename Parameters::has_variable_chunk_size>>
       : std::true_type
     {
     };
 
-    template <typename Parameters> struct extract_has_variable_chunk_size<::std::reference_wrapper<Parameters>>
+    HPX_CXX_CORE_EXPORT template <typename Parameters>
+    struct extract_has_variable_chunk_size<::std::reference_wrapper<Parameters>>
       : extract_has_variable_chunk_size<Parameters>
     {
     };
@@ -83,14 +86,16 @@ namespace hpx::execution::experimental {
 
 #if !defined(DOXYGEN)
     // doxygen gets confused by the following construct
-    template <typename Parameters> struct extract_invokes_testing_function<Parameters,
+    HPX_CXX_CORE_EXPORT template <typename Parameters>
+    struct extract_invokes_testing_function<Parameters,
         std::void_t<typename Parameters::invokes_testing_function>>
       : std::true_type
     {
     };
 #endif
 
-    template <typename Parameters> struct extract_invokes_testing_function<
+    HPX_CXX_CORE_EXPORT template <typename Parameters>
+    struct extract_invokes_testing_function<
         ::std::reference_wrapper<Parameters>>
       : extract_invokes_testing_function<Parameters>
     {
@@ -109,12 +114,14 @@ namespace hpx::execution::experimental {
         {
         };
 
-        template <> struct is_executor_parameters<sequential_executor_parameters>
+        template <>
+        struct is_executor_parameters<sequential_executor_parameters>
           : std::true_type
         {
         };
 
-        template <typename T> struct is_executor_parameters<::std::reference_wrapper<T>>
+        template <typename T>
+        struct is_executor_parameters<::std::reference_wrapper<T>>
           : hpx::traits::is_executor_parameters<T>
         {
         };

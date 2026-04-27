@@ -20,22 +20,26 @@
 namespace hpx::parallel::traits {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T> struct is_vector_pack<eve::wide<T, eve::expected_cardinal_t<T>>>
+    HPX_CXX_CORE_EXPORT template <typename T>
+    struct is_vector_pack<eve::wide<T, eve::expected_cardinal_t<T>>>
       : std::true_type
     {
     };
 
-    template <typename T> struct is_vector_pack<T> : std::false_type
+    HPX_CXX_CORE_EXPORT template <typename T>
+    struct is_vector_pack<T> : std::false_type
     {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T> struct is_scalar_vector_pack<eve::wide<T, eve::expected_cardinal_t<T>>>
+    HPX_CXX_CORE_EXPORT template <typename T>
+    struct is_scalar_vector_pack<eve::wide<T, eve::expected_cardinal_t<T>>>
       : std::false_type
     {
     };
 
-    template <typename T> struct is_scalar_vector_pack<T> : std::true_type
+    HPX_CXX_CORE_EXPORT template <typename T>
+    struct is_scalar_vector_pack<T> : std::true_type
     {
     };
 
@@ -46,7 +50,8 @@ namespace hpx::parallel::traits {
         static constexpr std::size_t const value = sizeof(T);
     };
 
-    template <typename T, typename Abi> struct vector_pack_alignment<eve::wide<T, Abi>>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Abi>
+    struct vector_pack_alignment<eve::wide<T, Abi>>
     {
         static constexpr std::size_t const value =
             eve::alignment_v<eve::wide<T, Abi>>;
@@ -59,7 +64,8 @@ namespace hpx::parallel::traits {
         static constexpr std::size_t const value = 1;
     };
 
-    template <typename T, typename Abi> struct vector_pack_size<eve::wide<T, Abi>>
+    HPX_CXX_CORE_EXPORT template <typename T, typename Abi>
+    struct vector_pack_size<eve::wide<T, Abi>>
     {
         static constexpr std::size_t const value = eve::wide<T, Abi>::size();
     };

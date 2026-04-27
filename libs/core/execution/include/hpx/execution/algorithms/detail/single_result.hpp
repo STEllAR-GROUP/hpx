@@ -24,29 +24,34 @@ namespace hpx::execution::experimental::detail {
             "expected a single variant with a single type in value_types_of_t");
     };
 
-    template <> struct single_result<meta::pack<>>
+    template <>
+    struct single_result<meta::pack<>>
     {
         using type = void;
     };
 
-    template <> struct single_result<meta::pack<meta::pack<>>>
+    template <>
+    struct single_result<meta::pack<meta::pack<>>>
     {
         using type = void;
     };
 
-    template <typename T> struct single_result<meta::pack<meta::pack<T>>>
+    HPX_CXX_CORE_EXPORT template <typename T>
+    struct single_result<meta::pack<meta::pack<T>>>
     {
         using type = T;
     };
 
-    template <typename T, typename U, typename... Ts> struct single_result<meta::pack<meta::pack<T, U, Ts...>>>
+    HPX_CXX_CORE_EXPORT template <typename T, typename U, typename... Ts>
+    struct single_result<meta::pack<meta::pack<T, U, Ts...>>>
     {
         static_assert(sizeof(T) == 0,
             "expected a single variant with a single type in value_types_of_t "
             "(single variant with two or more types given)");
     };
 
-    template <typename T, typename U, typename... Ts> struct single_result<meta::pack<T, U, Ts...>>
+    HPX_CXX_CORE_EXPORT template <typename T, typename U, typename... Ts>
+    struct single_result<meta::pack<T, U, Ts...>>
     {
         static_assert(sizeof(T) == 0,
             "expected a single variant with a single type in value_types_of_t "
@@ -77,17 +82,20 @@ namespace hpx::execution::experimental::detail {
             "expected a single variant completion_signatures<>::value_types");
     };
 
-    template <typename T> struct single_variant<util::pack<T>>
+    HPX_CXX_CORE_EXPORT template <typename T>
+    struct single_variant<util::pack<T>>
     {
         using type = T;
     };
 
-    template <typename T> struct single_variant<meta::pack<T>>
+    HPX_CXX_CORE_EXPORT template <typename T>
+    struct single_variant<meta::pack<T>>
     {
         using type = T;
     };
 
-    template <typename T> struct single_variant<hpx::variant<T>>
+    HPX_CXX_CORE_EXPORT template <typename T>
+    struct single_variant<hpx::variant<T>>
     {
         using type = T;
     };
@@ -103,13 +111,13 @@ namespace hpx::execution::experimental::detail {
             "expected a single variant completion_signatures<>::value_types");
     };
 
-    template <template <typename...> typename Variants>
+    HPX_CXX_CORE_EXPORT template <template <typename...> typename Variants>
     struct single_variant_tuple_size<Variants<>>
     {
         static constexpr std::size_t size = 0;
     };
 
-    template <template <typename...> typename Variants,
+    HPX_CXX_CORE_EXPORT template <template <typename...> typename Variants,
         template <typename...> typename Tuple, typename... Ts>
     struct single_variant_tuple_size<Variants<Tuple<Ts...>>>
     {

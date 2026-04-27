@@ -32,7 +32,8 @@ namespace hpx::compute::traits {
             using type = compute::traits::access_target<compute::host::target>;
         };
 
-        template <typename Allocator> struct get_target_traits<Allocator,
+        HPX_CXX_CORE_EXPORT template <typename Allocator>
+        struct get_target_traits<Allocator,
             std::void_t<typename Allocator::target_type>>
         {
             using type =
@@ -50,7 +51,8 @@ namespace hpx::compute::traits {
         };
 #endif
 
-        template <typename Allocator> struct get_reference_type<Allocator,
+        HPX_CXX_CORE_EXPORT template <typename Allocator>
+        struct get_reference_type<Allocator,
             std::void_t<typename Allocator::reference>>
         {
             using type = typename Allocator::reference;
@@ -68,7 +70,8 @@ namespace hpx::compute::traits {
         };
 #endif
 
-        template <typename Allocator> struct get_const_reference_type<Allocator,
+        HPX_CXX_CORE_EXPORT template <typename Allocator>
+        struct get_const_reference_type<Allocator,
             std::void_t<typename Allocator::const_reference>>
         {
             using type = typename Allocator::const_reference;
@@ -81,7 +84,8 @@ namespace hpx::compute::traits {
             using type = compute::host::target;
         };
 
-        template <typename Allocator> struct target_helper_result<Allocator,
+        HPX_CXX_CORE_EXPORT template <typename Allocator>
+        struct target_helper_result<Allocator,
             std::void_t<typename Allocator::target_type>>
         {
             using type = decltype(std::declval<Allocator const&>().target());

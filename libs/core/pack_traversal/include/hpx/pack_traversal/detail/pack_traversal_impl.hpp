@@ -44,7 +44,8 @@ namespace hpx::util::detail {
             }
         };
 
-        template <> class spread_box<>
+        template <>
+        class spread_box<>
         {
         public:
             explicit constexpr spread_box() noexcept = default;
@@ -68,7 +69,8 @@ namespace hpx::util::detail {
         {
         };
 
-        template <typename... T> struct is_spread<spread_box<T...>> : std::true_type
+        template <typename... T>
+        struct is_spread<spread_box<T...>> : std::true_type
         {
         };
 
@@ -78,7 +80,8 @@ namespace hpx::util::detail {
         {
         };
 
-        template <> struct is_empty_spread<spread_box<>> : std::true_type
+        template <>
+        struct is_empty_spread<spread_box<>> : std::true_type
         {
         };
 
@@ -310,13 +313,15 @@ namespace hpx::util::detail {
     template <typename Mapper, typename... T>
     struct is_effective_any_of_t;
 
-    template <typename Mapper, typename First, typename... Rest> struct is_effective_any_of_t<Mapper, First, Rest...>
+    template <typename Mapper, typename First, typename... Rest>
+    struct is_effective_any_of_t<Mapper, First, Rest...>
       : std::conditional_t<is_effective_v<Mapper, First>, std::true_type,
             is_effective_any_of_t<Mapper, Rest...>>
     {
     };
 
-    template <typename Mapper> struct is_effective_any_of_t<Mapper> : std::false_type
+    template <typename Mapper>
+    struct is_effective_any_of_t<Mapper> : std::false_type
     {
     };
 
@@ -335,7 +340,8 @@ namespace hpx::util::detail {
         {
         };
 
-        template <typename T, typename E> struct has_push_back<T, E,
+        HPX_CXX_CORE_EXPORT template <typename T, typename E>
+        struct has_push_back<T, E,
             std::void_t<decltype(std::declval<T>().push_back(
                 std::declval<E>()))>> : std::true_type
         {
@@ -385,7 +391,8 @@ namespace hpx::util::detail {
             }
         };
 
-        template <typename C> class container_accessor<C,
+        template <typename C>
+        class container_accessor<C,
             std::enable_if_t<std::is_rvalue_reference_v<C&&>>>
         {
             C&& container_;
@@ -694,7 +701,8 @@ namespace hpx::util::detail {
         }
     };
 
-    template <> struct mapping_strategy_base<strategy_traverse_tag>
+    template <>
+    struct mapping_strategy_base<strategy_traverse_tag>
     {
         template <typename T>
         constexpr void may_void(T&& /*element*/) const noexcept

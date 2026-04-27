@@ -30,7 +30,8 @@ namespace hpx::iostream {
     HPX_CXX_CORE_EXPORT template <typename Ch>
     struct char_traits;
 
-    template <> struct char_traits<char> : std::char_traits<char>
+    template <>
+    struct char_traits<char> : std::char_traits<char>
     {
         [[nodiscard]] static constexpr char newline() noexcept
         {
@@ -61,7 +62,8 @@ namespace hpx::iostream {
 #if defined(HPX_IOSTREAM_HAVE_WIDE_STREAMS)
     HPX_CXX_CORE_EXPORT inline constexpr std::wint_t WWOULD_BLOCK = WEOF - 1;
 
-    template <> struct char_traits<wchar_t> : std::char_traits<wchar_t>
+    template <>
+    struct char_traits<wchar_t> : std::char_traits<wchar_t>
     {
         [[nodiscard]] static constexpr wchar_t newline() noexcept
         {

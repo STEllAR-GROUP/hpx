@@ -88,7 +88,8 @@ namespace hpx::parallel::execution {
 
         ///////////////////////////////////////////////////////////////////////
         // emulate async_execute() on OneWayExecutors
-        template <typename Executor> struct async_execute_fn_helper<Executor,
+        template <typename Executor>
+        struct async_execute_fn_helper<Executor,
             std::enable_if_t<hpx::traits::is_one_way_executor_v<Executor> &&
                 !hpx::traits::is_two_way_executor_v<Executor>>>
         {
@@ -128,7 +129,8 @@ namespace hpx::parallel::execution {
         };
 
         // emulate sync_execute() on OneWayExecutors
-        template <typename Executor> struct sync_execute_fn_helper<Executor,
+        template <typename Executor>
+        struct sync_execute_fn_helper<Executor,
             std::enable_if_t<hpx::traits::is_one_way_executor_v<Executor> &&
                 !hpx::traits::is_two_way_executor_v<Executor>>>
         {
@@ -152,7 +154,8 @@ namespace hpx::parallel::execution {
         };
 
         // emulate then_execute() on OneWayExecutors
-        template <typename Executor> struct then_execute_fn_helper<Executor,
+        template <typename Executor>
+        struct then_execute_fn_helper<Executor,
             std::enable_if_t<hpx::traits::is_one_way_executor_v<Executor> &&
                 !hpx::traits::is_two_way_executor_v<Executor>>>
         {
@@ -192,7 +195,8 @@ namespace hpx::parallel::execution {
 
         ///////////////////////////////////////////////////////////////////////
         // emulate post() on OneWayExecutors
-        template <typename Executor> struct post_fn_helper<Executor,
+        template <typename Executor>
+        struct post_fn_helper<Executor,
             std::enable_if_t<hpx::traits::is_one_way_executor_v<Executor> &&
                 !hpx::traits::is_two_way_executor_v<Executor> &&
                 !hpx::traits::is_never_blocking_one_way_executor_v<Executor>>>
@@ -301,7 +305,8 @@ namespace hpx::parallel::execution {
                 HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
-        template <typename Executor> struct async_execute_fn_helper<Executor,
+        template <typename Executor>
+        struct async_execute_fn_helper<Executor,
             std::enable_if_t<hpx::traits::is_two_way_executor_v<Executor>>>
         {
             template <typename TwoWayExecutor, typename F, typename... Ts>
@@ -325,7 +330,8 @@ namespace hpx::parallel::execution {
 
         ///////////////////////////////////////////////////////////////////////
         // default implementation of the sync_execute() customization point
-        template <typename Executor> struct sync_execute_fn_helper<Executor,
+        template <typename Executor>
+        struct sync_execute_fn_helper<Executor,
             std::enable_if_t<hpx::traits::is_two_way_executor_v<Executor>>>
         {
             // fall-back: emulate sync_execute using async_execute
@@ -423,7 +429,8 @@ namespace hpx::parallel::execution {
         ///////////////////////////////////////////////////////////////////////
         // then_execute()
 
-        template <typename Executor> struct then_execute_fn_helper<Executor,
+        template <typename Executor>
+        struct then_execute_fn_helper<Executor,
             std::enable_if_t<hpx::traits::is_two_way_executor_v<Executor>>>
         {
             template <typename TwoWayExecutor, typename F, typename Future,
@@ -508,7 +515,8 @@ namespace hpx::parallel::execution {
 
         ///////////////////////////////////////////////////////////////////////
         // emulate post() on TwoWayExecutors
-        template <typename Executor> struct post_fn_helper<Executor,
+        template <typename Executor>
+        struct post_fn_helper<Executor,
             std::enable_if_t<hpx::traits::is_two_way_executor_v<Executor> &&
                 !hpx::traits::is_never_blocking_one_way_executor_v<Executor>>>
         {
@@ -615,7 +623,8 @@ namespace hpx::parallel::execution {
             return exec.post(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
-        template <typename Executor> struct post_fn_helper<Executor,
+        template <typename Executor>
+        struct post_fn_helper<Executor,
             std::enable_if_t<
                 hpx::traits::is_never_blocking_one_way_executor_v<Executor>>>
         {
@@ -714,7 +723,8 @@ namespace hpx::parallel::execution {
         using bulk_function_result_t =
             typename bulk_function_result<F, Shape, Ts...>::type;
 
-        template <typename Executor> struct bulk_async_execute_fn_helper<Executor,
+        template <typename Executor>
+        struct bulk_async_execute_fn_helper<Executor,
             std::enable_if_t<
                 (hpx::traits::is_one_way_executor_v<Executor> ||
                     hpx::traits::is_two_way_executor_v<Executor>) &&
@@ -796,7 +806,8 @@ namespace hpx::parallel::execution {
             };
         };
 
-        template <typename Executor> struct bulk_async_execute_fn_helper<Executor,
+        template <typename Executor>
+        struct bulk_async_execute_fn_helper<Executor,
             std::enable_if_t<hpx::traits::is_bulk_two_way_executor_v<Executor>>>
         {
             template <typename BulkExecutor, typename F, typename Shape,
@@ -876,12 +887,14 @@ namespace hpx::parallel::execution {
         template <typename F, typename Shape, bool IsVoid, typename... Ts>
         struct bulk_execute_result_impl;
 
-        template <typename F, typename Shape, typename... Ts> struct bulk_execute_result_impl<F, Shape, false, Ts...>
+        template <typename F, typename Shape, typename... Ts>
+        struct bulk_execute_result_impl<F, Shape, false, Ts...>
         {
             using type = std::vector<bulk_function_result_t<F, Shape, Ts...>>;
         };
 
-        template <typename F, typename Shape, typename... Ts> struct bulk_execute_result_impl<F, Shape, true, Ts...>
+        template <typename F, typename Shape, typename... Ts>
+        struct bulk_execute_result_impl<F, Shape, true, Ts...>
         {
             using type = void;
         };
@@ -904,7 +917,8 @@ namespace hpx::parallel::execution {
             typename bulk_execute_result<F, Shape, Ts...>::type;
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Executor> struct bulk_sync_execute_fn_helper<Executor,
+        template <typename Executor>
+        struct bulk_sync_execute_fn_helper<Executor,
             std::enable_if_t<hpx::traits::is_one_way_executor_v<Executor> &&
                 !hpx::traits::is_two_way_executor_v<Executor> &&
                 !hpx::traits::is_bulk_one_way_executor_v<Executor>>>
@@ -1007,7 +1021,8 @@ namespace hpx::parallel::execution {
             };
         };
 
-        template <typename Executor> struct bulk_sync_execute_fn_helper<Executor,
+        template <typename Executor>
+        struct bulk_sync_execute_fn_helper<Executor,
             std::enable_if_t<hpx::traits::is_two_way_executor_v<Executor> &&
                 !hpx::traits::is_bulk_one_way_executor_v<Executor>>>
         {
@@ -1132,7 +1147,8 @@ namespace hpx::parallel::execution {
             };
         };
 
-        template <typename Executor> struct bulk_sync_execute_fn_helper<Executor,
+        template <typename Executor>
+        struct bulk_sync_execute_fn_helper<Executor,
             std::enable_if_t<hpx::traits::is_bulk_one_way_executor_v<Executor>>>
         {
             template <typename BulkExecutor, typename F, typename Shape,
@@ -1167,7 +1183,8 @@ namespace hpx::parallel::execution {
         ///////////////////////////////////////////////////////////////////////
         // bulk_then_execute()
 
-        template <typename Executor> struct bulk_then_execute_fn_helper<Executor,
+        template <typename Executor>
+        struct bulk_then_execute_fn_helper<Executor,
             std::enable_if_t<
                 !hpx::traits::is_bulk_two_way_executor_v<Executor>>>
         {
@@ -1278,7 +1295,8 @@ namespace hpx::parallel::execution {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Executor> struct bulk_then_execute_fn_helper<Executor,
+        template <typename Executor>
+        struct bulk_then_execute_fn_helper<Executor,
             std::enable_if_t<hpx::traits::is_bulk_two_way_executor_v<Executor>>>
         {
             template <typename BulkExecutor, typename F, typename Shape,

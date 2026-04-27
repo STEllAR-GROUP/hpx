@@ -29,8 +29,9 @@ namespace hpx::util::plugin {
             typename Parameter>
         struct HPX_PLUGIN_EXPORT_API abstract_factory_item;
 
-        template <typename BasePlugin, typename Base,
-            typename... Parameters> struct HPX_PLUGIN_EXPORT_API abstract_factory_item<BasePlugin, Base,
+        HPX_CXX_CORE_EXPORT template <typename BasePlugin, typename Base,
+            typename... Parameters>
+        struct HPX_PLUGIN_EXPORT_API abstract_factory_item<BasePlugin, Base,
             hpx::util::pack<Parameters...>> : public Base
         {
             using Base::create;

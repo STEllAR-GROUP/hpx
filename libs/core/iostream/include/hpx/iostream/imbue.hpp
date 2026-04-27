@@ -46,7 +46,8 @@ namespace hpx::iostream {
         {
         };
 
-        template <> struct imbue_impl<any_tag>
+        template <>
+        struct imbue_impl<any_tag>
         {
             template <typename T, typename Locale>
             static void imbue(T&, Locale const&)
@@ -54,7 +55,8 @@ namespace hpx::iostream {
             }
         };
 
-        template <> struct imbue_impl<streambuf_tag>
+        template <>
+        struct imbue_impl<streambuf_tag>
         {
             template <typename T, typename Locale>
             static void imbue(T& t, Locale const& loc)
@@ -63,7 +65,8 @@ namespace hpx::iostream {
             }
         };
 
-        template <> struct imbue_impl<localizable_tag>
+        template <>
+        struct imbue_impl<localizable_tag>
         {
             template <typename T, typename Locale>
             static void imbue(T& t, Locale const& loc)

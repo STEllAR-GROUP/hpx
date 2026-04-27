@@ -132,17 +132,20 @@ namespace hpx::traits {
         // robust concept checking). Here we provide a specialization to capture
         // this case, such that, bidirectional and random access iterators will
         // be properly recognized as satisfying the ForwardIterator concept.
-        template <typename Iter> struct satisfy_traversal_concept<Iter, hpx::forward_traversal_tag>
+        HPX_CXX_CORE_EXPORT template <typename Iter>
+        struct satisfy_traversal_concept<Iter, hpx::forward_traversal_tag>
           : std::bool_constant<std::bidirectional_iterator<Iter>>
         {
         };
 
-        template <typename Iter> struct satisfy_traversal_concept<Iter, hpx::bidirectional_traversal_tag>
+        HPX_CXX_CORE_EXPORT template <typename Iter>
+        struct satisfy_traversal_concept<Iter, hpx::bidirectional_traversal_tag>
           : std::bool_constant<std::bidirectional_iterator<Iter>>
         {
         };
 
-        template <typename Iter> struct satisfy_traversal_concept<Iter, hpx::random_access_traversal_tag>
+        HPX_CXX_CORE_EXPORT template <typename Iter>
+        struct satisfy_traversal_concept<Iter, hpx::random_access_traversal_tag>
           : std::bool_constant<std::random_access_iterator<Iter>>
         {
         };
@@ -173,7 +176,8 @@ namespace hpx::traits {
         {
         };
 
-        template <typename Iter, typename Cat> struct belongs_to_iterator_category<Iter, Cat,
+        HPX_CXX_CORE_EXPORT template <typename Iter, typename Cat>
+        struct belongs_to_iterator_category<Iter, Cat,
             std::enable_if_t<is_iterator_v<Iter>>>
           : std::is_base_of<Cat, iter_category_t<Iter>>
         {
@@ -190,7 +194,8 @@ namespace hpx::traits {
         {
         };
 
-        template <typename Iter, typename Traversal> struct belongs_to_iterator_traversal<Iter, Traversal,
+        HPX_CXX_CORE_EXPORT template <typename Iter, typename Traversal>
+        struct belongs_to_iterator_traversal<Iter, Traversal,
             std::enable_if_t<is_iterator_v<Iter>>>
           : std::integral_constant<bool,
                 std::is_base_of_v<Traversal,
@@ -210,7 +215,8 @@ namespace hpx::traits {
         {
         };
 
-        template <typename Iter, typename Cat> struct has_category<Iter, Cat, std::enable_if_t<is_iterator_v<Iter>>>
+        HPX_CXX_CORE_EXPORT template <typename Iter, typename Cat>
+        struct has_category<Iter, Cat, std::enable_if_t<is_iterator_v<Iter>>>
           : std::is_same<Cat, iter_category_t<Iter>>
         {
         };
@@ -234,13 +240,15 @@ namespace hpx::traits {
         {
         };
 
-        template <typename Iter, typename Traversal> struct has_traversal<Iter, Traversal,
+        HPX_CXX_CORE_EXPORT template <typename Iter, typename Traversal>
+        struct has_traversal<Iter, Traversal,
             std::enable_if_t<is_iterator_v<Iter>>>
           : std::is_same<Traversal, hpx::traits::iterator_traversal_t<Iter>>
         {
         };
 
-        template <typename Iter> struct has_traversal<Iter, hpx::bidirectional_traversal_tag,
+        HPX_CXX_CORE_EXPORT template <typename Iter>
+        struct has_traversal<Iter, hpx::bidirectional_traversal_tag,
             std::enable_if_t<is_iterator_v<Iter>>>
           : std::integral_constant<bool,
                 std::is_same_v<hpx::bidirectional_traversal_tag,
@@ -252,7 +260,8 @@ namespace hpx::traits {
         {
         };
 
-        template <typename Iter> struct has_traversal<Iter, hpx::random_access_traversal_tag,
+        HPX_CXX_CORE_EXPORT template <typename Iter>
+        struct has_traversal<Iter, hpx::random_access_traversal_tag,
             std::enable_if_t<is_iterator_v<Iter>>>
           : std::integral_constant<bool,
                 std::is_same_v<hpx::random_access_traversal_tag,

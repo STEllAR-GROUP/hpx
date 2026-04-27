@@ -151,7 +151,8 @@ namespace hpx::lcos::detail {
         }
     };
 
-    template <typename Result> struct future_data_result<Result&>
+    template <typename Result>
+    struct future_data_result<Result&>
     {
         using type = Result*;
 
@@ -166,7 +167,8 @@ namespace hpx::lcos::detail {
         }
     };
 
-    template <> struct future_data_result<void>
+    template <>
+    struct future_data_result<void>
     {
         using type = util::unused_type;
 
@@ -215,7 +217,8 @@ namespace hpx::lcos::detail {
     HPX_CORE_EXPORT void handle_on_completed(
         future_data_refcnt_base::completed_callback_vector_type&& on_completed);
 
-    template <> struct HPX_CORE_EXPORT future_data_base<traits::detail::future_data_void>
+    template <>
+    struct HPX_CORE_EXPORT future_data_base<traits::detail::future_data_void>
       : future_data_refcnt_base
     {
         using mutex_type = hpx::spinlock;

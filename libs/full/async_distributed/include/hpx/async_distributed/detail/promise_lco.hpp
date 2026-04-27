@@ -127,7 +127,8 @@ namespace hpx::lcos::detail {
         }
     };
 
-    template <> class promise_lco<void, hpx::util::unused_type>
+    template <>
+    class promise_lco<void, hpx::util::unused_type>
       : public promise_lco_base<void, hpx::util::unused_type>
     {
     protected:
@@ -171,7 +172,8 @@ namespace hpx {
             HPX_EXPORT extern util::atomic_count unique_type;
         }
 
-        template <typename Result, typename RemoteResult> struct component_type_database<
+        template <typename Result, typename RemoteResult>
+        struct component_type_database<
             lcos::detail::promise_lco<Result, RemoteResult>>
         {
             static components::component_type value;
@@ -214,7 +216,8 @@ namespace hpx {
         component_heap_helper<hpx::components::managed_component<
             lcos::detail::promise_lco<void, hpx::util::unused_type>>>(...);
 
-        template <typename Result, typename RemoteResult> struct component_heap_impl<hpx::components::managed_component<
+        template <typename Result, typename RemoteResult>
+        struct component_heap_impl<hpx::components::managed_component<
             lcos::detail::promise_lco<Result, RemoteResult>>>
         {
             using valid = void;

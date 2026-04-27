@@ -70,7 +70,8 @@ namespace hpx::execution::experimental {
     } null_parameters{};
 
     /// \cond NOINTERNAL
-    template <> struct is_executor_parameters<null_parameters_t> : std::true_type
+    template <>
+    struct is_executor_parameters<null_parameters_t> : std::true_type
     {
     };
     /// \endcond
@@ -421,7 +422,8 @@ namespace hpx::execution::experimental {
         }
     } collect_execution_parameters{};
 
-    template <> struct is_scheduling_property<with_processing_units_count_t>
+    template <>
+    struct is_scheduling_property<with_processing_units_count_t>
       : std::true_type
     {
     };

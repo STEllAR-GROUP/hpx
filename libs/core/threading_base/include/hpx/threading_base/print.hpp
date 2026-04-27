@@ -21,7 +21,8 @@ namespace hpx::debug {
     struct threadinfo;
 
     // safely dump thread pointer/description
-    template <> struct threadinfo<threads::thread_data*>
+    template <>
+    struct threadinfo<threads::thread_data*>
     {
         explicit constexpr threadinfo(threads::thread_data const* v) noexcept
           : data(v)
@@ -34,7 +35,8 @@ namespace hpx::debug {
             std::ostream& os, threadinfo const& d);
     };
 
-    template <> struct threadinfo<threads::thread_id_type*>
+    template <>
+    struct threadinfo<threads::thread_id_type*>
     {
         explicit constexpr threadinfo(threads::thread_id_type const* v) noexcept
           : data(v)
@@ -47,7 +49,8 @@ namespace hpx::debug {
             std::ostream& os, threadinfo const& d);
     };
 
-    template <> struct threadinfo<threads::thread_id_ref_type*>
+    template <>
+    struct threadinfo<threads::thread_id_ref_type*>
     {
         explicit constexpr threadinfo(
             threads::thread_id_ref_type const* v) noexcept
@@ -61,7 +64,8 @@ namespace hpx::debug {
             std::ostream& os, threadinfo const& d);
     };
 
-    template <> struct threadinfo<hpx::threads::thread_init_data>
+    template <>
+    struct threadinfo<hpx::threads::thread_init_data>
     {
         explicit constexpr threadinfo(
             hpx::threads::thread_init_data const& v) noexcept

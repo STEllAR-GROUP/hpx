@@ -34,7 +34,8 @@ namespace hpx::components {
         template <typename BackPtrTag>
         struct init;
 
-        template <> struct init<traits::construct_with_back_ptr>
+        template <>
+        struct init<traits::construct_with_back_ptr>
         {
             template <typename Component, typename Managed>
             static constexpr void call(
@@ -51,7 +52,8 @@ namespace hpx::components {
             }
         };
 
-        template <> struct init<traits::construct_without_back_ptr>
+        template <>
+        struct init<traits::construct_without_back_ptr>
         {
             template <typename Component, typename Managed>
             static void call(Component* component, Managed* this_)
@@ -75,7 +77,8 @@ namespace hpx::components {
         template <typename DtorTag>
         struct destroy_backptr;
 
-        template <> struct destroy_backptr<traits::managed_object_is_lifetime_controlled>
+        template <>
+        struct destroy_backptr<traits::managed_object_is_lifetime_controlled>
         {
             template <typename BackPtr>
             static void call(BackPtr* back_ptr)
@@ -88,7 +91,8 @@ namespace hpx::components {
             }
         };
 
-        template <> struct destroy_backptr<traits::managed_object_controls_lifetime>
+        template <>
+        struct destroy_backptr<traits::managed_object_controls_lifetime>
         {
             template <typename BackPtr>
             static constexpr void call(BackPtr*) noexcept
@@ -104,7 +108,8 @@ namespace hpx::components {
         template <typename DtorTag>
         struct manage_lifetime;
 
-        template <> struct manage_lifetime<traits::managed_object_is_lifetime_controlled>
+        template <>
+        struct manage_lifetime<traits::managed_object_is_lifetime_controlled>
         {
             template <typename Component>
             static constexpr void call(Component*) noexcept
@@ -126,7 +131,8 @@ namespace hpx::components {
             }
         };
 
-        template <> struct manage_lifetime<traits::managed_object_controls_lifetime>
+        template <>
+        struct manage_lifetime<traits::managed_object_controls_lifetime>
         {
             template <typename Component>
             static void call(Component* component) noexcept(

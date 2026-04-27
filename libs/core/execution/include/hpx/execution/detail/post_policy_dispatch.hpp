@@ -25,7 +25,8 @@ namespace hpx::detail {
     HPX_CXX_CORE_EXPORT template <typename Policy>
     struct post_policy_dispatch;
 
-    template <> struct post_policy_dispatch<launch::async_policy>
+    template <>
+    struct post_policy_dispatch<launch::async_policy>
     {
         template <typename Policy, typename F, typename... Ts>
         static void call(Policy policy,
@@ -55,7 +56,8 @@ namespace hpx::detail {
         }
     };
 
-    template <> struct post_policy_dispatch<launch::fork_policy>
+    template <>
+    struct post_policy_dispatch<launch::fork_policy>
     {
         template <typename Policy, typename F, typename... Ts>
         static void call(Policy policy,
@@ -102,7 +104,8 @@ namespace hpx::detail {
         }
     };
 
-    template <> struct post_policy_dispatch<launch::sync_policy>
+    template <>
+    struct post_policy_dispatch<launch::sync_policy>
     {
         template <typename Policy, typename F, typename... Ts>
         static void call(Policy&& policy,
@@ -124,7 +127,8 @@ namespace hpx::detail {
         }
     };
 
-    template <> struct post_policy_dispatch<launch::deferred_policy>
+    template <>
+    struct post_policy_dispatch<launch::deferred_policy>
     {
         template <typename Policy, typename F, typename... Ts>
         static void call(Policy&& policy,

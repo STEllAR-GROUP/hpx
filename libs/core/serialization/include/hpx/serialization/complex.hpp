@@ -35,12 +35,14 @@ namespace hpx::serialization {
 
 namespace hpx::traits {
 
-    template <typename T> struct is_bitwise_serializable<std::complex<T>>
+    HPX_CXX_CORE_EXPORT template <typename T>
+    struct is_bitwise_serializable<std::complex<T>>
       : is_bitwise_serializable<std::remove_const_t<T>>
     {
     };
 
-    template <typename T> struct is_not_bitwise_serializable<std::complex<T>>
+    HPX_CXX_CORE_EXPORT template <typename T>
+    struct is_not_bitwise_serializable<std::complex<T>>
       : std::integral_constant<bool,
             !is_bitwise_serializable_v<std::complex<T>>>
     {

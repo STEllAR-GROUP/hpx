@@ -21,7 +21,8 @@ namespace hpx::thrust::detail {
     HPX_CXX_CORE_EXPORT template <typename Tag>
     struct algorithm_map;
 
-    template <> struct algorithm_map<hpx::fill_t>
+    template <>
+    struct algorithm_map<hpx::fill_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -30,7 +31,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::fill_n_t>
+    template <>
+    struct algorithm_map<hpx::fill_n_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -39,7 +41,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::copy_t>
+    template <>
+    struct algorithm_map<hpx::copy_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -48,7 +51,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::transform_t>
+    template <>
+    struct algorithm_map<hpx::transform_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -58,7 +62,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::for_each_t>
+    template <>
+    struct algorithm_map<hpx::for_each_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -67,7 +72,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::reduce_t>
+    template <>
+    struct algorithm_map<hpx::reduce_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -76,7 +82,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::sort_t>
+    template <>
+    struct algorithm_map<hpx::sort_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -85,7 +92,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::find_t>
+    template <>
+    struct algorithm_map<hpx::find_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -94,7 +102,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::count_t>
+    template <>
+    struct algorithm_map<hpx::count_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -103,7 +112,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::unique_t>
+    template <>
+    struct algorithm_map<hpx::unique_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -112,7 +122,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::reverse_t>
+    template <>
+    struct algorithm_map<hpx::reverse_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -121,7 +132,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::generate_t>
+    template <>
+    struct algorithm_map<hpx::generate_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -130,7 +142,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::generate_n_t>
+    template <>
+    struct algorithm_map<hpx::generate_n_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -140,7 +153,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::remove_t>
+    template <>
+    struct algorithm_map<hpx::remove_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -149,7 +163,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::remove_if_t>
+    template <>
+    struct algorithm_map<hpx::remove_if_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -159,7 +174,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::replace_t>
+    template <>
+    struct algorithm_map<hpx::replace_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -168,7 +184,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::replace_if_t>
+    template <>
+    struct algorithm_map<hpx::replace_if_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -178,7 +195,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::merge_t>
+    template <>
+    struct algorithm_map<hpx::merge_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -187,7 +205,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::partition_t>
+    template <>
+    struct algorithm_map<hpx::partition_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -197,7 +216,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::transform_reduce_t>
+    template <>
+    struct algorithm_map<hpx::transform_reduce_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -207,7 +227,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::copy_n_t>
+    template <>
+    struct algorithm_map<hpx::copy_n_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -216,7 +237,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::copy_if_t>
+    template <>
+    struct algorithm_map<hpx::copy_if_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -225,7 +247,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::count_if_t>
+    template <>
+    struct algorithm_map<hpx::count_if_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -234,7 +257,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::find_if_t>
+    template <>
+    struct algorithm_map<hpx::find_if_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -243,7 +267,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::find_if_not_t>
+    template <>
+    struct algorithm_map<hpx::find_if_not_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -253,7 +278,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::stable_sort_t>
+    template <>
+    struct algorithm_map<hpx::stable_sort_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -263,7 +289,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::stable_partition_t>
+    template <>
+    struct algorithm_map<hpx::stable_partition_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -273,7 +300,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::partition_copy_t>
+    template <>
+    struct algorithm_map<hpx::partition_copy_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -283,7 +311,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::remove_copy_t>
+    template <>
+    struct algorithm_map<hpx::remove_copy_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -293,7 +322,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::remove_copy_if_t>
+    template <>
+    struct algorithm_map<hpx::remove_copy_if_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -303,7 +333,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::replace_copy_t>
+    template <>
+    struct algorithm_map<hpx::replace_copy_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -313,7 +344,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::replace_copy_if_t>
+    template <>
+    struct algorithm_map<hpx::replace_copy_if_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -323,7 +355,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::reverse_copy_t>
+    template <>
+    struct algorithm_map<hpx::reverse_copy_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -333,7 +366,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::unique_copy_t>
+    template <>
+    struct algorithm_map<hpx::unique_copy_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -343,7 +377,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::adjacent_difference_t>
+    template <>
+    struct algorithm_map<hpx::adjacent_difference_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -353,7 +388,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::transform_inclusive_scan_t>
+    template <>
+    struct algorithm_map<hpx::transform_inclusive_scan_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -363,7 +399,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::transform_exclusive_scan_t>
+    template <>
+    struct algorithm_map<hpx::transform_exclusive_scan_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -373,7 +410,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::equal_t>
+    template <>
+    struct algorithm_map<hpx::equal_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -382,7 +420,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::mismatch_t>
+    template <>
+    struct algorithm_map<hpx::mismatch_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -391,7 +430,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::min_element_t>
+    template <>
+    struct algorithm_map<hpx::min_element_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -401,7 +441,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::max_element_t>
+    template <>
+    struct algorithm_map<hpx::max_element_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -411,7 +452,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::minmax_element_t>
+    template <>
+    struct algorithm_map<hpx::minmax_element_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -421,7 +463,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::all_of_t>
+    template <>
+    struct algorithm_map<hpx::all_of_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -430,7 +473,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::any_of_t>
+    template <>
+    struct algorithm_map<hpx::any_of_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -439,7 +483,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::none_of_t>
+    template <>
+    struct algorithm_map<hpx::none_of_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -448,7 +493,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::swap_ranges_t>
+    template <>
+    struct algorithm_map<hpx::swap_ranges_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -458,7 +504,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::uninitialized_copy_t>
+    template <>
+    struct algorithm_map<hpx::uninitialized_copy_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -468,7 +515,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::uninitialized_copy_n_t>
+    template <>
+    struct algorithm_map<hpx::uninitialized_copy_n_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -478,7 +526,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::uninitialized_fill_t>
+    template <>
+    struct algorithm_map<hpx::uninitialized_fill_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -488,7 +537,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::uninitialized_fill_n_t>
+    template <>
+    struct algorithm_map<hpx::uninitialized_fill_n_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -498,7 +548,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::set_union_t>
+    template <>
+    struct algorithm_map<hpx::set_union_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -508,7 +559,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::set_intersection_t>
+    template <>
+    struct algorithm_map<hpx::set_intersection_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -518,7 +570,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::set_difference_t>
+    template <>
+    struct algorithm_map<hpx::set_difference_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -528,7 +581,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::set_symmetric_difference_t>
+    template <>
+    struct algorithm_map<hpx::set_symmetric_difference_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -538,7 +592,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::for_each_n_t>
+    template <>
+    struct algorithm_map<hpx::for_each_n_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -548,7 +603,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::is_sorted_t>
+    template <>
+    struct algorithm_map<hpx::is_sorted_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -558,7 +614,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::is_partitioned_t>
+    template <>
+    struct algorithm_map<hpx::is_partitioned_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -568,7 +625,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::inclusive_scan_t>
+    template <>
+    struct algorithm_map<hpx::inclusive_scan_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)
@@ -578,7 +636,8 @@ namespace hpx::thrust::detail {
         }
     };
 
-    template <> struct algorithm_map<hpx::exclusive_scan_t>
+    template <>
+    struct algorithm_map<hpx::exclusive_scan_t>
     {
         template <typename Policy, typename... Args>
         static constexpr decltype(auto) invoke(Policy&& policy, Args&&... args)

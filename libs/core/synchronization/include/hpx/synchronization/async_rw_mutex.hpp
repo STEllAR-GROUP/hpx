@@ -102,7 +102,8 @@ namespace hpx::experimental {
             }
         };
 
-        template <> struct async_rw_mutex_shared_state<void>
+        template <>
+        struct async_rw_mutex_shared_state<void>
         {
             using shared_state_ptr_type =
                 std::shared_ptr<async_rw_mutex_shared_state>;
@@ -157,7 +158,8 @@ namespace hpx::experimental {
             async_rw_mutex_access_type AccessType>
         struct async_rw_mutex_access_wrapper;
 
-        template <typename ReadWriteT, typename ReadT> struct async_rw_mutex_access_wrapper<ReadWriteT, ReadT,
+        HPX_CXX_CORE_EXPORT template <typename ReadWriteT, typename ReadT>
+        struct async_rw_mutex_access_wrapper<ReadWriteT, ReadT,
             async_rw_mutex_access_type::read>
         {
         private:
@@ -195,7 +197,8 @@ namespace hpx::experimental {
             }
         };
 
-        template <typename ReadWriteT, typename ReadT> struct async_rw_mutex_access_wrapper<ReadWriteT, ReadT,
+        HPX_CXX_CORE_EXPORT template <typename ReadWriteT, typename ReadT>
+        struct async_rw_mutex_access_wrapper<ReadWriteT, ReadT,
             async_rw_mutex_access_type::readwrite>
         {
         private:
@@ -245,7 +248,8 @@ namespace hpx::experimental {
         // The void wrappers for read and readwrite are identical, but must be
         // specialized separately to avoid ambiguity with the non-void
         // specializations above.
-        template <> struct async_rw_mutex_access_wrapper<void, void,
+        template <>
+        struct async_rw_mutex_access_wrapper<void, void,
             async_rw_mutex_access_type::read>
         {
         private:
@@ -270,7 +274,8 @@ namespace hpx::experimental {
                 async_rw_mutex_access_wrapper const&) = default;
         };
 
-        template <> struct async_rw_mutex_access_wrapper<void, void,
+        template <>
+        struct async_rw_mutex_access_wrapper<void, void,
             async_rw_mutex_access_type::readwrite>
         {
         private:
@@ -352,7 +357,8 @@ namespace hpx::experimental {
     // The protected value is moved from state to state and is released when the
     // last shared state is destroyed.
 
-    template <typename Allocator> class async_rw_mutex<void, void, Allocator>
+    HPX_CXX_CORE_EXPORT template <typename Allocator>
+    class async_rw_mutex<void, void, Allocator>
     {
     private:
         template <detail::async_rw_mutex_access_type AccessType>

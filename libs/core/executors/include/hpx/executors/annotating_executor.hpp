@@ -265,37 +265,43 @@ namespace hpx::execution::experimental {
     // underlying (wrapped) executor.
 
     /// \cond NOINTERNAL
-    template <typename BaseExecutor> struct is_one_way_executor<
+    HPX_CXX_CORE_EXPORT template <typename BaseExecutor>
+    struct is_one_way_executor<
         hpx::execution::experimental::annotating_executor<BaseExecutor>>
       : is_one_way_executor<BaseExecutor>
     {
     };
 
-    template <typename BaseExecutor> struct is_never_blocking_one_way_executor<
+    HPX_CXX_CORE_EXPORT template <typename BaseExecutor>
+    struct is_never_blocking_one_way_executor<
         hpx::execution::experimental::annotating_executor<BaseExecutor>>
       : is_never_blocking_one_way_executor<BaseExecutor>
     {
     };
 
-    template <typename BaseExecutor> struct is_bulk_one_way_executor<
+    HPX_CXX_CORE_EXPORT template <typename BaseExecutor>
+    struct is_bulk_one_way_executor<
         hpx::execution::experimental::annotating_executor<BaseExecutor>>
       : is_bulk_one_way_executor<BaseExecutor>
     {
     };
 
-    template <typename BaseExecutor> struct is_two_way_executor<
+    HPX_CXX_CORE_EXPORT template <typename BaseExecutor>
+    struct is_two_way_executor<
         hpx::execution::experimental::annotating_executor<BaseExecutor>>
       : is_two_way_executor<BaseExecutor>
     {
     };
 
-    template <typename BaseExecutor> struct is_bulk_two_way_executor<
+    HPX_CXX_CORE_EXPORT template <typename BaseExecutor>
+    struct is_bulk_two_way_executor<
         hpx::execution::experimental::annotating_executor<BaseExecutor>>
       : is_bulk_two_way_executor<BaseExecutor>
     {
     };
 
-    template <typename BaseExecutor> struct is_scheduler_executor<
+    HPX_CXX_CORE_EXPORT template <typename BaseExecutor>
+    struct is_scheduler_executor<
         hpx::execution::experimental::annotating_executor<BaseExecutor>>
       : is_scheduler_executor<BaseExecutor>
     {

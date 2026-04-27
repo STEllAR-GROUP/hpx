@@ -165,7 +165,8 @@ namespace hpx::detail {
             this_thread::has_sufficient_stack_space(requested_stack_size);
     }
 
-    template <typename Action> struct sync_local_invoke<Action, void>
+    template <typename Action>
+    struct sync_local_invoke<Action, void>
     {
         template <typename... Ts>
         static hpx::future<void> call(
@@ -344,7 +345,8 @@ namespace hpx::detail {
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::traits {
 
-    template <typename Action> struct get_function_address<hpx::detail::action_invoker<Action>>
+    template <typename Action>
+    struct get_function_address<hpx::detail::action_invoker<Action>>
     {
         static constexpr std::size_t call(
             hpx::detail::action_invoker<Action> const&) noexcept
@@ -353,7 +355,8 @@ namespace hpx::traits {
         }
     };
 
-    template <typename Action> struct get_function_annotation<hpx::detail::action_invoker<Action>>
+    template <typename Action>
+    struct get_function_annotation<hpx::detail::action_invoker<Action>>
     {
         static constexpr char const* call(
             hpx::detail::action_invoker<Action> const&) noexcept
@@ -363,7 +366,8 @@ namespace hpx::traits {
     };
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-    template <typename Action> struct get_function_annotation_itt<hpx::detail::action_invoker<Action>>
+    template <typename Action>
+    struct get_function_annotation_itt<hpx::detail::action_invoker<Action>>
     {
         static util::itt::string_handle call(
             hpx::detail::action_invoker<Action> const&) noexcept

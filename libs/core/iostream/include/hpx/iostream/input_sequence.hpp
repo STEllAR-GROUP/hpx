@@ -44,7 +44,8 @@ namespace hpx::iostream {
         {
         };
 
-        template <> struct input_sequence_impl<direct_tag>
+        template <>
+        struct input_sequence_impl<direct_tag>
         {
             template <typename U>
             static decltype(auto) input_sequence(U&& u)

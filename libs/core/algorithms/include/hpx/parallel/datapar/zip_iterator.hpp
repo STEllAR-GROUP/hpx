@@ -23,7 +23,8 @@
 namespace hpx::parallel::util::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename... Iter> struct is_data_aligned_impl<hpx::util::zip_iterator<Iter...>>
+    HPX_CXX_CORE_EXPORT template <typename... Iter>
+    struct is_data_aligned_impl<hpx::util::zip_iterator<Iter...>>
     {
         template <std::size_t... Is>
         static HPX_FORCEINLINE constexpr bool call(
@@ -42,7 +43,8 @@ namespace hpx::parallel::util::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename... Iter> struct iterator_datapar_compatible_impl<hpx::util::zip_iterator<Iter...>>
+    HPX_CXX_CORE_EXPORT template <typename... Iter>
+    struct iterator_datapar_compatible_impl<hpx::util::zip_iterator<Iter...>>
       : hpx::util::all_of<std::is_arithmetic<
             typename std::iterator_traits<Iter>::value_type>...>
     {
@@ -82,7 +84,8 @@ namespace hpx::parallel::traits {
         }
     }    // namespace detail
 
-    template <typename... Vector, typename ValueType> struct vector_pack_load<hpx::tuple<Vector...>, ValueType>
+    HPX_CXX_CORE_EXPORT template <typename... Vector, typename ValueType>
+    struct vector_pack_load<hpx::tuple<Vector...>, ValueType>
     {
         using value_type = hpx::tuple<Vector...>;
 
@@ -133,7 +136,8 @@ namespace hpx::parallel::traits {
         }
     }    // namespace detail
 
-    template <typename... Vector, typename ValueType> struct vector_pack_store<hpx::tuple<Vector...>, ValueType>
+    HPX_CXX_CORE_EXPORT template <typename... Vector, typename ValueType>
+    struct vector_pack_store<hpx::tuple<Vector...>, ValueType>
     {
         template <typename V, typename... Iter>
         static constexpr void aligned(

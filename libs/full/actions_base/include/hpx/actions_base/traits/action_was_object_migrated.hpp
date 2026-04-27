@@ -26,7 +26,8 @@ namespace hpx::traits {
         {
         };
 
-        template <typename Component> struct does_support_migration<Component,
+        template <typename Component>
+        struct does_support_migration<Component,
             std::enable_if_t<has_supports_migration_v<Component>>>
           : std::bool_constant<Component::supports_migration()>
         {

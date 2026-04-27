@@ -388,7 +388,8 @@ namespace hpx::threads {
 
 namespace std {
 
-    template <> struct hash<::hpx::threads::thread_id>
+    template <>
+    struct hash<::hpx::threads::thread_id>
     {
         std::size_t operator()(
             ::hpx::threads::thread_id const& v) const noexcept
@@ -398,7 +399,8 @@ namespace std {
         }
     };
 
-    template <> struct hash<::hpx::threads::thread_id_ref>
+    template <>
+    struct hash<::hpx::threads::thread_id_ref>
     {
         std::size_t operator()(
             ::hpx::threads::thread_id_ref const& v) const noexcept

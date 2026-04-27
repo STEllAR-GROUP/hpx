@@ -23,14 +23,16 @@
 
 namespace hpx::traits {
 
-    template <typename Key, typename Value> struct is_bitwise_serializable<std::pair<Key, Value>>
+    HPX_CXX_CORE_EXPORT template <typename Key, typename Value>
+    struct is_bitwise_serializable<std::pair<Key, Value>>
       : std::integral_constant<bool,
             is_bitwise_serializable_v<std::remove_const_t<Key>> &&
                 is_bitwise_serializable_v<std::remove_const_t<Value>>>
     {
     };
 
-    template <typename Key, typename Value> struct is_not_bitwise_serializable<std::pair<Key, Value>>
+    HPX_CXX_CORE_EXPORT template <typename Key, typename Value>
+    struct is_not_bitwise_serializable<std::pair<Key, Value>>
       : std::integral_constant<bool,
             !is_bitwise_serializable_v<std::pair<Key, Value>>>
     {

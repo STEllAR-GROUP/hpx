@@ -120,7 +120,8 @@ public:
 // This is the context to be associated with basic_task's awaiter when
 // the parent coroutine's promise type is known, is a stop_token_provider,
 // and its stop token type is neither in_place_stop_token nor unstoppable.
-template <typename ParentPromise> struct default_awaiter_context<ParentPromise,
+template <typename ParentPromise>
+struct default_awaiter_context<ParentPromise,
     std::enable_if_t<indirect_stop_token_provider<ParentPromise>>>
 {
     using stop_token_t = hpx::execution::experimental::stop_token_of_t<
@@ -148,7 +149,8 @@ template <typename ParentPromise> struct default_awaiter_context<ParentPromise,
 
 // If the parent coroutine's type has a stop token of type in_place_stop_token,
 // we don't need to register a stop callback.
-template <typename ParentPromise> struct default_awaiter_context<ParentPromise,
+template <typename ParentPromise>
+struct default_awaiter_context<ParentPromise,
     std::enable_if_t<
         std::is_same_v<hpx::experimental::in_place_stop_source,
             hpx::execution::experimental::stop_token_of_t<
@@ -168,7 +170,8 @@ inline bool unstoppable_token = !Token::stop_possible();
 
 // If the parent coroutine's stop token is unstoppable, there's no point
 // forwarding stop tokens or stop requests at all.
-template <typename ParentPromise> struct default_awaiter_context<ParentPromise,
+template <typename ParentPromise>
+struct default_awaiter_context<ParentPromise,
     std::enable_if_t<
         unstoppable_token<hpx::execution::experimental::stop_token_of_t<
             hpx::execution::experimental::env_of_t<ParentPromise>>> &&
@@ -182,7 +185,8 @@ template <typename ParentPromise> struct default_awaiter_context<ParentPromise,
 
 // Finally, if we don't know the parent coroutine's promise type, assume the
 // worst and save a type-erased stop callback.
-template <> struct default_awaiter_context<void>
+template <>
+struct default_awaiter_context<void>
 {
     explicit default_awaiter_context(default_task_context_impl&, auto&) noexcept
     {
@@ -241,7 +245,8 @@ struct promise_base
     std::variant<std::monostate, T, std::exception_ptr> data_{};
 };
 
-template <> struct promise_base<void>
+template <>
+struct promise_base<void>
 {
     struct _void
     {

@@ -72,7 +72,8 @@ namespace hpx::actions {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Result> struct typed_continuation<Result, Result> : continuation
+    template <typename Result>
+    struct typed_continuation<Result, Result> : continuation
     {
     private:
         using function_type =
@@ -294,7 +295,8 @@ namespace hpx::actions {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <> struct HPX_EXPORT typed_continuation<void, util::unused_type> : continuation
+    template <>
+    struct HPX_EXPORT typed_continuation<void, util::unused_type> : continuation
     {
     private:
         using function_type =

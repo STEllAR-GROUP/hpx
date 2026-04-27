@@ -27,12 +27,14 @@ namespace hpx::execution::experimental {
         template <typename F, bool IsAction, typename... Ts>
         struct distribution_policy_execute_result_impl;
 
-        template <typename F, typename... Ts> struct distribution_policy_execute_result_impl<F, false, Ts...>
+        template <typename F, typename... Ts>
+        struct distribution_policy_execute_result_impl<F, false, Ts...>
         {
             using type = hpx::util::detail::invoke_deferred_result_t<F, Ts...>;
         };
 
-        template <typename Action, typename... Ts> struct distribution_policy_execute_result_impl<Action, true, Ts...>
+        template <typename Action, typename... Ts>
+        struct distribution_policy_execute_result_impl<Action, true, Ts...>
         {
             using type = typename std::decay_t<Action>::local_result_type;
         };
@@ -207,7 +209,8 @@ namespace hpx::execution::experimental {
     }
 
     /// \cond NOINTERNAL
-    template <typename DistPolicy> struct is_two_way_executor<distribution_policy_executor<DistPolicy>>
+    template <typename DistPolicy>
+    struct is_two_way_executor<distribution_policy_executor<DistPolicy>>
       : std::true_type
     {
     };

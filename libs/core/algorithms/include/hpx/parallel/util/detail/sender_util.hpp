@@ -41,7 +41,8 @@ namespace hpx::detail {
     {
     };
 
-    template <typename Tag, typename ExPolicy> struct is_bound_algorithm<bound_algorithm<Tag, ExPolicy>> : std::true_type
+    HPX_CXX_CORE_EXPORT template <typename Tag, typename ExPolicy>
+    struct is_bound_algorithm<bound_algorithm<Tag, ExPolicy>> : std::true_type
     {
     };
 

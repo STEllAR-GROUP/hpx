@@ -125,7 +125,8 @@ namespace hpx::util {
             }
         };
 
-        template <typename T> struct arrow_dispatch<T&>    // "real" references
+        template <typename T>
+        struct arrow_dispatch<T&>    // "real" references
         {
             using type = T*;
 
@@ -195,7 +196,8 @@ namespace hpx::util {
         ////////////////////////////////////////////////////////////////////////
         // Implementation for bidirectional iterators
         template <typename Derived, typename T, typename Reference,
-            typename Distance, typename Pointer> class iterator_facade_base<Derived, T, std::bidirectional_iterator_tag,
+            typename Distance, typename Pointer>
+        class iterator_facade_base<Derived, T, std::bidirectional_iterator_tag,
             Reference, Distance, Pointer>
           : public iterator_facade_base<Derived, T, std::forward_iterator_tag,
                 Reference, Distance, Pointer>
@@ -283,14 +285,16 @@ namespace hpx::util {
         {
         };
 
-        template <typename Iterator, typename Value> struct use_operator_brackets_proxy<Iterator, Value,
+        template <typename Iterator, typename Value>
+        struct use_operator_brackets_proxy<Iterator, Value,
             std::enable_if_t<has_use_brackets_proxy_v<Iterator>>>
           : Iterator::use_brackets_proxy
         {
         };
 
         template <typename Derived, typename T, typename Reference,
-            typename Distance, typename Pointer> class iterator_facade_base<Derived, T, std::random_access_iterator_tag,
+            typename Distance, typename Pointer>
+        class iterator_facade_base<Derived, T, std::random_access_iterator_tag,
             Reference, Distance, Pointer>
           : public iterator_facade_base<Derived, T,
                 std::bidirectional_iterator_tag, Reference, Distance, Pointer>
@@ -519,7 +523,8 @@ namespace hpx::util {
             using type = Iterator;
         };
 
-        template <typename Iterator, typename Value, typename Reference> struct postfix_increment_result<Iterator, Value, Reference,
+        template <typename Iterator, typename Value, typename Reference>
+        struct postfix_increment_result<Iterator, Value, Reference,
             std::enable_if_t<
                 traits::has_category_v<Iterator, std::input_iterator_tag> &&
                 is_non_proxy_reference_v<Reference, Value>>>
@@ -527,7 +532,8 @@ namespace hpx::util {
             using type = postfix_increment_proxy<Iterator>;
         };
 
-        template <typename Iterator, typename Value, typename Reference> struct postfix_increment_result<Iterator, Value, Reference,
+        template <typename Iterator, typename Value, typename Reference>
+        struct postfix_increment_result<Iterator, Value, Reference,
             std::enable_if_t<
                 traits::has_category_v<Iterator, std::input_iterator_tag> &&
                 !is_non_proxy_reference_v<Reference, Value>>>

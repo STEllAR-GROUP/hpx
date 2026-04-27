@@ -128,10 +128,10 @@ namespace hpx::concurrency::details {
     inline thread_id_t thread_id() { return std::this_thread::get_id(); }
 
     template<std::size_t> struct thread_id_size { };
-    template <> struct thread_id_size<4> { typedef std::uint32_t numeric_t; };
-    template <> struct thread_id_size<8> { typedef std::uint64_t numeric_t; };
+    template<> struct thread_id_size<4> { typedef std::uint32_t numeric_t; };
+    template<> struct thread_id_size<8> { typedef std::uint64_t numeric_t; };
 
-    template <> struct thread_id_converter<thread_id_t> {
+    template<> struct thread_id_converter<thread_id_t> {
         typedef thread_id_size<sizeof(thread_id_t)>::numeric_t thread_id_numeric_size_t;
 #if !defined(__APPLE__)
         typedef std::size_t thread_id_hash_t;
@@ -402,7 +402,7 @@ namespace details
             return h ^ (h >> 16);
         }
     };
-    template <> struct _hash_32_or_64<1> {
+    template<> struct _hash_32_or_64<1> {
         static inline std::uint64_t hash(std::uint64_t h)
         {
             h ^= h >> 33;
@@ -483,7 +483,8 @@ namespace details
         }
     };
 
-    template <> struct nomove_if<false>
+    template<>
+    struct nomove_if<false>
     {
         template<typename U>
         static inline auto eval(U&& x)
@@ -571,14 +572,14 @@ namespace details
 #endif
 
     template<typename T> struct static_is_lock_free_num { enum { value = 0 }; };
-    template <> struct static_is_lock_free_num<signed char> { enum { value = ATOMIC_CHAR_LOCK_FREE }; };
-    template <> struct static_is_lock_free_num<short> { enum { value = ATOMIC_SHORT_LOCK_FREE }; };
-    template <> struct static_is_lock_free_num<int> { enum { value = ATOMIC_INT_LOCK_FREE }; };
-    template <> struct static_is_lock_free_num<long> { enum { value = ATOMIC_LONG_LOCK_FREE }; };
-    template <> struct static_is_lock_free_num<long long> { enum { value = ATOMIC_LLONG_LOCK_FREE }; };
+    template<> struct static_is_lock_free_num<signed char> { enum { value = ATOMIC_CHAR_LOCK_FREE }; };
+    template<> struct static_is_lock_free_num<short> { enum { value = ATOMIC_SHORT_LOCK_FREE }; };
+    template<> struct static_is_lock_free_num<int> { enum { value = ATOMIC_INT_LOCK_FREE }; };
+    template<> struct static_is_lock_free_num<long> { enum { value = ATOMIC_LONG_LOCK_FREE }; };
+    template<> struct static_is_lock_free_num<long long> { enum { value = ATOMIC_LLONG_LOCK_FREE }; };
     template<typename T> struct static_is_lock_free : static_is_lock_free_num<typename std::make_signed<T>::type> {  };
-    template <> struct static_is_lock_free<bool> { enum { value = ATOMIC_BOOL_LOCK_FREE }; };
-    template <typename U> struct static_is_lock_free<U*> { enum { value = ATOMIC_POINTER_LOCK_FREE }; };
+    template<> struct static_is_lock_free<bool> { enum { value = ATOMIC_BOOL_LOCK_FREE }; };
+    template<typename U> struct static_is_lock_free<U*> { enum { value = ATOMIC_POINTER_LOCK_FREE }; };
 }
 
 

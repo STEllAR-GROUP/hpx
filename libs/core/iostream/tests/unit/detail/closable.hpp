@@ -42,7 +42,8 @@ namespace hpx::iostream::test {
     };
 
     // Source
-    template <> class closable_device<input> : public source
+    template <>
+    class closable_device<input> : public source
     {
     public:
         closable_device(operation close)
@@ -65,7 +66,8 @@ namespace hpx::iostream::test {
     };
 
     // Sink
-    template <> class closable_device<output> : public sink
+    template <>
+    class closable_device<output> : public sink
     {
     public:
         closable_device(operation close)
@@ -88,7 +90,8 @@ namespace hpx::iostream::test {
     };
 
     // Bidirectional device
-    template <> class closable_device<bidirectional> : public device<bidirectional>
+    template <>
+    class closable_device<bidirectional> : public device<bidirectional>
     {
     public:
         closable_device(operation close_input, operation close_output)
@@ -128,7 +131,8 @@ namespace hpx::iostream::test {
     };
 
     // Seekable device
-    template <> class closable_device<seekable> : public device<seekable>
+    template <>
+    class closable_device<seekable> : public device<seekable>
     {
     public:
         closable_device(operation close)
@@ -189,7 +193,8 @@ namespace hpx::iostream::test {
     };
 
     // Direct source
-    template <> class closable_device<direct_input>
+    template <>
+    class closable_device<direct_input>
     {
     public:
         typedef char char_type;
@@ -215,7 +220,8 @@ namespace hpx::iostream::test {
     };
 
     // Direct sink
-    template <> class closable_device<direct_output>
+    template <>
+    class closable_device<direct_output>
     {
     public:
         typedef char char_type;
@@ -241,7 +247,8 @@ namespace hpx::iostream::test {
     };
 
     // Direct bidirectional device
-    template <> class closable_device<direct_bidirectional>
+    template <>
+    class closable_device<direct_bidirectional>
     {
     public:
         typedef char char_type;
@@ -286,7 +293,8 @@ namespace hpx::iostream::test {
     };
 
     // Direct seekable device
-    template <> class closable_device<direct_seekable>
+    template <>
+    class closable_device<direct_seekable>
     {
     public:
         typedef char char_type;
@@ -322,7 +330,8 @@ namespace hpx::iostream::test {
     };
 
     // Input filter
-    template <> class closable_filter<input> : public input_filter
+    template <>
+    class closable_filter<input> : public input_filter
     {
     public:
         closable_filter(operation close)
@@ -347,7 +356,8 @@ namespace hpx::iostream::test {
     };
 
     // Output filter
-    template <> class closable_filter<output> : public output_filter
+    template <>
+    class closable_filter<output> : public output_filter
     {
     public:
         closable_filter(operation close)
@@ -372,7 +382,8 @@ namespace hpx::iostream::test {
     };
 
     // Bidirectional filter
-    template <> class closable_filter<bidirectional> : public filter<bidirectional>
+    template <>
+    class closable_filter<bidirectional> : public filter<bidirectional>
     {
     public:
         closable_filter(operation close_input, operation close_output)
@@ -415,7 +426,8 @@ namespace hpx::iostream::test {
     };
 
     // Seekable filter
-    template <> class closable_filter<seekable> : public filter<seekable>
+    template <>
+    class closable_filter<seekable> : public filter<seekable>
     {
     public:
         closable_filter(operation close)
@@ -456,7 +468,8 @@ namespace hpx::iostream::test {
     };
 
     // Dual-use filter
-    template <> class closable_filter<dual_use>
+    template <>
+    class closable_filter<dual_use>
     {
     public:
         typedef char char_type;

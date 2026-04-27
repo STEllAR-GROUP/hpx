@@ -89,7 +89,8 @@ namespace hpx::parallel::util::detail {
     {
     };
 
-    template <typename Iter> struct iterator_datapar_compatible<Iter,
+    HPX_CXX_CORE_EXPORT template <typename Iter>
+    struct iterator_datapar_compatible<Iter,
         std::enable_if_t<std::random_access_iterator<Iter>>>
       : iterator_datapar_compatible_impl<std::decay_t<Iter>>::type
     {
@@ -129,7 +130,8 @@ namespace hpx::parallel::util::detail {
         }
     };
 
-    template <typename I> struct datapar_loop_step<I, std::enable_if_t<std::is_integral_v<I>>>
+    HPX_CXX_CORE_EXPORT template <typename I>
+    struct datapar_loop_step<I, std::enable_if_t<std::is_integral_v<I>>>
     {
         using V1 = traits::vector_pack_type_t<I, 1>;
         using V = traits::vector_pack_type_t<I>;

@@ -66,7 +66,8 @@ namespace hpx::iostream {
         {
         };
 
-        template <> struct write_device_impl<ostream_tag>
+        template <>
+        struct write_device_impl<ostream_tag>
         {
             template <typename T>
             static bool put(T& t, char_type_of_t<T> c)
@@ -86,7 +87,8 @@ namespace hpx::iostream {
             }
         };
 
-        template <> struct write_device_impl<streambuf_tag>
+        template <>
+        struct write_device_impl<streambuf_tag>
         {
             template <typename T>
             static bool put(T& t, char_type_of_t<T> c)
@@ -106,7 +108,8 @@ namespace hpx::iostream {
             }
         };
 
-        template <> struct write_device_impl<output>
+        template <>
+        struct write_device_impl<output>
         {
             template <typename T>
             static bool put(T& t, char_type_of_t<T> c)
@@ -130,7 +133,8 @@ namespace hpx::iostream {
         {
         };
 
-        template <> struct write_filter_impl<multichar_tag>
+        template <>
+        struct write_filter_impl<multichar_tag>
         {
             template <typename T, typename Sink>
             static std::streamsize write(
@@ -140,7 +144,8 @@ namespace hpx::iostream {
             }
         };
 
-        template <> struct write_filter_impl<any_tag>
+        template <>
+        struct write_filter_impl<any_tag>
         {
             template <typename T, typename Sink>
             static std::streamsize write(
