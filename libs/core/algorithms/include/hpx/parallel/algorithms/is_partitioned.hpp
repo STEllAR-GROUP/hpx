@@ -135,10 +135,10 @@ namespace hpx::parallel {
     ////////////////////////////////////////////////////////////////////////////
     // is_partitioned
     namespace detail {
-        enum class partition_status
+        enum class partition_status : std::uint8_t
         {
-            true_ = 0,
-            false_ = 1,
+            is_partitioned = 0,
+            is_not_partitioned = 1,
             mixed = 2,
             cancelled = 3
         };
@@ -214,20 +214,15 @@ namespace hpx::parallel {
                     -> intermediate_result_t {
                     bool fst_bool = HPX_INVOKE(pred_projected, *part_begin);
                     if (part_count == 1)
-                        return fst_bool ? partition_status::true_ :
-                                          partition_status::false_;
+                        return fst_bool ? partition_status::is_partitioned :
+                                          partition_status::is_not_partitioned;
 
                     bool is_mixed = false;
 
-                    using local_policy = std::conditional_t<
-                        hpx::is_unsequenced_execution_policy_v<
-                            std::decay_t<ExPolicy>>,
-                        hpx::execution::unsequenced_policy,
-                        hpx::execution::sequenced_policy>;
-
-                    util::loop_n<local_policy>(++part_begin, --part_count, tok,
+                    util::const_loop_n<std::decay_t<ExPolicy>>(++part_begin,
+                        --part_count, tok,
                         [&fst_bool, &is_mixed, &pred_projected, &tok](
-                            auto const& a) mutable -> void {
+                            Iter_ const& a) mutable -> void {
                             if (fst_bool != hpx::invoke(pred_projected, *a))
                             {
                                 if (fst_bool)
@@ -245,9 +240,10 @@ namespace hpx::parallel {
                     if (tok.was_cancelled())
                         return partition_status::cancelled;
 
-                    return is_mixed ? partition_status::mixed :
-                                      (fst_bool ? partition_status::true_ :
-                                                  partition_status::false_);
+                    return is_mixed ?
+                        partition_status::mixed :
+                        (fst_bool ? partition_status::is_partitioned :
+                                    partition_status::is_not_partitioned);
                 };
 
                 auto f2 = [tok](auto&& results) -> bool {
@@ -256,7 +252,7 @@ namespace hpx::parallel {
 
                     auto it = std::find_if(hpx::util::begin(results),
                         hpx::util::end(results), [](partition_status x) {
-                            return x != partition_status::true_;
+                            return x != partition_status::is_partitioned;
                         });
 
                     if (it == hpx::util::end(results))
@@ -267,7 +263,7 @@ namespace hpx::parallel {
 
                     return std::all_of(
                         it, hpx::util::end(results), [](partition_status x) {
-                            return x == partition_status::false_;
+                            return x == partition_status::is_not_partitioned;
                         });
                 };
 
