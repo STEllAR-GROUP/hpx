@@ -98,8 +98,6 @@ set(STANDARD_LIBRARY_HEADERS
     "<cstdint>"
     "<cstdio>"
     "<cstdlib>"
-    "<dlfcn.h>"
-    "<link.h>"
     "<cstring>"
     "<ctime>"
     "<cuchar>"
@@ -139,8 +137,11 @@ function(hpx_extract_includes_from_file module)
     if(NOT filename MATCHES "\\.|/")
       # Check if the include is a standard library header
       if(${filename} IN_LIST STANDARD_LIBRARY_HEADERS)
-        list(APPEND found_includes ${filename})
+        list(APPEND found_includes "${filename}")
       endif()
+    elseif(filename STREQUAL "link.h" OR filename STREQUAL "dlfcn.h")
+      # Also collect these POSIX headers as they must be in the Global Module Fragment
+      list(APPEND found_includes "<${filename}>")
     endif()
   endforeach()
 

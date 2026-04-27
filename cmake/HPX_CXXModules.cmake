@@ -68,7 +68,6 @@ endif()
 # hpx_configure_module_producer(<producer> [MODULE_OUT_DIR <dir>])
 #
 # * Ensures a stable module output dir for producer target
-# * Adds compiler flags to write module cache there (Clang/GCC)
 # * Creates an interface target '<producer>_if' for consumers to link to
 function(hpx_configure_module_producer producer)
   if(NOT TARGET ${producer})
