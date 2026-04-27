@@ -38,9 +38,10 @@ struct partition_hooks_parameters
     friend void tag_override_invoke(
         hpx::execution::experimental::mark_partition_t,
         partition_hooks_parameters& self, Executor&&, std::size_t partition,
-        auto, std::size_t a, std::size_t b, auto) noexcept
+        auto state, std::size_t a, std::size_t b, auto) noexcept
     {
-        HPX_ASSERT(partition < self.values_.size());
+        HPX_TEST_LT(partition, self.values_.size());
+        HPX_TEST_EQ(std::uint8_t(1), static_cast<std::uint8_t>(state));
         self.values_[partition] = {a, b};
         self.seen_[partition] = 1;
     }

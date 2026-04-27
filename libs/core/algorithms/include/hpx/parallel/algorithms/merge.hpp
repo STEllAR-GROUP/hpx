@@ -321,7 +321,7 @@ namespace hpx::parallel {
         /// \cond NOINTERNAL
 
         ///////////////////////////////////////////////////////////////////////
-        enum class partition_phase : std::size_t
+        enum class partition_phase : std::uint8_t
         {
             start = 1,
             end = 2
