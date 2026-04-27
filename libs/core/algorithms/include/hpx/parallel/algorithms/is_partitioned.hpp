@@ -125,6 +125,7 @@ namespace hpx {
 
 #include <algorithm>
 #include <cstddef>
+#include <cstdint>
 #include <iterator>
 #include <type_traits>
 #include <utility>
@@ -135,16 +136,9 @@ namespace hpx::parallel {
     ////////////////////////////////////////////////////////////////////////////
     // is_partitioned
     namespace detail {
-        enum class partition_status
-        {
-            true_ = 0,
-            false_ = 1,
-            mixed = 2,
-            cancelled = 3
-        };
 
         /// \cond NOINTERNAL
-        template <typename T>
+        HPX_CXX_CORE_EXPORT template <typename T>
         inline bool sequential_is_partitioned(std::vector<T>&& res)
         {
             auto first = res.begin();
@@ -166,7 +160,7 @@ namespace hpx::parallel {
             return true;
         }
 
-        template <typename Iter, typename Sent>
+        HPX_CXX_CORE_EXPORT template <typename Iter, typename Sent>
         struct is_partitioned
           : public algorithm<is_partitioned<Iter, Sent>, bool>
         {
@@ -190,10 +184,17 @@ namespace hpx::parallel {
             static decltype(auto) parallel(ExPolicy&& policy, Iter_ first,
                 Sent_ last, Pred&& pred, Proj&& proj)
             {
-                using difference_type = hpx::traits::iter_difference_t<Iter_>;
+                using difference_type =
+                    typename std::iterator_traits<Iter_>::difference_type;
                 using result = util::detail::algorithm_result<ExPolicy, bool>;
                 constexpr bool has_scheduler_executor =
                     hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
+
+                if constexpr (!has_scheduler_executor)
+                {
+                    if (first == last)
+                        return result::get(true);
+                }
 
                 difference_type count =
                     hpx::parallel::detail::distance(first, last);
@@ -207,68 +208,36 @@ namespace hpx::parallel {
                 util::invoke_projected<Pred, Proj> pred_projected(
                     HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
                 util::cancellation_token<> tok;
-                using intermediate_result_t = partition_status;
+                using intermediate_result_t = std::uint8_t;
 
                 auto f1 = [tok, pred_projected = HPX_MOVE(pred_projected)](
                               Iter_ part_begin, std::size_t part_count) mutable
                     -> intermediate_result_t {
                     bool fst_bool = HPX_INVOKE(pred_projected, *part_begin);
                     if (part_count == 1)
-                        return fst_bool ? partition_status::true_ :
-                                          partition_status::false_;
+                        return fst_bool;
 
-                    bool is_mixed = false;
-
-                    using local_policy = std::conditional_t<
-                        hpx::is_unsequenced_execution_policy_v<
-                            std::decay_t<ExPolicy>>,
-                        hpx::execution::unsequenced_policy,
-                        hpx::execution::sequenced_policy>;
-
-                    util::loop_n<local_policy>(++part_begin, --part_count, tok,
-                        [&fst_bool, &is_mixed, &pred_projected, &tok](
-                            auto const& a) mutable -> void {
+                    util::const_loop_n<std::decay_t<ExPolicy>>(++part_begin,
+                        --part_count, tok,
+                        [&fst_bool, &pred_projected, &tok](
+                            Iter_ const& a) mutable -> void {
                             if (fst_bool != hpx::invoke(pred_projected, *a))
                             {
                                 if (fst_bool)
-                                {
                                     fst_bool = false;
-                                    is_mixed = true;
-                                }
                                 else
-                                {
                                     tok.cancel();
-                                }
                             }
                         });
 
-                    if (tok.was_cancelled())
-                        return partition_status::cancelled;
-
-                    return is_mixed ? partition_status::mixed :
-                                      (fst_bool ? partition_status::true_ :
-                                                  partition_status::false_);
+                    return fst_bool;
                 };
 
                 auto f2 = [tok](auto&& results) -> bool {
                     if (tok.was_cancelled())
                         return false;
-
-                    auto it = std::find_if(hpx::util::begin(results),
-                        hpx::util::end(results), [](partition_status x) {
-                            return x != partition_status::true_;
-                        });
-
-                    if (it == hpx::util::end(results))
-                        return true;
-
-                    if (*it == partition_status::mixed)
-                        ++it;
-
-                    return std::all_of(
-                        it, hpx::util::end(results), [](partition_status x) {
-                            return x == partition_status::false_;
-                        });
+                    return sequential_is_partitioned(
+                        HPX_FORWARD(decltype(results), results));
                 };
 
                 return util::partitioner<ExPolicy, bool,

@@ -35,7 +35,7 @@ namespace hpx::parallel::detail {
             ZipIterator it, std::size_t part_count, Token& tok, F&& f)
         {
             bool cancelled = false;
-            util::loop_n<ExPolicy>(it, part_count, tok,
+            util::const_loop_n<ExPolicy>(it, part_count, tok,
                 [&f, &cancelled](auto const& curr) mutable -> void {
                     if (!cancelled)
                     {
@@ -122,7 +122,7 @@ namespace hpx::parallel::detail {
             Proj2&& proj2)
         {
             bool cancelled = false;
-            util::loop_n<ExPolicy>(it, part_count, tok,
+            util::const_loop_n<ExPolicy>(it, part_count, tok,
                 [&f, &proj1, &proj2, &cancelled](
                     auto const& curr) mutable -> void {
                     if (!cancelled)

@@ -109,7 +109,7 @@ namespace hpx::parallel::detail {
     {
         if constexpr (RankIdx == Mapping::rank())
         {
-            HPX_INVOKE(f, idx...);
+            hpx::invoke(f, idx...);
         }
         else if constexpr (RankIdx == Mapping::rank() - 1)
         {
@@ -120,7 +120,7 @@ namespace hpx::parallel::detail {
             hpx::util::counting_iterator<std::size_t> first(std::size_t{0});
             hpx::parallel::util::loop_n<std::decay_t<ExPolicy>>(
                 first, bound, [&](auto const& it) {
-                    HPX_INVOKE(f, idx..., static_cast<index_type>(*it));
+                    hpx::invoke(f, idx..., static_cast<index_type>(*it));
                 });
         }
         else
@@ -137,13 +137,13 @@ namespace hpx::parallel::detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // Functor used by the parallel partitioner.
+    // Function object used by the parallel partitioner.
     //
     // The partitioner splits the integer range [0, extent(0)) across threads.
     // Each call receives a sub-range of i0 values; for each i0 we recurse
     // sequentially over the remaining dimensions.
     //
-    // The Mapping and Fun are stored by value so the functor is
+    // The Mapping and Fun are stored by value so the function object is
     // thread-safe and can be copied to GPU device memory if needed.
     template <typename ExPolicy, typename Mapping, typename Fun>
     struct for_each_index_iteration_right
@@ -226,7 +226,7 @@ namespace hpx::parallel::detail {
             hpx::util::counting_iterator<std::size_t> first(std::size_t{0});
             hpx::parallel::util::loop_n<std::decay_t<ExPolicy>>(
                 first, bound, [&](auto const& it) {
-                    HPX_INVOKE(f, static_cast<index_type>(*it), idx...);
+                    hpx::invoke(f, static_cast<index_type>(*it), idx...);
                 });
         }
         else
@@ -332,8 +332,8 @@ namespace hpx::parallel::detail {
         // Parallel path.
         //
         // Dispatch is layout-aware: column-major (layout_left) mappings
-        // parallelise the last extent and recurse inward; row-major
-        // (layout_right) and all other layouts parallelise the first extent.
+        // parallelize the last extent and recurse inward; row-major
+        // (layout_right) and all other layouts parallelize the first extent.
         template <typename ExPolicy, typename Mapping, typename Fun>
         static decltype(auto) parallel(
             ExPolicy&& policy, Mapping const& m, Fun&& f)
@@ -344,7 +344,7 @@ namespace hpx::parallel::detail {
             // rank-0: exactly one invocation - execute sequentially.
             if constexpr (Mapping::rank() == 0)
             {
-                HPX_INVOKE(f);
+                hpx::invoke(f);
                 return util::detail::algorithm_result<ExPolicy>::get();
             }
             else

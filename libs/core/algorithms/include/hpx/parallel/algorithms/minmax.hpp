@@ -411,7 +411,7 @@ namespace hpx::parallel {
                 std::invoke_result_t<Proj, std::iter_reference_t<FwdIter>>>>;
 
             element_type value = HPX_INVOKE(proj, *smallest);
-            util::loop_n<std::decay_t<ExPolicy>>(
+            util::const_loop_n<std::decay_t<ExPolicy>>(
                 ++it, count - 1, [&](FwdIter const& curr) -> void {
                     element_type curr_value = HPX_INVOKE(proj, *curr);
                     if (HPX_INVOKE(f, curr_value, value))
@@ -449,7 +449,7 @@ namespace hpx::parallel {
                         std::iter_reference_t<FwdIter>>>>;
 
                 element_type value = HPX_INVOKE(proj, *smallest);
-                util::loop_n<std::decay_t<ExPolicy>>(
+                util::const_loop_n<std::decay_t<ExPolicy>>(
                     ++it, count - 1, [&](FwdIter const& curr) -> void {
                         element_type curr_value = HPX_INVOKE(proj, **curr);
                         if (HPX_INVOKE(f, curr_value, value))
@@ -482,7 +482,7 @@ namespace hpx::parallel {
                         std::iter_reference_t<FwdIter>>>>;
 
                 element_type value = HPX_INVOKE(proj, *smallest);
-                util::loop(HPX_FORWARD(ExPolicy, policy), ++first, last,
+                util::const_loop(HPX_FORWARD(ExPolicy, policy), ++first, last,
                     [&](FwdIter const& curr) -> void {
                         element_type curr_value = HPX_INVOKE(proj, *curr);
                         if (HPX_INVOKE(f, curr_value, value))
@@ -565,7 +565,7 @@ namespace hpx::parallel {
                 std::invoke_result_t<Proj, std::iter_reference_t<FwdIter>>>>;
 
             element_type value = HPX_INVOKE(proj, *largest);
-            util::loop_n<std::decay_t<ExPolicy>>(
+            util::const_loop_n<std::decay_t<ExPolicy>>(
                 ++it, count - 1, [&](FwdIter const& curr) -> void {
                     element_type curr_value = HPX_INVOKE(proj, *curr);
                     if (!HPX_INVOKE(f, curr_value, value))
@@ -603,7 +603,7 @@ namespace hpx::parallel {
                         std::iter_reference_t<FwdIter>>>>;
 
                 element_type value = HPX_INVOKE(proj, *largest);
-                util::loop_n<std::decay_t<ExPolicy>>(
+                util::const_loop_n<std::decay_t<ExPolicy>>(
                     ++it, count - 1, [&](FwdIter const& curr) -> void {
                         element_type curr_value = HPX_INVOKE(proj, **curr);
                         if (!HPX_INVOKE(f, curr_value, value))
@@ -636,7 +636,7 @@ namespace hpx::parallel {
                         std::iter_reference_t<FwdIter>>>>;
 
                 element_type value = HPX_INVOKE(proj, *largest);
-                util::loop(HPX_FORWARD(ExPolicy, policy), ++first, last,
+                util::const_loop(HPX_FORWARD(ExPolicy, policy), ++first, last,
                     [&](FwdIter const& curr) -> void {
                         element_type curr_value = HPX_INVOKE(proj, *curr);
                         if (!HPX_INVOKE(f, curr_value, value))
@@ -720,7 +720,7 @@ namespace hpx::parallel {
 
             element_type min_value = HPX_INVOKE(proj, *it);
             element_type max_value = min_value;
-            util::loop_n<std::decay_t<ExPolicy>>(
+            util::const_loop_n<std::decay_t<ExPolicy>>(
                 ++it, count - 1, [&](FwdIter const& curr) -> void {
                     element_type curr_value = HPX_INVOKE(proj, *curr);
                     if (HPX_INVOKE(f, curr_value, min_value))
@@ -765,7 +765,7 @@ namespace hpx::parallel {
 
                 element_type min_value = HPX_INVOKE(proj, *result.min);
                 element_type max_value = HPX_INVOKE(proj, *result.max);
-                util::loop_n<std::decay_t<ExPolicy>>(
+                util::const_loop_n<std::decay_t<ExPolicy>>(
                     ++it, count - 1, [&](PairIter const& curr) -> void {
                         element_type curr_min_value =
                             HPX_INVOKE(proj, *curr->min);
@@ -812,7 +812,7 @@ namespace hpx::parallel {
 
                 element_type min_value = HPX_INVOKE(proj, *min);
                 element_type max_value = HPX_INVOKE(proj, *max);
-                util::loop(HPX_FORWARD(ExPolicy, policy), first, last,
+                util::const_loop(HPX_FORWARD(ExPolicy, policy), first, last,
                     [&](FwdIter const& curr) -> void {
                         element_type curr_value = HPX_INVOKE(proj, *curr);
                         if (HPX_INVOKE(f, curr_value, min_value))
