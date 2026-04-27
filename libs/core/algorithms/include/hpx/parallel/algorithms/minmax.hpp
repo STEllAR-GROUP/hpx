@@ -761,7 +761,7 @@ namespace hpx::parallel {
 
                 using element_type = hpx::traits::proxy_value_t<
                     std::decay_t<std::invoke_result_t<Proj,
-                        std::iter_reference_t<FwdIter>>>>;
+                        std::iter_reference_t<PairIter>>>>;
 
                 element_type min_value = HPX_INVOKE(proj, *result.min);
                 element_type max_value = HPX_INVOKE(proj, *result.max);
