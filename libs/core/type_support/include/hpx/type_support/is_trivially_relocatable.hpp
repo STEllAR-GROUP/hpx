@@ -12,6 +12,18 @@
 
 namespace hpx::experimental {
 
+// std::is_trivially_relocatable is a library trait introduced by P2786R13.
+// Guard its use on the library feature-test macro __cpp_lib_trivially_relocatable
+// rather than the core-language macro __cpp_trivial_relocatability, since the
+// standard library may not ship the trait even when the language keyword is
+// available (or vice versa).
+#if defined(__cpp_lib_trivially_relocatable)
+    template <typename T>
+    struct is_trivially_relocatable : std::is_trivially_relocatable<T>
+    {
+    };
+#else
+
     // All trivially copyable types are trivially relocatable
     // Other types should default to false.
     HPX_CXX_CORE_EXPORT template <typename T>
@@ -73,6 +85,8 @@ namespace hpx::experimental {
       : is_trivially_relocatable<T>
     {
     };
+
+#endif
 
     HPX_CXX_CORE_EXPORT template <typename T>
     inline constexpr bool is_trivially_relocatable_v =
