@@ -86,3 +86,13 @@ Add the project license header:
 - Match local patterns in nearby files.
 - Keep changes minimal.
 - Preserve existing APIs and behavior unless the task explicitly asks otherwise.
+
+## Additional guidelines
+
+- Never #include HPX module-internal headers (paths under
+  `libs/<module>/include/hpx/<module>/...`, e.g. `hpx/serialization/serialize.hpp`)
+  from outside that module. Only code that is itself part of a given module may
+  include its internal headers directly. Any other consumer (another module, a test
+  executable, or application code) must include the generated umbrella header
+  `hpx/modules/<module_name>.hpp` instead
+  (e.g. `#include <hpx/modules/serialization.hpp>`).

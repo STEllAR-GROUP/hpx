@@ -606,4 +606,147 @@ namespace hpx::supervision {
     ///                        unregistration completes.
     HPX_CXX_EXPORT HPX_EXPORT void unregister_observer(
         hpx::id_type const& observer_handle, hpx::error_code& ec = hpx::throws);
+
+    /// \brief Asynchronously wait for a target actor on a possibly remote
+    ///        locality to reach a terminal lifecycle event (\c completed or
+    ///        \c failed) within a given epoch.
+    ///
+    /// The function \a await_terminal() is a one-shot, blocking-free
+    /// counterpart to \a register_observer() for the specific case of waiting
+    /// on the terminal transition: unlike an observer, it does not need to be
+    /// explicitly unregistered, but it also only ever resolves once, for the
+    /// exact (\a target, \a epoch) pair passed in.
+    ///
+    /// \param locality [in] The locality on which the supervision manager
+    ///                 responsible for \a target is running.
+    /// \param target   [in] The actor (or component) to wait on.
+    /// \param epoch    [in] The epoch \a target must reach a terminal event
+    ///                 under for the returned future to resolve. If \a target's
+    ///                 epoch is later superseded by a higher epoch (see the
+    ///                 epoch semantics of \a publish_event) before it reaches a
+    ///                 terminal event under \a epoch, the returned future
+    ///                 becomes exceptional (see \throws below) instead of ever
+    ///                 resolving with a value.
+    /// \param timeout  [in] Overrides the server-enforced timeout described
+    ///                 in \note below for this call only. If \c std::nullopt
+    ///                 (the default), \a locality's current default timeout
+    ///                 is used instead.
+    ///
+    /// \returns        A future that becomes ready, holding the
+    ///                 \a lifecycle_state recorded for \a target, as soon
+    ///                 as \a target reaches a terminal event under
+    ///                 \a epoch. If \a target has already reached a
+    ///                 terminal event under \a epoch at the time of the call,
+    ///                 the returned future is ready immediately.
+    ///
+    /// \throws         hpx::exception if \a locality does not represent a
+    ///                 locality, or if \a target does not represent a valid
+    ///                 target. The returned future becomes exceptional with a
+    ///                 \a hpx::error::stale_state exception, naming
+    ///                 \a target, \a epoch, and the epoch that superseded it,
+    ///                 if \a target's epoch advances past \a epoch before
+    ///                 reaching a terminal event under it. It also becomes
+    ///                 exceptional with a \a hpx::error::future_cancelled
+    ///                 exception if neither of the above happens before
+    ///                 \a timeout elapses (see \note below).
+    ///
+    /// \note           \a locality bounds the lifetime of every waiter it
+    ///                 registers on behalf of an outstanding call, so dropping
+    ///                 the returned future without \a target ever reaching a
+    ///                 terminal event under \a epoch does not leak the
+    ///                 corresponding waiter entry indefinitely: it is swept and
+    ///                 invalidated at or after \a timeout elapses, enforced by
+    ///                 a background timer on \a locality independently of any
+    ///                 further activity for \a target, so an idle target's
+    ///                 waiter is not left to accumulate until some later,
+    ///                 unrelated call happens to sweep it. Callers that need a
+    ///                 tighter bound than \a timeout should still race the
+    ///                 returned future against an external timeout.
+    HPX_CXX_EXPORT HPX_EXPORT hpx::future<lifecycle_state> await_terminal(
+        hpx::id_type const& locality, hpx::id_type const& target,
+        std::uint64_t epoch = 0,
+        std::optional<std::chrono::steady_clock::duration> timeout =
+            std::nullopt);
+
+    /// \brief Wait for a target actor on a possibly remote locality to reach a
+    ///        terminal lifecycle event, blocking until it does.
+    ///
+    /// This is the synchronous equivalent of
+    /// \a await_terminal(hpx::id_type const&, hpx::id_type const&,
+    /// std::uint64_t).
+    ///
+    /// \param locality [in] The locality on which the supervision manager
+    ///                 responsible for \a target is running.
+    /// \param target   [in] The actor (or component) to wait on.
+    /// \param epoch    [in] The epoch \a target must reach a terminal event
+    ///                 under. See the asynchronous overload for details.
+    /// \param timeout  [in] Overrides the server-enforced timeout described
+    ///                 in the asynchronous overload for this call only. If
+    ///                 \c std::nullopt (the default), \a locality's current
+    ///                 default timeout is used instead.
+    /// \param ec       [in,out] this represents the error status on exit,
+    ///                 if this is pre-initialized to \a hpx::throws the
+    ///                 function will throw on error instead.
+    ///
+    /// \returns        The \a lifecycle_state recorded for \a target once
+    ///                 it reaches a terminal event under \a epoch.
+    ///
+    /// \throws         hpx::exception if \a locality does not represent a
+    ///                 locality, or if \a target does not represent a valid
+    ///                 target, unless \a ec was not pre-initialized to \a
+    ///                 hpx::throws. Also throws (or sets \a ec to) a
+    ///                 \a hpx::error::stale_state exception, naming
+    ///                 \a target, \a epoch, and the epoch that superseded it,
+    ///                 if \a target's epoch advances past \a epoch before
+    ///                 reaching a terminal event under it. Also throws (or sets
+    ///                 \a ec to) a \a hpx::error::future_cancelled
+    ///                 exception if neither of the above happens before
+    ///                 \a timeout elapses.
+    ///
+    /// \note           This call blocks until \a target reaches a terminal
+    ///                 event, its epoch is superseded, or \a timeout elapses.
+    HPX_CXX_EXPORT HPX_EXPORT lifecycle_state await_terminal(
+        hpx::launch::sync_policy, hpx::id_type const& locality,
+        hpx::id_type const& target, std::uint64_t epoch = 0,
+        std::optional<std::chrono::steady_clock::duration> timeout =
+            std::nullopt,
+        hpx::error_code& ec = hpx::throws);
+
+    /// \brief Asynchronously wait for a target actor on the local locality to
+    ///        reach a terminal lifecycle event within a given epoch.
+    ///
+    /// \param target [in] The actor (or component) to wait on. Must be
+    ///               local to the calling locality.
+    /// \param epoch  [in] The epoch \a target must reach a terminal event
+    ///               under. See the remote overload for details.
+    /// \param timeout [in] Overrides the server-enforced timeout described
+    ///               in the asynchronous overload for this call only. If
+    ///               \c std::nullopt (the default), the local locality's
+    ///               default timeout is used instead.
+    /// \param ec     [in,out] this represents the error status on exit, if
+    ///               this is pre-initialized to \a hpx::throws the function
+    ///               will throw on error instead.
+    ///
+    /// \returns      A future that becomes ready, holding the
+    ///               \a lifecycle_state recorded for \a target, as soon as
+    ///               \a target reaches a terminal event under \a epoch. See
+    ///               the remote overload for how the returned future behaves if
+    ///               \a target's epoch is superseded before reaching a
+    ///               terminal event under \a epoch.
+    ///
+    /// \note         As for the remote overloads, the returned future becomes
+    ///               exceptional with \a hpx::error::stale_state if \a epoch is
+    ///               superseded, or with
+    ///               \a hpx::error::future_cancelled if \a timeout elapses
+    ///               first.
+    ///
+    /// \throws       hpx::exception if \a target does not represent a
+    ///               valid target, unless \a ec was not pre-initialized to
+    ///               \a hpx::throws.
+    HPX_CXX_EXPORT HPX_EXPORT hpx::future<lifecycle_state> await_terminal(
+        hpx::id_type const& target, std::uint64_t epoch = 0,
+        std::optional<std::chrono::steady_clock::duration> timeout =
+            std::nullopt,
+        hpx::error_code& ec = hpx::throws);
+
 }    // namespace hpx::supervision

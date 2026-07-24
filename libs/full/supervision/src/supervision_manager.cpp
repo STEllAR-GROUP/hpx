@@ -93,7 +93,7 @@ namespace hpx::supervision {
 
     hpx::id_type supervision_manager::register_observer(
         hpx::id_type const& target, hpx::id_type const& agent,
-        std::optional<std::uint64_t> epoch_filter, hpx::error_code& ec) const
+        std::uint64_t const epoch_filter, hpx::error_code& ec) const
     {
         if (!server_)
         {
@@ -103,8 +103,7 @@ namespace hpx::supervision {
             return {};
         }
 
-        auto result =
-            server_->register_observer(target, agent, HPX_MOVE(epoch_filter));
+        auto result = server_->register_observer(target, agent, epoch_filter);
         if (&ec != &throws)
             ec = make_success_code();
         return result;
@@ -124,6 +123,25 @@ namespace hpx::supervision {
         server_->unregister_observer(observer_handle);
         if (&ec != &throws)
             ec = make_success_code();
+    }
+
+    hpx::future<lifecycle_state> supervision_manager::await_terminal(
+        hpx::id_type const& target, std::uint64_t const epoch,
+        std::chrono::steady_clock::duration const timeout,
+        hpx::error_code& ec) const
+    {
+        if (!server_)
+        {
+            HPX_THROWS_IF(ec, hpx::error::invalid_status,
+                "hpx::supervision::supervision_manager::await_terminal",
+                "server is not registered");
+            return hpx::make_ready_future(lifecycle_state{});
+        }
+
+        auto result = server_->await_terminal(target, epoch, timeout);
+        if (&ec != &throws)
+            ec = make_success_code();
+        return result;
     }
 
     ///////////////////////////////////////////////////////////////////////////

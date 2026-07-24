@@ -13,16 +13,21 @@
 #include <hpx/modules/components_base.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/naming_base.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/synchronization.hpp>
 
 #include <hpx/supervision/supervision_api.hpp>
 
+#include <chrono>
+#include <cstddef>
 #include <cstdint>
 #include <map>
 #include <mutex>
 #include <optional>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace hpx::supervision::server {
@@ -46,7 +51,36 @@ namespace hpx::supervision::server {
     struct observer_entry
     {
         hpx::id_type agent;
-        std::optional<std::uint64_t> epoch_filter;
+        std::uint64_t epoch_filter;
+    };
+
+    struct waiter_key
+    {
+        hpx::id_type target;
+        std::uint64_t epoch;
+
+        friend bool operator<(waiter_key const& lhs, waiter_key const& rhs)
+        {
+            if (lhs.target != rhs.target)
+                return lhs.target < rhs.target;
+            return lhs.epoch < rhs.epoch;
+        }
+
+        friend bool operator==(waiter_key const& lhs, waiter_key const& rhs)
+        {
+            return lhs.target == rhs.target && lhs.epoch == rhs.epoch;
+        }
+    };
+
+    // A pending await_terminal() waiter together with the point in time after
+    // which it is considered abandoned. deadline bounds how long a waiter can
+    // stay in waiters_ if it is never reached via the exact-epoch or
+    // epoch-supersession drain paths, e.g. because the caller dropped the
+    // returned future or the target never publishes another event.
+    struct waiter_entry
+    {
+        hpx::promise<lifecycle_state> promise;
+        std::chrono::steady_clock::time_point deadline;
     };
 
     struct supervision_manager
@@ -54,11 +88,9 @@ namespace hpx::supervision::server {
     {
         using base_type = components::fixed_component_base<supervision_manager>;
 
-        supervision_manager()
-          : base_type(supervision::detail::supervision_manager_msb,
-                supervision::detail::supervision_manager_lsb)
-        {
-        }
+        supervision_manager();
+
+        ~supervision_manager();
 
         void finalize() const;
 
@@ -88,7 +120,7 @@ namespace hpx::supervision::server {
 
         hpx::id_type register_observer(hpx::id_type const& target,
             hpx::id_type const& agent,
-            std::optional<std::uint64_t> epoch_filter = std::nullopt);
+            std::uint64_t epoch_filter = static_cast<std::uint64_t>(-1));
 
         struct register_observer_action
           : hpx::actions::make_action_t<
@@ -108,6 +140,39 @@ namespace hpx::supervision::server {
         {
         };
 
+        // Resolve once `target` reaches a terminal event (`completed` or
+        // `failed`) within `epoch`. If `target` has already reached a terminal
+        // event within `epoch` at the time of the call, the returned future is
+        // ready immediately. Otherwise, the returned future becomes ready when
+        // `publish_event` next records a terminal event for `target` under the
+        // exact same epoch. Waiters registered for an epoch that is superseded
+        // by a higher epoch (see the epoch semantics of `publish_event`) never
+        // reach a terminal event under that epoch; instead, their future
+        // becomes exceptional with an `hpx::error::stale_state` exception
+        // describing the epoch that superseded them. A waiter that is reached
+        // by neither of these two paths (e.g. the caller drops the returned
+        // future, or `target` never publishes another event) is bounded by a
+        // deadline set from `timeout` (relative to registration time), or a
+        // built-in default if `timeout` is left at its sentinel value
+        // `std::chrono::steady_clock::duration::max()`: it is swept and its
+        // future made exceptional with an `hpx::error::future_cancelled`
+        // exception at or after that deadline passes, so entries in waiters_
+        // cannot accumulate indefinitely. This is enforced by sweep_timer_
+        // independently of any further activity for `target`, in addition to
+        // the opportunistic sweep performed by this function and
+        // publish_event() as a fast path.
+        hpx::future<lifecycle_state> await_terminal(hpx::id_type const& target,
+            std::uint64_t epoch = 0,
+            std::chrono::steady_clock::duration timeout =
+                (std::chrono::steady_clock::duration::max) ());
+
+        struct await_terminal_action
+          : hpx::actions::make_action_t<
+                decltype(&supervision_manager::await_terminal),
+                &supervision_manager::await_terminal, await_terminal_action>
+        {
+        };
+
     protected:
         hpx::future<void> fire_events(hpx::id_type const& target,
             lifecycle_event_notification const& notification);
@@ -120,6 +185,107 @@ namespace hpx::supervision::server {
 
         void unregister_observer_target(
             hpx::id_type const& target, hpx::id_type const& observer_handle);
+
+        using waiters_t = std::vector<waiter_entry>;
+        using stale_waiters_t =
+            std::vector<std::pair<std::uint64_t, waiters_t>>;
+
+        // A waiter that was swept because its deadline passed, together with
+        // the (target, epoch) it was registered for; unlike stale_waiters_t,
+        // expired waiters are not scoped to a single target since the expiry
+        // sweep walks the entire waiters_ map.
+        struct expired_waiter
+        {
+            hpx::id_type target;
+            std::uint64_t epoch;
+            hpx::promise<lifecycle_state> promise;
+        };
+        using expired_waiters_t = std::vector<expired_waiter>;
+
+        // Helpers used to implement publish_event(); see the .cpp file for
+        // details on the locking discipline each of these follows.
+        struct apply_result
+        {
+            lifecycle_event_notification notification;
+            waiters_t to_resolve;
+        };
+
+        waiters_t drain_terminal_waiters_locked(
+            std::unique_lock<hpx::spinlock>& l, hpx::id_type const& target,
+            std::uint64_t epoch, event last_event);
+
+        stale_waiters_t drain_stale_waiters_locked(
+            std::unique_lock<hpx::spinlock>& l, hpx::id_type const& target,
+            std::uint64_t epoch);
+
+        apply_result apply_new_epoch_locked(std::unique_lock<hpx::spinlock>& l,
+            hpx::id_type const& target, supervision::event ev,
+            std::uint64_t epoch);
+
+        std::optional<apply_result> apply_current_epoch_locked(
+            std::unique_lock<hpx::spinlock>& l, hpx::id_type const& target,
+            supervision::event ev, std::uint64_t epoch);
+
+        static void invalidate_stale_waiters(hpx::id_type const& target,
+            std::uint64_t epoch, stale_waiters_t& stale);
+
+        static void resolve_terminal_waiters(
+            lifecycle_event_notification const& notification,
+            waiters_t& to_resolve);
+
+        // Walks the entire waiters_ map and drains any waiter whose deadline is
+        // at or before `now`, regardless of target/epoch. Also recomputes
+        // earliest_deadline_ as a byproduct of this scan, folding over the
+        // deadlines of the waiters that survive. The caller invalidates the
+        // returned waiters after the lock has been released.
+        expired_waiters_t drain_expired_waiters_locked(
+            std::unique_lock<hpx::spinlock>& l,
+            std::chrono::steady_clock::time_point now);
+
+        static void invalidate_expired_waiters(expired_waiters_t& expired);
+
+        // Opportunistic, lazy cleanup for abandoned await_terminal() waiters:
+        // acquires mtx_, drains any waiter past its deadline, then invalidates
+        // the drained waiters after releasing the lock. Called from both
+        // await_terminal() and publish_event() so that abandoned waiters are
+        // bounded without a dedicated background sweep thread. Skips the
+        // full-map scan in drain_expired_waiters_locked() entirely whenever
+        // earliest_deadline_ indicates no waiter could possibly have expired
+        // yet.
+        void sweep_expired_waiters();
+
+        // Arms (or re-arms) sweep_timer_ so it fires at or after
+        // earliest_deadline_, unless it is already armed for a deadline at or
+        // before that; this is the guaranteed backstop that lets
+        // sweep_expired_waiters() reach waiters registered for a target whose
+        // locality never sees another await_terminal()/publish_event() call. A
+        // no-op if waiters_ is currently empty. Called with mtx_ held (both
+        // after a new (possibly earlier) deadline is registered in
+        // await_terminal() and from sweep_timer_callback() itself, to re-arm
+        // for the next earliest deadline once the timer fires) and returns
+        // with mtx_ held again, but internally releases mtx_ (via
+        // sweep_timer_mtx_ instead) around the actual pool_timer calls; see
+        // the .cpp file for why.
+        void arm_sweep_timer_locked(std::unique_lock<hpx::spinlock>&& l);
+
+        // Callback invoked by sweep_timer_ when it fires: drains and
+        // invalidates any waiters past their deadline, then re-arms the timer
+        // (via arm_sweep_timer_locked()) for whatever deadline is earliest
+        // among the waiters that remain. sweep_timer_ is one-shot, so re-arming
+        // here is what turns it into a recurring backstop.
+        bool sweep_timer_callback();
+
+        // Recomputes earliest_deadline_ from scratch by folding over every
+        // remaining waiter in waiters_. Called by
+        // drain_terminal_waiters_locked() and drain_stale_waiters_locked(),
+        // which only touch a single target/epoch bucket (or a small range of
+        // buckets) and therefore cannot otherwise tell whether the waiter(s)
+        // they just erased held the current earliest deadline.
+        // drain_expired_waiters_locked() does not use this helper: since it
+        // already performs a full scan of waiters_, it derives the new earliest
+        // deadline directly as a byproduct of that scan instead.
+        void recompute_earliest_deadline_locked(
+            std::unique_lock<hpx::spinlock>& l);
 
     private:
         mutable hpx::spinlock mtx_;
@@ -134,6 +300,70 @@ namespace hpx::supervision::server {
         std::map<hpx::id_type, std::vector<observer_entry>> observers_;
         // inverse lookup for agents: agents -> targets
         std::map<hpx::id_type, std::vector<hpx::id_type>> agents_;
+        // one-shot waiters for await_terminal(): (target, epoch) -> pending
+        // promises (each paired with a deadline). Resolved and erased from
+        // this map by publish_event() as soon as the corresponding
+        // target/epoch pair reaches a terminal event; set to an explicit
+        // exception and erased instead if that epoch is superseded first,
+        // or if its deadline passes before either of those happens (see
+        // sweep_expired_waiters()).
+        std::map<waiter_key, waiters_t> waiters_;
+
+        // Earliest deadline among all waiters currently in waiters_, or
+        // std::chrono::steady_clock::time_point::max() if waiters_ is empty.
+        // Let sweep_expired_waiters() skip the full-map scan performed by
+        // drain_expired_waiters_locked() when no waiter could possibly have
+        // expired yet; kept up to date whenever waiters_ is mutated (see
+        // await_terminal(), drain_expired_waiters_locked(), and
+        // recompute_earliest_deadline_locked()).
+        std::chrono::steady_clock::time_point earliest_deadline_ =
+            (std::chrono::steady_clock::time_point::max) ();
+
+        // Independent backstop for sweep_expired_waiters(): guarantees that
+        // idle targets (whose locality sees no further await_terminal() or
+        // publish_event() call) still get their expired waiters swept and
+        // invalidated at or after each waiter's deadline, instead of relying
+        // solely on such later activity to trigger the opportunistic sweep
+        // calls. Armed/re-armed via arm_sweep_timer_locked(), see there for
+        // details; drained via shutting_down_/callbacks_in_flight_ (below) in
+        // the destructor before any other member is destroyed.
+        hpx::util::pool_timer sweep_timer_;
+
+        // The deadline sweep_timer_ is currently armed for, or
+        // steady_clock::time_point::max() if it is not currently armed. Kept in
+        // sync with sweep_timer_ under mtx_ so arm_sweep_timer_locked() can
+        // tell whether the timer needs to be (re-)armed for an earlier deadline
+        // than the one it is already running for.
+        std::chrono::steady_clock::time_point armed_deadline_ =
+            (std::chrono::steady_clock::time_point::max) ();
+
+        // Serializes the actual pool_timer::init()/stop()/start() calls made by
+        // arm_sweep_timer_locked() and by the destructor, which perform them
+        // with mtx_ released (see arm_sweep_timer_locked() for why):
+        // sweep_timer_ is not safe against concurrent init()/stop()/start()
+        // calls, so this dedicated (non-busy-wait) lock protects it instead of
+        // mtx_.
+        hpx::spinlock sweep_timer_mtx_;
+
+        // Set by the destructor, under mtx_, before waiting for any
+        // sweep_timer_callback() invocation already in flight (tracked by
+        // callbacks_in_flight_) to finish; checked by sweep_timer_callback()
+        // under mtx_ before it touches any other member, so a callback
+        // dispatched concurrently with destruction never touches this object
+        // once teardown has begun. This is needed because pool_timer::stop()
+        // only cancels a not-yet-fired wait: it does not wait for an
+        // already-dispatched callback invocation (sweep_timer_ is bound to a
+        // raw `this`) to finish running.
+        bool shutting_down_ = false;
+
+        // Number of sweep_timer_callback() invocations currently executing. The
+        // destructor waits (via shutdown_cv_) until this reaches zero after
+        // setting shutting_down_, guaranteeing no invocation is still touching
+        // mtx_/waiters_/etc. before the rest of this object's state starts
+        // being destroyed. Mirrors agent_component::deactivate_and_wait() (see
+        // agent_server.cpp).
+        std::size_t callbacks_in_flight_ = 0;
+        hpx::lcos::local::detail::condition_variable shutdown_cv_;
     };
 }    // namespace hpx::supervision::server
 
@@ -149,3 +379,6 @@ HPX_REGISTER_ACTION_DECLARATION(
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::supervision::server::supervision_manager::query_state_action,
     supervision_query_state_action)
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::supervision::server::supervision_manager::await_terminal_action,
+    supervision_await_terminal_action)
