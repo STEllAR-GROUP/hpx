@@ -82,25 +82,23 @@ std::uint16_t get_unused_port(std::string const& address)
     for (auto it = hpx::util::accept_begin(address, 0, io_service);
         it != hpx::util::accept_end(); ++it)
     {
-        std::error_code ec;
-        ::asio::ip::tcp::endpoint const ep = *it;
-        ::asio::ip::tcp::acceptor acceptor(io_service);
+        try
+        {
+            ::asio::ip::tcp::endpoint const ep = *it;
+            ::asio::ip::tcp::acceptor acceptor(io_service);
 
-        acceptor.open(ep.protocol(), ec);
-        if (ec)
+            acceptor.open(ep.protocol());
+            acceptor.set_option(::asio::ip::tcp::acceptor::reuse_address(true));
+            acceptor.bind(ep);
+
+            // the acceptor is closed again on the way out, releasing the port
+            // for the launched locality to pick up
+            return acceptor.local_endpoint().port();
+        }
+        catch (std::system_error const&)
+        {
             continue;
-
-        acceptor.set_option(::asio::ip::tcp::acceptor::reuse_address(true), ec);
-        if (ec)
-            continue;
-
-        acceptor.bind(ep, ec);
-        if (ec)
-            continue;
-
-        // the acceptor is closed again on the way out, releasing the port for
-        // the launched locality to pick up
-        return acceptor.local_endpoint().port();
+        }
     }
 
     HPX_THROW_EXCEPTION(hpx::error::network_error, "get_unused_port",
