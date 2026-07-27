@@ -687,13 +687,27 @@ namespace hpx::collectives {
                     "pairwise/" +
                     std::to_string(static_cast<std::size_t>(num_sites)) + "/";
 
-                return pairwise_all_to_all(
-                    get_cached_channel_communicator(
-                        HPX_MOVE(channel_basename), num_sites, this_site)
-                        .get(),
-                    HPX_MOVE(local_result), static_cast<std::size_t>(num_sites),
-                    static_cast<std::size_t>(this_site),
-                    tag_arg(static_cast<std::size_t>(generation)));
+                std::size_t const num_sites_value = num_sites;
+                std::size_t const this_site_value = this_site;
+                tag_arg const tag(static_cast<std::size_t>(generation));
+
+                // The communicator is chained onto rather than waited for.
+                // This function backs an overload that hands the caller a
+                // future, so it must not spend the caller's thread on the
+                // first call's AGAS registration before returning one. The
+                // communicator type is spelled out because the unqualified
+                // name resolves to the detail class in this namespace.
+                return get_cached_channel_communicator(
+                    HPX_MOVE(channel_basename), num_sites, this_site)
+                    .then(hpx::launch::sync,
+                        [local_result = HPX_MOVE(local_result), num_sites_value,
+                            this_site_value, tag](hpx::shared_future<
+                            hpx::collectives::channel_communicator>&&
+                                f) mutable {
+                            return pairwise_all_to_all(f.get(),
+                                HPX_MOVE(local_result), num_sites_value,
+                                this_site_value, tag);
+                        });
             }
 
             return hpx::collectives::all_to_all(
