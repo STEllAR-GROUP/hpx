@@ -235,6 +235,7 @@ namespace hpx { namespace collectives {
 
 #include <hpx/assert.hpp>
 #include <hpx/collectives/argument_types.hpp>
+#include <hpx/collectives/channel_communicator.hpp>
 #include <hpx/collectives/create_communicator.hpp>
 #include <hpx/collectives/detail/flattened_data.hpp>
 #include <hpx/collectives/detail/hierarchical_all_to_all_helpers.hpp>
@@ -671,24 +672,25 @@ namespace hpx::collectives {
             {
                 // The channel communicator carries a name of its own so it
                 // cannot collide with the collective communicator registered
-                // under this basename. The generation is part of that name
-                // because a communicator is built per call: registering the
-                // same name for a later generation would be refused while the
-                // earlier one is still registered.
+                // under this basename. That name spans a group of sites rather
+                // than a single call: one communicator serves every
+                // generation, and the exchange tag is what keeps the
+                // generations apart. Registering a name per generation instead
+                // would put an AGAS registration and a full peer lookup back
+                // into every call, which is the cost this path exists to
+                // remove.
                 //
-                // Building one per call is the conservative choice, not the
-                // cheap one. Reusing a single channel communicator across
-                // generations is what the exchange tag was threaded through
-                // for, and it is the version worth measuring, but it needs a
-                // cache with a lifetime rule of its own.
-                std::string const channel_basename = std::string(basename) +
+                // The site count belongs in the name because two groups of
+                // different size are two different communicators, and the
+                // cache creates one only on the first call that names it.
+                std::string channel_basename = std::string(basename) +
                     "pairwise/" +
-                    std::to_string(static_cast<std::size_t>(generation)) + "/";
+                    std::to_string(static_cast<std::size_t>(num_sites)) + "/";
 
                 return pairwise_all_to_all(
-                    hpx::collectives::create_channel_communicator(
-                        hpx::launch::sync, channel_basename.c_str(), num_sites,
-                        this_site),
+                    get_cached_channel_communicator(
+                        HPX_MOVE(channel_basename), num_sites, this_site)
+                        .get(),
                     HPX_MOVE(local_result), static_cast<std::size_t>(num_sites),
                     static_cast<std::size_t>(this_site),
                     tag_arg(static_cast<std::size_t>(generation)));
