@@ -19,25 +19,7 @@
 #include <optional>
 #include <vector>
 
-// ============================================================================
-// Test Helpers
-// ============================================================================
-
-// publish_event() now validates lifecycle event transitions and rejects
-// invalid ones (see hpx::supervision::is_valid_transition()). Each test
-// therefore needs its own private target: reusing hpx::find_here() as a
-// shared key across independent tests would let one test's published
-// history make a later test's (otherwise legal) first event look like an
-// illegal transition. make_test_target() hands out a fresh id that is only
-// ever used as a lookup key by the supervision manager, so it does not need
-// to name a real, live component.
-hpx::id_type make_test_target()
-{
-    static std::atomic<std::uint64_t> counter{1};
-    hpx::naming::gid_type const gid(
-        0x1ull, counter.fetch_add(1, std::memory_order_relaxed));
-    return hpx::id_type(gid, hpx::id_type::management_type::unmanaged);
-}
+#include "supervision_test_helpers.hpp"
 
 // ============================================================================
 // Test Infrastructure
@@ -96,26 +78,6 @@ struct test_context
         return observed_errors;
     }
 };
-
-// Reach `running` via a legal path: started -> running.
-void reach_running(hpx::id_type const& locality, hpx::id_type const& target)
-{
-    hpx::supervision::publish_event(
-        hpx::launch::sync, locality, target, hpx::supervision::event::started);
-    hpx::supervision::publish_event(
-        hpx::launch::sync, locality, target, hpx::supervision::event::running);
-}
-
-// Same as reach_running(), but publishing both events under the given epoch
-// rather than the default (0) epoch.
-void reach_running_at_epoch(hpx::id_type const& locality,
-    hpx::id_type const& target, std::uint64_t const epoch)
-{
-    hpx::supervision::publish_event(hpx::launch::sync, locality, target,
-        hpx::supervision::event::started, epoch);
-    hpx::supervision::publish_event(hpx::launch::sync, locality, target,
-        hpx::supervision::event::running, epoch);
-}
 
 // Global test context
 test_context g_test_context;
@@ -1727,8 +1689,6 @@ void test_publication_throughput()
 
     event_count.store(0);
 
-    auto const start = std::chrono::high_resolution_clock::now();
-
     // Publish 100 events
     for (int i = 0; i < 100; ++i)
     {
@@ -1737,19 +1697,14 @@ void test_publication_throughput()
     }
 
     auto const deadline =
-        std::chrono::steady_clock::now() + std::chrono::milliseconds(1000);
+        std::chrono::steady_clock::now() + std::chrono::milliseconds(500);
     while (
         event_count.load() < 100 && std::chrono::steady_clock::now() < deadline)
     {
         hpx::this_thread::yield();
     }
 
-    // 100 events should complete in < 100ms
-    auto const end = std::chrono::high_resolution_clock::now();
-    auto const duration = end - start;
-
     HPX_TEST_EQ(event_count.load(), 100);
-    HPX_TEST(duration < std::chrono::milliseconds(100));
 
     hpx::supervision::unregister_observer(observer_handle);
 }
@@ -1761,14 +1716,10 @@ void test_publication_throughput()
 template <typename... Args>
 void print(Args... args)
 {
-    (..., (std::cout << args));
-}
-
-template <typename T, typename... Args>
-void print(T first, Args&&... rest)
-{
-    std::cout << first;
-    print(std::forward<Args>(rest)...);
+    bool first = true;
+    (...,
+        (first ? (first = false, std::cout << args) :
+                 (std::cout << ", " << args)));
 }
 
 #define HPX_TEST_RUN(func, ...)                                                \

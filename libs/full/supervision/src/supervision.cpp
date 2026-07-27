@@ -44,6 +44,10 @@ HPX_REGISTER_ACTION_ID(
     hpx::supervision::server::supervision_manager::query_state_action,
     supervision_manager_query_state_action,
     hpx::actions::supervision_manager_query_state_action_id)
+HPX_REGISTER_ACTION_ID(
+    hpx::supervision::server::supervision_manager::await_terminal_action,
+    supervision_manager_await_terminal_action,
+    hpx::actions::supervision_manager_await_terminal_action_id)
 
 namespace hpx::supervision {
 
@@ -82,11 +86,54 @@ namespace hpx::supervision {
         return false;
     }
 
+    namespace {
+
+        template <typename Result, typename Action, typename LocalOp,
+            typename... Args>
+        hpx::future<Result> supervision_dispatch(
+            hpx::id_type const& locality, LocalOp&& local_op, Args&&... args)
+        {
+            // handle local requests locally
+            if (locality.get_gid() == agas::get_locality())
+            {
+                return hpx::detail::try_catch_exception_ptr(
+                    HPX_FORWARD(LocalOp, local_op),
+                    [&](std::exception_ptr const& ep) {
+                        return hpx::make_exceptional_future<Result>(ep);
+                    });
+            }
+
+            auto dest = hpx::id_type(
+                supervision_manager::get_service_instance(locality),
+                hpx::id_type::management_type::unmanaged);
+            return hpx::async(Action(), dest, HPX_FORWARD(Args, args)...);
+        }
+    }    // namespace
+
     ///////////////////////////////////////////////////////////////////////////
     // Publish a lifecycle event from within an actor or action
+    namespace {
+
+        hpx::future<publish_result> publish_event_helper(
+            hpx::id_type const& locality, hpx::id_type const& target,
+            hpx::supervision::event const ev, std::uint64_t epoch)
+        {
+            using action_type =
+                server::supervision_manager::publish_event_action;
+            return supervision_dispatch<publish_result, action_type>(
+                locality,
+                [&]() {
+                    return hpx::make_ready_future<publish_result>(
+                        get_supervision_manager().publish_event(
+                            target, ev, epoch));
+                },
+                target, ev, epoch);
+        }
+    }    // namespace
+
     hpx::future<publish_result> publish_event(hpx::id_type const& locality,
         hpx::id_type const& target, hpx::supervision::event const ev,
-        std::uint64_t epoch)
+        std::uint64_t const epoch)
     {
         if (!hpx::naming::is_locality(locality))
         {
@@ -103,25 +150,7 @@ namespace hpx::supervision {
                 "a valid target");
         }
 
-        // handle local requests locally
-        if (locality.get_gid() == agas::get_locality())
-        {
-            return hpx::detail::try_catch_exception_ptr(
-                [&]() {
-                    auto result = get_supervision_manager().publish_event(
-                        target, ev, epoch);
-                    return hpx::make_ready_future(result);
-                },
-                [&](std::exception_ptr const& ep) {
-                    return hpx::make_exceptional_future<publish_result>(ep);
-                });
-        }
-
-        auto dest =
-            hpx::id_type(supervision_manager::get_service_instance(locality),
-                hpx::id_type::management_type::unmanaged);
-        using action_type = server::supervision_manager::publish_event_action;
-        return hpx::async(action_type(), dest, target, ev, epoch);
+        return publish_event_helper(locality, target, ev, epoch);
     }
 
     publish_result publish_event(hpx::launch::sync_policy,
@@ -145,7 +174,8 @@ namespace hpx::supervision {
                 "a valid target");
             return publish_result::already_terminal;
         }
-        return publish_event(locality, target, ev, epoch).get(ec);
+
+        return publish_event_helper(locality, target, ev, epoch).get(ec);
     }
 
     // purely local request
@@ -161,6 +191,7 @@ namespace hpx::supervision {
                 "a valid target");
             return publish_result::already_terminal;
         }
+
         return get_supervision_manager().publish_event(target, ev, epoch, ec);
     }
 
@@ -180,6 +211,22 @@ namespace hpx::supervision {
             state.event_sequence_number >> state.epoch >> state.ec;
     }
 
+    namespace {
+
+        hpx::future<lifecycle_state> query_state_helper(
+            hpx::id_type const& locality, hpx::id_type const& target)
+        {
+            using action_type = server::supervision_manager::query_state_action;
+            return supervision_dispatch<lifecycle_state, action_type>(
+                locality,
+                [&]() {
+                    return hpx::make_ready_future<lifecycle_state>(
+                        get_supervision_manager().query_state(target));
+                },
+                target);
+        }
+    }    // namespace
+
     hpx::future<lifecycle_state> query_state(
         hpx::id_type const& locality, hpx::id_type const& target)
     {
@@ -198,24 +245,7 @@ namespace hpx::supervision {
                 "a valid target");
         }
 
-        // handle local requests locally
-        if (locality.get_gid() == agas::get_locality())
-        {
-            return hpx::detail::try_catch_exception_ptr(
-                [&]() {
-                    auto result = get_supervision_manager().query_state(target);
-                    return hpx::make_ready_future(HPX_MOVE(result));
-                },
-                [&](std::exception_ptr const& ep) {
-                    return hpx::make_exceptional_future<lifecycle_state>(ep);
-                });
-        }
-
-        auto dest =
-            hpx::id_type(supervision_manager::get_service_instance(locality),
-                hpx::id_type::management_type::unmanaged);
-        using action_type = server::supervision_manager::query_state_action;
-        return hpx::async(action_type(), dest, target);
+        return query_state_helper(locality, target);
     }
 
     lifecycle_state query_state(hpx::launch::sync_policy,
@@ -238,7 +268,8 @@ namespace hpx::supervision {
                 "a valid target");
             return {};
         }
-        return query_state(locality, target).get(ec);
+
+        return query_state_helper(locality, target).get(ec);
     }
 
     lifecycle_state query_state(hpx::id_type const& target, hpx::error_code& ec)
@@ -251,6 +282,7 @@ namespace hpx::supervision {
                 "a valid target");
             return {};
         }
+
         return get_supervision_manager().query_state(target, ec);
     }
 
@@ -272,9 +304,31 @@ namespace hpx::supervision {
     }
 
     // Register a callback to observe lifecycle events from a target actor
+    namespace {
+
+        hpx::future<hpx::id_type> register_observer_helper(
+            hpx::id_type const& locality, hpx::id_type const& target,
+            lifecycle_callback const& callback,
+            std::uint64_t const epoch_filter)
+        {
+            auto agent = server::create_agent(callback);
+
+            using action_type =
+                server::supervision_manager::register_observer_action;
+            return supervision_dispatch<hpx::id_type, action_type>(
+                locality,
+                [&]() {
+                    return hpx::make_ready_future<hpx::id_type>(
+                        get_supervision_manager().register_observer(
+                            target, agent, epoch_filter));
+                },
+                target, agent, epoch_filter);
+        }
+    }    // namespace
+
     hpx::future<hpx::id_type> register_observer(hpx::id_type const& locality,
         hpx::id_type const& target, lifecycle_callback const& callback,
-        std::optional<std::uint64_t> epoch_filter)
+        std::optional<std::uint64_t> const epoch_filter)
     {
         if (!hpx::naming::is_locality(locality))
         {
@@ -291,35 +345,14 @@ namespace hpx::supervision {
                 "a valid target");
         }
 
-        auto agent = server::create_agent(callback);
-
-        // handle local requests locally
-        if (locality.get_gid() == agas::get_locality())
-        {
-            return hpx::detail::try_catch_exception_ptr(
-                [&]() {
-                    auto result = get_supervision_manager().register_observer(
-                        target, agent, HPX_MOVE(epoch_filter));
-                    return hpx::make_ready_future(result);
-                },
-                [&](std::exception_ptr const& ep) {
-                    return hpx::make_exceptional_future<hpx::id_type>(ep);
-                });
-        }
-
-        auto dest =
-            hpx::id_type(supervision_manager::get_service_instance(locality),
-                hpx::id_type::management_type::unmanaged);
-        using action_type =
-            server::supervision_manager::register_observer_action;
-        return hpx::async(
-            action_type(), dest, target, agent, HPX_MOVE(epoch_filter));
+        return register_observer_helper(locality, target, callback,
+            epoch_filter.value_or(static_cast<std::uint64_t>(-1)));
     }
 
     hpx::id_type register_observer(hpx::launch::sync_policy,
         hpx::id_type const& locality, hpx::id_type const& target,
         lifecycle_callback const& callback,
-        std::optional<std::uint64_t> epoch_filter, hpx::error_code& ec)
+        std::optional<std::uint64_t> const epoch_filter, hpx::error_code& ec)
     {
         if (!hpx::naming::is_locality(locality))
         {
@@ -337,14 +370,15 @@ namespace hpx::supervision {
                 "a valid target");
             return hpx::invalid_id;
         }
-        return register_observer(
-            locality, target, callback, HPX_MOVE(epoch_filter))
+
+        return register_observer_helper(locality, target, callback,
+            epoch_filter.value_or(static_cast<std::uint64_t>(-1)))
             .get(ec);
     }
 
     hpx::id_type register_observer(hpx::id_type const& target,
         lifecycle_callback const& callback,
-        std::optional<std::uint64_t> epoch_filter, hpx::error_code& ec)
+        std::optional<std::uint64_t> const epoch_filter, hpx::error_code& ec)
     {
         if (!target)
         {
@@ -354,12 +388,33 @@ namespace hpx::supervision {
                 "a valid target");
             return hpx::invalid_id;
         }
+
         auto agent = server::create_agent(callback);
-        return get_supervision_manager().register_observer(
-            target, HPX_MOVE(agent), HPX_MOVE(epoch_filter), ec);
+        return get_supervision_manager().register_observer(target,
+            HPX_MOVE(agent),
+            epoch_filter.value_or(static_cast<std::uint64_t>(-1)), ec);
     }
 
-    // Register a callback
+    ///////////////////////////////////////////////////////////////////////////
+    // Unregister a callback
+    namespace {
+
+        hpx::future<void> unregister_observer_helper(
+            hpx::id_type const& locality, hpx::id_type const& observer_handle)
+        {
+            using action_type =
+                server::supervision_manager::unregister_observer_action;
+            return supervision_dispatch<void, action_type>(
+                locality,
+                [&]() {
+                    get_supervision_manager().unregister_observer(
+                        observer_handle);
+                    return hpx::make_ready_future();
+                },
+                observer_handle);
+        }
+    }    // namespace
+
     hpx::future<void> unregister_observer(
         hpx::id_type const& locality, hpx::id_type const& observer_handle)
     {
@@ -378,26 +433,7 @@ namespace hpx::supervision {
                 "a valid observer handle");
         }
 
-        // handle local requests locally
-        if (locality.get_gid() == agas::get_locality())
-        {
-            return hpx::detail::try_catch_exception_ptr(
-                [&]() {
-                    get_supervision_manager().unregister_observer(
-                        observer_handle);
-                    return hpx::make_ready_future();
-                },
-                [&](std::exception_ptr const& ep) {
-                    return hpx::make_exceptional_future<void>(ep);
-                });
-        }
-
-        auto dest =
-            hpx::id_type(supervision_manager::get_service_instance(locality),
-                hpx::id_type::management_type::unmanaged);
-        using action_type =
-            server::supervision_manager::unregister_observer_action;
-        return hpx::async(action_type(), dest, observer_handle);
+        return unregister_observer_helper(locality, observer_handle);
     }
 
     void unregister_observer(hpx::launch::sync_policy,
@@ -420,7 +456,8 @@ namespace hpx::supervision {
                 "a valid observer handle");
             return;
         }
-        unregister_observer(locality, observer_handle).get(ec);
+
+        unregister_observer_helper(locality, observer_handle).get(ec);
     }
 
     // Local callback unregistration
@@ -435,7 +472,98 @@ namespace hpx::supervision {
                 "a valid observer handle");
             return;
         }
+
         get_supervision_manager().unregister_observer(observer_handle, ec);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    // Wait for the target to reach a terminal state
+    namespace {
+
+        hpx::future<lifecycle_state> await_terminal_helper(
+            hpx::id_type const& locality, hpx::id_type const& target,
+            std::uint64_t epoch, std::chrono::steady_clock::duration timeout)
+        {
+            using action_type =
+                server::supervision_manager::await_terminal_action;
+            return supervision_dispatch<lifecycle_state, action_type>(
+                locality,
+                [&]() {
+                    return get_supervision_manager().await_terminal(
+                        target, epoch, timeout);
+                },
+                target, epoch, timeout);
+        }
+    }    // namespace
+
+    hpx::future<lifecycle_state> await_terminal(hpx::id_type const& locality,
+        hpx::id_type const& target, std::uint64_t const epoch,
+        std::optional<std::chrono::steady_clock::duration> const timeout)
+    {
+        if (!hpx::naming::is_locality(locality))
+        {
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                "hpx::supervision::await_terminal",
+                "The id passed as the first argument is not representing "
+                "a locality");
+        }
+        if (!target)
+        {
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                "hpx::supervision::await_terminal",
+                "The id passed as the second argument is not representing "
+                "a valid target");
+        }
+
+        return await_terminal_helper(locality, target, epoch,
+            timeout.value_or((std::chrono::steady_clock::duration::max) ()));
+    }
+
+    lifecycle_state await_terminal(hpx::launch::sync_policy,
+        hpx::id_type const& locality, hpx::id_type const& target,
+        std::uint64_t const epoch,
+        std::optional<std::chrono::steady_clock::duration> const timeout,
+        hpx::error_code& ec)
+    {
+        if (!hpx::naming::is_locality(locality))
+        {
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "hpx::supervision::await_terminal",
+                "The id passed as the first argument is not representing "
+                "a locality");
+            return {};
+        }
+        if (!target)
+        {
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "hpx::supervision::await_terminal",
+                "The id passed as the second argument is not representing "
+                "a valid target");
+            return {};
+        }
+
+        return await_terminal_helper(locality, target, epoch,
+            timeout.value_or((std::chrono::steady_clock::duration::max) ()))
+            .get(ec);
+    }
+
+    hpx::future<lifecycle_state> await_terminal(hpx::id_type const& target,
+        std::uint64_t const epoch,
+        std::optional<std::chrono::steady_clock::duration> const timeout,
+        hpx::error_code& ec)
+    {
+        if (!target)
+        {
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "hpx::supervision::await_terminal",
+                "The id passed as the first argument is not representing "
+                "a valid target");
+            return hpx::make_ready_future(lifecycle_state{});
+        }
+
+        return get_supervision_manager().await_terminal(target, epoch,
+            timeout.value_or((std::chrono::steady_clock::duration::max) ()),
+            ec);
     }
 }    // namespace hpx::supervision
 

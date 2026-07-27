@@ -12,6 +12,7 @@
 #include <hpx/supervision/server/supervision_manager.hpp>
 #include <hpx/supervision/supervision_fwd.hpp>
 
+#include <chrono>
 #include <cstdint>
 #include <memory>
 #include <optional>
@@ -33,10 +34,16 @@ namespace hpx::supervision {
 
         hpx::id_type register_observer(hpx::id_type const& target,
             hpx::id_type const& agent,
-            std::optional<std::uint64_t> epoch_filter = std::nullopt,
+            std::uint64_t epoch_filter = static_cast<std::uint64_t>(-1),
             hpx::error_code& ec = throws) const;
 
         void unregister_observer(hpx::id_type const& observer_handle,
+            hpx::error_code& ec = throws) const;
+
+        hpx::future<lifecycle_state> await_terminal(hpx::id_type const& target,
+            std::uint64_t epoch = 0,
+            std::chrono::steady_clock::duration timeout =
+                (std::chrono::steady_clock::duration::max) (),
             hpx::error_code& ec = throws) const;
 
         // Helper functions
