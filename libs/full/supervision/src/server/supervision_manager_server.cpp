@@ -28,6 +28,7 @@
 #include <map>
 #include <mutex>
 #include <optional>
+#include <ranges>
 #include <utility>
 #include <vector>
 
@@ -223,9 +224,9 @@ namespace hpx::supervision::server {
         HPX_ASSERT_OWNS_LOCK(l);
 
         auto next_deadline = (std::chrono::steady_clock::time_point::max) ();
-        for (auto const& bucket : waiters_)
+        for (auto const& val : waiters_ | std::views::values)
         {
-            for (auto const& [_, deadline] : bucket.second)
+            for (auto const& [_, deadline] : val)
             {
                 next_deadline = (std::min) (next_deadline, deadline);
             }
@@ -605,16 +606,16 @@ namespace hpx::supervision::server {
         // unaffected by any early-return path (stale_epoch/already_terminal)
         // taken while still holding the lock, since those paths never reach
         // that code.
-        bool had_state_before = false;
+        bool had_state_before;
 
         {
             std::unique_lock<hpx::spinlock> l(mtx_);
 
-            auto const epoch_it = current_epoch_.find(target);
-            had_state_before = epoch_it != current_epoch_.end();
+            had_state_before = states_.contains(target);
 
+            auto const epoch_it = current_epoch_.find(target);
             std::uint64_t const current_ep =
-                had_state_before ? epoch_it->second : 0;
+                epoch_it != current_epoch_.end() ? epoch_it->second : 0;
 
             if (epoch < current_ep)
             {
@@ -643,6 +644,19 @@ namespace hpx::supervision::server {
                 notification = HPX_MOVE(result->notification);
                 to_resolve = HPX_MOVE(result->to_resolve);
             }
+
+            // Record the target's original activation time for
+            // register_activity_observer()'s replay logic, guarded by
+            // try_emplace() so a target that was already activated via
+            // register_observer() (first_observer) keeps that earlier time.
+            // Only reached for a target's first-ever publish_event (see
+            // had_state_before above); harmless to skip for the
+            // already_terminal/stale_epoch early returns above, since neither
+            // represents a new activation.
+            if (!had_state_before)
+            {
+                activated_at_.try_emplace(target, notification.event_time);
+            }
         }
 
         invalidate_stale_waiters(target, epoch, stale);
@@ -668,8 +682,7 @@ namespace hpx::supervision::server {
         // not disappear on the publishing path).
         if (!had_state_before)
         {
-            target_activity_notification const activity_notification{
-                .actor = target,
+            activity_notification const activity_notification{.actor = target,
                 .state = activity_state::active,
                 .transition = activity_transition::first_event,
                 .event_time = notification.event_time,
@@ -787,12 +800,23 @@ namespace hpx::supervision::server {
                 {
                     agents_.erase(it);
                 }
+
+                // Only truly untracked (per the has-ever-published/
+                // has-observers predicate used by
+                // register_activity_observer()'s replay logic) once
+                // it also has no states_ entry; a target that has published
+                // at least one event stays tracked even after its last
+                // observer is removed.
+                if (deactivated && !states_.contains(target))
+                {
+                    activated_at_.erase(target);
+                }
             }
 
             // Fired with mtx_ released, mirroring unregister_observer() below.
             if (deactivated)
             {
-                target_activity_notification const activity_notification{
+                activity_notification const activity_notification{
                     .actor = target,
                     .state = activity_state::inactive,
                     .transition =
@@ -821,7 +845,14 @@ namespace hpx::supervision::server {
         // only if target currently has no per-target observer at all, i.e. the
         // entry this call adds below will be its first. Drives the
         // activity_transition::first_observer notification fired further down.
-        bool target_had_no_observers = false;
+        bool target_had_no_observers;
+
+        // Set under mtx_ below, alongside activated_at_, only if
+        // target_had_no_observers; reused below (once mtx_ has been released)
+        // as the first_observer notification's event_time, so it agrees with
+        // the time register_activity_observer()'s replay logic records
+        // as this target's original activation time.
+        std::chrono::steady_clock::time_point activation_time;
 
         {
             std::unique_lock<hpx::spinlock> l(mtx_);
@@ -881,6 +912,16 @@ namespace hpx::supervision::server {
 
             it2->second.push_back(target);
 
+            // Record the target's original activation time for
+            // register_activity_observer()'s replay logic, guarded by
+            // try_emplace() so a target that was already activated via
+            // publish_event() (first_event) keeps that earlier time.
+            if (target_had_no_observers)
+            {
+                activation_time = std::chrono::steady_clock::now();
+                activated_at_.try_emplace(target, activation_time);
+            }
+
             // An existing target gets an initial notification. Keep a value
             // snapshot: do not let a subsequent publish replace its contents.
             // A freshly-registered observer scoped to a specific epoch
@@ -937,11 +978,10 @@ namespace hpx::supervision::server {
         // for local delivery.
         if (target_had_no_observers)
         {
-            target_activity_notification const activity_notification{
-                .actor = target,
+            activity_notification const activity_notification{.actor = target,
                 .state = activity_state::active,
                 .transition = activity_transition::first_observer,
-                .event_time = std::chrono::steady_clock::now(),
+                .event_time = activation_time,
                 .epoch = current_epoch_for(target)};
 
             fire_activity_events(activity_notification).get();
@@ -1011,6 +1051,14 @@ namespace hpx::supervision::server {
                     if (unregister_observer_target(target, observer_handle))
                     {
                         deactivated_targets.push_back(target);
+
+                        // See the matching comment in fire_event(): only erase
+                        // activated_at_ if target is also not tracked via
+                        // states_ (i.e. it never published an event).
+                        if (!states_.contains(target))
+                        {
+                            activated_at_.erase(target);
+                        }
                     }
                 }
                 agents_.erase(it);
@@ -1019,8 +1067,7 @@ namespace hpx::supervision::server {
 
         for (hpx::id_type const& target : deactivated_targets)
         {
-            target_activity_notification const activity_notification{
-                .actor = target,
+            activity_notification const activity_notification{.actor = target,
                 .state = activity_state::inactive,
                 .transition = activity_transition::last_observer_unregistered,
                 .event_time = std::chrono::steady_clock::now(),
@@ -1039,7 +1086,7 @@ namespace hpx::supervision::server {
     }
 
     hpx::future<void> supervision_manager::fire_activity_events(
-        target_activity_notification const& notification)
+        activity_notification const& notification)
     {
         std::vector<observer_entry> observers;
         {
@@ -1061,6 +1108,7 @@ namespace hpx::supervision::server {
             {
                 fire_activity_event(observer, notification).get();
             }
+            // NOLINTNEXTLINE(bugprone-empty-catch)
             catch (...)
             {
                 // Best effort: one activity observer's failure must not
@@ -1074,7 +1122,7 @@ namespace hpx::supervision::server {
     }
 
     hpx::future<void> supervision_manager::fire_activity_event(
-        hpx::id_type const& agent, target_activity_notification notification)
+        hpx::id_type const& agent, activity_notification notification)
     {
         {
             std::unique_lock<hpx::spinlock> l(mtx_);
@@ -1112,23 +1160,107 @@ namespace hpx::supervision::server {
         return hpx::make_ready_future();
     }
 
-    hpx::id_type supervision_manager::register_target_activity_observer(
+    hpx::id_type supervision_manager::register_activity_observer(
         hpx::id_type const& agent, std::uint64_t const epoch_filter)
     {
-        std::unique_lock<hpx::spinlock> l(mtx_);
+        // Registration-time replay: snapshot every currently-tracked target
+        // (the same has-ever-published-via-states_/has-observers-via-
+        // observers_ predicate that governs activated_at_ above) and install
+        // `agent` into activity_observers_ inside the same critical section, so
+        // no live transition recorded concurrently by publish_event()/
+        // register_observer()/unregister_observer()/fire_event() can be missed
+        // or delivered twice to `agent`: any such transition either already
+        // shows up in the snapshot below (if it completed before this call
+        // acquired mtx_), or is picked up live once fire_activity_events()
+        // copies the now-installed entry out of activity_observers_ (if it
+        // happens after mtx_ is released here), since fire_activity_events()
+        // itself acquires mtx_ to take that copy.
+        std::vector<activity_notification> replay;
 
-        // Registration-time replay of activity_transition::already_active
-        // for currently-tracked targets is added in a later substep; this
-        // only starts delivering live transitions occurring after this call
-        // returns (see fire_activity_events() call sites in publish_event(),
-        // register_observer(), unregister_observer(), and fire_event()).
-        activity_observers_.push_back(
-            observer_entry{.agent = agent, .epoch_filter = epoch_filter});
+        {
+            std::unique_lock<hpx::spinlock> l(mtx_);
+
+            // Union of states_ and observers_ keys: a target counts as tracked
+            // if it has ever published an event (states_ entry exists) or
+            // currently has at least one per-target observer (observers_ entry
+            // exists; unregister_observer_target() never leaves an empty entry
+            // behind, see there). Deliberately not a merged reference count:
+            // either signal on its own is sufficient.
+            std::map<hpx::id_type, std::uint64_t> tracked;
+            for (auto const& [target, state] : states_)
+            {
+                tracked.emplace(target, state.epoch);
+            }
+
+            for (auto const& key : observers_ | std::views::keys)
+            {
+                hpx::id_type const& target = key;
+                if (auto const epoch_it = current_epoch_.find(target);
+                    epoch_it != current_epoch_.end())
+                {
+                    tracked.try_emplace(target, epoch_it->second);
+                }
+                else
+                {
+                    tracked.try_emplace(target, 0);
+                }
+            }
+
+            replay.reserve(tracked.size());
+            for (auto const& [target, epoch] : tracked)
+            {
+                // Same epoch-filter semantics as fire_activity_events(): a
+                // filter engaged to a specific epoch skips any target whose
+                // (current) epoch does not match, including here at replay
+                // time.
+                if (epoch_filter != static_cast<std::uint64_t>(-1) &&
+                    epoch_filter != epoch)
+                {
+                    continue;
+                }
+
+                // event_time reflects the target's original activation time
+                // (see activated_at_ above), not the time of this registration,
+                // per activity_notification::event_time.
+                auto const activated_it = activated_at_.find(target);
+                auto const event_time = activated_it != activated_at_.end() ?
+                    activated_it->second :
+                    std::chrono::steady_clock::now();
+
+                replay.push_back(activity_notification{.actor = target,
+                    .state = activity_state::active,
+                    .transition = activity_transition::already_active,
+                    .event_time = event_time,
+                    .epoch = epoch});
+            }
+
+            activity_observers_.push_back(
+                observer_entry{.agent = agent, .epoch_filter = epoch_filter});
+        }
+
+        // Deliver the replay outside mtx_, mirroring register_observer()'s
+        // delivery of its own initial notification: fire_activity_event()
+        // re-checks that `agent` is still registered before invoking it, so
+        // this remains safe even if `agent` is concurrently unregistered.
+        for (auto const& notification : replay)
+        {
+            try
+            {
+                fire_activity_event(agent, notification).get();
+            }
+            catch (...)
+            {
+                // Best effort, mirroring fire_activity_events(): one replay
+                // delivery failing must not prevent delivery of the remaining
+                // replay notifications, nor this registration call from
+                // returning.
+            }
+        }
 
         return agent;
     }
 
-    void supervision_manager::unregister_target_activity_observer(
+    void supervision_manager::unregister_activity_observer(
         hpx::id_type const& observer_handle)
     {
         {
@@ -1137,9 +1269,8 @@ namespace hpx::supervision::server {
             // Rejecting a handle that belongs to the
             // observer_handle_kind::target_observer namespace (i.e. one
             // returned by register_observer() rather than
-            // register_target_activity_observer()) is added in a later substep;
-            // this only removes a matching entry from activity_observers_, if
-            // any.
+            // register_activity_observer()) is added in a later substep; this
+            // only removes a matching entry from activity_observers_, if any.
             std::erase_if(activity_observers_,
                 [&observer_handle](observer_entry const& entry) {
                     return entry.agent == observer_handle;
@@ -1152,7 +1283,7 @@ namespace hpx::supervision::server {
         // call returns, mirroring unregister_observer() above.
         using action_type =
             activity_agent_component::deactivate_and_wait_action;
-        hpx::sync(hpx::launch::task, action_type(), observer_handle);
+        hpx::sync(action_type(), observer_handle);
     }
 
     lifecycle_state supervision_manager::query_state(hpx::id_type const& target)
@@ -1195,9 +1326,9 @@ namespace hpx::supervision::server {
             epoch_it != current_epoch_.end() && epoch_it->second > epoch)
         {
             // the caller is asking about an epoch that has already been
-            // superseded; a waiter registered under the stale epoch would
-            // only ever be drained by a *future* epoch transition, so fail
-            // fast instead of hanging indefinitely
+            // superseded; a waiter registered under the stale epoch would only
+            // ever be drained by a *future* epoch transition, so fail fast
+            // instead of hanging indefinitely
             l.unlock();
 
             return hpx::make_exceptional_future<lifecycle_state>(
@@ -1211,8 +1342,8 @@ namespace hpx::supervision::server {
         }
 
         // std::chrono::steady_clock::duration::max() (the default) defers to
-        // the live default_await_terminal_timeout_ms; any other value
-        // overrides the deadline for this call only.
+        // the live default_await_terminal_timeout_ms; any other value overrides
+        // the deadline for this call only.
         auto const effective_timeout =
             (timeout == (std::chrono::steady_clock::duration::max) ()) ?
             std::chrono::milliseconds(default_await_terminal_timeout_ms) :

@@ -47,7 +47,7 @@ namespace hpx::supervision::server {
     }
 
     bool activity_agent_component::invoke_if_active(
-        target_activity_notification const& notify)
+        activity_notification const& notify)
     {
         {
             std::lock_guard<hpx::spinlock> l(mtx_);

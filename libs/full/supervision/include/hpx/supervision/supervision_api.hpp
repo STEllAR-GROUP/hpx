@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file hpx/supervision/supervision_api.hpp
-/// \page hpx::supervision::publish_event, hpx::supervision::query_state, hpx::supervision::register_observer, hpx::supervision::unregister_observer, hpx::supervision::register_target_activity_observer, hpx::supervision::unregister_target_activity_observer
+/// \page hpx::supervision::publish_event, hpx::supervision::query_state, hpx::supervision::register_observer, hpx::supervision::unregister_observer, hpx::supervision::register_activity_observer, hpx::supervision::unregister_activity_observer
 /// \headerfile hpx/supervision.hpp
 
 #pragma once
@@ -15,7 +15,6 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/naming_base.hpp>
-#include <hpx/modules/serialization.hpp>
 
 #include <hpx/supervision/supervision_fwd.hpp>
 
@@ -260,15 +259,16 @@ namespace hpx::supervision {
         hpx::error_code ec = hpx::make_success_code();
     };
 
-    /// \brief Determine whether transitioning from lifecycle event \a from
-    ///        to lifecycle event \a to is permitted by the supervision
-    ///        lifecycle state machine.
+    /// \brief Determine whether transitioning from lifecycle event \a from to
+    ///        lifecycle event \a to is permitted by the supervision lifecycle
+    ///        state machine.
     ///
-    /// \a completed and \a failed are terminal states and have no outgoing
-    /// transitions. \a losing_locality is only reachable from \a started,
-    /// \a running, or \a suspending, and may only transition to \a failed.
-    /// A missing prior event is represented as \a event::unknown, from
-    /// which the only valid transition is to \a started.
+    /// \a event::completed and \a event::failed are terminal states and have no
+    /// outgoing transitions. \a event::losing_locality is only reachable from
+    /// \a event::started, \a event::running, or \a event::suspending, and may
+    /// only transition to \a failed. A missing prior event is represented as \a
+    /// event::unknown, from which the only valid transition is to \a
+    /// event::started.
     HPX_CXX_EXPORT HPX_EXPORT bool is_valid_transition(
         event from, event to) noexcept;
 
@@ -816,7 +816,7 @@ namespace hpx::supervision {
         hpx::id_type const& target, std::uint64_t epoch = 0) noexcept;
 
     /// \brief The activity state of a supervised target, as tracked by
-    ///        \a register_target_activity_observer().
+    ///        \a register_activity_observer().
     ///
     /// A target is considered \c active as soon as it has published at least
     /// one lifecycle event or has at least one registered activity observer,
@@ -831,7 +831,7 @@ namespace hpx::supervision {
         active,
     };
 
-    /// \brief The reason a \a target_activity_notification was delivered.
+    /// \brief The reason a \a activity_notification was delivered.
     HPX_CXX_EXPORT enum class activity_transition : std::uint8_t {
         /// The target transitioned to \c activity_state::active because it
         /// published its first lifecycle event.
@@ -855,11 +855,11 @@ namespace hpx::supervision {
     ///        whenever a supervised target transitions between
     ///        \a activity_state::inactive and \a activity_state::active.
     ///
-    /// A `target_activity_notification` is constructed by the supervision
-    /// manager whenever \ref actor's activity state changes (see
+    /// A `activity_notification` is constructed by the supervision manager
+    /// whenever \ref actor's activity state changes (see
     /// \ref activity_transition), and once more, synchronously at
     /// registration time, if \ref actor is already active when
-    /// \ref hpx::supervision::register_target_activity_observer is called
+    /// \ref hpx::supervision::register_activity_observer is called
     /// (carrying \c activity_transition::already_active). It is delivered
     /// synchronously to local observers within the call that triggered the
     /// transition, and asynchronously via a dedicated parcel to remote
@@ -871,8 +871,8 @@ namespace hpx::supervision {
     /// \see hpx::supervision::activity_state
     /// \see hpx::supervision::activity_transition
     /// \see hpx::supervision::activity_callback
-    /// \see hpx::supervision::register_target_activity_observer
-    HPX_CXX_EXPORT struct target_activity_notification
+    /// \see hpx::supervision::register_activity_observer
+    HPX_CXX_EXPORT struct activity_notification
     {
         /// The global id of the actor this notification describes.
         hpx::id_type actor;
@@ -906,9 +906,9 @@ namespace hpx::supervision {
     /// \brief Callback type used to observe activity-state transitions for a
     ///        supervised target.
     ///
-    /// The callback is invoked with the \ref target_activity_notification
-    /// describing the transition that occurred. Delivery status (e.g. staleness
-    /// or delivery failures for remote observers) is reported via \c
+    /// The callback is invoked with the \ref activity_notification describing
+    /// the transition that occurred. Delivery status (e.g. staleness or
+    /// delivery failures for remote observers) is reported via \c
     /// notification.ec.
     ///
     /// \returns `true` if the observer should stay registered, `false`
@@ -921,7 +921,7 @@ namespace hpx::supervision {
     ///       invoked synchronously from within the call that triggers the
     ///       transition.
     HPX_CXX_EXPORT using activity_callback =
-        std::function<bool(target_activity_notification const&)>;
+        std::function<bool(activity_notification const&)>;
 #endif
 
     /// \brief Register a callback to observe activity-state transitions of all
@@ -943,7 +943,7 @@ namespace hpx::supervision {
     ///
     /// \returns        A future holding the global id of the observer
     ///                 handle. This handle must be passed to
-    ///                 \a unregister_target_activity_observer() in order
+    ///                 \a unregister_activity_observer() in order
     ///                 to stop receiving notifications.
     ///
     /// \throws         hpx::exception if \a locality does not represent a
@@ -973,7 +973,7 @@ namespace hpx::supervision {
     ///                 it are logged and do not affect the observer
     ///                 registration.
     HPX_CXX_EXPORT HPX_EXPORT hpx::future<hpx::id_type>
-    register_target_activity_observer(hpx::id_type const& locality,
+    register_activity_observer(hpx::id_type const& locality,
         activity_callback const& callback,
         std::optional<std::uint64_t> epoch_filter = std::nullopt);
 
@@ -982,7 +982,7 @@ namespace hpx::supervision {
     ///        registration has completed.
     ///
     /// This is the synchronous equivalent of
-    /// \a register_target_activity_observer(hpx::id_type const&,
+    /// \a register_activity_observer(hpx::id_type const&,
     /// activity_callback const&, std::optional<std::uint64_t>).
     ///
     /// \param locality     [in] The locality on which the callback should
@@ -1002,13 +1002,13 @@ namespace hpx::supervision {
     ///
     /// \returns        The global id of the observer handle. This handle
     ///                 must be passed to
-    ///                 \a unregister_target_activity_observer() in order
+    ///                 \a unregister_activity_observer() in order
     ///                 to stop receiving notifications.
     ///
     /// \throws         hpx::exception if \a locality does not represent a
     ///                 locality, unless \a ec was not pre-initialized to \a
     ///                 hpx::throws.
-    HPX_CXX_EXPORT HPX_EXPORT hpx::id_type register_target_activity_observer(
+    HPX_CXX_EXPORT HPX_EXPORT hpx::id_type register_activity_observer(
         hpx::launch::sync_policy, hpx::id_type const& locality,
         activity_callback const& callback,
         std::optional<std::uint64_t> epoch_filter = std::nullopt,
@@ -1033,7 +1033,7 @@ namespace hpx::supervision {
     ///
     /// \returns        The global id of the observer handle. This handle
     ///                 must be passed to
-    ///                 \a unregister_target_activity_observer() in order
+    ///                 \a unregister_activity_observer() in order
     ///                 to stop receiving notifications.
     ///
     /// \throws         hpx::exception if the operation fails, unless \a ec
@@ -1047,7 +1047,7 @@ namespace hpx::supervision {
     ///                 lock that serializes activity-state transitions, so the
     ///                 observer can neither miss nor double-receive any active
     ///                 target's current activity state.
-    HPX_CXX_EXPORT HPX_EXPORT hpx::id_type register_target_activity_observer(
+    HPX_CXX_EXPORT HPX_EXPORT hpx::id_type register_activity_observer(
         activity_callback const& callback,
         std::optional<std::uint64_t> epoch_filter = std::nullopt,
         hpx::error_code& ec = hpx::throws);
@@ -1058,7 +1058,7 @@ namespace hpx::supervision {
     /// \param locality        [in] The locality on which the observer was
     ///                        registered.
     /// \param observer_handle [in] The handle returned by a prior call to
-    ///                        \a register_target_activity_observer(). Only
+    ///                        \a register_activity_observer(). Only
     ///                        handles returned from that function are accepted;
     ///                        passing a handle obtained from
     ///                        \a register_observer() (or any foreign
@@ -1077,8 +1077,7 @@ namespace hpx::supervision {
     /// \note                  Once the returned future has become ready,
     ///                        no orphaned callbacks fire after unregistration
     ///                        completes.
-    HPX_CXX_EXPORT HPX_EXPORT hpx::future<void>
-    unregister_target_activity_observer(
+    HPX_CXX_EXPORT HPX_EXPORT hpx::future<void> unregister_activity_observer(
         hpx::id_type const& locality, hpx::id_type const& observer_handle);
 
     /// \brief Unregister a previously registered activity observer on a
@@ -1086,13 +1085,13 @@ namespace hpx::supervision {
     ///        completed.
     ///
     /// This is the synchronous equivalent of
-    /// \a unregister_target_activity_observer(hpx::id_type const&,
+    /// \a unregister_activity_observer(hpx::id_type const&,
     /// hpx::id_type const&).
     ///
     /// \param locality        [in] The locality on which the observer was
     ///                        registered.
     /// \param observer_handle [in] The handle returned by a prior call to
-    ///                        \a register_target_activity_observer(). See
+    ///                        \a register_activity_observer(). See
     ///                        the asynchronous overload regarding foreign
     ///                        handles.
     /// \param ec              [in,out] this represents the error status on
@@ -1109,7 +1108,7 @@ namespace hpx::supervision {
     ///
     /// \note                  No orphaned callbacks fire after
     ///                        unregistration completes.
-    HPX_CXX_EXPORT HPX_EXPORT void unregister_target_activity_observer(
+    HPX_CXX_EXPORT HPX_EXPORT void unregister_activity_observer(
         hpx::launch::sync_policy, hpx::id_type const& locality,
         hpx::id_type const& observer_handle, hpx::error_code& ec = hpx::throws);
 
@@ -1117,7 +1116,7 @@ namespace hpx::supervision {
     ///        locality.
     ///
     /// \param observer_handle [in] The handle returned by a prior call to
-    ///                        \a register_target_activity_observer(). Must
+    ///                        \a register_activity_observer(). Must
     ///                        be local to the calling locality. See the remote
     ///                        overload regarding foreign handles.
     /// \param ec              [in,out] this represents the error status on
@@ -1132,7 +1131,7 @@ namespace hpx::supervision {
     ///
     /// \note                  No orphaned callbacks fire after
     ///                        unregistration completes.
-    HPX_CXX_EXPORT HPX_EXPORT void unregister_target_activity_observer(
+    HPX_CXX_EXPORT HPX_EXPORT void unregister_activity_observer(
         hpx::id_type const& observer_handle, hpx::error_code& ec = hpx::throws);
 
 }    // namespace hpx::supervision

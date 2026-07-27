@@ -51,19 +51,17 @@ namespace hpx::supervision {
         // set, so that no transition is missed or duplicated across the
         // replay/subscribe boundary. No such replay is implemented yet; this
         // declaration only reserves the interface.
-        hpx::id_type register_target_activity_observer(
-            hpx::id_type const& agent,
+        hpx::id_type register_activity_observer(hpx::id_type const& agent,
             std::uint64_t epoch_filter = static_cast<std::uint64_t>(-1),
             hpx::error_code& ec = throws) const;
 
         // Unregister a handle previously returned by
-        // register_target_activity_observer(). As with unregister_observer(),
-        // no orphaned callbacks fire after this call completes. `handle` must
-        // have been obtained from register_target_activity_observer(), not from
+        // register_activity_observer(). As with unregister_observer(), no
+        // orphaned callbacks fire after this call completes. `handle` must have
+        // been obtained from register_activity_observer(), not from
         // register_observer(); passing a handle from the latter is rejected
         // (rejection logic added in a later substep).
-        void unregister_target_activity_observer(
-            hpx::id_type const& observer_handle,
+        void unregister_activity_observer(hpx::id_type const& observer_handle,
             hpx::error_code& ec = throws) const;
 
         hpx::future<lifecycle_state> await_terminal(hpx::id_type const& target,
