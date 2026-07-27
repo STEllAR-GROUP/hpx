@@ -118,6 +118,29 @@ std::pair<std::string, std::uint16_t> get_unused_endpoint(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// Set a variable in the environment handed to the launched locality, replacing
+// any entry this process already inherited for the same name.
+//
+// The vector is passed to execve() verbatim and getenv() returns the first
+// match, so appending alone would leave an inherited entry shadowing the value
+// set here instead of being overridden by it. Every name this test sets is one
+// HPX itself reads from the environment, so an inherited entry is exactly the
+// case that has to lose.
+void set_env_var(std::vector<std::string>& env, std::string const& name,
+    std::string const& value)
+{
+    std::string const prefix = name + "=";
+
+    env.erase(std::remove_if(env.begin(), env.end(),
+                  [&prefix](std::string const& entry) {
+                      return entry.starts_with(prefix);
+                  }),
+        env.end());
+
+    env.push_back(prefix + value);
+}
+
+///////////////////////////////////////////////////////////////////////////////
 void ping() {}
 HPX_PLAIN_ACTION(ping, departed_locality_ping_action)
 
@@ -155,8 +178,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
         hpx::get_config_entry("hpx.agas.address", HPX_INITIAL_IP_ADDRESS);
 
     // pass along the console parcelport address
-    env.push_back("HPX_AGAS_SERVER_ADDRESS=" + address);
-    env.push_back("HPX_AGAS_SERVER_PORT=" +
+    set_env_var(env, "HPX_AGAS_SERVER_ADDRESS", address);
+    set_env_var(env, "HPX_AGAS_SERVER_PORT",
         hpx::get_config_entry(
             "hpx.agas.port", std::to_string(HPX_INITIAL_IP_PORT)));
 
@@ -166,11 +189,11 @@ int hpx_main(hpx::program_options::variables_map& vm)
     // the child cannot resolve its way to a different endpoint of the same
     // name and then fail to bind it.
     auto const [parcel_address, parcel_port] = get_unused_endpoint(address);
-    env.push_back("HPX_PARCEL_SERVER_ADDRESS=" + parcel_address);
-    env.push_back("HPX_PARCEL_SERVER_PORT=" + std::to_string(parcel_port));
+    set_env_var(env, "HPX_PARCEL_SERVER_ADDRESS", parcel_address);
+    set_env_var(env, "HPX_PARCEL_SERVER_PORT", std::to_string(parcel_port));
 
     // instruct new locality to connect back on startup using the given name
-    env.push_back("HPX_ON_STARTUP_WAIT_ON_LATCH=departed_locality_7384");
+    set_env_var(env, "HPX_ON_STARTUP_WAIT_ON_LATCH", "departed_locality_7384");
 
     // The launched locality waits on this latch before disconnecting so that
     // its locality id can be captured here while it is still connected.
