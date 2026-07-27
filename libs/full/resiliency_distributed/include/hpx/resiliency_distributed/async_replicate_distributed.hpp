@@ -107,7 +107,7 @@ namespace hpx::resiliency::experimental {
     // Return the valid output.
     HPX_CXX_EXPORT template <typename Vote, typename Pred, typename Action,
         typename... Ts>
-    decltype(auto) tag_invoke(async_replicate_vote_validate_t,
+    decltype(auto) hpx_invoke(async_replicate_vote_validate_t,
         std::vector<hpx::id_type> const& ids, Vote&& vote, Pred&& pred,
         Action&& action, Ts&&... ts)
     {
@@ -125,7 +125,7 @@ namespace hpx::resiliency::experimental {
     // Run all the valid results against a user provided voting function.
     // Return the valid output.
     HPX_CXX_EXPORT template <typename Vote, typename Action, typename... Ts>
-    decltype(auto) tag_invoke(async_replicate_vote_t,
+    decltype(auto) hpx_invoke(async_replicate_vote_t,
         std::vector<hpx::id_type> const& ids, Vote&& vote, Action&& action,
         Ts&&... ts)
     {
@@ -143,7 +143,7 @@ namespace hpx::resiliency::experimental {
     // Run all the valid results against a user provided voting function.
     // Return the valid output.
     HPX_CXX_EXPORT template <typename Pred, typename Action, typename... Ts>
-    decltype(auto) tag_invoke(async_replicate_validate_t,
+    decltype(auto) hpx_invoke(async_replicate_validate_t,
         std::vector<hpx::id_type> const& ids, Pred&& pred, Action&& action,
         Ts&&... ts)
     {
@@ -161,7 +161,7 @@ namespace hpx::resiliency::experimental {
     // Run all the valid results against a user provided voting function.
     // Return the valid output.
     HPX_CXX_EXPORT template <typename Action, typename... Ts>
-    decltype(auto) tag_invoke(async_replicate_t,
+    decltype(auto) hpx_invoke(async_replicate_t,
         std::vector<hpx::id_type> const& ids, Action&& action, Ts&&... ts)
     {
         HPX_ASSERT(ids.size() > 0);

@@ -238,7 +238,7 @@ namespace hpx::parallel::detail {
 namespace hpx::segmented {
 
     ///////////////////////////////////////////////////////////////////////////
-    // segmented copy - tag_invoke overloads
+    // segmented copy - hpx_invoke overloads
 
     // no-policy (sequential) overload
     HPX_CXX_EXPORT template <typename SegIter, typename OutIter>
@@ -246,7 +246,7 @@ namespace hpx::segmented {
             hpx::traits::is_segmented_iterator_v<SegIter> &&
             hpx::traits::is_iterator_v<OutIter> &&
             hpx::traits::is_segmented_iterator_v<OutIter>)
-    OutIter tag_invoke(hpx::copy_t, SegIter first, SegIter last, OutIter dest)
+    OutIter hpx_invoke(hpx::copy_t, SegIter first, SegIter last, OutIter dest)
     {
         static_assert(hpx::traits::is_input_iterator_v<SegIter>,
             "Requires at least input iterator.");
@@ -279,7 +279,7 @@ namespace hpx::segmented {
             hpx::traits::is_iterator_v<OutIter> &&
             hpx::traits::is_segmented_iterator_v<OutIter>)
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy, OutIter>
-    tag_invoke(hpx::copy_t, ExPolicy&& policy, SegIter first, SegIter last,
+    hpx_invoke(hpx::copy_t, ExPolicy&& policy, SegIter first, SegIter last,
         OutIter dest)
     {
         static_assert(hpx::traits::is_forward_iterator_v<SegIter>,

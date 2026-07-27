@@ -338,7 +338,7 @@ namespace hpx::segmented {
     HPX_CXX_EXPORT template <typename InIter, typename T>
         requires(hpx::traits::is_iterator_v<InIter> &&
             hpx::traits::is_segmented_iterator_v<InIter>)
-    typename std::iterator_traits<InIter>::difference_type tag_invoke(
+    typename std::iterator_traits<InIter>::difference_type hpx_invoke(
         hpx::count_t, InIter first, InIter last, T const& value)
     {
         static_assert(
@@ -364,7 +364,7 @@ namespace hpx::segmented {
             hpx::traits::is_segmented_iterator_v<SegIter>)
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
         typename std::iterator_traits<SegIter>::difference_type>
-    tag_invoke(hpx::count_t, ExPolicy&& policy, SegIter first, SegIter last,
+    hpx_invoke(hpx::count_t, ExPolicy&& policy, SegIter first, SegIter last,
         T const& value)
     {
         static_assert((std::forward_iterator<SegIter>),
@@ -390,7 +390,7 @@ namespace hpx::segmented {
     HPX_CXX_EXPORT template <typename InIter, typename F>
         requires(hpx::traits::is_iterator_v<InIter> &&
             hpx::traits::is_segmented_iterator_v<InIter>)
-    typename std::iterator_traits<InIter>::difference_type tag_invoke(
+    typename std::iterator_traits<InIter>::difference_type hpx_invoke(
         hpx::count_if_t, InIter first, InIter last, F&& f)
     {
         static_assert(
@@ -416,7 +416,7 @@ namespace hpx::segmented {
             hpx::traits::is_segmented_iterator_v<SegIter>)
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
         typename std::iterator_traits<SegIter>::difference_type>
-    tag_invoke(
+    hpx_invoke(
         hpx::count_if_t, ExPolicy&& policy, SegIter first, SegIter last, F&& f)
     {
         static_assert((std::forward_iterator<SegIter>),

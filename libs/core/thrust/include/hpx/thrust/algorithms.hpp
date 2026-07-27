@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/thrust/detail/algorithm_map.hpp>
 #include <hpx/thrust/policy.hpp>
 
@@ -19,7 +18,7 @@ namespace hpx::thrust {
     template <typename Tag, typename ThrustPolicy, typename... Args>
         requires(is_thrust_execution_policy_v<std::decay_t<ThrustPolicy>> &&
             detail::is_algorithm_mapped<Tag, ThrustPolicy, Args...>)
-    decltype(auto) tag_invoke(Tag tag, ThrustPolicy&& policy, Args&&... args)
+    decltype(auto) hpx_invoke(Tag tag, ThrustPolicy&& policy, Args&&... args)
     {
         if constexpr (hpx::is_async_execution_policy_v<
                           std::decay_t<ThrustPolicy>>)

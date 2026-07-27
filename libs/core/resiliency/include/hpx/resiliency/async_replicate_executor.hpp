@@ -18,7 +18,6 @@
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
-#include <hpx/modules/tag_invoke.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -247,7 +246,7 @@ namespace hpx::resiliency::experimental {
     HPX_CXX_CORE_EXPORT template <typename Executor, typename Vote,
         typename Pred, typename F, typename... Ts>
         requires(one_way_executor<Executor> || two_way_executor<Executor>)
-    decltype(auto) tag_invoke(async_replicate_vote_validate_t, Executor&& exec,
+    decltype(auto) hpx_invoke(async_replicate_vote_validate_t, Executor&& exec,
         std::size_t n, Vote&& vote, Pred&& pred, F&& f, Ts&&... ts)
     {
         using result_type =
@@ -266,7 +265,7 @@ namespace hpx::resiliency::experimental {
     HPX_CXX_CORE_EXPORT template <typename Executor, typename Vote, typename F,
         typename... Ts>
         requires(one_way_executor<Executor> || two_way_executor<Executor>)
-    decltype(auto) tag_invoke(async_replicate_vote_t, Executor&& exec,
+    decltype(auto) hpx_invoke(async_replicate_vote_t, Executor&& exec,
         std::size_t n, Vote&& vote, F&& f, Ts&&... ts)
     {
         using result_type =
@@ -285,7 +284,7 @@ namespace hpx::resiliency::experimental {
     HPX_CXX_CORE_EXPORT template <typename Executor, typename Pred, typename F,
         typename... Ts>
         requires(one_way_executor<Executor> || two_way_executor<Executor>)
-    decltype(auto) tag_invoke(async_replicate_validate_t, Executor&& exec,
+    decltype(auto) hpx_invoke(async_replicate_validate_t, Executor&& exec,
         std::size_t n, Pred&& pred, F&& f, Ts&&... ts)
     {
         using result_type =
@@ -303,7 +302,7 @@ namespace hpx::resiliency::experimental {
     // Return the first valid result.
     HPX_CXX_CORE_EXPORT template <typename Executor, typename F, typename... Ts>
         requires(one_way_executor<Executor> || two_way_executor<Executor>)
-    decltype(auto) tag_invoke(
+    decltype(auto) hpx_invoke(
         async_replicate_t, Executor&& exec, std::size_t n, F&& f, Ts&&... ts)
     {
         using result_type =

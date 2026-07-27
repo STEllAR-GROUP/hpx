@@ -10,7 +10,6 @@
 #include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/executors.hpp>
 #include <hpx/modules/functional.hpp>
-#include <hpx/modules/tag_invoke.hpp>
 
 #include <iterator>
 #include <type_traits>

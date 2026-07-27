@@ -19,7 +19,6 @@
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
-#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
@@ -221,7 +220,7 @@ namespace hpx::resiliency::experimental {
     HPX_CXX_CORE_EXPORT template <typename Executor, typename Pred, typename F,
         typename... Ts>
         requires(one_way_executor<Executor> || two_way_executor<Executor>)
-    decltype(auto) tag_invoke(async_replay_validate_t, Executor&& exec,
+    decltype(auto) hpx_invoke(async_replay_validate_t, Executor&& exec,
         std::size_t n, Pred&& pred, F&& f, Ts&&... ts)
     {
         using result_type =
@@ -238,7 +237,7 @@ namespace hpx::resiliency::experimental {
     // n times (except if abort_replay_exception is thrown).
     HPX_CXX_CORE_EXPORT template <typename Executor, typename F, typename... Ts>
         requires(one_way_executor<Executor> || two_way_executor<Executor>)
-    decltype(auto) tag_invoke(
+    decltype(auto) hpx_invoke(
         async_replay_t, Executor&& exec, std::size_t n, F&& f, Ts&&... ts)
     {
         using result_type =

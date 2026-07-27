@@ -17,7 +17,6 @@
 #include <hpx/functional/invoke.hpp>
 #include <hpx/modules/async_local.hpp>
 #include <hpx/modules/futures.hpp>
-#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
@@ -127,7 +126,7 @@ namespace hpx::resiliency::experimental {
     // exactly n times (except if abort_replay_exception is thrown).
     HPX_CXX_CORE_EXPORT template <typename Pred, typename F, typename... Ts>
     hpx::future<hpx::util::detail::invoke_deferred_result_t<F, Ts...>>
-    tag_invoke(
+    hpx_invoke(
         async_replay_validate_t, std::size_t n, Pred&& pred, F&& f, Ts&&... ts)
     {
         using result_type =
@@ -144,7 +143,7 @@ namespace hpx::resiliency::experimental {
     // n times (except if abort_replay_exception is thrown).
     HPX_CXX_CORE_EXPORT template <typename F, typename... Ts>
     hpx::future<hpx::util::detail::invoke_deferred_result_t<F, Ts...>>
-    tag_invoke(async_replay_t, std::size_t n, F&& f, Ts&&... ts)
+    hpx_invoke(async_replay_t, std::size_t n, F&& f, Ts&&... ts)
     {
         using result_type =
             hpx::util::detail::invoke_deferred_result_t<F, Ts...>;

@@ -11,7 +11,6 @@
 #include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/executors.hpp>
 #include <hpx/modules/functional.hpp>
-#include <hpx/modules/tag_invoke.hpp>
 
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/reduce.hpp>
@@ -192,7 +191,7 @@ namespace hpx ::segmented {
             hpx::traits::is_segmented_iterator_v<InIterB> &&
             hpx::traits::is_iterator_v<InIterE> &&
             hpx::traits::is_segmented_iterator_v<InIterE>)
-    T tag_invoke(hpx::reduce_t, InIterB first, InIterE last, T init, F&& f)
+    T hpx_invoke(hpx::reduce_t, InIterB first, InIterE last, T init, F&& f)
     {
         static_assert(
             std::input_iterator<InIterB>, "Requires at least input iterator.");
@@ -217,7 +216,7 @@ namespace hpx ::segmented {
             hpx::traits::is_segmented_iterator_v<InIterB> &&
             hpx::traits::is_iterator_v<InIterE> &&
             hpx::traits::is_segmented_iterator_v<InIterE>)
-    parallel::util::detail::algorithm_result_t<ExPolicy, T> tag_invoke(
+    parallel::util::detail::algorithm_result_t<ExPolicy, T> hpx_invoke(
         hpx::reduce_t, ExPolicy&& policy, InIterB first, InIterE last, T init,
         F&& f)
     {

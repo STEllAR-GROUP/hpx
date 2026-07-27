@@ -27,7 +27,7 @@ namespace tt = hpx::this_thread::experimental;
 // This overload is only used to check dispatching. It is not a useful
 // implementation.
 template <typename T>
-auto tag_invoke(mpi::transform_mpi_t, custom_type<T>& c)
+auto hpx_invoke(mpi::transform_mpi_t, custom_type<T>& c)
 {
     c.tag_invoke_overload_called = true;
     return mpi::transform_mpi(
@@ -162,9 +162,9 @@ int hpx_main()
             }
 
             {
-                // tag_invoke overload
-                std::atomic<bool> tag_invoke_overload_called{false};
-                custom_type<int> c{tag_invoke_overload_called, 0};
+                // hpx_invoke overload
+                std::atomic<bool> hpx_invoke_overload_called{false};
+                custom_type<int> c{hpx_invoke_overload_called, 0};
                 if (rank == 0)
                 {
                     c.x = 3;
@@ -175,7 +175,7 @@ int hpx_main()
                 {
                     HPX_TEST_EQ(c.x, 3);
                 }
-                HPX_TEST(tag_invoke_overload_called);
+                HPX_TEST(hpx_invoke_overload_called);
             }
 
             // Operator| overload

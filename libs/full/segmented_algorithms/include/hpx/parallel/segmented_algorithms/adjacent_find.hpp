@@ -11,7 +11,6 @@
 #include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/executors.hpp>
 #include <hpx/modules/functional.hpp>
-#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
 
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
@@ -275,7 +274,7 @@ namespace hpx::segmented {
     HPX_CXX_EXPORT template <typename InIter, typename Pred>
         requires(hpx::traits::is_iterator_v<InIter> &&
             hpx::traits::is_segmented_iterator_v<InIter>)
-    InIter tag_invoke(
+    InIter hpx_invoke(
         hpx::adjacent_find_t, InIter first, InIter last, Pred&& pred = Pred())
     {
         static_assert(
@@ -301,7 +300,7 @@ namespace hpx::segmented {
             hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter>)
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy, SegIter>
-    tag_invoke(hpx::adjacent_find_t, ExPolicy&& policy, SegIter first,
+    hpx_invoke(hpx::adjacent_find_t, ExPolicy&& policy, SegIter first,
         SegIter last, Pred&& pred)
     {
         static_assert((std::forward_iterator<SegIter>),

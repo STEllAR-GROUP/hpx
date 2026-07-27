@@ -18,7 +18,6 @@
 
 #include <hpx/modules/async_local.hpp>
 #include <hpx/modules/futures.hpp>
-#include <hpx/modules/tag_invoke.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -105,7 +104,7 @@ namespace hpx::resiliency::experimental {
     HPX_CXX_CORE_EXPORT template <typename Vote, typename Pred, typename F,
         typename... Ts>
     hpx::future<hpx::util::detail::invoke_deferred_result_t<F, Ts...>>
-    tag_invoke(async_replicate_vote_validate_t, std::size_t n, Vote&& vote,
+    hpx_invoke(async_replicate_vote_validate_t, std::size_t n, Vote&& vote,
         Pred&& pred, F&& f, Ts&&... ts)
     {
         return detail::async_replicate_vote_validate(n, HPX_FORWARD(Vote, vote),
@@ -119,7 +118,7 @@ namespace hpx::resiliency::experimental {
     // valid output.
     HPX_CXX_CORE_EXPORT template <typename Vote, typename F, typename... Ts>
     hpx::future<hpx::util::detail::invoke_deferred_result_t<F, Ts...>>
-    tag_invoke(
+    hpx_invoke(
         async_replicate_vote_t, std::size_t n, Vote&& vote, F&& f, Ts&&... ts)
     {
         return detail::async_replicate_vote_validate(n, HPX_FORWARD(Vote, vote),
@@ -133,7 +132,7 @@ namespace hpx::resiliency::experimental {
     // first valid result.
     HPX_CXX_CORE_EXPORT template <typename Pred, typename F, typename... Ts>
     hpx::future<hpx::util::detail::invoke_deferred_result_t<F, Ts...>>
-    tag_invoke(async_replicate_validate_t, std::size_t n, Pred&& pred, F&& f,
+    hpx_invoke(async_replicate_validate_t, std::size_t n, Pred&& pred, F&& f,
         Ts&&... ts)
     {
         return detail::async_replicate_vote_validate(n,
@@ -147,7 +146,7 @@ namespace hpx::resiliency::experimental {
     // valid result.
     HPX_CXX_CORE_EXPORT template <typename F, typename... Ts>
     hpx::future<hpx::util::detail::invoke_deferred_result_t<F, Ts...>>
-    tag_invoke(async_replicate_t, std::size_t n, F&& f, Ts&&... ts)
+    hpx_invoke(async_replicate_t, std::size_t n, F&& f, Ts&&... ts)
     {
         return detail::async_replicate_vote_validate(n,
             detail::replicate_voter{}, detail::replicate_validator{},

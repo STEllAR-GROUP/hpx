@@ -141,7 +141,7 @@ namespace hpx::resiliency::experimental {
     HPX_CXX_EXPORT template <typename Action, typename... Ts>
     hpx::future<hpx::util::detail::invoke_deferred_result_t<Action,
         hpx::id_type, Ts...>>
-    tag_invoke(async_replay_t, std::vector<hpx::id_type> const& ids,
+    hpx_invoke(async_replay_t, std::vector<hpx::id_type> const& ids,
         Action&& action, Ts&&... ts)
     {
         HPX_ASSERT(ids.size() > 0);
@@ -163,7 +163,7 @@ namespace hpx::resiliency::experimental {
     HPX_CXX_EXPORT template <typename Pred, typename Action, typename... Ts>
     hpx::future<hpx::util::detail::invoke_deferred_result_t<Action,
         hpx::id_type, Ts...>>
-    tag_invoke(async_replay_validate_t, std::vector<hpx::id_type> const& ids,
+    hpx_invoke(async_replay_validate_t, std::vector<hpx::id_type> const& ids,
         Pred&& pred, Action&& action, Ts&&... ts)
     {
         HPX_ASSERT(ids.size() > 0);
