@@ -247,11 +247,38 @@ namespace hpx::supervision::server {
             hpx::id_type const& agent,
             lifecycle_event_notification notification);
 
+        // Delivers `notification` to every currently-registered activity
+        // observer (see activity_observers_ below), skipping any observer whose
+        // epoch_filter does not match. Local delivery is synchronous: each
+        // observer's callback has already run by the time the returned future
+        // becomes ready. One observer's failure does not prevent delivery to
+        // the remaining observers.
+        hpx::future<void> fire_activity_events(
+            target_activity_notification const& notification);
+
+        // Delivers `notification` to the single activity observer identified by
+        // `agent`, if it is still registered. Removes `agent` from
+        // activity_observers_ if its callback signals it no longer wants to be
+        // invoked.
+        hpx::future<void> fire_activity_event(hpx::id_type const& agent,
+            target_activity_notification notification);
+
         void record_error(hpx::id_type const& target,
             std::uint64_t expected_sequence_number, hpx::error_code const& ec);
 
-        void unregister_observer_target(
+        // Returns true if this removed the last remaining per-target observer
+        // for `target` (i.e. its per-target observer count just transitioned
+        // from one to zero), so the caller can fire an
+        // activity_transition::last_observer_unregistered notification once
+        // mtx_ has been released.
+        bool unregister_observer_target(
             hpx::id_type const& target, hpx::id_type const& observer_handle);
+
+        // Returns the epoch currently recorded for `target`, or 0 if no epoch
+        // has been recorded yet. Used to populate the `epoch` field of activity
+        // notifications that are not themselves triggered by a publish_event()
+        // call (i.e. first_observer/ last_observer_unregistered).
+        std::uint64_t current_epoch_for(hpx::id_type const& target) const;
 
         using waiters_t = std::vector<waiter_entry>;
         using stale_waiters_t =
@@ -367,6 +394,17 @@ namespace hpx::supervision::server {
         std::map<hpx::id_type, std::vector<observer_entry>> observers_;
         // inverse lookup for agents: agents -> targets
         std::map<hpx::id_type, std::vector<hpx::id_type>> agents_;
+
+        // registered activity observers (see
+        // register_target_activity_observer()): locality-scoped, not keyed by
+        // target, so every entry here is delivered every activation/
+        // deactivation transition recorded for any target this manager
+        // tracks (filtered only by each entry's own epoch_filter). Kept
+        // entirely separate from observers_/agents_ above so that this
+        // collection only ever holds
+        // observer_handle_kind::target_activity_observer handles.
+        std::vector<observer_entry> activity_observers_;
+
         // one-shot waiters for await_terminal(): (target, epoch) -> pending
         // promises (each paired with a deadline). Resolved and erased from
         // this map by publish_event() as soon as the corresponding

@@ -579,6 +579,22 @@ namespace hpx::supervision {
         return get_supervision_manager().check_admission(target, epoch);
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    void serialize(hpx::serialization::output_archive& ar,
+        target_activity_notification const& notification, unsigned int)
+    {
+        ar << notification.actor << notification.state
+           << notification.transition << notification.event_time
+           << notification.epoch << notification.ec;
+    }
+
+    void serialize(hpx::serialization::input_archive& ar,
+        target_activity_notification& notification, unsigned int)
+    {
+        ar >> notification.actor >> notification.state >>
+            notification.transition >> notification.event_time >>
+            notification.epoch >> notification.ec;
+    }
 }    // namespace hpx::supervision
 
 #include <hpx/config/warnings_suffix.hpp>

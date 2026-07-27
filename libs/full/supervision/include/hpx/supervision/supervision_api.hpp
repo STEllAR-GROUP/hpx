@@ -760,8 +760,6 @@ namespace hpx::supervision {
         /// epoch; dispatch may proceed.
         admitted,
         /// The target has already latched a terminal event (\c completed or
-        /// \c failed) for the queried epoch; dispatch was refused.
-        /// The target has already latched a terminal event (\c completed or
         /// \c failed) for the queried epoch, as observed by the *local*
         /// supervision manager; dispatch was refused. This is final relative to
         /// this locality's latch state - not a stale read - so callers on the
@@ -926,13 +924,14 @@ namespace hpx::supervision {
         std::function<bool(target_activity_notification const&)>;
 #endif
 
-    /// \brief Register a callback to observe activity-state transitions of a
-    ///        target actor running on a possibly remote locality.
+    /// \brief Register a callback to observe activity-state transitions of all
+    ///        targets tracked on a possibly remote locality.
     ///
     /// \param locality     [in] The locality on which the callback should
     ///                     be registered.
-    /// \param callback     [in] The callback invoked whenever \a target
-    ///                     transitions between \a activity_state::inactive and
+    /// \param callback     [in] The callback invoked whenever any target
+    ///                     tracked on \a locality transitions between
+    ///                     \a activity_state::inactive and
     ///                     \a activity_state::active.
     /// \param epoch_filter [in] If set, restricts notifications to
     ///                     transitions recorded under this epoch; transitions
@@ -948,29 +947,28 @@ namespace hpx::supervision {
     ///                 to stop receiving notifications.
     ///
     /// \throws         hpx::exception if \a locality does not represent a
-    ///                 locality, or if \a target does not represent a valid
-    ///                 target. The returned future becomes exceptional if the
+    ///                 locality. The returned future becomes exceptional if the
     ///                 operation fails.
     ///
-    /// \note           If \a target is already \c activity_state::active at
-    ///                 registration time, the new observer synchronously
-    ///                 receives a single replay notification (carrying
-    ///                 \c activity_transition::already_active) as part of
-    ///                 registration, taken under the same lock that serializes
-    ///                 activity-state transitions. This guarantees the observer
-    ///                 sees exactly one notification for the target's current
-    ///                 activity state: either the replay, or a live transition
-    ///                 that raced with registration, but never both and never
-    ///                 neither.
-    /// \note           If \a locality is the locality \a target is running
-    ///                 on, callbacks (including the registration-time replay)
-    ///                 are invoked synchronously from within the call that
-    ///                 triggered the transition (best effort; the callback must
-    ///                 not block indefinitely).
-    /// \note           If \a locality differs from the locality \a target
-    ///                 is running on, callbacks are invoked asynchronously via
-    ///                 a dedicated parcel, with retry semantics (e.g., 3
-    ///                 attempts over 500 ms before logging failure).
+    /// \note           For every target tracked on \a locality that is already
+    ///                 \c activity_state::active at registration time, the new
+    ///                 observer synchronously receives one replay notification
+    ///                 (carrying \c activity_transition::already_active) as
+    ///                 part of registration, taken under the same lock that
+    ///                 serializes activity-state transitions. This guarantees
+    ///                 the observer sees exactly one notification for each such
+    ///                 target's current activity state: either the replay, or a
+    ///                 live transition that raced with registration, but never
+    ///                 both and never neither.
+    /// \note           If \a locality is the local locality, callbacks
+    ///                 (including the registration-time replay) are invoked
+    ///                 synchronously from within the call that triggered the
+    ///                 transition (best effort; the callback must not block
+    ///                 indefinitely).
+    /// \note           If \a locality is remote, callbacks are invoked
+    ///                 asynchronously via a dedicated parcel, with retry
+    ///                 semantics (e.g., 3 attempts over 500 ms before logging
+    ///                 failure).
     /// \note           The callback must not throw; exceptions thrown from
     ///                 it are logged and do not affect the observer
     ///                 registration.
@@ -979,18 +977,19 @@ namespace hpx::supervision {
         activity_callback const& callback,
         std::optional<std::uint64_t> epoch_filter = std::nullopt);
 
-    /// \brief Register a callback to observe activity-state transitions of a
-    ///        target actor running on a possibly remote locality, blocking
-    ///        until the registration has completed.
+    /// \brief Register a callback to observe activity-state transitions of all
+    ///        targets tracked on a possibly remote locality, blocking until the
+    ///        registration has completed.
     ///
     /// This is the synchronous equivalent of
     /// \a register_target_activity_observer(hpx::id_type const&,
-    /// hpx::id_type const&, activity_callback const&).
+    /// activity_callback const&, std::optional<std::uint64_t>).
     ///
     /// \param locality     [in] The locality on which the callback should
     ///                     be registered.
-    /// \param callback     [in] The callback invoked whenever \a target
-    ///                     transitions between \a activity_state::inactive and
+    /// \param callback     [in] The callback invoked whenever any target
+    ///                     tracked on \a locality transitions between
+    ///                     \a activity_state::inactive and
     ///                     \a activity_state::active.
     /// \param epoch_filter [in] If set, restricts notifications to
     ///                     transitions recorded under this epoch; see the
@@ -1007,8 +1006,7 @@ namespace hpx::supervision {
     ///                 to stop receiving notifications.
     ///
     /// \throws         hpx::exception if \a locality does not represent a
-    ///                 locality, or if \a target does not represent a valid
-    ///                 target, unless \a ec was not pre-initialized to \a
+    ///                 locality, unless \a ec was not pre-initialized to \a
     ///                 hpx::throws.
     HPX_CXX_EXPORT HPX_EXPORT hpx::id_type register_target_activity_observer(
         hpx::launch::sync_policy, hpx::id_type const& locality,
@@ -1016,18 +1014,18 @@ namespace hpx::supervision {
         std::optional<std::uint64_t> epoch_filter = std::nullopt,
         hpx::error_code& ec = hpx::throws);
 
-    /// \brief Register a callback to observe activity-state transitions of a
-    ///        target actor on the local locality.
+    /// \brief Register a callback to observe activity-state transitions of all
+    ///        targets tracked on the local locality.
     ///
-    /// \param callback     [in] The callback invoked whenever \a target
-    ///                     transitions between \a activity_state::inactive and
+    /// \param callback     [in] The callback invoked whenever any target
+    ///                     tracked on the local locality transitions between
+    ///                     \a activity_state::inactive and
     ///                     \a activity_state::active.
     /// \param epoch_filter [in] If set, restricts notifications to
     ///                     transitions recorded under this epoch, including the
     ///                     registration-time replay; see the remote overload
-    ///                     for details. If
-    ///                     \c std::nullopt (the default), the observer is
-    ///                     notified regardless of epoch.
+    ///                     for details. If \c std::nullopt (the default), the
+    ///                     observer is notified regardless of epoch.
     /// \param ec           [in,out] this represents the error status on
     ///                     exit, if this is pre-initialized to
     ///                     \a hpx::throws the function will throw on error
@@ -1038,18 +1036,17 @@ namespace hpx::supervision {
     ///                 \a unregister_target_activity_observer() in order
     ///                 to stop receiving notifications.
     ///
-    /// \throws         hpx::exception if \a target does not represent a
-    ///                 valid target, unless \a ec was initialized to
-    ///                 \a hpx::throws.
+    /// \throws         hpx::exception if the operation fails, unless \a ec
+    ///                 was initialized to \a hpx::throws.
     ///
-    /// \note           As for the remote overloads, a target that is
-    ///                 already \c activity_state::active at registration time
-    ///                 synchronously delivers a single
-    ///                 \c activity_transition::already_active replay as
-    ///                 part of this call, taken under the same lock that
-    ///                 serializes activity-state transitions, so the observer
-    ///                 can neither miss nor double-receive the target's current
-    ///                 activity state.
+    /// \note           As for the remote overloads, for every target on the
+    ///                 local locality that is already \c activity_state::active
+    ///                 at registration time, one \c activity_transition::
+    ///                 already_active replay notification is delivered
+    ///                 synchronously as part of this call, taken under the same
+    ///                 lock that serializes activity-state transitions, so the
+    ///                 observer can neither miss nor double-receive any active
+    ///                 target's current activity state.
     HPX_CXX_EXPORT HPX_EXPORT hpx::id_type register_target_activity_observer(
         activity_callback const& callback,
         std::optional<std::uint64_t> epoch_filter = std::nullopt,

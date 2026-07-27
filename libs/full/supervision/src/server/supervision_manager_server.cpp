@@ -15,6 +15,7 @@
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/type_support.hpp>
 
+#include <hpx/supervision/server/activity_agent.hpp>
 #include <hpx/supervision/server/agent.hpp>
 #include <hpx/supervision/server/supervision_manager.hpp>
 #include <hpx/supervision/supervision_api.hpp>
@@ -597,12 +598,23 @@ namespace hpx::supervision::server {
         waiters_t to_resolve;
         stale_waiters_t stale;
 
+        // Captured before states_ is (possibly) mutated below: true only for a
+        // target that has never had a states_ entry before this call, i.e. this
+        // is its first-ever publish_event. Drives the
+        // activity_transition::first_event notification fired further down;
+        // unaffected by any early-return path (stale_epoch/already_terminal)
+        // taken while still holding the lock, since those paths never reach
+        // that code.
+        bool had_state_before = false;
+
         {
             std::unique_lock<hpx::spinlock> l(mtx_);
 
             auto const epoch_it = current_epoch_.find(target);
+            had_state_before = epoch_it != current_epoch_.end();
+
             std::uint64_t const current_ep =
-                epoch_it != current_epoch_.end() ? epoch_it->second : 0;
+                had_state_before ? epoch_it->second : 0;
 
             if (epoch < current_ep)
             {
@@ -646,6 +658,24 @@ namespace hpx::supervision::server {
         {
             record_error(target, notification.event_sequence_number,
                 hpx::make_error_code(std::current_exception()));
+        }
+
+        // Delivery ordering: per-target register_observer callbacks (above)
+        // fire before activity-observer callbacks (below), both synchronous for
+        // local delivery. Only a target's very first publish_event ever
+        // triggers activity_transition::first_event; later publications never
+        // repeat it (and never trigger a deactivation, since latched state does
+        // not disappear on the publishing path).
+        if (!had_state_before)
+        {
+            target_activity_notification const activity_notification{
+                .actor = target,
+                .state = activity_state::active,
+                .transition = activity_transition::first_event,
+                .event_time = notification.event_time,
+                .epoch = notification.epoch};
+
+            fire_activity_events(activity_notification).get();
         }
 
         return publish_result::applied;
@@ -746,16 +776,31 @@ namespace hpx::supervision::server {
                 ep = std::current_exception();
             }
 
+            bool deactivated = false;
             if (!keep_registered)
             {
                 // remove observer from the given target
                 std::unique_lock<hpx::spinlock> l(mtx_);
 
-                unregister_observer_target(target, agent);
+                deactivated = unregister_observer_target(target, agent);
                 if (auto const it = agents_.find(agent); it != agents_.end())
                 {
                     agents_.erase(it);
                 }
+            }
+
+            // Fired with mtx_ released, mirroring unregister_observer() below.
+            if (deactivated)
+            {
+                target_activity_notification const activity_notification{
+                    .actor = target,
+                    .state = activity_state::inactive,
+                    .transition =
+                        activity_transition::last_observer_unregistered,
+                    .event_time = std::chrono::steady_clock::now(),
+                    .epoch = current_epoch_for(target)};
+
+                fire_activity_events(activity_notification).get();
             }
 
             // rethrow exception, if any
@@ -772,12 +817,19 @@ namespace hpx::supervision::server {
     {
         std::optional<lifecycle_event_notification> initial_notification;
 
+        // Captured before observers_[target] is (possibly) mutated below: true
+        // only if target currently has no per-target observer at all, i.e. the
+        // entry this call adds below will be its first. Drives the
+        // activity_transition::first_observer notification fired further down.
+        bool target_had_no_observers = false;
+
         {
             std::unique_lock<hpx::spinlock> l(mtx_);
 
             // insert observer into table of registered observers
             auto it = observers_.find(target);
-            if (it == observers_.end())
+            target_had_no_observers = (it == observers_.end());
+            if (target_had_no_observers)
             {
                 auto [it2, inserted] = observers_.insert(
                     std::make_pair(target, std::vector<observer_entry>()));
@@ -879,10 +931,32 @@ namespace hpx::supervision::server {
                     hpx::make_error_code(std::current_exception()));
             }
         }
+
+        // Delivery ordering: the per-target register_observer replay above
+        // fires before this activity-observer notification, both synchronous
+        // for local delivery.
+        if (target_had_no_observers)
+        {
+            target_activity_notification const activity_notification{
+                .actor = target,
+                .state = activity_state::active,
+                .transition = activity_transition::first_observer,
+                .event_time = std::chrono::steady_clock::now(),
+                .epoch = current_epoch_for(target)};
+
+            fire_activity_events(activity_notification).get();
+        }
+
         return agent;
     }
 
-    void supervision_manager::unregister_observer_target(
+    // Returns true if this removed the last remaining per-target observer for
+    // `target` (its observer count just transitioned from one to zero); the
+    // caller is responsible for firing the corresponding
+    // activity_transition::last_observer_unregistered notification once
+    // mtx_ has been released (this function is always called with mtx_
+    // already held).
+    bool supervision_manager::unregister_observer_target(
         hpx::id_type const& target, hpx::id_type const& observer_handle)
     {
         if (auto const it = observers_.find(target); it != observers_.end())
@@ -901,13 +975,28 @@ namespace hpx::supervision::server {
             if (it->second.empty())
             {
                 observers_.erase(it);
+                return true;
             }
         }
+        return false;
+    }
+
+    std::uint64_t supervision_manager::current_epoch_for(
+        hpx::id_type const& target) const
+    {
+        std::scoped_lock<hpx::spinlock> l(mtx_);
+        auto const it = current_epoch_.find(target);
+        return it != current_epoch_.end() ? it->second : 0;
     }
 
     void supervision_manager::unregister_observer(
         hpx::id_type const& observer_handle)
     {
+        // Targets whose last per-target observer was just removed by this call;
+        // the corresponding activity_transition::last_observer_unregistered
+        // notifications are fired below, once mtx_ has been released.
+        std::vector<hpx::id_type> deactivated_targets;
+
         {
             // remove observer from all targets
             std::unique_lock<hpx::spinlock> l(mtx_);
@@ -919,10 +1008,25 @@ namespace hpx::supervision::server {
                 // remove observer from all targets
                 for (hpx::id_type const& target : it->second)
                 {
-                    unregister_observer_target(target, observer_handle);
+                    if (unregister_observer_target(target, observer_handle))
+                    {
+                        deactivated_targets.push_back(target);
+                    }
                 }
                 agents_.erase(it);
             }
+        }
+
+        for (hpx::id_type const& target : deactivated_targets)
+        {
+            target_activity_notification const activity_notification{
+                .actor = target,
+                .state = activity_state::inactive,
+                .transition = activity_transition::last_observer_unregistered,
+                .event_time = std::chrono::steady_clock::now(),
+                .epoch = current_epoch_for(target)};
+
+            fire_activity_events(activity_notification).get();
         }
 
         // A delivery action that was already queued may still reach the agent.
@@ -932,6 +1036,123 @@ namespace hpx::supervision::server {
         // prevent the agent callback from being run inline as it may block
         using action_type = agent_component::deactivate_and_wait_action;
         hpx::async(hpx::launch::task, action_type(), observer_handle).get();
+    }
+
+    hpx::future<void> supervision_manager::fire_activity_events(
+        target_activity_notification const& notification)
+    {
+        std::vector<observer_entry> observers;
+        {
+            std::unique_lock<hpx::spinlock> l(mtx_);
+            observers = activity_observers_;
+        }
+
+        for (auto const& [observer, filter] : observers)
+        {
+            // An observer scoped to a specific epoch does not get notified of
+            // transitions recorded under any other epoch.
+            if (filter != static_cast<std::uint64_t>(-1) &&
+                filter != notification.epoch)
+            {
+                continue;
+            }
+
+            try
+            {
+                fire_activity_event(observer, notification).get();
+            }
+            catch (...)
+            {
+                // Best effort: one activity observer's failure must not
+                // prevent delivery to the remaining activity observers, and
+                // there is no per-target latch to record this failure into
+                // (unlike record_error() for per-target observers).
+            }
+        }
+
+        return hpx::make_ready_future();
+    }
+
+    hpx::future<void> supervision_manager::fire_activity_event(
+        hpx::id_type const& agent, target_activity_notification notification)
+    {
+        {
+            std::unique_lock<hpx::spinlock> l(mtx_);
+
+            // check again if the agent is still registered as an activity
+            // observer
+            if (std::ranges::find(activity_observers_, agent,
+                    &observer_entry::agent) == activity_observers_.end())
+            {
+                return hpx::make_ready_future();
+            }
+        }
+
+        try
+        {
+            using action_type =
+                activity_agent_component::invoke_if_active_action;
+            bool const keep_registered =
+                hpx::sync(action_type(), agent, notification);
+
+            if (!keep_registered)
+            {
+                std::unique_lock<hpx::spinlock> l(mtx_);
+                std::erase_if(
+                    activity_observers_, [&agent](observer_entry const& entry) {
+                        return entry.agent == agent;
+                    });
+            }
+        }
+        catch (...)
+        {
+            return hpx::make_exceptional_future<void>(std::current_exception());
+        }
+
+        return hpx::make_ready_future();
+    }
+
+    hpx::id_type supervision_manager::register_target_activity_observer(
+        hpx::id_type const& agent, std::uint64_t const epoch_filter)
+    {
+        std::unique_lock<hpx::spinlock> l(mtx_);
+
+        // Registration-time replay of activity_transition::already_active
+        // for currently-tracked targets is added in a later substep; this
+        // only starts delivering live transitions occurring after this call
+        // returns (see fire_activity_events() call sites in publish_event(),
+        // register_observer(), unregister_observer(), and fire_event()).
+        activity_observers_.push_back(
+            observer_entry{.agent = agent, .epoch_filter = epoch_filter});
+
+        return agent;
+    }
+
+    void supervision_manager::unregister_target_activity_observer(
+        hpx::id_type const& observer_handle)
+    {
+        {
+            std::unique_lock<hpx::spinlock> l(mtx_);
+
+            // Rejecting a handle that belongs to the
+            // observer_handle_kind::target_observer namespace (i.e. one
+            // returned by register_observer() rather than
+            // register_target_activity_observer()) is added in a later substep;
+            // this only removes a matching entry from activity_observers_, if
+            // any.
+            std::erase_if(activity_observers_,
+                [&observer_handle](observer_entry const& entry) {
+                    return entry.agent == observer_handle;
+                });
+        }
+
+        // A delivery that was already in flight for this agent may still be
+        // running (see fire_activity_event()); deactivate_and_wait fences such
+        // deliveries and drains any callback that had already begun before this
+        // call returns, mirroring unregister_observer() above.
+        using action_type =
+            activity_agent_component::deactivate_and_wait_action;
+        hpx::sync(hpx::launch::task, action_type(), observer_handle);
     }
 
     lifecycle_state supervision_manager::query_state(hpx::id_type const& target)

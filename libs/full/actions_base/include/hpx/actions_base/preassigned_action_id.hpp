@@ -188,6 +188,10 @@ namespace hpx::actions {
         supervision_invoke_if_active_action_id,
         supervision_deactivate_and_wait_action_id,
 
+        // supervision activity agent
+        supervision_activity_invoke_if_active_action_id,
+        supervision_activity_deactivate_and_wait_action_id,
+
         last_action_id
     };
     /// \endcond
