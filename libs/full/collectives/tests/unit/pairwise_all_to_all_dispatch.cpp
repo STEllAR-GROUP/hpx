@@ -18,6 +18,7 @@
 #include <hpx/modules/collectives.hpp>
 #include <hpx/modules/testing.hpp>
 
+#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <string>
@@ -25,6 +26,18 @@
 #include <vector>
 
 using namespace hpx::collectives;
+
+///////////////////////////////////////////////////////////////////////////////
+// A row whose type alone reaches the default threshold, which is all an
+// automatic decision is allowed to look at: the contributed data may differ
+// from site to site, and sites that disagreed on the path would wait on each
+// other forever.
+using big_row = std::array<std::uint64_t, 512>;
+
+static_assert(detail::pairwise_type_bytes<big_row>() >=
+    static_cast<std::size_t>(pairwise_threshold_arg()));
+static_assert(detail::pairwise_type_bytes<std::uint32_t>() <
+    static_cast<std::size_t>(pairwise_threshold_arg()));
 
 ///////////////////////////////////////////////////////////////////////////////
 // The value site source contributes for site destination. Encoding both ends
@@ -61,6 +74,8 @@ void check_result(std::vector<std::uint32_t> const& result,
 ///////////////////////////////////////////////////////////////////////////////
 // A threshold of 0 selects the direct exchange, the default threshold leaves
 // a four-byte row on the routed one. Both have to agree, element for element.
+// The first call is therefore also the end-to-end case for a small row being
+// left alone by an automatic decision.
 void test_both_paths_agree(
     std::uint32_t const this_locality, std::uint32_t const num_localities)
 {
@@ -132,6 +147,63 @@ void test_sync_overload(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// The tests above force a path. These two leave the choice to the default
+// threshold, which is how a caller who never touches the knob reaches either
+// path.
+//
+// A completed exchange says nothing about which path ran -- that is the point
+// of the dispatch -- so the decision itself is pinned down separately, for the
+// two row types used here and at the site count these tests run at.
+void test_default_threshold_decides(std::uint32_t const num_localities)
+{
+    HPX_TEST(!detail::exchange_pairwise(num_localities,
+        detail::pairwise_type_bytes<std::uint32_t>(),
+        pairwise_threshold_arg()));
+
+    HPX_TEST(detail::exchange_pairwise(num_localities,
+        detail::pairwise_type_bytes<big_row>(), pairwise_threshold_arg()));
+}
+
+// A row large enough for the default threshold to send it directly, driven
+// through the public API with no threshold argument at all. Only the first
+// element is checked against; the rest is filled so that a row arriving from
+// the wrong peer cannot pass by accident.
+big_row big_value(
+    std::uint32_t const source, std::uint32_t const destination) noexcept
+{
+    big_row row{};
+    for (std::size_t i = 0; i != row.size(); ++i)
+    {
+        row[i] = exchanged_value(source, destination) + i;
+    }
+    return row;
+}
+
+void test_auto_selects_direct_for_large_rows(
+    std::uint32_t const this_locality, std::uint32_t const num_localities)
+{
+    std::vector<big_row> values;
+    values.reserve(num_localities);
+    for (std::uint32_t destination = 0; destination != num_localities;
+        ++destination)
+    {
+        values.push_back(big_value(this_locality, destination));
+    }
+
+    std::vector<big_row> const result =
+        all_to_all("/test/pairwise_dispatch/auto_direct/", HPX_MOVE(values),
+            num_sites_arg(num_localities), this_site_arg(this_locality),
+            generation_arg(1))
+            .get();
+
+    HPX_TEST_EQ(result.size(), std::size_t(num_localities));
+    for (std::uint32_t source = 0; source != num_localities; ++source)
+    {
+        HPX_TEST(result[source] == big_value(source, this_locality));
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // A default generation gives the sites no tag they all derive the same way,
 // so the call stays on the routed path rather than failing. It still has to
 // deliver the right answer, which is the part that matters to a caller.
@@ -161,6 +233,8 @@ int hpx_main()
     test_both_paths_agree(this_locality, num_localities);
     test_direct_path_generations(this_locality, num_localities);
     test_sync_overload(this_locality, num_localities);
+    test_default_threshold_decides(num_localities);
+    test_auto_selects_direct_for_large_rows(this_locality, num_localities);
     test_default_generation_still_works(this_locality, num_localities);
 
     return hpx::finalize();
