@@ -635,9 +635,19 @@ namespace hpx::collectives {
             {
                 // The channel communicator carries a name of its own so it
                 // cannot collide with the collective communicator registered
-                // under this basename.
-                std::string const channel_basename =
-                    std::string(basename) + "pairwise/";
+                // under this basename. The generation is part of that name
+                // because a communicator is built per call: registering the
+                // same name for a later generation would be refused while the
+                // earlier one is still registered.
+                //
+                // Building one per call is the conservative choice, not the
+                // cheap one. Reusing a single channel communicator across
+                // generations is what the exchange tag was threaded through
+                // for, and it is the version worth measuring, but it needs a
+                // cache with a lifetime rule of its own.
+                std::string const channel_basename = std::string(basename) +
+                    "pairwise/" +
+                    std::to_string(static_cast<std::size_t>(generation)) + "/";
 
                 return pairwise_all_to_all(
                     hpx::collectives::create_channel_communicator(

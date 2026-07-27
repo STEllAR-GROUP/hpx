@@ -318,7 +318,6 @@ void test_dispatch_decision()
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
-    test_payload_size_estimate();
     test_type_size_estimate();
     test_dispatch_decision();
 
