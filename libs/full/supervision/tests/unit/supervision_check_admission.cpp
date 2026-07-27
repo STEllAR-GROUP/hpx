@@ -9,7 +9,6 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/modules/preprocessor.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/supervision.hpp>
 

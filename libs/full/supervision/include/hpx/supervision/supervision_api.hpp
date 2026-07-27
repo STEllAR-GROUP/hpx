@@ -837,22 +837,22 @@ namespace hpx::supervision {
         /// published its first lifecycle event.
         first_event,
         /// The target transitioned to \c activity_state::active because
-        /// the first activity observer was registered for it.
+        /// the first per-target lifecycle observer was registered for it.
         first_observer,
         /// The target transitioned to \c activity_state::inactive because
-        /// its last remaining activity observer was unregistered.
+        /// its last remaining per-target lifecycle observer was unregistered.
         last_observer_unregistered,
-        /// The target was already \c activity_state::active at the time an
-        /// activity observer was registered for it. Delivered as a replay,
-        /// synchronously as part of registration under the same lock that
-        /// guards the activity state, so that a newly-registered observer
-        /// cannot miss (nor be delivered twice for) a transition that
-        /// raced with its own registration.
+        /// The target was already \c activity_state::active at the time a
+        /// per-target lifecycle observer was registered for it. Delivered as a
+        /// replay, synchronously as part of registration under the same lock
+        /// that guards the activity state, so that a newly-registered observer
+        /// cannot miss (nor be delivered twice for) a transition that raced
+        /// with its own registration.
         already_active,
     };
 
-    /// \brief Payload delivered to a registered activity observer callback
-    ///        whenever a supervised target transitions between
+    /// \brief Payload delivered to a registered per-target lifecycle observer
+    ///        callback whenever a supervised target transitions between
     ///        \a activity_state::inactive and \a activity_state::active.
     ///
     /// A `activity_notification` is constructed by the supervision manager

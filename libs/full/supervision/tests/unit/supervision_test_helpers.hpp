@@ -11,6 +11,7 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #include <hpx/hpx.hpp>
+#include <hpx/modules/preprocessor.hpp>
 #include <hpx/supervision.hpp>
 
 #include <atomic>

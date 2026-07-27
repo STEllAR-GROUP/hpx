@@ -45,12 +45,12 @@ namespace hpx::supervision {
         // manager. Unlike register_observer(), this is deliberately
         // locality-scoped rather than target-scoped: it takes no `target`
         // parameter by design. Registration will replay an `already_active`
-        // notification for every currently-tracked active target (added in a
-        // later substep); that replay must appear to happen atomically with
-        // subscription, i.e. under the same lock that guards the tracked-target
-        // set, so that no transition is missed or duplicated across the
-        // replay/subscribe boundary. No such replay is implemented yet; this
-        // declaration only reserves the interface.
+        // notification for every currently-tracked active target. That replay
+        // must appear to happen atomically with subscription, i.e. under the
+        // same lock that guards the tracked-target set, so that no transition
+        // is missed or duplicated across the replay/subscribe boundary. No such
+        // replay is implemented yet; this declaration only reserves the
+        // interface.
         hpx::id_type register_activity_observer(hpx::id_type const& agent,
             std::uint64_t epoch_filter = static_cast<std::uint64_t>(-1),
             hpx::error_code& ec = throws) const;

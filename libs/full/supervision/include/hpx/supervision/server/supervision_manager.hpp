@@ -154,19 +154,20 @@ namespace hpx::supervision::server {
         {
         };
 
-        // Register `agent` to be notified of activation/deactivation
-        // transitions across all targets tracked by this manager. Unlike
-        // register_observer(), this takes no `target` parameter by design: the
-        // feature is locality-scoped, not target-scoped, so `agent` is notified
-        // about every target this manager tracks rather than a single one.
-        // Registration will replay an `already_active` notification (added in a
-        // later substep) for every currently-tracked active target, delivered
-        // atomically with subscription under the same lock that guards the
-        // tracked-target set, so no transition is missed or duplicated across
-        // the replay/subscribe boundary. Returned handles come from the
-        // observer_handle_kind::activity_observer namespace (see
-        // observer_handle_kind above), distinct from register_observer()
-        // handles.
+        /// Registers an activity observer for the given target and replays its
+        /// current state if the target is already active.
+        ///
+        /// The snapshot of the target's tracked state and the insertion of the
+        /// observer into the tracked set happen atomically under `mtx_`, which
+        /// guarantees the observer receives exactly one notification for the
+        /// target's current state: either the replay (if already active at
+        /// registration time) or a live transition that raced with
+        /// registration, but never both and never neither.
+        ///
+        /// Delivery of that notification (replay or live) happens after `mtx_`
+        /// is released and is therefore not ordered relative to any other
+        /// concurrent live notification for the same target; callers must not
+        /// assume replay is delivered before or after a racing live event.
         hpx::id_type register_activity_observer(hpx::id_type const& agent,
             std::uint64_t epoch_filter = static_cast<std::uint64_t>(-1));
 
@@ -243,14 +244,26 @@ namespace hpx::supervision::server {
             hpx::id_type const& agent,
             lifecycle_event_notification notification);
 
-        // Delivers `notification` to every currently-registered activity
-        // observer (see activity_observers_ below), skipping any observer whose
+        // Delivers `notification` to each entry in `observers` (a snapshot of
+        // activity_observers_ taken by the caller), skipping any observer whose
         // epoch_filter does not match. Local delivery is synchronous: each
         // observer's callback has already run by the time the returned future
         // becomes ready. One observer's failure does not prevent delivery to
-        // the remaining observers.
-        hpx::future<void> fire_activity_events(
-            activity_notification const& notification);
+        // the remaining observers. Used by publish_event()/
+        // register_observer()/unregister_observer()/fire_event() so that the
+        // activity_observers_ snapshot determining delivery of a
+        // first_event/first_observer/last_observer_unregistered transition is
+        // taken in the very same mtx_ critical section as the
+        // states_/observers_ mutation that drives the transition, instead of in
+        // a later, separate critical section: otherwise, a
+        // register_activity_observer() call that acquires mtx_ in between would
+        // install its agent into activity_observers_ in time to receive this
+        // transition's live notification *and* see the already-mutated state in
+        // its own replay snapshot, delivering the same transition to that agent
+        // twice (or, symmetrically, delivering it zero times).
+        hpx::future<void> deliver_activity_notification(
+            activity_notification const& notification,
+            std::vector<observer_entry> const& observers);
 
         // Delivers `notification` to the single activity observer identified by
         // `agent`, if it is still registered. Removes `agent` from

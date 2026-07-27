@@ -137,17 +137,17 @@ Registering activity observers
     parameter: the feature reports on every target the addressed manager
     tracks rather than on a single one.
 
-    Registration synchronously and atomically delivers one
-    ``activity_transition::already_active`` notification for every target
-    that is already active at the time of the call, taken under the same
-    lock that guards subscription, before the registration call returns.
-    This guarantees ``callback`` observes exactly one notification for each
-    such target's current activity state - either this replay, or a live
-    transition that raced with registration, but never both and never
-    neither. For local delivery, both the replay and any subsequent live
-    transitions invoke ``callback`` synchronously; for a given lifecycle
-    event, per-target ``register_observer`` callbacks always fire before
-    activity-observer callbacks triggered by that same event.
+    Registering an activity observer for an already-active target triggers a
+    replay of its current state. The snapshot of tracked state and the
+    insertion of the observer are performed atomically under the manager's
+    internal lock, which guarantees exactly-once delivery: the observer
+    receives either the replay or a live transition that raced with
+    registration, but never both and never neither.
+    
+    Note that the notification itself (replay or live) is delivered after the
+    lock is released. Its delivery order relative to any other concurrent live
+    notification for the same target is *not* guaranteed, only the
+    exactly-once property is guaranteed, not relative ordering.
 
     Activity notifications are a pure discovery/notification signal: unlike
     ``publish_event``, registering or unregistering an activity observer

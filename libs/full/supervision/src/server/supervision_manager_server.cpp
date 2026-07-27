@@ -608,6 +608,17 @@ namespace hpx::supervision::server {
         // that code.
         bool had_state_before;
 
+        // Snapshot of activity_observers_ taken in the very same mtx_
+        // critical section as the states_/activated_at_ mutation below (see
+        // deliver_activity_notification() for why): guarantees that any
+        // register_activity_observer() call race is resolved consistently,
+        // either its own replay already reflects this target's new state (if
+        // it acquires mtx_ after this critical section) or its agent is
+        // already captured here and receives the live notification below (if
+        // it acquires mtx_ before this critical section) - never both, never
+        // neither.
+        std::vector<observer_entry> activity_observers_snapshot;
+
         {
             std::unique_lock<hpx::spinlock> l(mtx_);
 
@@ -656,6 +667,11 @@ namespace hpx::supervision::server {
             if (!had_state_before)
             {
                 activated_at_.try_emplace(target, notification.event_time);
+
+                // See activity_observers_snapshot above: must be taken here,
+                // before mtx_ is released below, not later after mtx_ has
+                // already been released.
+                activity_observers_snapshot = activity_observers_;
             }
         }
 
@@ -688,7 +704,9 @@ namespace hpx::supervision::server {
                 .event_time = notification.event_time,
                 .epoch = notification.epoch};
 
-            fire_activity_events(activity_notification).get();
+            deliver_activity_notification(
+                activity_notification, activity_observers_snapshot)
+                .get();
         }
 
         return publish_result::applied;
@@ -790,6 +808,14 @@ namespace hpx::supervision::server {
             }
 
             bool deactivated = false;
+
+            // Snapshot of activity_observers_ taken in the very same mtx_
+            // critical section as the observers_/activated_at_ mutation below,
+            // if it happens; see the matching comment in publish_event() for
+            // why this must not instead be taken later, after mtx_ has already
+            // been released.
+            std::vector<observer_entry> activity_observers_snapshot;
+
             if (!keep_registered)
             {
                 // remove observer from the given target
@@ -811,6 +837,11 @@ namespace hpx::supervision::server {
                 {
                     activated_at_.erase(target);
                 }
+
+                if (deactivated)
+                {
+                    activity_observers_snapshot = activity_observers_;
+                }
             }
 
             // Fired with mtx_ released, mirroring unregister_observer() below.
@@ -824,7 +855,9 @@ namespace hpx::supervision::server {
                     .event_time = std::chrono::steady_clock::now(),
                     .epoch = current_epoch_for(target)};
 
-                fire_activity_events(activity_notification).get();
+                deliver_activity_notification(
+                    activity_notification, activity_observers_snapshot)
+                    .get();
             }
 
             // rethrow exception, if any
@@ -853,6 +886,12 @@ namespace hpx::supervision::server {
         // the time register_activity_observer()'s replay logic records
         // as this target's original activation time.
         std::chrono::steady_clock::time_point activation_time;
+
+        // Snapshot of activity_observers_ taken in the very same mtx_
+        // critical section as the observers_/activated_at_ mutation below;
+        // see the matching comment in publish_event() for why this must not
+        // instead be taken later, after mtx_ has already been released.
+        std::vector<observer_entry> activity_observers_snapshot;
 
         {
             std::unique_lock<hpx::spinlock> l(mtx_);
@@ -920,6 +959,11 @@ namespace hpx::supervision::server {
             {
                 activation_time = std::chrono::steady_clock::now();
                 activated_at_.try_emplace(target, activation_time);
+
+                // See activity_observers_snapshot above: must be taken here,
+                // before mtx_ is released below, not later after mtx_ has
+                // already been released.
+                activity_observers_snapshot = activity_observers_;
             }
 
             // An existing target gets an initial notification. Keep a value
@@ -984,7 +1028,9 @@ namespace hpx::supervision::server {
                 .event_time = activation_time,
                 .epoch = current_epoch_for(target)};
 
-            fire_activity_events(activity_notification).get();
+            deliver_activity_notification(
+                activity_notification, activity_observers_snapshot)
+                .get();
         }
 
         return agent;
@@ -1037,6 +1083,15 @@ namespace hpx::supervision::server {
         // notifications are fired below, once mtx_ has been released.
         std::vector<hpx::id_type> deactivated_targets;
 
+        // Snapshot of activity_observers_ taken in the very same mtx_
+        // critical section as the observers_/activated_at_ mutations below,
+        // and reused for every target in deactivated_targets below (a single
+        // snapshot is valid for all of them, since none of this function's
+        // own mutations touch activity_observers_); see the matching comment
+        // in publish_event() for why this must not instead be taken later,
+        // after mtx_ has already been released.
+        std::vector<observer_entry> activity_observers_snapshot;
+
         {
             // remove observer from all targets
             std::unique_lock<hpx::spinlock> l(mtx_);
@@ -1063,6 +1118,11 @@ namespace hpx::supervision::server {
                 }
                 agents_.erase(it);
             }
+
+            if (!deactivated_targets.empty())
+            {
+                activity_observers_snapshot = activity_observers_;
+            }
         }
 
         for (hpx::id_type const& target : deactivated_targets)
@@ -1073,7 +1133,9 @@ namespace hpx::supervision::server {
                 .event_time = std::chrono::steady_clock::now(),
                 .epoch = current_epoch_for(target)};
 
-            fire_activity_events(activity_notification).get();
+            deliver_activity_notification(
+                activity_notification, activity_observers_snapshot)
+                .get();
         }
 
         // A delivery action that was already queued may still reach the agent.
@@ -1085,15 +1147,10 @@ namespace hpx::supervision::server {
         hpx::async(hpx::launch::task, action_type(), observer_handle).get();
     }
 
-    hpx::future<void> supervision_manager::fire_activity_events(
-        activity_notification const& notification)
+    hpx::future<void> supervision_manager::deliver_activity_notification(
+        activity_notification const& notification,
+        std::vector<observer_entry> const& observers)
     {
-        std::vector<observer_entry> observers;
-        {
-            std::unique_lock<hpx::spinlock> l(mtx_);
-            observers = activity_observers_;
-        }
-
         for (auto const& [observer, filter] : observers)
         {
             // An observer scoped to a specific epoch does not get notified of
@@ -1169,12 +1226,21 @@ namespace hpx::supervision::server {
         // `agent` into activity_observers_ inside the same critical section, so
         // no live transition recorded concurrently by publish_event()/
         // register_observer()/unregister_observer()/fire_event() can be missed
-        // or delivered twice to `agent`: any such transition either already
-        // shows up in the snapshot below (if it completed before this call
-        // acquired mtx_), or is picked up live once fire_activity_events()
-        // copies the now-installed entry out of activity_observers_ (if it
-        // happens after mtx_ is released here), since fire_activity_events()
-        // itself acquires mtx_ to take that copy.
+        // or delivered twice to `agent`. Each of those call sites mutates its
+        // tracked state (states_/observers_/activated_at_) and snapshots
+        // activity_observers_ (the set that will receive its live notification,
+        // see deliver_activity_notification()) within one single mtx_ critical
+        // section of its own. Since this call's snapshot-and-install below is
+        // likewise a single critical section on the same mtx_, the two are
+        // strictly ordered relative to each other: if the other call's critical
+        // section runs first, its activity_observers_ snapshot cannot yet
+        // include `agent` (installed only below), but the mutated state it just
+        // recorded is already visible to the snapshot below, which replays it
+        // as already_active; if this call's critical section runs first,
+        // `agent` is already installed by the time the other call takes its
+        // activity_observers_ snapshot, so it receives that live notification
+        // instead, while the snapshot below - running before that mutation -
+        // does not also replay it.
         std::vector<activity_notification> replay;
 
         {
@@ -1209,10 +1275,10 @@ namespace hpx::supervision::server {
             replay.reserve(tracked.size());
             for (auto const& [target, epoch] : tracked)
             {
-                // Same epoch-filter semantics as fire_activity_events(): a
-                // filter engaged to a specific epoch skips any target whose
-                // (current) epoch does not match, including here at replay
-                // time.
+                // Same epoch-filter semantics as
+                // deliver_activity_notification(): a filter engaged to a
+                // specific epoch skips any target whose (current) epoch does
+                // not match, including here at replay time.
                 if (epoch_filter != static_cast<std::uint64_t>(-1) &&
                     epoch_filter != epoch)
                 {
@@ -1248,12 +1314,13 @@ namespace hpx::supervision::server {
             {
                 fire_activity_event(agent, notification).get();
             }
+            // NOLINTNEXTLINE(bugprone-empty-catch)
             catch (...)
             {
-                // Best effort, mirroring fire_activity_events(): one replay
-                // delivery failing must not prevent delivery of the remaining
-                // replay notifications, nor this registration call from
-                // returning.
+                // Best effort, mirroring deliver_activity_notification(): one
+                // replay delivery failing must not prevent delivery of the
+                // remaining replay notifications, nor this registration call
+                // from returning.
             }
         }
 
