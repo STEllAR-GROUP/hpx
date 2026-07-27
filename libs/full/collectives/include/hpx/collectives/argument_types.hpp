@@ -124,7 +124,13 @@ namespace hpx::collectives {
     /// routing every row through a single communicator site. Direct exchange
     /// costs num_sites - 1 messages per site rather than two, so it only pays
     /// once a row is large enough for the routing detour to dominate the
-    /// message count. Pass 0 to always exchange directly.
+    /// message count. Pass 0 to ask for the direct exchange whenever it is
+    /// available, which is not unconditional: it also needs at least three
+    /// participating sites, below which there is no routing detour left to
+    /// remove, and an explicit generation number, which is what gives every
+    /// site the same exchange tag. A call supplying neither is routed whatever
+    /// this value is. Which path runs affects performance only, never the
+    /// result.
     ///
     /// The default is provisional: measurements on 20 localities per node put
     /// the crossover between 256 and 1024 four-byte elements per pair, and the
