@@ -62,4 +62,18 @@ namespace hpx::supervision {
 
     HPX_CXX_EXPORT enum class dispatch_outcome : std::uint8_t;
 
+    // global observer interface
+    HPX_CXX_EXPORT enum class activity_state : std::uint8_t;
+    HPX_CXX_EXPORT enum class activity_transition : std::uint8_t;
+    HPX_CXX_EXPORT struct target_activity_notification;
+
+    HPX_CXX_EXPORT HPX_EXPORT void serialize(
+        hpx::serialization::output_archive& ar,
+        target_activity_notification const&, unsigned int);
+    HPX_CXX_EXPORT HPX_EXPORT void serialize(
+        hpx::serialization::input_archive& ar, target_activity_notification&,
+        unsigned int);
+
+    HPX_CXX_EXPORT using activity_callback =
+        std::function<bool(target_activity_notification const&)>;
 }    // namespace hpx::supervision

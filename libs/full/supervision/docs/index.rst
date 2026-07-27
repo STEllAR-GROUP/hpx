@@ -112,5 +112,16 @@ Checking dispatch admission
     whether dispatch should proceed; it must only be called on the locality
     ``target`` lives on.
 
+    This admission fence is scoped to a single locality's latch state: it
+    reflects only terminal events published to the supervision manager
+    hosting ``target``, and it fails open (returns ``admitted``) when
+    ``target`` is unknown locally, including when its terminal event was
+    only ever published elsewhere. There is no built-in mechanism that
+    propagates terminal latch state across localities - observer
+    registration delivers notifications, not admission state. Any
+    additional locality that needs to fence its own dispatch decisions on
+    ``target`` must independently mirror or route to the owning locality's
+    state; this module does not provide that for you.
+
 See the :ref:`API reference <modules_supervision_api>` of this module for
 more details.

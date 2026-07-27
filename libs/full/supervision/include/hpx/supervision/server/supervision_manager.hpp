@@ -83,6 +83,20 @@ namespace hpx::supervision::server {
         std::chrono::steady_clock::time_point deadline;
     };
 
+    // Discriminates which registration API a given observer handle originated
+    // from. register_target_activity_observer() handles are reserved into their
+    // own namespace, distinct from register_observer() handles, so that
+    // unregister_target_activity_observer() (and, symmetrically,
+    // unregister_observer()) can reject a handle that was returned by the other
+    // registration API rather than silently misinterpreting it. Only the tag is
+    // reserved here; the storage and rejection logic that consult it are added
+    // in a later substep.
+    enum class observer_handle_kind : std::uint8_t
+    {
+        target_observer,
+        target_activity_observer
+    };
+
     struct supervision_manager
       : hpx::components::fixed_component_base<supervision_manager>
     {
@@ -137,6 +151,51 @@ namespace hpx::supervision::server {
                 decltype(&supervision_manager::unregister_observer),
                 &supervision_manager::unregister_observer,
                 unregister_observer_action>
+        {
+        };
+
+        // Register `agent` to be notified of activation/deactivation
+        // transitions across all targets tracked by this manager. Unlike
+        // register_observer(), this takes no `target` parameter by design: the
+        // feature is locality-scoped, not target-scoped, so `agent` is notified
+        // about every target this manager tracks rather than a single one.
+        // Registration will replay an `already_active` notification (added in a
+        // later substep) for every currently-tracked active target, delivered
+        // atomically with subscription under the same lock that guards the
+        // tracked-target set, so no transition is missed or duplicated across
+        // the replay/subscribe boundary. Returned handles come from the
+        // observer_handle_kind::target_activity_observer namespace (see
+        // observer_handle_kind above), distinct from register_observer()
+        // handles.
+        hpx::id_type register_target_activity_observer(
+            hpx::id_type const& agent,
+            std::uint64_t epoch_filter = static_cast<std::uint64_t>(-1));
+
+        struct register_target_activity_observer_action
+          : hpx::actions::make_action_t<
+                decltype(&supervision_manager::
+                        register_target_activity_observer),
+                &supervision_manager::register_target_activity_observer,
+                register_target_activity_observer_action>
+        {
+        };
+
+        // Unregister a handle previously returned by
+        // register_target_activity_observer(). As with unregister_observer(),
+        // no orphaned callbacks fire after this call completes.
+        // `observer_handle` must belong to the
+        // observer_handle_kind::target_activity_observer namespace; a handle
+        // from register_observer() is rejected (rejection logic added in a
+        // later substep).
+        void unregister_target_activity_observer(
+            hpx::id_type const& observer_handle);
+
+        struct unregister_target_activity_observer_action
+          : hpx::actions::make_action_t<
+                decltype(&supervision_manager::
+                        unregister_target_activity_observer),
+                &supervision_manager::unregister_target_activity_observer,
+                unregister_target_activity_observer_action>
         {
         };
 
@@ -384,6 +443,12 @@ HPX_REGISTER_ACTION_DECLARATION(
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::supervision::server::supervision_manager::unregister_observer_action,
     supervision_unregister_observer_action)
+HPX_REGISTER_ACTION_DECLARATION(hpx::supervision::server::supervision_manager::
+                                    register_target_activity_observer_action,
+    supervision_register_target_activity_observer_action)
+HPX_REGISTER_ACTION_DECLARATION(hpx::supervision::server::supervision_manager::
+                                    unregister_target_activity_observer_action,
+    supervision_unregister_target_activity_observer_action)
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::supervision::server::supervision_manager::query_state_action,
     supervision_query_state_action)
