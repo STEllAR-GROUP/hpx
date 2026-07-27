@@ -237,8 +237,68 @@ void test_rejects_bad_arguments()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// What the size estimate reports is what the dispatch decides on, so both
+// the trivially copyable row and the block row have to be measured correctly,
+// and an unmeasurable row has to report that rather than guess.
+struct opaque_row
+{
+    std::vector<int> data;
+
+    template <typename Archive>
+    void serialize(Archive& ar, unsigned)
+    {
+        // clang-format off
+        ar & data;
+        // clang-format on
+    }
+};
+
+void test_payload_size_estimate()
+{
+    std::vector<std::size_t> const scalars(4);
+    HPX_TEST_EQ(detail::pairwise_payload_bytes(scalars), sizeof(std::size_t));
+
+    std::vector<std::vector<int>> blocks(4);
+    blocks[0].resize(10);
+    blocks[1].resize(64);
+    blocks[2].resize(32);
+    blocks[3].resize(7);
+
+    // the largest row decides, so a short row cannot hide a large exchange
+    HPX_TEST_EQ(detail::pairwise_payload_bytes(blocks), 64 * sizeof(int));
+
+    // a row whose size cannot be established reports zero
+    std::vector<opaque_row> const opaque(4);
+    HPX_TEST_EQ(detail::pairwise_payload_bytes(opaque), std::size_t(0));
+}
+
+void test_dispatch_decision()
+{
+    constexpr auto threshold = pairwise_threshold_arg(4096);
+
+    // below three sites there is no routing detour to remove
+    HPX_TEST(!detail::exchange_pairwise(1, 1 << 20, threshold));
+    HPX_TEST(!detail::exchange_pairwise(2, 1 << 20, threshold));
+
+    // small rows stay on the routed path, large rows go direct
+    HPX_TEST(!detail::exchange_pairwise(8, 4095, threshold));
+    HPX_TEST(detail::exchange_pairwise(8, 4096, threshold));
+    HPX_TEST(detail::exchange_pairwise(8, 1 << 20, threshold));
+
+    // an unmeasurable payload never selects the direct path on size alone
+    HPX_TEST(!detail::exchange_pairwise(8, 0, threshold));
+
+    // a zero threshold forces the direct path, unmeasurable payload included
+    HPX_TEST(detail::exchange_pairwise(8, 0, pairwise_threshold_arg(0)));
+    HPX_TEST(detail::exchange_pairwise(8, 1, pairwise_threshold_arg(0)));
+}
+
+///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
+    test_payload_size_estimate();
+    test_dispatch_decision();
+
     // A single site exchanges with itself and never touches the network.
     test_scalar_exchange("scalar-1", 1);
 

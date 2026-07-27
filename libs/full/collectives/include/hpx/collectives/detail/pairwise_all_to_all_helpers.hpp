@@ -26,11 +26,97 @@
 #include <hpx/modules/async_combinators.hpp>
 #include <hpx/type_support/unused.hpp>
 
+#include <algorithm>
 #include <cstddef>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
 namespace hpx::collectives::detail {
+
+    ///////////////////////////////////////////////////////////////////////////
+    // pairwise_payload_bytes
+    //
+    // Estimates how many bytes one site sends to one peer, which is what the
+    // choice between the two exchange paths turns on.
+    //
+    // A row is one element of the contribution, so a trivially copyable
+    // element answers the question by itself. The payload this path exists
+    // for is a block per peer, though, so a vector of trivially copyable
+    // elements is measured by its contents; the largest row is used, because
+    // under-reporting would keep a large exchange on the routed path. Anything
+    // else reports 0, meaning "unknown": the caller then keeps the routed
+    // path, which is correct for every payload rather than fast for some.
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    struct pairwise_row_bytes
+    {
+        static constexpr std::size_t call(std::vector<T> const&) noexcept
+        {
+            if constexpr (std::is_trivially_copyable_v<T>)
+            {
+                return sizeof(T);
+            }
+            else
+            {
+                return 0;
+            }
+        }
+    };
+
+    template <typename U, typename Allocator>
+    struct pairwise_row_bytes<std::vector<U, Allocator>>
+    {
+        static std::size_t call(
+            std::vector<std::vector<U, Allocator>> const& rows) noexcept
+        {
+            if constexpr (std::is_trivially_copyable_v<U>)
+            {
+                std::size_t longest = 0;
+                for (auto const& row : rows)
+                {
+                    longest = (std::max) (longest, row.size());
+                }
+                return longest * sizeof(U);
+            }
+            else
+            {
+                return 0;
+            }
+        }
+    };
+
+    template <typename T>
+    std::size_t pairwise_payload_bytes(std::vector<T> const& rows) noexcept
+    {
+        return pairwise_row_bytes<T>::call(rows);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // exchange_pairwise
+    //
+    // Decides between the direct and the routed exchange. A payload whose
+    // size cannot be established never selects the direct path on its own,
+    // and neither does an exchange with fewer than three sites: below that
+    // there is no routing detour left to remove.
+    ///////////////////////////////////////////////////////////////////////////
+    inline bool exchange_pairwise(std::size_t const num_sites,
+        std::size_t const bytes_per_pair,
+        pairwise_threshold_arg const threshold) noexcept
+    {
+        if (num_sites < 3)
+        {
+            return false;
+        }
+
+        if (threshold == 0)
+        {
+            return true;
+        }
+
+        return bytes_per_pair != 0 &&
+            bytes_per_pair >= static_cast<std::size_t>(threshold);
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     // pairwise_all_to_all
@@ -51,8 +137,12 @@ namespace hpx::collectives::detail {
     // The tag separates concurrent exchanges on one channel communicator, so
     // the caller must pass a distinct tag per generation.
     ///////////////////////////////////////////////////////////////////////////
+    // The communicator type has to be spelled out: inside this namespace the
+    // unqualified name resolves to the detail implementation class, not to the
+    // public handle callers hold.
     HPX_CXX_EXPORT template <typename T>
-    hpx::future<std::vector<T>> pairwise_all_to_all(channel_communicator comm,
+    hpx::future<std::vector<T>> pairwise_all_to_all(
+        hpx::collectives::channel_communicator comm,
         std::vector<T>&& local_result, std::size_t const num_sites,
         std::size_t const this_site, tag_arg const tag)
     {
@@ -109,10 +199,10 @@ namespace hpx::collectives::detail {
 
         return hpx::when_all(HPX_MOVE(sends), HPX_MOVE(receives))
             .then(hpx::launch::sync,
+                // the communicator is captured to keep it alive until every
+                // send and receive on it has completed
                 [comm = HPX_MOVE(comm), diagonal = HPX_MOVE(diagonal),
                     num_sites, this_site](auto&& f) mutable {
-                    HPX_UNUSED(comm);
-
                     auto [sent, received] = HPX_MOVE(f).get();
 
                     // Report a failed send rather than a truncated result.

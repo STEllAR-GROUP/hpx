@@ -72,6 +72,7 @@ namespace hpx::collectives {
         struct tag_tag;
         struct arity_tag;
         struct flat_fallback_threshold_tag;
+        struct pairwise_threshold_tag;
     }    // namespace detail
 
     /// The number of participating sites (default: all localities)
@@ -117,4 +118,17 @@ namespace hpx::collectives {
     /// Pass 0 to disable the fallback and always build a tree.
     HPX_CXX_EXPORT using flat_fallback_threshold_arg =
         detail::argument_type<detail::flat_fallback_threshold_tag, 16>;
+
+    /// The per-pair payload size, in bytes, at or above which all_to_all
+    /// exchanges rows directly between the participating sites instead of
+    /// routing every row through a single communicator site. Direct exchange
+    /// costs num_sites - 1 messages per site rather than two, so it only pays
+    /// once a row is large enough for the routing detour to dominate the
+    /// message count. Pass 0 to always exchange directly.
+    ///
+    /// The default is provisional: measurements on 20 localities per node put
+    /// the crossover between 256 and 1024 four-byte elements per pair, and the
+    /// focused sweep that would pin it down has not been run yet.
+    HPX_CXX_EXPORT using pairwise_threshold_arg =
+        detail::argument_type<detail::pairwise_threshold_tag, 4096>;
 }    // namespace hpx::collectives
