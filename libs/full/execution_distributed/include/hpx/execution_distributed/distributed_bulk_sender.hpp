@@ -192,9 +192,19 @@ namespace hpx::distributed::experimental::detail {
                         //
                         // For now, execute the bulk loop locally as a
                         // functional fallback / stub.
-                        for (auto const& s : shape_)
+                        if constexpr (std::is_integral_v<std::decay_t<Shape>>)
                         {
-                            HPX_INVOKE(f_, s, ts...);
+                            for (std::decay_t<Shape> i = 0; i < shape_; ++i)
+                            {
+                                HPX_INVOKE(f_, i, ts...);
+                            }
+                        }
+                        else
+                        {
+                            for (auto const& s : shape_)
+                            {
+                                HPX_INVOKE(f_, s, ts...);
+                            }
                         }
                         hpx::execution::experimental::set_value(
                             HPX_MOVE(receiver_), HPX_FORWARD(Ts, ts)...);
