@@ -535,32 +535,34 @@ namespace hpx::supervision {
         std::optional<std::uint64_t> epoch_filter = std::nullopt,
         hpx::error_code& ec = hpx::throws);
 
-    /// \brief Unregister a previously registered observer on a possibly
-    ///        remote locality.
+    /// \brief Unregister a previously registered observer on a possibly remote
+    ///        locality.
     ///
     /// \param locality        [in] The locality on which the observer was
     ///                        registered.
     /// \param observer_handle [in] The handle returned by a prior call to
-    ///                        \a register_observer().
+    ///                        \a register_observer(). Only handles returned
+    ///                        from that function are accepted; passing a handle
+    ///                        obtained from \a register_activity_observer() (or
+    ///                        any foreign handle) is rejected.
     ///
     /// \returns               A future that becomes ready once the
     ///                        observer has been unregistered.
     ///
     /// \throws                hpx::exception if \a locality does not
-    ///                        represent a locality, or if
-    ///                        \a observer_handle does not represent a
-    ///                        valid observer handle. The returned future
-    ///                        becomes exceptional if the operation
-    ///                        fails.
+    ///                        represent a locality, or if \a observer_handle
+    ///                        does not represent a valid observer handle. The
+    ///                        returned future becomes exceptional if the
+    ///                        operation fails.
     ///
     /// \note                  Once the returned future has become ready,
-    ///                        no orphaned callbacks fire after
-    ///                        unregistration completes.
+    ///                        no orphaned callbacks fire after unregistration
+    ///                        completes.
     HPX_CXX_EXPORT HPX_EXPORT hpx::future<void> unregister_observer(
         hpx::id_type const& locality, hpx::id_type const& observer_handle);
 
-    /// \brief Unregister a previously registered observer on a possibly
-    ///        remote locality, blocking until the operation has completed.
+    /// \brief Unregister a previously registered observer on a possibly remote
+    ///        locality, blocking until the operation has completed.
     ///
     /// This is the synchronous equivalent of
     /// \a unregister_observer(hpx::id_type const&, hpx::id_type const&).
@@ -568,17 +570,18 @@ namespace hpx::supervision {
     /// \param locality        [in] The locality on which the observer was
     ///                        registered.
     /// \param observer_handle [in] The handle returned by a prior call to
-    ///                        \a register_observer().
+    ///                        \a register_observer(). See the asynchronous
+    ///                        overload regarding foreign handles.
     /// \param ec              [in,out] this represents the error status on
     ///                        exit, if this pre-initialized to
     ///                        \a hpx::throws the function will throw on
     ///                        error instead.
     ///
     /// \throws                hpx::exception if \a locality does not
-    ///                        represent a locality, or if
-    ///                        \a observer_handle does not represent a
-    ///                        valid observer handle, unless \a ec was
-    ///                        initialized not to \a hpx::throws.
+    ///                        represent a locality, or if \a observer_handle
+    ///                        does not represent a valid observer handle,
+    ///                        unless \a ec was initialized not to \a
+    ///                        hpx::throws.
     ///
     /// \note                  No orphaned callbacks fire after
     ///                        unregistration completes.
@@ -591,7 +594,8 @@ namespace hpx::supervision {
     ///
     /// \param observer_handle [in] The handle returned by a prior call to
     ///                        \a register_observer(). Must be local to the
-    ///                        calling locality.
+    ///                        calling locality. See the remote overload
+    ///                        regarding foreign handles.
     /// \param ec              [in,out] this represents the error status on
     ///                        exit, if this is pre-initialized to
     ///                        \a hpx::throws the function will throw on
@@ -813,7 +817,7 @@ namespace hpx::supervision {
     ///               to the owning locality); this API provides no such
     ///               mechanism.
     HPX_CXX_EXPORT HPX_EXPORT dispatch_outcome check_admission(
-        hpx::id_type const& target, std::uint64_t epoch = 0) noexcept;
+        hpx::id_type const& target, std::uint64_t epoch = 0);
 
     /// \brief The activity state of a supervised target, as tracked by
     ///        \a register_activity_observer().

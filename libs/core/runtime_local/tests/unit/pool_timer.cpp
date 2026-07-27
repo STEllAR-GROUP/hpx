@@ -175,7 +175,7 @@ void test_timer_firing()
     }));
 
     HPX_TEST_EQ(fire_count.load(), 1);
-    HPX_TEST(!timer.is_started());
+    HPX_TEST(wait_for_atomic([&timer]() { return !timer.is_started(); }));
 }
 
 ///////////////////////////////////////////////////////////////////////////////

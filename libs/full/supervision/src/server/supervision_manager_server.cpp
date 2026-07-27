@@ -22,6 +22,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <cstddef>
 #include <cstdint>
 #include <exception>
 #include <iterator>
@@ -824,7 +825,11 @@ namespace hpx::supervision::server {
                 deactivated = unregister_observer_target(target, agent);
                 if (auto const it = agents_.find(agent); it != agents_.end())
                 {
-                    agents_.erase(it);
+                    std::erase(it->second, target);
+                    if (it->second.empty())
+                    {
+                        agents_.erase(it);
+                    }
                 }
 
                 // Only truly untracked (per the has-ever-published/
@@ -1118,6 +1123,30 @@ namespace hpx::supervision::server {
                 }
                 agents_.erase(it);
             }
+            else if (std::ranges::find(activity_observers_, observer_handle,
+                         &observer_entry::agent) != activity_observers_.end())
+            {
+                // observer_handle was not registered via register_observer(),
+                // but was found registered via register_activity_observer():
+                // reject it before touching any state or dispatching
+                // deactivate_and_wait below.
+                l.unlock();
+
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                    "supervision_manager::unregister_observer",
+                    "observer_handle was not returned by register_observer()");
+            }
+            else
+            {
+                // observer_handle was never returned by either registration
+                // API.
+                l.unlock();
+
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                    "supervision_manager::unregister_observer",
+                    "observer_handle does not represent a handle previously "
+                    "returned by register_observer()");
+            }
 
             if (!deactivated_targets.empty())
             {
@@ -1197,10 +1226,10 @@ namespace hpx::supervision::server {
         {
             using action_type =
                 activity_agent_component::invoke_if_active_action;
-            bool const keep_registered =
-                hpx::sync(action_type(), agent, notification);
+            hpx::future<bool> keep_registered = hpx::async(hpx::launch::task,
+                action_type(), agent, HPX_MOVE(notification));
 
-            if (!keep_registered)
+            if (!keep_registered.get())
             {
                 std::unique_lock<hpx::spinlock> l(mtx_);
                 std::erase_if(
@@ -1338,10 +1367,36 @@ namespace hpx::supervision::server {
             // returned by register_observer() rather than
             // register_activity_observer()) is added in a later substep; this
             // only removes a matching entry from activity_observers_, if any.
-            std::erase_if(activity_observers_,
+            std::size_t const removed = std::erase_if(activity_observers_,
                 [&observer_handle](observer_entry const& entry) {
                     return entry.agent == observer_handle;
                 });
+
+            if (removed == 0)
+            {
+                if (agents_.find(observer_handle) != agents_.end())
+                {
+                    // observer_handle is valid, but was returned by
+                    // register_observer(), not
+                    // register_activity_observer(): reject it rather than
+                    // silently treating it as a no-op.
+                    l.unlock();
+
+                    HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                        "supervision_manager::unregister_activity_observer",
+                        "observer_handle was returned by register_observer(), "
+                        "not register_activity_observer()");
+                }
+
+                // observer_handle was never returned by either registration
+                // API.
+                l.unlock();
+
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                    "supervision_manager::unregister_activity_observer",
+                    "observer_handle does not represent a handle previously "
+                    "returned by register_activity_observer()");
+            }
         }
 
         // A delivery that was already in flight for this agent may still be

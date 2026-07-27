@@ -48,9 +48,7 @@ namespace hpx::supervision {
         // notification for every currently-tracked active target. That replay
         // must appear to happen atomically with subscription, i.e. under the
         // same lock that guards the tracked-target set, so that no transition
-        // is missed or duplicated across the replay/subscribe boundary. No such
-        // replay is implemented yet; this declaration only reserves the
-        // interface.
+        // is missed or duplicated across the replay/subscribe boundary.
         hpx::id_type register_activity_observer(hpx::id_type const& agent,
             std::uint64_t epoch_filter = static_cast<std::uint64_t>(-1),
             hpx::error_code& ec = throws) const;
@@ -59,8 +57,9 @@ namespace hpx::supervision {
         // register_activity_observer(). As with unregister_observer(), no
         // orphaned callbacks fire after this call completes. `handle` must have
         // been obtained from register_activity_observer(), not from
-        // register_observer(); passing a handle from the latter is rejected
-        // (rejection logic added in a later substep).
+        // register_observer(); passing a handle from the latter, or one that
+        // was never returned by either registration API, is rejected with
+        // hpx::error::bad_parameter.
         void unregister_activity_observer(hpx::id_type const& observer_handle,
             hpx::error_code& ec = throws) const;
 

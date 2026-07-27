@@ -577,7 +577,7 @@ namespace hpx::supervision {
 
     ///////////////////////////////////////////////////////////////////////////
     dispatch_outcome check_admission(
-        hpx::id_type const& target, std::uint64_t const epoch) noexcept
+        hpx::id_type const& target, std::uint64_t const epoch)
     {
         if (!target)
         {
