@@ -83,20 +83,6 @@ namespace hpx::supervision::server {
         std::chrono::steady_clock::time_point deadline;
     };
 
-    // Discriminates which registration API a given observer handle originated
-    // from. register_activity_observer() handles are reserved into their
-    // own namespace, distinct from register_observer() handles, so that
-    // unregister_activity_observer() (and, symmetrically,
-    // unregister_observer()) can reject a handle that was returned by the other
-    // registration API rather than silently misinterpreting it. Only the tag is
-    // reserved here; the storage and rejection logic that consult it are added
-    // in a later substep.
-    enum class observer_handle_kind : std::uint8_t
-    {
-        target_observer,
-        activity_observer
-    };
-
     struct supervision_manager
       : hpx::components::fixed_component_base<supervision_manager>
     {
@@ -180,12 +166,11 @@ namespace hpx::supervision::server {
         };
 
         // Unregister a handle previously returned by
-        // register_activity_observer(). As with unregister_observer(),
-        // no orphaned callbacks fire after this call completes.
-        // `observer_handle` must belong to the
-        // observer_handle_kind::activity_observer namespace; a handle
-        // from register_observer() is rejected (rejection logic added in a
-        // later substep).
+        // register_activity_observer(). As with unregister_observer(), no
+        // orphaned callbacks fire after this call completes. `observer_handle`
+        // must have been returned by register_activity_observer(); a handle
+        // returned by register_observer() instead (i.e. found in agents_ rather
+        // than activity_observers_) is rejected.
         void unregister_activity_observer(hpx::id_type const& observer_handle);
 
         struct unregister_activity_observer_action
@@ -409,8 +394,9 @@ namespace hpx::supervision::server {
         // delivered every activation/ deactivation transition recorded for any
         // target this manager tracks (filtered only by each entry's own
         // epoch_filter). Kept entirely separate from observers_/agents_ above
-        // so that this collection only ever holds
-        // observer_handle_kind::activity_observer handles.
+        // so that this collection only ever holds handles returned by
+        // register_activity_observer(), never ones returned by
+        // register_observer().
         std::vector<observer_entry> activity_observers_;
 
         // Records, for every target currently tracked (i.e. present in states_

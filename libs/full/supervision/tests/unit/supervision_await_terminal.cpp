@@ -385,26 +385,30 @@ int hpx_main()
 {
     for (auto const& locality : hpx::find_all_localities())
     {
-        HPX_TEST_RUN(test_await_terminal_fast_path, locality);
-        HPX_TEST_RUN(test_await_terminal_registers_then_resolves, locality);
-        HPX_TEST_RUN(
+        HPX_SUPERVISION_TEST_RUN(test_await_terminal_fast_path, locality);
+        HPX_SUPERVISION_TEST_RUN(
+            test_await_terminal_registers_then_resolves, locality);
+        HPX_SUPERVISION_TEST_RUN(
             test_await_terminal_epoch_mismatch_never_resolves, locality);
-        HPX_TEST_RUN(test_await_terminal_concurrent_publish_stress, locality);
+        HPX_SUPERVISION_TEST_RUN(
+            test_await_terminal_concurrent_publish_stress, locality);
 
-        HPX_TEST_RUN(
+        HPX_SUPERVISION_TEST_RUN(
             test_await_terminal_default_timeout_not_expired_early, locality);
-        HPX_TEST_RUN(test_await_terminal_abandoned_waiter_expires, locality);
-        HPX_TEST_RUN(
+        HPX_SUPERVISION_TEST_RUN(
+            test_await_terminal_abandoned_waiter_expires, locality);
+        HPX_SUPERVISION_TEST_RUN(
             test_await_terminal_explicit_timeout_overrides_default, locality);
 
-        HPX_TEST_RUN(test_await_terminal_concurrent_epoch_bump_resolves_waiters,
+        HPX_SUPERVISION_TEST_RUN(
+            test_await_terminal_concurrent_epoch_bump_resolves_waiters,
             locality);
-        HPX_TEST_RUN(
+        HPX_SUPERVISION_TEST_RUN(
             test_await_terminal_concurrent_epoch_skip_invalidates_waiters,
             locality);
     }
 
-    HPX_TEST_RUN(
+    HPX_SUPERVISION_TEST_RUN(
         test_await_terminal_cross_locality_epoch_bump_abandons_remote_waiter);
 
     return hpx::finalize();

@@ -1716,66 +1716,84 @@ int hpx_main()
 {
     for (auto const& locality : hpx::find_all_localities())
     {
-        HPX_TEST_RUN(test_publish_completion_async, locality);
-        HPX_TEST_RUN(test_publish_failed_state, locality);
+        HPX_SUPERVISION_TEST_RUN(test_publish_completion_async, locality);
+        HPX_SUPERVISION_TEST_RUN(test_publish_failed_state, locality);
 
-        HPX_TEST_RUN(test_register_observer_local_completion, locality);
-        HPX_TEST_RUN(test_register_observer_multiple_events, locality);
-        HPX_TEST_RUN(test_register_observer, locality);
-        HPX_TEST_RUN(test_register_observer_receives_existing_state, locality);
+        HPX_SUPERVISION_TEST_RUN(
+            test_register_observer_local_completion, locality);
+        HPX_SUPERVISION_TEST_RUN(
+            test_register_observer_multiple_events, locality);
+        HPX_SUPERVISION_TEST_RUN(test_register_observer, locality);
+        HPX_SUPERVISION_TEST_RUN(
+            test_register_observer_receives_existing_state, locality);
 
-        HPX_TEST_RUN(test_observe_failure_detection, locality);
+        HPX_SUPERVISION_TEST_RUN(test_observe_failure_detection, locality);
 
-        HPX_TEST_RUN(test_sequence_numbers_monotonic, locality);
-        HPX_TEST_RUN(test_sequence_numbers_no_gaps, locality);
-        HPX_TEST_RUN(test_detect_connector_terminal, locality);
-        HPX_TEST_RUN(test_error_does_not_stop_callbacks, locality);
-        HPX_TEST_RUN(test_duplicate_completion_is_latched, locality);
+        HPX_SUPERVISION_TEST_RUN(test_sequence_numbers_monotonic, locality);
+        HPX_SUPERVISION_TEST_RUN(test_sequence_numbers_no_gaps, locality);
+        HPX_SUPERVISION_TEST_RUN(test_detect_connector_terminal, locality);
+        HPX_SUPERVISION_TEST_RUN(test_error_does_not_stop_callbacks, locality);
+        HPX_SUPERVISION_TEST_RUN(
+            test_duplicate_completion_is_latched, locality);
 
-        HPX_TEST_RUN(test_unregister_waits_for_in_flight_callback, locality);
-        HPX_TEST_RUN(test_unregister_observer_stops_callbacks, locality);
-        HPX_TEST_RUN(test_unregister_observer_from_within_callback, locality);
-        HPX_TEST_RUN(test_multiple_observers_same_target, locality);
-        HPX_TEST_RUN(test_publish_delivers_its_own_event_snapshot, locality);
+        HPX_SUPERVISION_TEST_RUN(
+            test_unregister_waits_for_in_flight_callback, locality);
+        HPX_SUPERVISION_TEST_RUN(
+            test_unregister_observer_stops_callbacks, locality);
+        HPX_SUPERVISION_TEST_RUN(
+            test_unregister_observer_from_within_callback, locality);
+        HPX_SUPERVISION_TEST_RUN(test_multiple_observers_same_target, locality);
+        HPX_SUPERVISION_TEST_RUN(
+            test_publish_delivers_its_own_event_snapshot, locality);
 
-        HPX_TEST_RUN(test_publish_no_observers, locality);
+        HPX_SUPERVISION_TEST_RUN(test_publish_no_observers, locality);
 
-        HPX_TEST_RUN(test_rapid_event_sequence, locality);
+        HPX_SUPERVISION_TEST_RUN(test_rapid_event_sequence, locality);
 
-        HPX_TEST_RUN(test_query_after_publication, locality);
+        HPX_SUPERVISION_TEST_RUN(test_query_after_publication, locality);
 
-        HPX_TEST_RUN(test_epoch_duplicate_completion_is_latched, locality);
-        HPX_TEST_RUN(test_epoch_increase_resets_sequence_number, locality);
-        HPX_TEST_RUN(test_stale_epoch_publish_is_noop, locality);
-        HPX_TEST_RUN(
+        HPX_SUPERVISION_TEST_RUN(
+            test_epoch_duplicate_completion_is_latched, locality);
+        HPX_SUPERVISION_TEST_RUN(
+            test_epoch_increase_resets_sequence_number, locality);
+        HPX_SUPERVISION_TEST_RUN(test_stale_epoch_publish_is_noop, locality);
+        HPX_SUPERVISION_TEST_RUN(
             test_concurrent_publishes_settle_on_higher_epoch, locality);
 
-        HPX_TEST_RUN(test_epoch_filter_basic_match, locality);
-        HPX_TEST_RUN(test_epoch_filter_mismatch_ignored, locality);
-        HPX_TEST_RUN(test_epoch_filter_default_receives_all_epochs, locality);
-        HPX_TEST_RUN(test_epoch_filter_mixed_observers, locality);
-        HPX_TEST_RUN(
+        HPX_SUPERVISION_TEST_RUN(test_epoch_filter_basic_match, locality);
+        HPX_SUPERVISION_TEST_RUN(test_epoch_filter_mismatch_ignored, locality);
+        HPX_SUPERVISION_TEST_RUN(
+            test_epoch_filter_default_receives_all_epochs, locality);
+        HPX_SUPERVISION_TEST_RUN(test_epoch_filter_mixed_observers, locality);
+        HPX_SUPERVISION_TEST_RUN(
             test_epoch_filter_initial_snapshot_respects_filter, locality);
-        HPX_TEST_RUN(
+        HPX_SUPERVISION_TEST_RUN(
             test_epoch_filter_unregister_removes_filter_entry, locality);
 
-        HPX_TEST_RUN(test_query_state_miss_returns_stale_state, locality);
-        HPX_TEST_RUN(test_query_state_hit_returns_success, locality);
-        HPX_TEST_RUN(test_query_state_concurrent_access, locality);
+        HPX_SUPERVISION_TEST_RUN(
+            test_query_state_miss_returns_stale_state, locality);
+        HPX_SUPERVISION_TEST_RUN(
+            test_query_state_hit_returns_success, locality);
+        HPX_SUPERVISION_TEST_RUN(test_query_state_concurrent_access, locality);
 
-        HPX_TEST_RUN(test_illegal_transition_out_of_completed, locality);
-        HPX_TEST_RUN(test_illegal_transition_unknown_to_completed, locality);
-        HPX_TEST_RUN(test_illegal_transitions_out_of_failed, locality);
-        HPX_TEST_RUN(
+        HPX_SUPERVISION_TEST_RUN(
+            test_illegal_transition_out_of_completed, locality);
+        HPX_SUPERVISION_TEST_RUN(
+            test_illegal_transition_unknown_to_completed, locality);
+        HPX_SUPERVISION_TEST_RUN(
+            test_illegal_transitions_out_of_failed, locality);
+        HPX_SUPERVISION_TEST_RUN(
             test_legal_transitions_suspending_running_resume, locality);
-        HPX_TEST_RUN(test_legal_transition_losing_locality_to_failed, locality);
+        HPX_SUPERVISION_TEST_RUN(
+            test_legal_transition_losing_locality_to_failed, locality);
     }
 
-    HPX_TEST_RUN(test_publish_completion);
-    HPX_TEST_RUN(test_register_observer_keeps_initial_state_snapshot);
-    HPX_TEST_RUN(test_query_nonexistent_actor);
-    HPX_TEST_RUN(test_observer_latency_local);
-    HPX_TEST_RUN(test_publication_throughput);
+    HPX_SUPERVISION_TEST_RUN(test_publish_completion);
+    HPX_SUPERVISION_TEST_RUN(
+        test_register_observer_keeps_initial_state_snapshot);
+    HPX_SUPERVISION_TEST_RUN(test_query_nonexistent_actor);
+    HPX_SUPERVISION_TEST_RUN(test_observer_latency_local);
+    HPX_SUPERVISION_TEST_RUN(test_publication_throughput);
 
     return hpx::finalize();
 }

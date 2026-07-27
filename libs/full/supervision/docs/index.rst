@@ -18,7 +18,7 @@ localities.
 Overview
 ========
 
-Four core operations are exposed, each with a local (synchronous) call and
+Several core operations are exposed, each with a local (synchronous) call and
 a remote (locality-qualified, future-returning or ``launch::sync_policy``)
 call:
 
@@ -71,7 +71,10 @@ Unregistering observers
 .. cpp:function:: void hpx::supervision::unregister_observer(hpx::launch::sync_policy, hpx::id_type const& locality, hpx::id_type const& observer_handle, hpx::error_code& ec = hpx::throws)
 .. cpp:function:: void hpx::supervision::unregister_observer(hpx::id_type const& observer_handle, hpx::error_code& ec = hpx::throws)
 
-    Unregister a previously registered observer.
+    Unregister a previously registered observer. ``observer_handle`` must
+    have been obtained from ``register_observer``; a handle obtained from
+    ``register_activity_observer``, or any handle never returned by either
+    registration function, is rejected.
 
 Waiting for terminal events
 ---------------------------
@@ -143,7 +146,7 @@ Registering activity observers
     internal lock, which guarantees exactly-once delivery: the observer
     receives either the replay or a live transition that raced with
     registration, but never both and never neither.
-    
+
     Note that the notification itself (replay or live) is delivered after the
     lock is released. Its delivery order relative to any other concurrent live
     notification for the same target is *not* guaranteed, only the
@@ -166,7 +169,8 @@ Unregistering activity observers
 
     Unregister a previously registered activity observer. ``observer_handle``
     must have been obtained from ``register_activity_observer``; a
-    handle obtained from ``register_observer`` is rejected.
+    handle obtained from ``register_observer``, or any handle never returned
+    by either registration function, is rejected.
 
 See the :ref:`API reference <modules_supervision_api>` of this module for
 more details.

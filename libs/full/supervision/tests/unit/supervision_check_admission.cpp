@@ -90,11 +90,11 @@ void test_check_admission_admitted_for_invalid_target()
 
 int hpx_main()
 {
-    HPX_TEST_RUN(test_check_admission_admitted_for_unknown_target);
-    HPX_TEST_RUN(test_check_admission_admitted_before_terminal);
-    HPX_TEST_RUN(test_check_admission_rejected_after_terminal);
-    HPX_TEST_RUN(test_check_admission_scoped_to_epoch);
-    HPX_TEST_RUN(test_check_admission_admitted_for_invalid_target);
+    HPX_SUPERVISION_TEST_RUN(test_check_admission_admitted_for_unknown_target);
+    HPX_SUPERVISION_TEST_RUN(test_check_admission_admitted_before_terminal);
+    HPX_SUPERVISION_TEST_RUN(test_check_admission_rejected_after_terminal);
+    HPX_SUPERVISION_TEST_RUN(test_check_admission_scoped_to_epoch);
+    HPX_SUPERVISION_TEST_RUN(test_check_admission_admitted_for_invalid_target);
 
     return hpx::finalize();
 }
