@@ -93,12 +93,47 @@ namespace hpx::collectives::detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    // pairwise_type_bytes
+    //
+    // The same estimate, but derived from the element type alone.
+    //
+    // Every site has to choose the same exchange path. If one site went
+    // direct while another waited on the routed path, the exchange would
+    // simply never complete, so the choice may only rest on something all
+    // sites are guaranteed to compute identically. A type is such a thing; the
+    // contributed data is not, because nothing in the all_to_all contract
+    // forces two sites to contribute rows of equal length.
+    //
+    // That is why an automatic decision uses this function and not
+    // pairwise_payload_bytes, which measures local data and can therefore
+    // differ between sites. A caller who knows its rows are uniform can still
+    // select the direct path deliberately, by passing a threshold of 0 at
+    // every site.
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    constexpr std::size_t pairwise_type_bytes() noexcept
+    {
+        if constexpr (std::is_trivially_copyable_v<T>)
+        {
+            return sizeof(T);
+        }
+        else
+        {
+            return 0;
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     // exchange_pairwise
     //
     // Decides between the direct and the routed exchange. A payload whose
     // size cannot be established never selects the direct path on its own,
     // and neither does an exchange with fewer than three sites: below that
     // there is no routing detour left to remove.
+    //
+    // The caller must pass a bytes_per_pair that every site computes
+    // identically, and the same threshold at every site; see
+    // pairwise_type_bytes for why.
     ///////////////////////////////////////////////////////////////////////////
     inline bool exchange_pairwise(std::size_t const num_sites,
         std::size_t const bytes_per_pair,

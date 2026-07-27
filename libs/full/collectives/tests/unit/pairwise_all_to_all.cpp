@@ -272,6 +272,28 @@ void test_payload_size_estimate()
     HPX_TEST_EQ(detail::pairwise_payload_bytes(opaque), std::size_t(0));
 }
 
+// An automatic decision may only rest on what every site computes the same
+// way, which is the element type. Measuring contributed rows cannot serve:
+// two sites are free to contribute rows of different length, and if that
+// split the exchange path between them the operation would never complete.
+void test_type_size_estimate()
+{
+    static_assert(
+        detail::pairwise_type_bytes<std::size_t>() == sizeof(std::size_t));
+    static_assert(detail::pairwise_type_bytes<std::vector<int>>() == 0);
+    static_assert(detail::pairwise_type_bytes<opaque_row>() == 0);
+
+    // the local measurement really does disagree between sites for the same
+    // type, which is exactly why it must not drive the automatic decision
+    std::vector<std::vector<int>> one_site(3);
+    one_site[0].resize(4096);
+
+    std::vector<std::vector<int>> const other_site(3);
+
+    HPX_TEST(detail::pairwise_payload_bytes(one_site) !=
+        detail::pairwise_payload_bytes(other_site));
+}
+
 void test_dispatch_decision()
 {
     constexpr auto threshold = pairwise_threshold_arg(4096);
@@ -297,6 +319,7 @@ void test_dispatch_decision()
 int hpx_main()
 {
     test_payload_size_estimate();
+    test_type_size_estimate();
     test_dispatch_decision();
 
     // A single site exchanges with itself and never touches the network.
