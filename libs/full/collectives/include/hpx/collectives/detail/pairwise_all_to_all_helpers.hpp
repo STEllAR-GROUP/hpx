@@ -24,7 +24,6 @@
 #include <hpx/errors/exception.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/async_combinators.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <algorithm>
 #include <cstddef>
