@@ -36,6 +36,16 @@ namespace hpx { namespace collectives {
     /// \param root_site    The site that is responsible for creating the
     ///                     all_to_all support object. This value is optional
     ///                     and defaults to '0' (zero).
+    /// \param threshold    The per-pair payload size, in bytes, at or above
+    ///                     which the rows are exchanged directly between the
+    ///                     participating sites instead of being routed through
+    ///                     one communicator site; see \a pairwise_threshold_arg
+    ///                     for the default and for what a value of zero
+    ///                     selects. The direct exchange additionally requires
+    ///                     at least three participating sites and an explicit
+    ///                     generation number, and a call that supplies neither
+    ///                     is routed whatever this value is. Which path runs
+    ///                     affects performance only, never the result.
     ///
     /// \returns    This function returns a future holding a vector with all
     ///             values send by all participating sites. It will become
@@ -47,7 +57,8 @@ namespace hpx { namespace collectives {
         num_sites_arg num_sites = num_sites_arg(),
         this_site_arg this_site = this_site_arg(),
         generation_arg generation = generation_arg(),
-        root_site_arg root_site = root_site_arg());
+        root_site_arg root_site = root_site_arg(),
+        pairwise_threshold_arg threshold = pairwise_threshold_arg());
 
     /// AllToAll a set of values from different call sites
     ///
@@ -131,6 +142,16 @@ namespace hpx { namespace collectives {
     /// \param root_site    The site that is responsible for creating the
     ///                     all_to_all support object. This value is optional
     ///                     and defaults to '0' (zero).
+    /// \param threshold    The per-pair payload size, in bytes, at or above
+    ///                     which the rows are exchanged directly between the
+    ///                     participating sites instead of being routed through
+    ///                     one communicator site; see \a pairwise_threshold_arg
+    ///                     for the default and for what a value of zero
+    ///                     selects. The direct exchange additionally requires
+    ///                     at least three participating sites and an explicit
+    ///                     generation number, and a call that supplies neither
+    ///                     is routed whatever this value is. Which path runs
+    ///                     affects performance only, never the result.
     ///
     /// \returns    This function returns a vector with all values send by all
     ///             participating sites. This function executes synchronously and
@@ -142,7 +163,8 @@ namespace hpx { namespace collectives {
         num_sites_arg num_sites = num_sites_arg(),
         this_site_arg this_site = this_site_arg(),
         generation_arg generation = generation_arg(),
-        root_site_arg root_site = root_site_arg());
+        root_site_arg root_site = root_site_arg(),
+        pairwise_threshold_arg threshold = pairwise_threshold_arg());
 
     /// AllToAll a set of values from different call sites
     ///
