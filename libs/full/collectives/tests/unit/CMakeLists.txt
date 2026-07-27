@@ -24,6 +24,7 @@ set(tests
     fold
     global_spmd_block
     hierarchical_helpers
+    pairwise_all_to_all
     reduce_direct
     remote_latch
     subtree_gather_scatter
