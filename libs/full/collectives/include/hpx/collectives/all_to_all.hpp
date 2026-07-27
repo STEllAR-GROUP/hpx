@@ -641,6 +641,20 @@ namespace hpx::collectives {
             root_site_arg const root_site,
             pairwise_threshold_arg const threshold)
         {
+            // Validation cannot depend on which path serves the call: the
+            // routed path rejects a zero generation inside detail::all_to_all,
+            // while the direct path would accept it as an exchange tag, since
+            // only a default generation reads as "unspecified" there. Reject it
+            // before the path is chosen, so a performance knob cannot move the
+            // boundary of what the operation accepts.
+            if (generation == 0)
+            {
+                return hpx::make_exceptional_future<std::vector<T>>(
+                    HPX_GET_EXCEPTION(hpx::error::bad_parameter,
+                        "hpx::collectives::all_to_all",
+                        "the generation number shouldn't be zero"));
+            }
+
             if (num_sites.is_default())
             {
                 num_sites =
