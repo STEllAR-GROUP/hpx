@@ -749,4 +749,50 @@ namespace hpx::supervision {
             std::nullopt,
         hpx::error_code& ec = hpx::throws);
 
+    /// \brief Outcome of an admission check performed before dispatching new
+    ///        work to a target.
+    ///
+    /// Unlike \c publish_result, which reports how a *publication* was
+    /// resolved, \c dispatch_outcome answers a *consumer-side* question:
+    /// is it safe to schedule/route work to this target right now?
+    HPX_CXX_EXPORT enum class dispatch_outcome : std::uint8_t {
+        /// The target has not latched a terminal event for the queried
+        /// epoch; dispatch may proceed.
+        admitted,
+        /// The target has already latched a terminal event (\c completed or
+        /// \c failed) for the queried epoch; dispatch was refused. This is
+        /// final, not a stale read: callers should not retry against this
+        /// target/epoch.
+        rejected_fenced,
+        // queued is intentionally not implemented in v1. Admitting it would
+        // require a pending-dispatch buffer together with a re-delivery
+        // mechanism triggered on epoch-bump release, which is new
+        // infrastructure not provided by this enum's initial version.
+    };
+
+    /// \brief Check whether \a target currently admits new dispatch under
+    ///        \a epoch.
+    ///
+    /// Queries the local supervision manager's terminal-latch state for
+    /// \a target within \a epoch, i.e. the same state maintained by
+    /// \a publish_event() and consulted by \a await_terminal(). Does not
+    /// publish, mutate state, or notify observers.
+    ///
+    /// \param target [in] The actor (or component) to check. Must be local
+    ///               to the calling locality.
+    /// \param epoch  [in] The epoch dispatch would occur under.
+    ///
+    /// \returns      \c dispatch_outcome::rejected_fenced if \a target has
+    ///               already latched a terminal event (\c completed or
+    ///               \c failed) under \a epoch, \c dispatch_outcome::admitted
+    ///               otherwise (including when \a target is unknown locally or
+    ///               invalid).
+    ///
+    /// \note         This is a pure local read of already-resident latch
+    ///               state, not a query that can fail the way a remote
+    ///               \a publish_event() call can; it never throws and
+    ///               carries no \a hpx::error_code out-parameter.
+    HPX_CXX_EXPORT HPX_EXPORT dispatch_outcome check_admission(
+        hpx::id_type const& target, std::uint64_t epoch = 0) noexcept;
+
 }    // namespace hpx::supervision

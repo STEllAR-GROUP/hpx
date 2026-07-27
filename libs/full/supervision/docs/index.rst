@@ -95,5 +95,22 @@ Waiting for terminal events
     supervision manager lives on the calling locality, and remotely (via a
     registered distributed action) otherwise.
 
+Checking dispatch admission
+-----------------------------
+
+.. cpp:function:: hpx::supervision::dispatch_outcome hpx::supervision::check_admission(hpx::id_type const& target, std::uint64_t epoch = 0)
+
+    Check whether ``target`` currently admits new dispatch under ``epoch``,
+    i.e. whether it is safe to schedule or route work to it right now. This
+    is a pure, ``noexcept`` local read of the same terminal latch state
+    consulted by ``await_terminal``: it returns
+    ``dispatch_outcome::rejected_fenced`` if ``target`` has already latched a
+    terminal event (``event::completed`` or ``event::failed``) under
+    ``epoch``, and ``dispatch_outcome::admitted`` otherwise. Unlike
+    ``publish_result``, which reports how a publication was resolved,
+    ``dispatch_outcome`` answers the separate, consumer-side question of
+    whether dispatch should proceed; it must only be called on the locality
+    ``target`` lives on.
+
 See the :ref:`API reference <modules_supervision_api>` of this module for
 more details.

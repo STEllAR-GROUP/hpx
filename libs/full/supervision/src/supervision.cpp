@@ -565,6 +565,20 @@ namespace hpx::supervision {
             timeout.value_or((std::chrono::steady_clock::duration::max) ()),
             ec);
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    dispatch_outcome check_admission(
+        hpx::id_type const& target, std::uint64_t const epoch) noexcept
+    {
+        if (!target)
+        {
+            // nothing is latched against an invalid target
+            return dispatch_outcome::admitted;
+        }
+
+        return get_supervision_manager().check_admission(target, epoch);
+    }
+
 }    // namespace hpx::supervision
 
 #include <hpx/config/warnings_suffix.hpp>

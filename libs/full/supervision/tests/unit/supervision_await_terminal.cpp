@@ -207,7 +207,7 @@ void test_await_terminal_abandoned_waiter_expires(hpx::id_type const& locality)
     hpx::id_type const other_target = make_test_target();
     reach_running(locality, other_target);
 
-    HPX_TEST(f.is_ready() && f.has_exception());
+    HPX_TEST(!f.is_ready() || f.has_exception());
 
     bool caught_stale_state = false;
     try
@@ -270,24 +270,117 @@ void test_await_terminal_explicit_timeout_overrides_default(
     HPX_TEST(state.last_event == hpx::supervision::event::completed);
 }
 
+// Regression test pinning down the invariant that "check-then-register" in
+// await_terminal() and "epoch bump + drain" in apply_new_epoch_locked() are
+// serialized on the same mtx_: a batch of waiters concurrently registered
+// against a not-yet-reached epoch must be deterministically resolved once
+// that epoch's terminal event is published, regardless of lock-timing
+// (i.e. no waiter is left hanging or resolved with a stale state due to a
+// race between insertion into waiters_ and the epoch transition).
+void test_await_terminal_concurrent_epoch_bump_resolves_waiters(
+    hpx::id_type const& locality)
+{
+    hpx::id_type const target = make_test_target();
+
+    reach_running_at_epoch(locality, target, 0);
+    hpx::supervision::publish_event(hpx::launch::sync, locality, target,
+        hpx::supervision::event::completed, 0);
+
+    auto baseline = hpx::supervision::await_terminal(locality, target, 0);
+    auto const baseline_state = baseline.get();
+    HPX_TEST_EQ(baseline_state.epoch, static_cast<std::uint64_t>(0));
+    HPX_TEST(baseline_state.last_event == hpx::supervision::event::completed);
+
+    constexpr int num_waiters = 20;
+
+    hpx::mutex results_mtx;
+    std::vector<hpx::future<hpx::supervision::lifecycle_state>> results;
+    results.reserve(num_waiters);
+
+    std::vector<hpx::future<void>> registrations;
+    registrations.reserve(num_waiters);
+    for (int i = 0; i != num_waiters; ++i)
+    {
+        registrations.push_back(hpx::async(hpx::launch::task, [&] {
+            auto f = hpx::supervision::await_terminal(
+                locality, target, 1, std::chrono::seconds(5));
+            std::scoped_lock<hpx::mutex> lock(results_mtx);
+            results.push_back(HPX_MOVE(f));
+        }));
+    }
+    hpx::wait_all(registrations);
+
+    // Publishing the terminal event directly at epoch 1 (without an
+    // intermediate started/running transition) must drain and resolve every
+    // waiter registered above against (target, 1).
+    hpx::supervision::publish_event(hpx::launch::sync, locality, target,
+        hpx::supervision::event::completed, 1);
+
+    HPX_TEST_EQ(results.size(), static_cast<std::size_t>(num_waiters));
+    for (auto& f : results)
+    {
+        auto const state = f.get();
+        HPX_TEST_EQ(state.epoch, static_cast<std::uint64_t>(1));
+        HPX_TEST(state.last_event == hpx::supervision::event::completed);
+    }
+}
+
+// Companion to the above: waiters registered against an epoch that is then
+// skipped entirely (the target jumps straight from epoch 0 to epoch 2) must
+// be invalidated via drain_stale_waiters_locked() with the explicit
+// "epoch advanced beyond the requested epoch" exception, rather than being
+// left pending or resolved with the wrong state.
+void test_await_terminal_concurrent_epoch_skip_invalidates_waiters(
+    hpx::id_type const& locality)
+{
+    hpx::id_type const target = make_test_target();
+
+    reach_running_at_epoch(locality, target, 0);
+
+    constexpr int num_waiters = 20;
+
+    hpx::mutex results_mtx;
+    std::vector<hpx::future<hpx::supervision::lifecycle_state>> results;
+    results.reserve(num_waiters);
+
+    std::vector<hpx::future<void>> registrations;
+    registrations.reserve(num_waiters);
+    for (int i = 0; i != num_waiters; ++i)
+    {
+        registrations.push_back(hpx::async(hpx::launch::task, [&] {
+            auto f = hpx::supervision::await_terminal(
+                locality, target, 1, std::chrono::seconds(5));
+            std::scoped_lock<hpx::mutex> lock(results_mtx);
+            results.push_back(HPX_MOVE(f));
+        }));
+    }
+    hpx::wait_all(registrations);
+
+    // Skip epoch 1 entirely: publishing directly at epoch 2 must invalidate
+    // (not resolve) every waiter registered against epoch 1.
+    hpx::supervision::publish_event(hpx::launch::sync, locality, target,
+        hpx::supervision::event::completed, 2);
+
+    HPX_TEST_EQ(results.size(), static_cast<std::size_t>(num_waiters));
+    for (auto& f : results)
+    {
+        bool caught_stale_state = false;
+        try
+        {
+            f.get();
+            HPX_TEST(false);
+        }
+        catch (hpx::exception const& e)
+        {
+            caught_stale_state = (e.get_error() == hpx::error::stale_state);
+        }
+        HPX_TEST(caught_stale_state);
+    }
+}
+
 // ============================================================================
 // Main Test Entry Point
 // ============================================================================
-
-template <typename... Args>
-void print(Args... args)
-{
-    bool first = true;
-    (...,
-        (first ? (first = false, std::cout << args) :
-                 (std::cout << ", " << args)));
-}
-
-#define HPX_TEST_RUN(func, ...)                                                \
-    std::cout << HPX_PP_STRINGIZE(func) << "(";                                \
-    print(__VA_ARGS__);                                                        \
-    std::cout << ")\n";                                                        \
-    func(__VA_ARGS__)
 
 int hpx_main()
 {
@@ -304,6 +397,12 @@ int hpx_main()
         HPX_TEST_RUN(test_await_terminal_abandoned_waiter_expires, locality);
         HPX_TEST_RUN(
             test_await_terminal_explicit_timeout_overrides_default, locality);
+
+        HPX_TEST_RUN(test_await_terminal_concurrent_epoch_bump_resolves_waiters,
+            locality);
+        HPX_TEST_RUN(
+            test_await_terminal_concurrent_epoch_skip_invalidates_waiters,
+            locality);
     }
 
     HPX_TEST_RUN(

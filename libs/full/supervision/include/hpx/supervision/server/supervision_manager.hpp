@@ -173,6 +173,14 @@ namespace hpx::supervision::server {
         {
         };
 
+        // Pure local read of the terminal latch state maintained for
+        // `target`; see hpx::supervision::check_admission() for the exact
+        // semantics. Not exposed as an action: unlike publish_event()/
+        // query_state(), this is only ever meant to be called on the
+        // locality `target` lives on.
+        dispatch_outcome check_admission(
+            hpx::id_type const& target, std::uint64_t epoch = 0) const noexcept;
+
     protected:
         hpx::future<void> fire_events(hpx::id_type const& target,
             lifecycle_event_notification const& notification);

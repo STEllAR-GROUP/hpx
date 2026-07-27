@@ -46,6 +46,9 @@ namespace hpx::supervision {
                 (std::chrono::steady_clock::duration::max) (),
             hpx::error_code& ec = throws) const;
 
+        dispatch_outcome check_admission(
+            hpx::id_type const& target, std::uint64_t epoch = 0) const noexcept;
+
         // Helper functions
         void register_server_instance(error_code& ec = throws) const;
         void unregister_server_instance(error_code& ec = throws) const;

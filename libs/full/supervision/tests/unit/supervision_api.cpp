@@ -1713,21 +1713,6 @@ void test_publication_throughput()
 // Main Test Entry Point
 // ============================================================================
 
-template <typename... Args>
-void print(Args... args)
-{
-    bool first = true;
-    (...,
-        (first ? (first = false, std::cout << args) :
-                 (std::cout << ", " << args)));
-}
-
-#define HPX_TEST_RUN(func, ...)                                                \
-    std::cout << HPX_PP_STRINGIZE(func) << "(";                                \
-    print(__VA_ARGS__);                                                        \
-    std::cout << ")\n";                                                        \
-    func(__VA_ARGS__)
-
 int hpx_main()
 {
     for (auto const& locality : hpx::find_all_localities())

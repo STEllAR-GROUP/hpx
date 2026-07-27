@@ -145,8 +145,14 @@ namespace hpx {
                              ///< preceding notification has not yet been
                              ///< delivered
 
+        target_fenced = 58,    ///< A dispatch was deliberately and correctly
+                               ///< refused because the target had already
+                               ///< latched a terminal lifecycle event; this
+                               ///< is a final rejection, not a staleness
+                               ///< signal, and should not be retried
+
         /// \cond NOINTERNAL
-        last_error = 58,
+        last_error = 59,
 
         system_error_flag = 0x4000L,
 

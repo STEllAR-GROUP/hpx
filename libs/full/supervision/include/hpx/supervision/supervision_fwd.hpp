@@ -60,4 +60,6 @@ namespace hpx::supervision {
     HPX_CXX_EXPORT using lifecycle_callback =
         std::function<bool(lifecycle_event_notification const&)>;
 
+    HPX_CXX_EXPORT enum class dispatch_outcome : std::uint8_t;
+
 }    // namespace hpx::supervision

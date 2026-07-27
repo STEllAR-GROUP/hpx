@@ -1017,6 +1017,18 @@ namespace hpx::supervision::server {
         return f;
     }
 
+    dispatch_outcome supervision_manager::check_admission(
+        hpx::id_type const& target, std::uint64_t const epoch) const noexcept
+    {
+        std::scoped_lock<hpx::spinlock> l(mtx_);
+        if (auto const it = states_.find(target); it != states_.end() &&
+            it->second.epoch == epoch && is_terminal(it->second.last_event))
+        {
+            return dispatch_outcome::rejected_fenced;
+        }
+        return dispatch_outcome::admitted;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     void supervision_manager::register_server_instance(
         char const* service_name, std::uint32_t locality_id, error_code& ec)

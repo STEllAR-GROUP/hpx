@@ -260,7 +260,7 @@ namespace hpx::util {
     {
         if (timer_ != nullptr)
             return timer_->is_terminated();
-        return true;
+        return false;
     }
 
     bool pool_timer::is_valid() const

@@ -4,10 +4,13 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests supervision_api supervision_await_terminal)
+set(tests supervision_api supervision_await_terminal
+          supervision_check_admission
+)
 
 set(supervision_api_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 4)
 set(supervision_await_terminal_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 4)
+set(supervision_check_admission_PARAMETERS THREADS_PER_LOCALITY 4)
 
 foreach(test ${tests})
   set(sources ${test}.cpp)

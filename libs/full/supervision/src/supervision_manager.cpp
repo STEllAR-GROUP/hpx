@@ -144,6 +144,17 @@ namespace hpx::supervision {
         return result;
     }
 
+    dispatch_outcome supervision_manager::check_admission(
+        hpx::id_type const& target, std::uint64_t const epoch) const noexcept
+    {
+        if (!server_)
+        {
+            return dispatch_outcome::admitted;
+        }
+
+        return server_->check_admission(target, epoch);
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     naming::gid_type supervision_manager::get_service_instance(
         std::uint32_t const service_locality_id)
