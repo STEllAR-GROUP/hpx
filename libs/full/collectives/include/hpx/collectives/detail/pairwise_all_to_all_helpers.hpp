@@ -33,6 +33,14 @@
 
 namespace hpx::collectives::detail {
 
+    // The entities carrying HPX_CXX_EXPORT below are exactly the ones the
+    // pairwise_all_to_all and pairwise_all_to_all_dispatch unit tests name
+    // directly. With C++20 modules enabled those tests reach this header
+    // through `import HPX.Full;` (via the generated hpx/modules/collectives.hpp
+    // umbrella), so anything an importer names must be module-exported. The
+    // pairwise_row_bytes specializations are only ever reached from within the
+    // module purview, where reachability is enough, and stay unexported.
+
     ///////////////////////////////////////////////////////////////////////////
     // pairwise_payload_bytes
     //
@@ -85,7 +93,7 @@ namespace hpx::collectives::detail {
         }
     };
 
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     std::size_t pairwise_payload_bytes(std::vector<T> const& rows) noexcept
     {
         return pairwise_row_bytes<T>::call(rows);
@@ -109,7 +117,7 @@ namespace hpx::collectives::detail {
     // select the direct path deliberately, by passing a threshold of 0 at
     // every site.
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
+    HPX_CXX_EXPORT template <typename T>
     constexpr std::size_t pairwise_type_bytes() noexcept
     {
         if constexpr (std::is_trivially_copyable_v<T>)
@@ -134,7 +142,7 @@ namespace hpx::collectives::detail {
     // identically, and the same threshold at every site; see
     // pairwise_type_bytes for why.
     ///////////////////////////////////////////////////////////////////////////
-    inline bool exchange_pairwise(std::size_t const num_sites,
+    HPX_CXX_EXPORT inline bool exchange_pairwise(std::size_t const num_sites,
         std::size_t const bytes_per_pair,
         pairwise_threshold_arg const threshold) noexcept
     {
