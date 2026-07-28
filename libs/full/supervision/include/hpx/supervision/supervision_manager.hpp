@@ -40,11 +40,38 @@ namespace hpx::supervision {
         void unregister_observer(hpx::id_type const& observer_handle,
             hpx::error_code& ec = throws) const;
 
+        // Register an agent to be notified of activation/deactivation
+        // transitions across all targets tracked by this locality's supervision
+        // manager. Unlike register_observer(), this is deliberately
+        // locality-scoped rather than target-scoped: it takes no `target`
+        // parameter by design. Registration will replay an `already_active`
+        // notification for every currently-tracked active target. That replay
+        // must appear to happen atomically with subscription, i.e. under the
+        // same lock that guards the tracked-target set, so that no transition
+        // is missed or duplicated across the replay/subscribe boundary. No such
+        // replay is implemented yet; this declaration only reserves the
+        // interface.
+        hpx::id_type register_activity_observer(hpx::id_type const& agent,
+            std::uint64_t epoch_filter = static_cast<std::uint64_t>(-1),
+            hpx::error_code& ec = throws) const;
+
+        // Unregister a handle previously returned by
+        // register_activity_observer(). As with unregister_observer(), no
+        // orphaned callbacks fire after this call completes. `handle` must have
+        // been obtained from register_activity_observer(), not from
+        // register_observer(); passing a handle from the latter is rejected
+        // (rejection logic added in a later substep).
+        void unregister_activity_observer(hpx::id_type const& observer_handle,
+            hpx::error_code& ec = throws) const;
+
         hpx::future<lifecycle_state> await_terminal(hpx::id_type const& target,
             std::uint64_t epoch = 0,
             std::chrono::steady_clock::duration timeout =
                 (std::chrono::steady_clock::duration::max) (),
             hpx::error_code& ec = throws) const;
+
+        dispatch_outcome check_admission(
+            hpx::id_type const& target, std::uint64_t epoch = 0) const noexcept;
 
         // Helper functions
         void register_server_instance(error_code& ec = throws) const;

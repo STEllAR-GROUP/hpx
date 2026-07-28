@@ -15,12 +15,15 @@ set(supervision_headers
     hpx/supervision/supervision_manager.hpp
     hpx/supervision/supervision_api.hpp
     hpx/supervision/supervision_fwd.hpp
+    hpx/supervision/server/activity_agent.hpp
     hpx/supervision/server/agent.hpp
     hpx/supervision/server/supervision_manager.hpp
 )
 
-set(supervision_sources supervision.cpp server/supervision_manager_server.cpp
-                        server/agent_server.cpp supervision_manager.cpp
+set(supervision_sources
+    supervision.cpp server/supervision_manager_server.cpp
+    server/activity_agent_server.cpp server/agent_server.cpp
+    supervision_manager.cpp
 )
 
 include(HPX_AddModule)
