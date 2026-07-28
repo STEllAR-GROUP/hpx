@@ -34,8 +34,4 @@ HPX_REGISTER_COMPONENT(
     supervision_registry_component, hpx::components::factory_state::enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(supervision_registry_component)
 
-///////////////////////////////////////////////////////////////////////////////
-HPX_REGISTER_ACTION(hpx::supervision::server::sentinel::start_action,
-    supervision_dispatch_sentinel_start_action)
-
 #include <hpx/config/warnings_suffix.hpp>

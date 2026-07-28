@@ -21,8 +21,8 @@
 namespace hpx::supervision {
 
     sentinel::sentinel(hpx::id_type const& target_locality)
-      : base_type(hpx::new_<server::sentinel>(target_locality))
-      , target_locality_(target_locality)
+      : base_type(hpx::new_<server::sentinel>(
+            target_locality ? target_locality : hpx::find_here()))
     {
     }
 
@@ -34,26 +34,14 @@ namespace hpx::supervision {
     hpx::future<hpx::supervision::publish_result> sentinel::start(
         std::uint64_t const epoch) const
     {
-        //using action_type = hpx::supervision::server::sentinel::start_action;
-        //return async(action_type(), this->get_id(), epoch);
-        hpx::id_type const& target = this->get_id();
-        hpx::id_type const locality = target_locality_ ?
-            target_locality_ :
-            hpx::get_colocation_id(hpx::launch::sync, target);
-        return hpx::supervision::publish_event(
-            locality, target, event::started, epoch);
+        using action_type = hpx::supervision::server::sentinel::start_action;
+        return async(action_type(), this->get_id(), epoch);
     }
 
     publish_result sentinel::start(hpx::launch::sync_policy,
         std::uint64_t const epoch, hpx::error_code& ec) const
     {
-        //return start(epoch).get(ec);
-        hpx::id_type const& target = this->get_id();
-        hpx::id_type const locality = target_locality_ ?
-            target_locality_ :
-            hpx::get_colocation_id(hpx::launch::sync, target);
-        return hpx::supervision::publish_event(
-            hpx::launch::sync, locality, target, event::started, epoch, ec);
+        return start(epoch).get(ec);
     }
 }    // namespace hpx::supervision
 

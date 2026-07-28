@@ -36,7 +36,8 @@ namespace hpx::supervision {
             hpx::components::client_base<sentinel, server::sentinel>;
 
     public:
-        explicit sentinel(hpx::id_type const& target_locality);
+        explicit sentinel(
+            hpx::id_type const& target_locality = hpx::invalid_id);
         /* implicit */ sentinel(hpx::future<hpx::id_type>&& f);
 
         // Publish the `started` lifecycle event (at the given epoch) for
@@ -45,9 +46,6 @@ namespace hpx::supervision {
         hpx::future<publish_result> start(std::uint64_t epoch = 0) const;
         publish_result start(hpx::launch::sync_policy, std::uint64_t epoch = 0,
             hpx::error_code& ec = hpx::throws) const;
-
-    private:
-        hpx::id_type target_locality_;
     };
 }    // namespace hpx::supervision
 
