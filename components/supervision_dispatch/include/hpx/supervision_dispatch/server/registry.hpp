@@ -26,6 +26,17 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::supervision::server {
 
+    namespace detail {
+
+        // Testing infrastructure support: returns the shadow target most
+        // recently minted by join(), regardless of whether the
+        // register_observers() call that followed it went on to succeed or
+        // fail. Lets tests verify that a failed join() does not leak the
+        // shadow's locally tracked supervision state (see
+        // registry::register_observers()'s catch block).
+        HPX_SUPERVISION_DISPATCH_EXPORT hpx::id_type last_join_shadow();
+    }    // namespace detail
+
     ///////////////////////////////////////////////////////////////////////////
     class HPX_SUPERVISION_DISPATCH_EXPORT registry
       : public hpx::components::component_base<registry>
@@ -50,6 +61,20 @@ namespace hpx::supervision::server {
             hpx::id_type const& peer_sentinel);
         std::pair<hpx::id_type, hpx::id_type> register_observers(
             hpx::id_type const& peer_sentinel,
+            hpx::id_type const& peer_locality, hpx::id_type const& shadow);
+
+        // Evicts a peer that has reached a terminal lifecycle event: erases its
+        // entry from peers_, unregisters its lifecycle_observer and
+        // activity_observer on peer_locality, and removes the shadow's local
+        // state. Called via hpx::post() from the (lock-free) lifecycle observer
+        // callback installed in register_observers(), so that the mtx_
+        // acquisition needed to safely mutate peers_ happens on a separate task
+        // rather than inline in that callback (see the comment on
+        // register_observers() for why the callback itself must not take mtx_).
+        // `shadow` identifies which entry to evict: if peer_sentinel has since
+        // been re-joined (fresh shadow) or already evicted by a racing terminal
+        // notification, this is a no-op.
+        void evict_peer(hpx::id_type const& peer_sentinel,
             hpx::id_type const& peer_locality, hpx::id_type const& shadow);
 
     private:

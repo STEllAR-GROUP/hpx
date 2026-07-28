@@ -823,14 +823,7 @@ namespace hpx::supervision::server {
                 std::unique_lock<hpx::spinlock> l(mtx_);
 
                 deactivated = unregister_observer_target(target, agent);
-                if (auto const it = agents_.find(agent); it != agents_.end())
-                {
-                    std::erase(it->second, target);
-                    if (it->second.empty())
-                    {
-                        agents_.erase(it);
-                    }
-                }
+                remove_target_from_agents_locked(l, agent, target);
 
                 // Only truly untracked (per the has-ever-published/
                 // has-observers predicate used by
@@ -1174,6 +1167,98 @@ namespace hpx::supervision::server {
         // prevent the agent callback from being run inline as it may block
         using action_type = agent_component::deactivate_and_wait_action;
         hpx::async(hpx::launch::task, action_type(), observer_handle).get();
+    }
+
+    // Internal helper for remove_target_from_agents_locked(): removes the
+    // given target from the agents_ map, if present.
+    void supervision_manager::remove_target_from_agents_locked(
+        std::unique_lock<hpx::spinlock>& l, hpx::id_type const& agent,
+        hpx::id_type const& target)
+    {
+        HPX_ASSERT_OWNS_LOCK(l);
+
+        if (auto const it = agents_.find(agent); it != agents_.end())
+        {
+            std::erase(it->second, target);
+            if (it->second.empty())
+            {
+                agents_.erase(it);
+            }
+        }
+    }
+
+    // Clears all locally tracked state for `target`: its recorded lifecycle
+    // state and current epoch (states_/current_epoch_), any per-target
+    // observers still registered for it (observers_, along with their
+    // corresponding entries in the agents_ inverse lookup), and its
+    // activated_at_ entry. Unlike unregister_observer_target(), which removes
+    // a single observer_handle's entry for a target and leaves its recorded
+    // lifecycle state intact, this forgets every bit of local state
+    // associated with target, regardless of any specific observer handle.
+    void supervision_manager::remove_target(hpx::id_type const& target)
+    {
+        // Targets are considered tracked (see register_activity_observer()'s
+        // replay logic) if they have a recorded lifecycle state or at least one
+        // registered observer; captured before either map is mutated below to
+        // decide whether a deactivation notification is warranted.
+        bool was_tracked;
+
+        // The epoch target was in immediately before its state was removed,
+        // captured before current_epoch_ is erased below, for use in the
+        // activity_transition::last_observer_unregistered notification fired
+        // once mtx_ has been released (mirrors unregister_observer()).
+        std::uint64_t epoch_at_removal = 0;
+
+        // Snapshot of activity_observers_ taken in the very same mtx_ critical
+        // section as the states_/observers_/activated_at_ mutations below; see
+        // the matching comment in publish_event() for why this must not instead
+        // be taken later, after mtx_ has already been released.
+        std::vector<observer_entry> activity_observers_snapshot;
+
+        {
+            std::unique_lock<hpx::spinlock> l(mtx_);
+
+            auto const it = observers_.find(target);
+            was_tracked = states_.contains(target) || it != observers_.end();
+
+            if (auto const it2 = current_epoch_.find(target);
+                it2 != current_epoch_.end())
+            {
+                epoch_at_removal = it2->second;
+            }
+
+            if (it != observers_.end())
+            {
+                for (auto const& [agent, _] : it->second)
+                {
+                    // remove target from agents
+                    remove_target_from_agents_locked(l, agent, target);
+                }
+                observers_.erase(it);
+            }
+
+            states_.erase(target);
+            current_epoch_.erase(target);
+            activated_at_.erase(target);
+
+            if (was_tracked)
+            {
+                activity_observers_snapshot = activity_observers_;
+            }
+        }
+
+        if (was_tracked)
+        {
+            activity_notification const activity_notification{.actor = target,
+                .state = activity_state::inactive,
+                .transition = activity_transition::last_observer_unregistered,
+                .event_time = std::chrono::steady_clock::now(),
+                .epoch = epoch_at_removal};
+
+            deliver_activity_notification(
+                activity_notification, activity_observers_snapshot)
+                .get();
+        }
     }
 
     hpx::future<void> supervision_manager::deliver_activity_notification(

@@ -76,6 +76,23 @@ Unregistering observers
     ``register_activity_observer``, or any handle never returned by either
     registration function, is rejected.
 
+Removing target state
+---------------------
+
+.. cpp:function:: hpx::future<void> hpx::supervision::remove_target(hpx::id_type const& locality, hpx::id_type const& target)
+.. cpp:function:: void hpx::supervision::remove_target(hpx::launch::sync_policy, hpx::id_type const& locality, hpx::id_type const& target, hpx::error_code& ec = hpx::throws)
+.. cpp:function:: void hpx::supervision::remove_target(hpx::id_type const& target, hpx::error_code& ec = hpx::throws)
+
+    Clear all locally tracked state for ``target``. Unlike
+    ``unregister_observer``, which removes a single previously registered
+    observer handle, ``remove_target`` unconditionally forgets every piece of
+    local state held for ``target`` - its recorded lifecycle state and
+    current epoch, and any observers still registered for it - regardless of
+    any specific observer handle. Intended for callers that know ``target``
+    will never be queried or observed again locally (e.g. after a failed
+    registration that seeded some state for it, or once a peer has been
+    evicted), so that local state does not accumulate indefinitely.
+
 Waiting for terminal events
 ---------------------------
 

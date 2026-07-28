@@ -140,6 +140,29 @@ namespace hpx::supervision::server {
         {
         };
 
+        /// \brief Clears all locally tracked state for `target`.
+        ///
+        /// Unlike unregister_observer(), which removes a single previously
+        /// registered observer handle (and leaves any recorded lifecycle state
+        /// for its target(s) intact), remove_target() unconditionally forgets
+        /// every piece of local bookkeeping this supervision manager holds for
+        /// `target` - its recorded lifecycle state and current epoch (see
+        /// publish_event()), and any per-target observers still registered for
+        /// it (see register_observer()) - regardless of any specific observer
+        /// handle. Intended for callers that know `target` will never be
+        /// queried or observed again locally (e.g. after a failed registration
+        /// that seeded some state for it, or once a peer has been evicted) and
+        /// want to reclaim that local state instead of letting it accumulate
+        /// indefinitely.
+        void remove_target(hpx::id_type const& target);
+
+        struct remove_target_action
+          : hpx::actions::make_action_t<
+                decltype(&supervision_manager::remove_target),
+                &supervision_manager::remove_target, remove_target_action>
+        {
+        };
+
         /// \brief Registers a locality-scoped activity observer.
         ///
         /// Replays targets that are already active when registration takes its
@@ -379,6 +402,12 @@ namespace hpx::supervision::server {
         void recompute_earliest_deadline_locked(
             std::unique_lock<hpx::spinlock>& l);
 
+        // Internal helper for remove_target_from_agents_locked(): removes the
+        // given target from the agents_ map, if present.
+        void remove_target_from_agents_locked(
+            std::unique_lock<hpx::spinlock>& l, hpx::id_type const& agent,
+            hpx::id_type const& target);
+
     private:
         mutable hpx::spinlock mtx_;
         std::string instance_name_;
@@ -505,3 +534,6 @@ HPX_REGISTER_ACTION_DECLARATION(
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::supervision::server::supervision_manager::await_terminal_action,
     supervision_await_terminal_action)
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::supervision::server::supervision_manager::remove_target_action,
+    supervision_remove_target_action)
