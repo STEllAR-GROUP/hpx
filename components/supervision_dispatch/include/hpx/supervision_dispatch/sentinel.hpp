@@ -15,9 +15,7 @@
 
 #include <hpx/supervision_dispatch/server/sentinel.hpp>
 
-#include <cstddef>
 #include <cstdint>
-#include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -46,6 +44,30 @@ namespace hpx::supervision {
         hpx::future<publish_result> start(std::uint64_t epoch = 0) const;
         publish_result start(hpx::launch::sync_policy, std::uint64_t epoch = 0,
             hpx::error_code& ec = hpx::throws) const;
+
+        // Register this sentinel's id with AGAS under a name pinned to the
+        // locality that actually hosts its underlying server component (derived
+        // from the component's own id via
+        // hpx::naming::get_locality_id_from_id(), not the ambient
+        // hpx::get_locality_id() of the caller), so that discovery of this
+        // sentinel is unaffected by failures on any locality other than the one
+        // it actually lives on. May only be called once per sentinel instance,
+        // mirroring the call-once contract of the underlying
+        // client_base::register_as().
+        hpx::future<bool> register_basename();
+        bool register_basename(
+            hpx::launch::sync_policy, hpx::error_code& ec = hpx::throws);
+
+        // Remove this sentinel's AGAS name registration again, using the name
+        // most recently established by register_basename() (retrieved via
+        // registered_name(), the single source of truth client_base already
+        // maintains for it). Calling this explicitly is safe even though
+        // destroying this sentinel also unregisters its name automatically
+        // (client_base::register_as()'s default manage_lifetime=true): the
+        // redundant unregister attempt on destruction is a silent no-op.
+        hpx::future<hpx::id_type> unregister_basename() const;
+        hpx::id_type unregister_basename(
+            hpx::launch::sync_policy, hpx::error_code& ec = hpx::throws) const;
     };
 }    // namespace hpx::supervision
 

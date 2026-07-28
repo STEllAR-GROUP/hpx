@@ -16,9 +16,6 @@
 #include <hpx/supervision_dispatch/sentinel.hpp>
 #include <hpx/supervision_dispatch/server/registry.hpp>
 
-#include <cstddef>
-#include <vector>
-
 #include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx::supervision {
@@ -44,6 +41,30 @@ namespace hpx::supervision {
         hpx::id_type join(hpx::launch::sync_policy,
             sentinel const& peer_sentinel, hpx::id_type const& peer_locality,
             hpx::error_code& ec = hpx::throws) const;
+
+        // Register this registry's id with AGAS under a name pinned to the
+        // locality that actually hosts its underlying server component (derived
+        // from the component's own id via
+        // hpx::naming::get_locality_id_from_id(), not the ambient
+        // hpx::get_locality_id() of the caller), so that discovery of this
+        // registry is unaffected by failures on any locality other than the one
+        // it actually lives on. May only be called once per registry instance,
+        // mirroring the call-once contract of the underlying
+        // client_base::register_as().
+        hpx::future<bool> register_basename();
+        bool register_basename(
+            hpx::launch::sync_policy, hpx::error_code& ec = hpx::throws);
+
+        // Remove this registry's AGAS name registration again, using the name
+        // most recently established by register_basename() (retrieved via
+        // registered_name(), the single source of truth client_base already
+        // maintains for it). Calling this explicitly is safe even though
+        // destroying this registry also unregisters its name automatically
+        // (client_base::register_as()'s default manage_lifetime=true): the
+        // redundant unregister attempt on destruction is a silent no-op.
+        hpx::future<hpx::id_type> unregister_basename() const;
+        hpx::id_type unregister_basename(
+            hpx::launch::sync_policy, hpx::error_code& ec = hpx::throws) const;
     };
 }    // namespace hpx::supervision
 

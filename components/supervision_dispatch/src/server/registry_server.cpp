@@ -96,9 +96,11 @@ namespace hpx::supervision::server {
             // the local shadow (see below).
             lifecycle_observer = hpx::supervision::register_observer(
                 hpx::launch::sync, peer_locality, peer_sentinel,
-                [shadow, peer_sentinel, peer_locality, this](
+                [shadow, peer_sentinel, peer_locality, this,
+                    keep_alive = get_id()](
                     hpx::supervision::lifecycle_event_notification const&
                         notification) {
+                    HPX_UNUSED(keep_alive);
                     if (hpx::supervision::is_terminal(notification.event))
                     {
                         // `event::completed` is only reachable from `running`
@@ -150,26 +152,31 @@ namespace hpx::supervision::server {
         }
         catch (...)
         {
+            std::exception_ptr const original = std::current_exception();
+
             // The activity-observer registration failed after the lifecycle
             // observer was registered successfully; unregister both again so
             // neither is leaked on the peer's locality.
             if (lifecycle_observer)
             {
+                hpx::error_code ec(hpx::throwmode::lightweight);
                 hpx::supervision::unregister_observer(
-                    hpx::launch::sync, peer_locality, lifecycle_observer);
+                    hpx::launch::sync, peer_locality, lifecycle_observer, ec);
             }
             if (activity_observer)
             {
+                hpx::error_code ec(hpx::throwmode::lightweight);
                 hpx::supervision::unregister_activity_observer(
-                    hpx::launch::sync, peer_locality, activity_observer);
+                    hpx::launch::sync, peer_locality, activity_observer, ec);
             }
 
             // Remove the `started` seed published on `shadow` by join() before
             // this call, so a failed registration does not leave orphaned local
             // shadow state behind.
-            hpx::supervision::remove_target(shadow, hpx::throws);
+            hpx::error_code ec(hpx::throwmode::lightweight);
+            hpx::supervision::remove_target(shadow, ec);
 
-            std::rethrow_exception(std::current_exception());
+            std::rethrow_exception(original);
         }
 
         return std::make_pair(lifecycle_observer, activity_observer);

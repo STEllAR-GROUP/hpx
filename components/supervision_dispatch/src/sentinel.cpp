@@ -6,6 +6,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/async_distributed.hpp>
+#include <hpx/modules/components_base.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/runtime_components.hpp>
 #include <hpx/modules/runtime_distributed.hpp>
 
@@ -14,6 +16,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <string>
 #include <utility>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -42,6 +45,32 @@ namespace hpx::supervision {
         std::uint64_t const epoch, hpx::error_code& ec) const
     {
         return start(epoch).get(ec);
+    }
+
+    hpx::future<bool> sentinel::register_basename()
+    {
+        std::uint32_t const locality_id =
+            hpx::naming::get_locality_id_from_id(this->get_id());
+        std::string name = "/" + std::to_string(locality_id) +
+            "/supervision_dispatch/sentinel";
+        return this->register_as(HPX_MOVE(name));
+    }
+
+    bool sentinel::register_basename(
+        hpx::launch::sync_policy, hpx::error_code& ec)
+    {
+        return register_basename().get(ec);
+    }
+
+    hpx::future<hpx::id_type> sentinel::unregister_basename() const
+    {
+        return hpx::agas::unregister_name(this->registered_name());
+    }
+
+    hpx::id_type sentinel::unregister_basename(
+        hpx::launch::sync_policy, hpx::error_code& ec) const
+    {
+        return unregister_basename().get(ec);
     }
 }    // namespace hpx::supervision
 
