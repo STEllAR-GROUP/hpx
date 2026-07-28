@@ -117,19 +117,19 @@ int hpx_main(hpx::program_options::variables_map& vm)
     results.push_back(
         measure("baseline: ready_future.get()", [](std::uint64_t i) {
             auto f = hpx::make_ready_future<std::uint64_t>(i);
-            sink += f.get();
+            sink = sink + f.get();
         }));
 
     results.push_back(measure("as_sender(future)", [](std::uint64_t i) {
         auto sender = ex::as_sender(hpx::make_ready_future<std::uint64_t>(i));
-        sink += sync_wait_value(HPX_MOVE(sender));
+        sink = sink + sync_wait_value(HPX_MOVE(sender));
     }));
 
     results.push_back(
         measure("as_sender(future, scheduler)", [&](std::uint64_t i) {
             auto sender =
                 ex::as_sender(hpx::make_ready_future<std::uint64_t>(i), sched);
-            sink += sync_wait_value(HPX_MOVE(sender));
+            sink = sink + sync_wait_value(HPX_MOVE(sender));
         }));
 
     results.push_back(measure(
@@ -137,7 +137,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
             auto sender =
                 ex::as_sender(hpx::make_ready_future<std::uint64_t>(i)) |
                 ex::continues_on(sched);
-            sink += sync_wait_value(HPX_MOVE(sender));
+            sink = sink + sync_wait_value(HPX_MOVE(sender));
         }));
 
     std::cout << "\n-------------- Future Sender Bridge --------------\n";
