@@ -6,6 +6,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/async_distributed.hpp>
+#include <hpx/modules/components_base.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/runtime_components.hpp>
 #include <hpx/modules/runtime_distributed.hpp>
 
@@ -13,6 +15,8 @@
 #include <hpx/supervision_dispatch/server/registry.hpp>
 
 #include <cstddef>
+#include <cstdint>
+#include <string>
 #include <utility>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -46,6 +50,32 @@ namespace hpx::supervision {
         return hpx::async<action_type>(
             this->get_id(), peer_sentinel.get_id(), peer_locality)
             .get(ec);
+    }
+
+    hpx::future<bool> registry::register_basename()
+    {
+        std::uint32_t const locality_id =
+            hpx::naming::get_locality_id_from_id(this->get_id());
+        std::string name = "/" + std::to_string(locality_id) +
+            "/supervision_dispatch/registry";
+        return this->register_as(HPX_MOVE(name));
+    }
+
+    bool registry::register_basename(
+        hpx::launch::sync_policy, hpx::error_code& ec)
+    {
+        return register_basename().get(ec);
+    }
+
+    hpx::future<hpx::id_type> registry::unregister_basename() const
+    {
+        return hpx::agas::unregister_name(this->registered_name());
+    }
+
+    hpx::id_type registry::unregister_basename(
+        hpx::launch::sync_policy, hpx::error_code& ec) const
+    {
+        return unregister_basename().get(ec);
     }
 }    // namespace hpx::supervision
 
