@@ -20,13 +20,32 @@
 namespace hpx::supervision {
 
     registry::registry(hpx::id_type const& target_locality)
-      : base_type(hpx::new_<server::registry>(target_locality))
+      : base_type(hpx::new_<server::registry>(
+            target_locality ? target_locality : hpx::find_here()))
     {
     }
 
     registry::registry(hpx::future<hpx::id_type>&& f)
       : base_type(HPX_MOVE(f))
     {
+    }
+
+    hpx::future<hpx::id_type> registry::join(
+        sentinel const& peer_sentinel, hpx::id_type const& peer_locality) const
+    {
+        using action_type = server::registry::join_action;
+        return hpx::async<action_type>(
+            this->get_id(), peer_sentinel.get_id(), peer_locality);
+    }
+
+    hpx::id_type registry::join(hpx::launch::sync_policy,
+        sentinel const& peer_sentinel, hpx::id_type const& peer_locality,
+        hpx::error_code& ec) const
+    {
+        using action_type = server::registry::join_action;
+        return hpx::async<action_type>(
+            this->get_id(), peer_sentinel.get_id(), peer_locality)
+            .get(ec);
     }
 }    // namespace hpx::supervision
 

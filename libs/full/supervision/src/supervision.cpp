@@ -52,7 +52,7 @@ HPX_REGISTER_ACTION_ID(
 HPX_REGISTER_ACTION_ID(hpx::supervision::server::supervision_manager::
                            register_activity_observer_action,
     supervision_register_activity_observer__action,
-    hpx::actions::supervision_manager_register_activity_observer__action_id)
+    hpx::actions::supervision_manager_register_activity_observer_action_id)
 HPX_REGISTER_ACTION_ID(hpx::supervision::server::supervision_manager::
                            unregister_activity_observer_action,
     supervision_manager_unregister_activity_observer_action,

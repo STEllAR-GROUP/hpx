@@ -140,8 +140,10 @@ namespace hpx::supervision::server {
         {
         };
 
-        /// Registers an activity observer for the given target and replays its
-        /// current state if the target is already active.
+        /// \brief Registers a locality-scoped activity observer.
+        ///
+        /// Replays targets that are already active when registration takes its
+        /// snapshot.
         ///
         /// The snapshot of the target's tracked state and the insertion of the
         /// observer into the tracked set happen atomically under `mtx_`, which
@@ -165,12 +167,14 @@ namespace hpx::supervision::server {
         {
         };
 
-        // Unregister a handle previously returned by
-        // register_activity_observer(). As with unregister_observer(), no
-        // orphaned callbacks fire after this call completes. `observer_handle`
-        // must have been returned by register_activity_observer(); a handle
-        // returned by register_observer() instead (i.e. found in agents_ rather
-        // than activity_observers_) is rejected.
+        /// \brief Unregisters an activity observer.
+        ///
+        /// The handle must have been returned by register_activity_observer().
+        /// As with unregister_observer(), no orphaned callbacks fire after this
+        /// call completes. `observer_handle` must have been returned by
+        /// register_activity_observer(); a handle returned by
+        /// register_observer() instead (i.e. found in agents_ rather than
+        /// activity_observers_) is rejected.
         void unregister_activity_observer(hpx::id_type const& observer_handle);
 
         struct unregister_activity_observer_action

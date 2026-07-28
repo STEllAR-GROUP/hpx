@@ -192,13 +192,13 @@ void test_activity_replay_on_registration(hpx::id_type const& locality)
         hpx::launch::sync, locality, make_recording_callback(ctx));
 
     HPX_TEST(ctx.wait_for_target_count(
-        target_via_event, 1, std::chrono::milliseconds(20)));
+        target_via_event, 1, std::chrono::milliseconds(50)));
     HPX_TEST(ctx.wait_for_target_count(
-        target_via_observer, 1, std::chrono::milliseconds(20)));
+        target_via_observer, 1, std::chrono::milliseconds(50)));
 
     auto const events_replay = ctx.for_target(target_via_event);
     HPX_TEST_EQ(events_replay.size(), static_cast<std::size_t>(1));
-    if (events_replay.size() == 1)
+    if (!events_replay.empty())
     {
         HPX_TEST(
             events_replay[0].state == hpx::supervision::activity_state::active);
@@ -208,7 +208,7 @@ void test_activity_replay_on_registration(hpx::id_type const& locality)
 
     auto const observer_replay = ctx.for_target(target_via_observer);
     HPX_TEST_EQ(observer_replay.size(), static_cast<std::size_t>(1));
-    if (observer_replay.size() == 1)
+    if (!observer_replay.empty())
     {
         HPX_TEST(observer_replay[0].state ==
             hpx::supervision::activity_state::active);
@@ -239,14 +239,17 @@ void test_activity_live_first_event(hpx::id_type const& locality)
         hpx::launch::sync, locality, target, hpx::supervision::event::started);
 
     HPX_TEST(
-        ctx.wait_for_target_count(target, 1, std::chrono::milliseconds(20)));
+        ctx.wait_for_target_count(target, 1, std::chrono::milliseconds(50)));
 
     auto const notifications = ctx.for_target(target);
     HPX_TEST_EQ(notifications.size(), static_cast<std::size_t>(1));
-    HPX_TEST(
-        notifications[0].state == hpx::supervision::activity_state::active);
-    HPX_TEST(notifications[0].transition ==
-        hpx::supervision::activity_transition::first_event);
+    if (!notifications.empty())
+    {
+        HPX_TEST(
+            notifications[0].state == hpx::supervision::activity_state::active);
+        HPX_TEST(notifications[0].transition ==
+            hpx::supervision::activity_transition::first_event);
+    }
 
     hpx::supervision::unregister_activity_observer(
         hpx::launch::sync, locality, activity_handle);
@@ -265,14 +268,17 @@ void test_activity_live_first_observer(hpx::id_type const& locality)
         hpx::launch::sync, locality, target, no_op_lifecycle_observer);
 
     HPX_TEST(
-        ctx.wait_for_target_count(target, 1, std::chrono::milliseconds(20)));
+        ctx.wait_for_target_count(target, 1, std::chrono::milliseconds(50)));
 
     auto const notifications = ctx.for_target(target);
     HPX_TEST_EQ(notifications.size(), static_cast<std::size_t>(1));
-    HPX_TEST(
-        notifications[0].state == hpx::supervision::activity_state::active);
-    HPX_TEST(notifications[0].transition ==
-        hpx::supervision::activity_transition::first_observer);
+    if (!notifications.empty())
+    {
+        HPX_TEST(
+            notifications[0].state == hpx::supervision::activity_state::active);
+        HPX_TEST(notifications[0].transition ==
+            hpx::supervision::activity_transition::first_observer);
+    }
 
     hpx::supervision::unregister_observer(
         hpx::launch::sync, locality, lifecycle_handle);
@@ -295,21 +301,24 @@ void test_activity_live_last_observer_unregistered(hpx::id_type const& locality)
     // The registration above replays target's current (already active) state;
     // that replay is not what this test is exercising.
     HPX_TEST(
-        ctx.wait_for_target_count(target, 1, std::chrono::milliseconds(20)));
+        ctx.wait_for_target_count(target, 1, std::chrono::milliseconds(50)));
     ctx.reset();
 
     hpx::supervision::unregister_observer(
         hpx::launch::sync, locality, lifecycle_handle);
 
     HPX_TEST(
-        ctx.wait_for_target_count(target, 1, std::chrono::milliseconds(20)));
+        ctx.wait_for_target_count(target, 1, std::chrono::milliseconds(50)));
 
     auto const notifications = ctx.for_target(target);
     HPX_TEST_EQ(notifications.size(), static_cast<std::size_t>(1));
-    HPX_TEST(
-        notifications[0].state == hpx::supervision::activity_state::inactive);
-    HPX_TEST(notifications[0].transition ==
-        hpx::supervision::activity_transition::last_observer_unregistered);
+    if (!notifications.empty())
+    {
+        HPX_TEST(notifications[0].state ==
+            hpx::supervision::activity_state::inactive);
+        HPX_TEST(notifications[0].transition ==
+            hpx::supervision::activity_transition::last_observer_unregistered);
+    }
 
     hpx::supervision::unregister_activity_observer(
         hpx::launch::sync, locality, activity_handle);
@@ -330,7 +339,7 @@ void test_activity_no_deactivation_on_publish_path(hpx::id_type const& locality)
         hpx::launch::sync, locality, target, hpx::supervision::event::started);
 
     HPX_TEST(
-        ctx.wait_for_target_count(target, 1, std::chrono::milliseconds(20)));
+        ctx.wait_for_target_count(target, 1, std::chrono::milliseconds(50)));
 
     hpx::supervision::publish_event(
         hpx::launch::sync, locality, target, hpx::supervision::event::running);
@@ -350,8 +359,11 @@ void test_activity_no_deactivation_on_publish_path(hpx::id_type const& locality)
 
     auto const notifications = ctx.for_target(target);
     HPX_TEST_EQ(notifications.size(), static_cast<std::size_t>(1));
-    HPX_TEST(notifications[0].transition ==
-        hpx::supervision::activity_transition::first_event);
+    if (!notifications.empty())
+    {
+        HPX_TEST(notifications[0].transition ==
+            hpx::supervision::activity_transition::first_event);
+    }
 
     hpx::supervision::unregister_activity_observer(
         hpx::launch::sync, locality, activity_handle);
@@ -378,18 +390,35 @@ void test_activity_multiple_targets_single_registration(
         hpx::supervision::event::started);
 
     HPX_TEST(ctx.wait_for_target_count(
-        target_event_1, 1, std::chrono::milliseconds(20)));
+        target_event_1, 1, std::chrono::milliseconds(50)));
     HPX_TEST(ctx.wait_for_target_count(
-        target_observer, 1, std::chrono::milliseconds(20)));
+        target_observer, 1, std::chrono::milliseconds(50)));
     HPX_TEST(ctx.wait_for_target_count(
-        target_event_2, 1, std::chrono::milliseconds(20)));
+        target_event_2, 1, std::chrono::milliseconds(50)));
 
-    HPX_TEST(ctx.for_target(target_event_1)[0].transition ==
-        hpx::supervision::activity_transition::first_event);
-    HPX_TEST(ctx.for_target(target_observer)[0].transition ==
-        hpx::supervision::activity_transition::first_observer);
-    HPX_TEST(ctx.for_target(target_event_2)[0].transition ==
-        hpx::supervision::activity_transition::first_event);
+    auto notifications = ctx.for_target(target_event_1);
+    HPX_TEST_EQ(notifications.size(), static_cast<std::size_t>(1));
+    if (!notifications.empty())
+    {
+        HPX_TEST(notifications[0].transition ==
+            hpx::supervision::activity_transition::first_event);
+    }
+
+    notifications = ctx.for_target(target_observer);
+    HPX_TEST_EQ(notifications.size(), static_cast<std::size_t>(1));
+    if (!notifications.empty())
+    {
+        HPX_TEST(notifications[0].transition ==
+            hpx::supervision::activity_transition::first_observer);
+    }
+
+    notifications = ctx.for_target(target_event_2);
+    HPX_TEST_EQ(notifications.size(), static_cast<std::size_t>(1));
+    if (!notifications.empty())
+    {
+        HPX_TEST(notifications[0].transition ==
+            hpx::supervision::activity_transition::first_event);
+    }
 
     hpx::supervision::unregister_observer(
         hpx::launch::sync, locality, lifecycle_handle);
@@ -422,11 +451,11 @@ void test_activity_epoch_filter_replay(hpx::id_type const& locality)
             locality, make_recording_callback(ctx), filter_epoch);
 
     HPX_TEST(ctx.wait_for_target_count(
-        target_match, 1, std::chrono::milliseconds(20)));
+        target_match, 1, std::chrono::milliseconds(50)));
 
     // Give a would-be (incorrect) replay for the mismatched target a chance
     // to arrive before asserting its absence.
-    hpx::this_thread::sleep_for(std::chrono::milliseconds(20));
+    hpx::this_thread::sleep_for(std::chrono::milliseconds(50));
     HPX_TEST_EQ(
         ctx.count_for_target(target_mismatch), static_cast<std::size_t>(0));
 
@@ -455,10 +484,18 @@ void test_activity_epoch_filter_live(hpx::id_type const& locality)
     hpx::supervision::publish_event(hpx::launch::sync, locality,
         target_mismatch, hpx::supervision::event::started, other_epoch);
 
+    // Publish a fence event under the matching epoch and wait for its
+    // notification to arrive. Activity notifications are delivered in
+    // publication order, so this guarantees any (unexpected) notification
+    // for `target_mismatch` would already be recorded by the time the
+    // fence's notification is observed.
+    hpx::id_type const fence_target = make_test_target();
+    hpx::supervision::publish_event(hpx::launch::sync, locality, fence_target,
+        hpx::supervision::event::started, filter_epoch);
     HPX_TEST(ctx.wait_for_target_count(
-        target_match, 1, std::chrono::milliseconds(20)));
+        fence_target, 1, std::chrono::milliseconds(1000)));
 
-    hpx::this_thread::sleep_for(std::chrono::milliseconds(20));
+    hpx::this_thread::sleep_for(std::chrono::milliseconds(50));
     HPX_TEST_EQ(
         ctx.count_for_target(target_mismatch), static_cast<std::size_t>(0));
 

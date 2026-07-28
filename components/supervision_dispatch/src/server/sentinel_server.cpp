@@ -14,6 +14,9 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
+HPX_REGISTER_ACTION(hpx::supervision::server::sentinel::start_action,
+    supervision_dispatch_sentinel_start_action)
+
 namespace hpx::supervision::server {
 
     sentinel::sentinel() = default;
