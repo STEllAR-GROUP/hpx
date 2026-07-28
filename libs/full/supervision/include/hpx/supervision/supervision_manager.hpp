@@ -40,6 +40,13 @@ namespace hpx::supervision {
         void unregister_observer(hpx::id_type const& observer_handle,
             hpx::error_code& ec = throws) const;
 
+        /// \brief Clears all locally tracked state for \p target.
+        ///
+        /// \param target Target whose local supervision state is removed.
+        /// \param ec Error code receiving the operation result.
+        void remove_target(
+            hpx::id_type const& target, hpx::error_code& ec = throws) const;
+
         // Register an agent to be notified of activation/deactivation
         // transitions across all targets tracked by this locality's supervision
         // manager. Unlike register_observer(), this is deliberately

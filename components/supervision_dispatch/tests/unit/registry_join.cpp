@@ -22,6 +22,7 @@
 
 #include <hpx/supervision_dispatch/registry.hpp>
 #include <hpx/supervision_dispatch/sentinel.hpp>
+#include <hpx/supervision_dispatch/server/registry.hpp>
 
 // ============================================================================
 // Test Cases
@@ -169,7 +170,7 @@ void test_registry_join_concurrent_race()
         futures.push_back(r.join(peer, hpx::find_here()));
     }
 
-    std::vector<hpx::id_type> shadows = hpx::unwrap(std::move(futures));
+    std::vector<hpx::id_type> const shadows = hpx::unwrap(std::move(futures));
 
     // Every concurrent joiner must observe the same, valid shadow id.
     HPX_TEST_NEQ(shadows.front(), hpx::invalid_id);
@@ -184,6 +185,88 @@ void test_registry_join_concurrent_race()
     // half-constructed entry would leave this unset or inconsistent.
     auto const seeded_state = hpx::supervision::query_state(shadows.front());
     HPX_TEST(seeded_state.last_event == hpx::supervision::event::started);
+}
+
+// If register_observers() fails during join() -- e.g. because the peer's
+// locality could not be validated -- the shadow minted and seeded just before
+// that call must not be left behind: the failure path must remove its locally
+// tracked supervision state, not just release the peer's reservation in peers_.
+// hpx::supervision::server::detail::last_join_shadow() is testing
+// infrastructure support that lets us retrieve the shadow that was minted for
+// the failed attempt, since join() itself never hands it back to the caller on
+// failure.
+void test_registry_join_failure_removes_shadow_state()
+{
+    hpx::supervision::sentinel const peer(hpx::find_here());
+    hpx::supervision::registry const r(hpx::find_here());
+
+    // An invalid peer locality makes hpx::supervision::register_observer()
+    // reject the call outright (see registry::register_observers()), so join()
+    // fails before either observer is actually registered -- but only after
+    // already minting and seeding a shadow for it.
+    hpx::error_code ec;
+    hpx::id_type const shadow =
+        r.join(hpx::launch::sync, peer, hpx::invalid_id, ec);
+
+    HPX_TEST(ec);
+    HPX_TEST_EQ(shadow, hpx::invalid_id);
+
+    hpx::id_type const failed_shadow =
+        hpx::supervision::server::detail::last_join_shadow();
+    HPX_TEST_NEQ(failed_shadow, hpx::invalid_id);
+
+    // The failed attempt's shadow must have had its local state removed by
+    // register_observers()'s catch block: querying it now must report the same
+    // "never seen this target" result as a target that never published
+    // anything, rather than the `started` event join() seeded it with.
+    auto const state = hpx::supervision::query_state(failed_shadow);
+    HPX_TEST(state.last_event == hpx::supervision::event::unknown);
+    HPX_TEST(state.ec);
+
+    // The failed reservation must also have been released: retrying with a
+    // valid locality must succeed and mint a fresh shadow.
+    hpx::id_type const retried_shadow =
+        r.join(hpx::launch::sync, peer, hpx::find_here());
+    HPX_TEST_NEQ(retried_shadow, hpx::invalid_id);
+    HPX_TEST_NEQ(retried_shadow, failed_shadow);
+}
+
+// Once a joined peer sentinel reaches a terminal lifecycle event, its entry
+// must be erased from the registry's peers_ map (see registry::evict_peer())
+// instead of accumulating there indefinitely. Since peers_ is private registry
+// state, this is observed indirectly: re-joining the same peer sentinel
+// afterward must mint a fresh shadow (and re-run the full registration path)
+// rather than returning the very same shadow that was created before the
+// terminal event -- which is exactly what would happen if the (now-terminal)
+// entry were still sitting in peers_.
+void test_registry_join_terminal_peer_evicted_from_peers()
+{
+    hpx::supervision::sentinel const peer(hpx::find_here());
+    hpx::supervision::registry const r(hpx::find_here());
+
+    hpx::id_type const shadow =
+        r.join(hpx::launch::sync, peer, hpx::find_here());
+
+    peer.start(hpx::launch::sync);
+    hpx::supervision::publish_event(hpx::launch::sync, hpx::find_here(),
+        peer.get_id(), hpx::supervision::event::failed, 0);
+
+    // Eviction is dispatched asynchronously (via hpx::post()) once the terminal
+    // publish above has completed, so poll re-joining until the peer's entry is
+    // actually gone rather than assuming this has already happened by the time
+    // publish_event() returns.
+    hpx::id_type rejoined_shadow;
+    for (int i = 0; i != 10000; ++i)
+    {
+        rejoined_shadow = r.join(hpx::launch::sync, peer, hpx::find_here());
+        if (rejoined_shadow != shadow)
+        {
+            break;
+        }
+        hpx::this_thread::yield();
+    }
+
+    HPX_TEST_NEQ(rejoined_shadow, shadow);
 }
 
 // ============================================================================
@@ -202,6 +285,8 @@ int hpx_main()
     {
         test_registry_join_concurrent_race();
     }
+    test_registry_join_failure_removes_shadow_state();
+    test_registry_join_terminal_peer_evicted_from_peers();
 
     return hpx::finalize();
 }

@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file hpx/supervision/supervision_api.hpp
-/// \page hpx::supervision::publish_event, hpx::supervision::query_state, hpx::supervision::register_observer, hpx::supervision::unregister_observer, hpx::supervision::register_activity_observer, hpx::supervision::unregister_activity_observer
+/// \page hpx::supervision::publish_event, hpx::supervision::query_state, hpx::supervision::register_observer, hpx::supervision::unregister_observer, hpx::supervision::remove_target, hpx::supervision::register_activity_observer, hpx::supervision::unregister_activity_observer
 /// \headerfile hpx/supervision.hpp
 
 #pragma once
@@ -602,14 +602,85 @@ namespace hpx::supervision {
     ///                        error instead.
     ///
     /// \throws                hpx::exception if \a observer_handle does
-    ///                        not represent a valid observer handle,
-    ///                        unless \a ec was not pre-initialized to
+    ///                        not represent a valid observer handle, unless \a
+    ///                        ec was not pre-initialized to
     ///                        \a hpx::throws.
     ///
     /// \note                  No orphaned callbacks fire after
     ///                        unregistration completes.
     HPX_CXX_EXPORT HPX_EXPORT void unregister_observer(
         hpx::id_type const& observer_handle, hpx::error_code& ec = hpx::throws);
+
+    /// \brief Clear all locally tracked state for a target on a possibly remote
+    ///        locality.
+    ///
+    /// Unlike \a unregister_observer(), which removes a single previously
+    /// registered observer handle, \a remove_target() unconditionally forgets
+    /// every piece of local state held for \a target - its recorded lifecycle
+    /// state (see \a publish_event() / \a query_state()) and any observers
+    /// still registered for it (see \a register_observer()) - regardless of any
+    /// specific observer handle.
+    ///
+    /// \param locality [in] The locality on which \a target's state is
+    ///                 tracked.
+    /// \param target   [in] The actor (or component) whose locally tracked
+    ///                 state should be removed.
+    ///
+    /// \returns        A future that becomes ready once \a target's state
+    ///                 has been removed.
+    ///
+    /// \throws         hpx::exception if \a locality does not represent a
+    ///                 locality, or if \a target does not represent a valid
+    ///                 target. The returned future becomes exceptional if the
+    ///                 operation fails.
+    ///
+    /// \note           This is intended for callers that know \a target
+    ///                 will never be queried or observed again locally (e.g.
+    ///                 after a failed registration that seeded some state for
+    ///                 it, or once a peer has been evicted), so that local
+    ///                 state does not accumulate indefinitely. It is not itself
+    ///                 a lifecycle event and does not affect
+    ///                 \a target's state on any other locality.
+    HPX_CXX_EXPORT HPX_EXPORT hpx::future<void> remove_target(
+        hpx::id_type const& locality, hpx::id_type const& target);
+
+    /// \brief Clear all locally tracked state for a target on a possibly remote
+    ///        locality, blocking until the operation has completed.
+    ///
+    /// This is the synchronous equivalent of
+    /// \a remove_target(hpx::id_type const&, hpx::id_type const&).
+    ///
+    /// \param locality [in] The locality on which \a target's state is
+    ///                 tracked.
+    /// \param target   [in] The actor (or component) whose locally tracked
+    ///                 state should be removed.
+    /// \param ec       [in,out] this represents the error status on exit,
+    ///                 if this pre-initialized to \a hpx::throws the function
+    ///                 will throw on error instead.
+    ///
+    /// \throws         hpx::exception if \a locality does not represent a
+    ///                 locality, or if \a target does not represent a valid
+    ///                 target, unless \a ec was initialized not to \a
+    ///                 hpx::throws.
+    HPX_CXX_EXPORT HPX_EXPORT void remove_target(hpx::launch::sync_policy,
+        hpx::id_type const& locality, hpx::id_type const& target,
+        hpx::error_code& ec = hpx::throws);
+
+    /// \brief Clear all locally tracked state for a target on the local
+    ///        locality.
+    ///
+    /// \param target [in] The actor (or component) whose locally tracked
+    ///               state should be removed. Must be local to the calling
+    ///               locality.
+    /// \param ec     [in,out] this represents the error status on exit, if
+    ///               this is pre-initialized to \a hpx::throws the function
+    ///               will throw on error instead.
+    ///
+    /// \throws       hpx::exception if \a target does not represent a valid
+    ///               target, unless \a ec was not pre-initialized to \a
+    ///               hpx::throws.
+    HPX_CXX_EXPORT HPX_EXPORT void remove_target(
+        hpx::id_type const& target, hpx::error_code& ec = hpx::throws);
 
     /// \brief Asynchronously wait for a target actor on a possibly remote
     ///        locality to reach a terminal lifecycle event (\c completed or
