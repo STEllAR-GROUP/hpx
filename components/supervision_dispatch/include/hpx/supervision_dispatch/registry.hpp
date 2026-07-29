@@ -42,27 +42,46 @@ namespace hpx::supervision {
             sentinel const& peer_sentinel, hpx::id_type const& peer_locality,
             hpx::error_code& ec = hpx::throws) const;
 
-        // Register this registry's id with AGAS under a name pinned to the
-        // locality that actually hosts its underlying server component (derived
-        // from the component's own id via
-        // hpx::naming::get_locality_id_from_id(), not the ambient
-        // hpx::get_locality_id() of the caller), so that discovery of this
-        // registry is unaffected by failures on any locality other than the one
-        // it actually lives on. May only be called once per registry instance,
-        // mirroring the call-once contract of the underlying
-        // client_base::register_as().
+        /// Register this registry's id with AGAS under a name pinned to the
+        /// locality that actually hosts its underlying server component
+        /// (derived from the component's own id via
+        /// hpx::naming::get_locality_id_from_id(), not the ambient
+        /// hpx::get_locality_id() of the caller), so that discovery of this
+        /// registry is unaffected by failures on any locality other than the
+        /// one it actually lives on. May only be called once per registry
+        /// instance, mirroring the call-once contract of the underlying
+        /// client_base::register_as().
+        ///
+        /// \return A future that becomes ready with `true` if the name was
+        ///         registered successfully, `false` otherwise.
         hpx::future<bool> register_basename();
+
+        /// \copydoc register_basename()
+        ///
+        /// \param ec Used to hold the error code that results from the
+        ///           operation instead of throwing an exception on failure.
+        /// \return `true` if the name was registered successfully, `false`
+        ///         otherwise.
         bool register_basename(
             hpx::launch::sync_policy, hpx::error_code& ec = hpx::throws);
 
-        // Remove this registry's AGAS name registration again, using the name
-        // most recently established by register_basename() (retrieved via
-        // registered_name(), the single source of truth client_base already
-        // maintains for it). Calling this explicitly is safe even though
-        // destroying this registry also unregisters its name automatically
-        // (client_base::register_as()'s default manage_lifetime=true): the
-        // redundant unregister attempt on destruction is a silent no-op.
+        /// Remove this registry's AGAS name registration again, using the name
+        /// most recently established by register_basename() (retrieved via
+        /// registered_name(), the single source of truth client_base already
+        /// maintains for it). Calling this explicitly is safe even though
+        /// destroying this registry also unregisters its name automatically
+        /// (client_base::register_as()'s default manage_lifetime=true): the
+        /// redundant unregister attempt on destruction is a silent no-op.
+        ///
+        /// \return A future that becomes ready with the id that was registered
+        ///         under the removed name.
         hpx::future<hpx::id_type> unregister_basename() const;
+
+        /// \copydoc unregister_basename()
+        ///
+        /// \param ec Used to hold the error code that results from the
+        ///           operation instead of throwing an exception on failure.
+        /// \return The id that was registered under the removed name.
         hpx::id_type unregister_basename(
             hpx::launch::sync_policy, hpx::error_code& ec = hpx::throws) const;
     };

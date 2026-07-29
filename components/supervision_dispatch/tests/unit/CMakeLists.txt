@@ -6,6 +6,8 @@
 
 set(tests basename_registration registry_join sentinel_start)
 
+set(basename_registration_PARAMETERS LOCALITIES 2)
+
 foreach(test ${tests})
   set(sources ${test}.cpp)
 

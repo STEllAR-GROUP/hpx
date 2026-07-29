@@ -23,6 +23,7 @@
 
 #include <cstdint>
 #include <string>
+#include <vector>
 
 // ============================================================================
 // Test Cases
@@ -31,19 +32,25 @@
 // register_basename() must succeed and register the sentinel's id under a name
 // pinned to the locality derived from the sentinel's own id (via
 // hpx::naming::get_locality_id_from_id()), not merely the ambient
-// hpx::get_locality_id() of the caller -- though for a sentinel created locally
-// via find_here() the two coincide, which this test verifies explicitly rather
-// than assuming.
+// hpx::get_locality_id() of the caller. To actually exercise that distinction
+// (rather than trivially satisfying it), the sentinel is created on a remote
+// locality when one is available, so that a regression that used the caller's
+// locality instead of the component's own locality would be detected.
 void test_sentinel_register_basename()
 {
-    hpx::supervision::sentinel s(hpx::find_here());
+    std::vector<hpx::id_type> const remote_localities =
+        hpx::find_remote_localities();
+    hpx::id_type const target =
+        remote_localities.empty() ? hpx::find_here() : remote_localities[0];
+
+    hpx::supervision::sentinel s(target);
 
     bool const registered = s.register_basename(hpx::launch::sync);
     HPX_TEST(registered);
 
     std::uint32_t const locality_id =
         hpx::naming::get_locality_id_from_id(s.get_id());
-    HPX_TEST_EQ(locality_id, hpx::get_locality_id());
+    HPX_TEST_EQ(locality_id, hpx::naming::get_locality_id_from_id(target));
 
     std::string const expected_name =
         "/" + std::to_string(locality_id) + "/supervision_dispatch/sentinel";
@@ -55,14 +62,19 @@ void test_sentinel_register_basename()
 // Same as above, but for registry::register_basename().
 void test_registry_register_basename()
 {
-    hpx::supervision::registry r(hpx::find_here());
+    std::vector<hpx::id_type> const remote_localities =
+        hpx::find_remote_localities();
+    hpx::id_type const target =
+        remote_localities.empty() ? hpx::find_here() : remote_localities[0];
+
+    hpx::supervision::registry r(target);
 
     bool const registered = r.register_basename(hpx::launch::sync);
     HPX_TEST(registered);
 
     std::uint32_t const locality_id =
         hpx::naming::get_locality_id_from_id(r.get_id());
-    HPX_TEST_EQ(locality_id, hpx::get_locality_id());
+    HPX_TEST_EQ(locality_id, hpx::naming::get_locality_id_from_id(target));
 
     std::string const expected_name =
         "/" + std::to_string(locality_id) + "/supervision_dispatch/registry";
