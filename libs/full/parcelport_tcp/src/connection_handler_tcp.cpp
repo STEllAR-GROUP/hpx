@@ -111,6 +111,28 @@ namespace hpx::parcelset::policies::tcp {
                 acceptor_->async_accept(receiver_conn->socket(),
                     hpx::bind(&connection_handler::handle_accept, this,
                         placeholders::_1, receiver_conn));
+
+                // Advertise the port the acceptor actually bound rather than
+                // the one that was requested. The two differ when the
+                // configuration asks for port 0, which hands the choice to the
+                // operating system; without this nothing would ever learn
+                // which port it picked and no peer could connect.
+                //
+                // Only the port is taken from the acceptor. The address stays
+                // as configured, because the bound address may be a wildcard
+                // that is not reachable from anywhere else.
+                //
+                // A single acceptor is shared by every iteration of this loop,
+                // so at most one bind succeeds and there is exactly one port
+                // to report; later iterations fail in open() and are collected
+                // as errors below.
+                if (std::uint16_t const bound_port =
+                        acceptor_->local_endpoint().port();
+                    bound_port != here_.get<locality>().port())
+                {
+                    here_ = parcelset::locality(
+                        locality(here_.get<locality>().address(), bound_port));
+                }
             }
             catch (std::system_error const&)
             {

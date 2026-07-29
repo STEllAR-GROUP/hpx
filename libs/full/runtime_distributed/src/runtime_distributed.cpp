@@ -269,6 +269,23 @@ namespace hpx {
                     std::terminate();
                 });
 
+            // Every other locality finds the AGAS root by reading its address
+            // out of its own configuration, so the root is the one locality
+            // whose endpoint cannot be chosen at bind time: no peer would be
+            // able to discover the choice. Say so, rather than let the run
+            // continue with an address that has already been published and no
+            // longer describes this locality.
+            if (pp && pp->here() != pp->agas_locality(rtcfg_))
+            {
+                HPX_THROW_EXCEPTION(hpx::error::network_error,
+                    "runtime_distributed::initialize_agas",
+                    "the AGAS root bound {} but the configuration advertises "
+                    "it as {}; the root locality cannot let its endpoint be "
+                    "assigned at bind time because every other locality reads "
+                    "that endpoint from its own configuration",
+                    pp->here(), pp->agas_locality(rtcfg_));
+            }
+
             agas::get_big_boot_barrier().wait_bootstrap();
         }
         else
@@ -287,6 +304,14 @@ namespace hpx {
                         hpx::get_error_what(e));
                     std::terminate();
                 });
+
+            // The parcelport has bound by now, so its endpoint is final. It
+            // was recorded when the parcelport was attached, which is before
+            // the bind, so refresh it here: wait_hosted below is what hands
+            // these endpoints to AGAS, and a locality that let the operating
+            // system choose its port would otherwise register the port it
+            // asked for rather than the one it got.
+            parcel_handler_.update_endpoints();
 
             agas::get_big_boot_barrier().wait_hosted(
                 pp ? pp->get_locality_name() : "<console>",
