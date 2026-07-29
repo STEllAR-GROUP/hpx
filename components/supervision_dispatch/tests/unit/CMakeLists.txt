@@ -4,9 +4,15 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests basename_registration registry_join sentinel_start)
+set(tests basename_registration discover_peers fan_out_join registry_join
+          sentinel_start
+)
 
-set(basename_registration_PARAMETERS LOCALITIES 2)
+set(discover_peers_PARAMETERS LOCALITIES 2)
+set(discover_peers_FLAGS COMPILE_FLAGS -DHPX_HAVE_RUN_MAIN_EVERYWHERE)
+
+set(fan_out_join_PARAMETERS LOCALITIES 2)
+set(fan_out_join_FLAGS COMPILE_FLAGS -DHPX_HAVE_RUN_MAIN_EVERYWHERE)
 
 foreach(test ${tests})
   set(sources ${test}.cpp)
@@ -14,7 +20,7 @@ foreach(test ${tests})
   # add executable
   add_hpx_executable(
     ${test}_test INTERNAL_FLAGS
-    SOURCES ${sources}
+    SOURCES ${sources} ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
     COMPONENT_DEPENDENCIES supervision_dispatch

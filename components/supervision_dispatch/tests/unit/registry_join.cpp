@@ -5,12 +5,11 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 // Acceptance check: a registry client can join a peer sentinel -- creating a
-// local shadow target, registering as an observer of the peer's
-// lifecycle/activity events via the public hpx::supervision API, and
-// re-publishing terminal notifications for the peer onto the local shadow --
-// with no compile/link errors. This test only exercises join() with explicit,
-// manually-supplied peer ids; it deliberately never exercises basename
-// discovery.
+// local shadow target, registering as an observer of the peer's lifecycle/
+// activity events via the public hpx::supervision API, and re-publishing
+// terminal notifications for the peer onto the local shadow -- with no
+// compile/link errors. This test only exercises join() with explicit,
+// manually-supplied peer ids; it deliberately never exercises name discovery.
 
 #include <hpx/hpx.hpp>
 
@@ -33,8 +32,8 @@
 // was created rather than simply aliasing the peer.
 void test_registry_join_creates_shadow()
 {
-    hpx::supervision::sentinel const peer(hpx::find_here());
-    hpx::supervision::registry const r(hpx::find_here());
+    hpx::supervision::sentinel const peer;
+    hpx::supervision::registry const r;
 
     hpx::id_type const shadow =
         r.join(hpx::launch::sync, peer, hpx::find_here());
@@ -48,8 +47,8 @@ void test_registry_join_creates_shadow()
 // tracked in registry state rather than recreated on every call.
 void test_registry_join_idempotent()
 {
-    hpx::supervision::sentinel const peer(hpx::find_here());
-    hpx::supervision::registry const r(hpx::find_here());
+    hpx::supervision::sentinel const peer;
+    hpx::supervision::registry const r;
 
     hpx::id_type const shadow1 =
         r.join(hpx::launch::sync, peer, hpx::find_here());
@@ -63,8 +62,8 @@ void test_registry_join_idempotent()
 // overload of join().
 void test_registry_join_async()
 {
-    hpx::supervision::sentinel const peer(hpx::find_here());
-    hpx::supervision::registry const r(hpx::find_here());
+    hpx::supervision::sentinel const peer;
+    hpx::supervision::registry const r;
 
     hpx::future<hpx::id_type> f = r.join(peer, hpx::find_here());
     hpx::id_type const shadow = f.get();
@@ -76,9 +75,9 @@ void test_registry_join_async()
 // independently and get distinct shadow ids.
 void test_registry_join_distinct_peers()
 {
-    hpx::supervision::sentinel const peer1(hpx::find_here());
-    hpx::supervision::sentinel const peer2(hpx::find_here());
-    hpx::supervision::registry const r(hpx::find_here());
+    hpx::supervision::sentinel const peer1;
+    hpx::supervision::sentinel const peer2;
+    hpx::supervision::registry const r;
 
     hpx::id_type const shadow1 =
         r.join(hpx::launch::sync, peer1, hpx::find_here());
@@ -93,8 +92,8 @@ void test_registry_join_distinct_peers()
 // notification for the peer arrives.
 void test_registry_join_seeds_shadow_started()
 {
-    hpx::supervision::sentinel const peer(hpx::find_here());
-    hpx::supervision::registry const r(hpx::find_here());
+    hpx::supervision::sentinel const peer;
+    hpx::supervision::registry const r;
 
     hpx::id_type const shadow =
         r.join(hpx::launch::sync, peer, hpx::find_here());
@@ -109,8 +108,8 @@ void test_registry_join_seeds_shadow_started()
 // querying the shadow's state reflects the peer's terminal state.
 void test_registry_join_mirrors_failed_event_on_shadow()
 {
-    hpx::supervision::sentinel const peer(hpx::find_here());
-    hpx::supervision::registry const r(hpx::find_here());
+    hpx::supervision::sentinel const peer;
+    hpx::supervision::registry const r;
 
     hpx::id_type const shadow =
         r.join(hpx::launch::sync, peer, hpx::find_here());
@@ -133,8 +132,8 @@ void test_registry_join_mirrors_failed_event_on_shadow()
 // shadow so the mirrored `completed` event is accepted.
 void test_registry_join_mirrors_completed_event_on_shadow()
 {
-    hpx::supervision::sentinel const peer(hpx::find_here());
-    hpx::supervision::registry const r(hpx::find_here());
+    hpx::supervision::sentinel const peer;
+    hpx::supervision::registry const r;
 
     hpx::id_type const shadow =
         r.join(hpx::launch::sync, peer, hpx::find_here());
@@ -158,8 +157,8 @@ void test_registry_join_mirrors_completed_event_on_shadow()
 // a deadlock.
 void test_registry_join_concurrent_race()
 {
-    hpx::supervision::sentinel const peer(hpx::find_here());
-    hpx::supervision::registry const r(hpx::find_here());
+    hpx::supervision::sentinel const peer;
+    hpx::supervision::registry const r;
 
     constexpr std::size_t num_joiners = 64;
 
@@ -197,8 +196,8 @@ void test_registry_join_concurrent_race()
 // failure.
 void test_registry_join_failure_removes_shadow_state()
 {
-    hpx::supervision::sentinel const peer(hpx::find_here());
-    hpx::supervision::registry const r(hpx::find_here());
+    hpx::supervision::sentinel const peer;
+    hpx::supervision::registry const r;
 
     // An invalid peer locality makes hpx::supervision::register_observer()
     // reject the call outright (see registry::register_observers()), so join()
@@ -241,8 +240,8 @@ void test_registry_join_failure_removes_shadow_state()
 // entry were still sitting in peers_.
 void test_registry_join_terminal_peer_evicted_from_peers()
 {
-    hpx::supervision::sentinel const peer(hpx::find_here());
-    hpx::supervision::registry const r(hpx::find_here());
+    hpx::supervision::sentinel const peer;
+    hpx::supervision::registry const r;
 
     hpx::id_type const shadow =
         r.join(hpx::launch::sync, peer, hpx::find_here());

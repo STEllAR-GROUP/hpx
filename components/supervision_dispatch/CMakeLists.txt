@@ -16,14 +16,15 @@ set(HPX_COMPONENTS
 set(supervision_dispatch_headers
     hpx/supervision_dispatch/server/registry.hpp
     hpx/supervision_dispatch/server/sentinel.hpp
+    hpx/supervision_dispatch/discovery.hpp
     hpx/supervision_dispatch/registry.hpp
     hpx/supervision_dispatch/sentinel.hpp
     hpx/supervision_dispatch/export_definitions.hpp
 )
 
 set(supervision_dispatch_sources
-    server/registry_server.cpp server/sentinel_server.cpp registry.cpp
-    sentinel.cpp component_module.cpp
+    server/registry_server.cpp server/sentinel_server.cpp discovery.cpp
+    registry.cpp sentinel.cpp component_module.cpp
 )
 
 add_hpx_component(

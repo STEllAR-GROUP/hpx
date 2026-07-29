@@ -16,6 +16,8 @@
 #include <hpx/supervision_dispatch/sentinel.hpp>
 #include <hpx/supervision_dispatch/server/registry.hpp>
 
+#include <string>
+
 #include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx::supervision {
@@ -30,6 +32,9 @@ namespace hpx::supervision {
     public:
         explicit registry(
             hpx::id_type const& target_locality = hpx::invalid_id);
+
+        explicit registry(std::string const& symbolic_name);
+
         /* implicit */ registry(hpx::future<hpx::id_type>&& f);
 
         // Join a peer sentinel: create (or reuse) a local shadow target
@@ -54,15 +59,15 @@ namespace hpx::supervision {
         ///
         /// \return A future that becomes ready with `true` if the name was
         ///         registered successfully, `false` otherwise.
-        hpx::future<bool> register_basename();
+        hpx::future<bool> register_name();
 
-        /// \copydoc register_basename()
+        /// \copydoc register_name()
         ///
         /// \param ec Used to hold the error code that results from the
         ///           operation instead of throwing an exception on failure.
         /// \return `true` if the name was registered successfully, `false`
         ///         otherwise.
-        bool register_basename(
+        bool register_name(
             hpx::launch::sync_policy, hpx::error_code& ec = hpx::throws);
 
         /// Remove this registry's AGAS name registration again, using the name
@@ -75,14 +80,14 @@ namespace hpx::supervision {
         ///
         /// \return A future that becomes ready with the id that was registered
         ///         under the removed name.
-        hpx::future<hpx::id_type> unregister_basename() const;
+        hpx::future<hpx::id_type> unregister_name() const;
 
-        /// \copydoc unregister_basename()
+        /// \copydoc unregister_name()
         ///
         /// \param ec Used to hold the error code that results from the
         ///           operation instead of throwing an exception on failure.
         /// \return The id that was registered under the removed name.
-        hpx::id_type unregister_basename(
+        hpx::id_type unregister_name(
             hpx::launch::sync_policy, hpx::error_code& ec = hpx::throws) const;
     };
 }    // namespace hpx::supervision
