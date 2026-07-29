@@ -10,11 +10,13 @@
 #include <hpx/modules/runtime_distributed.hpp>
 #include <hpx/modules/supervision.hpp>
 #include <hpx/modules/synchronization.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <hpx/supervision_dispatch/server/registry.hpp>
 
 #include <atomic>
 #include <cstdint>
+#include <exception>
 #include <mutex>
 #include <tuple>
 #include <utility>

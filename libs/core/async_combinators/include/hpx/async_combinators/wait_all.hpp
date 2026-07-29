@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2025 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -6,7 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file wait_all.hpp
-/// \page hpx::wait_all
+/// \page hpx::wait_all, hpx::wait_all_nothrow, hxp::wait_all_n, hpx::wait_all_n_nothrow
 /// \headerfile hpx/future.hpp
 
 #pragma once
@@ -236,7 +236,7 @@ namespace hpx::detail {
 
     template <typename R>
     using future_or_shared_state_result_t =
-        typename future_or_shared_state_result<R>::type;
+        future_or_shared_state_result<R>::type;
 
     ///////////////////////////////////////////////////////////////////////
     template <typename Tuple>
@@ -245,7 +245,7 @@ namespace hpx::detail {
     {
     private:
         using base_type = hpx::lcos::detail::future_data<void>;
-        using init_no_addref = typename base_type::init_no_addref;
+        using init_no_addref = base_type::init_no_addref;
 
         wait_all_frame(wait_all_frame const&) = delete;
         wait_all_frame(wait_all_frame&&) = delete;
@@ -255,7 +255,7 @@ namespace hpx::detail {
 
         template <std::size_t I>
         struct is_end
-          : std::integral_constant<bool, hpx::tuple_size<Tuple>::value == I>
+          : std::integral_constant<bool, hpx::tuple_size_v<Tuple> == I>
         {
         };
 
@@ -272,7 +272,7 @@ namespace hpx::detail {
     protected:
         // Current element is a range (vector or array) of futures
         template <std::size_t I, typename Iter>
-        void await_range(Iter&& next, Iter&& end)
+        void await_range(Iter next, Iter end)
         {
             hpx::intrusive_ptr<wait_all_frame> this_(this);
             for (/**/; next != end; ++next)
@@ -294,10 +294,7 @@ namespace hpx::detail {
                             // re-evaluate it and continue to the next element
                             // in the sequence (if any).
                             next_future_data->set_on_completed(
-                                [this_ = HPX_MOVE(this_),
-                                    next = HPX_FORWARD(Iter, next),
-                                    end = HPX_FORWARD(
-                                        Iter, end)]() mutable -> void {
+                                [this_ = HPX_MOVE(this_), next, end]() mutable {
                                     this_->template await_range<I>(
                                         HPX_MOVE(next), HPX_MOVE(end));
                                 });
@@ -384,13 +381,13 @@ namespace hpx::detail {
             // Check if end of the tuple is reached
             if constexpr (is_end_v<I>)
             {
-                // simply make ourself ready
+                // simply make ourselves ready
                 this->set_data(util::unused);
             }
             else
             {
-                using future_type = hpx::util::decay_unwrap_t<
-                    typename hpx::tuple_element<I, Tuple>::type>;
+                using future_type =
+                    hpx::util::decay_unwrap_t<hpx::tuple_element_t<I, Tuple>>;
 
                 if constexpr (is_future_or_shared_state_v<future_type>)
                 {
@@ -423,8 +420,36 @@ namespace hpx::detail {
             return has_exceptional_results_;
         }
 
+        // Same as wait_all(), except that the final suspend is bounded by a
+        // given timeout instead of waiting indefinitely. Note that the
+        // individual input futures are only ever inspected/attached-to, never
+        // moved-from, so they remain valid (and can be queried with is_ready())
+        // whether the combined wait finishes because all them became ready or
+        // because the timeout elapsed first.
+        hpx::future_status wait_all_for(
+            hpx::chrono::steady_duration const& timeout)
+        {
+            do_await<0>();
+
+            // If there are still futures which are not ready, suspend and wait,
+            // but no longer than the given timeout. Note that this does not
+            // cancel/abandon the still outstanding futures; they simply
+            // continue to be resolved in the background and can still be
+            // queried by the caller after this function returns.
+            if (!this->is_ready(std::memory_order_relaxed))
+            {
+                return this->wait_until(timeout.from_now());
+            }
+            return hpx::future_status::ready;
+        }
+
+        bool has_exceptional_results() const noexcept
+        {
+            return has_exceptional_results_;
+        }
+
     private:
-        Tuple const& t_;
+        Tuple t_;
         bool has_exceptional_results_ = false;
     };
 }    // namespace hpx::detail
@@ -505,9 +530,8 @@ namespace hpx {
                 const_cast<std::array<Future, N> const&>(values));
         }
 
-        template <typename Iterator,
-            typename Enable =
-                std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
+        template <typename Iterator>
+            requires(hpx::traits::is_iterator_v<Iterator>)
         friend bool tag_invoke(wait_all_nothrow_t, Iterator begin, Iterator end)
         {
             if (begin == end)
@@ -634,9 +658,8 @@ namespace hpx {
             }
         }
 
-        template <typename Iterator,
-            typename Enable =
-                std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
+        template <typename Iterator>
+            requires(hpx::traits::is_iterator_v<Iterator>)
         friend void tag_invoke(wait_all_t, Iterator begin, Iterator end)
         {
             if (begin != end)
@@ -687,9 +710,8 @@ namespace hpx {
       : hpx::functional::tag<wait_all_n_nothrow_t>
     {
     private:
-        template <typename Iterator,
-            typename Enable =
-                std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
+        template <typename Iterator>
+            requires(hpx::traits::is_iterator_v<Iterator>)
         friend bool tag_invoke(
             wait_all_n_nothrow_t, Iterator begin, std::size_t count)
         {
@@ -709,9 +731,8 @@ namespace hpx {
       : hpx::functional::tag<wait_all_n_t>
     {
     private:
-        template <typename Iterator,
-            typename Enable =
-                std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
+        template <typename Iterator>
+            requires(hpx::traits::is_iterator_v<Iterator>)
         friend void tag_invoke(wait_all_n_t, Iterator begin, std::size_t count)
         {
             if (count != 0)
