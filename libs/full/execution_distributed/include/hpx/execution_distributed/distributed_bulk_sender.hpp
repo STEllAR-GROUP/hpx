@@ -7,6 +7,11 @@
 /// \file distributed_bulk_sender.hpp
 /// \brief P2300-compliant distributed bulk sender adaptor.
 ///
+/// \note **Current status: local-only stub.** The bulk loop executes
+///       sequentially on the calling locality. Remote parcelport dispatch
+///       will be added once the component-based receiver marshalling
+///       infrastructure (nvexec-style) is complete.
+///
 /// Provides a bulk sender that executes data-parallel work on a remote
 /// HPX locality via the distributed_scheduler. The sender intercepts
 /// ex::bulk() when the upstream sender's completion scheduler is a
@@ -29,11 +34,6 @@
 ///       |  => forward set_value(ts...) to downstream
 ///       v
 ///   downstream_receiver
-///
-/// Current Status:
-///   Local fallback loop over the shape. Remote parcelport dispatch
-///   will be added once the component-based receiver marshalling
-///   infrastructure (nvexec-style) is complete.
 
 #pragma once
 
@@ -179,6 +179,25 @@ namespace hpx::distributed::experimental::detail {
             template <typename... Ts>
             void set_value(Ts&&... ts) && noexcept
             {
+                // Fail early if the function is not invocable with the
+                // shape element type and the upstream value types.
+                if constexpr (std::is_integral_v<std::decay_t<Shape>>)
+                {
+                    static_assert(hpx::is_invocable_v<std::decay_t<F>,
+                                      std::decay_t<Shape>, Ts...>,
+                        "distributed_bulk_sender: F must be invocable "
+                        "with (Shape, Ts...)");
+                }
+                else
+                {
+                    using element_type = decltype(*std::begin(
+                        std::declval<std::decay_t<Shape> const&>()));
+                    static_assert(hpx::is_invocable_v<std::decay_t<F>,
+                                      element_type, Ts...>,
+                        "distributed_bulk_sender: F must be invocable "
+                        "with (element_type, Ts...)");
+                }
+
                 hpx::detail::try_catch_exception_ptr(
                     [&]() {
                         // TODO: Implement remote parcelport dispatch.
@@ -190,8 +209,10 @@ namespace hpx::distributed::experimental::detail {
                         // signal completion back through the
                         // distributed_receiver_component.
                         //
-                        // For now, execute the bulk loop locally as a
-                        // functional fallback / stub.
+                        // NOTE: This stub executes strictly sequentially.
+                        // The final remote parcelport implementation will
+                        // execute concurrently, which will change observable
+                        // behavior for non-thread-safe functions.
                         if constexpr (std::is_integral_v<std::decay_t<Shape>>)
                         {
                             for (std::decay_t<Shape> i = 0; i < shape_; ++i)
