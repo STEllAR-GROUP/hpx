@@ -29,6 +29,11 @@ namespace hpx::supervision {
     {
     }
 
+    sentinel::sentinel(std::string const& symbolic_name)
+      : base_type(symbolic_name)
+    {
+    }
+
     sentinel::sentinel(hpx::future<hpx::id_type>&& f)
       : base_type(HPX_MOVE(f))
     {
@@ -47,30 +52,32 @@ namespace hpx::supervision {
         return start(epoch).get(ec);
     }
 
-    hpx::future<bool> sentinel::register_basename()
+    hpx::future<bool> sentinel::register_name()
     {
         std::uint32_t const locality_id =
             hpx::naming::get_locality_id_from_id(this->get_id());
         std::string name = "/" + std::to_string(locality_id) +
             "/supervision_dispatch/sentinel";
-        return this->register_as(HPX_MOVE(name));
+
+        // AGAS doesn't manage lifetime
+        return this->register_as(HPX_MOVE(name), false);
     }
 
-    bool sentinel::register_basename(
+    bool sentinel::register_name(
         hpx::launch::sync_policy, hpx::error_code& ec)
     {
-        return register_basename().get(ec);
+        return register_name().get(ec);
     }
 
-    hpx::future<hpx::id_type> sentinel::unregister_basename() const
+    hpx::future<hpx::id_type> sentinel::unregister_name() const
     {
         return hpx::agas::unregister_name(this->registered_name());
     }
 
-    hpx::id_type sentinel::unregister_basename(
+    hpx::id_type sentinel::unregister_name(
         hpx::launch::sync_policy, hpx::error_code& ec) const
     {
-        return unregister_basename().get(ec);
+        return unregister_name().get(ec);
     }
 }    // namespace hpx::supervision
 

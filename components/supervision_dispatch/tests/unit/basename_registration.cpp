@@ -9,7 +9,7 @@
 // server component, and unregister that name again, with no compile/link
 // errors and no leftover AGAS state. This test only exercises the
 // registration plumbing itself with explicit, manually-supplied peers; it
-// deliberately never exercises basename-based discovery/fan-out.
+// deliberately never exercises name-based discovery/fan-out.
 
 #include <hpx/hpx.hpp>
 
@@ -29,23 +29,20 @@
 // Test Cases
 // ============================================================================
 
-// register_basename() must succeed and register the sentinel's id under a name
+// register_name() must succeed and register the sentinel's id under a name
 // pinned to the locality derived from the sentinel's own id (via
 // hpx::naming::get_locality_id_from_id()), not merely the ambient
 // hpx::get_locality_id() of the caller. To actually exercise that distinction
 // (rather than trivially satisfying it), the sentinel is created on a remote
 // locality when one is available, so that a regression that used the caller's
 // locality instead of the component's own locality would be detected.
-void test_sentinel_register_basename()
+void test_sentinel_register_name()
 {
-    std::vector<hpx::id_type> const remote_localities =
-        hpx::find_remote_localities();
-    hpx::id_type const target =
-        remote_localities.empty() ? hpx::find_here() : remote_localities[0];
+    hpx::id_type const target = hpx::find_here();
 
-    hpx::supervision::sentinel s(target);
+    hpx::supervision::sentinel s;
 
-    bool const registered = s.register_basename(hpx::launch::sync);
+    bool const registered = s.register_name(hpx::launch::sync);
     HPX_TEST(registered);
 
     std::uint32_t const locality_id =
@@ -56,20 +53,17 @@ void test_sentinel_register_basename()
         "/" + std::to_string(locality_id) + "/supervision_dispatch/sentinel";
     HPX_TEST_EQ(s.registered_name(), expected_name);
 
-    s.unregister_basename(hpx::launch::sync);
+    s.unregister_name(hpx::launch::sync);
 }
 
-// Same as above, but for registry::register_basename().
-void test_registry_register_basename()
+// Same as above, but for registry::register_name().
+void test_registry_register_name()
 {
-    std::vector<hpx::id_type> const remote_localities =
-        hpx::find_remote_localities();
-    hpx::id_type const target =
-        remote_localities.empty() ? hpx::find_here() : remote_localities[0];
+    hpx::id_type const target = hpx::find_here();
 
-    hpx::supervision::registry r(target);
+    hpx::supervision::registry r;
 
-    bool const registered = r.register_basename(hpx::launch::sync);
+    bool const registered = r.register_name(hpx::launch::sync);
     HPX_TEST(registered);
 
     std::uint32_t const locality_id =
@@ -80,51 +74,51 @@ void test_registry_register_basename()
         "/" + std::to_string(locality_id) + "/supervision_dispatch/registry";
     HPX_TEST_EQ(r.registered_name(), expected_name);
 
-    r.unregister_basename(hpx::launch::sync);
+    r.unregister_name(hpx::launch::sync);
 }
 
 // Registering, unregistering, and then registering a freshly constructed
 // sentinel under the very same pinned name (both instances live on the same
 // locality, so they are assigned the same name) must succeed without error,
-// confirming that unregister_basename() actually removed the prior registration
+// confirming that unregister_name() actually removed the prior registration
 // from AGAS rather than leaving it dangling.
 void test_sentinel_register_unregister_cycle()
 {
     {
-        hpx::supervision::sentinel s(hpx::find_here());
-        HPX_TEST(s.register_basename(hpx::launch::sync));
-        s.unregister_basename(hpx::launch::sync);
+        hpx::supervision::sentinel s;
+        HPX_TEST(s.register_name(hpx::launch::sync));
+        s.unregister_name(hpx::launch::sync);
     }
 
-    hpx::supervision::sentinel s2(hpx::find_here());
-    HPX_TEST(s2.register_basename(hpx::launch::sync));
-    s2.unregister_basename(hpx::launch::sync);
+    hpx::supervision::sentinel s2;
+    HPX_TEST(s2.register_name(hpx::launch::sync));
+    s2.unregister_name(hpx::launch::sync);
 }
 
 // Same as above, but for registry.
 void test_registry_register_unregister_cycle()
 {
     {
-        hpx::supervision::registry r(hpx::find_here());
-        HPX_TEST(r.register_basename(hpx::launch::sync));
-        r.unregister_basename(hpx::launch::sync);
+        hpx::supervision::registry r;
+        HPX_TEST(r.register_name(hpx::launch::sync));
+        r.unregister_name(hpx::launch::sync);
     }
 
-    hpx::supervision::registry r2(hpx::find_here());
-    HPX_TEST(r2.register_basename(hpx::launch::sync));
-    r2.unregister_basename(hpx::launch::sync);
+    hpx::supervision::registry r2;
+    HPX_TEST(r2.register_name(hpx::launch::sync));
+    r2.unregister_name(hpx::launch::sync);
 }
 
-// Same as test_sentinel_register_basename(), but using the asynchronous
-// overloads of register_basename()/unregister_basename().
-void test_sentinel_register_basename_async()
+// Same as test_sentinel_register_name(), but using the asynchronous
+// overloads of register_name()/unregister_name().
+void test_sentinel_register_name_async()
 {
-    hpx::supervision::sentinel s(hpx::find_here());
+    hpx::supervision::sentinel s;
 
-    hpx::future<bool> f = s.register_basename();
+    hpx::future<bool> f = s.register_name();
     HPX_TEST(f.get());
 
-    hpx::future<hpx::id_type> unreg_f = s.unregister_basename();
+    hpx::future<hpx::id_type> unreg_f = s.unregister_name();
     unreg_f.get();
 }
 
@@ -133,11 +127,11 @@ void test_sentinel_register_basename_async()
 // ============================================================================
 int hpx_main()
 {
-    test_sentinel_register_basename();
-    test_registry_register_basename();
+    test_sentinel_register_name();
+    test_registry_register_name();
     test_sentinel_register_unregister_cycle();
     test_registry_register_unregister_cycle();
-    test_sentinel_register_basename_async();
+    test_sentinel_register_name_async();
 
     return hpx::finalize();
 }

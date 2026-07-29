@@ -16,6 +16,7 @@
 #include <hpx/supervision_dispatch/server/sentinel.hpp>
 
 #include <cstdint>
+#include <string>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -36,6 +37,9 @@ namespace hpx::supervision {
     public:
         explicit sentinel(
             hpx::id_type const& target_locality = hpx::invalid_id);
+
+        explicit sentinel(std::string const& symbolic_name);
+
         /* implicit */ sentinel(hpx::future<hpx::id_type>&& f);
 
         // Publish the `started` lifecycle event (at the given epoch) for
@@ -45,7 +49,7 @@ namespace hpx::supervision {
         publish_result start(hpx::launch::sync_policy, std::uint64_t epoch = 0,
             hpx::error_code& ec = hpx::throws) const;
 
-/// Register this sentinel's id with AGAS under a name pinned to the
+        /// Register this sentinel's id with AGAS under a name pinned to the
         /// locality that actually hosts its underlying server component
         /// (derived from the component's own id via
         /// hpx::naming::get_locality_id_from_id(), not the ambient
@@ -57,15 +61,15 @@ namespace hpx::supervision {
         ///
         /// \return A future that becomes ready with `true` if the name was
         ///         registered successfully, `false` otherwise.
-        hpx::future<bool> register_basename();
+        hpx::future<bool> register_name();
 
-        /// \copydoc register_basename()
+        /// \copydoc register_name()
         ///
         /// \param ec Used to hold the error code that results from the
         ///           operation instead of throwing an exception on failure.
         /// \return `true` if the name was registered successfully, `false`
         ///         otherwise.
-        bool register_basename(
+        bool register_name(
             hpx::launch::sync_policy, hpx::error_code& ec = hpx::throws);
 
         /// Remove this sentinel's AGAS name registration again, using the name
@@ -78,15 +82,16 @@ namespace hpx::supervision {
         ///
         /// \return A future that becomes ready with the id that was registered
         ///         under the removed name.
-        hpx::future<hpx::id_type> unregister_basename() const;
+        hpx::future<hpx::id_type> unregister_name() const;
 
-        /// \copydoc unregister_basename()
+        /// \copydoc unregister_name()
         ///
         /// \param ec Used to hold the error code that results from the
         ///           operation instead of throwing an exception on failure.
         /// \return The id that was registered under the removed name.
-        hpx::id_type unregister_basename(
-            hpx::launch::sync_policy, hpx::error_code& ec = hpx::throws) const;    };
+        hpx::id_type unregister_name(
+            hpx::launch::sync_policy, hpx::error_code& ec = hpx::throws) const;
+    };
 }    // namespace hpx::supervision
 
 #include <hpx/config/warnings_suffix.hpp>
