@@ -32,10 +32,7 @@
 // register_name() must succeed and register the sentinel's id under a name
 // pinned to the locality derived from the sentinel's own id (via
 // hpx::naming::get_locality_id_from_id()), not merely the ambient
-// hpx::get_locality_id() of the caller. To actually exercise that distinction
-// (rather than trivially satisfying it), the sentinel is created on a remote
-// locality when one is available, so that a regression that used the caller's
-// locality instead of the component's own locality would be detected.
+// hpx::get_locality_id() of the caller.
 void test_sentinel_register_name()
 {
     hpx::id_type const target = hpx::find_here();

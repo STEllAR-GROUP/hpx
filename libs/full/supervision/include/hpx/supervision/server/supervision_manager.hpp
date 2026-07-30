@@ -92,8 +92,6 @@ namespace hpx::supervision::server {
 
         ~supervision_manager();
 
-        void finalize() const;
-
         void register_server_instance(char const* service_name,
             std::uint32_t locality_id, error_code& ec = throws);
         void unregister_server_instance(error_code& ec = throws) const;
@@ -359,6 +357,14 @@ namespace hpx::supervision::server {
 
         static void invalidate_expired_waiters(expired_waiters_t& expired);
 
+        // Drains *all* waiters registered for `target`, across every epoch
+        // (unlike drain_stale_waiters_locked, which only drains epochs below a
+        // cutoff). Used when the target is being removed entirely, so no waiter
+        // should be left behind regardless of which epoch it was registered
+        // under.
+        stale_waiters_t drain_all_waiters_for_target_locked(
+            std::unique_lock<hpx::spinlock>& l, hpx::id_type const& target);
+
         // Opportunistic, lazy cleanup for abandoned await_terminal() waiters:
         // acquires mtx_, drains any waiter past its deadline, then invalidates
         // the drained waiters after releasing the lock. Called from both
@@ -402,20 +408,28 @@ namespace hpx::supervision::server {
         void recompute_earliest_deadline_locked(
             std::unique_lock<hpx::spinlock>& l);
 
-        // Internal helper for remove_target_from_agents_locked(): removes the
-        // given target from the agents_ map, if present.
+        // Removes the target from the agent's entry in agents_ (the agent ->
+        // targets inverse map) and erases the entry entirely once it becomes
+        // empty.
         void remove_target_from_agents_locked(
             std::unique_lock<hpx::spinlock>& l, hpx::id_type const& agent,
             hpx::id_type const& target);
 
     private:
         mutable hpx::spinlock mtx_;
-        std::string instance_name_;
+
+        // Serializes the actual pool_timer::init()/stop()/start() calls made by
+        // arm_sweep_timer_locked() and by the destructor, which perform them
+        // with mtx_ released (see arm_sweep_timer_locked() for why):
+        // sweep_timer_ is not safe against concurrent init()/stop()/start()
+        // calls, so this dedicated (non-busy-wait) lock protects it instead of
+        // mtx_.
+        hpx::spinlock sweep_timer_mtx_;
+
+        mutable char const* instance_name_ = nullptr;
 
         // registered events: targets -> states
         std::map<hpx::id_type, lifecycle_state> states_;
-        // current epoch per target: targets -> epoch
-        std::map<hpx::id_type, std::uint64_t> current_epoch_;
         // registered observers: targets -> observer entries (agent +
         // optional epoch filter)
         std::map<hpx::id_type, std::vector<observer_entry>> observers_;
@@ -482,14 +496,6 @@ namespace hpx::supervision::server {
         // than the one it is already running for.
         std::chrono::steady_clock::time_point armed_deadline_ =
             (std::chrono::steady_clock::time_point::max) ();
-
-        // Serializes the actual pool_timer::init()/stop()/start() calls made by
-        // arm_sweep_timer_locked() and by the destructor, which perform them
-        // with mtx_ released (see arm_sweep_timer_locked() for why):
-        // sweep_timer_ is not safe against concurrent init()/stop()/start()
-        // calls, so this dedicated (non-busy-wait) lock protects it instead of
-        // mtx_.
-        hpx::spinlock sweep_timer_mtx_;
 
         // Set by the destructor, under mtx_, before waiting for any
         // sweep_timer_callback() invocation already in flight (tracked by

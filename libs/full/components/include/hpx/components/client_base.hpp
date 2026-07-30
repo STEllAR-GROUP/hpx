@@ -378,7 +378,9 @@ namespace hpx::components {
         {
         }
 
-        // Connect this instance to an existing registered name
+        /// Connect this instance to an existing registered name.
+        ///
+        /// \param symbolic_name The AGAS name to resolve.
         explicit client_base(std::string const& symbolic_name)
           : client_base(agas::on_symbol_namespace_event(symbolic_name, true))
         {

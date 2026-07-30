@@ -24,8 +24,7 @@
 namespace hpx::supervision {
 
     sentinel::sentinel(hpx::id_type const& target_locality)
-      : base_type(hpx::new_<server::sentinel>(
-            target_locality ? target_locality : hpx::find_here()))
+      : base_type(hpx::new_<server::sentinel>(target_locality))
     {
     }
 
@@ -58,13 +57,10 @@ namespace hpx::supervision {
             hpx::naming::get_locality_id_from_id(this->get_id());
         std::string name = "/" + std::to_string(locality_id) +
             "/supervision_dispatch/sentinel";
-
-        // AGAS doesn't manage lifetime
-        return this->register_as(HPX_MOVE(name), false);
+        return this->register_as(HPX_MOVE(name));
     }
 
-    bool sentinel::register_name(
-        hpx::launch::sync_policy, hpx::error_code& ec)
+    bool sentinel::register_name(hpx::launch::sync_policy, hpx::error_code& ec)
     {
         return register_name().get(ec);
     }

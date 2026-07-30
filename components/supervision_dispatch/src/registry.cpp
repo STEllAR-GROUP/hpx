@@ -24,8 +24,7 @@
 namespace hpx::supervision {
 
     registry::registry(hpx::id_type const& target_locality)
-      : base_type(hpx::new_<server::registry>(
-            target_locality ? target_locality : hpx::find_here()))
+      : base_type(hpx::new_<server::registry>(target_locality))
     {
     }
 
@@ -63,9 +62,7 @@ namespace hpx::supervision {
             hpx::naming::get_locality_id_from_id(this->get_id());
         std::string name = "/" + std::to_string(locality_id) +
             "/supervision_dispatch/registry";
-
-        // AGAS doesn't manage lifetime
-        return this->register_as(HPX_MOVE(name), false);
+        return this->register_as(HPX_MOVE(name));
     }
 
     bool registry::register_name(hpx::launch::sync_policy, hpx::error_code& ec)

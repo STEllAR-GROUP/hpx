@@ -35,8 +35,18 @@ namespace hpx::supervision {
             hpx::components::client_base<sentinel, server::sentinel>;
 
     public:
-        explicit sentinel(
-            hpx::id_type const& target_locality = hpx::invalid_id);
+        /// Constructs an empty (not-yet-connected) sentinel client, suitable
+        /// for later binding to an existing, remotely registered sentinel via
+        /// the constructor taking a symbol name (see discover_peers()). Unlike
+        /// the constructor below (taking the locality), this does not create a
+        /// new server-side component.
+        sentinel() = default;
+
+        /// \brief Constructs a sentinel by creating a new server-side component
+        ///        on the given target locality.
+        /// \param target_locality The locality on which the underlying sentinel
+        ///        component will be created.
+        explicit sentinel(hpx::id_type const& target_locality);
 
         explicit sentinel(std::string const& symbolic_name);
 
@@ -73,7 +83,7 @@ namespace hpx::supervision {
             hpx::launch::sync_policy, hpx::error_code& ec = hpx::throws);
 
         /// Remove this sentinel's AGAS name registration again, using the name
-        /// most recently established by register_basename() (retrieved via
+        /// most recently established by register_name() (retrieved via
         /// registered_name(), the single source of truth client_base already
         /// maintains for it). Calling this explicitly is safe even though
         /// destroying this sentinel also unregisters its name automatically

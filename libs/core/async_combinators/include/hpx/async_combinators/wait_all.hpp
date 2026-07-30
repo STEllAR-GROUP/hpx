@@ -20,9 +20,9 @@ namespace hpx {
     /// \param first    The iterator pointing to the first element of a
     ///                 sequence of \a future or \a shared_future objects for
     ///                 which \a wait_all should wait.
-    /// \param last     The iterator pointing to the last element of a
-    ///                 sequence of \a future or \a shared_future objects for
-    ///                 which \a wait_all should wait.
+    /// \param last     The iterator pointing to the element after the last one
+    ///                 of a sequence of \a future or \a shared_future objects
+    ///                 for which \a wait_all should wait.
     ///
     /// \note The function \a wait_all returns after all futures have become
     ///       ready. All input futures are still valid after \a wait_all
@@ -140,6 +140,172 @@ namespace hpx {
     ///
     template <typename InputIter>
     void wait_all_n(InputIter begin, std::size_t count);
+
+    /// The function \a wait_all_nothrow is an operator allowing to join on the
+    /// result of all given futures. It AND-composes all future objects given
+    /// and returns after they finished executing, similar to \a wait_all. It
+    /// differs from \a wait_all in that it will not rethrow any exceptions
+    /// captured by the given futures while they became ready.
+    ///
+    /// \param first    The iterator pointing to the first element of a
+    ///                 sequence of \a future or \a shared_future objects for
+    ///                 which \a wait_all_nothrow should wait.
+    /// \param last     The iterator pointing to the element after the last one
+    ///                 of a sequence of \a future or \a shared_future objects
+    ///                 for which \a wait_all_nothrow should wait.
+    ///
+    /// \return         Returns \a true if any of the given futures held an
+    ///                 exception once it became ready, and \a false otherwise.
+    ///
+    /// \note The function \a wait_all_nothrow returns after all futures have
+    ///       become ready. All input futures are still valid after
+    ///       \a wait_all_nothrow returns.
+    ///
+    /// \note           Unlike \a wait_all, this function will not rethrow any
+    ///                 exceptions captured by the futures while becoming ready.
+    ///                 Any such exceptions are not rethrown by this call; the
+    ///                 caller can use the returned \a bool to detect their
+    ///                 presence.
+    ///
+    template <typename InputIter>
+    bool wait_all_nothrow(InputIter first, InputIter last);
+
+    /// The function \a wait_all_nothrow is an operator allowing to join on the
+    /// result of all given futures. It AND-composes all future objects given
+    /// and returns after they finished executing, similar to \a wait_all. It
+    /// differs from \a wait_all in that it will not rethrow any exceptions
+    /// captured by the given futures while they became ready.
+    ///
+    /// \param futures  A vector or array holding an arbitrary amount of
+    ///                 \a future or \a shared_future objects for which
+    ///                 \a wait_all_nothrow should wait.
+    ///
+    /// \return         Returns \a true if any of the given futures held an
+    ///                 exception once it became ready, and \a false otherwise.
+    ///
+    /// \note The function \a wait_all_nothrow returns after all futures have
+    ///       become ready. All input futures are still valid after
+    ///       \a wait_all_nothrow returns.
+    ///
+    /// \note           Unlike \a wait_all, this function will not rethrow any
+    ///                 exceptions captured by the futures while becoming ready.
+    ///                 Any such exceptions are not rethrown by this call; the
+    ///                 caller can use the returned \a bool to detect their
+    ///                 presence.
+    ///
+    template <typename R>
+    bool wait_all_nothrow(std::vector<future<R>>&& futures);
+
+    /// The function \a wait_all_nothrow is an operator allowing to join on the
+    /// result of all given futures. It AND-composes all future objects given
+    /// and returns after they finished executing, similar to \a wait_all. It
+    /// differs from \a wait_all in that it will not rethrow any exceptions
+    /// captured by the given futures while they became ready.
+    ///
+    /// \param futures  A vector or array holding an arbitrary amount of
+    ///                 \a future or \a shared_future objects for which
+    ///                 \a wait_all_nothrow should wait.
+    ///
+    /// \return         Returns \a true if any of the given futures held an
+    ///                 exception once it became ready, and \a false otherwise.
+    ///
+    /// \note The function \a wait_all_nothrow returns after all futures have
+    ///       become ready. All input futures are still valid after
+    ///       \a wait_all_nothrow returns.
+    ///
+    /// \note           Unlike \a wait_all, this function will not rethrow any
+    ///                 exceptions captured by the futures while becoming ready.
+    ///                 Any such exceptions are not rethrown by this call; the
+    ///                 caller can use the returned \a bool to detect their
+    ///                 presence.
+    ///
+    template <typename R, std::size_t N>
+    bool wait_all_nothrow(std::array<future<R>, N>&& futures);
+
+    /// The function \a wait_all_nothrow is an operator allowing to join on the
+    /// result of all given futures. It AND-composes all future objects given
+    /// and returns after they finished executing, similar to \a wait_all. It
+    /// differs from \a wait_all in that it will not rethrow any exceptions
+    /// captured by the given future while it became ready.
+    ///
+    /// \param f        A \a future or \a shared_future for which
+    ///                 \a wait_all_nothrow should wait.
+    ///
+    /// \return         Returns \a true if the given future held an exception
+    ///                 once it became ready, and \a false otherwise.
+    ///
+    /// \note The function \a wait_all_nothrow returns after the future has
+    ///       become ready. The input future is still valid after
+    ///       \a wait_all_nothrow returns.
+    ///
+    /// \note           Unlike \a wait_all, this function will not rethrow any
+    ///                 exception captured by the future while becoming ready.
+    ///                 Any such exception is silently discarded; the caller can
+    ///                 use the returned \a bool to detect its presence.
+    ///
+    template <typename T>
+    bool wait_all_nothrow(hpx::future<T> const& f);
+
+    /// The function \a wait_all_nothrow is an operator allowing to join on the
+    /// result of all given futures. It AND-composes all future objects given
+    /// and returns after they finished executing, similar to \a wait_all. It
+    /// differs from \a wait_all in that it will not rethrow any exceptions
+    /// captured by the given futures while they became ready.
+    ///
+    /// \param futures  An arbitrary number of \a future or \a shared_future
+    ///                 objects, possibly holding different types for which
+    ///                 \a wait_all_nothrow should wait.
+    ///
+    /// \return         Returns \a true if any of the given futures held an
+    ///                 exception once it became ready, and \a false otherwise.
+    ///
+    /// \note The function \a wait_all_nothrow returns after all futures have
+    ///       become ready. All input futures are still valid after
+    ///       \a wait_all_nothrow returns.
+    ///
+    /// \note           Unlike \a wait_all, this function will not rethrow any
+    ///                 exceptions captured by the futures while becoming ready.
+    ///                 Any such exceptions are not rethrown by this call; the
+    ///                 caller can use the returned \a bool to detect their
+    ///                 presence.
+    ///
+    template <typename... T>
+    bool wait_all_nothrow(T&&... futures);
+
+    /// The function \a wait_all_n_nothrow is an operator allowing to join on
+    /// the result of all given futures. It AND-composes all future objects
+    /// given and returns after they finished executing, similar to
+    /// \a wait_all_n. It differs from \a wait_all_n in that it will not
+    /// rethrow any exceptions captured by the given futures while they became
+    /// ready.
+    ///
+    /// \param begin    The iterator pointing to the first element of a
+    ///                 sequence of \a future or \a shared_future objects for
+    ///                 which \a wait_all_n_nothrow should wait.
+    /// \param count    The number of elements in the sequence starting at
+    ///                 \a first.
+    ///
+    /// \return         The function \a wait_all_n_nothrow returns a pair
+    ///                 consisting of an iterator referring to the first element
+    ///                 in the input sequence after the last processed element,
+    ///                 and a \a bool that is \a true if any of the given
+    ///                 futures held an exception once it became ready, and \a
+    ///                 false otherwise.
+    ///
+    /// \note The function \a wait_all_n_nothrow returns after all futures have
+    ///       become ready. All input futures are still valid after
+    ///       \a wait_all_n_nothrow returns.
+    ///
+    /// \note           Unlike \a wait_all_n, this function will not rethrow
+    ///                 any exceptions captured by the futures while becoming
+    ///                 ready. Any such exceptions are not rethrown by this
+    ///                 call; the caller can use the returned \a bool to detect
+    ///                 their presence.
+    ///
+    template <typename InputIter>
+    std::pair<InputIter, bool> wait_all_n_nothrow(
+        InputIter begin, std::size_t count);
+
 }    // namespace hpx
 
 #else    // DOXYGEN

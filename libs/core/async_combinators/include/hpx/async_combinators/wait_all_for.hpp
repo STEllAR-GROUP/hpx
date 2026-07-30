@@ -25,9 +25,9 @@ namespace hpx {
     /// \param first    The iterator pointing to the first element of a
     ///                 sequence of \a future or \a shared_future objects for
     ///                 which \a wait_all_for should wait.
-    /// \param last     The iterator pointing to the last element of a
-    ///                 sequence of \a future or \a shared_future objects for
-    ///                 which \a wait_all_for should wait.
+    /// \param last     The iterator pointing to the element after the last one
+    ///                 of a sequence of \a future or \a shared_future objects
+    ///                 for which \a wait_all_for should wait.
     ///
     /// \return         Returns \a hpx::future_status::ready if all the
     ///                 given futures have become ready before \a timeout has
@@ -268,9 +268,9 @@ namespace hpx {
     /// \param first    The iterator pointing to the first element of a
     ///                 sequence of \a future or \a shared_future objects for
     ///                 which \a wait_all_for_nothrow should wait.
-    /// \param last     The iterator pointing to the last element of a
-    ///                 sequence of \a future or \a shared_future objects for
-    ///                 which \a wait_all_for_nothrow should wait.
+    /// \param last     The iterator pointing to the element after the last one
+    ///                 of a sequence of \a future or \a shared_future objects
+    ///                 for which \a wait_all_for_nothrow should wait.
     ///
     /// \return         Returns a \a wait_all_for_nothrow_result object whose
     ///                 \a status member is \a hpx::future_status::ready if all
@@ -289,8 +289,8 @@ namespace hpx {
     ///
     /// \note           Unlike \a wait_all_for, this function will not
     ///                 rethrow any exceptions captured by the futures while
-    ///                 becoming ready. Any such exceptions are silently
-    ///                 discarded.
+    ///                 becoming ready. Any such exceptions are not rethrown by
+    ///                 this call.
     ///
     template <typename InputIter>
     hpx::wait_all_for_nothrow_result wait_all_for_nothrow(
@@ -327,8 +327,8 @@ namespace hpx {
     ///
     /// \note           Unlike \a wait_all_for, this function will not
     ///                 rethrow any exceptions captured by the futures while
-    ///                 becoming ready. Any such exceptions are silently
-    ///                 discarded.
+    ///                 becoming ready. Any such exceptions are not rethrown by
+    ///                 this call.
     ///
     template <typename R>
     hpx::wait_all_for_nothrow_result wait_all_for_nothrow(
@@ -365,8 +365,8 @@ namespace hpx {
     ///
     /// \note           Unlike \a wait_all_for, this function will not
     ///                 rethrow any exceptions captured by the futures while
-    ///                 becoming ready. Any such exceptions are silently
-    ///                 discarded.
+    ///                 becoming ready. Any such exceptions are not rethrown by
+    ///                 this call.
     ///
     template <typename R, std::size_t N>
     hpx::wait_all_for_nothrow_result wait_all_for_nothrow(
@@ -438,8 +438,8 @@ namespace hpx {
     ///
     /// \note           Unlike \a wait_all_for, this function will not
     ///                 rethrow any exceptions captured by the futures while
-    ///                 becoming ready. Any such exceptions are silently
-    ///                 discarded.
+    ///                 becoming ready. Any such exceptions are not rethrown by
+    ///                 this call.
     ///
     template <typename... T>
     hpx::wait_all_for_nothrow_result wait_all_for_nothrow(
@@ -478,8 +478,8 @@ namespace hpx {
     ///
     /// \note           Unlike \a wait_all_for_n, this function will not
     ///                 rethrow any exceptions captured by the futures while
-    ///                 becoming ready. Any such exceptions are silently
-    ///                 discarded.
+    ///                 becoming ready. Any such exceptions are not rethrown by
+    ///                 this call.
     ///
     template <typename InputIter>
     hpx::wait_all_for_nothrow_result wait_all_for_n_nothrow(

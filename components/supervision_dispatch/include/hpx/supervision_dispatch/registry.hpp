@@ -30,8 +30,18 @@ namespace hpx::supervision {
             hpx::components::client_base<registry, server::registry>;
 
     public:
-        explicit registry(
-            hpx::id_type const& target_locality = hpx::invalid_id);
+        /// Constructs an empty (not-yet-connected) registry client, suitable
+        /// for later binding to an existing, remotely registered registry via
+        /// the constructor taking a symbol name (see discover_peers()). Unlike
+        /// the constructor below (taking the locality), this does not create a
+        /// new server-side component.
+        registry() = default;
+
+        /// \brief Constructs a registry by creating a new server-side
+        ///        component on the given target locality.
+        /// \param target_locality The locality on which the underlying
+        ///        registry component will be created.
+        explicit registry(hpx::id_type const& target_locality);
 
         explicit registry(std::string const& symbolic_name);
 
@@ -71,7 +81,7 @@ namespace hpx::supervision {
             hpx::launch::sync_policy, hpx::error_code& ec = hpx::throws);
 
         /// Remove this registry's AGAS name registration again, using the name
-        /// most recently established by register_basename() (retrieved via
+        /// most recently established by register_name() (retrieved via
         /// registered_name(), the single source of truth client_base already
         /// maintains for it). Calling this explicitly is safe even though
         /// destroying this registry also unregisters its name automatically

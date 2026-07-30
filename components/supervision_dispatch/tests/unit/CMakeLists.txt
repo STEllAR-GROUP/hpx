@@ -4,9 +4,18 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests basename_registration discover_peers fan_out_join registry_join
-          sentinel_start
+set(tests
+    symbol_name_registration
+    discover_and_join
+    discover_peers
+    dispatch_api
+    fan_out_join
+    registry_join
+    sentinel_start
 )
+
+set(discover_and_join_PARAMETERS LOCALITIES 2)
+set(discover_and_join_FLAGS COMPILE_FLAGS -DHPX_HAVE_RUN_MAIN_EVERYWHERE)
 
 set(discover_peers_PARAMETERS LOCALITIES 2)
 set(discover_peers_FLAGS COMPILE_FLAGS -DHPX_HAVE_RUN_MAIN_EVERYWHERE)
