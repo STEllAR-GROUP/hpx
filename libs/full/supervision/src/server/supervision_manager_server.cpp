@@ -1679,7 +1679,7 @@ namespace hpx::supervision::server {
         agas::register_name(launch::sync, instance_name, gid, ec);
     }
 
-    void supervision_manager::unregister_server_instance(error_code& ec) const
+    void supervision_manager::unregister_server_instance(error_code&) const
     {
         if (instance_name_ != nullptr)
         {
