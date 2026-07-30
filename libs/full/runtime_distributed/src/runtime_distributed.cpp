@@ -254,6 +254,11 @@ namespace hpx {
 
             init_id_pool_range();
 
+            // The endpoints have just been published, so remember what was
+            // said about this locality. Binding must not contradict it.
+            parcelset::locality const published =
+                pp ? pp->here() : parcelset::locality();
+
             hpx::detail::try_catch_exception_ptr(
                 [&]() {
                     if (pp)
@@ -269,21 +274,24 @@ namespace hpx {
                     std::terminate();
                 });
 
-            // Every other locality finds the AGAS root by reading its address
-            // out of its own configuration, so the root is the one locality
-            // whose endpoint cannot be chosen at bind time: no peer would be
-            // able to discover the choice. Say so, rather than let the run
-            // continue with an address that has already been published and no
-            // longer describes this locality.
-            if (pp && pp->here() != pp->agas_locality(rtcfg_))
+            // Binding may settle an endpoint that was left open in the
+            // configuration, which every other locality is free to do. The
+            // root is the exception: its endpoint has already been published
+            // above, and the peers that will look for it read that endpoint
+            // from their own configuration rather than from AGAS, so a root
+            // that moved is a root nobody can reach. Only a change is
+            // rejected here; an endpoint that disagreed with the
+            // configuration from the start is a separate, pre-existing
+            // condition and is left alone.
+            if (pp && pp->here() != published)
             {
                 HPX_THROW_EXCEPTION(hpx::error::network_error,
                     "runtime_distributed::initialize_agas",
-                    "the AGAS root bound {} but the configuration advertises "
-                    "it as {}; the root locality cannot let its endpoint be "
-                    "assigned at bind time because every other locality reads "
-                    "that endpoint from its own configuration",
-                    pp->here(), pp->agas_locality(rtcfg_));
+                    "the AGAS root locality published {} and then bound {}; "
+                    "the root cannot have its endpoint assigned at bind time "
+                    "because every other locality reads that endpoint from "
+                    "its own configuration",
+                    published, pp->here());
             }
 
             agas::get_big_boot_barrier().wait_bootstrap();
