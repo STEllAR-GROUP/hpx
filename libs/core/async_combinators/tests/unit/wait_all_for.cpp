@@ -16,7 +16,7 @@
 
 hpx::future<int> make_future()
 {
-    return hpx::make_ready_future_after(std::chrono::milliseconds(100), 42);
+    return hpx::make_ready_future_after(std::chrono::milliseconds(50), 42);
 }
 
 void test_wait_all_for()
@@ -181,7 +181,7 @@ void test_wait_all_for()
         auto f1 = make_future();
 
         auto const [status, has_exceptional_future] = hpx::wait_all_for_nothrow(
-            std::chrono::milliseconds(200), f1, never_ready);
+            std::chrono::milliseconds(500), f1, never_ready);
 
         HPX_TEST(status == hpx::future_status::timeout);
         HPX_TEST(!has_exceptional_future);
@@ -222,7 +222,8 @@ void test_wait_all_for()
         bool caught_exception = false;
         try
         {
-            hpx::wait_all_for(std::chrono::milliseconds(200), never_ready);
+            HPX_TEST(hpx::wait_all_for(std::chrono::milliseconds(200),
+                         never_ready) == hpx::future_status::timeout);
         }
         catch (...)
         {

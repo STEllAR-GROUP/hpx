@@ -31,7 +31,7 @@ namespace hpx::supervision::server {
     public:
         sentinel();
 
-        // Publish event::started for this sentinel at the give epoch. Consumes
+        // Publish event::started for this sentinel at the given epoch. Consumes
         // the public hpx::supervision API purely as an external client.
         hpx::supervision::publish_result start(std::uint64_t epoch) const;
 
