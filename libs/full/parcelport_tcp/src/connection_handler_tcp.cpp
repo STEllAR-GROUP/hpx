@@ -108,9 +108,6 @@ namespace hpx::parcelset::policies::tcp {
                 acceptor_->set_option(tcp::acceptor::reuse_address(true));
                 acceptor_->bind(ep);
                 acceptor_->listen();
-                acceptor_->async_accept(receiver_conn->socket(),
-                    hpx::bind(&connection_handler::handle_accept, this,
-                        placeholders::_1, receiver_conn));
 
                 // Advertise the port the acceptor actually bound rather than
                 // the one that was requested. The two differ when the
@@ -126,13 +123,24 @@ namespace hpx::parcelset::policies::tcp {
                 // so at most one bind succeeds and there is exactly one port
                 // to report; later iterations fail in open() and are collected
                 // as errors below.
-                if (std::uint16_t const bound_port =
-                        acceptor_->local_endpoint().port();
-                    bound_port != here_.get<locality>().port())
+                //
+                // This runs before the first async_accept so that no handler
+                // can observe a half-updated locality, and it asks for the
+                // endpoint without throwing: the socket is bound either way,
+                // and a failure to read it back is not a reason to treat this
+                // endpoint as unusable.
+                std::error_code local_ec;
+                if (tcp::endpoint const bound =
+                        acceptor_->local_endpoint(local_ec);
+                    !local_ec && bound.port() != here_.get<locality>().port())
                 {
-                    here_ = parcelset::locality(
-                        locality(here_.get<locality>().address(), bound_port));
+                    here_ = parcelset::locality(locality(
+                        here_.get<locality>().address(), bound.port()));
                 }
+
+                acceptor_->async_accept(receiver_conn->socket(),
+                    hpx::bind(&connection_handler::handle_accept, this,
+                        placeholders::_1, receiver_conn));
             }
             catch (std::system_error const&)
             {
