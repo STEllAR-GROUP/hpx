@@ -109,26 +109,18 @@ namespace hpx::parcelset::policies::tcp {
                 acceptor_->bind(ep);
                 acceptor_->listen();
 
-                // Advertise the port the acceptor actually bound rather than
-                // the one that was requested. The two differ when the
-                // configuration asks for port 0, which hands the choice to the
-                // operating system; without this nothing would ever learn
-                // which port it picked and no peer could connect.
+                // Advertise the port that was bound, not the one that was
+                // asked for. They differ when the configuration says port 0,
+                // which hands the choice to the operating system; without this
+                // nothing learns which port it picked and no peer can connect.
                 //
-                // Only the port is taken from the acceptor. The address stays
-                // as configured, because the bound address may be a wildcard
-                // that is not reachable from anywhere else.
-                //
-                // A single acceptor is shared by every iteration of this loop,
-                // so at most one bind succeeds and there is exactly one port
-                // to report; later iterations fail in open() and are collected
-                // as errors below.
-                //
-                // This runs before the first async_accept so that no handler
-                // can observe a half-updated locality, and it asks for the
-                // endpoint without throwing: the socket is bound either way,
-                // and a failure to read it back is not a reason to treat this
-                // endpoint as unusable.
+                // Only the port is taken. The bound address may be a wildcard
+                // that is reachable from nowhere, so the configured one stays.
+                // One acceptor serves the whole loop, so at most one bind
+                // succeeds and there is exactly one port to report. Reading it
+                // back is done before the first async_accept, and without
+                // throwing: a bound socket that cannot be queried is still
+                // usable.
                 std::error_code local_ec;
                 if (tcp::endpoint const bound =
                         acceptor_->local_endpoint(local_ec);
