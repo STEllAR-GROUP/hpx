@@ -30,6 +30,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <iterator>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -147,13 +148,24 @@ int hpx_main(hpx::program_options::variables_map& vm)
     }
     HPX_TEST(launched != hpx::invalid_id);
 
-    // AGAS has to hold an endpoint for it at all.
+    // AGAS has to hold the endpoint the locality actually bound, not the one
+    // it was configured with. Advertising the configured port would register
+    // this locality on port zero.
     {
         hpx::error_code ec;
         auto const& endpoints = hpx::naming::get_agas_client().resolve_locality(
             launched.get_gid(), ec);
         HPX_TEST(!ec);
         HPX_TEST(!endpoints.empty());
+
+        for (auto const& ep : endpoints)
+        {
+            std::ostringstream os;
+            os << ep.second;
+
+            // the locality prints as "address:port"
+            HPX_TEST(!os.str().ends_with(":0"));
+        }
     }
 
     // Releasing the latch is what proves the locality is reachable: the
