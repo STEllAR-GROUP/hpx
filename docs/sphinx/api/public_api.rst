@@ -559,7 +559,9 @@ Functions
    :cpp:func:`hpx::when_some`
    :cpp:func:`hpx::when_each`
    :cpp:func:`hpx::wait_all`
+   :cpp:func:`hpx::wait_all_nothrow`
    :cpp:func:`hpx::wait_all_for`
+   :cpp:func:`hpx::wait_all_for_nothrow`
    :cpp:func:`hpx::wait_any`
    :cpp:func:`hpx::wait_some`
    :cpp:func:`hpx::wait_each`

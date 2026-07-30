@@ -17,6 +17,7 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #include <hpx/hpx_init.hpp>
+#include <hpx/modules/collectives.hpp>
 #include <hpx/modules/runtime_distributed.hpp>
 #include <hpx/modules/supervision.hpp>
 #include <hpx/modules/testing.hpp>
@@ -26,6 +27,7 @@
 #include <hpx/supervision_dispatch/sentinel.hpp>
 
 #include <chrono>
+#include <cstddef>
 #include <cstdint>
 #include <vector>
 
@@ -129,6 +131,12 @@ void test_discover_peers_finds_registered_peer()
 int hpx_main()
 {
     test_discover_peers_excludes_unregistered_peer();
+
+    // A fast locality can register names in the second test while another is
+    // still running the unregistered-peer assertion, making the first test
+    // flaky. This barrier prevents this from happening
+    hpx::distributed::barrier::synchronize();
+
     test_discover_peers_finds_registered_peer();
 
     return hpx::finalize();
