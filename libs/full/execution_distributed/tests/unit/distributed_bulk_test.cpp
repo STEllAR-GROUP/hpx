@@ -22,17 +22,21 @@
 
 #include <atomic>
 #include <cstddef>
+#include <vector>
 
 namespace ex = hpx::execution::experimental;
 namespace tt = hpx::this_thread::experimental;
 
 ///////////////////////////////////////////////////////////////////////////////
-// Test 1: basic bulk with integral shape on local distributed_scheduler.
+// Test 1: basic bulk with integral shape targeting a remote locality.
 //         Verifies the function is invoked exactly `shape` times.
 void test_bulk_integral_shape()
 {
-    auto sched =
-        hpx::distributed::experimental::distributed_scheduler{hpx::find_here()};
+    std::vector<hpx::id_type> remotes = hpx::find_remote_localities();
+    HPX_TEST(!remotes.empty());
+    hpx::id_type target = remotes.empty() ? hpx::find_here() : remotes[0];
+
+    auto sched = hpx::distributed::experimental::distributed_scheduler{target};
 
     std::atomic<int> count{0};
     auto snd = ex::schedule(sched) | ex::bulk(10, [&](int) { count++; });
@@ -107,7 +111,7 @@ void test_bulk_exception_propagation()
     }
     catch (...)
     {
-        caught_exception = true;
+        HPX_TEST(false);    // unexpected exception type
     }
     HPX_TEST(caught_exception);
 }
