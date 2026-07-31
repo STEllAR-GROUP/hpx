@@ -44,7 +44,8 @@ namespace hpx::supervision::server {
     public:
         registry();
 
-        /// \brief Joins a peer sentinel and creates or reuses its shadow.
+        /// Joins a peer sentinel and creates or reuses its shadow.
+        ///
         /// \param peer_sentinel The peer sentinel to observe.
         /// \param peer_locality The locality that owns \p peer_sentinel.
         hpx::id_type join(hpx::id_type const& peer_sentinel,
@@ -77,6 +78,23 @@ namespace hpx::supervision::server {
         void evict_peer(hpx::id_type const& peer_sentinel,
             hpx::id_type const& peer_locality, hpx::id_type const& shadow);
 
+        /// Unregisters a peer's observers and removes its shadow state.
+        ///
+        /// Performs the actual peer teardown deferred by evict_peer():
+        /// unregisters \p lifecycle_observer and \p activity_observer on
+        /// \p peer_locality and removes the shadow's locally tracked
+        /// supervision state. Kept separate from evict_peer() because
+        /// evict_peer() only posts this work as a task (via hpx::post())
+        /// rather than performing it inline.
+        ///
+        /// \param peer_locality The locality that owns the observers.
+        /// \param lifecycle_observer The lifecycle observer id to unregister.
+        /// \param activity_observer The activity observer id to unregister.
+        /// \param shadow The peer's shadow whose local state is removed.
+        static void cleanup_peer(hpx::id_type const& peer_locality,
+            hpx::id_type const& lifecycle_observer,
+            hpx::id_type const& activity_observer, hpx::id_type const& shadow);
+
     private:
         struct peer_entry
         {
@@ -90,6 +108,10 @@ namespace hpx::supervision::server {
             // the entry. Concurrent join() calls for the same peer wait on
             // cond_ instead of racing to register duplicate observers.
             bool ready = false;
+
+            // Ensure that a terminal notification racing ahead of join()
+            // completion can be deferred instead of dropped.
+            bool evict_pending = false;
         };
 
         hpx::spinlock mtx_;

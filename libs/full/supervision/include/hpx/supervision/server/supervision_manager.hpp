@@ -426,7 +426,7 @@ namespace hpx::supervision::server {
         // mtx_.
         hpx::spinlock sweep_timer_mtx_;
 
-        mutable char const* instance_name_ = nullptr;
+        mutable std::string instance_name_;
 
         // registered events: targets -> states
         std::map<hpx::id_type, lifecycle_state> states_;

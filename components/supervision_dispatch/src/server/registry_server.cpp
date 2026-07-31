@@ -255,6 +255,25 @@ namespace hpx::supervision::server {
         {
             shadow = make_shadow_target();
 
+            // join() itself must not rely solely on a future notification to
+            // establish the shadow's initial started state (see the registered
+            // observer callback in register_observers() above).
+            {
+                hpx::error_code ec(hpx::throwmode::lightweight);
+                auto const peer_state = hpx::supervision::query_state(
+                    hpx::launch::sync, peer_locality, peer_sentinel, ec);
+                std::uint64_t const seed_epoch = !ec ? peer_state.epoch : 0;
+
+                hpx::error_code ec1(hpx::throwmode::lightweight);
+                hpx::supervision::publish_event(
+                    shadow, hpx::supervision::event::started, seed_epoch, ec1);
+            }
+
+            {
+                std::scoped_lock<hpx::spinlock> l(mtx_);
+                peers_.at(peer_sentinel).shadow = shadow;
+            }
+
             // Register for lifecycle-event notifications published for the
             // peer's sentinel.
             std::tie(lifecycle_observer, activity_observer) =
@@ -265,13 +284,22 @@ namespace hpx::supervision::server {
             // Unconditionally release the reservation made by
             // reserve_ownership() above so a concurrent join() for the same
             // peer, waiting in cond_.wait(l), is not left hanging forever.
-            std::unique_lock l(mtx_);
-            peers_.erase(peer_sentinel);
-            cond_.notify_all(HPX_MOVE(l));
+            {
+                std::unique_lock l(mtx_);
+                peers_.erase(peer_sentinel);
+                cond_.notify_all(HPX_MOVE(l));
+            }
+
+            if (shadow)
+            {
+                hpx::error_code ec(hpx::throwmode::lightweight);
+                hpx::supervision::remove_target(shadow, ec);
+            }
 
             std::rethrow_exception(std::current_exception());
         }
 
+        bool need_cleanup = false;
         {
             std::unique_lock l(mtx_);
             peer_entry& entry = peers_.at(peer_sentinel);
@@ -282,9 +310,19 @@ namespace hpx::supervision::server {
             entry.activity_observer = activity_observer;
             entry.ready = true;
 
+            if (entry.evict_pending)
+            {
+                peers_.erase(peer_sentinel);
+                need_cleanup = true;
+            }
             cond_.notify_all(HPX_MOVE(l));
         }
 
+        if (need_cleanup)
+        {
+            cleanup_peer(
+                peer_locality, lifecycle_observer, activity_observer, shadow);
+        }
         return shadow;
     }
 
@@ -310,6 +348,12 @@ namespace hpx::supervision::server {
                 return;
             }
 
+            if (!it->second.ready)
+            {
+                it->second.evict_pending = true;
+                return;
+            }
+
             lifecycle_observer = it->second.lifecycle_observer;
             activity_observer = it->second.activity_observer;
             peers_.erase(it);
@@ -317,6 +361,14 @@ namespace hpx::supervision::server {
             cond_.notify_all(HPX_MOVE(l));
         }
 
+        cleanup_peer(
+            peer_locality, lifecycle_observer, activity_observer, shadow);
+    }
+
+    void registry::cleanup_peer(hpx::id_type const& peer_locality,
+        hpx::id_type const& lifecycle_observer,
+        hpx::id_type const& activity_observer, hpx::id_type const& shadow)
+    {
         if (lifecycle_observer)
         {
             hpx::error_code ec(hpx::throwmode::lightweight);

@@ -29,25 +29,6 @@ namespace {
     // comfortably absorb AGAS/peer-startup jitter for the "already registered"
     // case.
     constexpr std::chrono::seconds test_discovery_timeout{2};
-
-    // Helper reserved for a stricter "no symbol name registered" check once the
-    // sentinel/registry symbol naming scheme is exposed to tests. Not yet wired
-    // into the assertions below (see note at the bottom of this file); kept
-    // here so it's ready to use without re-deriving the AGAS lookup.
-    bool any_symbol_name_resolves(std::vector<std::string> const& symbol_names)
-    {
-        for (std::string const& name : symbol_names)
-        {
-            hpx::error_code ec(hpx::throwmode::lightweight);
-            hpx::id_type const id =
-                hpx::agas::resolve_name(hpx::launch::sync, name, ec);
-            if (!ec && id != hpx::invalid_id)
-            {
-                return true;
-            }
-        }
-        return false;
-    }
 }    // namespace
 
 // Scenario 1: no side effects before init.

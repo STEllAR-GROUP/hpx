@@ -1793,8 +1793,8 @@ void test_legal_new_epoch_opened_with_started(hpx::id_type const& locality)
     hpx::id_type const target = make_test_target();
     constexpr std::uint64_t epoch = 1;
 
-    hpx::supervision::publish_event(hpx::launch::sync, locality, target,
-        hpx::supervision::event::started, epoch);
+    reach_running_at_epoch(locality, target, epoch);
+
     hpx::supervision::publish_event(hpx::launch::sync, locality, target,
         hpx::supervision::event::completed, epoch);
 

@@ -107,6 +107,10 @@ void test_discover_and_join_bidirectional()
             HPX_TEST_EQ(shadows_again[i], shadows[i]);
         }
     }
+
+    // Keep both localities' names registered until every participant has
+    // finished its second discovery pass.
+    hpx::distributed::barrier::synchronize();
 }
 
 // ============================================================================

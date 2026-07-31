@@ -24,14 +24,12 @@
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
-#include <cstdlib>
 #include <exception>
 #include <iterator>
 #include <map>
 #include <mutex>
 #include <optional>
 #include <ranges>
-#include <string.h>
 #include <string>
 #include <utility>
 #include <vector>
@@ -1662,9 +1660,6 @@ namespace hpx::supervision::server {
         instance_name += service_name;
         instance_name += supervision::server::supervision_manager_name;
 
-        std::free(const_cast<char*>(instance_name_));
-        instance_name_ = strdup(service_name);
-
         auto const gid = get_unmanaged_id().get_gid();
         naming::address const manager_address(agas::get_locality(),
             components::get_component_type<
@@ -1674,14 +1669,16 @@ namespace hpx::supervision::server {
         if (ec)
             return;
 
+        instance_name_ = service_name;
+
         // register a gid (not the id) to avoid AGAS holding a reference to this
         // component
         agas::register_name(launch::sync, instance_name, gid, ec);
     }
 
-    void supervision_manager::unregister_server_instance(error_code&) const
+    void supervision_manager::unregister_server_instance(error_code& ec) const
     {
-        if (instance_name_ != nullptr)
+        if (!instance_name_.empty())
         {
             std::string instance_name = supervision::service_name;
             instance_name += instance_name_;
@@ -1689,8 +1686,7 @@ namespace hpx::supervision::server {
 
             agas::unregister_name(launch::sync, instance_name, ec);
 
-            std::free(const_cast<char*>(instance_name_));
-            instance_name_ = nullptr;
+            instance_name_.clear();
         }
     }
 }    // namespace hpx::supervision::server

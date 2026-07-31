@@ -45,7 +45,6 @@ namespace hpx {
     ///                 all the   given futures became ready before the timeout
     ///                 elapsed. If this behavior is undesirable, use
     ///                 \a wait_all_for_nothrow instead.
-    ///
     template <typename InputIter>
     hpx::future_status wait_all_for(hpx::chrono::steady_duration const& timeout,
         InputIter first, InputIter last);
@@ -80,6 +79,21 @@ namespace hpx {
     ///                 elapsed. If this behavior is undesirable, use
     ///                 \a wait_all_for_nothrow instead.
     ///
+    /// \note   The function wait_all_for returns after all futures have become
+    ///         ready, or after the given timeout has expired, whichever comes
+    ///         first. All input futures are still valid after wait_all_for
+    ///         returns, independently of the returned status, and can be
+    ///         inspected (e.g. using is_ready()) to determine which of the
+    ///         given futures have become ready.
+    ///
+    /// \note   The caller is responsible for keeping the \a futures container
+    ///         itself (and, for the iterator-range overload, the underlying
+    ///         sequence) alive, unmoved, and unmodified until it is done
+    ///         inspecting the futures' state. If the timeout expires before all
+    ///         futures become ready, wait_all_for may leave asynchronous
+    ///         continuations attached to the not-yet-ready futures; destroying,
+    ///         moving, or reallocating the container before those futures
+    ///         settle results in undefined behavior.
     template <typename R>
     hpx::future_status wait_all_for(hpx::chrono::steady_duration const& timeout,
         std::vector<future<R>> const& futures);
@@ -114,6 +128,21 @@ namespace hpx {
     ///                 timeout elapsed. If this behavior is undesirable, use
     ///                 \a wait_all_for_nothrow instead.
     ///
+    /// \note   The function wait_all_for returns after all futures have become
+    ///         ready, or after the given timeout has expired, whichever comes
+    ///         first. All input futures are still valid after wait_all_for
+    ///         returns, independently of the returned status, and can be
+    ///         inspected (e.g. using is_ready()) to determine which of the
+    ///         given futures have become ready.
+    ///
+    /// \note   The caller is responsible for keeping the \a futures container
+    ///         itself (and, for the iterator-range overload, the underlying
+    ///         sequence) alive, unmoved, and unmodified until it is done
+    ///         inspecting the futures' state. If the timeout expires before all
+    ///         futures become ready, wait_all_for may leave asynchronous
+    ///         continuations attached to the not-yet-ready futures; destroying,
+    ///         moving, or reallocating the container before those futures
+    ///         settle results in undefined behavior.
     template <typename R, std::size_t N>
     hpx::future_status wait_all_for(hpx::chrono::steady_duration const& timeout,
         std::array<future<R>, N> const& futures);
@@ -184,11 +213,11 @@ namespace hpx {
         hpx::chrono::steady_duration const& timeout, T const&... futures);
 
     /// The function \a wait_all_for_n is an operator allowing to join on the
-    /// result of all given futures, similar to \a wait_all_n. It differs
-    /// from \a wait_all_n in that it will not suspend indefinitely if one or
-    /// more of the given futures never become ready; instead it returns as
-    /// soon as either all futures have become ready, or the given timeout
-    /// has elapsed, whichever happens first.
+    /// result of all given futures, similar to \a wait_all_n. It differs from
+    /// \a wait_all_n in that it will not suspend indefinitely if one or
+    /// more of the given futures never become ready; instead it returns as soon
+    /// as either all futures have become ready, or the given timeout has
+    /// elapsed, whichever happens first.
     ///
     /// \param timeout  The maximum duration to wait for all the given
     ///                 futures to become ready.
@@ -210,11 +239,10 @@ namespace hpx {
     ///       determine which of the given futures have become ready.
     ///
     /// \note           The function wait_all_for_n will rethrow any
-    ///                 exceptions captured by the futures while becoming
-    ///                 ready, as long as all the given futures became
-    ///                 ready before the timeout elapsed. If this behavior is
-    ///                 undesirable, use \a wait_all_for_n_nothrow instead.
-    ///
+    ///                 exceptions captured by the futures while becoming ready,
+    ///                 as long as all the given futures became ready before the
+    ///                 timeout elapsed. If this behavior is undesirable, use \a
+    ///                 wait_all_for_n_nothrow instead.
     template <typename InputIter>
     hpx::future_status wait_all_for_n(
         hpx::chrono::steady_duration const& timeout, InputIter begin,
@@ -287,11 +315,10 @@ namespace hpx {
     ///       status, and can be inspected (e.g. using \a is_ready()) to
     ///       determine which of the given futures have become ready.
     ///
-    /// \note           Unlike \a wait_all_for, this function will not
+    /// \note           Unlike \a wait_all_for_nothrow, this function will not
     ///                 rethrow any exceptions captured by the futures while
     ///                 becoming ready. Any such exceptions are not rethrown by
     ///                 this call.
-    ///
     template <typename InputIter>
     hpx::wait_all_for_nothrow_result wait_all_for_nothrow(
         hpx::chrono::steady_duration const& timeout, InputIter first,
@@ -330,6 +357,21 @@ namespace hpx {
     ///                 becoming ready. Any such exceptions are not rethrown by
     ///                 this call.
     ///
+    /// \note   The function wait_all_for_nothrow returns after all futures have
+    ///         become ready, or after the given timeout has expired, whichever
+    ///         comes first. All input futures are still valid after
+    ///         wait_all_for returns, independently of the returned status, and
+    ///         can be inspected (e.g. using is_ready()) to determine which of
+    ///         the given futures have become ready.
+    ///
+    /// \note   The caller is responsible for keeping the \a futures container
+    ///         itself (and, for the iterator-range overload, the underlying
+    ///         sequence) alive, unmoved, and unmodified until it is done
+    ///         inspecting the futures' state. If the timeout expires before all
+    ///         futures become ready, wait_all_for may leave asynchronous
+    ///         continuations attached to the not-yet-ready futures; destroying,
+    ///         moving, or reallocating the container before those futures
+    ///         settle results in undefined behavior.
     template <typename R>
     hpx::wait_all_for_nothrow_result wait_all_for_nothrow(
         hpx::chrono::steady_duration const& timeout,
@@ -368,6 +410,21 @@ namespace hpx {
     ///                 becoming ready. Any such exceptions are not rethrown by
     ///                 this call.
     ///
+    /// \note   The function wait_all_for_nothrow returns after all futures have
+    ///         become ready, or after the given timeout has expired, whichever
+    ///         comes first. All input futures are still valid after
+    ///         wait_all_for returns, independently of the returned status, and
+    ///         can be inspected (e.g. using is_ready()) to determine which of
+    ///         the given futures have become ready.
+    ///
+    /// \note   The caller is responsible for keeping the \a futures container
+    ///         itself (and, for the iterator-range overload, the underlying
+    ///         sequence) alive, unmoved, and unmodified until it is done
+    ///         inspecting the futures' state. If the timeout expires before all
+    ///         futures become ready, wait_all_for may leave asynchronous
+    ///         continuations attached to the not-yet-ready futures; destroying,
+    ///         moving, or reallocating the container before those futures
+    ///         settle results in undefined behavior.
     template <typename R, std::size_t N>
     hpx::wait_all_for_nothrow_result wait_all_for_nothrow(
         hpx::chrono::steady_duration const& timeout,
@@ -480,7 +537,6 @@ namespace hpx {
     ///                 rethrow any exceptions captured by the futures while
     ///                 becoming ready. Any such exceptions are not rethrown by
     ///                 this call.
-    ///
     template <typename InputIter>
     hpx::wait_all_for_nothrow_result wait_all_for_n_nothrow(
         hpx::chrono::steady_duration const& timeout, InputIter begin,

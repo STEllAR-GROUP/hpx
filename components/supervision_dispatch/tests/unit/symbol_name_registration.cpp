@@ -37,7 +37,7 @@ void test_sentinel_register_name()
 {
     hpx::id_type const target = hpx::find_here();
 
-    hpx::supervision::sentinel s;
+    hpx::supervision::sentinel s(target);
 
     bool const registered = s.register_name(hpx::launch::sync);
     HPX_TEST(registered);
@@ -58,7 +58,7 @@ void test_registry_register_name()
 {
     hpx::id_type const target = hpx::find_here();
 
-    hpx::supervision::registry r;
+    hpx::supervision::registry r(target);
 
     bool const registered = r.register_name(hpx::launch::sync);
     HPX_TEST(registered);
@@ -81,13 +81,15 @@ void test_registry_register_name()
 // from AGAS rather than leaving it dangling.
 void test_sentinel_register_unregister_cycle()
 {
+    hpx::id_type const here = hpx::find_here();
+
     {
-        hpx::supervision::sentinel s;
+        hpx::supervision::sentinel s(here);
         HPX_TEST(s.register_name(hpx::launch::sync));
         s.unregister_name(hpx::launch::sync);
     }
 
-    hpx::supervision::sentinel s2;
+    hpx::supervision::sentinel s2(here);
     HPX_TEST(s2.register_name(hpx::launch::sync));
     s2.unregister_name(hpx::launch::sync);
 }
@@ -95,13 +97,15 @@ void test_sentinel_register_unregister_cycle()
 // Same as above, but for registry.
 void test_registry_register_unregister_cycle()
 {
+    hpx::id_type const here = hpx::find_here();
+
     {
-        hpx::supervision::registry r;
+        hpx::supervision::registry r(here);
         HPX_TEST(r.register_name(hpx::launch::sync));
         r.unregister_name(hpx::launch::sync);
     }
 
-    hpx::supervision::registry r2;
+    hpx::supervision::registry r2(here);
     HPX_TEST(r2.register_name(hpx::launch::sync));
     r2.unregister_name(hpx::launch::sync);
 }
@@ -110,7 +114,7 @@ void test_registry_register_unregister_cycle()
 // overloads of register_name()/unregister_name().
 void test_sentinel_register_name_async()
 {
-    hpx::supervision::sentinel s;
+    hpx::supervision::sentinel s(hpx::find_here());
 
     hpx::future<bool> f = s.register_name();
     HPX_TEST(f.get());

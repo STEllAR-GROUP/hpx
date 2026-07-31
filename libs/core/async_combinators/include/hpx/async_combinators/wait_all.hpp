@@ -33,6 +33,9 @@ namespace hpx {
     ///                 behavior is undesirable, use \a wait_all_nothrow
     ///                 instead.
     ///
+    /// \note   The caller is responsible for keeping the \a futures container
+    ///         alive, unmoved, and unmodified until wait_all returns and all
+    ///         inspection of the futures is complete.
     template <typename InputIter>
     void wait_all(InputIter first, InputIter last);
 
@@ -53,6 +56,10 @@ namespace hpx {
     ///                 behavior is undesirable, use \a wait_all_nothrow
     ///                 instead.
     ///
+    ///
+    /// \note   The caller is responsible for keeping the \a futures container
+    ///         alive, unmoved, and unmodified until wait_all returns and all
+    ///         inspection of the futures is complete.
     template <typename R>
     void wait_all(std::vector<future<R>>&& futures);
 
@@ -73,6 +80,10 @@ namespace hpx {
     ///                 behavior is undesirable, use \a wait_all_nothrow
     ///                 instead.
     ///
+    ///
+    /// \note   The caller is responsible for keeping the \a futures container
+    ///         alive, unmoved, and unmodified until wait_all returns and all
+    ///         inspection of the futures is complete.
     template <typename R, std::size_t N>
     void wait_all(std::array<future<R>, N>&& futures);
 
@@ -138,6 +149,9 @@ namespace hpx {
     ///                 behavior is undesirable, use \a wait_all_n_nothrow
     ///                 instead.
     ///
+    /// \note   The caller is responsible for keeping the \a futures container
+    ///         alive, unmoved, and unmodified until wait_all returns and all
+    ///         inspection of the futures is complete.
     template <typename InputIter>
     void wait_all_n(InputIter begin, std::size_t count);
 
@@ -167,6 +181,9 @@ namespace hpx {
     ///                 caller can use the returned \a bool to detect their
     ///                 presence.
     ///
+    /// \note   The caller is responsible for keeping the \a futures container
+    ///         alive, unmoved, and unmodified until wait_all returns and all
+    ///         inspection of the futures is complete.
     template <typename InputIter>
     bool wait_all_nothrow(InputIter first, InputIter last);
 
@@ -302,6 +319,9 @@ namespace hpx {
     ///                 call; the caller can use the returned \a bool to detect
     ///                 their presence.
     ///
+    /// \note   The caller is responsible for keeping the \a futures container
+    ///         alive, unmoved, and unmodified until wait_all returns and all
+    ///         inspection of the futures is complete.
     template <typename InputIter>
     std::pair<InputIter, bool> wait_all_n_nothrow(
         InputIter begin, std::size_t count);

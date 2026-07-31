@@ -34,7 +34,7 @@ if(HPX_WITH_FETCH_STDEXEC)
     SOURCE_SUBDIR _hpx_skip_stdexec_cmakelists
     PATCH_COMMAND
       ${CMAKE_COMMAND}
-      "-DSTDEXEC_SPIN_LOOP_PAUSE_FILE=<SOURCE_DIR>/include/stdexec/__detail/__spin_loop_pause.hpp"
+      "-DHPX_STDEXEC_SPIN_LOOP_PAUSE_FILE=<SOURCE_DIR>/include/stdexec/__detail/__spin_loop_pause.hpp"
       -P ${CMAKE_CURRENT_LIST_DIR}/HPX_PatchStdexecSpinLoopPause.cmake
   )
 
