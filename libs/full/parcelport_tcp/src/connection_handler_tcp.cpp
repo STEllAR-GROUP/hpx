@@ -129,6 +129,16 @@ namespace hpx::parcelset::policies::tcp {
                     here_ = parcelset::locality(locality(
                         here_.get<locality>().address(), bound.port()));
                 }
+                else if (local_ec)
+                {
+                    // Keeping the configured port is the safe course, but if
+                    // that port was 0 this locality is now unreachable and the
+                    // reason would otherwise be invisible.
+                    LPT_(warning).format(
+                        "tcp::parcelport::run: bound {} but could not read the "
+                        "endpoint back, keeping the configured one: {}",
+                        ep, local_ec.message());
+                }
 
                 acceptor_->async_accept(receiver_conn->socket(),
                     hpx::bind(&connection_handler::handle_accept, this,
