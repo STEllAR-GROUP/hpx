@@ -252,7 +252,13 @@ namespace hpx::lcos::detail {
     template <typename Callback>
     void handle_on_completed_impl(Callback&& on_completed)
     {
-        HPX_TRACING_MARK_EVENT("future::handle_on_completed");
+        // Uses handle_on_completed_fired() (a Tracy message) instead of
+        // HPX_TRACING_MARK_EVENT because mark_event calls rename_region which
+        // is silently dropped inside fiber contexts. The message API is
+        // fiber-context-safe and appears in the Tracy Message Log.
+#if defined(HPX_HAVE_TRACING)
+        hpx::tracing::handle_on_completed_fired();
+#endif
 
         // We need to run the completion on a new thread if we are on a non HPX
         // thread.
