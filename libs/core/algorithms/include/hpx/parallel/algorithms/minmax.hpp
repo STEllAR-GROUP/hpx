@@ -873,6 +873,7 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
+        // used for both scalar and vectorized execution policies
         HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename FwdIter,
             typename F, typename Proj>
         minmax_element_result<FwdIter> sequential_minmax_element(ExPolicy&&,
@@ -889,17 +890,17 @@ namespace hpx::parallel {
 
             element_type min_value = HPX_INVOKE(proj, *it);
             element_type max_value = min_value;
-            element_type next_value = HPX_INVOKE(proj, *++it);
+            element_type second_value = HPX_INVOKE(proj, *++it);
 
-            if (HPX_INVOKE(f, next_value, min_value))
+            if (HPX_INVOKE(f, second_value, min_value))
             {
                 result.min = it;
-                min_value = HPX_MOVE(next_value);
+                min_value = HPX_MOVE(second_value);
             }
             else
             {
                 result.max = it;
-                max_value = HPX_MOVE(next_value);
+                max_value = HPX_MOVE(second_value);
             }
 
             std::size_t remaining = count - 2;
@@ -958,6 +959,7 @@ namespace hpx::parallel {
             return result;
         }
 
+        // used for both scalar and vectorized execution policies
         HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename FwdIter,
             typename F>
         minmax_element_result<FwdIter> sequential_minmax_element(ExPolicy&&,
@@ -973,17 +975,17 @@ namespace hpx::parallel {
 
             element_type min_value = *it;
             element_type max_value = min_value;
-            element_type next_value = *++it;
+            element_type second_value = *++it;
 
-            if (HPX_INVOKE(f, next_value, min_value))
+            if (HPX_INVOKE(f, second_value, min_value))
             {
                 result.min = it;
-                min_value = HPX_MOVE(next_value);
+                min_value = HPX_MOVE(second_value);
             }
             else
             {
                 result.max = it;
-                max_value = HPX_MOVE(next_value);
+                max_value = HPX_MOVE(second_value);
             }
 
             std::size_t remaining = count - 2;
@@ -1134,6 +1136,7 @@ namespace hpx::parallel {
             {
             }
 
+            // used for both scalar and vectorized execution policies
             template <typename ExPolicy, typename FwdIter, typename Sent,
                 typename F, typename Proj>
             static constexpr minmax_element_result<FwdIter> sequential(
@@ -1151,17 +1154,17 @@ namespace hpx::parallel {
 
                 element_type min_value = HPX_INVOKE(proj, *min);
                 element_type max_value = min_value;
-                element_type next_value = HPX_INVOKE(proj, *first);
+                element_type second_value = HPX_INVOKE(proj, *first);
 
-                if (HPX_INVOKE(f, next_value, min_value))
+                if (HPX_INVOKE(f, second_value, min_value))
                 {
                     min = first;
-                    min_value = HPX_MOVE(next_value);
+                    min_value = HPX_MOVE(second_value);
                 }
                 else
                 {
                     max = first;
-                    max_value = HPX_MOVE(next_value);
+                    max_value = HPX_MOVE(second_value);
                 }
 
                 while (++first != last)
@@ -1218,6 +1221,7 @@ namespace hpx::parallel {
                 return minmax_element_result<FwdIter>{min, max};
             }
 
+            // used for both scalar and vectorized execution policies
             template <typename ExPolicy, typename FwdIter, typename Sent,
                 typename F>
             static constexpr minmax_element_result<FwdIter> sequential(
@@ -1234,17 +1238,17 @@ namespace hpx::parallel {
 
                 element_type min_value = *min;
                 element_type max_value = min_value;
-                element_type next_value = *first;
+                element_type second_value = *first;
 
-                if (HPX_INVOKE(f, next_value, min_value))
+                if (HPX_INVOKE(f, second_value, min_value))
                 {
                     min = first;
-                    min_value = HPX_MOVE(next_value);
+                    min_value = HPX_MOVE(second_value);
                 }
                 else
                 {
                     max = first;
-                    max_value = HPX_MOVE(next_value);
+                    max_value = HPX_MOVE(second_value);
                 }
 
                 while (++first != last)
