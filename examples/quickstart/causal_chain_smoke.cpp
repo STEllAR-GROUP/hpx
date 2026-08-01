@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// Causal tracing smoke test — value fulfillment path.
+// Causal tracing smoke test - value fulfillment path.
 //
 // PURPOSE: Validate that set_value() emits a producer-side causal signal
 //          that precedes the consumer continuation in Tracy.
@@ -77,7 +77,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     if (failures == 0)
     {
-        std::cout << "OK: causal_chain_smoke — all " << iterations
+        std::cout << "OK: causal_chain_smoke - all " << iterations
                   << " iterations passed\n";
     }
     else

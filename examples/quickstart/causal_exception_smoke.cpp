@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// Causal tracing smoke test — exception set path.
+// Causal tracing smoke test - exception set path.
 //
 // PURPOSE: Validate that set_exception() emits a RED producer-side causal
 //          signal in Tracy when a shared state receives an exception.
@@ -84,7 +84,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     if (failures == 0)
     {
-        std::cout << "OK: causal_exception_smoke — all " << iterations
+        std::cout << "OK: causal_exception_smoke - all " << iterations
                   << " iterations passed\n";
     }
     else
