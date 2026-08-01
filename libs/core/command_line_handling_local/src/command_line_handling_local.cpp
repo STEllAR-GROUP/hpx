@@ -555,7 +555,10 @@ namespace hpx::local::detail {
             affinity_bind_ = "";
 #else
             ini_config.emplace_back("hpx.bind!=" + affinity_bind_);
-            ini_config.emplace_back("hpx.bind-provided!=1");
+            if (affinity_bind_ != "none")
+            {
+                ini_config.emplace_back("hpx.bind-provided!=1");
+            }
 #endif
         }
 #if !defined(__APPLE__)

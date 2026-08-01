@@ -11,6 +11,7 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/serialization.hpp>
 
+#include <hpx/supervision/server/activity_agent.hpp>
 #include <hpx/supervision/server/agent.hpp>
 #include <hpx/supervision/server/supervision_manager.hpp>
 #include <hpx/supervision/supervision_api.hpp>
@@ -48,6 +49,18 @@ HPX_REGISTER_ACTION_ID(
     hpx::supervision::server::supervision_manager::await_terminal_action,
     supervision_manager_await_terminal_action,
     hpx::actions::supervision_manager_await_terminal_action_id)
+HPX_REGISTER_ACTION_ID(hpx::supervision::server::supervision_manager::
+                           register_activity_observer_action,
+    supervision_register_activity_observer__action,
+    hpx::actions::supervision_manager_register_activity_observer_action_id)
+HPX_REGISTER_ACTION_ID(hpx::supervision::server::supervision_manager::
+                           unregister_activity_observer_action,
+    supervision_manager_unregister_activity_observer_action,
+    hpx::actions::supervision_manager_unregister_activity_observer_action_id)
+HPX_REGISTER_ACTION_ID(
+    hpx::supervision::server::supervision_manager::remove_target_action,
+    supervision_manager_remove_target_action,
+    hpx::actions::supervision_manager_remove_target_action_id)
 
 namespace hpx::supervision {
 
@@ -476,6 +489,84 @@ namespace hpx::supervision {
         get_supervision_manager().unregister_observer(observer_handle, ec);
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    // Clear all locally tracked state for a target
+    namespace {
+
+        hpx::future<void> remove_target_helper(
+            hpx::id_type const& locality, hpx::id_type const& target)
+        {
+            using action_type =
+                server::supervision_manager::remove_target_action;
+            return supervision_dispatch<void, action_type>(
+                locality,
+                [&]() {
+                    get_supervision_manager().remove_target(target);
+                    return hpx::make_ready_future();
+                },
+                target);
+        }
+    }    // namespace
+
+    hpx::future<void> remove_target(
+        hpx::id_type const& locality, hpx::id_type const& target)
+    {
+        if (!hpx::naming::is_locality(locality))
+        {
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                "hpx::supervision::remove_target",
+                "The id passed as the first argument is not representing "
+                "a locality");
+        }
+        if (!target)
+        {
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                "hpx::supervision::remove_target",
+                "The id passed as the second argument is not representing "
+                "a valid target");
+        }
+
+        return remove_target_helper(locality, target);
+    }
+
+    void remove_target(hpx::launch::sync_policy, hpx::id_type const& locality,
+        hpx::id_type const& target, hpx::error_code& ec)
+    {
+        if (!hpx::naming::is_locality(locality))
+        {
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "hpx::supervision::remove_target",
+                "The id passed as the first argument is not representing "
+                "a locality");
+            return;
+        }
+        if (!target)
+        {
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "hpx::supervision::remove_target",
+                "The id passed as the second argument is not representing "
+                "a valid target");
+            return;
+        }
+
+        remove_target_helper(locality, target).get(ec);
+    }
+
+    // Local target-state removal
+    void remove_target(hpx::id_type const& target, hpx::error_code& ec)
+    {
+        if (!target)
+        {
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "hpx::supervision::remove_target",
+                "The id passed as the first argument is not representing "
+                "a valid target");
+            return;
+        }
+
+        get_supervision_manager().remove_target(target, ec);
+    }
+
     ////////////////////////////////////////////////////////////////////////////
     // Wait for the target to reach a terminal state
     namespace {
@@ -564,6 +655,183 @@ namespace hpx::supervision {
         return get_supervision_manager().await_terminal(target, epoch,
             timeout.value_or((std::chrono::steady_clock::duration::max) ()),
             ec);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    dispatch_outcome check_admission(
+        hpx::id_type const& target, std::uint64_t const epoch)
+    {
+        if (!target)
+        {
+            // nothing is latched against an invalid target
+            return dispatch_outcome::admitted;
+        }
+
+        return get_supervision_manager().check_admission(target, epoch);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void serialize(hpx::serialization::output_archive& ar,
+        activity_notification const& notification, unsigned int)
+    {
+        ar << notification.actor << notification.state
+           << notification.transition << notification.event_time
+           << notification.epoch << notification.ec;
+    }
+
+    void serialize(hpx::serialization::input_archive& ar,
+        activity_notification& notification, unsigned int)
+    {
+        ar >> notification.actor >> notification.state >>
+            notification.transition >> notification.event_time >>
+            notification.epoch >> notification.ec;
+    }
+
+    // Register a callback to observe activity-state transitions of all
+    // targets tracked by a locality's supervision manager
+    namespace {
+
+        hpx::future<hpx::id_type> register_activity_observer_helper(
+            hpx::id_type const& locality, hpx::id_type const& agent,
+            std::uint64_t const epoch_filter)
+        {
+            using action_type =
+                server::supervision_manager::register_activity_observer_action;
+            return supervision_dispatch<hpx::id_type, action_type>(
+                locality,
+                [&]() {
+                    return hpx::make_ready_future<hpx::id_type>(
+                        get_supervision_manager().register_activity_observer(
+                            agent, epoch_filter));
+                },
+                agent, epoch_filter);
+        }
+    }    // namespace
+
+    hpx::future<hpx::id_type> register_activity_observer(
+        hpx::id_type const& locality, activity_callback const& callback,
+        std::optional<std::uint64_t> const epoch_filter)
+    {
+        if (!hpx::naming::is_locality(locality))
+        {
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                "hpx::supervision::register_activity_observer",
+                "The id passed as the first argument is not representing "
+                "a locality");
+        }
+
+        auto const agent = server::create_activity_agent(callback);
+        return register_activity_observer_helper(locality, agent,
+            epoch_filter.value_or(static_cast<std::uint64_t>(-1)));
+    }
+
+    hpx::id_type register_activity_observer(hpx::launch::sync_policy,
+        hpx::id_type const& locality, activity_callback const& callback,
+        std::optional<std::uint64_t> const epoch_filter, hpx::error_code& ec)
+    {
+        if (!hpx::naming::is_locality(locality))
+        {
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "hpx::supervision::register_activity_observer",
+                "The id passed as the first argument is not representing "
+                "a locality");
+            return hpx::invalid_id;
+        }
+
+        auto const agent = server::create_activity_agent(callback);
+        return register_activity_observer_helper(locality, agent,
+            epoch_filter.value_or(static_cast<std::uint64_t>(-1)))
+            .get(ec);
+    }
+
+    hpx::id_type register_activity_observer(activity_callback const& callback,
+        std::optional<std::uint64_t> const epoch_filter, hpx::error_code& ec)
+    {
+        auto const agent = server::create_activity_agent(callback);
+        return get_supervision_manager().register_activity_observer(
+            agent, epoch_filter.value_or(static_cast<std::uint64_t>(-1)), ec);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Unregister a previously registered activity observer
+    namespace {
+
+        hpx::future<void> unregister_activity_observer_helper(
+            hpx::id_type const& locality, hpx::id_type const& observer_handle)
+        {
+            using action_type = server::supervision_manager::
+                unregister_activity_observer_action;
+            return supervision_dispatch<void, action_type>(
+                locality,
+                [&]() {
+                    get_supervision_manager().unregister_activity_observer(
+                        observer_handle);
+                    return hpx::make_ready_future();
+                },
+                observer_handle);
+        }
+    }    // namespace
+
+    hpx::future<void> unregister_activity_observer(
+        hpx::id_type const& locality, hpx::id_type const& observer_handle)
+    {
+        if (!hpx::naming::is_locality(locality))
+        {
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                "hpx::supervision::unregister_activity_observer",
+                "The id passed as the first argument is not representing "
+                "a locality");
+        }
+        if (!observer_handle)
+        {
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                "hpx::supervision::unregister_activity_observer",
+                "The id passed as the second argument is not representing "
+                "a valid observer handle");
+        }
+
+        return unregister_activity_observer_helper(locality, observer_handle);
+    }
+
+    void unregister_activity_observer(hpx::launch::sync_policy,
+        hpx::id_type const& locality, hpx::id_type const& observer_handle,
+        hpx::error_code& ec)
+    {
+        if (!hpx::naming::is_locality(locality))
+        {
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "hpx::supervision::unregister_activity_observer",
+                "The id passed as the first argument is not representing "
+                "a locality");
+            return;
+        }
+        if (!observer_handle)
+        {
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "hpx::supervision::unregister_activity_observer",
+                "The id passed as the second argument is not representing "
+                "a valid observer handle");
+            return;
+        }
+
+        unregister_activity_observer_helper(locality, observer_handle).get(ec);
+    }
+
+    // Local activity-observer unregistration
+    void unregister_activity_observer(
+        hpx::id_type const& observer_handle, hpx::error_code& ec)
+    {
+        if (!observer_handle)
+        {
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "hpx::supervision::unregister_activity_observer",
+                "The id passed as the first argument is not representing "
+                "a valid observer handle");
+            return;
+        }
+
+        get_supervision_manager().unregister_activity_observer(
+            observer_handle, ec);
     }
 }    // namespace hpx::supervision
 
