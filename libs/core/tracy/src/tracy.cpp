@@ -81,7 +81,26 @@ namespace hpx::tracy {
     void message(
         char const* text, std::size_t size, std::uint32_t color) noexcept
     {
-        tracy_helpers::call_tracy_message_c(text, size, color);
+        if (color == 0)
+        {
+            TracyCMessageS(text, size, 10);
+        }
+        else
+        {
+            TracyCMessageCS(text, size, color, 10);
+        }
+    }
+
+    void frame_mark(char const* name) noexcept
+    {
+        if (name && name[0] != '\0')
+        {
+            TracyCFrameMarkNamed(name);
+        }
+        else
+        {
+            TracyCFrameMark;
+        }
     }
 }    // namespace hpx::tracy
 
