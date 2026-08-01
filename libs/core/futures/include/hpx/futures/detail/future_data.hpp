@@ -488,7 +488,7 @@ namespace hpx::lcos::detail {
             // alive as long as the future
             this->base_type::runs_child_.reset();
 
-            // ── CAUSAL TRACING SIGNAL ──────────────────────────────────────
+            // --- CAUSAL TRACING SIGNAL --------------------------------------
             // Emitted after the CAS sets state to `value` (so any newly-woken
             // consumer observes a ready future) and before notify_one() (so
             // the producer message precedes the consumer wake in Tracy).
@@ -496,7 +496,7 @@ namespace hpx::lcos::detail {
 #if defined(HPX_HAVE_TRACING)
             hpx::tracing::future_fulfilled(this);
 #endif
-            // ───────────────────────────────────────────────────────────────
+            // ---------------------------------------------------------------
 
             // 26111: Caller failing to release lock 'this->mtx_'
             // 26115: Failing to release lock 'this->mtx_'
@@ -580,7 +580,7 @@ namespace hpx::lcos::detail {
             // alive as long as the future
             this->base_type::runs_child_.reset();
 
-            // ── CAUSAL TRACING SIGNAL ──────────────────────────────────────
+            // --- CAUSAL TRACING SIGNAL --------------------------------------
             // Mirrors the set_value() placement: after state is set to
             // `exception` (atomic CAS), before notify_one() wakes consumers.
             // Emits a bright-red Tracy message so exception propagation paths
@@ -588,7 +588,7 @@ namespace hpx::lcos::detail {
 #if defined(HPX_HAVE_TRACING)
             hpx::tracing::future_exception_set(this);
 #endif
-            // ───────────────────────────────────────────────────────────────
+            // ---------------------------------------------------------------
 
             // 26111: Caller failing to release lock 'this->mtx_'
             // 26115: Failing to release lock 'this->mtx_'
