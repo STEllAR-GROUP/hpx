@@ -50,11 +50,11 @@ int hpx_main(hpx::program_options::variables_map& vm)
         hpx::future<int> result =
             f.then([](hpx::future<int> fut) { return fut.get() * 2; });
 
-        // ── Producer side ────────────────────────────────────────────────
+        // --- Producer side ------------------------------------------------
         // set_value() emits:
         //   [green] "Future Fulfilled: 0x<future_data*>"
         // then wakes the consumer, which fires:
-        //   [mark]  "continuation::run_impl"
+        //   [white] "Continuation Run: 0x<future_data*>"
         p.set_value(21);
 
         int const value = result.get();

@@ -58,7 +58,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
             }
         });
 
-        // ── Producer side (exception) ───────────────────────────────────
+        // --- Producer side (exception) -----------------------------------
         // set_exception() emits:
         //   [red] "Future Exception Set: 0x<future_data*>"
         p.set_exception(
