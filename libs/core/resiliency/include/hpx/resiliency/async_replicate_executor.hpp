@@ -239,10 +239,21 @@ namespace hpx::resiliency::experimental {
         };
     }    // namespace detail
 
-    ///////////////////////////////////////////////////////////////////////////
-    // Asynchronously launch given function f exactly n times. Verify the result
-    // of those invocations using the given predicate pred. Run all the valid
-    // results against a user provided voting function. Return the valid output.
+    /// \brief ADL hook for async_replicate_vote_validate CPO with executor.
+    ///
+    /// Asynchronously launches \a f exactly \a n times on \a exec,
+    /// validates results with \a pred, then runs valid results through
+    /// \a vote.
+    ///
+    /// \param tag   CPO tag (async_replicate_vote_validate_t).
+    /// \param exec  Executor to run \a f on.
+    /// \param n     Number of replicated invocations.
+    /// \param vote  Voting function selecting among valid results.
+    /// \param pred  Predicate validating each invocation result.
+    /// \param f     Callable to invoke asynchronously.
+    /// \param ts    Arguments forwarded to \a f.
+    ///
+    /// \returns future with the voted-upon result.
     HPX_CXX_CORE_EXPORT template <typename Executor, typename Vote,
         typename Pred, typename F, typename... Ts>
         requires(one_way_executor<Executor> || two_way_executor<Executor>)
@@ -258,10 +269,20 @@ namespace hpx::resiliency::experimental {
             HPX_FORWARD(Ts, ts)...);
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    // Asynchronously launch given function f exactly n times. Verify the result
-    // of those invocations using the given predicate pred. Run all the valid
-    // results against a user provided voting function. Return the valid output.
+    /// \brief ADL hook for async_replicate_vote CPO with executor.
+    ///
+    /// Asynchronously launches \a f exactly \a n times on \a exec, runs
+    /// valid results through \a vote. Validation uses the default
+    /// exception check.
+    ///
+    /// \param tag   CPO tag (async_replicate_vote_t).
+    /// \param exec  Executor to run \a f on.
+    /// \param n     Number of replicated invocations.
+    /// \param vote  Voting function selecting among valid results.
+    /// \param f     Callable to invoke asynchronously.
+    /// \param ts    Arguments forwarded to \a f.
+    ///
+    /// \returns future with the voted-upon result.
     HPX_CXX_CORE_EXPORT template <typename Executor, typename Vote, typename F,
         typename... Ts>
         requires(one_way_executor<Executor> || two_way_executor<Executor>)
@@ -277,10 +298,19 @@ namespace hpx::resiliency::experimental {
             HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    // Asynchronously launch given function f exactly n times. Verify the result
-    // of those invocations using the given predicate pred. Return the first
-    // valid result.
+    /// \brief ADL hook for async_replicate_validate CPO with executor.
+    ///
+    /// Asynchronously launches \a f exactly \a n times on \a exec,
+    /// validates results with \a pred. Returns the first valid result.
+    ///
+    /// \param tag   CPO tag (async_replicate_validate_t).
+    /// \param exec  Executor to run \a f on.
+    /// \param n     Number of replicated invocations.
+    /// \param pred  Predicate validating each invocation result.
+    /// \param f     Callable to invoke asynchronously.
+    /// \param ts    Arguments forwarded to \a f.
+    ///
+    /// \returns future with the first valid result.
     HPX_CXX_CORE_EXPORT template <typename Executor, typename Pred, typename F,
         typename... Ts>
         requires(one_way_executor<Executor> || two_way_executor<Executor>)
@@ -296,10 +326,19 @@ namespace hpx::resiliency::experimental {
             HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    // Asynchronously launch given function f exactly n times. Verify
-    // the result of those invocations by checking for exception.
-    // Return the first valid result.
+    /// \brief ADL hook for async_replicate CPO with executor.
+    ///
+    /// Asynchronously launches \a f exactly \a n times on \a exec.
+    /// Validates by checking for exceptions. Returns the first valid
+    /// result.
+    ///
+    /// \param tag   CPO tag (async_replicate_t).
+    /// \param exec  Executor to run \a f on.
+    /// \param n     Number of replicated invocations.
+    /// \param f     Callable to invoke asynchronously.
+    /// \param ts    Arguments forwarded to \a f.
+    ///
+    /// \returns future with the first non-throwing result.
     HPX_CXX_CORE_EXPORT template <typename Executor, typename F, typename... Ts>
         requires(one_way_executor<Executor> || two_way_executor<Executor>)
     decltype(auto) hpx_invoke(

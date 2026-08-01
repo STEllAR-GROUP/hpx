@@ -99,12 +99,20 @@ namespace hpx::resiliency::experimental {
         }
     }    // namespace detail
 
-    ///////////////////////////////////////////////////////////////////////////
-    // Asynchronously launch given function \a f exactly \a n times on \a n
-    // different localities, where \a n is the size of the vector of \a ids.
-    // Verify the result of those invocations using the given predicate \a pred.
-    // Run all the valid results against a user provided voting function.
-    // Return the valid output.
+    /// \brief ADL hook for distributed async_replicate_vote_validate CPO.
+    ///
+    /// Asynchronously launches \a action on each locality in \a ids,
+    /// validates results with \a pred, then runs valid results through
+    /// \a vote.
+    ///
+    /// \param tag     CPO tag (async_replicate_vote_validate_t).
+    /// \param ids     Target localities (one invocation per locality).
+    /// \param vote    Voting function selecting among valid results.
+    /// \param pred    Predicate validating each invocation result.
+    /// \param action  Action to invoke on each locality.
+    /// \param ts      Arguments forwarded to \a action.
+    ///
+    /// \returns future with the voted-upon result.
     HPX_CXX_EXPORT template <typename Vote, typename Pred, typename Action,
         typename... Ts>
     decltype(auto) hpx_invoke(async_replicate_vote_validate_t,
@@ -118,12 +126,19 @@ namespace hpx::resiliency::experimental {
             HPX_FORWARD(Action, action), HPX_FORWARD(Ts, ts)...);
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    // Asynchronously launch given function \a f exactly \a n times on \a n
-    // different localities, where \a n is the size of the vector of \a ids.
-    // Verify the result of those invocations using the given predicate \a pred.
-    // Run all the valid results against a user provided voting function.
-    // Return the valid output.
+    /// \brief ADL hook for distributed async_replicate_vote CPO.
+    ///
+    /// Asynchronously launches \a action on each locality in \a ids,
+    /// runs valid results through \a vote. Validation uses the default
+    /// exception check.
+    ///
+    /// \param tag     CPO tag (async_replicate_vote_t).
+    /// \param ids     Target localities (one invocation per locality).
+    /// \param vote    Voting function selecting among valid results.
+    /// \param action  Action to invoke on each locality.
+    /// \param ts      Arguments forwarded to \a action.
+    ///
+    /// \returns future with the voted-upon result.
     HPX_CXX_EXPORT template <typename Vote, typename Action, typename... Ts>
     decltype(auto) hpx_invoke(async_replicate_vote_t,
         std::vector<hpx::id_type> const& ids, Vote&& vote, Action&& action,
@@ -136,12 +151,18 @@ namespace hpx::resiliency::experimental {
             HPX_FORWARD(Action, action), HPX_FORWARD(Ts, ts)...);
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    // Asynchronously launch given function \a f exactly \a n times on \a n
-    // different localities, where \a n is the size of the vector of \a ids.
-    // Verify the result of those invocations using the given predicate \a pred.
-    // Run all the valid results against a user provided voting function.
-    // Return the valid output.
+    /// \brief ADL hook for distributed async_replicate_validate CPO.
+    ///
+    /// Asynchronously launches \a action on each locality in \a ids,
+    /// validates results with \a pred. Returns the first valid result.
+    ///
+    /// \param tag     CPO tag (async_replicate_validate_t).
+    /// \param ids     Target localities (one invocation per locality).
+    /// \param pred    Predicate validating each invocation result.
+    /// \param action  Action to invoke on each locality.
+    /// \param ts      Arguments forwarded to \a action.
+    ///
+    /// \returns future with the first valid result.
     HPX_CXX_EXPORT template <typename Pred, typename Action, typename... Ts>
     decltype(auto) hpx_invoke(async_replicate_validate_t,
         std::vector<hpx::id_type> const& ids, Pred&& pred, Action&& action,
@@ -154,12 +175,18 @@ namespace hpx::resiliency::experimental {
             HPX_FORWARD(Action, action), HPX_FORWARD(Ts, ts)...);
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    // Asynchronously launch given function \a f exactly \a n times on \a n
-    // different localities, where \a n is the size of the vector of \a ids.
-    // Verify the result of those invocations using the given predicate \a pred.
-    // Run all the valid results against a user provided voting function.
-    // Return the valid output.
+    /// \brief ADL hook for distributed async_replicate CPO.
+    ///
+    /// Asynchronously launches \a action on each locality in \a ids.
+    /// Validates by checking for exceptions. Returns the first valid
+    /// result.
+    ///
+    /// \param tag     CPO tag (async_replicate_t).
+    /// \param ids     Target localities (one invocation per locality).
+    /// \param action  Action to invoke on each locality.
+    /// \param ts      Arguments forwarded to \a action.
+    ///
+    /// \returns future with the first non-throwing result.
     HPX_CXX_EXPORT template <typename Action, typename... Ts>
     decltype(auto) hpx_invoke(async_replicate_t,
         std::vector<hpx::id_type> const& ids, Action&& action, Ts&&... ts)

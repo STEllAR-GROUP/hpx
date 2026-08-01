@@ -120,10 +120,19 @@ namespace hpx::resiliency::experimental {
         }
     }    // namespace detail
 
-    ///////////////////////////////////////////////////////////////////////////
-    // Asynchronously launch given function f. Verify the result of those
-    // invocations using the given predicate pred. Repeat launching on error
-    // exactly n times (except if abort_replay_exception is thrown).
+    /// \brief ADL hook for async_replay_validate CPO.
+    ///
+    /// Asynchronously launches \a f, validating results with \a pred.
+    /// Repeats on error up to \a n times (aborts on
+    /// abort_replay_exception).
+    ///
+    /// \param tag    CPO tag (async_replay_validate_t).
+    /// \param n      Maximum number of retry attempts.
+    /// \param pred   Predicate validating each invocation result.
+    /// \param f      Callable to invoke asynchronously.
+    /// \param ts     Arguments forwarded to \a f.
+    ///
+    /// \returns future with the first valid result of \a f.
     HPX_CXX_CORE_EXPORT template <typename Pred, typename F, typename... Ts>
     hpx::future<hpx::util::detail::invoke_deferred_result_t<F, Ts...>>
     hpx_invoke(
@@ -138,9 +147,17 @@ namespace hpx::resiliency::experimental {
         return helper->call(n);
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    // Asynchronously launch given function f. Repeat launching on error exactly
-    // n times (except if abort_replay_exception is thrown).
+    /// \brief ADL hook for async_replay CPO.
+    ///
+    /// Asynchronously launches \a f, repeating on error up to \a n times
+    /// (aborts on abort_replay_exception).
+    ///
+    /// \param tag  CPO tag (async_replay_t).
+    /// \param n    Maximum number of retry attempts.
+    /// \param f    Callable to invoke asynchronously.
+    /// \param ts   Arguments forwarded to \a f.
+    ///
+    /// \returns future with the first successful result of \a f.
     HPX_CXX_CORE_EXPORT template <typename F, typename... Ts>
     hpx::future<hpx::util::detail::invoke_deferred_result_t<F, Ts...>>
     hpx_invoke(async_replay_t, std::size_t n, F&& f, Ts&&... ts)

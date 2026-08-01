@@ -84,7 +84,6 @@ struct default_awaiter_context
 // This is the context that is associated with basic_task's promise type
 // by default. It handles forwarding of stop requests from parent to child.
 struct default_task_context_impl
-  : hpx::functional::tag<default_task_context_impl>
 {
     hpx::experimental::in_place_stop_token stop_token_;
 

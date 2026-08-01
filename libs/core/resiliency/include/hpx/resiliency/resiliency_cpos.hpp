@@ -17,20 +17,25 @@ namespace hpx::resiliency::experimental {
     // helper base classes implementing the CPO dispatch logic
     namespace detail {
 
-        // Detects whether an ADL customization point `hpx_invoke(tag, args...)`
-        // has been defined for the given CPO `Tag`. This is the replacement
-        // hook for external customizations of the resiliency CPOs (e.g. by
-        // full/resiliency_distributed), used in place of the legacy tag-based dispatch.
+        /// \brief Detects whether an ADL customization point
+        ///   `hpx_invoke(tag, args...)` has been defined for the given CPO
+        ///   \a Tag.
+        ///
+        /// \tparam Tag  The CPO tag type to check.
+        /// \tparam Args The argument types forwarded to the hook.
         template <typename Tag, typename... Args>
         concept has_hpx_invoke = requires(Tag const& tag, Args&&... args) {
             hpx_invoke(tag, HPX_FORWARD(Args, args)...);
         };
 
-        // CRTP mixin providing ADL-based dispatch for the resiliency CPOs.
-        // These CPOs have no builtin default body of their own -- all
-        // implementations (both the core ones and the distributed
-        // customizations) are supplied as free ADL hooks living in the same
-        // namespace. Dispatch order: hpx_invoke(tag, args...).
+        /// \brief CRTP mixin providing ADL-based dispatch for resiliency
+        ///   CPOs.
+        ///
+        /// Implementations are supplied as free `hpx_invoke` ADL hooks in
+        /// the same namespace as \a Tag. The CPO's `operator()` forwards
+        /// to `hpx_invoke(tag, args...)`.
+        ///
+        /// \tparam Tag  The concrete CPO tag type (CRTP derived class).
         template <typename Tag>
         // NOLINTNEXTLINE(bugprone-crtp-constructor-accessibility)
         struct dispatch_cpo
