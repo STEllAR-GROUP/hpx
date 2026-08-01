@@ -217,6 +217,56 @@ namespace hpx::tracing {
     HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void task_deleted(
         void const* task_id) noexcept;
 
+    ////////////////////////////////////////////////////////////////////////////
+    // Causal tracing: future fulfillment signals.
+    //
+    // These functions emit a producer-side Tracy message at the exact point a
+    // future shared state transitions to ready. The `future_id` parameter is
+    // the address of the `future_data` shared state and acts as a stable
+    // correlation key: a consumer thread's subsequent `task_resumed` event
+    // (emitted by thread_helpers.cpp) can be visually linked to the preceding
+    // `future_fulfilled` / `future_exception_set` message in the Tracy log.
+    //
+    // Placement contract: both functions must be called after the atomic state
+    // CAS succeeds (so `future_id` is already observable as ready by any
+    // newly-woken consumer) and before `cond_.notify_one()` fires (so the
+    // producer message precedes the consumer wake-up in wall-clock order).
+
+    /// \brief Producer-side signal: a future shared state was set to a value.
+    ///
+    /// \param future_id  Pointer to the `future_data` shared state. Used as a
+    ///                   stable identifier to correlate producer and consumer
+    ///                   events in the Tracy message log.
+    /// \param desc       Optional description of the producing context
+    ///                   (e.g. the name of the promise or task).
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void future_fulfilled(
+        void const* future_id, char const* desc = nullptr) noexcept;
+
+    /// \brief Producer-side signal: a future shared state was set with an
+    ///        exception.
+    ///
+    /// \param future_id  Pointer to the `future_data` shared state.
+    /// \param desc       Optional description of the producing context.
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void future_exception_set(
+        void const* future_id, char const* desc = nullptr) noexcept;
+
+    /// \brief Consumer-side signal: a .then() continuation has started
+    ///        executing. Appears in the Tracy message log immediately after
+    ///        the corresponding future_fulfilled producer signal.
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void continuation_run(
+        void const* task_id = nullptr) noexcept;
+
+    /// \brief Consumer-side signal: handle_on_completed fired, dispatching
+    ///        registered continuations.
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void handle_on_completed_fired(
+        void const* task_id = nullptr) noexcept;
+
+    /// \brief Emit a frame/stage boundary marker in Tracy timeline.
+    ///
+    /// \param name  Optional name for the frame/stage.
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void frame_mark(
+        char const* name = nullptr) noexcept;
+
     HPX_CXX_CORE_EXPORT constexpr void tracing_init(
         char const*, int, char**, std::uint32_t = 0, std::uint32_t = 1) noexcept
     {
