@@ -178,14 +178,14 @@ namespace hpx::supervision {
             // detected the fence.
             return hpx::make_exceptional_future<typename Action::result_type>(
                 HPX_GET_EXCEPTION(hpx::error::target_fenced,
-                    "hpx::supervision::detail::dispatch",
+                    "hpx::supervision::dispatch_work",
                     "target has already latched a terminal event for this "
                     "epoch; dispatch was fenced and the wrapped action was "
                     "not invoked"));
         }
 
-        using fenced_action =
-            fenced_action<Action, hpx::id_type, std::uint64_t, Ts...>;
+        using fenced_action = fenced_action<Action, hpx::id_type, std::uint64_t,
+            std::decay_t<Ts>...>;
 
         // Dispatch fenced_action to run *on target's own locality*
         // (hpx::colocated), so invoke_fenced_action's re-check above is

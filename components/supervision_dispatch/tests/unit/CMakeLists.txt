@@ -9,9 +9,11 @@ set(tests
     discover_and_join
     discover_peers
     dispatch_api
+    failure_detection
     fan_out_join
     fenced_dispatch
     registry_join
+    registry_snapshot
     sentinel_start
 )
 
@@ -21,8 +23,8 @@ set(discover_and_join_FLAGS COMPILE_FLAGS -DHPX_HAVE_RUN_MAIN_EVERYWHERE)
 set(discover_peers_PARAMETERS LOCALITIES 2)
 set(discover_peers_FLAGS COMPILE_FLAGS -DHPX_HAVE_RUN_MAIN_EVERYWHERE)
 
-set(fenced_dispatch_PARAMETERS LOCALITIES 2)
-set(fenced_dispatch_FLAGS COMPILE_FLAGS -DHPX_HAVE_RUN_MAIN_EVERYWHERE)
+set(failure_detection_PARAMETERS LOCALITIES 2)
+set(failure_detection_FLAGS COMPILE_FLAGS -DHPX_HAVE_RUN_MAIN_EVERYWHERE)
 
 set(fan_out_join_PARAMETERS LOCALITIES 2)
 set(fan_out_join_FLAGS COMPILE_FLAGS -DHPX_HAVE_RUN_MAIN_EVERYWHERE)

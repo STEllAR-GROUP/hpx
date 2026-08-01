@@ -20,11 +20,14 @@
 
 #include <map>
 #include <utility>
+#include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::supervision::server {
+
+    class HPX_SUPERVISION_DISPATCH_EXPORT registry;
 
     namespace detail {
 
@@ -38,8 +41,7 @@ namespace hpx::supervision::server {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    class HPX_SUPERVISION_DISPATCH_EXPORT registry
-      : public hpx::components::component_base<registry>
+    class registry : public hpx::components::component_base<registry>
     {
     public:
         registry();
@@ -54,6 +56,44 @@ namespace hpx::supervision::server {
         struct join_action
           : hpx::actions::make_action_t<decltype(&registry::join),
                 &registry::join, join_action>
+        {
+        };
+
+        /// Plain-data view of a single joined peer, safe to hand out to
+        /// callers outside the registry (unlike peer_entry, does not expose
+        /// the ready/evict_pending bookkeeping used internally to coordinate
+        /// concurrent join()/evict_peer() calls).
+        struct peer_snapshot
+        {
+            /// The peer sentinel this entry was joined against.
+            hpx::id_type peer_sentinel;
+
+            /// The locality that owns \c peer_sentinel, as recorded by
+            /// join().
+            hpx::id_type peer_locality;
+
+            /// The locally tracked shadow mirroring \c peer_sentinel's
+            /// supervision state.
+            hpx::id_type shadow;
+        };
+
+        /// Returns a point-in-time snapshot of all fully joined, non-evicting
+        /// peers.
+        ///
+        /// Intended for a future failure-detection poller (or other local
+        /// consumers) that needs a stable, lock-safe list of peers to iterate
+        /// over without reaching into \c peers_ directly. Entries mid-join
+        /// (ready == false) or already scheduled for eviction (evict_pending ==
+        /// true) are excluded, so a poller never observes a half-registered or
+        /// torn-down peer.
+        ///
+        /// \return A snapshot of every peer entry with \c ready == true and
+        ///         \c evict_pending == false at the time of the call.
+        std::vector<peer_snapshot> snapshot_peers() const;
+
+        struct snapshot_peers_action
+          : hpx::actions::make_action_t<decltype(&registry::snapshot_peers),
+                &registry::snapshot_peers, snapshot_peers_action>
         {
         };
 
@@ -96,25 +136,49 @@ namespace hpx::supervision::server {
             hpx::id_type const& activity_observer, hpx::id_type const& shadow);
 
     private:
+        /// Internal bookkeeping for a single joined (or joining) peer.
+        ///
+        /// Not exposed outside the registry; see peer_snapshot for the
+        /// plain-data subset safe to hand to external callers.
         struct peer_entry
         {
+            /// The locality that owns this peer's sentinel, recorded by
+            /// join() when the entry is marked ready. Surfaced read-only via
+            /// peer_snapshot::peer_locality.
+            hpx::id_type peer_locality;
+
+            /// The locally tracked shadow mirroring this peer's supervision
+            /// state (the same shadow returned by join() and referenced by
+            /// evict_peer()/cleanup_peer()).
             hpx::id_type shadow;
+
+            /// The observer id registered on peer_locality to receive this
+            /// peer's terminal lifecycle notification (drives evict_peer()
+            /// via hpx::post()).
             hpx::id_type lifecycle_observer;
+
+            /// The observer id registered on peer_locality to receive this
+            /// peer's activity notifications (used to keep the shadow's
+            /// local state current between terminal events).
             hpx::id_type activity_observer;
 
-            // False while a join() call has reserved ownership of this peer
-            // sentinel (i.e. is in the process of performing the remote
-            // observer registrations) but has not yet filled in the rest of
-            // the entry. Concurrent join() calls for the same peer wait on
-            // cond_ instead of racing to register duplicate observers.
+            /// False while a join() call has reserved ownership of this peer
+            /// sentinel (i.e. is in the process of performing the remote
+            /// observer registrations) but has not yet filled in the rest of
+            /// the entry. Concurrent join() calls for the same peer wait on
+            /// cond_ instead of racing to register duplicate observers.
             bool ready = false;
 
-            // Ensure that a terminal notification racing ahead of join()
-            // completion can be deferred instead of dropped.
+            /// True once a terminal notification has been observed for this
+            /// peer but eviction has not yet completed (deferred via
+            /// hpx::post() to evict_peer()). Ensures a terminal notification
+            /// racing ahead of join() completion is deferred instead of
+            /// dropped, and lets snapshot_peers() exclude a peer that is
+            /// already tearing down.
             bool evict_pending = false;
         };
 
-        hpx::spinlock mtx_;
+        mutable hpx::spinlock mtx_;
         hpx::lcos::local::detail::condition_variable cond_;
 
         std::map<hpx::id_type, peer_entry> peers_;
@@ -123,5 +187,8 @@ namespace hpx::supervision::server {
 
 HPX_REGISTER_ACTION_DECLARATION(hpx::supervision::server::registry::join_action,
     supervision_dispatch_registry_join_action)
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::supervision::server::registry::snapshot_peers_action,
+    supervision_dispatch_registry_snapshot_peers_action)
 
 #include <hpx/config/warnings_suffix.hpp>

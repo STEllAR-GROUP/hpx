@@ -17,6 +17,7 @@
 #include <hpx/supervision_dispatch/server/registry.hpp>
 
 #include <string>
+#include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -81,6 +82,24 @@ namespace hpx::supervision {
         hpx::id_type join(hpx::launch::sync_policy,
             sentinel const& peer_sentinel, hpx::id_type const& peer_locality,
             hpx::error_code& ec = hpx::throws) const;
+
+        /// Returns a point-in-time snapshot of all fully joined, non-evicting
+        /// peers held by the underlying registry component.
+        ///
+        /// \return A future that becomes ready with one peer_snapshot per
+        ///         peer that is fully joined and not pending eviction.
+        hpx::future<std::vector<server::registry::peer_snapshot>>
+        snapshot_peers() const;
+
+        /// \copydoc snapshot_peers() const
+        ///
+        /// \param ec Used to hold the error code that results from the
+        ///           operation instead of throwing an exception on failure.
+        ///
+        /// \return One peer_snapshot per peer that is fully joined and not
+        ///         pending eviction.
+        std::vector<server::registry::peer_snapshot> snapshot_peers(
+            hpx::launch::sync_policy, hpx::error_code& ec = hpx::throws) const;
 
         /// Register this registry's id with AGAS under a name pinned to the
         /// locality that actually hosts its underlying server component

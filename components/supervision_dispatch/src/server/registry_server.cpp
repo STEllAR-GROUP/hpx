@@ -21,11 +21,14 @@
 #include <mutex>
 #include <tuple>
 #include <utility>
+#include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
 
 HPX_REGISTER_ACTION(hpx::supervision::server::registry::join_action,
     supervision_dispatch_registry_join_action)
+HPX_REGISTER_ACTION(hpx::supervision::server::registry::snapshot_peers_action,
+    supervision_dispatch_registry_snapshot_peers_action)
 
 namespace hpx::supervision::server {
 
@@ -305,6 +308,7 @@ namespace hpx::supervision::server {
             peer_entry& entry = peers_.at(peer_sentinel);
             HPX_ASSERT(!entry.ready);
 
+            entry.peer_locality = peer_locality;
             entry.shadow = shadow;
             entry.lifecycle_observer = lifecycle_observer;
             entry.activity_observer = activity_observer;
@@ -324,6 +328,28 @@ namespace hpx::supervision::server {
                 peer_locality, lifecycle_observer, activity_observer, shadow);
         }
         return shadow;
+    }
+
+    // Implementation note: iterates peers_ under mtx_ and copies out only the
+    // peer_sentinel/peer_locality/shadow triple for entries that are fully
+    // joined and not pending eviction, deliberately omitting the
+    // ready/evict_pending bookkeeping fields from the returned view.
+    std::vector<registry::peer_snapshot> registry::snapshot_peers() const
+    {
+        std::scoped_lock<hpx::spinlock> l(mtx_);
+
+        std::vector<peer_snapshot> result;
+        result.reserve(peers_.size());
+        for (auto const& [peer_sentinel, entry] : peers_)
+        {
+            if (entry.ready && !entry.evict_pending)
+            {
+                result.push_back(peer_snapshot{.peer_sentinel = peer_sentinel,
+                    .peer_locality = entry.peer_locality,
+                    .shadow = entry.shadow});
+            }
+        }
+        return result;
     }
 
     void registry::evict_peer(hpx::id_type const& peer_sentinel,

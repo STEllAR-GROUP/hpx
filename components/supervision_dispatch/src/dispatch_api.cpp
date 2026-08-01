@@ -6,6 +6,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/modules/async_combinators.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/naming_base.hpp>
@@ -16,6 +17,7 @@
 #include <hpx/supervision_dispatch/dispatch_api.hpp>
 #include <hpx/supervision_dispatch/registry.hpp>
 #include <hpx/supervision_dispatch/sentinel.hpp>
+#include <hpx/supervision_dispatch/testing.hpp>
 
 #include <atomic>
 #include <chrono>
@@ -27,6 +29,22 @@
 namespace hpx::supervision {
 
     namespace {
+
+        // Defaults to hpx::supervision::default_discovery_timeout; overridable
+        // only for tests, via
+        // testing::set_failure_detection_poll_timeout_for_testing. Relaxed
+        // atomic is sufficient: this is a coarse test knob, not something
+        // failure_detection_loop() needs strict ordering against other state
+        // for.
+        std::atomic<std::int64_t> failure_detection_poll_timeout_ms{
+            hpx::supervision::default_discovery_timeout.count()};
+
+        std::chrono::milliseconds current_failure_detection_poll_timeout()
+        {
+            return std::chrono::milliseconds(
+                failure_detection_poll_timeout_ms.load(
+                    std::memory_order_relaxed));
+        }
 
         // The four states of the supervision-dispatch lifecycle. Transitions
         // are always driven by a successful compare_exchange on
@@ -81,6 +99,16 @@ namespace hpx::supervision {
             // attach to this shared_future instead of starting a second,
             // redundant init sequence.
             hpx::shared_future<void> in_flight_init_;
+
+            // Owned/guarded the same way sentinel_/registry_ already are.
+            // failure_detection_task_ holds the running poll loop so finalize()
+            // can join it before tearing down registry_/sentinel_.
+            hpx::future<void> failure_detection_task_;
+
+            // Cooperative stop flag. Checked at loop-top and per-peer so a call
+            // to finalize() can interrupt an in-flight poll cycle promptly
+            // instead of waiting out the full await_terminal timeout.
+            std::atomic<bool> stop_failure_detection_{false};
         };
 
         // Meyer's singleton: constructed on first use, destroyed at program
@@ -138,8 +166,176 @@ namespace hpx::supervision {
                 std::rethrow_exception(std::current_exception());
             }
         }
+
+        bool needs_stopping(dispatch_state const& ds) noexcept
+        {
+            return ds.stop_failure_detection_.load(std::memory_order_acquire) ||
+                !is_initialized();
+        }
+
+        // Active-probing complement to the reactive eviction path (evict_peer/
+        // cleanup_peer). While that path fences a peer when its lifecycle
+        // observer receives a terminal callback, this loop catches the case
+        // where a peer goes silent without ever delivering one (e.g. a hard
+        // locality crash where no callback fires).
+        //
+        // Lifecycle:
+        //   - Started as the last step of run_init_sequence()'s success path,
+        //     after discover_and_join() returns, so it only ever iterates over
+        //     peers already joined and never races initialization.
+        //   - Stopped from finalize(): stop_failure_detection_ is flipped and
+        //     the owning hpx::future<void> is .get()'d before sentinel_/
+        //     registry_ are torn down, since the loop dereferences the
+        //     registry's shadows while running.
+        //
+        // Per sweep:
+        //   - Snapshots currently-joined, ready, non-evicting peers via
+        //     registry_->snapshot_peers() (no new registry state was added for
+        //     this: the accessor already existed for this purpose).
+        //   - Dispatches await_terminal(...) concurrently (async, not
+        //     sequential sync calls) for every peer in the sweep, so an
+        //     unresponsive peer doesn't block the detection of others and
+        //     doesn't multiply the sweep's total duration by peer count.
+        //   - Each dispatch is read against a freshly queried epoch
+        //     (query_state), since peer_snapshot itself carries no epoch.
+        //
+        // Fencing semantics:
+        //   - hpx::error::future_cancelled on a peer's await_terminal future
+        //     means a genuine timeout: no terminal event arrived under the
+        //     epoch we waited on. In that case we bump and publish
+        //     event::failed against *our own local copy* of that peer's shadow
+        //     only. We never contact the (possibly dead) peer's own
+        //     sentinel/registry - the remote re-check inside
+        //     invoke_fenced_action is what is authoritative on the target
+        //     locality; this loop only needs the local shadow to reflect
+        //     failure so future check_admission()/dispatch_work() calls against
+        //     it observe the fence.
+        //   - hpx::error::stale_state means the epoch was already advanced
+        //     (typically the reactive eviction path already fired) - no action
+        //     needed.
+        //   - Any other outcome is a genuinely delivered terminal event -
+        //     nothing to do; the reactive path already handles it.
+        //   - check_admission() itself is never called from this loop; it
+        //     remains exclusively the caller-side gate inside
+        //     dispatch_work.hpp.
+        //
+        // Cancellation/shutdown behavior:
+        //   - The outer sweep loop and the per-peer dispatch loop both check
+        //     stop_failure_detection_ and is_initialized() before doing any
+        //     more work, so a call to finalize() is observed promptly rather
+        //     than only between full sweeps.
+        //   - Sweep completion is polled in short poll_interval slices via
+        //     wait_all_for rather than a single blocking wait_all, so
+        //     finalize() is bounded by ~poll_interval, not by
+        //     default_discovery_timeout, even if a sweep has unresponsive peers
+        //     in flight.
+        //   - If the stop signal fires mid-sweep, outstanding per-peer
+        //     continuations are abandoned (not cancelled): they hold their own
+        //     reference-counted future shared state independent of the `checks`
+        //     vector, so they run to completion safely after this function
+        //     returns. This is intentionally allowed: each continuation only
+        //     touches a captured-by-value shadow/epoch and calls publish_event
+        //     against that local shadow, never reaching into dispatch_state's
+        //     registry_/sentinel_, so it cannot race finalize()'s teardown.
+        //     Consequently, finalize() returning promptly does not imply all
+        //     background poll activity has ceased - only that this loop itself
+        //     has stopped issuing new sweeps.
+        void failure_detection_loop()
+        {
+            dispatch_state const& ds = get_dispatch_state();
+
+            // Outer loop: keep polling as long as we haven't been asked to stop
+            // and the dispatcher is still in the "active" state.
+            // is_initialized() guards against racing finalize() that's already
+            // in progress.
+            while (!needs_stopping(ds))
+            {
+                // Snapshot of currently-joined, ready, non-evicting peers. Uses
+                // the sync overload so this call blocks inline rather than
+                // returning a future we'd have to chain off of.
+                auto const peers =
+                    ds.registry_.snapshot_peers(hpx::launch::sync);
+
+                std::vector<hpx::future<void>> checks;
+                checks.reserve(peers.size());
+
+                for (auto const& peer : peers)
+                {
+                    // peer_snapshot carries no epoch of its own
+                    auto const state = hpx::supervision::query_state(
+                        hpx::launch::sync, hpx::find_here(), peer.shadow);
+
+                    auto cont = [peer, epoch = state.epoch](auto&& f) {
+                        try
+                        {
+                            f.get();    // success: real terminal event delivered
+                        }
+                        catch (hpx::exception const& e)
+                        {
+                            if (e.get_error() == hpx::error::future_cancelled)
+                            {
+                                // Genuine timeout: fence locally only, never
+                                // touch the peer's own sentinel/registry.
+                                hpx::supervision::publish_event(
+                                    hpx::launch::sync, hpx::find_here(),
+                                    peer.shadow, event::failed, epoch + 1);
+                            }
+                            // stale_state: epoch already advanced (reactive
+                            // eviction already fired) - nothing to do.
+                        }
+                    };
+
+                    auto const poll_timeout =
+                        current_failure_detection_poll_timeout();
+                    checks.push_back(await_terminal(hpx::find_here(),
+                        peer.shadow, state.epoch, poll_timeout)
+                            .then(hpx::launch::sync, HPX_MOVE(cont)));
+                }
+
+                // Poll the batch in short slices so the stop flag is rechecked
+                // every poll_interval instead of only after the full sweep
+                // resolves. This is what makes finalize() exit promptly without
+                // a second stop_promise_/wait_any mechanism.
+                constexpr std::chrono::milliseconds poll_interval{200};
+                while (!needs_stopping(ds) &&
+                    hpx::wait_all_for(poll_interval, checks) ==
+                        hpx::future_status::timeout)
+                {
+                    // still waiting on this sweep; recheck stop flag
+                }
+
+                // If stop fired mid-sweep, finalize() isn't blocked on the
+                // stragglers: each continuation only touches a *copy* of
+                // peer.shadow (captured by value) and publishes against that
+                // local shadow - it never reaches into ds.registry_/ds.sentinel_,
+                // so letting any still-running continuations finish in the
+                // background is safe.
+            }
+        }
     }    // namespace
 
+    namespace testing {
+
+        std::vector<server::registry::peer_snapshot> local_snapshot_peers()
+        {
+            dispatch_state const& ds = get_dispatch_state();
+
+            // Same guard failure_detection_loop() itself uses before touching
+            // registry_ - returns empty if not currently active.
+            if (needs_stopping(ds))
+                return {};
+            return ds.registry_.snapshot_peers(hpx::launch::sync);
+        }
+
+        void set_failure_detection_poll_timeout_for_testing(
+            hpx::chrono::steady_duration const timeout)
+        {
+            failure_detection_poll_timeout_ms.store(
+                timeout.value().count(), std::memory_order_relaxed);
+        }
+    }    // namespace testing
+
+    ////////////////////////////////////////////////////////////////////////////
     hpx::shared_future<void> init(
         hpx::chrono::steady_duration const& discovery_timeout)
     {
@@ -151,11 +347,11 @@ namespace hpx::supervision {
         {
             // Winner: publish in_flight_init_ before running the sequence so
             // losers observing "initializing" have something to attach to.
-            hpx::shared_future<void> f =
+            hpx::future<void> f =
                 hpx::async(&run_init_sequence, discovery_timeout);
 
-            f = f.then(hpx::launch::sync,
-                [&ds](hpx::shared_future<void> const& result) {
+            hpx::shared_future<void> sf =
+                f.then(hpx::launch::sync, [&ds](hpx::future<void>&& result) {
                     if (result.has_value())
                     {
                         std::scoped_lock<hpx::spinlock> l(ds.mtx_);
@@ -171,16 +367,29 @@ namespace hpx::supervision {
                         ds.in_flight_init_ = shared_future<void>();
                         ds.state_.store(
                             dispatcher_lifecycle_state::uninitialized);
+
+                        // Reset the stop flag in case a prior init/finalize
+                        // cycle left it set (dispatch_api can presumably be
+                        // re-initialized after finalize()).
+                        ds.stop_failure_detection_.store(
+                            false, std::memory_order_release);
+
+                        // Start the poll loop as the last step of the success
+                        // path - after discover_and_join() has returned, so it
+                        // only ever iterates over peers that are already joined
+                        // and never races initialization.
+                        ds.failure_detection_task_ =
+                            hpx::async(&failure_detection_loop);
                     }
                     result.get();    // rethrow exception, if any
                 });
 
             {
                 std::scoped_lock<hpx::spinlock> l(ds.mtx_);
-                ds.in_flight_init_ = f;
+                ds.in_flight_init_ = sf;
             }
 
-            return f;
+            return sf;
         }
 
         switch (expected)
@@ -250,9 +459,20 @@ namespace hpx::supervision {
                 expected, dispatcher_lifecycle_state::finalizing))
         {
             // Documented no-op: uninitialized, still initializing, or already
-            // finalizing all resolve immediately with zero side effects -- no
+            // finalizing all resolve immediately with zero side effects - no
             // event published, no name touched, no component destroyed.
             return;
+        }
+
+        // Signal the loop to stop as early as possible in finalize(), before
+        // any teardown of the state the loop still references.
+        ds.stop_failure_detection_.store(true, std::memory_order_release);
+        if (ds.failure_detection_task_.valid())
+        {
+            // Join the task before releasing sentinel_/registry_ ownership -
+            // the loop dereferences registry_'s shadows, so this must complete
+            // first to avoid a dangling reference during extraction/publish.
+            ds.failure_detection_task_.get();
         }
 
         // Winner: extract the owned pair under the lock so no other thread can
