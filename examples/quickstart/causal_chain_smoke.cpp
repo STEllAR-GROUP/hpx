@@ -13,15 +13,16 @@
 //   1. Start Tracy profiler GUI.
 //   2. Run:  TRACY_NO_EXIT=1 ./bin/causal_chain_smoke --iterations=200
 //   3. Connect Tracy to the process.
-//   4. In the Tracy message log, filter by color 0x00FF88 (bright green).
+//   4. In the Tracy message log, filter by color 0x00FF00 (bright green).
 //      You should see repeated:
 //        "Future Fulfilled: 0x<addr>"  [bright green]
-//      immediately followed by mark_event:
-//        "continuation::run_impl"      [mark event on same or next thread]
+//      immediately followed by consumer-side message:
+//        "Continuation Run: 0x<addr>" [white]
 
 #include <hpx/future.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/tracing.hpp>
+#include <hpx/thread.hpp>
 
 #include <chrono>
 #include <cstddef>
@@ -84,7 +85,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
         std::cerr << "FAIL: " << failures << " failures\n";
     }
 
-    return hpx::local::finalize();
+    hpx::local::finalize();
+    return failures == 0 ? 0 : -1;
 }
 
 int main(int argc, char* argv[])

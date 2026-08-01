@@ -21,6 +21,7 @@
 #include <hpx/future.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/tracing.hpp>
+#include <hpx/thread.hpp>
 
 #include <chrono>
 #include <cstddef>
@@ -91,7 +92,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
         std::cerr << "FAIL: " << failures << " failures\n";
     }
 
-    return hpx::local::finalize();
+    hpx::local::finalize();
+    return failures == 0 ? 0 : -1;
 }
 
 int main(int argc, char* argv[])
