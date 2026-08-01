@@ -241,7 +241,7 @@ namespace hpx::tracy {
             char const* txt, std::size_t size) noexcept
         {
             auto& fz = current_fiber_zone();
-            if (!fz.active || fz.ctx_value == 0)
+            if (txt == nullptr || size == 0 || !fz.active || fz.ctx_value == 0)
                 return;
 
             tracy_context data;

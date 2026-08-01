@@ -326,7 +326,7 @@ namespace hpx::tracing {
     }
 
     namespace {
-        std::atomic<std::int64_t> g_active_continuations{0};
+        std::atomic<std::int64_t> g_executed_continuations{0};
     }
 
     void continuation_run(void const* task_id) noexcept
@@ -347,11 +347,12 @@ namespace hpx::tracing {
         // Embed directly into active fiber visual zone text
         hpx::tracy::detail::add_zone_text_to_fiber(buffer, len);
 
-        // Update live time-series plot graph for Active Continuations in Tracy
-        std::int64_t const current_active =
-            g_active_continuations.fetch_add(1, std::memory_order_relaxed) + 1;
+        // Update live time-series plot graph for Executed Continuations in Tracy
+        std::int64_t const total_executed =
+            g_executed_continuations.fetch_add(1, std::memory_order_relaxed) +
+            1;
         hpx::tracy::sample_value(
-            "Active Continuations", static_cast<double>(current_active));
+            "Executed Continuations", static_cast<double>(total_executed));
     }
 
     void handle_on_completed_fired(void const* task_id) noexcept

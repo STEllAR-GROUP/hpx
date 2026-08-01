@@ -19,14 +19,6 @@
 #include <tracy/Tracy.hpp>
 #include <tracy/TracyC.h>
 
-namespace tracy_helpers {
-    static inline void call_tracy_message_c(
-        char const* text, std::size_t size, std::uint32_t color) noexcept
-    {
-        TracyMessageC(text, size, color);
-    }
-}    // namespace tracy_helpers
-
 namespace hpx::tracy {
 
     void set_thread_name(char const* name) noexcept
