@@ -284,29 +284,31 @@ namespace hpx::tracing {
 
     HPX_CXX_CORE_EXPORT constexpr void task_deleted(void const*) noexcept {}
 
-    // Causal tracing: future fulfillment signals.
-    // Note: ITTNotify backend parity (e.g., via __itt_event) is deferred to
-    // a dedicated backend-parity PR. These are intentional no-ops.
+    /// \brief Producer-side signal: future state fulfilled (no-op stub for ITTNotify).
     HPX_CXX_CORE_EXPORT constexpr void future_fulfilled(
         void const*, char const* = nullptr) noexcept
     {
     }
 
+    /// \brief Producer-side signal: future exception set (no-op stub for ITTNotify).
     HPX_CXX_CORE_EXPORT constexpr void future_exception_set(
         void const*, char const* = nullptr) noexcept
     {
     }
 
+    /// \brief Consumer-side signal: continuation started (no-op stub for ITTNotify).
     HPX_CXX_CORE_EXPORT constexpr void continuation_run(
         void const* = nullptr) noexcept
     {
     }
 
+    /// \brief Consumer-side signal: handle_on_completed fired (no-op stub for ITTNotify).
     HPX_CXX_CORE_EXPORT constexpr void handle_on_completed_fired(
         void const* = nullptr) noexcept
     {
     }
 
+    /// \brief Frame boundary marker (no-op stub for ITTNotify).
     HPX_CXX_CORE_EXPORT constexpr void frame_mark(
         char const* = nullptr) noexcept
     {

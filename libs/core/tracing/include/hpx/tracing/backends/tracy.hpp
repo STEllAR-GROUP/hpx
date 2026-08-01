@@ -250,9 +250,8 @@ namespace hpx::tracing {
     HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void future_exception_set(
         void const* future_id, char const* desc = nullptr) noexcept;
 
-    /// \brief Consumer-side signal: a .then() continuation has started
-    ///        executing. Appears in the Tracy message log immediately after
-    ///        the corresponding future_fulfilled producer signal.
+    /// \brief Consumer-side signal: a continuation has started executing,
+    ///        correlated with the source future state.
     HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void continuation_run(
         void const* task_id = nullptr) noexcept;
 
