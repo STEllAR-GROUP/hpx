@@ -255,6 +255,10 @@ namespace hpx::tracing {
     HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void continuation_run(
         void const* task_id = nullptr) noexcept;
 
+    /// \brief Consumer-side signal: a continuation has finished executing.
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void continuation_finished(
+        void const* task_id = nullptr) noexcept;
+
     /// \brief Consumer-side signal: handle_on_completed fired, dispatching
     ///        registered continuations.
     HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void handle_on_completed_fired(

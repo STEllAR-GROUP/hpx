@@ -302,6 +302,12 @@ namespace hpx::tracing {
     {
     }
 
+    /// \brief Consumer-side signal: continuation finished (no-op stub for ITTNotify).
+    HPX_CXX_CORE_EXPORT constexpr void continuation_finished(
+        void const* = nullptr) noexcept
+    {
+    }
+
     /// \brief Consumer-side signal: handle_on_completed fired (no-op stub for ITTNotify).
     HPX_CXX_CORE_EXPORT constexpr void handle_on_completed_fired(
         void const* = nullptr) noexcept
