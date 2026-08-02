@@ -18,9 +18,11 @@ set(supervision_dispatch_headers
     hpx/supervision_dispatch/server/sentinel.hpp
     hpx/supervision_dispatch/discovery.hpp
     hpx/supervision_dispatch/dispatch_api.hpp
+    hpx/supervision_dispatch/dispatch_work.hpp
     hpx/supervision_dispatch/registry.hpp
     hpx/supervision_dispatch/sentinel.hpp
     hpx/supervision_dispatch/export_definitions.hpp
+    hpx/supervision_dispatch.hpp
 )
 
 set(supervision_dispatch_sources

@@ -10,6 +10,7 @@ set(tests
     discover_peers
     dispatch_api
     fan_out_join
+    fenced_dispatch
     registry_join
     sentinel_start
 )
@@ -22,6 +23,8 @@ set(discover_peers_FLAGS COMPILE_FLAGS -DHPX_HAVE_RUN_MAIN_EVERYWHERE)
 
 set(fan_out_join_PARAMETERS LOCALITIES 2)
 set(fan_out_join_FLAGS COMPILE_FLAGS -DHPX_HAVE_RUN_MAIN_EVERYWHERE)
+
+set(fenced_dispatch_PARAMETERS LOCALITIES 2)
 
 foreach(test ${tests})
   set(sources ${test}.cpp)
