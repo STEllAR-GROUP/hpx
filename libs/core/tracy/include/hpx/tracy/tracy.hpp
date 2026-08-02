@@ -54,8 +54,12 @@ namespace hpx::tracy {
     };
 
     HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void create_counter(
+        char const* name) noexcept;
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void create_counter(
         std::string const& name) noexcept;
 
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void sample_value(
+        char const* name, double value) noexcept;
     HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void sample_value(
         std::string const& name, double value) noexcept;
 

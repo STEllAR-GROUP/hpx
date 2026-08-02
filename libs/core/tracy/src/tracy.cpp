@@ -58,16 +58,26 @@ namespace hpx::tracy {
     }    // namespace detail
 
     // Create a new plot in Tracy
-    void create_counter(std::string const& name) noexcept
+    void create_counter(char const* name) noexcept
     {
         ::TracyPlotConfig(
-            name.c_str(), ::tracy::PlotFormatType::Number, true, false, 0);
+            name, ::tracy::PlotFormatType::Number, true, false, 0);
+    }
+
+    void create_counter(std::string const& name) noexcept
+    {
+        create_counter(name.c_str());
     }
 
     // Pass a plot value to Tracy
+    void sample_value(char const* name, double const value) noexcept
+    {
+        ::TracyPlot(name, value);
+    }
+
     void sample_value(std::string const& name, double const value) noexcept
     {
-        ::TracyPlot(name.c_str(), value);
+        sample_value(name.c_str(), value);
     }
 
     void message(
