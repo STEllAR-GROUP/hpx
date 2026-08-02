@@ -558,6 +558,7 @@ namespace hpx {
 #include <hpx/modules/type_support.hpp>
 
 #include <array>
+#include <atomic>
 #include <cstddef>
 #include <type_traits>
 #include <vector>

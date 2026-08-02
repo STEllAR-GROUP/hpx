@@ -32,13 +32,6 @@
 
 namespace hpx::supervision::server {
 
-    namespace detail {
-
-        // Testing infrastructure support
-        HPX_CXX_EXPORT HPX_EXPORT void set_register_observer_snapshot_hook(
-            std::function<void()> hook);
-    }    // namespace detail
-
     ////////////////////////////////////////////////////////////////////////////
     // Base name used to register the component
     HPX_CXX_EXPORT inline constexpr char const* const supervision_manager_name =

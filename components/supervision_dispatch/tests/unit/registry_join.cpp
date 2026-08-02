@@ -22,6 +22,7 @@
 #include <hpx/supervision_dispatch/registry.hpp>
 #include <hpx/supervision_dispatch/sentinel.hpp>
 #include <hpx/supervision_dispatch/server/registry.hpp>
+#include <hpx/supervision_dispatch/testing.hpp>
 
 #include <cstddef>
 #include <vector>
@@ -214,7 +215,7 @@ void test_registry_join_failure_removes_shadow_state()
     HPX_TEST_EQ(shadow, hpx::invalid_id);
 
     hpx::id_type const failed_shadow =
-        hpx::supervision::server::detail::last_join_shadow();
+        hpx::supervision::testing::last_join_shadow();
     HPX_TEST_NEQ(failed_shadow, hpx::invalid_id);
 
     // The failed attempt's shadow must have had its local state removed by

@@ -17,7 +17,9 @@
 #include <hpx/modules/tracing.hpp>
 
 #include <hpx/supervision_dispatch/export_definitions.hpp>
+#include <hpx/supervision_dispatch/testing.hpp>
 
+#include <cstdint>
 #include <map>
 #include <utility>
 #include <vector>
@@ -29,18 +31,28 @@ namespace hpx::supervision::server {
 
     class HPX_SUPERVISION_DISPATCH_EXPORT registry;
 
-    namespace detail {
-
-        // Testing infrastructure support: returns the shadow target most
-        // recently minted by join(), regardless of whether the
-        // register_observers() call that followed it went on to succeed or
-        // fail. Lets tests verify that a failed join() does not leak the
-        // shadow's locally tracked supervision state (see
-        // registry::register_observers()'s catch block).
-        HPX_SUPERVISION_DISPATCH_EXPORT hpx::id_type last_join_shadow();
-    }    // namespace detail
-
     ///////////////////////////////////////////////////////////////////////////
+    /// Plain-data view of a single joined peer, safe to hand out to
+    /// callers outside the registry (unlike peer_entry, does not expose
+    /// the ready/evict_pending bookkeeping used internally to coordinate
+    /// concurrent join()/evict_peer() calls).
+    struct peer_snapshot
+    {
+        /// The peer sentinel this entry was joined against.
+        hpx::id_type peer_sentinel;
+
+        /// The locality that owns \c peer_sentinel, as recorded by
+        /// join().
+        hpx::id_type peer_locality;
+
+        /// The locally tracked shadow mirroring \c peer_sentinel's
+        /// supervision state.
+        hpx::id_type shadow;
+
+        /// The epoch at which \c peer_sentinel was joined.
+        std::uint64_t join_epoch;
+    };
+
     class registry : public hpx::components::component_base<registry>
     {
     public:
@@ -57,24 +69,6 @@ namespace hpx::supervision::server {
           : hpx::actions::make_action_t<decltype(&registry::join),
                 &registry::join, join_action>
         {
-        };
-
-        /// Plain-data view of a single joined peer, safe to hand out to
-        /// callers outside the registry (unlike peer_entry, does not expose
-        /// the ready/evict_pending bookkeeping used internally to coordinate
-        /// concurrent join()/evict_peer() calls).
-        struct peer_snapshot
-        {
-            /// The peer sentinel this entry was joined against.
-            hpx::id_type peer_sentinel;
-
-            /// The locality that owns \c peer_sentinel, as recorded by
-            /// join().
-            hpx::id_type peer_locality;
-
-            /// The locally tracked shadow mirroring \c peer_sentinel's
-            /// supervision state.
-            hpx::id_type shadow;
         };
 
         /// Returns a point-in-time snapshot of all fully joined, non-evicting
@@ -161,6 +155,9 @@ namespace hpx::supervision::server {
             /// peer's activity notifications (used to keep the shadow's
             /// local state current between terminal events).
             hpx::id_type activity_observer;
+
+            /// The epoch at which this peer was joined, recorded by join().
+            std::uint64_t join_epoch;
 
             /// False while a join() call has reserved ownership of this peer
             /// sentinel (i.e. is in the process of performing the remote

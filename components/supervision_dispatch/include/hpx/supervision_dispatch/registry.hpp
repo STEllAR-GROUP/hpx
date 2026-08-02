@@ -88,8 +88,7 @@ namespace hpx::supervision {
         ///
         /// \return A future that becomes ready with one peer_snapshot per
         ///         peer that is fully joined and not pending eviction.
-        hpx::future<std::vector<server::registry::peer_snapshot>>
-        snapshot_peers() const;
+        hpx::future<std::vector<server::peer_snapshot>> snapshot_peers() const;
 
         /// \copydoc snapshot_peers() const
         ///
@@ -98,7 +97,7 @@ namespace hpx::supervision {
         ///
         /// \return One peer_snapshot per peer that is fully joined and not
         ///         pending eviction.
-        std::vector<server::registry::peer_snapshot> snapshot_peers(
+        std::vector<server::peer_snapshot> snapshot_peers(
             hpx::launch::sync_policy, hpx::error_code& ec = hpx::throws) const;
 
         /// Register this registry's id with AGAS under a name pinned to the

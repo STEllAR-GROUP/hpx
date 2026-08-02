@@ -7,26 +7,54 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/timing.hpp>
 
 #include <hpx/supervision_dispatch/export_definitions.hpp>
-#include <hpx/supervision_dispatch/server/registry.hpp>
 
 #include <chrono>
 #include <vector>
 
+namespace hpx::supervision::server {
+
+    struct peer_snapshot;
+}    // namespace hpx::supervision::server
+
 namespace hpx::supervision::testing {
 
-    HPX_SUPERVISION_DISPATCH_EXPORT std::vector<server::registry::peer_snapshot>
+    /// Returns a snapshot of this locality's currently-joined, ready peers, as
+    /// tracked by the local registry. Not part of the public dispatch API -
+    /// exists so tests can inspect registry state directly.
+    HPX_SUPERVISION_DISPATCH_EXPORT std::vector<server::peer_snapshot>
     local_snapshot_peers();
 
-    // Overrides the timeout failure_detection_loop() passes to await_terminal()
-    // on each sweep. Must be called before init() starts the loop to take
-    // effect for that lifecycle; has no effect on a sweep already in flight.
-    // Not part of the public dispatch API - exists only to make
-    // failure-detection tests deterministic and fast instead of bound by the
-    // real 60s default_discovery_timeout.
+    /// Overrides the timeout failure_detection_loop() passes to await_terminal()
+    /// on each sweep. Must be called before init() starts the loop to take
+    /// effect for that lifecycle; has no effect on a sweep already in flight.
+    /// Not part of the public dispatch API - exists only to make
+    /// failure-detection tests deterministic and fast instead of bound by the
+    /// real 60s default_discovery_timeout.
+    ///
+    /// \param timeout  The new poll timeout.
     HPX_SUPERVISION_DISPATCH_EXPORT void
     set_failure_detection_poll_timeout_for_testing(
-        hpx::chrono::steady_duration timeout);
+        hpx::chrono::steady_duration const& timeout);
+
+    /// Returns the shadow target most recently minted by join(), regardless of
+    /// whether the register_observers() call that followed it went on to succeed
+    /// or fail. Lets tests verify that a failed join() does not leak the
+    /// shadow's locally tracked supervision state (see
+    /// registry::register_observers()'s catch block).
+    HPX_SUPERVISION_DISPATCH_EXPORT hpx::id_type last_join_shadow();
+
+    /// Stops this locality's own heartbeat_loop() without finalizing the
+    /// dispatcher, simulating a hard crash (all lifecycle activity ceases,
+    /// including the periodic event::running pulse) while staying joined in
+    /// peers' registries. Idempotent; no-op if init() was never called or the
+    /// loop is already stopped. Not part of the public dispatch API - exists
+    /// only so failure-detection tests can deterministically simulate silence
+    /// instead of relying on the absence of explicit calls, which no longer
+    /// implies silence now that heartbeats are mirrored onto observers'
+    /// shadows.
+    HPX_SUPERVISION_DISPATCH_EXPORT void suspend_heartbeat_for_testing();
 }    // namespace hpx::supervision::testing

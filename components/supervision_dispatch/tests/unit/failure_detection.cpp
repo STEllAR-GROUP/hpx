@@ -14,7 +14,7 @@
 // Locality 0 is the "observer": it runs every assertion via dispatch_work()/
 // check_admission() against its local view of locality 1's shadow. Locality 1
 // is the "peer": for most scenarios it stays live (publishing nothing further
-// is *not* required to be alive -- only the fencing scenario deliberately
+// is *not* required to be alive - only the fencing scenario deliberately
 // withholds all further activity), and it self-paces via barrier::synchronize()
 // so the observer can drive each scenario to completion before the peer moves
 // on to teardown.
@@ -32,14 +32,9 @@
 #include <hpx/modules/supervision.hpp>
 #include <hpx/modules/testing.hpp>
 
-#include <hpx/supervision_dispatch/dispatch_api.hpp>
-#include <hpx/supervision_dispatch/dispatch_work.hpp>
+#include <hpx/supervision_dispatch.hpp>
 
-// Proposed, not yet present: exposes the two test-only hooks described
-// above. If these land under a different header/namespace, only the
-// #include and call sites below need updating.
-#include <hpx/supervision_dispatch/testing.hpp>
-
+#include <algorithm>
 #include <chrono>
 #include <cstdint>
 #include <optional>
@@ -59,10 +54,6 @@ namespace {
     // the real default_discovery_timeout (60s) so tests are deterministic
     // and fast. Must be set before init() starts the loop.
     constexpr std::chrono::milliseconds test_poll_timeout{500};
-
-    // A generous bound the *unresponsive* peer sleeps for, long enough to
-    // comfortably outlast every scenario the observer runs against it.
-    constexpr std::chrono::seconds peer_idle_bound{30};
 
     // Polls query_state()+check_admission() in short increments (rather than
     // sleeping a hardcoded number of poll cycles) until `target` reports
@@ -90,13 +81,14 @@ namespace {
     std::optional<hpx::id_type> find_shadow_for(
         hpx::id_type const& peer_locality)
     {
-        for (auto const& peer :
-            hpx::supervision::testing::local_snapshot_peers())
+        auto const peers = hpx::supervision::testing::local_snapshot_peers();
+        auto const it = std::ranges::find_if(peers, [&](auto const& peer) {
+            return peer.peer_locality == peer_locality;
+        });
+
+        if (it != peers.end())
         {
-            if (peer.peer_locality == peer_locality)
-            {
-                return peer.shadow;
-            }
+            return it->shadow;
         }
         return std::nullopt;
     }
@@ -109,12 +101,12 @@ namespace {
 
 // Scenario 1: detection causes fencing.
 //
-// The peer locality joins and then goes silent -- no completed/failed event
+// The peer locality joins and then goes silent - no completed/failed event
 // ever arrives, simulating a hard crash where no lifecycle callback fires.
 // After one poll cycle (bounded by test_poll_timeout, not the real 60s
 // default), the observer's local shadow for that peer must report fenced, and a
 // subsequent dispatch_work() against it must fail with
-// hpx::error::target_fenced -- proving the *local* shadow was fenced by the
+// hpx::error::target_fenced - proving the *local* shadow was fenced by the
 // detector, without the observer ever contacting the peer's own
 // sentinel/registry.
 void test_detection_causes_fencing(hpx::id_type const& peer_locality)
@@ -148,6 +140,7 @@ void test_detection_causes_fencing(hpx::id_type const& peer_locality)
     try
     {
         f.get();
+        HPX_TEST(false);
     }
     catch (hpx::exception const& e)
     {
@@ -195,14 +188,11 @@ void test_no_false_positives(hpx::id_type const& peer_locality)
 // finalize() must return promptly (bounded by the loop's internal poll_interval
 // slicing, not by the full await_terminal timeout) even while a sweep is in
 // flight against an unresponsive peer. Deliberately uses the *unshortened*
-// default_discovery_timeout for this scenario's own poll bound -- shortening it
+// default_discovery_timeout for this scenario's own poll bound - shortening it
 // here would hide a broken implementation that still blocks finalize() on the
 // full wait.
-void test_clean_shutdown_during_in_flight_sweep(
-    hpx::id_type const& observer_marker)
+void test_clean_shutdown_during_in_flight_sweep()
 {
-    (void) observer_marker;
-
     // Re-init with the real, unshortened timeout so this scenario actually
     // exercises the "long wait in flight" case finalize() must not block on.
     hpx::supervision::testing::set_failure_detection_poll_timeout_for_testing(
@@ -259,6 +249,7 @@ void test_fence_is_idempotent(hpx::id_type const& peer_locality)
         try
         {
             hpx::supervision::dispatch_work<probe_action>(*shadow, epoch).get();
+            HPX_TEST(false);
         }
         catch (hpx::exception const& e)
         {
@@ -294,7 +285,7 @@ int hpx_main()
     bool const is_observer = (hpx::get_locality_id() == 0);
 
     // Shrink the poll timeout before init() starts the background loop, on
-    // both sides -- the peer side needs it too for scenarios 2/4's repeated
+    // both sides - the peer side needs it too for scenarios 2/4's repeated
     // sweep timing to be meaningful.
     hpx::supervision::testing::set_failure_detection_poll_timeout_for_testing(
         test_poll_timeout);
@@ -304,7 +295,7 @@ int hpx_main()
 
     if (is_observer)
     {
-        // --- Scenario 2 first: peer is still fully live at this point. ---
+        // Scenario 2 first: peer is still fully live at this point.
         test_no_false_positives(peer_locality);
     }
     hpx::distributed::barrier::synchronize();
@@ -314,14 +305,16 @@ int hpx_main()
         // The peer now goes silent for the remainder of the test: no more
         // events are published from here on, simulating a hard crash with
         // no terminal callback ever firing.
-        hpx::this_thread::sleep_for(peer_idle_bound);
+        hpx::supervision::testing::suspend_heartbeat_for_testing();
     }
-    else
+    hpx::distributed::barrier::synchronize();
+
+    if (is_observer)
     {
-        // --- Scenario 1: peer is now silent; wait for detection. ---
+        // Scenario 1: peer is now silent; wait for detection.
         test_detection_causes_fencing(peer_locality);
 
-        // --- Scenario 4: fence must be sticky, no epoch churn. ---
+        // Scenario 4: fence must be sticky, no epoch churn.
         test_fence_is_idempotent(peer_locality);
     }
     hpx::distributed::barrier::synchronize();
@@ -332,13 +325,13 @@ int hpx_main()
     }
     hpx::distributed::barrier::synchronize();
 
-    // --- Scenario 3: clean shutdown while a sweep may still be in flight. Run
-    // on the observer only, against its own re-armed lifecycle -- the peer side
+    // Scenario 3: clean shutdown while a sweep may still be in flight. Run
+    // on the observer only, against its own re-armed lifecycle - the peer side
     // has already gone (and stays) silent, so this exercises finalize() racing
     // a real unresponsive-peer sweep end-to-end.
     if (is_observer)
     {
-        test_clean_shutdown_during_in_flight_sweep(peer_locality);
+        test_clean_shutdown_during_in_flight_sweep();
     }
     else
     {
