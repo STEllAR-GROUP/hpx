@@ -23,6 +23,10 @@
 namespace hpx::supervision {
 
     ///////////////////////////////////////////////////////////////////////////
+    /// A registry is a lightweight, self-supervising handle for pairing with
+    /// peer sentinels. It mirrors a peer's lifecycle state locally via join(),
+    /// and can itself be discovered by name in AGAS like other
+    /// supervision_dispatch components.
     class HPX_SUPERVISION_DISPATCH_EXPORT registry
       : public hpx::components::client_base<registry, server::registry>
     {
@@ -37,22 +41,43 @@ namespace hpx::supervision {
         /// new server-side component.
         registry() = default;
 
-        /// \brief Constructs a registry by creating a new server-side
-        ///        component on the given target locality.
-        /// \param target_locality The locality on which the underlying
-        ///        registry component will be created.
+        /// Constructs a registry by creating a new server-side component on the
+        /// given target locality.
+        ///
+        /// \param target_locality The locality on which the underlying registry
+        ///        component will be created.
         explicit registry(hpx::id_type const& target_locality);
 
+        /// Connect to a peer's registry component.
+        ///
+        /// \param symbolic_name The symbol name of the peer's registry
+        ///        component.
         explicit registry(std::string const& symbolic_name);
 
         /* implicit */ registry(hpx::future<hpx::id_type>&& f);
 
-        // Join a peer sentinel: create (or reuse) a local shadow target
-        // that mirrors the peer's lifecycle state, and register this
-        // registry as an observer of the peer's lifecycle/activity events.
-        // Returns the id of the local shadow target.
+        /// Join a peer sentinel: create (or reuse) a local shadow target that
+        /// mirrors the peer's lifecycle state, and register this registry as an
+        /// observer of the peer's lifecycle/activity events.
+        ///
+        /// \param peer_sentinel The peer sentinel to join.
+        /// \param peer_locality The locality on which the peer sentinel
+        ///        resides.
+        ///
+        /// \return A future that becomes ready with the id of the local shadow
+        ///         target.
         hpx::future<hpx::id_type> join(sentinel const& peer_sentinel,
             hpx::id_type const& peer_locality) const;
+
+        /// \copydoc join(sentinel const&, hpx::id_type const&) const
+        ///
+        /// \param peer_sentinel The peer sentinel to join.
+        /// \param peer_locality The locality on which the peer sentinel
+        ///        resides.
+        /// \param ec Used to hold the error code that results from the
+        ///           operation instead of throwing an exception on failure.
+        ///
+        /// \return The id of the local shadow target.
         hpx::id_type join(hpx::launch::sync_policy,
             sentinel const& peer_sentinel, hpx::id_type const& peer_locality,
             hpx::error_code& ec = hpx::throws) const;

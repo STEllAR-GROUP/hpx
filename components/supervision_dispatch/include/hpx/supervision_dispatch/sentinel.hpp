@@ -23,11 +23,11 @@
 namespace hpx::supervision {
 
     ///////////////////////////////////////////////////////////////////////////
-    // A sentinel is a lightweight, self-supervising handle: constructing it
-    // creates a component on the given target locality, and calling start()
-    // publishes the `started` lifecycle event for that component to the
-    // supervision manager running on the same locality. No registry lookup or
-    // discovery step is required.
+    /// A sentinel is a lightweight, self-supervising handle: constructing it
+    /// creates a component on the given target locality, and calling start()
+    /// publishes the `started` lifecycle event for that component to the
+    /// supervision manager running on the same locality. No registry lookup
+    /// or discovery step is required.
     class HPX_SUPERVISION_DISPATCH_EXPORT sentinel
       : public hpx::components::client_base<sentinel, server::sentinel>
     {
@@ -42,20 +42,36 @@ namespace hpx::supervision {
         /// new server-side component.
         sentinel() = default;
 
-        /// \brief Constructs a sentinel by creating a new server-side component
-        ///        on the given target locality.
+        /// Constructs a sentinel by creating a new server-side component on the
+        /// given target locality.
         /// \param target_locality The locality on which the underlying sentinel
         ///        component will be created.
         explicit sentinel(hpx::id_type const& target_locality);
 
+        /// Connect to a peer's sentinel component.
+        ///
+        /// \param symbolic_name The symbol name of the peer's sentinel
+        ///        component.
         explicit sentinel(std::string const& symbolic_name);
 
         /* implicit */ sentinel(hpx::future<hpx::id_type>&& f);
 
-        // Publish the `started` lifecycle event (at the given epoch) for
-        // this sentinel to the supervision manager running on its target
-        // locality.
+        /// Publish the `started` lifecycle event (at the given epoch) for this
+        /// sentinel to the supervision manager running on its target locality.
+        ///
+        /// \param epoch The epoch value to associate with this lifecycle event.
+        ///
+        /// \return A future that becomes ready with the result of publishing
+        ///         the event.
         hpx::future<publish_result> start(std::uint64_t epoch = 0) const;
+
+        /// \copydoc start(std::uint64_t) const
+        ///
+        /// \param epoch The epoch value to associate with this lifecycle event.
+        /// \param ec Used to hold the error code that results from the
+        ///           operation instead of throwing an exception on failure.
+        ///
+        /// \return The result of publishing the event.
         publish_result start(hpx::launch::sync_policy, std::uint64_t epoch = 0,
             hpx::error_code& ec = hpx::throws) const;
 
