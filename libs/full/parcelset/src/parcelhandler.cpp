@@ -329,6 +329,18 @@ namespace hpx::parcelset {
             endpoints_[pp->type()] = pp->here();
     }
 
+    void parcelhandler::update_endpoints()
+    {
+        for (pports_type::value_type const& pp : pports_)
+        {
+            if (pp.first > 0 && pp.second)
+            {
+                HPX_ASSERT(pp.second->type() == pp.second->here().type());
+                endpoints_[pp.second->type()] = pp.second->here();
+            }
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Make sure the specified locality is not held by any
     /// connection caches anymore
