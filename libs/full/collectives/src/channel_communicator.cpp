@@ -206,10 +206,10 @@ namespace hpx::collectives {
             if (auto const it = cached_channel_communicators.find(name);
                 it != cached_channel_communicators.end())
             {
-                // A creation that failed is handed back as it stands rather
-                // than retried: the only way it fails is a name that was
-                // already registered, and repeating the registration cannot
-                // change that.
+                // Hand an exceptional creation back unchanged. Retrying after
+                // another site may already have registered its endpoint could
+                // split the sites across different communicators; recovery
+                // therefore needs a new basename.
                 return it->second;
             }
 

@@ -221,6 +221,29 @@ void test_default_generation_still_works(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// Selecting the direct path must not bypass validation performed by the
+// established routed implementation.
+void test_direct_path_preserves_root_validation(
+    std::uint32_t const this_locality, std::uint32_t const num_localities)
+{
+    bool caught_bad_root = false;
+    try
+    {
+        all_to_all("/test/pairwise_dispatch/invalid_root/",
+            contribution(this_locality, num_localities),
+            num_sites_arg(num_localities), this_site_arg(this_locality),
+            generation_arg(1), root_site_arg(num_localities),
+            pairwise_threshold_arg(0))
+            .get();
+    }
+    catch (hpx::exception const& e)
+    {
+        caught_bad_root = e.get_error() == hpx::error::bad_parameter;
+    }
+    HPX_TEST(caught_bad_root);
+}
+
+///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
     std::uint32_t const this_locality = hpx::get_locality_id();
@@ -236,6 +259,7 @@ int hpx_main()
     test_default_threshold_decides(num_localities);
     test_auto_selects_direct_for_large_rows(this_locality, num_localities);
     test_default_generation_still_works(this_locality, num_localities);
+    test_direct_path_preserves_root_validation(this_locality, num_localities);
 
     return hpx::finalize();
 }

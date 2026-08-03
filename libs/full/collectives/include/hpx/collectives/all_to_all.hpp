@@ -664,7 +664,11 @@ namespace hpx::collectives {
                 this_site = this_site_arg(agas::get_locality_id());
             }
 
-            if (!generation.is_default() &&
+            // Leave malformed communicator arguments to the routed path's
+            // existing validation instead of changing their behavior here.
+            if (basename != nullptr && basename[0] != '\0' &&
+                this_site < num_sites && root_site < num_sites &&
+                !generation.is_default() &&
                 exchange_pairwise(static_cast<std::size_t>(num_sites),
                     pairwise_type_bytes<T>(), threshold))
             {
@@ -681,8 +685,13 @@ namespace hpx::collectives {
                 // The site count belongs in the name because two groups of
                 // different size are two different communicators, and the
                 // cache creates one only on the first call that names it.
-                std::string channel_basename = std::string(basename) +
-                    "pairwise/" +
+                std::string channel_basename(basename);
+                HPX_ASSERT(!channel_basename.empty());
+                if (channel_basename.back() != '/')
+                {
+                    channel_basename += '/';
+                }
+                channel_basename += "pairwise/" +
                     std::to_string(static_cast<std::size_t>(num_sites)) + "/";
 
                 std::size_t const num_sites_value = num_sites;
