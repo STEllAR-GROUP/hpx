@@ -54,6 +54,49 @@
 namespace hpx::distributed::experimental::detail {
 
     ///////////////////////////////////////////////////////////////////////////
+    // Extracted bulk loop for remote execution.
+    //
+    // This function encapsulates the shape-indexed invocation logic so
+    // that it can be dispatched as an HPX action on a remote locality.
+    // It handles both integral shapes (index-based loop) and range-based
+    // shapes (iterator-based loop).
+    //
+    // Parameters:
+    //   shape - The iteration space (integral count or iterable range)
+    //   f     - The user function invoked for each index
+    //   ts... - The upstream values forwarded from the predecessor sender
+    template <typename Shape, typename F, typename... Ts>
+    void remote_bulk_execute(Shape const& shape, F& f, Ts&... ts)
+    {
+        if constexpr (std::is_integral_v<std::decay_t<Shape>>)
+        {
+            for (std::decay_t<Shape> i = 0; i < shape; ++i)
+            {
+                HPX_INVOKE(f, i, ts...);
+            }
+        }
+        else
+        {
+            for (auto const& s : shape)
+            {
+                HPX_INVOKE(f, s, ts...);
+            }
+        }
+    }
+
+    // TODO: Define HPX_ACTION here.
+    //
+    // Templated plain actions are not directly supported by
+    // HPX_DEFINE_PLAIN_ACTION. The action registration will require
+    // either:
+    //   (a) A type-erased wrapper that serializes Shape, F, and Ts...
+    //       through the HPX serialization framework, or
+    //   (b) Explicit action instantiation for known type sets.
+    //
+    // This will be implemented once the serialization constraints
+    // for F (callable) and Ts... (upstream values) are finalized.
+
+    ///////////////////////////////////////////////////////////////////////////
     // Distributed bulk sender: wraps an upstream sender with shape + function
     // for data-parallel execution on a remote locality.
     template <typename Sender, typename Shape, typename F>
@@ -200,33 +243,26 @@ namespace hpx::distributed::experimental::detail {
 
                 hpx::detail::try_catch_exception_ptr(
                     [&]() {
-                        // TODO: Implement remote parcelport dispatch.
+                        // TODO: Dispatch remote_bulk_execute action
+                        // using hpx::async to target_locality_.
                         //
-                        // In the final implementation, the shape, function,
-                        // and values will be serialized and dispatched to
-                        // the target locality via a component action. The
-                        // remote locality will execute the bulk loop and
-                        // signal completion back through the
-                        // distributed_receiver_component.
+                        // Once the action is registered and the
+                        // serialization constraints for F and Ts...
+                        // are finalized, this call will become:
+                        //
+                        //   hpx::async<remote_bulk_execute_action<
+                        //       Shape, F, Ts...>>(
+                        //       target_locality_, shape_, f_, ts...)
+                        //       .get();
+                        //
+                        // For now, execute locally as a fallback.
                         //
                         // NOTE: This stub executes strictly sequentially.
                         // The final remote parcelport implementation will
                         // execute concurrently, which will change observable
                         // behavior for non-thread-safe functions.
-                        if constexpr (std::is_integral_v<std::decay_t<Shape>>)
-                        {
-                            for (std::decay_t<Shape> i = 0; i < shape_; ++i)
-                            {
-                                HPX_INVOKE(f_, i, ts...);
-                            }
-                        }
-                        else
-                        {
-                            for (auto const& s : shape_)
-                            {
-                                HPX_INVOKE(f_, s, ts...);
-                            }
-                        }
+                        remote_bulk_execute(shape_, f_, ts...);
+
                         hpx::execution::experimental::set_value(
                             HPX_MOVE(receiver_), HPX_FORWARD(Ts, ts)...);
                     },
