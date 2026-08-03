@@ -21,10 +21,9 @@
 #include <hpx/collectives/argument_types.hpp>
 #include <hpx/collectives/channel_communicator.hpp>
 #include <hpx/collectives/detail/hierarchical_helpers.hpp>
-#include <hpx/errors/error.hpp>
-#include <hpx/errors/exception.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/async_combinators.hpp>
+#include <hpx/modules/errors.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -178,7 +177,7 @@ namespace hpx::collectives::detail {
                 // send and receive on it has completed
                 [comm = HPX_MOVE(comm), diagonal = HPX_MOVE(diagonal),
                     num_sites, this_site](auto&& f) mutable {
-                    auto [sent, received] = HPX_MOVE(f).get();
+                    auto [sent, received] = HPX_FORWARD(decltype(f), f).get();
 
                     // Report a failed send rather than a truncated result.
                     for (auto& send : sent)
