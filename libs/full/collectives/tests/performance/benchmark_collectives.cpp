@@ -48,6 +48,29 @@ constexpr char const* barrier_bench_basename = "/test/barrier_bench/";
 // for every operation, so this is threaded as a file-scope option rather than
 // as an extra parameter on all ten of them. -1 leaves the library default.
 int pairwise_threshold_option = -1;
+
+pairwise_threshold_arg benchmark_pairwise_threshold(
+    std::size_t const block_size) noexcept
+{
+    if (pairwise_threshold_option == -1)
+    {
+        return pairwise_threshold_arg();
+    }
+
+    std::size_t const threshold =
+        static_cast<std::size_t>(pairwise_threshold_option);
+    std::size_t const threshold_elements =
+        (threshold + sizeof(int) - 1) / sizeof(int);
+
+    // The benchmark gives every site the same row size, so it can make the
+    // globally consistent choice that the general vector-row API cannot infer.
+    // Zero forces pairwise; any non-zero value keeps an unmeasurable vector row
+    // on the routed path.
+    bool const use_pairwise =
+        threshold == 0 || block_size >= threshold_elements;
+    return pairwise_threshold_arg(use_pairwise ? 0 : 1);
+}
+
 constexpr char const* exclusive_scan_basename = "/test/exclusive_scan_direct/";
 constexpr char const* inclusive_scan_basename = "/test/inclusive_scan_direct/";
 
@@ -1634,10 +1657,7 @@ void test_one_shot_use_all_to_all(int lpn, std::size_t iterations,
         recv_data = all_to_all(all_to_all_direct_basename, std::move(iter_data),
             num_sites_arg(num_localities), this_site_arg(this_locality),
             generation_arg(i + 1), root_site_arg(0),
-            pairwise_threshold_option < 0 ?
-                pairwise_threshold_arg() :
-                pairwise_threshold_arg(
-                    static_cast<std::size_t>(pairwise_threshold_option)))
+            benchmark_pairwise_threshold(block_size))
                         .get();
         // Reduce max elapsed time to root
         double max_elapsed = timer.elapsed();
@@ -1657,7 +1677,7 @@ void test_one_shot_use_all_to_all(int lpn, std::size_t iterations,
 
     if (this_locality == 0)
     {
-        std::string const mod_name = pairwise_threshold_option < 0 ?
+        std::string const mod_name = pairwise_threshold_option == -1 ?
             "single_use" :
             "single_use_p" + std::to_string(pairwise_threshold_option);
         write_to_file(operation, mod_name, -1, num_localities, lpn, test_size,
@@ -2133,10 +2153,12 @@ int hpx_main(hpx::program_options::variables_map& vm)
     int const warmup_iterations = vm["warmup_iterations"].as<int>();
     pairwise_threshold_option = vm["pairwise_threshold"].as<int>();
 
-    if (iterations <= 0 || warmup_iterations < 0 || test_size <= 0 || lpn <= 0)
+    if (iterations <= 0 || warmup_iterations < 0 || test_size <= 0 ||
+        lpn <= 0 || pairwise_threshold_option < -1)
     {
         std::cout << "error: iterations and test_size and lpn must be > 0; "
-                     "warmup_iterations must be >= 0\n";
+                     "warmup_iterations must be >= 0; pairwise_threshold "
+                     "must be >= -1\n";
         return hpx::finalize();
     }
 
