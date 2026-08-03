@@ -341,6 +341,18 @@ int hpx_main()
     }
     hpx::distributed::barrier::synchronize();
 
+    // Peer tears down its supervision runtime (unregistering names and
+    // destroying sentinel_/registry_) completely before the observer re-inits
+    // below - otherwise the observer's fresh discover_and_join() can discover
+    // the peer's still-registered names and send a join RPC that races the
+    // peer's component teardown, hanging fan_out_join()'s untimed hpx::unwrap()
+    // for the remainder of the CI job.
+    if (!is_observer)
+    {
+        hpx::supervision::finalize();
+    }
+    hpx::distributed::barrier::synchronize();
+
     // Scenario 3: clean shutdown while a sweep may still be in flight. Run
     // on the observer only, against its own re-armed lifecycle - the peer side
     // has already gone (and stays) silent, so this exercises finalize() racing
@@ -348,10 +360,6 @@ int hpx_main()
     if (is_observer)
     {
         test_clean_shutdown_during_in_flight_sweep();
-    }
-    else
-    {
-        hpx::supervision::finalize();
     }
 
     return hpx::finalize();

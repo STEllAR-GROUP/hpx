@@ -4,6 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \page hpx::supervision::testing::set_register_observer_snapshot_hook
+/// \file hpx/supervision/testing.hpp
+/// \headerfile hpx/supervision.hpp
+
 #pragma once
 
 #include <hpx/config.hpp>

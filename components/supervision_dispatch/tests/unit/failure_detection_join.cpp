@@ -144,8 +144,8 @@ int hpx_main()
     HPX_TEST_NO_THROW(hpx::supervision::init(hpx::launch::sync));
     hpx::distributed::barrier::synchronize();
 
-    // Peer suspends heartbeat immediately after join, before any
-    // barrier-synchronized step could let the observer succeed even once. No
+    // Peer suspends heartbeat immediately after join, before any barrier-
+    // synchronized step could let the observer succeed even once. No
     // no-false-positives case to preserve in this file, unlike
     // failure_detection.cpp.
     if (!is_observer)

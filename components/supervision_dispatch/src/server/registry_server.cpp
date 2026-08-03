@@ -130,9 +130,7 @@ namespace hpx::supervision::server {
                 [shadow, peer_sentinel, peer_locality, this,
                     keep_alive = get_id()](
                     hpx::supervision::lifecycle_event_notification const&
-                        notification) {
-                    HPX_UNUSED(keep_alive);
-
+                        notification) mutable {
                     // Read the shadow's current epoch/state before mirroring.
                     // If the shadow hasn't been seeded yet (epoch mismatch or
                     // still "unknown"), open its epoch with `started` at the
@@ -172,7 +170,7 @@ namespace hpx::supervision::server {
                     if (hpx::supervision::is_terminal(notification.event))
                     {
                         hpx::post(&registry::evict_peer, this, peer_sentinel,
-                            peer_locality, shadow);
+                            peer_locality, shadow, HPX_MOVE(keep_alive));
                     }
                     return true;
                 };
@@ -356,7 +354,8 @@ namespace hpx::supervision::server {
     }
 
     void registry::evict_peer(hpx::id_type const& peer_sentinel,
-        hpx::id_type const& peer_locality, hpx::id_type const& shadow)
+        hpx::id_type const& peer_locality, hpx::id_type const& shadow,
+        [[maybe_unused]] hpx::id_type keep_alive)
     {
         hpx::id_type lifecycle_observer;
         hpx::id_type activity_observer;

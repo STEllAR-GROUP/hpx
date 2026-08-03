@@ -258,28 +258,6 @@ namespace {
     //     background poll activity has ceased - only that this loop itself has
     //     stopped issuing new sweeps.
 
-    bool peer_is_alive_but_silent(
-        std::uint64_t const seq, hpx::id_type const& shadow)
-    {
-        // await_terminal only unblocks on a terminal event, so a timeout alone
-        // does not distinguish "dead" from "alive but only publishing
-        // non-terminal events" (e.g. the periodic event::running heartbeat).
-        // Re-query and compare event_sequence_number before concluding genuine
-        // failure.
-        hpx::error_code ec(hpx::throwmode::lightweight);
-        auto const recheck = hpx::supervision::query_state(shadow, ec);
-        if (ec || recheck.ec)
-        {
-            // Can't confirm liveness or death right now; don't fence on an
-            // untrustworthy read - try again next sweep.
-            return true;
-        }
-
-        // Sequence number may have advanced since we started waiting (e.g. a
-        // heartbeat pulse) - in which case the peer is alive, just quiet.
-        return recheck.event_sequence_number != seq;
-    }
-
     void pace_consecutive_sweeps(std::atomic<bool> const& flag,
         std::chrono::milliseconds const& poll_interval)
     {
@@ -300,6 +278,95 @@ namespace {
         std::uint64_t last_known_epoch = 0;
         std::uint32_t consecutive_query_failures = 0;
     };
+
+    // Result of probing whether a peer is genuinely silent (no new terminal
+    // event/heartbeat) or should not be fenced on (either it became active,
+    // or the read itself was untrustworthy).
+    enum class silence_status : std::uint8_t
+    {
+        alive_or_unknown,    // don't fence: alive, or read was untrustworthy
+        still_silent
+    };
+
+    struct silence_probe
+    {
+        std::uint64_t seq;    // valid when status == still_silent
+        silence_status status;
+    };
+
+    // await_terminal only unblocks on a terminal event, so a timeout alone
+    // does not distinguish "dead" from "alive but only publishing
+    // non-terminal events" (e.g. the periodic event::running heartbeat).
+    // Re-query and compare event_sequence_number before concluding genuine
+    // silence. Callers reuse the returned seq instead of re-querying.
+    silence_probe probe_peer_silence(
+        std::uint64_t const last_seq, hpx::id_type const& shadow)
+    {
+        // await_terminal only unblocks on a terminal event, so a timeout alone
+        // does not distinguish "dead" from "alive but only publishing
+        // non-terminal events" (e.g. the periodic event::running heartbeat).
+        // Re-query and compare event_sequence_number before concluding genuine
+        // failure.
+        hpx::error_code ec(hpx::throwmode::lightweight);
+        auto const recheck = hpx::supervision::query_state(shadow, ec);
+        if (ec || recheck.ec)
+        {
+            // Can't confirm liveness or death right now; don't fence on an
+            // untrustworthy read - try again next sweep.
+            return {
+                .seq = last_seq, .status = silence_status::alive_or_unknown};
+        }
+
+        if (recheck.event_sequence_number != last_seq)
+        {
+            // Sequence number advanced since we started waiting (e.g. a
+            // heartbeat pulse) - the peer is alive, just quiet.
+            return {
+                .seq = last_seq, .status = silence_status::alive_or_unknown};
+        }
+
+        return {.seq = recheck.event_sequence_number,
+            .status = silence_status::still_silent};
+    }
+
+    bool stalled_after_grace(std::uint64_t last_seq,
+        hpx::supervision::server::peer_snapshot const& peer,
+        std::uint64_t const epoch,
+        std::chrono::milliseconds const& poll_timeout)
+    {
+        constexpr int max_consecutive_silent_windows = 3;
+
+        // Each retry should only wait long enough to observe a fresh
+        // heartbeat/terminal event, not the full detection window - otherwise
+        // fencing is delayed by up to max_consecutive_silent_windows *
+        // poll_timeout instead of one detection window.
+        auto const grace_interval =
+            poll_timeout / max_consecutive_silent_windows;
+
+        for (int attempt = 0; attempt < max_consecutive_silent_windows;
+            ++attempt)
+        {
+            auto const [seq, status] =
+                probe_peer_silence(last_seq, peer.shadow);
+            if (status == silence_status::alive_or_unknown)
+                return false;
+
+            last_seq = seq;
+
+            hpx::error_code ec2(hpx::throwmode::lightweight);
+            hpx::supervision::await_terminal(
+                hpx::launch::sync, peer.shadow, epoch, grace_interval, ec2);
+
+            if (!ec2 || get_error(ec2) != hpx::error::future_cancelled)
+            {
+                // peer became responsive during the grace window
+                return false;
+            }
+
+            // still silent -> loop again for one more grace
+        }
+        return true;
+    }
 
     void failure_detection_loop()
     {
@@ -326,7 +393,16 @@ namespace {
             // Snapshot of currently-joined, ready, non-evicting peers. Uses the
             // sync overload so this call blocks inline rather than returning a
             // future we'd have to chain off of.
-            auto const peers = ds.registry_.snapshot_peers(hpx::launch::sync);
+            hpx::error_code peers_ec(hpx::throwmode::lightweight);
+            auto const peers =
+                ds.registry_.snapshot_peers(hpx::launch::sync, peers_ec);
+            if (peers_ec)
+            {
+                // A transient failure here (e.g. registry AGAS lookup hiccup)
+                // must not terminate the detection loop retry on the next sweep
+                hpx::this_thread::sleep_for(poll_interval);
+                continue;
+            }
 
             std::vector<hpx::future<void>> checks;
             checks.reserve(peers.size());
@@ -368,37 +444,33 @@ namespace {
                 failures = 0;
 
                 auto cont = [peer, epoch = state.epoch,
-                                seq = state.event_sequence_number](auto&& f) {
+                                seq = state.event_sequence_number,
+                                poll_timeout](auto&& f) {
                     try
                     {
                         f.get();    // success: real terminal event delivered
                     }
                     catch (hpx::exception const& e)
                     {
-                        if (e.get_error() == hpx::error::future_cancelled)
-                        {
-                            if (peer_is_alive_but_silent(seq, peer.shadow))
-                            {
-                                return;    // nothing to do
-                            }
+                        if (e.get_error() != hpx::error::future_cancelled)
+                            return;
 
-                            // No progress since the wait started: genuine
-                            // stall. Fence locally only, never touch the peer's
-                            // own sentinel/registry.
-                            hpx::error_code ec1(hpx::throwmode::lightweight);
-                            hpx::supervision::publish_event(peer.shadow,
-                                hpx::supervision::event::failed, epoch, ec1);
-                        }
+                        if (!stalled_after_grace(
+                                seq, peer, epoch, poll_timeout))
+                            return;    // not stalled (yet)
 
-                        // If a reactive eviction already advanced the epoch
-                        // past `epoch` (epoch < current_ep), publish_event
-                        // rejects this as stale and there is nothing to do.
+                        // No progress since the wait started: genuine stall.
+                        // Fence locally only, never touch the peer's own
+                        // sentinel/registry.
+                        hpx::error_code ec3(hpx::throwmode::lightweight);
+                        hpx::supervision::publish_event(peer.shadow,
+                            hpx::supervision::event::failed, epoch, ec3);
                     }
                 };
 
                 checks.push_back(hpx::supervision::await_terminal(
                     peer.shadow, state.epoch, poll_timeout)
-                        .then(hpx::launch::sync, HPX_MOVE(cont)));
+                        .then(hpx::launch::async, HPX_MOVE(cont)));
             }
 
             {
@@ -447,24 +519,12 @@ namespace {
     {
         dispatch_state& ds = get_dispatch_state();
 
-        while (!needs_stopping(ds.stop_heartbeat_, std::memory_order_acquire))
-        {
-            // Do not spin: pace consecutive publish_event calls.
-            pace_consecutive_sweeps(
-                ds.stop_heartbeat_, current_heartbeat_interval());
-
-            if (needs_stopping(ds.stop_heartbeat_))
-            {
-                break;
-            }
-
+        auto publish_pulse = [&]() {
             hpx::id_type sentinel_id;
             {
                 std::scoped_lock<hpx::spinlock> l(ds.mtx_);
                 if (!ds.sentinel_)
-                {
-                    continue;    // torn down concurrently by finalize(); retry
-                }
+                    return false;    // torn down concurrently by finalize(); retry
                 sentinel_id = ds.sentinel_.get_id();
             }
 
@@ -476,6 +536,23 @@ namespace {
             hpx::error_code ec(hpx::throwmode::lightweight);
             hpx::supervision::publish_event(
                 sentinel_id, hpx::supervision::event::running, epoch, ec);
+            return true;
+        };
+
+        publish_pulse();
+
+        while (!needs_stopping(ds.stop_heartbeat_, std::memory_order_acquire))
+        {
+            // Do not spin: pace consecutive publish_event calls.
+            pace_consecutive_sweeps(
+                ds.stop_heartbeat_, current_heartbeat_interval());
+
+            if (needs_stopping(ds.stop_heartbeat_))
+            {
+                break;
+            }
+
+            publish_pulse();
         }
     }
 }    // namespace

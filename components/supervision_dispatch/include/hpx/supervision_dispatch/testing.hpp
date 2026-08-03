@@ -4,6 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \headerfile hpx/supervision_dispatch/testing.hpp
+/// \page hpx::supervision::testing::local_snapshot_peers, hpx::supervision::testing::set_failure_detection_poll_timeout_for_testing, hpx::supervision::testing::last_join_shadow, hpx::supervision::testing::suspend_heartbeat_for_testing, hpx::supervision::testing::failure_detection_sweep_in_flight_for_testing
+/// \headerfile hpx/supervision_dispatch.hpp
+
 #pragma once
 
 #include <hpx/config.hpp>

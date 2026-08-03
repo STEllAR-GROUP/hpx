@@ -82,12 +82,9 @@ namespace hpx::supervision {
     }
 
     std::vector<hpx::id_type> fan_out_join(registry const& local_registry,
-        std::vector<hpx::supervision::discovered_peer> const& peers)
+        std::vector<hpx::supervision::discovered_peer> const& peers,
+        hpx::chrono::steady_duration const& timeout)
     {
-        // Fire off all join() calls concurrently, up front, rather than joining
-        // one peer at a time; each individually reuses registry::join()'s
-        // existing reservation/idempotency handling, so there is nothing
-        // further to coordinate between them here.
         std::vector<hpx::future<hpx::id_type>> shadow_futures;
         shadow_futures.reserve(peers.size());
 
@@ -97,14 +94,39 @@ namespace hpx::supervision {
                 local_registry.join(peer.sentinel_client, peer.locality));
         }
 
-        return hpx::unwrap(HPX_MOVE(shadow_futures));
+        //return hpx::unwrap(HPX_MOVE(shadow_futures));
+
+        // Bound the join phase the same way discover_peers() bounds resolution:
+        // a peer that resolved during discovery but tears down its sentinel_/
+        // registry_ mid-join (e.g. a concurrent finalize()) must not be able to
+        // hang this call indefinitely. Inputs are left untouched by
+        // wait_all_for, so is_ready()/has_exception() below remain individually
+        // queryable regardless of the returned status.
+        hpx::wait_all_for_nothrow(timeout, shadow_futures);
+
+        std::vector<hpx::id_type> joined_ids;
+        joined_ids.reserve(shadow_futures.size());
+
+        for (hpx::future<hpx::id_type>& f : shadow_futures)
+        {
+            // Only keep peers whose join() settled successfully within the
+            // timeout; anything still pending or that failed is dropped rather
+            // than propagated - mirrors discover_peers()'s own "missing peer
+            // is not an error" contract.
+            if (f.is_ready() && !f.has_exception())
+            {
+                joined_ids.push_back(f.get());
+            }
+        }
+
+        return joined_ids;
     }
 
     std::vector<hpx::id_type> discover_and_join(registry const& local_registry,
         hpx::chrono::steady_duration const& timeout)
     {
         std::vector<discovered_peer> const peers = discover_peers(timeout);
-        return fan_out_join(local_registry, peers);
+        return fan_out_join(local_registry, peers, timeout);
     }
 }    // namespace hpx::supervision
 

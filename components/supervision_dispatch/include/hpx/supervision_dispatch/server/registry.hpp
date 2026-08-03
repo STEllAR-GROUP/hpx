@@ -110,7 +110,8 @@ namespace hpx::supervision::server {
         // been re-joined (fresh shadow) or already evicted by a racing terminal
         // notification, this is a no-op.
         void evict_peer(hpx::id_type const& peer_sentinel,
-            hpx::id_type const& peer_locality, hpx::id_type const& shadow);
+            hpx::id_type const& peer_locality, hpx::id_type const& shadow,
+            hpx::id_type keep_alive);
 
         /// Unregisters a peer's observers and removes its shadow state.
         ///

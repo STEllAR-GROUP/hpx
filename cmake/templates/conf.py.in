@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # Copyright (c) 2020-@HPX_COPYRIGHT_YEAR@ STE||AR Group
 # Copyright (c) 2018 Mikael Simberg
 #
@@ -60,7 +58,7 @@ extensions = [
 # Fix Sphinx/Breathe duplicate declaration warnings caused by repeated
 # C++ namespace rendering. Apply a filter to suppress only namespace
 # types (hpx, ranges, experimental) emitted as cpp:type duplicates.
-# This prevents false-positive “Duplicate C++ declaration” warnings
+# This prevents false-positive 'Duplicate C++ declaration' warnings
 # while preserving all real API duplication checks.
 class _BreatheNamespaceDuplicateFilter(py_logging.Filter):
     namespace_type_declarations = {
@@ -91,23 +89,64 @@ breathe_projects_source = {}
 
 hpx_source_dir = '@HPX_SOURCE_DIR@'
 hpx_libs_dir = hpx_source_dir + '/libs'
+hpx_components_dir = hpx_source_dir + '/components'
 hpx_libs = {}
+hpx_components = []
 header_info = {}
 
-def get_info_from_file(source):
-    title = "None"
-    header = "None"
 
+def detect_symbol_kind(content, title):
+    """Guess the Doxygen directive for a \\page-tagged symbol title
+    by searching the header source for its declaration kind."""
+    name = title.split("::")[-1].strip()
+    if not name:
+        return "doxygenfunction"
+    patterns = [
+        (r'\bclass\s+(?:[A-Z_][A-Za-z0-9_]*\s+)?' + re.escape(name) + r'\b',
+            "doxygenclass"),
+        (r'\bstruct\s+(?:[A-Z_][A-Za-z0-9_]*\s+)?' + re.escape(name) + r'\b',
+            "doxygenstruct"),
+        (r'\benum\s+(?:class\s+)?' + re.escape(name) + r'\b', "doxygenenum"),
+    ]
+    for pattern, kind in patterns:
+        if re.search(pattern, content):
+            return kind
+    return "doxygenfunction"
+
+
+def get_info_from_file(source):
+    page_groups = []
+    header = "None"
+    kind_map = {}
     if os.path.exists(source):
         with open(source, 'r') as file:
-            # Search for patterns indicating the title and header
-            for line in file:
-                if "/// \\page" in line:
-                    title = line.split("/// \\page", 1)[-1].strip()
-                elif "/// \\headerfile" in line:
-                    header = line.split("/// \\headerfile", 1)[-1].strip()
+            content = file.read()
+        for line in content.splitlines():
+            if "/// \\page" in line:
+                page_value = line.split("/// \\page", 1)[-1].strip()
+                group = [t.strip() for t in page_value.split(',') if t.strip()]
+                if group:
+                    page_groups.append(group)
+            elif "/// \\headerfile" in line:
+                header = line.split("/// \\headerfile", 1)[-1].strip()
 
-    return title, header
+        # Merge every \page tag in this header into one group so all its
+        # symbols become mutual "See also" siblings, regardless of which
+        # \page line introduced them. De-duplicate titles that appear in
+        # more than one tag, preserving first-seen order.
+        merged_group = []
+        for group in page_groups:
+            for title in group:
+                if title not in merged_group:
+                    merged_group.append(title)
+        page_groups = [merged_group] if merged_group else [["None"]]
+        for title in merged_group:
+            kind_map[title] = detect_symbol_kind(content, title)
+
+    if not page_groups:
+        page_groups = [["None"]]
+    return page_groups, header, kind_map
+
 
 # Dictionary including the hpx headers with their base path
 # needed to link to the hpx header files themselves.
@@ -206,7 +245,8 @@ for lib_dir in os.listdir(hpx_libs_dir):
                     try:
                         for line in open(header_file_path):
                             if '/// \\' in line:
-                                page_title, include_header = get_info_from_file(header_file_path)
+                                page_title, include_header, kind_map = \
+                                    get_info_from_file(header_file_path)
                                 skip = False
                                 break
                     except:
@@ -219,14 +259,65 @@ for lib_dir in os.listdir(hpx_libs_dir):
                     include_index = header_file_path.find(include_prefix)
                     if include_index != -1:
                         header = header_file_path[include_index + len(include_prefix):]
-                        header_info[header] = (page_title, include_header)
+                        header_info[header] = (page_title, include_header, kind_map)
+
+
+# Scan the components directory for source files to be included in
+# the documentation
+for module in os.listdir(hpx_components_dir):
+    full_module_dir = os.path.join(hpx_components_dir, module)
+    if not os.path.isdir(full_module_dir):
+        continue
+
+    breathe_projects_source[module] = (full_module_dir, [])
+    hpx_components.append(module)
+
+    for subdir_full, dirs, files in os.walk(full_module_dir):
+        subdir = subdir_full[len(full_module_dir) + 1:]
+        if len(subdir) == 0:
+            continue
+        if subdir != 'include' and not subdir.startswith('include/'):
+            continue
+        if '/detail' in subdir or '/include_compatibility' in subdir:
+            continue
+
+        # full_module_dir is already the module directory (unlike the libs
+        # loop), so subdir already starts with "include/..." - no module
+        # name segment to strip here.
+
+        for f in files:
+            if file_regex.match(f) is None:
+                continue
+            header_file_path = subdir_full + '/' + f
+            skip = True
+            try:
+                for line in open(header_file_path):
+                    if '/// \\' in line:
+                        page_title, include_header, kind_map = \
+                            get_info_from_file(header_file_path)
+                        skip = False
+                        break
+            except Exception:
+                print('Exception while processing %s' % f)
+                print(traceback.format_exc())
+            if skip:
+                continue
+            breathe_projects_source[module][1].append(subdir + '/' + f)
+            include_prefix = 'include/'
+            include_index = header_file_path.find(include_prefix)
+            if include_index != -1:
+                header = header_file_path[include_index + len(include_prefix):]
+                header_info[header] = (page_title, include_header, kind_map)
+
 
 # Generate the rst files for the API documentation
 api_refs = ''
 api_ref_header = '''
 ..
     Copyright (C) 2019 Thomas Heller
+    Copyright (C) 2019-2026 The STE||AR Group
 
+    SPDX-License-Identifier: BSL-1.0
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -248,8 +339,10 @@ api_ref_file = '''
 
 api_header_file = '''
 ..
-    Copyright (C) 2022 Dimitra Karatza
+    Copyright (C) 2022-2026 Dimitra Karatza
+    Copyright (C) 2022-2026 The STE||AR Group
 
+    SPDX-License-Identifier: BSL-1.0
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -275,45 +368,134 @@ api_file = '''
 
 '''
 
+api_symbol_file = '''
+..
+    Copyright (C) 2022-2026 Dimitra Karatza
+    Copyright (C) 2022-2026 The STE||AR Group
+
+    SPDX-License-Identifier: BSL-1.0
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+.. _modules_{0}_api:
+
+{3}
+{1}
+{3}
+
+Defined in header {2}.
+
+See :ref:`public_api` for a list of names and headers that are part of the public
+|hpx| API.
+
+.. {5}:: {6}
+   :project: hpx
+{4}
+'''
+
+def sanitize_page_name(title):
+    return re.sub(r'[^A-Za-z0-9_]+', '_', title).strip('_')
+
+
+def generate_module_api_refs(module, out_root):
+    """Generate full_api.rst and per-header/per-symbol API pages for a
+    single module. `out_root` is the doc-tree-relative path under which
+    the module's own `api/` directory lives, e.g. 'libs/full/supervision'
+    or 'components/supervision_dispatch'. Returns the toctree entry line
+    for full_api.rst, or '' if the module had no scanned sources."""
+    assert module in breathe_projects_source.keys()
+    module_sources = breathe_projects_source[module]
+    if len(module_sources[1]) == 0:
+        return ''
+
+    basedir = os.path.abspath('.') + '/' + out_root + '/api'
+    if not os.path.exists(basedir):
+        os.makedirs(basedir)
+    module_api_ref = open(basedir + '/full_api.rst', 'w')
+    module_api_ref.write(api_ref_header.format(module, '-' * len(module)))
+
+    header_refs = ''
+    header_names = set()       # uniquifies whole-file pages (headers w/o \page)
+    symbol_page_names = set()  # uniquifies per-symbol pages (headers w/ \page)
+    for source in module_sources[1]:
+        header = source[len('include/'):]
+        header_splitted = re.split('[/ .]', header)
+
+        header_name = header_splitted[-2]
+        if header_name in header_names:
+            header_name = '{0}_{1}'.format(header_splitted[-3], header_name)
+        header_names.add(header_name)
+
+        page_groups, include_header, kind_map = header_info.get(
+            header, ([["None"]], "None", {}))
+        if include_header == "None":
+            include_header = header
+
+        if page_groups == [["None"]]:
+            header_ref = open(basedir + '/' + header_name + '.rst', 'w')
+            header_ref.write(api_header_file.format(header, module, header,
+                find_link_hpx_header(include_header), '-' * len(header)))
+            header_ref.close()
+            header_refs += '   /' + out_root + '/api/' + header_name + '.rst\n'
+            continue
+
+        title_to_pagename = {}
+        for group in page_groups:
+            for title in group:
+                if title == "None":
+                    continue
+                symbol_page_name = header_name + '_' + sanitize_page_name(title)
+                if symbol_page_name in symbol_page_names:
+                    symbol_page_name = '{0}_{1}'.format(
+                        header_splitted[-3], symbol_page_name)
+                symbol_page_names.add(symbol_page_name)
+                title_to_pagename[title] = symbol_page_name
+
+        for group in page_groups:
+            for page_title in group:
+                if page_title == "None":
+                    continue
+                symbol_page_name = title_to_pagename[page_title]
+                siblings = [t for t in group if t != page_title]
+                see_also = ""
+                if siblings:
+                    see_also = "\nSee also:\n\n" + "\n".join(
+                        '   - :ref:`{0} <modules_{1}_api>`'.format(
+                            sib, title_to_pagename[sib])
+                        for sib in siblings) + "\n"
+
+                symbol_ref = open(basedir + '/' + symbol_page_name + '.rst', 'w')
+                kind = kind_map.get(page_title, 'doxygenfunction')
+
+                # Breathe can't disambiguate a bare name when a symbol has
+                # multiple overloads (e.g. hpx::supervision::init). Appending
+                # '+overload' is safe unconditionally: for single-overload
+                # symbols it matches trivially; for overloaded ones it
+                # documents every overload instead of erroring.
+                directive_name = (
+                    page_title + '+overload' if kind == 'doxygenfunction'
+                    else page_title)
+                symbol_ref.write(api_symbol_file.format(
+                    symbol_page_name, page_title, header, '-' * len(page_title),
+                    see_also, kind, directive_name))
+
+                symbol_ref.close()
+                header_refs += ('   /' + out_root +
+                    '/api/' + symbol_page_name + '.rst\n')
+
+    module_api_ref.write(api_file)
+    module_api_ref.write(header_refs)
+    module_api_ref.close()
+    return '   /' + out_root + '/api/full_api.rst\n'
+
+
 for lib in hpx_libs.keys():
     for module in sorted(hpx_libs[lib]):
-        assert module in breathe_projects_source.keys()
-        module_sources = breathe_projects_source[module]
-        if len(module_sources[1]) == 0:
-            continue
-        basedir = os.path.abspath('.') + '/libs/' + lib + '/' + module + '/api'
-        if not os.path.exists(basedir):
-            os.makedirs(basedir)
-        module_api_ref = open(basedir + '/full_api.rst', 'w')
-        module_api_ref.write(api_ref_header.format(module, '-' * len(module)))
-        header_refs = ''
-        header_names = set()
-        for source in module_sources[1]:
-            header = source[len('include/'):]
-            header_splitted = re.split('[/ .]',header)
+        api_refs += generate_module_api_refs(module, 'libs/' + lib + '/' + module)
 
-            header_name = header_splitted[-2]
-            # create a new, longer header name if current one already exists
-            if header_name in header_names:
-                header_name = '{0}_{1}'.format(header_splitted[-3], header_name)
-            header_names.add(header_name)
+for module in sorted(hpx_components):
+    api_refs += generate_module_api_refs(module, 'components/' + module)
 
-            # Get the info from the dictionary using the header file path
-            page_title, include_header = header_info.get(header, ("None", "None"))
-            if page_title == "None":
-                page_title = header
-            if include_header == "None":
-                include_header = header
-
-            header_ref = open(basedir + '/' + header_name + '.rst', 'w')
-            header_ref.write(api_header_file.format(header, module, page_title,
-                find_link_hpx_header(include_header), '-' * len(page_title)))
-            header_ref.close()
-            header_refs += '   /libs/' + lib + '/' + module + '/api/' + header_name + '.rst\n'
-        module_api_ref.write(api_file)
-        module_api_ref.write(header_refs)
-        module_api_ref.close()
-        api_refs += '   /libs/' + lib + '/' + module + '/api/full_api.rst\n'
 
 api_rst = open(os.path.abspath('.') + '/api/full_api.rst', 'w')
 for line in open(hpx_source_dir + '/docs/sphinx/api/full_api.rst').readlines():

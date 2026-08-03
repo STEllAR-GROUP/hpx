@@ -4,6 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file hpx/supervision_dispatch/discovery.hpp
+/// \page hpx::supervision::discover_peers, hpx::supervision::fan_out_join, hpx::supervision::discover_and_join
+/// \headerfile hpx/supervision_dispatch.hpp
+
 #pragma once
 
 #include <hpx/config.hpp>
@@ -88,12 +92,19 @@ namespace hpx::supervision {
     /// \param local_registry The registry to join every peer in \a peers to.
     /// \param peers          The peers to join, typically returned by a prior
     ///                       discover_peers() call.
+    /// \param timeout  The maximum duration to wait, across all peers
+    ///                 combined, for their join() calls to settle. Peers
+    ///                 whose join() has not settled (or failed) within this
+    ///                 bound are silently dropped from the result, rather
+    ///                 than hanging or throwing.
     ///
     /// \return The shadow target id that \a local_registry created (or already
     ///         had) for each entry in \a peers, in the same order.
     HPX_SUPERVISION_DISPATCH_EXPORT std::vector<hpx::id_type> fan_out_join(
         hpx::supervision::registry const& local_registry,
-        std::vector<hpx::supervision::discovered_peer> const& peers);
+        std::vector<hpx::supervision::discovered_peer> const& peers,
+        hpx::chrono::steady_duration const& timeout =
+            default_discovery_timeout);
 
     /// Composes a single reactive discovery-and-join pass for
     /// supervision_dispatch peers: performs exactly one discover_peers() pull
