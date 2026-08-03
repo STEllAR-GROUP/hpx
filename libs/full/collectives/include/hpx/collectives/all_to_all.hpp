@@ -36,16 +36,15 @@ namespace hpx { namespace collectives {
     /// \param root_site    The site that is responsible for creating the
     ///                     all_to_all support object. This value is optional
     ///                     and defaults to '0' (zero).
-    /// \param threshold    The per-pair payload size, in bytes, at or above
-    ///                     which the rows are exchanged directly between the
-    ///                     participating sites instead of being routed through
-    ///                     one communicator site; see \a pairwise_threshold_arg
-    ///                     for the default and for what a value of zero
-    ///                     selects. The direct exchange additionally requires
-    ///                     at least three participating sites and an explicit
-    ///                     generation number, and a call that supplies neither
-    ///                     is routed whatever this value is. Which path runs
-    ///                     affects performance only, never the result.
+    /// \param threshold    The fixed row-size threshold, in bytes, at or above
+    ///                     which rows are exchanged directly between sites
+    ///                     instead of being routed through one communicator
+    ///                     site. Automatic selection uses sizeof(T) only for a
+    ///                     trivially copyable T; other row types stay routed
+    ///                     unless every site passes zero. See
+    ///                     \a pairwise_threshold_arg for the default and the
+    ///                     remaining direct-exchange requirements. Which path
+    ///                     runs affects performance only, never the result.
     ///
     /// \returns    This function returns a future holding a vector with all
     ///             values send by all participating sites. It will become
@@ -142,16 +141,15 @@ namespace hpx { namespace collectives {
     /// \param root_site    The site that is responsible for creating the
     ///                     all_to_all support object. This value is optional
     ///                     and defaults to '0' (zero).
-    /// \param threshold    The per-pair payload size, in bytes, at or above
-    ///                     which the rows are exchanged directly between the
-    ///                     participating sites instead of being routed through
-    ///                     one communicator site; see \a pairwise_threshold_arg
-    ///                     for the default and for what a value of zero
-    ///                     selects. The direct exchange additionally requires
-    ///                     at least three participating sites and an explicit
-    ///                     generation number, and a call that supplies neither
-    ///                     is routed whatever this value is. Which path runs
-    ///                     affects performance only, never the result.
+    /// \param threshold    The fixed row-size threshold, in bytes, at or above
+    ///                     which rows are exchanged directly between sites
+    ///                     instead of being routed through one communicator
+    ///                     site. Automatic selection uses sizeof(T) only for a
+    ///                     trivially copyable T; other row types stay routed
+    ///                     unless every site passes zero. See
+    ///                     \a pairwise_threshold_arg for the default and the
+    ///                     remaining direct-exchange requirements. Which path
+    ///                     runs affects performance only, never the result.
     ///
     /// \returns    This function returns a vector with all values send by all
     ///             participating sites. This function executes synchronously and

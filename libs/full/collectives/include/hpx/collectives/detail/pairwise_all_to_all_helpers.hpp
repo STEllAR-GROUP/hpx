@@ -25,79 +25,12 @@
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/async_combinators.hpp>
 
-#include <algorithm>
 #include <cstddef>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
 namespace hpx::collectives::detail {
-
-    // The entities carrying HPX_CXX_EXPORT below are exactly the ones the
-    // pairwise_all_to_all and pairwise_all_to_all_dispatch unit tests name
-    // directly. With C++20 modules enabled those tests reach this header
-    // through `import HPX.Full;` (via the generated hpx/modules/collectives.hpp
-    // umbrella), so anything an importer names must be module-exported. The
-    // pairwise_row_bytes specializations are only ever reached from within the
-    // module purview, where reachability is enough, and stay unexported.
-
-    ///////////////////////////////////////////////////////////////////////////
-    // pairwise_payload_bytes
-    //
-    // Estimates how many bytes one site sends to one peer, which is what the
-    // choice between the two exchange paths turns on.
-    //
-    // A row is one element of the contribution, so a trivially copyable
-    // element answers the question by itself. The payload this path exists
-    // for is a block per peer, though, so a vector of trivially copyable
-    // elements is measured by its contents; the largest row is used, because
-    // under-reporting would keep a large exchange on the routed path. Anything
-    // else reports 0, meaning "unknown": the caller then keeps the routed
-    // path, which is correct for every payload rather than fast for some.
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
-    struct pairwise_row_bytes
-    {
-        static constexpr std::size_t call(std::vector<T> const&) noexcept
-        {
-            if constexpr (std::is_trivially_copyable_v<T>)
-            {
-                return sizeof(T);
-            }
-            else
-            {
-                return 0;
-            }
-        }
-    };
-
-    template <typename U, typename Allocator>
-    struct pairwise_row_bytes<std::vector<U, Allocator>>
-    {
-        static std::size_t call(
-            std::vector<std::vector<U, Allocator>> const& rows) noexcept
-        {
-            if constexpr (std::is_trivially_copyable_v<U>)
-            {
-                std::size_t longest = 0;
-                for (auto const& row : rows)
-                {
-                    longest = (std::max) (longest, row.size());
-                }
-                return longest * sizeof(U);
-            }
-            else
-            {
-                return 0;
-            }
-        }
-    };
-
-    HPX_CXX_EXPORT template <typename T>
-    std::size_t pairwise_payload_bytes(std::vector<T> const& rows) noexcept
-    {
-        return pairwise_row_bytes<T>::call(rows);
-    }
 
     ///////////////////////////////////////////////////////////////////////////
     // pairwise_type_bytes
@@ -111,11 +44,10 @@ namespace hpx::collectives::detail {
     // contributed data is not, because nothing in the all_to_all contract
     // forces two sites to contribute rows of equal length.
     //
-    // That is why an automatic decision uses this function and not
-    // pairwise_payload_bytes, which measures local data and can therefore
-    // differ between sites. A caller who knows its rows are uniform can still
-    // select the direct path deliberately, by passing a threshold of 0 at
-    // every site.
+    // That is why an automatic decision uses this function and never inspects
+    // the contributed rows. A caller who knows its rows are uniform can still
+    // select the direct path deliberately by passing a threshold of 0 at every
+    // site.
     ///////////////////////////////////////////////////////////////////////////
     HPX_CXX_EXPORT template <typename T>
     constexpr std::size_t pairwise_type_bytes() noexcept

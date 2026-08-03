@@ -119,22 +119,24 @@ namespace hpx::collectives {
     HPX_CXX_EXPORT using flat_fallback_threshold_arg =
         detail::argument_type<detail::flat_fallback_threshold_tag, 16>;
 
-    /// The per-pair payload size, in bytes, at or above which all_to_all
+    /// The fixed row-size threshold, in bytes, at or above which all_to_all
     /// exchanges rows directly between the participating sites instead of
-    /// routing every row through a single communicator site. Direct exchange
-    /// costs num_sites - 1 messages per site rather than two, so it only pays
-    /// once a row is large enough for the routing detour to dominate the
-    /// message count. Pass 0 to ask for the direct exchange whenever it is
-    /// available, which is not unconditional: it also needs at least three
-    /// participating sites, below which there is no routing detour left to
-    /// remove, and an explicit generation number, which is what gives every
-    /// site the same exchange tag. A call supplying neither is routed whatever
-    /// this value is. Which path runs affects performance only, never the
-    /// result.
+    /// routing every row through a single communicator site. Automatic
+    /// selection uses sizeof(T) for a trivially copyable row type T. Other row
+    /// types stay routed because inspecting local dynamic data could make sites
+    /// select different exchange paths. Every participating site must use the
+    /// same threshold.
     ///
-    /// The default is provisional: measurements on 20 localities per node put
-    /// the crossover between 256 and 1024 four-byte elements per pair, and the
-    /// focused sweep that would pin it down has not been run yet.
+    /// Pass 0 at every site to request direct exchange for a dynamically sized
+    /// row type, or to force it for a fixed-size type. Direct exchange still
+    /// requires at least three participating sites and an explicit generation
+    /// number. A call that does not meet those requirements stays routed.
+    /// Which path runs affects performance only, never the result.
+    ///
+    /// The 4096-byte default is the smallest tested payload for which direct
+    /// exchange won in every layout of a 16-node sweep across 16 to 128
+    /// localities. The crossover depends on the transport and topology, so
+    /// callers may override it.
     HPX_CXX_EXPORT using pairwise_threshold_arg =
         detail::argument_type<detail::pairwise_threshold_tag, 4096>;
 }    // namespace hpx::collectives

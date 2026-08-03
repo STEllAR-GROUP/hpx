@@ -236,10 +236,6 @@ void test_rejects_bad_arguments()
     HPX_TEST(caught_bad_site);
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// What the size estimate reports is what the dispatch decides on, so both
-// the trivially copyable row and the block row have to be measured correctly,
-// and an unmeasurable row has to report that rather than guess.
 struct opaque_row
 {
     std::vector<int> data;
@@ -253,25 +249,6 @@ struct opaque_row
     }
 };
 
-void test_payload_size_estimate()
-{
-    std::vector<std::size_t> const scalars(4);
-    HPX_TEST_EQ(detail::pairwise_payload_bytes(scalars), sizeof(std::size_t));
-
-    std::vector<std::vector<int>> blocks(4);
-    blocks[0].resize(10);
-    blocks[1].resize(64);
-    blocks[2].resize(32);
-    blocks[3].resize(7);
-
-    // the largest row decides, so a short row cannot hide a large exchange
-    HPX_TEST_EQ(detail::pairwise_payload_bytes(blocks), 64 * sizeof(int));
-
-    // a row whose size cannot be established reports zero
-    std::vector<opaque_row> const opaque(4);
-    HPX_TEST_EQ(detail::pairwise_payload_bytes(opaque), std::size_t(0));
-}
-
 // An automatic decision may only rest on what every site computes the same
 // way, which is the element type. Measuring contributed rows cannot serve:
 // two sites are free to contribute rows of different length, and if that
@@ -282,16 +259,6 @@ void test_type_size_estimate()
         detail::pairwise_type_bytes<std::size_t>() == sizeof(std::size_t));
     static_assert(detail::pairwise_type_bytes<std::vector<int>>() == 0);
     static_assert(detail::pairwise_type_bytes<opaque_row>() == 0);
-
-    // the local measurement really does disagree between sites for the same
-    // type, which is exactly why it must not drive the automatic decision
-    std::vector<std::vector<int>> one_site(3);
-    one_site[0].resize(4096);
-
-    std::vector<std::vector<int>> const other_site(3);
-
-    HPX_TEST(detail::pairwise_payload_bytes(one_site) !=
-        detail::pairwise_payload_bytes(other_site));
 }
 
 void test_dispatch_decision()
