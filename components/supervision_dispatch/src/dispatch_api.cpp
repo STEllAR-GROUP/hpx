@@ -125,6 +125,9 @@ namespace {
         // progress (a losing caller reading in_flight_init_ must never observe
         // a partially-constructed sentinel_/registry_ pair, and vice versa).
         hpx::spinlock mtx_;
+
+        // Testing infrastructure: track ongoing await_terminal calls.
+        std::atomic<bool> sweep_in_flight_{false};
     };
 
     // Meyer's singleton: constructed on first use, destroyed at program exit,
@@ -303,7 +306,7 @@ namespace {
         constexpr std::chrono::milliseconds poll_interval{200};
         constexpr std::uint32_t max_consecutive_query_failures = 3;
 
-        dispatch_state const& ds = get_dispatch_state();
+        dispatch_state& ds = get_dispatch_state();
 
         // Consecutive query_state failure count per peer. Persists across
         // sweeps (unlike everything else in this loop) so a peer that is
@@ -398,14 +401,23 @@ namespace {
                         .then(hpx::launch::sync, HPX_MOVE(cont)));
             }
 
-            // Poll the batch in short slices so the stop flag is rechecked
-            // every poll_interval instead of only after the full sweep
-            // resolves.
-            while (!needs_stopping(ds.stop_failure_detection_) &&
-                hpx::wait_all_for(poll_interval, checks) ==
-                    hpx::future_status::timeout)
             {
-                // still waiting on this sweep; recheck stop flag
+                // Testing support: mark the sweep in flight while we wait
+                ds.sweep_in_flight_.store(
+                    !checks.empty(), std::memory_order_release);
+                auto _ = hpx::experimental::scope_exit([&]() {
+                    ds.sweep_in_flight_.store(false, std::memory_order_release);
+                });
+
+                // Poll the batch in short slices so the stop flag is rechecked
+                // every poll_interval instead of only after the full sweep
+                // resolves.
+                while (!needs_stopping(ds.stop_failure_detection_) &&
+                    hpx::wait_all_for(poll_interval, checks) ==
+                        hpx::future_status::timeout)
+                {
+                    // still waiting on this sweep; recheck stop flag
+                }
             }
 
             // Do not spin: pace consecutive sweeps even when the batch resolves
@@ -517,6 +529,14 @@ namespace hpx::supervision {
             {
                 local_heartbeat_task.get();
             }
+        }
+
+        bool failure_detection_sweep_in_flight_for_testing()
+        {
+            if (!hpx::supervision::is_initialized())
+                return false;
+            return get_dispatch_state().sweep_in_flight_.load(
+                std::memory_order_acquire);
         }
     }    // namespace testing
 

@@ -57,4 +57,14 @@ namespace hpx::supervision::testing {
     /// implies silence now that heartbeats are mirrored onto observers'
     /// shadows.
     HPX_SUPERVISION_DISPATCH_EXPORT void suspend_heartbeat_for_testing();
+
+    /// Reports whether failure_detection_loop() currently has one or more
+    /// await_terminal() calls outstanding against unresponsive peers (i.e. a
+    /// sweep is mid-flight). Returns false before init() is called, between
+    /// sweeps, and after finalize(). Not part of the public dispatch API -
+    /// exists only so tests can deterministically synchronize on a real
+    /// in-flight sweep instead of sleeping and hoping the loop got there first.
+    HPX_SUPERVISION_DISPATCH_EXPORT bool
+    failure_detection_sweep_in_flight_for_testing();
+
 }    // namespace hpx::supervision::testing

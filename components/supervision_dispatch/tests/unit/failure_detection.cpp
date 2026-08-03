@@ -200,9 +200,25 @@ void test_clean_shutdown_during_in_flight_sweep()
 
     HPX_TEST_NO_THROW(hpx::supervision::init(hpx::launch::sync));
 
-    // Let a sweep actually start against the (still-silent) peer before
-    // tearing down, so finalize() races a real in-flight await_terminal.
-    hpx::this_thread::sleep_for(std::chrono::milliseconds(200));
+    // Poll until failure_detection_loop() has actually entered an
+    // await_terminal() sweep against the (still-silent) peer, rather than
+    // sleeping a fixed duration and hoping the loop got there first. This makes
+    // the "finalize() races a real in-flight await_terminal" premise below
+    // deterministic instead of a race with CI jitter.
+    auto const deadline =
+        std::chrono::steady_clock::now() + std::chrono::seconds(5);
+    bool sweep_started = false;
+    while (std::chrono::steady_clock::now() < deadline)
+    {
+        if (hpx::supervision::testing::
+                failure_detection_sweep_in_flight_for_testing())
+        {
+            sweep_started = true;
+            break;
+        }
+        hpx::this_thread::sleep_for(std::chrono::milliseconds(5));
+    }
+    HPX_TEST(sweep_started);
 
     auto const start = std::chrono::steady_clock::now();
     hpx::supervision::finalize();

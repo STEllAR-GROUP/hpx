@@ -1856,8 +1856,8 @@ void test_concurrent_publish_event_same_epoch(hpx::id_type const& locality)
 // Case B: the two callers race with *different* epochs (models a concurrent
 // reactive eviction, or a stale in-flight await_terminal continuation from an
 // earlier sweep, bumping the epoch mid-race against a fresher query-failure
-// fence). Invariant under test: the final stored state always converges to
-// the *maximum* submitted epoch, independent of submission order.
+// fence). Invariant under test: the final stored state always converges to the
+// *maximum* submitted epoch, independent of submission order.
 //
 // Run with both submission orders to rule out an ordering-dependent bug that
 // only manifests when the lower epoch happens to be submitted first.
@@ -1873,6 +1873,8 @@ void test_concurrent_publish_event_racing_epochs(
     hpx::future<hpx::supervision::publish_result> f_low, f_high;
     if (submit_high_first)
     {
+        hpx::supervision::publish_event(hpx::launch::sync, locality, target,
+            hpx::supervision::event::started, epoch_high);
         f_high = hpx::supervision::publish_event(
             locality, target, hpx::supervision::event::failed, epoch_high);
         f_low = hpx::supervision::publish_event(
@@ -1880,6 +1882,8 @@ void test_concurrent_publish_event_racing_epochs(
     }
     else
     {
+        hpx::supervision::publish_event(hpx::launch::sync, locality, target,
+            hpx::supervision::event::started, epoch_high);
         f_low = hpx::supervision::publish_event(
             locality, target, hpx::supervision::event::failed, epoch_low);
         f_high = hpx::supervision::publish_event(
@@ -1990,10 +1994,10 @@ int hpx_main()
 
         HPX_SUPERVISION_TEST_RUN(
             test_concurrent_publish_event_same_epoch, locality);
-        //HPX_SUPERVISION_TEST_RUN(
-        //    test_concurrent_publish_event_racing_epochs, locality, true);
-        //HPX_SUPERVISION_TEST_RUN(
-        //    test_concurrent_publish_event_racing_epochs, locality, false);
+        HPX_SUPERVISION_TEST_RUN(
+            test_concurrent_publish_event_racing_epochs, locality, true);
+        HPX_SUPERVISION_TEST_RUN(
+            test_concurrent_publish_event_racing_epochs, locality, false);
     }
 
     HPX_SUPERVISION_TEST_RUN(test_publish_completion);
