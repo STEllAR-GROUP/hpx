@@ -553,7 +553,6 @@ namespace hpx {
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/modules/type_support.hpp>
 
@@ -579,7 +578,6 @@ namespace hpx {
     };
 
     HPX_CXX_CORE_EXPORT inline constexpr struct wait_all_for_nothrow_t final
-      : hpx::functional::tag<wait_all_for_nothrow_t>
     {
     private:
         template <typename Future>
@@ -632,29 +630,29 @@ namespace hpx {
                 .has_exceptional_results = false};
         }
 
+    public:
         template <typename Future>
-        friend wait_all_for_nothrow_result tag_invoke(wait_all_for_nothrow_t,
+        wait_all_for_nothrow_result operator()(
             hpx::chrono::steady_duration const& timeout,
-            std::vector<Future> const& values)
+            std::vector<Future> const& values) const
         {
             return wait_all_for_nothrow_t::wait_all_for_nothrow_impl(
                 values, timeout);
         }
 
         template <typename Future>
-        friend wait_all_for_nothrow_result tag_invoke(wait_all_for_nothrow_t,
+        wait_all_for_nothrow_result operator()(
             hpx::chrono::steady_duration const& timeout,
-            std::vector<Future>&& values)
+            std::vector<Future>&& values) const
         {
             return wait_all_for_nothrow_t::wait_all_for_nothrow_impl(
                 HPX_MOVE(values), timeout);
         }
 
         template <typename Future>
-        friend HPX_WAIT_ALL_FOR_FORCEINLINE wait_all_for_nothrow_result
-        tag_invoke(wait_all_for_nothrow_t,
+        HPX_WAIT_ALL_FOR_FORCEINLINE wait_all_for_nothrow_result operator()(
             hpx::chrono::steady_duration const& timeout,
-            std::vector<Future>& values)
+            std::vector<Future>& values) const
         {
             return wait_all_for_nothrow_t::wait_all_for_nothrow_impl(
                 const_cast<std::vector<Future> const&>(values), timeout);
@@ -697,28 +695,27 @@ namespace hpx {
         }
 
         template <typename Future, std::size_t N>
-        friend wait_all_for_nothrow_result tag_invoke(wait_all_for_nothrow_t,
+        wait_all_for_nothrow_result operator()(
             hpx::chrono::steady_duration const& timeout,
-            std::array<Future, N> const& values)
+            std::array<Future, N> const& values) const
         {
             return wait_all_for_nothrow_t::wait_all_for_nothrow_impl(
                 values, timeout);
         }
 
         template <typename Future, std::size_t N>
-        friend wait_all_for_nothrow_result tag_invoke(wait_all_for_nothrow_t,
+        wait_all_for_nothrow_result operator()(
             hpx::chrono::steady_duration const& timeout,
-            std::array<Future, N>&& values)
+            std::array<Future, N>&& values) const
         {
             return wait_all_for_nothrow_t::wait_all_for_nothrow_impl(
                 HPX_MOVE(values), timeout);
         }
 
         template <typename Future, std::size_t N>
-        friend HPX_WAIT_ALL_FOR_FORCEINLINE wait_all_for_nothrow_result
-        tag_invoke(wait_all_for_nothrow_t,
+        HPX_WAIT_ALL_FOR_FORCEINLINE wait_all_for_nothrow_result operator()(
             hpx::chrono::steady_duration const& timeout,
-            std::array<Future, N>& values)
+            std::array<Future, N>& values) const
         {
             return wait_all_for_nothrow_t::wait_all_for_nothrow_impl(
                 const_cast<std::array<Future, N> const&>(values), timeout);
@@ -726,9 +723,9 @@ namespace hpx {
 
         template <typename Iterator>
             requires(hpx::traits::is_iterator_v<Iterator>)
-        friend wait_all_for_nothrow_result tag_invoke(wait_all_for_nothrow_t,
+        wait_all_for_nothrow_result operator()(
             hpx::chrono::steady_duration const& timeout, Iterator begin,
-            Iterator end)
+            Iterator end) const
         {
             if (begin == end)
             {
@@ -741,17 +738,16 @@ namespace hpx {
                 HPX_MOVE(values), timeout);
         }
 
-        friend HPX_WAIT_ALL_FOR_FORCEINLINE wait_all_for_nothrow_result
-        tag_invoke(wait_all_for_nothrow_t,
-            hpx::chrono::steady_duration const&) noexcept
+        HPX_WAIT_ALL_FOR_FORCEINLINE wait_all_for_nothrow_result operator()(
+            hpx::chrono::steady_duration const&) const noexcept
         {
             return {.status = hpx::future_status::ready,
                 .has_exceptional_results = false};
         }
 
         template <typename... Ts>
-        friend wait_all_for_nothrow_result tag_invoke(wait_all_for_nothrow_t,
-            hpx::chrono::steady_duration const& timeout, Ts const&... ts)
+        wait_all_for_nothrow_result operator()(
+            hpx::chrono::steady_duration const& timeout, Ts const&... ts) const
         {
             if constexpr (sizeof...(Ts) != 0)
             {
@@ -779,10 +775,9 @@ namespace hpx {
         }
 
         template <typename T>
-        friend HPX_WAIT_ALL_FOR_FORCEINLINE wait_all_for_nothrow_result
-        tag_invoke(wait_all_for_nothrow_t,
+        HPX_WAIT_ALL_FOR_FORCEINLINE wait_all_for_nothrow_result operator()(
             hpx::chrono::steady_duration const& timeout,
-            hpx::future<T> const& f)
+            hpx::future<T> const& f) const
         {
             auto status = f.wait_for(timeout);
             return {
@@ -790,10 +785,9 @@ namespace hpx {
         }
 
         template <typename T>
-        friend HPX_WAIT_ALL_FOR_FORCEINLINE wait_all_for_nothrow_result
-        tag_invoke(wait_all_for_nothrow_t,
+        HPX_WAIT_ALL_FOR_FORCEINLINE wait_all_for_nothrow_result operator()(
             hpx::chrono::steady_duration const& timeout,
-            hpx::shared_future<T> const& f)
+            hpx::shared_future<T> const& f) const
         {
             auto status = f.wait_for(timeout);
             return {
@@ -803,13 +797,11 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_CXX_CORE_EXPORT inline constexpr struct wait_all_for_t final
-      : hpx::functional::tag<wait_all_for_t>
     {
-    private:
         template <typename Future>
-        friend HPX_WAIT_ALL_FOR_FORCEINLINE hpx::future_status tag_invoke(
-            wait_all_for_t, hpx::chrono::steady_duration const& timeout,
-            std::vector<Future> const& values)
+        HPX_WAIT_ALL_FOR_FORCEINLINE hpx::future_status operator()(
+            hpx::chrono::steady_duration const& timeout,
+            std::vector<Future> const& values) const
         {
             auto const [status, has_exceptional_results] =
                 hpx::wait_all_for_nothrow(timeout, values);
@@ -821,9 +813,9 @@ namespace hpx {
         }
 
         template <typename Future>
-        friend HPX_WAIT_ALL_FOR_FORCEINLINE hpx::future_status tag_invoke(
-            wait_all_for_t, hpx::chrono::steady_duration const& timeout,
-            std::vector<Future>& values)
+        HPX_WAIT_ALL_FOR_FORCEINLINE hpx::future_status operator()(
+            hpx::chrono::steady_duration const& timeout,
+            std::vector<Future>& values) const
         {
             auto const [status, has_exceptional_results] =
                 hpx::wait_all_for_nothrow(
@@ -836,9 +828,9 @@ namespace hpx {
         }
 
         template <typename Future, std::size_t N>
-        friend HPX_WAIT_ALL_FOR_FORCEINLINE hpx::future_status tag_invoke(
-            wait_all_for_t, hpx::chrono::steady_duration const& timeout,
-            std::array<Future, N> const& values)
+        HPX_WAIT_ALL_FOR_FORCEINLINE hpx::future_status operator()(
+            hpx::chrono::steady_duration const& timeout,
+            std::array<Future, N> const& values) const
         {
             auto const [status, has_exceptional_results] =
                 hpx::wait_all_for_nothrow(timeout, values);
@@ -850,9 +842,9 @@ namespace hpx {
         }
 
         template <typename Future, std::size_t N>
-        friend HPX_WAIT_ALL_FOR_FORCEINLINE hpx::future_status tag_invoke(
-            wait_all_for_t, hpx::chrono::steady_duration const& timeout,
-            std::array<Future, N>& values)
+        HPX_WAIT_ALL_FOR_FORCEINLINE hpx::future_status operator()(
+            hpx::chrono::steady_duration const& timeout,
+            std::array<Future, N>& values) const
         {
             auto const [status, has_exceptional_results] =
                 hpx::wait_all_for_nothrow(
@@ -866,9 +858,9 @@ namespace hpx {
 
         template <typename Iterator>
             requires(hpx::traits::is_iterator_v<Iterator>)
-        friend hpx::future_status tag_invoke(wait_all_for_t,
+        hpx::future_status operator()(
             hpx::chrono::steady_duration const& timeout, Iterator begin,
-            Iterator end)
+            Iterator end) const
         {
             if (begin == end)
             {
@@ -885,15 +877,15 @@ namespace hpx {
             return status;
         }
 
-        friend HPX_WAIT_ALL_FOR_FORCEINLINE hpx::future_status tag_invoke(
-            wait_all_for_t, hpx::chrono::steady_duration const&) noexcept
+        HPX_WAIT_ALL_FOR_FORCEINLINE hpx::future_status operator()(
+            hpx::chrono::steady_duration const&) const noexcept
         {
             return hpx::future_status::ready;
         }
 
         template <typename... Ts>
-        friend hpx::future_status tag_invoke(wait_all_for_t,
-            hpx::chrono::steady_duration const& timeout, Ts const&... ts)
+        hpx::future_status operator()(
+            hpx::chrono::steady_duration const& timeout, Ts const&... ts) const
         {
             auto const [status, has_exceptional_results] =
                 hpx::wait_all_for_nothrow(timeout, ts...);
@@ -905,9 +897,9 @@ namespace hpx {
         }
 
         template <typename T>
-        friend HPX_WAIT_ALL_FOR_FORCEINLINE hpx::future_status tag_invoke(
-            wait_all_for_t, hpx::chrono::steady_duration const& timeout,
-            hpx::future<T> const& f)
+        HPX_WAIT_ALL_FOR_FORCEINLINE hpx::future_status operator()(
+            hpx::chrono::steady_duration const& timeout,
+            hpx::future<T> const& f) const
         {
             auto const [status, has_exceptional_results] =
                 hpx::wait_all_for_nothrow(timeout, f);
@@ -919,9 +911,9 @@ namespace hpx {
         }
 
         template <typename T>
-        friend HPX_WAIT_ALL_FOR_FORCEINLINE hpx::future_status tag_invoke(
-            wait_all_for_t, hpx::chrono::steady_duration const& timeout,
-            hpx::shared_future<T> const& f)
+        HPX_WAIT_ALL_FOR_FORCEINLINE hpx::future_status operator()(
+            hpx::chrono::steady_duration const& timeout,
+            hpx::shared_future<T> const& f) const
         {
             auto const [status, has_exceptional_results] =
                 hpx::wait_all_for_nothrow(timeout, f);
@@ -935,14 +927,12 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_CXX_CORE_EXPORT inline constexpr struct wait_all_for_n_nothrow_t final
-      : hpx::functional::tag<wait_all_for_n_nothrow_t>
     {
-    private:
         template <typename Iterator>
             requires(hpx::traits::is_iterator_v<Iterator>)
-        friend wait_all_for_nothrow_result tag_invoke(wait_all_for_n_nothrow_t,
+        wait_all_for_nothrow_result operator()(
             hpx::chrono::steady_duration const& timeout, Iterator begin,
-            std::size_t count)
+            std::size_t count) const
         {
             if (count == 0)
             {
@@ -958,14 +948,12 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_CXX_CORE_EXPORT inline constexpr struct wait_all_for_n_t final
-      : hpx::functional::tag<wait_all_for_n_t>
     {
-    private:
         template <typename Iterator>
             requires(hpx::traits::is_iterator_v<Iterator>)
-        friend hpx::future_status tag_invoke(wait_all_for_n_t,
+        hpx::future_status operator()(
             hpx::chrono::steady_duration const& timeout, Iterator begin,
-            std::size_t count)
+            std::size_t count) const
         {
             if (count == 0)
             {
