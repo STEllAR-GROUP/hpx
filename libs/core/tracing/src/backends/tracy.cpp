@@ -12,11 +12,11 @@
 #include <hpx/modules/tracy.hpp>
 #include <hpx/tracing/tracing.hpp>
 
-#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
+#include <mutex>
 #include <string>
 
 namespace hpx::tracing {
@@ -326,8 +326,9 @@ namespace hpx::tracing {
     }
 
     namespace {
-        std::atomic<std::int64_t> g_active_continuations{0};
-    }
+        std::int64_t g_active_continuations{0};
+        std::mutex g_active_continuations_mtx;
+    }    // namespace
 
     void continuation_run(void const* task_id) noexcept
     {
@@ -348,18 +349,24 @@ namespace hpx::tracing {
         hpx::tracy::detail::add_zone_text_to_fiber(buffer, len);
 
         // Update live time-series plot graph for Active Continuations in Tracy
-        std::int64_t const current_active =
-            g_active_continuations.fetch_add(1, std::memory_order_relaxed) + 1;
-        hpx::tracy::sample_value(
-            "Active Continuations", static_cast<double>(current_active));
+        std::int64_t current_active = 0;
+        {
+            std::lock_guard<std::mutex> lock(g_active_continuations_mtx);
+            current_active = ++g_active_continuations;
+            hpx::tracy::sample_value(
+                "Active Continuations", static_cast<double>(current_active));
+        }
     }
 
     void continuation_finished(void const* /* task_id */) noexcept
     {
-        std::int64_t const current_active =
-            g_active_continuations.fetch_sub(1, std::memory_order_relaxed) - 1;
-        hpx::tracy::sample_value(
-            "Active Continuations", static_cast<double>(current_active));
+        std::int64_t current_active = 0;
+        {
+            std::lock_guard<std::mutex> lock(g_active_continuations_mtx);
+            current_active = --g_active_continuations;
+            hpx::tracy::sample_value(
+                "Active Continuations", static_cast<double>(current_active));
+        }
     }
 
     void handle_on_completed_fired(void const* task_id) noexcept
