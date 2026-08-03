@@ -20,6 +20,7 @@
 
 #include <hpx/collectives/argument_types.hpp>
 #include <hpx/collectives/channel_communicator.hpp>
+#include <hpx/collectives/detail/hierarchical_helpers.hpp>
 #include <hpx/errors/error.hpp>
 #include <hpx/errors/exception.hpp>
 #include <hpx/futures/future.hpp>
@@ -162,7 +163,7 @@ namespace hpx::collectives::detail {
         {
             std::size_t const destination = (this_site + k) % num_sites;
             sends.push_back(set(comm, that_site_arg(destination),
-                HPX_MOVE(local_result[destination]), tag));
+                handle_bool<T>(HPX_MOVE(local_result[destination])), tag));
 
             std::size_t const source = (this_site + num_sites - k) % num_sites;
             receives.push_back(get<T>(comm, that_site_arg(source), tag));
@@ -185,16 +186,21 @@ namespace hpx::collectives::detail {
                         send.get();
                     }
 
-                    std::vector<T> result(num_sites);
-                    result[this_site] = HPX_MOVE(diagonal);
-
-                    // received[i] came from the peer i + 1 hops behind this
-                    // site, matching the receive order posted above.
-                    for (std::size_t k = 1; k != num_sites; ++k)
+                    std::vector<T> result;
+                    result.reserve(num_sites);
+                    for (std::size_t source = 0; source != num_sites; ++source)
                     {
-                        std::size_t const source =
-                            (this_site + num_sites - k) % num_sites;
-                        result[source] = received[k - 1].get();
+                        if (source == this_site)
+                        {
+                            result.push_back(HPX_MOVE(diagonal));
+                            continue;
+                        }
+
+                        // received[k - 1] came from the peer k hops behind
+                        // this site, matching the receive order posted above.
+                        std::size_t const k =
+                            (this_site + num_sites - source) % num_sites;
+                        result.push_back(received[k - 1].get());
                     }
 
                     return result;

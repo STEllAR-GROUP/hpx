@@ -19,6 +19,7 @@
 #include <hpx/modules/testing.hpp>
 
 #include <cstddef>
+#include <new>
 #include <string>
 #include <utility>
 #include <vector>
@@ -101,6 +102,45 @@ void test_scalar_exchange(char const* const phase, std::size_t const num_sites)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// vector<bool> rows are proxy references until they are materialized. The
+// direct path must send bool values, not the implementation-specific proxy.
+void run_bool_site(channel_communicator comm, std::size_t const num_sites,
+    std::size_t const this_site)
+{
+    std::vector<bool> local_result;
+    local_result.reserve(num_sites);
+    for (std::size_t destination = 0; destination != num_sites; ++destination)
+    {
+        local_result.push_back((this_site + destination) % 2 != 0);
+    }
+
+    std::vector<bool> const result = detail::pairwise_all_to_all(HPX_MOVE(comm),
+        HPX_MOVE(local_result), num_sites, this_site, tag_arg(1))
+                                         .get();
+
+    HPX_TEST_EQ(result.size(), num_sites);
+    for (std::size_t source = 0; source != num_sites; ++source)
+    {
+        HPX_TEST_EQ(result[source], (source + this_site) % 2 != 0);
+    }
+}
+
+void test_bool_exchange(std::size_t const num_sites)
+{
+    auto comms = create_communicators("bool", num_sites);
+
+    std::vector<hpx::future<void>> sites;
+    sites.reserve(num_sites);
+    for (std::size_t site = 0; site != num_sites; ++site)
+    {
+        sites.push_back(
+            hpx::async(run_bool_site, HPX_MOVE(comms[site]), num_sites, site));
+    }
+
+    hpx::wait_all(sites);
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // The payload this path exists for is a block per peer, not a scalar.
 void run_block_site(channel_communicator comm, std::size_t const num_sites,
     std::size_t const this_site, std::size_t const block_size)
@@ -141,6 +181,84 @@ void test_block_exchange(char const* const phase, std::size_t const num_sites)
     {
         sites.push_back(hpx::async(run_block_site, HPX_MOVE(comms[site]),
             num_sites, site, block_size));
+    }
+
+    hpx::wait_all(sites);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// The existing all_to_all accepts rows that can be constructed in place but
+// cannot be default-constructed or assigned. The direct path must preserve
+// that contract.
+struct nonassignable_row
+{
+    nonassignable_row() = delete;
+    nonassignable_row(nonassignable_row const&) = default;
+    nonassignable_row& operator=(nonassignable_row const&) = delete;
+    nonassignable_row(nonassignable_row&&) = default;
+    nonassignable_row& operator=(nonassignable_row&&) = delete;
+
+    explicit nonassignable_row(std::size_t const value)
+      : value(value)
+    {
+    }
+
+    template <typename Archive>
+    void serialize(Archive&, unsigned int const)
+    {
+    }
+
+    template <typename Archive>
+    friend void save_construct_data(
+        Archive& ar, nonassignable_row const* const row, unsigned int const)
+    {
+        ar & row->value;
+    }
+
+    template <typename Archive>
+    friend void load_construct_data(
+        Archive& ar, nonassignable_row* const row, unsigned int const)
+    {
+        std::size_t value = 0;
+        ar & value;
+        ::new (row) nonassignable_row(value);
+    }
+
+    std::size_t value;
+};
+
+void run_nonassignable_site(channel_communicator comm,
+    std::size_t const num_sites, std::size_t const this_site)
+{
+    std::vector<nonassignable_row> local_result;
+    local_result.reserve(num_sites);
+    for (std::size_t destination = 0; destination != num_sites; ++destination)
+    {
+        local_result.emplace_back(exchanged_value(this_site, destination));
+    }
+
+    std::vector<nonassignable_row> const result =
+        detail::pairwise_all_to_all(HPX_MOVE(comm), HPX_MOVE(local_result),
+            num_sites, this_site, tag_arg(1))
+            .get();
+
+    HPX_TEST_EQ(result.size(), num_sites);
+    for (std::size_t source = 0; source != num_sites; ++source)
+    {
+        HPX_TEST_EQ(result[source].value, exchanged_value(source, this_site));
+    }
+}
+
+void test_nonassignable_exchange(std::size_t const num_sites)
+{
+    auto comms = create_communicators("nonassignable", num_sites);
+
+    std::vector<hpx::future<void>> sites;
+    sites.reserve(num_sites);
+    for (std::size_t site = 0; site != num_sites; ++site)
+    {
+        sites.push_back(hpx::async(
+            run_nonassignable_site, HPX_MOVE(comms[site]), num_sites, site));
     }
 
     hpx::wait_all(sites);
@@ -296,9 +414,11 @@ int hpx_main()
     test_scalar_exchange("scalar-3", 3);
     test_scalar_exchange("scalar-5", 5);
     test_scalar_exchange("scalar-8", 8);
+    test_bool_exchange(5);
 
     test_block_exchange("block-4", 4);
     test_block_exchange("block-7", 7);
+    test_nonassignable_exchange(4);
 
     test_tag_separation(4);
 
