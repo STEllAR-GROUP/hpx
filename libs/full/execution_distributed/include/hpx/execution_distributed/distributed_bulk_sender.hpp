@@ -42,10 +42,13 @@
 #if defined(HPX_HAVE_NETWORKING)
 
 #include <hpx/execution_distributed/distributed_scheduler.hpp>
+#include <hpx/modules/async_distributed.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/naming_base.hpp>
 
 #include <exception>
 #include <type_traits>
@@ -84,17 +87,44 @@ namespace hpx::distributed::experimental::detail {
         }
     }
 
-    // TODO: Define HPX_ACTION here.
+    ///////////////////////////////////////////////////////////////////////////
+    // Tuple-packed variant for HPX action dispatch.
     //
-    // Templated plain actions are not directly supported by
-    // HPX_DEFINE_PLAIN_ACTION. The action registration will require
-    // either:
-    //   (a) A type-erased wrapper that serializes Shape, F, and Ts...
-    //       through the HPX serialization framework, or
-    //   (b) Explicit action instantiation for known type sets.
+    // HPX_DEFINE_PLAIN_ACTION requires a concrete function pointer
+    // (decltype(&func)), which is incompatible with function templates.
+    // We solve this by packing the variadic upstream values into an
+    // hpx::tuple<Ts...>, yielding a fixed-arity function signature
+    // per <Shape, F, ArgsTuple> instantiation.
     //
-    // This will be implemented once the serialization constraints
-    // for F (callable) and Ts... (upstream values) are finalized.
+    // The action type is defined manually below using
+    // hpx::actions::make_action_t for each concrete instantiation.
+    template <typename Shape, typename F, typename ArgsTuple>
+    void remote_bulk_execute_tuple(Shape shape, F f, ArgsTuple args_tuple)
+    {
+        hpx::invoke_fused(
+            [&](auto&... args) { remote_bulk_execute(shape, f, args...); },
+            args_tuple);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Action type for remote_bulk_execute_tuple.
+    //
+    // This manually defines the action struct that
+    // HPX_DEFINE_PLAIN_ACTION would generate, but parameterized on
+    // <Shape, F, ArgsTuple>. Each instantiation produces a concrete
+    // action type that can be dispatched via hpx::async.
+    //
+    // Usage:
+    //   hpx::async<remote_bulk_execute_action<Shape, F, ArgsTuple>>(
+    //       target_id, shape, f, args_tuple);
+    template <typename Shape, typename F, typename ArgsTuple>
+    struct remote_bulk_execute_action
+      : hpx::actions::make_action_t<
+            decltype(&remote_bulk_execute_tuple<Shape, F, ArgsTuple>),
+            &remote_bulk_execute_tuple<Shape, F, ArgsTuple>,
+            remote_bulk_execute_action<Shape, F, ArgsTuple>>
+    {
+    };
 
     ///////////////////////////////////////////////////////////////////////////
     // Distributed bulk sender: wraps an upstream sender with shape + function
@@ -198,12 +228,15 @@ namespace hpx::distributed::experimental::detail {
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver> receiver_;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Shape> shape_;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f_;
+            hpx::id_type target_locality_;
 
             template <typename Receiver_, typename Shape_, typename F_>
-            bulk_receiver(Receiver_&& receiver, Shape_&& shape, F_&& f)
+            bulk_receiver(Receiver_&& receiver, Shape_&& shape, F_&& f,
+                hpx::id_type target)
               : receiver_(HPX_FORWARD(Receiver_, receiver))
               , shape_(HPX_FORWARD(Shape_, shape))
               , f_(HPX_FORWARD(F_, f))
+              , target_locality_(HPX_MOVE(target))
             {
             }
 
@@ -243,28 +276,48 @@ namespace hpx::distributed::experimental::detail {
 
                 hpx::detail::try_catch_exception_ptr(
                     [&]() {
-                        // TODO: Dispatch remote_bulk_execute action
-                        // using hpx::async to target_locality_.
-                        //
-                        // Once the action is registered and the
-                        // serialization constraints for F and Ts...
-                        // are finalized, this call will become:
-                        //
-                        //   hpx::async<remote_bulk_execute_action<
-                        //       Shape, F, Ts...>>(
-                        //       target_locality_, shape_, f_, ts...)
-                        //       .get();
-                        //
-                        // For now, execute locally as a fallback.
-                        //
-                        // NOTE: This stub executes strictly sequentially.
-                        // The final remote parcelport implementation will
-                        // execute concurrently, which will change observable
-                        // behavior for non-thread-safe functions.
-                        remote_bulk_execute(shape_, f_, ts...);
+                        // Pack the upstream values into a tuple for
+                        // action dispatch.
+                        auto args_tuple =
+                            hpx::make_tuple(HPX_FORWARD(Ts, ts)...);
+                        using args_tuple_type = decltype(args_tuple);
 
-                        hpx::execution::experimental::set_value(
-                            HPX_MOVE(receiver_), HPX_FORWARD(Ts, ts)...);
+                        if (target_locality_ == hpx::find_here())
+                        {
+                            // Local execution: call directly without
+                            // going through the parcelport.
+                            // Pass args_tuple by lvalue so it retains
+                            // its values for the downstream set_value.
+                            hpx::invoke_fused(
+                                [&](auto&... args) {
+                                    remote_bulk_execute(shape_, f_, args...);
+                                },
+                                args_tuple);
+                        }
+                        else
+                        {
+                            // Remote execution: dispatch over the
+                            // network via the action. The action
+                            // consumes a copy; the local tuple is
+                            // preserved for set_value forwarding.
+                            using action_type =
+                                remote_bulk_execute_action<std::decay_t<Shape>,
+                                    std::decay_t<F>, args_tuple_type>;
+                            hpx::async<action_type>(
+                                target_locality_, shape_, f_, args_tuple)
+                                .get();
+                        }
+
+                        // Forward the (locally retained) values to the
+                        // downstream receiver.
+                        hpx::invoke_fused(
+                            [&](auto&&... unpacked) {
+                                hpx::execution::experimental::set_value(
+                                    HPX_MOVE(receiver_),
+                                    HPX_FORWARD(
+                                        decltype(unpacked), unpacked)...);
+                            },
+                            HPX_MOVE(args_tuple));
                     },
                     [&](std::exception_ptr ep) {
                         hpx::execution::experimental::set_error(
@@ -285,15 +338,15 @@ namespace hpx::distributed::experimental::detail {
         {
             return hpx::execution::experimental::connect(HPX_MOVE(sender_),
                 bulk_receiver<Receiver>(HPX_FORWARD(Receiver, receiver),
-                    HPX_MOVE(shape_), HPX_MOVE(f_)));
+                    HPX_MOVE(shape_), HPX_MOVE(f_), scheduler_.target()));
         }
 
         template <typename Receiver>
         auto connect(Receiver&& receiver) &
         {
             return hpx::execution::experimental::connect(sender_,
-                bulk_receiver<Receiver>(
-                    HPX_FORWARD(Receiver, receiver), shape_, f_));
+                bulk_receiver<Receiver>(HPX_FORWARD(Receiver, receiver), shape_,
+                    f_, scheduler_.target()));
         }
     };
 
