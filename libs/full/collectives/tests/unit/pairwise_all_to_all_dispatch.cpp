@@ -133,6 +133,37 @@ void test_direct_path_generations(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// A routed explicit generation gets a generation-specific collective
+// communicator, while the direct path separates generations with channel
+// tags. They do not share a generation gate, so one basename may switch paths.
+void test_paths_change_across_generations(
+    std::uint32_t const this_locality, std::uint32_t const num_localities)
+{
+    char const* const basename = "/test/pairwise_dispatch/path_changes/";
+
+    std::vector<std::uint32_t> const direct =
+        all_to_all(basename, contribution(this_locality, num_localities),
+            num_sites_arg(num_localities), this_site_arg(this_locality),
+            generation_arg(1), root_site_arg(), pairwise_threshold_arg(0))
+            .get();
+    check_result(direct, this_locality, num_localities);
+
+    std::vector<std::uint32_t> const routed =
+        all_to_all(basename, contribution(this_locality, num_localities),
+            num_sites_arg(num_localities), this_site_arg(this_locality),
+            generation_arg(2))
+            .get();
+    check_result(routed, this_locality, num_localities);
+
+    std::vector<std::uint32_t> const direct_again =
+        all_to_all(basename, contribution(this_locality, num_localities),
+            num_sites_arg(num_localities), this_site_arg(this_locality),
+            generation_arg(3), root_site_arg(), pairwise_threshold_arg(0))
+            .get();
+    check_result(direct_again, this_locality, num_localities);
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // The sync overload carries the same knob and must reach the same place.
 void test_sync_overload(
     std::uint32_t const this_locality, std::uint32_t const num_localities)
@@ -255,6 +286,7 @@ int hpx_main()
 
     test_both_paths_agree(this_locality, num_localities);
     test_direct_path_generations(this_locality, num_localities);
+    test_paths_change_across_generations(this_locality, num_localities);
     test_sync_overload(this_locality, num_localities);
     test_default_threshold_decides(num_localities);
     test_auto_selects_direct_for_large_rows(this_locality, num_localities);

@@ -43,8 +43,10 @@ namespace hpx { namespace collectives {
     ///                     trivially copyable T; other row types stay routed
     ///                     unless every site passes zero. See
     ///                     \a pairwise_threshold_arg for the default and the
-    ///                     remaining direct-exchange requirements. Which path
-    ///                     runs affects performance only, never the result.
+    ///                     remaining direct-exchange requirements. Successive
+    ///                     generations using one basename may select different
+    ///                     paths. Which path runs affects performance only,
+    ///                     never the result.
     ///
     /// \returns    This function returns a future holding a vector with all
     ///             values send by all participating sites. It will become
@@ -148,8 +150,10 @@ namespace hpx { namespace collectives {
     ///                     trivially copyable T; other row types stay routed
     ///                     unless every site passes zero. See
     ///                     \a pairwise_threshold_arg for the default and the
-    ///                     remaining direct-exchange requirements. Which path
-    ///                     runs affects performance only, never the result.
+    ///                     remaining direct-exchange requirements. Successive
+    ///                     generations using one basename may select different
+    ///                     paths. Which path runs affects performance only,
+    ///                     never the result.
     ///
     /// \returns    This function returns a vector with all values send by all
     ///             participating sites. This function executes synchronously and
@@ -633,6 +637,12 @@ namespace hpx::collectives {
         // exchange tag. A default generation therefore stays routed. Which
         // path runs is a performance choice rather than a semantic one, so an
         // otherwise valid call is served rather than rejected.
+        //
+        // An explicit routed generation gets its own collective communicator
+        // from create_communicator. Direct generations share a channel
+        // communicator and use the generation as the exchange tag. The two
+        // paths therefore do not share a gate, and successive generations may
+        // choose different paths.
         template <typename T>
         hpx::future<std::vector<T>> all_to_all_by_name(char const* basename,
             std::vector<T>&& local_result, num_sites_arg num_sites,
