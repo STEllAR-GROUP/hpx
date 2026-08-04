@@ -493,9 +493,7 @@ namespace hpx::lcos::detail {
             // consumer observes a ready future) and before notify_one() (so
             // the producer message precedes the consumer wake in Tracy).
             // The `this` pointer is the stable future_data correlation key.
-#if defined(HPX_HAVE_TRACING)
             hpx::tracing::future_fulfilled(this);
-#endif
             // ---------------------------------------------------------------
 
             // 26111: Caller failing to release lock 'this->mtx_'
@@ -585,9 +583,7 @@ namespace hpx::lcos::detail {
             // `exception` (atomic CAS), before notify_one() wakes consumers.
             // Emits a bright-red Tracy message so exception propagation paths
             // are visually distinct from value-fulfillment paths.
-#if defined(HPX_HAVE_TRACING)
             hpx::tracing::future_exception_set(this);
-#endif
             // ---------------------------------------------------------------
 
             // 26111: Caller failing to release lock 'this->mtx_'
