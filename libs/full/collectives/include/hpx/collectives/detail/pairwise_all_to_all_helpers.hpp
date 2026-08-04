@@ -21,9 +21,9 @@
 #include <hpx/collectives/argument_types.hpp>
 #include <hpx/collectives/channel_communicator.hpp>
 #include <hpx/collectives/detail/hierarchical_helpers.hpp>
-#include <hpx/futures/future.hpp>
 #include <hpx/modules/async_combinators.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/futures.hpp>
 
 #include <cstddef>
 #include <type_traits>
