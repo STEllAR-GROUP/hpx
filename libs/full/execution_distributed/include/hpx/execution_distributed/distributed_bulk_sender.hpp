@@ -325,10 +325,10 @@ namespace hpx::distributed::experimental::detail {
                     });
             }
 
-            auto get_env() const noexcept
-            {
-                return hpx::execution::experimental::get_env(receiver_);
-            }
+            using env_type = decltype(hpx::execution::experimental::get_env(
+                std::declval<std::decay_t<Receiver> const&>()));
+
+            env_type get_env() const noexcept;
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -349,6 +349,14 @@ namespace hpx::distributed::experimental::detail {
                     f_, scheduler_.target()));
         }
     };
+
+    template <typename Sender, typename Shape, typename F>
+    template <typename Receiver>
+    inline auto distributed_bulk_sender<Sender, Shape,
+        F>::bulk_receiver<Receiver>::get_env() const noexcept -> env_type
+    {
+        return hpx::execution::experimental::get_env(receiver_);
+    }
 
 }    // namespace hpx::distributed::experimental::detail
 
