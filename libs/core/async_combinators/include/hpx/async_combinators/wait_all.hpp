@@ -634,11 +634,16 @@ namespace hpx::detail {
             return has_exceptional_results_;
         }
 
+        /// Returns whether at least one of the awaited futures completed with
+        /// an exception.
         bool has_exceptional_results() const noexcept
         {
             return has_exceptional_results_;
         }
 
+        /// Extension point allowing derived frames to abort waiting early
+        /// (e.g. on timeout). Returning false from this function stops
+        /// further waiting/traversal of the remaining futures.
         constexpr static bool continue_waiting() noexcept
         {
             return true;

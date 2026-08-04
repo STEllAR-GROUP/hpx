@@ -160,6 +160,32 @@ foreach(sphinx_source_file ${sphinx_libs_source_files})
   )
 endforeach()
 
+# Copy the Sphinx source files of the components directory to build directory
+file(
+  GLOB_RECURSE sphinx_components_source_files
+  LIST_DIRECTORIES false
+  RELATIVE "${PROJECT_SOURCE_DIR}/components"
+  "${PROJECT_SOURCE_DIR}/components/*/docs/*"
+)
+
+foreach(sphinx_source_file ${sphinx_components_source_files})
+  add_custom_command(
+    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/sphinx/components/${sphinx_source_file}"
+    DEPENDS "${PROJECT_SOURCE_DIR}/components/${sphinx_source_file}"
+    COMMAND
+      ${CMAKE_COMMAND} -E copy_if_different
+      "${PROJECT_SOURCE_DIR}/components/${sphinx_source_file}"
+      "${CMAKE_CURRENT_BINARY_DIR}/sphinx/components/${sphinx_source_file}"
+  )
+endforeach()
+
+foreach(sphinx_source_file ${sphinx_components_source_files})
+  set(sphinx_source_files_build
+      ${sphinx_source_files_build}
+      "${CMAKE_CURRENT_BINARY_DIR}/sphinx/components/${sphinx_source_file}"
+  )
+endforeach()
+
 # Create links to source files so that they are visible to sphinx
 if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/src")
   file(CREATE_LINK "${PROJECT_SOURCE_DIR}/src"

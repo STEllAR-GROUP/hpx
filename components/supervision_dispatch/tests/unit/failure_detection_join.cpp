@@ -99,17 +99,19 @@ void test_fencing_without_prior_successful_query(
 
     std::uint64_t const join_epoch = peer->join_epoch;
     HPX_TEST_NEQ(join_epoch, static_cast<std::uint64_t>(0));
-    HPX_TEST_EQ(hpx::supervision::query_state(peer->shadow).epoch, join_epoch);
+    HPX_TEST_EQ(
+        hpx::supervision::query_state(peer->shadow.get()).epoch, join_epoch);
 
-    bool const fenced =
-        wait_until_fenced(peer->shadow, join_epoch, std::chrono::seconds(5));
+    bool const fenced = wait_until_fenced(
+        peer->shadow.get(), join_epoch, std::chrono::seconds(5));
     HPX_TEST(fenced);
 
-    HPX_TEST(hpx::supervision::check_admission(peer->shadow, join_epoch) ==
+    HPX_TEST(
+        hpx::supervision::check_admission(peer->shadow.get(), join_epoch) ==
         hpx::supervision::dispatch_outcome::rejected_fenced);
 
-    hpx::future<int> f =
-        hpx::supervision::dispatch_work<probe_action>(peer->shadow, join_epoch);
+    hpx::future<int> f = hpx::supervision::dispatch_work<probe_action>(
+        peer->shadow, peer_locality, join_epoch);
 
     bool caught = false;
     try

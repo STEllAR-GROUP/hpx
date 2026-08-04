@@ -14,6 +14,7 @@
 #include <hpx/modules/type_support.hpp>
 
 #include <hpx/supervision_dispatch/server/registry.hpp>
+#include <hpx/supervision_dispatch/shadow_id.hpp>
 
 #include <atomic>
 #include <cstdint>
@@ -29,6 +30,8 @@ HPX_REGISTER_ACTION(hpx::supervision::server::registry::join_action,
     supervision_dispatch_registry_join_action)
 HPX_REGISTER_ACTION(hpx::supervision::server::registry::snapshot_peers_action,
     supervision_dispatch_registry_snapshot_peers_action)
+HPX_REGISTER_ACTION(hpx::supervision::server::registry::leave_action,
+    supervision_dispatch_registry_leave_action)
 
 namespace {
 
@@ -38,7 +41,7 @@ namespace {
     // (in which case the shadow id is otherwise never handed back to the
     // caller).
     hpx::spinlock last_join_shadow_mtx;
-    hpx::id_type last_join_shadow_target;
+    hpx::supervision::shadow_id last_join_shadow_target;
 
     std::atomic<std::uint64_t> shadow_target_counter{1};
 
@@ -49,7 +52,7 @@ namespace {
     // dereferenced as a component id, so it does not need to name a real,
     // live component (the public hpx::supervision API treats targets as
     // opaque lookup keys).
-    hpx::id_type make_shadow_target()
+    hpx::supervision::shadow_id make_shadow_target()
     {
         // Shadow targets are never resolved or dereferenced, so always
         // construct them as unmanaged ids that pretend to live on the
@@ -64,10 +67,10 @@ namespace {
 
         {
             std::scoped_lock<hpx::spinlock> l(last_join_shadow_mtx);
-            last_join_shadow_target = shadow;
+            last_join_shadow_target = hpx::supervision::shadow_id(shadow);
         }
 
-        return shadow;
+        return hpx::supervision::shadow_id(HPX_MOVE(shadow));
     }
 
     void unregister_observers(hpx::id_type const& peer_locality,
@@ -92,7 +95,7 @@ namespace {
 
 namespace hpx::supervision::testing {
 
-    hpx::id_type last_join_shadow()
+    hpx::supervision::shadow_id last_join_shadow()
     {
         std::scoped_lock<hpx::spinlock> l(last_join_shadow_mtx);
         return last_join_shadow_target;
@@ -117,7 +120,7 @@ namespace hpx::supervision::server {
     // asynchronously with respect to join()/re-join races.
     std::pair<hpx::id_type, hpx::id_type> registry::register_observers(
         hpx::id_type const& peer_sentinel, hpx::id_type const& peer_locality,
-        hpx::id_type const& shadow)
+        shadow_id const& shadow)
     {
         hpx::id_type activity_observer;
         hpx::id_type lifecycle_observer;
@@ -140,14 +143,14 @@ namespace hpx::supervision::server {
                     // mid-epoch.
                     hpx::error_code ec(hpx::throwmode::lightweight);
                     auto const shadow_state =
-                        hpx::supervision::query_state(shadow, ec);
-                    if (ec &&
+                        hpx::supervision::query_state(shadow.get(), ec);
+                    if (ec ||
                         (shadow_state.epoch != notification.epoch ||
                             shadow_state.last_event ==
                                 hpx::supervision::event::unknown))
                     {
                         hpx::error_code ec1(hpx::throwmode::lightweight);
-                        hpx::supervision::publish_event(shadow,
+                        hpx::supervision::publish_event(shadow.get(),
                             hpx::supervision::event::started,
                             notification.epoch, ec1);
                     }
@@ -155,8 +158,8 @@ namespace hpx::supervision::server {
                     // Mirror the peer's event onto the shadow at the same epoch
                     // it actually occurred in.
                     hpx::error_code ec2(hpx::throwmode::lightweight);
-                    hpx::supervision::publish_event(
-                        shadow, notification.event, notification.epoch, ec2);
+                    hpx::supervision::publish_event(shadow.get(),
+                        notification.event, notification.epoch, ec2);
 
                     // Evict the peer if it has reached a terminal event, so
                     // peers_ does not grow without bound over the lifetime of a
@@ -206,7 +209,7 @@ namespace hpx::supervision::server {
         return std::make_pair(lifecycle_observer, activity_observer);
     }
 
-    std::pair<hpx::id_type, bool> registry::reserve_ownership(
+    std::pair<shadow_id, bool> registry::reserve_ownership(
         hpx::id_type const& peer_sentinel)
     {
         std::unique_lock l(mtx_);
@@ -239,7 +242,7 @@ namespace hpx::supervision::server {
         return {};
     }
 
-    hpx::id_type registry::join(
+    joined_peer registry::join(
         hpx::id_type const& peer_sentinel, hpx::id_type const& peer_locality)
     {
         // Reserve ownership of peer_sentinel before performing any of
@@ -247,7 +250,7 @@ namespace hpx::supervision::server {
         auto [shadow, reserved] = reserve_ownership(peer_sentinel);
         if (reserved)
         {
-            return shadow;
+            return {.shadow = shadow, .target = peer_locality};
         }
 
         hpx::id_type lifecycle_observer;
@@ -267,8 +270,8 @@ namespace hpx::supervision::server {
                 seed_epoch = !ec ? peer_state.epoch : 0;
 
                 hpx::error_code ec1(hpx::throwmode::lightweight);
-                hpx::supervision::publish_event(
-                    shadow, hpx::supervision::event::started, seed_epoch, ec1);
+                hpx::supervision::publish_event(shadow.get(),
+                    hpx::supervision::event::started, seed_epoch, ec1);
             }
 
             {
@@ -295,7 +298,7 @@ namespace hpx::supervision::server {
             if (shadow)
             {
                 hpx::error_code ec(hpx::throwmode::lightweight);
-                hpx::supervision::remove_target(shadow, ec);
+                hpx::supervision::remove_target(shadow.get(), ec);
             }
 
             std::rethrow_exception(std::current_exception());
@@ -327,7 +330,7 @@ namespace hpx::supervision::server {
             cleanup_peer(
                 peer_locality, lifecycle_observer, activity_observer, shadow);
         }
-        return shadow;
+        return {.shadow = shadow, .target = peer_locality};
     }
 
     // Implementation note: iterates peers_ under mtx_ and copies out the
@@ -353,8 +356,14 @@ namespace hpx::supervision::server {
         return result;
     }
 
+    void registry::leave(hpx::id_type const& peer_sentinel,
+        hpx::id_type const& peer_locality, shadow_id const& shadow)
+    {
+        evict_peer(peer_sentinel, peer_locality, shadow, hpx::invalid_id);
+    }
+
     void registry::evict_peer(hpx::id_type const& peer_sentinel,
-        hpx::id_type const& peer_locality, hpx::id_type const& shadow,
+        hpx::id_type const& peer_locality, shadow_id const& shadow,
         [[maybe_unused]] hpx::id_type keep_alive)
     {
         hpx::id_type lifecycle_observer;
@@ -395,7 +404,7 @@ namespace hpx::supervision::server {
 
     void registry::cleanup_peer(hpx::id_type const& peer_locality,
         hpx::id_type const& lifecycle_observer,
-        hpx::id_type const& activity_observer, hpx::id_type const& shadow)
+        hpx::id_type const& activity_observer, shadow_id const& shadow)
     {
         unregister_observers(
             peer_locality, lifecycle_observer, activity_observer);
@@ -403,7 +412,7 @@ namespace hpx::supervision::server {
         // Drop the shadow's local state now that the peer has been evicted;
         // nothing will consult it again.
         hpx::error_code ec(hpx::throwmode::lightweight);
-        hpx::supervision::remove_target(shadow, ec);
+        hpx::supervision::remove_target(shadow.get(), ec);
     }
 }    // namespace hpx::supervision::server
 

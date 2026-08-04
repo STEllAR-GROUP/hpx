@@ -17,6 +17,7 @@
 #include <hpx/modules/tracing.hpp>
 
 #include <hpx/supervision_dispatch/export_definitions.hpp>
+#include <hpx/supervision_dispatch/shadow_id.hpp>
 #include <hpx/supervision_dispatch/testing.hpp>
 
 #include <cstdint>
@@ -47,7 +48,7 @@ namespace hpx::supervision::server {
 
         /// The locally tracked shadow mirroring \c peer_sentinel's
         /// supervision state.
-        hpx::id_type shadow;
+        shadow_id shadow;
 
         /// The epoch at which \c peer_sentinel was joined.
         std::uint64_t join_epoch;
@@ -62,14 +63,16 @@ namespace hpx::supervision::server {
         ///
         /// \param peer_sentinel The peer sentinel to observe.
         /// \param peer_locality The locality that owns \p peer_sentinel.
-        hpx::id_type join(hpx::id_type const& peer_sentinel,
+        joined_peer join(hpx::id_type const& peer_sentinel,
             hpx::id_type const& peer_locality);
 
+        /// \cond NOINTERNAL
         struct join_action
           : hpx::actions::make_action_t<decltype(&registry::join),
                 &registry::join, join_action>
         {
         };
+        /// \endcond
 
         /// Returns a point-in-time snapshot of all fully joined, non-evicting
         /// peers.
@@ -85,18 +88,31 @@ namespace hpx::supervision::server {
         ///         \c evict_pending == false at the time of the call.
         std::vector<peer_snapshot> snapshot_peers() const;
 
+        /// \cond NOINTERNAL
         struct snapshot_peers_action
           : hpx::actions::make_action_t<decltype(&registry::snapshot_peers),
                 &registry::snapshot_peers, snapshot_peers_action>
         {
         };
+        /// \endcond
+
+        void leave(hpx::id_type const& peer_sentinel,
+            hpx::id_type const& peer_locality, shadow_id const& shadow);
+
+        /// \cond NOINTERNAL
+        struct leave_action
+          : hpx::actions::make_action_t<decltype(&registry::leave),
+                &registry::leave, leave_action>
+        {
+        };
+        /// \endcond
 
     protected:
-        std::pair<hpx::id_type, bool> reserve_ownership(
+        std::pair<shadow_id, bool> reserve_ownership(
             hpx::id_type const& peer_sentinel);
         std::pair<hpx::id_type, hpx::id_type> register_observers(
             hpx::id_type const& peer_sentinel,
-            hpx::id_type const& peer_locality, hpx::id_type const& shadow);
+            hpx::id_type const& peer_locality, shadow_id const& shadow);
 
         // Evicts a peer that has reached a terminal lifecycle event: erases its
         // entry from peers_, unregisters its lifecycle_observer and
@@ -110,7 +126,7 @@ namespace hpx::supervision::server {
         // been re-joined (fresh shadow) or already evicted by a racing terminal
         // notification, this is a no-op.
         void evict_peer(hpx::id_type const& peer_sentinel,
-            hpx::id_type const& peer_locality, hpx::id_type const& shadow,
+            hpx::id_type const& peer_locality, shadow_id const& shadow,
             hpx::id_type keep_alive);
 
         /// Unregisters a peer's observers and removes its shadow state.
@@ -128,7 +144,7 @@ namespace hpx::supervision::server {
         /// \param shadow The peer's shadow whose local state is removed.
         static void cleanup_peer(hpx::id_type const& peer_locality,
             hpx::id_type const& lifecycle_observer,
-            hpx::id_type const& activity_observer, hpx::id_type const& shadow);
+            hpx::id_type const& activity_observer, shadow_id const& shadow);
 
     private:
         /// Internal bookkeeping for a single joined (or joining) peer.
@@ -145,7 +161,7 @@ namespace hpx::supervision::server {
             /// The locally tracked shadow mirroring this peer's supervision
             /// state (the same shadow returned by join() and referenced by
             /// evict_peer()/cleanup_peer()).
-            hpx::id_type shadow;
+            shadow_id shadow;
 
             /// The observer id registered on peer_locality to receive this
             /// peer's terminal lifecycle notification (drives evict_peer()
@@ -188,5 +204,8 @@ HPX_REGISTER_ACTION_DECLARATION(hpx::supervision::server::registry::join_action,
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::supervision::server::registry::snapshot_peers_action,
     supervision_dispatch_registry_snapshot_peers_action)
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::supervision::server::registry::leave_action,
+    supervision_dispatch_registry_leave_action)
 
 #include <hpx/config/warnings_suffix.hpp>

@@ -38,14 +38,17 @@ void test_snapshot_peers_reports_joined_peer()
 
     // join() both creates the shadow and (per this task) now persists
     // peer_locality into the entry so snapshot_peers() can report it.
-    hpx::id_type const shadow =
+    hpx::supervision::joined_peer const peer =
         r.join(hpx::launch::sync, peer_sentinel, peer_locality);
 
     auto const snapshot = r.snapshot_peers(hpx::launch::sync);
     HPX_TEST_EQ(snapshot.size(), static_cast<std::size_t>(1));
-    HPX_TEST(snapshot[0].peer_sentinel == peer_sentinel.get_id());
-    HPX_TEST(snapshot[0].peer_locality == peer_locality);
-    HPX_TEST(snapshot[0].shadow == shadow);
+    if (!snapshot.empty())
+    {
+        HPX_TEST(snapshot[0].peer_sentinel == peer_sentinel.get_id());
+        HPX_TEST(snapshot[0].peer_locality == peer_locality);
+        HPX_TEST(snapshot[0].shadow == peer.shadow);
+    }
 }
 
 // Verifies that snapshot_peers() aggregates all currently joined peers, not
@@ -66,9 +69,7 @@ void test_snapshot_peers_reports_multiple_peers()
 
     auto const contains_sentinel = [&](hpx::id_type const& expected) {
         return std::ranges::any_of(snapshot,
-            [&](auto const& peer) {
-                return peer.peer_sentinel == expected;
-            });
+            [&](auto const& peer) { return peer.peer_sentinel == expected; });
     };
 
     HPX_TEST(contains_sentinel(p1.get_id()));

@@ -300,7 +300,7 @@ namespace {
     // Re-query and compare event_sequence_number before concluding genuine
     // silence. Callers reuse the returned seq instead of re-querying.
     silence_probe probe_peer_silence(
-        std::uint64_t const last_seq, hpx::id_type const& shadow)
+        std::uint64_t const last_seq, hpx::supervision::shadow_id const& shadow)
     {
         // await_terminal only unblocks on a terminal event, so a timeout alone
         // does not distinguish "dead" from "alive but only publishing
@@ -308,7 +308,7 @@ namespace {
         // Re-query and compare event_sequence_number before concluding genuine
         // failure.
         hpx::error_code ec(hpx::throwmode::lightweight);
-        auto const recheck = hpx::supervision::query_state(shadow, ec);
+        auto const recheck = hpx::supervision::query_state(shadow.get(), ec);
         if (ec || recheck.ec)
         {
             // Can't confirm liveness or death right now; don't fence on an
@@ -354,8 +354,8 @@ namespace {
             last_seq = seq;
 
             hpx::error_code ec2(hpx::throwmode::lightweight);
-            hpx::supervision::await_terminal(
-                hpx::launch::sync, peer.shadow, epoch, grace_interval, ec2);
+            hpx::supervision::await_terminal(hpx::launch::sync,
+                peer.shadow.get(), epoch, grace_interval, ec2);
 
             if (!ec2 || get_error(ec2) != hpx::error::future_cancelled)
             {
@@ -384,7 +384,8 @@ namespace {
         // genuinely unreachable - not just transiently slow - can be
         // distinguished from a one-off blip and eventually fenced, instead of
         // perpetually deferring judgment via continue/return.
-        std::unordered_map<hpx::id_type, peer_tracking> query_failures;
+        std::unordered_map<hpx::supervision::shadow_id, peer_tracking>
+            query_failures;
 
         // Outer loop: keep polling as long as we haven't been asked to stop and
         // the dispatcher is still in the "active" state. is_initialized()
@@ -419,7 +420,7 @@ namespace {
                 // peer_snapshot carries no epoch of its own
                 hpx::error_code ec(hpx::throwmode::lightweight);
                 auto const state =
-                    hpx::supervision::query_state(peer.shadow, ec);
+                    hpx::supervision::query_state(peer.shadow.get(), ec);
 
                 auto [it, _] = query_failures.try_emplace(peer.shadow,
                     peer_tracking{.last_known_epoch = peer.join_epoch,
@@ -435,7 +436,7 @@ namespace {
                     if (++failures >= max_consecutive_query_failures)
                     {
                         hpx::error_code ec1(hpx::throwmode::lightweight);
-                        hpx::supervision::publish_event(peer.shadow,
+                        hpx::supervision::publish_event(peer.shadow.get(),
                             hpx::supervision::event::failed, last_known_epoch,
                             ec1);
                         query_failures.erase(peer.shadow);
@@ -467,13 +468,13 @@ namespace {
                         // Fence locally only, never touch the peer's own
                         // sentinel/registry.
                         hpx::error_code ec3(hpx::throwmode::lightweight);
-                        hpx::supervision::publish_event(peer.shadow,
+                        hpx::supervision::publish_event(peer.shadow.get(),
                             hpx::supervision::event::failed, epoch, ec3);
                     }
                 };
 
                 checks.push_back(hpx::supervision::await_terminal(
-                    peer.shadow, state.epoch, poll_timeout)
+                    peer.shadow.get(), state.epoch, poll_timeout)
                         .then(hpx::launch::async, HPX_MOVE(cont)));
             }
 

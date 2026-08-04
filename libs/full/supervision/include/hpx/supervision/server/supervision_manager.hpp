@@ -93,26 +93,31 @@ namespace hpx::supervision::server {
         publish_result publish_event(
             hpx::id_type const& target, event ev, std::uint64_t epoch);
 
+        /// \cond NOINTERNAL
         struct publish_event_action
           : hpx::actions::make_action_t<
                 decltype(&supervision_manager::publish_event),
                 &supervision_manager::publish_event, publish_event_action>
         {
         };
+        /// \endcond
 
         lifecycle_state query_state(hpx::id_type const& target);
 
+        /// \cond NOINTERNAL
         struct query_state_action
           : hpx::actions::make_action_t<
                 decltype(&supervision_manager::query_state),
                 &supervision_manager::query_state, query_state_action>
         {
         };
+        /// \endcond
 
         hpx::id_type register_observer(hpx::id_type const& target,
             hpx::id_type const& agent,
             std::uint64_t epoch_filter = static_cast<std::uint64_t>(-1));
 
+        /// \cond NOINTERNAL
         struct register_observer_action
           : hpx::actions::make_action_t<
                 decltype(&supervision_manager::register_observer),
@@ -120,9 +125,11 @@ namespace hpx::supervision::server {
                 register_observer_action>
         {
         };
+        /// \endcond
 
         void unregister_observer(hpx::id_type const& observer_handle);
 
+        /// \cond NOINTERNAL
         struct unregister_observer_action
           : hpx::actions::make_action_t<
                 decltype(&supervision_manager::unregister_observer),
@@ -130,6 +137,7 @@ namespace hpx::supervision::server {
                 unregister_observer_action>
         {
         };
+        /// \endcond
 
         /// \brief Clears all locally tracked state for `target`.
         ///
@@ -147,12 +155,14 @@ namespace hpx::supervision::server {
         /// indefinitely.
         void remove_target(hpx::id_type const& target);
 
+        /// \cond NOINTERNAL
         struct remove_target_action
           : hpx::actions::make_action_t<
                 decltype(&supervision_manager::remove_target),
                 &supervision_manager::remove_target, remove_target_action>
         {
         };
+        /// \endcond
 
         /// \brief Registers a locality-scoped activity observer.
         ///
@@ -173,6 +183,7 @@ namespace hpx::supervision::server {
         hpx::id_type register_activity_observer(hpx::id_type const& agent,
             std::uint64_t epoch_filter = static_cast<std::uint64_t>(-1));
 
+        /// \cond NOINTERNAL
         struct register_activity_observer_action
           : hpx::actions::make_action_t<
                 decltype(&supervision_manager::register_activity_observer),
@@ -180,6 +191,7 @@ namespace hpx::supervision::server {
                 register_activity_observer_action>
         {
         };
+        /// \endcond
 
         /// \brief Unregisters an activity observer.
         ///
@@ -191,6 +203,7 @@ namespace hpx::supervision::server {
         /// activity_observers_) is rejected.
         void unregister_activity_observer(hpx::id_type const& observer_handle);
 
+        /// \cond NOINTERNAL
         struct unregister_activity_observer_action
           : hpx::actions::make_action_t<
                 decltype(&supervision_manager::unregister_activity_observer),
@@ -198,6 +211,7 @@ namespace hpx::supervision::server {
                 unregister_activity_observer_action>
         {
         };
+        /// \endcond
 
         // Resolve once `target` reaches a terminal event (`completed` or
         // `failed`) within `epoch`. If `target` has already reached a terminal
@@ -225,12 +239,14 @@ namespace hpx::supervision::server {
             std::chrono::steady_clock::duration timeout =
                 (std::chrono::steady_clock::duration::max) ());
 
+        /// \cond NOINTERNAL
         struct await_terminal_action
           : hpx::actions::make_action_t<
                 decltype(&supervision_manager::await_terminal),
                 &supervision_manager::await_terminal, await_terminal_action>
         {
         };
+        /// \endcond
 
         // Pure local read of the terminal latch state maintained for
         // `target`; see hpx::supervision::check_admission() for the exact

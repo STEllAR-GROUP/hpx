@@ -15,10 +15,12 @@
 #include <hpx/modules/timing.hpp>
 
 #include <hpx/supervision_dispatch/export_definitions.hpp>
+#include <hpx/supervision_dispatch/shadow_id.hpp>
 
 #include <chrono>
 #include <vector>
 
+////////////////////////////////////////////////////////////////////////////////
 namespace hpx::supervision::server {
 
     struct peer_snapshot;
@@ -49,7 +51,7 @@ namespace hpx::supervision::testing {
     /// or fail. Lets tests verify that a failed join() does not leak the
     /// shadow's locally tracked supervision state (see
     /// registry::register_observers()'s catch block).
-    HPX_SUPERVISION_DISPATCH_EXPORT hpx::id_type last_join_shadow();
+    HPX_SUPERVISION_DISPATCH_EXPORT shadow_id last_join_shadow();
 
     /// Stops this locality's own heartbeat_loop() without finalizing the
     /// dispatcher, simulating a hard crash (all lifecycle activity ceases,

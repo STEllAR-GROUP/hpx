@@ -120,28 +120,37 @@ def _load_doxygen_function_signatures():
             tree = ET.parse(xml_path)
         except ET.ParseError:
             continue
-        for memberdef in tree.getroot().iter('memberdef'):
-            if memberdef.get('kind') != 'function':
-                continue
 
-            qualname_el = memberdef.find('qualifiedname')
-            if qualname_el is not None and qualname_el.text:
-                qualname = qualname_el.text.strip()
-            else:
+        # Walk compounddef -> compoundname so every memberdef inside it is
+        # keyed consistently, instead of relying on each memberdef's own
+        # (unreliably-populated) <qualifiedname>
+        for compounddef in tree.getroot().iter('compounddef'):
+            compoundname_el = compounddef.find('compoundname')
+            compoundname = (compoundname_el.text.strip()
+                if compoundname_el is not None and compoundname_el.text else '')
+
+            for memberdef in compounddef.iter('memberdef'):
+                if memberdef.get('kind') != 'function':
+                    continue
+
                 name_el = memberdef.find('name')
                 if name_el is None or not name_el.text:
                     continue
-                qualname = name_el.text.strip()
+                name = name_el.text.strip()
 
-            argsstring_el = memberdef.find('argsstring')
-            argsstring = (argsstring_el.text.strip()
-                if argsstring_el is not None and argsstring_el.text else '')
+                qualname = f'{compoundname}::{name}' if compoundname else name
 
-            signatures.setdefault(qualname, []).append(argsstring)
+                argsstring_el = memberdef.find('argsstring')
+                argsstring = (argsstring_el.text.strip()
+                    if argsstring_el is not None and argsstring_el.text else '')
+
+                signatures.setdefault(qualname, []).append(argsstring)
 
     _function_signatures_by_qualname = signatures
     return signatures
 
+
+_doc_logger = py_logging.getLogger('hpx.sphinx.doxygen_overloads')
 
 def find_overloads(qualified_name):
     """Return the real Doxygen <argsstring> signatures needed to
@@ -153,7 +162,21 @@ def find_overloads(qualified_name):
     - list of signatures if there are multiple overloads: caller emits one
       directive per signature.
     """
-    matches = _load_doxygen_function_signatures().get(qualified_name, [])
+    signatures = _load_doxygen_function_signatures()
+    matches = signatures.get(qualified_name)
+
+    if matches is None:
+        # Key entirely absent from the map - distinct from "legitimately
+        # has exactly one overload". Likely a naming/parsing mismatch or
+        # incomplete Doxygen XML, worth surfacing in the build log.
+        _doc_logger.warning(
+            "doxygenfunction target '%s' not found in Doxygen XML "
+            "signature map (%d qualified names loaded from %s); "
+            "emitting an unsuffixed directive that may fail to resolve "
+            "or resolve ambiguously at Sphinx build time.",
+            qualified_name, len(signatures), _doxygen_xml_dir)
+        return []
+
     return matches if len(matches) > 1 else []
 
 
@@ -508,8 +531,10 @@ def generate_module_api_refs(module, out_root):
                     continue
                 symbol_page_name = header_name + '_' + sanitize_page_name(title)
                 if symbol_page_name in symbol_page_names:
+                    prefix = (header_splitted[-3]
+                        if len(header_splitted) >= 3 else module)
                     symbol_page_name = '{0}_{1}'.format(
-                        header_splitted[-3], symbol_page_name)
+                        prefix, symbol_page_name)
                 symbol_page_names.add(symbol_page_name)
                 title_to_pagename[title] = symbol_page_name
                 all_symbol_anchors[title] = 'modules_{0}_api'.format(symbol_page_name)
@@ -543,8 +568,9 @@ def generate_module_api_refs(module, out_root):
                         for sig in overload_sigs)
 
                 symbol_ref.write(api_symbol_file.format(
-                    symbol_page_name, page_title, header, '-' * len(page_title),
-                    see_also, directive_block))
+                    symbol_page_name, page_title,
+                    find_link_hpx_header(include_header),
+                    '-' * len(page_title), see_also, directive_block))
 
                 symbol_ref.close()
                 header_refs += ('   /' + out_root +

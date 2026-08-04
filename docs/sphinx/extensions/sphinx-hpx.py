@@ -8,7 +8,8 @@
 import json
 import os
 from docutils import nodes
-from sphinx.roles import XRefRole
+from sphinx.roles import ReferenceRole
+from sphinx import addnodes
 from sphinx.util import logging
 
 
@@ -25,20 +26,28 @@ def _load_hpx_api_anchors(app):
             with open(manifest) as f:
                 _hpx_api_anchors_cache[srcdir] = json.load(f)
         except (OSError, ValueError):
-            return {}
+            _hpx_api_anchors_cache[srcdir] = {}
     return _hpx_api_anchors_cache[srcdir]
 
 
-class HPXAPIRole(XRefRole):
+class HPXAPIRole(ReferenceRole):
     def run(self):
         anchors = _load_hpx_api_anchors(self.env.app)
         anchor = anchors.get(self.target)
         if anchor is None:
-            logger.warning('hpx-api: no generated page for %r' % self.target)
-            return [nodes.Text(self.title)], []
-        display = self.title if self.has_explicit_title else self.target
-        node = nodes.reference(self.rawtext, display, refuri=anchor)
-        return [node], []
+            logger.warning(f"hpx-api: unknown symbol '{self.target}'")
+            return [nodes.literal(self.rawtext, self.title)], []
+
+        refnode = addnodes.pending_xref(
+            self.rawtext,
+            refdomain='std',
+            reftype='ref',
+            reftarget=anchor,
+            refexplicit=True,
+            refwarn=True,
+        )
+        refnode += nodes.inline(self.rawtext, self.title, classes=['xref', 'std', 'std-ref'])
+        return [refnode], []
 
 
 def setup(app):
