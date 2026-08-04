@@ -20,6 +20,7 @@
 
 #include <hpx/future.hpp>
 #include <hpx/init.hpp>
+#include <hpx/modules/testing.hpp>
 #include <hpx/modules/tracing.hpp>
 #include <hpx/thread.hpp>
 
@@ -36,8 +37,6 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::cout << "causal_exception_smoke: starting (" << iterations
               << " iterations)\n"
               << std::flush;
-
-    std::size_t failures = 0;
 
     for (std::size_t i = 0; i < iterations; ++i)
     {
@@ -65,12 +64,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
             std::make_exception_ptr(std::runtime_error("causal test error")));
 
         int const value = result.get();
-        if (value != -1)
-        {
-            std::cerr << "FAIL at iteration " << i << ": expected -1, got "
-                      << value << "\n";
-            ++failures;
-        }
+        HPX_TEST_EQ(value, -1);
 
         // Brief pause so each iteration is clearly visible in Tracy timeline
         hpx::this_thread::sleep_for(std::chrono::milliseconds(150));
@@ -82,18 +76,10 @@ int hpx_main(hpx::program_options::variables_map& vm)
         }
     }
 
-    if (failures == 0)
-    {
-        std::cout << "OK: causal_exception_smoke - all " << iterations
-                  << " iterations passed\n";
-    }
-    else
-    {
-        std::cerr << "FAIL: " << failures << " failures\n";
-    }
+    std::cout << "OK: causal_exception_smoke - all " << iterations
+              << " iterations passed\n";
 
-    hpx::local::finalize();
-    return failures == 0 ? 0 : -1;
+    return hpx::local::finalize();
 }
 
 int main(int argc, char* argv[])
@@ -107,5 +93,7 @@ int main(int argc, char* argv[])
     hpx::local::init_params init_args;
     init_args.desc_cmdline = desc_commandline;
     init_args.cfg = {"hpx.os_threads=2"};
-    return hpx::local::init(hpx_main, argc, argv, init_args);
+
+    HPX_TEST_EQ(hpx::local::init(hpx_main, argc, argv, init_args), 0);
+    return hpx::util::report_errors();
 }
