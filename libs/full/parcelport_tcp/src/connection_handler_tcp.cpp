@@ -108,6 +108,38 @@ namespace hpx::parcelset::policies::tcp {
                 acceptor_->set_option(tcp::acceptor::reuse_address(true));
                 acceptor_->bind(ep);
                 acceptor_->listen();
+
+                // Advertise the port that was bound, not the one that was
+                // asked for. They differ when the configuration says port 0,
+                // which hands the choice to the operating system; without this
+                // nothing learns which port it picked and no peer can connect.
+                //
+                // Only the port is taken. The bound address may be a wildcard
+                // that is reachable from nowhere, so the configured one stays.
+                // One acceptor serves the whole loop, so at most one bind
+                // succeeds and there is exactly one port to report. Reading it
+                // back is done before the first async_accept, and without
+                // throwing: a bound socket that cannot be queried is still
+                // usable.
+                std::error_code local_ec;
+                if (tcp::endpoint const bound =
+                        acceptor_->local_endpoint(local_ec);
+                    !local_ec && bound.port() != here_.get<locality>().port())
+                {
+                    here_ = parcelset::locality(locality(
+                        here_.get<locality>().address(), bound.port()));
+                }
+                else if (local_ec)
+                {
+                    // Keeping the configured port is the safe course, but if
+                    // that port was 0 this locality is now unreachable and the
+                    // reason would otherwise be invisible.
+                    LPT_(warning).format(
+                        "tcp::parcelport::run: bound {} but could not read the "
+                        "endpoint back, keeping the configured one: {}",
+                        ep, local_ec.message());
+                }
+
                 acceptor_->async_accept(receiver_conn->socket(),
                     hpx::bind(&connection_handler::handle_accept, this,
                         placeholders::_1, receiver_conn));
