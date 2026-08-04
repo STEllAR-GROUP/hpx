@@ -93,13 +93,14 @@ namespace hpx::supervision {
     /// \param peers          The peers to join, typically returned by a prior
     ///                       discover_peers() call.
     /// \param timeout  The maximum duration to wait, across all peers
-    ///                 combined, for their join() calls to settle. Peers
-    ///                 whose join() has not settled (or failed) within this
-    ///                 bound are silently dropped from the result, rather
-    ///                 than hanging or throwing.
+    ///                 combined, for their join() calls to settle. Peers whose
+    ///                 join() has not settled (or failed) within this bound are
+    ///                 silently dropped from the result, rather than hanging or
+    ///                 throwing.
     ///
-    /// \return The shadow target id that \a local_registry created (or already
-    ///         had) for each entry in \a peers, in the same order.
+    /// \return The shadow target IDs for peers whose join() calls settled
+    ///         successfully within \a timeout, in the same relative order as
+    ///         \a peers.
     HPX_SUPERVISION_DISPATCH_EXPORT std::vector<hpx::id_type> fan_out_join(
         hpx::supervision::registry const& local_registry,
         std::vector<hpx::supervision::discovered_peer> const& peers,

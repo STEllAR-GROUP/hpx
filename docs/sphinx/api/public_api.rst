@@ -558,26 +558,26 @@ Functions
    :cpp:func:`hpx::when_any`                 |p0159|_
    :cpp:func:`hpx::when_some`
    :cpp:func:`hpx::when_each`
-   :cpp:func:`hpx::wait_all`
-   :cpp:func:`hpx::wait_all_nothrow`
-   :cpp:func:`hpx::wait_all_n`
-   :cpp:func:`hpx::wait_all_n_nothrow`
-   :cpp:func:`hpx::wait_all_for`
-   :cpp:func:`hpx::wait_all_for_nothrow`
-   :cpp:func:`hpx::wait_all_for_n`
-   :cpp:func:`hpx::wait_all_for_n_nothrow`
-   :cpp:func:`hpx::wait_any`
-   :cpp:func:`hpx::wait_any_n`
-   :cpp:func:`hpx::wait_any_nothrow`
-   :cpp:func:`hpx::wait_any_n_nothrow`
-   :cpp:func:`hpx::wait_some`
-   :cpp:func:`hpx::wait_some_n`
-   :cpp:func:`hpx::wait_some_nothrow`
-   :cpp:func:`hpx::wait_some_n_nothrow`
-   :cpp:func:`hpx::wait_each`
-   :cpp:func:`hpx::wait_each_n`
-   :cpp:func:`hpx::wait_each_nothrow`
-   :cpp:func:`hpx::wait_each_n_nothrow`
+   :hpx-api:`hpx::wait_all`
+   :hpx-api:`hpx::wait_all_nothrow`
+   :hpx-api:`hpx::wait_all_n`
+   :hpx-api:`hpx::wait_all_n_nothrow`
+   :hpx-api:`hpx::wait_all_for`
+   :hpx-api:`hpx::wait_all_for_nothrow`
+   :hpx-api:`hpx::wait_all_for_n`
+   :hpx-api:`hpx::wait_all_for_n_nothrow`
+   :hpx-api:`hpx::wait_any`
+   :hpx-api:`hpx::wait_any_n`
+   :hpx-api:`hpx::wait_any_nothrow`
+   :hpx-api:`hpx::wait_any_n_nothrow`
+   :hpx-api:`hpx::wait_some`
+   :hpx-api:`hpx::wait_some_n`
+   :hpx-api:`hpx::wait_some_nothrow`
+   :hpx-api:`hpx::wait_some_n_nothrow`
+   :hpx-api:`hpx::wait_each`
+   :hpx-api:`hpx::wait_each_n`
+   :hpx-api:`hpx::wait_each_nothrow`
+   :hpx-api:`hpx::wait_each_n_nothrow`
    ========================================  =====================================
 
 .. _public_api_header_hpx_init:

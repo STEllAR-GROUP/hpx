@@ -22,7 +22,11 @@ import re
 import sys
 import traceback
 import logging as py_logging
+import glob
+import json
+import xml.etree.ElementTree as ET
 from datetime import datetime
+
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -93,6 +97,64 @@ hpx_components_dir = hpx_source_dir + '/components'
 hpx_libs = {}
 hpx_components = []
 header_info = {}
+all_symbol_anchors = {}
+
+
+_doxygen_xml_dir = os.path.abspath(breathe_projects['hpx'])
+_function_signatures_by_qualname = None
+
+
+def _load_doxygen_function_signatures():
+    """Lazily parse the already-generated Doxygen XML once, building a map
+    from fully-qualified function name -> list of real Doxygen
+    <argsstring> signatures (one entry per overload)."""
+    global _function_signatures_by_qualname
+    if _function_signatures_by_qualname is not None:
+        return _function_signatures_by_qualname
+
+    signatures = {}
+    for xml_path in glob.glob(os.path.join(_doxygen_xml_dir, '*.xml')):
+        if os.path.basename(xml_path) in ('index.xml', 'Doxyfile.xml'):
+            continue
+        try:
+            tree = ET.parse(xml_path)
+        except ET.ParseError:
+            continue
+        for memberdef in tree.getroot().iter('memberdef'):
+            if memberdef.get('kind') != 'function':
+                continue
+
+            qualname_el = memberdef.find('qualifiedname')
+            if qualname_el is not None and qualname_el.text:
+                qualname = qualname_el.text.strip()
+            else:
+                name_el = memberdef.find('name')
+                if name_el is None or not name_el.text:
+                    continue
+                qualname = name_el.text.strip()
+
+            argsstring_el = memberdef.find('argsstring')
+            argsstring = (argsstring_el.text.strip()
+                if argsstring_el is not None and argsstring_el.text else '')
+
+            signatures.setdefault(qualname, []).append(argsstring)
+
+    _function_signatures_by_qualname = signatures
+    return signatures
+
+
+def find_overloads(qualified_name):
+    """Return the real Doxygen <argsstring> signatures needed to
+    disambiguate `.. doxygenfunction::` for every overload of
+    `qualified_name`.
+
+    - [] if there are 0 or 1 matching entries: caller emits a single bare,
+      unsuffixed directive (unambiguous).
+    - list of signatures if there are multiple overloads: caller emits one
+      directive per signature.
+    """
+    matches = _load_doxygen_function_signatures().get(qualified_name, [])
+    return matches if len(matches) > 1 else []
 
 
 def detect_symbol_kind(content, title):
@@ -388,10 +450,10 @@ Defined in header {2}.
 See :ref:`public_api` for a list of names and headers that are part of the public
 |hpx| API.
 
-.. {5}:: {6}
-   :project: hpx
 {4}
+{5}
 '''
+
 
 def sanitize_page_name(title):
     return re.sub(r'[^A-Za-z0-9_]+', '_', title).strip('_')
@@ -450,6 +512,7 @@ def generate_module_api_refs(module, out_root):
                         header_splitted[-3], symbol_page_name)
                 symbol_page_names.add(symbol_page_name)
                 title_to_pagename[title] = symbol_page_name
+                all_symbol_anchors[title] = 'modules_{0}_api'.format(symbol_page_name)
 
         for group in page_groups:
             for page_title in group:
@@ -467,17 +530,21 @@ def generate_module_api_refs(module, out_root):
                 symbol_ref = open(basedir + '/' + symbol_page_name + '.rst', 'w')
                 kind = kind_map.get(page_title, 'doxygenfunction')
 
-                # Breathe can't disambiguate a bare name when a symbol has
-                # multiple overloads (e.g. hpx::supervision::init). Appending
-                # '+overload' is safe unconditionally: for single-overload
-                # symbols it matches trivially; for overloaded ones it
-                # documents every overload instead of erroring.
-                directive_name = (
-                    page_title + '+overload' if kind == 'doxygenfunction'
-                    else page_title)
+                if kind == 'doxygenfunction':
+                    overload_sigs = find_overloads(page_title)
+                else:
+                    overload_sigs = []
+
+                if not overload_sigs:
+                    directive_block = '.. {0}:: {1}\n   :project: hpx'.format(kind, page_title)
+                else:
+                    directive_block = '\n'.join(
+                        '.. {0}:: {1}{2}\n   :project: hpx'.format(kind, page_title, sig)
+                        for sig in overload_sigs)
+
                 symbol_ref.write(api_symbol_file.format(
                     symbol_page_name, page_title, header, '-' * len(page_title),
-                    see_also, kind, directive_name))
+                    see_also, directive_block))
 
                 symbol_ref.close()
                 header_refs += ('   /' + out_root +
@@ -495,6 +562,13 @@ for lib in hpx_libs.keys():
 
 for module in sorted(hpx_components):
     api_refs += generate_module_api_refs(module, 'components/' + module)
+
+
+# write found symbols to 'symbol_anchors.json' for the :hpx-api: sphinx
+# role to pick up (see: extensions/sphinx-hpx.py)
+json_path = os.path.join(os.path.abspath('.'), 'api/symbol_anchors.json')
+with open(json_path, 'w') as json_file:
+    json.dump(all_symbol_anchors, json_file, indent=2, sort_keys=True)
 
 
 api_rst = open(os.path.abspath('.') + '/api/full_api.rst', 'w')

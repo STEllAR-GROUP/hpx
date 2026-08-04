@@ -1,11 +1,45 @@
 # Copyright (c) 2018 Mikael Simberg
-# Copyright (c) 2022 Hartmut Kaiser
+# Copyright (c) 2022-2026 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+import json
+import os
 from docutils import nodes
+from sphinx.roles import XRefRole
+from sphinx.util import logging
+
+
+logger = logging.getLogger(__name__)
+
+
+_hpx_api_anchors_cache = {}
+
+def _load_hpx_api_anchors(app):
+    srcdir = app.srcdir
+    if srcdir not in _hpx_api_anchors_cache:
+        manifest = os.path.join(srcdir, 'api', 'symbol_anchors.json')
+        try:
+            with open(manifest) as f:
+                _hpx_api_anchors_cache[srcdir] = json.load(f)
+        except (OSError, ValueError):
+            return {}
+    return _hpx_api_anchors_cache[srcdir]
+
+
+class HPXAPIRole(XRefRole):
+    def run(self):
+        anchors = _load_hpx_api_anchors(self.env.app)
+        anchor = anchors.get(self.target)
+        if anchor is None:
+            logger.warning('hpx-api: no generated page for %r' % self.target)
+            return [nodes.Text(self.title)], []
+        display = self.title if self.has_explicit_title else self.target
+        node = nodes.reference(self.rawtext, display, refuri=anchor)
+        return [node], []
+
 
 def setup(app):
     app.add_role('hpx-issue', autolink('https://github.com/TheHPXProject/hpx/issues/%s', "Issue #"))
@@ -16,6 +50,8 @@ def setup(app):
     app.add_role('cppreference-memory', autolink('http://en.cppreference.com/w/cpp/memory/%s'))
     app.add_role('cppreference-container', autolink('http://en.cppreference.com/w/cpp/container/%s'))
     app.add_role('cppreference-generic', autolink_generic('http://en.cppreference.com/w/cpp/%s/%s'))
+    app.add_role('hpx-api', HPXAPIRole())
+
 
 def autolink(pattern, prefix=''):
     def role(name, rawtext, text, lineno, inliner, options={}, content=[]):

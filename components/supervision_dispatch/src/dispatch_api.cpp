@@ -48,11 +48,11 @@ namespace {
 
     // Interval must stay comfortably below the detector's poll_timeout so a
     // stale-sweep counter (once added) reliably observes progress before
-    // fencing. A third of the poll_timeout gives at least one heartbeat per
+    // fencing. A fourth of the poll_timeout gives at least one heartbeat per
     // sweep even under scheduling jitter.
     std::chrono::milliseconds current_heartbeat_interval()
     {
-        return current_failure_detection_poll_timeout() / 3;
+        return current_failure_detection_poll_timeout() / 4;
     }
 
     // The four states of the supervision-dispatch lifecycle. Transitions are
@@ -365,7 +365,11 @@ namespace {
 
             // still silent -> loop again for one more grace
         }
-        return true;
+
+        // Close the observation gap left by the loop above.
+        auto const [final_seq, final_status] =
+            probe_peer_silence(last_seq, peer.shadow);
+        return final_status == silence_status::still_silent;
     }
 
     void failure_detection_loop()

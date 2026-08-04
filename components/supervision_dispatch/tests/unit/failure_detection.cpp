@@ -183,28 +183,27 @@ void test_no_false_positives(hpx::id_type const& peer_locality)
     }
 }
 
-// Scenario 3: clean shutdown.
+// Scenario 3: clean shutdown while a sweep may still be in flight.
 //
-// finalize() must return promptly (bounded by the loop's internal poll_interval
-// slicing, not by the full await_terminal timeout) even while a sweep is in
-// flight against an unresponsive peer. Deliberately uses the *unshortened*
-// default_discovery_timeout for this scenario's own poll bound - shortening it
-// here would hide a broken implementation that still blocks finalize() on the
-// full wait.
-void test_clean_shutdown_during_in_flight_sweep()
+// Must run while `peer_locality` is still silent-but-joinable (heartbeat
+// suspended, but its sentinel/registry components not yet torn down) -
+// otherwise a fresh discover_and_join() finds no peer at all and
+// sweep_in_flight_ can never become true. Re-arms the session under the real
+// default_discovery_timeout to exercise finalize() racing a genuine
+// long-running sweep, then restores the short test timeout and rejoins so
+// later scenarios have a working session again.
+void test_clean_shutdown_during_in_flight_sweep(
+    hpx::id_type const& peer_locality)
 {
-    // Re-init with the real, unshortened timeout so this scenario actually
-    // exercises the "long wait in flight" case finalize() must not block on.
     hpx::supervision::testing::set_failure_detection_poll_timeout_for_testing(
         hpx::supervision::default_discovery_timeout);
 
+    // Tear down the short-timeout session and re-init under the long one;
+    // the peer is still registered (only silent), so this rediscovers and
+    // rejoins it.
+    hpx::supervision::finalize();
     HPX_TEST_NO_THROW(hpx::supervision::init(hpx::launch::sync));
 
-    // Poll until failure_detection_loop() has actually entered an
-    // await_terminal() sweep against the (still-silent) peer, rather than
-    // sleeping a fixed duration and hoping the loop got there first. This makes
-    // the "finalize() races a real in-flight await_terminal" premise below
-    // deterministic instead of a race with CI jitter.
     auto const deadline =
         std::chrono::steady_clock::now() + std::chrono::seconds(5);
     bool sweep_started = false;
@@ -223,16 +222,15 @@ void test_clean_shutdown_during_in_flight_sweep()
     auto const start = std::chrono::steady_clock::now();
     hpx::supervision::finalize();
     auto const elapsed = std::chrono::steady_clock::now() - start;
-
-    // Bounded by poll_interval slicing (~200ms), not by
-    // default_discovery_timeout (60s). 2s gives ample margin for scheduler
-    // jitter while still clearly failing if finalize() blocked on the full
-    // timeout.
     HPX_TEST(elapsed < std::chrono::seconds(2));
 
-    // Restore the short timeout for any tests still to run.
+    // Restore the short timeout and rejoin so scenarios 1/4 (fencing,
+    // idempotency) have a working session again. `peer_locality` is still
+    // silent, so this rejoin picks it right back up.
     hpx::supervision::testing::set_failure_detection_poll_timeout_for_testing(
         test_poll_timeout);
+    HPX_TEST_NO_THROW(hpx::supervision::init(hpx::launch::sync));
+    (void) peer_locality;
 }
 
 // Scenario 4: idempotency of the fence.
@@ -297,7 +295,6 @@ int hpx_main()
     }
 
     hpx::id_type const& peer_locality = remote_localities.front();
-
     bool const is_observer = (hpx::get_locality_id() == 0);
 
     // Shrink the poll timeout before init() starts the background loop, on
@@ -327,40 +324,18 @@ int hpx_main()
 
     if (is_observer)
     {
+        // Scenario 3: Runs first, while the peer is silent but still joinable -
+        // otherwise a fresh discover_and_join() finds no peer at all.
+        test_clean_shutdown_during_in_flight_sweep(peer_locality);
+
         // Scenario 1: peer is now silent; wait for detection.
         test_detection_causes_fencing(peer_locality);
 
         // Scenario 4: fence must be sticky, no epoch churn.
         test_fence_is_idempotent(peer_locality);
     }
-    hpx::distributed::barrier::synchronize();
 
-    if (is_observer)
-    {
-        hpx::supervision::finalize();
-    }
-    hpx::distributed::barrier::synchronize();
-
-    // Peer tears down its supervision runtime (unregistering names and
-    // destroying sentinel_/registry_) completely before the observer re-inits
-    // below - otherwise the observer's fresh discover_and_join() can discover
-    // the peer's still-registered names and send a join RPC that races the
-    // peer's component teardown, hanging fan_out_join()'s untimed hpx::unwrap()
-    // for the remainder of the CI job.
-    if (!is_observer)
-    {
-        hpx::supervision::finalize();
-    }
-    hpx::distributed::barrier::synchronize();
-
-    // Scenario 3: clean shutdown while a sweep may still be in flight. Run
-    // on the observer only, against its own re-armed lifecycle - the peer side
-    // has already gone (and stays) silent, so this exercises finalize() racing
-    // a real unresponsive-peer sweep end-to-end.
-    if (is_observer)
-    {
-        test_clean_shutdown_during_in_flight_sweep();
-    }
+    hpx::supervision::finalize();
 
     return hpx::finalize();
 }
