@@ -202,9 +202,19 @@ namespace hpx::when_all_vector_detail {
             template <typename... Ts>
             void set_value(Ts&&... ts) && noexcept;
 
-            // clang-format off
-            auto get_env() const noexcept;
-            // clang-format on
+            using receiver_env_type =
+                decltype(hpx::execution::experimental::get_env(
+                    std::declval<std::decay_t<Receiver> const&>()));
+            using stop_token_type =
+                decltype(std::declval<hpx::experimental::in_place_stop_source>()
+                        .get_token());
+            using prop_type = decltype(hpx::execution::experimental::prop(
+                hpx::execution::experimental::get_stop_token,
+                std::declval<stop_token_type>()));
+            using env_type = decltype(hpx::execution::experimental::make_env(
+                std::declval<receiver_env_type>(), std::declval<prop_type>()));
+
+            env_type get_env() const noexcept;
         };
 
         template <typename Receiver>
@@ -569,7 +579,7 @@ namespace hpx::when_all_vector_detail {
     template <typename Receiver>
     inline auto
     when_all_vector_sender_impl<Sender>::when_all_vector_sender_type::
-        when_all_vector_receiver<Receiver>::get_env() const noexcept
+        when_all_vector_receiver<Receiver>::get_env() const noexcept -> env_type
     {
         // Due to the bug described in the get_env.cpp tests,
         // returning an env constructed directly with the
