@@ -102,6 +102,19 @@ all_symbol_anchors = {}
 
 _doxygen_xml_dir = os.path.abspath(breathe_projects['hpx'])
 _function_signatures_by_qualname = None
+_symbol_kinds_by_qualname = None
+
+# Maps a Doxygen compounddef/memberdef "kind" attribute to the Breathe
+# directive used to document it.
+_DOXYGEN_KIND_TO_DIRECTIVE = {
+    'class': 'doxygenclass',
+    'struct': 'doxygenstruct',
+    'union': 'doxygenclass',
+    'variable': 'doxygenvariable',
+    'enum': 'doxygenenum',
+    'typedef': 'doxygentypedef',
+    'function': 'doxygenfunction',
+}
 
 
 def _load_doxygen_function_signatures():
@@ -150,6 +163,53 @@ def _load_doxygen_function_signatures():
     return signatures
 
 
+def _load_doxygen_symbol_kinds():
+    """Lazily parse the already-generated Doxygen XML once, building a map
+    from fully-qualified symbol name (as it appears in the XML) -> Breathe
+    directive name ("doxygenclass", "doxygenstruct", "doxygenvariable",
+    ...), mirroring the compounddef/memberdef walk already done by
+    _load_doxygen_function_signatures()."""
+    global _symbol_kinds_by_qualname
+    if _symbol_kinds_by_qualname is not None:
+        return _symbol_kinds_by_qualname
+    kinds = {}
+    for xml_path in glob.glob(os.path.join(_doxygen_xml_dir, '*.xml')):
+        if os.path.basename(xml_path) in ('index.xml', 'Doxyfile.xml'):
+            continue
+        try:
+            tree = ET.parse(xml_path)
+        except ET.ParseError:
+            continue
+        for compounddef in tree.getroot().iter('compounddef'):
+            compoundname_el = compounddef.find('compoundname')
+            compoundname = (compoundname_el.text.strip()
+                if compoundname_el is not None and compoundname_el.text else '')
+            # Classes/structs/unions are themselves compounds - record the
+            # compound's own fully-qualified name.
+            compound_directive = _DOXYGEN_KIND_TO_DIRECTIVE.get(
+                compounddef.get('kind'))
+            if compound_directive and compoundname:
+                kinds[compoundname] = compound_directive
+            # Variables, enums, typedefs and functions are members of a
+            # namespace/class compound - qualify them with the enclosing
+            # compound's name, exactly like the overload-disambiguation map
+            # above, so e.g. `hpx::adjacent_find` (a variable in namespace
+            # `hpx`) never collides with an unrelated `detail::adjacent_find`
+            # struct that merely shares the unqualified name.
+            for memberdef in compounddef.iter('memberdef'):
+                name_el = memberdef.find('name')
+                if name_el is None or not name_el.text:
+                    continue
+                name = name_el.text.strip()
+                qualname = f'{compoundname}::{name}' if compoundname else name
+                member_directive = _DOXYGEN_KIND_TO_DIRECTIVE.get(
+                    memberdef.get('kind'))
+                if member_directive:
+                    kinds[qualname] = member_directive
+    _symbol_kinds_by_qualname = kinds
+    return kinds
+
+
 _doc_logger = py_logging.getLogger('hpx.sphinx.doxygen_overloads')
 
 def find_overloads(qualified_name):
@@ -180,23 +240,25 @@ def find_overloads(qualified_name):
     return matches if len(matches) > 1 else []
 
 
-def detect_symbol_kind(content, title):
-    """Guess the Doxygen directive for a \\page-tagged symbol title
-    by searching the header source for its declaration kind."""
-    name = title.split("::")[-1].strip()
-    if not name:
+def detect_symbol_kind(title):
+    """Look up the Breathe directive for a \\page-tagged symbol title from
+    the already-generated Doxygen XML, keyed by the exact fully-qualified
+    name (e.g. `hpx::adjacent_find`). Unlike scanning the raw header text,
+    this can't be fooled by an unrelated same-named symbol declared in a
+    different (e.g. detail) namespace."""
+    if not title:
         return "doxygenfunction"
-    patterns = [
-        (r'\bclass\s+(?:[A-Z_][A-Za-z0-9_]*\s+)?' + re.escape(name) + r'\b',
-            "doxygenclass"),
-        (r'\bstruct\s+(?:[A-Z_][A-Za-z0-9_]*\s+)?' + re.escape(name) + r'\b',
-            "doxygenstruct"),
-        (r'\benum\s+(?:class\s+)?' + re.escape(name) + r'\b', "doxygenenum"),
-    ]
-    for pattern, kind in patterns:
-        if re.search(pattern, content):
-            return kind
-    return "doxygenfunction"
+
+    kinds = _load_doxygen_symbol_kinds()
+    kind = kinds.get(title)
+    if kind is None:
+        _doc_logger.warning(
+            "symbol '%s' not found in Doxygen XML kind map (%d qualified "
+            "names loaded from %s); falling back to doxygenfunction, which "
+            "may fail to resolve.",
+            title, len(kinds), _doxygen_xml_dir)
+        return "doxygenfunction"
+    return kind
 
 
 def get_info_from_file(source):
@@ -226,7 +288,7 @@ def get_info_from_file(source):
                     merged_group.append(title)
         page_groups = [merged_group] if merged_group else [["None"]]
         for title in merged_group:
-            kind_map[title] = detect_symbol_kind(content, title)
+            kind_map[title] = detect_symbol_kind(title)
 
     if not page_groups:
         page_groups = [["None"]]
