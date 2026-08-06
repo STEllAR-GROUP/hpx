@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file post.hpp
-/// \page hpx::post (distributed)
+/// \page hpx::post_distributed hpx::post (distributed)
 /// \headerfile hpx/async.hpp
 
 #pragma once

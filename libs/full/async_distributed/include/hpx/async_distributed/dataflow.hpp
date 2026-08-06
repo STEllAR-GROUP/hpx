@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file dataflow.hpp
-/// \page hpx::dataflow (distributed)
+/// \page hpx::dataflow_distributed hpx::dataflow (distributed)
 /// \headerfile hpx/async.hpp
 
 #pragma once
