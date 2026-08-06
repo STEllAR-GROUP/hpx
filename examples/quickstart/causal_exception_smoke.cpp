@@ -76,8 +76,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
         }
     }
 
-    std::cout << "OK: causal_exception_smoke - all " << iterations
-              << " iterations passed\n";
+    std::cout << "causal_exception_smoke completed (" << iterations
+              << " iterations)\n";
 
     return hpx::local::finalize();
 }
