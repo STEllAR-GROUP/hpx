@@ -234,6 +234,22 @@ namespace hpx::tracy {
             open_fiber_zone(fz, safe_name, col);
         }
 
+        // Embed text into the currently-active fiber zone so it appears in
+        // Tracy's "Zone Info" popup when the user clicks the colored bar on
+        // the timeline. Uses the same ctx stored by open_fiber_zone.
+        HPX_CORE_EXPORT void add_zone_text_to_fiber(
+            char const* txt, std::size_t size) noexcept
+        {
+            auto& fz = current_fiber_zone();
+            if (txt == nullptr || size == 0 || !fz.active || fz.ctx_value == 0)
+                return;
+
+            tracy_context data;
+            data.value = fz.ctx_value;
+            // TracyCZoneText sends the text via the zone validation protocol.
+            TracyCZoneText(data.context, txt, size);
+        }
+
         HPX_CORE_EXPORT char const* rename_region(
             char const* new_region) noexcept
         {

@@ -6,6 +6,8 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(example_programs
+    causal_chain_smoke
+    causal_exception_smoke
     barrier_docs
     composable_guard
     condition_variable_docs

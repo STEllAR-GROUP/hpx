@@ -9,12 +9,14 @@
 
 #if defined(HPX_HAVE_TRACY)
 
+#include <hpx/modules/tracy.hpp>
 #include <hpx/tracing/tracing.hpp>
 
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
+#include <mutex>
 #include <string>
 
 namespace hpx::tracing {
@@ -277,6 +279,118 @@ namespace hpx::tracing {
             const_cast<void*>(task_id));
         hpx::tracy::message(buffer, std::strlen(buffer),
             static_cast<std::uint32_t>(detail::color::deleted));
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    // Causal tracing: future fulfillment signals
+
+    void future_fulfilled(void const* future_id, char const* desc) noexcept
+    {
+        char buffer[256];
+        if (desc)
+        {
+            std::snprintf(buffer, sizeof(buffer), "Future Fulfilled: %p (%s)",
+                const_cast<void*>(future_id), desc);
+        }
+        else
+        {
+            std::snprintf(buffer, sizeof(buffer), "Future Fulfilled: %p",
+                const_cast<void*>(future_id));
+        }
+        std::size_t const len = std::strlen(buffer);
+        // Green: producer signal
+        hpx::tracy::message(buffer, len, 0x00FF00u);
+        // Embed directly into active fiber visual zone text
+        hpx::tracy::detail::add_zone_text_to_fiber(buffer, len);
+    }
+
+    void future_exception_set(void const* future_id, char const* desc) noexcept
+    {
+        char buffer[256];
+        if (desc)
+        {
+            std::snprintf(buffer, sizeof(buffer),
+                "Future Exception Set: %p (%s)", const_cast<void*>(future_id),
+                desc);
+        }
+        else
+        {
+            std::snprintf(buffer, sizeof(buffer), "Future Exception Set: %p",
+                const_cast<void*>(future_id));
+        }
+        std::size_t const len = std::strlen(buffer);
+        // Red: producer error signal
+        hpx::tracy::message(buffer, len, 0xFF0000u);
+        // Embed directly into active fiber visual zone text
+        hpx::tracy::detail::add_zone_text_to_fiber(buffer, len);
+    }
+
+    namespace {
+        std::int64_t g_active_continuations{0};
+        std::mutex g_active_continuations_mtx;
+    }    // namespace
+
+    void continuation_run(void const* task_id) noexcept
+    {
+        char buffer[256];
+        if (task_id)
+        {
+            std::snprintf(buffer, sizeof(buffer), "Continuation Run: %p",
+                const_cast<void*>(task_id));
+        }
+        else
+        {
+            std::snprintf(buffer, sizeof(buffer), "Continuation Run");
+        }
+        std::size_t const len = std::strlen(buffer);
+        // White: consumer signal
+        hpx::tracy::message(buffer, len, 0xFFFFFFu);
+        // Embed directly into active fiber visual zone text
+        hpx::tracy::detail::add_zone_text_to_fiber(buffer, len);
+
+        // Update live time-series plot graph for Active Continuations in Tracy
+        std::int64_t current_active = 0;
+        {
+            std::lock_guard<std::mutex> lock(g_active_continuations_mtx);
+            current_active = ++g_active_continuations;
+            hpx::tracy::sample_value(
+                "Active Continuations", static_cast<double>(current_active));
+        }
+    }
+
+    void continuation_finished(void const* /* task_id */) noexcept
+    {
+        std::int64_t current_active = 0;
+        {
+            std::lock_guard<std::mutex> lock(g_active_continuations_mtx);
+            current_active = --g_active_continuations;
+            hpx::tracy::sample_value(
+                "Active Continuations", static_cast<double>(current_active));
+        }
+    }
+
+    void handle_on_completed_fired(void const* task_id) noexcept
+    {
+        char buffer[256];
+        if (task_id)
+        {
+            std::snprintf(buffer, sizeof(buffer),
+                "Handle On Completed Fired: %p", const_cast<void*>(task_id));
+        }
+        else
+        {
+            std::snprintf(buffer, sizeof(buffer), "Handle On Completed Fired");
+        }
+        std::size_t const len = std::strlen(buffer);
+        // Yellow: dispatch signal
+        hpx::tracy::message(buffer, len, 0xFFFF00u);
+        // Embed directly into active fiber visual zone text
+        hpx::tracy::detail::add_zone_text_to_fiber(buffer, len);
+    }
+
+    void frame_mark(char const* name) noexcept
+    {
+        hpx::tracy::frame_mark(name);
     }
 
     ////////////////////////////////////////////////////////////////////////////

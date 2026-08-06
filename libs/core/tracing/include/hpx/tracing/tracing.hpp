@@ -37,6 +37,12 @@
 /// - \b task_resumed: Task is unblocked and returns to a pending state.
 /// - \b task_completed: Task finishes its execution loop.
 /// - \b task_deleted: Task identity is removed from scheduler maps.
+/// - \b future_fulfilled: Producer-side signal emitted when a future shared
+///   state transitions to the value-ready state. Enables visual correlation
+///   with the consumer thread's subsequent task_resumed event via the shared
+///   future_data pointer in the Tracy message log.
+/// - \b future_exception_set: Producer-side signal emitted when a future
+///   shared state is set with an exception.
 ///
 /// \b Regions \b & \b Events:
 /// - \b region: General scope annotation.
