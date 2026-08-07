@@ -224,7 +224,7 @@ namespace hpx::threads::policies {
                 {
                     addfrom->new_tasks_wait_ +=
                         hpx::chrono::high_resolution_clock::now() -
-                        task.waittime;
+                        task.wait_time;
                     ++addfrom->new_tasks_wait_count_;
                 }
 #endif
@@ -856,9 +856,9 @@ namespace hpx::threads::policies {
                 {
                     std::uint64_t now =
                         hpx::chrono::high_resolution_clock::now();
-                    src->work_items_wait_ += now - trd->waittime;
+                    src->work_items_wait_ += now - trd->wait_time;
                     ++src->work_items_wait_count_;
-                    trd->waittime = now;
+                    trd->wait_time = now;
                 }
 #endif
 
@@ -879,9 +879,9 @@ namespace hpx::threads::policies {
                 {
                     std::int64_t now =
                         hpx::chrono::high_resolution_clock::now();
-                    src->new_tasks_wait_ += now - task.waittime;
+                    src->new_tasks_wait_ += now - task.wait_time;
                     ++src->new_tasks_wait_count_;
-                    task.waittime = now;
+                    task.wait_time = now;
                 }
 #endif
 
@@ -932,7 +932,7 @@ namespace hpx::threads::policies {
                 {
                     work_items_wait_ +=
                         hpx::chrono::high_resolution_clock::now() -
-                        task_desc->waittime;
+                        task_desc->wait_time;
                     ++work_items_wait_count_;
                 }
 
@@ -985,7 +985,7 @@ namespace hpx::threads::policies {
                 {
                     work_items_wait_ +=
                         hpx::chrono::high_resolution_clock::now() -
-                        task_desc->waittime;
+                        task_desc->wait_time;
                     ++work_items_wait_count_;
                 }
 

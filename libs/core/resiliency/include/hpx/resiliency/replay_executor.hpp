@@ -185,35 +185,6 @@ namespace hpx::resiliency::experimental {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    // support all properties exposed by the wrapped executor
-    HPX_CXX_CORE_EXPORT template <typename Tag, typename BaseExecutor,
-        typename Validate, typename Property,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::execution::experimental::is_scheduling_property_v<Tag>)>
-    auto tag_invoke(Tag tag,
-        replay_executor<BaseExecutor, Validate> const& exec, Property&& prop)
-        -> decltype(replay_executor<BaseExecutor, Validate>(
-            std::declval<Tag>()(
-                std::declval<BaseExecutor>(), std::declval<Property>()),
-            std::declval<std::size_t>(), std::declval<Validate>()))
-    {
-        return replay_executor<BaseExecutor, Validate>(
-            tag(exec.get_executor(), HPX_FORWARD(Property, prop)),
-            exec.get_replay_count(), exec.get_validator());
-    }
-
-    HPX_CXX_CORE_EXPORT template <typename Tag, typename BaseExecutor,
-        typename Validate,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::execution::experimental::is_scheduling_property_v<Tag>)>
-    auto tag_invoke(
-        Tag tag, replay_executor<BaseExecutor, Validate> const& exec)
-        -> decltype(std::declval<Tag>()(std::declval<BaseExecutor>()))
-    {
-        return tag(exec.get_executor());
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
     HPX_CXX_CORE_EXPORT template <executor_any BaseExecutor, typename Validate>
     replay_executor<BaseExecutor, std::decay_t<Validate>> make_replay_executor(
         BaseExecutor& exec, std::size_t n, Validate&& validate)

@@ -11,11 +11,14 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #include <hpx/hpx.hpp>
+#include <hpx/modules/preprocessor.hpp>
 #include <hpx/supervision.hpp>
 
 #include <atomic>
 #include <cstdint>
+#include <iostream>
 
+///////////////////////////////////////////////////////////////////////////////
 // publish_event() now validates lifecycle event transitions and rejects
 // invalid ones (see hpx::supervision::is_valid_transition()). Each test
 // therefore needs its own private target: reusing hpx::find_here() as a
@@ -52,5 +55,24 @@ inline void reach_running_at_epoch(hpx::id_type const& locality,
     hpx::supervision::publish_event(hpx::launch::sync, locality, target,
         hpx::supervision::event::running, epoch);
 }
+
+///////////////////////////////////////////////////////////////////////////////
+template <typename... Args>
+void print(Args... args)
+{
+    bool first = true;
+    (...,
+        (first ? (first = false, std::cout << args) :
+                 (std::cout << ", " << args)));
+}
+
+#define HPX_SUPERVISION_TEST_RUN(func, ...)                                    \
+    do                                                                         \
+    {                                                                          \
+        std::cout << HPX_PP_STRINGIZE(func) << "(";                            \
+        print(__VA_ARGS__);                                                    \
+        std::cout << ")\n";                                                    \
+        func(__VA_ARGS__);                                                     \
+    } while (false) /**/
 
 #endif

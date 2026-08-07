@@ -200,6 +200,7 @@ namespace hpx { namespace ranges {
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/parallel/algorithms/detail/tag_dispatch.hpp>
 #include <hpx/parallel/algorithms/shift_right.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 
 #include <iterator>
 #include <ranges>
@@ -210,7 +211,7 @@ namespace hpx::ranges {
 
     HPX_CXX_CORE_EXPORT inline constexpr struct shift_right_t final
       : hpx::detail::tag_dispatch<shift_right_t,
-            hpx::functional::detail::tag_fallback<shift_right_t>>
+            hpx::detail::tag_parallel_algorithm<shift_right_t>>
     {
         template <typename FwdIter, typename Sent, typename Size>
         // clang-format off

@@ -7,9 +7,9 @@
 
 .. _modules_supervision:
 
-===========
-supervision
-===========
+==================
+Supervision module
+==================
 
 The supervision module provides lifecycle event publication, state querying,
 and observer registration for actors/components running on local or remote
@@ -18,12 +18,12 @@ localities.
 Overview
 ========
 
-Four core operations are exposed, each with a local (synchronous) call and
+Several core operations are exposed, each with a local (synchronous) call and
 a remote (locality-qualified, future-returning or ``launch::sync_policy``)
 call:
 
 Publishing events
-------------------
+-----------------
 
 .. cpp:function:: hpx::future<hpx::supervision::publish_result> hpx::supervision::publish_event(hpx::id_type const& locality, hpx::id_type const& target, hpx::supervision::event ev, std::uint64_t epoch = 0)
 .. cpp:function:: hpx::supervision::publish_result hpx::supervision::publish_event(hpx::launch::sync_policy, hpx::id_type const& locality, hpx::id_type const& target, hpx::supervision::event ev, std::uint64_t epoch = 0, hpx::error_code& ec = hpx::throws)
@@ -39,7 +39,7 @@ Publishing events
     ``publish_result::already_terminal``.
 
 Querying lifecycle state
--------------------------
+------------------------
 
 .. cpp:function:: hpx::future<hpx::supervision::lifecycle_state> hpx::supervision::query_state(hpx::id_type const& locality, hpx::id_type const& target)
 .. cpp:function:: hpx::supervision::lifecycle_state hpx::supervision::query_state(hpx::launch::sync_policy, hpx::id_type const& locality, hpx::id_type const& target, hpx::error_code& ec = hpx::throws)
@@ -50,7 +50,7 @@ Querying lifecycle state
     queries whose result may lag the latest event.
 
 Registering observers
-----------------------
+---------------------
 
 .. cpp:function:: hpx::future<hpx::id_type> hpx::supervision::register_observer(hpx::id_type const& locality, hpx::id_type const& target, hpx::supervision::lifecycle_callback const& callback, std::optional<std::uint64_t> epoch_filter = std::nullopt)
 .. cpp:function:: hpx::id_type hpx::supervision::register_observer(hpx::launch::sync_policy, hpx::id_type const& locality, hpx::id_type const& target, hpx::supervision::lifecycle_callback const& callback, std::optional<std::uint64_t> epoch_filter = std::nullopt, hpx::error_code& ec = hpx::throws)
@@ -65,16 +65,36 @@ Registering observers
     receives notifications for every epoch.
 
 Unregistering observers
-------------------------
+-----------------------
 
 .. cpp:function:: hpx::future<void> hpx::supervision::unregister_observer(hpx::id_type const& locality, hpx::id_type const& observer_handle)
 .. cpp:function:: void hpx::supervision::unregister_observer(hpx::launch::sync_policy, hpx::id_type const& locality, hpx::id_type const& observer_handle, hpx::error_code& ec = hpx::throws)
 .. cpp:function:: void hpx::supervision::unregister_observer(hpx::id_type const& observer_handle, hpx::error_code& ec = hpx::throws)
 
-    Unregister a previously registered observer.
+    Unregister a previously registered observer. ``observer_handle`` must
+    have been obtained from ``register_observer``; a handle obtained from
+    ``register_activity_observer``, or any handle never returned by either
+    registration function, is rejected.
+
+Removing target state
+---------------------
+
+.. cpp:function:: hpx::future<void> hpx::supervision::remove_target(hpx::id_type const& locality, hpx::id_type const& target)
+.. cpp:function:: void hpx::supervision::remove_target(hpx::launch::sync_policy, hpx::id_type const& locality, hpx::id_type const& target, hpx::error_code& ec = hpx::throws)
+.. cpp:function:: void hpx::supervision::remove_target(hpx::id_type const& target, hpx::error_code& ec = hpx::throws)
+
+    Clear all locally tracked state for ``target``. Unlike
+    ``unregister_observer``, which removes a single previously registered
+    observer handle, ``remove_target`` unconditionally forgets every piece of
+    local state held for ``target`` - its recorded lifecycle state and
+    current epoch, and any observers still registered for it - regardless of
+    any specific observer handle. Intended for callers that know ``target``
+    will never be queried or observed again locally (e.g. after a failed
+    registration that seeded some state for it, or once a peer has been
+    evicted), so that local state does not accumulate indefinitely.
 
 Waiting for terminal events
------------------------------
+---------------------------
 
 .. cpp:function:: hpx::future<hpx::supervision::lifecycle_state> hpx::supervision::await_terminal(hpx::id_type const& locality, hpx::id_type const& target, std::uint64_t epoch = 0, std::chrono::steady_clock::duration timeout = std::chrono::steady_clock::duration::max())
 .. cpp:function:: hpx::supervision::lifecycle_state hpx::supervision::await_terminal(hpx::launch::sync_policy, hpx::id_type const& locality, hpx::id_type const& target, std::uint64_t epoch = 0, std::chrono::steady_clock::duration timeout = std::chrono::steady_clock::duration::max(), hpx::error_code& ec = hpx::throws)
@@ -87,13 +107,87 @@ Waiting for terminal events
     ``target`` in ``epoch``, the returned future is immediately satisfied
     with that state. Waits are scoped to a single epoch: if ``target``'s
     epoch advances past ``epoch`` before a terminal event occurs, any
-   outstanding waiter for the stale epoch is invalidated. A waiter that
+    outstanding waiter for the stale epoch is invalidated. A waiter that
     reaches neither of these outcomes is bounded by ``timeout`` (or a
     built-in default if ``timeout`` is left at its sentinel value
     ``std::chrono::steady_clock::duration::max()``), after which it is
     swept and invalidated. Dispatch is routed locally when ``target``'s
     supervision manager lives on the calling locality, and remotely (via a
     registered distributed action) otherwise.
+
+Checking dispatch admission
+---------------------------
+
+.. cpp:function:: hpx::supervision::dispatch_outcome hpx::supervision::check_admission(hpx::id_type const& target, std::uint64_t epoch = 0)
+
+    Check whether ``target`` currently admits new dispatch under ``epoch``,
+    i.e. whether it is safe to schedule or route work to it right now. This
+    is a pure, ``noexcept`` local read of the same terminal latch state
+    consulted by ``await_terminal``: it returns
+    ``dispatch_outcome::rejected_fenced`` if ``target`` has already latched a
+    terminal event (``event::completed`` or ``event::failed``) under
+    ``epoch``, and ``dispatch_outcome::admitted`` otherwise. Unlike
+    ``publish_result``, which reports how a publication was resolved,
+    ``dispatch_outcome`` answers the separate, consumer-side question of
+    whether dispatch should proceed; it must only be called on the locality
+    ``target`` lives on.
+
+    This admission fence is scoped to a single locality's latch state: it
+    reflects only terminal events published to the supervision manager
+    hosting ``target``, and it fails open (returns ``admitted``) when
+    ``target`` is unknown locally, including when its terminal event was
+    only ever published elsewhere. There is no built-in mechanism that
+    propagates terminal latch state across localities - observer
+    registration delivers notifications, not admission state. Any
+    additional locality that needs to fence its own dispatch decisions on
+    ``target`` must independently mirror or route to the owning locality's
+    state; this module does not provide that for you.
+
+Registering activity observers
+------------------------------
+
+.. cpp:function:: hpx::future<hpx::id_type> hpx::supervision::register_activity_observer(hpx::id_type const& locality, hpx::supervision::activity_callback const& callback, std::optional<std::uint64_t> epoch_filter = std::nullopt)
+.. cpp:function:: hpx::id_type hpx::supervision::register_activity_observer(hpx::launch::sync_policy, hpx::id_type const& locality, hpx::supervision::activity_callback const& callback, std::optional<std::uint64_t> epoch_filter = std::nullopt, hpx::error_code& ec = hpx::throws)
+.. cpp:function:: hpx::id_type hpx::supervision::register_activity_observer(hpx::supervision::activity_callback const& callback, std::optional<std::uint64_t> epoch_filter = std::nullopt, hpx::error_code& ec = hpx::throws)
+
+    Register ``callback`` to observe activity-state transitions (between
+    ``hpx::supervision::activity_state::inactive`` and ``active``) of *all*
+    targets tracked by a locality's supervision manager. Unlike
+    ``register_observer``, none of these overloads take a ``target``
+    parameter: the feature reports on every target the addressed manager
+    tracks rather than on a single one.
+
+    Registering an activity observer for an already-active target triggers a
+    replay of its current state. The snapshot of tracked state and the
+    insertion of the observer are performed atomically under the manager's
+    internal lock, which guarantees exactly-once delivery: the observer
+    receives either the replay or a live transition that raced with
+    registration, but never both and never neither.
+
+    Note that the notification itself (replay or live) is delivered after the
+    lock is released. Its delivery order relative to any other concurrent live
+    notification for the same target is *not* guaranteed, only the
+    exactly-once property is guaranteed, not relative ordering.
+
+    Activity notifications are a pure discovery/notification signal: unlike
+    ``publish_event``, registering or unregistering an activity observer
+    never feeds the terminal latch consulted by ``check_admission``.
+
+    If ``epoch_filter`` is set, ``callback`` only receives notifications -
+    including the registration-time replay - whose epoch matches; by
+    default it receives notifications regardless of epoch.
+
+Unregistering activity observers
+--------------------------------
+
+.. cpp:function:: hpx::future<void> hpx::supervision::unregister_activity_observer(hpx::id_type const& locality, hpx::id_type const& observer_handle)
+.. cpp:function:: void hpx::supervision::unregister_activity_observer(hpx::launch::sync_policy, hpx::id_type const& locality, hpx::id_type const& observer_handle, hpx::error_code& ec = hpx::throws)
+.. cpp:function:: void hpx::supervision::unregister_activity_observer(hpx::id_type const& observer_handle, hpx::error_code& ec = hpx::throws)
+
+    Unregister a previously registered activity observer. ``observer_handle``
+    must have been obtained from ``register_activity_observer``; a
+    handle obtained from ``register_observer``, or any handle never returned
+    by either registration function, is rejected.
 
 See the :ref:`API reference <modules_supervision_api>` of this module for
 more details.

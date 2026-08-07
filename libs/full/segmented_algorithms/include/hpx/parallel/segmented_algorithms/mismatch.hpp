@@ -344,7 +344,7 @@ namespace hpx::segmented {
             hpx::traits::is_segmented_iterator_v<SegIter1> &&
             hpx::traits::is_iterator_v<SegIter2> &&
             hpx::traits::is_segmented_iterator_v<SegIter2>)
-    std::pair<SegIter1, SegIter2> tag_invoke(hpx::mismatch_t, SegIter1 first1,
+    std::pair<SegIter1, SegIter2> hpx_invoke(hpx::mismatch_t, SegIter1 first1,
         SegIter1 last1, SegIter2 first2, Pred&& pred = Pred())
     {
         static_assert(std::forward_iterator<SegIter1>,
@@ -369,7 +369,7 @@ namespace hpx::segmented {
             hpx::traits::is_segmented_iterator_v<SegIter2>)
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
         std::pair<SegIter1, SegIter2>>
-    tag_invoke(hpx::mismatch_t, ExPolicy&& policy, SegIter1 first1,
+    hpx_invoke(hpx::mismatch_t, ExPolicy&& policy, SegIter1 first1,
         SegIter1 last1, SegIter2 first2, Pred&& pred = Pred())
     {
         static_assert(std::forward_iterator<SegIter1>,
@@ -399,7 +399,7 @@ namespace hpx::segmented {
             hpx::traits::is_segmented_iterator_v<SegIter1> &&
             hpx::traits::is_iterator_v<SegIter2> &&
             hpx::traits::is_segmented_iterator_v<SegIter2>)
-    std::pair<SegIter1, SegIter2> tag_invoke(hpx::mismatch_t, SegIter1 first1,
+    std::pair<SegIter1, SegIter2> hpx_invoke(hpx::mismatch_t, SegIter1 first1,
         SegIter1 last1, SegIter2 first2, SegIter2 last2, Pred&& pred = Pred())
     {
         static_assert(std::forward_iterator<SegIter1>,
@@ -433,7 +433,7 @@ namespace hpx::segmented {
             hpx::traits::is_segmented_iterator_v<SegIter2>)
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
         std::pair<SegIter1, SegIter2>>
-    tag_invoke(hpx::mismatch_t, ExPolicy&& policy, SegIter1 first1,
+    hpx_invoke(hpx::mismatch_t, ExPolicy&& policy, SegIter1 first1,
         SegIter1 last1, SegIter2 first2, SegIter2 last2, Pred&& pred = Pred())
     {
         static_assert(std::forward_iterator<SegIter1>,

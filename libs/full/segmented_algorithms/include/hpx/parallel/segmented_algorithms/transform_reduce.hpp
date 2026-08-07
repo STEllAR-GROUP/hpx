@@ -363,7 +363,7 @@ namespace hpx::segmented {
         typename Convert>
         requires(hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter>)
-    std::decay_t<T> tag_invoke(hpx::transform_reduce_t, SegIter first,
+    std::decay_t<T> hpx_invoke(hpx::transform_reduce_t, SegIter first,
         SegIter last, T&& init, Reduce&& red_op, Convert&& conv_op)
     {
         static_assert(
@@ -389,7 +389,7 @@ namespace hpx::segmented {
             hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter>)
     parallel::util::detail::algorithm_result_t<ExPolicy, std::decay_t<T>>
-    tag_invoke(hpx::transform_reduce_t, ExPolicy&& policy, SegIter first,
+    hpx_invoke(hpx::transform_reduce_t, ExPolicy&& policy, SegIter first,
         SegIter last, T&& init, Reduce&& red_op, Convert&& conv_op)
     {
         static_assert(std::forward_iterator<SegIter>,
@@ -417,7 +417,7 @@ namespace hpx::segmented {
             hpx::traits::is_segmented_iterator_v<FwdIter1> &&
             hpx::traits::is_iterator_v<FwdIter2> &&
             hpx::traits::is_segmented_iterator_v<FwdIter2>)
-    T tag_invoke(hpx::transform_reduce_t, FwdIter1 first1, FwdIter1 last1,
+    T hpx_invoke(hpx::transform_reduce_t, FwdIter1 first1, FwdIter1 last1,
         FwdIter2 first2, T init, Reduce&& red_op, Convert&& conv_op)
     {
         static_assert(
@@ -443,7 +443,7 @@ namespace hpx::segmented {
             hpx::traits::is_segmented_iterator_v<FwdIter1> &&
             hpx::traits::is_iterator_v<FwdIter2> &&
             hpx::traits::is_segmented_iterator_v<FwdIter2>)
-    parallel::util::detail::algorithm_result_t<ExPolicy, T> tag_invoke(
+    parallel::util::detail::algorithm_result_t<ExPolicy, T> hpx_invoke(
         hpx::transform_reduce_t, ExPolicy&& policy, FwdIter1 first1,
         FwdIter1 last1, FwdIter2 first2, T init, Reduce&& red_op,
         Convert&& conv_op)

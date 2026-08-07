@@ -174,7 +174,7 @@ namespace hpx::segmented {
     HPX_CXX_EXPORT template <typename SegIter, typename F>
         requires(hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter>)
-    SegIter tag_invoke(hpx::generate_t, SegIter first, SegIter last, F&& f)
+    SegIter hpx_invoke(hpx::generate_t, SegIter first, SegIter last, F&& f)
     {
         static_assert(std::forward_iterator<SegIter>,
             "Requires at least forward iterator.");
@@ -197,7 +197,7 @@ namespace hpx::segmented {
         requires(hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter> &&
             std::is_integral_v<Size>)
-    SegIter tag_invoke(hpx::generate_n_t, SegIter first, Size count, F&& f)
+    SegIter hpx_invoke(hpx::generate_n_t, SegIter first, Size count, F&& f)
     {
         static_assert(std::forward_iterator<SegIter>,
             "Requires at least forward iterator.");
@@ -222,7 +222,7 @@ namespace hpx::segmented {
         requires(hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter>)
-    parallel::util::detail::algorithm_result_t<ExPolicy, SegIter> tag_invoke(
+    parallel::util::detail::algorithm_result_t<ExPolicy, SegIter> hpx_invoke(
         hpx::generate_t, ExPolicy&& policy, SegIter first, SegIter last, F&& f)
     {
         static_assert(std::forward_iterator<SegIter>,
@@ -251,7 +251,7 @@ namespace hpx::segmented {
             hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter> &&
             std::is_integral_v<Size>)
-    parallel::util::detail::algorithm_result_t<ExPolicy, SegIter> tag_invoke(
+    parallel::util::detail::algorithm_result_t<ExPolicy, SegIter> hpx_invoke(
         hpx::generate_n_t, ExPolicy&& policy, SegIter first, Size count, F&& f)
     {
         static_assert(std::forward_iterator<SegIter>,

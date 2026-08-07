@@ -10,6 +10,7 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <atomic>

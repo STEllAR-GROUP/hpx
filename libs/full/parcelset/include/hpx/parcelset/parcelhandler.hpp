@@ -231,6 +231,15 @@ namespace hpx::parcelset {
             return endpoints_;
         }
 
+        /// \brief re-read the local endpoint of every enabled parcelport
+        ///
+        /// The endpoints are recorded when a parcelport is attached, which
+        /// happens before it binds. A parcelport that is told to let the
+        /// operating system choose its port only learns the real one at bind
+        /// time, so the recorded endpoint has to be refreshed afterwards and
+        /// before it is published to AGAS.
+        void update_endpoints();
+
         void enable_alternative_parcelports()
         {
             use_alternative_parcelports_.store(true);

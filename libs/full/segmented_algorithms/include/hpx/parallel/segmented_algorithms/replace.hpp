@@ -10,7 +10,6 @@
 #include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/executors.hpp>
 #include <hpx/modules/functional.hpp>
-#include <hpx/modules/tag_invoke.hpp>
 
 #include <hpx/parallel/segmented_algorithms/for_each.hpp>
 
@@ -92,7 +91,7 @@ namespace hpx::segmented {
     HPX_CXX_EXPORT template <typename SegIter, typename T>
         requires(hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter>)
-    SegIter tag_invoke(hpx::replace_t, SegIter first, SegIter last,
+    SegIter hpx_invoke(hpx::replace_t, SegIter first, SegIter last,
         T const& old_value, T const& new_value)
     {
         static_assert(hpx::traits::is_forward_iterator_v<SegIter>,
@@ -118,7 +117,7 @@ namespace hpx::segmented {
             hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter>)
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy, SegIter>
-    tag_invoke(hpx::replace_t, ExPolicy&& policy, SegIter first, SegIter last,
+    hpx_invoke(hpx::replace_t, ExPolicy&& policy, SegIter first, SegIter last,
         T const& old_value, T const& new_value)
     {
         static_assert(hpx::traits::is_forward_iterator_v<SegIter>,
@@ -148,7 +147,7 @@ namespace hpx::segmented {
     HPX_CXX_EXPORT template <typename SegIter, typename Pred, typename T>
         requires(hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter>)
-    SegIter tag_invoke(hpx::replace_if_t, SegIter first, SegIter last,
+    SegIter hpx_invoke(hpx::replace_if_t, SegIter first, SegIter last,
         Pred&& pred, T const& new_value)
     {
         static_assert(hpx::traits::is_forward_iterator_v<SegIter>,
@@ -176,7 +175,7 @@ namespace hpx::segmented {
             hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter>)
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy, SegIter>
-    tag_invoke(hpx::replace_if_t, ExPolicy&& policy, SegIter first,
+    hpx_invoke(hpx::replace_if_t, ExPolicy&& policy, SegIter first,
         SegIter last, Pred&& pred, T const& new_value)
     {
         static_assert(hpx::traits::is_forward_iterator_v<SegIter>,

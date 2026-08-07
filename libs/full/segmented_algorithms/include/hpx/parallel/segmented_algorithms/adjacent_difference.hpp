@@ -12,7 +12,6 @@
 #include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/executors.hpp>
 #include <hpx/modules/functional.hpp>
-#include <hpx/modules/tag_invoke.hpp>
 
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
 
@@ -249,7 +248,7 @@ namespace hpx::segmented {
             hpx::traits::is_iterator_v<FwdIter2> &&
             hpx::traits::is_segmented_iterator_v<FwdIter2>)
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter2>
-    tag_invoke(hpx::adjacent_difference_t, ExPolicy&& policy, FwdIter1 first,
+    hpx_invoke(hpx::adjacent_difference_t, ExPolicy&& policy, FwdIter1 first,
         FwdIter1 last, FwdIter2 dest, Op&& op)
     {
         static_assert(std::forward_iterator<FwdIter1>,
@@ -280,7 +279,7 @@ namespace hpx::segmented {
             hpx::traits::is_segmented_iterator_v<InIter1> &&
             hpx::traits::is_iterator_v<InIter2> &&
             hpx::traits::is_segmented_iterator_v<InIter2>)
-    InIter2 tag_invoke(hpx::adjacent_difference_t, InIter1 first, InIter1 last,
+    InIter2 hpx_invoke(hpx::adjacent_difference_t, InIter1 first, InIter1 last,
         InIter2 dest, Op&& op)
     {
         static_assert(

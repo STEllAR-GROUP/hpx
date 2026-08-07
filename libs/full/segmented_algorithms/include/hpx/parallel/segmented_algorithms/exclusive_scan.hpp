@@ -237,7 +237,7 @@ namespace hpx::segmented {
             hpx::is_invocable_v<Op,
                 typename std::iterator_traits<InIter>::value_type,
                 typename std::iterator_traits<InIter>::value_type>)
-    OutIter tag_invoke(hpx::exclusive_scan_t, InIter first, InIter last,
+    OutIter hpx_invoke(hpx::exclusive_scan_t, InIter first, InIter last,
         OutIter dest, T init, Op&& op = Op())
     {
         static_assert(
@@ -265,7 +265,7 @@ namespace hpx::segmented {
             hpx::is_invocable_v<Op,
                 typename std::iterator_traits<FwdIter1>::value_type,
                 typename std::iterator_traits<FwdIter1>::value_type>)
-    parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter2> tag_invoke(
+    parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter2> hpx_invoke(
         hpx::exclusive_scan_t, ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
         FwdIter2 dest, T init, Op&& op = Op())
     {

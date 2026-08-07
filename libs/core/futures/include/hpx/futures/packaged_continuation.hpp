@@ -17,6 +17,7 @@
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/threading_base.hpp>
 
@@ -206,6 +207,12 @@ namespace hpx::lcos::detail {
         template <bool Unwrap>
         void run_impl(traits::detail::shared_state_ptr_for_t<Future>&& f)
         {
+            hpx::tracing::continuation_run(f.get());
+            auto on_exit =
+                hpx::experimental::scope_exit([id = f.get()]() noexcept {
+                    hpx::tracing::continuation_finished(id);
+                });
+
             auto future = traits::future_access<std::decay_t<Future>>::create(
                 HPX_MOVE(f));
             if constexpr (Unwrap)
