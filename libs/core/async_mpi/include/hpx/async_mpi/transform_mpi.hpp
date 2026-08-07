@@ -16,7 +16,6 @@
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/mpi_base.hpp>
-#include <hpx/modules/tag_invoke.hpp>
 
 #include <exception>
 #include <type_traits>
@@ -25,6 +24,15 @@
 namespace hpx::mpi::experimental {
 
     namespace detail {
+
+        // Detects whether an ADL customization point `hpx_invoke(tag, args...)`
+        // has been defined for the given CPO `Tag`. This is the replacement
+        // hook for external customizations of `transform_mpi_t`, used in
+        // place of the legacy tag-based dispatch.
+        template <typename Tag, typename... Args>
+        concept has_hpx_invoke = requires(Tag const& tag, Args&&... args) {
+            hpx_invoke(tag, HPX_FORWARD(Args, args)...);
+        };
 
         template <typename R, typename... Ts>
         void set_value_request_callback_helper(
@@ -265,21 +273,30 @@ namespace hpx::mpi::experimental {
     }    // namespace detail
 
     HPX_CXX_CORE_EXPORT inline constexpr struct transform_mpi_t final
-      : hpx::functional::detail::tag_fallback<transform_mpi_t>
     {
-    private:
+        // Dispatch order (mirrors the previous tag_fallback semantics):
+        //   1. hpx_invoke(tag, args...)  external customization (new hook)
+        //   2. the default bodies below
+        template <typename... Args>
+            requires(detail::has_hpx_invoke<transform_mpi_t, Args...>)
+        constexpr HPX_FORCEINLINE decltype(auto) operator()(
+            Args&&... args) const
+        {
+            return hpx_invoke(*this, HPX_FORWARD(Args, args)...);
+        }
+
         template <typename Sender, typename F>
-            requires(hpx::execution::experimental::is_sender_v<Sender>)
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
-            transform_mpi_t, Sender&& s, F&& f)
+            requires(hpx::execution::experimental::is_sender_v<Sender> &&
+                !detail::has_hpx_invoke<transform_mpi_t, Sender, F>)
+        constexpr HPX_FORCEINLINE auto operator()(Sender&& s, F&& f) const
         {
             return detail::transform_mpi_sender<Sender, F>{
                 HPX_FORWARD(Sender, s), HPX_FORWARD(F, f)};
         }
 
         template <typename F>
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
-            transform_mpi_t, F&& f)
+            requires(!detail::has_hpx_invoke<transform_mpi_t, F>)
+        constexpr HPX_FORCEINLINE auto operator()(F&& f) const
         {
             return ::hpx::execution::experimental::detail::partial_algorithm<
                 transform_mpi_t, F>{HPX_FORWARD(F, f)};

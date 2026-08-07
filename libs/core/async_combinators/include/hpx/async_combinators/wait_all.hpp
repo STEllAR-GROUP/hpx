@@ -336,7 +336,6 @@ namespace hpx {
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
 
 #include <algorithm>
@@ -659,7 +658,6 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_CXX_CORE_EXPORT inline constexpr struct wait_all_nothrow_t final
-      : hpx::functional::tag<wait_all_nothrow_t>
     {
     private:
         template <typename Future>
@@ -680,29 +678,6 @@ namespace hpx {
             return false;
         }
 
-        template <typename Future>
-        friend bool tag_invoke(
-            wait_all_nothrow_t, std::vector<Future> const& values)
-        {
-            return wait_all_nothrow_t::wait_all_nothrow_impl(values);
-        }
-
-        template <typename Future>
-        friend HPX_WAIT_ALL_FORCEINLINE bool tag_invoke(
-            wait_all_nothrow_t, std::vector<Future>& values)
-        {
-            return wait_all_nothrow_t::wait_all_nothrow_impl(
-                const_cast<std::vector<Future> const&>(values));
-        }
-
-        template <typename Future>
-        friend HPX_WAIT_ALL_FORCEINLINE bool tag_invoke(
-            wait_all_nothrow_t, std::vector<Future>&& values)
-        {
-            return wait_all_nothrow_t::wait_all_nothrow_impl(
-                const_cast<std::vector<Future> const&>(values));
-        }
-
         template <typename Future, std::size_t N>
         static bool wait_all_nothrow_impl(std::array<Future, N> const& values)
         {
@@ -716,16 +691,38 @@ namespace hpx {
             return frame->wait_all();
         }
 
+    public:
+        template <typename Future>
+        bool operator()(std::vector<Future> const& values) const
+        {
+            return wait_all_nothrow_t::wait_all_nothrow_impl(values);
+        }
+
+        template <typename Future>
+        HPX_WAIT_ALL_FORCEINLINE bool operator()(
+            std::vector<Future>& values) const
+        {
+            return wait_all_nothrow_t::wait_all_nothrow_impl(
+                const_cast<std::vector<Future> const&>(values));
+        }
+
+        template <typename Future>
+        HPX_WAIT_ALL_FORCEINLINE bool operator()(
+            std::vector<Future>&& values) const
+        {
+            return wait_all_nothrow_t::wait_all_nothrow_impl(
+                const_cast<std::vector<Future> const&>(values));
+        }
+
         template <typename Future, std::size_t N>
-        friend bool tag_invoke(
-            wait_all_nothrow_t, std::array<Future, N> const& values)
+        bool operator()(std::array<Future, N> const& values) const
         {
             return wait_all_nothrow_t::wait_all_nothrow_impl(values);
         }
 
         template <typename Future, std::size_t N>
-        friend HPX_WAIT_ALL_FORCEINLINE bool tag_invoke(
-            wait_all_nothrow_t, std::array<Future, N>& values)
+        HPX_WAIT_ALL_FORCEINLINE bool operator()(
+            std::array<Future, N>& values) const
         {
             return wait_all_nothrow_t::wait_all_nothrow_impl(
                 const_cast<std::array<Future, N> const&>(values));
@@ -733,7 +730,7 @@ namespace hpx {
 
         template <typename Iterator>
             requires(hpx::traits::is_iterator_v<Iterator>)
-        friend bool tag_invoke(wait_all_nothrow_t, Iterator begin, Iterator end)
+        bool operator()(Iterator begin, Iterator end) const
         {
             if (begin == end)
             {
@@ -744,14 +741,13 @@ namespace hpx {
             return wait_all_nothrow_t::wait_all_nothrow_impl(values);
         }
 
-        friend HPX_WAIT_ALL_FORCEINLINE constexpr bool tag_invoke(
-            wait_all_nothrow_t) noexcept
+        HPX_WAIT_ALL_FORCEINLINE constexpr bool operator()() const noexcept
         {
             return false;
         }
 
         template <typename... Ts>
-        friend bool tag_invoke(wait_all_nothrow_t, Ts&&... ts)
+        bool operator()(Ts&&... ts) const
         {
             if constexpr (sizeof...(Ts) != 0)
             {
@@ -774,16 +770,15 @@ namespace hpx {
         }
 
         template <typename T>
-        friend HPX_WAIT_ALL_FORCEINLINE bool tag_invoke(
-            wait_all_nothrow_t, hpx::future<T> const& f)
+        HPX_WAIT_ALL_FORCEINLINE bool operator()(hpx::future<T> const& f) const
         {
             f.wait();
             return f.has_exception();
         }
 
         template <typename T>
-        friend HPX_WAIT_ALL_FORCEINLINE bool tag_invoke(
-            wait_all_nothrow_t, hpx::shared_future<T> const& f)
+        HPX_WAIT_ALL_FORCEINLINE bool operator()(
+            hpx::shared_future<T> const& f) const
         {
             f.wait();
             return f.has_exception();
@@ -792,12 +787,10 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_CXX_CORE_EXPORT inline constexpr struct wait_all_t final
-      : hpx::functional::tag<wait_all_t>
     {
-    private:
         template <typename Future>
-        friend HPX_WAIT_ALL_FORCEINLINE void tag_invoke(
-            wait_all_t, std::vector<Future> const& values)
+        HPX_WAIT_ALL_FORCEINLINE void operator()(
+            std::vector<Future> const& values) const
         {
             if (hpx::wait_all_nothrow(values))
             {
@@ -806,8 +799,8 @@ namespace hpx {
         }
 
         template <typename Future>
-        friend HPX_WAIT_ALL_FORCEINLINE void tag_invoke(
-            wait_all_t, std::vector<Future>& values)
+        HPX_WAIT_ALL_FORCEINLINE void operator()(
+            std::vector<Future>& values) const
         {
             if (hpx::wait_all_nothrow(
                     const_cast<std::vector<Future> const&>(values)))
@@ -817,8 +810,8 @@ namespace hpx {
         }
 
         template <typename Future>
-        friend HPX_WAIT_ALL_FORCEINLINE void tag_invoke(
-            wait_all_t, std::vector<Future>&& values)
+        HPX_WAIT_ALL_FORCEINLINE void operator()(
+            std::vector<Future>&& values) const
         {
             if (hpx::wait_all_nothrow(
                     const_cast<std::vector<Future> const&>(values)))
@@ -828,8 +821,8 @@ namespace hpx {
         }
 
         template <typename Future, std::size_t N>
-        friend HPX_WAIT_ALL_FORCEINLINE void tag_invoke(
-            wait_all_t, std::array<Future, N> const& values)
+        HPX_WAIT_ALL_FORCEINLINE void operator()(
+            std::array<Future, N> const& values) const
         {
             if (hpx::wait_all_nothrow(values))
             {
@@ -838,8 +831,8 @@ namespace hpx {
         }
 
         template <typename Future, std::size_t N>
-        friend HPX_WAIT_ALL_FORCEINLINE void tag_invoke(
-            wait_all_t, std::array<Future, N>& values)
+        HPX_WAIT_ALL_FORCEINLINE void operator()(
+            std::array<Future, N>& values) const
         {
             if (hpx::wait_all_nothrow(
                     const_cast<std::array<Future, N> const&>(values)))
@@ -849,8 +842,8 @@ namespace hpx {
         }
 
         template <typename Future, std::size_t N>
-        friend HPX_WAIT_ALL_FORCEINLINE void tag_invoke(
-            wait_all_t, std::array<Future, N>&& values)
+        HPX_WAIT_ALL_FORCEINLINE void operator()(
+            std::array<Future, N>&& values) const
         {
             if (hpx::wait_all_nothrow(
                     const_cast<std::array<Future, N> const&>(values)))
@@ -861,7 +854,7 @@ namespace hpx {
 
         template <typename Iterator>
             requires(hpx::traits::is_iterator_v<Iterator>)
-        friend void tag_invoke(wait_all_t, Iterator begin, Iterator end)
+        void operator()(Iterator begin, Iterator end) const
         {
             if (begin != end)
             {
@@ -874,10 +867,10 @@ namespace hpx {
             }
         }
 
-        friend HPX_WAIT_ALL_FORCEINLINE void tag_invoke(wait_all_t) noexcept {}
+        HPX_WAIT_ALL_FORCEINLINE void operator()() const noexcept {}
 
         template <typename... Ts>
-        friend HPX_WAIT_ALL_FORCEINLINE void tag_invoke(wait_all_t, Ts&&... ts)
+        HPX_WAIT_ALL_FORCEINLINE void operator()(Ts&&... ts) const
         {
             if (hpx::wait_all_nothrow(ts...))
             {
@@ -886,8 +879,7 @@ namespace hpx {
         }
 
         template <typename T>
-        friend HPX_WAIT_ALL_FORCEINLINE void tag_invoke(
-            wait_all_t, hpx::future<T> const& f)
+        HPX_WAIT_ALL_FORCEINLINE void operator()(hpx::future<T> const& f) const
         {
             if (hpx::wait_all_nothrow(f))
             {
@@ -896,8 +888,8 @@ namespace hpx {
         }
 
         template <typename T>
-        friend HPX_WAIT_ALL_FORCEINLINE void tag_invoke(
-            wait_all_t, hpx::shared_future<T> const& f)
+        HPX_WAIT_ALL_FORCEINLINE void operator()(
+            hpx::shared_future<T> const& f) const
         {
             if (hpx::wait_all_nothrow(f))
             {
@@ -908,13 +900,10 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_CXX_CORE_EXPORT inline constexpr struct wait_all_n_nothrow_t final
-      : hpx::functional::tag<wait_all_n_nothrow_t>
     {
-    private:
         template <typename Iterator>
             requires(hpx::traits::is_iterator_v<Iterator>)
-        friend bool tag_invoke(
-            wait_all_n_nothrow_t, Iterator begin, std::size_t count)
+        bool operator()(Iterator begin, std::size_t count) const
         {
             if (count == 0)
             {
@@ -929,12 +918,10 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_CXX_CORE_EXPORT inline constexpr struct wait_all_n_t final
-      : hpx::functional::tag<wait_all_n_t>
     {
-    private:
         template <typename Iterator>
             requires(hpx::traits::is_iterator_v<Iterator>)
-        friend void tag_invoke(wait_all_n_t, Iterator begin, std::size_t count)
+        void operator()(Iterator begin, std::size_t count) const
         {
             if (count != 0)
             {

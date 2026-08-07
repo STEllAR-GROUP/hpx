@@ -7,8 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-// TODO(tag_invoke-removal): drop with has_legacy_tag_invoke in upcoming PR.
-#include <hpx/modules/tag_invoke.hpp>
 
 #include <utility>
 
@@ -17,17 +15,10 @@ namespace hpx::detail {
     // Detects whether an ADL customization point `hpx_invoke(tag, args...)`
     // has been defined for the given CPO `Tag`. This is the replacement hook
     // for external customizations of core algorithm CPOs (e.g. by
-    // full/segmented_algorithms), used in place of `tag_invoke`.
+    // full/segmented_algorithms), used in place of the legacy tag-based dispatch.
     template <typename Tag, typename... Args>
     concept has_hpx_invoke = requires(Tag const& tag, Args&&... args) {
         hpx_invoke(tag, HPX_FORWARD(Args, args)...);
-    };
-
-    // TODO(tag_invoke-removal): drop once full/segmented_algorithms migrate to
-    // `hpx_invoke` and upcoming PR removes the legacy probe below.
-    template <typename Tag, typename... Args>
-    concept has_legacy_tag_invoke = requires(Tag const& tag, Args&&... args) {
-        tag_invoke(tag, HPX_FORWARD(Args, args)...);
     };
 
     template <typename Tag, typename... Args>
@@ -51,11 +42,6 @@ namespace hpx::detail {
                 return noexcept(hpx_invoke(
                     std::declval<Tag const&>(), std::declval<Args>()...));
             }
-            else if constexpr (has_legacy_tag_invoke<Tag, Args...>)
-            {
-                return hpx::functional::is_nothrow_tag_invocable_v<Tag,
-                    Args...>;
-            }
             else if constexpr (has_invoke_default<Tag, Args...>)
             {
                 return noexcept(Tag::invoke_default(std::declval<Args>()...));
@@ -77,9 +63,8 @@ namespace hpx::detail {
     // hpx::functional::detail::tag_fallback<Tag>. Dispatch order:
     //
     //   1. hpx_invoke(tag, args...)       external customization (new hook)
-    //   2. tag_invoke(tag, args...)       legacy external customization
-    //   3. Tag::invoke_default(args...) algorithm default (was tag_fallback_invoke)
-    //   4. Base::operator()(args...)      sender/policy/scheduler (e.g.
+    //   2. Tag::invoke_default(args...) algorithm default (was tag_fallback_invoke)
+    //   3. Base::operator()(args...)      sender/policy/scheduler (e.g.
     //                                     tag_parallel_algorithm)
     //
     // `Base` keeps working exactly as before (unmodified); this mixin only
@@ -91,7 +76,6 @@ namespace hpx::detail {
     {
         template <typename... Args>
             requires(has_hpx_invoke<Tag, Args...> ||
-                has_legacy_tag_invoke<Tag, Args...> ||
                 has_invoke_default<Tag, Args...> ||
                 requires(Base const& base, Args&&... args) {
                     base(HPX_FORWARD(Args, args)...);
@@ -104,11 +88,6 @@ namespace hpx::detail {
             if constexpr (has_hpx_invoke<Tag, Args...>)
             {
                 return hpx_invoke(tag, HPX_FORWARD(Args, args)...);
-            }
-            // TODO(tag_invoke-removal): remove this branch in upcoming PR
-            else if constexpr (has_legacy_tag_invoke<Tag, Args...>)
-            {
-                return tag_invoke(tag, HPX_FORWARD(Args, args)...);
             }
             else if constexpr (has_invoke_default<Tag, Args...>)
             {

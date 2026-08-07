@@ -33,7 +33,7 @@ namespace hpx::segmented {
             hpx::traits::is_segmented_iterator_v<InIter> &&
             hpx::traits::is_iterator_v<OutIter> &&
             hpx::traits::is_segmented_iterator_v<OutIter>)
-    OutIter tag_invoke(hpx::transform_exclusive_scan_t, InIter first,
+    OutIter hpx_invoke(hpx::transform_exclusive_scan_t, InIter first,
         InIter last, OutIter dest, T init, Op&& op, Conv&& conv)
     {
         static_assert(
@@ -58,7 +58,7 @@ namespace hpx::segmented {
             hpx::traits::is_segmented_iterator_v<FwdIter1> &&
             hpx::traits::is_iterator_v<FwdIter2> &&
             hpx::traits::is_segmented_iterator_v<FwdIter2>)
-    parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter2> tag_invoke(
+    parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter2> hpx_invoke(
         hpx::transform_exclusive_scan_t, ExPolicy&& policy, FwdIter1 first,
         FwdIter1 last, FwdIter2 dest, T init, Op&& op, Conv&& conv)
     {

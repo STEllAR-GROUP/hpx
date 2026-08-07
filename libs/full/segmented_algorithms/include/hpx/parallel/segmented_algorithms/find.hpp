@@ -225,7 +225,7 @@ namespace hpx::segmented {
     HPX_CXX_EXPORT template <typename SegIter, typename T>
         requires(hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter>)
-    SegIter tag_invoke(hpx::find_t, SegIter first, SegIter last, T const& val)
+    SegIter hpx_invoke(hpx::find_t, SegIter first, SegIter last, T const& val)
     {
         static_assert(
             std::input_iterator<SegIter>, "Requires at least input iterator.");
@@ -247,7 +247,7 @@ namespace hpx::segmented {
         requires(hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter>)
-    parallel::util::detail::algorithm_result_t<ExPolicy, SegIter> tag_invoke(
+    parallel::util::detail::algorithm_result_t<ExPolicy, SegIter> hpx_invoke(
         hpx::find_t, ExPolicy&& policy, SegIter first, SegIter last,
         T const& val)
     {
@@ -273,7 +273,7 @@ namespace hpx::segmented {
     HPX_CXX_EXPORT template <typename FwdIter, typename F>
         requires(hpx::traits::is_iterator_v<FwdIter> &&
             hpx::traits::is_segmented_iterator_v<FwdIter>)
-    FwdIter tag_invoke(hpx::find_if_t, FwdIter first, FwdIter last, F&& f)
+    FwdIter hpx_invoke(hpx::find_if_t, FwdIter first, FwdIter last, F&& f)
     {
         static_assert(
             std::input_iterator<FwdIter>, "Requires at least input iterator.");
@@ -296,7 +296,7 @@ namespace hpx::segmented {
         requires(hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<FwdIter> &&
             hpx::traits::is_segmented_iterator_v<FwdIter>)
-    parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter> tag_invoke(
+    parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter> hpx_invoke(
         hpx::find_if_t, ExPolicy&& policy, FwdIter first, FwdIter last, F&& f)
     {
         static_assert(std::forward_iterator<FwdIter>,
@@ -322,7 +322,7 @@ namespace hpx::segmented {
     HPX_CXX_EXPORT template <typename FwdIter, typename F>
         requires(hpx::traits::is_iterator_v<FwdIter> &&
             hpx::traits::is_segmented_iterator_v<FwdIter>)
-    FwdIter tag_invoke(hpx::find_if_not_t, FwdIter first, FwdIter last, F&& f)
+    FwdIter hpx_invoke(hpx::find_if_not_t, FwdIter first, FwdIter last, F&& f)
     {
         static_assert(
             std::input_iterator<FwdIter>, "Requires at least input iterator.");
@@ -345,7 +345,7 @@ namespace hpx::segmented {
         requires(hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<FwdIter> &&
             hpx::traits::is_segmented_iterator_v<FwdIter>)
-    parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter> tag_invoke(
+    parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter> hpx_invoke(
         hpx::find_if_not_t, ExPolicy&& policy, FwdIter first, FwdIter last,
         F&& f)
     {

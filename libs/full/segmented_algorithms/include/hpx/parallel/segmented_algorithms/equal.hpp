@@ -206,7 +206,7 @@ namespace hpx::segmented {
             hpx::traits::is_segmented_iterator_v<SegIter1> &&
             hpx::traits::is_iterator_v<SegIter2> &&
             hpx::traits::is_segmented_iterator_v<SegIter2>)
-    bool tag_invoke(hpx::equal_t, SegIter1 first1, SegIter1 last1,
+    bool hpx_invoke(hpx::equal_t, SegIter1 first1, SegIter1 last1,
         SegIter2 first2, Pred&& pred = Pred())
     {
         static_assert(std::forward_iterator<SegIter1>,
@@ -230,7 +230,7 @@ namespace hpx::segmented {
             hpx::traits::is_segmented_iterator_v<SegIter1> &&
             hpx::traits::is_iterator_v<SegIter2> &&
             hpx::traits::is_segmented_iterator_v<SegIter2>)
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool> tag_invoke(
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool> hpx_invoke(
         hpx::equal_t, ExPolicy&& policy, SegIter1 first1, SegIter1 last1,
         SegIter2 first2, Pred&& pred = Pred())
     {

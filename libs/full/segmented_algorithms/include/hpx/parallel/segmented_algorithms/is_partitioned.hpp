@@ -245,7 +245,7 @@ namespace hpx::segmented {
     HPX_CXX_EXPORT template <typename InIter, typename Pred>
         requires(hpx::traits::is_iterator_v<InIter> &&
             hpx::traits::is_segmented_iterator_v<InIter>)
-    bool tag_invoke(
+    bool hpx_invoke(
         hpx::is_partitioned_t, InIter first, InIter last, Pred&& pred)
     {
         static_assert(std::forward_iterator<InIter>,
@@ -267,7 +267,7 @@ namespace hpx::segmented {
         requires(hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter>)
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool> tag_invoke(
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool> hpx_invoke(
         hpx::is_partitioned_t, ExPolicy&& policy, SegIter first, SegIter last,
         Pred&& pred)
     {

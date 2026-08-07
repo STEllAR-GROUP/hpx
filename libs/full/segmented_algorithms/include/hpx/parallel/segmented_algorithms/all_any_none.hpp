@@ -482,7 +482,7 @@ namespace hpx::segmented {
     HPX_CXX_EXPORT template <typename InIter, typename F>
         requires(hpx::traits::is_iterator_v<InIter> &&
             hpx::traits::is_segmented_iterator_v<InIter>)
-    bool tag_invoke(hpx::none_of_t, InIter first, InIter last, F&& f)
+    bool hpx_invoke(hpx::none_of_t, InIter first, InIter last, F&& f)
     {
         static_assert(
             std::input_iterator<InIter>, "Requires at least input iterator.");
@@ -496,7 +496,7 @@ namespace hpx::segmented {
         requires(hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter>)
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool> tag_invoke(
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool> hpx_invoke(
         hpx::none_of_t, ExPolicy&& policy, SegIter first, SegIter last, F&& f)
     {
         static_assert(std::forward_iterator<SegIter>,
@@ -512,7 +512,7 @@ namespace hpx::segmented {
     HPX_CXX_EXPORT template <typename InIter, typename F>
         requires(hpx::traits::is_iterator_v<InIter> &&
             hpx::traits::is_segmented_iterator_v<InIter>)
-    bool tag_invoke(hpx::any_of_t, InIter first, InIter last, F&& f)
+    bool hpx_invoke(hpx::any_of_t, InIter first, InIter last, F&& f)
     {
         static_assert(
             std::input_iterator<InIter>, "Requires at least input iterator.");
@@ -526,7 +526,7 @@ namespace hpx::segmented {
         requires(hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter>)
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool> tag_invoke(
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool> hpx_invoke(
         hpx::any_of_t, ExPolicy&& policy, SegIter first, SegIter last, F&& f)
     {
         static_assert(std::forward_iterator<SegIter>,
@@ -542,7 +542,7 @@ namespace hpx::segmented {
     HPX_CXX_EXPORT template <typename InIter, typename F>
         requires(hpx::traits::is_iterator_v<InIter> &&
             hpx::traits::is_segmented_iterator_v<InIter>)
-    bool tag_invoke(hpx::all_of_t, InIter first, InIter last, F&& f)
+    bool hpx_invoke(hpx::all_of_t, InIter first, InIter last, F&& f)
     {
         static_assert(
             std::input_iterator<InIter>, "Requires at least input iterator.");
@@ -556,7 +556,7 @@ namespace hpx::segmented {
         requires(hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter>)
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool> tag_invoke(
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool> hpx_invoke(
         hpx::all_of_t, ExPolicy&& policy, SegIter first, SegIter last, F&& f)
     {
         static_assert(std::forward_iterator<SegIter>,

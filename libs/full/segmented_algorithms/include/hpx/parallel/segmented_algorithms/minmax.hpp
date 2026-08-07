@@ -419,7 +419,7 @@ namespace hpx::segmented {
     HPX_CXX_EXPORT template <typename SegIter, typename F>
         requires(hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter>)
-    SegIter tag_invoke(hpx::min_element_t, SegIter first, SegIter last, F&& f)
+    SegIter hpx_invoke(hpx::min_element_t, SegIter first, SegIter last, F&& f)
     {
         static_assert((std::forward_iterator<SegIter>),
             "Requires at least forward iterator.");
@@ -443,7 +443,7 @@ namespace hpx::segmented {
             hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter>)
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy, SegIter>
-    tag_invoke(hpx::min_element_t, ExPolicy&& policy, SegIter first,
+    hpx_invoke(hpx::min_element_t, ExPolicy&& policy, SegIter first,
         SegIter last, F&& f)
     {
         static_assert((std::forward_iterator<SegIter>),
@@ -469,7 +469,7 @@ namespace hpx::segmented {
     HPX_CXX_EXPORT template <typename SegIter, typename F>
         requires(hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter>)
-    SegIter tag_invoke(hpx::max_element_t, SegIter first, SegIter last, F&& f)
+    SegIter hpx_invoke(hpx::max_element_t, SegIter first, SegIter last, F&& f)
     {
         static_assert((std::forward_iterator<SegIter>),
             "Requires at least forward iterator.");
@@ -493,7 +493,7 @@ namespace hpx::segmented {
             hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter>)
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy, SegIter>
-    tag_invoke(hpx::max_element_t, ExPolicy&& policy, SegIter first,
+    hpx_invoke(hpx::max_element_t, ExPolicy&& policy, SegIter first,
         SegIter last, F&& f)
     {
         static_assert((std::forward_iterator<SegIter>),
@@ -519,7 +519,7 @@ namespace hpx::segmented {
     HPX_CXX_EXPORT template <typename SegIter, typename F>
         requires(hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter>)
-    minmax_element_result<SegIter> tag_invoke(
+    minmax_element_result<SegIter> hpx_invoke(
         hpx::minmax_element_t, SegIter first, SegIter last, F&& f)
     {
         static_assert((std::forward_iterator<SegIter>),
@@ -545,7 +545,7 @@ namespace hpx::segmented {
             hpx::traits::is_segmented_iterator_v<SegIter>)
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
         minmax_element_result<SegIter>>
-    tag_invoke(hpx::minmax_element_t, ExPolicy&& policy, SegIter first,
+    hpx_invoke(hpx::minmax_element_t, ExPolicy&& policy, SegIter first,
         SegIter last, F&& f)
     {
         static_assert((std::forward_iterator<SegIter>),

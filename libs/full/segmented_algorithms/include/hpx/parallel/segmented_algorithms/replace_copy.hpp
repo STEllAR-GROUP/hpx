@@ -403,7 +403,7 @@ namespace hpx::segmented {
             hpx::traits::is_segmented_iterator_v<SegIter> &&
             hpx::traits::is_iterator_v<OutIter> &&
             hpx::traits::is_segmented_iterator_v<OutIter>)
-    OutIter tag_invoke(hpx::replace_copy_t, SegIter first, SegIter last,
+    OutIter hpx_invoke(hpx::replace_copy_t, SegIter first, SegIter last,
         OutIter dest, T const& old_value, T const& new_value)
     {
         static_assert(hpx::traits::is_input_iterator_v<SegIter>,
@@ -437,7 +437,7 @@ namespace hpx::segmented {
             hpx::traits::is_iterator_v<OutIter> &&
             hpx::traits::is_segmented_iterator_v<OutIter>)
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy, OutIter>
-    tag_invoke(hpx::replace_copy_t, ExPolicy&& policy, SegIter first,
+    hpx_invoke(hpx::replace_copy_t, ExPolicy&& policy, SegIter first,
         SegIter last, OutIter dest, T const& old_value, T const& new_value)
     {
         static_assert(hpx::traits::is_forward_iterator_v<SegIter>,
@@ -475,7 +475,7 @@ namespace hpx::segmented {
             hpx::traits::is_segmented_iterator_v<SegIter> &&
             hpx::traits::is_iterator_v<OutIter> &&
             hpx::traits::is_segmented_iterator_v<OutIter>)
-    OutIter tag_invoke(hpx::replace_copy_if_t, SegIter first, SegIter last,
+    OutIter hpx_invoke(hpx::replace_copy_if_t, SegIter first, SegIter last,
         OutIter dest, Pred&& pred, T const& new_value)
     {
         static_assert(hpx::traits::is_input_iterator_v<SegIter>,
@@ -509,7 +509,7 @@ namespace hpx::segmented {
             hpx::traits::is_iterator_v<OutIter> &&
             hpx::traits::is_segmented_iterator_v<OutIter>)
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy, OutIter>
-    tag_invoke(hpx::replace_copy_if_t, ExPolicy&& policy, SegIter first,
+    hpx_invoke(hpx::replace_copy_if_t, ExPolicy&& policy, SegIter first,
         SegIter last, OutIter dest, Pred&& pred, T const& new_value)
     {
         static_assert(hpx::traits::is_forward_iterator_v<SegIter>,
