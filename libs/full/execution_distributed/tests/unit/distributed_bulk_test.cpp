@@ -33,17 +33,21 @@ namespace tt = hpx::this_thread::experimental;
 void test_bulk_integral_shape()
 {
     std::vector<hpx::id_type> remotes = hpx::find_remote_localities();
-    HPX_TEST(!remotes.empty());
-    hpx::id_type target = remotes.empty() ? hpx::find_here() : remotes[0];
+    if (remotes.empty())
+        return;
+
+    hpx::id_type target = remotes[0];
+    std::uint32_t target_id = hpx::naming::get_locality_id_from_id(target);
 
     auto sched = hpx::distributed::experimental::distributed_scheduler{target};
 
-    std::atomic<int> count{0};
-    auto snd = ex::schedule(sched) | ex::bulk(10, [&](int) { count++; });
+    auto snd = ex::schedule(sched) |
+        ex::then([]() { return hpx::get_locality_id(); }) |
+        ex::bulk(10, [](int /*index*/, std::uint32_t /*loc*/) {});
 
     auto result = tt::sync_wait(std::move(snd));
     HPX_TEST(result.has_value());
-    HPX_TEST_EQ(count.load(), 10);
+    HPX_TEST_EQ(std::get<0>(*result), target_id);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
