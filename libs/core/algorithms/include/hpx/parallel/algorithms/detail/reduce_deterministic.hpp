@@ -26,7 +26,8 @@ namespace hpx::parallel::detail {
     {
         template <typename InIterB, typename InIterE, typename T,
             typename Reduce>
-        constexpr T operator()(ExPolicy&&, InIterB first, InIterE last, T init,
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr T operator()(ExPolicy&&,
+            InIterB first, InIterE last, T init,
             [[maybe_unused]] Reduce&& r) const
         {
             /// TODO: Put constraint on Reduce to be a binary plus operator
@@ -65,10 +66,10 @@ namespace hpx::parallel::detail {
     struct sequential_reduce_deterministic_rfa_t final
     {
         template <typename InIterB, typename T>
-        constexpr hpx::parallel::detail::rfa::reproducible_floating_accumulator<
-            T>
-        operator()(ExPolicy&&, InIterB first, std::size_t partition_size,
-            T init, std::true_type&&) const
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr hpx::parallel::detail::rfa::
+            reproducible_floating_accumulator<T>
+            operator()(ExPolicy&&, InIterB first, std::size_t partition_size,
+                T init, std::true_type&&) const
         {
             // hpx_rfa_bin_host_buffer should be initialized by the frontend of
             // this method
@@ -101,8 +102,9 @@ namespace hpx::parallel::detail {
         }
 
         template <typename InIterB, typename T>
-        constexpr T operator()(ExPolicy&&, InIterB first,
-            std::size_t partition_size, T init, std::false_type&&) const
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr T operator()(ExPolicy&&,
+            InIterB first, std::size_t partition_size, T init,
+            std::false_type&&) const
         {
             // hpx_rfa_bin_host_buffer should be initialized by the frontend of
             // this method

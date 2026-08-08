@@ -17,7 +17,7 @@
 namespace ex = hpx::execution::experimental;
 
 static std::size_t member_connect_calls = 0;
-static std::size_t free_connect_calls = 0;
+static std::size_t member_connect_calls_2 = 0;
 
 struct non_sender_1
 {
@@ -180,7 +180,7 @@ struct sender_2
 
     operation_state connect(example_receiver& r) && noexcept
     {
-        ++free_connect_calls;
+        ++member_connect_calls_2;
         return {{}, r};
     }
 };
@@ -331,7 +331,7 @@ int main()
         ex::start(os);
         HPX_TEST_EQ(r1.i, 4711);
         HPX_TEST_EQ(member_connect_calls, std::size_t(1));
-        HPX_TEST_EQ(free_connect_calls, std::size_t(0));
+        HPX_TEST_EQ(member_connect_calls_2, std::size_t(0));
     }
 
     {
@@ -340,7 +340,7 @@ int main()
         ex::start(os);
         HPX_TEST_EQ(r2.i, 4711);
         HPX_TEST_EQ(member_connect_calls, std::size_t(1));
-        HPX_TEST_EQ(free_connect_calls, std::size_t(1));
+        HPX_TEST_EQ(member_connect_calls_2, std::size_t(1));
     }
 
     {
@@ -349,7 +349,7 @@ int main()
         ex::start(os);
         HPX_TEST_EQ(r3.i, 4711);
         HPX_TEST_EQ(member_connect_calls, std::size_t(2));
-        HPX_TEST_EQ(free_connect_calls, std::size_t(1));
+        HPX_TEST_EQ(member_connect_calls_2, std::size_t(1));
     }
 
     return hpx::util::report_errors();

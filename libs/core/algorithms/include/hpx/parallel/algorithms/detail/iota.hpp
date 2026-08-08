@@ -35,7 +35,7 @@ namespace hpx::parallel::detail {
     {
         template <typename ExPolicy, typename FwdIter, typename Sent,
             typename T>
-        constexpr FwdIter operator()(
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr FwdIter operator()(
             ExPolicy&&, FwdIter first, Sent last, T& value) const
         {
             return sequential_iota_helper(first, last, value);
