@@ -20,16 +20,13 @@
 #include <hpx/modules/testing.hpp>
 
 #include <hpx/agas/addressing_service.hpp>
-#include <hpx/asio/asio_util.hpp>
 
 #include <algorithm>
 #include <chrono>
 #include <cstddef>
-#include <cstdint>
 #include <iterator>
 #include <string>
 #include <system_error>
-#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -58,63 +55,6 @@ std::vector<std::string> get_environment()
 #error "Don't know, how to access the execution environment on this platform"
 #endif
     return env;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// Return a TCP endpoint on the given address that is unused right now, as the
-// literal address and port the probe actually bound.
-//
-// The launched locality needs a parcelport endpoint of its own. Deriving the
-// port from a fixed constant collides with whatever else happens to hold it: a
-// concurrent test run, an unrelated HPX application, or a socket still
-// lingering in TIME_WAIT. Worse, the collision is never diagnosed: the launched
-// locality simply cannot bind, so this test hangs until it is killed rather
-// than failing. Let the operating system name a free endpoint instead.
-//
-// Both halves of the endpoint have to be reported, not just the port. The
-// address handed in may be a name rather than a literal, and accept_begin()
-// then falls back to a resolver query that can yield several endpoints across
-// address families. The child resolves that same name independently, so if it
-// were given only the port it could pick a different endpoint from the list
-// than the one proved bindable here, and fail its bind with EADDRNOTAVAIL. The
-// probe only speaks for the endpoint it actually claimed.
-//
-// The endpoint is claimed the same way the TCP parcelport claims its own
-// acceptor, so the probe rejects anything the launched locality could not bind
-// either. The probe cannot reserve it, though: it is released before the child
-// starts, so a small window remains in which another process could take the
-// port. Closing that window would require the parcelport to bind port 0 and
-// report the port it actually got, which it does not do (see #7406).
-std::pair<std::string, std::uint16_t> get_unused_endpoint(
-    std::string const& address)
-{
-    ::asio::io_context io_service;
-
-    for (auto it = hpx::util::accept_begin(address, 0, io_service);
-        it != hpx::util::accept_end(); ++it)
-    {
-        try
-        {
-            ::asio::ip::tcp::endpoint const ep = *it;
-            ::asio::ip::tcp::acceptor acceptor(io_service);
-
-            acceptor.open(ep.protocol());
-            acceptor.set_option(::asio::ip::tcp::acceptor::reuse_address(true));
-            acceptor.bind(ep);
-
-            // the acceptor is closed again on the way out, releasing the
-            // endpoint for the launched locality to pick up
-            ::asio::ip::tcp::endpoint const bound = acceptor.local_endpoint();
-            return {bound.address().to_string(), bound.port()};
-        }
-        catch (std::system_error const&)
-        {
-            continue;
-        }
-    }
-
-    HPX_THROW_EXCEPTION(hpx::error::network_error, "get_unused_endpoint",
-        "failed to find an unused endpoint on {}", address);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -183,14 +123,9 @@ int hpx_main(hpx::program_options::variables_map& vm)
         hpx::get_config_entry(
             "hpx.agas.port", std::to_string(HPX_INITIAL_IP_PORT)));
 
-    // The launched executable runs on the same host as this test, so give it a
-    // parcelport endpoint that is known to be free at this moment. Pass the
-    // literal address the probe bound rather than the name it started from, so
-    // the child cannot resolve its way to a different endpoint of the same
-    // name and then fail to bind it.
-    auto const [parcel_address, parcel_port] = get_unused_endpoint(address);
-    set_env_var(env, "HPX_PARCEL_SERVER_ADDRESS", parcel_address);
-    set_env_var(env, "HPX_PARCEL_SERVER_PORT", std::to_string(parcel_port));
+    // Let the launched locality bind an available port selected by the OS.
+    set_env_var(env, "HPX_PARCEL_SERVER_ADDRESS", address);
+    set_env_var(env, "HPX_PARCEL_SERVER_PORT", "0");
 
     // instruct new locality to connect back on startup using the given name
     set_env_var(env, "HPX_ON_STARTUP_WAIT_ON_LATCH", "departed_locality_7384");
