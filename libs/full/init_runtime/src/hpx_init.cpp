@@ -1076,7 +1076,8 @@ namespace hpx {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    int disconnect(double shutdown_timeout, double localwait, error_code& ec)
+    int disconnect([[maybe_unused]] double shutdown_timeout,
+        [[maybe_unused]] double localwait, [[maybe_unused]] error_code& ec)
     {
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
         if (!threads::get_self_ptr())
@@ -1128,14 +1129,73 @@ namespace hpx {
         p->call_shutdown_functions(false);
 
         p->stop(shutdown_timeout, hpx::invalid_id, true);
-#else
-        HPX_UNUSED(shutdown_timeout);
-        HPX_UNUSED(localwait);
-        HPX_UNUSED(ec);
 #endif
 
         return 0;
     }
+
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+    ///////////////////////////////////////////////////////////////////////////
+    int force_disconnect(hpx::id_type const& locality, error_code& ec)
+    {
+        if (!threads::get_self_ptr())
+        {
+            HPX_THROWS_IF(ec, hpx::error::invalid_status,
+                "hpx::force_disconnect",
+                "this function can be called from an HPX thread only");
+            return -1;
+        }
+
+        if (!is_running())
+        {
+            HPX_THROWS_IF(ec, hpx::error::invalid_status,
+                "hpx::force_disconnect",
+                "the runtime system is not active (did you already "
+                "call finalize?)");
+            return -1;
+        }
+
+        if (!agas::is_console())
+        {
+            HPX_THROWS_IF(ec, hpx::error::invalid_status,
+                "hpx::force_disconnect",
+                "hpx::force_disconnect should be called on the console "
+                "locality only.");
+            return -1;
+        }
+
+        if (locality == hpx::find_here())
+        {
+            HPX_THROWS_IF(ec, hpx::error::invalid_status,
+                "hpx::force_disconnect",
+                "hpx::force_disconnect cannot be used to disconnect the "
+                "console locality itself.");
+            return -1;
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        auto* p = static_cast<components::server::runtime_support*>(
+            get_runtime_distributed().get_runtime_support_lva());
+
+        if (nullptr == p)
+        {
+            HPX_THROWS_IF(ec, hpx::error::invalid_status, "hpx::disconnect",
+                "the runtime system is not active (did you already "
+                "call finalize?)");
+            return -1;
+        }
+
+        p->remove_locality(locality, ec);
+        if (ec)
+        {
+            return -1;
+        }
+
+        return 0;
+    }
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     void terminate()
