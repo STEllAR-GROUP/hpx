@@ -11,6 +11,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <exception>
 #include <iterator>
 #include <new>
 #include <stdexcept>
@@ -71,6 +72,10 @@ void test_copy_if_sender_case(LnPolicy ln_policy, ExPolicy&& ex_policy,
 
     auto result = tt::sync_wait(std::move(sender));
     HPX_TEST(result.has_value());
+    if (!result.has_value())
+    {
+        return;
+    }
 
     auto const output_end = hpx::get<0>(*result);
     HPX_TEST(output_end ==
@@ -130,9 +135,26 @@ void test_copy_if_sender_exception(
     {
         if constexpr (std::is_same_v<Exception, std::runtime_error>)
         {
-            caught_expected_exception = true;
             test::test_num_exceptions<ExPolicy, IteratorTag>::call(
                 ex_policy, errors);
+
+            bool all_exceptions_expected = errors.begin() != errors.end();
+            for (std::exception_ptr const& error : errors)
+            {
+                try
+                {
+                    std::rethrow_exception(error);
+                }
+                catch (std::runtime_error const&)
+                {
+                }
+                catch (...)
+                {
+                    all_exceptions_expected = false;
+                }
+            }
+            HPX_TEST(all_exceptions_expected);
+            caught_expected_exception = all_exceptions_expected;
         }
         else
         {
