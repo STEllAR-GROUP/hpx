@@ -15,6 +15,7 @@
 #include "components/launch_process_test_server.hpp"
 
 #include <algorithm>
+#include <cctype>
 #include <cstddef>
 #include <iostream>
 #include <iterator>
@@ -57,7 +58,16 @@ void set_env_var(std::vector<std::string>& env, std::string const& name,
 
     env.erase(std::remove_if(env.begin(), env.end(),
                   [&prefix](std::string const& entry) {
+#if defined(HPX_WINDOWS)
+                      return entry.size() >= prefix.size() &&
+                          std::equal(prefix.begin(), prefix.end(),
+                              entry.begin(),
+                              [](unsigned char lhs, unsigned char rhs) {
+                                  return std::tolower(lhs) == std::tolower(rhs);
+                              });
+#else
                       return entry.starts_with(prefix);
+#endif
                   }),
         env.end());
 
@@ -103,6 +113,11 @@ int hpx_main(hpx::program_options::variables_map& vm)
     // set up environment for launched executable
     std::vector<std::string> env = get_environment();    // current environment
 
+#if defined(HPX_WINDOWS)
+    // Exercise Windows' case-insensitive environment variable names.
+    env.push_back("hpx_parcel_server_port=invalid");
+#endif
+
     std::string const address =
         hpx::get_config_entry("hpx.agas.address", HPX_INITIAL_IP_ADDRESS);
 
@@ -115,6 +130,10 @@ int hpx_main(hpx::program_options::variables_map& vm)
     // Let the launched locality bind an available port selected by the OS.
     set_env_var(env, "HPX_PARCEL_SERVER_ADDRESS", address);
     set_env_var(env, "HPX_PARCEL_SERVER_PORT", "0");
+#if defined(HPX_WINDOWS)
+    HPX_TEST(std::find(env.begin(), env.end(),
+                 "hpx_parcel_server_port=invalid") == env.end());
+#endif
 
     // Instruct new locality to connect back on startup using the given name.
     set_env_var(env, "HPX_ON_STARTUP_WAIT_ON_LATCH", "launch_process");

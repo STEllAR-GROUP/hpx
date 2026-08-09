@@ -22,6 +22,7 @@
 #include <hpx/agas/addressing_service.hpp>
 
 #include <algorithm>
+#include <cctype>
 #include <chrono>
 #include <cstddef>
 #include <iterator>
@@ -61,11 +62,10 @@ std::vector<std::string> get_environment()
 // Set a variable in the environment handed to the launched locality, replacing
 // any entry this process already inherited for the same name.
 //
-// The vector is passed to execve() verbatim and getenv() returns the first
-// match, so appending alone would leave an inherited entry shadowing the value
-// set here instead of being overridden by it. Every name this test sets is one
-// HPX itself reads from the environment, so an inherited entry is exactly the
-// case that has to lose.
+// The vector is passed to the child process verbatim, so appending alone can
+// leave an inherited entry shadowing the value set here. Every name this test
+// sets is one HPX itself reads from the environment, so an inherited entry is
+// exactly the case that has to lose.
 void set_env_var(std::vector<std::string>& env, std::string const& name,
     std::string const& value)
 {
@@ -73,7 +73,16 @@ void set_env_var(std::vector<std::string>& env, std::string const& name,
 
     env.erase(std::remove_if(env.begin(), env.end(),
                   [&prefix](std::string const& entry) {
+#if defined(HPX_WINDOWS)
+                      return entry.size() >= prefix.size() &&
+                          std::equal(prefix.begin(), prefix.end(),
+                              entry.begin(),
+                              [](unsigned char lhs, unsigned char rhs) {
+                                  return std::tolower(lhs) == std::tolower(rhs);
+                              });
+#else
                       return entry.starts_with(prefix);
+#endif
                   }),
         env.end());
 
