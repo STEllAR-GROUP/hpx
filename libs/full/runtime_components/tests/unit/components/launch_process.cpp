@@ -14,8 +14,10 @@
 
 #include "components/launch_process_test_server.hpp"
 
+#include <algorithm>
 #include <cstddef>
 #include <iostream>
+#include <iterator>
 #include <string>
 #include <vector>
 
@@ -45,6 +47,21 @@ std::vector<std::string> get_environment()
 #error "Don't know, how to access the execution environment on this platform"
 #endif
     return env;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+void set_env_var(std::vector<std::string>& env, std::string const& name,
+    std::string const& value)
+{
+    std::string const prefix = name + "=";
+
+    env.erase(std::remove_if(env.begin(), env.end(),
+                  [&prefix](std::string const& entry) {
+                      return entry.starts_with(prefix);
+                  }),
+        env.end());
+
+    env.push_back(prefix + value);
 }
 
 // ----------------------------------------------------------------------------
@@ -86,27 +103,21 @@ int hpx_main(hpx::program_options::variables_map& vm)
     // set up environment for launched executable
     std::vector<std::string> env = get_environment();    // current environment
 
-    // Pass along the console parcelport address
-    env.push_back("HPX_AGAS_SERVER_ADDRESS=" +
-        hpx::get_config_entry("hpx.agas.address", HPX_INITIAL_IP_ADDRESS));
-    env.push_back("HPX_AGAS_SERVER_PORT=" +
+    std::string const address =
+        hpx::get_config_entry("hpx.agas.address", HPX_INITIAL_IP_ADDRESS);
+
+    // Pass along the console parcelport address.
+    set_env_var(env, "HPX_AGAS_SERVER_ADDRESS", address);
+    set_env_var(env, "HPX_AGAS_SERVER_PORT",
         hpx::get_config_entry(
             "hpx.agas.port", std::to_string(HPX_INITIAL_IP_PORT)));
 
-    // Pass along the parcelport address which should be used by the launched
-    // executable
-
-    // The launched executable will run on the same host as this test
-    int port = 42;    // each launched HPX locality needs to be assigned a
-                      // unique port
-
-    env.push_back("HPX_PARCEL_SERVER_ADDRESS=" +
-        hpx::get_config_entry("hpx.agas.address", HPX_INITIAL_IP_ADDRESS));
-    env.push_back("HPX_PARCEL_SERVER_PORT=" +
-        std::to_string(HPX_CONNECTING_IP_PORT - port));
+    // Let the launched locality bind an available port selected by the OS.
+    set_env_var(env, "HPX_PARCEL_SERVER_ADDRESS", address);
+    set_env_var(env, "HPX_PARCEL_SERVER_PORT", "0");
 
     // Instruct new locality to connect back on startup using the given name.
-    env.push_back("HPX_ON_STARTUP_WAIT_ON_LATCH=launch_process");
+    set_env_var(env, "HPX_ON_STARTUP_WAIT_ON_LATCH", "launch_process");
 
     // launch test executable
     process::child c = process::execute(
