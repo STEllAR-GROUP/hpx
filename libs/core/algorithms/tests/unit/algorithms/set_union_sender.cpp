@@ -175,6 +175,7 @@ void test_set_union_sender_empty(
 
         auto const result_last = hpx::get<0>(result.value());
         HPX_TEST(result_last == std::begin(c3));
+        HPX_TEST_EQ(c3[0], static_cast<std::size_t>(-1));
     }
 }
 
