@@ -12,6 +12,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/collectives/include
 set(collectives_headers
+    hpx/collectives.hpp
     hpx/collectives/all_gather.hpp
     hpx/collectives/all_reduce.hpp
     hpx/collectives/all_to_all.hpp
@@ -84,6 +85,7 @@ add_hpx_module(
   SOURCES ${collectives_sources}
   HEADERS ${collectives_headers}
   MACRO_HEADERS ${collectives_macros_headers}
+  EXCLUDE_FROM_GLOBAL_HEADER "hpx/collectives.hpp"
   ADD_TO_GLOBAL_HEADER
     "hpx/collectives/detail/flattened_data.hpp"
     "hpx/collectives/detail/hierarchical_all_to_all_helpers.hpp"
