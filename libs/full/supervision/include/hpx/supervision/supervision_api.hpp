@@ -802,9 +802,6 @@ namespace hpx::supervision {
     ///               in the asynchronous overload for this call only. If
     ///               \c std::nullopt (the default), the local locality's
     ///               default timeout is used instead.
-    /// \param ec     [in,out] this represents the error status on exit, if
-    ///               this is pre-initialized to \a hpx::throws the function
-    ///               will throw on error instead.
     ///
     /// \returns      A future that becomes ready, holding the
     ///               \a lifecycle_state recorded for \a target, as soon as
@@ -818,15 +815,10 @@ namespace hpx::supervision {
     ///               superseded, or with
     ///               \a hpx::error::future_cancelled if \a timeout elapses
     ///               first.
-    ///
-    /// \throws       hpx::exception if \a target does not represent a
-    ///               valid target, unless \a ec was not pre-initialized to
-    ///               \a hpx::throws.
     HPX_CXX_EXPORT HPX_EXPORT hpx::future<lifecycle_state> await_terminal(
         hpx::id_type const& target, std::uint64_t epoch = 0,
         std::optional<std::chrono::steady_clock::duration> timeout =
-            std::nullopt,
-        hpx::error_code& ec = hpx::throws);
+            std::nullopt);
 
     /// \brief Synchronously wait for a local supervised target to reach a
     ///        terminal lifecycle state (\c completed or \c failed).

@@ -77,8 +77,7 @@ namespace hpx::supervision {
         hpx::future<lifecycle_state> await_terminal(hpx::id_type const& target,
             std::uint64_t epoch = 0,
             std::chrono::steady_clock::duration timeout =
-                (std::chrono::steady_clock::duration::max) (),
-            hpx::error_code& ec = throws) const;
+                (std::chrono::steady_clock::duration::max) ()) const;
 
         dispatch_outcome check_admission(
             hpx::id_type const& target, std::uint64_t epoch = 0) const noexcept;

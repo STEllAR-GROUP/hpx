@@ -161,7 +161,7 @@ void test_cross_locality_authoritative_fence(hpx::id_type const& peer_locality)
     // drop a publish at a stale, lower epoch, so every epoch used below must
     // be the actual value returned by join() (peer.join_epoch), not a
     // hardcoded 0.
-    peer_sentinel.start(hpx::launch::sync);
+    peer_sentinel.start(hpx::launch::sync, peer.join_epoch);
     hpx::supervision::publish_event(hpx::launch::sync, peer_locality,
         peer_sentinel.get_id(), hpx::supervision::event::failed,
         peer.join_epoch);

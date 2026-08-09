@@ -101,6 +101,26 @@ namespace hpx::detail {
                 hpx::throwmode::rethrow);
     }
 
+    void rethrows_if(hpx::error_code& ec, std::exception_ptr const& e,
+        std::string const& func)
+    {
+        if (&ec == &hpx::throws)
+        {
+            std::rethrow_exception(e);
+        }
+
+        auto const rethrow_mode =
+            (ec.category() == hpx::get_lightweight_hpx_category() ||
+                ec.category() == hpx::get_lightweight_hpx_rethrow_category()) ?
+            hpx::throwmode::lightweight_rethrow :
+            hpx::throwmode::rethrow;
+
+        auto&& [what, ecode] = hpx::get_error_info(e);
+        ec = make_error_code(ecode, what, func.c_str(),
+            hpx::get_error_file_name(e).c_str(), hpx::get_error_line_number(e),
+            rethrow_mode);
+    }
+
     [[noreturn]] void throw_thread_interrupted_exception()
     {
         throw hpx::thread_interrupted();

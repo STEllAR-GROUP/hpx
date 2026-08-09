@@ -237,13 +237,17 @@ namespace {
     // Fencing semantics:
     //   - hpx::error::future_cancelled on a peer's await_terminal future means
     //     a genuine timeout: no terminal event arrived under the epoch we
-    //     waited on. In that case we bump and publish event::failed against
-    //     *our own local copy* of that peer's shadow only. We never contact the
-    //     (possibly dead) peer's own sentinel/registry - the remote re-check
-    //     inside invoke_fenced_action is what is authoritative on the target
-    //     locality; this loop only needs the local shadow to reflect failure so
-    //     future check_admission()/dispatch_work() calls against it observe the
-    //     fence.
+    //     waited on. Before fencing, the epoch captured when the wait was
+    //     started is re-confirmed against a fresh query_state() call, since
+    //     the target's supervision manager may have erased its recorded state
+    //     for this epoch in the interim (e.g. remove_target() ran because the
+    //     peer left/rejoined); publishing event::failed against a no-longer-
+    //     open epoch would otherwise be rejected as an illegal new-epoch
+    //     opener. If the epoch is still confirmed open, we bump and publish
+    //     event::failed against *our own local copy* of that peer's shadow
+    //     only; this loop only needs the local shadow to reflect failure so
+    //     future check_admission()/dispatch_work() calls against it observe
+    //     the fence.
     //   - hpx::error::stale_state means the epoch was already advanced
     //     (typically the reactive eviction path already fired) - no action
     //     needed.
@@ -502,6 +506,20 @@ namespace {
                         if (!stalled_after_grace(
                                 seq, peer, epoch, poll_timeout))
                             return;    // not stalled (yet)
+
+                        // No progress since the wait started: genuine stall.
+                        // Before fencing, re-confirm the target still has
+                        // *this* epoch open - remove_target() on the peer may
+                        // have erased its states_ entry in the interim (e.g.
+                        // the peer left/rejoined), in which case a `failed`
+                        // fence would be rejected as an illegal new-epoch
+                        // opener. Treat that as a no-op, mirroring the state.ec
+                        // branch above.
+                        hpx::error_code ec_check(hpx::throwmode::lightweight);
+                        auto const recheck = hpx::supervision::query_state(
+                            peer.peer_locality, ec_check);
+                        if (ec_check || recheck.ec || recheck.epoch != epoch)
+                            return;
 
                         // No progress since the wait started: genuine stall.
                         // Fence locally only, never touch the peer's own

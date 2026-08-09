@@ -170,6 +170,9 @@ namespace hpx::detail {
     HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void rethrows_if(
         hpx::error_code& ec, exception const& e, std::string const& func);
 
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void rethrows_if(hpx::error_code& ec,
+        std::exception_ptr const& e, std::string const& func);
+
     HPX_CXX_CORE_EXPORT [[noreturn]] HPX_CORE_EXPORT void
     throw_thread_interrupted_exception();
 }    // namespace hpx::detail
