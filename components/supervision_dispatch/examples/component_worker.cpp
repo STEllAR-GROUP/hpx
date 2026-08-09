@@ -140,7 +140,7 @@ struct worker_client
 
 void run_worker_role()
 {
-    hpx::supervision::supervision_handle const handle =
+    hpx::supervision::registry const handle =
         hpx::supervision::init(hpx::launch::sync, worker_discovery_timeout);
 
     std::uint64_t const epoch =
@@ -201,7 +201,7 @@ void run_worker_role()
 
 void run_root_role()
 {
-    hpx::supervision::supervision_handle const handle =
+    hpx::supervision::registry const handle =
         hpx::supervision::init(hpx::launch::sync, worker_discovery_timeout);
 
     std::uint64_t const epoch =

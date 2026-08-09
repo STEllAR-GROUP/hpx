@@ -184,8 +184,8 @@ namespace {
     // Assumes success throughout (see the "Explicit non-goals" paragraph in the
     // file comment above): a process launch failure here is not handled and
     // simply propagates out of this function.
-    worker_slot spawn_worker(hpx::supervision::supervision_handle const& handle,
-        bool use_failing_variant)
+    worker_slot spawn_worker(
+        hpx::supervision::registry const& handle, bool use_failing_variant)
     {
         namespace process = hpx::components::process;
         namespace fs = hpx::filesystem;
@@ -303,7 +303,7 @@ namespace {
     // Task 4b: fencing-aware dispatch loop.
     // ========================================================================
 
-    void run_launcher(hpx::supervision::supervision_handle const& handle)
+    void run_launcher(hpx::supervision::registry const& handle)
     {
         std::vector<std::optional<worker_slot>> worker_slots;
 
@@ -411,7 +411,7 @@ namespace {
 
 int hpx_main()
 {
-    hpx::supervision::supervision_handle const handle =
+    hpx::supervision::registry const handle =
         hpx::supervision::init(hpx::launch::sync, root_discovery_timeout);
 
     std::uint64_t const epoch =

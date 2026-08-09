@@ -16,7 +16,6 @@ set(tests
     query_publish
     registry_join
     registry_snapshot
-    sentinel_start
 )
 
 set(discover_and_join_PARAMETERS LOCALITIES 2)

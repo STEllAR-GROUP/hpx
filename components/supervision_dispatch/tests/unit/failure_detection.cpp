@@ -101,14 +101,13 @@ namespace {
 
 // Scenario 1: detection causes fencing.
 //
-// The peer locality joins and then goes silent - no completed/failed event
-// ever arrives, simulating a hard crash where no lifecycle callback fires.
-// After one poll cycle (bounded by test_poll_timeout, not the real 60s
-// default), the observer's local shadow for that peer must report fenced, and a
-// subsequent dispatch_work() against it must fail with
-// hpx::error::target_fenced - proving the *local* shadow was fenced by the
-// detector, without the observer ever contacting the peer's own
-// sentinel/registry.
+// The peer locality joins and then goes silent - no completed/failed event ever
+// arrives, simulating a hard crash where no lifecycle callback fires. After one
+// poll cycle (bounded by test_poll_timeout, not the real 60s default), the
+// observer's local shadow for that peer must report fenced, and a subsequent
+// dispatch_work() against it must fail with hpx::error::target_fenced - proving
+// the *local* shadow was fenced by the detector, without the observer ever
+// contacting the peer's own registry.
 void test_detection_causes_fencing(hpx::id_type const& peer_locality)
 {
     auto const locality = find_locality_for(peer_locality);
@@ -186,12 +185,12 @@ void test_no_false_positives(hpx::id_type const& peer_locality)
 // Scenario 3: clean shutdown while a sweep may still be in flight.
 //
 // Must run while `peer_locality` is still silent-but-joinable (heartbeat
-// suspended, but its sentinel/registry components not yet torn down) -
-// otherwise a fresh discover_and_join() finds no peer at all and
-// sweep_in_flight_ can never become true. Re-arms the session under the real
-// default_discovery_timeout to exercise finalize() racing a genuine
-// long-running sweep, then restores the short test timeout and rejoins so
-// later scenarios have a working session again.
+// suspended, but its registry components not yet torn down) - otherwise a fresh
+// discover_and_join() finds no peer at all and sweep_in_flight_ can never
+// become true. Re-arms the session under the real default_discovery_timeout to
+// exercise finalize() racing a genuine long-running sweep, then restores the
+// short test timeout and rejoins so later scenarios have a working session
+// again.
 void test_clean_shutdown_during_in_flight_sweep(
     hpx::id_type const& peer_locality)
 {

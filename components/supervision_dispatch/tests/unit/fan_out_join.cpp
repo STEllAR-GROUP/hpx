@@ -26,9 +26,7 @@
 #include <hpx/modules/supervision.hpp>
 #include <hpx/modules/testing.hpp>
 
-#include <hpx/supervision_dispatch/discovery.hpp>
-#include <hpx/supervision_dispatch/registry.hpp>
-#include <hpx/supervision_dispatch/sentinel.hpp>
+#include <hpx/supervision_dispatch.hpp>
 
 #include <chrono>
 #include <cstddef>
@@ -45,14 +43,14 @@ namespace {
 // Test Cases
 // ============================================================================
 
-// Both localities register their sentinel/registry names, discover each
-// other, and fan out join() calls against every discovered peer. Since both
-// localities run this identical sequence concurrently (SPMD), each side ends up
-// joining the other's sentinel at roughly the same time -- exercising the
-// bidirectional join race -- and must end up with exactly one shadow for the
-// peer's sentinel, seeded with event::started. A second fan_out_join() call
-// with the very same peer list must be idempotent, returning the same shadow
-// ids rather than minting duplicates.
+// Both localities register their registry names, discover each other, and fan
+// out join() calls against every discovered peer. Since both localities run
+// this identical sequence concurrently (SPMD), each side ends up joining the
+// other's locality at roughly the same time - exercising the bidirectional join
+// race - and must end up with exactly one shadow for the peer's locality,
+// seeded with event::started. A second fan_out_join() call with the very same
+// peer list must be idempotent, returning the same shadow ids rather than
+// minting duplicates.
 void test_fan_out_join_bidirectional()
 {
     std::vector<hpx::id_type> const remote_localities =
@@ -63,17 +61,13 @@ void test_fan_out_join_bidirectional()
         return;    // nothing to join without a second locality
     }
 
-    hpx::supervision::sentinel local_sentinel(hpx::find_here());
     hpx::supervision::registry local_registry(hpx::find_here());
 
-    HPX_TEST(local_sentinel.register_name(hpx::launch::sync));
     HPX_TEST(local_registry.register_name(hpx::launch::sync));
 
     auto at_exit = hpx::experimental::scope_exit([&]() noexcept {
-        hpx::error_code ec1(hpx::throwmode::lightweight);
-        local_sentinel.unregister_name(hpx::launch::sync, ec1);
-        hpx::error_code ec2(hpx::throwmode::lightweight);
-        local_registry.unregister_name(hpx::launch::sync, ec2);
+        hpx::error_code ec(hpx::throwmode::lightweight);
+        local_registry.unregister_name(hpx::launch::sync, ec);
     });
 
     std::vector<hpx::supervision::discovered_peer> const peers =

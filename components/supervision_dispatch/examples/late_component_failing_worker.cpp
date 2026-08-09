@@ -87,7 +87,7 @@ namespace {
             set_failure_detection_poll_timeout_for_testing(
                 failure_detection_poll_timeout);
 
-        hpx::supervision::supervision_handle const handle =
+        hpx::supervision::registry const handle =
             hpx::supervision::init(hpx::launch::sync, worker_discovery_timeout);
 
         std::uint64_t const epoch =

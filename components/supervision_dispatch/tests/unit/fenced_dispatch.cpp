@@ -14,9 +14,7 @@
 #include <hpx/modules/supervision.hpp>
 #include <hpx/modules/testing.hpp>
 
-#include <hpx/supervision_dispatch/dispatch_work.hpp>
-#include <hpx/supervision_dispatch/registry.hpp>
-#include <hpx/supervision_dispatch/sentinel.hpp>
+#include <hpx/supervision_dispatch.hpp>
 
 #include <atomic>
 #include <cstdint>
@@ -69,12 +67,11 @@ void test_dispatch_success(hpx::id_type const& locality)
 
     constexpr std::uint64_t epoch = 0;
 
-    // Join `locality` as a peer sentinel to obtain the real dispatch target
-    // for it via joined_peer::target.
-    hpx::supervision::sentinel const peer_sentinel(locality);
+    // Join `locality` as a peer to obtain the real dispatch target for it via
+    // joined_peer::target.
     hpx::supervision::registry const r(locality);
     hpx::supervision::joined_peer const peer =
-        r.join(hpx::launch::sync, peer_sentinel, locality);
+        r.join(hpx::launch::sync, locality);
 
     HPX_TEST_NEQ(peer.target, hpx::invalid_id);
     HPX_TEST_EQ(peer.target, locality);

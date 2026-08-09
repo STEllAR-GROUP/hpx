@@ -32,6 +32,7 @@
 #include <hpx/modules/runtime_distributed.hpp>
 #include <hpx/modules/supervision.hpp>
 #include <hpx/modules/testing.hpp>
+
 #include <hpx/supervision_dispatch.hpp>
 
 #include <algorithm>
@@ -143,14 +144,13 @@ void test_fencing_without_prior_successful_query(
 // would silently admit; after the fix, it must observe the fence.
 void test_cross_locality_authoritative_fence(hpx::id_type const& peer_locality)
 {
-    hpx::supervision::sentinel const peer_sentinel(peer_locality);
     hpx::supervision::registry const r(hpx::find_here());
 
     hpx::supervision::joined_peer const peer =
-        r.join(hpx::launch::sync, peer_sentinel, peer_locality);
+        r.join(hpx::launch::sync, hpx::find_here());
     HPX_TEST_NEQ(peer.target, hpx::invalid_id);
 
-    // Bring the peer sentinel to a legal terminal state (started -> failed)
+    // Bring the peer locality to a legal terminal state (started -> failed)
     // directly on peer_locality, triggering the registry's lifecycle observer.
     //
     // This test shares peer_locality with
@@ -161,10 +161,16 @@ void test_cross_locality_authoritative_fence(hpx::id_type const& peer_locality)
     // drop a publish at a stale, lower epoch, so every epoch used below must
     // be the actual value returned by join() (peer.join_epoch), not a
     // hardcoded 0.
-    peer_sentinel.start(hpx::launch::sync, peer.join_epoch);
-    hpx::supervision::publish_event(hpx::launch::sync, peer_locality,
-        peer_sentinel.get_id(), hpx::supervision::event::failed,
-        peer.join_epoch);
+    hpx::supervision::publish_event(
+        peer_locality, hpx::supervision::event::started, peer.join_epoch);
+
+    // Publish under the hosting locality (hpx::find_here(), evaluated on that
+    // locality) rather than the locality's own component id;
+    // register_observers() now watches that same locality-keyed target, so the
+    // simulated `failed` event below must target peer_locality too for the
+    // registry's lifecycle observer to fire.
+    hpx::supervision::publish_event(
+        peer_locality, hpx::supervision::event::failed, peer.join_epoch);
 
     // Wait for the observer's mirroring callback to run. Its dual-publish onto
     // peer_locality (see register_observers() in registry_server.cpp) happens

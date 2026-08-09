@@ -82,7 +82,7 @@ void run_worker_role()
 {
     // Registers this locality as a supervised participant and returns the
     // handle used for every subsequent supervision_dispatch call below.
-    hpx::supervision::supervision_handle const handle =
+    hpx::supervision::registry const handle =
         hpx::supervision::init(hpx::launch::sync, worker_discovery_timeout);
 
     // Pull the epoch init() just established (via run_init_sequence()'s

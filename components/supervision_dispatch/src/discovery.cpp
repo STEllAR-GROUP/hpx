@@ -12,7 +12,6 @@
 #include <hpx/supervision_dispatch/discovery.hpp>
 #include <hpx/supervision_dispatch/dispatch_api.hpp>
 #include <hpx/supervision_dispatch/registry.hpp>
-#include <hpx/supervision_dispatch/sentinel.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -30,14 +29,11 @@ namespace hpx::supervision {
         std::vector<hpx::id_type> const remote_localities =
             hpx::find_remote_localities();
 
-        std::vector<sentinel> sentinel_clients;
         std::vector<registry> registry_clients;
-
-        sentinel_clients.reserve(remote_localities.size());
         registry_clients.reserve(remote_localities.size());
 
-        // Fire off all sentinel/registry lookups concurrently, up front, rather
-        // than resolving them one locality at a time.
+        // Fire off all registry lookups concurrently, up front, rather than
+        // resolving them one locality at a time.
         for (hpx::id_type const& remote_locality : remote_localities)
         {
             std::uint32_t const locality_id =
@@ -45,7 +41,6 @@ namespace hpx::supervision {
             std::string const prefix =
                 "/" + std::to_string(locality_id) + "/supervision_dispatch/";
 
-            sentinel_clients.emplace_back(prefix + "sentinel");
             registry_clients.emplace_back(prefix + "registry");
         }
 
@@ -54,28 +49,25 @@ namespace hpx::supervision {
         // to remote_localities.size() * timeout in the worst case). Inputs are
         // left untouched by wait_all_for, so they remain individually queryable
         // via is_ready() below regardless of the returned status.
-        hpx::wait_all_for_nothrow(timeout, sentinel_clients, registry_clients);
+        hpx::wait_all_for_nothrow(timeout, registry_clients);
 
         std::vector<hpx::supervision::discovered_peer> peers;
         peers.reserve(remote_localities.size());
 
         for (std::size_t i = 0; i != remote_localities.size(); ++i)
         {
-            // Only include peers whose sentinel *and* registry names both
-            // resolved within the timeout; a locality that never called
-            // register_name() (e.g. because it has not run init_supervision()
-            // yet) is simply not participating in supervision, not an error.
-            hpx::supervision::sentinel& s = sentinel_clients[i];
-            hpx::supervision::registry& r = registry_clients[i];
-
-            bool const sentinel_resolved = s.is_ready() && !s.has_exception();
-            bool const registry_resolved = r.is_ready() && !r.has_exception();
-
-            if (sentinel_resolved && registry_resolved)
+            // Only include peers whose registry name resolved within the
+            // timeout; a locality that never called register_name() (e.g.
+            // because it has not run init_supervision() yet) is simply not
+            // participating in supervision, not an error.
+            if (hpx::supervision::registry& r = registry_clients[i];
+                r.is_ready() && !r.has_exception())
             {
+                // remote_localities[i] was only ever the starting candidate to
+                // probe; the registry that actually answered is ground truth
+                // for locality, so derive it from the resolved registry client
                 peers.push_back(hpx::supervision::discovered_peer{
-                    .locality = remote_localities[i],
-                    .sentinel_client = HPX_MOVE(s),
+                    .locality = r.get_locality(),
                     .registry_client = HPX_MOVE(r)});
             }
         }
@@ -92,16 +84,15 @@ namespace hpx::supervision {
 
         for (discovered_peer const& peer : peers)
         {
-            shadow_futures.push_back(
-                local_registry.join(peer.sentinel_client, peer.locality));
+            shadow_futures.push_back(local_registry.join(peer.locality));
         }
 
         // Bound the join phase the same way discover_peers() bounds resolution:
-        // a peer that resolved during discovery but tears down its sentinel_/
-        // registry_ mid-join (e.g. a concurrent finalize()) must not be able to
-        // hang this call indefinitely. Inputs are left untouched by
-        // wait_all_for, so is_ready()/has_exception() below remain individually
-        // queryable regardless of the returned status.
+        // a peer that resolved during discovery but tears down its registry_
+        // mid-join (e.g. a concurrent finalize()) must not be able to hang this
+        // call indefinitely. Inputs are left untouched by wait_all_for, so
+        // is_ready()/has_exception() below remain individually queryable
+        // regardless of the returned status.
         hpx::wait_all_for_nothrow(timeout, shadow_futures);
 
         std::vector<discovered_peer> joined;
@@ -133,18 +124,10 @@ namespace hpx::supervision {
             // that fan_out_join() never reported as joined. evict_peer() is
             // already safe to call redundantly/late (no-op if re-joined or
             // already evicted), so this only needs to fire-and-forget.
-            local_registry.leave(
-                peers[i].sentinel_client, peers[i].locality, HPX_MOVE(f));
+            local_registry.leave(peers[i].locality, HPX_MOVE(f));
         }
 
         return joined;
-    }
-
-    std::vector<discovered_peer> fan_out_join(supervision_handle const& handle,
-        std::vector<discovered_peer> const& peers,
-        hpx::chrono::steady_duration const& timeout)
-    {
-        return fan_out_join(handle.registry_client, peers, timeout);
     }
 
     std::vector<discovered_peer> discover_and_join(
@@ -154,10 +137,10 @@ namespace hpx::supervision {
         // One shared budget for discovery, join, and visibility polling.
         auto const deadline = timeout.from_now();
         auto const remaining = [&] {
-            return hpx::chrono::steady_duration(
-                std::chrono::steady_clock::now() >= deadline ?
+            auto const now = std::chrono::steady_clock::now();
+            return hpx::chrono::steady_duration(now >= deadline ?
                     std::chrono::steady_clock::duration::zero() :
-                    deadline - std::chrono::steady_clock::now());
+                    deadline - now);
         };
 
         std::vector<discovered_peer> const peers = discover_peers(remaining());
@@ -194,13 +177,6 @@ namespace hpx::supervision {
             hpx::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
         return joined;
-    }
-
-    std::vector<discovered_peer> discover_and_join(
-        supervision_handle const& handle,
-        hpx::chrono::steady_duration const& timeout)
-    {
-        return discover_and_join(handle.registry_client, timeout);
     }
 }    // namespace hpx::supervision
 
