@@ -98,6 +98,7 @@ hpx_libs = {}
 hpx_components = []
 header_info = {}
 all_symbol_anchors = {}
+page_symbol_targets = {}
 
 # Symmetric mapping between a page's title (the key used in
 # all_symbol_anchors) and its "distributed"/"core" counterpart's title,
@@ -121,8 +122,23 @@ _DOXYGEN_KIND_TO_DIRECTIVE = {
     'enum': 'doxygenenum',
     'typedef': 'doxygentypedef',
     'function': 'doxygenfunction',
+    'concept': 'doxygenconcept',
 }
 
+# Maps a Breathe directive (as returned by detect_symbol_kind() below) to
+# the matching disambiguation-aware ":hpx:<kind>:" role registered by
+# extensions/sphinx-hpx.py, used to emit kind-aware counterpart "See also"
+# cross-references (see populate see_also below).
+_DOXYGEN_DIRECTIVE_TO_HPX_ROLE = {
+    'doxygenclass': 'class',
+    'doxygenstruct': 'struct',
+    'doxygenvariable': 'member',
+    'doxygenenum': 'enum',
+    'doxygentypedef': 'type',
+    'doxygenfunction': 'func',
+    'doxygenconcept': 'concept',
+    'doxygenvariable': 'variable',
+}
 
 def _load_doxygen_function_signatures():
     """Lazily parse the already-generated Doxygen XML once, building a map
@@ -294,6 +310,7 @@ def get_info_from_file(source):
                     title = remainder if remainder else page_id
                     if remainder:
                         leading_token = title.split()[0]
+                        page_symbol_targets[title] = leading_token
                         overload_counterparts[title] = leading_token
                         overload_counterparts[leading_token] = title
                     group = [title]
@@ -313,7 +330,8 @@ def get_info_from_file(source):
                     merged_group.append(title)
         page_groups = [merged_group] if merged_group else [["None"]]
         for title in merged_group:
-            kind_map[title] = detect_symbol_kind(title)
+            kind_map[title] = detect_symbol_kind(
+                page_symbol_targets.get(title, title))
 
     if not page_groups:
         page_groups = [["None"]]
@@ -679,22 +697,25 @@ def generate_module_api_refs(module, out_root):
 
                 counterpart_title = overload_counterparts.get(page_title)
                 if counterpart_title:
-                    see_also += "\n.. seealso::\n   :hpx-api:`{0}`\n".format(
-                        counterpart_title)
+                    hpx_role = _DOXYGEN_DIRECTIVE_TO_HPX_ROLE.get(
+                        detect_symbol_kind(counterpart_title), 'func')
+                    see_also += "\n.. seealso::\n   :hpx:{0}:`{1}`\n".format(
+                        hpx_role, counterpart_title)
 
                 symbol_ref = open(basedir + '/' + symbol_page_name + '.rst', 'w')
                 kind = kind_map.get(page_title, 'doxygenfunction')
 
+                symbol_target = page_symbol_targets.get(page_title, page_title)
                 if kind == 'doxygenfunction':
-                    overload_sigs = find_overloads(page_title)
+                    overload_sigs = find_overloads(symbol_target)
                 else:
                     overload_sigs = []
 
                 if not overload_sigs:
-                    directive_block = '.. {0}:: {1}\n   :project: hpx'.format(kind, page_title)
+                    directive_block = '.. {0}:: {1}\n   :project: hpx'.format(kind, symbol_target)
                 else:
                     directive_block = '\n'.join(
-                        '.. {0}:: {1}{2}\n   :project: hpx'.format(kind, page_title, sig)
+                        '.. {0}:: {1}{2}\n   :project: hpx'.format(kind, symbol_target, sig)
                         for sig in overload_sigs)
 
                 symbol_ref.write(api_symbol_file.format(
@@ -733,8 +754,8 @@ for module in sorted(hpx_components):
     api_refs += generate_module_api_refs(module, 'components/' + module)
 
 
-# write found symbols to 'symbol_anchors.json' for the :hpx-api: sphinx
-# role to pick up (see: extensions/sphinx-hpx.py)
+# write found symbols to 'symbol_anchors.json' for the :hpx:<kind>:
+# sphinx roles to pick up (see: extensions/sphinx-hpx.py)
 json_path = os.path.join(os.path.abspath('.'), 'api/symbol_anchors.json')
 with open(json_path, 'w') as json_file:
     json.dump(all_symbol_anchors, json_file, indent=2, sort_keys=True)

@@ -22,7 +22,6 @@
 
 #include <cstdint>
 #include <map>
-#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -109,15 +108,8 @@ namespace hpx::supervision::server {
         /// \endcond
 
     protected:
-        // Returns {shadow, stored_peer_locality, true} if peer_sentinel is
-        // already fully joined (stored_peer_locality being the peer_locality
-        // originally recorded for it by join(), not necessarily the one passed
-        // to the current call), or {shadow_id(), hpx::id_type(), false} once
-        // this call has reserved a fresh entry for it and the caller is
-        // responsible for completing the join.
-        std::tuple<shadow_id, hpx::id_type, bool> reserve_ownership(
+        std::pair<shadow_id, bool> reserve_ownership(
             hpx::id_type const& peer_sentinel);
-
         std::pair<hpx::id_type, hpx::id_type> register_observers(
             hpx::id_type const& peer_sentinel,
             hpx::id_type const& peer_locality, shadow_id const& shadow);
