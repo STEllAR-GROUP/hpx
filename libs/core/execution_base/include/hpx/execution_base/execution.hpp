@@ -512,7 +512,10 @@ namespace hpx::parallel::execution {
             requires(!std::integral<Shape> &&
                 !detail::has_bulk_async_execute_member<Executor, F, Shape,
                     Ts...> &&
-                hpx::traits::is_bulk_two_way_executor_v<std::decay_t<Executor>>)
+                hpx::traits::is_bulk_two_way_executor_v<
+                    std::decay_t<Executor>> &&
+                !hpx::functional::is_tag_invocable_v<bulk_async_execute_t,
+                    Executor &&, F &&, Shape const&, Ts && ...>)
         HPX_FORCEINLINE auto operator()(
             Executor&& exec, F&& f, Shape const& shape, Ts&&... ts) const
             -> decltype(HPX_FORWARD(Executor, exec)
@@ -529,8 +532,6 @@ namespace hpx::parallel::execution {
             requires(!std::integral<Shape> &&
                 !detail::has_bulk_async_execute_member<Executor, F, Shape,
                     Ts...> &&
-                !hpx::traits::is_bulk_two_way_executor_v<
-                    std::decay_t<Executor>> &&
                 hpx::functional::is_tag_invocable_v<bulk_async_execute_t,
                     Executor &&, F &&, Shape const&, Ts && ...>)
         HPX_DEPRECATED_V(2, 0,
