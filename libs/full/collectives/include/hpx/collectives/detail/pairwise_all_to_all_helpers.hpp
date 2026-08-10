@@ -187,25 +187,20 @@ namespace hpx::collectives::detail {
 
                     std::vector<T> result;
                     result.reserve(num_sites);
-                    auto append_received = [&](std::size_t const source) {
+
+                    for (std::size_t source = 0; source != num_sites; ++source)
+                    {
+                        if (source == this_site)
+                        {
+                            result.push_back(HPX_MOVE(diagonal));
+                            continue;
+                        }
+
                         // received[k - 1] came from the peer k hops behind
                         // this site, matching the receive order posted above.
                         std::size_t const k =
                             (this_site + num_sites - source) % num_sites;
                         result.push_back(received[k - 1].get());
-                    };
-
-                    for (std::size_t source = 0; source != this_site; ++source)
-                    {
-                        append_received(source);
-                    }
-
-                    result.push_back(HPX_MOVE(diagonal));
-
-                    for (std::size_t source = this_site + 1;
-                        source != num_sites; ++source)
-                    {
-                        append_received(source);
                     }
 
                     return result;
