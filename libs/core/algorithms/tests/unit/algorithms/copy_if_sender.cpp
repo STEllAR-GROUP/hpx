@@ -141,17 +141,21 @@ void test_copy_if_sender_exception(
             bool all_exceptions_expected = errors.begin() != errors.end();
             for (std::exception_ptr const& error : errors)
             {
+                bool is_expected_exception = false;
                 try
                 {
                     std::rethrow_exception(error);
                 }
                 catch (std::runtime_error const&)
                 {
+                    is_expected_exception = true;
                 }
                 catch (...)
                 {
-                    all_exceptions_expected = false;
+                    is_expected_exception = false;
                 }
+                all_exceptions_expected =
+                    all_exceptions_expected && is_expected_exception;
             }
             HPX_TEST(all_exceptions_expected);
             caught_expected_exception = all_exceptions_expected;
