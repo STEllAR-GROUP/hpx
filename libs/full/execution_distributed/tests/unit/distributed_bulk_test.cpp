@@ -36,8 +36,7 @@ namespace tt = hpx::this_thread::experimental;
 //         comparing it to the target.
 void test_bulk_integral_shape(hpx::id_type const& target)
 {
-    auto sched =
-        hpx::distributed::experimental::distributed_scheduler{target};
+    auto sched = hpx::distributed::experimental::distributed_scheduler{target};
 
     auto snd = ex::schedule(sched) |
         ex::then([]() { return hpx::find_here(); }) |
@@ -54,8 +53,7 @@ void test_bulk_integral_shape(hpx::id_type const& target)
 //         value is forwarded unchanged to the downstream.
 void test_bulk_with_upstream_value(hpx::id_type const& target)
 {
-    auto sched =
-        hpx::distributed::experimental::distributed_scheduler{target};
+    auto sched = hpx::distributed::experimental::distributed_scheduler{target};
 
     // Use an accumulator returned from ex::then so the bulk
     // function does not capture a reference to a local variable
@@ -74,8 +72,7 @@ void test_bulk_with_upstream_value(hpx::id_type const& target)
 //         and still forward the upstream value.
 void test_bulk_zero_shape(hpx::id_type const& target)
 {
-    auto sched =
-        hpx::distributed::experimental::distributed_scheduler{target};
+    auto sched = hpx::distributed::experimental::distributed_scheduler{target};
 
     auto snd = ex::schedule(sched) | ex::then([]() { return 42; }) |
         ex::bulk(0, [](int, int) {});
@@ -90,8 +87,7 @@ void test_bulk_zero_shape(hpx::id_type const& target)
 //         error channel should fire.
 void test_bulk_exception_propagation(hpx::id_type const& target)
 {
-    auto sched =
-        hpx::distributed::experimental::distributed_scheduler{target};
+    auto sched = hpx::distributed::experimental::distributed_scheduler{target};
 
     bool caught_exception = false;
     try
@@ -121,8 +117,7 @@ void test_bulk_exception_propagation(hpx::id_type const& target)
 //         the distributed_scheduler (environment propagation).
 void test_bulk_preserves_scheduler_env(hpx::id_type const& target)
 {
-    auto sched =
-        hpx::distributed::experimental::distributed_scheduler{target};
+    auto sched = hpx::distributed::experimental::distributed_scheduler{target};
 
     auto snd = ex::schedule(sched) | ex::bulk(1, [](int) {});
 
