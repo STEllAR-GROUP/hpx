@@ -94,5 +94,5 @@ int main(int argc, char* argv[])
     hpx::init_params init_args;
     init_args.desc_cmdline = desc_commandline;
 
-    return hpx::init(argc, argv, init_args);
+    return hpx::init(hpx_main, argc, argv, init_args);
 }
