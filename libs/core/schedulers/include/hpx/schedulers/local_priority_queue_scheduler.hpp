@@ -16,6 +16,7 @@
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/topology.hpp>
+#include <hpx/modules/tracing.hpp>
 #include <hpx/schedulers/deadlock_detection.hpp>
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
 #include <hpx/schedulers/thread_queue.hpp>
@@ -742,6 +743,11 @@ namespace hpx::threads::policies {
                     q->get_next_thread(thrd, true, true))
                 {
                     increment_counters(q, this_queue);
+                    hpx::tracing::work_stolen(num_thread, idx,
+                        get_thread_id_data(thrd)->get_thread_id().get(),
+                        get_thread_id_data(thrd)
+                            ->get_description()
+                            .get_description());
                     return true;
                 }
                 return false;
@@ -761,6 +767,11 @@ namespace hpx::threads::policies {
                         q->get_next_thread(thrd, true, true))
                     {
                         increment_counters(q, this_high_priority_queue);
+                        hpx::tracing::work_stolen(num_thread, idx,
+                            get_thread_id_data(thrd)->get_thread_id().get(),
+                            get_thread_id_data(thrd)
+                                ->get_description()
+                                .get_description());
                         return true;
                     }
                 }
