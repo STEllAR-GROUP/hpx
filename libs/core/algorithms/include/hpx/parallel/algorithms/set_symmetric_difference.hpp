@@ -283,9 +283,9 @@ namespace hpx::parallel {
             template <typename ExPolicy, typename Iter1, typename Sent1,
                 typename Iter2, typename Sent2, typename Iter3, typename F,
                 typename Proj1, typename Proj2>
-            static decltype(auto)
-            parallel(ExPolicy&& policy, Iter1 first1, Sent1 last1, Iter2 first2,
-                Sent2 last2, Iter3 dest, F&& f, Proj1&& proj1, Proj2&& proj2)
+            static decltype(auto) parallel(ExPolicy&& policy, Iter1 first1,
+                Sent1 last1, Iter2 first2, Sent2 last2, Iter3 dest, F&& f,
+                Proj1&& proj1, Proj2&& proj2)
             {
                 using difference_type1 =
                     typename std::iterator_traits<Iter1>::difference_type;
@@ -349,9 +349,9 @@ namespace hpx {
                 >
             )
         // clang-format on
-        static decltype(auto)
-        invoke_default(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
-            FwdIter2 first2, FwdIter2 last2, FwdIter3 dest, Pred op = Pred())
+        static decltype(auto) invoke_default(ExPolicy&& policy, FwdIter1 first1,
+            FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, FwdIter3 dest,
+            Pred op = Pred())
         {
             static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");
