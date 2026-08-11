@@ -16,7 +16,6 @@
 //   4. In the Tracy message log, search for "Work Stolen" or color 0xFFC107.
 //      You will see thief-victim core mappings and task pointers.
 
-#include <hpx/async.hpp>
 #include <hpx/future.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/tracing.hpp>
