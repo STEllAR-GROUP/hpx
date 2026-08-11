@@ -63,7 +63,11 @@ namespace hpx::supervision {
     /// publications for the same target/epoch become no-ops, reported via
     /// \c already_terminal. Non-terminal transitions remain invalid.
     HPX_CXX_EXPORT enum class publish_result : std::uint8_t {
-        /// The event was recorded and observers (if any) were notified.
+        /// The event was successfully recorded (state was mutated),
+        /// independent of whether any registered observers were notified.
+        /// Notification behavior depends on which function was called:
+        /// \a publish_event() notifies registered observers, while
+        /// \a publish_event_no_notify() never does.
         applied,
         /// The target had already reached a terminal event (\c completed
         /// or \c failed) within the current epoch; the call was a no-op
@@ -207,6 +211,43 @@ namespace hpx::supervision {
     /// \note         Local observers of \a target are notified
     ///               synchronously as part of this call.
     HPX_CXX_EXPORT HPX_EXPORT publish_result publish_event(
+        hpx::id_type const& target, hpx::supervision::event ev,
+        std::uint64_t epoch = 0, hpx::error_code& ec = throws);
+
+    /// \brief Publish a lifecycle event for a target actor on the local
+    ///        locality, without notifying any registered observers.
+    ///
+    /// This overload applies the same epoch/terminal-latch state-mutation rules
+    /// as the local-only \a publish_event() overload above, and resolves any \a
+    /// await_terminal() waiters affected by the transition, but never invokes
+    /// per-target lifecycle observers (\a register_observer()) or activity
+    /// observers (\a register_activity_observer()) for this call: it is meant
+    /// purely as a state write for consumers of \a query_state(), \a
+    /// check_admission(), and \a await_terminal(), not as a notification
+    /// mechanism. In particular, calling it from within a lifecycle observer
+    /// callback registered for \a target cannot re-invoke that observer, unlike
+    /// the notifying overload.
+    ///
+    /// \param target [in] The actor (or component) for which the event is
+    ///               published. Must be local to the calling locality.
+    /// \param ev     [in] The lifecycle event to publish for \a target.
+    /// \param epoch  [in] The epoch this publication belongs to. See
+    ///               \a publish_event() for the epoch-scoped semantics.
+    /// \param ec     [in,out] this represents the error status on exit, if
+    ///               this is pre-initialized to \a hpx::throws the function
+    ///               will throw on error instead.
+    ///
+    /// \throws       hpx::exception if \a target does not represent a
+    ///               valid target, unless \a ec was not pre-initialized to
+    ///               \a hpx::throws.
+    ///
+    /// \returns      \c publish_result::applied,
+    ///               \c publish_result::already_terminal if \a target had
+    ///               already reached a terminal event (\c completed or
+    ///               \c failed) within \a epoch, or
+    ///               \c publish_result::stale_epoch if \a epoch is lower
+    ///               than the target's current epoch.
+    HPX_CXX_EXPORT HPX_EXPORT publish_result publish_event_no_notify(
         hpx::id_type const& target, hpx::supervision::event ev,
         std::uint64_t epoch = 0, hpx::error_code& ec = throws);
 

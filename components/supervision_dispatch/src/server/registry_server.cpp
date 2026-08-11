@@ -136,29 +136,24 @@ namespace hpx::supervision::server {
                     auto const local_state =
                         hpx::supervision::query_state(peer_locality, ec);
 
-                    // Skipped the publish_event when peer_locality *is* L (e.g.
-                    // a locality joining a peer locality hosted on itself, as
-                    // unit tests do): register_observer() above now watches
-                    // peer_locality directly, so in that case this callback was
-                    // triggered by a publish into that very same local manager
-                    // entry it is about to write to again. Since non-terminal
-                    // transitions (started/running/suspending) legally
-                    // self-loop, an unconditional re-publish here would feed
-                    // the just-applied event straight back into this same
-                    // observer, looping forever. No such loop exists in the
-                    // genuine cross-locality case, since the re-publish then
-                    // targets a different manager instance than the one the
-                    // observer is registered against.
-                    bool const would_self_recurse = peer_locality == here ||
-                        local_state.epoch == notification.epoch;
-
-                    if (!would_self_recurse &&
-                        (ec ||
-                            local_state.last_event ==
-                                hpx::supervision::event::unknown))
+                    // Both mirroring publishes below go through
+                    // publish_event_no_notify() rather than publish_event():
+                    // this callback is itself registered as an observer for
+                    // peer_locality, so a notifying re-publish into that same
+                    // local manager entry would synchronously re-invoke this
+                    // very observer, regardless of whether peer_locality names
+                    // a different locality than L or not (the
+                    // register_observer()/publish_event() pair operate on a
+                    // single local per-target observer list, not one scoped per
+                    // remote manager instance). publish_event_no_notify()
+                    // performs the same state mutation without delivering to
+                    // observers_, so it cannot re-trigger this callback.
+                    if (ec ||
+                        local_state.last_event ==
+                            hpx::supervision::event::unknown)
                     {
                         hpx::error_code ec1(hpx::throwmode::lightweight);
-                        hpx::supervision::publish_event(peer_locality,
+                        hpx::supervision::publish_event_no_notify(peer_locality,
                             hpx::supervision::event::started,
                             notification.epoch, ec1);
                     }
@@ -192,16 +187,16 @@ namespace hpx::supervision::server {
                     // itself always runs on L (the dispatching locality that
                     // owns this registry/agent, regardless of where the peer
                     // lives - see the comment on register_observers() above),
-                    // and the publish_event() call below is the local-only
-                    // overload, i.e. it writes into L's own local
-                    // supervision_manager keyed by peer_locality - a distinct
-                    // map entry from peer_locality's own manager whenever
-                    // peer_locality genuinely names a different locality than
-                    // L.
-                    if (!would_self_recurse)
+                    // and the publish_event_no_notify() call below is the
+                    // local-only, non-notifying overload, i.e. it writes into
+                    // L's own local supervision_manager keyed by
+                    // peer_locality without delivering to that entry's
+                    // registered observers (see the comment above explaining
+                    // why a notifying publish would self-recurse into this
+                    // very callback).
                     {
                         hpx::error_code ec2(hpx::throwmode::lightweight);
-                        hpx::supervision::publish_event(peer_locality,
+                        hpx::supervision::publish_event_no_notify(peer_locality,
                             notification.event, notification.epoch, ec2);
                     }
 
@@ -227,8 +222,12 @@ namespace hpx::supervision::server {
                     return true;
                 };
 
-            lifecycle_observer = hpx::supervision::register_observer(
-                peer_locality, HPX_MOVE(observer));
+            // Register ourselves as an observer for the peer's locality  the
+            // its locality. This enables mirroring the peer's lifecycle events
+            // to here.
+            lifecycle_observer =
+                hpx::supervision::register_observer(hpx::launch::sync,
+                    peer_locality, peer_locality, HPX_MOVE(observer));
 
             // Register for activity-state transitions of any target tracked on
             // the peer's locality (this includes the peer locality itself).
@@ -396,7 +395,8 @@ namespace hpx::supervision::server {
                 if (need_publish_started)
                 {
                     hpx::error_code ec1(hpx::throwmode::lightweight);
-                    hpx::supervision::publish_event(peer_locality,
+                    hpx::supervision::publish_event(hpx::launch::sync,
+                        peer_locality, peer_locality,
                         hpx::supervision::event::started, seed_epoch, ec1);
                 }
             }

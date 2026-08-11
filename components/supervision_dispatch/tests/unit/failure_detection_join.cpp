@@ -67,130 +67,190 @@ namespace {
         return hpx::supervision::check_admission(target, epoch) ==
             hpx::supervision::dispatch_outcome::rejected_fenced;
     }
-
-    std::optional<hpx::supervision::server::peer_snapshot> find_peer_for(
-        hpx::id_type const& peer_locality)
-    {
-        auto const peers = hpx::supervision::testing::local_snapshot_peers();
-        auto const it = std::ranges::find_if(peers, [&](auto const& peer) {
-            return peer.peer_locality == peer_locality;
-        });
-
-        if (it != peers.end())
-        {
-            return *it;
-        }
-        return std::nullopt;
-    }
 }    // namespace
 
-// The peer suspends its heartbeat immediately after join() completes, before
-// the observer's failure_detection_loop() has any realistic chance to run a
-// single successful query_state() sweep against it - the exact window the
-// old default-0 query_failures seeding mishandled.
-void test_fencing_without_prior_successful_query(
-    hpx::id_type const& peer_locality)
-{
-    auto const peer = find_peer_for(peer_locality);
-    HPX_TEST(peer.has_value());
-    if (!peer)
-    {
-        return;
-    }
-
-    std::uint64_t const join_epoch = peer->join_epoch;
-    HPX_TEST_NEQ(join_epoch, static_cast<std::uint64_t>(0));
-    HPX_TEST_EQ(
-        hpx::supervision::query_state(peer->peer_locality).epoch, join_epoch);
-
-    bool const fenced = wait_until_fenced(
-        peer->peer_locality, join_epoch, std::chrono::seconds(5));
-    HPX_TEST(fenced);
-
-    HPX_TEST(
-        hpx::supervision::check_admission(peer->peer_locality, join_epoch) ==
-        hpx::supervision::dispatch_outcome::rejected_fenced);
-
-    hpx::future<int> f = hpx::supervision::dispatch_work<probe_action>(
-        peer->peer_locality, join_epoch);
-
-    bool caught = false;
-    try
-    {
-        f.get();
-        HPX_TEST(false);
-    }
-    catch (hpx::exception const& e)
-    {
-        caught = true;
-        HPX_TEST(hpx::get_error(e) == hpx::error::target_fenced);
-    }
-    HPX_TEST(caught);
-}
-
-// Regression check for registry_server.cpp's peer_locality dual-publish fix:
-// register_observers() and join() must mirror a joined peer's lifecycle events
-// onto the peer's own locality (peer_locality), not just onto the joining
-// registry's local shadow copy, so that invoke_fenced_action()'s authoritative
-// re-check -- which always consults whichever locality it is actually executing
-// on (see dispatch_work.hpp) -- can see the fence.
+// Regression check for register_observers()'s epoch-sensitive guard (see
+// registry_server.cpp's "notification.epoch > join_epoch" handling): a fix that
+// only re-arms mirroring for a peer's *first* epoch (e.g. by relying on some
+// one-time registration/reset state that is never re-armed on epoch rollover)
+// could still silently stop mirroring once the peer rejoins under a new epoch.
+// This drives peer_locality through two distinct epochs against the same
+// registry and asserts that mirroring - and the "never regress" / stale-epoch
+// rejection contract of publish_event() - keeps working identically in the
+// second epoch, not just the first.
 //
-// Deliberately bypasses dispatch_work()'s caller-local early-out by dispatching
-// fenced_action directly to peer_locality: that early-out independently
-// observes the *local* mirror, which was never missing, so routing through
-// dispatch_work() here would mask the bug under test. Before the
-// registry_server.cpp fix, peer_locality's supervision_manager never received a
-// publish_event() call for this shadow at all, so the authoritative re-check
-// would silently admit; after the fix, it must observe the fence.
-void test_cross_locality_authoritative_fence(hpx::id_type const& peer_locality)
+// Reuses the same join()/publish_event() scaffolding as
+// test_cross_locality_authoritative_fence() above. In particular,
+// peer_locality's locally tracked shadow state carries over from whatever the
+// previously run tests in this file left behind, so every epoch used below is
+// read back from join()'s return value (peer1.join_epoch / peer2.join_epoch)
+// rather than hardcoded - see that test's comment for why.
+hpx::supervision::joined_peer test_mirroring_survives_epoch_rollover(
+    hpx::id_type const& peer_locality)
 {
     hpx::supervision::registry const r(hpx::find_here());
 
-    hpx::supervision::joined_peer const peer =
-        r.join(hpx::launch::sync, hpx::find_here());
-    HPX_TEST_NEQ(peer.target, hpx::invalid_id);
+    // --- Epoch N ---
+    hpx::supervision::joined_peer const peer1 =
+        r.join(hpx::launch::sync, peer_locality);
+    HPX_TEST_NEQ(peer1.target, hpx::invalid_id);
 
-    // Bring the peer locality to a legal terminal state (started -> failed)
-    // directly on peer_locality, triggering the registry's lifecycle observer.
+    std::uint64_t const epoch_n = peer1.join_epoch + 1;
+
+    // Drive started -> running -> running under epoch N, confirming mirroring
+    // (mirrored epoch matches, event_sequence_number strictly advancing) - the
+    // same monotonicity check used by
+    // test_cross_locality_sequence_number_increasing() in
+    // registry_mirroring.cpp.
+    std::vector<hpx::supervision::event> const first_sequence{
+        hpx::supervision::event::started, hpx::supervision::event::running,
+        hpx::supervision::event::running};
+
+    std::uint64_t previous = 0;
+    for (auto const ev : first_sequence)
+    {
+        hpx::supervision::publish_event(
+            hpx::launch::sync, peer_locality, peer_locality, ev, epoch_n);
+
+        auto const deadline =
+            std::chrono::steady_clock::now() + std::chrono::seconds(5);
+        hpx::supervision::lifecycle_state state =
+            hpx::supervision::query_state(peer1.target);
+        while (state.event_sequence_number <= previous &&
+            std::chrono::steady_clock::now() < deadline)
+        {
+            hpx::this_thread::yield();
+            state = hpx::supervision::query_state(peer1.target);
+        }
+
+        HPX_TEST(state.event_sequence_number > previous);
+        HPX_TEST_EQ(state.epoch, epoch_n);
+        HPX_TEST(state.last_event == ev);
+
+        previous = state.event_sequence_number;
+    }
+
+    // Drive the peer to a terminal event so the registry's own lifecycle
+    // observer (registered by the join() above) evicts this entry from its
+    // internal peers_ map (see registry::evict_peer() in registry_server.cpp) -
+    // the same mechanism test_registry_join_terminal_peer_evicted_from_peers()
+    // in registry_join.cpp relies on to make a *later* join() for the same peer
+    // mint a fresh epoch instead of returning this same, now-terminal entry.
+    hpx::supervision::publish_event(hpx::launch::sync, peer_locality,
+        peer_locality, hpx::supervision::event::failed, epoch_n);
+
+    // Eviction is dispatched asynchronously (via hpx::post(), see
+    // register_observers()); poll re-joining via the very same registry `r`
+    // until it returns a different entry, exactly as
+    // test_registry_join_terminal_peer_evicted_from_peers() does.
+    hpx::supervision::joined_peer peer2 = peer1;
+    auto const rejoin_deadline =
+        std::chrono::steady_clock::now() + std::chrono::seconds(5);
+    while (std::chrono::steady_clock::now() < rejoin_deadline)
+    {
+        peer2 = r.join(hpx::launch::sync, peer_locality);
+        if (peer2 != peer1)
+        {
+            break;
+        }
+        hpx::this_thread::sleep_for(std::chrono::milliseconds(20));
+    }
+
+    HPX_TEST(peer2 != peer1);
+    HPX_TEST_NEQ(peer2.target, hpx::invalid_id);
+
+    std::uint64_t const epoch_n1 = peer2.join_epoch;
+    HPX_TEST(epoch_n1 > epoch_n);
+
+    // --- Simulated rejoin: epoch N+1 ---
     //
-    // This test shares peer_locality with
-    // test_fencing_without_prior_successful_query(), which runs first and can
-    // drive peer_locality's shadow past epoch 0 (join()'s escalation logic
-    // seeds a fresh epoch past whatever terminal state that earlier test left
-    // behind). publish_event()'s "never regress" contract would then silently
-    // drop a publish at a stale, lower epoch, so every epoch used below must
-    // be the actual value returned by join() (peer.join_epoch), not a
-    // hardcoded 0.
-    hpx::supervision::publish_event(
-        peer_locality, hpx::supervision::event::started, peer.join_epoch);
+    // Same started -> running -> running -> completed sequence and monotonicity
+    // checks as epoch N above, but the mirrored epoch must now track epoch_n1,
+    // not remain stuck at epoch_n - exactly the gap a fix that only re-arms
+    // mirroring once (for the peer's first epoch) would fail to close.
+    std::vector<hpx::supervision::event> const second_sequence{
+        hpx::supervision::event::started,
+        hpx::supervision::event::running,
+        hpx::supervision::event::running,
+        hpx::supervision::event::completed,
+    };
 
-    // Publish under the hosting locality (hpx::find_here(), evaluated on that
-    // locality) rather than the locality's own component id;
-    // register_observers() now watches that same locality-keyed target, so the
-    // simulated `failed` event below must target peer_locality too for the
-    // registry's lifecycle observer to fire.
-    hpx::supervision::publish_event(
-        peer_locality, hpx::supervision::event::failed, peer.join_epoch);
+    previous = 0;
+    for (auto const ev : second_sequence)
+    {
+        hpx::supervision::publish_event(
+            hpx::launch::sync, peer_locality, peer_locality, ev, epoch_n1);
 
-    // Wait for the observer's mirroring callback to run. Its dual-publish onto
-    // peer_locality (see register_observers() in registry_server.cpp) happens
-    // strictly before its local publish returns, so once the local mirror is
-    // observed as fenced here, the peer_locality-side mirror is guaranteed to
-    // be in place too.
-    bool const fenced = wait_until_fenced(
-        peer.target, peer.join_epoch, std::chrono::seconds(5));
+        auto const deadline =
+            std::chrono::steady_clock::now() + std::chrono::seconds(5);
+        hpx::supervision::lifecycle_state state =
+            hpx::supervision::query_state(peer2.target);
+
+        while (state.event_sequence_number <= previous &&
+            std::chrono::steady_clock::now() < deadline)
+        {
+            hpx::this_thread::yield();
+            state = hpx::supervision::query_state(peer2.target);
+        }
+
+        HPX_TEST_EQ(state.epoch, epoch_n1);
+        HPX_TEST(state.last_event == ev);
+        HPX_TEST(state.event_sequence_number > previous);
+
+        previous = state.event_sequence_number;
+    }
+
+    // A stale-epoch (N) publish attempted after the rejoin must be rejected the
+    // same way as before the rejoin - no leakage into the N+1 state.
+    hpx::supervision::lifecycle_state const before_stale =
+        hpx::supervision::query_state(
+            hpx::launch::sync, peer_locality, peer2.target);
+
+    hpx::supervision::publish_event(hpx::launch::sync, peer_locality,
+        peer_locality, hpx::supervision::event::running, epoch_n);
+
+    hpx::supervision::lifecycle_state const after_stale =
+        hpx::supervision::query_state(
+            hpx::launch::sync, peer_locality, peer2.target);
+
+    HPX_TEST_EQ(after_stale.epoch, before_stale.epoch);
+    HPX_TEST_EQ(
+        after_stale.event_sequence_number, before_stale.event_sequence_number);
+    HPX_TEST(after_stale.last_event == before_stale.last_event);
+
+    return peer2;
+}
+
+// The peer suspends its heartbeat immediately after the second barrier
+// completes, before the observer's failure_detection_loop() has any realistic
+// chance to run a single successful query_state() sweep against it - the exact
+// window the old default-0 query_failures seeding mishandled.
+void test_fencing_without_prior_successful_query(
+    hpx::id_type const& peer_locality,
+    hpx::supervision::joined_peer const& peer)
+{
+    std::uint64_t const join_epoch = peer.join_epoch;
+    HPX_TEST_NEQ(join_epoch, static_cast<std::uint64_t>(0));
+
+    auto const state = hpx::supervision::query_state(
+        hpx::launch::sync, peer_locality, peer_locality);
+    HPX_TEST_EQ(state.epoch, join_epoch);
+    HPX_TEST(state.last_event == hpx::supervision::event::completed);
+
+    // the peer's state should have been mirrored here
+    auto const local_state = hpx::supervision::query_state(peer_locality);
+    HPX_TEST_EQ(local_state.epoch, join_epoch);
+    HPX_TEST(local_state.last_event == hpx::supervision::event::completed);
+
+    bool const fenced =
+        wait_until_fenced(peer_locality, join_epoch, std::chrono::seconds(5));
     HPX_TEST(fenced);
 
-    // Dispatch fenced_action directly to peer_locality, bypassing
-    // dispatch_work()'s caller-local early-out entirely, so only the
-    // authoritative re-check performed on peer_locality's own
-    // supervision_manager decides the outcome.
-    using probe_fenced_action = hpx::supervision::fenced_action<probe_action,
-        hpx::id_type, std::uint64_t>;
+    HPX_TEST(hpx::supervision::check_admission(peer_locality, join_epoch) ==
+        hpx::supervision::dispatch_outcome::rejected_fenced);
 
-    hpx::future<int> f =
-        hpx::async(probe_fenced_action(), hpx::colocated(peer_locality),
-            probe_action(), peer.target, peer.join_epoch);
+    hpx::future<int> f = hpx::supervision::dispatch_work<probe_action>(
+        peer_locality, join_epoch);
 
     bool caught = false;
     try
@@ -237,11 +297,12 @@ int hpx_main()
 
     if (is_observer)
     {
-        test_fencing_without_prior_successful_query(peer_locality);
-        test_cross_locality_authoritative_fence(peer_locality);
+        hpx::supervision::joined_peer peer =
+            test_mirroring_survives_epoch_rollover(peer_locality);
+        test_fencing_without_prior_successful_query(peer_locality, peer);
     }
-    hpx::distributed::barrier::synchronize();
 
+    hpx::distributed::barrier::synchronize();
     hpx::supervision::finalize();
 
     return hpx::finalize();

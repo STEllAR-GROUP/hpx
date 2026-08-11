@@ -83,6 +83,35 @@ namespace hpx::supervision {
             });
     }
 
+    publish_result supervision_manager::publish_event_no_notify(
+        hpx::id_type const& target, event const ev, std::uint64_t const epoch,
+        hpx::error_code& ec) const
+    {
+        if (!server_)
+        {
+            HPX_THROWS_IF(ec, hpx::error::invalid_status,
+                "hpx::supervision::supervision_manager::publish_event_no_"
+                "notify",
+                "server is not registered");
+            return publish_result::already_terminal;
+        }
+
+        return hpx::detail::try_catch_exception_ptr(
+            [&]() {
+                auto const result =
+                    server_->publish_event_no_notify(target, ev, epoch);
+                if (&ec != &throws)
+                    ec = make_success_code();
+                return result;
+            },
+            [&](std::exception_ptr const& ep) {
+                HPX_RETHROWS_IF(ec, ep,
+                    "hpx::supervision::supervision_manager::publish_event_no_"
+                    "notify");
+                return publish_result::already_terminal;
+            });
+    }
+
     lifecycle_state supervision_manager::query_state(
         hpx::id_type const& target, hpx::error_code& ec) const
     {
@@ -264,6 +293,28 @@ namespace hpx::supervision {
         }
 
         return server_->check_admission(target, epoch);
+    }
+
+    void supervision_manager::tidy(hpx::error_code& ec) const
+    {
+        if (!server_)
+        {
+            HPX_THROWS_IF(ec, hpx::error::invalid_status,
+                "hpx::supervision::supervision_manager::tidy",
+                "server is not registered");
+            return;
+        }
+
+        hpx::detail::try_catch_exception_ptr(
+            [&]() {
+                server_->tidy();
+                if (&ec != &throws)
+                    ec = make_success_code();
+            },
+            [&](std::exception_ptr const& ep) {
+                HPX_RETHROWS_IF(
+                    ec, ep, "hpx::supervision::supervision_manager::tidy");
+            });
     }
 
     ///////////////////////////////////////////////////////////////////////////

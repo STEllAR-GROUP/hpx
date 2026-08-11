@@ -15,6 +15,7 @@ set(tests
     fenced_dispatch
     query_publish
     registry_join
+    registry_mirroring
     registry_snapshot
 )
 
@@ -34,6 +35,9 @@ set(fan_out_join_PARAMETERS LOCALITIES 2)
 set(fan_out_join_FLAGS COMPILE_FLAGS -DHPX_HAVE_RUN_MAIN_EVERYWHERE)
 
 set(fenced_dispatch_PARAMETERS LOCALITIES 2)
+
+set(registry_mirroring_PARAMETERS LOCALITIES 2)
+set(registry_mirroring_FLAGS COMPILE_FLAGS -DHPX_HAVE_RUN_MAIN_EVERYWHERE)
 
 foreach(test ${tests})
   set(sources ${test}.cpp)

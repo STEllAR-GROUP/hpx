@@ -208,6 +208,24 @@ namespace hpx::supervision {
         return get_supervision_manager().publish_event(target, ev, epoch, ec);
     }
 
+    // purely local request, never notifies observers
+    publish_result publish_event_no_notify(hpx::id_type const& target,
+        hpx::supervision::event const ev, std::uint64_t const epoch,
+        hpx::error_code& ec)
+    {
+        if (!target)
+        {
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "hpx::supervision::publish_event_no_notify",
+                "The id passed as the first argument is not representing "
+                "a valid target");
+            return publish_result::already_terminal;
+        }
+
+        return get_supervision_manager().publish_event_no_notify(
+            target, ev, epoch, ec);
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // Completion Query
     void serialize(hpx::serialization::output_archive& ar,

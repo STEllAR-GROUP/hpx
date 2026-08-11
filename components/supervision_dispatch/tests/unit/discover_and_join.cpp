@@ -35,7 +35,7 @@ namespace {
 
     // Long enough to comfortably absorb AGAS/peer-startup jitter across two
     // localities booting concurrently; short enough to keep the test fast.
-    constexpr std::chrono::milliseconds test_discovery_timeout{50000};
+    constexpr std::chrono::milliseconds test_discovery_timeout{5000};
 }    // namespace
 
 // ============================================================================

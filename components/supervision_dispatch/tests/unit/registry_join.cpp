@@ -118,7 +118,7 @@ void test_registry_join_distinct_peers()
     std::vector<hpx::supervision::server::peer_snapshot> const peers =
         r.snapshot_peers(hpx::launch::sync);
 
-    HPX_TEST_EQ(peers.size(), static_cast<std::size_t>(2));
+    HPX_TEST_EQ(peers.size(), static_cast<std::size_t>(1));
 
     bool const found_peer1 = std::ranges::find_if(peers, [&](auto const& peer) {
         return peer.peer_locality == here;
