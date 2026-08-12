@@ -157,8 +157,13 @@ namespace hpx::distributed::experimental::detail {
             template <class... Args>
             consteval auto operator()() const noexcept
             {
+                // Advertise decayed value types: hpx::make_tuple
+                // materializes copies, so downstream receives
+                // std::decay_t<Args>... rather than the original
+                // reference-qualified types.
                 return hpx::execution::experimental::completion_signatures<
-                    hpx::execution::experimental::set_value_t(Args...)>{};
+                    hpx::execution::experimental::set_value_t(
+                        std::decay_t<Args>...)>{};
             }
         };
 
@@ -258,21 +263,25 @@ namespace hpx::distributed::experimental::detail {
             {
                 // Fail early if the function is not invocable with the
                 // shape element type and the upstream value types.
+                // The check uses lvalue references (std::decay_t<Ts>&...)
+                // because remote_bulk_execute receives its arguments as
+                // lvalues unpacked from the hpx::tuple.
                 if constexpr (std::is_integral_v<std::decay_t<Shape>>)
                 {
-                    static_assert(hpx::is_invocable_v<std::decay_t<F>,
-                                      std::decay_t<Shape>, Ts...>,
+                    static_assert(
+                        hpx::is_invocable_v<std::decay_t<F>&,
+                            std::decay_t<Shape>, std::decay_t<Ts>&...>,
                         "distributed_bulk_sender: F must be invocable "
-                        "with (Shape, Ts...)");
+                        "with (Shape, Ts&...)");
                 }
                 else
                 {
                     using element_type = decltype(*std::begin(
                         std::declval<std::decay_t<Shape> const&>()));
-                    static_assert(hpx::is_invocable_v<std::decay_t<F>,
-                                      element_type, Ts...>,
+                    static_assert(hpx::is_invocable_v<std::decay_t<F>&,
+                                      element_type, std::decay_t<Ts>&...>,
                         "distributed_bulk_sender: F must be invocable "
-                        "with (element_type, Ts...)");
+                        "with (element_type, Ts&...)");
                 }
 
                 hpx::detail::try_catch_exception_ptr(

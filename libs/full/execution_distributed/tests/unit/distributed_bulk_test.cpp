@@ -75,7 +75,7 @@ void test_bulk_zero_shape(hpx::id_type const& target)
     auto sched = hpx::distributed::experimental::distributed_scheduler{target};
 
     auto snd = ex::schedule(sched) | ex::then([]() { return 42; }) |
-        ex::bulk(0, [](int, int) {});
+        ex::bulk(0, [](int, int) { HPX_TEST(false); });
 
     auto result = tt::sync_wait(std::move(snd));
     HPX_TEST(result.has_value());
@@ -128,6 +128,49 @@ void test_bulk_preserves_scheduler_env(hpx::id_type const& target)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// Test 6: verify that reference completions from the upstream sender
+//         are properly decayed into copies by the bulk adaptor.
+//         The upstream sends a std::string by value; the bulk function
+//         receives it as a decayed lvalue reference.
+void test_bulk_decayed_reference(hpx::id_type const& target)
+{
+    auto sched = hpx::distributed::experimental::distributed_scheduler{target};
+
+    auto snd = ex::schedule(sched) |
+        ex::then([]() { return std::string("hello"); }) |
+        ex::bulk(3, [](int /*index*/, std::string& s) { s += "!"; });
+
+    auto result = tt::sync_wait(std::move(snd));
+    HPX_TEST(result.has_value());
+    // The bulk function mutated the decayed copy 3 times
+    HPX_TEST_EQ(std::get<0>(*result), std::string("hello!!!"));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Test 7: verify that a move-only callable (rvalue-only) compiles and
+//         runs correctly through the bulk adaptor.
+void test_bulk_move_only_callable(hpx::id_type const& target)
+{
+    auto sched = hpx::distributed::experimental::distributed_scheduler{target};
+
+    struct move_only_fn
+    {
+        move_only_fn() = default;
+        move_only_fn(move_only_fn&&) = default;
+        move_only_fn& operator=(move_only_fn&&) = default;
+        move_only_fn(move_only_fn const&) = delete;
+        move_only_fn& operator=(move_only_fn const&) = delete;
+
+        void operator()(int /*index*/) const {}
+    };
+
+    auto snd = ex::schedule(sched) | ex::bulk(5, move_only_fn{});
+
+    auto result = tt::sync_wait(std::move(snd));
+    HPX_TEST(result.has_value());
+}
+
+///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
@@ -139,6 +182,8 @@ int hpx_main()
         test_bulk_zero_shape(loc);
         test_bulk_exception_propagation(loc);
         test_bulk_preserves_scheduler_env(loc);
+        test_bulk_decayed_reference(loc);
+        test_bulk_move_only_callable(loc);
     }
 
     return hpx::finalize();
