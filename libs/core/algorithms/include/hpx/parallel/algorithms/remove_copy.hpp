@@ -269,10 +269,12 @@ namespace hpx {
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/tag_dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 
 #include <algorithm>
+#include <exception>
 #include <iterator>
 #include <type_traits>
 #include <utility>
@@ -444,9 +446,7 @@ namespace hpx {
             )
         // clang-format on
         // clang-format off
-        static typename parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter2>::type
-        invoke_default(ExPolicy&& policy,
+        static decltype(auto) invoke_default(ExPolicy&& policy,
             FwdIter1 first, FwdIter1 last, FwdIter2 dest, Pred pred)
         // clang-format on
         {
@@ -456,12 +456,41 @@ namespace hpx {
             static_assert(std::forward_iterator<FwdIter2>,
                 "Required at least forward iterator.");
 
-            auto&& res = hpx::parallel::detail::remove_copy_if<
-                hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>>()
-                             .call(HPX_FORWARD(ExPolicy, policy), first, last,
-                                 dest, HPX_MOVE(pred), hpx::identity_v);
+            constexpr bool has_scheduler_executor =
+                hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
-            return hpx::parallel::util::get_second_element(HPX_MOVE(res));
+            if constexpr (has_scheduler_executor)
+            {
+                using result_handler =
+                    hpx::parallel::util::detail::algorithm_result<ExPolicy,
+                        hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>>;
+
+                return hpx::parallel::util::get_second_element(
+                    result_handler::get(hpx::parallel::execution::async_execute(
+                        policy.executor(),
+                        [first, last, dest, pred = HPX_MOVE(pred)]() mutable {
+                            try
+                            {
+                                return hpx::parallel::detail::
+                                    sequential_remove_copy_if(first, last, dest,
+                                        HPX_MOVE(pred), hpx::identity_v);
+                            }
+                            catch (...)
+                            {
+                                hpx::parallel::util::detail::
+                                    handle_local_exceptions<ExPolicy>::call(
+                                        std::current_exception());
+                            }
+                        })));
+            }
+            else
+            {
+                return hpx::parallel::util::get_second_element(
+                    hpx::parallel::detail::remove_copy_if<hpx::parallel::util::
+                            in_out_result<FwdIter1, FwdIter2>>()
+                        .call(HPX_FORWARD(ExPolicy, policy), first, last, dest,
+                            HPX_MOVE(pred), hpx::identity_v));
+            }
         }
     } remove_copy_if{};
 
@@ -505,9 +534,7 @@ namespace hpx {
             )
         // clang-format on
         // clang-format off
-        static typename parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter2>::type
-        invoke_default(ExPolicy&& policy,
+        static decltype(auto) invoke_default(ExPolicy&& policy,
             FwdIter1 first, FwdIter1 last, FwdIter2 dest, T const& value)
         // clang-format on
         {
