@@ -140,11 +140,11 @@ namespace hpx::components::server {
 
     // function to be called during shutdown
     // Action: shut down this runtime system instance
-    void runtime_support::shutdown(
-        double const timeout, hpx::id_type const& respond_to)
+    void runtime_support::shutdown(double const timeout,
+        hpx::id_type const& respond_to, bool force_disconnect)
     {
         // initiate system shutdown
-        stop(timeout, respond_to, false);
+        stop(timeout, respond_to, false, force_disconnect);
     }
 
     // function to be called to terminate this locality immediately
@@ -475,7 +475,7 @@ namespace hpx::components::server {
 
         // Now make sure this local locality gets shut down as well.
         // There is no need to respond...
-        stop(timeout, hpx::invalid_id, false);
+        stop(timeout, hpx::invalid_id, false, false);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -589,8 +589,8 @@ namespace hpx::components::server {
         }
     }
 
-    void runtime_support::stop(double const timeout,
-        hpx::id_type const& respond_to, bool const remove_from_remote_caches)
+    void runtime_support::stop(double timeout, hpx::id_type const& respond_to,
+        bool const remove_from_remote_caches, bool const force_disconnect)
     {
         std::unique_lock<std::mutex> l(mtx_);
         if (!stop_called_)
@@ -610,6 +610,11 @@ namespace hpx::components::server {
 
             {
                 unlock_guard<std::mutex> ul(mtx_);
+
+                if (timeout == -1.0)
+                {
+                    timeout = 0.0;
+                }
 
                 auto const duration_timeout = hpx::chrono::steady_duration(
                     std::chrono::duration_cast<std::chrono::nanoseconds>(
@@ -662,7 +667,8 @@ namespace hpx::components::server {
                 if (remove_from_remote_caches)
                     remove_locality_from_connection_cache(agas::get_locality());
 
-                agas_client.unregister_locality(here, ec);
+                if (!force_disconnect)
+                    agas_client.unregister_locality(here, ec);
 
                 if (remove_from_remote_caches)
                     remove_locality_from_console_connection_cache(
@@ -713,15 +719,69 @@ namespace hpx::components::server {
         }
     }
 
-    void runtime_support::remove_locality(
+    namespace {
+
+        // working around non-copy-ability of packaged_task
+        struct indirect_packaged_task
+        {
+            using packaged_task_type = hpx::packaged_task<void()>;
+
+            indirect_packaged_task()
+              : pt(std::make_shared<packaged_task_type>([]() {}))
+            {
+            }
+
+            hpx::future<void> get_future() const
+            {
+                return pt->get_future();
+            }
+
+            template <typename... Ts>
+            void operator()(Ts&&... /* vs */)
+            {
+                // This needs to be run on a HPX thread
+                hpx::post(HPX_MOVE(*pt));
+                pt.reset();
+            }
+
+            std::shared_ptr<packaged_task_type> pt;
+        };
+    }    // namespace
+
+    bool runtime_support::remove_locality(
         hpx::id_type const& locality, error_code& ec)
     {
+#if !defined(HPX_COMPUTE_DEVICE_CODE) && defined(HPX_HAVE_NETWORKING)
+        // try to inform the locality that it has been disconnected (ignore any
+        // errors)
+        using action_type = server::runtime_support::shutdown_action;
+
+        indirect_packaged_task ipt;
+        future<void> callback = ipt.get_future();
+
+        hpx::post_cb(action_type(), locality, HPX_MOVE(ipt), -1.0,
+            hpx::invalid_id, true);
+
+        // Bounded wait: don't let an unreachable/partitioned locality block
+        // forced cleanup indefinitely. Best-effort - ignore timeout/errors.
+        constexpr std::chrono::seconds shutdown_notify_timeout(5);
+        if (callback.wait_for(shutdown_notify_timeout) ==
+            hpx::future_status::ready)
+        {
+            error_code cb_ec(throwmode::lightweight);
+            callback.get(cb_ec);    // swallow any errors
+        }
+#endif
+
         remove_locality_from_connection_cache(locality.get_gid(), true);
 
         agas::addressing_service& agas_client = naming::get_agas_client();
-        agas_client.unregister_locality(locality.get_gid(), ec);
+        bool const result =
+            agas_client.unregister_locality(locality.get_gid(), ec);
 
         remove_locality_from_console_connection_cache(locality.get_gid());
+
+        return result;
     }
 
     void runtime_support::notify_waiting_main()
@@ -869,32 +929,6 @@ namespace hpx::components::server {
         }
     }
 
-    // working around non-copy-ability of packaged_task
-    struct indirect_packaged_task
-    {
-        using packaged_task_type = hpx::packaged_task<void()>;
-
-        indirect_packaged_task()
-          : pt(std::make_shared<packaged_task_type>([]() {}))
-        {
-        }
-
-        hpx::future<void> get_future() const
-        {
-            return pt->get_future();
-        }
-
-        template <typename... Ts>
-        void operator()(Ts&&... /* vs */)
-        {
-            // This needs to be run on a HPX thread
-            hpx::post(HPX_MOVE(*pt));
-            pt.reset();
-        }
-
-        std::shared_ptr<packaged_task_type> pt;
-    };
-
     void runtime_support::remove_locality_from_connection_cache(
         [[maybe_unused]] hpx::naming::gid_type const& locality,
         [[maybe_unused]] bool const skip_current)
@@ -939,11 +973,20 @@ namespace hpx::components::server {
     void runtime_support::remove_locality_from_console_connection_cache(
         [[maybe_unused]] hpx::naming::gid_type const& locality)
     {
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
-#if defined(HPX_HAVE_NETWORKING)
-        runtime_distributed const* rtd = get_runtime_distributed_ptr();
+        runtime_distributed* rtd = get_runtime_distributed_ptr();
         if (rtd == nullptr)
             return;
+
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_HAVE_NETWORKING)
+        if (agas::is_console() &&
+            locality == agas::get_console_locality().get_gid())
+        {
+            // do it locally, if possible
+            rtd->get_parcel_handler().remove_from_connection_cache(
+                locality, rtd->endpoints());
+            return;
+        }
 
         using action_type =
             server::runtime_support::remove_from_connection_cache_action;
