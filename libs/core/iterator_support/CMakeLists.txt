@@ -53,7 +53,6 @@ add_hpx_module(
     hpx_datastructures
     hpx_functional
     hpx_serialization
-    hpx_tag_invoke
     hpx_type_support
   CMAKE_SUBDIRS examples tests
 )
