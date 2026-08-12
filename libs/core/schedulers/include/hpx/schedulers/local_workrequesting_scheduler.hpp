@@ -916,14 +916,16 @@ namespace hpx::threads::policies {
                     {
                         if (stolen_thrd)
                         {
-                            hpx::tracing::work_stolen(req.num_thread_,
-                                d.num_thread_,
-                                get_thread_id_data(stolen_thrd)
-                                    ->get_thread_id()
-                                    .get(),
-                                get_thread_id_data(stolen_thrd)
-                                    ->get_description()
-                                    .get_description());
+                            if (auto* thrd_data =
+                                    get_thread_id_data(stolen_thrd))
+                            {
+                                hpx::tracing::work_stolen(req.num_thread_,
+                                    d.num_thread_,
+                                    thrd_data->get_thread_id().get(),
+                                    thread_data::get_safe_description(
+                                        thrd_data->get_description(),
+                                        "thread"));
+                            }
                         }
                     }
 
