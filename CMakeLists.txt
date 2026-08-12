@@ -1035,6 +1035,8 @@ hpx_option(
 
 if(HPX_WITH_SUPERVISION)
   hpx_add_config_define(HPX_HAVE_SUPERVISION)
+  hpx_add_config_define(HPX_HAVE_FAULT_TOLERANCE)
+  hpx_add_config_define(HPX_HAVE_FORCE_DISCONNECT)
 endif()
 
 # Profiling related build options

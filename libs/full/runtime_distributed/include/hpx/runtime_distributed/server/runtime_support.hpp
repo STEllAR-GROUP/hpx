@@ -140,7 +140,7 @@ namespace hpx::components::server {
         void shutdown_all(double timeout);
 
         /// \brief Shutdown this runtime system instance
-        [[noreturn]] static void terminate(hpx::id_type const& respond_to);
+        [[noreturn]] void terminate(hpx::id_type const& respond_to);
 
         void terminate_act(hpx::id_type const& id)
         {
@@ -148,7 +148,7 @@ namespace hpx::components::server {
         }
 
         /// \brief Shutdown runtime system instances on all localities
-        [[noreturn]] static void terminate_all();
+        [[noreturn]] void terminate_all();
 
         void terminate_all_act()
         {
@@ -291,7 +291,7 @@ namespace hpx::components::server {
 
         bool load_startup_shutdown_functions(
             hpx::util::plugin::dll& d, error_code& ec);
-        static bool load_commandline_options(hpx::util::plugin::dll& d,
+        bool load_commandline_options(hpx::util::plugin::dll& d,
             hpx::program_options::options_description& options, error_code& ec);
 #endif
 
@@ -303,7 +303,7 @@ namespace hpx::components::server {
             std::set<std::string>& startup_handled);
         bool load_startup_shutdown_functions_static(
             std::string const& mod, error_code& ec);
-        static bool load_commandline_options_static(std::string const& mod,
+        bool load_commandline_options_static(std::string const& mod,
             hpx::program_options::options_description& options, error_code& ec);
 
         // Load all plugins from the ini files found in the configuration

@@ -39,7 +39,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
       hpx_collectives
       hpx_components_base
       hpx_naming
-      hpx_naming_base
       hpx_parcelports
       hpx_performance_counters
       hpx_runtime_components

@@ -99,7 +99,7 @@ namespace {
         "__worker_slot_shutdown__";
 
     using set_message_action =
-        late_component::server::test_client::set_message_action;
+        late_component::server::test_server::set_message_action;
 
     // Copies this process's current environment, exactly as launch_process.cpp
     // and os_assigned_parcelport_port_7406.cpp do, so it can be handed to

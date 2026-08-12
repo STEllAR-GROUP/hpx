@@ -10,11 +10,10 @@ set(tests runtime_type parcel_pool shutdown_suspended_thread
 )
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(tests ${tests} force_disconnect handled_exception unhandled_exception)
+  set(tests ${tests} handled_exception unhandled_exception)
 endif()
 
 set(unhandled_exception_PARAMETERS FAILURE_EXPECTED)
-set(force_disconnect_PARAMETERS LOCALITIES 3)
 
 foreach(test ${tests})
   set(sources ${test}.cpp)

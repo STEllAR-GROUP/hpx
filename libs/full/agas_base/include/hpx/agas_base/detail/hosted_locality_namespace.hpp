@@ -28,7 +28,7 @@ namespace hpx::agas::detail {
 
     struct hosted_locality_namespace : locality_namespace
     {
-        explicit hosted_locality_namespace(naming::address addr);
+        explicit hosted_locality_namespace(naming::address const& addr);
 
         naming::address::address_type ptr() const override
         {
