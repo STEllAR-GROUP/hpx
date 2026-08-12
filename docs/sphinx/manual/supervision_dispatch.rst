@@ -23,13 +23,17 @@ locally cached peer state and the registry's authoritative state, and how that
 distinction shows up in the two-tier admission check used by fenced dispatch.
 For the detailed semantics of individual lifecycle events, ``check_admission``,
 and ``dispatch_outcome`` values, see :ref:`modules_supervision`; this page does
-not repeat that reference material.
+not repeat that reference material. For the API reference of the
+dispatch-specific types and functions this component introduces -
+``registry``, ``sentinel``, ``discovery::discover_and_join``, and
+``dispatch_work`` - see :ref:`modules_supervision_dispatch`.
 
 Initialization and shutdown ordering
 =====================================
 
-Supervision dispatch is brought up with a single call to ``init()`` and torn
-down with a single call to ``finalize()``:
+Supervision dispatch is brought up with a single call to
+:hpx:func:`hpx::supervision::init` and torn down with a single call to
+:hpx:func:`hpx::supervision::finalize`:
 
 .. code-block:: c++
 
@@ -51,8 +55,11 @@ down with a single call to ``finalize()``:
    component's symbol name is registered with AGAS, so that no peer can
    discover and join a not-yet-started sentinel.
 #. Registration of both symbol names.
-#. A single ``discover_and_join()`` pass that joins every peer registry
-   reachable within ``discovery_timeout``.
+#. A single :hpx:func:`hpx::supervision::discover_and_join` pass that joins
+   every peer registry reachable within ``discovery_timeout``. Its result is
+   a list of ``joined_discovery_result`` (peer paired with the shadow id its
+   ``join()`` call was assigned); peers that time out mid-pass are omitted
+   from that list entirely rather than leaving a gap in it.
 
 ``init()`` is idempotent: calling it while already active is a no-op, and
 concurrent callers attach to a single in-flight initialization rather than
@@ -106,12 +113,14 @@ is not something publishing ``event::started`` can paper over.
 In practice, two kinds of ids show up as targets in this component:
 
 - The sentinel/registry ids of peer localities, once joined via
-  ``registry::join()`` - these are the targets whose shadow state feeds
-  ``registry::snapshot_peers()`` and local admission filtering.
+  :hpx:func:`hpx::supervision::registry::join` - these are the targets whose
+  shadow state feeds ``registry::snapshot_peers()`` and local admission
+  filtering.
 - The ids of individual localities/components that fenced work is dispatched
-  against via ``dispatch_work(target, epoch, ...)`` -- these need not be
-  peers' sentinels at all; any component id that has had lifecycle events
-  published for it can be fenced.
+  against via :hpx:func:`hpx::supervision::dispatch_work`
+  (``dispatch_work(target, epoch, ...)``) -- these need not be peers'
+  sentinels at all; any component id that has had lifecycle events published
+  for it can be fenced.
 
 Unlike joining a peer registry, there is no explicit "register this target"
 call for the underlying supervision manager. A target is introduced
@@ -148,16 +157,18 @@ registry, to avoid accumulating unbounded per-target state.
 Removing a target
 -----------------
 
-``hpx::supervision::remove_target()`` is the counterpart to introducing a
-target: it unconditionally erases whatever supervision state is locally
-recorded for a target id, on a single locality.
+:hpx:func:`hpx::supervision::remove_target` is the counterpart to
+introducing a target: it unconditionally erases whatever supervision state
+is locally recorded for a target id, on a single locality.
 
 .. code-block:: c++
 
     // Synchronous version, target on a possibly remote locality:
     hpx::supervision::remove_target(hpx::launch::sync, locality, target);
 
-See :ref:`modules_supervision` for the full semantics of ``remove_target``.
+See :ref:`modules_supervision` for the full semantics of ``remove_target``,
+and :ref:`modules_supervision_dispatch` for this component's own API
+reference.
 
 A few points worth calling out:
 
@@ -784,4 +795,7 @@ Waiting on a dispatch outcome with a timeout
     }
 
 See :ref:`modules_supervision` for the full semantics of ``check_admission``,
-``dispatch_outcome``, and the individual lifecycle events referenced above.
+``dispatch_outcome``, and the individual lifecycle events referenced above,
+and :ref:`modules_supervision_dispatch` for the API reference of this
+component's own types and functions (``registry``, ``sentinel``,
+``discovery``, and ``dispatch_work``).

@@ -25,6 +25,40 @@ client-side filtering versus fenced-dispatch admission, see
 Overview
 ========
 
+Functions
+---------
+
+.. table:: `hpx::supervision` dispatch functions
+
+   ===============================================  ===========================================================================================
+   Function                                         Description
+   ===============================================  ===========================================================================================
+   :hpx:func:`hpx::supervision::init`               :ref:`One-shot, idempotent runtime initialization. <supervision_dispatch_init>`
+   :hpx:func:`hpx::supervision::finalize`           :ref:`One-shot, idempotent runtime teardown. <supervision_dispatch_init>`
+   :hpx:func:`hpx::supervision::is_initialized`     :ref:`Whether the runtime is currently active. <supervision_dispatch_init>`
+   :hpx:func:`hpx::supervision::discover_peers`     :ref:`One-time discovery pull across localities. <supervision_dispatch_peer_discovery>`
+   :hpx:func:`hpx::supervision::fan_out_join`       :ref:`Fan out join() calls to discovered peers. <supervision_dispatch_peer_discovery>`
+   :hpx:func:`hpx::supervision::discover_and_join`  :ref:`Composed discovery-and-join pass. <supervision_dispatch_peer_discovery>`
+   :hpx:func:`hpx::supervision::dispatch_work`      :ref:`Dispatch an action under supervision fencing. <supervision_dispatch_fenced_dispatch>`
+   ===============================================  ===========================================================================================
+
+Types
+-----
+
+.. table:: `hpx::supervision` dispatch types
+
+   =======================================================  ===============================================================================================
+   Type                                                     Description
+   =======================================================  ===============================================================================================
+   :hpx:struct:`hpx::supervision::discovered_peer`          :ref:`A discovered peer's sentinel/registry client pair. <supervision_dispatch_peer_discovery>`
+   :hpx:struct:`hpx::supervision::joined_discovery_result`  :ref:`A discovered peer paired with its join shadow id. <supervision_dispatch_peer_discovery>`
+   :hpx:class:`hpx::supervision::sentinel`                  :ref:`Self-supervising client handle for a locality. <supervision_dispatch_sentinel_client>`
+   :hpx:class:`hpx::supervision::registry`                  :ref:`Client handle mirroring a peer's lifecycle state. <supervision_dispatch_registry_client>`
+   :hpx:struct:`hpx::supervision::server::peer_snapshot`    :ref:`Point-in-time view of a joined peer. <supervision_dispatch_registry_client>`
+   =======================================================  ===============================================================================================
+
+.. _supervision_dispatch_init:
+
 Lifecycle initialization and shutdown
 -------------------------------------
 
@@ -52,6 +86,8 @@ Lifecycle initialization and shutdown
     to call from any thread, including while ``init()``/``finalize()`` is in
     flight.
 
+.. _supervision_dispatch_peer_discovery:
+
 Peer discovery
 --------------
 
@@ -68,18 +104,40 @@ Peer discovery
     single wait for ``timeout``. Localities that have not yet called
     ``init()`` are silently excluded rather than causing a hang or failure.
 
-.. cpp:function:: std::vector<hpx::id_type> hpx::supervision::fan_out_join(hpx::supervision::registry const& local_registry, std::vector<hpx::supervision::discovered_peer> const& peers)
+.. cpp:struct:: hpx::supervision::joined_discovery_result
+
+    Pairs a resolved ``discovered_peer`` with the ``shadow_id`` that
+    ``registry::join()`` produced for it, so callers of ``fan_out_join()``
+    and ``discover_and_join()`` never need to re-correlate a shadow id
+    against the peer list themselves.
+
+    .. cpp:member:: hpx::supervision::discovered_peer peer
+    .. cpp:member:: hpx::supervision::shadow_id shadow
+
+.. cpp:function:: std::vector<hpx::supervision::joined_discovery_result> hpx::supervision::fan_out_join(hpx::supervision::registry const& local_registry, std::vector<hpx::supervision::discovered_peer> const& peers, hpx::chrono::steady_duration const& timeout = hpx::supervision::default_discovery_timeout)
 
     Fans out ``join()`` calls from ``local_registry`` to every entry in
     ``peers``. Reuses ``registry::join()``'s reservation/idempotency
     machinery, so repeated or overlapping calls never create more than one
     shadow per peer sentinel.
 
-.. cpp:function:: std::vector<hpx::id_type> hpx::supervision::discover_and_join(hpx::supervision::registry const& local_registry, hpx::chrono::steady_duration const& timeout = hpx::supervision::default_discovery_timeout)
+    Returns a ``joined_discovery_result`` for each peer whose ``join()``
+    call settled successfully within ``timeout``, in the same relative
+    order as ``peers``. Peers whose ``join()`` call did not settle in time
+    are omitted from the result (rather than left as gaps or defaulted
+    entries), so the returned vector is a same-order *subset* of ``peers``,
+    not index-aligned with it.
+
+.. cpp:function:: std::vector<hpx::supervision::joined_discovery_result> hpx::supervision::discover_and_join(hpx::supervision::registry const& local_registry, hpx::chrono::steady_duration const& timeout = hpx::supervision::default_discovery_timeout)
 
     Composes a single reactive discovery-and-join pass: one
     ``discover_peers()`` pull followed by one ``fan_out_join()`` call.
     Introduces no polling, timer, or repeated broadcast of its own.
+
+    Returns the same ``joined_discovery_result`` vector produced by
+    ``fan_out_join()`` for the peers it discovered.
+
+.. _supervision_dispatch_sentinel_client:
 
 Sentinel client
 ---------------
@@ -96,6 +154,8 @@ Sentinel client
     .. cpp:function:: bool register_name(hpx::launch::sync_policy, hpx::error_code& ec = hpx::throws)
     .. cpp:function:: hpx::future<hpx::id_type> unregister_name() const
     .. cpp:function:: hpx::id_type unregister_name(hpx::launch::sync_policy, hpx::error_code& ec = hpx::throws) const
+
+.. _supervision_dispatch_registry_client:
 
 Registry client
 ---------------
@@ -129,6 +189,8 @@ Registry client
     Plain-data view of a single joined peer: ``peer_sentinel``,
     ``peer_locality``, ``shadow``, and ``join_epoch``.
 
+.. _supervision_dispatch_fenced_dispatch:
+
 Fenced dispatch
 ---------------
 
@@ -149,6 +211,8 @@ Fenced dispatch
              target has latched a terminal event for ``epoch`` since the
              client-side check; the wrapped action is not invoked in that
              case.
+
+.. _supervision_dispatch_testing_support:
 
 Testing support
 ---------------
