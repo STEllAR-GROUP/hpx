@@ -297,7 +297,6 @@ add_hpx_module(
     hpx_properties
     hpx_serialization
     hpx_synchronization
-    hpx_tag_invoke
     hpx_threading_base
     hpx_tracing
     hpx_type_support
