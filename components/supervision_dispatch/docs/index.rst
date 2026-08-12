@@ -25,6 +25,38 @@ client-side filtering versus fenced-dispatch admission, see
 Overview
 ========
 
+Functions
+---------
+
+.. table:: `hpx::supervision` dispatch functions
+
+   ===============================================  ===========================================================================================
+   Function                                         Description
+   ===============================================  ===========================================================================================
+   :hpx:func:`hpx::supervision::init`               :ref:`One-shot, idempotent runtime initialization. <supervision_dispatch_init>`
+   :hpx:func:`hpx::supervision::finalize`           :ref:`One-shot, idempotent runtime teardown. <supervision_dispatch_init>`
+   :hpx:func:`hpx::supervision::is_initialized`     :ref:`Whether the runtime is currently active. <supervision_dispatch_init>`
+   :hpx:func:`hpx::supervision::discover_peers`     :ref:`One-time discovery pull across localities. <supervision_dispatch_peer_discovery>`
+   :hpx:func:`hpx::supervision::fan_out_join`       :ref:`Fan out join() calls to discovered peers. <supervision_dispatch_peer_discovery>`
+   :hpx:func:`hpx::supervision::discover_and_join`  :ref:`Composed discovery-and-join pass. <supervision_dispatch_peer_discovery>`
+   :hpx:func:`hpx::supervision::dispatch_work`      :ref:`Dispatch an action under supervision fencing. <supervision_dispatch_fenced_dispatch>`
+   ===============================================  ===========================================================================================
+
+Types
+-----
+
+.. table:: `hpx::supervision` dispatch types
+
+   =======================================================  ===============================================================================================
+   Type                                                     Description
+   =======================================================  ===============================================================================================
+   :hpx:class:`hpx::supervision::registry`                  :ref:`Client handle mirroring a peer's lifecycle state. <supervision_dispatch_registry_client>`
+   :hpx:struct:`hpx::supervision::server::peer_snapshot`    :ref:`Point-in-time view of a joined peer. <supervision_dispatch_registry_client>`
+   :hpx:struct:`hpx::supervision::discovered_peer`          :ref:`A discovered peer with locality and join epoch. <supervision_dispatch_peer_discovery>`
+   =======================================================  ===============================================================================================
+
+.. _supervision_dispatch_init:
+
 Lifecycle initialization and shutdown
 -------------------------------------
 
@@ -51,6 +83,8 @@ Lifecycle initialization and shutdown
     to call from any thread, including while ``init()``/``finalize()`` is in
     flight.
 
+.. _supervision_dispatch_peer_discovery:
+
 Peer discovery
 --------------
 
@@ -73,7 +107,7 @@ Peer discovery
     ``timeout``. Localities that have not yet called ``init()`` are
     silently excluded rather than causing a hang or failure.
 
-.. cpp:function:: std::vector<hpx::supervision::discovered_peer> hpx::supervision::fan_out_join(hpx::supervision::registry const& local_registry, std::vector<hpx::supervision::discovered_peer> const& peers, hpx::chrono::steady_duration const& timeout = hpx::supervision::default_discovery_timeout)
+.. cpp:function:: std::vector<hpx::supervision::discovered_peer> hpx::supervision::fan_out_join(...)
 
     Fans out ``join()`` calls from ``local_registry`` to every entry in
     ``peers``. Reuses ``registry::join()``'s reservation/idempotency
@@ -123,7 +157,14 @@ State query and event publication
     requiring the caller to name them explicitly. Thin forwarders over the
     raw-id ``publish_event()`` overloads in :ref:`modules_supervision`.
     There is no peer variant: a locality publishes lifecycle events only for
-    itself, never on behalf of a peer's.
+    itself, never on behalf of a peer.
+    The default epoch value of 0 is only correct for a locality's very first
+    publication after init(); once the target's real epoch has advanced,
+    0 is stale. Callers publishing events after the initial one should first
+    obtain the current epoch - e.g. via
+    query_state(hpx::launch::sync, handle).epoch - and pass it explicitly."
+
+.. _supervision_dispatch_registry_client:
 
 Registry client
 ---------------
@@ -158,6 +199,8 @@ Registry client
     Plain-data view of a single joined peer: ``peer_locality`` and
     ``join_epoch``.
 
+.. _supervision_dispatch_fenced_dispatch:
+
 Fenced dispatch
 ---------------
 
@@ -178,6 +221,8 @@ Fenced dispatch
              target has latched a terminal event for ``epoch`` since the
              client-side check; the wrapped action is not invoked in that
              case.
+
+.. _supervision_dispatch_testing_support:
 
 Testing support
 ---------------
