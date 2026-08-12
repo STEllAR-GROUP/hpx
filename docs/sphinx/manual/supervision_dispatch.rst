@@ -118,8 +118,8 @@ In practice, two kinds of ids show up as targets in this component:
   filtering.
 - The ids of individual localities/components that fenced work is dispatched
   against via :hpx:func:`hpx::supervision::dispatch_work`
-  (``dispatch_work(target, epoch, ...)``) -- these need not be peers'
-  sentinels at all; any component id that has had lifecycle events published
+  (``dispatch_work(target, epoch, ...)``) - these need not be peers'
+  localities at all; any component id that has had lifecycle events published
   for it can be fenced.
 
 Unlike joining a peer registry, there is no explicit "register this target"
@@ -213,8 +213,8 @@ Tracked once per locality (``dispatch_api.cpp``), driven by ``init()``/
 
     uninitialized -> initializing -> active -> finalizing -> uninitialized
 
-- ``uninitialized``: no local sentinel/registry exist.
-- ``initializing``: sentinel/registry creation, ``event::started``
+- ``uninitialized``: no local registry exist.
+- ``initializing``: registry creation, ``event::started``
   publication, symbol registration, and the one-shot ``discover_and_join()``
   pass are in progress. Concurrent callers attach to the same in-flight
   initialization rather than racing.
@@ -265,8 +265,8 @@ Heartbeats: distinguishing idle from dead
 While a locality is ``active`` (see "Application-visible state machines"
 above), a background heartbeat task runs alongside the failure-detection
 loop. Its job is narrow but essential: periodically republish
-``event::running`` against the locality's own local sentinel, purely to keep
-that sentinel's event sequence number and timestamp advancing even when the
+``event::running`` against the locality, purely to keep
+that localty's event sequence number and timestamp advancing even when the
 application itself has nothing new to report.
 
 Why this is needed
@@ -341,7 +341,7 @@ One-shot discovery and staleness
 =================================
 
 The ``discover_and_join()`` pass performed by ``init()`` runs exactly once. It
-finds whichever peer sentinels/registries are reachable *at that moment* and
+finds whichever peer registries are reachable *at that moment* and
 joins them; it does not re-run periodically, and peers that join the system
 later are not automatically discovered by localities that have already
 initialized. This has two practical implications:
@@ -382,7 +382,7 @@ two: a background loop periodically checks each joined peer's shadow for
 silence and marks it accordingly, but there is always a window between a
 peer actually going silent and that silence being locally observed.
 
-How sentinels and registries stay synchronized
+How registries stay synchronized
 =================================================
 
 The shadow-mirroring described above is not maintained by polling. It is
@@ -393,16 +393,17 @@ the joined peer.
 Registration, at join time
 --------------------------
 
-When ``registry::join(peer_sentinel, peer_locality)`` is called, the local
-registry does two things before returning a shadow id to the caller:
+When ``registry::join(peer_locality)`` is called, the local registry does
+two things before returning a shadow id to the caller. A peer's identity
+*is* its locality since exactly one registry exists per locality.
 
 #. **Seeds the shadow with the peer's current state.** It performs a single,
-   synchronous ``query_state()`` call against ``peer_sentinel`` to read
+   synchronous ``query_state()`` call against ``peer_locality`` to read
    whatever epoch the peer is currently in, then publishes ``event::started``
    for that epoch onto a freshly minted shadow id. This seed step exists so
    the shadow reflects the peer's state as of joining, rather than starting
    from ``unknown`` and waiting for the first subsequent event to arrive.
-#. **Registers a lifecycle-event observer** on ``peer_sentinel`` (via
+#. **Registers a lifecycle-event observer** on ``peer_locality`` (via
    ``hpx::supervision::register_observer()``), along with an
    activity-transition observer (via ``register_activity_observer()``,
    currently a no-op placeholder reserved for future use). These
@@ -607,7 +608,7 @@ handle a single error regardless of which side detected the fence:
     ----------------                         ---------------
     dispatch_work(action, target, epoch, args...)
       check_admission(target, epoch)   <-- reads local shadow (non-authoritative)
-        rejected -> exceptiona future, done (no dispatch sent)
+        rejected -> exceptional future, done (no dispatch sent)
         admitted -> hpx::async(fenced_action, hpx::colocated(target), ...)
                                           |
                                           v
@@ -738,10 +739,9 @@ Fencing a silent peer
     #include <hpx/supervision_dispatch.hpp>
 
     hpx::supervision::registry local_registry(hpx::find_here());
-    hpx::supervision::sentinel peer_sentinel(peer_symbolic_name);
 
     hpx::id_type const shadow = local_registry.join(
-        hpx::launch::sync, peer_sentinel, peer_locality);
+        hpx::launch::sync, hpx::find_here());
 
     // ... time passes; the peer's heartbeat stops ...
 
@@ -793,6 +793,52 @@ Waiting on a dispatch outcome with a timeout
         // slow, unreachable, or the shadow state used for client-side
         // filtering may be stale.
     }
+
+Querying state and publishing events through a handle
+-----------------------------------------------------
+
+The handle returned by ``init()`` also doubles as the argument to a small
+family of convenience overloads of ``query_state()``/``publish_event()``
+that resolve locality and target automatically, instead of requiring the
+caller to extract ``handle.get_id()`` and ``hpx::find_here()`` manually:
+
+.. code-block:: c++
+
+    #include <hpx/supervision_dispatch.hpp>
+
+    hpx::supervision::supervision_handle const handle =
+        hpx::supervision::init(hpx::launch::sync);
+
+    // Recover the epoch init() started this handle's locality at, for use
+    // with dispatch_work()/publish_event() later on.
+    std::uint64_t const epoch =
+        hpx::supervision::query_state(hpx::launch::sync, handle).epoch;
+
+    // ... later, e.g. once this locality's own supervised work completes ...
+    hpx::supervision::publish_event(
+        hpx::launch::sync, handle, hpx::supervision::event::completed, epoch);
+
+Querying a peer's state after joining it follows the same pattern, using a
+``discovered_peer`` in place of an explicit locality/target pair:
+
+.. code-block:: c++
+
+    for (auto const& peer :
+        hpx::supervision::discover_and_join(handle.registry_client))
+    {
+        hpx::supervision::lifecycle_state const peer_state =
+            hpx::supervision::query_state(hpx::launch::sync, handle, peer);
+        // `handle` is only needed here for overload resolution; `peer`
+        // alone carries the locality/target this call actually queries.
+    }
+
+There is no peer-publishing overload: a locality only ever publishes
+lifecycle events it self, never on behalf of a peer's.
+
+A worked example combining this with a supervised worker loop - covering
+when to publish ``started``/``running``/a terminal event for a worker's own
+locality, and how a supervisor queries peer worker state through the handle
+above - is available in ``components/supervision_dispatch/examples/plain_worker.cpp``.
 
 See :ref:`modules_supervision` for the full semantics of ``check_admission``,
 ``dispatch_outcome``, and the individual lifecycle events referenced above,
