@@ -177,7 +177,9 @@ namespace hpx::collectives::detail {
                 // send and receive on it has completed
                 [comm = HPX_MOVE(comm), diagonal = HPX_MOVE(diagonal),
                     num_sites, this_site](auto&& f) mutable {
-                    auto [sent, received] = HPX_FORWARD(decltype(f), f).get();
+                    auto res = HPX_FORWARD(decltype(f), f).get();
+                    auto& sent = hpx::get<0>(res);
+                    auto& received = hpx::get<1>(res);
 
                     // Report a failed send rather than a truncated result.
                     for (auto& send : sent)
