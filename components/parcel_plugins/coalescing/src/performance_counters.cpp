@@ -16,10 +16,9 @@
 #include <hpx/modules/string_util.hpp>
 
 #include <hpx/modules/components_base.hpp>
+#include <hpx/modules/performance_counters.hpp>
+
 #include <hpx/parcel_coalescing/counter_registry.hpp>
-#include <hpx/performance_counters/counter_creators.hpp>
-#include <hpx/performance_counters/counters.hpp>
-#include <hpx/performance_counters/manage_counter_type.hpp>
 
 #include <cstdint>
 #include <exception>

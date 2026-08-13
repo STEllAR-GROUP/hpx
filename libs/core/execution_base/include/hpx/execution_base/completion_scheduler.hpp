@@ -8,7 +8,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/modules/tag_invoke.hpp>
 
 #include <hpx/execution_base/stdexec_forward.hpp>
 #include <utility>
@@ -28,8 +27,7 @@ namespace hpx::execution::experimental { namespace detail {
         typename AlgorithmCPO, typename... Ts>
     concept is_completion_scheduler_tag_invocable_v = requires(
         AlgorithmCPO alg, Sender&& snd, Ts&&... ts) {
-        tag_invoke(alg,
-            hpx::execution::experimental::get_completion_scheduler<ReceiverCPO>(
+        alg(hpx::execution::experimental::get_completion_scheduler<ReceiverCPO>(
                 hpx::execution::experimental::get_env(snd)),
             std::forward<Sender>(snd), std::forward<Ts>(ts)...);
     };

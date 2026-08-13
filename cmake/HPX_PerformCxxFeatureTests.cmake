@@ -121,9 +121,7 @@ function(hpx_perform_cxx_feature_tests)
     DEFINITIONS HPX_HAVE_CXX26_EXPERIMENTAL_SCOPE
   )
 
-  hpx_check_for_cxx26_experimental_meta(
-    DEFINITIONS HPX_HAVE_CXX26_EXPERIMENTAL_META
-  )
+  hpx_check_for_cxx26_reflection(DEFINITIONS HPX_HAVE_CXX26_REFLECTION)
 
   hpx_check_for_cxx26_contracts(DEFINITIONS HPX_HAVE_CXX26_CONTRACTS)
 

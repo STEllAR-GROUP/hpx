@@ -17,7 +17,6 @@
 #include <eve/module/core.hpp>
 
 #include <memory>
-#include <type_traits>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::parallel::traits {
@@ -37,13 +36,17 @@ namespace hpx::parallel::traits {
         template <typename Iter>
         HPX_HOST_DEVICE HPX_FORCEINLINE static V unaligned(Iter& iter)
         {
-            if constexpr (std::is_same_v<V, ValueType>)
+            // V can be a genuine SIMD pack or a scalar value_type (width-1
+            // pack, see vector_pack_type<T, 1, Abi>). eve::wide's pointer
+            // constructor only accepts actual SIMD types, so scalars take
+            // the plain-load path instead.
+            if constexpr (eve::is_simd_value<V>{})
             {
-                return *iter;
+                return V(std::addressof(*iter));
             }
             else
             {
-                return V(std::addressof(*iter));
+                return *iter;
             }
         }
     };
@@ -65,13 +68,16 @@ namespace hpx::parallel::traits {
         HPX_HOST_DEVICE HPX_FORCEINLINE static void unaligned(
             V& value, Iter& iter)
         {
-            if constexpr (std::is_same_v<V, ValueType>)
+            // See vector_pack_load::unaligned above: eve::store only
+            // accepts genuine SIMD packs, so scalars take the plain-store
+            // path instead.
+            if constexpr (eve::is_simd_value<V>{})
             {
-                *iter = value;
+                eve::store(value, std::addressof(*iter));
             }
             else
             {
-                eve::store(value, std::addressof(*iter));
+                *iter = value;
             }
         }
     };

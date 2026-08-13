@@ -10,7 +10,6 @@
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
-#include <hpx/modules/tag_invoke.hpp>
 
 #include <functional>
 #include <type_traits>

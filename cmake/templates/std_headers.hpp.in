@@ -58,7 +58,6 @@
 # undef exception_info
 #endif
 
-# include <asio.hpp>
 # include <hwloc.h>
 
 #if defined(HPX_HAVE_MODULE_LIKWID)
@@ -127,8 +126,4 @@
 #  include <Vc/Vc>
 #  include <Vc/global.h>
 # endif
-#endif
-
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
-# include <boost/accumulators/accumulators.hpp>
 #endif

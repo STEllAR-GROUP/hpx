@@ -6,15 +6,15 @@
 
 #pragma once
 
-#include <hpx/serialization/config/defines.hpp>
+#include <hpx/config.hpp>
 
-// clang-format off
+#if defined(HPX_HAVE_CXX26_REFLECTION)
+
 #include <hpx/serialization/input_archive.hpp>
 #include <hpx/serialization/output_archive.hpp>
-#include <hpx/serialization/base_object.hpp>
-// clang-format on
 
-#if defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
+#include <hpx/serialization/base_object.hpp>
+
 #include <cstddef>
 #include <cstdint>
 #include <meta>

@@ -32,13 +32,6 @@
 #include <hpx/config/version.hpp>
 #include <hpx/config/weak_symbol.hpp>
 
-#include <boost/version.hpp>
-
-#if BOOST_VERSION < 107100
-// Please update your Boost installation (see www.boost.org for details).
-#error HPX cannot be compiled with a Boost version earlier than 1.71.0
-#endif
-
 #include <hpx/modules/preprocessor.hpp>
 
 #include <cstddef>

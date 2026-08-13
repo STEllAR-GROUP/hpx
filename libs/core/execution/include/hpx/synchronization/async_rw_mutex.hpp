@@ -533,11 +533,10 @@ namespace hpx::experimental {
             };
 
             template <typename R>
-            friend auto tag_invoke(
-                hpx::execution::experimental::connect_t, sender&& s, R&& r)
+            auto connect(R&& r) &&
             {
-                return operation_state<R>{HPX_FORWARD(R, r),
-                    HPX_MOVE(s.prev_state), HPX_MOVE(s.state)};
+                return operation_state<R>{
+                    HPX_FORWARD(R, r), HPX_MOVE(prev_state), HPX_MOVE(state)};
             }
         };
 
@@ -750,11 +749,10 @@ namespace hpx::experimental {
             };
 
             template <typename R>
-            friend auto tag_invoke(
-                hpx::execution::experimental::connect_t, sender&& s, R&& r)
+            auto connect(R&& r) &&
             {
-                return operation_state<R>{HPX_FORWARD(R, r),
-                    HPX_MOVE(s.prev_state), HPX_MOVE(s.state)};
+                return operation_state<R>{
+                    HPX_FORWARD(R, r), HPX_MOVE(prev_state), HPX_MOVE(state)};
             }
         };
 

@@ -10,17 +10,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/distribution_policies/container_distribution_policy.hpp>
 #include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/async_combinators.hpp>
 #include <hpx/modules/components.hpp>
 #include <hpx/modules/components_base.hpp>
+#include <hpx/modules/distribution_policies.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/runtime_components.hpp>
+#include <hpx/modules/runtime_distributed.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/runtime_components/distributed_metadata_base.hpp>
-#include <hpx/runtime_components/new.hpp>
-#include <hpx/runtime_distributed/copy_component.hpp>
 
 #include <hpx/components/containers/unordered/partition_unordered_map_component.hpp>
 #include <hpx/components/containers/unordered/unordered_map_segmented_iterator.hpp>

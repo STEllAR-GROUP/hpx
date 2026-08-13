@@ -14,13 +14,14 @@
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
-#include <hpx/modules/itt_notify.hpp>
+
 #include <hpx/modules/naming.hpp>
 #include <hpx/modules/parcelset_base.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/timing.hpp>
+#include <hpx/modules/tracing.hpp>
 
 #include <hpx/modules/actions.hpp>
 #include <hpx/parcelset/parcel.hpp>
@@ -470,14 +471,10 @@ namespace hpx::parcelset::detail {
         action_->load_schedule(ar, HPX_MOVE(data_.dest_), p.first, p.second,
             num_thread, deferred_schedule);
 
-#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-        static util::itt::event parcel_recv("recv_parcel");
-        util::itt::event_tick(parcel_recv);
-#endif
+        HPX_TRACING_MARK_EVENT("recv_parcel");
 
-#if defined(HPX_HAVE_APEX) && defined(HPX_HAVE_PARCEL_PROFILING)
-        // tell APEX about the received parcel
-        util::external_timer::recv(data_.parcel_id_.get_lsb(), size_,
+#if defined(HPX_HAVE_PARCEL_PROFILING)
+        hpx::tracing::recv_parcel(data_.parcel_id_.get_lsb(), size_,
             naming::get_locality_id_from_gid(data_.source_id_),
             reinterpret_cast<std::uint64_t>(
                 action_->get_parent_thread_id().get()));

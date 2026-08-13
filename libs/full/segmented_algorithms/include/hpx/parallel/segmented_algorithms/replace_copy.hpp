@@ -10,6 +10,7 @@
 #include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/executors.hpp>
+
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
 
 #include <algorithm>
@@ -22,397 +23,387 @@
 #include <utility>
 #include <vector>
 
-namespace hpx::parallel {
+namespace hpx::parallel::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     // segmented_replace_copy
-    namespace detail {
-        ///////////////////////////////////////////////////////////////////////
-        /// \cond NOINTERNAL
 
-        // sequential remote implementation
-        template <typename Algo, typename ExPolicy, typename SegIter,
-            typename OutIter, typename T, typename Proj>
-        static util::detail::algorithm_result_t<ExPolicy,
-            util::in_out_result<SegIter, OutIter>>
-        segmented_replace_copy(Algo&& algo, ExPolicy const& policy,
-            SegIter first, SegIter last, OutIter dest, T const& old_value,
-            T const& new_value, Proj&& proj, std::true_type)
+    /// \cond NOINTERNAL
+
+    // sequential remote implementation
+    template <typename Algo, typename ExPolicy, typename SegIter,
+        typename OutIter, typename T, typename Proj>
+    util::detail::algorithm_result_t<ExPolicy,
+        util::in_out_result<SegIter, OutIter>>
+    segmented_replace_copy(Algo&& algo, ExPolicy const& policy, SegIter first,
+        SegIter last, OutIter dest, T const& old_value, T const& new_value,
+        Proj&& proj, std::true_type)
+    {
+        using traits1 = hpx::traits::segmented_iterator_traits<SegIter>;
+        using traits2 = hpx::traits::segmented_iterator_traits<OutIter>;
+        using segment_iterator1 = typename traits1::segment_iterator;
+        using local_iterator_type1 = typename traits1::local_iterator;
+        using segment_iterator2 = typename traits2::segment_iterator;
+        using local_iterator_type2 = typename traits2::local_iterator;
+
+        using result = util::detail::algorithm_result<ExPolicy,
+            util::in_out_result<SegIter, OutIter>>;
+
+        segment_iterator1 sit = traits1::segment(first);
+        segment_iterator1 send = traits1::segment(last);
+        segment_iterator2 sdest = traits2::segment(dest);
+
+        if (sit == send)
         {
-            using traits1 = hpx::traits::segmented_iterator_traits<SegIter>;
-            using traits2 = hpx::traits::segmented_iterator_traits<OutIter>;
-            using segment_iterator1 = typename traits1::segment_iterator;
-            using local_iterator_type1 = typename traits1::local_iterator;
-            using segment_iterator2 = typename traits2::segment_iterator;
-            using local_iterator_type2 = typename traits2::local_iterator;
-
-            using result = util::detail::algorithm_result<ExPolicy,
-                util::in_out_result<SegIter, OutIter>>;
-
-            segment_iterator1 sit = traits1::segment(first);
-            segment_iterator1 send = traits1::segment(last);
-            segment_iterator2 sdest = traits2::segment(dest);
-
-            if (sit == send)
+            // all elements are on the same partition
+            local_iterator_type1 beg = traits1::local(first);
+            local_iterator_type1 end = traits1::local(last);
+            local_iterator_type2 ldest = traits2::local(dest);
+            if (beg != end)
             {
-                // all elements are on the same partition
-                local_iterator_type1 beg = traits1::local(first);
-                local_iterator_type1 end = traits1::local(last);
-                local_iterator_type2 ldest = traits2::local(dest);
-                if (beg != end)
-                {
-                    util::in_out_result<local_iterator_type1,
-                        local_iterator_type2>
-                        out = dispatch(traits2::get_id(sdest), algo, policy,
-                            std::true_type(), beg, end, ldest, old_value,
-                            new_value, HPX_FORWARD(Proj, proj));
-                    last = traits1::compose(send, out.in);
-                    dest = traits2::compose(sdest, out.out);
-                }
-            }
-            else
-            {
-                // handle the remaining part of the first partition
-                local_iterator_type1 beg = traits1::local(first);
-                local_iterator_type1 end = traits1::end(sit);
-                local_iterator_type2 ldest = traits2::local(dest);
                 util::in_out_result<local_iterator_type1, local_iterator_type2>
-                    out;
+                    out = dispatch(traits2::get_id(sdest), algo, policy,
+                        std::true_type(), beg, end, ldest, old_value, new_value,
+                        HPX_FORWARD(Proj, proj));
+                last = traits1::compose(send, out.in);
+                dest = traits2::compose(sdest, out.out);
+            }
+        }
+        else
+        {
+            // handle the remaining part of the first partition
+            local_iterator_type1 beg = traits1::local(first);
+            local_iterator_type1 end = traits1::end(sit);
+            local_iterator_type2 ldest = traits2::local(dest);
+            util::in_out_result<local_iterator_type1, local_iterator_type2> out;
+            if (beg != end)
+            {
+                out = dispatch(traits2::get_id(sdest), algo, policy,
+                    std::true_type(), beg, end, ldest, old_value, new_value,
+                    proj);
+            }
+
+            // handle all of the full partitions
+            for (++sit, ++sdest; sit != send; ++sit, ++sdest)
+            {
+                beg = traits1::begin(sit);
+                end = traits1::end(sit);
+                ldest = traits2::begin(sdest);
                 if (beg != end)
                 {
                     out = dispatch(traits2::get_id(sdest), algo, policy,
                         std::true_type(), beg, end, ldest, old_value, new_value,
                         proj);
                 }
-
-                // handle all of the full partitions
-                for (++sit, ++sdest; sit != send; ++sit, ++sdest)
-                {
-                    beg = traits1::begin(sit);
-                    end = traits1::end(sit);
-                    ldest = traits2::begin(sdest);
-                    if (beg != end)
-                    {
-                        out = dispatch(traits2::get_id(sdest), algo, policy,
-                            std::true_type(), beg, end, ldest, old_value,
-                            new_value, proj);
-                    }
-                }
-
-                // handle the beginning of the last partition
-                beg = traits1::begin(sit);
-                end = traits1::local(last);
-                ldest = traits2::begin(sdest);
-                if (beg != end)
-                {
-                    out = dispatch(traits2::get_id(sdest), algo, policy,
-                        std::true_type(), beg, end, ldest, old_value, new_value,
-                        HPX_FORWARD(Proj, proj));
-                }
-                last = traits1::compose(send, out.in);
-                dest = traits2::compose(sdest, out.out);
             }
-            return result::get(util::in_out_result<SegIter, OutIter>{
-                HPX_MOVE(last), HPX_MOVE(dest)});
+
+            // handle the beginning of the last partition
+            beg = traits1::begin(sit);
+            end = traits1::local(last);
+            ldest = traits2::begin(sdest);
+            if (beg != end)
+            {
+                out = dispatch(traits2::get_id(sdest), algo, policy,
+                    std::true_type(), beg, end, ldest, old_value, new_value,
+                    HPX_FORWARD(Proj, proj));
+            }
+            last = traits1::compose(send, out.in);
+            dest = traits2::compose(sdest, out.out);
         }
+        return result::get(util::in_out_result<SegIter, OutIter>{
+            HPX_MOVE(last), HPX_MOVE(dest)});
+    }
 
-        // parallel remote implementation
-        template <typename Algo, typename ExPolicy, typename SegIter,
-            typename OutIter, typename T, typename Proj>
-        static util::detail::algorithm_result_t<ExPolicy,
-            util::in_out_result<SegIter, OutIter>>
-        segmented_replace_copy(Algo&& algo, ExPolicy const& policy,
-            SegIter first, SegIter last, OutIter dest, T const& old_value,
-            T const& new_value, Proj&& proj, std::false_type)
+    // parallel remote implementation
+    template <typename Algo, typename ExPolicy, typename SegIter,
+        typename OutIter, typename T, typename Proj>
+    util::detail::algorithm_result_t<ExPolicy,
+        util::in_out_result<SegIter, OutIter>>
+    segmented_replace_copy(Algo&& algo, ExPolicy const& policy, SegIter first,
+        SegIter last, OutIter dest, T const& old_value, T const& new_value,
+        Proj&& proj, std::false_type)
+    {
+        using traits1 = hpx::traits::segmented_iterator_traits<SegIter>;
+        using traits2 = hpx::traits::segmented_iterator_traits<OutIter>;
+        using segment_iterator1 = typename traits1::segment_iterator;
+        using local_iterator_type1 = typename traits1::local_iterator;
+        using segment_iterator2 = typename traits2::segment_iterator;
+        using local_iterator_type2 = typename traits2::local_iterator;
+
+        using result = util::detail::algorithm_result<ExPolicy,
+            util::in_out_result<SegIter, OutIter>>;
+
+        using forced_seq = std::integral_constant<bool,
+            !hpx::traits::is_forward_iterator_v<SegIter>>;
+
+        segment_iterator1 sit = traits1::segment(first);
+        segment_iterator1 send = traits1::segment(last);
+        segment_iterator2 sdest = traits2::segment(dest);
+
+        using segment_type = std::vector<future<
+            util::in_out_result<local_iterator_type1, local_iterator_type2>>>;
+        segment_type segments;
+        segments.reserve(std::distance(sit, send));
+
+        if (sit == send)
         {
-            using traits1 = hpx::traits::segmented_iterator_traits<SegIter>;
-            using traits2 = hpx::traits::segmented_iterator_traits<OutIter>;
-            using segment_iterator1 = typename traits1::segment_iterator;
-            using local_iterator_type1 = typename traits1::local_iterator;
-            using segment_iterator2 = typename traits2::segment_iterator;
-            using local_iterator_type2 = typename traits2::local_iterator;
-
-            using result = util::detail::algorithm_result<ExPolicy,
-                util::in_out_result<SegIter, OutIter>>;
-
-            using forced_seq = std::integral_constant<bool,
-                !hpx::traits::is_forward_iterator_v<SegIter>>;
-
-            segment_iterator1 sit = traits1::segment(first);
-            segment_iterator1 send = traits1::segment(last);
-            segment_iterator2 sdest = traits2::segment(dest);
-
-            using segment_type =
-                std::vector<future<util::in_out_result<local_iterator_type1,
-                    local_iterator_type2>>>;
-            segment_type segments;
-            segments.reserve(std::distance(sit, send));
-
-            if (sit == send)
+            // all elements are on the same partition
+            local_iterator_type1 beg = traits1::local(first);
+            local_iterator_type1 end = traits1::local(last);
+            local_iterator_type2 ldest = traits2::local(dest);
+            if (beg != end)
             {
-                // all elements are on the same partition
-                local_iterator_type1 beg = traits1::local(first);
-                local_iterator_type1 end = traits1::local(last);
-                local_iterator_type2 ldest = traits2::local(dest);
-                if (beg != end)
-                {
-                    segments.push_back(dispatch_async(traits2::get_id(sdest),
-                        algo, policy, forced_seq(), beg, end, ldest, old_value,
-                        new_value, HPX_FORWARD(Proj, proj)));
-                }
+                segments.push_back(dispatch_async(traits2::get_id(sdest), algo,
+                    policy, forced_seq(), beg, end, ldest, old_value, new_value,
+                    HPX_FORWARD(Proj, proj)));
             }
-            else
+        }
+        else
+        {
+            // handle the remaining part of the first partition
+            local_iterator_type1 beg = traits1::local(first);
+            local_iterator_type1 end = traits1::end(sit);
+            local_iterator_type2 ldest = traits2::local(dest);
+            if (beg != end)
             {
-                // handle the remaining part of the first partition
-                local_iterator_type1 beg = traits1::local(first);
-                local_iterator_type1 end = traits1::end(sit);
-                local_iterator_type2 ldest = traits2::local(dest);
+                segments.push_back(dispatch_async(traits2::get_id(sdest), algo,
+                    policy, forced_seq(), beg, end, ldest, old_value, new_value,
+                    proj));
+            }
+
+            // handle all of the full partitions
+            for (++sit, ++sdest; sit != send; ++sit, ++sdest)
+            {
+                beg = traits1::begin(sit);
+                end = traits1::end(sit);
+                ldest = traits2::begin(sdest);
                 if (beg != end)
                 {
                     segments.push_back(dispatch_async(traits2::get_id(sdest),
                         algo, policy, forced_seq(), beg, end, ldest, old_value,
                         new_value, proj));
                 }
-
-                // handle all of the full partitions
-                for (++sit, ++sdest; sit != send; ++sit, ++sdest)
-                {
-                    beg = traits1::begin(sit);
-                    end = traits1::end(sit);
-                    ldest = traits2::begin(sdest);
-                    if (beg != end)
-                    {
-                        segments.push_back(dispatch_async(
-                            traits2::get_id(sdest), algo, policy, forced_seq(),
-                            beg, end, ldest, old_value, new_value, proj));
-                    }
-                }
-
-                // handle the beginning of the last partition
-                beg = traits1::begin(sit);
-                end = traits1::local(last);
-                ldest = traits2::begin(sdest);
-                if (beg != end)
-                {
-                    segments.push_back(dispatch_async(traits2::get_id(sdest),
-                        algo, policy, forced_seq(), beg, end, ldest, old_value,
-                        new_value, HPX_FORWARD(Proj, proj)));
-                }
             }
 
-            return result::get(dataflow(
-                [=](segment_type&& r) -> util::in_out_result<SegIter, OutIter> {
-                    // handle any remote exceptions, will throw on error
-                    std::list<std::exception_ptr> errors;
-                    parallel::util::detail::handle_remote_exceptions<
-                        ExPolicy>::call(r, errors);
-                    auto ft = r.back().get();
-                    auto olast = traits1::compose(send, ft.in);
-                    auto odest = traits2::compose(sdest, ft.out);
-                    return util::in_out_result<SegIter, OutIter>{olast, odest};
-                },
-                HPX_MOVE(segments)));
+            // handle the beginning of the last partition
+            beg = traits1::begin(sit);
+            end = traits1::local(last);
+            ldest = traits2::begin(sdest);
+            if (beg != end)
+            {
+                segments.push_back(dispatch_async(traits2::get_id(sdest), algo,
+                    policy, forced_seq(), beg, end, ldest, old_value, new_value,
+                    HPX_FORWARD(Proj, proj)));
+            }
         }
 
-        ///////////////////////////////////////////////////////////////////////
-        // segmented_replace_copy_if
+        return result::get(dataflow(
+            [=](segment_type&& r) -> util::in_out_result<SegIter, OutIter> {
+                // handle any remote exceptions, will throw on error
+                std::list<std::exception_ptr> errors;
+                parallel::util::detail::handle_remote_exceptions<
+                    ExPolicy>::call(r, errors);
+                auto ft = r.back().get();
+                auto olast = traits1::compose(send, ft.in);
+                auto odest = traits2::compose(sdest, ft.out);
+                return util::in_out_result<SegIter, OutIter>{olast, odest};
+            },
+            HPX_MOVE(segments)));
+    }
 
-        // sequential remote implementation
-        template <typename Algo, typename ExPolicy, typename SegIter,
-            typename OutIter, typename F, typename T, typename Proj>
-        static util::detail::algorithm_result_t<ExPolicy,
-            util::in_out_result<SegIter, OutIter>>
-        segmented_replace_copy_if(Algo&& algo, ExPolicy const& policy,
-            SegIter first, SegIter last, OutIter dest, F&& f,
-            T const& new_value, Proj&& proj, std::true_type)
+    ///////////////////////////////////////////////////////////////////////
+    // segmented_replace_copy_if
+
+    // sequential remote implementation
+    template <typename Algo, typename ExPolicy, typename SegIter,
+        typename OutIter, typename F, typename T, typename Proj>
+    util::detail::algorithm_result_t<ExPolicy,
+        util::in_out_result<SegIter, OutIter>>
+    segmented_replace_copy_if(Algo&& algo, ExPolicy const& policy,
+        SegIter first, SegIter last, OutIter dest, F&& f, T const& new_value,
+        Proj&& proj, std::true_type)
+    {
+        using traits1 = hpx::traits::segmented_iterator_traits<SegIter>;
+        using traits2 = hpx::traits::segmented_iterator_traits<OutIter>;
+        using segment_iterator1 = typename traits1::segment_iterator;
+        using local_iterator_type1 = typename traits1::local_iterator;
+        using segment_iterator2 = typename traits2::segment_iterator;
+        using local_iterator_type2 = typename traits2::local_iterator;
+
+        using result = util::detail::algorithm_result<ExPolicy,
+            util::in_out_result<SegIter, OutIter>>;
+
+        segment_iterator1 sit = traits1::segment(first);
+        segment_iterator1 send = traits1::segment(last);
+        segment_iterator2 sdest = traits2::segment(dest);
+
+        if (sit == send)
         {
-            using traits1 = hpx::traits::segmented_iterator_traits<SegIter>;
-            using traits2 = hpx::traits::segmented_iterator_traits<OutIter>;
-            using segment_iterator1 = typename traits1::segment_iterator;
-            using local_iterator_type1 = typename traits1::local_iterator;
-            using segment_iterator2 = typename traits2::segment_iterator;
-            using local_iterator_type2 = typename traits2::local_iterator;
-
-            using result = util::detail::algorithm_result<ExPolicy,
-                util::in_out_result<SegIter, OutIter>>;
-
-            segment_iterator1 sit = traits1::segment(first);
-            segment_iterator1 send = traits1::segment(last);
-            segment_iterator2 sdest = traits2::segment(dest);
-
-            if (sit == send)
+            // all elements are on the same partition
+            local_iterator_type1 beg = traits1::local(first);
+            local_iterator_type1 end = traits1::local(last);
+            local_iterator_type2 ldest = traits2::local(dest);
+            if (beg != end)
             {
-                // all elements are on the same partition
-                local_iterator_type1 beg = traits1::local(first);
-                local_iterator_type1 end = traits1::local(last);
-                local_iterator_type2 ldest = traits2::local(dest);
-                if (beg != end)
-                {
-                    util::in_out_result<local_iterator_type1,
-                        local_iterator_type2>
-                        out = dispatch(traits2::get_id(sdest), algo, policy,
-                            std::true_type(), beg, end, ldest, f, new_value,
-                            HPX_FORWARD(Proj, proj));
-                    last = traits1::compose(send, out.in);
-                    dest = traits2::compose(sdest, out.out);
-                }
-            }
-            else
-            {
-                // handle the remaining part of the first partition
-                local_iterator_type1 beg = traits1::local(first);
-                local_iterator_type1 end = traits1::end(sit);
-                local_iterator_type2 ldest = traits2::local(dest);
                 util::in_out_result<local_iterator_type1, local_iterator_type2>
-                    out;
+                    out = dispatch(traits2::get_id(sdest), algo, policy,
+                        std::true_type(), beg, end, ldest, f, new_value,
+                        HPX_FORWARD(Proj, proj));
+                last = traits1::compose(send, out.in);
+                dest = traits2::compose(sdest, out.out);
+            }
+        }
+        else
+        {
+            // handle the remaining part of the first partition
+            local_iterator_type1 beg = traits1::local(first);
+            local_iterator_type1 end = traits1::end(sit);
+            local_iterator_type2 ldest = traits2::local(dest);
+            util::in_out_result<local_iterator_type1, local_iterator_type2> out;
+            if (beg != end)
+            {
+                out = dispatch(traits2::get_id(sdest), algo, policy,
+                    std::true_type(), beg, end, ldest, f, new_value, proj);
+            }
+
+            // handle all of the full partitions
+            for (++sit, ++sdest; sit != send; ++sit, ++sdest)
+            {
+                beg = traits1::begin(sit);
+                end = traits1::end(sit);
+                ldest = traits2::begin(sdest);
                 if (beg != end)
                 {
                     out = dispatch(traits2::get_id(sdest), algo, policy,
                         std::true_type(), beg, end, ldest, f, new_value, proj);
                 }
-
-                // handle all of the full partitions
-                for (++sit, ++sdest; sit != send; ++sit, ++sdest)
-                {
-                    beg = traits1::begin(sit);
-                    end = traits1::end(sit);
-                    ldest = traits2::begin(sdest);
-                    if (beg != end)
-                    {
-                        out = dispatch(traits2::get_id(sdest), algo, policy,
-                            std::true_type(), beg, end, ldest, f, new_value,
-                            proj);
-                    }
-                }
-
-                // handle the beginning of the last partition
-                beg = traits1::begin(sit);
-                end = traits1::local(last);
-                ldest = traits2::begin(sdest);
-                if (beg != end)
-                {
-                    out = dispatch(traits2::get_id(sdest), algo, policy,
-                        std::true_type(), beg, end, ldest, f, new_value,
-                        HPX_FORWARD(Proj, proj));
-                }
-                last = traits1::compose(send, out.in);
-                dest = traits2::compose(sdest, out.out);
             }
-            return result::get(util::in_out_result<SegIter, OutIter>{
-                HPX_MOVE(last), HPX_MOVE(dest)});
+
+            // handle the beginning of the last partition
+            beg = traits1::begin(sit);
+            end = traits1::local(last);
+            ldest = traits2::begin(sdest);
+            if (beg != end)
+            {
+                out = dispatch(traits2::get_id(sdest), algo, policy,
+                    std::true_type(), beg, end, ldest, f, new_value,
+                    HPX_FORWARD(Proj, proj));
+            }
+            last = traits1::compose(send, out.in);
+            dest = traits2::compose(sdest, out.out);
         }
+        return result::get(util::in_out_result<SegIter, OutIter>{
+            HPX_MOVE(last), HPX_MOVE(dest)});
+    }
 
-        // parallel remote implementation
-        template <typename Algo, typename ExPolicy, typename SegIter,
-            typename OutIter, typename F, typename T, typename Proj>
-        static util::detail::algorithm_result_t<ExPolicy,
-            util::in_out_result<SegIter, OutIter>>
-        segmented_replace_copy_if(Algo&& algo, ExPolicy const& policy,
-            SegIter first, SegIter last, OutIter dest, F&& f,
-            T const& new_value, Proj&& proj, std::false_type)
+    // parallel remote implementation
+    template <typename Algo, typename ExPolicy, typename SegIter,
+        typename OutIter, typename F, typename T, typename Proj>
+    util::detail::algorithm_result_t<ExPolicy,
+        util::in_out_result<SegIter, OutIter>>
+    segmented_replace_copy_if(Algo&& algo, ExPolicy const& policy,
+        SegIter first, SegIter last, OutIter dest, F&& f, T const& new_value,
+        Proj&& proj, std::false_type)
+    {
+        using traits1 = hpx::traits::segmented_iterator_traits<SegIter>;
+        using traits2 = hpx::traits::segmented_iterator_traits<OutIter>;
+        using segment_iterator1 = typename traits1::segment_iterator;
+        using local_iterator_type1 = typename traits1::local_iterator;
+        using segment_iterator2 = typename traits2::segment_iterator;
+        using local_iterator_type2 = typename traits2::local_iterator;
+
+        using result = util::detail::algorithm_result<ExPolicy,
+            util::in_out_result<SegIter, OutIter>>;
+
+        using forced_seq = std::integral_constant<bool,
+            !hpx::traits::is_forward_iterator_v<SegIter>>;
+
+        segment_iterator1 sit = traits1::segment(first);
+        segment_iterator1 send = traits1::segment(last);
+        segment_iterator2 sdest = traits2::segment(dest);
+
+        using segment_type = std::vector<future<
+            util::in_out_result<local_iterator_type1, local_iterator_type2>>>;
+        segment_type segments;
+        segments.reserve(std::distance(sit, send));
+
+        if (sit == send)
         {
-            using traits1 = hpx::traits::segmented_iterator_traits<SegIter>;
-            using traits2 = hpx::traits::segmented_iterator_traits<OutIter>;
-            using segment_iterator1 = typename traits1::segment_iterator;
-            using local_iterator_type1 = typename traits1::local_iterator;
-            using segment_iterator2 = typename traits2::segment_iterator;
-            using local_iterator_type2 = typename traits2::local_iterator;
-
-            using result = util::detail::algorithm_result<ExPolicy,
-                util::in_out_result<SegIter, OutIter>>;
-
-            using forced_seq = std::integral_constant<bool,
-                !hpx::traits::is_forward_iterator_v<SegIter>>;
-
-            segment_iterator1 sit = traits1::segment(first);
-            segment_iterator1 send = traits1::segment(last);
-            segment_iterator2 sdest = traits2::segment(dest);
-
-            using segment_type =
-                std::vector<future<util::in_out_result<local_iterator_type1,
-                    local_iterator_type2>>>;
-            segment_type segments;
-            segments.reserve(std::distance(sit, send));
-
-            if (sit == send)
+            // all elements are on the same partition
+            local_iterator_type1 beg = traits1::local(first);
+            local_iterator_type1 end = traits1::local(last);
+            local_iterator_type2 ldest = traits2::local(dest);
+            if (beg != end)
             {
-                // all elements are on the same partition
-                local_iterator_type1 beg = traits1::local(first);
-                local_iterator_type1 end = traits1::local(last);
-                local_iterator_type2 ldest = traits2::local(dest);
-                if (beg != end)
-                {
-                    segments.push_back(dispatch_async(traits2::get_id(sdest),
-                        algo, policy, forced_seq(), beg, end, ldest, f,
-                        new_value, HPX_FORWARD(Proj, proj)));
-                }
+                segments.push_back(dispatch_async(traits2::get_id(sdest), algo,
+                    policy, forced_seq(), beg, end, ldest, f, new_value,
+                    HPX_FORWARD(Proj, proj)));
             }
-            else
+        }
+        else
+        {
+            // handle the remaining part of the first partition
+            local_iterator_type1 beg = traits1::local(first);
+            local_iterator_type1 end = traits1::end(sit);
+            local_iterator_type2 ldest = traits2::local(dest);
+            if (beg != end)
             {
-                // handle the remaining part of the first partition
-                local_iterator_type1 beg = traits1::local(first);
-                local_iterator_type1 end = traits1::end(sit);
-                local_iterator_type2 ldest = traits2::local(dest);
+                segments.push_back(dispatch_async(traits2::get_id(sdest), algo,
+                    policy, forced_seq(), beg, end, ldest, f, new_value, proj));
+            }
+
+            // handle all of the full partitions
+            for (++sit, ++sdest; sit != send; ++sit, ++sdest)
+            {
+                beg = traits1::begin(sit);
+                end = traits1::end(sit);
+                ldest = traits2::begin(sdest);
                 if (beg != end)
                 {
                     segments.push_back(
                         dispatch_async(traits2::get_id(sdest), algo, policy,
                             forced_seq(), beg, end, ldest, f, new_value, proj));
                 }
-
-                // handle all of the full partitions
-                for (++sit, ++sdest; sit != send; ++sit, ++sdest)
-                {
-                    beg = traits1::begin(sit);
-                    end = traits1::end(sit);
-                    ldest = traits2::begin(sdest);
-                    if (beg != end)
-                    {
-                        segments.push_back(dispatch_async(
-                            traits2::get_id(sdest), algo, policy, forced_seq(),
-                            beg, end, ldest, f, new_value, proj));
-                    }
-                }
-
-                // handle the beginning of the last partition
-                beg = traits1::begin(sit);
-                end = traits1::local(last);
-                ldest = traits2::begin(sdest);
-                if (beg != end)
-                {
-                    segments.push_back(dispatch_async(traits2::get_id(sdest),
-                        algo, policy, forced_seq(), beg, end, ldest, f,
-                        new_value, HPX_FORWARD(Proj, proj)));
-                }
             }
 
-            return result::get(dataflow(
-                [=](segment_type&& r) -> util::in_out_result<SegIter, OutIter> {
-                    // handle any remote exceptions, will throw on error
-                    std::list<std::exception_ptr> errors;
-                    parallel::util::detail::handle_remote_exceptions<
-                        ExPolicy>::call(r, errors);
-                    auto ft = r.back().get();
-                    auto olast = traits1::compose(send, ft.in);
-                    auto odest = traits2::compose(sdest, ft.out);
-                    return util::in_out_result<SegIter, OutIter>{olast, odest};
-                },
-                HPX_MOVE(segments)));
+            // handle the beginning of the last partition
+            beg = traits1::begin(sit);
+            end = traits1::local(last);
+            ldest = traits2::begin(sdest);
+            if (beg != end)
+            {
+                segments.push_back(dispatch_async(traits2::get_id(sdest), algo,
+                    policy, forced_seq(), beg, end, ldest, f, new_value,
+                    HPX_FORWARD(Proj, proj)));
+            }
         }
-    }    // namespace detail
+
+        return result::get(dataflow(
+            [=](segment_type&& r) -> util::in_out_result<SegIter, OutIter> {
+                // handle any remote exceptions, will throw on error
+                std::list<std::exception_ptr> errors;
+                parallel::util::detail::handle_remote_exceptions<
+                    ExPolicy>::call(r, errors);
+                auto ft = r.back().get();
+                auto olast = traits1::compose(send, ft.in);
+                auto odest = traits2::compose(sdest, ft.out);
+                return util::in_out_result<SegIter, OutIter>{olast, odest};
+            },
+            HPX_MOVE(segments)));
+    }
     /// \endcond
-}    // namespace hpx::parallel
+}    // namespace hpx::parallel::detail
 
 // The segmented iterators we support all live in namespace hpx::segmented
 namespace hpx::segmented {
 
     // segmented replace_copy
-    template <typename SegIter, typename OutIter, typename T>
+    HPX_CXX_EXPORT template <typename SegIter, typename OutIter, typename T>
         requires(hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter> &&
             hpx::traits::is_iterator_v<OutIter> &&
             hpx::traits::is_segmented_iterator_v<OutIter>)
-    OutIter tag_invoke(hpx::replace_copy_t, SegIter first, SegIter last,
+    OutIter hpx_invoke(hpx::replace_copy_t, SegIter first, SegIter last,
         OutIter dest, T const& old_value, T const& new_value)
     {
         static_assert(hpx::traits::is_input_iterator_v<SegIter>,
@@ -438,14 +429,15 @@ namespace hpx::segmented {
         return HPX_MOVE(result.out);
     }
 
-    template <typename ExPolicy, typename SegIter, typename OutIter, typename T>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename SegIter,
+        typename OutIter, typename T>
         requires(hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter> &&
             hpx::traits::is_iterator_v<OutIter> &&
             hpx::traits::is_segmented_iterator_v<OutIter>)
-    static hpx::parallel::util::detail::algorithm_result_t<ExPolicy, OutIter>
-    tag_invoke(hpx::replace_copy_t, ExPolicy&& policy, SegIter first,
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, OutIter>
+    hpx_invoke(hpx::replace_copy_t, ExPolicy&& policy, SegIter first,
         SegIter last, OutIter dest, T const& old_value, T const& new_value)
     {
         static_assert(hpx::traits::is_forward_iterator_v<SegIter>,
@@ -477,12 +469,13 @@ namespace hpx::segmented {
     }
 
     // segmented replace_copy_if
-    template <typename SegIter, typename OutIter, typename Pred, typename T>
+    HPX_CXX_EXPORT template <typename SegIter, typename OutIter, typename Pred,
+        typename T>
         requires(hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter> &&
             hpx::traits::is_iterator_v<OutIter> &&
             hpx::traits::is_segmented_iterator_v<OutIter>)
-    OutIter tag_invoke(hpx::replace_copy_if_t, SegIter first, SegIter last,
+    OutIter hpx_invoke(hpx::replace_copy_if_t, SegIter first, SegIter last,
         OutIter dest, Pred&& pred, T const& new_value)
     {
         static_assert(hpx::traits::is_input_iterator_v<SegIter>,
@@ -508,15 +501,15 @@ namespace hpx::segmented {
         return HPX_MOVE(result.out);
     }
 
-    template <typename ExPolicy, typename SegIter, typename OutIter,
-        typename Pred, typename T>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename SegIter,
+        typename OutIter, typename Pred, typename T>
         requires(hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter> &&
             hpx::traits::is_iterator_v<OutIter> &&
             hpx::traits::is_segmented_iterator_v<OutIter>)
-    static hpx::parallel::util::detail::algorithm_result_t<ExPolicy, OutIter>
-    tag_invoke(hpx::replace_copy_if_t, ExPolicy&& policy, SegIter first,
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, OutIter>
+    hpx_invoke(hpx::replace_copy_if_t, ExPolicy&& policy, SegIter first,
         SegIter last, OutIter dest, Pred&& pred, T const& new_value)
     {
         static_assert(hpx::traits::is_forward_iterator_v<SegIter>,

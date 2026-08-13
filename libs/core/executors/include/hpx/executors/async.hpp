@@ -60,7 +60,8 @@ namespace hpx::detail {
     };
 
     // Launch the given function or function object asynchronously and return a
-    // future allowing to synchronize with the returned result.
+    // future allowing to synchronize with the returned result. Enable inline
+    // execution by default (uses launch::async).
     HPX_CXX_CORE_EXPORT template <typename Func, typename Enable>
     struct async_dispatch
     {

@@ -30,6 +30,8 @@ namespace hpx::tracy {
         HPX_CORE_EXPORT region_data start_region(
             char const*, std::size_t = 0, std::size_t = 0) noexcept;
         HPX_CORE_EXPORT char const* rename_region(char const*) noexcept;
+        HPX_CORE_EXPORT std::uint64_t push_zone(char const*) noexcept;
+        HPX_CORE_EXPORT void pop_zone(std::uint64_t) noexcept;
         HPX_CORE_EXPORT region_data stop_region(
             region_data const& prev_region) noexcept;
         // Set/clear the per-OS-thread "inside fiber" flag used to guard
@@ -53,6 +55,17 @@ namespace hpx::tracy {
             char const* suspend_reason = nullptr) noexcept;
         HPX_CORE_EXPORT void resume_fiber_zone(
             char const* zone_name = nullptr, std::uint32_t color = 0) noexcept;
+
+        /// \brief Embed arbitrary text into the currently-active fiber zone.
+        ///
+        /// The text appears in the Zone Info popup when the user clicks the
+        /// colored bar on the Tracy timeline. This is how producer/consumer
+        /// addresses are attached directly to the visual zone rectangle.
+        ///
+        /// \param txt  Pointer to character string.
+        /// \param size Length of the string.
+        HPX_CORE_EXPORT void add_zone_text_to_fiber(
+            char const* txt, std::size_t size) noexcept;
 
     }    // namespace detail
 
@@ -112,17 +125,22 @@ namespace hpx::tracy {
     HPX_CXX_CORE_EXPORT struct mark_event
     {
         explicit mark_event(char const* name) noexcept
-          : previous_name(detail::rename_region(name))
+          : ctx_value(detail::push_zone(name))
         {
         }
+
+        mark_event(mark_event const&) = delete;
+        mark_event(mark_event&&) = delete;
+        mark_event& operator=(mark_event const&) = delete;
+        mark_event& operator=(mark_event&&) = delete;
 
         ~mark_event()
         {
-            detail::rename_region(previous_name);
+            detail::pop_zone(ctx_value);
         }
 
     private:
-        char const* previous_name;
+        std::uint64_t ctx_value;
     };
 
     // RAII guard that closes the running fiber zone before self_.yield() and

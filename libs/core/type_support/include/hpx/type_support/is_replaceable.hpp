@@ -39,12 +39,12 @@ namespace hpx::experimental {
     {
     };
 
-    HPX_CXX_CORE_EXPORT template <typename T>
+    template <typename T>
     struct is_replaceable<T[]> : std::false_type
     {
     };
 
-    HPX_CXX_CORE_EXPORT template <typename T, std::size_t N>
+    template <typename T, std::size_t N>
     struct is_replaceable<T[N]> : std::false_type
     {
     };

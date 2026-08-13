@@ -6,7 +6,6 @@
 
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/execution_base.hpp>
-#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <exception>
@@ -21,15 +20,10 @@ namespace mylib {
     {
     } derived_forwarding_query{};
 
+    // Opt into forwarding_query by inheriting from forwarding_query_t
     inline constexpr struct non_query_t final
-      : hpx::functional::tag<non_query_t>
+      : hpx::execution::experimental::forwarding_query_t
     {
-        friend constexpr auto tag_invoke(
-            hpx::execution::experimental::forwarding_query_t,
-            non_query_t) noexcept
-        {
-            return true;
-        }
     } non_query{};
 
 }    // namespace mylib
@@ -38,7 +32,7 @@ int main()
 {
     static_assert(hpx::execution::experimental::forwarding_query(
                       mylib::non_query) == true,
-        "non_query CPO is user implemented that returns true");
+        "non_query inherits forwarding_query_t so returns true");
     // P2300R8: "forwarding_query(execution::get_scheduler) is a core constant
     // expression and has value true."
     static_assert(hpx::execution::experimental::forwarding_query(

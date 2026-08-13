@@ -10,6 +10,7 @@
 #include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/executors.hpp>
 #include <hpx/modules/functional.hpp>
+
 #include <hpx/parallel/segmented_algorithms/for_each.hpp>
 
 #include <algorithm>
@@ -20,79 +21,77 @@
 #include <utility>
 #include <vector>
 
-namespace hpx::parallel {
+namespace hpx::parallel::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     // segmented_replace
-    namespace detail {
-        ///////////////////////////////////////////////////////////////////////
-        /// \cond NOINTERNAL
 
-        template <typename T>
-        struct replace_function
+    /// \cond NOINTERNAL
+
+    template <typename T>
+    struct replace_function
+    {
+        replace_function() = default;
+
+        template <typename T1, typename T2>
+        explicit replace_function(T1&& old_val, T2&& new_val)
+          : old_value_(HPX_FORWARD(T1, old_val))
+          , new_value_(HPX_FORWARD(T2, new_val))
         {
-            replace_function() = default;
+        }
 
-            template <typename T1, typename T2>
-            explicit replace_function(T1&& old_val, T2&& new_val)
-              : old_value_(HPX_FORWARD(T1, old_val))
-              , new_value_(HPX_FORWARD(T2, new_val))
-            {
-            }
+        T old_value_ = T();
+        T new_value_ = T();
 
-            T old_value_ = T();
-            T new_value_ = T();
-
-            void operator()(T& val) const
-            {
-                if (val == old_value_)
-                {
-                    val = new_value_;
-                }
-            }
-        };
-
-        template <typename T>
-        replace_function(T, T) -> replace_function<std::decay_t<T>>;
-
-        template <typename T, typename F>
-        struct replace_if_function
+        void operator()(T& val) const
         {
-            replace_if_function() = default;
-
-            template <typename T_, typename F_>
-            explicit replace_if_function(T_&& new_val, F_&& pred)
-              : pred_(HPX_FORWARD(F_, pred))
-              , new_value_(HPX_FORWARD(T_, new_val))
+            if (val == old_value_)
             {
+                val = new_value_;
             }
+        }
+    };
 
-            F pred_ = F();
-            T new_value_ = T();
+    template <typename T>
+    replace_function(T, T) -> replace_function<std::decay_t<T>>;
 
-            void operator()(T& val) const
+    template <typename T, typename F>
+    struct replace_if_function
+    {
+        replace_if_function() = default;
+
+        template <typename T_, typename F_>
+        explicit replace_if_function(T_&& new_val, F_&& pred)
+          : pred_(HPX_FORWARD(F_, pred))
+          , new_value_(HPX_FORWARD(T_, new_val))
+        {
+        }
+
+        F pred_ = F();
+        T new_value_ = T();
+
+        void operator()(T& val) const
+        {
+            if (HPX_INVOKE(pred_, val))
             {
-                if (HPX_INVOKE(pred_, val))
-                {
-                    val = new_value_;
-                }
+                val = new_value_;
             }
-        };
+        }
+    };
 
-        template <typename T, typename F>
-        replace_if_function(T&&, F&&)
-            -> replace_if_function<std::decay_t<T>, std::decay_t<F>>;
-    }    // namespace detail
+    template <typename T, typename F>
+    replace_if_function(T&&, F&&)
+        -> replace_if_function<std::decay_t<T>, std::decay_t<F>>;
     /// \endcond
-}    // namespace hpx::parallel
+}    // namespace hpx::parallel::detail
 
 namespace hpx::segmented {
 
     // segmented replace
-    template <typename SegIter, typename T>
+    HPX_CXX_EXPORT template <typename SegIter, typename T>
         requires(hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter>)
-    SegIter tag_invoke(hpx::replace_t, SegIter first, SegIter last,
+    SegIter hpx_invoke(hpx::replace_t, SegIter first, SegIter last,
         T const& old_value, T const& new_value)
     {
         static_assert(hpx::traits::is_forward_iterator_v<SegIter>,
@@ -113,12 +112,12 @@ namespace hpx::segmented {
             hpx::identity_v, std::true_type{});
     }
 
-    template <typename ExPolicy, typename SegIter, typename T>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename SegIter, typename T>
         requires(hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter>)
-    static hpx::parallel::util::detail::algorithm_result_t<ExPolicy, SegIter>
-    tag_invoke(hpx::replace_t, ExPolicy&& policy, SegIter first, SegIter last,
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, SegIter>
+    hpx_invoke(hpx::replace_t, ExPolicy&& policy, SegIter first, SegIter last,
         T const& old_value, T const& new_value)
     {
         static_assert(hpx::traits::is_forward_iterator_v<SegIter>,
@@ -145,10 +144,10 @@ namespace hpx::segmented {
     }
 
     // segmented replace_if
-    template <typename SegIter, typename Pred, typename T>
+    HPX_CXX_EXPORT template <typename SegIter, typename Pred, typename T>
         requires(hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter>)
-    SegIter tag_invoke(hpx::replace_if_t, SegIter first, SegIter last,
+    SegIter hpx_invoke(hpx::replace_if_t, SegIter first, SegIter last,
         Pred&& pred, T const& new_value)
     {
         static_assert(hpx::traits::is_forward_iterator_v<SegIter>,
@@ -170,12 +169,13 @@ namespace hpx::segmented {
             hpx::identity_v, std::true_type{});
     }
 
-    template <typename ExPolicy, typename SegIter, typename Pred, typename T>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename SegIter, typename Pred,
+        typename T>
         requires(hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter>)
-    static hpx::parallel::util::detail::algorithm_result_t<ExPolicy, SegIter>
-    tag_invoke(hpx::replace_if_t, ExPolicy&& policy, SegIter first,
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, SegIter>
+    hpx_invoke(hpx::replace_if_t, ExPolicy&& policy, SegIter first,
         SegIter last, Pred&& pred, T const& new_value)
     {
         static_assert(hpx::traits::is_forward_iterator_v<SegIter>,

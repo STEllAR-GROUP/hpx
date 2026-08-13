@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Bryce Lelbach & Katelyn Kufahl
-//  Copyright (c) 2007-2025 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //  Copyright (c) 2015 Anton Bikineev
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -9,9 +9,9 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
-#include <hpx/agas/addressing_service.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/modules/actions_base.hpp>
+#include <hpx/modules/agas.hpp>
 #include <hpx/modules/agas_base.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/async_distributed.hpp>
@@ -27,6 +27,7 @@
 #include <hpx/modules/static_reinit.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/modules/topology.hpp>
+
 #include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime_distributed/big_boot_barrier.hpp>
 #include <hpx/runtime_distributed/runtime_fwd.hpp>
@@ -604,8 +605,14 @@ namespace hpx::agas {
         // store number of initial localities
         cfg.set_num_localities(header.num_localities);
 
+        // prevent adding a core-offset if the user provided explicit affinity
+        // bindings
+        bool const explicit_core_assignment =
+            cfg.get_entry("hpx.bind-provided", "0") != "0";
+
         // store number of used cores by other localities
-        cfg.set_first_used_core(header.used_cores);
+        cfg.set_first_used_core(
+            explicit_core_assignment ? 0 : header.used_cores);
         rt.assign_cores();
 
         // pre-cache all known locality endpoints in local AGAS

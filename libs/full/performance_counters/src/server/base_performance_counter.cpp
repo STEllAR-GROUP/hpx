@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2025 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,6 +11,7 @@
 #include <hpx/modules/components_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/thread_support.hpp>
+
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/performance_counter_base.hpp>
 #include <hpx/performance_counters/server/base_performance_counter.hpp>
@@ -19,7 +20,7 @@ HPX_DEFINE_GET_COMPONENT_TYPE(hpx::components::component<
     hpx::performance_counters::server::base_performance_counter>)
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace performance_counters { namespace server {
+namespace hpx::performance_counters::server {
 
     void base_performance_counter::reset_counter_value()
     {
@@ -122,4 +123,4 @@ namespace hpx { namespace performance_counters { namespace server {
     {
         reinit(reset);
     }
-}}}    // namespace hpx::performance_counters::server
+}    // namespace hpx::performance_counters::server

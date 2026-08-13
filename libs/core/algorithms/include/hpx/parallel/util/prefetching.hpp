@@ -159,16 +159,14 @@ namespace hpx::parallel::util {
                 return tmp;
             }
 
-            // FIXME: should other members be compared too?
             bool operator==(prefetching_iterator const& rhs) const
             {
                 return idx_ == rhs.idx_ && base_ == rhs.base_;
             }
 
-            // FIXME: should the base iterators be compared too?
             bool operator!=(prefetching_iterator const& rhs) const
             {
-                return idx_ != rhs.idx_;
+                return !(*this == rhs);
             }
             bool operator>(prefetching_iterator const& rhs) const
             {
@@ -342,7 +340,7 @@ namespace hpx::parallel::util {
             typename... Ts, typename F>
         HPX_HOST_DEVICE
             HPX_FORCEINLINE constexpr prefetching_iterator<Itr, Ts...>
-            tag_invoke(hpx::parallel::util::loop_n_t<ExPolicy>,
+            hpx_invoke(hpx::parallel::util::loop_n_t<ExPolicy>,
                 prefetching_iterator<Itr, Ts...> it, std::size_t count, F&& f)
         {
             return loop_n_helper::call(
@@ -353,7 +351,7 @@ namespace hpx::parallel::util {
             typename... Ts, typename F>
         HPX_HOST_DEVICE
             HPX_FORCEINLINE constexpr prefetching_iterator<Itr, Ts...>
-            tag_invoke(hpx::parallel::util::const_loop_n_t<ExPolicy>,
+            hpx_invoke(hpx::parallel::util::const_loop_n_t<ExPolicy>,
                 prefetching_iterator<Itr, Ts...> it, std::size_t count, F&& f)
         {
             return loop_n_helper::call(
@@ -437,7 +435,7 @@ namespace hpx::parallel::util {
             typename... Ts, typename F>
         HPX_HOST_DEVICE
             HPX_FORCEINLINE constexpr prefetching_iterator<Itr, Ts...>
-            tag_invoke(hpx::parallel::util::loop_n_ind_t<ExPolicy>,
+            hpx_invoke(hpx::parallel::util::loop_n_ind_t<ExPolicy>,
                 prefetching_iterator<Itr, Ts...> it, std::size_t count, F&& f)
         {
             return loop_n_ind_helper::call(

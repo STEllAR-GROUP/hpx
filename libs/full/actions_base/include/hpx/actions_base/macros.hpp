@@ -87,10 +87,7 @@
 #if !defined(HPX_HAVE_NETWORKING)
 
 #define HPX_DEFINE_GET_ACTION_NAME(action) /**/
-#if defined(HPX_HAVE_ITTNOTIFY) && HPX_HAVE_ITTNOTIFY != 0 &&                  \
-    !defined(HPX_HAVE_APEX)
-#define HPX_DEFINE_GET_ACTION_NAME_ITT(action, actionname) /**/
-#endif
+
 #define HPX_REGISTER_ACTION_EXTERN_DECLARATION(action) /**/
 
 #define HPX_REGISTER_ACTION_2(action, actionname)                              \
@@ -228,7 +225,7 @@
 /// defined using one of the \a HPX_DEFINE_COMPONENT_ACTION macros. It has to
 /// be visible in all translation units using the action, thus it is
 /// recommended to place it into the header file defining the component.
-#if defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_COMPUTE_DEVICE_CODE) || defined(HPX_HAVE_CXX26_REFLECTION)
 #define HPX_REGISTER_ACTION_DECLARATION(...) /**/
 #else
 #define HPX_REGISTER_ACTION_DECLARATION(...)                                   \
@@ -272,7 +269,7 @@
 ///       \a HPX_REGISTER_ACTION_ID should be used for a particular action,
 ///       never both.
 ///
-#if defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_COMPUTE_DEVICE_CODE) || defined(HPX_HAVE_CXX26_REFLECTION)
 #define HPX_REGISTER_ACTION(...) /**/
 #else
 #define HPX_REGISTER_ACTION(...)                                               \
@@ -292,7 +289,7 @@
 /// The parameter \a action is the type of the action to define the
 /// boilerplate for.
 ///
-/// The parameter \a actionname specifies an unique name of the action to be
+/// The parameter \a actionname specifies a unique name of the action to be
 /// used for serialization purposes.
 /// The second parameter has to be usable as a plain (nonqualified) C++
 /// identifier, it should not contain special characters which cannot be part
@@ -311,7 +308,7 @@
 ///       \a HPX_REGISTER_ACTION_ID should be used for a particular action,
 ///       never both.
 ///
-#if defined(HPX_COMPUTE_DEVICE_CODE)
+#if defined(HPX_COMPUTE_DEVICE_CODE) || defined(HPX_HAVE_CXX26_REFLECTION)
 #define HPX_REGISTER_ACTION_ID(action, actionname, actionid) /**/
 #else
 #define HPX_REGISTER_ACTION_ID(action, actionname, actionid)                   \
@@ -392,12 +389,23 @@
         HPX_DEFINE_COMPONENT_ACTION_, HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__)) \
     /**/
 
+#if defined(HPX_HAVE_CXX26_REFLECTION)
+/// When C++26 reflection is available, HPX_DEFINE_COMPONENT_ACTION_3 uses
+/// reflect_component_action<^^component::func> instead of make_action_t.
+/// This eliminates the need for HPX_REGISTER_ACTION while keeping the same
+/// user-facing macro syntax.
+#define HPX_DEFINE_COMPONENT_ACTION_3(component, func, name)                   \
+    struct name : hpx::actions::reflect_component_action<^^component::func>    \
+    {                                                                          \
+    }; /**/
+#else
 #define HPX_DEFINE_COMPONENT_ACTION_3(component, func, name)                   \
     struct name                                                                \
       : hpx::actions::make_action_t<decltype(&component::func),                \
             &component::func, name>                                            \
     {                                                                          \
     }; /**/
+#endif
 #define HPX_DEFINE_COMPONENT_ACTION_2(component, func)                         \
     HPX_DEFINE_COMPONENT_ACTION_3(component, func, HPX_PP_CAT(func, _action))  \
     /**/
@@ -413,6 +421,13 @@
         HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))                               \
     /**/
 
+#if defined(HPX_HAVE_CXX26_REFLECTION)
+#define HPX_DEFINE_COMPONENT_DIRECT_ACTION_3(component, func, name)            \
+    struct name                                                                \
+      : hpx::actions::reflect_component_direct_action<^^component::func>       \
+    {                                                                          \
+    }; /**/
+#else
 #define HPX_DEFINE_COMPONENT_DIRECT_ACTION_3(component, func, name)            \
     struct name                                                                \
       : hpx::actions::make_direct_action_t<decltype(&component::func),         \
@@ -420,6 +435,7 @@
     {                                                                          \
     };                                                                         \
     /**/
+#endif
 
 #define HPX_DEFINE_COMPONENT_DIRECT_ACTION_2(component, func)                  \
     HPX_DEFINE_COMPONENT_DIRECT_ACTION_3(                                      \
@@ -483,21 +499,23 @@
     /**/
 
 #define HPX_DEFINE_PLAIN_ACTION_1(func)                                        \
-    HPX_DEFINE_PLAIN_ACTION_2(func, HPX_PP_CAT(func, _action))                 \
+    HPX_DEFINE_PLAIN_ACTION_3(HPX_PP_EMPTY(), func, HPX_PP_CAT(func, _action)) \
+    /**/
+
+#define HPX_DEFINE_PLAIN_ACTION_2(func, name)                                  \
+    HPX_DEFINE_PLAIN_ACTION_3(HPX_PP_EMPTY(), func, name)                      \
     /**/
 
 #if defined(HPX_HAVE_CXX26_REFLECTION)
-// clang-format off
 /// When C++26 reflection is available, HPX_DEFINE_PLAIN_ACTION_2 uses
 /// reflect_action<^^func> instead of make_action_t. This eliminates the
 /// need for HPX_REGISTER_ACTION while keeping the same user-facing syntax.
-#define HPX_DEFINE_PLAIN_ACTION_2(func, name)                                  \
-    using name = hpx::actions::reflect_action<^^func>                          \
+#define HPX_DEFINE_PLAIN_ACTION_3(Prefix, func, name)                          \
+    Prefix using name = hpx::actions::reflect_action<^^func>;                  \
     /**/
-// clang-format on
 #elif defined(__NVCC__) || defined(__CUDACC__)
-#define HPX_DEFINE_PLAIN_ACTION_2(func, name)                                  \
-    struct name                                                                \
+#define HPX_DEFINE_PLAIN_ACTION_3(Prefix, func, name)                          \
+    Prefix struct name                                                         \
       : hpx::actions::make_action<                                             \
             typename std::add_pointer<                                         \
                 typename std::remove_pointer<decltype(&func)>::type>::type,    \
@@ -505,21 +523,33 @@
     {                                                                          \
     } /**/
 #else
-#define HPX_DEFINE_PLAIN_ACTION_2(func, name)                                  \
-    struct name : hpx::actions::make_action_t<decltype(&func), &func, name>    \
+#define HPX_DEFINE_PLAIN_ACTION_3(Prefix, func, name)                          \
+    Prefix struct name                                                         \
+      : hpx::actions::make_action_t<decltype(&func), &func, name>              \
     {                                                                          \
     } /**/
 #endif
 
 #define HPX_DEFINE_PLAIN_DIRECT_ACTION_1(func)                                 \
-    HPX_DEFINE_PLAIN_DIRECT_ACTION_2(func, HPX_PP_CAT(func, _action))          \
+    HPX_DEFINE_PLAIN_DIRECT_ACTION_3(                                          \
+        HPX_PP_EMPTY(), func, HPX_PP_CAT(func, _action))                       \
     /**/
 
 #define HPX_DEFINE_PLAIN_DIRECT_ACTION_2(func, name)                           \
-    struct name                                                                \
+    HPX_DEFINE_PLAIN_DIRECT_ACTION_3(HPX_PP_EMPTY(), func, name)               \
+    /**/
+
+#if defined(HPX_HAVE_CXX26_REFLECTION)
+#define HPX_DEFINE_PLAIN_DIRECT_ACTION_3(Prefix, func, name)                   \
+    Prefix using name = hpx::actions::reflect_direct_action<^^func>;           \
+    /**/
+#else
+#define HPX_DEFINE_PLAIN_DIRECT_ACTION_3(Prefix, func, name)                   \
+    Prefix struct name                                                         \
       : hpx::actions::make_direct_action_t<decltype(&func), &func, name>       \
     {                                                                          \
     } /**/
+#endif
 
 /// \endcond
 
@@ -597,7 +627,7 @@
 /// be encapsulated into a plain action. The parameter \p name is the name of
 /// the action type defined by this macro.
 ///
-/// The second parameter has to be usable as a plain (non-qualified) C++
+/// The second parameter has to be usable as a plain (nonqualified) C++
 /// identifier, it should not contain special characters which cannot be part of
 /// a C++ identifier, such as '<', '>', or ':'.
 ///
@@ -714,5 +744,5 @@
 ///
 /// \note Requires HPX_WITH_CXX26_REFLECTION=ON
 #define HPX_ACTION(func, name)                                                 \
-    using name = hpx::actions::reflect_action<^^func> /**/
+    using name = hpx::actions::reflect_action<^^func>; /**/
 #endif    // HPX_HAVE_CXX26_REFLECTION

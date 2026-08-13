@@ -380,7 +380,7 @@ void test_bulk_then(Executor&& executor)
 template <typename ExPolicy>
 void test_post_policy([[maybe_unused]] ExPolicy&& policy)
 {
-// GCC V8 and below don't properly find the policy tag_invoke overloads
+// GCC V8 and below don't properly find the policy overloads
 #if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 90000
     std::string desc("test_post_policy");
     auto p = hpx::execution::experimental::with_annotation(policy, desc);
@@ -469,8 +469,7 @@ struct test_async_executor
     using execution_category = hpx::execution::parallel_execution_tag;
 
     template <typename F, typename... Ts>
-    friend decltype(auto) tag_invoke(hpx::parallel::execution::async_execute_t,
-        test_async_executor const&, F&& f, Ts&&... ts)
+    decltype(auto) async_execute(F&& f, Ts&&... ts) const
     {
         return hpx::async(std::forward<F>(f), std::forward<Ts>(ts)...);
     }

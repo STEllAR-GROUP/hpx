@@ -24,7 +24,7 @@ jobs:
         container: stellargroup/build_env:17
 
         steps:
-            - uses: actions/checkout@v6
+            - uses: actions/checkout@v7
 
             - name: Setup HPX workspace
               shell: bash

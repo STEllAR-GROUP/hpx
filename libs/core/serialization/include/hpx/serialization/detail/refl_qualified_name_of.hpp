@@ -6,9 +6,9 @@
 
 #pragma once
 
-#include <hpx/serialization/config/defines.hpp>
+#include <hpx/config.hpp>
 
-#if defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
+#if defined(HPX_HAVE_CXX26_REFLECTION)
 
 #include <algorithm>
 #include <cstddef>
@@ -19,7 +19,9 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
+
 namespace hpx::serialization::detail {
+
     // A simple wrapper around a char array that can be constructed
     // and concatenated at compile time.
     template <std::size_t N>

@@ -24,7 +24,6 @@
 #include <cstddef>
 #include <iterator>
 #include <string>
-#include <type_traits>
 #include <utility>
 #include <variant>
 #include <vector>
@@ -175,24 +174,24 @@ namespace hpx::distributed {
         release();
     }
 
+    bool barrier::is_released() const noexcept
+    {
+        return std::visit([](auto const& c) { return !c.valid(); }, comm_);
+    }
+
     hpx::future<void> barrier::wait(hpx::launch::async_policy) const
     {
+        if (is_released())
+        {
+            return hpx::make_exceptional_future<void>(HPX_GET_EXCEPTION(
+                hpx::error::invalid_status, "hpx::distributed::barrier::wait",
+                "wait() called on a released, detached, or moved-from "
+                "barrier instance"));
+        }
+
         auto const gen = ++generation_;
         return std::visit(
             [&](auto& c) -> hpx::future<void> {
-                using T = std::decay_t<decltype(c)>;
-                if constexpr (std::is_same_v<T, hpx::collectives::communicator>)
-                {
-                    if (!c.valid())
-                    {
-                        return hpx::make_exceptional_future<void>(
-                            HPX_GET_EXCEPTION(hpx::error::invalid_status,
-                                "hpx::distributed::barrier::wait",
-                                "wait() called on a released, detached, or "
-                                "moved-from barrier instance"));
-                    }
-                }
-
                 return hpx::collectives::barrier(c,
                     hpx::collectives::this_site_arg(rank_),
                     hpx::collectives::generation_arg(gen));
@@ -207,8 +206,7 @@ namespace hpx::distributed {
 
     void barrier::release()
     {
-        if (auto const* c = std::get_if<hpx::collectives::communicator>(&comm_);
-            c && !c->valid())
+        if (is_released())
         {
             return;
         }

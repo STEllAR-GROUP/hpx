@@ -15,7 +15,7 @@
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/logging.hpp>
-#include <hpx/runtime_distributed/runtime_fwd.hpp>
+#include <hpx/modules/runtime_distributed.hpp>
 
 #include <hpx/components/iostreams/ostream.hpp>
 #include <hpx/components/iostreams/standard_streams.hpp>

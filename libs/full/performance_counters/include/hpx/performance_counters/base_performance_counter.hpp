@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2025 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,9 +10,11 @@
 #include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/components_base.hpp>
 #include <hpx/modules/runtime_local.hpp>
+
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/server/base_performance_counter.hpp>
 
+#if defined(DOXYGEN)
 ///////////////////////////////////////////////////////////////////////////////
 //[performance_counter_base_class
 namespace hpx::performance_counters {
@@ -21,11 +23,12 @@ namespace hpx::performance_counters {
     class base_performance_counter;
 }    // namespace hpx::performance_counters
 //]
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::performance_counters {
 
-    template <typename Derived>
+    HPX_CXX_EXPORT template <typename Derived>
     class base_performance_counter
       : public hpx::performance_counters::server::base_performance_counter
       , public hpx::components::component_base<Derived>

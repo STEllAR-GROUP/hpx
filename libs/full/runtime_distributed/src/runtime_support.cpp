@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,8 +6,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/components_base.hpp>
-#include <hpx/performance_counters/detail/counter_interface_functions.hpp>
-#include <hpx/runtime_components/component_registry.hpp>
+#include <hpx/modules/performance_counters.hpp>
+#include <hpx/modules/runtime_components.hpp>
 #include <hpx/runtime_distributed/runtime_support.hpp>
 
 #include <mutex>

@@ -46,6 +46,7 @@ set(algorithms_headers
     hpx/parallel/algorithms/detail/search.hpp
     hpx/parallel/algorithms/detail/set_operation.hpp
     hpx/parallel/algorithms/detail/spin_sort.hpp
+    hpx/parallel/algorithms/detail/tag_dispatch.hpp
     hpx/parallel/algorithms/detail/transfer.hpp
     hpx/parallel/algorithms/detail/upper_lower_bound.hpp
     hpx/parallel/algorithms/ends_with.hpp
@@ -280,6 +281,7 @@ add_hpx_module(
     hpx_concepts
     hpx_concurrency
     hpx_config
+    hpx_contracts
     hpx_coroutines
     hpx_datastructures
     hpx_errors
@@ -289,7 +291,6 @@ add_hpx_module(
     hpx_functional
     hpx_futures
     hpx_iterator_support
-    hpx_itt_notify
     hpx_lcos_local
     hpx_memory
     hpx_pack_traversal

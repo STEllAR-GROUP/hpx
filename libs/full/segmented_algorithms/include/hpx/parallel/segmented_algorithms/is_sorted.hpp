@@ -11,6 +11,7 @@
 #include <hpx/modules/executors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/type_support.hpp>
+
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
 
 #include <algorithm>
@@ -22,7 +23,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx::parallel { namespace detail {
+namespace hpx::parallel::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     // segmented_is_sorted_until
@@ -33,7 +34,7 @@ namespace hpx::parallel { namespace detail {
     // sequential remote implementation
     template <typename Algo, typename ExPolicy, typename SegIter, typename Pred,
         typename Proj>
-    static util::detail::algorithm_result_t<ExPolicy, SegIter>
+    util::detail::algorithm_result_t<ExPolicy, SegIter>
     segmented_is_sorted_until(Algo&& algo, ExPolicy const& policy,
         SegIter first, SegIter last, Pred&& pred, Proj&& proj, std::true_type)
     {
@@ -140,7 +141,7 @@ namespace hpx::parallel { namespace detail {
     // parallel remote implementation
     template <typename Algo, typename ExPolicy, typename SegIter, typename Pred,
         typename Proj>
-    static util::detail::algorithm_result_t<ExPolicy, SegIter>
+    util::detail::algorithm_result_t<ExPolicy, SegIter>
     segmented_is_sorted_until(Algo&& algo, ExPolicy const& policy,
         SegIter first, SegIter last, Pred&& pred, Proj&& proj, std::false_type)
     {
@@ -273,17 +274,17 @@ namespace hpx::parallel { namespace detail {
             },
             HPX_MOVE(segments)));
     }
-
     /// \endcond
-}}    // namespace hpx::parallel::detail
+}    // namespace hpx::parallel::detail
 
 // The segmented iterators we support all live in namespace hpx::segmented
 namespace hpx::segmented {
 
-    template <typename InIter, typename Pred = hpx::parallel::detail::less>
+    HPX_CXX_EXPORT template <typename InIter,
+        typename Pred = hpx::parallel::detail::less>
         requires(hpx::traits::is_iterator_v<InIter> &&
             hpx::traits::is_segmented_iterator_v<InIter>)
-    InIter tag_invoke(
+    InIter hpx_invoke(
         hpx::is_sorted_until_t, InIter first, InIter last, Pred&& pred = Pred())
     {
         static_assert(std::forward_iterator<InIter>,
@@ -302,13 +303,13 @@ namespace hpx::segmented {
             hpx::identity_v, std::true_type());
     }
 
-    template <typename ExPolicy, typename SegIter,
+    HPX_CXX_EXPORT template <typename ExPolicy, typename SegIter,
         typename Pred = hpx::parallel::detail::less>
         requires(hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter>)
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy, SegIter>
-    tag_invoke(hpx::is_sorted_until_t, ExPolicy&& policy, SegIter first,
+    hpx_invoke(hpx::is_sorted_until_t, ExPolicy&& policy, SegIter first,
         SegIter last, Pred&& pred = Pred())
     {
         static_assert(std::forward_iterator<SegIter>,
@@ -333,10 +334,11 @@ namespace hpx::segmented {
             hpx::identity_v, is_seq());
     }
 
-    template <typename InIter, typename Pred = hpx::parallel::detail::less>
+    HPX_CXX_EXPORT template <typename InIter,
+        typename Pred = hpx::parallel::detail::less>
         requires(hpx::traits::is_iterator_v<InIter> &&
             hpx::traits::is_segmented_iterator_v<InIter>)
-    bool tag_invoke(
+    bool hpx_invoke(
         hpx::is_sorted_t, InIter first, InIter last, Pred&& pred = Pred())
     {
         static_assert(std::forward_iterator<InIter>,
@@ -355,12 +357,12 @@ namespace hpx::segmented {
                    hpx::identity_v, std::true_type()) == last;
     }
 
-    template <typename ExPolicy, typename SegIter,
+    HPX_CXX_EXPORT template <typename ExPolicy, typename SegIter,
         typename Pred = hpx::parallel::detail::less>
         requires(hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter>)
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool> tag_invoke(
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool> hpx_invoke(
         hpx::is_sorted_t, ExPolicy&& policy, SegIter first, SegIter last,
         Pred&& pred = Pred())
     {

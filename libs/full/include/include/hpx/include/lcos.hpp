@@ -8,15 +8,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/include/actions.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/dataflow.hpp>
 #include <hpx/include/lcos_local.hpp>
 #include <hpx/modules/async_combinators.hpp>
-
-#include <hpx/collectives/barrier.hpp>
-#include <hpx/collectives/gather.hpp>
-#include <hpx/collectives/latch.hpp>
-#include <hpx/collectives/reduce.hpp>
-#include <hpx/include/actions.hpp>
-#include <hpx/lcos_distributed/channel.hpp>
 #include <hpx/modules/async_distributed.hpp>
+#include <hpx/modules/collectives.hpp>
+#include <hpx/modules/lcos_distributed.hpp>

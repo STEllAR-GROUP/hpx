@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -8,7 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/async_colocated/async_colocated_fwd.hpp>
+#include <hpx/modules/async_colocated.hpp>
 #include <hpx/modules/components_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/futures.hpp>
@@ -16,6 +16,7 @@
 #include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/type_support.hpp>
+
 #include <hpx/runtime_distributed/server/runtime_support.hpp>
 
 #include <cstddef>
@@ -30,7 +31,7 @@ namespace hpx::components::stubs {
     ///////////////////////////////////////////////////////////////////////////
     // The \a runtime_support class is the client side representation of a
     // \a server#runtime_support component
-    struct HPX_EXPORT runtime_support
+    HPX_CXX_EXPORT struct HPX_EXPORT runtime_support
     {
         ///////////////////////////////////////////////////////////////////////
         /// Create a new component \a type using the runtime_support with the

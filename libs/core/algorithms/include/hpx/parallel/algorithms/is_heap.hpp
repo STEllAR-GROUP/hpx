@@ -209,18 +209,19 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
+#include <hpx/contracts.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/executors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/iterator_support.hpp>
-#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
 
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
+#include <hpx/parallel/algorithms/detail/tag_dispatch.hpp>
 #include <hpx/parallel/util/adapt_placement_mode.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
@@ -595,9 +596,9 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::is_heap
     HPX_CXX_CORE_EXPORT inline constexpr struct is_heap_t final
-      : hpx::detail::tag_parallel_algorithm<is_heap_t>
+      : hpx::detail::tag_dispatch<is_heap_t,
+            hpx::detail::tag_parallel_algorithm<is_heap_t>>
     {
-    private:
         template <typename ExPolicy, typename RandIter,
             typename Comp = hpx::parallel::detail::less>
         // clang-format off
@@ -610,8 +611,8 @@ namespace hpx {
                 >
             )
         // clang-format on
-        friend decltype(auto) tag_fallback_invoke(is_heap_t, ExPolicy&& policy,
-            RandIter first, RandIter last, Comp comp = Comp())
+        static decltype(auto) invoke_default(ExPolicy&& policy, RandIter first,
+            RandIter last, Comp comp = Comp()) HPX_PRE(first <= last)
         {
             static_assert(std::random_access_iterator<RandIter>,
                 "Requires a random access iterator.");
@@ -632,8 +633,8 @@ namespace hpx {
                 >
             )
         // clang-format on
-        friend bool tag_fallback_invoke(
-            is_heap_t, RandIter first, RandIter last, Comp comp = Comp())
+        static bool invoke_default(RandIter first, RandIter last,
+            Comp comp = Comp()) HPX_PRE(first <= last)
         {
             static_assert(std::random_access_iterator<RandIter>,
                 "Requires a random access iterator.");
@@ -647,9 +648,9 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::is_heap_until
     HPX_CXX_CORE_EXPORT inline constexpr struct is_heap_until_t final
-      : hpx::detail::tag_parallel_algorithm<is_heap_until_t>
+      : hpx::detail::tag_dispatch<is_heap_until_t,
+            hpx::detail::tag_parallel_algorithm<is_heap_until_t>>
     {
-    private:
         template <typename ExPolicy, typename RandIter,
             typename Comp = hpx::parallel::detail::less>
         // clang-format off
@@ -662,9 +663,8 @@ namespace hpx {
                 >
             )
         // clang-format on
-        friend decltype(auto) tag_fallback_invoke(is_heap_until_t,
-            ExPolicy&& policy, RandIter first, RandIter last,
-            Comp comp = Comp())
+        static decltype(auto) invoke_default(ExPolicy&& policy, RandIter first,
+            RandIter last, Comp comp = Comp()) HPX_PRE(first <= last)
         {
             static_assert(std::random_access_iterator<RandIter>,
                 "Requires a random access iterator.");
@@ -685,8 +685,8 @@ namespace hpx {
                 >
             )
         // clang-format on
-        friend RandIter tag_fallback_invoke(
-            is_heap_until_t, RandIter first, RandIter last, Comp comp = Comp())
+        static RandIter invoke_default(RandIter first, RandIter last,
+            Comp comp = Comp()) HPX_PRE(first <= last)
         {
             static_assert(std::random_access_iterator<RandIter>,
                 "Requires a random access iterator.");

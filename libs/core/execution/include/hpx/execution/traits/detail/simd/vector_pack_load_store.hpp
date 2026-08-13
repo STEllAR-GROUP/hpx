@@ -16,7 +16,6 @@
 #include <cstddef>
 #include <iterator>
 #include <memory>
-#include <type_traits>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::parallel::traits {
@@ -36,14 +35,18 @@ namespace hpx::parallel::traits {
         template <typename Iter>
         HPX_HOST_DEVICE HPX_FORCEINLINE static V unaligned(Iter& iter)
         {
-            if constexpr (std::is_same_v<V, ValueType>)
+            // V can be a genuine SIMD pack or a scalar value_type (width-1
+            // pack, see vector_pack_type<T, 1, Abi>). std::experimental::simd's
+            // pointer constructor only accepts actual SIMD types, so scalars
+            // take the plain-load path instead.
+            if constexpr (datapar::experimental::is_simd_v<V>)
             {
-                return *iter;
+                return V(std::addressof(*iter),
+                    datapar::experimental::element_aligned);
             }
             else
             {
-                return V(
-                    std::addressof(*iter), datapar::experimental::element_aligned);
+                return *iter;
             }
         }
     };
@@ -65,14 +68,17 @@ namespace hpx::parallel::traits {
         HPX_HOST_DEVICE HPX_FORCEINLINE static void unaligned(
             V& value, Iter& iter)
         {
-            if constexpr (std::is_same_v<V, ValueType>)
+            // See vector_pack_load::unaligned above: copy_to() is only
+            // available on genuine SIMD packs, so scalars take the
+            // plain-store path instead.
+            if constexpr (datapar::experimental::is_simd_v<V>)
             {
-                *iter = value;
+                value.copy_to(std::addressof(*iter),
+                    datapar::experimental::element_aligned);
             }
             else
             {
-                value.copy_to(
-                    std::addressof(*iter), datapar::experimental::element_aligned);
+                *iter = value;
             }
         }
     };

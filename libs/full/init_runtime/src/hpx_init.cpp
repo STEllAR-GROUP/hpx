@@ -8,13 +8,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/hpx_init.hpp>
-
 #include <hpx/assert.hpp>
-#include <hpx/hpx_finalize.hpp>
-#include <hpx/hpx_main_winsocket.hpp>
-#include <hpx/hpx_suspend.hpp>
-#include <hpx/hpx_user_main_config.hpp>
 #include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/command_line_handling.hpp>
 #include <hpx/modules/coroutines.hpp>
@@ -38,7 +32,14 @@
 #include <hpx/modules/threading.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/timing.hpp>
+#include <hpx/modules/tracing.hpp>
 #include <hpx/modules/type_support.hpp>
+
+#include <hpx/hpx_user_main_config.hpp>
+#include <hpx/init.hpp>
+#include <hpx/init_runtime/detail/main_winsocket.hpp>
+#include <hpx/init_runtime/finalize.hpp>
+#include <hpx/init_runtime/suspend.hpp>
 
 #ifdef HPX_HAVE_MODULE_MPI_BASE
 #include <hpx/modules/mpi_base.hpp>
@@ -54,11 +55,8 @@
 #include <hpx/modules/parcelset_base.hpp>
 #include <hpx/parcelports/init_all_parcelports.hpp>
 #endif
-#include <hpx/performance_counters/counters.hpp>
-#include <hpx/performance_counters/query_counters.hpp>
-#include <hpx/runtime_distributed.hpp>
-#include <hpx/runtime_distributed/runtime_fwd.hpp>
-#include <hpx/runtime_distributed/runtime_support.hpp>
+#include <hpx/modules/performance_counters.hpp>
+#include <hpx/modules/runtime_distributed.hpp>
 #endif
 #if defined(HPX_HAVE_LOGGING)
 #include <hpx/init_runtime/detail/init_logging.hpp>
@@ -755,10 +753,8 @@ namespace hpx {
 
             hpx::assertion::set_assertion_handler(&detail::assertion_handler);
             hpx::util::set_test_failure_handler(&detail::test_failure_handler);
-#if defined(HPX_HAVE_APEX)
-            hpx::util::set_enable_parent_task_handler(
+            hpx::tracing::set_enable_parent_task_handler(
                 &detail::enable_parent_task_handler);
-#endif
             hpx::set_custom_exception_info_handler(
                 &detail::custom_exception_info);
             hpx::serialization::detail::set_save_custom_exception_handler(
@@ -941,6 +937,7 @@ namespace hpx {
                 }
                 catch (hpx::exception const& e)
                 {
+                    resource::detail::delete_partitioner();
                     std::cerr << "hpx::init: hpx::exception caught: "
                               << hpx::get_error_what(e) << "\n";
                     return -1;
@@ -993,6 +990,7 @@ namespace hpx {
             }
             catch (detail::command_line_error const& e)
             {
+                resource::detail::delete_partitioner();
                 std::cerr << "hpx::init: std::exception caught: " << e.what()
                           << "\n";
                 return -1;

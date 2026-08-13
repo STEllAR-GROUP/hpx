@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file dataflow.hpp
-/// \page hpx::dataflow (distributed)
+/// \page hpx::dataflow_distributed hpx::dataflow (distributed)
 /// \headerfile hpx/async.hpp
 
 #pragma once
@@ -106,6 +106,7 @@ namespace hpx::lcos::detail {
                 act,
             hpx::id_type const& id, Ts&&... ts)
         {
+            // Enable inline execution by default (uses launch::async).
             return dataflow_dispatch_impl<true, launch>::call(
                 alloc, launch::async, act, id, HPX_FORWARD(Ts, ts)...);
         }

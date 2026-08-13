@@ -10,7 +10,6 @@
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/synchronization.hpp>
-#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
 
 #include <any>
@@ -85,7 +84,6 @@ struct default_awaiter_context
 // This is the context that is associated with basic_task's promise type
 // by default. It handles forwarding of stop requests from parent to child.
 struct default_task_context_impl
-  : hpx::functional::tag<default_task_context_impl>
 {
     hpx::experimental::in_place_stop_token stop_token_;
 
@@ -391,11 +389,9 @@ private:
 
     // Make this task awaitable within a particular context:
     template <typename ParentPromise>
-    friend task_awaitable<ParentPromise> tag_invoke(
-        hpx::execution::experimental::as_awaitable_t, basic_task&& self,
-        ParentPromise&) noexcept
+    task_awaitable<ParentPromise> as_awaitable(ParentPromise&) && noexcept
     {
-        return task_awaitable<ParentPromise>{std::exchange(self.coro_, {})};
+        return task_awaitable<ParentPromise>{std::exchange(coro_, {})};
     }
 
     // Make this task generally awaitable:
@@ -415,10 +411,13 @@ private:
         hpx::execution::experimental::set_stopped_t()>;
 
     // clang-format off
-    friend auto tag_invoke(
-        hpx::execution::experimental::get_completion_signatures_t,
-        const basic_task&, auto) -> std::conditional_t<std::is_void_v<T>,
-                                     task_traits_t<>, task_traits_t<T>>;
+    template <typename Self, typename... Env>
+    static auto get_completion_signatures(Self&&, Env&&...) noexcept
+        -> std::conditional_t<std::is_void_v<T>,
+                                     task_traits_t<>, task_traits_t<T>>
+    {
+        return {};
+    }
     // clang-format on
 
     explicit basic_task(hpx::coroutine_handle<promise_type> hcoro) noexcept

@@ -12,6 +12,7 @@
 #if defined(HPX_HAVE_TRACY)
 
 #include <cstddef>
+#include <cstdint>
 #include <string>
 
 namespace hpx::tracy {
@@ -53,10 +54,23 @@ namespace hpx::tracy {
     };
 
     HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void create_counter(
+        char const* name) noexcept;
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void create_counter(
         std::string const& name) noexcept;
 
     HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void sample_value(
+        char const* name, double value) noexcept;
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void sample_value(
         std::string const& name, double value) noexcept;
+
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void message(
+        char const* text, std::size_t size, std::uint32_t color) noexcept;
+
+    /// \brief Emit a frame boundary marker in Tracy.
+    ///
+    /// \param name Optional name for the named frame boundary.
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void frame_mark(
+        char const* name = nullptr) noexcept;
 
 }    // namespace hpx::tracy
 

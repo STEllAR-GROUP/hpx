@@ -409,6 +409,7 @@ namespace hpx {
 #include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
+#include <hpx/parallel/algorithms/detail/tag_dispatch.hpp>
 #include <hpx/parallel/unseq/loop.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/clear_container.hpp>
@@ -1004,7 +1005,8 @@ namespace hpx::experimental {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::uninitialized_relocate_n
     HPX_CXX_CORE_EXPORT inline constexpr struct uninitialized_relocate_n_t final
-      : hpx::detail::tag_parallel_algorithm<uninitialized_relocate_n_t>
+      : hpx::detail::tag_dispatch<uninitialized_relocate_n_t,
+            hpx::detail::tag_parallel_algorithm<uninitialized_relocate_n_t>>
     {
         template <typename InIter, typename Size, typename FwdIter>
         // clang-format off
@@ -1014,8 +1016,7 @@ namespace hpx::experimental {
                 std::is_integral_v<Size>
             )
         // clang-format on
-        friend FwdIter tag_fallback_invoke(uninitialized_relocate_n_t,
-            InIter first, Size count,
+        static FwdIter invoke_default(InIter first, Size count,
             FwdIter dest) noexcept(util::detail::relocation_traits<InIter,
             FwdIter>::is_noexcept_relocatable_v)
         {
@@ -1053,8 +1054,8 @@ namespace hpx::experimental {
                 std::is_integral_v<Size>
             )
         // clang-format on
-        friend decltype(auto) tag_fallback_invoke(uninitialized_relocate_n_t,
-            ExPolicy&& policy, InIter first, Size count,
+        static decltype(auto) invoke_default(ExPolicy&& policy, InIter first,
+            Size count,
             FwdIter dest) noexcept(util::detail::relocation_traits<InIter,
             FwdIter>::is_noexcept_relocatable_v)
         {
@@ -1206,7 +1207,8 @@ namespace hpx::experimental {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::uninitialized_relocate
     HPX_CXX_CORE_EXPORT inline constexpr struct uninitialized_relocate_t final
-      : hpx::detail::tag_parallel_algorithm<uninitialized_relocate_t>
+      : hpx::detail::tag_dispatch<uninitialized_relocate_t,
+            hpx::detail::tag_parallel_algorithm<uninitialized_relocate_t>>
     {
         template <typename InIter1, typename InIter2, typename FwdIter>
         // clang-format off
@@ -1216,8 +1218,7 @@ namespace hpx::experimental {
                 hpx::traits::is_iterator_v<FwdIter>
             )
         // clang-format on
-        friend FwdIter tag_fallback_invoke(uninitialized_relocate_t,
-            InIter1 first, InIter2 last,
+        static FwdIter invoke_default(InIter1 first, InIter2 last,
             FwdIter dest) noexcept(util::detail::relocation_traits<InIter1,
             FwdIter>::is_noexcept_relocatable_v)
         {
@@ -1255,8 +1256,8 @@ namespace hpx::experimental {
                 hpx::traits::is_iterator_v<FwdIter>
             )
         // clang-format on
-        friend decltype(auto) tag_fallback_invoke(uninitialized_relocate_t,
-            ExPolicy&& policy, InIter1 first, InIter2 last,
+        static decltype(auto) invoke_default(ExPolicy&& policy, InIter1 first,
+            InIter2 last,
             FwdIter dest) noexcept(util::detail::relocation_traits<InIter1,
             FwdIter>::is_noexcept_relocatable_v)
         {
@@ -1412,7 +1413,9 @@ namespace hpx::experimental {
     // CPO for hpx::uninitialized_relocate_backward
     HPX_CXX_CORE_EXPORT inline constexpr struct
         uninitialized_relocate_backward_t final
-      : hpx::detail::tag_parallel_algorithm<uninitialized_relocate_backward_t>
+      : hpx::detail::tag_dispatch<uninitialized_relocate_backward_t,
+            hpx::detail::tag_parallel_algorithm<
+                uninitialized_relocate_backward_t>>
     {
         template <typename BiIter1, typename BiIter2>
         // clang-format off
@@ -1421,8 +1424,7 @@ namespace hpx::experimental {
                 hpx::traits::is_iterator_v<BiIter2>
             )
         // clang-format on
-        friend BiIter2 tag_fallback_invoke(uninitialized_relocate_backward_t,
-            BiIter1 first, BiIter1 last,
+        static BiIter2 invoke_default(BiIter1 first, BiIter1 last,
             BiIter2 dest_last) noexcept(util::detail::relocation_traits<BiIter1,
             BiIter2>::is_noexcept_relocatable_v)
         {
@@ -1456,8 +1458,7 @@ namespace hpx::experimental {
                 hpx::traits::is_iterator_v<BiIter2>
             )
         // clang-format on
-        friend decltype(auto) tag_fallback_invoke(
-            uninitialized_relocate_backward_t, ExPolicy&& policy, BiIter1 first,
+        static decltype(auto) invoke_default(ExPolicy&& policy, BiIter1 first,
             BiIter1 last,
             BiIter2 dest_last) noexcept(util::detail::relocation_traits<BiIter1,
             BiIter2>::is_noexcept_relocatable_v)

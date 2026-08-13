@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2025 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -19,6 +19,7 @@
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/threading_base.hpp>
+
 #include <hpx/performance_counters/base_performance_counter.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counter_interface.hpp>
@@ -84,6 +85,56 @@ HPX_DEFINE_GET_COMPONENT_TYPE(
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::performance_counters {
+
+    std::string& ensure_counter_prefix(std::string& name)
+    {
+        if (name.compare(0, counter_prefix_len, counter_prefix) != 0)
+            name = counter_prefix + name;
+        return name;
+    }
+
+    std::string ensure_counter_prefix(std::string const& counter)    //-V659
+    {
+        std::string name(counter);
+        return ensure_counter_prefix(name);
+    }
+
+    std::string& remove_counter_prefix(std::string& name)
+    {
+        if (name.compare(0, counter_prefix_len, counter_prefix) == 0)
+            name = name.substr(counter_prefix_len);
+        return name;
+    }
+
+    std::string remove_counter_prefix(std::string const& counter)    //-V659
+    {
+        std::string name(counter);
+        return remove_counter_prefix(name);
+    }
+
+    counter_status add_counter_type(counter_info const& info, error_code& ec)
+    {
+        return add_counter_type(
+            info, create_counter_func(), discover_counters_func(), ec);
+    }
+
+    hpx::id_type get_counter(std::string const& name, error_code& ec)
+    {
+        hpx::future<hpx::id_type> f = get_counter_async(name, ec);
+        if (ec)
+            return hpx::invalid_id;
+
+        return f.get(ec);
+    }
+
+    hpx::id_type get_counter(counter_info const& info, error_code& ec)
+    {
+        hpx::future<hpx::id_type> f = get_counter_async(info, ec);
+        if (ec)
+            return hpx::invalid_id;
+
+        return f.get(ec);
+    }
 
     std::ostream& operator<<(std::ostream& os, counter_status rhs)
     {

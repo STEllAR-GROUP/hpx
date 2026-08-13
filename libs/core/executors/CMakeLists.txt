@@ -26,6 +26,8 @@ set(executors_headers
     hpx/executors/execution_policy_parameters.hpp
     hpx/executors/execution_policy_scheduling_property.hpp
     hpx/executors/execution_policy.hpp
+    hpx/executors/executor_scheduler.hpp
+    hpx/executors/executor_scheduler_bulk.hpp
     hpx/executors/explicit_scheduler_executor.hpp
     hpx/executors/fork_join_executor.hpp
     hpx/executors/limiting_executor.hpp
@@ -41,6 +43,7 @@ set(executors_headers
     hpx/executors/service_executors.hpp
     hpx/executors/std_execution_policy.hpp
     hpx/executors/sync.hpp
+    hpx/executors/thread_pool_continues_on_sender.hpp
     hpx/executors/thread_pool_executor.hpp
     hpx/executors/thread_pool_scheduler.hpp
     hpx/executors/thread_pool_scheduler_bulk.hpp
@@ -50,7 +53,10 @@ set(executors_macro_headers hpx/executors/macros.hpp)
 
 if(HPX_WITH_DATAPAR)
   set(executors_headers
-      ${executors_headers} hpx/executors/datapar/execution_policy_fwd.hpp
+      ${executors_headers}
+      hpx/executors/datapar/detail/execution_policy_mapping_members.hpp
+      hpx/executors/datapar/detail/execution_policy_mapping_members_impl.hpp
+      hpx/executors/datapar/execution_policy_fwd.hpp
       hpx/executors/datapar/execution_policy_mappings.hpp
       hpx/executors/datapar/execution_policy.hpp
   )
@@ -128,7 +134,6 @@ add_hpx_module(
     hpx_hardware
     hpx_io_service
     hpx_iterator_support
-    hpx_itt_notify
     hpx_memory
     hpx_pack_traversal
     hpx_properties

@@ -1,4 +1,5 @@
 //  Copyright (c) 2020 ETH Zurich
+//  Copyright (c) 2026 Sai Charan Arvapally
 //  Copyright (c) 2022-2025 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -21,6 +22,7 @@
 #include <concepts>
 #include <cstddef>
 #include <exception>
+#include <memory>
 #include <mutex>
 #include <optional>
 #include <string>
@@ -29,8 +31,9 @@
 #include <utility>
 #include <variant>
 
-#include <hpx/execution/algorithms/bulk.hpp>
-#include <hpx/execution_base/stdexec_forward.hpp>
+#include <hpx/executors/thread_pool_continues_on_sender.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/execution_base.hpp>
 
 #include <ranges>
 
@@ -109,10 +112,10 @@ namespace hpx::execution::experimental {
     {
         // transform_sender for bulk operations (stdexec parallel_scheduler pattern)
         template <bulk_chunked_or_unchunked_sender Sender, typename Env>
-            requires std::same_as<
+            requires(std::same_as<
                 std::decay_t<decltype(hpx::execution::experimental::
                         get_scheduler(std::declval<Env const&>()))>,
-                thread_pool_policy_scheduler<Policy>>
+                thread_pool_policy_scheduler<Policy>>)
         constexpr auto transform_sender(
             hpx::execution::experimental::set_value_t, Sender&& sndr,
             Env const& env) const noexcept
@@ -143,6 +146,49 @@ namespace hpx::execution::experimental {
                     is_unsequenced>{HPX_MOVE(sched),
                     HPX_FORWARD(decltype(child), child), HPX_MOVE(iota_shape),
                     HPX_FORWARD(decltype(f), f), HPX_MOVE(pu_mask)};
+        }
+
+        // transform_sender for continues_on operations.
+        //
+        // When stdexec's domain resolution encounters
+        //   continues_on(sender, hpx_thread_pool_scheduler)
+        // it calls this transform_sender to replace the generic double-state
+        // continues_on with our optimized single-state implementation.
+        //
+        // The continues_on expression tree is:
+        //   continues_on_t [ scheduler, schedule_from_t [ {}, original_sender ] ]
+        //
+        // We extract the original sender and scheduler, then return our
+        // thread_pool_continues_on_sender which uses a single operation
+        // state and inline forwarding when already on an HPX thread.
+        //
+        // Note: We constrain on the sender being a continues_on expression
+        // only. The scheduler type check is done inside the body since the
+        // domain dispatch already ensures we are in thread_pool_domain.
+        template <typename Sender, typename Env>
+            requires sender_invokes_algorithm_v<Sender,
+                hpx::execution::experimental::continues_on_t>
+        constexpr auto transform_sender(
+            hpx::execution::experimental::set_value_t, Sender&& sndr,
+            Env const& /*env*/) const noexcept
+        {
+            // Destructure the continues_on expression:
+            //   [continues_on_tag, scheduler, schedule_from_child]
+            auto&& [tag, sched, schedule_from_child] =
+                HPX_FORWARD(Sender, sndr);
+
+            // Destructure the schedule_from wrapper to get the original
+            // predecessor sender:
+            //   [schedule_from_tag, empty_data, original_sender]
+            auto&& [sf_tag, sf_data, original_sender] =
+                HPX_FORWARD(decltype(schedule_from_child), schedule_from_child);
+
+            return hpx::execution::experimental::detail::
+                thread_pool_continues_on_sender<
+                    std::decay_t<decltype(original_sender)>,
+                    std::decay_t<decltype(sched)>>{
+                    HPX_FORWARD(decltype(original_sender), original_sender),
+                    HPX_FORWARD(decltype(sched), sched)};
         }
     };
 
@@ -196,39 +242,121 @@ namespace hpx::execution::experimental {
             return pool_;
         }
 
-        template <typename Executor_>
-            requires(
-                std::is_convertible_v<Executor_, thread_pool_policy_scheduler>)
-        friend auto tag_invoke(
-            hpx::execution::experimental::with_processing_units_count_t,
-            Executor_ const& scheduler, std::size_t num_cores)
+        [[nodiscard]] auto query(
+            with_processing_units_count_t, std::size_t num_cores) const
         {
             if (num_cores == 0)
             {
-                auto pool = scheduler.pool_ ?
-                    scheduler.pool_ :
-                    threads::detail::get_self_or_default_pool();
+                auto pool =
+                    pool_ ? pool_ : threads::detail::get_self_or_default_pool();
                 num_cores = pool->get_active_os_thread_count();
             }
-            auto scheduler_with_num_cores = scheduler;
+            auto scheduler_with_num_cores = *this;
             scheduler_with_num_cores.num_cores_ = num_cores;
             return scheduler_with_num_cores;
         }
 
         template <executor_parameters Parameters>
-        friend constexpr std::size_t tag_invoke(
-            hpx::execution::experimental::processing_units_count_t,
-            Parameters&&, thread_pool_policy_scheduler const& scheduler,
-            hpx::chrono::steady_duration const& = hpx::chrono::null_duration,
-            std::size_t = 0)
+        [[nodiscard]] std::size_t query(processing_units_count_t,
+            Parameters&& params,
+            hpx::chrono::steady_duration const& iter_dur =
+                hpx::chrono::null_duration,
+            std::size_t num_tasks = 0) const
         {
-            return scheduler.get_num_cores();
+            using exec_type = std::decay_t<decltype(*this)>;
+            if constexpr (requires(std::decay_t<Parameters> const& p,
+                              exec_type const& e,
+                              hpx::chrono::steady_duration const& d) {
+                              p.processing_units_count(e, d, std::size_t{});
+                          })
+            {
+                return HPX_FORWARD(Parameters, params)
+                    .processing_units_count(*this, iter_dur, num_tasks);
+            }
+            else
+            {
+                return get_num_cores();
+            }
+        }
+
+        [[nodiscard]] auto query(
+            with_first_core_t, std::size_t first_core) const noexcept
+        {
+            auto scheduler_with_first_core = *this;
+            scheduler_with_first_core.first_core_ = first_core;
+            return scheduler_with_first_core;
+        }
+
+        [[nodiscard]] constexpr std::size_t query(
+            get_first_core_t) const noexcept
+        {
+            return get_first_core();
+        }
+
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+        [[nodiscard]] auto query(
+            with_annotation_t, char const* annotation) const
+        {
+            auto sched_with_annotation = *this;
+            sched_with_annotation.annotation_ = annotation;
+            return sched_with_annotation;
+        }
+
+        [[nodiscard]] auto query(
+            with_annotation_t, std::string annotation) const
+        {
+            auto sched_with_annotation = *this;
+            sched_with_annotation.annotation_ =
+                hpx::detail::store_function_annotation(HPX_MOVE(annotation));
+            return sched_with_annotation;
+        }
+
+        [[nodiscard]] constexpr char const* query(
+            get_annotation_t) const noexcept
+        {
+            return annotation_;
+        }
+#endif
+
+        [[nodiscard]] auto query(get_processing_units_mask_t) const
+        {
+            auto pool =
+                pool_ ? pool_ : threads::detail::get_self_or_default_pool();
+            return pool->get_used_processing_units(get_num_cores(), false);
+        }
+
+        [[nodiscard]] auto query(get_cores_mask_t) const
+        {
+            auto pool =
+                pool_ ? pool_ : threads::detail::get_self_or_default_pool();
+            return pool->get_used_processing_units(get_num_cores(), true);
+        }
+
+        template <typename Tag, typename Property>
+            requires(
+                hpx::execution::experimental::is_scheduling_property_v<Tag> &&
+                hpx::execution::experimental::has_query_v<Policy const&, Tag,
+                    Property>)
+        [[nodiscard]] auto query(Tag tag, Property&& prop) const
+        {
+            auto scheduler_with_prop = *this;
+            scheduler_with_prop.policy(
+                tag(policy(), HPX_FORWARD(Property, prop)));
+            return scheduler_with_prop;
+        }
+
+        template <typename Tag>
+            requires(
+                hpx::execution::experimental::is_scheduling_property_v<Tag> &&
+                hpx::execution::experimental::has_query_v<Policy const&, Tag>)
+        [[nodiscard]] auto query(Tag tag) const
+        {
+            return tag(policy());
         }
 
         template <typename Sender, typename Shape, typename F>
-        friend auto tag_invoke(hpx::execution::experimental::bulk_t,
-            thread_pool_policy_scheduler const& scheduler, Sender&& sender,
-            Shape const& shape, F&& f)
+        [[nodiscard]] auto query(hpx::execution::experimental::bulk_t,
+            Sender&& sender, Shape const& shape, F&& f) const
         {
             constexpr bool is_parallel =
                 !std::is_same_v<Policy, hpx::launch::sync_policy> &&
@@ -240,9 +368,6 @@ namespace hpx::execution::experimental {
             {
                 auto iota_shape = hpx::util::counting_shape(shape);
 
-                // For parallel policies, we want internal chunking for efficiency.
-                // Since bulk_t expects an unchunked function, we wrap f to
-                // handle a range of indices in a loop.
                 if constexpr (!std::is_same_v<Policy, hpx::launch::sync_policy>)
                 {
                     auto wrapped_f = [f = HPX_FORWARD(F, f)](auto start,
@@ -256,7 +381,7 @@ namespace hpx::execution::experimental {
                     return detail::thread_pool_bulk_sender<Policy,
                         std::decay_t<Sender>, decltype(iota_shape),
                         decltype(wrapped_f), true, is_parallel, is_unsequenced>{
-                        scheduler, HPX_FORWARD(Sender, sender), iota_shape,
+                        *this, HPX_FORWARD(Sender, sender), iota_shape,
                         HPX_MOVE(wrapped_f)};
                 }
                 else
@@ -264,7 +389,7 @@ namespace hpx::execution::experimental {
                     return detail::thread_pool_bulk_sender<Policy,
                         std::decay_t<Sender>, decltype(iota_shape),
                         std::decay_t<F>, false, is_parallel, is_unsequenced>{
-                        scheduler, HPX_FORWARD(Sender, sender), iota_shape,
+                        *this, HPX_FORWARD(Sender, sender), iota_shape,
                         HPX_FORWARD(F, f)};
                 }
             }
@@ -283,7 +408,7 @@ namespace hpx::execution::experimental {
                     return detail::thread_pool_bulk_sender<Policy,
                         std::decay_t<Sender>, std::decay_t<Shape>,
                         decltype(wrapped_f), true, is_parallel, is_unsequenced>{
-                        scheduler, HPX_FORWARD(Sender, sender), shape,
+                        *this, HPX_FORWARD(Sender, sender), shape,
                         HPX_MOVE(wrapped_f)};
                 }
                 else
@@ -291,83 +416,10 @@ namespace hpx::execution::experimental {
                     return detail::thread_pool_bulk_sender<Policy,
                         std::decay_t<Sender>, std::decay_t<Shape>,
                         std::decay_t<F>, false, is_parallel, is_unsequenced>{
-                        scheduler, HPX_FORWARD(Sender, sender), shape,
+                        *this, HPX_FORWARD(Sender, sender), shape,
                         HPX_FORWARD(F, f)};
                 }
             }
-        }
-
-        template <typename Executor_>
-            requires(
-                std::is_convertible_v<Executor_, thread_pool_policy_scheduler>)
-        friend constexpr auto tag_invoke(
-            hpx::execution::experimental::with_first_core_t,
-            Executor_ const& exec, std::size_t first_core) noexcept
-        {
-            auto exec_with_first_core = exec;
-            exec_with_first_core.first_core_ = first_core;
-            return exec_with_first_core;
-        }
-
-        friend constexpr std::size_t tag_invoke(
-            hpx::execution::experimental::get_first_core_t,
-            thread_pool_policy_scheduler const& exec) noexcept
-        {
-            return exec.get_first_core();
-        }
-
-#if defined(HPX_HAVE_THREAD_DESCRIPTION)
-        // support with_annotation property
-        template <typename Executor_>
-            requires(
-                std::is_convertible_v<Executor_, thread_pool_policy_scheduler>)
-        friend constexpr auto tag_invoke(
-            hpx::execution::experimental::with_annotation_t,
-            Executor_ const& scheduler, char const* annotation)
-        {
-            auto sched_with_annotation = scheduler;
-            sched_with_annotation.annotation_ = annotation;
-            return sched_with_annotation;
-        }
-
-        template <typename Executor_>
-            requires(
-                std::is_convertible_v<Executor_, thread_pool_policy_scheduler>)
-        friend auto tag_invoke(hpx::execution::experimental::with_annotation_t,
-            Executor_ const& scheduler, std::string annotation)
-        {
-            auto sched_with_annotation = scheduler;
-            sched_with_annotation.annotation_ =
-                hpx::detail::store_function_annotation(HPX_MOVE(annotation));
-            return sched_with_annotation;
-        }
-
-        // support get_annotation property
-        friend constexpr char const* tag_invoke(
-            hpx::execution::experimental::get_annotation_t,
-            thread_pool_policy_scheduler const& scheduler) noexcept
-        {
-            return scheduler.annotation_;
-        }
-#endif
-
-        friend auto tag_invoke(
-            hpx::execution::experimental::get_processing_units_mask_t,
-            thread_pool_policy_scheduler const& exec)
-        {
-            auto pool = exec.pool_ ?
-                exec.pool_ :
-                threads::detail::get_self_or_default_pool();
-            return pool->get_used_processing_units(exec.get_num_cores(), false);
-        }
-
-        friend auto tag_invoke(hpx::execution::experimental::get_cores_mask_t,
-            thread_pool_policy_scheduler const& exec)
-        {
-            auto pool = exec.pool_ ?
-                exec.pool_ :
-                threads::detail::get_self_or_default_pool();
-            return pool->get_used_processing_units(exec.get_num_cores(), true);
         }
 
         template <typename F>
@@ -485,8 +537,8 @@ namespace hpx::execution::experimental {
                 }
 
                 template <typename CPO>
-                    requires meta::value<
-                        meta::one_of<CPO, set_value_t, set_stopped_t>>
+                    requires(meta::value<
+                        meta::one_of<CPO, set_value_t, set_stopped_t>>)
                 auto query(
                     hpx::execution::experimental::get_completion_scheduler_t<
                         CPO>) const noexcept
@@ -507,6 +559,14 @@ namespace hpx::execution::experimental {
                     return sched.query(
                         hpx::execution::experimental::get_completion_domain_t<
                             CPO>{});
+                }
+
+                // P2300 get_allocator query
+                constexpr auto query(
+                    hpx::execution::experimental::get_allocator_t)
+                    const noexcept
+                {
+                    return std::allocator<std::byte>{};
                 }
             };
 
@@ -615,40 +675,6 @@ namespace hpx::execution::experimental {
 #endif
         /// \endcond
     };
-
-    // support all properties exposed by the embedded policy
-    // clang-format off
-    HPX_CXX_CORE_EXPORT template <typename Tag, typename Policy,
-        typename Property,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::execution::experimental::is_scheduling_property_v<Tag>
-        )>
-    // clang-format on
-    auto tag_invoke(Tag tag,
-        thread_pool_policy_scheduler<Policy> const& scheduler, Property&& prop)
-        -> decltype(std::declval<thread_pool_policy_scheduler<Policy>>().policy(
-                        std::declval<Tag>()(
-                            std::declval<Policy>(), std::declval<Property>())),
-            thread_pool_policy_scheduler<Policy>())
-    {
-        auto scheduler_with_prop = scheduler;
-        scheduler_with_prop.policy(
-            tag(scheduler.policy(), HPX_FORWARD(Property, prop)));
-        return scheduler_with_prop;
-    }
-
-    // clang-format off
-    HPX_CXX_CORE_EXPORT template <typename Tag, typename Policy,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::execution::experimental::is_scheduling_property_v<Tag>
-        )>
-    // clang-format on
-    auto tag_invoke(
-        Tag tag, thread_pool_policy_scheduler<Policy> const& scheduler)
-        -> decltype(std::declval<Tag>()(std::declval<Policy>()))
-    {
-        return tag(scheduler.policy());
-    }
 
     HPX_CXX_CORE_EXPORT using thread_pool_scheduler =
         thread_pool_policy_scheduler<hpx::launch>;

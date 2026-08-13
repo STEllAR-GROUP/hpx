@@ -223,6 +223,7 @@ namespace hpx {
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/algorithms/detail/find.hpp>
+#include <hpx/parallel/algorithms/detail/tag_dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/loop.hpp>
@@ -369,7 +370,8 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::remove_if
     HPX_CXX_CORE_EXPORT inline constexpr struct remove_if_t final
-      : hpx::detail::tag_parallel_algorithm<remove_if_t>
+      : hpx::detail::tag_dispatch<remove_if_t,
+            hpx::detail::tag_parallel_algorithm<remove_if_t>>
     {
         template <typename FwdIter, typename Pred>
         // clang-format off
@@ -380,8 +382,7 @@ namespace hpx {
                 >
             )
         // clang-format on
-        friend FwdIter tag_fallback_invoke(
-            hpx::remove_if_t, FwdIter first, FwdIter last, Pred pred)
+        static FwdIter invoke_default(FwdIter first, FwdIter last, Pred pred)
         {
             static_assert(std::forward_iterator<FwdIter>,
                 "Required at least forward iterator.");
@@ -401,7 +402,7 @@ namespace hpx {
                 >
             )
         // clang-format on
-        friend decltype(auto) tag_fallback_invoke(hpx::remove_if_t,
+        static decltype(auto) invoke_default(
             ExPolicy&& policy, FwdIter first, FwdIter last, Pred pred)
         {
             static_assert(std::forward_iterator<FwdIter>,
@@ -416,9 +417,9 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::remove
     HPX_CXX_CORE_EXPORT inline constexpr struct remove_t final
-      : hpx::detail::tag_parallel_algorithm<remove_t>
+      : hpx::detail::tag_dispatch<remove_t,
+            hpx::detail::tag_parallel_algorithm<remove_t>>
     {
-    private:
         template <typename FwdIter,
             typename T = typename std::iterator_traits<FwdIter>::value_type>
         // clang-format off
@@ -426,8 +427,8 @@ namespace hpx {
                 hpx::traits::is_iterator_v<FwdIter>
             )
         // clang-format on
-        friend FwdIter tag_fallback_invoke(
-            hpx::remove_t, FwdIter first, FwdIter last, T const& value)
+        static FwdIter invoke_default(
+            FwdIter first, FwdIter last, T const& value)
         {
             using Type = typename std::iterator_traits<FwdIter>::value_type;
 
@@ -443,7 +444,7 @@ namespace hpx {
                 hpx::traits::is_iterator_v<FwdIter>
             )
         // clang-format on
-        friend decltype(auto) tag_fallback_invoke(hpx::remove_t,
+        static decltype(auto) invoke_default(
             ExPolicy&& policy, FwdIter first, FwdIter last, T const& value)
         {
             using Type = typename std::iterator_traits<FwdIter>::value_type;

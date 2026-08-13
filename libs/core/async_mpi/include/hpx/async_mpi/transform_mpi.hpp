@@ -16,7 +16,6 @@
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/mpi_base.hpp>
-#include <hpx/modules/tag_invoke.hpp>
 
 #include <exception>
 #include <type_traits>
@@ -25,6 +24,15 @@
 namespace hpx::mpi::experimental {
 
     namespace detail {
+
+        // Detects whether an ADL customization point `hpx_invoke(tag, args...)`
+        // has been defined for the given CPO `Tag`. This is the replacement
+        // hook for external customizations of `transform_mpi_t`, used in
+        // place of the legacy tag-based dispatch.
+        template <typename Tag, typename... Args>
+        concept has_hpx_invoke = requires(Tag const& tag, Args&&... args) {
+            hpx_invoke(tag, HPX_FORWARD(Args, args)...);
+        };
 
         template <typename R, typename... Ts>
         void set_value_request_callback_helper(
@@ -49,13 +57,8 @@ namespace hpx::mpi::experimental {
         // owned by the polling driver until `MPI_Test*` reports completion.
         //
         // Contract:
-        //   * `Ts...` must be passed by the caller in the same shape they
-        //     were forwarded into the user-supplied MPI function. The
-        //     lambda's pack-capture moves them once into `keep_alive`; if
-        //     the caller has already moved them, we'd capture moved-from
-        //     state. Callers in this file (`transform_mpi_receiver`) pass
-        //     them unforwarded into `f` and then forward into this helper
-        //     to satisfy the single-move invariant.
+        //   * `Ts...` are captured by the callback to keep the upstream
+        //     sender values alive until the MPI request completes.
         //   * The lambda fires on the polling thread (inside `poll()` in
         //     `mpi_future.cpp`), not on the receiver's preferred completion
         //     scheduler. Receivers must be safe to invoke on that thread.
@@ -140,18 +143,18 @@ namespace hpx::mpi::experimental {
                 hpx::execution::experimental::set_stopped(HPX_MOVE(r));
             }
 
-            template <typename... Ts,
-                typename = std::enable_if_t<
-                    hpx::is_invocable_v<F, Ts..., MPI_Request*>>>
+            template <typename... Ts>
+                requires(hpx::is_invocable_v<F &&, Ts && ..., MPI_Request*>)
             void set_value(Ts&&... ts) && noexcept
             {
                 hpx::detail::try_catch_exception_ptr(
                     [&]() {
-                        if constexpr (std::is_void_v<util::invoke_result_t<F,
-                                          Ts..., MPI_Request*>>)
+                        if constexpr (std::is_void_v<util::invoke_result_t<F&&,
+                                          Ts&&..., MPI_Request*>>)
                         {
                             MPI_Request request;
-                            HPX_INVOKE(f, ts..., &request);
+                            HPX_INVOKE(
+                                HPX_MOVE(f), HPX_FORWARD(Ts, ts)..., &request);
                             // When the return type is void, there is no value
                             // to forward to the receiver
                             set_value_request_callback_void(
@@ -161,12 +164,9 @@ namespace hpx::mpi::experimental {
                         {
                             MPI_Request request;
                             // When the return type is non-void, we have to
-                            // forward the value to the receiver. Pass `ts...`
-                            // unforwarded into `f` so the same arguments can
-                            // be moved once into the keep-alive callback
-                            // below; this matches the void branch above and
-                            // avoids a double-move when `Ts...` are rvalues.
-                            auto&& result = HPX_INVOKE(f, ts..., &request);
+                            // forward the value to the receiver.
+                            auto&& result = HPX_INVOKE(
+                                HPX_MOVE(f), HPX_FORWARD(Ts, ts)..., &request);
                             set_value_request_callback_non_void(request,
                                 HPX_MOVE(r), HPX_MOVE(result),
                                 HPX_FORWARD(Ts, ts)...);
@@ -193,11 +193,12 @@ namespace hpx::mpi::experimental {
                 template <typename... Args>
                 consteval auto operator()() const noexcept
                 {
-                    static_assert(hpx::is_invocable_v<F, Args..., MPI_Request*>,
+                    static_assert(
+                        hpx::is_invocable_v<F&&, Args&&..., MPI_Request*>,
                         "F not invocable with the value_types specified.");
 
-                    using result_type =
-                        hpx::util::invoke_result_t<F, Args..., MPI_Request*>;
+                    using result_type = hpx::util::invoke_result_t<F&&,
+                        Args&&..., MPI_Request*>;
 
                     if constexpr (std::is_void_v<result_type>)
                     {
@@ -248,6 +249,12 @@ namespace hpx::mpi::experimental {
             }
             // clang-format on
 
+            constexpr decltype(auto) get_env() const
+                noexcept(noexcept(hpx::execution::experimental::get_env(s)))
+            {
+                return hpx::execution::experimental::get_env(s);
+            }
+
             template <typename R>
             constexpr auto connect(R&& r) &
             {
@@ -266,21 +273,30 @@ namespace hpx::mpi::experimental {
     }    // namespace detail
 
     HPX_CXX_CORE_EXPORT inline constexpr struct transform_mpi_t final
-      : hpx::functional::detail::tag_fallback<transform_mpi_t>
     {
-    private:
+        // Dispatch order (mirrors the previous tag_fallback semantics):
+        //   1. hpx_invoke(tag, args...)  external customization (new hook)
+        //   2. the default bodies below
+        template <typename... Args>
+            requires(detail::has_hpx_invoke<transform_mpi_t, Args...>)
+        constexpr HPX_FORCEINLINE decltype(auto) operator()(
+            Args&&... args) const
+        {
+            return hpx_invoke(*this, HPX_FORWARD(Args, args)...);
+        }
+
         template <typename Sender, typename F>
-            requires(hpx::execution::experimental::is_sender_v<Sender>)
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
-            transform_mpi_t, Sender&& s, F&& f)
+            requires(hpx::execution::experimental::is_sender_v<Sender> &&
+                !detail::has_hpx_invoke<transform_mpi_t, Sender, F>)
+        constexpr HPX_FORCEINLINE auto operator()(Sender&& s, F&& f) const
         {
             return detail::transform_mpi_sender<Sender, F>{
                 HPX_FORWARD(Sender, s), HPX_FORWARD(F, f)};
         }
 
         template <typename F>
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
-            transform_mpi_t, F&& f)
+            requires(!detail::has_hpx_invoke<transform_mpi_t, F>)
+        constexpr HPX_FORCEINLINE auto operator()(F&& f) const
         {
             return ::hpx::execution::experimental::detail::partial_algorithm<
                 transform_mpi_t, F>{HPX_FORWARD(F, f)};

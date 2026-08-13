@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+
 #include <hpx/serialization/config/defines.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/traits/brace_initializable_traits.hpp>
@@ -18,6 +19,7 @@
 #include <utility>
 
 namespace hpx::traits {
+
     ///////////////////////////////////////////////////////////////////////////
     HPX_CXX_CORE_EXPORT template <typename T>
     class is_serialization_supported
@@ -32,7 +34,7 @@ namespace hpx::traits {
             !hpx::traits::is_not_bitwise_serializable_v<T>;
 
         static constexpr bool has_refl_serialize =
-#if defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
+#if defined(HPX_HAVE_CXX26_REFLECTION)
             true;
 #else
             false;

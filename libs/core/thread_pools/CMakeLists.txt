@@ -36,6 +36,8 @@ add_hpx_module(
   SOURCES ${thread_pools_sources}
   HEADERS ${thread_pools_headers}
   COMPAT_HEADERS ${thread_pools_compat_headers}
+  ADD_TO_GLOBAL_HEADER "hpx/thread_pools/detail/scheduling_callbacks.hpp"
+                       "hpx/thread_pools/detail/background_thread.hpp"
   MODULE_DEPENDENCIES
     hpx_affinity
     hpx_assertion
@@ -46,7 +48,6 @@ add_hpx_module(
     hpx_errors
     hpx_execution_base
     hpx_functional
-    hpx_itt_notify
     hpx_logging
     hpx_schedulers
     hpx_tag_invoke

@@ -8,6 +8,7 @@
 #pragma once
 
 #include <hpx/assert.hpp>
+#include <hpx/async_base/query_dispatch.hpp>
 #include <hpx/execution/algorithms/detail/inject_scheduler.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution/algorithms/detail/single_result.hpp>
@@ -18,7 +19,6 @@
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
 
 #include <exception>
@@ -31,28 +31,17 @@ namespace hpx::execution::experimental {
     // enforce proper formatting
     namespace detail {
 
-        // Recover the parent `run_loop&` from a `run_loop::scheduler`.
-        //
-        // P2300 deliberately does not provide a public API to obtain the owning
-        // `run_loop&` from one of its schedulers. The only way to do this
-        // against the current stdexec implementation is to read the private
-        // `loop` member exposed by the scheduler's environment.
-        //
-        // The parameter is constrained to the concrete `run_loop::scheduler`
-        // type (rather than a generic template) because the implementation
-        // depends on `.loop` being the specific stdexec env layout.
-        // `run_loop::scheduler::schedule()` is `noexcept`, so the unconditional
-        // `noexcept` here is sound. The function is not marked `constexpr`
-        // because the `stdexec::schedule` CPO wrapper is not declared
-        // `constexpr` (GCC strict mode rejects calling it from a constexpr
-        // context, even though the underlying member is constexpr).
+        using run_loop_scheduler_type =
+            decltype(std::declval<run_loop&>().get_scheduler());
+
+        // Recover the parent `run_loop&` from HPX's concrete run-loop
+        // scheduler through its public accessor instead of depending on the
+        // scheduled sender's environment layout.
         inline hpx::execution::experimental::run_loop&
-        get_run_loop_from_scheduler(
-            decltype(std::declval<hpx::execution::experimental::run_loop>()
-                    .get_scheduler()) const& sched) noexcept
+        get_run_loop_from_scheduler(run_loop_scheduler_type const&
+                sched) noexcept(noexcept(sched.get_run_loop()))
         {
-            return static_cast<hpx::execution::experimental::run_loop&>(
-                *hpx::execution::experimental::get_env(schedule(sched)).loop);
+            return sched.get_run_loop();
         }
 
         template <typename OperationState>
@@ -196,9 +185,7 @@ namespace hpx::execution::experimental {
             template <typename Sender>
             future_data_with_run_loop(init_no_addref no_addref,
                 other_allocator const& alloc,
-                decltype(std::declval<hpx::execution::experimental::run_loop>()
-                        .get_scheduler()) const& sched,
-                Sender&& sender)
+                run_loop_scheduler_type const& sched, Sender&& sender)
               : base_type(no_addref, alloc, HPX_FORWARD(Sender, sender))
               , loop(get_run_loop_from_scheduler(sched))
             {
@@ -252,17 +239,16 @@ namespace hpx::execution::experimental {
             // never drives loop.run(), so a sender whose set_value
             // completion scheduler is a run_loop_scheduler produces a
             // future that hangs in get(). The public make_future CPO
-            // routes such senders to the scheduler-form overload via
-            // tag_override_invoke, so reaching this body with a run-loop
-            // completion scheduler indicates a direct call to
-            // detail::make_future rather than the public API. HPX_ASSERT_MSG
-            // is a no-op in release builds (HPX_DEBUG off), so this only
-            // catches the misuse in debug; an unconditional throw would
-            // also alter the release-mode failure shape and is left out
-            // intentionally -- the assert exists to flag bypassing the
-            // public CPO during development, not to harden release-mode
-            // misuse. static_assert is avoided here because tag_priority's
-            // SFINAE probing during overload resolution may instantiate
+            // routes such senders to the scheduler-form overload, so
+            // reaching this body with a run-loop completion scheduler
+            // indicates a direct call to detail::make_future rather than
+            // the public API. HPX_ASSERT_MSG is a no-op in release builds
+            // (HPX_DEBUG off), so this only catches the misuse in debug;
+            // an unconditional throw would also alter the release-mode
+            // failure shape and is left out intentionally -- the assert
+            // exists to flag bypassing the public CPO during development,
+            // not to harden release-mode misuse. static_assert is avoided
+            // here because overload-resolution probing may instantiate
             // this body before the scheduler-form overload is selected.
             HPX_ASSERT_MSG(!sender_completion_is_run_loop_scheduler<
                                std::decay_t<Sender>>::value,
@@ -392,10 +378,12 @@ namespace hpx::execution::experimental {
     // If the provided sender sends the "stopped" signal instead of values,
     // make_future calls std::terminate.
     //
+    // Overloads, highest preference first: completion-scheduler routing,
+    // explicit scheduler.query, default, inject_scheduler, then partial.
     HPX_CXX_CORE_EXPORT inline constexpr struct make_future_t final
-      : hpx::functional::detail::tag_priority<make_future_t>
     {
-    private:
+        // Prefer the sender's completion scheduler when it customizes
+        // make_future.
         // clang-format off
         template <typename Sender,
             typename Allocator = hpx::util::internal_allocator<>,
@@ -408,48 +396,50 @@ namespace hpx::execution::experimental {
                 >
             )>
         // clang-format on
-        friend constexpr HPX_FORCEINLINE auto tag_override_invoke(make_future_t,
-            Sender&& sender, Allocator const& allocator = Allocator{})
+        constexpr HPX_FORCEINLINE auto operator()(
+            Sender&& sender, Allocator const& allocator = Allocator{}) const
         {
             auto scheduler =
                 hpx::execution::experimental::get_completion_scheduler<
                     hpx::execution::experimental::set_value_t>(
                     hpx::execution::experimental::get_env(sender));
 
-            return hpx::functional::tag_invoke(make_future_t{},
+            return make_future_t{}(
                 HPX_MOVE(scheduler), HPX_FORWARD(Sender, sender), allocator);
         }
 
-        // clang-format off
-        template <typename Sender,
-            typename Allocator = hpx::util::internal_allocator<>,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::execution::experimental::is_sender_v<Sender>
-            )>
-        // clang-format on
-        friend auto tag_invoke(make_future_t,
-            decltype(std::declval<hpx::execution::experimental::run_loop>()
-                    .get_scheduler()) const& sched,
-            Sender&& sender, Allocator const& allocator = Allocator{})
+        // Explicit scheduler: make_future(sched, sender, alloc)
+        template <typename Scheduler, typename Sender,
+            typename Allocator = hpx::util::internal_allocator<>>
+        constexpr auto operator()(Scheduler&& sched, Sender&& sender,
+            Allocator const& allocator = Allocator{}) const
+            requires(
+                has_query_v<Scheduler, make_future_t, Sender, Allocator const&>)
         {
-            return detail::make_future_with_run_loop(
-                sched, HPX_FORWARD(Sender, sender), allocator);
+            return HPX_FORWARD(Scheduler, sched)
+                .query(make_future_t{}, HPX_FORWARD(Sender, sender), allocator);
         }
 
+        // Default: sender (+ optional allocator)
         // clang-format off
         template <typename Sender,
             typename Allocator = hpx::util::internal_allocator<>,
             HPX_CONCEPT_REQUIRES_(
                 is_sender_v<Sender> &&
-                hpx::traits::is_allocator_v<Allocator>
+                hpx::traits::is_allocator_v<Allocator> &&
+                !experimental::detail::is_completion_scheduler_tag_invocable_v<
+                    hpx::execution::experimental::set_value_t,
+                    Sender, make_future_t, Allocator
+                >
             )>
         // clang-format on
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(make_future_t,
-            Sender&& sender, Allocator const& allocator = Allocator{})
+        constexpr HPX_FORCEINLINE auto operator()(
+            Sender&& sender, Allocator const& allocator = Allocator{}) const
         {
             return detail::make_future(HPX_FORWARD(Sender, sender), allocator);
         }
 
+        // Partial with scheduler: make_future(sched) | ...
         // clang-format off
         template <typename Scheduler,
             typename Allocator = hpx::util::internal_allocator<>,
@@ -458,25 +448,34 @@ namespace hpx::execution::experimental {
                 hpx::traits::is_allocator_v<Allocator>
             )>
         // clang-format on
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(make_future_t,
-            Scheduler&& scheduler, Allocator const& allocator = Allocator{})
+        constexpr HPX_FORCEINLINE auto operator()(Scheduler&& scheduler,
+            Allocator const& allocator = Allocator{}) const
         {
             return hpx::execution::experimental::detail::inject_scheduler<
                 make_future_t, Scheduler, Allocator>{
                 HPX_FORWARD(Scheduler, scheduler), allocator};
         }
 
+        // Partial: make_future(alloc) | ...
         // clang-format off
         template <typename Allocator = hpx::util::internal_allocator<>,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_allocator_v<Allocator>
             )>
         // clang-format on
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
-            make_future_t, Allocator const& allocator = Allocator{})
+        constexpr HPX_FORCEINLINE auto operator()(
+            Allocator const& allocator = Allocator{}) const
         {
             return detail::partial_algorithm<make_future_t, Allocator>{
                 allocator};
         }
     } make_future{};
+
+    template <typename Sender, typename Allocator>
+    auto run_loop::run_loop_scheduler::query(
+        make_future_t, Sender&& sender, Allocator const& allocator) const
+    {
+        return detail::make_future_with_run_loop(
+            *this, HPX_FORWARD(Sender, sender), allocator);
+    }
 }    // namespace hpx::execution::experimental

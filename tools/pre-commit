@@ -131,6 +131,22 @@ if [ ${#inspectroots[@]} -ne 0 ]; then
     fi
 fi
 
+spellfiles=()
+for file in `git diff --cached --name-only --diff-filter=ACMRT`; do
+    [ -f "${file}" ] && spellfiles+=("${file}")
+done
+
+if [ ${#spellfiles[@]} -ne 0 ]; then
+    if command -v codespell >/dev/null 2>&1; then
+        if ! codespell --ignore-words tools/.codespell_whitelist --skip='*.h5,*.png' "${spellfiles[@]}"; then
+            printf "# ${yellow}codespell ${red}error pre-commit${normal} : fix the spellings above (use git commit ${yellow}--no-verify${normal} to bypass)\n"
+            returncode=1
+        fi
+    else
+        printf "# ${yellow}codespell not found${normal} : skipping spell check (install codespell to match CI)\n"
+    fi
+fi
+
 if [ ! -z "$full_list" ]; then
     printf "\n# ${red}To commit the corrected files, run\n${normal}\ngit add ${full_list}\n"
 fi

@@ -14,6 +14,7 @@
 #include <hpx/config.hpp>
 #include <hpx/modules/debugging.hpp>
 #include <hpx/modules/type_support.hpp>
+
 #include <hpx/serialization/detail/non_default_constructible.hpp>
 #include <hpx/serialization/macros.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
@@ -29,21 +30,21 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-#if defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
+#if defined(HPX_HAVE_CXX26_REFLECTION)
 #include <hpx/serialization/detail/refl_qualified_name_of.hpp>
 #endif
 
 namespace hpx::serialization::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
+    HPX_CXX_CORE_EXPORT template <typename T>
     struct get_serialization_name
 #ifdef HPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION
         ;
 #else
     {
 
-#if defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
+#if defined(HPX_HAVE_CXX26_REFLECTION)
         [[nodiscard]] constexpr char const* operator()() const noexcept
         {
             // Unless the user specifically creates a specialization of this
@@ -85,7 +86,7 @@ namespace hpx::serialization::detail {
         [[nodiscard]] static T* create(input_archive& ar);
     };
 
-    class polymorphic_nonintrusive_factory
+    HPX_CXX_CORE_EXPORT class polymorphic_nonintrusive_factory
     {
     public:
         polymorphic_nonintrusive_factory(
@@ -147,7 +148,7 @@ namespace hpx::serialization::detail {
         serializer_typeinfo_map_type typeinfo_map_;
     };
 
-    template <typename Derived>
+    HPX_CXX_CORE_EXPORT template <typename Derived>
     struct register_class
     {
         static void save(output_archive& ar, void const* base);

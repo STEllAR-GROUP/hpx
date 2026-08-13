@@ -80,6 +80,7 @@ namespace hpx { namespace experimental {
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/detail/tag_dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/loop.hpp>
@@ -487,9 +488,9 @@ namespace hpx::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_CXX_CORE_EXPORT inline constexpr struct for_each_index_t final
-      : hpx::detail::tag_parallel_algorithm<for_each_index_t>
+      : hpx::detail::tag_dispatch<for_each_index_t,
+            hpx::detail::tag_parallel_algorithm<for_each_index_t>>
     {
-    private:
         // ------------------------------------------------------------------ //
         // Sequential overload (no execution policy) - constexpr, returns void.
         // ------------------------------------------------------------------ //
@@ -500,9 +501,7 @@ namespace hpx::experimental {
             std::is_copy_constructible_v<std::decay_t<Fun>>
         )
         // clang-format on
-        friend constexpr void tag_fallback_invoke(
-            hpx::experimental::for_each_index_t, Mapping const& mapping,
-            Fun fun)
+        static constexpr void invoke_default(Mapping const& mapping, Fun fun)
         {
             hpx::parallel::detail::for_each_index_seq_impl_right<0,
                 hpx::execution::sequenced_policy>(mapping, fun);
@@ -520,9 +519,8 @@ namespace hpx::experimental {
             std::is_copy_constructible_v<std::decay_t<Fun>>
         )
         // clang-format on
-        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy>
-        tag_fallback_invoke(hpx::experimental::for_each_index_t,
-            ExPolicy&& policy, Mapping const& mapping, Fun fun)
+        static hpx::parallel::util::detail::algorithm_result_t<ExPolicy>
+        invoke_default(ExPolicy&& policy, Mapping const& mapping, Fun fun)
         {
             return hpx::parallel::detail::for_each_index_algo().call(
                 HPX_FORWARD(ExPolicy, policy), mapping, HPX_MOVE(fun));

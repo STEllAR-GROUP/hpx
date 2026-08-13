@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012-2021 Hartmut Kaiser
+//  Copyright (c) 2012-2026 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -16,15 +16,16 @@
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace agas {
+namespace hpx::agas {
 
     // Create statistics counter for component namespace on this component
-    HPX_EXPORT naming::gid_type component_namespace_statistics_counter(
-        std::string const& name);
+    HPX_CXX_EXPORT HPX_EXPORT naming::gid_type
+    component_namespace_statistics_counter(std::string const& name);
 
-    HPX_DEFINE_PLAIN_ACTION(component_namespace_statistics_counter,
+    HPX_DEFINE_PLAIN_ACTION(HPX_CXX_EXPORT,
+        component_namespace_statistics_counter,
         component_namespace_statistics_counter_action);
-}}    // namespace hpx::agas
+}    // namespace hpx::agas
 
 HPX_ACTION_USES_MEDIUM_STACK(
     hpx::agas::component_namespace_statistics_counter_action)

@@ -307,6 +307,7 @@ namespace hpx {
 #include <hpx/parallel/algorithms/detail/advance_and_get_distance.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
+#include <hpx/parallel/algorithms/detail/tag_dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/clear_container.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
@@ -689,7 +690,8 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::unique
     HPX_CXX_CORE_EXPORT inline constexpr struct unique_t final
-      : hpx::detail::tag_parallel_algorithm<unique_t>
+      : hpx::detail::tag_dispatch<unique_t,
+            hpx::detail::tag_parallel_algorithm<unique_t>>
     {
         template <typename FwdIter,
             typename Pred = hpx::parallel::detail::equal_to>
@@ -702,8 +704,8 @@ namespace hpx {
                 >
             )
         // clang-format on
-        friend FwdIter tag_fallback_invoke(
-            hpx::unique_t, FwdIter first, FwdIter last, Pred pred = Pred())
+        static FwdIter invoke_default(
+            FwdIter first, FwdIter last, Pred pred = Pred())
         {
             static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
@@ -725,7 +727,7 @@ namespace hpx {
                 >
             )
         // clang-format on
-        friend decltype(auto) tag_fallback_invoke(hpx::unique_t,
+        static decltype(auto) invoke_default(
             ExPolicy&& policy, FwdIter first, FwdIter last, Pred pred = Pred())
         {
             static_assert(std::forward_iterator<FwdIter>,
@@ -740,7 +742,8 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::unique_copy
     HPX_CXX_CORE_EXPORT inline constexpr struct unique_copy_t final
-      : hpx::detail::tag_parallel_algorithm<unique_copy_t>
+      : hpx::detail::tag_dispatch<unique_copy_t,
+            hpx::detail::tag_parallel_algorithm<unique_copy_t>>
     {
         template <typename InIter, typename OutIter,
             typename Pred = hpx::parallel::detail::equal_to>
@@ -754,8 +757,8 @@ namespace hpx {
                 >
             )
         // clang-format on
-        friend OutIter tag_fallback_invoke(hpx::unique_copy_t, InIter first,
-            InIter last, OutIter dest, Pred pred = Pred())
+        static OutIter invoke_default(
+            InIter first, InIter last, OutIter dest, Pred pred = Pred())
         {
             static_assert(std::input_iterator<InIter>,
                 "Requires at least input iterator.");
@@ -781,9 +784,9 @@ namespace hpx {
                 >
             )
         // clang-format on
-        friend parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter2>
-        tag_fallback_invoke(hpx::unique_copy_t, ExPolicy&& policy,
-            FwdIter1 first, FwdIter1 last, FwdIter2 dest, Pred pred = Pred())
+        static parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter2>
+        invoke_default(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
+            FwdIter2 dest, Pred pred = Pred())
         {
             static_assert(std::forward_iterator<FwdIter1>,
                 "Requires at least forward iterator.");

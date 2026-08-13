@@ -10,7 +10,7 @@
 #include <vector>
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
-#include <hpx/hpx_user_main_config.hpp>
+#include <hpx/modules/init_runtime.hpp>
 #else
 namespace hpx_startup {
 

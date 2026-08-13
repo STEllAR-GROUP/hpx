@@ -17,6 +17,7 @@
 /// classes are asynchronous API which return the futures.
 
 #include <hpx/config.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/actions.hpp>
 #include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/async_base.hpp>
@@ -25,7 +26,6 @@
 #include <hpx/modules/components_base.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/preprocessor.hpp>
-#include <hpx/modules/tag_invoke.hpp>
 
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_fwd.hpp>
 

@@ -264,21 +264,21 @@ function(hpx_setup_target target)
       target_compile_definitions(
         ${target} PRIVATE HPX_HAVE_FORCE_NO_CXX_MODULES
       )
-
-      # If modules are enabled, Clang emits DWARF v5, which requires using lld
-      # instead of ld.
-      if((NOT MSVC)
-         AND (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-         AND (NOT (CMAKE_CXX_COMPILER_ID MATCHES "AppleClang"))
-      )
-        get_target_property(_type ${target} TYPE)
-        if((_type STREQUAL "SHARED_LIBRARY") OR (_type STREQUAL "EXECUTABLE"))
-          target_link_options(${target} PRIVATE "-fuse-ld=lld")
-        endif()
-      endif()
     endif()
 
     set_target_properties(${target} PROPERTIES CXX_SCAN_FOR_MODULES OFF)
+  endif()
+
+  # Newer Clang emits DWARF v5, which requires using lld instead of ld.
+  if(HPX_WITH_CXX_MODULES
+     AND (NOT MSVC)
+     AND (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+     AND (NOT (CMAKE_CXX_COMPILER_ID MATCHES "AppleClang"))
+  )
+    get_target_property(_type ${target} TYPE)
+    if((_type STREQUAL "SHARED_LIBRARY") OR (_type STREQUAL "EXECUTABLE"))
+      target_link_options(${target} PRIVATE "-fuse-ld=lld")
+    endif()
   endif()
 
   get_target_property(target_EXCLUDE_FROM_ALL ${target} EXCLUDE_FROM_ALL)

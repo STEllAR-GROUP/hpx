@@ -8,27 +8,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/include/actions.hpp>
-
-#include <hpx/runtime_components/component_factory.hpp>
-#include <hpx/runtime_components/component_registry.hpp>
-#include <hpx/runtime_components/derived_component_factory.hpp>
-#include <hpx/runtime_components/distributed_metadata_base.hpp>
-#include <hpx/runtime_components/new.hpp>
-
-#include <hpx/async_colocated/server/destroy_component.hpp>
-
 #include <hpx/modules/actions.hpp>
+#include <hpx/modules/async_colocated.hpp>
 #include <hpx/modules/components.hpp>
 #include <hpx/modules/components_base.hpp>
-
-#include <hpx/runtime_distributed/copy_component.hpp>
-#include <hpx/runtime_distributed/migrate_component.hpp>
-#include <hpx/runtime_distributed/runtime_support.hpp>
-#include <hpx/runtime_distributed/stubs/runtime_support.hpp>
-
-#include <hpx/distribution_policies/binpacking_distribution_policy.hpp>
-#include <hpx/distribution_policies/colocating_distribution_policy.hpp>
-#include <hpx/distribution_policies/default_distribution_policy.hpp>
-#include <hpx/distribution_policies/target_distribution_policy.hpp>
-#include <hpx/distribution_policies/unwrapping_result_policy.hpp>
+#include <hpx/modules/distribution_policies.hpp>
+#include <hpx/modules/runtime_components.hpp>
+#include <hpx/modules/runtime_distributed.hpp>

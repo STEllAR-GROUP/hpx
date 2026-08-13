@@ -233,14 +233,14 @@ struct sender_1
     {
         return {};
     }
-};
 
-template <typename Signatures, typename Env = ex::empty_env>
-constexpr auto tag_invoke(ex::get_completion_signatures_t,
-    sender_1<Signatures> const&, Env = Env{}) noexcept -> Signatures
-{
-    return {};
-}
+    template <typename Self, typename... Env>
+    static consteval auto get_completion_signatures(Self&&, Env&&...) noexcept
+        -> Signatures
+    {
+        return {};
+    }
+};
 
 template <typename Signatures>
 void test_sender1(Signatures)
@@ -263,19 +263,20 @@ struct sender_2
 {
     using is_sender = void;
     using sender_concept = ex::sender_t;
+    using completion_signatures = Signatures;
 
     constexpr ex::empty_env get_env() const noexcept
     {
         return {};
     }
-};
 
-template <typename Signatures, typename Env = ex::empty_env>
-constexpr auto tag_invoke(ex::get_completion_signatures_t,
-    sender_2<Signatures> const&, Env = Env{}) noexcept -> Signatures
-{
-    return {};
-}
+    template <typename Self, typename... Env>
+    static consteval auto get_completion_signatures(Self&&, Env&&...) noexcept
+        -> Signatures
+    {
+        return {};
+    }
+};
 
 template <typename Signatures>
 void test_sender2(Signatures)
@@ -284,9 +285,6 @@ void test_sender2(Signatures)
         static_assert(ex::is_sender_v<sender_2<Signatures>>);
 
         sender_2<Signatures> s1;
-        static_assert(
-            hpx::functional::is_tag_invocable_v<ex::get_completion_signatures_t,
-                sender_2<Signatures>>);
         static_assert(std::is_same_v<decltype(ex::get_completion_signatures(
                                          s1, ex::empty_env{})),
             Signatures>);
@@ -299,9 +297,6 @@ void test_sender2(Signatures)
         static_assert(ex::is_sender_in_v<sender_2<Signatures>, ex::empty_env>);
 
         sender_2<Signatures> s2;
-        static_assert(
-            hpx::functional::is_tag_invocable_v<ex::get_completion_signatures_t,
-                sender_2<Signatures>, ex::empty_env>);
         static_assert(std::is_same_v<decltype(ex::get_completion_signatures(
                                          s2, ex::empty_env{})),
             Signatures>);

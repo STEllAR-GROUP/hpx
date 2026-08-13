@@ -19,11 +19,11 @@ jobs:
     container: stellargroup/build_env:17
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: InstallLikwid
       shell: bash
       run: |
-          git clone https://github.com/RRZE-HPC/likwid.git
+          git clone --branch v5.5.0 --depth 1 https://github.com/RRZE-HPC/likwid.git
           cd likwid
           make; make install; cd ..
     - name: Configure

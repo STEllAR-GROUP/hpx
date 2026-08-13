@@ -10,9 +10,11 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/lcos.hpp>
+#include <hpx/modules/collectives.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/testing.hpp>
 
+#include <algorithm>
 #include <atomic>
 #include <cstddef>
 #include <exception>
@@ -141,11 +143,203 @@ void test_release_from_non_hpx_thread(hpx::program_options::variables_map& vm)
     }
 }
 
+void collectives_barrier_generation_tests()
+{
+    using namespace hpx::collectives;
+
+    auto const default_generation_client = create_local_communicator(
+        "/test/barrier/collectives/default_generation/", num_sites_arg(1),
+        this_site_arg(0));
+    hpx::collectives::barrier(
+        default_generation_client, this_site_arg(0), generation_arg())
+        .get();
+
+    auto const zero_generation_client =
+        create_local_communicator("/test/barrier/collectives/zero_generation/",
+            num_sites_arg(1), this_site_arg(0));
+
+    bool caught_exception = false;
+    try
+    {
+        hpx::collectives::barrier(
+            zero_generation_client, this_site_arg(0), generation_arg(0))
+            .get();
+    }
+    catch (hpx::exception const& e)
+    {
+        caught_exception = true;
+        HPX_TEST_EQ(e.get_error(), hpx::error::bad_parameter);
+    }
+    HPX_TEST(caught_exception);
+
+    hpx::collectives::barrier("/test/barrier/collectives/basename_async/",
+        num_sites_arg(1), this_site_arg(0), generation_arg(1))
+        .get();
+
+    hpx::collectives::barrier(hpx::launch::sync,
+        "/test/barrier/collectives/basename_sync/", num_sites_arg(1),
+        this_site_arg(0), generation_arg(1));
+
+    auto const singleton_sync_client1 = create_communicator(hpx::launch::sync,
+        "/test/barrier/collectives/singleton_sync/", num_sites_arg(1),
+        this_site_arg(0), generation_arg(1));
+    auto const singleton_sync_client2 = create_communicator(hpx::launch::sync,
+        "/test/barrier/collectives/singleton_sync/", num_sites_arg(1),
+        this_site_arg(0), generation_arg(1));
+
+    hpx::collectives::barrier(
+        singleton_sync_client1, this_site_arg(0), generation_arg(1))
+        .get();
+    hpx::collectives::barrier(
+        singleton_sync_client2, this_site_arg(0), generation_arg(1))
+        .get();
+
+    auto const singleton_local_sync_client1 = create_local_communicator(
+        hpx::launch::sync, "/test/barrier/collectives/local_singleton_sync/",
+        num_sites_arg(1), this_site_arg(0), generation_arg(1));
+    auto const singleton_local_sync_client2 = create_local_communicator(
+        hpx::launch::sync, "/test/barrier/collectives/local_singleton_sync/",
+        num_sites_arg(1), this_site_arg(0), generation_arg(1));
+
+    hpx::collectives::barrier(
+        singleton_local_sync_client1, this_site_arg(0), generation_arg(1))
+        .get();
+    hpx::collectives::barrier(
+        singleton_local_sync_client2, this_site_arg(0), generation_arg(1))
+        .get();
+}
+
+void collectives_communicator_validation_tests()
+{
+    using namespace hpx::collectives;
+
+    auto const expect_bad_parameter = [](char const* test_name, auto&& test) {
+        bool rejected = false;
+        try
+        {
+            test();
+        }
+        catch (hpx::exception const& e)
+        {
+            rejected = true;
+            HPX_TEST_EQ_MSG(
+                e.get_error(), hpx::error::bad_parameter, test_name);
+        }
+        HPX_TEST_MSG(rejected, test_name);
+    };
+
+    expect_bad_parameter("null communicator basename", [] {
+        (void) create_local_communicator(
+            nullptr, num_sites_arg(1), this_site_arg(0));
+    });
+    expect_bad_parameter("empty communicator basename", [] {
+        (void) create_local_communicator(
+            "", num_sites_arg(1), this_site_arg(0));
+    });
+    expect_bad_parameter("unspecified local communicator site count", [] {
+        (void) create_local_communicator(
+            "/test/barrier/collectives/default_num_sites/", num_sites_arg(),
+            this_site_arg(0));
+    });
+    expect_bad_parameter("zero local communicator site count", [] {
+        (void) create_local_communicator(
+            "/test/barrier/collectives/zero_num_sites/", num_sites_arg(0),
+            this_site_arg(0));
+    });
+    expect_bad_parameter("unspecified local communicator site", [] {
+        (void) create_local_communicator(
+            "/test/barrier/collectives/default_this_site/", num_sites_arg(1),
+            this_site_arg());
+    });
+    expect_bad_parameter("out-of-range communicator site", [] {
+        (void) create_communicator(
+            "/test/barrier/collectives/out_of_range_factory_site/",
+            num_sites_arg(1), this_site_arg(1));
+    });
+    expect_bad_parameter("out-of-range communicator root", [] {
+        (void) create_communicator(
+            "/test/barrier/collectives/out_of_range_factory_root/",
+            num_sites_arg(1), this_site_arg(0), generation_arg(),
+            root_site_arg(1));
+    });
+    expect_bad_parameter("zero hierarchical communicator site count", [] {
+        (void) create_hierarchical_communicator(
+            "/test/barrier/collectives/zero_hierarchical_num_sites/",
+            num_sites_arg(0), this_site_arg(0));
+    });
+    expect_bad_parameter("unsupported hierarchical communicator root", [] {
+        (void) create_hierarchical_communicator(
+            "/test/barrier/collectives/nonzero_hierarchical_root/",
+            num_sites_arg(2), this_site_arg(0), arity_arg(2), generation_arg(),
+            root_site_arg(1));
+    });
+    expect_bad_parameter("invalid hierarchical communicator arity", [] {
+        (void) create_hierarchical_communicator(
+            "/test/barrier/collectives/invalid_hierarchical_arity/",
+            num_sites_arg(2), this_site_arg(0), arity_arg(1));
+    });
+
+    if (hpx::get_locality_id() == 0)
+    {
+        auto const range_guard_client = create_communicator(
+            "/test/barrier/collectives/out_of_range_collective_site/",
+            num_sites_arg(2), this_site_arg(0));
+
+        expect_bad_parameter("out-of-range collective site", [&] {
+            hpx::collectives::barrier(
+                range_guard_client, this_site_arg(2), generation_arg(1))
+                .get();
+        });
+    }
+}
+
+void test_owned_local_communicator_basename()
+{
+    using namespace hpx::collectives;
+
+    std::string basename = "/test/barrier/collectives/owned_local_basename/";
+    std::string const original_basename = basename;
+
+    auto const first = create_local_communicator(hpx::launch::sync,
+        basename.c_str(), num_sites_arg(2), this_site_arg(0), generation_arg(),
+        root_site_arg(0));
+    auto const second = create_local_communicator(hpx::launch::sync,
+        basename.c_str(), num_sites_arg(2), this_site_arg(1), generation_arg(),
+        root_site_arg(0));
+
+    // Keep the original buffer alive but overwrite its contents. A server
+    // holding the caller's pointer would then report the overwritten name.
+    std::fill(basename.begin(), basename.end(), 'x');
+
+    auto first_barrier = barrier(first, this_site_arg(0), generation_arg());
+    auto second_barrier = barrier(second, this_site_arg(1), generation_arg());
+    first_barrier.get();
+    second_barrier.get();
+
+    bool caught_exception = false;
+    try
+    {
+        barrier(hpx::launch::sync, first, this_site_arg(0), generation_arg(1));
+    }
+    catch (hpx::exception const& e)
+    {
+        caught_exception = true;
+        HPX_TEST_EQ(e.get_error(), hpx::error::bad_parameter);
+        HPX_TEST(
+            std::string(e.what()).find(original_basename) != std::string::npos);
+    }
+    HPX_TEST(caught_exception);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(hpx::program_options::variables_map& vm)
 {
     // Regression test for release() from non-HPX threads.
     test_release_from_non_hpx_thread(vm);
+
+    collectives_barrier_generation_tests();
+    collectives_communicator_validation_tests();
+    test_owned_local_communicator_basename();
 
     local_tests(vm);
 

@@ -7,7 +7,6 @@
 
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
-#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <exception>

@@ -9,7 +9,6 @@
 #include <hpx/config.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/functional.hpp>
-#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/modules/util.hpp>
 #include <hpx/pack_traversal/detail/container_category.hpp>

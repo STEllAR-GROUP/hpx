@@ -289,10 +289,8 @@ void measure_function_futures_sliding_semaphore(
 struct unlimited_number_of_chunks
 {
     template <typename Executor>
-    friend std::size_t tag_override_invoke(
-        hpx::execution::experimental::maximal_number_of_chunks_t,
-        unlimited_number_of_chunks, Executor&&, std::size_t,
-        std::size_t num_tasks)
+    std::size_t maximal_number_of_chunks(
+        Executor&&, std::size_t, std::size_t num_tasks) const noexcept
     {
         return num_tasks;
     }

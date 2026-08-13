@@ -16,8 +16,8 @@
 
 namespace ex = hpx::execution::experimental;
 
-static std::size_t friend_tag_invoke_connect_calls = 0;
-static std::size_t tag_invoke_connect_calls = 0;
+static std::size_t member_connect_calls = 0;
+static std::size_t member_connect_calls_2 = 0;
 
 struct non_sender_1
 {
@@ -129,9 +129,12 @@ struct sender_1
         ex::completion_signatures<ex::set_value_t(int),
             ex::set_error_t(std::exception_ptr)>;
 
-    template <typename Env>
-    friend auto tag_invoke(ex::get_completion_signatures_t, sender_1 const&,
-        Env&&) -> completion_signatures;
+    template <typename Self, typename... Env>
+    static consteval auto get_completion_signatures(Self&&, Env&&...) noexcept
+        -> completion_signatures
+    {
+        return {};
+    }
 
     struct operation_state : immovable
     {
@@ -143,10 +146,9 @@ struct sender_1
         }
     };
 
-    friend operation_state tag_invoke(
-        ex::connect_t, sender_1&&, example_receiver& r)
+    operation_state connect(example_receiver& r) && noexcept
     {
-        ++friend_tag_invoke_connect_calls;
+        ++member_connect_calls;
         return {{}, r};
     }
 };
@@ -159,9 +161,12 @@ struct sender_2
         ex::completion_signatures<ex::set_value_t(int),
             ex::set_error_t(std::exception_ptr)>;
 
-    template <typename Env>
-    friend auto tag_invoke(ex::get_completion_signatures_t, sender_2 const&,
-        Env&&) -> completion_signatures;
+    template <typename Self, typename... Env>
+    static consteval auto get_completion_signatures(Self&&, Env&&...) noexcept
+        -> completion_signatures
+    {
+        return {};
+    }
 
     struct operation_state : immovable
     {
@@ -172,14 +177,13 @@ struct sender_2
             ex::set_value(std::move(r), 4711);
         }
     };
-};
 
-sender_2::operation_state tag_invoke(
-    ex::connect_t, sender_2, example_receiver& r)
-{
-    ++tag_invoke_connect_calls;
-    return {{}, r};
-}
+    operation_state connect(example_receiver& r) && noexcept
+    {
+        ++member_connect_calls_2;
+        return {{}, r};
+    }
+};
 
 struct sender_3
 {
@@ -189,9 +193,12 @@ struct sender_3
         ex::completion_signatures<ex::set_value_t(int),
             ex::set_error_t(std::exception_ptr)>;
 
-    template <typename Env>
-    friend auto tag_invoke(ex::get_completion_signatures_t, sender_3 const&,
-        Env&&) -> completion_signatures;
+    template <typename Self, typename... Env>
+    static consteval auto get_completion_signatures(Self&&, Env&&...) noexcept
+        -> completion_signatures
+    {
+        return {};
+    }
 
     struct operation_state : immovable
     {
@@ -203,10 +210,9 @@ struct sender_3
         }
     };
 
-    friend operation_state tag_invoke(
-        ex::connect_t, sender_3&&, example_receiver& r)
+    operation_state connect(example_receiver& r) && noexcept
     {
-        ++friend_tag_invoke_connect_calls;
+        ++member_connect_calls;
         return {{}, r};
     }
 };
@@ -324,8 +330,8 @@ int main()
         auto os = ex::connect(sender_1{}, r1);
         ex::start(os);
         HPX_TEST_EQ(r1.i, 4711);
-        HPX_TEST_EQ(friend_tag_invoke_connect_calls, std::size_t(1));
-        HPX_TEST_EQ(tag_invoke_connect_calls, std::size_t(0));
+        HPX_TEST_EQ(member_connect_calls, std::size_t(1));
+        HPX_TEST_EQ(member_connect_calls_2, std::size_t(0));
     }
 
     {
@@ -333,8 +339,8 @@ int main()
         auto os = ex::connect(sender_2{}, r2);
         ex::start(os);
         HPX_TEST_EQ(r2.i, 4711);
-        HPX_TEST_EQ(friend_tag_invoke_connect_calls, std::size_t(1));
-        HPX_TEST_EQ(tag_invoke_connect_calls, std::size_t(1));
+        HPX_TEST_EQ(member_connect_calls, std::size_t(1));
+        HPX_TEST_EQ(member_connect_calls_2, std::size_t(1));
     }
 
     {
@@ -342,8 +348,8 @@ int main()
         auto os = ex::connect(sender_3{}, r3);
         ex::start(os);
         HPX_TEST_EQ(r3.i, 4711);
-        HPX_TEST_EQ(friend_tag_invoke_connect_calls, std::size_t(2));
-        HPX_TEST_EQ(tag_invoke_connect_calls, std::size_t(1));
+        HPX_TEST_EQ(member_connect_calls, std::size_t(2));
+        HPX_TEST_EQ(member_connect_calls_2, std::size_t(1));
     }
 
     return hpx::util::report_errors();

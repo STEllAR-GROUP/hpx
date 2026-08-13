@@ -181,7 +181,7 @@ void test_find_explicit_sender_direct_async(Policy l, ExPolicy&& p, IteratorTag)
 
     auto snd_result = tt::sync_wait(hpx::find(
         p.on(exec), iterator(std::begin(c)), iterator(std::end(c)), int(1)));
-    auto result = hpx::get<0>(snd_result.value());
+    auto result = hpx::get<0>(*snd_result);
 
     // create iterator at position of value to be found
     base_iterator test_index =

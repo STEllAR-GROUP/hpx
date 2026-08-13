@@ -57,13 +57,13 @@ struct non_copyable_sender
 
     hpx::tuple<std::decay_t<Ts>...> ts;
 
-    // clang-format off
-    template <typename Env>
-    friend auto tag_invoke(ex::get_completion_signatures_t,
-        non_copyable_sender const&,
-        Env) noexcept -> ex::completion_signatures<ex::set_value_t(Ts...),
-                          ex::set_error_t(std::exception_ptr)>;
-    // clang-format on
+    template <typename Self, typename... Env>
+    static consteval auto get_completion_signatures(Self&&, Env&&...) noexcept
+        -> ex::completion_signatures<ex::set_value_t(Ts...),
+            ex::set_error_t(std::exception_ptr)>
+    {
+        return {};
+    }
 
     non_copyable_sender() = default;
     template <typename T,
@@ -99,11 +99,9 @@ struct non_copyable_sender
     };
 
     template <typename R>
-    friend operation_state<R> tag_invoke(
-        hpx::execution::experimental::connect_t, non_copyable_sender&& s,
-        R&& r) noexcept
+    operation_state<R> connect(R&& r) && noexcept
     {
-        return {{}, std::forward<R>(r), std::move(s.ts)};
+        return {{}, std::forward<R>(r), std::move(ts)};
     }
 };
 
@@ -115,13 +113,13 @@ struct example_sender
     using is_sender = void;
     using sender_concept = ex::sender_t;
 
-    // clang-format off
-    template <typename Env>
-    friend auto tag_invoke(ex::get_completion_signatures_t,
-        example_sender const&,
-        Env) noexcept -> ex::completion_signatures<ex::set_value_t(Ts...),
-                          ex::set_error_t(std::exception_ptr)>;
-    // clang-format on
+    template <typename Self, typename... Env>
+    static consteval auto get_completion_signatures(Self&&, Env&&...) noexcept
+        -> ex::completion_signatures<ex::set_value_t(Ts...),
+            ex::set_error_t(std::exception_ptr)>
+    {
+        return {};
+    }
 
     example_sender() = default;
     template <typename T,
@@ -157,17 +155,15 @@ struct example_sender
     };
 
     template <typename R>
-    friend operation_state<R> tag_invoke(
-        hpx::execution::experimental::connect_t, example_sender&& s, R&& r)
+    operation_state<R> connect(R&& r) && noexcept
     {
-        return {{}, std::forward<R>(r), std::move(s.ts)};
+        return {{}, std::forward<R>(r), std::move(ts)};
     }
 
     template <typename R>
-    friend operation_state<R> tag_invoke(
-        hpx::execution::experimental::connect_t, example_sender& s, R&& r)
+    operation_state<R> connect(R&& r) & noexcept
     {
-        return {{}, std::forward<R>(r), s.ts};
+        return {{}, std::forward<R>(r), ts};
     }
 };
 

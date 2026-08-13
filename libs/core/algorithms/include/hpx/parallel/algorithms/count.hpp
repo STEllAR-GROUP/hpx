@@ -212,6 +212,7 @@ namespace hpx {
 #include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
+#include <hpx/parallel/algorithms/detail/tag_dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/loop.hpp>
@@ -425,15 +426,15 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::count
     HPX_CXX_CORE_EXPORT inline constexpr struct count_t final
-      : hpx::detail::tag_parallel_algorithm<count_t>
+      : hpx::detail::tag_dispatch<count_t,
+            hpx::detail::tag_parallel_algorithm<count_t>>
     {
-    private:
         template <typename ExPolicy, typename FwdIter,
             typename T = typename std::iterator_traits<FwdIter>::value_type>
             requires(hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter>)
-        friend decltype(auto) tag_fallback_invoke(count_t, ExPolicy&& policy,
-            FwdIter first, FwdIter last, T const& value)
+        static decltype(auto) invoke_default(
+            ExPolicy&& policy, FwdIter first, FwdIter last, T const& value)
         {
             static_assert(std::forward_iterator<FwdIter>,
                 "Required at least forward iterator.");
@@ -449,8 +450,8 @@ namespace hpx {
         template <typename InIter,
             typename T = typename std::iterator_traits<InIter>::value_type>
             requires(hpx::traits::is_iterator_v<InIter>)
-        friend decltype(auto) tag_fallback_invoke(
-            count_t, InIter first, InIter last, T const& value)
+        static decltype(auto) invoke_default(
+            InIter first, InIter last, T const& value)
         {
             static_assert(std::input_iterator<InIter>,
                 "Required at least input iterator.");
@@ -466,9 +467,9 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::count_if
     HPX_CXX_CORE_EXPORT inline constexpr struct count_if_t final
-      : hpx::detail::tag_parallel_algorithm<count_if_t>
+      : hpx::detail::tag_dispatch<count_if_t,
+            hpx::detail::tag_parallel_algorithm<count_if_t>>
     {
-    private:
         template <typename ExPolicy, typename FwdIter, typename F>
         // clang-format off
         requires (
@@ -479,8 +480,8 @@ namespace hpx {
                 >
             )
         // clang-format on
-        friend decltype(auto) tag_fallback_invoke(
-            count_if_t, ExPolicy&& policy, FwdIter first, FwdIter last, F f)
+        static decltype(auto) invoke_default(
+            ExPolicy&& policy, FwdIter first, FwdIter last, F f)
         {
             static_assert(std::forward_iterator<FwdIter>,
                 "Required at least forward iterator.");
@@ -497,8 +498,7 @@ namespace hpx {
             requires(hpx::traits::is_iterator_v<InIter> &&
                 hpx::is_invocable_v<F,
                     typename std::iterator_traits<InIter>::value_type>)
-        friend decltype(auto) tag_fallback_invoke(
-            count_if_t, InIter first, InIter last, F f)
+        static decltype(auto) invoke_default(InIter first, InIter last, F f)
         {
             static_assert(std::input_iterator<InIter>,
                 "Required at least input iterator.");

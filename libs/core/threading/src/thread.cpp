@@ -17,6 +17,7 @@
 
 #include <cstddef>
 #include <exception>
+#include <memory>
 #include <mutex>
 #include <utility>
 
@@ -183,15 +184,6 @@ namespace hpx {
         }
     }
 
-    namespace {
-
-        void resume_thread(threads::thread_id_ref_type const& id)
-        {
-            threads::set_thread_state(
-                id.noref(), threads::thread_schedule_state::pending);
-        }
-    }    // namespace
-
     void thread::join()
     {
         std::unique_lock l(mtx_);
@@ -204,8 +196,7 @@ namespace hpx {
         }
 
         // keep ourselves alive while being suspended
-        threads::thread_id_ref_type this_id = threads::get_self_id();
-        if (this_id == id_)
+        if (threads::get_self_id() == id_)
         {
             l.unlock();
             HPX_THROW_EXCEPTION(hpx::error::thread_resource_error,
@@ -217,15 +208,33 @@ namespace hpx {
         // register callback function to be called when thread exits
         auto const id = id_;
 
-        detach_locked();    // invalidate this object
-
-        if (threads::add_thread_exit_callback(
-                id.noref(), hpx::bind_front(&resume_thread, HPX_MOVE(this_id))))
+        // Register callback before detaching. The condition variable and done
+        // flag are held in a shared state so that they stay alive for as long
+        // as either the exit callback or this function needs them, even if this
+        // function is unwound (e.g. by an interruption while waiting) before
+        // the callback has run.
+        struct join_state
         {
-            // wait for thread to be terminated
-            unlock_guard ul(l);
-            this_thread::suspend(
-                threads::thread_schedule_state::suspended, "thread::join");
+            hpx::lcos::local::detail::condition_variable cv;
+            bool done = false;
+        };
+        auto const state = std::make_shared<join_state>();
+
+        bool const added =
+            threads::add_thread_exit_callback(id.noref(), [this, state]() {
+                std::unique_lock lock(mtx_);
+                state->done = true;
+                state->cv.notify_one(HPX_MOVE(lock));
+            });
+
+        detach_locked();    // Now safe to detach
+
+        if (added)
+        {
+            while (!state->done)
+            {
+                state->cv.wait(l);
+            }
         }
     }
 

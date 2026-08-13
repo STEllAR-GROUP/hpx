@@ -17,29 +17,26 @@
 #include <cstdint>
 #include <utility>
 
-#if defined(HPX_HAVE_APEX)
-#include <memory>
+namespace hpx::tracing {
 
-namespace hpx::util::external_timer {
-
-    HPX_CXX_CORE_EXPORT struct task_wrapper;
-}    // namespace hpx::util::external_timer
-#endif
+    HPX_CXX_CORE_EXPORT struct task_timer_data;
+}    // namespace hpx::tracing
 
 namespace hpx::threads {
 
-    HPX_CXX_CORE_EXPORT class HPX_CORE_EXPORT
-        thread_data;    // forward declaration only
+    // forward declaration only
+    HPX_CXX_CORE_EXPORT class HPX_CORE_EXPORT thread_data;
     HPX_CXX_CORE_EXPORT class thread_data_stackful;
     HPX_CXX_CORE_EXPORT class thread_data_stackless;
 
     HPX_CXX_CORE_EXPORT class thread_init_data;
-    HPX_CXX_CORE_EXPORT struct thread_description;
+    HPX_CXX_CORE_EXPORT struct HPX_CORE_EXPORT thread_description;
 
     namespace policies {
 
         HPX_CXX_CORE_EXPORT struct HPX_CORE_EXPORT scheduler_base;
-    }
+    }    // namespace policies
+
     HPX_CXX_CORE_EXPORT class HPX_CORE_EXPORT thread_pool_base;
 
     /// \cond NOINTERNAL
@@ -63,13 +60,10 @@ namespace hpx::threads {
     HPX_CXX_CORE_EXPORT using thread_self_impl_type =
         coroutines::detail::coroutine_impl;
 
-#if defined(HPX_HAVE_APEX)
-    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT
-        std::shared_ptr<hpx::util::external_timer::task_wrapper>
-        get_self_timer_data();
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT tracing::task_timer_data
+    get_self_timer_data();
     HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void set_self_timer_data(
-        std::shared_ptr<hpx::util::external_timer::task_wrapper> data);
-#endif
+        tracing::task_timer_data data);
     /// \endcond
 
     ////////////////////////////////////////////////////////////////////////////

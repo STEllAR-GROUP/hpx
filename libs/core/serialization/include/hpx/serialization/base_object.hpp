@@ -11,6 +11,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+
 #include <hpx/serialization/access.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/serialize.hpp>
@@ -18,7 +20,7 @@
 
 #include <type_traits>
 
-#if defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
+#if defined(HPX_HAVE_CXX26_REFLECTION)
 #include <bit>
 #include <cstddef>
 #include <memory>
@@ -28,8 +30,9 @@
 
 namespace hpx::serialization {
 
-#if defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
+#if defined(HPX_HAVE_CXX26_REFLECTION)
     namespace detail {
+
         template <typename MemberType, typename T>
         constexpr decltype(auto) at_offset(T& base, std::size_t offset) noexcept
         {
@@ -57,7 +60,7 @@ namespace hpx::serialization {
         template <typename Archive>
         void serialize(Archive& ar, unsigned)
         {
-#if defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
+#if defined(HPX_HAVE_CXX26_REFLECTION)
             static constexpr std::optional<std::size_t> offset =
                 []() consteval -> std::optional<std::size_t> {
                 constexpr auto ctx = std::meta::access_context::unchecked();

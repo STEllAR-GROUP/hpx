@@ -102,7 +102,7 @@ namespace hpx::detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Action>
+    template <typename Action>
     struct post_helper<Action, /*DirectExecute=*/false>
     {
         template <typename... Ts>
@@ -151,7 +151,7 @@ namespace hpx::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_CXX_EXPORT template <typename Action>
+    template <typename Action>
     struct post_helper<Action, /*DirectExecute=*/true>
     {
         // If local and to be directly executed, just call the function

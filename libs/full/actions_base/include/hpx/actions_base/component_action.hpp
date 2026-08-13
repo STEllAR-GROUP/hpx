@@ -72,9 +72,8 @@ namespace hpx::actions {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    //  Specialized generic non-const component action types allowing to hold
-    //  a different number of arguments
-    ///////////////////////////////////////////////////////////////////////////
+    //  Specialized generic non-const component action types allowing to hold an
+    //  arbitrary number of arguments
     template <typename Component, typename R, typename... Ps,
         R (Component::*F)(Ps...), typename Derived>
     struct action<R (Component::*)(Ps...), F, Derived>
@@ -104,13 +103,12 @@ namespace hpx::actions {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    //  Specialized generic const component action types allowing to hold a
-    //  different number of arguments
-    ///////////////////////////////////////////////////////////////////////////
+    //  Specialized generic const component action types allowing to hold an
+    //  arbitrary number of arguments
     template <typename Component, typename R, typename... Ps,
         R (Component::*F)(Ps...) const, typename Derived>
     struct action<R (Component::*)(Ps...) const, F, Derived>
-      : basic_action<Component const, R(Ps...),
+      : basic_action<Component, R(Ps...),
             detail::action_type_t<
                 action<R (Component::*)(Ps...) const, F, Derived>, Derived>>
     {
@@ -127,18 +125,17 @@ namespace hpx::actions {
         static R invoke(naming::address_type lva,
             naming::component_type comptype, Ts&&... vs)
         {
-            basic_action<Component const, R(Ps...),
+            basic_action<Component, R(Ps...),
                 derived_type>::increment_invocation_count();
 
-            return detail::component_invoke<Component const, R>(
+            return detail::component_invoke<Component, R>(
                 lva, comptype, F, HPX_FORWARD(Ts, vs)...);
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
     //  Specialized generic non-const noexcept component action types allowing
-    //  to hold a different number of arguments
-    ///////////////////////////////////////////////////////////////////////////
+    //  to hold an arbitrary number of arguments
     template <typename Component, typename R, typename... Ps,
         R (Component::*F)(Ps...) noexcept, typename Derived>
     struct action<R (Component::*)(Ps...) noexcept, F, Derived>
@@ -169,11 +166,11 @@ namespace hpx::actions {
 
     ///////////////////////////////////////////////////////////////////////////
     //  Specialized generic const noexcept component action types allowing to
-    //  hold a different number of arguments
+    //  hold an arbitrary number of arguments
     template <typename Component, typename R, typename... Ps,
         R (Component::*F)(Ps...) const noexcept, typename Derived>
     struct action<R (Component::*)(Ps...) const noexcept, F, Derived>
-      : basic_action<Component const, R(Ps...),
+      : basic_action<Component, R(Ps...),
             detail::action_type_t<
                 action<R (Component::*)(Ps...) const noexcept, F, Derived>,
                 Derived>>
@@ -191,10 +188,10 @@ namespace hpx::actions {
         static R invoke(naming::address_type lva,
             naming::component_type comptype, Ts&&... vs)
         {
-            basic_action<Component const, R(Ps...),
+            basic_action<Component, R(Ps...),
                 derived_type>::increment_invocation_count();
 
-            return detail::component_invoke<Component const, R>(
+            return detail::component_invoke<Component, R>(
                 lva, comptype, F, HPX_FORWARD(Ts, vs)...);
         }
     };

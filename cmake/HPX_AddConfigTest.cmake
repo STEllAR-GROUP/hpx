@@ -560,10 +560,10 @@ function(hpx_check_for_cxx26_contracts)
 endfunction()
 
 # ##############################################################################
-function(hpx_check_for_cxx26_experimental_meta)
+function(hpx_check_for_cxx26_reflection)
   add_hpx_config_test(
-    HPX_WITH_CXX26_EXPERIMENTAL_META
-    SOURCE cmake/tests/cxx26_experimental_meta.cpp
+    HPX_WITH_CXX26_REFLECTION
+    SOURCE cmake/tests/cxx26_reflection.cpp
     FILE ${ARGN}
   )
 endfunction()

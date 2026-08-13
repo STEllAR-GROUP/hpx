@@ -9,5 +9,4 @@
 #include <hpx/config.hpp>
 #include <hpx/execution_base/stdexec_forward.hpp>
 #include <hpx/modules/execution_base.hpp>
-#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>

@@ -9,8 +9,8 @@
 
 #include <hpx/config.hpp>
 
+#include <hpx/async_base/query_dispatch.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
-#include <hpx/functional/detail/tag_priority_invoke.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
@@ -144,21 +144,19 @@ namespace hpx::execution::experimental {
             };
 
             template <typename Receiver>
-            friend auto tag_invoke(
-                connect_t, bulk_sender&& s, Receiver&& receiver)
+            auto connect(Receiver&& receiver) &&
             {
-                return hpx::execution::experimental::connect(HPX_MOVE(s.sender),
+                return hpx::execution::experimental::connect(HPX_MOVE(sender),
                     bulk_receiver<Receiver>(HPX_FORWARD(Receiver, receiver),
-                        HPX_MOVE(s.shape), HPX_MOVE(s.f)));
+                        HPX_MOVE(shape), HPX_MOVE(f)));
             }
 
             template <typename Receiver>
-            friend auto tag_invoke(
-                connect_t, bulk_sender& s, Receiver&& receiver)
+            auto connect(Receiver&& receiver) &
             {
-                return hpx::execution::experimental::connect(s.sender,
+                return hpx::execution::experimental::connect(sender,
                     bulk_receiver<Receiver>(
-                        HPX_FORWARD(Receiver, receiver), s.shape, s.f));
+                        HPX_FORWARD(Receiver, receiver), shape, f));
             }
         };
     }    // namespace detail
@@ -189,10 +187,11 @@ namespace hpx::execution::experimental {
     // additional operations such as let_value to deliver dynamic shape
     // information to the bulk operation.
     //
+    // Overloads, highest preference first: completion-scheduler routing,
+    // explicit scheduler.query, default bulk_sender, then partial apply.
     HPX_CXX_CORE_EXPORT inline constexpr struct bulk_t final
-      : hpx::functional::detail::tag_priority<bulk_t>
     {
-    private:
+        // Prefer the sender's completion scheduler when it customizes bulk.
         // clang-format off
         template <typename Sender, typename Shape, typename F,
             HPX_CONCEPT_REQUIRES_(
@@ -203,51 +202,74 @@ namespace hpx::execution::experimental {
                 >
             )>
         // clang-format on
-        friend constexpr HPX_FORCEINLINE auto tag_override_invoke(
-            bulk_t, Sender&& sender, Shape const& shape, F&& f)
+        constexpr HPX_FORCEINLINE auto operator()(
+            Sender&& sender, Shape const& shape, F&& f) const
         {
             auto scheduler =
                 hpx::execution::experimental::get_completion_scheduler<
                     hpx::execution::experimental::set_value_t>(
                     hpx::execution::experimental::get_env(sender));
 
-            return hpx::functional::tag_invoke(bulk_t{}, HPX_MOVE(scheduler),
-                HPX_FORWARD(Sender, sender), shape, HPX_FORWARD(F, f));
+            return HPX_FORWARD(decltype(scheduler), scheduler)
+                .query(bulk_t{}, HPX_FORWARD(Sender, sender), shape,
+                    HPX_FORWARD(F, f));
         }
 
+        // Explicit scheduler: bulk(sched, sender, shape, f)
+        template <typename Scheduler, typename Sender, typename Shape,
+            typename F>
+        constexpr auto operator()(
+            Scheduler&& sched, Sender&& sender, Shape const& shape, F&& f) const
+            requires has_query_v<Scheduler, bulk_t, Sender, Shape const&, F&&>
+        {
+            return HPX_FORWARD(Scheduler, sched)
+                .query(bulk_t{}, HPX_FORWARD(Sender, sender), shape,
+                    HPX_FORWARD(F, f));
+        }
+
+        // Default: integral shape -> counting_shape
         // clang-format off
         template <typename Sender, typename Shape, typename F,
             HPX_CONCEPT_REQUIRES_(
                 is_sender_v<Sender> &&
-                std::is_integral_v<Shape>
+                std::is_integral_v<Shape> &&
+                !experimental::detail::is_completion_scheduler_tag_invocable_v<
+                    hpx::execution::experimental::set_value_t, Sender,
+                    bulk_t, Shape, F&&
+                >
             )>
         // clang-format on
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
-            bulk_t, Sender&& sender, Shape const& shape, F&& f)
+        constexpr HPX_FORCEINLINE auto operator()(
+            Sender&& sender, Shape const& shape, F&& f) const
         {
             return detail::bulk_sender<Sender, hpx::util::counting_shape<Shape>,
                 F>{HPX_FORWARD(Sender, sender),
                 hpx::util::counting_shape(shape), HPX_FORWARD(F, f)};
         }
 
+        // Default: non-integral shape
         // clang-format off
         template <typename Sender, typename Shape, typename F,
             HPX_CONCEPT_REQUIRES_(
                 is_sender_v<Sender> &&
-                !std::is_integral_v<std::decay_t<Shape>>
+                !std::is_integral_v<std::decay_t<Shape>> &&
+                !experimental::detail::is_completion_scheduler_tag_invocable_v<
+                    hpx::execution::experimental::set_value_t, Sender,
+                    bulk_t, Shape, F&&
+                >
             )>
         // clang-format on
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
-            bulk_t, Sender&& sender, Shape&& shape, F&& f)
+        constexpr HPX_FORCEINLINE auto operator()(
+            Sender&& sender, Shape&& shape, F&& f) const
         {
             return detail::bulk_sender<Sender, Shape, F>{
                 HPX_FORWARD(Sender, sender), HPX_FORWARD(Shape, shape),
                 HPX_FORWARD(F, f)};
         }
 
+        // Partial: bulk(shape, f) | ...
         template <typename Shape, typename F>
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
-            bulk_t, Shape&& shape, F&& f)
+        constexpr HPX_FORCEINLINE auto operator()(Shape&& shape, F&& f) const
         {
             return detail::partial_algorithm<bulk_t, Shape, F>{
                 HPX_FORWARD(Shape, shape), HPX_FORWARD(F, f)};

@@ -12,9 +12,9 @@
 #include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/async_local.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/naming.hpp>
-#include <hpx/modules/tag_invoke.hpp>
 
 #include <type_traits>
 

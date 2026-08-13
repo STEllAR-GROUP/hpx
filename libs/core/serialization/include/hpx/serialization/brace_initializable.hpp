@@ -9,12 +9,13 @@
 
 #include <hpx/config.hpp>
 
+#if !defined(HPX_HAVE_CXX26_REFLECTION)
+
 #include <hpx/serialization/brace_initializable_fwd.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/std_tuple.hpp>
 #include <hpx/serialization/traits/brace_initializable_traits.hpp>
 
-#if !defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
 // We use std::tuple instead of hpx::tuple to avoid circular dependencies
 // between the serialization and datastructure modules.
 #include <tuple>
@@ -176,4 +177,5 @@ namespace hpx::serialization {
         serialize_struct(ar, t, version, hpx::traits::detail::arity<T>());
     }
 }    // namespace hpx::serialization
+
 #endif

@@ -29,9 +29,9 @@
 // --hpx:threads=1.
 //
 // sync_wait_domain customizes apply_sender(sync_wait_t, sndr) to use HPX-aware
-// waiting with hpx::spinlock + hpx::condition_variable_any. This suspends the
-// HPX task cooperatively instead of OS-blocking the worker thread, allowing
-// queued HPX work to continue running.
+// waiting with hpx::spinlock + hpx::lcos::local::detail::condition_variable.
+// This suspends the HPX task cooperatively instead of OS-blocking the worker
+// thread, allowing queued HPX work to continue running.
 //
 // Senders executing through HPX should expose this domain through
 // get_completion_domain<set_value_t> so sync_wait routes here.
@@ -74,7 +74,7 @@ namespace hpx::execution::experimental::detail {
     inline constexpr bool sync_wait_can_query_attrs_completion_scheduler_v =
         false;
 
-    HPX_CXX_CORE_EXPORT template <typename Sender>
+    template <typename Sender>
     inline constexpr bool sync_wait_can_query_attrs_completion_scheduler_v<
         Sender,
         std::enable_if_t<
@@ -89,7 +89,7 @@ namespace hpx::execution::experimental::detail {
                     .get_scheduler())>;
     };
 
-    HPX_CXX_CORE_EXPORT template <typename Sender>
+    template <typename Sender>
     struct sync_wait_rcv_scheduler_impl<Sender,
         std::enable_if_t<
             sync_wait_detail::can_attrs_completion_scheduler<Sender>::value>>
@@ -100,7 +100,7 @@ namespace hpx::execution::experimental::detail {
 
     HPX_CXX_CORE_EXPORT template <typename Sender>
     using sync_wait_rcv_scheduler_t =
-        typename sync_wait_rcv_scheduler_impl<Sender>::type;
+        sync_wait_rcv_scheduler_impl<Sender>::type;
 
     // Receiver env: exposes a stdexec run_loop scheduler via the standard
     // get_scheduler / get_delegation_scheduler queries so dependent senders
@@ -188,7 +188,7 @@ namespace hpx::execution::experimental::detail {
     HPX_CXX_CORE_EXPORT template <typename Variant>
     struct first_alternative;
 
-    HPX_CXX_CORE_EXPORT template <typename T>
+    template <typename T>
     struct first_alternative<std::variant<T>>
     {
         using type = T;
@@ -212,78 +212,74 @@ namespace hpx::execution::experimental::detail {
     struct shared_state
     {
         hpx::spinlock mtx;
-        hpx::condition_variable_any cv;
+        hpx::lcos::local::detail::condition_variable cv;
         hpx::execution::experimental::run_loop loop;
         bool done = false;
         std::variant<std::monostate, ValueTuple, std::exception_ptr,
             stopped_t<ValueTuple>>
             result;
 
+        void notify_all(std::unique_lock<hpx::spinlock> l)
+        {
+            cv.notify_all(HPX_MOVE(l));
+        }
+
         template <typename... Vs>
         void notify_value(Vs&&... vs) noexcept
         {
             try
             {
-                {
-                    std::unique_lock<hpx::spinlock> l(mtx);
-                    result.template emplace<ValueTuple>(HPX_FORWARD(Vs, vs)...);
-                    done = true;
-                }
-                cv.notify_all();
+                std::unique_lock<hpx::spinlock> l(mtx);
+                result.template emplace<ValueTuple>(HPX_FORWARD(Vs, vs)...);
+                done = true;
+                notify_all(HPX_MOVE(l));
             }
             catch (...)
             {
-                {
-                    std::unique_lock<hpx::spinlock> l(mtx);
-                    result.template emplace<std::exception_ptr>(
-                        std::current_exception());
-                    done = true;
-                }
-                cv.notify_all();
+                std::unique_lock<hpx::spinlock> l(mtx);
+                result.template emplace<std::exception_ptr>(
+                    std::current_exception());
+                done = true;
+                notify_all(HPX_MOVE(l));
             }
         }
 
         template <typename E>
         void notify_error(E&& e) noexcept
         {
+            std::unique_lock<hpx::spinlock> l(mtx);
+            using err_t = std::decay_t<E>;
+            if constexpr (std::is_same_v<err_t, std::exception_ptr>)
             {
-                std::unique_lock<hpx::spinlock> l(mtx);
-                using err_t = std::decay_t<E>;
-                if constexpr (std::is_same_v<err_t, std::exception_ptr>)
-                {
-                    result.template emplace<std::exception_ptr>(
-                        HPX_FORWARD(E, e));
-                }
-                else if constexpr (std::is_same_v<err_t, std::error_code>)
-                {
-                    result.template emplace<std::exception_ptr>(
-                        std::make_exception_ptr(std::system_error(e)));
-                }
-                else
-                {
-                    try
-                    {
-                        throw HPX_FORWARD(E, e);
-                    }
-                    catch (...)
-                    {
-                        result.template emplace<std::exception_ptr>(
-                            std::current_exception());
-                    }
-                }
-                done = true;
+                result.template emplace<std::exception_ptr>(HPX_FORWARD(E, e));
             }
-            cv.notify_all();
+            else if constexpr (std::is_same_v<err_t, std::error_code>)
+            {
+                result.template emplace<std::exception_ptr>(
+                    std::make_exception_ptr(std::system_error(e)));
+            }
+            else
+            {
+                try
+                {
+                    throw HPX_FORWARD(E, e);
+                }
+                catch (...)
+                {
+                    result.template emplace<std::exception_ptr>(
+                        std::current_exception());
+                }
+            }
+            done = true;
+            notify_all(HPX_MOVE(l));
         }
 
         void notify_stopped() noexcept
         {
-            {
-                std::unique_lock<hpx::spinlock> l(mtx);
-                result.template emplace<stopped_t<ValueTuple>>();
-                done = true;
-            }
-            cv.notify_all();
+            std::unique_lock<hpx::spinlock> l(mtx);
+            result.template emplace<stopped_t<ValueTuple>>();
+            done = true;
+            notify_all(HPX_MOVE(l));
         }
 
         // Wait HPX-aware: yields the calling HPX task while waiting, does not
@@ -292,7 +288,10 @@ namespace hpx::execution::experimental::detail {
         {
             {
                 std::unique_lock<hpx::spinlock> l(mtx);
-                cv.wait(l, [this] { return done; });
+                while (!done)
+                {
+                    cv.wait(l, "sync_wait_domain::wait_get_value");
+                }
             }
 
             loop.finish();
@@ -355,8 +354,8 @@ namespace hpx::execution::experimental::detail {
         // task yields cooperatively rather than the OS thread being blocked,
         // avoiding deadlock with --hpx:threads=1.
         template <typename Sender>
-            requires hpx::execution::experimental::sender_in<Sender,
-                sync_wait_rcv_env<Sender>>
+            requires(hpx::execution::experimental::sender_in<Sender,
+                sync_wait_rcv_env<Sender>>)
         auto apply_sender(hpx::execution::experimental::sync_wait_t,
             Sender&& sndr) const -> std::optional<value_tuple_for_t<Sender>>
         {
@@ -373,9 +372,9 @@ namespace hpx::execution::experimental::detail {
         }
 
         template <typename Sender>
-            requires hpx::execution::experimental::sender_in<
+            requires(hpx::execution::experimental::sender_in<
                 into_variant_sender_t<Sender>,
-                sync_wait_rcv_env<into_variant_sender_t<Sender>>>
+                sync_wait_rcv_env<into_variant_sender_t<Sender>>>)
         auto apply_sender(
             hpx::execution::experimental::sync_wait_with_variant_t,
             Sender&& sndr) const -> std::optional<value_variant_for_t<Sender>>

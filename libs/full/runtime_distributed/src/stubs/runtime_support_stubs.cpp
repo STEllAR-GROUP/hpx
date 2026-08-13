@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2025 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -7,17 +7,18 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_colocated/post_colocated.hpp>
 #include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/async_base.hpp>
+#include <hpx/modules/async_colocated.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/components_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/ini.hpp>
 #include <hpx/modules/naming_base.hpp>
+#include <hpx/modules/performance_counters.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/type_support.hpp>
-#include <hpx/performance_counters/counters.hpp>
+
 #include <hpx/runtime_distributed/applier.hpp>
 #include <hpx/runtime_distributed/stubs/runtime_support.hpp>
 

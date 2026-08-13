@@ -11,7 +11,6 @@
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/serialization.hpp>
-#include <hpx/modules/tag_invoke.hpp>
 
 #include <type_traits>
 #include <utility>

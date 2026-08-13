@@ -11,7 +11,6 @@
 #include <hpx/async_cuda/custom_gpu_api.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/execution_base.hpp>
-#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
 
 #include <exception>
@@ -327,7 +326,8 @@ namespace hpx::cuda::experimental {
             }
             // clang-format on
 
-            constexpr auto get_env() const noexcept
+            constexpr decltype(auto) get_env() const
+                noexcept(noexcept(hpx::execution::experimental::get_env(s)))
             {
                 return hpx::execution::experimental::get_env(s);
             }
@@ -356,22 +356,20 @@ namespace hpx::cuda::experimental {
     // - values from the predecessor sender are not forwarded, only passed by
     //   reference, to the call to f to keep them alive until the event is ready
     HPX_CXX_CORE_EXPORT inline constexpr struct transform_stream_t final
-      : hpx::functional::detail::tag_fallback<transform_stream_t>
     {
-    private:
         template <typename S, typename F,
             typename = std::enable_if_t<
                 !std::is_same_v<std::decay_t<F>, cudaStream_t>>>
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
-            transform_stream_t, S&& s, F&& f, cudaStream_t stream = {})
+        constexpr HPX_FORCEINLINE auto operator()(
+            S&& s, F&& f, cudaStream_t stream = {}) const
         {
             return detail::transform_stream_sender<S, F>{
                 HPX_FORWARD(S, s), HPX_FORWARD(F, f), stream};
         }
 
         template <typename F>
-        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
-            transform_stream_t, F&& f, cudaStream_t stream = {})
+        constexpr HPX_FORCEINLINE auto operator()(
+            F&& f, cudaStream_t stream = {}) const
         {
             return hpx::execution::experimental::detail::partial_algorithm<
                 transform_stream_t, F, cudaStream_t>{HPX_FORWARD(F, f), stream};

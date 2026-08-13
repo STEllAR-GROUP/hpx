@@ -9,12 +9,14 @@
 #include <hpx/config.hpp>
 #include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/executors.hpp>
+#include <hpx/modules/functional.hpp>
 
 #include <iterator>
 #include <type_traits>
 #include <utility>
 
 namespace hpx::parallel::detail {
+
     struct local_result
     {
         bool local_res;     // local is_partitioned result
@@ -26,7 +28,7 @@ namespace hpx::parallel::detail {
     struct seg_is_partitioned
       : algorithm<seg_is_partitioned<Iter>, local_result>
     {
-        seg_is_partitioned()
+        constexpr seg_is_partitioned() noexcept
           : algorithm<seg_is_partitioned<Iter>, local_result>("is_partitioned")
         {
         }

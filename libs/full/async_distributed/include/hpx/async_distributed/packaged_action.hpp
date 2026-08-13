@@ -19,10 +19,6 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/memory.hpp>
 
-#if defined(HPX_HAVE_NETWORKING)
-#include <asio/error.hpp>
-#endif
-
 #include <exception>
 #include <memory>
 #include <system_error>
@@ -34,6 +30,8 @@ namespace hpx::lcos {
 
 #if defined(HPX_HAVE_NETWORKING)
     namespace detail {
+
+        HPX_CXX_EXPORT HPX_EXPORT bool is_asio_error(std::error_code const& ec);
 
         template <typename Result>
         struct parcel_write_handler
@@ -47,15 +45,11 @@ namespace hpx::lcos {
                 // object
                 if (ec)
                 {
-                    if (hpx::tolerate_node_faults())
+                    if (hpx::tolerate_node_faults() && is_asio_error(ec))
                     {
-                        if (ec ==
-                            ::asio::error::make_error_code(
-                                ::asio::error::connection_reset))
-                        {
-                            return;
-                        }
+                        return;
                     }
+
                     std::exception_ptr exception = HPX_GET_EXCEPTION(ec,
                         "packaged_action::parcel_write_handler",
                         parcelset::dump_parcel(p));

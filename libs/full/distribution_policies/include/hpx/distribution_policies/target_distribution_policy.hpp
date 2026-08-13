@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2023 Hartmut Kaiser
+//  Copyright (c) 2014-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,8 +15,8 @@
 #include <hpx/modules/components_base.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/naming_base.hpp>
+#include <hpx/modules/runtime_components.hpp>
 #include <hpx/modules/serialization.hpp>
-#include <hpx/runtime_components/create_component_helpers.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -224,14 +224,14 @@ namespace hpx::components {
 
     /// A predefined instance of the \a target_distribution_policy. It will
     /// represent the local locality and will place all items to create here.
-    static target_distribution_policy const target{};
+    HPX_CXX_EXPORT HPX_EXPORT extern target_distribution_policy const target;
 }    // namespace hpx::components
 
 /// \cond NOINTERNAL
 namespace hpx {
 
-    using hpx::components::target;
-    using hpx::components::target_distribution_policy;
+    HPX_CXX_EXPORT using hpx::components::target;
+    HPX_CXX_EXPORT using hpx::components::target_distribution_policy;
 
     template <>
     struct traits::is_distribution_policy<

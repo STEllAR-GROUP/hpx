@@ -15,9 +15,11 @@
 
 namespace hpx::execution::experimental {
 
+    // ADL hook for hpx::detail::dataflow when args are senders (not futures).
+    // dataflow_t probes hpx_invoke before its default future-based dispatch.
     template <typename F, typename Sender, typename... Senders>
         requires(!hpx::traits::is_future_any_v<Sender, Senders...>)
-    constexpr HPX_FORCEINLINE auto tag_invoke(
+    constexpr HPX_FORCEINLINE auto hpx_invoke(
         hpx::detail::dataflow_t, F&& f, Sender&& sender, Senders&&... senders)
         -> decltype(hpx::execution::experimental::then(
             hpx::execution::experimental::when_all(
@@ -33,7 +35,7 @@ namespace hpx::execution::experimental {
     HPX_CXX_CORE_EXPORT template <typename F, typename Sender,
         typename... Senders>
         requires(!hpx::traits::is_future_any_v<Sender, Senders...>)
-    constexpr HPX_FORCEINLINE auto tag_invoke(hpx::detail::dataflow_t,
+    constexpr HPX_FORCEINLINE auto hpx_invoke(hpx::detail::dataflow_t,
         hpx::launch, F&& f, Sender&& sender, Senders&&... senders)
         -> decltype(hpx::execution::experimental::then(
             hpx::execution::experimental::when_all(

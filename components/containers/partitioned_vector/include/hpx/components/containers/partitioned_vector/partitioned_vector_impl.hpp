@@ -9,18 +9,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/distribution_policies/container_distribution_policy.hpp>
-#include <hpx/distribution_policies/explicit_container_distribution_policy.hpp>
 #include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/async_combinators.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/components.hpp>
+#include <hpx/modules/distribution_policies.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
-#include <hpx/runtime_components/distributed_metadata_base.hpp>
-#include <hpx/runtime_components/new.hpp>
-#include <hpx/runtime_distributed/copy_component.hpp>
+#include <hpx/modules/runtime_components.hpp>
+#include <hpx/modules/runtime_distributed.hpp>
 
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_component_impl.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_decl.hpp>

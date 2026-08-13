@@ -12,6 +12,7 @@
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/statistics.hpp>
 #include <hpx/modules/util.hpp>
+
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/performance_counters/server/arithmetics_counter.hpp>
@@ -35,7 +36,7 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace performance_counters {
+namespace hpx::performance_counters {
 
     ///////////////////////////////////////////////////////////////////////////
     void registry::clear()
@@ -1214,5 +1215,4 @@ namespace hpx { namespace performance_counters {
         static registry instance_;
         return instance_;
     }
-
-}}    // namespace hpx::performance_counters
+}    // namespace hpx::performance_counters

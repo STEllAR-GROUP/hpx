@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2025 Hartmut Kaiser
+# Copyright (c) 2007-2026 Hartmut Kaiser
 # Copyright (c)      2011 Bryce Lelbach
 # Copyright (c)      2018 Nikunj Gupta
 # Copyright (c) 2020 The STE||AR-Group
@@ -11,6 +11,7 @@ include(HPX_Message)
 include(HPX_AddPseudoDependencies)
 include(HPX_AddPseudoTarget)
 include(HPX_CXXModules)
+include(HPX_ConfigureIfChanged)
 
 # ##############################################################################
 # gather headers and sources
@@ -412,8 +413,10 @@ foreach(lib ${HPX_LIBS})
       )
     endforeach()
 
-    configure_file(
-      "${HPX_SOURCE_DIR}/cmake/templates/hpx.ixx.in" ${lib_module_file} @ONLY
+    hpx_configure_if_changed(
+      INPUT "${HPX_SOURCE_DIR}/cmake/templates/hpx.ixx.in"
+      OUTPUT ${lib_module_file}
+      CONFIGURE_ARGS @ONLY
     )
 
     target_link_libraries(hpx INTERFACE hpx_${lib}_module_if)
@@ -471,9 +474,11 @@ if(HPX_WITH_CXX_MODULES)
     set(cxx_standard_headers "${cxx_standard_headers}#include ${std_header}\n")
   endforeach()
 
-  configure_file(
-    "${HPX_SOURCE_DIR}/cmake/templates/std_headers.hpp.in"
-    "core/config/include/hpx/config/std_headers.hpp" @ONLY
+  hpx_configure_if_changed(
+    INPUT "${HPX_SOURCE_DIR}/cmake/templates/std_headers.hpp.in"
+    OUTPUT
+      "${PROJECT_BINARY_DIR}/libs/core/config/include/hpx/config/std_headers.hpp"
+    CONFIGURE_ARGS @ONLY
   )
 endif()
 
@@ -486,10 +491,11 @@ foreach(module ${HPX_ENABLED_MODULES})
   )
 endforeach()
 
-configure_file(
-  "${PROJECT_SOURCE_DIR}/cmake/templates/modules_enabled.hpp.in"
-  "${PROJECT_BINARY_DIR}/libs/core/config/include/hpx/config/modules_enabled.hpp"
-  @ONLY
+hpx_configure_if_changed(
+  INPUT "${PROJECT_SOURCE_DIR}/cmake/templates/modules_enabled.hpp.in"
+  OUTPUT
+    "${PROJECT_BINARY_DIR}/libs/core/config/include/hpx/config/modules_enabled.hpp"
+  CONFIGURE_ARGS @ONLY
 )
 
 if(MSVC AND HPX_COROUTINES_WITH_SWAP_CONTEXT_EMULATION)

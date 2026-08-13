@@ -173,6 +173,7 @@ namespace hpx {
 #include <hpx/modules/type_support.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
+#include <hpx/parallel/algorithms/detail/tag_dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/clear_container.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
@@ -362,7 +363,8 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::uninitialized_fill
     HPX_CXX_CORE_EXPORT inline constexpr struct uninitialized_fill_t final
-      : hpx::detail::tag_parallel_algorithm<uninitialized_fill_t>
+      : hpx::detail::tag_dispatch<uninitialized_fill_t,
+            hpx::detail::tag_parallel_algorithm<uninitialized_fill_t>>
     {
         template <typename FwdIter, typename T>
         // clang-format off
@@ -370,8 +372,7 @@ namespace hpx {
                 std::forward_iterator<FwdIter>
             )
         // clang-format on
-        friend void tag_fallback_invoke(hpx::uninitialized_fill_t,
-            FwdIter first, FwdIter last, T const& value)
+        static void invoke_default(FwdIter first, FwdIter last, T const& value)
         {
             static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
@@ -387,7 +388,7 @@ namespace hpx {
                 std::forward_iterator<FwdIter>
             )
         // clang-format on
-        friend decltype(auto) tag_fallback_invoke(hpx::uninitialized_fill_t,
+        static decltype(auto) invoke_default(
             ExPolicy&& policy, FwdIter first, FwdIter last, T const& value)
         {
             static_assert(std::forward_iterator<FwdIter>,
@@ -407,7 +408,8 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::uninitialized_fill_n
     HPX_CXX_CORE_EXPORT inline constexpr struct uninitialized_fill_n_t final
-      : hpx::detail::tag_parallel_algorithm<uninitialized_fill_n_t>
+      : hpx::detail::tag_dispatch<uninitialized_fill_n_t,
+            hpx::detail::tag_parallel_algorithm<uninitialized_fill_n_t>>
     {
         template <typename FwdIter, typename Size, typename T>
         // clang-format off
@@ -416,8 +418,7 @@ namespace hpx {
                 std::is_integral_v<Size>
             )
         // clang-format on
-        friend FwdIter tag_fallback_invoke(hpx::uninitialized_fill_n_t,
-            FwdIter first, Size count, T const& value)
+        static FwdIter invoke_default(FwdIter first, Size count, T const& value)
         {
             static_assert(std::forward_iterator<FwdIter>,
                 "Requires at least forward iterator.");
@@ -442,7 +443,7 @@ namespace hpx {
                 std::is_integral_v<Size>
             )
         // clang-format on
-        friend decltype(auto) tag_fallback_invoke(hpx::uninitialized_fill_n_t,
+        static decltype(auto) invoke_default(
             ExPolicy&& policy, FwdIter first, Size count, T const& value)
         {
             static_assert(std::forward_iterator<FwdIter>,

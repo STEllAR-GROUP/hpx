@@ -1,5 +1,5 @@
 //  Copyright (c) 2016 Minh-Khanh Do
-//  Copyright (c) 2024-2025 Hartmut Kaiser
+//  Copyright (c) 2024-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,52 +10,51 @@
 #include <hpx/config.hpp>
 #include <hpx/modules/algorithms.hpp>
 #include <hpx/modules/executors.hpp>
+
 #include <hpx/parallel/segmented_algorithms/for_each.hpp>
 
 #include <iterator>
 #include <type_traits>
 
-namespace hpx { namespace parallel {
+namespace hpx::parallel::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     // segmented_fill
-    namespace detail {
-        ///////////////////////////////////////////////////////////////////////
-        /// \cond NOINTERNAL
 
-        template <typename T>
-        struct fill_function
+    /// \cond NOINTERNAL
+
+    template <typename T>
+    struct fill_function
+    {
+        fill_function(T val = T())
+          : value_(val)
         {
-            fill_function(T val = T())
-              : value_(val)
-            {
-            }
+        }
 
-            T value_;
+        T value_;
 
-            void operator()(T& val) const
-            {
-                val = value_;
-            }
+        void operator()(T& val) const
+        {
+            val = value_;
+        }
 
-            template <typename Archive>
-            void serialize(Archive& ar, unsigned /* version */)
-            {
-                // clang-format off
+        template <typename Archive>
+        void serialize(Archive& ar, unsigned /* version */)
+        {
+            // clang-format off
                 ar & value_;
-                // clang-format on
-            }
-        };
-    }    // namespace detail
+            // clang-format on
+        }
+    };
     /// \endcond
-}}    // namespace hpx::parallel
+}    // namespace hpx::parallel::detail
 
-namespace hpx { namespace segmented {
+namespace hpx::segmented {
 
-    template <typename SegIter, typename T>
+    HPX_CXX_EXPORT template <typename SegIter, typename T>
         requires(hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter>)
-    SegIter tag_invoke(hpx::fill_t, SegIter first, SegIter last, T const& value)
+    SegIter hpx_invoke(hpx::fill_t, SegIter first, SegIter last, T const& value)
     {
         static_assert(std::forward_iterator<SegIter>,
             "Requires at least forward iterator.");
@@ -76,11 +75,11 @@ namespace hpx { namespace segmented {
             hpx::identity_v, std::true_type{});
     }
 
-    template <typename SegIter, typename Size, typename T>
+    HPX_CXX_EXPORT template <typename SegIter, typename Size, typename T>
         requires(hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter> &&
             std::is_integral_v<Size>)
-    SegIter tag_invoke(hpx::fill_n_t, SegIter first, Size count, T const& value)
+    SegIter hpx_invoke(hpx::fill_n_t, SegIter first, Size count, T const& value)
     {
         static_assert(std::forward_iterator<SegIter>,
             "Requires at least forward iterator.");
@@ -103,13 +102,12 @@ namespace hpx { namespace segmented {
             hpx::identity_v, std::true_type{});
     }
 
-    template <typename ExPolicy, typename SegIter, typename T>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename SegIter, typename T>
         requires(hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter>)
-    static typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-        SegIter>::type
-    tag_invoke(hpx::fill_t, ExPolicy&& policy, SegIter first, SegIter last,
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, SegIter>
+    hpx_invoke(hpx::fill_t, ExPolicy&& policy, SegIter first, SegIter last,
         T const& value)
     {
         static_assert(std::forward_iterator<SegIter>,
@@ -136,14 +134,14 @@ namespace hpx { namespace segmented {
             hpx::identity_v, is_seq());
     }
 
-    template <typename ExPolicy, typename SegIter, typename Size, typename T>
+    HPX_CXX_EXPORT template <typename ExPolicy, typename SegIter, typename Size,
+        typename T>
         requires(hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<SegIter> &&
             hpx::traits::is_segmented_iterator_v<SegIter> &&
             std::is_integral_v<Size>)
-    static typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-        SegIter>::type
-    tag_invoke(hpx::fill_n_t, ExPolicy&& policy, SegIter first, Size count,
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, SegIter>
+    hpx_invoke(hpx::fill_n_t, ExPolicy&& policy, SegIter first, Size count,
         T const& value)
     {
         static_assert(std::forward_iterator<SegIter>,
@@ -170,4 +168,4 @@ namespace hpx { namespace segmented {
             hpx::parallel::detail::fill_function<value_type>(value),
             hpx::identity_v, is_seq());
     }
-}}    // namespace hpx::segmented
+}    // namespace hpx::segmented

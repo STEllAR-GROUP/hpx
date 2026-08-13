@@ -11,8 +11,7 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/naming_base.hpp>
-#include <hpx/runtime_distributed/runtime_support.hpp>
-#include <hpx/runtime_distributed/server/migrate_component.hpp>
+#include <hpx/modules/runtime_distributed.hpp>
 
 #include <hpx/components/component_storage/export_definitions.hpp>
 #include <hpx/components/component_storage/server/component_storage.hpp>

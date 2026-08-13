@@ -232,6 +232,7 @@ namespace hpx {
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/algorithms/detail/is_sorted.hpp>
+#include <hpx/parallel/algorithms/detail/tag_dispatch.hpp>
 #include <hpx/parallel/util/adapt_placement_mode.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
@@ -456,9 +457,9 @@ namespace hpx::parallel {
 namespace hpx {
 
     HPX_CXX_CORE_EXPORT inline constexpr struct is_sorted_t final
-      : hpx::detail::tag_parallel_algorithm<is_sorted_t>
+      : hpx::detail::tag_dispatch<is_sorted_t,
+            hpx::detail::tag_parallel_algorithm<is_sorted_t>>
     {
-    private:
         template <typename FwdIter, typename Pred = hpx::parallel::detail::less>
         // clang-format off
             requires (
@@ -469,8 +470,8 @@ namespace hpx {
                 >
             )
         // clang-format on
-        friend bool tag_fallback_invoke(
-            hpx::is_sorted_t, FwdIter first, FwdIter last, Pred pred = Pred())
+        static bool invoke_default(
+            FwdIter first, FwdIter last, Pred pred = Pred())
         {
             return hpx::parallel::detail::is_sorted<FwdIter, FwdIter>().call(
                 hpx::execution::seq, first, last, HPX_MOVE(pred),
@@ -489,7 +490,7 @@ namespace hpx {
                 >
             )
         // clang-format on
-        friend decltype(auto) tag_fallback_invoke(hpx::is_sorted_t,
+        static decltype(auto) invoke_default(
             ExPolicy&& policy, FwdIter first, FwdIter last, Pred pred = Pred())
         {
             return hpx::parallel::detail::is_sorted<FwdIter, FwdIter>().call(
@@ -499,9 +500,9 @@ namespace hpx {
     } is_sorted{};
 
     HPX_CXX_CORE_EXPORT inline constexpr struct is_sorted_until_t final
-      : hpx::detail::tag_parallel_algorithm<is_sorted_until_t>
+      : hpx::detail::tag_dispatch<is_sorted_until_t,
+            hpx::detail::tag_parallel_algorithm<is_sorted_until_t>>
     {
-    private:
         template <typename FwdIter, typename Pred = hpx::parallel::detail::less>
         // clang-format off
             requires (
@@ -512,7 +513,7 @@ namespace hpx {
                 >
             )
         // clang-format on
-        friend FwdIter tag_fallback_invoke(hpx::is_sorted_until_t,
+        static FwdIter invoke_default(
             FwdIter first, FwdIter last, Pred pred = Pred())
         {
             return hpx::parallel::detail::is_sorted_until<FwdIter, FwdIter>()
@@ -532,7 +533,7 @@ namespace hpx {
                 >
             )
         // clang-format on
-        friend decltype(auto) tag_fallback_invoke(hpx::is_sorted_until_t,
+        static decltype(auto) invoke_default(
             ExPolicy&& policy, FwdIter first, FwdIter last, Pred pred = Pred())
         {
             return hpx::parallel::detail::is_sorted_until<FwdIter, FwdIter>()

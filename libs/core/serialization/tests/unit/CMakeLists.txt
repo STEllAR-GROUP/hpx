@@ -9,9 +9,11 @@ set(tests
     serialization_array
     serialization_valarray
     serialization_builtins
+    serialization_chrono
     serialization_complex
     serialization_custom_constructor
     serialization_deque
+    serialization_error_code
     serialization_list
     serialization_map
     serialization_multimap
@@ -35,7 +37,7 @@ if(HPX_SERIALIZATION_WITH_BOOST_TYPES)
   set(tests ${tests} serialization_boost_variant)
 endif()
 
-if(NOT HPX_SERIALIZATION_WITH_ALLOW_AUTO_GENERATE)
+if(NOT HPX_WITH_CXX26_REFLECTION)
   set(tests ${tests} serialization_brace_initializable)
 endif()
 

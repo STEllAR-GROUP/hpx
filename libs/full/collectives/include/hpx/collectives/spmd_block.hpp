@@ -4,12 +4,15 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file spmd_block.hpp
+/// \page hpx::lcos::spmd_block, hpx::lcos::define_spmd_block
+/// \headerfile hpx/collectives.hpp
+
 #pragma once
 
 #include <hpx/config.hpp>
+
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/collectives/barrier.hpp>
-#include <hpx/collectives/broadcast_direct.hpp>
 #include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/components_base.hpp>
@@ -23,6 +26,9 @@
 #include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/type_support.hpp>
+
+#include <hpx/collectives/barrier.hpp>
+#include <hpx/collectives/broadcast_direct.hpp>
 
 #include <array>
 #include <atomic>
@@ -38,7 +44,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace lcos {
+namespace hpx::lcos {
 
     /// The class spmd_block defines an interface for launching
     /// multiple images while giving handles to each image to interact with
@@ -47,7 +53,7 @@ namespace hpx { namespace lcos {
     /// separate thread. A temporary spmd block object is created and diffused
     /// to each image. The constraint for the action given to the
     /// define_spmd_block function is to accept a spmd_block as first parameter.
-    struct spmd_block
+    HPX_CXX_EXPORT struct spmd_block
     {
     private:
         using barrier_type = hpx::distributed::barrier;
@@ -337,7 +343,7 @@ namespace hpx { namespace lcos {
         };
     }    // namespace detail
 
-    template <typename F, typename... Args>
+    HPX_CXX_EXPORT template <typename F, typename... Args>
         requires(hpx::traits::is_action_v<F>)
     hpx::future<void> define_spmd_block(std::string&& name,
         std::size_t images_per_locality, F&& /* f */, Args&&... args)
@@ -370,6 +376,6 @@ namespace hpx { namespace lcos {
             HPX_FORWARD(std::string, name), images_per_locality, num_images,
             HPX_FORWARD(Args, args)...);
     }
-}}    // namespace hpx::lcos
+}    // namespace hpx::lcos
 
 #endif

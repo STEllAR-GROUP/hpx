@@ -114,6 +114,7 @@ set(async_sources
     base_lco_with_value_2.cpp
     base_lco_with_value_3.cpp
     continuation.cpp
+    packaged_action.cpp
     promise.cpp
     trigger_lco.cpp
 )

@@ -11,7 +11,6 @@
 #if defined(HPX_HAVE_DATAPAR)
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/executors.hpp>
-#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/algorithms/detail/mismatch.hpp>
@@ -80,7 +79,7 @@ namespace hpx::parallel::detail {
     HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename ZipIterator,
         typename Token, typename F>
         requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
-    HPX_HOST_DEVICE HPX_FORCEINLINE void tag_invoke(
+    HPX_HOST_DEVICE HPX_FORCEINLINE void hpx_invoke(
         sequential_mismatch_t<ExPolicy>, std::size_t base_idx, ZipIterator it,
         std::size_t part_count, Token& tok, F&& f)
     {
@@ -103,14 +102,12 @@ namespace hpx::parallel::detail {
     HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename Iter1,
         typename Sent, typename Iter2, typename F>
         requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
-    HPX_HOST_DEVICE HPX_FORCEINLINE auto tag_invoke(
+    HPX_HOST_DEVICE HPX_FORCEINLINE auto hpx_invoke(
         sequential_mismatch_t<ExPolicy>, Iter1 first1, Sent last1, Iter2 first2,
         F&& f)
     {
         if constexpr (hpx::parallel::util::detail::iterator_datapar_compatible<
-                          Iter1>::value &&
-            hpx::parallel::util::detail::iterator_datapar_compatible<
-                Iter2>::value)
+                          hpx::util::zip_iterator<Iter1, Iter2>>::value)
         {
             return datapar_mismatch<ExPolicy>::call(
                 first1, last1, first2, HPX_FORWARD(F, f));
@@ -188,7 +185,7 @@ namespace hpx::parallel::detail {
     HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename ZipIterator,
         typename Token, typename F, typename Proj1, typename Proj2>
         requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
-    HPX_HOST_DEVICE HPX_FORCEINLINE void tag_invoke(
+    HPX_HOST_DEVICE HPX_FORCEINLINE void hpx_invoke(
         sequential_mismatch_binary_t<ExPolicy>, std::size_t base_idx,
         ZipIterator it, std::size_t part_count, Token& tok, F&& f,
         Proj1&& proj1, Proj2&& proj2)
@@ -215,14 +212,12 @@ namespace hpx::parallel::detail {
         typename Sent1, typename Iter2, typename Sent2, typename F,
         typename Proj1, typename Proj2>
         requires(hpx::is_vectorpack_execution_policy_v<ExPolicy>)
-    HPX_HOST_DEVICE HPX_FORCEINLINE util::in_in_result<Iter1, Iter2> tag_invoke(
+    HPX_HOST_DEVICE HPX_FORCEINLINE util::in_in_result<Iter1, Iter2> hpx_invoke(
         sequential_mismatch_binary_t<ExPolicy>, Iter1 first1, Sent1 last1,
         Iter2 first2, Sent2 last2, F&& f, Proj1&& proj1, Proj2&& proj2)
     {
         if constexpr (hpx::parallel::util::detail::iterator_datapar_compatible<
-                          Iter1>::value &&
-            hpx::parallel::util::detail::iterator_datapar_compatible<
-                Iter2>::value)
+                          hpx::util::zip_iterator<Iter1, Iter2>>::value)
         {
             return datapar_mismatch_binary<ExPolicy>::call2(first1, last1,
                 first2, last2, HPX_FORWARD(F, f), HPX_FORWARD(Proj1, proj1),

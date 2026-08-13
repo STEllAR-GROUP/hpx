@@ -114,8 +114,15 @@ hpx_force_out_of_tree_build(
   "This project requires an out-of-source-tree build. See README.rst. Clean your CMake cache and CMakeFiles if this message persists."
 )
 
-if(NOT HPX_CMAKE_LOGLEVEL)
-  set(HPX_CMAKE_LOGLEVEL "WARN")
+hpx_option(
+  HPX_WITH_GIT_HOOKS BOOL
+  "Enable git commit hooks for formatting checks on commit (default: OFF)." OFF
+  ADVANCED
+)
+
+if(HPX_WITH_GIT_HOOKS)
+  include(HPX_SetupGitHooks)
+  hpx_setup_git_hooks()
 endif()
 
 # print initial diagnostics
@@ -293,16 +300,18 @@ if(HPX_WITH_DOCUMENTATION)
 endif()
 
 if(WIN32)
-  set(HPX_WITH_PSEUDO_DEPENDENCIES
-      OFF
-      CACHE INTERNAL "" FORCE
-  )
+  set(HPX_WITH_PSEUDO_DEPENDENCIES_DEFAULT OFF)
 else()
-  set(HPX_WITH_PSEUDO_DEPENDENCIES
-      ON
-      CACHE INTERNAL "" FORCE
-  )
+  set(HPX_WITH_PSEUDO_DEPENDENCIES_DEFAULT ON)
 endif()
+
+hpx_option(
+  HPX_WITH_PSEUDO_DEPENDENCIES
+  BOOL
+  "Turn compiler warnings into errors (default: ${HPX_WITH_PSEUDO_DEPENDENCIES_DEFAULT})"
+  ${HPX_WITH_PSEUDO_DEPENDENCIES_DEFAULT}
+  ADVANCED
+)
 
 hpx_option(
   HPX_WITH_UNITY_BUILD BOOL
@@ -1016,6 +1025,18 @@ if(HPX_WITH_SPINLOCK_DEADLOCK_DETECTION)
   hpx_add_config_define(HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION)
 endif()
 
+# Explicitly enable the supervision functionalities
+hpx_option(
+  HPX_WITH_SUPERVISION BOOL "Enable supervision functionalities. (default: OFF)"
+  OFF
+  CATEGORY "Modules"
+  ADVANCED
+)
+
+if(HPX_WITH_SUPERVISION)
+  hpx_add_config_define(HPX_HAVE_SUPERVISION)
+endif()
+
 # Profiling related build options
 hpx_option(
   HPX_WITH_APEX BOOL "Enable APEX instrumentation support." OFF
@@ -1544,6 +1565,15 @@ if(HPX_WITH_EXAMPLES_QTHREADS)
 endif()
 
 hpx_option(
+  HPX_WITH_EXAMPLES_TASKBENCH
+  BOOL
+  "Enable the task-bench example (fetched from upstream StanfordLegion/task-bench, default: OFF)."
+  OFF
+  CATEGORY "Build Targets"
+  ADVANCED
+)
+
+hpx_option(
   HPX_WITH_EXAMPLES_HDF5 BOOL
   "Enable examples requiring HDF5 support (default: OFF)." OFF
   CATEGORY "Build Targets"
@@ -1847,20 +1877,21 @@ if(MSVC)
 endif()
 
 # Setup platform specific compiler options and check for compatible compilers
+set(_compiler "${CMAKE_CXX_COMPILER_ID} V${CMAKE_CXX_COMPILER_VERSION}")
 if("${HPX_PLATFORM_UC}" STREQUAL "NATIVE")
-  hpx_info("Compiling with the native toolset")
+  hpx_info("Compiling with the native toolset: ${_compiler}")
 elseif("${HPX_PLATFORM_UC}" STREQUAL "ANDROID")
-  hpx_info("Compiling for Android devices")
+  hpx_info("Compiling for Android devices: ${_compiler}")
 elseif("${HPX_PLATFORM_UC}" STREQUAL "XEONPHI")
-  hpx_info("Compiling for Intel Xeon Phi devices")
+  hpx_info("Compiling for Intel Xeon Phi devices: ${_compiler}")
   if(NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel"))
     hpx_error("HPX on the MIC can only be compiled with the Intel compiler.")
   endif()
 elseif("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
+  hpx_info("Compiling for BlueGene/Q: ${_compiler}")
   if(NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     hpx_error("HPX on the BG/Q can only be compiled with bgclang")
   endif()
-  hpx_info("Compiling for BlueGene/Q")
 endif()
 
 # ##############################################################################

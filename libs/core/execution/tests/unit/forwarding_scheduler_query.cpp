@@ -5,7 +5,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/modules/execution.hpp>
-#include <hpx/modules/tag_invoke.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <exception>
@@ -15,15 +14,10 @@
 
 namespace mylib {
 
+    // Opt into forwarding_query by inheriting from forwarding_query_t
     inline constexpr struct non_query_t final
-      : hpx::functional::tag<non_query_t>
+      : hpx::execution::experimental::forwarding_query_t
     {
-        friend constexpr auto tag_invoke(
-            hpx::execution::experimental::forwarding_query_t,
-            non_query_t) noexcept
-        {
-            return true;
-        }
     } non_query{};
 
 }    // namespace mylib
@@ -32,7 +26,7 @@ int main()
 {
     static_assert(hpx::execution::experimental::forwarding_query(
                       mylib::non_query) == true,
-        "non_query CPO is user implemented to return true");
+        "non_query inherits forwarding_query_t so returns true");
 
     return hpx::util::report_errors();
 }

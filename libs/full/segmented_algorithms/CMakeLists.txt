@@ -1,4 +1,4 @@
-# Copyright (c) 2019 The STE||AR-Group
+# Copyright (c) 2019-2026 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -52,7 +52,10 @@ set(segmented_algorithms_compat_headers
 include(HPX_AddModule)
 add_hpx_module(
   full segmented_algorithms
+  GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_MODULE_GEN ON
   HEADERS ${segmented_algorithms_headers}
+  ADD_TO_GLOBAL_HEADER "hpx/parallel/segmented_algorithms/detail/dispatch.hpp"
   COMPAT_HEADERS ${segmented_algorithms_compat_headers}
   DEPENDENCIES hpx_core
   MODULE_DEPENDENCIES hpx_actions_base hpx_async_colocated hpx_async_distributed

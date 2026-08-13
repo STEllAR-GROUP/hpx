@@ -93,15 +93,16 @@ namespace hpx { namespace distributed {
 #include <hpx/config.hpp>
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-
 #include <hpx/assert.hpp>
-#include <hpx/collectives/argument_types.hpp>
-#include <hpx/collectives/create_communicator.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/components_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/futures.hpp>
+
+#include <hpx/collectives/argument_types.hpp>
+#include <hpx/collectives/create_communicator.hpp>
+#include <hpx/collectives/detail/hierarchical_helpers.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -117,7 +118,7 @@ namespace hpx::traits {
 
     namespace communication {
 
-        struct barrier_tag;
+        HPX_CXX_EXPORT struct barrier_tag;
 
         template <>
         struct communicator_data<barrier_tag>
@@ -147,7 +148,7 @@ namespace hpx::traits {
 namespace hpx::collectives {
 
     // Flat barrier: synchronize all sites associated with a single communicator.
-    inline hpx::future<void> barrier(communicator fid,
+    HPX_CXX_EXPORT inline hpx::future<void> barrier(communicator fid,
         this_site_arg this_site = this_site_arg(),
         generation_arg const generation = generation_arg())
     {
@@ -155,7 +156,7 @@ namespace hpx::collectives {
         {
             this_site = agas::get_locality_id();
         }
-        if (generation.is_default())
+        if (generation == 0)
         {
             return hpx::make_exceptional_future<void>(HPX_GET_EXCEPTION(
                 hpx::error::bad_parameter, "hpx::collectives::barrier",
@@ -191,14 +192,14 @@ namespace hpx::collectives {
         return fid.then(hpx::launch::sync, HPX_MOVE(barrier_data));
     }
 
-    inline hpx::future<void> barrier(communicator fid,
+    HPX_CXX_EXPORT inline hpx::future<void> barrier(communicator fid,
         generation_arg const generation,
         this_site_arg const this_site = this_site_arg())
     {
         return barrier(HPX_MOVE(fid), this_site, generation);
     }
 
-    inline hpx::future<void> barrier(char const* basename,
+    HPX_CXX_EXPORT inline hpx::future<void> barrier(char const* basename,
         num_sites_arg const num_sites = num_sites_arg(),
         this_site_arg const this_site = this_site_arg(),
         generation_arg const generation = generation_arg(),
@@ -206,54 +207,63 @@ namespace hpx::collectives {
     {
         return barrier(create_communicator(basename, num_sites, this_site,
                            generation, root_site),
-            this_site);
+            this_site, generation);
     }
 
-    inline void barrier(hpx::launch::sync_policy, communicator fid,
-        this_site_arg const this_site = this_site_arg(),
+    HPX_CXX_EXPORT inline void barrier(hpx::launch::sync_policy,
+        communicator fid, this_site_arg const this_site = this_site_arg(),
         generation_arg const generation = generation_arg())
     {
         barrier(HPX_MOVE(fid), this_site, generation).get();
     }
 
-    inline void barrier(hpx::launch::sync_policy, communicator fid,
-        generation_arg const generation,
+    HPX_CXX_EXPORT inline void barrier(hpx::launch::sync_policy,
+        communicator fid, generation_arg const generation,
         this_site_arg const this_site = this_site_arg())
     {
         barrier(HPX_MOVE(fid), this_site, generation).get();
     }
 
-    inline void barrier(hpx::launch::sync_policy, char const* basename,
-        num_sites_arg const num_sites = num_sites_arg(),
+    HPX_CXX_EXPORT inline void barrier(hpx::launch::sync_policy,
+        char const* basename, num_sites_arg const num_sites = num_sites_arg(),
         this_site_arg const this_site = this_site_arg(),
         generation_arg const generation = generation_arg(),
         root_site_arg const root_site = root_site_arg())
     {
         barrier(create_communicator(
                     basename, num_sites, this_site, generation, root_site),
-            this_site)
+            this_site, generation)
             .get();
     }
 
     ////////////////////////////////////////////////////////////////////////////
-    // Hierarchical barrier: reduce-phase + broadcast-phase no-op gates
-    // Uses the 2k-1 / 2k generation mapping: user generation k maps to
-    // internal generation 2k-1 (reduce phase) and 2k (broadcast phase). This
-    // allows the same sub-communicators to be used for both phases without
-    // generation collisions.
-    inline hpx::future<void> barrier(
+    // Hierarchical barrier: reduce-phase + broadcast-phase no-op gates Uses the
+    // 2k-1 / 2k generation mapping: user generation k maps to internal
+    // generation 2k-1 (reduce phase) and 2k (broadcast phase). This allows the
+    // same sub-communicators to be used for both phases without generation
+    // collisions.
+    HPX_CXX_EXPORT inline hpx::future<void> barrier(
         hierarchical_communicator const& communicators,
         this_site_arg this_site = this_site_arg(),
         generation_arg const generation = generation_arg(),
-        root_site_arg /*root_site*/ = root_site_arg())
+        root_site_arg root_site = root_site_arg())
     {
-        if (generation.is_default())
+        if (generation.is_default() || generation == 0)
         {
             return hpx::make_exceptional_future<void>(
                 HPX_GET_EXCEPTION(hpx::error::bad_parameter,
                     "hpx::collectives::barrier (hierarchical)",
-                    "hierarchical barrier requires an explicit generation "
-                    "number for the 2k-1/2k internal mapping"));
+                    "hierarchical barrier requires an explicit, positive "
+                    "generation number for the 2k-1/2k internal mapping"));
+        }
+
+        if (!detail::is_valid_hierarchical_phase_generation(generation))
+        {
+            return hpx::make_exceptional_future<void>(
+                HPX_GET_EXCEPTION(hpx::error::bad_parameter,
+                    "hpx::collectives::barrier (hierarchical)",
+                    "the generation number is too large for the internal "
+                    "2k-1/2k generation mapping"));
         }
 
         if (this_site.is_default())
@@ -261,13 +271,22 @@ namespace hpx::collectives {
             this_site = agas::get_locality_id();
         }
 
-        if (communicators.size() == 0)
+        if (auto const error =
+                detail::validate_hierarchical_root_site(root_site,
+                    "hpx::collectives::barrier (hierarchical)", "barrier"))
         {
-            return hpx::make_ready_future();
+            return hpx::make_exceptional_future<void>(error);
         }
 
-        generation_arg const reduce_gen(2 * generation - 1);
-        generation_arg const broadcast_gen(2 * generation);
+        if (auto const error =
+                detail::validate_hierarchical_communicator(communicators,
+                    this_site, "hpx::collectives::barrier (hierarchical)"))
+        {
+            return hpx::make_exceptional_future<void>(error);
+        }
+
+        auto const [reduce_gen, broadcast_gen] =
+            detail::hierarchical_phase_generations(generation);
 
         // Reduce phase: walk sub-communicators from deepest (end of vector) to
         // shallowest (start). Each sub-barrier releases only after all sites
@@ -282,7 +301,6 @@ namespace hpx::collectives {
 
         // Broadcast phase: walk sub-communicators from shallowest to deepest.
         // Returning the final future lets the caller chain on completion.
-
         for (std::size_t i = 0; i + 1 < communicators.size(); ++i)
         {
             barrier(communicators.get(i), communicators.site(i), broadcast_gen)
@@ -293,7 +311,7 @@ namespace hpx::collectives {
             communicators.back(), communicators.last_site(), broadcast_gen);
     }
 
-    inline void barrier(hpx::launch::sync_policy,
+    HPX_CXX_EXPORT inline void barrier(hpx::launch::sync_policy,
         hierarchical_communicator const& communicators,
         this_site_arg const this_site = this_site_arg(),
         generation_arg const generation = generation_arg(),
@@ -306,7 +324,7 @@ namespace hpx::collectives {
 ////////////////////////////////////////////////////////////////////////////////
 namespace hpx::distributed {
 
-    class HPX_EXPORT barrier
+    HPX_CXX_EXPORT class HPX_EXPORT barrier
     {
     public:
         explicit barrier(std::string const& base_name);
@@ -351,6 +369,7 @@ namespace hpx::distributed {
             force_flat_tag);
 
         void create_communicator(bool force_flat);
+        [[nodiscard]] bool is_released() const noexcept;
 
         std::string base_name_;
         std::size_t num_ = 0;

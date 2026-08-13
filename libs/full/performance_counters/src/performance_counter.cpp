@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -184,6 +184,7 @@ namespace hpx::performance_counters {
         return hpx::make_ready_future(true);
 #endif
     }
+
     bool performance_counter::stop(
         launch::sync_policy, [[maybe_unused]] error_code& ec) const
     {
@@ -210,6 +211,7 @@ namespace hpx::performance_counters {
         return hpx::make_ready_future();
 #endif
     }
+
     void performance_counter::reset(
         launch::sync_policy, [[maybe_unused]] error_code& ec) const
     {
@@ -236,6 +238,7 @@ namespace hpx::performance_counters {
         return hpx::make_ready_future();
 #endif
     }
+
     void performance_counter::reinit(
         launch::sync_policy, bool reset, error_code& ec) const
     {

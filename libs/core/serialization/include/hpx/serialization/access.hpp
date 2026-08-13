@@ -9,6 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+
 #include <hpx/serialization/config/defines.hpp>
 #include <hpx/serialization/brace_initializable_fwd.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
@@ -40,7 +41,7 @@ namespace hpx::serialization {
             serialize(ar, t, 0);
         }
 
-#if defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
+#if defined(HPX_HAVE_CXX26_REFLECTION)
         // Forward declare
         HPX_CXX_CORE_EXPORT template <typename Archive, typename T>
         void refl_serialize(Archive& ar, T& t, unsigned /*version*/);
@@ -116,7 +117,7 @@ namespace hpx::serialization {
                     ar.invoke(t);
                 }
 
-#if !defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
+#if !defined(HPX_HAVE_CXX26_REFLECTION)
                 else if constexpr (hpx::traits::has_struct_serialization_v<dT>)
                 {
                     // This is automatic serialization for types that are simple
@@ -183,7 +184,7 @@ namespace hpx::traits {
 }    // namespace hpx::traits
 #endif
 
-#if defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
+#if defined(HPX_HAVE_CXX26_REFLECTION)
 // We need to include refl_serialize_impl.hpp here to avoid circular
 // dependencies as refl_serialize_impl.hpp depends on base_object.hpp
 #include <hpx/serialization/detail/refl_serialize_impl.hpp>

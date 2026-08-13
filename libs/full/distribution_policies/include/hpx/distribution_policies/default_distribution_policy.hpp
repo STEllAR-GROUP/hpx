@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2025 Hartmut Kaiser
+//  Copyright (c) 2014-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -18,8 +18,8 @@
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/naming_base.hpp>
+#include <hpx/modules/runtime_components.hpp>
 #include <hpx/modules/serialization.hpp>
-#include <hpx/runtime_components/create_component_helpers.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -33,7 +33,7 @@ namespace hpx::components {
     /// This class specifies the parameters for a simple distribution policy
     /// to use for creating (and evenly distributing) a given number of items
     /// on a given set of localities.
-    struct default_distribution_policy
+    HPX_CXX_EXPORT struct default_distribution_policy
     {
     public:
         /// Default-construct a new instance of a \a default_distribution_policy.
@@ -347,14 +347,15 @@ namespace hpx::components {
 
     /// A predefined instance of the default \a distribution_policy. It will
     /// represent the local locality and will place all items to create here.
-    static default_distribution_policy const default_layout{};
+    HPX_CXX_EXPORT HPX_EXPORT extern default_distribution_policy const
+        default_layout;
 }    // namespace hpx::components
 
 /// \cond NOINTERNAL
 namespace hpx {
 
-    using hpx::components::default_distribution_policy;
-    using hpx::components::default_layout;
+    HPX_CXX_EXPORT using hpx::components::default_distribution_policy;
+    HPX_CXX_EXPORT using hpx::components::default_layout;
 
     template <>
     struct traits::is_distribution_policy<

@@ -105,6 +105,10 @@ set(STANDARD_LIBRARY_HEADERS
     "<cwctype>"
 )
 
+if(HPX_WITH_CXX26_REFLECTION)
+  list(APPEND STANDARD_LIBRARY_HEADERS "<meta>")
+endif()
+
 # Function to extract #includes from a file recursively
 function(hpx_extract_includes_from_file module)
 

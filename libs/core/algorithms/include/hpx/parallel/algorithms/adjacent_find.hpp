@@ -6,7 +6,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file parallel/algorithms/adjacent_find.hpp
+/// \file hpx/parallel/algorithms/adjacent_find.hpp
 /// \page hpx::adjacent_find
 /// \headerfile hpx/algorithm.hpp
 
@@ -132,6 +132,7 @@ namespace hpx {
 #include <hpx/parallel/algorithms/detail/adjacent_find.hpp>
 #include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/detail/tag_dispatch.hpp>
 #include <hpx/parallel/util/adapt_placement_mode.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
@@ -254,14 +255,14 @@ namespace hpx::parallel {
 namespace hpx {
 
     HPX_CXX_CORE_EXPORT inline constexpr struct adjacent_find_t final
-      : hpx::detail::tag_parallel_algorithm<adjacent_find_t>
+      : hpx::detail::tag_dispatch<adjacent_find_t,
+            hpx::detail::tag_parallel_algorithm<adjacent_find_t>>
     {
-    private:
         template <typename InIter,
             typename Pred = hpx::parallel::detail::equal_to>
             requires(std::input_iterator<InIter>)
-        friend InIter tag_fallback_invoke(
-            hpx::adjacent_find_t, InIter first, InIter last, Pred pred = Pred())
+        static InIter invoke_default(
+            InIter first, InIter last, Pred pred = Pred())
         {
             static_assert(std::input_iterator<InIter>,
                 "Requires at least input iterator.");
@@ -279,7 +280,7 @@ namespace hpx {
             std::forward_iterator<FwdIter>
         )
         // clang-format on
-        friend decltype(auto) tag_fallback_invoke(hpx::adjacent_find_t,
+        static decltype(auto) invoke_default(
             ExPolicy&& policy, FwdIter first, FwdIter last, Pred pred = Pred())
         {
             static_assert(std::forward_iterator<FwdIter>,

@@ -1,5 +1,5 @@
 //  Copyright (c) 2019 Thomas Heller
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,7 +11,7 @@
 #include <hpx/execution_base/agent_base.hpp>
 #include <hpx/execution_base/agent_ref.hpp>
 #include <hpx/execution_base/sender.hpp>
-#include <hpx/modules/tag_invoke.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/modules/type_support.hpp>
 
@@ -71,15 +71,17 @@ namespace hpx::execution_base {
         void sleep_for(std::chrono::duration<Rep, Period> const& sleep_duration,
             char const* desc = "hpx::execution_base::this_thread::sleep_for")
         {
-            agent().sleep_for(sleep_duration, desc);
+            agent().sleep_for(
+                sleep_duration, hpx::move_only_function<bool()>{}, desc);
         }
 
         HPX_CXX_CORE_EXPORT template <class Clock, class Duration>
         void sleep_until(
             std::chrono::time_point<Clock, Duration> const& sleep_time,
-            char const* desc = "hpx::execution_base::this_thread::sleep_for")
+            char const* desc = "hpx::execution_base::this_thread::sleep_until")
         {
-            agent().sleep_until(sleep_time, desc);
+            agent().sleep_until(
+                sleep_time, hpx::move_only_function<bool()>{}, desc);
         }
     }    // namespace this_thread
 }    // namespace hpx::execution_base

@@ -469,6 +469,7 @@ namespace hpx {
 #include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
+#include <hpx/parallel/algorithms/detail/tag_dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
@@ -1629,7 +1630,8 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::stable_partition
     HPX_CXX_CORE_EXPORT inline constexpr struct stable_partition_t final
-      : hpx::detail::tag_parallel_algorithm<stable_partition_t>
+      : hpx::detail::tag_dispatch<stable_partition_t,
+            hpx::detail::tag_parallel_algorithm<stable_partition_t>>
     {
         template <typename BidirIter, typename F>
         // clang-format off
@@ -1638,8 +1640,7 @@ namespace hpx {
                 hpx::is_invocable_v<F, hpx::traits::iter_value_t<BidirIter>>
         )
         // clang-format on
-        friend BidirIter tag_fallback_invoke(
-            hpx::stable_partition_t, BidirIter first, BidirIter last, F f)
+        static BidirIter invoke_default(BidirIter first, BidirIter last, F f)
         {
             static_assert(std::bidirectional_iterator<BidirIter>,
                 "Requires at least bidirectional iterator.");
@@ -1657,9 +1658,8 @@ namespace hpx {
                 hpx::is_invocable_v<F, hpx::traits::iter_value_t<BidirIter>>
         )
         // clang-format on
-        friend parallel::util::detail::algorithm_result_t<ExPolicy, BidirIter>
-        tag_fallback_invoke(hpx::stable_partition_t, ExPolicy&& policy,
-            BidirIter first, BidirIter last, F f)
+        static parallel::util::detail::algorithm_result_t<ExPolicy, BidirIter>
+        invoke_default(ExPolicy&& policy, BidirIter first, BidirIter last, F f)
         {
             static_assert(std::bidirectional_iterator<BidirIter>,
                 "Requires at least bidirectional iterator.");
@@ -1677,7 +1677,8 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::partition
     HPX_CXX_CORE_EXPORT inline constexpr struct partition_t final
-      : hpx::detail::tag_parallel_algorithm<partition_t>
+      : hpx::detail::tag_dispatch<partition_t,
+            hpx::detail::tag_parallel_algorithm<partition_t>>
     {
         template <typename FwdIter, typename Pred>
         // clang-format off
@@ -1686,8 +1687,7 @@ namespace hpx {
                 hpx::is_invocable_v<Pred, hpx::traits::iter_value_t<FwdIter>>
         )
         // clang-format on
-        friend FwdIter tag_fallback_invoke(
-            hpx::partition_t, FwdIter first, FwdIter last, Pred pred)
+        static FwdIter invoke_default(FwdIter first, FwdIter last, Pred pred)
         {
             static_assert(std::forward_iterator<FwdIter>,
                 "Required at least forward iterator.");
@@ -1705,9 +1705,9 @@ namespace hpx {
                 hpx::is_invocable_v<Pred, hpx::traits::iter_value_t<FwdIter>>
         )
         // clang-format on
-        friend parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
-        tag_fallback_invoke(hpx::partition_t, ExPolicy&& policy, FwdIter first,
-            FwdIter last, Pred pred)
+        static parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
+        invoke_default(
+            ExPolicy&& policy, FwdIter first, FwdIter last, Pred pred)
         {
             static_assert(std::forward_iterator<FwdIter>,
                 "Required at least forward iterator.");
@@ -1721,7 +1721,8 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::partition_copy
     HPX_CXX_CORE_EXPORT inline constexpr struct partition_copy_t final
-      : hpx::detail::tag_parallel_algorithm<partition_copy_t>
+      : hpx::detail::tag_dispatch<partition_copy_t,
+            hpx::detail::tag_parallel_algorithm<partition_copy_t>>
     {
         template <typename FwdIter1, typename FwdIter2, typename FwdIter3,
             typename Pred>
@@ -1733,9 +1734,8 @@ namespace hpx {
                 hpx::is_invocable_v<Pred, hpx::traits::iter_value_t<FwdIter1>>
             )
         // clang-format on
-        friend std::pair<FwdIter2, FwdIter3> tag_fallback_invoke(
-            hpx::partition_copy_t, FwdIter1 first, FwdIter1 last,
-            FwdIter2 dest_true, FwdIter3 dest_false, Pred pred)
+        static std::pair<FwdIter2, FwdIter3> invoke_default(FwdIter1 first,
+            FwdIter1 last, FwdIter2 dest_true, FwdIter3 dest_false, Pred pred)
         {
             static_assert(std::forward_iterator<FwdIter1>,
                 "Required at least forward iterator.");
@@ -1763,11 +1763,10 @@ namespace hpx {
                 hpx::is_invocable_v<Pred, hpx::traits::iter_value_t<FwdIter1>>
             )
         // clang-format on
-        friend parallel::util::detail::algorithm_result_t<ExPolicy,
+        static parallel::util::detail::algorithm_result_t<ExPolicy,
             std::pair<FwdIter2, FwdIter3>>
-        tag_fallback_invoke(hpx::partition_copy_t, ExPolicy&& policy,
-            FwdIter1 first, FwdIter1 last, FwdIter2 dest_true,
-            FwdIter3 dest_false, Pred pred)
+        invoke_default(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
+            FwdIter2 dest_true, FwdIter3 dest_false, Pred pred)
         {
             static_assert(std::forward_iterator<FwdIter1>,
                 "Required at least forward iterator.");

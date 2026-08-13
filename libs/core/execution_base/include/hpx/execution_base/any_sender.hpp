@@ -778,15 +778,13 @@ namespace hpx::execution::experimental {
                 set_value_t(Ts...), set_error_t(std::exception_ptr)>;
 
         template <typename R>
-        friend detail::any_operation_state tag_invoke(
-            hpx::execution::experimental::connect_t, unique_any_sender&& s,
-            R&& r)
+        detail::any_operation_state connect(R&& r) &&
         {
             // We first move the storage to a temporary variable so that this
             // any_sender is empty after this connect. Doing
             // HPX_MOVE(storage.get()).connect(...) would leave us with a
             // non-empty any_sender holding a moved-from sender.
-            auto moved_storage = HPX_MOVE(s.storage);
+            auto moved_storage = HPX_MOVE(storage);
             return HPX_MOVE(moved_storage.get())
                 .connect(detail::any_receiver<Ts...>{HPX_FORWARD(R, r)});
         }
@@ -855,22 +853,20 @@ namespace hpx::execution::experimental {
                 set_value_t(Ts...), set_error_t(std::exception_ptr)>;
 
         template <typename R>
-        friend detail::any_operation_state tag_invoke(
-            hpx::execution::experimental::connect_t, any_sender& s, R&& r)
+        detail::any_operation_state connect(R&& r) &
         {
-            return s.storage.get().connect(
+            return storage.get().connect(
                 detail::any_receiver<Ts...>{HPX_FORWARD(R, r)});
         }
 
         template <typename R>
-        friend detail::any_operation_state tag_invoke(
-            hpx::execution::experimental::connect_t, any_sender&& s, R&& r)
+        detail::any_operation_state connect(R&& r) &&
         {
             // We first move the storage to a temporary variable so that this
             // any_sender is empty after this connect. Doing
             // HPX_MOVE(storage.get()).connect(...) would leave us with a
             // non-empty any_sender holding a moved-from sender.
-            auto moved_storage = HPX_MOVE(s.storage);
+            auto moved_storage = HPX_MOVE(storage);
             return HPX_MOVE(moved_storage.get())
                 .connect(detail::any_receiver<Ts...>{HPX_FORWARD(R, r)});
         }

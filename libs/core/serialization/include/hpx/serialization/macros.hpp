@@ -462,7 +462,7 @@
     }                                                                          \
     /**/
 
-#if defined(HPX_SERIALIZATION_HAVE_ALLOW_AUTO_GENERATE)
+#if defined(HPX_HAVE_CXX26_REFLECTION)
 #define HPX_POLYMORPHIC_AUTO_REGISTER(Class)                                   \
     namespace hpx::serialization::detail {                                     \
         inline struct HPX_PP_CAT(register_class_helper_, __LINE__)             \

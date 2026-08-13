@@ -116,6 +116,7 @@ namespace hpx {
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
+#include <hpx/parallel/algorithms/detail/tag_dispatch.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
@@ -280,17 +281,16 @@ namespace hpx::parallel {
 namespace hpx {
 
     HPX_CXX_CORE_EXPORT inline constexpr struct is_partitioned_t final
-      : hpx::detail::tag_parallel_algorithm<is_partitioned_t>
+      : hpx::detail::tag_dispatch<is_partitioned_t,
+            hpx::detail::tag_parallel_algorithm<is_partitioned_t>>
     {
-    private:
         template <typename FwdIter, typename Pred>
         // clang-format off
             requires (
                 std::forward_iterator<FwdIter>
             )
         // clang-format on
-        friend bool tag_fallback_invoke(
-            hpx::is_partitioned_t, FwdIter first, FwdIter last, Pred pred)
+        static bool invoke_default(FwdIter first, FwdIter last, Pred pred)
         {
             return hpx::parallel::detail::is_partitioned<FwdIter, FwdIter>()
                 .call(hpx::execution::seq, first, last, HPX_MOVE(pred),
@@ -304,7 +304,7 @@ namespace hpx {
                 std::forward_iterator<FwdIter>
             )
         // clang-format on
-        friend decltype(auto) tag_fallback_invoke(hpx::is_partitioned_t,
+        static decltype(auto) invoke_default(
             ExPolicy&& policy, FwdIter first, FwdIter last, Pred pred)
         {
             return hpx::parallel::detail::is_partitioned<FwdIter, FwdIter>()

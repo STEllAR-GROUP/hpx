@@ -13,7 +13,9 @@
 #include <hpx/modules/testing.hpp>
 
 #include <cstdint>
+#include <functional>
 #include <iostream>
+#include <limits>
 #include <string>
 #include <utility>
 #include <vector>
@@ -124,6 +126,169 @@ void test_non_power_of_arity()
     }
 }
 
+void test_invalid_arity_rejected()
+{
+    for (std::uint32_t arity : {0u, 1u})
+    {
+        bool caught_exception = false;
+        try
+        {
+            [[maybe_unused]] auto const barrier_clients =
+                create_hierarchical_communicator(
+                    "/test/barrier_hierarchical/invalid_arity/",
+                    num_sites_arg(1), this_site_arg(0), arity_arg(arity),
+                    generation_arg(), root_site_arg(),
+                    flat_fallback_threshold_arg(0));
+        }
+        catch (hpx::exception const& e)
+        {
+            caught_exception = true;
+            HPX_TEST_EQ(e.get_error(), hpx::error::bad_parameter);
+        }
+        HPX_TEST(caught_exception);
+    }
+}
+
+void test_invalid_hierarchical_arguments_rejected()
+{
+    auto const barrier_clients = create_hierarchical_communicator(
+        "/test/barrier_hierarchical/invalid_arguments/", num_sites_arg(2),
+        this_site_arg(0), arity_arg(2), generation_arg(), root_site_arg(),
+        flat_fallback_threshold_arg(0));
+
+    bool nonzero_root_rejected = false;
+    try
+    {
+        hpx::collectives::barrier(hpx::launch::sync, barrier_clients,
+            this_site_arg(0), generation_arg(1), root_site_arg(1));
+    }
+    catch (hpx::exception const& e)
+    {
+        nonzero_root_rejected = true;
+        HPX_TEST_EQ(e.get_error(), hpx::error::bad_parameter);
+    }
+    HPX_TEST(nonzero_root_rejected);
+
+    bool mismatched_site_rejected = false;
+    try
+    {
+        hpx::collectives::barrier(hpx::launch::sync, barrier_clients,
+            this_site_arg(1), generation_arg(1));
+    }
+    catch (hpx::exception const& e)
+    {
+        mismatched_site_rejected = true;
+        HPX_TEST_EQ(e.get_error(), hpx::error::bad_parameter);
+    }
+    HPX_TEST(mismatched_site_rejected);
+
+    // this_site >= num_sites must be rejected before the mismatched-site
+    // check has a chance to classify it.
+    bool out_of_range_site_rejected = false;
+    try
+    {
+        hpx::collectives::barrier(hpx::launch::sync, barrier_clients,
+            this_site_arg(5), generation_arg(1));
+    }
+    catch (hpx::exception const& e)
+    {
+        out_of_range_site_rejected = true;
+        HPX_TEST_EQ(e.get_error(), hpx::error::bad_parameter);
+        HPX_TEST(std::string(e.what()).find(
+                     "this_site must be smaller than the number of "
+                     "participating sites") != std::string::npos);
+    }
+    HPX_TEST(out_of_range_site_rejected);
+}
+
+void test_invalid_communicator_rejected()
+{
+    auto comms =
+        create_hierarchical_communicator("/test/barrier_hierarchical/invalid/",
+            num_sites_arg(1), this_site_arg(0), arity_arg(2), generation_arg(),
+            root_site_arg(), flat_fallback_threshold_arg(0));
+
+    HPX_TEST(comms.valid());
+    comms.get(0) = communicator{};
+    HPX_TEST(!comms.valid());
+
+    bool rejected = false;
+    try
+    {
+        hpx::collectives::barrier(
+            hpx::launch::sync, comms, this_site_arg(0), generation_arg(1));
+    }
+    catch (hpx::exception const& e)
+    {
+        rejected = true;
+        HPX_TEST_EQ(e.get_error(), hpx::error::invalid_status);
+    }
+    HPX_TEST(rejected);
+}
+
+void test_large_single_pass_generations_rejected()
+{
+    auto const comms = create_hierarchical_communicator(
+        "/test/barrier_hierarchical/large_single_pass_generation/",
+        num_sites_arg(1), this_site_arg(0), arity_arg(2), generation_arg(),
+        root_site_arg(), flat_fallback_threshold_arg(0));
+
+    generation_arg const too_large(
+        (std::numeric_limits<std::size_t>::max)() / 2 + 1);
+
+    bool broadcast_rejected = false;
+    try
+    {
+        broadcast_to(hpx::launch::sync, comms, std::uint32_t(1),
+            this_site_arg(0), too_large);
+    }
+    catch (hpx::exception const& e)
+    {
+        broadcast_rejected = true;
+        HPX_TEST_EQ(e.get_error(), hpx::error::bad_parameter);
+    }
+    HPX_TEST(broadcast_rejected);
+
+    bool gather_rejected = false;
+    try
+    {
+        gather_here(hpx::launch::sync, comms, std::uint32_t(1),
+            this_site_arg(0), too_large);
+    }
+    catch (hpx::exception const& e)
+    {
+        gather_rejected = true;
+        HPX_TEST_EQ(e.get_error(), hpx::error::bad_parameter);
+    }
+    HPX_TEST(gather_rejected);
+
+    bool reduce_rejected = false;
+    try
+    {
+        reduce_here(hpx::launch::sync, comms, std::uint32_t(1),
+            std::plus<std::uint32_t>{}, this_site_arg(0), too_large);
+    }
+    catch (hpx::exception const& e)
+    {
+        reduce_rejected = true;
+        HPX_TEST_EQ(e.get_error(), hpx::error::bad_parameter);
+    }
+    HPX_TEST(reduce_rejected);
+
+    bool scatter_rejected = false;
+    try
+    {
+        scatter_to(hpx::launch::sync, comms, std::vector<std::uint32_t>{1},
+            this_site_arg(0), too_large);
+    }
+    catch (hpx::exception const& e)
+    {
+        scatter_rejected = true;
+        HPX_TEST_EQ(e.get_error(), hpx::error::bad_parameter);
+    }
+    HPX_TEST(scatter_rejected);
+}
+
 int hpx_main()
 {
 #if defined(HPX_HAVE_NETWORKING)
@@ -153,6 +318,10 @@ int hpx_main()
         }
 
         test_non_power_of_arity();
+        test_invalid_arity_rejected();
+        test_invalid_hierarchical_arguments_rejected();
+        test_invalid_communicator_rejected();
+        test_large_single_pass_generations_rejected();
     }
 
     return hpx::finalize();

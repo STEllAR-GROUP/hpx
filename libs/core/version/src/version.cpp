@@ -19,6 +19,11 @@
 #include <boost/config.hpp>
 #include <boost/version.hpp>
 
+#if BOOST_VERSION < 107100
+// Please update your Boost installation (see www.boost.org for details).
+#error HPX cannot be compiled with a Boost version earlier than 1.71.0
+#endif
+
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)) ||      \
     defined(HPX_HAVE_MODULE_MPI_BASE)
 #if defined(__clang__)

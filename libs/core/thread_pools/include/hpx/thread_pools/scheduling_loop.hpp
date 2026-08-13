@@ -109,7 +109,7 @@ namespace hpx::threads::detail {
         if (do_background_work)
         {
             // do background work in parcel layer and in agas
-            background_thread = create_background_thread(scheduler, num_thread,
+            create_background_thread(background_thread, scheduler, num_thread,
                 params, background_running, idle_loop_count);
         }
 
@@ -187,6 +187,8 @@ namespace hpx::threads::detail {
                                 thrd_stat.get_previous(),
                                 thread_schedule_state::active);
 
+                            hpx::tracing::task_executing(thrdptr);
+
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
                             auto tfunc_time_collector_inner =
                                 hpx::experimental::scope_exit([&idle_rate] {
@@ -207,22 +209,6 @@ namespace hpx::threads::detail {
                                     threads::get_region_init_data(thrdptr),
                                     num_thread);
 
-                                // Dual-view Tracy instrumentation:
-                                //
-                                // rctx declared FIRST -> constructed first ->
-                                //   ZoneBegin fires with NO active fiber,
-                                //   so Tracy attributes it to the OS worker
-                                //   thread row (utilization view).
-                                //
-                                // fctx declared SECOND -> constructed second ->
-                                //   TracyFiberEnter fires INSIDE the open zone,
-                                //   so Tracy also shows this slice on the fiber
-                                //   track (M:N migration view).
-                                //
-                                // Destruction is C++ reverse order:
-                                //   ~fctx first -> TracyFiberLeave
-                                //   ~rctx last  -> ZoneEnd
-                                // Zone outlives the fiber context - correct.
                                 hpx::tracing::fiber_region fctx(
                                     threads::get_fiber_region_init_data(
                                         thrdptr),
@@ -238,34 +224,26 @@ namespace hpx::threads::detail {
                                             idle_rate.collect_exec_time(ts);
                                         });
 #endif
-#if defined(HPX_HAVE_APEX)
-                                // get the APEX data pointer, in case we are
+                                // get the tracing data, in case we are
                                 // resuming the thread and have to restore any
                                 // leaf timers from direct actions, etc.
-
-                                // the address of tmp_data is getting stored by
-                                // APEX during this call
-                                util::external_timer::scoped_timer profiler(
+                                hpx::tracing::scoped_task_timer profiler(
                                     thrdptr->get_timer_data());
 
                                 thrd_stat = (*thrdptr)(context_storage);
 
-                                thread_schedule_state s =
-                                    thrd_stat.get_previous();
-                                if (s == thread_schedule_state::terminated ||
-                                    s == thread_schedule_state::deleted)
-                                {
-                                    profiler.stop();
-                                    // just in case, clean up the now dead pointer.
-                                    thrdptr->set_timer_data(nullptr);
-                                }
-                                else
-                                {
-                                    profiler.yield();
-                                }
-#else
-                                thrd_stat = (*thrdptr)(context_storage);
-#endif
+                                auto prev_state = thrd_stat.get_previous();
+                                auto on_exit =
+                                    hpx::experimental::scope_exit([&] {
+                                        if (prev_state ==
+                                            thread_schedule_state::terminated)
+                                        {
+                                            hpx::tracing::task_completed(
+                                                thrdptr);
+                                        }
+                                    });
+                                profiler.handle_post_execution(
+                                    thrdptr, prev_state);
                             }
 
                             detail::write_state_log(scheduler, num_thread, thrd,

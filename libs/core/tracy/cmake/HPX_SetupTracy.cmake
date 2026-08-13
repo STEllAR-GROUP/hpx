@@ -20,11 +20,14 @@ if(NOT HPX_WITH_TRACY_TAG)
 endif()
 
 if(NOT HPX_WITH_FETCH_TRACY)
-  find_package(Tracy ${HPX_WITH_TRACY_TAG})
+  find_package(Tracy)
   if(NOT Tracy_FOUND)
     hpx_error(
       "Could not find Tracy. Set Tracy_ROOT as a CMake or environment variable to point to the Tracy root install directory. Alternatively, set HPX_WITH_FETCH_TRACY=ON to fetch Tracy using CMake's FetchContent (when using this option Asio will be installed together with HPX, be careful about conflicts with separately installed versions of Tracy)."
     )
+  endif()
+  if(TARGET Tracy::TracyClient AND NOT TARGET tracy::tracy)
+    add_library(tracy::tracy ALIAS Tracy::TracyClient)
   endif()
 elseif(NOT TARGET tracy::tracy)
   if(FETCHCONTENT_SOURCE_DIR_TRACY)

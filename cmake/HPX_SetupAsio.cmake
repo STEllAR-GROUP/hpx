@@ -46,8 +46,20 @@ elseif(NOT TARGET Asio::asio AND NOT HPX_FIND_PACKAGE)
   set(Asio_ROOT ${asio_SOURCE_DIR})
 
   add_library(asio INTERFACE)
+
+  # convert ASIO tag into CMake version
+  string(REGEX REPLACE "asio-([0-9]+)-([0-9]+)-([0-9]+)" "\\1.\\2.\\3" VERSION
+                       "${HPX_WITH_ASIO_TAG}"
+  )
+
+  # starting v1.37.0 ASIO has changed its directory structure
+  set(asio_base_directory ${Asio_ROOT}/asio/include)
+  if(VERSION VERSION_GREATER "1.36.0")
+    set(asio_base_directory ${Asio_ROOT}/include)
+  endif()
+
   target_include_directories(
-    asio SYSTEM INTERFACE $<BUILD_INTERFACE:${Asio_ROOT}/asio/include>
+    asio SYSTEM INTERFACE $<BUILD_INTERFACE:${asio_base_directory}>
                           $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
   )
 
@@ -58,7 +70,7 @@ elseif(NOT TARGET Asio::asio AND NOT HPX_FIND_PACKAGE)
   )
 
   install(
-    DIRECTORY ${Asio_ROOT}/asio/include/
+    DIRECTORY ${asio_base_directory}/
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
     COMPONENT core
     FILES_MATCHING

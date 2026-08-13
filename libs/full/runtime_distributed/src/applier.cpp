@@ -1,5 +1,5 @@
 //  Copyright (c) 2007-2008 Anshul Tandon
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -8,9 +8,8 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/agas/addressing_service.hpp>
-#include <hpx/agas/agas_fwd.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/modules/agas.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/components_base.hpp>
 #include <hpx/modules/errors.hpp>
@@ -20,6 +19,7 @@
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/modules/type_support.hpp>
+
 #include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime_distributed/applier.hpp>
 #include <hpx/runtime_distributed/runtime_fwd.hpp>
@@ -31,7 +31,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace applier {
+namespace hpx::applier {
 
     applier::applier()
 #if defined(HPX_HAVE_NETWORKING)
@@ -182,4 +182,4 @@ namespace hpx { namespace applier {
     {
         return &hpx::get_runtime_distributed().get_applier();
     }
-}}    // namespace hpx::applier
+}    // namespace hpx::applier

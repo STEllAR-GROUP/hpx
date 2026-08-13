@@ -134,6 +134,7 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/contracts.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/execution_base.hpp>
@@ -144,6 +145,7 @@ namespace hpx {
 #include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/pivot.hpp>
+#include <hpx/parallel/algorithms/detail/tag_dispatch.hpp>
 #include <hpx/parallel/algorithms/minmax.hpp>
 #include <hpx/parallel/algorithms/partial_sort.hpp>
 #include <hpx/parallel/algorithms/partition.hpp>
@@ -419,7 +421,8 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::nth_element
     HPX_CXX_CORE_EXPORT inline constexpr struct nth_element_t final
-      : hpx::detail::tag_parallel_algorithm<nth_element_t>
+      : hpx::detail::tag_dispatch<nth_element_t,
+            hpx::detail::tag_parallel_algorithm<nth_element_t>>
     {
         template <typename RandomIt,
             typename Pred = hpx::parallel::detail::less>
@@ -432,8 +435,8 @@ namespace hpx {
                 >
             )
         // clang-format on
-        friend void tag_fallback_invoke(hpx::nth_element_t, RandomIt first,
-            RandomIt nth, RandomIt last, Pred pred = Pred())
+        static void invoke_default(RandomIt first, RandomIt nth, RandomIt last,
+            Pred pred = Pred()) HPX_PRE(first <= nth && nth <= last)
         {
             static_assert(std::random_access_iterator<RandomIt>,
                 "Requires at least random iterator.");
@@ -455,9 +458,9 @@ namespace hpx {
                 >
             )
         // clang-format on
-        friend decltype(auto) tag_fallback_invoke(hpx::nth_element_t,
-            ExPolicy&& policy, RandomIt first, RandomIt nth, RandomIt last,
-            Pred pred = Pred())
+        static decltype(auto) invoke_default(ExPolicy&& policy, RandomIt first,
+            RandomIt nth, RandomIt last, Pred pred = Pred())
+            HPX_PRE(first <= nth && nth <= last)
         {
             static_assert(std::random_access_iterator<RandomIt>,
                 "Requires at least random iterator.");

@@ -33,10 +33,12 @@ struct non_awaitable_sender
     using is_sender = void;
     using completion_signatures = Signatures;
 
-    template <typename Env>
-    friend auto tag_invoke(
-        hpx::execution::experimental::get_completion_signatures_t,
-        non_awaitable_sender const&, Env&&) -> completion_signatures;
+    template <typename Self, typename... Env>
+    static consteval auto get_completion_signatures(Self&&, Env&&...) noexcept
+        -> completion_signatures
+    {
+        return {};
+    }
 };
 
 template <typename Awaiter>
@@ -106,10 +108,8 @@ struct awaitable_sender_4
         return {};
     }
 
-private:
     template <typename Promise>
-    friend awaiter tag_invoke(hpx::execution::experimental::as_awaitable_t,
-        awaitable_sender_4, Promise&)
+    awaiter as_awaitable(Promise&) const noexcept
     {
         return {};
     }
@@ -122,10 +122,8 @@ struct awaitable_sender_5
         return {};
     }
 
-private:
     template <typename Promise>
-    friend awaiter tag_invoke(hpx::execution::experimental::as_awaitable_t,
-        awaitable_sender_5, Promise&)
+    awaiter as_awaitable(Promise&) const noexcept
     {
         return {};
     }
@@ -212,8 +210,8 @@ int main()
         static_assert(
             ex::is_awaitable_v<awaitable_sender_5, ::promise<awaiter>>);
         static_assert(std::is_same_v<
-            hpx::functional::tag_invoke_result_t<ex::as_awaitable_t,
-                awaitable_sender_4, ::promise<awaiter>&>,
+            decltype(std::declval<awaitable_sender_4>().as_awaitable(
+                std::declval<::promise<awaiter>&>())),
             awaiter>);
     }
 

@@ -54,7 +54,7 @@ int main()
                       scheduler_custom) ==
             hpx::execution::experimental::forward_progress_guarantee::
                 concurrent,
-        "CPO should invoke user tag_invoke");
+        "CPO should invoke user query()");
 
     return hpx::util::report_errors();
 }

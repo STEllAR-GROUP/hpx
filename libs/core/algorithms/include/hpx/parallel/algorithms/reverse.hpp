@@ -190,6 +190,7 @@ namespace hpx {
 #include <hpx/parallel/algorithms/detail/advance_and_get_distance.hpp>
 #include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/detail/tag_dispatch.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
@@ -345,17 +346,16 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::reverse
     HPX_CXX_CORE_EXPORT inline constexpr struct reverse_t final
-      : hpx::detail::tag_parallel_algorithm<reverse_t>
+      : hpx::detail::tag_dispatch<reverse_t,
+            hpx::detail::tag_parallel_algorithm<reverse_t>>
     {
-    private:
         template <typename BidirIter>
         // clang-format off
             requires (
                 hpx::traits::is_iterator_v<BidirIter>
             )
         // clang-format on
-        friend void tag_fallback_invoke(
-            hpx::reverse_t, BidirIter first, BidirIter last)
+        static void invoke_default(BidirIter first, BidirIter last)
         {
             static_assert(std::bidirectional_iterator<BidirIter>,
                 "Requires at least bidirectional iterator.");
@@ -371,8 +371,8 @@ namespace hpx {
                 hpx::is_execution_policy_v<ExPolicy>
             )
         // clang-format on
-        friend decltype(auto) tag_fallback_invoke(
-            hpx::reverse_t, ExPolicy&& policy, BidirIter first, BidirIter last)
+        static decltype(auto) invoke_default(
+            ExPolicy&& policy, BidirIter first, BidirIter last)
         {
             static_assert(std::bidirectional_iterator<BidirIter>,
                 "Requires at least bidirectional iterator.");
@@ -386,9 +386,9 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::reverse_copy
     HPX_CXX_CORE_EXPORT inline constexpr struct reverse_copy_t final
-      : hpx::detail::tag_parallel_algorithm<reverse_copy_t>
+      : hpx::detail::tag_dispatch<reverse_copy_t,
+            hpx::detail::tag_parallel_algorithm<reverse_copy_t>>
     {
-    private:
         template <typename BidirIter, typename OutIter>
         // clang-format off
             requires (
@@ -396,8 +396,8 @@ namespace hpx {
                 hpx::traits::is_iterator_v<OutIter>
             )
         // clang-format on
-        friend OutIter tag_fallback_invoke(
-            hpx::reverse_copy_t, BidirIter first, BidirIter last, OutIter dest)
+        static OutIter invoke_default(
+            BidirIter first, BidirIter last, OutIter dest)
         {
             static_assert(std::bidirectional_iterator<BidirIter>,
                 "Requires at least bidirectional iterator.");
@@ -422,7 +422,7 @@ namespace hpx {
                 hpx::traits::is_iterator_v<FwdIter>
             )
         // clang-format on
-        friend decltype(auto) tag_fallback_invoke(hpx::reverse_copy_t,
+        static decltype(auto) invoke_default(
             ExPolicy&& policy, BidirIter first, BidirIter last, FwdIter dest)
         {
             static_assert(std::bidirectional_iterator<BidirIter>,

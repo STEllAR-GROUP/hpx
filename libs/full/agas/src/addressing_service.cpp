@@ -286,13 +286,9 @@ namespace hpx::agas {
             endpoints = locality_ns_->resolve_locality(gid);
             if (endpoints.empty())
             {
-                std::string const str = hpx::util::format(
-                    "couldn't resolve the given target locality ({})", gid);
-
-                l.unlock();
-
                 HPX_THROWS_IF(ec, hpx::error::bad_parameter,
-                    "addressing_service::resolve_locality", str);
+                    "addressing_service::resolve_locality",
+                    "couldn't resolve the given target locality ({})", gid);
 
                 static parcelset::endpoints_type const empty_endpoints;
                 return empty_endpoints;
@@ -1561,6 +1557,7 @@ namespace hpx::agas {
         naming::gid_type& mutable_gid = const_cast<hpx::id_type&>(id).get_gid();
         naming::gid_type const new_gid =
             naming::detail::split_gid_if_needed(hpx::launch::sync, mutable_gid);
+
         std::int64_t const new_credit =
             naming::detail::get_credit_from_gid(new_gid);
 
@@ -1586,6 +1583,7 @@ namespace hpx::agas {
         naming::gid_type& mutable_gid = const_cast<hpx::id_type&>(id).get_gid();
         naming::gid_type const new_gid =
             naming::detail::split_gid_if_needed(hpx::launch::sync, mutable_gid);
+
         std::int64_t new_credit = naming::detail::get_credit_from_gid(new_gid);
 
         future<bool> f = symbol_ns_.bind_async(name, new_gid);
@@ -2019,6 +2017,43 @@ namespace hpx::agas {
         primary_ns_.register_server_instance(locality_id);
         component_ns_->register_server_instance(locality_id);
         symbol_ns_.register_server_instance(locality_id);
+    }
+
+    void addressing_service::unregister_server_instances(hpx::error_code& ec)
+    {
+        // unregister root server
+        hpx::error_code first_ec;
+
+        hpx::error_code local_ec;
+        symbol_ns_.unregister_server_instance(local_ec);
+        if (local_ec && !first_ec)
+            first_ec = local_ec;
+
+        local_ec = hpx::error_code();
+        component_ns_->unregister_server_instance(local_ec);
+        if (local_ec && !first_ec)
+            first_ec = local_ec;
+
+        local_ec = hpx::error_code();
+        primary_ns_.unregister_server_instance(local_ec);
+        if (local_ec && !first_ec)
+            first_ec = local_ec;
+
+        local_ec = hpx::error_code();
+        locality_ns_->unregister_server_instance(local_ec);
+        if (local_ec && !first_ec)
+            first_ec = local_ec;
+
+        if (first_ec)
+        {
+            HPX_THROWS_IF(ec, hpx::error::internal_server_error,
+                "addressing_service::unregister_server_instances",
+                first_ec.message());
+        }
+        else if (&ec != &hpx::throws)
+        {
+            ec = hpx::make_success_code();
+        }
     }
 
     void addressing_service::garbage_collect_non_blocking(error_code& ec)

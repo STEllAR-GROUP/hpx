@@ -15,10 +15,9 @@
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/pack_traversal.hpp>
+#include <hpx/modules/performance_counters.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/timing.hpp>
-#include <hpx/performance_counters/counters.hpp>
-#include <hpx/performance_counters/performance_counter.hpp>
 
 #include "activate_counters.hpp"
 
