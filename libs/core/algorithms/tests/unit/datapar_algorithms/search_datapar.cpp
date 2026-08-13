@@ -248,7 +248,9 @@ void test_search_boundaries(ExPolicy policy)
     {
         std::vector<int> haystack(pack_size * 3 + 1, 9);
         std::vector<int> const needle{1, 2, 3};
-        std::copy(needle.begin(), needle.end(), haystack.end() - needle.size());
+        auto const needle_size =
+            static_cast<std::vector<int>::difference_type>(needle.size());
+        std::copy(needle.begin(), needle.end(), haystack.end() - needle_size);
         check_search_result(policy, haystack, needle);
     }
 
