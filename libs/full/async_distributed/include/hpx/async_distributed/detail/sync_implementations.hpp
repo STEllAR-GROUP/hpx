@@ -55,8 +55,8 @@ namespace hpx::detail {
         Launch&& policy, hpx::id_type const& id, Ts&&... vs)
     {
         using action_type = hpx::traits::extract_action_t<Action>;
-        using result_type = typename action_type::local_result_type;
-        using component_type = typename action_type::component_type;
+        using result_type = action_type::local_result_type;
+        using component_type = action_type::component_type;
 
         [[maybe_unused]] std::pair<bool, components::pinned_ptr> r;
         naming::address addr;

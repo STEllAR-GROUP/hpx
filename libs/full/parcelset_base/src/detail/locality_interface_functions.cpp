@@ -23,8 +23,7 @@ namespace hpx::parcelset::detail {
     parcel_write_handler_type (*set_parcel_write_handler)(
         parcel_write_handler_type const& f) = nullptr;
 
-    void (*put_parcel)(
-        parcelset::parcel&& p, parcel_write_handler_type&& f) = nullptr;
+    void (*put_parcel)(parcelset::parcel&& p, write_handler_type&& f) = nullptr;
 
     void (*sync_put_parcel)(parcelset::parcel&& p) = nullptr;
 

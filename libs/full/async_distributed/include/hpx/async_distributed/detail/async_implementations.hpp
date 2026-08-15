@@ -8,21 +8,24 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_distributed/detail/async_implementations_fwd.hpp>
-#include <hpx/async_distributed/packaged_action.hpp>
-#include <hpx/modules/actions_base.hpp>
-#include <hpx/modules/allocator_support.hpp>
-#include <hpx/modules/async_base.hpp>
-#include <hpx/modules/components_base.hpp>
 #include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
-#include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/threading.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/tracing.hpp>
+
+#include <hpx/modules/actions_base.hpp>
+#include <hpx/modules/allocator_support.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/components_base.hpp>
+#include <hpx/modules/naming_base.hpp>
+#include <hpx/modules/parcelset_base.hpp>
+
+#include <hpx/async_distributed/detail/async_implementations_fwd.hpp>
+#include <hpx/async_distributed/packaged_action.hpp>
 
 #include <cstddef>
 #include <utility>

@@ -8,13 +8,15 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_distributed/detail/async_implementations.hpp>
-#include <hpx/async_distributed/detail/async_unwrap_result_implementations_fwd.hpp>
-#include <hpx/async_distributed/detail/sync_implementations.hpp>
 #include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/components_base.hpp>
 #include <hpx/modules/naming_base.hpp>
+#include <hpx/modules/parcelset_base.hpp>
+
+#include <hpx/async_distributed/detail/async_implementations.hpp>
+#include <hpx/async_distributed/detail/async_unwrap_result_implementations_fwd.hpp>
+#include <hpx/async_distributed/detail/sync_implementations.hpp>
 
 #include <utility>
 

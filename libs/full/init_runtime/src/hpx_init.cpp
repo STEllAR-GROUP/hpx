@@ -1076,7 +1076,8 @@ namespace hpx {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    int disconnect(double shutdown_timeout, double localwait, error_code& ec)
+    int disconnect([[maybe_unused]] double shutdown_timeout,
+        [[maybe_unused]] double localwait, [[maybe_unused]] error_code& ec)
     {
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
         if (!threads::get_self_ptr())
@@ -1128,10 +1129,6 @@ namespace hpx {
         p->call_shutdown_functions(false);
 
         p->stop(shutdown_timeout, hpx::invalid_id, true);
-#else
-        HPX_UNUSED(shutdown_timeout);
-        HPX_UNUSED(localwait);
-        HPX_UNUSED(ec);
 #endif
 
         return 0;
