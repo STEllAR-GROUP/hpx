@@ -16,7 +16,6 @@
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/io_service.hpp>
-
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/preprocessor.hpp>
 #include <hpx/modules/resource_partitioner.hpp>
@@ -69,6 +68,58 @@ namespace hpx::detail {
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::parcelset {
 
+    namespace {
+
+        ///////////////////////////////////////////////////////////////////////////
+        // default callback for put_parcel
+        bool default_parcel_write_handler(
+            std::error_code const& ec, parcel const& p)
+        {
+            if (!ec)
+            {
+                return false;
+            }
+
+            // If we are in a stopped state, ignore some errors
+            if (hpx::is_stopped_or_shutting_down())
+            {
+                using ::asio::error::make_error_code;
+                if (ec == make_error_code(::asio::error::connection_aborted) ||
+                    ec == make_error_code(::asio::error::connection_reset) ||
+                    ec == make_error_code(::asio::error::broken_pipe) ||
+                    ec == make_error_code(::asio::error::not_connected) ||
+                    ec == make_error_code(::asio::error::eof))
+                {
+                    return true;
+                }
+            }
+            else if (hpx::tolerate_node_faults())
+            {
+                if (ec ==
+                    ::asio::error::make_error_code(
+                        ::asio::error::connection_reset))
+                {
+                    return true;
+                }
+            }
+
+            hpx::error_code ec1(hpx::throwmode::lightweight);
+            endpoints_type const& dest_endpoints =
+                agas::resolve_locality(p.destination(), ec1);
+            if (dest_endpoints.empty())
+            {
+                return true;
+            }
+
+            // all unhandled exceptions are rethrown here
+            std::exception_ptr const exception = hpx::detail::get_exception(
+                hpx::exception(ec), "default_parcel_write_handler", __FILE__,
+                __LINE__, parcelset::dump_parcel(p));
+
+            std::rethrow_exception(exception);
+        }
+    }    // namespace
+
     ///////////////////////////////////////////////////////////////////////////
     // A parcel is submitted for transport at the source locality site to
     // the parcel set of the locality with the put-parcel command
@@ -84,6 +135,11 @@ namespace hpx::parcelset {
         sent_future.get();    // wait for the parcel to be sent
     }
 
+    void default_write_handler(std::error_code const& ec, parcel const& p)
+    {
+        default_parcel_write_handler(ec, p);
+    }
+
     parcelhandler::parcelhandler(util::runtime_configuration const& cfg)
       : tm_(nullptr)
       , use_alternative_parcelports_(false)
@@ -93,7 +149,7 @@ namespace hpx::parcelset {
             util::get_entry_as<int>(cfg, "hpx.parcel.message_handlers", 0) != 0)
       , count_routed_(0)
       , mtx_("parcelhandler::mtx")
-      , write_handler_(&default_write_handler)
+      , write_handler_(&default_parcel_write_handler)
 #if defined(HPX_HAVE_NETWORKING)
       , is_networking_enabled_(cfg.enable_networking())
 #else
@@ -231,8 +287,8 @@ namespace hpx::parcelset {
                 auto it = pports_.find(pp);
                 if (it != pports_.end())
                 {
-                    std::cerr << "  " << (*it).second->type() << "\n";
-                    (*it).second->stop();
+                    std::cerr << "  " << it->second->type() << "\n";
+                    it->second->stop();
                     pports_.erase(it);
                 }
             }
@@ -241,7 +297,7 @@ namespace hpx::parcelset {
     }
 
     void parcelhandler::list_parcelport(std::ostringstream& strm,
-        std::string const& ppname, int priority, bool bootstrap) const
+        std::string const& ppname, int const priority, bool const bootstrap)
     {
         hpx::util::format_to(strm, "parcel port: {}", ppname);
 
@@ -259,15 +315,16 @@ namespace hpx::parcelset {
     // list available parcel ports
     void parcelhandler::list_parcelports(std::ostringstream& strm) const
     {
-        for (pports_type::value_type const& pp : pports_)
+        for (auto const& pport : pports_ | std::views::values)
         {
-            list_parcelport(strm, pp.second->type(), pp.second->priority(),
-                pp.second == get_bootstrap_parcelport());
+            list_parcelport(strm, pport->type(), pport->priority(),
+                pport == get_bootstrap_parcelport());
         }
         strm << '\n';
     }
 
-    write_handler_type parcelhandler::set_write_handler(write_handler_type f)
+    parcel_write_handler_type parcelhandler::set_write_handler(
+        parcel_write_handler_type f)
     {
         std::lock_guard<mutex_type> l(mtx_);
         std::swap(f, write_handler_);
@@ -301,7 +358,7 @@ namespace hpx::parcelset {
         int const priority = get_priority(type);
         if (priority <= 0)
             return nullptr;
-        HPX_ASSERT(pports_.find(priority) != pports_.end());
+        HPX_ASSERT(pports_.contains(priority));
         return pports_.find(priority)->second.get();    // -V783
     }
 
@@ -342,18 +399,18 @@ namespace hpx::parcelset {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \brief Make sure the specified locality is not held by any
-    /// connection caches anymore
+    /// \brief Make sure the specified locality is not held by any connection
+    ///        caches anymore
     void parcelhandler::remove_from_connection_cache(
-        naming::gid_type const& gid, endpoints_type const& endpoints) const
+        naming::gid_type const& gid, endpoints_type const& endpoints)
     {
-        for (endpoints_type::value_type const& loc : endpoints)
+        for (auto const& endpoint : endpoints | std::views::values)
         {
-            for (pports_type::value_type const& pp : pports_)
+            for (auto const& pport : pports_ | std::views::values)
             {
-                if (std::string(pp.second->type()) == loc.second.type())
+                if (std::string(pport->type()) == endpoint.type())
                 {
-                    pp.second->remove_from_connection_cache(loc.second);
+                    pport->remove_from_connection_cache(endpoint);
                 }
             }
         }
@@ -362,8 +419,8 @@ namespace hpx::parcelset {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool parcelhandler::do_background_work(std::size_t num_thread,
-        bool stop_buffering, parcelport_background_mode mode)
+    bool parcelhandler::do_background_work(std::size_t const num_thread,
+        bool const stop_buffering, parcelport_background_mode const mode)
     {
         bool did_some_work = false;
         if (!is_networking_enabled_)
@@ -390,10 +447,10 @@ namespace hpx::parcelset {
                 auto const end = handlers_.end();
                 for (auto it = handlers_.begin(); it != end; ++it)
                 {
-                    if ((*it).second)
+                    if (it->second)
                     {
                         std::shared_ptr<policies::message_handler> const p(
-                            (*it).second);
+                            it->second);
                         unlock_guard<std::unique_lock<mutex_type>> ul(l);
                         did_some_work = p->flush(flush_mode, stop_buffering) ||
                             did_some_work;
@@ -431,7 +488,7 @@ namespace hpx::parcelset {
         }
     }
 
-    void parcelhandler::stop(bool blocking)
+    void parcelhandler::stop(bool const blocking)
     {
         // now stop all parcel ports
         for (pports_type::value_type const& pp : pports_)
@@ -448,22 +505,22 @@ namespace hpx::parcelset {
 
     bool parcelhandler::get_raw_remote_localities(
         std::vector<naming::gid_type>& locality_ids,
-        components::component_type type, error_code& ec) const
+        components::component_type const type, error_code& ec)
     {
         std::vector<naming::gid_type> allprefixes;
         bool const result = get_raw_localities(allprefixes, type, ec);
         if (ec || !result)
             return false;
 
-        std::remove_copy(allprefixes.begin(), allprefixes.end(),
-            std::back_inserter(locality_ids), agas::get_locality());
+        std::ranges::remove_copy(allprefixes, std::back_inserter(locality_ids),
+            agas::get_locality());
 
         return !locality_ids.empty();
     }
 
     bool parcelhandler::get_raw_localities(
         std::vector<naming::gid_type>& locality_ids,
-        components::component_type type, error_code&) const
+        components::component_type const type, error_code&)
     {
         std::vector<std::uint32_t> const ids = agas::get_all_locality_ids(type);
 
@@ -483,16 +540,15 @@ namespace hpx::parcelset {
     {
         endpoints_type const& dest_endpoints = agas::resolve_locality(dest_gid);
 
-        for (pports_type::value_type& pp : pports_)
+        for (auto& [idx, pp] : pports_)
         {
-            if (pp.first > 0)
+            if (idx > 0)
             {
                 if (locality const& dest =
-                        find_endpoint(dest_endpoints, pp.second->type());
-                    dest &&
-                    pp.second->can_connect(dest, use_alternative_parcelports_))
+                        find_endpoint(dest_endpoints, pp->type());
+                    dest && pp->can_connect(dest, use_alternative_parcelports_))
                 {
-                    return std::make_pair(pp.second, dest);
+                    return std::make_pair(pp, dest);
                 }
             }
         }
@@ -501,11 +557,11 @@ namespace hpx::parcelset {
         strm << "target locality: " << dest_gid << "\n";
         strm << "available destination endpoints:\n" << dest_endpoints << "\n";
         strm << "available parcelports:\n";
-        for (auto const& pp : pports_)
+        for (auto const& pp : pports_ | std::views::values)
         {
-            list_parcelport(strm, pp.second->type(), pp.second->priority(),
-                pp.second == get_bootstrap_parcelport());
-            strm << "\t [" << pp.second->here() << "]\n";
+            list_parcelport(strm, pp->type(), pp->priority(),
+                pp == get_bootstrap_parcelport());
+            strm << "\t [" << pp->here() << "]\n";
         }
 
         HPX_THROW_EXCEPTION(hpx::error::network_error,
@@ -518,8 +574,7 @@ namespace hpx::parcelset {
     locality parcelhandler::find_endpoint(
         endpoints_type const& eps, std::string const& name)
     {
-        auto const it = eps.find(name);
-        if (it != eps.end())
+        if (auto const it = eps.find(name); it != eps.end())
             return it->second;
         return {};
     }
@@ -529,9 +584,9 @@ namespace hpx::parcelset {
         char const* name) const
     {
         util::io_service_pool* result = nullptr;
-        for (pports_type::value_type const& pp : pports_)
+        for (auto const& pp : pports_ | std::views::values)
         {
-            result = pp.second->get_thread_pool(name);
+            result = pp->get_thread_pool(name);
             if (result)
                 return result;
         }
@@ -539,7 +594,8 @@ namespace hpx::parcelset {
     }
 
     namespace detail {
-        void parcel_sent_handler(
+
+        static void parcel_sent_handler(
             parcelhandler::write_handler_type const& f,    //-V669
             std::error_code const& ec, parcelset::parcel const& p)
         {
@@ -574,7 +630,7 @@ namespace hpx::parcelset {
 
         auto handler = [this](std::error_code const& ec,
                            parcelset::parcel const& p) -> void {
-            invoke_write_handler(ec, p);
+            [[maybe_unused]] bool const r = invoke_write_handler(ec, p);
 
             LPT_(debug).format(
                 "parcelhandler::put_parcel: handled: {}", p.parcel_id());
@@ -597,8 +653,16 @@ namespace hpx::parcelset {
 
         auto handler = [this, f = HPX_MOVE(f)](std::error_code const& ec,
                            parcelset::parcel const& p) -> void {
-            invoke_write_handler(ec, p);
-            f(ec, p);
+            if (invoke_write_handler(ec, p))
+            {
+                // the error was handled, pass on a success code
+                std::error_code const ec1(0, std::generic_category());
+                f(ec1, p);
+            }
+            else
+            {
+                f(ec, p);
+            }
 
             LPT_(debug).format(
                 "parcelhandler::put_parcel: handled: {}", p.parcel_id());
@@ -706,7 +770,8 @@ namespace hpx::parcelset {
 
         std::vector<write_handler_type> handlers(parcels.size(),
             [this](std::error_code const& ec, parcel const& p) -> void {
-                invoke_write_handler(ec, p);
+                [[maybe_unused]] bool const r = invoke_write_handler(ec, p);
+
                 LPT_(debug).format(
                     "parcelhandler::put_parcels: handled: {}", p.parcel_id());
             });
@@ -739,8 +804,16 @@ namespace hpx::parcelset {
             handlers.emplace_back([this, f = HPX_MOVE(funcs[i])](
                                       std::error_code const& ec,
                                       parcel const& p) -> void {
-                invoke_write_handler(ec, p);
-                f(ec, p);
+                if (invoke_write_handler(ec, p))
+                {
+                    // the error was handled, pass on a success code
+                    std::error_code const ec1(0, std::generic_category());
+                    f(ec1, p);
+                }
+                else
+                {
+                    f(ec, p);
+                }
 
                 LPT_(debug).format(
                     "parcelhandler::put_parcels: handled: {}", p.parcel_id());
@@ -892,67 +965,33 @@ namespace hpx::parcelset {
         }
     }
 
-    void parcelhandler::invoke_write_handler(
+    bool parcelhandler::invoke_write_handler(
         std::error_code const& ec, parcel const& p) const
     {
-        write_handler_type const f = write_handler_;
-        f(ec, p);
+        if (parcel_write_handler_type const f = write_handler_; f)
+        {
+            return f(ec, p);
+        }
+        return false;
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    std::int64_t parcelhandler::get_outgoing_queue_length(bool reset) const
+    std::int64_t parcelhandler::get_outgoing_queue_length(
+        bool const reset) const
     {
         std::int64_t parcel_count = 0;
-        for (pports_type::value_type const& pp : pports_)
+        for (auto const& port : pports_ | std::views::values)
         {
-            parcel_count += pp.second->get_pending_parcels_count(reset);
+            parcel_count += port->get_pending_parcels_count(reset);
         }
         return parcel_count;
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // default callback for put_parcel
-    void default_write_handler(std::error_code const& ec, parcel const& p)
-    {
-        if (ec)
-        {
-            // If we are in a stopped state, ignore some errors
-            if (hpx::is_stopped_or_shutting_down())
-            {
-                using ::asio::error::make_error_code;
-                if (ec == make_error_code(::asio::error::connection_aborted) ||
-                    ec == make_error_code(::asio::error::connection_reset) ||
-                    ec == make_error_code(::asio::error::broken_pipe) ||
-                    ec == make_error_code(::asio::error::not_connected) ||
-                    ec == make_error_code(::asio::error::eof))
-                {
-                    return;
-                }
-            }
-            else if (hpx::tolerate_node_faults())
-            {
-                if (ec ==
-                    ::asio::error::make_error_code(
-                        ::asio::error::connection_reset))
-                {
-                    return;
-                }
-            }
-
-            // all unhandled exceptions terminate the whole application
-            std::exception_ptr const exception = hpx::detail::get_exception(
-                hpx::exception(ec), "default_write_handler", __FILE__, __LINE__,
-                parcelset::dump_parcel(p));
-
-            hpx::report_error(exception);
-        }
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
     policies::message_handler* parcelhandler::get_message_handler(
         char const* action, char const* message_handler_type,
-        std::size_t num_messages, std::size_t interval, locality const& loc,
-        error_code& ec)
+        std::size_t const num_messages, std::size_t const interval,
+        locality const& loc, error_code& ec)
     {
         if (!is_networking_enabled_)
         {
@@ -985,13 +1024,13 @@ namespace hpx::parcelset {
                 l.unlock();
                 if (&ec != &throws)
                 {
-                    if ((*it).second)
+                    if (it->second)
                         ec = make_success_code();
                     else
                         ec = make_error_code(
                             hpx::error::bad_parameter, throwmode::lightweight);
                 }
-                return (*it).second.get();
+                return it->second.get();
             }
 
             if (ec || !p)
@@ -1026,7 +1065,7 @@ namespace hpx::parcelset {
             }
             it = r.first;
         }
-        else if (!(*it).second)
+        else if (!it->second)
         {
             l.unlock();
             if (&ec != &throws)
@@ -1046,7 +1085,7 @@ namespace hpx::parcelset {
         if (&ec != &throws)
             ec = make_success_code();
 
-        return (*it).second.get();
+        return it->second.get();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1068,7 +1107,7 @@ namespace hpx::parcelset {
     // Performance counter data
 
     // number of parcels routed
-    std::int64_t parcelhandler::get_parcel_routed_count(bool reset)
+    std::int64_t parcelhandler::get_parcel_routed_count(bool const reset)
     {
         return util::get_and_reset_value(count_routed_, reset);
     }
@@ -1338,8 +1377,8 @@ namespace hpx::parcelset {
     // connection stack statistics
     std::int64_t parcelhandler::get_connection_cache_statistics(
         std::string const& pp_type,
-        parcelport::connection_cache_statistics_type stat_type,
-        bool reset) const
+        parcelport::connection_cache_statistics_type const stat_type,
+        bool const reset) const
     {
         error_code ec(throwmode::lightweight);
         parcelport* pp = find_parcelport(pp_type, ec);

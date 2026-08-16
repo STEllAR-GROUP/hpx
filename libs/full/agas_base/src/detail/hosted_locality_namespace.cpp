@@ -26,7 +26,8 @@
 
 namespace hpx::agas::detail {
 
-    hosted_locality_namespace::hosted_locality_namespace(naming::address addr)
+    hosted_locality_namespace::hosted_locality_namespace(
+        naming::address const& addr)
       : gid_(naming::gid_type(agas::locality_ns_msb, agas::locality_ns_lsb),
             hpx::id_type::management_type::unmanaged)
       , addr_(addr)
