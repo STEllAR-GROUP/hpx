@@ -181,7 +181,7 @@ namespace hpx {
     ///           is pre-initialized to \a hpx#throws the function will throw
     ///           on error instead.
     ///
-    /// \returns  This function will always return zero.
+    /// \returns  This function will always return zero if successful, -1 otherwise.
     ///
     /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
     ///           function doesn't throw but returns the result code using the

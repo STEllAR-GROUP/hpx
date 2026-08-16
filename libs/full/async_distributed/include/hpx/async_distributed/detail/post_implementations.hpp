@@ -8,11 +8,14 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_distributed/detail/post_implementations_fwd.hpp>
+#include <hpx/modules/errors.hpp>
+
 #include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/components_base.hpp>
-#include <hpx/modules/errors.hpp>
 #include <hpx/modules/naming_base.hpp>
+#include <hpx/modules/parcelset_base.hpp>
+
+#include <hpx/async_distributed/detail/post_implementations_fwd.hpp>
 
 #include <type_traits>
 #include <utility>

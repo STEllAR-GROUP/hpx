@@ -1,4 +1,4 @@
-# Copyright (c) 2020 The STE||AR-Group
+# Copyright (c) 2020-2026 The STE||AR-Group
 #               2011 Bryce Adelstein-Lelbach
 #
 # SPDX-License-Identifier: BSL-1.0

@@ -10,6 +10,7 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/modules/errors.hpp>
+
 #include <hpx/parcelset_base/parcelset_base_fwd.hpp>
 
 #include <string>
@@ -26,7 +27,7 @@ namespace hpx::parcelset::detail {
         parcel_write_handler_type const& f);
 
     extern HPX_EXPORT void (*put_parcel)(
-        parcelset::parcel&& p, parcel_write_handler_type&& f);
+        parcelset::parcel&& p, write_handler_type&& f);
 
     extern HPX_EXPORT void (*sync_put_parcel)(parcelset::parcel&& p);
 

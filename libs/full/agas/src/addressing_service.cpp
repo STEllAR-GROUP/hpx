@@ -9,11 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/modules/actions_base.hpp>
-#include <hpx/modules/agas_base.hpp>
-#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/async_combinators.hpp>
-#include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
@@ -22,7 +18,6 @@
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/logging.hpp>
-#include <hpx/modules/naming.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/serialization.hpp>
@@ -30,6 +25,13 @@
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/modules/util.hpp>
+
+#include <hpx/modules/actions_base.hpp>
+#include <hpx/modules/agas_base.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/async_distributed.hpp>
+#include <hpx/modules/naming.hpp>
+#include <hpx/modules/parcelset_base.hpp>
 
 #include <hpx/agas/addressing_service.hpp>
 
@@ -1110,7 +1112,6 @@ namespace hpx::agas {
             HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "addressing_service::get_colocation_id_async",
                 "invalid reference id");
-            return hpx::invalid_id;
         }
 
         return primary_ns_.colocate(id.get_gid());
