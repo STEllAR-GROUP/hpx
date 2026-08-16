@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
     desc_commandline.add_options()("iterations",
-        po::value<std::size_t>()->default_value(100),
+        po::value<std::size_t>()->default_value(5),
         "Number of iterations to run")("depth",
         po::value<std::size_t>()->default_value(8),
         "Fibonacci recursion depth");
