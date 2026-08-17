@@ -138,7 +138,8 @@ void test_bulk_decayed_reference(hpx::id_type const& target)
     std::string upstream_value = "hello";
 
     auto snd = ex::schedule(sched) |
-        ex::then([&upstream_value]() -> std::string& { return upstream_value; }) |
+        ex::then(
+            [&upstream_value]() -> std::string& { return upstream_value; }) |
         ex::bulk(3, [](int /*index*/, std::string& s) { s += "!"; });
 
     auto result = tt::sync_wait(std::move(snd));

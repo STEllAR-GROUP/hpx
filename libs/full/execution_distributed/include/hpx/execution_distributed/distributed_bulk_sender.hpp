@@ -313,9 +313,8 @@ namespace hpx::distributed::experimental::detail {
                             using action_type =
                                 remote_bulk_execute_action<std::decay_t<Shape>,
                                     std::decay_t<F>, args_tuple_type>;
-                            hpx::async<action_type>(
-                                target_locality_, shape_, HPX_MOVE(f_),
-                                args_tuple)
+                            hpx::async<action_type>(target_locality_, shape_,
+                                HPX_MOVE(f_), args_tuple)
                                 .get();
                         }
 
