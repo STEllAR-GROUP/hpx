@@ -920,8 +920,7 @@ namespace hpx::threads::policies {
                                     get_thread_id_data(stolen_thrd))
                             {
                                 hpx::tracing::work_stolen(req.num_thread_,
-                                    d.num_thread_,
-                                    thrd_data->get_thread_id().get(),
+                                    d.num_thread_, thrd_data,
                                     thread_data::get_safe_description(
                                         thrd_data->get_description(),
                                         "thread"));
