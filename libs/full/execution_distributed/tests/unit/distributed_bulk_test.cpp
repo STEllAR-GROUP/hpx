@@ -130,20 +130,23 @@ void test_bulk_preserves_scheduler_env(hpx::id_type const& target)
 ///////////////////////////////////////////////////////////////////////////////
 // Test 6: verify that reference completions from the upstream sender
 //         are properly decayed into copies by the bulk adaptor.
-//         The upstream sends a std::string by value; the bulk function
-//         receives it as a decayed lvalue reference.
+//         The upstream sends a std::string& (reference); the bulk adaptor
+//         should decay it into a copy so the original remains unchanged.
 void test_bulk_decayed_reference(hpx::id_type const& target)
 {
     auto sched = hpx::distributed::experimental::distributed_scheduler{target};
+    std::string upstream_value = "hello";
 
     auto snd = ex::schedule(sched) |
-        ex::then([]() { return std::string("hello"); }) |
+        ex::then([&upstream_value]() -> std::string& { return upstream_value; }) |
         ex::bulk(3, [](int /*index*/, std::string& s) { s += "!"; });
 
     auto result = tt::sync_wait(std::move(snd));
     HPX_TEST(result.has_value());
     // The bulk function mutated the decayed copy 3 times
     HPX_TEST_EQ(std::get<0>(*result), std::string("hello!!!"));
+    // The original value must remain unchanged (decay created a copy)
+    HPX_TEST_EQ(upstream_value, std::string("hello"));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
