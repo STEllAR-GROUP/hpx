@@ -21,6 +21,31 @@
 
 namespace hpx::actions {
 
+    namespace detail {
+
+        HPX_CXX_EXPORT template <typename Result, typename RemoteResult>
+        void trigger_error(typed_continuation<Result, RemoteResult> const& cont,
+            std::exception_ptr const& ex) noexcept
+        {
+            hpx::detail::try_catch_exception_ptr(
+                [&] {
+                    // make sure hpx::exceptions are propagated back to the client
+                    cont.trigger_error(ex);
+                },
+                [&](std::exception_ptr const&) {
+#if defined(HPX_HAVE_FORCE_DISCONNECT)
+                    if (parcelset::locality_was_disconnected(
+                            naming::get_locality_id_from_id(cont.get_id())))
+                    {
+                        // ignore any errors as locality is now unreachable
+                        return;
+                    }
+#endif
+                    std::abort();    // nothing we can do here
+                });
+        }
+    }    // namespace detail
+
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Invoke \a f with the given arguments and forward its result to
     ///        \a cont.
@@ -40,16 +65,15 @@ namespace hpx::actions {
     void trigger(typed_continuation<Result, RemoteResult>&& cont, F&& f,
         Ts&&... vs) noexcept
     {
-        try
-        {
-            cont.trigger_value(
-                HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(Ts, vs)...));
-        }
-        catch (...)
-        {
-            // make sure hpx::exceptions are propagated back to the client
-            cont.trigger_error(std::current_exception());
-        }
+        hpx::detail::try_catch_exception_ptr(
+            [&] {
+                cont.trigger_value(
+                    HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(Ts, vs)...));
+            },
+            [&](std::exception_ptr const& ep) {
+                // make sure hpx::exceptions are propagated back to the client
+                detail::trigger_error(cont, ep);
+            });
     }
 
     /// \brief Invoke \a f with the given arguments and notify \a cont of
@@ -69,15 +93,14 @@ namespace hpx::actions {
     void trigger(typed_continuation<Result, util::unused_type>&& cont, F&& f,
         Ts&&... vs) noexcept
     {
-        try
-        {
-            HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(Ts, vs)...);
-            cont.trigger();
-        }
-        catch (...)
-        {
-            // make sure hpx::exceptions are propagated back to the client
-            cont.trigger_error(std::current_exception());
-        }
+        hpx::detail::try_catch_exception_ptr(
+            [&] {
+                HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(Ts, vs)...);
+                cont.trigger();
+            },
+            [&](std::exception_ptr const& ep) {
+                // make sure hpx::exceptions are propagated back to the client
+                detail::trigger_error(cont, ep);
+            });
     }
 }    // namespace hpx::actions

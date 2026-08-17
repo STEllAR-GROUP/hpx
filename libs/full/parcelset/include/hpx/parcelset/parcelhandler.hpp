@@ -33,6 +33,7 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <set>
 #include <sstream>
 #include <string>
 #include <system_error>
@@ -215,6 +216,9 @@ namespace hpx::parcelset {
         {
             return find_parcelport(name)->create_locality();
         }
+
+        /// \brief return whether the given locality was disconnected
+        bool locality_was_disconnected(std::uint32_t id) const;
 
         /// Return the name of this locality as retrieved from the active
         /// parcelport
@@ -454,6 +458,9 @@ namespace hpx::parcelset {
 
         /// the endpoints corresponding to the parcel-ports
         endpoints_type endpoints_;
+
+        /// the list of disconnected localities
+        std::set<std::uint32_t> disconnected_localities_;
 
         /// the thread-manager to use (optional)
         threads::threadmanager* tm_;

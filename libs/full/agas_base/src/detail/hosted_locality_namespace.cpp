@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Bryce Lelbach
-//  Copyright (c) 2012-2021 Hartmut Kaiser
+//  Copyright (c) 2012-2026 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -10,18 +10,18 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assert.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/serialization.hpp>
+#include <hpx/modules/type_support.hpp>
+
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/parcelset_base.hpp>
-#include <hpx/modules/serialization.hpp>
-#include <hpx/modules/type_support.hpp>
 
 #include <hpx/agas_base/detail/hosted_locality_namespace.hpp>
 #include <hpx/agas_base/server/locality_namespace.hpp>
 
 #include <cstdint>
-#include <map>
-#include <string>
 #include <vector>
 
 namespace hpx::agas::detail {
@@ -42,22 +42,25 @@ namespace hpx::agas::detail {
         return 0;
     }
 
-    void hosted_locality_namespace::free(naming::gid_type const& locality)
+    bool hosted_locality_namespace::free(
+        [[maybe_unused]] naming::gid_type const& locality)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-        server::locality_namespace::free_action action;
-        action(gid_, locality);
+        constexpr server::locality_namespace::free_action action;
+        return hpx::wait_or_handle_timeout(hpx::async(action, gid_, locality),
+            "hosted_locality_namespace::free");
 #else
-        HPX_UNUSED(locality);
         HPX_ASSERT(false);
+        return false;
 #endif
     }
 
     std::vector<std::uint32_t> hosted_locality_namespace::localities()
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-        server::locality_namespace::localities_action action;
-        return action(gid_);
+        constexpr server::locality_namespace::localities_action action;
+        return hpx::wait_or_handle_timeout(
+            hpx::async(action, gid_), "hosted_locality_namespace::localities");
 #else
         HPX_ASSERT(false);
         return std::vector<std::uint32_t>{};
@@ -65,10 +68,10 @@ namespace hpx::agas::detail {
     }
 
     parcelset::endpoints_type hosted_locality_namespace::resolve_locality(
-        naming::gid_type const& locality)
+        [[maybe_unused]] naming::gid_type const& locality)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-        server::locality_namespace::resolve_locality_action action;
+        constexpr server::locality_namespace::resolve_locality_action action;
         future<parcelset::endpoints_type> endpoints_future =
             hpx::async(action, gid_, locality);
 
@@ -81,9 +84,9 @@ namespace hpx::agas::detail {
                 /**/;
         }
 
-        return endpoints_future.get();
+        return hpx::wait_or_handle_timeout(HPX_MOVE(endpoints_future),
+            "hosted_locality_namespace::resolve_locality");
 #else
-        HPX_UNUSED(locality);
         HPX_ASSERT(false);
         return parcelset::endpoints_type{};
 #endif
@@ -92,8 +95,9 @@ namespace hpx::agas::detail {
     std::uint32_t hosted_locality_namespace::get_num_localities()
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-        server::locality_namespace::get_num_localities_action action;
-        return action(gid_);
+        constexpr server::locality_namespace::get_num_localities_action action;
+        return hpx::wait_or_handle_timeout(hpx::async(action, gid_),
+            "hosted_locality_namespace::get_num_localities");
 #else
         HPX_ASSERT(false);
         return std::uint32_t{};
@@ -104,7 +108,7 @@ namespace hpx::agas::detail {
     hosted_locality_namespace::get_num_localities_async()
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-        server::locality_namespace::get_num_localities_action action;
+        constexpr server::locality_namespace::get_num_localities_action action;
         return hpx::async(action, gid_);
 #else
         HPX_ASSERT(false);
@@ -115,8 +119,9 @@ namespace hpx::agas::detail {
     std::vector<std::uint32_t> hosted_locality_namespace::get_num_threads()
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-        server::locality_namespace::get_num_threads_action action;
-        return action(gid_);
+        constexpr server::locality_namespace::get_num_threads_action action;
+        return hpx::wait_or_handle_timeout(hpx::async(action, gid_),
+            "hosted_locality_namespace::get_num_threads");
 #else
         HPX_ASSERT(false);
         return std::vector<std::uint32_t>{};
@@ -127,7 +132,7 @@ namespace hpx::agas::detail {
     hosted_locality_namespace::get_num_threads_async()
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-        server::locality_namespace::get_num_threads_action action;
+        constexpr server::locality_namespace::get_num_threads_action action;
         return hpx::async(action, gid_);
 #else
         HPX_ASSERT(false);
@@ -138,8 +143,10 @@ namespace hpx::agas::detail {
     std::uint32_t hosted_locality_namespace::get_num_overall_threads()
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-        server::locality_namespace::get_num_overall_threads_action action;
-        return action(gid_);
+        constexpr server::locality_namespace::get_num_overall_threads_action
+            action;
+        return hpx::wait_or_handle_timeout(hpx::async(action, gid_),
+            "hosted_locality_namespace::get_num_overall_threads");
 #else
         HPX_ASSERT(false);
         return hpx::resource::get_num_threads();
@@ -150,7 +157,8 @@ namespace hpx::agas::detail {
     hosted_locality_namespace::get_num_overall_threads_async()
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-        server::locality_namespace::get_num_overall_threads_action action;
+        constexpr server::locality_namespace::get_num_overall_threads_action
+            action;
         return hpx::async(action, gid_);
 #else
         HPX_ASSERT(false);

@@ -10,6 +10,8 @@
 // error path (hpx::error::bad_parameter) instead of letting a
 // std::system_error raised by unique_lock::unlock escape (see #7384).
 
+#define HPX_HAVE_FORCE_NO_CXX_MODULES
+
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
@@ -46,7 +48,7 @@ std::vector<std::string> get_environment()
 {
     std::vector<std::string> env;
 #if defined(HPX_WINDOWS)
-    int len = get_arraylen(_environ);
+    int const len = get_arraylen(_environ);
     std::copy(&_environ[0], &_environ[len], std::back_inserter(env));
 #elif defined(linux) || defined(__linux) || defined(__linux__) ||              \
     defined(__AIX__) || defined(__APPLE__) || defined(__FreeBSD__)
@@ -160,8 +162,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
     hpx::id_type const here = hpx::find_here();
     hpx::id_type departed;
 
-    std::vector<hpx::id_type> localities = hpx::find_all_localities();
-    HPX_TEST_EQ(localities.size(), std::size_t(2));
+    std::vector<hpx::id_type> const localities = hpx::find_all_localities();
+    HPX_TEST_EQ(localities.size(), static_cast<std::size_t>(2));
     for (hpx::id_type const& id : localities)
     {
         if (id != here)
@@ -197,7 +199,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
             break;
         hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
-    HPX_TEST_EQ(hpx::find_all_localities().size(), std::size_t(1));
+    HPX_TEST_EQ(hpx::find_all_localities().size(), static_cast<std::size_t>(1));
 
     // Resolving the departed locality now has to fail through the intended
     // AGAS error path. Before the fix for #7384 a std::system_error raised by
@@ -241,7 +243,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
     // Dispatching an action to the departed locality fails with the intended
     // hpx::error::bad_parameter as well. Note that hpx::exception is derived
     // from std::system_error, catch it first.
-    bool caught_bad_parameter = false;
+    bool caught_hpx_exception = false;
+    hpx::error err = hpx::error::success;
     bool no_error = false;
     caught_system_error = false;
     try
@@ -253,7 +256,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
     }
     catch (hpx::exception const& e)
     {
-        caught_bad_parameter = e.get_error() == hpx::error::bad_parameter;
+        caught_hpx_exception = true;
+        err = e.get_error();
     }
     catch (std::system_error const&)
     {
@@ -262,7 +266,9 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     HPX_TEST(!no_error);
     HPX_TEST(!caught_system_error);
-    HPX_TEST(caught_bad_parameter);
+    HPX_TEST(caught_hpx_exception);
+    HPX_TEST(err == hpx::error::locality_was_disconnected ||
+        err == hpx::error::bad_parameter);
 
     return hpx::finalize();
 }
