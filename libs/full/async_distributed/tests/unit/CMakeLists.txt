@@ -70,8 +70,8 @@ if(HPX_WITH_COMPILE_ONLY_TESTS)
   # Verifies that the managed_component_dtor_policy specialization for
   # promise_lco correctly resolves to managed_object_is_lifetime_controlled.
   # Without the 'void' second template argument fix this static_assert fails
-  # (clang: "too few template arguments for class template
-  # 'managed_component_dtor_policy'").
+  # with clang reporting too few template arguments for class template
+  # managed_component_dtor_policy.
   set(compile_tests promise_lco_dtor_policy)
 
   foreach(compile_test ${compile_tests})
