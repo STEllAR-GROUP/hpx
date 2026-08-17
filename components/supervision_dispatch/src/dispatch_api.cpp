@@ -14,6 +14,7 @@
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/runtime_distributed.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/synchronization.hpp>
 
 #include <hpx/supervision_dispatch/discovery.hpp>
@@ -1004,7 +1005,7 @@ namespace hpx::supervision {
             return hpx::make_exceptional_future<lifecycle_state>(
                 HPX_GET_EXCEPTION(hpx::error::bad_parameter,
                     "hpx::supervision::query_state",
-                    "the given registry is not valid"));
+                    "the given peer does not hold a valid locality"));
         }
 
         // peer.locality is passed as both the locality to contact and the

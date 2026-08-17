@@ -150,7 +150,8 @@ namespace hpx::supervision::server {
                     // observers_, so it cannot re-trigger this callback.
                     if (ec ||
                         local_state.last_event ==
-                            hpx::supervision::event::unknown)
+                            hpx::supervision::event::unknown ||
+                        local_state.epoch < notification.epoch)
                     {
                         hpx::error_code ec1(hpx::throwmode::lightweight);
                         hpx::supervision::publish_event_no_notify(peer_locality,
@@ -292,6 +293,14 @@ namespace hpx::supervision::server {
 
     joined_peer registry::join(hpx::id_type const& peer_locality)
     {
+        if (!hpx::naming::is_locality(peer_locality))
+        {
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                "hpx::supervision::server::registry::join",
+                "The id passed as peer_locality is not representing a "
+                "locality");
+        }
+
         // Reserve ownership of peer_locality before performing any of
         // the remote registration calls.
         auto [original_peer_locality, join_epoch, reserved] =
@@ -314,6 +323,7 @@ namespace hpx::supervision::server {
         hpx::id_type lifecycle_observer;
         hpx::id_type activity_observer;
         std::uint64_t reported_join_epoch;
+        bool need_publish_started = true;
         try
         {
             // join() itself must not rely solely on a future notification to
@@ -336,8 +346,6 @@ namespace hpx::supervision::server {
                     hpx::supervision::query_state(peer_locality, ec);
 
                 seed_epoch = !ec ? local_state.epoch : 0;
-
-                bool need_publish_started = true;
                 if (!ec)
                 {
                     if (hpx::supervision::is_terminal(local_state.last_event))
@@ -406,32 +414,33 @@ namespace hpx::supervision::server {
                 peers_.at(peer_locality).join_epoch = reported_join_epoch;
             }
 
-            if (!hpx::naming::is_locality(peer_locality))
-            {
-                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
-                    "hpx::supervision::server::registry::join",
-                    "The id passed as peer_locality is not representing a "
-                    "locality");
-            }
-
             // Register for lifecycle-event notifications published for the
-            // peer's locality.
+            // peer's locality. The baseline must match the epoch recorded in
+            // `peers_` above, otherwise evict_peer()'s epoch guard and the
+            // callback's epoch-forward correction can never match.
             std::tie(lifecycle_observer, activity_observer) =
-                register_observers(peer_locality, seed_epoch);
+                register_observers(peer_locality, reported_join_epoch);
         }
         catch (...)
         {
-            // Unconditionally release the reservation made by
-            // reserve_ownership() above so a concurrent join() for the same
-            // peer, waiting in cond_.wait(l), is not left hanging forever.
+            // Clean up any target state seeded by this failed join *before*
+            // releasing the reservation, so a concurrent join() for the same
+            // peer cannot have its freshly published state removed by this
+            // failed attempt.
+            if (need_publish_started)
+            {
+                hpx::error_code ec(hpx::throwmode::lightweight);
+                hpx::supervision::remove_target(peer_locality, ec);
+            }
+
+            // Only now release the reservation made by reserve_ownership()
+            // above, so a concurrent join() for the same peer, waiting in
+            // cond_.wait(l), is not left hanging forever.
             {
                 std::unique_lock l(mtx_);
                 peers_.erase(peer_locality);
                 cond_.notify_all(HPX_MOVE(l));
             }
-
-            hpx::error_code ec(hpx::throwmode::lightweight);
-            hpx::supervision::remove_target(peer_locality, ec);
 
             std::rethrow_exception(std::current_exception());
         }

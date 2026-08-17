@@ -1,4 +1,5 @@
 //  Copyright (c) 2016 Thomas Heller
+//  Copyright (c) 2026 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -21,7 +22,8 @@
 
 namespace hpx::agas::detail {
 
-    hosted_component_namespace::hosted_component_namespace(naming::address addr)
+    hosted_component_namespace::hosted_component_namespace(
+        naming::address const& addr)
       : gid_(naming::gid_type(agas::component_ns_msb, agas::component_ns_lsb),
             hpx::id_type::management_type::unmanaged)
       , addr_(addr)
