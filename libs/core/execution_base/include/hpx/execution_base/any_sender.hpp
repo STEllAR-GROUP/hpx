@@ -774,8 +774,9 @@ namespace hpx::execution::experimental {
 
         template <typename Self, typename... Env>
         static consteval auto get_completion_signatures() noexcept
-            -> hpx::execution::experimental::completion_signatures<
-                set_value_t(Ts...), set_error_t(std::exception_ptr)>
+            -> hpx::execution::experimental::completion_signatures<set_value_t(
+                                                                       Ts...),
+                set_error_t(std::exception_ptr), set_stopped_t()>
         {
             return {};
         }
@@ -852,8 +853,9 @@ namespace hpx::execution::experimental {
 
         template <typename Self, typename... Env>
         static consteval auto get_completion_signatures() noexcept
-            -> hpx::execution::experimental::completion_signatures<
-                set_value_t(Ts...), set_error_t(std::exception_ptr)>
+            -> hpx::execution::experimental::completion_signatures<set_value_t(
+                                                                       Ts...),
+                set_error_t(std::exception_ptr), set_stopped_t()>
         {
             return {};
         }
