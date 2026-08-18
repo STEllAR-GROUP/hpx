@@ -105,9 +105,22 @@ namespace hpx::agas {
         std::atomic<hpx::state> state_;
         naming::gid_type locality_;
 
+        enum class resolved_locality_state : std::uint8_t
+        {
+            connected,
+            connecting,
+            disconnecting
+        };
+
+        struct resolved_locality
+        {
+            parcelset::endpoints_type endpoints;
+            resolved_locality_state state;
+        };
+
         mutable hpx::shared_mutex resolved_localities_mtx_;
-        using resolved_localities_type = std::map<naming::gid_type,
-            std::pair<parcelset::endpoints_type, bool>>;
+        using resolved_localities_type =
+            std::map<naming::gid_type, resolved_locality>;
         resolved_localities_type resolved_localities_;
 
         explicit addressing_service(util::runtime_configuration const& ini_);
@@ -172,8 +185,18 @@ namespace hpx::agas {
         ///                 return the connecting status of the calling
         ///                 locality.
         ///
-        /// \returns `true` if the locality is marked as connecting.
+        /// \returns `true` if the locality joined while connecting and has not
+        ///          been removed.
         bool is_connecting(hpx::naming::gid_type const& locality) const;
+
+        /// \brief Atomically claim a connecting locality for disconnection.
+        ///
+        /// \param locality The locality GID to claim.
+        ///
+        /// \returns `true` if this call changed the locality state from
+        ///          connecting to disconnecting, and `false` otherwise.
+        bool mark_connecting_locality_as_disconnecting(
+            hpx::naming::gid_type const& locality);
 
         bool resolve_locally_known_addresses(
             naming::gid_type const& id, naming::address& addr) const;

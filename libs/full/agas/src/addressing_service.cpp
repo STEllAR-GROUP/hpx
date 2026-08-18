@@ -217,8 +217,11 @@ namespace hpx::agas {
 
             {
                 std::unique_lock<hpx::shared_mutex> l(resolved_localities_mtx_);
+                resolved_locality_state const state = is_connecting ?
+                    resolved_locality_state::connecting :
+                    resolved_locality_state::connected;
                 auto const [it, inserted] = resolved_localities_.emplace(
-                    prefix, std::make_pair(endpoints, is_connecting));
+                    prefix, resolved_locality{endpoints, state});
 
                 if (!inserted)
                 {
@@ -252,7 +255,9 @@ namespace hpx::agas {
             if (auto const it = resolved_localities_.find(locality);
                 it != resolved_localities_.end())
             {
-                return it->second.second;
+                resolved_locality_state const state = it->second.state;
+                return state == resolved_locality_state::connecting ||
+                    state == resolved_locality_state::disconnecting;
             }
         }
 
@@ -266,13 +271,33 @@ namespace hpx::agas {
 #endif
     }
 
+    bool addressing_service::mark_connecting_locality_as_disconnecting(
+        hpx::naming::gid_type const& locality)
+    {
+        if (!locality)
+        {
+            return false;
+        }
+
+        std::lock_guard<hpx::shared_mutex> l(resolved_localities_mtx_);
+        auto const it = resolved_localities_.find(locality);
+        if (it == resolved_localities_.end() ||
+            it->second.state != resolved_locality_state::connecting)
+        {
+            return false;
+        }
+
+        it->second.state = resolved_locality_state::disconnecting;
+        return true;
+    }
+
     void addressing_service::register_console(
         parcelset::endpoints_type const& eps)
     {
         std::lock_guard<hpx::shared_mutex> l(resolved_localities_mtx_);
         [[maybe_unused]] auto const [it, inserted] =
             resolved_localities_.emplace(naming::get_gid_from_locality_id(0),
-                std::make_pair(eps, false));
+                resolved_locality{eps, resolved_locality_state::connected});
         HPX_ASSERT(inserted);
     }
 
@@ -292,7 +317,8 @@ namespace hpx::agas {
         {
             resolved_localities_.emplace(
                 naming::get_gid_from_locality_id(locality_id),
-                std::make_pair(endpoint, false));
+                resolved_locality{
+                    endpoint, resolved_locality_state::connected});
             ++locality_id;
         }
     }
@@ -304,9 +330,10 @@ namespace hpx::agas {
         {
             std::shared_lock<hpx::shared_mutex> l(resolved_localities_mtx_);
             it = resolved_localities_.find(gid);
-            if (it != resolved_localities_.end() && !it->second.first.empty())
+            if (it != resolved_localities_.end() &&
+                !it->second.endpoints.empty())
             {
-                return it->second.first;
+                return it->second.endpoints;
             }
         }
 
@@ -331,10 +358,11 @@ namespace hpx::agas {
         it = resolved_localities_.find(gid);
         if (it == resolved_localities_.end())
         {
-            if (HPX_UNLIKELY(
-                    !util::insert_checked(resolved_localities_.emplace(gid,
-                                              std::make_pair(endpoints, false)),
-                        it)))
+            if (HPX_UNLIKELY(!util::insert_checked(
+                    resolved_localities_.emplace(gid,
+                        resolved_locality{
+                            endpoints, resolved_locality_state::connected}),
+                    it)))
             {
                 l.unlock();
 
@@ -347,12 +375,11 @@ namespace hpx::agas {
                 return empty_endpoints;
             }
         }
-        else if (it->second.first.empty() && !endpoints.empty())
+        else if (it->second.endpoints.empty() && !endpoints.empty())
         {
-            resolved_localities_[gid] =
-                std::make_pair(HPX_MOVE(endpoints), false);
+            it->second.endpoints = HPX_MOVE(endpoints);
         }
-        return it->second.first;
+        return it->second.endpoints;
     }
 
     bool addressing_service::unregister_locality(

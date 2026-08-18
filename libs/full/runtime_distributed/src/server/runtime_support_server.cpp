@@ -886,6 +886,18 @@ namespace hpx::components::server {
     bool runtime_support::remove_locality(
         hpx::id_type const& locality, error_code& ec)
     {
+        agas::addressing_service& agas_client = naming::get_agas_client();
+        if (!agas_client.mark_connecting_locality_as_disconnecting(
+                locality.get_gid()))
+        {
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "hpx::force_disconnect",
+                "hpx::force_disconnect can be called to disconnect only a "
+                "locality that was connecting late and is not already being "
+                "disconnected.");
+            return false;
+        }
+
 #if !defined(HPX_COMPUTE_DEVICE_CODE) && defined(HPX_HAVE_NETWORKING)
         // try to inform the locality that it has been disconnected (ignore any
         // errors)
@@ -910,7 +922,6 @@ namespace hpx::components::server {
 
         remove_locality_from_connection_cache(locality.get_gid(), true);
 
-        agas::addressing_service& agas_client = naming::get_agas_client();
         bool const result =
             agas_client.unregister_locality(locality.get_gid(), ec);
 
