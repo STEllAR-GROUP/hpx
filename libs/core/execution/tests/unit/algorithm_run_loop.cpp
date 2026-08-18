@@ -674,17 +674,20 @@ void test_future_sender()
         ex::run_loop loop;
         auto sched = loop.get_scheduler();
         auto s = ex::just(3) | ex::continues_on(sched);
-        
+
         bool caught = false;
-        try {
+        try
+        {
             [[maybe_unused]] auto f = ex::make_future(std::move(s));
             HPX_TEST(false);
         }
-        catch (hpx::exception const& e) {
+        catch (hpx::exception const& e)
+        {
             HPX_TEST_EQ(e.get_error(), hpx::error::invalid_status);
             caught = true;
         }
-        catch (...) {
+        catch (...)
+        {
             HPX_TEST(false);
         }
         HPX_TEST(caught);
