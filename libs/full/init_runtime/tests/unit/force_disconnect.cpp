@@ -11,9 +11,9 @@
 // caches while leaving the remaining localities unaffected. Calling
 // force_disconnect a second time on an already-disconnected locality does not
 // hang. Once a locality has been removed, its gid no longer reports
-// is_connecting() == true, so the eligibility check in force_disconnect fails
-// fast with hpx::error::bad_parameter rather than attempting a second removal
-// or blocking.
+// is_connecting() == true, so the atomic claim in force_disconnect fails fast
+// with hpx::error::bad_parameter rather than attempting a second removal or
+// blocking.
 //
 // Beyond that baseline, this test also covers: disconnecting a locality while
 // an action is still in flight to it; repeated connect/disconnect cycles across
@@ -40,6 +40,7 @@
 #include <hpx/modules/prefix.hpp>
 #include <hpx/modules/runtime_distributed.hpp>
 #include <hpx/modules/runtime_local.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <chrono>
@@ -283,7 +284,7 @@ std::pair<hpx::id_type, hpx::id_type> test_force_disconnect_removes_locality()
 
 // Calling force_disconnect a second time on an already-disconnected
 // locality does not hang. Once a locality has been removed, its gid no
-// longer reports is_connecting() == true, so the eligibility check in
+// longer reports is_connecting() == true, so the atomic claim in
 // force_disconnect fails fast with hpx::error::bad_parameter rather than
 // attempting a second removal or blocking.
 void test_double_disconnect_should_fail(hpx::id_type const& target)
@@ -418,8 +419,8 @@ void test_repeated_connect_disconnect_cycles(fs::path const& exe,
 }
 
 // Two concurrent hpx::force_disconnect calls targeting the same locality
-// must not corrupt state or hang: at most one may succeed, and the losing
-// call must fail cleanly instead of duplicating the removal.
+// must not corrupt state or hang: exactly one succeeds, and the losing call is
+// rejected with hpx::error::bad_parameter before it duplicates the removal.
 void test_concurrent_double_disconnect_race(hpx::id_type const& target)
 {
     if (!target)
@@ -429,11 +430,18 @@ void test_concurrent_double_disconnect_race(hpx::id_type const& target)
 
     hpx::error_code ec1(hpx::throwmode::lightweight);
     hpx::error_code ec2(hpx::throwmode::lightweight);
+    hpx::latch start(3);
 
-    hpx::future<int> f1 = hpx::async(
-        [&target, &ec1]() { return hpx::force_disconnect(target, ec1); });
-    hpx::future<int> f2 = hpx::async(
-        [&target, &ec2]() { return hpx::force_disconnect(target, ec2); });
+    hpx::future<int> f1 = hpx::async([&target, &ec1, &start]() {
+        start.arrive_and_wait();
+        return hpx::force_disconnect(target, ec1);
+    });
+    hpx::future<int> f2 = hpx::async([&target, &ec2, &start]() {
+        start.arrive_and_wait();
+        return hpx::force_disconnect(target, ec2);
+    });
+
+    start.arrive_and_wait();
 
     int const r1 = f1.get();
     int const r2 = f2.get();
@@ -441,6 +449,17 @@ void test_concurrent_double_disconnect_race(hpx::id_type const& target)
     bool const succeeded1 = (r1 == 0) && !ec1;
     bool const succeeded2 = (r2 == 0) && !ec2;
     HPX_TEST(succeeded1 != succeeded2);
+
+    if (succeeded1)
+    {
+        HPX_TEST_EQ(r2, -1);
+        HPX_TEST_EQ(ec2.value(), static_cast<int>(hpx::error::bad_parameter));
+    }
+    else if (succeeded2)
+    {
+        HPX_TEST_EQ(r1, -1);
+        HPX_TEST_EQ(ec1.value(), static_cast<int>(hpx::error::bad_parameter));
+    }
 }
 
 // Force-disconnecting a locality whose process has already been killed (rather
