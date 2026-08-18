@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 
 #include <exception>
+#include <tuple>
 #include <type_traits>
 #include <utility>
 
@@ -53,6 +54,9 @@ namespace hpx::detail {
     /// \param c The callable to invoke with the captured exception if \a t
     ///          throws a matching exception. Its return value is returned from
     ///          \a try_catch_exception_ptr in that case.
+    /// \param args Additional arguments that are stored in the local frame of
+    ///        the try_catch_exception_ptr function and passed to both of the
+    ///        callbacks as additional arguments.
     ///
     /// \return The result of invoking \a t() if no matching exception is
     ///         thrown; otherwise, the result of invoking \a c() with the
@@ -79,35 +83,71 @@ namespace hpx::detail {
     ///       by using the default \a ExceptionType = void overload) instead of
     ///       relying on the typed value alone.
     HPX_CXX_CORE_EXPORT template <typename ExceptionType = void,
-        typename TryCallable, typename CatchCallable>
+        typename TryCallable, typename CatchCallable, typename... Args>
     HPX_FORCEINLINE decltype(auto) try_catch_exception_ptr(
-        TryCallable&& t, CatchCallable&& c)
+        TryCallable&& t, CatchCallable&& c, Args&&... args)
     {
+        [[maybe_unused]] auto local_args =
+            std::make_tuple(HPX_FORWARD(Args, args)...);
         if constexpr (std::is_void_v<ExceptionType>)
         {
             std::exception_ptr ep;
             try
             {
-                return t();
+                if constexpr (sizeof...(Args) == 0)
+                {
+                    return t();
+                }
+                else
+                {
+                    return std::apply(t, local_args);
+                }
             }
             catch (...)
             {
                 ep = std::current_exception();
             }
-            return c(HPX_MOVE(ep));
+
+            if constexpr (sizeof...(Args) == 0)
+            {
+                return c(HPX_MOVE(ep));
+            }
+            else
+            {
+                return std::apply(c,
+                    std::tuple_cat(std::forward_as_tuple(HPX_MOVE(ep)),
+                        HPX_MOVE(local_args)));
+            }
         }
         else
         {
             ExceptionType e;
             try
             {
-                return t();
+                if constexpr (sizeof...(Args) == 0)
+                {
+                    return t();
+                }
+                else
+                {
+                    return std::apply(t, local_args);
+                }
             }
             catch (ExceptionType const& caught)
             {
                 e = caught;
             }
-            return c(HPX_MOVE(e));
+
+            if constexpr (sizeof...(Args) == 0)
+            {
+                return c(HPX_MOVE(e));
+            }
+            else
+            {
+                return std::apply(c,
+                    std::tuple_cat(std::forward_as_tuple(HPX_MOVE(e)),
+                        HPX_MOVE(local_args)));
+            }
         }
     }
 }    // namespace hpx::detail

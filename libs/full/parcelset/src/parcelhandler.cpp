@@ -120,12 +120,8 @@ namespace hpx::parcelset {
                 return true;
             }
 #endif
-            // all unhandled exceptions are rethrown here
-            std::exception_ptr const exception = hpx::detail::get_exception(
-                hpx::exception(ec), "default_parcel_write_handler", __FILE__,
-                __LINE__, parcelset::dump_parcel(p));
 
-            std::rethrow_exception(exception);
+            return false;
         }
     }    // namespace
 
@@ -146,7 +142,14 @@ namespace hpx::parcelset {
 
     void default_write_handler(std::error_code const& ec, parcel const& p)
     {
-        default_parcel_write_handler(ec, p);
+        if (ec && !default_parcel_write_handler(ec, p))
+        {
+            std::exception_ptr const exception = hpx::detail::get_exception(
+                hpx::exception(ec), "default_write_handler", __FILE__, __LINE__,
+                parcelset::dump_parcel(p));
+
+            std::rethrow_exception(exception);
+        }
     }
 
     parcelhandler::parcelhandler(util::runtime_configuration const& cfg)
@@ -407,6 +410,23 @@ namespace hpx::parcelset {
         }
     }
 
+    void parcelhandler::remove_handler(locality const& dest)
+    {
+        std::scoped_lock<mutex_type> l(handlers_mtx_);
+        auto const end = handlers_.end();
+        for (auto it = handlers_.begin(); it != end; /**/)
+        {
+            if (it->first.first == dest)
+            {
+                it = handlers_.erase(it);
+            }
+            else
+            {
+                ++it;
+            }
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Make sure the specified locality is not held by any connection
     ///        caches anymore
@@ -430,6 +450,22 @@ namespace hpx::parcelset {
             }
         }
 
+        // remove message handlers for the removed locality
+        for (auto& [idx, pp] : pports_)
+        {
+            if (idx <= 0)
+            {
+                continue;
+            }
+
+            locality const& dest = find_endpoint(endpoints, pp->type());
+            if (!dest)
+            {
+                continue;
+            }
+
+            remove_handler(dest);
+        }
         agas::remove_resolved_locality(gid);
     }
 
@@ -650,11 +686,11 @@ namespace hpx::parcelset {
         }
 
         auto handler = [this](std::error_code const& ec,
-                           parcelset::parcel const& p) -> void {
-            [[maybe_unused]] bool const r = invoke_write_handler(ec, p);
+                           parcelset::parcel const& pc) -> void {
+            [[maybe_unused]] bool const r = invoke_write_handler(ec, pc);
 
             LPT_(debug).format(
-                "parcelhandler::put_parcel: handled: {}", p.parcel_id());
+                "parcelhandler::put_parcel: handled: {}", pc.parcel_id());
         };
 
         if (hpx::tolerate_node_faults())
@@ -688,20 +724,20 @@ namespace hpx::parcelset {
         }
 
         auto handler = [this, f = HPX_MOVE(f)](std::error_code const& ec,
-                           parcelset::parcel const& p) -> void {
-            if (invoke_write_handler(ec, p))
+                           parcelset::parcel const& pc) -> void {
+            if (invoke_write_handler(ec, pc))
             {
                 // the error was handled, pass on a success code
                 std::error_code const ec1(0, std::generic_category());
-                f(ec1, p);
+                f(ec1, pc);
             }
             else
             {
-                f(ec, p);
+                f(ec, pc);
             }
 
             LPT_(debug).format(
-                "parcelhandler::put_parcel: handled: {}", p.parcel_id());
+                "parcelhandler::put_parcel: handled: {}", pc.parcel_id());
         };
 
         if (hpx::tolerate_node_faults())
@@ -1059,7 +1095,7 @@ namespace hpx::parcelset {
     bool parcelhandler::invoke_write_handler(
         std::error_code const& ec, parcel const& p) const
     {
-        if (parcel_write_handler_type const f = write_handler_; f)
+        if (parcel_write_handler_type f = write_handler_; f)
         {
             return f(ec, p);
         }

@@ -83,6 +83,7 @@ namespace hpx::distributed {
         ///          constructed object.
         /// \post    other has no shared state.
         promise(promise&& other) noexcept = default;
+        promise(promise const& other) = default;
 
         /// \brief Abandons any shared state
         ~promise() = default;
@@ -91,6 +92,7 @@ namespace hpx::distributed {
         ///          promise(HPX_MOVE(other)).swap(*this).
         /// \returns *this.
         promise& operator=(promise&& other) noexcept = default;
+        promise& operator=(promise const& other) = default;
 
         /// \brief   Exchanges the shared state of *this and other.
         /// \post    *this has the shared state (if any) that other had
@@ -170,6 +172,7 @@ namespace hpx::distributed {
         ///          constructed object.
         /// \post    other has no shared state.
         promise(promise&& other) noexcept = default;
+        promise(promise const& other) = default;
 
         /// \brief   Abandons any shared state
         ~promise() = default;
@@ -178,6 +181,7 @@ namespace hpx::distributed {
         ///          promise(HPX_MOVE(other)).swap(*this).
         /// \returns *this.
         promise& operator=(promise&& other) noexcept = default;
+        promise& operator=(promise const& other) = default;
 
         /// \brief         Exchanges the shared state of *this and other.
         /// \post          *this has the shared state (if any) that other had

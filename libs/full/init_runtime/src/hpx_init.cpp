@@ -1175,6 +1175,15 @@ namespace hpx {
             return -1;
         }
 
+        if (parcelset::locality_was_disconnected(
+                naming::get_locality_id_from_id(locality)))
+        {
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "hpx::force_disconnect",
+                "the requested locality was already disconnected.");
+            return -1;
+        }
+
         if (!agas::is_connecting(locality.get_gid()))
         {
             HPX_THROWS_IF(ec, hpx::error::bad_parameter,

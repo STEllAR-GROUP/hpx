@@ -99,8 +99,20 @@ namespace {
         std::vector<hpx::supervision::discovered_peer> const peers =
             hpx::supervision::discover_and_join(
                 handle, worker_discovery_timeout);
+
+        if (peers.empty())
+        {
+            std::cerr << "late_component_failing_worker: failed to "
+                         "discover/join root locality\n";
+
+            hpx::supervision::publish_event(hpx::launch::sync, handle,
+                hpx::supervision::event::failed, epoch);
+            hpx::supervision::finalize();
+            return hpx::disconnect();
+        }
+
         hpx::util::format_to(
-            std::cout, "worker joined {} peer(s)\n", peers.size());
+            std::cerr, "worker joined {} peer(s)\n", peers.size());
 
         // Do a bit of local work, demonstrating this worker was actually
         // active before departing.
@@ -110,19 +122,19 @@ namespace {
         worker.set_message(
             "step 1: joined peers, epoch " + std::to_string(epoch));
         hpx::util::format_to(
-            std::cout, "worker reported: {}\n", worker.get_message());
+            std::cerr, "worker reported: {}\n", worker.get_message());
 
         worker.set_message("step 2: mid-work, about to depart");
         hpx::util::format_to(
-            std::cout, "worker reported: {}\n", worker.get_message());
+            std::cerr, "worker reported: {}\n", worker.get_message());
 
         // Depart mid-epoch: no finalize() (so no event::completed is ever
         // published and neither symbol name is ever unregistered - the
-        // sentinel's last published event stays stale), and no std::abort() (so
+        // sentinel's last published event stays stale), and no std::exit() (so
         // AGAS/the parcelport connection are torn down consistently rather than
         // corrupted). First join the background loops so hpx::disconnect()
         // below does not hang waiting on them or race their teardown of
-        // sentinel/registry state.
+        // registry state.
         hpx::supervision::testing::stop_background_loops();
 
         return hpx::disconnect();

@@ -117,6 +117,11 @@ int run_worker(std::chrono::milliseconds idle_timeout,
         return -1;
     }
 
+    // This needs to be seen by the compiler to instantiate the necessary remote
+    // component creation infrastructure.
+    auto const worker =
+        hpx::new_<late_component::test_client>(hpx::find_here());
+
     // "Last observed activity" -- see the file comment above for why this
     // can only ever mean "time since this loop started/last polled" here,
     // rather than time since any real work signal.

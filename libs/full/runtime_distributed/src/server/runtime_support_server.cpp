@@ -220,7 +220,7 @@ namespace hpx::components::server {
         }
     }
 
-    void runtime_support::send_dijkstra_termination_token(
+    bool runtime_support::send_dijkstra_termination_token(
         [[maybe_unused]] std::uint32_t const target_locality_id,
         [[maybe_unused]] std::uint32_t initiating_locality_id,
         [[maybe_unused]] std::uint32_t num_localities,
@@ -255,18 +255,49 @@ namespace hpx::components::server {
         }
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-        hpx::latch l(2);
-        hpx::id_type const id(
-            naming::get_id_from_locality_id(target_locality_id));
-        hpx::post_cb<dijkstra_termination_action>(
-            id,
-            [&l](std::error_code const&, parcelset::parcel const&) {
-                l.count_down(1);
+        // Only the post_cb completion callback ever counts down the latch;
+        // this function merely waits for it. latch and ec are stack
+        // variables that stay alive until wait() returns, which only
+        // happens after the callback has run.
+        auto l = std::make_shared<hpx::latch>(1);
+        std::error_code ec;
+
+        return hpx::detail::try_catch_exception_ptr(
+            [&]() {
+                hpx::id_type const id(
+                    naming::get_id_from_locality_id(target_locality_id));
+
+                hpx::post_cb<dijkstra_termination_action>(
+                    id,
+                    [&, l](std::error_code const& e, parcelset::parcel const&) {
+                        ec = e;
+                        l->count_down(1);
+                    },
+                    initiating_locality_id, num_localities, dijkstra_token);
+
+                // post_cb returned without throwing, i.e. the completion
+                // callback above has been registered and is guaranteed to run
+                // (and count down the latch) eventually.
+                l->wait();
+                return !ec;
             },
-            initiating_locality_id, num_localities, dijkstra_token);
-        l.arrive_and_wait();
+            [&](std::exception_ptr const& e) {
+                // post_cb threw synchronously, i.e. the completion callback
+                // above was never registered and will never run. Force the
+                // latch's counter to zero ourselves so its destructor's
+                // invariant holds, then rethrow.
+                l->count_down(1);
+
+                if (auto const err = hpx::get_error(e);
+                    err != hpx::error::locality_was_disconnected)
+                {
+                    std::rethrow_exception(e);
+                }
+                return false;
+            });
 #else
         HPX_ASSERT(false);
+        return false;
 #endif
     }
 
@@ -305,8 +336,24 @@ namespace hpx::components::server {
         if (0 == locality_id)
             locality_id = num_localities;
 
-        send_dijkstra_termination_token(locality_id - 1, initiating_locality_id,
-            num_localities, dijkstra_token);
+        // accommodate for disconnected localities
+        bool token_sent = false;
+        while (locality_id > 0 && locality_id != initiating_locality_id)
+        {
+            if (send_dijkstra_termination_token(locality_id - 1,
+                    initiating_locality_id, num_localities, dijkstra_color_))
+            {
+                token_sent = true;
+                break;
+            }
+            --locality_id;
+        }
+
+        if (!token_sent && initiating_locality_id != agas::get_locality_id())
+        {
+            send_dijkstra_termination_token(initiating_locality_id,
+                initiating_locality_id, num_localities, dijkstra_color_);
+        }
     }
 #endif
 
@@ -357,16 +404,49 @@ namespace hpx::components::server {
                 dijkstra_cond_ = std::make_unique<hpx::latch>(2);
 
                 {
-                    send_dijkstra_termination_token(target_id - 1,
-                        initiating_locality_id, num_localities,
-                        dijkstra_color_);
+                    // accommodate for disconnected localities
+                    bool token_sent = false;
+                    while (target_id > 0 && target_id != initiating_locality_id)
+                    {
+                        if (send_dijkstra_termination_token(target_id - 1,
+                                initiating_locality_id, num_localities,
+                                dijkstra_color_))
+                        {
+                            token_sent = true;
+                            break;
+                        }
+                        --target_id;
+                    }
 
-                    LRT_(info).format(
-                        "runtime_support::dijkstra_termination_detection: "
-                        "wait for token to come back to us.");
+                    if (!token_sent)
+                    {
+                        token_sent = send_dijkstra_termination_token(
+                            initiating_locality_id, initiating_locality_id,
+                            num_localities, dijkstra_color_);
+                    }
 
-                    // wait for token to come back to us
-                    dijkstra_cond_->arrive_and_wait(1);
+                    if (token_sent)
+                    {
+                        LRT_(info).format(
+                            "runtime_support::dijkstra_termination_detection: "
+                            "wait for token to come back to us.");
+
+                        // wait for token to come back to us
+                        dijkstra_cond_->arrive_and_wait(1);
+                    }
+                    else
+                    {
+                        // No response will ever arrive to count down the latch;
+                        // force it to zero and mark this probe unsuccessful so
+                        // another round runs.
+                        dijkstra_color_ = true;
+
+                        std::unique_lock<dijkstra_mtx_type> const l(
+                            dijkstra_mtx_);
+                        [[maybe_unused]] hpx::util::ignore_while_checking<
+                            std::unique_lock<dijkstra_mtx_type>> il(&l);
+                        dijkstra_cond_->count_down(2);
+                    }
                 }
 
                 // Rule 3: After the completion of an unsuccessful probe, machine
@@ -419,7 +499,8 @@ namespace hpx::components::server {
         applier::applier& appl = hpx::applier::get_applier();
         agas::addressing_service& agas_client = naming::get_agas_client();
 
-        agas_client.start_shutdown();
+        hpx::error_code ec(hpx::throwmode::lightweight);
+        agas_client.start_shutdown(ec);
 
         stop_evaluating_counters(true);
 
@@ -1006,7 +1087,7 @@ namespace hpx::components::server {
 #endif
     }
 
-    ///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_NETWORKING)
     void runtime_support::register_message_handler(
         char const* message_handler_type, char const* action, error_code& ec)

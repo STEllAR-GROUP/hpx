@@ -263,6 +263,8 @@ namespace hpx::parcelset {
             char const* message_handler_type, std::size_t num_messages,
             std::size_t interval, locality const& loc, error_code& ec = throws);
 
+        void remove_handler(locality const& dest);
+
         ///////////////////////////////////////////////////////////////////////
         // Performance counter data
 

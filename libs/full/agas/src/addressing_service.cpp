@@ -246,9 +246,23 @@ namespace hpx::agas {
             return is_connecting();
         }
 
-        std::lock_guard<hpx::shared_mutex> l(resolved_localities_mtx_);
-        auto const it = resolved_localities_.find(locality);
-        return it != resolved_localities_.end() && it->second.second;
+        {
+            std::shared_lock<hpx::shared_mutex> l(resolved_localities_mtx_);
+            if (auto const it = resolved_localities_.find(locality);
+                it != resolved_localities_.end())
+            {
+                return it->second.second;
+            }
+        }
+
+#if defined(HPX_HAVE_NETWORKING)
+        // if we don't know anything about this locality it may have been
+        // disconnected
+        return parcelset::locality_was_disconnected(
+            naming::get_locality_id_from_gid(locality));
+#else
+        return false;
+#endif
     }
 
     void addressing_service::register_console(
@@ -788,8 +802,8 @@ namespace hpx::agas {
     bool addressing_service::is_local_address_cached(
         naming::gid_type const& gid, naming::address& addr,
         [[maybe_unused]] std::pair<bool, components::pinned_ptr>& r,
-        hpx::move_only_function<std::pair<bool, components::pinned_ptr>(
-            naming::address const&)>&& f,
+        [[maybe_unused]] hpx::move_only_function<std::pair<bool,
+            components::pinned_ptr>(naming::address const&)>&& f,
         error_code& ec)
     {
         if (!naming::detail::is_migratable(gid))
@@ -2214,16 +2228,27 @@ namespace hpx::agas {
             auto const end = requests.end();
             for (auto it = requests.begin(); it != end; ++it)
             {
-                server::primary_namespace::decrement_credit_action action;
-                hpx::post(action, it->first, HPX_MOVE(it->second));
-            }
+                // ignore errors caused by disconnected localities
+                hpx::detail::try_catch_exception_ptr<hpx::exception>(
+                    [&] {
+                        server::primary_namespace::decrement_credit_action
+                            action;
+                        hpx::post(action, it->first, HPX_MOVE(it->second));
+                    },
+                    [&](hpx::exception const& e) {
+                        if (auto const err = hpx::get_error(e);
+                            err != hpx::error::locality_was_disconnected)
+                        {
+                            throw e;
+                        }
+                    });
 
-            if (&ec != &throws)
-                ec = make_success_code();
+                if (&ec != &throws)
+                    ec = make_success_code();
+            }
         }
         catch (hpx::exception const& e)
         {
-            l.unlock();
             HPX_RETHROWS_IF(
                 ec, e, "addressing_service::send_refcnt_requests_non_blocking");
         }
@@ -2285,9 +2310,25 @@ namespace hpx::agas {
         auto const end = requests.end();
         for (auto it = requests.begin(); it != end; ++it)
         {
-            server::primary_namespace::decrement_credit_action action;
-            lazy_results.push_back(
-                hpx::async(action, it->first, HPX_MOVE(it->second)));
+            // ignore errors caused by disconnected localities
+            hpx::future<std::vector<std::int64_t>> f;
+            hpx::detail::try_catch_exception_ptr<hpx::exception>(
+                [&] {
+                    server::primary_namespace::decrement_credit_action action;
+                    f = hpx::async(action, it->first, HPX_MOVE(it->second));
+                },
+                [&](hpx::exception const& e) {
+                    if (auto const err = hpx::get_error(e);
+                        err != hpx::error::locality_was_disconnected)
+                    {
+                        throw e;
+                    }
+                });
+
+            if (f.valid())
+            {
+                lazy_results.push_back(HPX_MOVE(f));
+            }
         }
 
         return lazy_results;
@@ -2307,8 +2348,26 @@ namespace hpx::agas {
         std::vector<hpx::future<std::vector<std::int64_t>>> lazy_results =
             send_refcnt_requests_async(l);
 
+        // wait for operations to finish
+        hpx::wait_all_nothrow(lazy_results);
+
         // re throw possible errors
-        hpx::wait_all(lazy_results);
+        for (auto& result : lazy_results)
+        {
+            if (result.has_exception())
+            {
+                try
+                {
+                    result.get();
+                }
+                catch (hpx::exception const& e)
+                {
+                    HPX_RETHROWS_IF(
+                        ec, e, "addressing_service::send_refcnt_requests_sync");
+                    return;
+                }
+            }
+        }
 
         if (&ec != &throws)
             ec = make_success_code();

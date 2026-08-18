@@ -81,6 +81,13 @@ namespace hpx {
                 other.shared_future_retrieved_ = false;
             }
 
+            promise_base(promise_base const& other) noexcept
+              : shared_state_(other.shared_state_)
+              , future_retrieved_(other.future_retrieved_)
+              , shared_future_retrieved_(other.shared_future_retrieved_)
+            {
+            }
+
             ~promise_base()
             {
                 check_abandon_shared_state(
@@ -100,6 +107,20 @@ namespace hpx {
 
                     other.future_retrieved_ = false;
                     other.shared_future_retrieved_ = false;
+                }
+                return *this;
+            }
+
+            promise_base& operator=(promise_base const& other) noexcept
+            {
+                if (this != &other)
+                {
+                    this->check_abandon_shared_state(
+                        "detail::promise_base<R>::operator=");
+
+                    shared_state_ = other.shared_state_;
+                    future_retrieved_ = other.future_retrieved_;
+                    shared_future_retrieved_ = other.shared_future_retrieved_;
                 }
                 return *this;
             }
@@ -211,7 +232,8 @@ namespace hpx {
             {
                 if (shared_state_ != nullptr &&
                     (future_retrieved_ || shared_future_retrieved_) &&
-                    !shared_state_->is_ready())
+                    !shared_state_->is_ready() &&
+                    shared_state_->ref_count(std::memory_order_relaxed) <= 1)
                 {
                     shared_state_->set_error(hpx::error::broken_promise, fun,
                         "abandoning not ready shared state");

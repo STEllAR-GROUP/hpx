@@ -96,6 +96,12 @@ namespace hpx::lcos::detail {
             delete this;
         }
 
+        long ref_count(std::memory_order const mo =
+                           std::memory_order_acquire) const noexcept
+        {
+            return count_.count(mo);
+        }
+
         // This is a tag type used to convey the information that the caller is
         // _not_ going to addref the future_data instance
         struct init_no_addref
@@ -884,7 +890,7 @@ namespace hpx::lcos::detail {
 
     public:
         // NOLINTBEGIN(bugprone-crtp-constructor-accessibility)
-        task_base()
+        task_base() noexcept
           : base_type()
           , started_(false)
         {

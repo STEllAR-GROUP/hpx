@@ -80,6 +80,12 @@ namespace hpx::util {
             return value_.load(std::memory_order_acquire);
         }
 
+        long count(std::memory_order const mo =
+                       std::memory_order_acquire) const noexcept
+        {
+            return value_.load(mo);
+        }
+
     private:
         std::atomic<long> value_;
     };
