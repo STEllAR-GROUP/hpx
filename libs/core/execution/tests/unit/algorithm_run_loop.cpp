@@ -675,22 +675,11 @@ void test_future_sender()
         auto sched = loop.get_scheduler();
         auto s = ex::just(3) | ex::continues_on(sched);
 
-        bool caught = false;
-        try
-        {
-            [[maybe_unused]] auto f = ex::make_future(std::move(s));
-            HPX_TEST(false);
-        }
-        catch (hpx::exception const& e)
-        {
-            HPX_TEST_EQ(e.get_error(), hpx::error::invalid_status);
-            caught = true;
-        }
-        catch (...)
-        {
-            HPX_TEST(false);
-        }
-        HPX_TEST(caught);
+        // The make_future CPO detects the run_loop completion scheduler
+        // and automatically routes through make_future_with_run_loop,
+        // which correctly drives the loop. No explicit scheduler needed.
+        auto f = ex::make_future(std::move(s));
+        HPX_TEST_EQ(f.get(), 3);
     }
 }
 
