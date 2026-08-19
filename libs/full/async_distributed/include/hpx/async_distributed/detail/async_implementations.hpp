@@ -29,6 +29,7 @@
 #include <hpx/async_distributed/packaged_action.hpp>
 
 #include <cstddef>
+#include <exception>
 #include <utility>
 
 namespace hpx::detail {

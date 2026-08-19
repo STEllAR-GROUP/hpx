@@ -2362,8 +2362,18 @@ namespace hpx::agas {
                 }
                 catch (hpx::exception const& e)
                 {
-                    HPX_RETHROWS_IF(
-                        ec, e, "addressing_service::send_refcnt_requests_sync");
+                    if (hpx::get_error(e) !=
+                        hpx::error::locality_was_disconnected)
+                    {
+                        HPX_RETHROWS_IF(ec, e,
+                            "addressing_service::send_refcnt_requests_sync");
+                        return;
+                    }
+                }
+                catch (...)
+                {
+                    HPX_RETHROWS_IF(ec, std::current_exception(),
+                        "addressing_service::send_refcnt_requests_sync");
                     return;
                 }
             }

@@ -36,6 +36,7 @@
 #include <hpx/modules/type_support.hpp>
 
 #include <hpx/runtime_distributed.hpp>
+#include <hpx/runtime_distributed/detail/dijkstra_termination_token.hpp>
 #include <hpx/runtime_distributed/find_localities.hpp>
 #include <hpx/runtime_distributed/runtime_fwd.hpp>
 #include <hpx/runtime_distributed/server/runtime_support.hpp>
@@ -141,7 +142,7 @@ namespace hpx::components::server {
     // function to be called during shutdown
     // Action: shut down this runtime system instance
     void runtime_support::shutdown(double const timeout,
-        hpx::id_type const& respond_to, bool force_disconnect)
+        hpx::id_type const& respond_to, bool const force_disconnect)
     {
         // initiate system shutdown
         stop(timeout, respond_to, false, force_disconnect);
@@ -337,17 +338,12 @@ namespace hpx::components::server {
             locality_id = num_localities;
 
         // accommodate for disconnected localities
-        bool token_sent = false;
-        while (locality_id > 0 && locality_id != initiating_locality_id)
-        {
-            if (send_dijkstra_termination_token(locality_id - 1,
-                    initiating_locality_id, num_localities, dijkstra_color_))
-            {
-                token_sent = true;
-                break;
-            }
-            --locality_id;
-        }
+        bool const token_sent = detail::dijkstra_forward_token(locality_id,
+            initiating_locality_id,
+            [&](std::uint32_t const target_locality_id) {
+                return send_dijkstra_termination_token(target_locality_id,
+                    initiating_locality_id, num_localities, dijkstra_color_);
+            });
 
         if (!token_sent && initiating_locality_id != agas::get_locality_id())
         {
@@ -405,18 +401,13 @@ namespace hpx::components::server {
 
                 {
                     // accommodate for disconnected localities
-                    bool token_sent = false;
-                    while (target_id > 0 && target_id != initiating_locality_id)
-                    {
-                        if (send_dijkstra_termination_token(target_id - 1,
-                                initiating_locality_id, num_localities,
-                                dijkstra_color_))
-                        {
-                            token_sent = true;
-                            break;
-                        }
-                        --target_id;
-                    }
+                    bool token_sent = detail::dijkstra_forward_token(target_id,
+                        initiating_locality_id,
+                        [&](std::uint32_t const target_locality_id) {
+                            return send_dijkstra_termination_token(
+                                target_locality_id, initiating_locality_id,
+                                num_localities, dijkstra_color_);
+                        });
 
                     if (!token_sent)
                     {

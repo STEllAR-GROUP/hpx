@@ -79,7 +79,7 @@ namespace hpx::agas::detail {
         {
             // This should happen only during bootstrap. If it happens later
             // we're dealing with a disconnected locality.
-            if(!hpx::is_starting())
+            if (!hpx::is_starting())
             {
                 return {};
             }

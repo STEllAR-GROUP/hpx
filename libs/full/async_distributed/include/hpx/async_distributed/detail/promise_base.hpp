@@ -190,14 +190,6 @@ namespace hpx::lcos::detail {
             other.addr_ = naming::address();
         }
 
-        promise_base(promise_base const& other)
-          : base_type(static_cast<base_type const&>(other))
-          , id_retrieved_(other.id_retrieved_)
-          , id_(other.id_)
-          , addr_(other.addr_)
-        {
-        }
-
         ~promise_base()
         {
             check_abandon_shared_state(
@@ -215,15 +207,6 @@ namespace hpx::lcos::detail {
             other.id_retrieved_ = false;
             other.id_ = hpx::invalid_id;
             other.addr_ = naming::address();
-            return *this;
-        }
-        promise_base& operator=(promise_base const& other)
-        {
-            base_type::operator=(static_cast<base_type const&>(other));
-
-            id_retrieved_ = other.id_retrieved_;
-            id_ = other.id_;
-            addr_ = other.addr_;
             return *this;
         }
 
@@ -352,8 +335,7 @@ namespace hpx::lcos::detail {
         void check_abandon_shared_state(char const* fun)
         {
             if (this->shared_state_ != nullptr && this->future_retrieved_ &&
-                !(this->shared_state_->is_ready() || id_retrieved_) &&
-                this->shared_state_->ref_count(std::memory_order_relaxed) <= 1)
+                !(this->shared_state_->is_ready() || id_retrieved_))
             {
                 this->shared_state_->set_error(hpx::error::broken_promise, fun,
                     "abandoning not ready shared state");
