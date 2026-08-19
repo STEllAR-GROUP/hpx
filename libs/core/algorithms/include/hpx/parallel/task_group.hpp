@@ -16,9 +16,6 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution_base.hpp>
 
-#include <hpx/execution_base/sender.hpp>
-#include <hpx/execution_base/stdexec_forward.hpp>
-#include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/modules/executors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
