@@ -14,6 +14,7 @@
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution.hpp>
 #include <hpx/modules/execution_base.hpp>
 
 #include <hpx/modules/executors.hpp>
@@ -121,22 +122,25 @@ namespace hpx::experimental {
 
             namespace ex = hpx::execution::experimental;
 
+            // Workaround for Clang compiler crash (exit code 139):
+            // Extract lambda body into a separate function to reduce template AST depth
+            auto task = [this, f = HPX_FORWARD(F, f),
+                            ... ts = HPX_FORWARD(Ts, ts)]() mutable {
+                hpx::detail::try_catch_exception_ptr(
+                    [&]() { HPX_INVOKE(f, ts...); },
+                    [this](
+                        std::exception_ptr e) { add_exception(HPX_MOVE(e)); });
+            };
+
             auto on_exit =
                 hpx::experimental::scope_exit([this] { latch_.count_down(1); });
 
             ex::start_detached(ex::schedule(HPX_FORWARD(Scheduler, sched)) |
-                ex::then(
-                    [this, on_exit = HPX_MOVE(on_exit), f = HPX_FORWARD(F, f),
-                        ... ts = HPX_FORWARD(Ts, ts)]() mutable {
-                        // latch needs to be released before the lambda exits
-                        auto _(HPX_MOVE(on_exit));
-
-                        hpx::detail::try_catch_exception_ptr(
-                            [&]() { HPX_INVOKE(f, ts...); },
-                            [this](std::exception_ptr e) {
-                                add_exception(HPX_MOVE(e));
-                            });
-                    }));
+                ex::then([this, on_exit = HPX_MOVE(on_exit),
+                             task = HPX_MOVE(task)]() mutable {
+                    auto _(HPX_MOVE(on_exit));
+                    HPX_INVOKE(task);
+                }));
         }
 
         /// \brief Adds a task to compute \c f() and returns immediately.
