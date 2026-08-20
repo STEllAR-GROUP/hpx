@@ -263,6 +263,15 @@ namespace hpx::parcelset {
             char const* message_handler_type, std::size_t num_messages,
             std::size_t interval, locality const& loc, error_code& ec = throws);
 
+        /// \brief Remove all message handlers registered for a given
+        ///        destination locality.
+        ///
+        /// \param dest The destination locality whose handlers should be
+        ///        removed.
+        ///
+        /// \note Every entry in the handler map keyed by \a dest is erased,
+        ///       independent of action or message type. This operation is
+        ///       synchronized via \c handlers_mtx_.
         void remove_handler(locality const& dest);
 
         ///////////////////////////////////////////////////////////////////////
@@ -416,6 +425,24 @@ namespace hpx::parcelset {
         ///         handler, false otherwise.
         bool invoke_write_handler(
             std::error_code const& ec, parcel const& p) const;
+
+        /// \brief Invoke the given write handler unless it is the installed
+        ///        default write handler.
+        ///
+        /// \param f  The write handler to invoke.
+        /// \param ec The error code (if any) reported for the completed send.
+        /// \param p  The parcel that was sent.
+        ///
+        /// \details The invocation of \a f is suppressed when it wraps a plain
+        ///          function pointer whose target is \c default_write_handler,
+        ///          since that handler is already invoked separately. \a f is
+        ///          identified as \c default_write_handler by comparing
+        ///          \c f.target<void(*)(std::error_code const&, parcel const&)>()
+        ///          against \c &default_write_handler; any other target
+        ///          (including handlers with no such target, e.g. lambdas or
+        ///          functors) causes \a f to be invoked normally.
+        static void invoke_if_not_default_handler(write_handler_type const& f,
+            std::error_code const& ec, parcel const& p);
 
         /// \brief Install a new write handler, replacing the previously
         ///        installed one.

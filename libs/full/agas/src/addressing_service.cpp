@@ -37,6 +37,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <exception>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -2241,6 +2242,9 @@ namespace hpx::agas {
                         {
                             throw e;
                         }
+                    },
+                    [&](std::exception_ptr const& ep) {
+                        std::rethrow_exception(ep);
                     });
 
                 if (&ec != &throws)
@@ -2323,6 +2327,9 @@ namespace hpx::agas {
                     {
                         throw e;
                     }
+                },
+                [&](std::exception_ptr const& ep) {
+                    std::rethrow_exception(ep);
                 });
 
             if (f.valid())
@@ -2349,31 +2356,34 @@ namespace hpx::agas {
             send_refcnt_requests_async(l);
 
         // wait for operations to finish
-        hpx::wait_all_nothrow(lazy_results);
-
-        // re throw possible errors
-        for (auto& result : lazy_results)
+        if (hpx::wait_all_nothrow(lazy_results))
         {
-            if (result.has_exception())
+            // re throw possible errors
+            for (auto& result : lazy_results)
             {
-                try
+                if (!result.has_exception())
                 {
-                    result.get();
+                    continue;
                 }
-                catch (hpx::exception const& e)
-                {
-                    if (hpx::get_error(e) !=
-                        hpx::error::locality_was_disconnected)
-                    {
-                        HPX_RETHROWS_IF(ec, e,
+
+                hpx::detail::try_catch_exception_ptr<hpx::exception>(
+                    [&]() { result.get(); },
+                    [&](hpx::exception const& e) {
+                        if (hpx::get_error(e) !=
+                            hpx::error::locality_was_disconnected)
+                        {
+                            HPX_RETHROWS_IF(ec, e,
+                                "addressing_service::send_refcnt_requests_"
+                                "sync");
+                        }
+                    },
+                    [&](std::exception_ptr const& ep) {
+                        HPX_RETHROWS_IF(ec, ep,
                             "addressing_service::send_refcnt_requests_sync");
-                        return;
-                    }
-                }
-                catch (...)
+                    });
+
+                if (ec)
                 {
-                    HPX_RETHROWS_IF(ec, std::current_exception(),
-                        "addressing_service::send_refcnt_requests_sync");
                     return;
                 }
             }

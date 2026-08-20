@@ -149,7 +149,8 @@ namespace hpx::components::server {
     }
 
     // function to be called to terminate this locality immediately
-    void runtime_support::terminate(hpx::id_type const& respond_to)
+    void runtime_support::terminate(
+        [[maybe_unused]] hpx::id_type const& respond_to)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         // push pending logs
@@ -179,22 +180,59 @@ namespace hpx::components::server {
         }
 #else
         HPX_ASSERT(false);
-        HPX_UNUSED(respond_to);
 #endif
         std::abort();
     }
 }    // namespace hpx::components::server
 
 ///////////////////////////////////////////////////////////////////////////////
+namespace {
+
+    // wait for all futures to become ready, ignore disconnected locality errors
+    void wait_all_ignore_disconnected_localities(
+        std::vector<hpx::future<void>>& results)
+    {
+        if (!hpx::wait_all_nothrow(results))
+        {
+            return;
+        }
+
+        // re throw possible errors
+        for (auto& result : results)
+        {
+            if (!result.has_exception())
+            {
+                continue;
+            }
+
+            hpx::detail::try_catch_exception_ptr<hpx::exception>(
+                [&]() { result.get(); },
+                [&](hpx::exception const& e) {
+                    if (hpx::get_error(e) !=
+                        hpx::error::locality_was_disconnected)
+                    {
+                        throw e;
+                    }
+                },
+                [&](std::exception_ptr const& ep) {
+                    std::rethrow_exception(ep);
+                });
+        }
+    }
+}    // namespace
+
+///////////////////////////////////////////////////////////////////////////////
 namespace hpx::components::server {
 
     // initiate system shutdown for all localities
     static void invoke_shutdown_functions(
-        std::vector<hpx::id_type> const& localities, bool pre_shutdown)
+        [[maybe_unused]] std::vector<hpx::id_type> const& localities,
+        [[maybe_unused]] bool pre_shutdown)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         std::vector<hpx::future<void>> results;
         results.reserve(localities.size());
+
         for (auto const& l : localities)
         {
             using call_shutdown_functions_action = hpx::components::server::
@@ -202,11 +240,10 @@ namespace hpx::components::server {
             results.push_back(
                 hpx::async(call_shutdown_functions_action(), l, pre_shutdown));
         }
-        hpx::wait_all(results);
+
+        wait_all_ignore_disconnected_localities(results);
 #else
         HPX_ASSERT(false);
-        HPX_UNUSED(localities);
-        HPX_UNUSED(pre_shutdown);
 #endif
     }
 
@@ -347,8 +384,35 @@ namespace hpx::components::server {
 
         if (!token_sent && initiating_locality_id != agas::get_locality_id())
         {
-            send_dijkstra_termination_token(initiating_locality_id,
-                initiating_locality_id, num_localities, dijkstra_color_);
+            // The regular ring-forwarding failed (every locality between us and
+            // the initiator is unreachable). Fall back to notifying the
+            // initiator directly; retry a bounded number of times in case the
+            // failure is transient, rather than giving up after a single
+            // attempt.
+            constexpr int max_fallback_attempts = 3;
+
+            bool fallback_sent = false;
+            for (int attempt = 0;
+                !fallback_sent && attempt != max_fallback_attempts; ++attempt)
+            {
+                fallback_sent = send_dijkstra_termination_token(
+                    initiating_locality_id, initiating_locality_id,
+                    num_localities, dijkstra_color_);
+            }
+
+            if (!fallback_sent)
+            {
+                // Nothing more can be done from this locality: the initiator is
+                // unreachable from here. Report this loudly instead of silently
+                // dropping the token, as the initiator will otherwise wait for
+                // it indefinitely.
+                LRT_(error).format(
+                    "runtime_support::dijkstra_termination: failed to "
+                    "deliver the termination token back to the initiating "
+                    "locality {} after {} attempts; termination detection "
+                    "on that locality may hang.",
+                    initiating_locality_id, max_fallback_attempts);
+            }
         }
     }
 #endif
@@ -539,8 +603,7 @@ namespace hpx::components::server {
             }
         }
 
-        // wait for all localities to be stopped
-        hpx::wait_all(lazy_actions);
+        wait_all_ignore_disconnected_localities(lazy_actions);
 
         LRT_(info).format("runtime_support::shutdown_all: all localities have "
                           "been shut down");
@@ -578,7 +641,7 @@ namespace hpx::components::server {
             }
 
             // wait for all localities to be stopped
-            hpx::wait_all(lazy_actions);
+            wait_all_ignore_disconnected_localities(lazy_actions);
         }
 
         // now make sure this local locality gets terminated as well.
@@ -1035,7 +1098,7 @@ namespace hpx::components::server {
                 action_type(), id, HPX_MOVE(ipt), locality, rtd->endpoints());
         }
 
-        hpx::wait_all(callbacks);
+        wait_all_ignore_disconnected_localities(callbacks);
 #endif
 #else
         HPX_ASSERT(false);
@@ -1861,23 +1924,19 @@ namespace hpx::components::server {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool runtime_support::load_component(hpx::util::plugin::dll& d,
-        util::section& ini, std::string const& instance,
-        std::string const& /* component */, filesystem::path const& lib,
+    bool runtime_support::load_component(
+        [[maybe_unused]] hpx::util::plugin::dll& d,
+        [[maybe_unused]] util::section& ini,
+        [[maybe_unused]] std::string const& instance,
+        std::string const& /* component */,
+        [[maybe_unused]] filesystem::path const& lib,
         naming::gid_type const& /* prefix */,
         agas::addressing_service& /* agas_client */, bool /* isdefault */,
         bool /* isenabled */,
-        hpx::program_options::options_description& options,
-        std::set<std::string>& startup_handled)
+        [[maybe_unused]] hpx::program_options::options_description& options,
+        [[maybe_unused]] std::set<std::string>& startup_handled)
     {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-        HPX_UNUSED(d);
-        HPX_UNUSED(ini);
-        HPX_UNUSED(instance);
-        HPX_UNUSED(lib);
-        HPX_UNUSED(options);
-        HPX_UNUSED(startup_handled);
-
         return false;
 #else
         try

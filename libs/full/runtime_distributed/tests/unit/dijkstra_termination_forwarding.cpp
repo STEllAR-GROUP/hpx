@@ -14,6 +14,7 @@
 #include <hpx/modules/runtime_distributed.hpp>
 #include <hpx/modules/testing.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <vector>
 

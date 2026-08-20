@@ -1031,9 +1031,18 @@ namespace hpx {
 
         if (!is_running())
         {
-            HPX_THROWS_IF(ec, hpx::error::invalid_status, "hpx::finalize",
-                "the runtime system is not active (did you already "
-                "call finalize?)");
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+            // Report error only on root locality. All other localities may have
+            // already been shutdown by the root.
+            hpx::error_code ec1(hpx::throwmode::lightweight);
+            auto const root = agas::get_console_locality(ec1);
+            if (!ec1 && agas::get_locality() == root.get_gid())
+#endif
+            {
+                HPX_THROWS_IF(ec, hpx::error::invalid_status, "hpx::finalize",
+                    "the runtime system is not active (did you already "
+                    "call finalize?)");
+            }
             return -1;
         }
 

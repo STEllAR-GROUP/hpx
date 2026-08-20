@@ -469,10 +469,11 @@ namespace hpx::detail {
     async_impl(Launch&& policy, hpx::id_type const& id, Ts&&... vs)
     {
         using action_type = hpx::traits::extract_action_t<Action>;
-        using result_type = action_type::local_result_type;
         using component_type = action_type::component_type;
 
 #if defined(HPX_HAVE_FORCE_DISCONNECT)
+        using result_type = action_type::local_result_type;
+
         if (parcelset::locality_was_disconnected(
                 naming::get_locality_id_from_id(id)))
         {

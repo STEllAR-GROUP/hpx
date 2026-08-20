@@ -91,7 +91,7 @@ namespace {
     // Long enough to comfortably absorb AGAS/peer-startup jitter for a
     // freshly-spawned worker; mirrors the timeout used by
     // late_component_worker.cpp/late_component_failing_worker.cpp.
-    constexpr std::chrono::milliseconds root_discovery_timeout{5000};
+    constexpr std::chrono::milliseconds root_discovery_timeout{500000};
 
     // Number of retries a task gets after a fenced dispatch before it is
     // dropped instead of requeued (see the catch block below).
@@ -115,14 +115,14 @@ namespace {
     enum class worker_variant : std::uint8_t
     {
         normal = 0,
-        failing = 1,
-        aborting = 2
+        //failing = 1,
+        //aborting = 2
     };
 
     constexpr char const* const worker_paths[] = {
         "late_component_worker" HPX_EXECUTABLE_EXTENSION,
-        "late_component_failing_worker" HPX_EXECUTABLE_EXTENSION,
-        "late_component_aborting_worker" HPX_EXECUTABLE_EXTENSION,
+        //"late_component_failing_worker" HPX_EXECUTABLE_EXTENSION,
+        //"late_component_aborting_worker" HPX_EXECUTABLE_EXTENSION,
     };
 
     // Everything root needs to fence/dispatch against, and eventually retire,
@@ -191,7 +191,9 @@ namespace {
 
         fs::path const exe = base_dir / worker_paths[static_cast<int>(variant)];
 
-        std::cerr << "launching: " << exe << "\n";
+        hpx::util::format_to(std::cerr,
+            "{}: late_component_launcher: launching: {}\n", hpx::find_here(),
+            exe);
 
         std::vector<std::string> args;
         args.emplace_back("--hpx:threads=1");
@@ -278,12 +280,12 @@ namespace {
         // true, unmodeled crash, rather than only ever taking the success path.
         worker_slots.emplace_back(spawn_worker(handle, worker_variant::normal));
         slot_variants.emplace_back(worker_variant::normal);
-        worker_slots.emplace_back(
-            spawn_worker(handle, worker_variant::failing));
-        slot_variants.emplace_back(worker_variant::failing);
-        worker_slots.emplace_back(
-            spawn_worker(handle, worker_variant::aborting));
-        slot_variants.emplace_back(worker_variant::aborting);
+        //worker_slots.emplace_back(
+        //    spawn_worker(handle, worker_variant::failing));
+        //slot_variants.emplace_back(worker_variant::failing);
+        //worker_slots.emplace_back(
+        //    spawn_worker(handle, worker_variant::aborting));
+        //slot_variants.emplace_back(worker_variant::aborting);
 
         std::deque<task> queue;
         queue.push_back(task{.worker_slot_index = 0,
@@ -292,12 +294,12 @@ namespace {
         queue.push_back(task{.worker_slot_index = 0,
             .payload = "hello from root: message 2 for worker 0",
             .retries = 0});
-        queue.push_back(task{.worker_slot_index = 1,
-            .payload = "hello from root: message 1 for worker 1",
-            .retries = 0});
-        queue.push_back(task{.worker_slot_index = 2,
-            .payload = "hello from root: message 1 for worker 2",
-            .retries = 0});
+        //queue.push_back(task{.worker_slot_index = 1,
+        //    .payload = "hello from root: message 1 for worker 1",
+        //    .retries = 0});
+        //queue.push_back(task{.worker_slot_index = 2,
+        //    .payload = "hello from root: message 1 for worker 2",
+        //    .retries = 0});
 
         while (!queue.empty())
         {
@@ -318,27 +320,8 @@ namespace {
                     handle, slot_variants[current.worker_slot_index]);
             }
 
-            bool const result = hpx::detail::try_catch_exception_ptr<
-                hpx::exception>(
-                [&]() {
-                    worker_slot const& slot =
-                        *worker_slots[current.worker_slot_index];
-
-                    hpx::supervision::dispatch_work<set_message_action>(
-                        slot.component_id, slot.peer.join_epoch,
-                        current.payload)
-                        .get();
-
-                    return false;
-                },
-                [&](hpx::exception const& e) {
-                    auto const err = hpx::get_error(e);
-                    if (err != hpx::error::target_fenced &&
-                        err != hpx::error::locality_was_disconnected)
-                    {
-                        throw e;
-                    }
-
+            auto locality_is_fenced =
+                [&](bool const locality_was_disconnected) {
                     // Step 4: fenced - drop the slot.
                     // worker_slot.peer.join_epoch is fixed for that peer's
                     // lifetime, so this slot must never be reused; a
@@ -359,55 +342,110 @@ namespace {
                     // by the time dispatch reports locality_was_disconnected. A
                     // fenced worker still needs force_disconnect() before it
                     // can be replaced.
-                    if (err == hpx::error::locality_was_disconnected)
+                    if (locality_was_disconnected)
                     {
-                        std::cerr << "late_component_launcher: worker at slot "
-                                  << current.worker_slot_index
-                                  << " already disconnected\n";
+                        hpx::util::format_to(std::cerr,
+                            "{}: late_component_launcher: worker at slot {} "
+                            "already disconnected\n",
+                            hpx::find_here(), current.worker_slot_index);
                     }
                     else
                     {
-                        std::cerr
-                            << "late_component_launcher: detected fenced "
-                               "worker at slot "
-                            << current.worker_slot_index
-                            << "; purging locality via force_disconnect\n";
+                        hpx::util::format_to(std::cerr,
+                            "{}: late_component_launcher: detected fenced "
+                            "worker at slot {}; purging locality via "
+                            "force_disconnect\n",
+                            hpx::find_here(), current.worker_slot_index);
 
                         hpx::error_code ec(hpx::throwmode::lightweight);
-                        hpx::force_disconnect(fenced_locality, ec);
+                        int const disconnect_result =
+                            hpx::force_disconnect(fenced_locality, ec);
 
-                        std::cerr
-                            << "late_component_launcher: purge complete for "
-                               "slot "
-                            << current.worker_slot_index << "\n";
+                        if (disconnect_result != 0 || ec)
+                        {
+                            hpx::util::format_to(std::cerr,
+                                "{}: late_component_launcher: "
+                                "force_disconnect failed for slot {}"
+                                "; will retry purge\n",
+                                hpx::find_here(), current.worker_slot_index);
+
+                            ++current.retries;
+                            if (current.retries > max_task_retries)
+                            {
+                                hpx::util::format_to(std::cerr,
+                                    "{}: late_component_launcher: dropping "
+                                    "task after {} retries (payload: {})\n",
+                                    hpx::find_here(), current.retries,
+                                    current.payload);
+                                return;
+                            }
+
+                            queue.push_front(std::move(current));
+                            return;
+                        }
+
+                        hpx::util::format_to(std::cerr,
+                            "{}: late_component_launcher: purge complete for "
+                            "slot {}\n",
+                            hpx::find_here(), current.worker_slot_index);
                     }
 
                     ++current.retries;
                     if (current.retries > max_task_retries)
                     {
-                        std::cerr << "late_component_launcher: dropping task "
-                                     "after "
-                                  << current.retries
-                                  << " retries (payload: " << current.payload
-                                  << ")\n";
-                        return true;
+                        hpx::util::format_to(std::cerr,
+                            "{}: late_component_launcher: dropping task "
+                            "after {} retries (payload: {})\n",
+                            hpx::find_here(), current.retries, current.payload);
+                        return;
                     }
 
                     worker_slots[current.worker_slot_index] =
                         spawn_worker(handle, variant);
                     slot_variants[current.worker_slot_index] = variant;
-                    std::cerr
-                        << "late_component_launcher: relaunch complete for "
-                           "slot "
-                        << current.worker_slot_index << "\n";
+                    hpx::util::format_to(std::cerr,
+                        "{}: late_component_launcher: relaunch complete for "
+                        "slot {}\n",
+                        hpx::find_here(), current.worker_slot_index);
 
                     // Retry before newer tasks.
                     queue.push_front(std::move(current));
-                    return true;
-                });
+                };
+
+            bool const result =
+                hpx::detail::try_catch_exception_ptr<hpx::exception>(
+                    [&]() {
+                        worker_slot const& slot =
+                            *worker_slots[current.worker_slot_index];
+
+                        hpx::supervision::dispatch_work<set_message_action>(
+                            slot.component_id, slot.peer.join_epoch,
+                            current.payload)
+                            .get();
+
+                        return false;
+                    },
+                    [&](hpx::exception const& e) {
+                        auto const err = hpx::get_error(e);
+                        if (err != hpx::error::target_fenced &&
+                            err != hpx::error::locality_was_disconnected)
+                        {
+                            throw e;
+                        }
+
+                        locality_is_fenced(
+                            err == hpx::error::locality_was_disconnected);
+                        return true;
+                    },
+                    [](std::exception_ptr const& ep) {
+                        std::rethrow_exception(ep);
+                        return true;
+                    });
 
             if (result)
+            {
                 continue;
+            }
 
             // Step 5: success. If no other queued task still targets this slot,
             // this was its last piece of work - send the per-worker shutdown
@@ -454,7 +492,8 @@ int hpx_main()
 
     hpx::supervision::finalize();
 
-    std::cerr << "late_component_launcher: complete, exiting.\n";
+    hpx::util::format_to(std::cerr,
+        "{}: late_component_launcher: complete, exiting.\n", hpx::find_here());
 
     return hpx::finalize();
 }
@@ -470,7 +509,12 @@ int main(int const argc, char* argv[])
     hpx::init_params init_args;
     init_args.cfg = cfg;
 
-    return hpx::init(argc, argv, init_args);
+    auto const result = hpx::init(argc, argv, init_args);
+
+    hpx::util::format_to(
+        std::cerr, "late_component_launcher: complete, exited.\n");
+
+    return result;
 }
 
 #else

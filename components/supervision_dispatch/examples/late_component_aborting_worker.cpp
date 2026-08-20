@@ -52,11 +52,14 @@ namespace {
     // Long enough to comfortably absorb AGAS/peer-startup jitter; mirrors the
     // timeout used by late_component_worker.cpp/
     // late_component_failing_worker.cpp.
-    constexpr std::chrono::milliseconds worker_discovery_timeout{5000};
+    constexpr std::chrono::milliseconds worker_discovery_timeout{500000};
 }    // namespace
 
 int hpx_main()
 {
+    hpx::util::format_to(std::cerr,
+        "{}: late_component_aborting_worker: started\n", hpx::find_here());
+
     // Register this locality as a supervised participant and announce it has
     // entered its active phase - this is what creates the registry entry on
     // root that, per the file comment above, simply stops being refreshed once
@@ -75,17 +78,20 @@ int hpx_main()
 
     if (peers.empty())
     {
-        std::cerr << "late_component_aborting_worker: failed to "
-                     "discover/join root locality\n";
+        hpx::util::format_to(std::cerr,
+            "{}: late_component_aborting_worker: failed to "
+            "discover/join root locality\n",
+            hpx::find_here());
 
         hpx::supervision::publish_event(
             hpx::launch::sync, handle, hpx::supervision::event::failed, epoch);
-        hpx::supervision::finalize();
         return hpx::disconnect();
     }
 
-    hpx::util::format_to(
-        std::cerr, "aborting worker joined {} peer(s)\n", peers.size());
+    hpx::util::format_to(std::cerr,
+        "{}: late_component_aborting_worker: aborting worker joined {} "
+        "peer(s)\n",
+        hpx::find_here(), peers.size());
 
     // Create/exercise its own local test_server briefly, as the file comment
     // above promises, purely so the demo has some observable "the worker was
@@ -94,8 +100,9 @@ int hpx_main()
         hpx::new_<late_component::test_client>(hpx::find_here());
 
     worker.set_message("step 1: joined peers, epoch " + std::to_string(epoch));
-    hpx::util::format_to(
-        std::cerr, "aborting worker reported: {}\n", worker.get_message());
+    hpx::util::format_to(std::cerr,
+        "{}: late_component_aborting_worker: aborting worker reported: {}\n",
+        hpx::find_here(), worker.get_message());
 
     // Simulate a genuine, unrecoverable crash: no hpx::supervision::finalize(),
     // no hpx::disconnect(), no supervision_dispatch call to "fake" a failure.

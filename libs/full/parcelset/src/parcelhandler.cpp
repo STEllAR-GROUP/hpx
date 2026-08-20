@@ -73,7 +73,7 @@ namespace hpx::parcelset {
         ///////////////////////////////////////////////////////////////////////////
         // default callback for put_parcel
         bool default_parcel_write_handler(
-            std::error_code const& ec, parcel const& p)
+            std::error_code const& ec, [[maybe_unused]] parcel const& p)
         {
             if (!ec)
             {
@@ -674,6 +674,19 @@ namespace hpx::parcelset {
         }
     }    // namespace detail
 
+    void parcelhandler::invoke_if_not_default_handler(
+        write_handler_type const& f, std::error_code const& ec, parcel const& p)
+    {
+        using parcel_write_handler_function_type =
+            void (*)(std::error_code const&, parcel const&);
+
+        auto const target = f.target<parcel_write_handler_function_type>();
+        if (target == nullptr || *target != &default_write_handler)
+        {
+            f(ec, p);
+        }
+    }
+
     void parcelhandler::put_parcel(parcelset::parcel p)
     {
         LPT_(debug).format(
@@ -729,11 +742,11 @@ namespace hpx::parcelset {
             {
                 // the error was handled, pass on a success code
                 std::error_code const ec1(0, std::generic_category());
-                f(ec1, pc);
+                invoke_if_not_default_handler(f, ec1, pc);
             }
             else
             {
-                f(ec, pc);
+                invoke_if_not_default_handler(f, ec, pc);
             }
 
             LPT_(debug).format(
@@ -915,11 +928,11 @@ namespace hpx::parcelset {
                 {
                     // the error was handled, pass on a success code
                     std::error_code const ec1(0, std::generic_category());
-                    f(ec1, p);
+                    invoke_if_not_default_handler(f, ec1, p);
                 }
                 else
                 {
-                    f(ec, p);
+                    invoke_if_not_default_handler(f, ec, p);
                 }
 
                 LPT_(debug).format(
