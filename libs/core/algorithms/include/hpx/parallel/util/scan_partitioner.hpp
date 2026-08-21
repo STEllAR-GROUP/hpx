@@ -384,6 +384,7 @@ namespace hpx::parallel::util {
                                             HPX_INVOKE(f4,
                                                 HPX_MOVE(scan_results),
                                                 HPX_MOVE(data));
+                                            return;
                                         }
                                         else
                                         {

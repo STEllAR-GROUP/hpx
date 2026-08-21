@@ -155,7 +155,10 @@ void test_remove_copy_sender_parallel()
     }
 
     HPX_TEST(hpx::get<0>(*result) == output.end());
-    HPX_TEST(max_active_count.load(std::memory_order_relaxed) > 1);
+    if (hpx::get_os_thread_count() > 1)
+    {
+        HPX_TEST(max_active_count.load(std::memory_order_relaxed) > 1);
+    }
 }
 
 template <typename Exception, typename LnPolicy, typename ExPolicy,
