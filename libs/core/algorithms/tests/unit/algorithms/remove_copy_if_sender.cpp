@@ -8,8 +8,11 @@
 #include <hpx/execution.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/modules/threading.hpp>
 
 #include <algorithm>
+#include <atomic>
+#include <chrono>
 #include <cstddef>
 #include <exception>
 #include <iterator>
@@ -24,6 +27,26 @@
 
 namespace ex = hpx::execution::experimental;
 namespace tt = hpx::this_thread::experimental;
+
+void record_concurrency(std::atomic<std::size_t>& active_count,
+    std::atomic<std::size_t>& max_active_count,
+    std::atomic<std::size_t>& invocation_count)
+{
+    std::size_t const active =
+        active_count.fetch_add(1, std::memory_order_relaxed) + 1;
+    std::size_t previous_max = max_active_count.load(std::memory_order_relaxed);
+    while (previous_max < active &&
+        !max_active_count.compare_exchange_weak(previous_max, active,
+            std::memory_order_relaxed, std::memory_order_relaxed))
+    {
+    }
+
+    if (invocation_count.fetch_add(1, std::memory_order_relaxed) < 16)
+    {
+        hpx::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+    active_count.fetch_sub(1, std::memory_order_relaxed);
+}
 
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
 void test_remove_copy_if_scheduler(
@@ -97,6 +120,42 @@ void test_remove_copy_if_sender(
         ln_policy, ex_policy, IteratorTag{}, {2, 4, 6}, {});
     test_remove_copy_if_sender_case(
         ln_policy, ex_policy, IteratorTag{}, {1, 3, 5}, {1, 3, 5});
+}
+
+void test_remove_copy_if_sender_parallel()
+{
+    using namespace hpx::execution;
+
+    using scheduler_type =
+        ex::thread_pool_policy_scheduler<hpx::launch::async_policy>;
+
+    constexpr std::size_t count = 65536;
+    std::vector<int> input(count, 1);
+    std::vector<int> output(count, -1);
+    std::atomic<std::size_t> active_count{0};
+    std::atomic<std::size_t> max_active_count{0};
+    std::atomic<std::size_t> invocation_count{0};
+    auto exec =
+        ex::explicit_scheduler_executor(scheduler_type(hpx::launch::async));
+
+    auto sender =
+        ex::just(input.begin(), input.end(), output.begin(),
+            [&active_count, &max_active_count, &invocation_count](int) {
+                record_concurrency(
+                    active_count, max_active_count, invocation_count);
+                return false;
+            }) |
+        hpx::remove_copy_if(par(task).on(exec));
+
+    auto result = tt::sync_wait(std::move(sender));
+    HPX_TEST(result.has_value());
+    if (!result.has_value())
+    {
+        return;
+    }
+
+    HPX_TEST(hpx::get<0>(*result) == output.end());
+    HPX_TEST(max_active_count.load(std::memory_order_relaxed) > 1);
 }
 
 template <typename Exception, typename LnPolicy, typename ExPolicy,
@@ -216,6 +275,7 @@ int hpx_main()
 {
     remove_copy_if_sender_test<std::forward_iterator_tag>();
     remove_copy_if_sender_test<std::random_access_iterator_tag>();
+    test_remove_copy_if_sender_parallel();
     return hpx::local::finalize();
 }
 
