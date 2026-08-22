@@ -51,6 +51,20 @@ int hpx_main()
     }
 
     {
+        hpx::chrono::steady_duration const sub_ms_negative_timeout(
+            hpx::chrono::steady_clock::duration(-1));
+
+        hpx::agas::set_rpc_timeout(sub_ms_negative_timeout);
+
+        auto const current_timeout = hpx::agas::get_rpc_timeout();
+        auto const ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+            current_timeout.value())
+                            .count();
+
+        HPX_TEST_EQ(ms, std::int64_t(12345));
+    }
+
+    {
         hpx::chrono::steady_duration const zero_timeout(
             std::chrono::milliseconds(0));
 

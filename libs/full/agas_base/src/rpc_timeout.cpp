@@ -16,13 +16,14 @@ namespace hpx::agas {
 
     void set_rpc_timeout(hpx::chrono::steady_duration const& timeout) noexcept
     {
-        auto const timeout_ms =
-            std::chrono::duration_cast<std::chrono::milliseconds>(
-                timeout.value());
-        
-        if (timeout_ms.count() >= 0){
+        if (timeout.value() >= timeout.value().zero())
+        {
+            auto const timeout_ms =
+                std::chrono::duration_cast<std::chrono::milliseconds>(
+                    timeout.value());
+
             agas_rpc_timeout_ms.store(
-                static_cast<std::uint64_t>(timeout_ms.count()), 
+                static_cast<std::uint64_t>(timeout_ms.count()),
                 std::memory_order_relaxed);
         }
     }
