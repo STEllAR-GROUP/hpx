@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/tracing/macros.hpp>
+#include <cstddef>
 #include <type_traits>
 
 #if defined(DOXYGEN)
