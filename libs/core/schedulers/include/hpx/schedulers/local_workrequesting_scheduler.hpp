@@ -912,21 +912,8 @@ namespace hpx::threads::policies {
                 // we are ready to send at least one task
                 if (!thrds.tasks_.empty())
                 {
-                    for (auto const& stolen_thrd : thrds.tasks_)
-                    {
-                        if (stolen_thrd)
-                        {
-                            if (auto* thrd_data =
-                                    get_thread_id_data(stolen_thrd))
-                            {
-                                hpx::tracing::work_stolen(req.num_thread_,
-                                    d.num_thread_, thrd_data,
-                                    thread_data::get_safe_description(
-                                        thrd_data->get_description(),
-                                        "thread"));
-                            }
-                        }
-                    }
+                    hpx::tracing::work_stolen_range(
+                        req.num_thread_, d.num_thread_, thrds.tasks_);
 
                     // send these tasks to the core that has sent the steal
                     // request
