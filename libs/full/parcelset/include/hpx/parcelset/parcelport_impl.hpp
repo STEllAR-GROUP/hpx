@@ -699,24 +699,33 @@ namespace hpx::parcelset {
             {
                 std::terminate();
             }
-            else
+
+            // Get a connection or reserve space for a new connection.
+            if (!connection_cache_.get_or_reserve(l, sender_connection))
             {
-                // Get a connection or reserve space for a new connection.
-                if (!connection_cache_.get_or_reserve(l, sender_connection))
-                {
-                    // If no slot is available it's not a problem as the parcel
-                    // will be sent out whenever the next connection is returned
-                    // to the cache.
-                    if (&ec != &throws)
-                        ec = make_success_code();
-                    return sender_connection;
-                }
+                // If no slot is available it's not a problem as the parcel
+                // will be sent out whenever the next connection is returned
+                // to the cache.
+                if (&ec != &throws)
+                    ec = make_success_code();
+                return sender_connection;
             }
 
             // Check if we need to create the new connection.
             if (!sender_connection)
             {
-                return connection_handler().create_connection(l, ec);
+                auto release_reservation = hpx::experimental::scope_exit(
+                    [&] { connection_cache_.clear(l, sender_connection); });
+
+                sender_connection =
+                    connection_handler().create_connection(l, ec);
+                if (sender_connection)
+                {
+                    release_reservation.release();
+                    if (&ec != &throws)
+                        ec = make_success_code();
+                }
+                return sender_connection;
             }
 
             if (&ec != &throws)
@@ -901,6 +910,10 @@ namespace hpx::parcelset {
                 return;
             }
 
+            ++operations_in_flight_;
+            auto finish_operation = hpx::experimental::scope_exit(
+                [this] { --operations_in_flight_; });
+
             // If one of the sending threads are in suspended state, we need to
             // force a new connection to avoid deadlocks.
             constexpr bool force_connection = true;
@@ -911,9 +924,21 @@ namespace hpx::parcelset {
 
             if (!sender_connection)
             {
-                // We can safely return if no connection is available at this
-                // point. As soon as a connection becomes available it checks
-                // for pending parcels and sends those out.
+                // A clear error means that creating a new connection failed.
+                // Complete the queued parcels instead of retrying them.
+                if (ec)
+                {
+                    std::vector<parcel> parcels;
+                    std::vector<write_handler_type> handlers;
+                    if (dequeue_parcels(locality_id, parcels, handlers))
+                    {
+                        detail::call_for_each(
+                            HPX_MOVE(handlers), HPX_MOVE(parcels))(ec);
+                    }
+                }
+
+                // If no cache slot was available, ec is clear and the parcels
+                // remain queued until a connection is returned to the cache.
                 return;
             }
 

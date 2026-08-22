@@ -1031,9 +1031,18 @@ namespace hpx {
 
         if (!is_running())
         {
-            HPX_THROWS_IF(ec, hpx::error::invalid_status, "hpx::finalize",
-                "the runtime system is not active (did you already "
-                "call finalize?)");
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+            // Report error only on root locality. All other localities may have
+            // already been shutdown by the root.
+            hpx::error_code ec1(hpx::throwmode::lightweight);
+            auto const root = agas::get_console_locality(ec1);
+            if (!ec1 && agas::get_locality() == root.get_gid())
+#endif
+            {
+                HPX_THROWS_IF(ec, hpx::error::invalid_status, "hpx::finalize",
+                    "the runtime system is not active (did you already "
+                    "call finalize?)");
+            }
             return -1;
         }
 
@@ -1172,6 +1181,15 @@ namespace hpx {
                 "hpx::force_disconnect",
                 "hpx::force_disconnect cannot be used to disconnect the "
                 "console locality itself.");
+            return -1;
+        }
+
+        if (parcelset::locality_was_disconnected(
+                naming::get_locality_id_from_id(locality)))
+        {
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "hpx::force_disconnect",
+                "the requested locality was already disconnected.");
             return -1;
         }
 

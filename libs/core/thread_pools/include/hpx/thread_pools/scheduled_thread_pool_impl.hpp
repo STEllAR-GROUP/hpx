@@ -609,14 +609,26 @@ namespace hpx::threads::detail {
         thread_init_data& data, thread_id_ref_type& id, error_code& ec)
     {
         // verify state
-        if (thread_count_ == 0 &&
-            !sched_->Scheduler::is_state(hpx::state::running))
+        if (thread_count_ == 0)
         {
-            // thread-manager is not currently running
-            HPX_THROWS_IF(ec, hpx::error::invalid_status,
-                "thread_pool<Scheduler>::create_thread",
-                "invalid state: thread pool is not running");
-            return;
+            if (sched_->Scheduler::has_reached_state(hpx::state::stopping))
+            {
+                // don't schedule new threads any more if the runtime is being
+                // torn down
+                HPX_THROWS_IF(ec, hpx::error::invalid_status,
+                    "thread_pool<Scheduler>::create_thread",
+                    "runtime is being shut down, not creating any new threads");
+                return;
+            }
+
+            if (!sched_->Scheduler::is_state(hpx::state::running))
+            {
+                // thread-manager is not currently running
+                HPX_THROWS_IF(ec, hpx::error::invalid_status,
+                    "thread_pool<Scheduler>::create_thread",
+                    "invalid state: thread pool is not running");
+                return;
+            }
         }
 
         if (data.schedulehint.runs_as_child_mode() ==
@@ -638,14 +650,26 @@ namespace hpx::threads::detail {
         thread_init_data& data, error_code& ec)
     {
         // verify state
-        if (thread_count_ == 0 &&
-            !sched_->Scheduler::is_state(hpx::state::running))
+        if (thread_count_ == 0)
         {
-            // thread-manager is not currently running
-            HPX_THROWS_IF(ec, hpx::error::invalid_status,
-                "thread_pool<Scheduler>::create_work",
-                "invalid state: thread pool is not running");
-            return invalid_thread_id;
+            if (sched_->Scheduler::has_reached_state(hpx::state::stopping))
+            {
+                // don't schedule new threads any more if the runtime is being
+                // torn down
+                HPX_THROWS_IF(ec, hpx::error::invalid_status,
+                    "thread_pool<Scheduler>::create_work",
+                    "runtime is being shut down, not creating any new threads");
+                return invalid_thread_id;
+            }
+
+            if (!sched_->Scheduler::is_state(hpx::state::running))
+            {
+                // thread-manager is not currently running
+                HPX_THROWS_IF(ec, hpx::error::invalid_status,
+                    "thread_pool<Scheduler>::create_work",
+                    "invalid state: thread pool is not running");
+                return invalid_thread_id;
+            }
         }
 
         if (data.schedulehint.runs_as_child_mode() ==

@@ -50,8 +50,11 @@ namespace late_component {
                 return message_;
             }
 
-            HPX_DEFINE_COMPONENT_ACTION(
-                test_server, set_message, set_message_action)
+            struct set_message_action
+              : hpx::actions::make_action_t<decltype(&test_server::set_message),
+                    &test_server::set_message, set_message_action>
+            {
+            };
             HPX_DEFINE_COMPONENT_ACTION(
                 test_server, get_message, get_message_action)
 
@@ -94,19 +97,26 @@ namespace late_component {
     };
 }    // namespace late_component
 
-using late_component_test_client_set_message_action =
+using late_component_test_server_set_message_action =
     late_component::server::test_server::set_message_action;
-using late_component_test_client_get_message_action =
+using late_component_test_server_get_message_action =
     late_component::server::test_server::get_message_action;
 
-HPX_REGISTER_ACTION_DECLARATION(late_component_test_client_set_message_action)
-HPX_REGISTER_ACTION_DECLARATION(late_component_test_client_get_message_action)
-HPX_REGISTER_ACTION(late_component_test_client_set_message_action)
-HPX_REGISTER_ACTION(late_component_test_client_get_message_action)
+HPX_REGISTER_ACTION_DECLARATION(late_component_test_server_set_message_action)
+HPX_REGISTER_ACTION_DECLARATION(late_component_test_server_get_message_action)
 
-using late_component_test_client_type =
-    hpx::components::component<late_component::server::test_server>;
-HPX_REGISTER_COMPONENT(
-    late_component_test_client_type, late_component_test_client)
+#include <hpx/modules/datastructures.hpp>
+
+using fenced_late_component_test_server_set_message_action =
+    hpx::supervision::make_fenced_action_t<
+        late_component_test_server_set_message_action>;
+using fenced_late_component_test_server_get_message_action =
+    hpx::supervision::make_fenced_action_t<
+        late_component_test_server_get_message_action>;
+
+HPX_REGISTER_ACTION_DECLARATION(
+    fenced_late_component_test_server_set_message_action)
+HPX_REGISTER_ACTION_DECLARATION(
+    fenced_late_component_test_server_get_message_action)
 
 #endif

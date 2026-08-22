@@ -9,6 +9,7 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/futures.hpp>
+#include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/type_support.hpp>
 
@@ -900,7 +901,10 @@ namespace hpx::supervision::server {
             if (!keep_registered)
             {
                 // remove observer from the given target
-                std::unique_lock<hpx::spinlock> l(mtx_);
+                using unique_lock = std::unique_lock<hpx::spinlock>;
+
+                unique_lock l(mtx_);
+                util::ignore_while_checking<unique_lock> il(&l);
 
                 deactivated = unregister_observer_target(target, agent);
                 remove_target_from_agents_locked(l, agent, target);
@@ -1297,7 +1301,10 @@ namespace hpx::supervision::server {
         stale_waiters_t stale_waiters;
 
         {
-            std::unique_lock<hpx::spinlock> l(mtx_);
+            using unique_lock = std::unique_lock<hpx::spinlock>;
+
+            unique_lock l(mtx_);
+            util::ignore_while_checking<unique_lock> il(&l);
 
             if (auto const it2 = states_.find(target); it2 != states_.end())
             {
@@ -1526,9 +1533,10 @@ namespace hpx::supervision::server {
         hpx::id_type const& observer_handle)
     {
         {
-            std::unique_lock<hpx::spinlock> l(mtx_);
-            hpx::util::ignore_while_checking<std::unique_lock<hpx::spinlock>>
-                il(&l);
+            using unique_lock = std::unique_lock<hpx::spinlock>;
+
+            unique_lock l(mtx_);
+            util::ignore_while_checking<unique_lock> il(&l);
 
             // Remove the matching entry from activity_observers_, if any; a
             // handle returned by register_observer() (found in agents_) or one

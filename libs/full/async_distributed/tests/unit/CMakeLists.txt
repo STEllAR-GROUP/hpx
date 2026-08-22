@@ -18,6 +18,7 @@ foreach(subdir ${subdirs})
 endforeach()
 
 set(tests
+    async_cb_post_failure
     async_cb_remote
     async_cb_remote_client
     async_continue
