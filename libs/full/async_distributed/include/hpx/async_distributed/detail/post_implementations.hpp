@@ -29,7 +29,7 @@ namespace hpx::detail {
         Ts&&... vs)
     {
         using action_type = hpx::traits::extract_action_t<Action>;
-        using component_type = typename action_type::component_type;
+        using component_type = action_type::component_type;
 
         if (!traits::action_is_target_valid<action_type>::call(id))
         {
@@ -108,7 +108,7 @@ namespace hpx::detail {
         }
 
         using action_type = hpx::traits::extract_action_t<Action>;
-        using component_type = typename action_type::component_type;
+        using component_type = action_type::component_type;
 
         // Determine whether the id is local or remote
         if (!traits::action_is_target_valid<action_type>::call(id))
@@ -162,7 +162,7 @@ namespace hpx::detail {
     bool post_impl(hpx::id_type const& id, hpx::launch policy, Ts&&... vs)
     {
         using action_type = hpx::traits::extract_action_t<Action>;
-        using component_type = typename action_type::component_type;
+        using component_type = action_type::component_type;
 
         if (!traits::action_is_target_valid<action_type>::call(id))
         {
@@ -236,7 +236,7 @@ namespace hpx::detail {
         }
 
         using action_type = hpx::traits::extract_action_t<Action>;
-        using component_type = typename action_type::component_type;
+        using component_type = action_type::component_type;
 
         // Determine whether the id is local or remote
         if (!traits::action_is_target_valid<action_type>::call(id))
@@ -292,23 +292,22 @@ namespace hpx::detail {
         hpx::launch policy, Callback&& cb, Ts&&... vs)
     {
         using action_type = hpx::traits::extract_action_t<Action>;
-        using component_type = typename action_type::component_type;
+        using component_type = action_type::component_type;
 
         if (!traits::action_is_target_valid<action_type>::call(id))
         {
-            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
-                "hpx::detail::post_cb_impl",
-                "the target (destination) does not match the action type ({})",
-                hpx::actions::detail::get_action_name<action_type>());
+            invoke_callback(HPX_FORWARD(Callback, cb),
+                make_system_error_code(hpx::error::bad_parameter));
+            return false;
         }
 
 #if defined(HPX_HAVE_FORCE_DISCONNECT)
         if (parcelset::locality_was_disconnected(
                 naming::get_locality_id_from_id(id)))
         {
-            HPX_THROW_EXCEPTION(hpx::error::locality_was_disconnected,
-                "hpx::detail::post_impl",
-                "the requested locality {} was disconnected", id);
+            invoke_callback(HPX_FORWARD(Callback, cb),
+                make_system_error_code(hpx::error::locality_was_disconnected));
+            return false;
         }
 #endif
 
@@ -371,23 +370,22 @@ namespace hpx::detail {
         hpx::id_type const& id, hpx::launch policy, Callback&& cb, Ts&&... vs)
     {
         using action_type = hpx::traits::extract_action_t<Action>;
-        using component_type = typename action_type::component_type;
+        using component_type = action_type::component_type;
 
         if (!traits::action_is_target_valid<action_type>::call(id))
         {
-            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
-                "hpx::detail::post_cb_impl",
-                "the target (destination) does not match the action type ({})",
-                hpx::actions::detail::get_action_name<action_type>());
+            invoke_callback(HPX_FORWARD(Callback, cb),
+                make_system_error_code(hpx::error::bad_parameter));
+            return false;
         }
 
 #if defined(HPX_HAVE_FORCE_DISCONNECT)
         if (parcelset::locality_was_disconnected(
                 naming::get_locality_id_from_id(id)))
         {
-            HPX_THROW_EXCEPTION(hpx::error::locality_was_disconnected,
-                "hpx::detail::post_impl",
-                "the requested locality {} was disconnected", id);
+            invoke_callback(HPX_FORWARD(Callback, cb),
+                make_system_error_code(hpx::error::locality_was_disconnected));
+            return false;
         }
 #endif
 

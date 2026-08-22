@@ -357,7 +357,7 @@ namespace hpx::components::server {
             std::vector<hpx::id_type> const& locality_ids);
 
 #if defined(HPX_HAVE_NETWORKING)
-        void send_dijkstra_termination_token(std::uint32_t target_locality_id,
+        bool send_dijkstra_termination_token(std::uint32_t target_locality_id,
             std::uint32_t initiating_locality_id, std::uint32_t num_localities,
             bool dijkstra_token);
 #endif

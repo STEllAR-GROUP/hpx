@@ -37,6 +37,24 @@ set(example_programs component_worker plain_worker)
 # add_hpx_example_test() below for now, alongside its two workers.
 set(example_programs_build_only
     late_component_worker late_component_failing_worker late_component_launcher
+    late_component_aborting_worker
+)
+
+set(late_component_example_folder
+    "Examples/Components/Supervision/DynamicLaunch"
+)
+
+add_hpx_component(
+  late_component INTERNAL_FLAGS
+  FOLDER ${late_component_example_folder}
+  INSTALL_HEADERS
+  INSTALL_COMPONENT runtime ${HPX_WITH_UNITY_BUILD_OPTION}
+  PREPEND_SOURCE_ROOT PREPEND_HEADER_ROOT
+  HEADER_ROOT "${CMAKE_CURRENT_SOURCE_DIR}"
+  HEADERS late_component_worker.hpp
+  SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}"
+  SOURCES late_component.cpp
+  DEPENDENCIES supervision_dispatch_component
 )
 
 # cmake-format: off
@@ -54,16 +72,28 @@ set(component_worker_FLAGS
 
 set(late_component_worker_FLAGS
     HEADERS late_component_worker.hpp
-    DEPENDENCIES supervision_dispatch_component
+    DEPENDENCIES supervision_dispatch_component late_component_component
 )
+set(late_component_worker_FOLDER ${late_component_example_folder})
+
 set(late_component_failing_worker_FLAGS
     HEADERS late_component_worker.hpp
-    DEPENDENCIES supervision_dispatch_component
+    DEPENDENCIES supervision_dispatch_component late_component_component
 )
+set(late_component_failing_worker_FOLDER ${late_component_example_folder})
+
+set(late_component_aborting_worker_FLAGS
+    HEADERS late_component_worker.hpp
+    DEPENDENCIES supervision_dispatch_component late_component_component
+)
+set(late_component_aborting_worker_FOLDER ${late_component_example_folder})
+
 set(late_component_launcher_FLAGS
     HEADERS late_component_worker.hpp
     DEPENDENCIES supervision_dispatch_component process_component
+                 late_component_component
 )
+set(late_component_launcher_FOLDER ${late_component_example_folder})
 # cmake-format: on
 
 foreach(example_program ${example_programs} ${example_programs_build_only})
@@ -71,11 +101,16 @@ foreach(example_program ${example_programs} ${example_programs_build_only})
 
   source_group("Source Files" FILES ${sources})
 
+  set(example_folder "Examples/Components/Supervision")
+  if(${example_program}_FOLDER)
+    set(example_folder ${${example_program}_FOLDER})
+  endif()
+
   # add example executable
   add_hpx_executable(
     ${example_program} INTERNAL_FLAGS
     SOURCES ${sources} ${${example_program}_FLAGS}
-    FOLDER "Examples/Components/Supervision"
+    FOLDER ${example_folder}
   )
 
   add_hpx_example_target_dependencies(
@@ -85,6 +120,7 @@ endforeach()
 
 add_dependencies(
   late_component_launcher late_component_worker late_component_failing_worker
+  late_component_aborting_worker
 )
 
 if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)

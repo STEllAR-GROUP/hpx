@@ -378,7 +378,14 @@ namespace {
             hpx::supervision::await_terminal(hpx::launch::sync,
                 peer.peer_locality, epoch, grace_interval, ec2);
 
-            if (!ec2 || get_error(ec2) != hpx::error::future_cancelled)
+            if (!ec2)
+            {
+                // peer became responsive during the grace window
+                return false;
+            }
+            if (auto const err = get_error(ec2);
+                err != hpx::error::future_cancelled &&
+                err != hpx::error::locality_was_disconnected)
             {
                 // peer became responsive during the grace window
                 return false;
@@ -502,7 +509,31 @@ namespace {
                 last_lifecycle_epoch = state.epoch;
                 failures = 0;
 
-                auto cont = [peer, epoch = state.epoch,
+                constexpr auto publish_failed_event =
+                    [](hpx::id_type const& peer_locality,
+                        std::uint64_t const epoch) {
+                        // No progress since the wait started: genuine stall. Before
+                        // fencing, re-confirm the target still has *this* epoch
+                        // open - remove_target() on the peer may have erased its
+                        // states_ entry in the interim (e.g. the peer
+                        // left/rejoined), in which case a `failed` fence would be
+                        // rejected as an illegal new-epoch opener. Treat that as a
+                        // no-op, mirroring the state.ec branch above.
+                        hpx::error_code ec_check(hpx::throwmode::lightweight);
+                        auto const recheck = hpx::supervision::query_state(
+                            peer_locality, ec_check);
+                        if (ec_check || recheck.ec || recheck.epoch != epoch)
+                            return;
+
+                        // No progress since the wait started: genuine
+                        // stall. Fence locally only, never touch the peer's
+                        // own registry.
+                        hpx::error_code ec3(hpx::throwmode::lightweight);
+                        hpx::supervision::publish_event(peer_locality,
+                            hpx::supervision::event::failed, epoch, ec3);
+                    };
+
+                auto cont = [publish_failed_event, peer, epoch = state.epoch,
                                 seq = state.event_sequence_number,
                                 poll_timeout](auto&& f) {
                     hpx::detail::try_catch_exception_ptr<hpx::exception>(
@@ -511,35 +542,37 @@ namespace {
                             f.get();
                         },
                         [&](hpx::exception const& e) {
-                            if (e.get_error() != hpx::error::future_cancelled)
+                            if (auto const err = e.get_error();
+                                err != hpx::error::future_cancelled &&
+                                err != hpx::error::locality_was_disconnected)
+                            {
                                 return;
+                            }
 
                             if (!stalled_after_grace(
                                     seq, peer, epoch, poll_timeout))
+                            {
                                 return;    // not stalled (yet)
+                            }
 
-                            // No progress since the wait started: genuine
-                            // stall. Before fencing, re-confirm the target
-                            // still has *this* epoch open - remove_target() on
-                            // the peer may have erased its states_ entry in the
-                            // interim (e.g. the peer left/rejoined), in which
-                            // case a `failed` fence would be rejected as an
-                            // illegal new-epoch opener. Treat that as a no-op,
-                            // mirroring the state.ec branch above.
-                            hpx::error_code ec_check(
-                                hpx::throwmode::lightweight);
-                            auto const recheck = hpx::supervision::query_state(
-                                peer.peer_locality, ec_check);
-                            if (ec_check || recheck.ec ||
-                                recheck.epoch != epoch)
-                                return;
+                            publish_failed_event(peer.peer_locality, epoch);
+                        },
+                        [&](std::exception_ptr const& ep) {
+                            // Unanticipated failure mode (not an
+                            // hpx::exception): report it rather than silently
+                            // discarding it, and only fence if the same
+                            // stalled/disconnected condition as the typed
+                            // branch can be confirmed - an unrelated exception
+                            // must not by itself cause an incorrect peer fence.
+                            hpx::report_error(ep);
 
-                            // No progress since the wait started: genuine
-                            // stall. Fence locally only, never touch the peer's
-                            // own registry.
-                            hpx::error_code ec3(hpx::throwmode::lightweight);
-                            hpx::supervision::publish_event(peer.peer_locality,
-                                hpx::supervision::event::failed, epoch, ec3);
+                            if (!stalled_after_grace(
+                                    seq, peer, epoch, poll_timeout))
+                            {
+                                return;    // not stalled (yet)
+                            }
+
+                            publish_failed_event(peer.peer_locality, epoch);
                         });
                 };
 
