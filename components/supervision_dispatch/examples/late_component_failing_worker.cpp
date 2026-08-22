@@ -70,7 +70,7 @@ namespace {
 
     // Long enough to comfortably absorb AGAS/peer-startup jitter; short enough
     // to keep this example fast (mirrors plain_worker.cpp).
-    constexpr std::chrono::milliseconds worker_discovery_timeout{500000};
+    constexpr std::chrono::milliseconds worker_discovery_timeout{5000};
 
     // Testing-only knob: must be set before init() starts
     // failure_detection_loop() to take effect for this worker's own lifecycle,
@@ -142,7 +142,9 @@ namespace {
         // registry state.
         hpx::supervision::testing::stop_background_loops();
 
-        return hpx::disconnect();
+        // Disconnect from HPX, ignore all errors.
+        hpx::error_code ec(hpx::throwmode::lightweight);
+        return hpx::disconnect(ec);
     }
 }    // namespace
 
@@ -161,7 +163,12 @@ int main(int argc, char* argv[])
     hpx::init_params init_args;
     init_args.mode = hpx::runtime_mode::connect;
 
-    return hpx::init(argc, argv, init_args);
+    int const result = hpx::init(argc, argv, init_args);
+
+    hpx::util::format_to(
+        std::cerr, "late_component_failing_worker: complete, exited.\n");
+
+    return result;
 }
 
 #else
