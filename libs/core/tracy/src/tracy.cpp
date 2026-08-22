@@ -85,11 +85,11 @@ namespace hpx::tracy {
     {
         if (color == 0)
         {
-            TracyCMessageS(text, size, 0);
+            TracyCMessageS(text, size, 10);
         }
         else
         {
-            TracyCMessageCS(text, size, color, 0);
+            TracyCMessageCS(text, size, color, 10);
         }
     }
 
