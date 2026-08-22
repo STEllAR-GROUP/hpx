@@ -743,12 +743,7 @@ namespace hpx::threads::policies {
                     q->get_next_thread(thrd, true, true))
                 {
                     increment_counters(q, this_queue);
-                    if (auto* thrd_data = get_thread_id_data(thrd))
-                    {
-                        hpx::tracing::work_stolen(num_thread, idx, thrd_data,
-                            thread_data::get_safe_description(
-                                thrd_data->get_description(), "thread"));
-                    }
+                    hpx::tracing::work_stolen(num_thread, idx, thrd);
                     return true;
                 }
                 return false;
@@ -768,13 +763,7 @@ namespace hpx::threads::policies {
                         q->get_next_thread(thrd, true, true))
                     {
                         increment_counters(q, this_high_priority_queue);
-                        if (auto* thrd_data = get_thread_id_data(thrd))
-                        {
-                            hpx::tracing::work_stolen(num_thread, idx,
-                                thrd_data,
-                                thread_data::get_safe_description(
-                                    thrd_data->get_description(), "thread"));
-                        }
+                        hpx::tracing::work_stolen(num_thread, idx, thrd);
                         return true;
                     }
                 }
