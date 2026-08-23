@@ -294,6 +294,7 @@ namespace hpx::collectives {
             return it->second.second;
         }
 
+        /// Returns the number of entries the cache currently holds.
         std::size_t get_cached_channel_communicator_count()
         {
             std::unique_lock<hpx::mutex> l(cached_channel_communicators_mtx);

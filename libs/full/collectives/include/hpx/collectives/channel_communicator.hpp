@@ -314,8 +314,8 @@ namespace hpx::collectives {
 
         HPX_EXPORT void reset_cached_channel_communicators();
 
-        // The number of entries currently held, for tests to verify that
-        // repeated lookups reuse an entry instead of growing the cache.
+        /// The number of entries currently held, for tests to verify that
+        /// repeated lookups reuse an entry instead of growing the cache.
         HPX_EXPORT std::size_t get_cached_channel_communicator_count();
     }    // namespace detail
 }    // namespace hpx::collectives

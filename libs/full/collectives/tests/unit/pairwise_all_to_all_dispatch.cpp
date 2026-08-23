@@ -252,8 +252,8 @@ void test_default_generation_still_works(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// One site's half of the exchange below. The site may be left to the default,
-// which resolves to the locality id the task runs on.
+/// One site's half of the exchange below. The site may be left to the default,
+/// which resolves to the locality id the task runs on.
 void run_colocated_site(std::string const& basename, std::uint32_t const site,
     std::uint32_t const num_sites, this_site_arg const this_site)
 {
@@ -265,9 +265,9 @@ void run_colocated_site(std::string const& basename, std::uint32_t const site,
     check_result(result, site, num_sites);
 }
 
-// A collective site need not be an HPX locality. Run four site indices through
-// HPX threads in one locality so they share one process-local cache. Each site
-// still needs its own communicator endpoint.
+/// A collective site need not be an HPX locality. Run four site indices through
+/// HPX threads in one locality so they share one process-local cache. Each site
+/// still needs its own communicator endpoint.
 void test_colocated_sites(
     std::uint32_t const this_locality, std::uint32_t const num_sites)
 {
@@ -288,10 +288,10 @@ void test_colocated_sites(
     hpx::wait_all(sites);
 }
 
-// The site that matches the locality id leaves this_site to the default
-// resolution instead of naming itself; the default has to land on the same
-// communicator the explicit value would have named, or the sites would split
-// across different groups and wait on each other forever.
+/// The site that matches the locality id leaves this_site to the default
+/// resolution instead of naming itself; the default has to land on the same
+/// communicator the explicit value would have named, or the sites would split
+/// across different groups and wait on each other forever.
 void test_colocated_sites_with_defaults(
     std::uint32_t const this_locality, std::uint32_t const num_sites)
 {

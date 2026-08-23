@@ -30,8 +30,8 @@ using namespace hpx::collectives;
 ///////////////////////////////////////////////////////////////////////////////
 namespace {
 
-    // The cache is per process, so every locality needs a basename of its own
-    // or the sites would collide on the AGAS names they register.
+    /// The cache is per process, so every locality needs a basename of its own
+    /// or the sites would collide on the AGAS names they register.
     std::string cache_basename(
         std::uint32_t const this_locality, char const* leaf = "")
     {
@@ -39,9 +39,9 @@ namespace {
             std::to_string(this_locality) + "/" + leaf;
     }
 
-    // The communicator records the (num_sites, this_site) pair it was built
-    // for, which is what a site that received a foreign communicator would
-    // give away.
+    /// The communicator records the (num_sites, this_site) pair it was built
+    /// for, which is what a site that received a foreign communicator would
+    /// give away.
     std::pair<std::size_t, std::size_t> cached_info(
         hpx::shared_future<hpx::collectives::channel_communicator> const& comm)
     {
@@ -50,9 +50,9 @@ namespace {
             static_cast<std::size_t>(info.second));
     }
 
-    // Each site must receive the communicator registered for its own endpoint.
-    // Were the cache keyed by basename alone, every site after the first would
-    // get that site's communicator, whose this_site reports a foreign index.
+    /// Each site must receive the communicator registered for its own endpoint.
+    /// Were the cache keyed by basename alone, every site after the first would
+    /// get that site's communicator, whose this_site reports a foreign index.
     void test_each_site_gets_its_own_communicator(
         std::uint32_t const this_locality)
     {
@@ -75,8 +75,8 @@ namespace {
             detail::get_cached_channel_communicator_count(), count_before + 4);
     }
 
-    // Repeating a lookup for the same (basename, site) must reuse the entry
-    // rather than create and register a second communicator.
+    /// Repeating a lookup for the same (basename, site) must reuse the entry
+    /// rather than create and register a second communicator.
     void test_repeated_lookup_reuses_entry(std::uint32_t const this_locality)
     {
         std::string const basename = cache_basename(this_locality, "reuse/");
@@ -101,8 +101,8 @@ namespace {
         HPX_TEST_EQ(info_second.second, info.second);
     }
 
-    // A default site resolves to the locality id, so the default and the
-    // explicit spelling of that site must meet in the same cache entry.
+    /// A default site resolves to the locality id, so the default and the
+    /// explicit spelling of that site must meet in the same cache entry.
     void test_default_site_resolves_to_locality(
         std::uint32_t const this_locality)
     {
@@ -128,9 +128,9 @@ namespace {
         HPX_TEST_EQ(info_explicit.second, info.second);
     }
 
-    // A second call that disagrees about the number of sites must not reuse
-    // the cached communicator: the exchange would run with the wrong group
-    // size while the caller believes it named another one.
+    /// A second call that disagrees about the number of sites must not reuse
+    /// the cached communicator: the exchange would run with the wrong group
+    /// size while the caller believes it named another one.
     void test_num_sites_mismatch_is_rejected(std::uint32_t const this_locality)
     {
         std::string const basename = cache_basename(this_locality, "mismatch/");
@@ -153,8 +153,8 @@ namespace {
         HPX_TEST(caught);
     }
 
-    // A default number of sites resolves to the number of localities before
-    // the lookup, so it is compared against the entry like an explicit one.
+    /// A default number of sites resolves to the number of localities before
+    /// the lookup, so it is compared against the entry like an explicit one.
     void test_default_num_sites_mismatch_is_rejected(
         std::uint32_t const this_locality)
     {
