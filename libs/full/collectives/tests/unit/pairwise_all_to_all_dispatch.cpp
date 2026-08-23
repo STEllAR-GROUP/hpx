@@ -252,13 +252,14 @@ void test_default_generation_still_works(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// One site's half of the exchange below.
+// One site's half of the exchange below. The site may be left to the default,
+// which resolves to the locality id the task runs on.
 void run_colocated_site(std::string const& basename, std::uint32_t const site,
-    std::uint32_t const num_sites)
+    std::uint32_t const num_sites, this_site_arg const this_site)
 {
     std::vector<std::uint32_t> const result =
         all_to_all(basename.c_str(), contribution(site, num_sites),
-            num_sites_arg(num_sites), this_site_arg(site), generation_arg(1),
+            num_sites_arg(num_sites), this_site, generation_arg(1),
             root_site_arg(), pairwise_threshold_arg(0))
             .get();
 
@@ -279,8 +280,38 @@ void test_colocated_sites(
 
     for (std::uint32_t site = 0; site != num_sites; ++site)
     {
-        sites.push_back(
-            hpx::async(run_colocated_site, basename, site, num_sites));
+        sites.push_back(hpx::async(run_colocated_site, basename, site,
+            num_sites, this_site_arg(site)));
+    }
+
+    hpx::wait_all(sites);
+    for (hpx::future<void>& site : sites)
+    {
+        site.get();
+    }
+}
+
+// The site that matches the locality id leaves this_site to the default
+// resolution instead of naming itself; the default has to land on the same
+// communicator the explicit value would have named, or the sites would split
+// across different groups and wait on each other forever.
+void test_colocated_sites_with_defaults(
+    std::uint32_t const this_locality, std::uint32_t const num_sites)
+{
+    std::string const basename =
+        "/test/pairwise_dispatch/local_sites_defaults/" +
+        std::to_string(this_locality) + "/";
+
+    std::vector<hpx::future<void>> sites;
+    sites.reserve(num_sites);
+
+    for (std::uint32_t site = 0; site != num_sites; ++site)
+    {
+        this_site_arg const this_site =
+            site == this_locality ? this_site_arg() : this_site_arg(site);
+
+        sites.push_back(hpx::async(
+            run_colocated_site, basename, site, num_sites, this_site));
     }
 
     hpx::wait_all(sites);
@@ -332,6 +363,7 @@ int hpx_main()
     test_default_generation_still_works(this_locality, num_localities);
     test_direct_path_preserves_root_validation(this_locality, num_localities);
     test_colocated_sites(this_locality, 4);
+    test_colocated_sites_with_defaults(this_locality, num_localities);
 
     return hpx::finalize();
 }
