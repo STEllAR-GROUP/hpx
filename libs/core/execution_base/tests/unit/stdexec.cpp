@@ -10,6 +10,7 @@
 #include <atomic>
 #include <chrono>
 #include <exception>
+#include <future>
 #include <stdexcept>
 #include <string>
 #include <thread>
@@ -154,9 +155,9 @@ void test_associate_pipe_syntax()
     ex::sync_wait(scope.join());
 }
 
-// Verify join() actually blocks until async work completes on another
-// thread. Uses exec::single_thread_context so spawned senders run off
-// the calling thread.
+// Verify join() remains incomplete while scoped work is in flight.
+// One operation signals that it is running and blocked, then join()
+// is started and must not complete until the operation is released.
 void test_counting_scope_concurrent_join()
 {
     exec::single_thread_context ctx;
@@ -164,25 +165,55 @@ void test_counting_scope_concurrent_join()
     std::atomic<int> completed{0};
     constexpr int n = 8;
 
+    // Synchronization: held op signals arrival, main thread releases it
+    std::promise<void> arrived;
+    std::promise<void> release;
+    auto arrived_fut = arrived.get_future();
+    auto release_fut = release.get_future();
+
     for (int i = 0; i < n; ++i)
     {
         auto work =
-            ex::schedule(ctx.get_scheduler()) | ex::then([&]() noexcept {
-                std::this_thread::sleep_for(std::chrono::milliseconds(2));
-                completed.fetch_add(1, std::memory_order_relaxed);
+            ex::schedule(ctx.get_scheduler()) | ex::then([&, i]() noexcept {
+                if (i == 0)
+                {
+                    // Signal that this operation is running and blocked
+                    arrived.set_value();
+                    release_fut.wait();
+                }
+                completed.fetch_add(1, std::memory_order_release);
             });
         ex::spawn(std::move(work), scope.get_token());
     }
 
-    scope.close();
-    ex::sync_wait(scope.join());
+    // Wait until the held operation confirms it is running
+    arrived_fut.wait();
 
-    // join() must have waited for all in-flight work
-    HPX_TEST_EQ(completed.load(), n);
+    scope.close();
+
+    // Start join() on a separate thread
+    std::atomic<bool> join_done{false};
+    std::thread joiner([&]() {
+        ex::sync_wait(scope.join());
+        join_done.store(true, std::memory_order_release);
+    });
+
+    // The held operation is still blocked; join() must not complete
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    HPX_TEST(!join_done.load(std::memory_order_acquire));
+
+    // Release the held operation
+    release.set_value();
+    joiner.join();
+
+    // join() completed only after all work finished
+    HPX_TEST(join_done.load(std::memory_order_acquire));
+    HPX_TEST_EQ(completed.load(std::memory_order_acquire), n);
 }
 
 // Verify concurrent spawns from multiple threads don't corrupt scope
-// state (exercises thread-safety of try_associate / disassociate).
+// state. One operation per thread is held at a synchronization point;
+// join() must block until all are released.
 void test_counting_scope_multithreaded_spawn()
 {
     exec::single_thread_context ctx;
@@ -190,6 +221,14 @@ void test_counting_scope_multithreaded_spawn()
     std::atomic<int> completed{0};
     constexpr int num_threads = 4;
     constexpr int spawns_per_thread = 8;
+    constexpr int n = num_threads * spawns_per_thread;
+
+    // One held operation: signals arrival, waits for release
+    std::promise<void> arrived;
+    std::promise<void> release;
+    auto arrived_fut = arrived.get_future();
+    auto release_fut = release.get_future();
+    std::atomic<bool> first_claimed{false};
 
     std::vector<std::thread> threads;
     for (int t = 0; t < num_threads; ++t)
@@ -199,7 +238,15 @@ void test_counting_scope_multithreaded_spawn()
             {
                 auto work = ex::schedule(ctx.get_scheduler()) |
                     ex::then([&]() noexcept {
-                        completed.fetch_add(1, std::memory_order_relaxed);
+                        // Exactly one operation holds the gate
+                        bool expected = false;
+                        if (first_claimed.compare_exchange_strong(
+                                expected, true, std::memory_order_acq_rel))
+                        {
+                            arrived.set_value();
+                            release_fut.wait();
+                        }
+                        completed.fetch_add(1, std::memory_order_release);
                     });
                 ex::spawn(std::move(work), scope.get_token());
             }
@@ -209,10 +256,28 @@ void test_counting_scope_multithreaded_spawn()
     for (auto& th : threads)
         th.join();
 
-    scope.close();
-    ex::sync_wait(scope.join());
+    // Wait until the held operation confirms it is running
+    arrived_fut.wait();
 
-    HPX_TEST_EQ(completed.load(), num_threads * spawns_per_thread);
+    scope.close();
+
+    // Start join() on a separate thread
+    std::atomic<bool> join_done{false};
+    std::thread joiner([&]() {
+        ex::sync_wait(scope.join());
+        join_done.store(true, std::memory_order_release);
+    });
+
+    // The held operation is still blocked; join() must not complete
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    HPX_TEST(!join_done.load(std::memory_order_acquire));
+
+    // Release the held operation
+    release.set_value();
+    joiner.join();
+
+    HPX_TEST(join_done.load(std::memory_order_acquire));
+    HPX_TEST_EQ(completed.load(std::memory_order_acquire), n);
 }
 
 // spawn on a closed scope silently drops the work (P3149 [exec.spawn])
