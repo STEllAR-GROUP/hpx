@@ -58,6 +58,9 @@ namespace {
     {
         std::string const basename = cache_basename(this_locality, "distinct/");
 
+        std::size_t const count_before =
+            detail::get_cached_channel_communicator_count();
+
         for (std::size_t site = 0; site != 4; ++site)
         {
             auto const comm = detail::get_cached_channel_communicator(
@@ -67,6 +70,9 @@ namespace {
             HPX_TEST_EQ(info.first, std::size_t(4));
             HPX_TEST_EQ(info.second, site);
         }
+
+        HPX_TEST_EQ(
+            detail::get_cached_channel_communicator_count(), count_before + 4);
     }
 
     // Repeating a lookup for the same (basename, site) must reuse the entry
@@ -137,8 +143,7 @@ namespace {
         try
         {
             detail::get_cached_channel_communicator(
-                basename, num_sites_arg(3), this_site_arg(1))
-                .get();
+                basename, num_sites_arg(3), this_site_arg(1));
         }
         catch (hpx::exception const& e)
         {

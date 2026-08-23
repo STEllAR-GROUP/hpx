@@ -233,6 +233,12 @@ namespace hpx::collectives {
             auto key = std::make_pair(
                 HPX_MOVE(name), static_cast<std::size_t>(this_site));
 
+            // Two first calls that race for the same (basename, site) with
+            // different numbers of sites can both miss the cache and
+            // overwrite the same entry before either has registered a name.
+            // One name may therefore never be used for groups of different
+            // sizes, not even concurrently.
+
             std::unique_lock<hpx::mutex> l(cached_channel_communicators_mtx);
             [[maybe_unused]] util::ignore_while_checking il(&l);
 
@@ -249,8 +255,10 @@ namespace hpx::collectives {
                         "hpx::collectives::detail::"
                         "get_cached_channel_communicator",
                         "the given base name for the communicator operation "
-                        "was already used with a different number of sites: {}",
-                        it->first.first);
+                        "was already used with a different number of sites: "
+                        "{} (cached {}, requested {})",
+                        it->first.first, it->second.first,
+                        static_cast<std::size_t>(num_sites));
                 }
 
                 // Hand an exceptional creation back unchanged. Retrying after

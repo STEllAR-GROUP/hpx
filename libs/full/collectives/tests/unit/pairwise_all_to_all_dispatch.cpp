@@ -283,11 +283,9 @@ void test_colocated_sites(
             num_sites, this_site_arg(site)));
     }
 
+    // wait_all rethrows the first exceptional result, so the individual
+    // futures need no further inspection.
     hpx::wait_all(sites);
-    for (hpx::future<void>& site : sites)
-    {
-        site.get();
-    }
 }
 
 // The site that matches the locality id leaves this_site to the default
@@ -313,11 +311,9 @@ void test_colocated_sites_with_defaults(
             run_colocated_site, basename, site, num_sites, this_site));
     }
 
+    // wait_all rethrows the first exceptional result, so the individual
+    // futures need no further inspection.
     hpx::wait_all(sites);
-    for (hpx::future<void>& site : sites)
-    {
-        site.get();
-    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
