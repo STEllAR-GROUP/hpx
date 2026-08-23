@@ -293,10 +293,12 @@ namespace hpx::collectives {
         // channel communicator to avoid in the first place.
         //
         // The name must therefore identify the group of sites and not one
-        // operation on it: every call naming a given communicator has to agree
-        // on num_sites, because only the first call creates it. The future is
-        // shared because the communicator is, and returning it unwaited keeps
-        // an asynchronous caller asynchronous.
+        // operation on it: the number of sites is fixed by the first call
+        // that names a communicator, and a later call that disagrees about
+        // it is rejected instead of silently reusing an entry built for
+        // another participant count. The future is shared because the
+        // communicator is, and returning it unwaited keeps an asynchronous
+        // caller asynchronous.
         //
         // Entries live until reset_cached_channel_communicators drops them
         // during runtime shutdown, which is what releases the registered names
@@ -311,6 +313,10 @@ namespace hpx::collectives {
             this_site_arg this_site = this_site_arg());
 
         HPX_EXPORT void reset_cached_channel_communicators();
+
+        // The number of entries currently held, for tests to verify that
+        // repeated lookups reuse an entry instead of growing the cache.
+        HPX_EXPORT std::size_t get_cached_channel_communicator_count();
     }    // namespace detail
 }    // namespace hpx::collectives
 
