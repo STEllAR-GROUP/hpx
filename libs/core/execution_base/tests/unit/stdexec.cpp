@@ -7,12 +7,17 @@
 #include <hpx/modules/testing.hpp>
 
 #include <hpx/config.hpp>
+#include <atomic>
+#include <chrono>
 #include <exception>
 #include <stdexcept>
 #include <string>
+#include <thread>
 #include <utility>
+#include <vector>
 
 #include <hpx/execution_base/stdexec_forward.hpp>
+#include <exec/single_thread_context.hpp>
 
 namespace ex = hpx::execution::experimental;
 
@@ -22,7 +27,9 @@ void test_counting_scope()
     ex::simple_counting_scope scope;
     auto token = scope.get_token();
 
-    ex::spawn(ex::just(), scope.get_token());
+    bool spawn_completed = false;
+    ex::spawn(ex::just() | ex::then([&]() noexcept { spawn_completed = true; }),
+        scope.get_token());
 
     auto fut = ex::spawn_future(ex::just(42), scope.get_token());
     auto assoc = ex::associate(ex::just(7), std::move(token));
@@ -40,6 +47,8 @@ void test_counting_scope()
     HPX_TEST(assoc_value == 7);
 
     ex::sync_wait(scope.join());
+
+    HPX_TEST(spawn_completed);
 }
 
 void test_counting_scope_request_stop()
@@ -114,7 +123,7 @@ void test_spawn_future_with_error()
         catch (std::runtime_error const& e)
         {
             caught = true;
-            HPX_TEST(std::string(e.what()) == "oops");
+            HPX_TEST_EQ(std::string(e.what()), std::string("oops"));
         }
         return ex::just(-1);
     });
@@ -145,6 +154,101 @@ void test_associate_pipe_syntax()
     ex::sync_wait(scope.join());
 }
 
+// Verify join() actually blocks until async work completes on another
+// thread. Uses exec::single_thread_context so spawned senders run off
+// the calling thread.
+void test_counting_scope_concurrent_join()
+{
+    exec::single_thread_context ctx;
+    ex::simple_counting_scope scope;
+    std::atomic<int> completed{0};
+    constexpr int n = 8;
+
+    for (int i = 0; i < n; ++i)
+    {
+        auto work =
+            ex::schedule(ctx.get_scheduler()) | ex::then([&]() noexcept {
+                std::this_thread::sleep_for(std::chrono::milliseconds(2));
+                completed.fetch_add(1, std::memory_order_relaxed);
+            });
+        ex::spawn(std::move(work), scope.get_token());
+    }
+
+    scope.close();
+    ex::sync_wait(scope.join());
+
+    // join() must have waited for all in-flight work
+    HPX_TEST_EQ(completed.load(), n);
+}
+
+// Verify concurrent spawns from multiple threads don't corrupt scope
+// state (exercises thread-safety of try_associate / disassociate).
+void test_counting_scope_multithreaded_spawn()
+{
+    exec::single_thread_context ctx;
+    ex::simple_counting_scope scope;
+    std::atomic<int> completed{0};
+    constexpr int num_threads = 4;
+    constexpr int spawns_per_thread = 8;
+
+    std::vector<std::thread> threads;
+    for (int t = 0; t < num_threads; ++t)
+    {
+        threads.emplace_back([&]() {
+            for (int i = 0; i < spawns_per_thread; ++i)
+            {
+                auto work = ex::schedule(ctx.get_scheduler()) |
+                    ex::then([&]() noexcept {
+                        completed.fetch_add(1, std::memory_order_relaxed);
+                    });
+                ex::spawn(std::move(work), scope.get_token());
+            }
+        });
+    }
+
+    for (auto& th : threads)
+        th.join();
+
+    scope.close();
+    ex::sync_wait(scope.join());
+
+    HPX_TEST_EQ(completed.load(), num_threads * spawns_per_thread);
+}
+
+// spawn on a closed scope silently drops the work (P3149 [exec.spawn])
+void test_spawn_on_closed_scope()
+{
+    ex::simple_counting_scope scope;
+    scope.close();
+
+    bool executed = false;
+    ex::spawn(ex::just() | ex::then([&]() noexcept { executed = true; }),
+        scope.get_token());
+
+    ex::sync_wait(scope.join());
+
+    // work must NOT have been started
+    HPX_TEST(!executed);
+}
+
+// spawn_future on a closed scope completes via set_stopped
+// (P3149 [exec.spawn.future])
+void test_spawn_future_on_closed_scope()
+{
+    ex::simple_counting_scope scope;
+    scope.close();
+
+    auto fut = ex::spawn_future(ex::just(42), scope.get_token());
+
+    // stopped_as_optional converts set_stopped to std::nullopt
+    auto result = ex::sync_wait(std::move(fut) | ex::stopped_as_optional());
+    HPX_TEST(result.has_value());
+    auto [opt_val] = std::move(*result);
+    HPX_TEST(!opt_val.has_value());
+
+    ex::sync_wait(scope.join());
+}
+
 int main()
 {
     auto x = hpx::execution::experimental::just(42);
@@ -162,6 +266,10 @@ int main()
     test_closed_scope_rejects_association();
     test_spawn_future_with_error();
     test_associate_pipe_syntax();
+    test_counting_scope_concurrent_join();
+    test_counting_scope_multithreaded_spawn();
+    test_spawn_on_closed_scope();
+    test_spawn_future_on_closed_scope();
 
     return hpx::util::report_errors();
 }
