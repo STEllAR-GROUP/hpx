@@ -17,7 +17,7 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/collectives/channel_communicator.hpp>
+#include <hpx/modules/collectives.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <cstddef>
@@ -83,8 +83,8 @@ namespace {
         auto const second = detail::get_cached_channel_communicator(
             basename, num_sites_arg(4), this_site_arg(2));
 
-        HPX_TEST_EQ(detail::get_cached_channel_communicator_count(),
-            count_before + 1);
+        HPX_TEST_EQ(
+            detail::get_cached_channel_communicator_count(), count_before + 1);
 
         auto const info = cached_info(first);
         HPX_TEST_EQ(info.first, std::size_t(4));
@@ -105,13 +105,13 @@ namespace {
         std::size_t const count_before =
             detail::get_cached_channel_communicator_count();
 
-        auto const resolved = detail::get_cached_channel_communicator(
-            basename, num_sites_arg(4));
+        auto const resolved =
+            detail::get_cached_channel_communicator(basename, num_sites_arg(4));
         auto const explicit_site = detail::get_cached_channel_communicator(
             basename, num_sites_arg(4), this_site_arg(this_locality));
 
-        HPX_TEST_EQ(detail::get_cached_channel_communicator_count(),
-            count_before + 1);
+        HPX_TEST_EQ(
+            detail::get_cached_channel_communicator_count(), count_before + 1);
 
         auto const info = cached_info(resolved);
         HPX_TEST_EQ(info.first, std::size_t(4));

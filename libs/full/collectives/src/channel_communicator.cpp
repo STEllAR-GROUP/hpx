@@ -212,8 +212,8 @@ namespace hpx::collectives {
     namespace detail {
 
         hpx::shared_future<collectives::channel_communicator>
-        get_cached_channel_communicator(std::string name,
-            num_sites_arg num_sites, this_site_arg this_site)
+        get_cached_channel_communicator(
+            std::string name, num_sites_arg num_sites, this_site_arg this_site)
         {
             // The site identifies the entry, so it has to be the one the
             // communicator registers under rather than the placeholder

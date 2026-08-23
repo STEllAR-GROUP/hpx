@@ -257,11 +257,10 @@ void test_default_generation_still_works(
 void run_colocated_site(std::string const& basename, std::uint32_t const site,
     std::uint32_t const num_sites, this_site_arg const this_site)
 {
-    std::vector<std::uint32_t> const result =
-        all_to_all(basename.c_str(), contribution(site, num_sites),
-            num_sites_arg(num_sites), this_site, generation_arg(1),
-            root_site_arg(), pairwise_threshold_arg(0))
-            .get();
+    std::vector<std::uint32_t> const result = all_to_all(basename.c_str(),
+        contribution(site, num_sites), num_sites_arg(num_sites), this_site,
+        generation_arg(1), root_site_arg(), pairwise_threshold_arg(0))
+                                                  .get();
 
     check_result(result, site, num_sites);
 }
