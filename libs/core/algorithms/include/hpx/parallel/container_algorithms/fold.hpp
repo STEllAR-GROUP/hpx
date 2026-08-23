@@ -357,7 +357,7 @@ namespace hpx::ranges {
                 return result_type{HPX_MOVE(first), hpx::optional<U>()};
             }
 
-            U result = hpx::traits::iter_value_t<InIter>(*first);
+            U result{*first};
             ++first;
 
             for (; first != last; ++first)
@@ -553,7 +553,7 @@ namespace hpx::ranges {
             }
 
             auto it = hpx::parallel::detail::advance_to_sentinel(first, last);
-            U result = hpx::traits::iter_value_t<BidIter>(*--it);
+            U result{*--it};
 
             while (it != first)
             {
