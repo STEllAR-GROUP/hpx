@@ -337,11 +337,14 @@ namespace hpx::ranges {
         // clang-format off
         requires (
             std::input_iterator<InIter> &&
-            std::constructible_from<hpx::traits::iter_value_t<InIter>,
-                hpx::traits::iter_reference_t<InIter>> &&
             std::sentinel_for<Sent, InIter> &&
             hpx::is_indirectly_binary_left_foldable<F,
-                hpx::traits::iter_value_t<InIter>, InIter>
+                hpx::traits::iter_value_t<InIter>, InIter> &&
+            std::constructible_from<
+                std::decay_t<hpx::util::invoke_result_t<F&,
+                    hpx::traits::iter_value_t<InIter>,
+                    hpx::traits::iter_reference_t<InIter>>>,
+                hpx::traits::iter_reference_t<InIter>>
         )
         // clang-format on
         static auto invoke_default(InIter first, Sent last, F f)
@@ -372,12 +375,14 @@ namespace hpx::ranges {
         // clang-format off
         requires (
             std::ranges::input_range<Rng> &&
-            std::constructible_from<
-                hpx::traits::iter_value_t<std::ranges::iterator_t<Rng>>,
-                std::ranges::range_reference_t<Rng>> &&
             hpx::is_indirectly_binary_left_foldable<F,
                 hpx::traits::iter_value_t<std::ranges::iterator_t<Rng>>,
-                std::ranges::iterator_t<Rng>>
+                std::ranges::iterator_t<Rng>> &&
+            std::constructible_from<
+                std::decay_t<hpx::util::invoke_result_t<F&,
+                    hpx::traits::iter_value_t<std::ranges::iterator_t<Rng>>,
+                    std::ranges::range_reference_t<Rng>>>,
+                std::ranges::range_reference_t<Rng>>
         )
         // clang-format on
         static auto invoke_default(Rng&& rng, F f)
@@ -437,11 +442,14 @@ namespace hpx::ranges {
         // clang-format off
         requires (
             std::input_iterator<InIter> &&
-            std::constructible_from<hpx::traits::iter_value_t<InIter>,
-                hpx::traits::iter_reference_t<InIter>> &&
             std::sentinel_for<Sent, InIter> &&
             hpx::is_indirectly_binary_left_foldable<F,
-                hpx::traits::iter_value_t<InIter>, InIter>
+                hpx::traits::iter_value_t<InIter>, InIter> &&
+            std::constructible_from<
+                std::decay_t<hpx::util::invoke_result_t<F&,
+                    hpx::traits::iter_value_t<InIter>,
+                    hpx::traits::iter_reference_t<InIter>>>,
+                hpx::traits::iter_reference_t<InIter>>
         )
         // clang-format on
         static auto invoke_default(InIter first, Sent last, F f)
@@ -455,12 +463,14 @@ namespace hpx::ranges {
         // clang-format off
         requires (
             std::ranges::input_range<Rng> &&
-            std::constructible_from<
-                hpx::traits::iter_value_t<std::ranges::iterator_t<Rng>>,
-                std::ranges::range_reference_t<Rng>> &&
             hpx::is_indirectly_binary_left_foldable<F,
                 hpx::traits::iter_value_t<std::ranges::iterator_t<Rng>>,
-                std::ranges::iterator_t<Rng>>
+                std::ranges::iterator_t<Rng>> &&
+            std::constructible_from<
+                std::decay_t<hpx::util::invoke_result_t<F&,
+                    hpx::traits::iter_value_t<std::ranges::iterator_t<Rng>>,
+                    std::ranges::range_reference_t<Rng>>>,
+                std::ranges::range_reference_t<Rng>>
         )
         // clang-format on
         static auto invoke_default(Rng&& rng, F f)
@@ -533,11 +543,14 @@ namespace hpx::ranges {
         // clang-format off
         requires (
             std::bidirectional_iterator<BidIter> &&
-            std::constructible_from<hpx::traits::iter_value_t<BidIter>,
-                hpx::traits::iter_reference_t<BidIter>> &&
             std::sentinel_for<Sent, BidIter> &&
             hpx::is_indirectly_binary_right_foldable<F,
-                hpx::traits::iter_value_t<BidIter>, BidIter>
+                hpx::traits::iter_value_t<BidIter>, BidIter> &&
+            std::constructible_from<
+                std::decay_t<hpx::util::invoke_result_t<F&,
+                    hpx::traits::iter_reference_t<BidIter>,
+                    hpx::traits::iter_value_t<BidIter>>>,
+                hpx::traits::iter_reference_t<BidIter>>
         )
         // clang-format on
         static auto invoke_default(BidIter first, Sent last, F f)
@@ -566,12 +579,14 @@ namespace hpx::ranges {
         // clang-format off
         requires (
             std::ranges::bidirectional_range<Rng> &&
-            std::constructible_from<
-                hpx::traits::iter_value_t<std::ranges::iterator_t<Rng>>,
-                std::ranges::range_reference_t<Rng>> &&
             hpx::is_indirectly_binary_right_foldable<F,
                 hpx::traits::iter_value_t<std::ranges::iterator_t<Rng>>,
-                std::ranges::iterator_t<Rng>>
+                std::ranges::iterator_t<Rng>> &&
+            std::constructible_from<
+                std::decay_t<hpx::util::invoke_result_t<F&,
+                    std::ranges::range_reference_t<Rng>,
+                    hpx::traits::iter_value_t<std::ranges::iterator_t<Rng>>>>,
+                std::ranges::range_reference_t<Rng>>
         )
         // clang-format on
         static auto invoke_default(Rng&& rng, F f)
