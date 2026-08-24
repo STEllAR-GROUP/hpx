@@ -14,8 +14,10 @@
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/schedulers.hpp>
+#include <hpx/modules/thread_support.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/topology.hpp>
+
 #include <hpx/thread_pools/scheduled_thread_pool.hpp>
 #include <hpx/thread_pools/scheduling_loop.hpp>
 
@@ -194,10 +196,15 @@ namespace hpx::threads::detail {
     }
 
     template <typename Scheduler>
-    void scheduled_thread_pool<Scheduler>::wait()
+    void scheduled_thread_pool<Scheduler>::wait(std::unique_lock<std::mutex>& l)
     {
+        hpx::unlock_guard<std::unique_lock<std::mutex>> ul(l);
         hpx::util::detail::yield_while_count(
-            [this]() { return is_busy(); }, shutdown_check_count_);
+            [&]() {
+                std::unique_lock<std::mutex> lk(*l.mutex());
+                return is_busy();
+            },
+            shutdown_check_count_);
     }
 
     template <typename Scheduler>
@@ -225,7 +232,7 @@ namespace hpx::threads::detail {
 
                 if (must_wait)
                 {
-                    wait();
+                    wait(l);
                 }
             }
 
