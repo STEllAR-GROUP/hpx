@@ -307,16 +307,18 @@ namespace hpx::collectives {
         // The communicator type has to be qualified: inside this namespace the
         // unqualified name resolves to the detail implementation class, not to
         // the public handle callers hold.
-        HPX_EXPORT hpx::shared_future<collectives::channel_communicator>
-        get_cached_channel_communicator(std::string name,
-            num_sites_arg num_sites = num_sites_arg(),
-            this_site_arg this_site = this_site_arg());
+        HPX_CXX_EXPORT HPX_EXPORT
+            hpx::shared_future<collectives::channel_communicator>
+            get_cached_channel_communicator(std::string name,
+                num_sites_arg num_sites = num_sites_arg(),
+                this_site_arg this_site = this_site_arg());
 
         HPX_EXPORT void reset_cached_channel_communicators();
 
         /// The number of entries currently held, for tests to verify that
         /// repeated lookups reuse an entry instead of growing the cache.
-        HPX_EXPORT std::size_t get_cached_channel_communicator_count();
+        HPX_CXX_EXPORT HPX_EXPORT std::size_t
+        get_cached_channel_communicator_count();
     }    // namespace detail
 }    // namespace hpx::collectives
 
