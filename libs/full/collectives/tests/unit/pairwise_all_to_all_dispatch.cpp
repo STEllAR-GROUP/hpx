@@ -19,6 +19,7 @@
 #include <hpx/modules/testing.hpp>
 
 #include <array>
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <string>
@@ -265,6 +266,29 @@ void run_colocated_site(std::string const& basename, std::uint32_t const site,
     check_result(result, site, num_sites);
 }
 
+/// The sites of one exchange wait on each other, so a site that ends up in a
+/// communicator of its own never returns. Bound the wait, so a regression in
+/// the cache key or in the default site resolution is reported here instead of
+/// running into the CI timeout with nothing to read.
+void wait_for_sites(std::vector<hpx::future<void>> sites)
+{
+    hpx::future<std::vector<hpx::future<void>>> done = hpx::when_all(sites);
+
+    hpx::future_status const status = done.wait_for(std::chrono::seconds(120));
+    HPX_TEST(status == hpx::future_status::ready);
+
+    if (status != hpx::future_status::ready)
+    {
+        return;
+    }
+
+    // Rethrows the first site that failed.
+    for (hpx::future<void>& site : done.get())
+    {
+        site.get();
+    }
+}
+
 /// A collective site need not be an HPX locality. Run four site indices through
 /// HPX threads in one locality so they share one process-local cache. Each site
 /// still needs its own communicator endpoint.
@@ -283,9 +307,7 @@ void test_colocated_sites(
             num_sites, this_site_arg(site)));
     }
 
-    // wait_all rethrows the first exceptional result, so the individual
-    // futures need no further inspection.
-    hpx::wait_all(sites);
+    wait_for_sites(HPX_MOVE(sites));
 }
 
 /// The site that matches the locality id leaves this_site to the default
@@ -311,9 +333,7 @@ void test_colocated_sites_with_defaults(
             run_colocated_site, basename, site, num_sites, this_site));
     }
 
-    // wait_all rethrows the first exceptional result, so the individual
-    // futures need no further inspection.
-    hpx::wait_all(sites);
+    wait_for_sites(HPX_MOVE(sites));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
