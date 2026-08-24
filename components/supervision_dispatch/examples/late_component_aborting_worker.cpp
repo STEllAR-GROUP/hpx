@@ -52,7 +52,7 @@ namespace {
     // Long enough to comfortably absorb AGAS/peer-startup jitter; mirrors the
     // timeout used by late_component_worker.cpp/
     // late_component_failing_worker.cpp.
-    constexpr std::chrono::milliseconds worker_discovery_timeout{500000};
+    constexpr std::chrono::milliseconds worker_discovery_timeout{5000};
 }    // namespace
 
 int hpx_main()
@@ -106,7 +106,7 @@ int hpx_main()
 
     // Simulate a genuine, unrecoverable crash: no hpx::supervision::finalize(),
     // no hpx::disconnect(), no supervision_dispatch call to "fake" a failure.
-    // This locality's sentinel/heartbeat entry simply stops being refreshed
+    // This locality's registry/heartbeat entry simply stops being refreshed
     // from here on - root's failure_detection_loop() is what notices.
     std::exit(-1);
 }
