@@ -70,7 +70,7 @@ namespace {
 
     // Long enough to comfortably absorb AGAS/peer-startup jitter; short enough
     // to keep this example fast (mirrors plain_worker.cpp).
-    constexpr std::chrono::milliseconds worker_discovery_timeout{5000};
+    constexpr std::chrono::milliseconds worker_discovery_timeout{500000};
 
     // Testing-only knob: must be set before init() starts
     // failure_detection_loop() to take effect for this worker's own lifecycle,
@@ -99,30 +99,47 @@ namespace {
         std::vector<hpx::supervision::discovered_peer> const peers =
             hpx::supervision::discover_and_join(
                 handle, worker_discovery_timeout);
-        hpx::util::format_to(
-            std::cout, "worker joined {} peer(s)\n", peers.size());
 
-        // Do a bit of local work, demonstrating this worker was actually
-        // active before departing.
-        auto const worker =
-            hpx::new_<late_component::test_client>(hpx::find_here());
+        if (peers.empty())
+        {
+            hpx::util::format_to(std::cerr,
+                "{}: late_component_failing_worker: failed to "
+                "discover/join root locality\n",
+                hpx::find_here());
 
-        worker.set_message(
-            "step 1: joined peers, epoch " + std::to_string(epoch));
-        hpx::util::format_to(
-            std::cout, "worker reported: {}\n", worker.get_message());
+            hpx::supervision::publish_event(hpx::launch::sync, handle,
+                hpx::supervision::event::failed, epoch);
+        }
+        else
+        {
+            hpx::util::format_to(std::cerr,
+                "{}: late_component_failing_worker: worker joined {} peer(s)\n",
+                hpx::find_here(), peers.size());
 
-        worker.set_message("step 2: mid-work, about to depart");
-        hpx::util::format_to(
-            std::cout, "worker reported: {}\n", worker.get_message());
+            // Do a bit of local work, demonstrating this worker was actually
+            // active before departing.
+            auto const worker =
+                hpx::new_<late_component::test_client>(hpx::find_here());
+
+            worker.set_message(
+                "step 1: joined peers, epoch " + std::to_string(epoch));
+            hpx::util::format_to(std::cerr,
+                "{}: late_component_failing_worker: worker reported: {}\n",
+                hpx::find_here(), worker.get_message());
+
+            worker.set_message("step 2: mid-work, about to depart");
+            hpx::util::format_to(std::cerr,
+                "{}: late_component_failing_worker: worker reported: {}\n",
+                hpx::find_here(), worker.get_message());
+        }
 
         // Depart mid-epoch: no finalize() (so no event::completed is ever
         // published and neither symbol name is ever unregistered - the
-        // sentinel's last published event stays stale), and no std::abort() (so
+        // sentinel's last published event stays stale), and no std::exit() (so
         // AGAS/the parcelport connection are torn down consistently rather than
         // corrupted). First join the background loops so hpx::disconnect()
         // below does not hang waiting on them or race their teardown of
-        // sentinel/registry state.
+        // registry state.
         hpx::supervision::testing::stop_background_loops();
 
         return hpx::disconnect();
@@ -131,6 +148,9 @@ namespace {
 
 int hpx_main()
 {
+    hpx::util::format_to(std::cerr,
+        "{}: late_component_failing_worker: started\n", hpx::find_here());
+
     return run_failing_worker_role();
 }
 

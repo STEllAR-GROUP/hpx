@@ -515,8 +515,7 @@ namespace hpx::util {
             check_invariants();
         }
 
-        /// Destroys all connections for the given locality in the cache, reset
-        /// all associated counts.
+        /// Discards one checked-out connection or reserved connection slot.
         void clear(
             key_type const& l, [[maybe_unused]] connection_type const& conn)
         {
@@ -548,7 +547,10 @@ namespace hpx::util {
 
                 // the connection itself will go out of scope on return
 #if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
-                conn->set_state(Connection::state_deleting);
+                if (conn)
+                {
+                    conn->set_state(Connection::state_deleting);
+                }
 #endif
             }
 

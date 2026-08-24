@@ -21,8 +21,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
+
+#include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/runtime_distributed.hpp>
 #include <hpx/modules/supervision.hpp>
@@ -141,6 +143,60 @@ namespace hpx::supervision {
     {
     };
 
+    namespace detail {
+
+        template <typename Action,
+            typename Args = typename Action::arguments_type>
+        struct fenced_action_pack;
+
+        template <typename Action, typename... Args>
+        struct fenced_action_pack<Action, hpx::tuple<Args...>>
+        {
+            using type =
+                fenced_action<Action, hpx::id_type, std::uint64_t, Args...>;
+        };
+    }    // namespace detail
+
+    /// \brief Type trait that derives the fenced-action wrapper type for a
+    ///        given HPX \p Action.
+    ///
+    /// Given an existing HPX action type \p Action, this trait computes the
+    /// corresponding fenced_action specialization that wraps it: the target
+    /// identifier type is fixed to `hpx::id_type`, the fencing epoch type is
+    /// fixed to `std::uint64_t`, and the remaining argument types are taken
+    /// from \p Action::arguments_type (i.e. \p Action's own declared argument
+    /// list, unpacked via detail::fenced_action_pack).
+    ///
+    /// This is the type-level building block used by dispatch_work() to obtain
+    /// the concrete fenced_action type to instantiate/register for a given
+    /// wrapped action, without requiring callers to spell out fenced_action's
+    /// template arguments by hand.
+    ///
+    /// \tparam Action The wrapped HPX action type whose fenced dispatch
+    ///                wrapper should be derived.
+    ///
+    /// \see fenced_action
+    /// \see detail::fenced_action_pack
+    /// \see make_fenced_action_t
+    template <typename Action>
+        requires(hpx::traits::is_action_v<Action>)
+    struct make_fenced_action
+    {
+        using type = detail::fenced_action_pack<Action>::type;
+    };
+
+    /// \brief Convenience alias for `make_fenced_action<Action>::type`.
+    ///
+    /// Yields the fenced_action wrapper type for \p Action directly, avoiding
+    /// the `typename ...::type` boilerplate at call sites.
+    ///
+    /// \tparam Action The wrapped HPX action type whose fenced dispatch
+    ///                wrapper should be derived.
+    ///
+    /// \see make_fenced_action
+    template <typename Action>
+    using make_fenced_action_t = make_fenced_action<Action>::type;
+
     /// \brief Dispatch an action to \p target under supervision fencing, by
     ///        action type template argument.
     ///
@@ -199,8 +255,7 @@ namespace hpx::supervision {
                     "not invoked"));
         }
 
-        using fenced_action = fenced_action<Action, hpx::id_type, std::uint64_t,
-            std::decay_t<Ts>...>;
+        using fenced_action = make_fenced_action_t<Action>;
 
         // Dispatch fenced_action to run *on target's own locality*
         // (hpx::colocated), so invoke_fenced_action's re-check above is
