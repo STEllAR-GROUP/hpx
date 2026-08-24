@@ -228,6 +228,7 @@ namespace hpx::threads::detail {
 
                 hpx::tracing::task_executing(thrdptr);
 
+                // invoke background thread
                 thrd_stat = (*thrdptr)(context_storage);
 
                 if (thread_id_ref_type next = thrd_stat.move_next_thread();
