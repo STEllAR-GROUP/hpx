@@ -155,14 +155,24 @@ int hpx_main(hpx::program_options::variables_map& vm)
         }
     }
 
-    std::cout << "OK: background_work_smoke - all " << iterations
-              << " iterations completed\n"
-              << "  parcel::tcp  polls=" << parcel_tcp.polls.load()
+    std::size_t const total_polls = parcel_tcp.polls.load();
+
+    std::cout << "  parcel::tcp  polls=" << parcel_tcp.polls.load()
               << "  work=" << parcel_tcp.work_done.load() << "\n"
               << "  agas         polls=" << agas.polls.load()
               << "  work=" << agas.work_done.load() << "\n"
               << "  cuda         polls=" << cuda.polls.load()
               << "  work=" << cuda.work_done.load() << "\n";
+
+    if (total_polls == 0)
+    {
+        std::cerr << "FAIL: background_poll was never invoked\n";
+        hpx::local::finalize();
+        return -1;
+    }
+
+    std::cout << "OK: background_work_smoke - all " << iterations
+              << " iterations completed\n";
 
     hpx::local::finalize();
     return 0;
