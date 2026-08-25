@@ -88,7 +88,7 @@ namespace hpx::components::stubs {
 
     /// \brief Shutdown the given runtime system
     hpx::future<void> runtime_support::shutdown_async(
-        [[maybe_unused]] hpx::id_type const& targetgid,
+        [[maybe_unused]] hpx::id_type const& targetid,
         [[maybe_unused]] double timeout,
         [[maybe_unused]] bool const force_disconnect)
     {
@@ -106,28 +106,28 @@ namespace hpx::components::stubs {
             value.get_id().get_gid(), id_type::management_type::unmanaged);
 
 #if defined(HPX_HAVE_NETWORKING)
-        auto callback = [shared_state = traits::detail::get_shared_state(f)](
+        auto callback = [targetgid = targetid.get_gid(),
+                            shared_state = traits::detail::get_shared_state(f)](
                             std::error_code const& ec,
                             parcelset::parcel const& p) mutable {
             if (ec)
             {
-                auto const dest = p.destination();
                 if (!parcelset::locality_was_disconnected(
-                        naming::get_locality_id_from_gid(dest)))
+                        naming::get_locality_id_from_gid(targetgid)))
                 {
-                    std::exception_ptr const exception = HPX_GET_EXCEPTION(ec,
-                        "packaged_action::parcel_write_handler_cb",
-                        parcelset::dump_parcel(p));
+                    std::exception_ptr const exception =
+                        HPX_GET_EXCEPTION(ec, "runtime_support::shutdown_async",
+                            parcelset::dump_parcel(p));
                     shared_state->set_exception(exception);
                 }
             }
         };
 
-        hpx::post_cb<action_type>(targetgid, HPX_MOVE(callback), timeout,
+        hpx::post_cb<action_type>(targetid, HPX_MOVE(callback), timeout,
             HPX_MOVE(gid), force_disconnect);
 #else
         hpx::post<action_type>(
-            targetgid, timeout, HPX_MOVE(gid), force_disconnect);
+            targetid, timeout, HPX_MOVE(gid), force_disconnect);
 #endif
 
         return f;

@@ -16,6 +16,7 @@
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/components_base.hpp>
 #include <hpx/modules/naming_base.hpp>
+#include <hpx/modules/parcelset_base.hpp>
 
 #include <hpx/supervision/server/activity_agent.hpp>
 #include <hpx/supervision/server/agent.hpp>
@@ -1402,13 +1403,20 @@ namespace hpx::supervision::server {
 
         return hpx::detail::try_catch_exception_ptr(
             [&]() {
-                using action_type =
-                    activity_agent_component::invoke_if_active_action;
-                hpx::future<bool> keep_registered =
-                    hpx::async(hpx::launch::task, action_type(), agent,
-                        HPX_MOVE(notification));
+                bool erase_agent = true;
+                if (!parcelset::locality_was_disconnected(
+                        naming::get_locality_id_from_gid(agent.get_gid())))
+                {
+                    using action_type =
+                        activity_agent_component::invoke_if_active_action;
+                    hpx::future<bool> keep_registered =
+                        hpx::async(hpx::launch::task, action_type(), agent,
+                            HPX_MOVE(notification));
 
-                if (!keep_registered.get())
+                    erase_agent = !keep_registered.get();
+                }
+
+                if (erase_agent)
                 {
                     std::unique_lock<hpx::spinlock> l(mtx_);
                     std::erase_if(activity_observers_,

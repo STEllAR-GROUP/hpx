@@ -262,6 +262,15 @@ namespace hpx::parcelset {
         {
             HPX_ASSERT(dest.type() == type());
 
+            if (parcelset::locality_was_disconnected(
+                    p.destination_locality_id()))
+            {
+                f(std::error_code(make_system_error_code(
+                      hpx::error::locality_was_disconnected)),
+                    p);
+                return;
+            }
+
             // We create a shared pointer of the parcels_await object since it
             // needs to be kept alive as long as there are futures not ready
             // or GIDs to be split. This is necessary to preserve the identity
@@ -302,6 +311,24 @@ namespace hpx::parcelset {
                     parcels[i].destination_locality());
             }
 #endif
+
+            if (parcels.empty())
+            {
+                return;    // nothing to do, return early
+            }
+
+            if (parcelset::locality_was_disconnected(
+                    parcels[0].destination_locality_id()))
+            {
+                auto const e = std::error_code(make_system_error_code(
+                    hpx::error::locality_was_disconnected));
+                for (std::size_t i = 0; i != parcels.size(); ++i)
+                {
+                    handlers[i](e, parcels[i]);
+                }
+                return;
+            }
+
             // We create a shared pointer of the parcels_await object since it
             // needs to be kept alive as long as there are futures not ready
             // or GIDs to be split. This is necessary to preserve the identity

@@ -53,7 +53,7 @@ namespace {
 
     // Long enough to comfortably absorb AGAS/root-startup jitter; mirrors the
     // timeout used by plain_worker.cpp/fan_out_join.cpp.
-    constexpr std::chrono::milliseconds worker_discovery_timeout{500000};
+    constexpr std::chrono::milliseconds worker_discovery_timeout{5000};
 }    // namespace
 
 // Walks this worker through its full lifecycle: init() -> publish_event(
@@ -185,12 +185,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::chrono::milliseconds const poll_interval{
         vm["poll-interval"].as<std::uint64_t>()};
 
-    auto const result = run_worker(idle_timeout, poll_interval);
-
-    hpx::util::format_to(
-        std::cerr, "late_component_worker: complete, exited.\n");
-
-    return result;
+    return run_worker(idle_timeout, poll_interval);
 }
 
 int main(int argc, char* argv[])
@@ -214,7 +209,12 @@ int main(int argc, char* argv[])
     init_args.mode = hpx::runtime_mode::connect;
     init_args.desc_cmdline = desc_commandline;
 
-    return hpx::init(argc, argv, init_args);
+    int const result = hpx::init(argc, argv, init_args);
+
+    hpx::util::format_to(
+        std::cerr, "late_component_worker: complete, exited.\n");
+
+    return result;
 }
 
 #else
