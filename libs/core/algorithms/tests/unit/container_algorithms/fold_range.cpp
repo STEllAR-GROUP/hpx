@@ -374,8 +374,7 @@ struct ref_constructible_accumulator
     }
     ref_constructible_accumulator(
         ref_constructible_accumulator const&) = default;
-    ref_constructible_accumulator(
-        ref_constructible_accumulator&&) = default;
+    ref_constructible_accumulator(ref_constructible_accumulator&&) = default;
     ref_constructible_accumulator& operator=(
         ref_constructible_accumulator const&) = default;
     ref_constructible_accumulator& operator=(
@@ -422,14 +421,14 @@ namespace constraint_checks {
 
     // U = ref_constructible_accumulator (produced by the fold callable below)
     // The constraint: constructible_from<U, iter_ref_t> must hold.
-    static_assert(std::constructible_from<ref_constructible_accumulator,
-                      iter_ref_t>,
+    static_assert(
+        std::constructible_from<ref_constructible_accumulator, iter_ref_t>,
         "fold_left_first constraint: U must be constructible from "
         "iter_reference_t<Iter>");
 
     // Symmetrically for fold_right_last (same iterator/reference types here).
-    static_assert(std::constructible_from<ref_constructible_accumulator,
-                      iter_ref_t>,
+    static_assert(
+        std::constructible_from<ref_constructible_accumulator, iter_ref_t>,
         "fold_right_last constraint: U must be constructible from "
         "iter_reference_t<Iter>");
 
@@ -488,8 +487,8 @@ void test_fold_left_first_ref_constructible_constraint()
     // U = ref_constructible_accumulator
     // The requires()-clause checks constructible_from<U, int const&>,
     // which must hold for this to compile.
-    auto op = [](ref_constructible_accumulator acc, int const& elem)
-        -> ref_constructible_accumulator {
+    auto op = [](ref_constructible_accumulator acc,
+                  int const& elem) -> ref_constructible_accumulator {
         acc.value += elem;
         return acc;
     };
