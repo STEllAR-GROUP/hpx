@@ -1114,8 +1114,7 @@ namespace hpx::components::server {
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #if defined(HPX_HAVE_NETWORKING)
-        if (agas::is_console() &&
-            locality == agas::get_console_locality().get_gid())
+        if (agas::is_console())
         {
             // do it locally, if possible
             rtd->get_parcel_handler().remove_from_connection_cache(

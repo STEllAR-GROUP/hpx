@@ -501,15 +501,15 @@ namespace hpx::parcelset {
                 constexpr message_handler::flush_mode flush_mode =
                     message_handler::flush_mode_background_work;
 
-                auto const end = handlers_.end();
-                for (auto it = handlers_.begin(); it != end; ++it)
+                message_handler_map handlers = handlers_;
+                unlock_guard<std::unique_lock<mutex_type>> ul(l);
+
+                for (auto& handler : handlers | std::views::values)
                 {
-                    if (it->second)
+                    if (handler)
                     {
-                        std::shared_ptr<policies::message_handler> const p(
-                            it->second);
-                        unlock_guard<std::unique_lock<mutex_type>> ul(l);
-                        did_some_work = p->flush(flush_mode, stop_buffering) ||
+                        did_some_work =
+                            handler->flush(flush_mode, stop_buffering) ||
                             did_some_work;
                     }
                 }

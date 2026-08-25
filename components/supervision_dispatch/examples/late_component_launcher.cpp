@@ -91,7 +91,7 @@ namespace {
     // Long enough to comfortably absorb AGAS/peer-startup jitter for a
     // freshly-spawned worker; mirrors the timeout used by
     // late_component_worker.cpp/late_component_failing_worker.cpp.
-    constexpr std::chrono::milliseconds root_discovery_timeout{500000};
+    constexpr std::chrono::milliseconds root_discovery_timeout{5000};
 
     // Number of retries a task gets after a fenced dispatch before it is
     // dropped instead of requeued (see the catch block below).
@@ -115,14 +115,14 @@ namespace {
     enum class worker_variant : std::uint8_t
     {
         normal = 0,
-        //failing = 1,
-        //aborting = 2
+        failing = 1,
+        aborting = 2
     };
 
     constexpr char const* const worker_paths[] = {
         "late_component_worker" HPX_EXECUTABLE_EXTENSION,
-        //"late_component_failing_worker" HPX_EXECUTABLE_EXTENSION,
-        //"late_component_aborting_worker" HPX_EXECUTABLE_EXTENSION,
+        "late_component_failing_worker" HPX_EXECUTABLE_EXTENSION,
+        "late_component_aborting_worker" HPX_EXECUTABLE_EXTENSION,
     };
 
     // Everything root needs to fence/dispatch against, and eventually retire,
@@ -280,12 +280,12 @@ namespace {
         // true, unmodeled crash, rather than only ever taking the success path.
         worker_slots.emplace_back(spawn_worker(handle, worker_variant::normal));
         slot_variants.emplace_back(worker_variant::normal);
-        //worker_slots.emplace_back(
-        //    spawn_worker(handle, worker_variant::failing));
-        //slot_variants.emplace_back(worker_variant::failing);
-        //worker_slots.emplace_back(
-        //    spawn_worker(handle, worker_variant::aborting));
-        //slot_variants.emplace_back(worker_variant::aborting);
+        worker_slots.emplace_back(
+            spawn_worker(handle, worker_variant::failing));
+        slot_variants.emplace_back(worker_variant::failing);
+        worker_slots.emplace_back(
+            spawn_worker(handle, worker_variant::aborting));
+        slot_variants.emplace_back(worker_variant::aborting);
 
         std::deque<task> queue;
         queue.push_back(task{.worker_slot_index = 0,
@@ -294,12 +294,12 @@ namespace {
         queue.push_back(task{.worker_slot_index = 0,
             .payload = "hello from root: message 2 for worker 0",
             .retries = 0});
-        //queue.push_back(task{.worker_slot_index = 1,
-        //    .payload = "hello from root: message 1 for worker 1",
-        //    .retries = 0});
-        //queue.push_back(task{.worker_slot_index = 2,
-        //    .payload = "hello from root: message 1 for worker 2",
-        //    .retries = 0});
+        queue.push_back(task{.worker_slot_index = 1,
+            .payload = "hello from root: message 1 for worker 1",
+            .retries = 0});
+        queue.push_back(task{.worker_slot_index = 2,
+            .payload = "hello from root: message 1 for worker 2",
+            .retries = 0});
 
         while (!queue.empty())
         {
