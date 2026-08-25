@@ -156,8 +156,7 @@ namespace hpx::experimental {
         // clang-format off
             requires (
                 !hpx::traits::is_executor_any_v<std::decay_t<F>> &&
-                !hpx::execution::experimental::is_scheduler_v<
-                    std::decay_t<F>>
+                !hpx::execution::experimental::is_scheduler_v<std::decay_t<F>>
             )
         // clang-format on
         void run(F&& f, Ts&&... ts)
