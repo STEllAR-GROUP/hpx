@@ -355,6 +355,32 @@ void test_fold_left_first_with_iter_empty()
 }
 
 #include <memory>
+#include <type_traits>
+
+// A type that is constructible from int const& (the iterator reference type
+// for vector<int>) but does NOT have an implicit conversion from int (the
+// iter_value_t). This distinguishes the tightened constraint
+//   constructible_from<U, iter_reference_t<Iter>>
+// from the old, weaker
+//   constructible_from<iter_value_t<Iter>, iter_reference_t<Iter>>.
+struct ref_constructible_accumulator
+{
+    int value;
+
+    // Constructible from a const lvalue reference — matches iter_reference_t
+    explicit ref_constructible_accumulator(int const& v)
+      : value(v)
+    {
+    }
+    ref_constructible_accumulator(
+        ref_constructible_accumulator const&) = default;
+    ref_constructible_accumulator(
+        ref_constructible_accumulator&&) = default;
+    ref_constructible_accumulator& operator=(
+        ref_constructible_accumulator const&) = default;
+    ref_constructible_accumulator& operator=(
+        ref_constructible_accumulator&&) = default;
+};
 
 struct copyable_asymmetric_accumulator
 {
@@ -373,6 +399,41 @@ struct copyable_asymmetric_accumulator
     copyable_asymmetric_accumulator& operator=(
         copyable_asymmetric_accumulator&&) = default;
 };
+
+// ---------------------------------------------------------------------------
+// Constraint verification (static_assert)
+//
+// The requires()-clause on fold_left_first / fold_right_last now enforces
+//   std::constructible_from<U, iter_reference_t<Iter>>
+// where U = decay_t<invoke_result_t<F&, iter_value_t<Iter>,
+//                                       iter_reference_t<Iter>>>.
+//
+// For vector<int>::iterator:
+//   iter_value_t      = int
+//   iter_reference_t  = int const& (conceptually; actually int& for vector)
+//
+// ref_constructible_accumulator is constructible from int const& directly,
+// so the constraint is satisfied. Verify this statically.
+// ---------------------------------------------------------------------------
+namespace constraint_checks {
+
+    using iter_ref_t = int const&;    // representative iter_reference_t
+    using iter_val_t = int;           // representative iter_value_t
+
+    // U = ref_constructible_accumulator (produced by the fold callable below)
+    // The constraint: constructible_from<U, iter_ref_t> must hold.
+    static_assert(std::constructible_from<ref_constructible_accumulator,
+                      iter_ref_t>,
+        "fold_left_first constraint: U must be constructible from "
+        "iter_reference_t<Iter>");
+
+    // Symmetrically for fold_right_last (same iterator/reference types here).
+    static_assert(std::constructible_from<ref_constructible_accumulator,
+                      iter_ref_t>,
+        "fold_right_last constraint: U must be constructible from "
+        "iter_reference_t<Iter>");
+
+}    // namespace constraint_checks
 
 void test_fold_left_first_asymmetric()
 {
@@ -412,6 +473,56 @@ void test_fold_right_last_asymmetric()
     }
 
     HPX_TEST(std::equal(c.begin(), c.end(), expected_c.begin()));
+}
+
+// Exercises the tightened constructible_from<U, iter_reference_t<Iter>>
+// constraint with ref_constructible_accumulator as the accumulator type U.
+// The seed expression U result{*first} / U result{*--it} constructs U
+// directly from the iterator reference — exactly what the requires()-clause
+// now mandates.
+void test_fold_left_first_ref_constructible_constraint()
+{
+    std::vector<int> c = {3, 1, 4, 1, 5};
+
+    // op: (ref_constructible_accumulator, int) -> ref_constructible_accumulator
+    // U = ref_constructible_accumulator
+    // The requires()-clause checks constructible_from<U, int const&>,
+    // which must hold for this to compile.
+    auto op = [](ref_constructible_accumulator acc, int const& elem)
+        -> ref_constructible_accumulator {
+        acc.value += elem;
+        return acc;
+    };
+
+    auto result = hpx::ranges::fold_left_first(c, op);
+    HPX_TEST(result.has_value());
+    // 3 + 1 + 4 + 1 + 5 = 14
+    if (result)
+    {
+        HPX_TEST_EQ(result->value, 14);
+    }
+}
+
+void test_fold_right_last_ref_constructible_constraint()
+{
+    std::vector<int> c = {3, 1, 4, 1, 5};
+
+    // op: (int, ref_constructible_accumulator) -> ref_constructible_accumulator
+    // U = ref_constructible_accumulator
+    // The requires()-clause checks constructible_from<U, int const&>.
+    auto op = [](int const& elem, ref_constructible_accumulator acc)
+        -> ref_constructible_accumulator {
+        acc.value += elem;
+        return acc;
+    };
+
+    auto result = hpx::ranges::fold_right_last(c, op);
+    HPX_TEST(result.has_value());
+    // 3 + 1 + 4 + 1 + 5 = 14
+    if (result)
+    {
+        HPX_TEST_EQ(result->value, 14);
+    }
 }
 
 void test_fold_custom_op()
@@ -454,6 +565,9 @@ int hpx_main()
 
     test_fold_left_first_asymmetric();
     test_fold_right_last_asymmetric();
+
+    test_fold_left_first_ref_constructible_constraint();
+    test_fold_right_last_ref_constructible_constraint();
 
     test_fold_custom_op();
 
