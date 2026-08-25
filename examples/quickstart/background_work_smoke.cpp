@@ -123,6 +123,8 @@ namespace {
         return did_work;
     }
 
+    void dummy_work() {}
+
 }    // namespace
 
 int hpx_main(hpx::program_options::variables_map& vm)
@@ -140,7 +142,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         std::vector<hpx::future<void>> futures;
         futures.reserve(8);
         for (std::size_t j = 0; j < 8; ++j)
-            futures.push_back(hpx::async([] {}));
+            futures.push_back(hpx::async(&dummy_work));
 
         hpx::wait_all(futures);
 
