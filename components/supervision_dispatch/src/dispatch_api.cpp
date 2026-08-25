@@ -165,35 +165,34 @@ namespace {
         hpx::id_type const& here = hpx::find_here();
         auto local_registry = hpx::supervision::registry(here);
 
-        try
-        {
-            // New, strictly increasing epoch for this cycle's event::start
-            // publication.
-            std::uint64_t const new_epoch = ++ds.epoch_;
-            hpx::supervision::publish_event(
-                here, hpx::supervision::event::started, new_epoch);
+        hpx::detail::try_catch_exception_ptr(
+            [&]() {
+                // New, strictly increasing epoch for this cycle's event::start
+                // publication.
+                std::uint64_t const new_epoch = ++ds.epoch_;
+                hpx::supervision::publish_event(
+                    here, hpx::supervision::event::started, new_epoch);
 
-            // Step 3: register symbol name.
-            local_registry.register_name(hpx::launch::sync);
+                // Step 3: register symbol name.
+                local_registry.register_name(hpx::launch::sync);
 
-            // Step 4: single reactive discover_and_join() pass.
-            discover_and_join(local_registry, discovery_timeout);
+                // Step 4: single reactive discover_and_join() pass.
+                discover_and_join(local_registry, discovery_timeout);
 
-            // Success: install the pair for finalize() and is_initialized()
-            // to observe.
-            {
-                std::scoped_lock<hpx::spinlock> l(ds.mtx_);
-                ds.registry_ = HPX_MOVE(local_registry);
-            }
-        }
-        catch (...)
-        {
-            // Step 5: unregister both names, best-effort.
-            hpx::error_code ec1(hpx::throwmode::lightweight);
-            local_registry.unregister_name(hpx::launch::sync, ec1);
+                // Success: install the pair for finalize() and is_initialized()
+                // to observe.
+                {
+                    std::scoped_lock<hpx::spinlock> l(ds.mtx_);
+                    ds.registry_ = HPX_MOVE(local_registry);
+                }
+            },
+            [&](std::exception_ptr const& e) {
+                // Step 5: unregister both names, best-effort.
+                hpx::error_code ec1(hpx::throwmode::lightweight);
+                local_registry.unregister_name(hpx::launch::sync, ec1);
 
-            std::rethrow_exception(std::current_exception());
-        }
+                std::rethrow_exception(e);
+            });
     }
 
     bool needs_stopping(std::atomic<bool> const& flag,
@@ -379,7 +378,14 @@ namespace {
             hpx::supervision::await_terminal(hpx::launch::sync,
                 peer.peer_locality, epoch, grace_interval, ec2);
 
-            if (!ec2 || get_error(ec2) != hpx::error::future_cancelled)
+            if (!ec2)
+            {
+                // peer became responsive during the grace window
+                return false;
+            }
+            if (auto const err = get_error(ec2);
+                err != hpx::error::future_cancelled &&
+                err != hpx::error::locality_was_disconnected)
             {
                 // peer became responsive during the grace window
                 return false;
@@ -503,43 +509,71 @@ namespace {
                 last_lifecycle_epoch = state.epoch;
                 failures = 0;
 
-                auto cont = [peer, epoch = state.epoch,
-                                seq = state.event_sequence_number,
-                                poll_timeout](auto&& f) {
-                    try
-                    {
-                        f.get();    // success: real terminal event delivered
-                    }
-                    catch (hpx::exception const& e)
-                    {
-                        if (e.get_error() != hpx::error::future_cancelled)
-                            return;
-
-                        if (!stalled_after_grace(
-                                seq, peer, epoch, poll_timeout))
-                            return;    // not stalled (yet)
-
-                        // No progress since the wait started: genuine stall.
-                        // Before fencing, re-confirm the target still has
-                        // *this* epoch open - remove_target() on the peer may
-                        // have erased its states_ entry in the interim (e.g.
-                        // the peer left/rejoined), in which case a `failed`
-                        // fence would be rejected as an illegal new-epoch
-                        // opener. Treat that as a no-op, mirroring the state.ec
-                        // branch above.
+                constexpr auto publish_failed_event =
+                    [](hpx::id_type const& peer_locality,
+                        std::uint64_t const epoch) {
+                        // No progress since the wait started: genuine stall. Before
+                        // fencing, re-confirm the target still has *this* epoch
+                        // open - remove_target() on the peer may have erased its
+                        // states_ entry in the interim (e.g. the peer
+                        // left/rejoined), in which case a `failed` fence would be
+                        // rejected as an illegal new-epoch opener. Treat that as a
+                        // no-op, mirroring the state.ec branch above.
                         hpx::error_code ec_check(hpx::throwmode::lightweight);
                         auto const recheck = hpx::supervision::query_state(
-                            peer.peer_locality, ec_check);
+                            peer_locality, ec_check);
                         if (ec_check || recheck.ec || recheck.epoch != epoch)
                             return;
 
-                        // No progress since the wait started: genuine stall.
-                        // Fence locally only, never touch the peer's own
-                        // registry.
+                        // No progress since the wait started: genuine
+                        // stall. Fence locally only, never touch the peer's
+                        // own registry.
                         hpx::error_code ec3(hpx::throwmode::lightweight);
-                        hpx::supervision::publish_event(peer.peer_locality,
+                        hpx::supervision::publish_event(peer_locality,
                             hpx::supervision::event::failed, epoch, ec3);
-                    }
+                    };
+
+                auto cont = [publish_failed_event, peer, epoch = state.epoch,
+                                seq = state.event_sequence_number,
+                                poll_timeout](auto&& f) {
+                    hpx::detail::try_catch_exception_ptr<hpx::exception>(
+                        [&]() {
+                            // success: real terminal event delivered
+                            f.get();
+                        },
+                        [&](hpx::exception const& e) {
+                            if (auto const err = e.get_error();
+                                err != hpx::error::future_cancelled &&
+                                err != hpx::error::locality_was_disconnected)
+                            {
+                                return;
+                            }
+
+                            if (!stalled_after_grace(
+                                    seq, peer, epoch, poll_timeout))
+                            {
+                                return;    // not stalled (yet)
+                            }
+
+                            publish_failed_event(peer.peer_locality, epoch);
+                        },
+                        [&](std::exception_ptr const& ep) {
+                            // Unanticipated failure mode (not an
+                            // hpx::exception): report it rather than silently
+                            // discarding it, and only fence if the same
+                            // stalled/disconnected condition as the typed
+                            // branch can be confirmed - an unrelated exception
+                            // must not by itself cause an incorrect peer fence.
+                            hpx::report_error(ep);
+
+                            if (!stalled_after_grace(
+                                    seq, peer, epoch, poll_timeout))
+                            {
+                                return;    // not stalled (yet)
+                            }
+
+                            publish_failed_event(peer.peer_locality, epoch);
+                        });
                 };
 
                 checks.push_back(hpx::supervision::await_terminal(
@@ -929,25 +963,24 @@ namespace hpx::supervision {
         auto const epoch = ds.epoch_.load(std::memory_order_acquire);
 
         std::exception_ptr publish_failure;
-        try
-        {
-            auto const here = hpx::find_here();
-            if (auto const state = hpx::supervision::query_state(here);
-                state.last_event == hpx::supervision::event::started)
-            {
+        hpx::detail::try_catch_exception_ptr(
+            [&]() {
+                auto const here = hpx::find_here();
+                if (auto const state = hpx::supervision::query_state(here);
+                    state.last_event == hpx::supervision::event::started)
+                {
+                    hpx::supervision::publish_event(
+                        here, hpx::supervision::event::running, epoch);
+                }
                 hpx::supervision::publish_event(
-                    here, hpx::supervision::event::running, epoch);
-            }
-            hpx::supervision::publish_event(
-                here, hpx::supervision::event::completed, epoch);
-        }
-        catch (...)
-        {
-            // Best-effort: still unregister/re-arm below even if event
-            // publication failed, so a transient failure never permanently
-            // strands the lifecycle at `finalizing`.
-            publish_failure = std::current_exception();
-        }
+                    here, hpx::supervision::event::completed, epoch);
+            },
+            [&](std::exception_ptr const& e) {
+                // Best-effort: still unregister/re-arm below even if event
+                // publication failed, so a transient failure never permanently
+                // strands the lifecycle at `finalizing`.
+                publish_failure = e;
+            });
 
         // Unregister registry name before releasing ownership, so no new peer
         // can discover either component mid-teardown.

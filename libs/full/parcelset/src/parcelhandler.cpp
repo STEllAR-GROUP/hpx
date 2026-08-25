@@ -73,7 +73,7 @@ namespace hpx::parcelset {
         ///////////////////////////////////////////////////////////////////////////
         // default callback for put_parcel
         bool default_parcel_write_handler(
-            std::error_code const& ec, parcel const& p)
+            std::error_code const& ec, [[maybe_unused]] parcel const& p)
         {
             if (!ec)
             {
@@ -103,20 +103,25 @@ namespace hpx::parcelset {
                 }
             }
 
-            hpx::error_code ec1(hpx::throwmode::lightweight);
-            endpoints_type const& dest_endpoints =
-                agas::resolve_locality(p.destination(), ec1);
-            if (dest_endpoints.empty())
+#if defined(HPX_HAVE_FORCE_DISCONNECT)
+            // check if the destination locality is (still) known
+            auto const dest = p.destination();
+            if (locality_was_disconnected(
+                    naming::get_locality_id_from_gid(dest)))
             {
                 return true;
             }
 
-            // all unhandled exceptions are rethrown here
-            std::exception_ptr const exception = hpx::detail::get_exception(
-                hpx::exception(ec), "default_parcel_write_handler", __FILE__,
-                __LINE__, parcelset::dump_parcel(p));
+            hpx::error_code ec1(hpx::throwmode::lightweight);
+            endpoints_type const& dest_endpoints =
+                agas::resolve_locality(dest, ec1);
+            if (hpx::tolerate_node_faults() && dest_endpoints.empty())
+            {
+                return true;
+            }
+#endif
 
-            std::rethrow_exception(exception);
+            return false;
         }
     }    // namespace
 
@@ -137,7 +142,14 @@ namespace hpx::parcelset {
 
     void default_write_handler(std::error_code const& ec, parcel const& p)
     {
-        default_parcel_write_handler(ec, p);
+        if (ec && !default_parcel_write_handler(ec, p))
+        {
+            std::exception_ptr const exception = hpx::detail::get_exception(
+                hpx::exception(ec), "default_write_handler", __FILE__, __LINE__,
+                parcelset::dump_parcel(p));
+
+            std::rethrow_exception(exception);
+        }
     }
 
     parcelhandler::parcelhandler(util::runtime_configuration const& cfg)
@@ -398,12 +410,35 @@ namespace hpx::parcelset {
         }
     }
 
+    void parcelhandler::remove_handler(locality const& dest)
+    {
+        std::scoped_lock<mutex_type> l(handlers_mtx_);
+        auto const end = handlers_.end();
+        for (auto it = handlers_.begin(); it != end; /**/)
+        {
+            if (it->first.first == dest)
+            {
+                it = handlers_.erase(it);
+            }
+            else
+            {
+                ++it;
+            }
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Make sure the specified locality is not held by any connection
     ///        caches anymore
     void parcelhandler::remove_from_connection_cache(
         naming::gid_type const& gid, endpoints_type const& endpoints)
     {
+        {
+            std::lock_guard<mutex_type> l(mtx_);
+            disconnected_localities_.insert(
+                naming::get_locality_id_from_gid(gid));
+        }
+
         for (auto const& endpoint : endpoints | std::views::values)
         {
             for (auto const& pport : pports_ | std::views::values)
@@ -415,7 +450,29 @@ namespace hpx::parcelset {
             }
         }
 
+        // remove message handlers for the removed locality
+        for (auto& [idx, pp] : pports_)
+        {
+            if (idx <= 0)
+            {
+                continue;
+            }
+
+            locality const& dest = find_endpoint(endpoints, pp->type());
+            if (!dest)
+            {
+                continue;
+            }
+
+            remove_handler(dest);
+        }
         agas::remove_resolved_locality(gid);
+    }
+
+    bool parcelhandler::locality_was_disconnected(std::uint32_t const id) const
+    {
+        std::lock_guard<mutex_type> l(mtx_);
+        return disconnected_localities_.contains(id);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -444,15 +501,15 @@ namespace hpx::parcelset {
                 constexpr message_handler::flush_mode flush_mode =
                     message_handler::flush_mode_background_work;
 
-                auto const end = handlers_.end();
-                for (auto it = handlers_.begin(); it != end; ++it)
+                message_handler_map handlers = handlers_;
+                unlock_guard<std::unique_lock<mutex_type>> ul(l);
+
+                for (auto& handler : handlers | std::views::values)
                 {
-                    if (it->second)
+                    if (handler)
                     {
-                        std::shared_ptr<policies::message_handler> const p(
-                            it->second);
-                        unlock_guard<std::unique_lock<mutex_type>> ul(l);
-                        did_some_work = p->flush(flush_mode, stop_buffering) ||
+                        did_some_work =
+                            handler->flush(flush_mode, stop_buffering) ||
                             did_some_work;
                     }
                 }
@@ -617,6 +674,19 @@ namespace hpx::parcelset {
         }
     }    // namespace detail
 
+    void parcelhandler::invoke_if_not_default_handler(
+        write_handler_type const& f, std::error_code const& ec, parcel const& p)
+    {
+        using parcel_write_handler_function_type =
+            void (*)(std::error_code const&, parcel const&);
+
+        auto const target = f.target<parcel_write_handler_function_type>();
+        if (target == nullptr || *target != &default_write_handler)
+        {
+            f(ec, p);
+        }
+    }
+
     void parcelhandler::put_parcel(parcelset::parcel p)
     {
         LPT_(debug).format(
@@ -629,14 +699,29 @@ namespace hpx::parcelset {
         }
 
         auto handler = [this](std::error_code const& ec,
-                           parcelset::parcel const& p) -> void {
-            [[maybe_unused]] bool const r = invoke_write_handler(ec, p);
+                           parcelset::parcel const& pc) -> void {
+            [[maybe_unused]] bool const r = invoke_write_handler(ec, pc);
 
             LPT_(debug).format(
-                "parcelhandler::put_parcel: handled: {}", p.parcel_id());
+                "parcelhandler::put_parcel: handled: {}", pc.parcel_id());
         };
 
-        put_parcel_impl(HPX_MOVE(p), HPX_MOVE(handler));
+        if (hpx::tolerate_node_faults())
+        {
+            parcelset::parcel const hold_p = p;
+            auto hold_handler = handler;
+            hpx::detail::try_catch_exception_ptr(
+                [&]() { put_parcel_impl(HPX_MOVE(p), HPX_MOVE(handler)); },
+                [&](std::exception_ptr const& ep) {
+                    error_code const ec =
+                        make_error_code(get_error(ep), throwmode::rethrow);
+                    hold_handler(ec, hold_p);
+                });
+        }
+        else
+        {
+            put_parcel_impl(HPX_MOVE(p), HPX_MOVE(handler));
+        }
     }
 
     void parcelhandler::put_parcel(parcelset::parcel p, write_handler_type f)
@@ -652,23 +737,38 @@ namespace hpx::parcelset {
         }
 
         auto handler = [this, f = HPX_MOVE(f)](std::error_code const& ec,
-                           parcelset::parcel const& p) -> void {
-            if (invoke_write_handler(ec, p))
+                           parcelset::parcel const& pc) -> void {
+            if (invoke_write_handler(ec, pc))
             {
                 // the error was handled, pass on a success code
                 std::error_code const ec1(0, std::generic_category());
-                f(ec1, p);
+                invoke_if_not_default_handler(f, ec1, pc);
             }
             else
             {
-                f(ec, p);
+                invoke_if_not_default_handler(f, ec, pc);
             }
 
             LPT_(debug).format(
-                "parcelhandler::put_parcel: handled: {}", p.parcel_id());
+                "parcelhandler::put_parcel: handled: {}", pc.parcel_id());
         };
 
-        put_parcel_impl(HPX_MOVE(p), HPX_MOVE(handler));
+        if (hpx::tolerate_node_faults())
+        {
+            parcelset::parcel const hold_p = p;
+            auto hold_handler = handler;
+            hpx::detail::try_catch_exception_ptr(
+                [&]() { put_parcel_impl(HPX_MOVE(p), HPX_MOVE(handler)); },
+                [&](std::exception_ptr const& ep) {
+                    error_code const ec =
+                        make_error_code(get_error(ep), throwmode::rethrow);
+                    hold_handler(ec, hold_p);
+                });
+        }
+        else
+        {
+            put_parcel_impl(HPX_MOVE(p), HPX_MOVE(handler));
+        }
     }
 
     void parcelhandler::put_parcel_impl(parcel&& p, write_handler_type&& f)
@@ -776,7 +876,27 @@ namespace hpx::parcelset {
                     "parcelhandler::put_parcels: handled: {}", p.parcel_id());
             });
 
-        put_parcels_impl(HPX_MOVE(parcels), HPX_MOVE(handlers));
+        if (hpx::tolerate_node_faults())
+        {
+            std::vector<parcel> const hold_parcels = parcels;
+            std::vector<write_handler_type> const hold_handlers = handlers;
+            hpx::detail::try_catch_exception_ptr(
+                [&]() {
+                    put_parcels_impl(HPX_MOVE(parcels), HPX_MOVE(handlers));
+                },
+                [&](std::exception_ptr const& ep) {
+                    for (std::size_t i = 0; i != hold_parcels.size(); ++i)
+                    {
+                        error_code ec =
+                            make_error_code(get_error(ep), throwmode::rethrow);
+                        hold_handlers[i](ec, hold_parcels[i]);
+                    }
+                });
+        }
+        else
+        {
+            put_parcels_impl(HPX_MOVE(parcels), HPX_MOVE(handlers));
+        }
     }
 
     void parcelhandler::put_parcels(
@@ -808,11 +928,11 @@ namespace hpx::parcelset {
                 {
                     // the error was handled, pass on a success code
                     std::error_code const ec1(0, std::generic_category());
-                    f(ec1, p);
+                    invoke_if_not_default_handler(f, ec1, p);
                 }
                 else
                 {
-                    f(ec, p);
+                    invoke_if_not_default_handler(f, ec, p);
                 }
 
                 LPT_(debug).format(
@@ -820,7 +940,27 @@ namespace hpx::parcelset {
             });
         }
 
-        put_parcels_impl(HPX_MOVE(parcels), HPX_MOVE(handlers));
+        if (hpx::tolerate_node_faults())
+        {
+            std::vector<parcel> const hold_parcels = parcels;
+            std::vector<write_handler_type> const hold_handlers = handlers;
+            hpx::detail::try_catch_exception_ptr(
+                [&]() {
+                    put_parcels_impl(HPX_MOVE(parcels), HPX_MOVE(handlers));
+                },
+                [&](std::exception_ptr const& ep) {
+                    for (std::size_t i = 0; i != hold_parcels.size(); ++i)
+                    {
+                        error_code ec =
+                            make_error_code(get_error(ep), throwmode::rethrow);
+                        hold_handlers[i](ec, hold_parcels[i]);
+                    }
+                });
+        }
+        else
+        {
+            put_parcels_impl(HPX_MOVE(parcels), HPX_MOVE(handlers));
+        }
     }
 
     void parcelhandler::put_parcels_impl(std::vector<parcel>&& parcels,
@@ -968,7 +1108,7 @@ namespace hpx::parcelset {
     bool parcelhandler::invoke_write_handler(
         std::error_code const& ec, parcel const& p) const
     {
-        if (parcel_write_handler_type const f = write_handler_; f)
+        if (parcel_write_handler_type f = write_handler_; f)
         {
             return f(ec, p);
         }

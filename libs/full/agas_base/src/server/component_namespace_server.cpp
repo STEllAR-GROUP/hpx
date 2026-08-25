@@ -47,7 +47,8 @@ namespace hpx::agas::server {
         char const* servicename, error_code& ec)
     {
         // now register this AGAS instance with AGAS :-P
-        instance_name_ = agas::service_name;
+        instance_name_ = hpx::util::format(agas::service_name,
+            agas::is_connecting() ? agas::get_locality_id() : 0);
         instance_name_ += servicename;
         instance_name_ += agas::server::component_namespace_service_name;
 
@@ -277,7 +278,6 @@ namespace hpx::agas::server {
         return true;
     }    // }}}
 
-    // TODO: catch exceptions
     void component_namespace::iterate_types(
         iterate_types_function_type const& f)
     {    // {{{ iterate implementation
@@ -352,8 +352,8 @@ namespace hpx::agas::server {
             LAGAS_(info).format("component_namespace::get_component_"
                                 "typename, key({1}/{2}), "
                                 "response(no_success)",
-                int(components::get_derived_type(t)),
-                int(components::get_base_type(t)));
+                static_cast<int>(components::get_derived_type(t)),
+                static_cast<int>(components::get_base_type(t)));
 
             return result;
         }
@@ -361,8 +361,8 @@ namespace hpx::agas::server {
         LAGAS_(info).format(
             "component_namespace::get_component_typename, key({1}/{2}), "
             "response({3})",
-            int(components::get_derived_type(t)),
-            int(components::get_base_type(t)), result);
+            static_cast<int>(components::get_derived_type(t)),
+            static_cast<int>(components::get_base_type(t)), result);
 
         return result;
     }    // }}}
@@ -391,7 +391,7 @@ namespace hpx::agas::server {
                 "localities(0)",
                 key);
 
-            return std::uint32_t(0);
+            return static_cast<std::uint32_t>(0);
         }
 
         std::uint32_t num_localities =

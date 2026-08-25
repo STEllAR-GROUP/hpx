@@ -119,7 +119,12 @@ int hpx_main()
 
 int main(int argc, char* argv[])
 {
-    HPX_TEST_EQ(hpx::init(argc, argv), 0);
+    int const result = hpx::init(argc, argv);
+
+    // non-console localities may see the runtime being shutdown before they
+    // call finalize, causing an error to be reported that can be ignored.
+    HPX_TEST(result == 0 || result == -1);
+
     return hpx::util::report_errors();
 }
 
