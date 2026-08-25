@@ -487,7 +487,8 @@ namespace hpx::threads::detail {
 
                 if (do_background_work)
                 {
-                    hpx::tracing::background_work_region bg_zone(num_thread);
+                    [[maybe_unused]] hpx::tracing::background_work_region
+                        bg_zone(num_thread);
                     call_and_create_background_thread(background_thread,
                         next_thrd, scheduler, num_thread,
                         bg_work_exec_time_init, context_storage, params,
@@ -516,7 +517,8 @@ namespace hpx::threads::detail {
 
                 if (do_background_work)
                 {
-                    hpx::tracing::background_work_region bg_zone(num_thread);
+                    [[maybe_unused]] hpx::tracing::background_work_region
+                        bg_zone(num_thread);
                     call_and_create_background_thread(background_thread,
                         next_thrd, scheduler, num_thread,
                         bg_work_exec_time_init, context_storage, params,
