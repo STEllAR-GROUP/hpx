@@ -9,9 +9,9 @@
 // Simulates the three main background-work consumers present in a real HPX
 // distributed run:
 //
-//   parcel::tcp   - parcelport TCP I/O completion polling (frequent, ~10 µs)
-//   agas::resolve - AGAS global-address resolution (moderate, ~5 µs)
-//   cuda::poll    - GPU/MPI completion polling (rare, ~2 µs)
+//   parcel::tcp   - parcelport TCP I/O completion polling (frequent, ~10 us)
+//   agas::resolve - AGAS global-address resolution (moderate, ~5 us)
+//   cuda::poll    - GPU/MPI completion polling (rare, ~2 us)
 //
 // Each subsystem emits a Tracy mark_event zone on the background-fiber row
 // when it "finds" work, so the three event types are visible as distinct
@@ -45,7 +45,7 @@
 
 namespace {
 
-    // Parcel/TCP polling: fires every ~7 background calls, simulates ~10 µs of
+    // Parcel/TCP polling: fires every ~7 background calls, simulates ~10 us of
     // I/O completion processing.
     struct parcel_tcp_subsystem
     {
@@ -68,7 +68,7 @@ namespace {
         }
     } parcel_tcp;
 
-    // AGAS resolution: fires every ~23 background calls, simulates ~5 µs of
+    // AGAS resolution: fires every ~23 background calls, simulates ~5 us of
     // address-resolution work.
     struct agas_subsystem
     {
@@ -92,7 +92,7 @@ namespace {
     } agas;
 
     // CUDA/MPI completion polling: fires every ~41 background calls, simulates
-    // ~2 µs of completion-queue draining.
+    // ~2 us of completion-queue draining.
     struct cuda_subsystem
     {
         static constexpr std::size_t poll_interval = 41;
