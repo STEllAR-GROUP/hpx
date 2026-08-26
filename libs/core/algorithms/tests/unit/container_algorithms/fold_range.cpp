@@ -365,7 +365,7 @@ struct ref_constructible_accumulator
 {
     int value;
 
-    // Constructible from a const lvalue reference — matches iter_reference_t
+    // Constructible from a const lvalue reference - matches iter_reference_t
     explicit ref_constructible_accumulator(int const& v)
       : value(v)
     {
@@ -474,7 +474,7 @@ void test_fold_right_last_asymmetric()
 // Exercises the tightened constructible_from<U, iter_reference_t<Iter>>
 // constraint with ref_constructible_accumulator as the accumulator type U.
 // The seed expression U result{*first} / U result{*--it} constructs U
-// directly from the iterator reference — exactly what the requires()-clause
+// directly from the iterator reference - exactly what the requires()-clause
 // now mandates.
 void test_fold_left_first_ref_constructible_constraint()
 {
