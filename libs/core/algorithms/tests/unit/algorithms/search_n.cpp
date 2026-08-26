@@ -170,7 +170,7 @@ void search_n_test1()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// test 2: value not present — must return last
+// test 2: value not present - must return last
 template <typename IteratorTag>
 void test_search_n2_without_expolicy(IteratorTag)
 {
@@ -242,7 +242,7 @@ void search_n_test2()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// test 3: count == 0 — must return first (C++20 [alg.search] p14)
+// test 3: count == 0 - must return first (C++20 [alg.search] p14)
 template <typename IteratorTag>
 void test_search_n3_without_expolicy(IteratorTag)
 {
@@ -314,7 +314,7 @@ void search_n_test3()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// test 4: count > range length — must return last (C++20 [alg.search] p14)
+// test 4: count > range length - must return last (C++20 [alg.search] p14)
 template <typename IteratorTag>
 void test_search_n4_without_expolicy(IteratorTag)
 {
@@ -579,7 +579,7 @@ void search_n_test6()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// test 7: multiple matching windows — must return the first match
+// test 7: multiple matching windows - must return the first match
 template <typename IteratorTag>
 void test_search_n7_without_expolicy(IteratorTag)
 {
@@ -735,7 +735,7 @@ template <typename IteratorTag>
 void test_search_n_exception()
 {
     using namespace hpx::execution;
-    // vector_execution_policy would call std::terminate — not tested
+    // vector_execution_policy would call std::terminate - not tested
     test_search_n_exception(seq, IteratorTag());
     test_search_n_exception(par, IteratorTag());
 
