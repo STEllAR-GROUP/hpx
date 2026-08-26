@@ -18,9 +18,78 @@
 #include <numeric>
 #include <stdexcept>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "test_utils.hpp"
+
+///////////////////////////////////////////////////////////////////////////////
+// Shared fixture helpers to reduce code duplication
+
+std::pair<std::vector<std::size_t>, std::ptrdiff_t> get_search_n1_fixture()
+{
+    std::vector<std::size_t> c(10007);
+    // fill with values above 2 so target value stands out
+    std::fill(std::begin(c), std::end(c), (std::rand() % 100) + 3);
+    // plant 3 consecutive 1s in the middle
+    c[c.size() / 2] = 1;
+    c[c.size() / 2 + 1] = 1;
+    c[c.size() / 2 + 2] = 1;
+    return {c, static_cast<std::ptrdiff_t>(c.size() / 2)};
+}
+
+std::pair<std::vector<std::size_t>, std::ptrdiff_t> get_search_n2_fixture()
+{
+    std::vector<std::size_t> c(10007);
+    std::fill(std::begin(c), std::end(c), (std::rand() % 100) + 3);
+    // do NOT plant the target value
+    return {c, static_cast<std::ptrdiff_t>(c.size())};
+}
+
+std::pair<std::vector<std::size_t>, std::ptrdiff_t> get_search_n3_fixture()
+{
+    std::vector<std::size_t> c(10007);
+    std::fill(std::begin(c), std::end(c), (std::rand() % 100) + 3);
+    return {c, 0};
+}
+
+std::pair<std::vector<std::size_t>, std::ptrdiff_t> get_search_n5_fixture()
+{
+    std::vector<std::size_t> c(10007);
+    std::fill(std::begin(c), std::end(c), (std::rand() % 100) + 3);
+    // plant 3 consecutive 1s at the very end
+    c[c.size() - 3] = 1;
+    c[c.size() - 2] = 1;
+    c[c.size() - 1] = 1;
+    return {c, static_cast<std::ptrdiff_t>(c.size() - 3)};
+}
+
+std::pair<std::vector<std::size_t>, std::ptrdiff_t> get_search_n6_fixture()
+{
+    std::vector<std::size_t> c(10007);
+    // fill with background value 4
+    std::fill(std::begin(c), std::end(c), static_cast<std::size_t>(4));
+    // plant 0, 1, 2 in the middle
+    c[c.size() / 2] = 0;
+    c[c.size() / 2 + 1] = 1;
+    c[c.size() / 2 + 2] = 2;
+    return {c, static_cast<std::ptrdiff_t>(c.size() / 2)};
+}
+
+std::pair<std::vector<std::size_t>, std::ptrdiff_t> get_search_n7_fixture()
+{
+    std::vector<std::size_t> c(10007);
+    std::fill(std::begin(c), std::end(c), (std::rand() % 100) + 3);
+    // first match at size / 4
+    c[c.size() / 4] = 1;
+    c[c.size() / 4 + 1] = 1;
+    c[c.size() / 4 + 2] = 1;
+    // second match at size / 2
+    c[c.size() / 2] = 1;
+    c[c.size() / 2 + 1] = 1;
+    c[c.size() / 2 + 2] = 1;
+    return {c, static_cast<std::ptrdiff_t>(c.size() / 4)};
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // test 1: match in the middle of the range
@@ -30,19 +99,13 @@ void test_search_n1_without_expolicy(IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10007);
-    // fill with values above 2 so target value stands out
-    std::fill(std::begin(c), std::end(c), (std::rand() % 100) + 3);
-    // plant 3 consecutive 1s in the middle
-    c[c.size() / 2] = 1;
-    c[c.size() / 2 + 1] = 1;
-    c[c.size() / 2 + 2] = 1;
+    auto fixture = get_search_n1_fixture();
+    std::vector<std::size_t>& c = fixture.first;
 
     iterator index = hpx::search_n(iterator(std::begin(c)),
         iterator(std::end(c)), 3, static_cast<std::size_t>(1));
 
-    base_iterator test_index =
-        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2);
+    base_iterator test_index = std::begin(c) + fixture.second;
 
     HPX_TEST(index == iterator(test_index));
 }
@@ -56,17 +119,13 @@ void test_search_n1(ExPolicy policy, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10007);
-    std::fill(std::begin(c), std::end(c), (std::rand() % 100) + 3);
-    c[c.size() / 2] = 1;
-    c[c.size() / 2 + 1] = 1;
-    c[c.size() / 2 + 2] = 1;
+    auto fixture = get_search_n1_fixture();
+    std::vector<std::size_t>& c = fixture.first;
 
     iterator index = hpx::search_n(policy, iterator(std::begin(c)),
         iterator(std::end(c)), 3, static_cast<std::size_t>(1));
 
-    base_iterator test_index =
-        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2);
+    base_iterator test_index = std::begin(c) + fixture.second;
 
     HPX_TEST(index == iterator(test_index));
 }
@@ -77,18 +136,14 @@ void test_search_n1_async(ExPolicy p, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10007);
-    std::fill(std::begin(c), std::end(c), (std::rand() % 100) + 3);
-    c[c.size() / 2] = 1;
-    c[c.size() / 2 + 1] = 1;
-    c[c.size() / 2 + 2] = 1;
+    auto fixture = get_search_n1_fixture();
+    std::vector<std::size_t>& c = fixture.first;
 
     hpx::future<iterator> f = hpx::search_n(p, iterator(std::begin(c)),
         iterator(std::end(c)), 3, static_cast<std::size_t>(1));
     f.wait();
 
-    base_iterator test_index =
-        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2);
+    base_iterator test_index = std::begin(c) + fixture.second;
 
     HPX_TEST(f.get() == iterator(test_index));
 }
@@ -110,6 +165,7 @@ void test_search_n1()
 void search_n_test1()
 {
     test_search_n1<std::random_access_iterator_tag>();
+    test_search_n1<std::bidirectional_iterator_tag>();
     test_search_n1<std::forward_iterator_tag>();
 }
 
@@ -121,9 +177,8 @@ void test_search_n2_without_expolicy(IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10007);
-    std::fill(std::begin(c), std::end(c), (std::rand() % 100) + 3);
-    // do NOT plant the target value
+    auto fixture = get_search_n2_fixture();
+    std::vector<std::size_t>& c = fixture.first;
 
     iterator result = hpx::search_n(iterator(std::begin(c)),
         iterator(std::end(c)), 3, static_cast<std::size_t>(1));
@@ -140,8 +195,8 @@ void test_search_n2(ExPolicy policy, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10007);
-    std::fill(std::begin(c), std::end(c), (std::rand() % 100) + 3);
+    auto fixture = get_search_n2_fixture();
+    std::vector<std::size_t>& c = fixture.first;
 
     iterator result = hpx::search_n(policy, iterator(std::begin(c)),
         iterator(std::end(c)), 3, static_cast<std::size_t>(1));
@@ -155,8 +210,8 @@ void test_search_n2_async(ExPolicy p, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10007);
-    std::fill(std::begin(c), std::end(c), (std::rand() % 100) + 3);
+    auto fixture = get_search_n2_fixture();
+    std::vector<std::size_t>& c = fixture.first;
 
     hpx::future<iterator> f = hpx::search_n(p, iterator(std::begin(c)),
         iterator(std::end(c)), 3, static_cast<std::size_t>(1));
@@ -182,6 +237,7 @@ void test_search_n2()
 void search_n_test2()
 {
     test_search_n2<std::random_access_iterator_tag>();
+    test_search_n2<std::bidirectional_iterator_tag>();
     test_search_n2<std::forward_iterator_tag>();
 }
 
@@ -193,13 +249,12 @@ void test_search_n3_without_expolicy(IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10007);
-    std::fill(std::begin(c), std::end(c), (std::rand() % 100) + 3);
+    auto fixture = get_search_n3_fixture();
+    std::vector<std::size_t>& c = fixture.first;
 
     iterator result = hpx::search_n(iterator(std::begin(c)),
         iterator(std::end(c)), 0, static_cast<std::size_t>(1));
 
-    // [alg.search] p14: if count == 0, returns first
     HPX_TEST(result == iterator(std::begin(c)));
 }
 
@@ -212,8 +267,8 @@ void test_search_n3(ExPolicy policy, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10007);
-    std::fill(std::begin(c), std::end(c), (std::rand() % 100) + 3);
+    auto fixture = get_search_n3_fixture();
+    std::vector<std::size_t>& c = fixture.first;
 
     iterator result = hpx::search_n(policy, iterator(std::begin(c)),
         iterator(std::end(c)), 0, static_cast<std::size_t>(1));
@@ -227,8 +282,8 @@ void test_search_n3_async(ExPolicy p, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10007);
-    std::fill(std::begin(c), std::end(c), (std::rand() % 100) + 3);
+    auto fixture = get_search_n3_fixture();
+    std::vector<std::size_t>& c = fixture.first;
 
     hpx::future<iterator> f = hpx::search_n(p, iterator(std::begin(c)),
         iterator(std::end(c)), 0, static_cast<std::size_t>(1));
@@ -254,6 +309,7 @@ void test_search_n3()
 void search_n_test3()
 {
     test_search_n3<std::random_access_iterator_tag>();
+    test_search_n3<std::bidirectional_iterator_tag>();
     test_search_n3<std::forward_iterator_tag>();
 }
 
@@ -265,13 +321,22 @@ void test_search_n4_without_expolicy(IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    // All elements are 1, but we ask for more consecutive 1s than exist
-    std::vector<std::size_t> c(5, static_cast<std::size_t>(1));
+    // case 4a: all elements match, but count is greater
+    {
+        std::vector<std::size_t> c(5, static_cast<std::size_t>(1));
+        iterator result = hpx::search_n(iterator(std::begin(c)),
+            iterator(std::end(c)), 10, static_cast<std::size_t>(1));
+        HPX_TEST(result == iterator(std::end(c)));
+    }
 
-    iterator result = hpx::search_n(iterator(std::begin(c)),
-        iterator(std::end(c)), 10, static_cast<std::size_t>(1));
-
-    HPX_TEST(result == iterator(std::end(c)));
+    // case 4b: elements do not match and count is greater
+    {
+        std::vector<std::size_t> c(10007);
+        std::fill(std::begin(c), std::end(c), (std::rand() % 100) + 3);
+        iterator result = hpx::search_n(iterator(std::begin(c)),
+            iterator(std::end(c)), 20000, static_cast<std::size_t>(1));
+        HPX_TEST(result == iterator(std::end(c)));
+    }
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -283,12 +348,20 @@ void test_search_n4(ExPolicy policy, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(5, static_cast<std::size_t>(1));
+    {
+        std::vector<std::size_t> c(5, static_cast<std::size_t>(1));
+        iterator result = hpx::search_n(policy, iterator(std::begin(c)),
+            iterator(std::end(c)), 10, static_cast<std::size_t>(1));
+        HPX_TEST(result == iterator(std::end(c)));
+    }
 
-    iterator result = hpx::search_n(policy, iterator(std::begin(c)),
-        iterator(std::end(c)), 10, static_cast<std::size_t>(1));
-
-    HPX_TEST(result == iterator(std::end(c)));
+    {
+        std::vector<std::size_t> c(10007);
+        std::fill(std::begin(c), std::end(c), (std::rand() % 100) + 3);
+        iterator result = hpx::search_n(policy, iterator(std::begin(c)),
+            iterator(std::end(c)), 20000, static_cast<std::size_t>(1));
+        HPX_TEST(result == iterator(std::end(c)));
+    }
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -297,13 +370,22 @@ void test_search_n4_async(ExPolicy p, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(5, static_cast<std::size_t>(1));
+    {
+        std::vector<std::size_t> c(5, static_cast<std::size_t>(1));
+        hpx::future<iterator> f = hpx::search_n(p, iterator(std::begin(c)),
+            iterator(std::end(c)), 10, static_cast<std::size_t>(1));
+        f.wait();
+        HPX_TEST(f.get() == iterator(std::end(c)));
+    }
 
-    hpx::future<iterator> f = hpx::search_n(p, iterator(std::begin(c)),
-        iterator(std::end(c)), 10, static_cast<std::size_t>(1));
-    f.wait();
-
-    HPX_TEST(f.get() == iterator(std::end(c)));
+    {
+        std::vector<std::size_t> c(10007);
+        std::fill(std::begin(c), std::end(c), (std::rand() % 100) + 3);
+        hpx::future<iterator> f = hpx::search_n(p, iterator(std::begin(c)),
+            iterator(std::end(c)), 20000, static_cast<std::size_t>(1));
+        f.wait();
+        HPX_TEST(f.get() == iterator(std::end(c)));
+    }
 }
 
 template <typename IteratorTag>
@@ -323,6 +405,7 @@ void test_search_n4()
 void search_n_test4()
 {
     test_search_n4<std::random_access_iterator_tag>();
+    test_search_n4<std::bidirectional_iterator_tag>();
     test_search_n4<std::forward_iterator_tag>();
 }
 
@@ -334,18 +417,13 @@ void test_search_n5_without_expolicy(IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10007);
-    std::fill(std::begin(c), std::end(c), (std::rand() % 100) + 3);
-    // plant 3 consecutive 1s at the very end
-    c[c.size() - 3] = 1;
-    c[c.size() - 2] = 1;
-    c[c.size() - 1] = 1;
+    auto fixture = get_search_n5_fixture();
+    std::vector<std::size_t>& c = fixture.first;
 
     iterator index = hpx::search_n(iterator(std::begin(c)),
         iterator(std::end(c)), 3, static_cast<std::size_t>(1));
 
-    base_iterator test_index =
-        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() - 3);
+    base_iterator test_index = std::begin(c) + fixture.second;
 
     HPX_TEST(index == iterator(test_index));
 }
@@ -359,17 +437,13 @@ void test_search_n5(ExPolicy policy, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10007);
-    std::fill(std::begin(c), std::end(c), (std::rand() % 100) + 3);
-    c[c.size() - 3] = 1;
-    c[c.size() - 2] = 1;
-    c[c.size() - 1] = 1;
+    auto fixture = get_search_n5_fixture();
+    std::vector<std::size_t>& c = fixture.first;
 
     iterator index = hpx::search_n(policy, iterator(std::begin(c)),
         iterator(std::end(c)), 3, static_cast<std::size_t>(1));
 
-    base_iterator test_index =
-        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() - 3);
+    base_iterator test_index = std::begin(c) + fixture.second;
 
     HPX_TEST(index == iterator(test_index));
 }
@@ -380,18 +454,14 @@ void test_search_n5_async(ExPolicy p, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10007);
-    std::fill(std::begin(c), std::end(c), (std::rand() % 100) + 3);
-    c[c.size() - 3] = 1;
-    c[c.size() - 2] = 1;
-    c[c.size() - 1] = 1;
+    auto fixture = get_search_n5_fixture();
+    std::vector<std::size_t>& c = fixture.first;
 
     hpx::future<iterator> f = hpx::search_n(p, iterator(std::begin(c)),
         iterator(std::end(c)), 3, static_cast<std::size_t>(1));
     f.wait();
 
-    base_iterator test_index =
-        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() - 3);
+    base_iterator test_index = std::begin(c) + fixture.second;
 
     HPX_TEST(f.get() == iterator(test_index));
 }
@@ -413,6 +483,7 @@ void test_search_n5()
 void search_n_test5()
 {
     test_search_n5<std::random_access_iterator_tag>();
+    test_search_n5<std::bidirectional_iterator_tag>();
     test_search_n5<std::forward_iterator_tag>();
 }
 
@@ -424,23 +495,18 @@ void test_search_n6_without_expolicy(IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10007);
-    // fill with background value 4
-    std::fill(std::begin(c), std::end(c), static_cast<std::size_t>(4));
-    // plant 0, 1, 2 in the middle
-    c[c.size() / 2] = 0;
-    c[c.size() / 2 + 1] = 1;
-    c[c.size() / 2 + 2] = 2;
+    auto fixture = get_search_n6_fixture();
+    std::vector<std::size_t>& c = fixture.first;
 
-    // predicate: order-sensitive
+    // predicate: order-sensitive. op(a, b) = a < b is invoked as
+    // pred(*it, value), so it reads as elem < 3.
     auto op = [](std::size_t a, std::size_t b) { return a < b; };
 
     // search for 3 elements that are less than 3
     iterator index = hpx::search_n(iterator(std::begin(c)),
         iterator(std::end(c)), 3, static_cast<std::size_t>(3), op);
 
-    base_iterator test_index =
-        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2);
+    base_iterator test_index = std::begin(c) + fixture.second;
 
     HPX_TEST(index == iterator(test_index));
 }
@@ -454,19 +520,17 @@ void test_search_n6(ExPolicy policy, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10007);
-    std::fill(std::begin(c), std::end(c), static_cast<std::size_t>(4));
-    c[c.size() / 2] = 0;
-    c[c.size() / 2 + 1] = 1;
-    c[c.size() / 2 + 2] = 2;
+    auto fixture = get_search_n6_fixture();
+    std::vector<std::size_t>& c = fixture.first;
 
+    // predicate: order-sensitive. op(a, b) = a < b is invoked as
+    // pred(*it, value), so it reads as elem < 3.
     auto op = [](std::size_t a, std::size_t b) { return a < b; };
 
     iterator index = hpx::search_n(policy, iterator(std::begin(c)),
         iterator(std::end(c)), 3, static_cast<std::size_t>(3), op);
 
-    base_iterator test_index =
-        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2);
+    base_iterator test_index = std::begin(c) + fixture.second;
 
     HPX_TEST(index == iterator(test_index));
 }
@@ -477,20 +541,18 @@ void test_search_n6_async(ExPolicy p, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::vector<std::size_t> c(10007);
-    std::fill(std::begin(c), std::end(c), static_cast<std::size_t>(4));
-    c[c.size() / 2] = 0;
-    c[c.size() / 2 + 1] = 1;
-    c[c.size() / 2 + 2] = 2;
+    auto fixture = get_search_n6_fixture();
+    std::vector<std::size_t>& c = fixture.first;
 
+    // predicate: order-sensitive. op(a, b) = a < b is invoked as
+    // pred(*it, value), so it reads as elem < 3.
     auto op = [](std::size_t a, std::size_t b) { return a < b; };
 
     hpx::future<iterator> f = hpx::search_n(p, iterator(std::begin(c)),
         iterator(std::end(c)), 3, static_cast<std::size_t>(3), op);
     f.wait();
 
-    base_iterator test_index =
-        std::begin(c) + static_cast<std::ptrdiff_t>(c.size() / 2);
+    base_iterator test_index = std::begin(c) + fixture.second;
 
     HPX_TEST(f.get() == iterator(test_index));
 }
@@ -512,7 +574,86 @@ void test_search_n6()
 void search_n_test6()
 {
     test_search_n6<std::random_access_iterator_tag>();
+    test_search_n6<std::bidirectional_iterator_tag>();
     test_search_n6<std::forward_iterator_tag>();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// test 7: multiple matching windows — must return the first match
+template <typename IteratorTag>
+void test_search_n7_without_expolicy(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    auto fixture = get_search_n7_fixture();
+    std::vector<std::size_t>& c = fixture.first;
+
+    iterator index = hpx::search_n(iterator(std::begin(c)),
+        iterator(std::end(c)), 3, static_cast<std::size_t>(1));
+
+    base_iterator test_index = std::begin(c) + fixture.second;
+
+    HPX_TEST(index == iterator(test_index));
+}
+
+template <typename ExPolicy, typename IteratorTag>
+void test_search_n7(ExPolicy policy, IteratorTag)
+{
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
+
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    auto fixture = get_search_n7_fixture();
+    std::vector<std::size_t>& c = fixture.first;
+
+    iterator index = hpx::search_n(policy, iterator(std::begin(c)),
+        iterator(std::end(c)), 3, static_cast<std::size_t>(1));
+
+    base_iterator test_index = std::begin(c) + fixture.second;
+
+    HPX_TEST(index == iterator(test_index));
+}
+
+template <typename ExPolicy, typename IteratorTag>
+void test_search_n7_async(ExPolicy p, IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    auto fixture = get_search_n7_fixture();
+    std::vector<std::size_t>& c = fixture.first;
+
+    hpx::future<iterator> f = hpx::search_n(p, iterator(std::begin(c)),
+        iterator(std::end(c)), 3, static_cast<std::size_t>(1));
+    f.wait();
+
+    base_iterator test_index = std::begin(c) + fixture.second;
+
+    HPX_TEST(f.get() == iterator(test_index));
+}
+
+template <typename IteratorTag>
+void test_search_n7()
+{
+    using namespace hpx::execution;
+    test_search_n7_without_expolicy(IteratorTag());
+
+    test_search_n7(seq, IteratorTag());
+    test_search_n7(par, IteratorTag());
+    test_search_n7(par_unseq, IteratorTag());
+
+    test_search_n7_async(seq(task), IteratorTag());
+    test_search_n7_async(par(task), IteratorTag());
+}
+
+void search_n_test7()
+{
+    test_search_n7<std::random_access_iterator_tag>();
+    test_search_n7<std::bidirectional_iterator_tag>();
+    test_search_n7<std::forward_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -605,6 +746,7 @@ void test_search_n_exception()
 void search_n_exception_test()
 {
     test_search_n_exception<std::random_access_iterator_tag>();
+    test_search_n_exception<std::bidirectional_iterator_tag>();
     test_search_n_exception<std::forward_iterator_tag>();
 }
 
@@ -695,6 +837,7 @@ void test_search_n_bad_alloc()
 void search_n_bad_alloc_test()
 {
     test_search_n_bad_alloc<std::random_access_iterator_tag>();
+    test_search_n_bad_alloc<std::bidirectional_iterator_tag>();
     test_search_n_bad_alloc<std::forward_iterator_tag>();
 }
 
@@ -714,6 +857,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     search_n_test4();
     search_n_test5();
     search_n_test6();
+    search_n_test7();
     search_n_exception_test();
     search_n_bad_alloc_test();
 
