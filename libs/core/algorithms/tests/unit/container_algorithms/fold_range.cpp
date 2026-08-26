@@ -13,6 +13,7 @@
 #include <cstddef>
 #include <functional>
 #include <string>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -354,9 +355,6 @@ void test_fold_left_first_with_iter_empty()
     HPX_TEST(!hpx_value.has_value());
 }
 
-#include <memory>
-#include <type_traits>
-
 // A type that is constructible from int const& (the iterator reference type
 // for vector<int>) but does NOT have an implicit conversion from int (the
 // iter_value_t). This distinguishes the tightened constraint
@@ -417,7 +415,6 @@ struct copyable_asymmetric_accumulator
 namespace constraint_checks {
 
     using iter_ref_t = int const&;    // representative iter_reference_t
-    using iter_val_t = int;           // representative iter_value_t
 
     // U = ref_constructible_accumulator (produced by the fold callable below)
     // The constraint: constructible_from<U, iter_ref_t> must hold.
