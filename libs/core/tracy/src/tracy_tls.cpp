@@ -275,9 +275,11 @@ namespace hpx::tracy {
 
             // Pre-formatted "Worker #N" strings for common thread indices.
             // Eliminates snprintf overhead in the hot background-polling path.
+            // Capacity covers up to 256 threads for high-core-count HPC systems.
+            // Thread counts exceeding capacity safely fall back to per-call snprintf.
             struct worker_label_cache
             {
-                static constexpr std::size_t capacity = 64;
+                static constexpr std::size_t capacity = 256;
 
                 worker_label_cache() noexcept
                 {
@@ -320,6 +322,7 @@ namespace hpx::tracy {
             }
             else
             {
+                // Fallback for thread counts > 256 (e.g. massive multi-socket systems)
                 int const n =
                     std::snprintf(tmp, sizeof(tmp), "Worker #%zu", num_thread);
                 text = tmp;
