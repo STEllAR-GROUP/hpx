@@ -205,6 +205,7 @@ if(HPX_WITH_CXX_MODULES
 )
   foreach(
     example
+    background_work_smoke
     barrier_docs
     customize_async
     component_ctors
