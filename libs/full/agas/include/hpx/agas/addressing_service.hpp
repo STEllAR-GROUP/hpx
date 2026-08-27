@@ -284,6 +284,11 @@ namespace hpx::agas {
         bool was_object_migrated_locked(naming::gid_type const& id) const;
 
     private:
+        /// Move a locality from one state to another under the resolved
+        /// localities lock. Returns `false` if it is unknown or not in \a from.
+        bool transition_resolved_locality(hpx::naming::gid_type const& locality,
+            resolved_locality_state from, resolved_locality_state to);
+
         /// Assumes that \a refcnt_requests_mtx_ is locked.
         void send_refcnt_requests(
             std::unique_lock<mutex_type>& l, error_code& ec = throws);

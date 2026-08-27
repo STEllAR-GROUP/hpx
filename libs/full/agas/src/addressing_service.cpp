@@ -271,8 +271,9 @@ namespace hpx::agas {
 #endif
     }
 
-    bool addressing_service::mark_connecting_locality_as_disconnecting(
-        hpx::naming::gid_type const& locality)
+    bool addressing_service::transition_resolved_locality(
+        hpx::naming::gid_type const& locality,
+        resolved_locality_state const from, resolved_locality_state const to)
     {
         if (!locality)
         {
@@ -281,34 +282,29 @@ namespace hpx::agas {
 
         std::lock_guard<hpx::shared_mutex> l(resolved_localities_mtx_);
         auto const it = resolved_localities_.find(locality);
-        if (it == resolved_localities_.end() ||
-            it->second.state != resolved_locality_state::connecting)
+        if (it == resolved_localities_.end() || it->second.state != from)
         {
             return false;
         }
 
-        it->second.state = resolved_locality_state::disconnecting;
+        it->second.state = to;
         return true;
+    }
+
+    bool addressing_service::mark_connecting_locality_as_disconnecting(
+        hpx::naming::gid_type const& locality)
+    {
+        return transition_resolved_locality(locality,
+            resolved_locality_state::connecting,
+            resolved_locality_state::disconnecting);
     }
 
     bool addressing_service::mark_disconnecting_locality_as_connecting(
         hpx::naming::gid_type const& locality)
     {
-        if (!locality)
-        {
-            return false;
-        }
-
-        std::lock_guard<hpx::shared_mutex> l(resolved_localities_mtx_);
-        auto const it = resolved_localities_.find(locality);
-        if (it == resolved_localities_.end() ||
-            it->second.state != resolved_locality_state::disconnecting)
-        {
-            return false;
-        }
-
-        it->second.state = resolved_locality_state::connecting;
-        return true;
+        return transition_resolved_locality(locality,
+            resolved_locality_state::disconnecting,
+            resolved_locality_state::connecting);
     }
 
     void addressing_service::register_console(
