@@ -447,6 +447,10 @@ void test_concurrent_double_disconnect_race(hpx::id_type const& target)
     HPX_TEST(succeeded1 != succeeded2);
 }
 
+// How long a parcel addressed to a killed locality may take to report its
+// error through the parcel layer.
+constexpr std::chrono::seconds parcel_error_timeout(5);
+
 // An async action sent to a locality whose process has already been killed must
 // report the parcel-write error through its future. Force-disconnecting that
 // locality must then complete within the best-effort notify timeout instead of
@@ -480,7 +484,7 @@ void test_disconnect_unreachable_locality(
     auto const wait_for_cache_eviction = [&get_cache_evictions](
                                              std::int64_t const previous) {
         auto const deadline =
-            std::chrono::steady_clock::now() + std::chrono::seconds(5);
+            std::chrono::steady_clock::now() + parcel_error_timeout;
         while (get_cache_evictions() == previous &&
             std::chrono::steady_clock::now() < deadline)
         {
@@ -521,7 +525,7 @@ void test_disconnect_unreachable_locality(
             });
 
         auto const probe_deadline =
-            std::chrono::steady_clock::now() + std::chrono::seconds(5);
+            std::chrono::steady_clock::now() + parcel_error_timeout;
         while (!probe->write_completed.load(std::memory_order_acquire) &&
             std::chrono::steady_clock::now() < probe_deadline)
         {
@@ -557,7 +561,7 @@ void test_disconnect_unreachable_locality(
     HPX_TEST(connection_failure_received);
 
     hpx::future<std::uint32_t> f = hpx::async(act, target);
-    hpx::future_status const status = f.wait_for(std::chrono::seconds(5));
+    hpx::future_status const status = f.wait_for(parcel_error_timeout);
     HPX_TEST(status == hpx::future_status::ready);
     bool const parcel_write_error_received =
         status == hpx::future_status::ready && f.has_exception();
