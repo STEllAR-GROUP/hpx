@@ -34,6 +34,18 @@
 /// Top-level namespace
 namespace hpx::experimental {
 
+    namespace detail {
+        template <typename Executor>
+        inline constexpr bool is_task_group_executor_v =
+            hpx::traits::is_executor_any_v<std::decay_t<Executor>>;
+
+        template <typename Scheduler>
+        inline constexpr bool is_task_group_scheduler_v =
+            hpx::execution::experimental::is_scheduler_v<
+                std::decay_t<Scheduler>> &&
+            !is_task_group_executor_v<Scheduler>;
+    }    // namespace detail
+
     /// A \c task_group represents concurrent execution of a group of tasks.
     /// Tasks can be dynamically added to the group while it is executing.
     HPX_CXX_CORE_EXPORT class task_group
@@ -66,32 +78,13 @@ namespace hpx::experimental {
         template <typename Executor, typename F, typename... Ts>
         // clang-format off
             requires (
-                hpx::traits::is_executor_any_v<std::decay_t<Executor>>
+                detail::is_task_group_executor_v<Executor>
             )
         // clang-format on
         void run(Executor&& exec, F&& f, Ts&&... ts)
         {
-            // make sure exceptions don't leave the latch in the wrong state
-            if (latch_.reset_if_needed_and_count_up(1, 1))
-            {
-                has_arrived_.store(false, std::memory_order_release);
-            }
-
-            auto on_exit =
-                hpx::experimental::scope_exit([this] { latch_.count_down(1); });
-
             hpx::parallel::execution::post(HPX_FORWARD(Executor, exec),
-                [this, on_exit = HPX_MOVE(on_exit), f = HPX_FORWARD(F, f),
-                    ... ts = HPX_FORWARD(Ts, ts)]() mutable {
-                    // latch needs to be released before the lambda exits
-                    auto _(HPX_MOVE(on_exit));
-
-                    hpx::detail::try_catch_exception_ptr(
-                        [&]() { HPX_INVOKE(f, ts...); },
-                        [this](std::exception_ptr e) {
-                            add_exception(HPX_MOVE(e));
-                        });
-                });
+                wrap_task(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
         }
 
         /// \brief Adds a task to compute \c f() and returns immediately.
@@ -109,44 +102,24 @@ namespace hpx::experimental {
         template <typename Scheduler, typename F, typename... Ts>
         // clang-format off
             requires (
-                hpx::execution::experimental::is_scheduler_v<
-                    std::decay_t<Scheduler>> &&
-                !hpx::traits::is_executor_any_v<std::decay_t<Scheduler>>
+                detail::is_task_group_scheduler_v<Scheduler>
             )
         // clang-format on
         void run(Scheduler&& sched, F&& f, Ts&&... ts)
         {
-            // make sure exceptions don't leave the latch in the wrong state
-            if (latch_.reset_if_needed_and_count_up(1, 1))
-            {
-                has_arrived_.store(false, std::memory_order_release);
-            }
-
             namespace ex = hpx::execution::experimental;
 
-            auto state = std::make_shared<std::function<void()>>(
-                [this]() { latch_.count_down(1); });
-
-            // Workaround for Clang compiler crash (exit code 139):
-            // Extract lambda body into a separate function to reduce template AST depth
-            auto task = [this, state, f = HPX_FORWARD(F, f),
-                            ... ts = HPX_FORWARD(Ts, ts)]() mutable {
-                hpx::detail::try_catch_exception_ptr(
-                    [&]() { HPX_INVOKE(f, ts...); },
-                    [this](
-                        std::exception_ptr e) { add_exception(HPX_MOVE(e)); });
-                HPX_INVOKE(*state);
-            };
+            // Extract the lambda into a separate variable to prevent AST depth crashes on Clang compilers during complex template instantiations.
+            auto task = wrap_task(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
 
             auto sender = ex::schedule(HPX_FORWARD(Scheduler, sched)) |
                 ex::then(HPX_MOVE(task)) |
-                ex::let_error([this, state](std::exception_ptr e) mutable {
+                ex::let_error([this](std::exception_ptr e) mutable {
                     add_exception(HPX_MOVE(e));
-                    // Manually invoke the latch countdown if the scheduler failed
-                    HPX_INVOKE(*state);
                     // Convert the error channel to a value channel to satisfy start_detached
                     return ex::just();
-                });
+                }) |
+                ex::let_stopped([]() { return ex::just(); });
 
             // Start the sender but don't wait for it to complete
             ex::start_detached(HPX_MOVE(sender));
@@ -164,8 +137,8 @@ namespace hpx::experimental {
         template <typename F, typename... Ts>
         // clang-format off
             requires (
-                !hpx::traits::is_executor_any_v<std::decay_t<F>> &&
-                !hpx::execution::experimental::is_scheduler_v<std::decay_t<F>>
+                !detail::is_task_group_executor_v<F> &&
+                !detail::is_task_group_scheduler_v<F>
             )
         // clang-format on
         void run(F&& f, Ts&&... ts)
@@ -179,6 +152,31 @@ namespace hpx::experimental {
 
         /// \brief Adds an exception to this \c task_group
         HPX_CORE_EXPORT void add_exception(std::exception_ptr p);
+
+    private:
+        template <typename F, typename... Ts>
+        auto wrap_task(F&& f, Ts&&... ts)
+        {
+            // make sure exceptions don't leave the latch in the wrong state
+            if (latch_.reset_if_needed_and_count_up(1, 1))
+            {
+                has_arrived_.store(false, std::memory_order_release);
+            }
+
+            auto on_exit =
+                hpx::experimental::scope_exit([this] { latch_.count_down(1); });
+
+            return [this, on_exit = HPX_MOVE(on_exit), f = HPX_FORWARD(F, f),
+                       ... ts = HPX_FORWARD(Ts, ts)]() mutable {
+                // latch needs to be released before the lambda exits
+                auto _(HPX_MOVE(on_exit));
+
+                hpx::detail::try_catch_exception_ptr(
+                    [&]() { HPX_INVOKE(f, ts...); },
+                    [this](
+                        std::exception_ptr e) { add_exception(HPX_MOVE(e)); });
+            };
+        }
 
     private:
         friend class serialization::access;
