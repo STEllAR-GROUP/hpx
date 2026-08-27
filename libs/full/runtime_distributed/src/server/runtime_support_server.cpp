@@ -899,9 +899,11 @@ namespace hpx::components::server {
             return false;
         }
 
-        // A removal that throws must not leave the locality claimed forever.
-        // If it fails without throwing, the console connection cache removal
-        // below still erases the entry.
+        // A removal that throws must not leave the locality claimed forever,
+        // so hand it back as connecting. A retry then repeats the shutdown
+        // notification and the cache removal broadcasts, which are idempotent.
+        // A removal that fails without throwing needs nothing, because the
+        // console connection cache removal below still erases the entry.
         auto release_claim = hpx::experimental::scope_fail([&]() noexcept {
             agas_client.mark_disconnecting_locality_as_connecting(
                 locality.get_gid());
