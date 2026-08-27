@@ -36,6 +36,7 @@
 #include <hpx/modules/components_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/parcelset.hpp>
 #include <hpx/modules/prefix.hpp>
@@ -491,6 +492,8 @@ void test_disconnect_unreachable_locality(
     // Exercise normal async error delivery. Fault-tolerant sends deliberately
     // keep an unsent parcel queued for a possible reconnect.
     hpx::get_config().tolerate_node_faults(false);
+    auto const restore_fault_tolerance = hpx::experimental::scope_exit(
+        [] { hpx::get_config().tolerate_node_faults(true); });
 
     // A probe that times out leaves its write callback pending, so each probe
     // owns its state and the callback keeps that state alive on its own.
@@ -575,8 +578,6 @@ void test_disconnect_unreachable_locality(
 
     HPX_TEST_EQ(result, 0);
     HPX_TEST(!ec);
-
-    hpx::get_config().tolerate_node_faults(true);
 }
 
 // hpx::finalize() is asynchronous: it merely flags all localities to stop
