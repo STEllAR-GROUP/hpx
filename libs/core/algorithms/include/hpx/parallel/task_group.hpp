@@ -26,6 +26,8 @@
 
 #include <atomic>
 #include <exception>
+#include <functional>
+#include <memory>
 #include <type_traits>
 #include <utility>
 
@@ -122,25 +124,32 @@ namespace hpx::experimental {
 
             namespace ex = hpx::execution::experimental;
 
+            auto state = std::make_shared<std::function<void()>>(
+                [this]() { latch_.count_down(1); });
+
             // Workaround for Clang compiler crash (exit code 139):
             // Extract lambda body into a separate function to reduce template AST depth
-            auto task = [this, f = HPX_FORWARD(F, f),
+            auto task = [this, state, f = HPX_FORWARD(F, f),
                             ... ts = HPX_FORWARD(Ts, ts)]() mutable {
                 hpx::detail::try_catch_exception_ptr(
                     [&]() { HPX_INVOKE(f, ts...); },
                     [this](
                         std::exception_ptr e) { add_exception(HPX_MOVE(e)); });
+                HPX_INVOKE(*state);
             };
 
-            auto on_exit =
-                hpx::experimental::scope_exit([this] { latch_.count_down(1); });
+            auto sender = ex::schedule(HPX_FORWARD(Scheduler, sched)) |
+                ex::then(HPX_MOVE(task)) |
+                ex::let_error([this, state](std::exception_ptr e) mutable {
+                    add_exception(HPX_MOVE(e));
+                    // Manually invoke the latch countdown if the scheduler failed
+                    HPX_INVOKE(*state);
+                    // Convert the error channel to a value channel to satisfy start_detached
+                    return ex::just();
+                });
 
-            ex::start_detached(ex::schedule(HPX_FORWARD(Scheduler, sched)) |
-                ex::then([this, on_exit = HPX_MOVE(on_exit),
-                             task = HPX_MOVE(task)]() mutable {
-                    auto _(HPX_MOVE(on_exit));
-                    HPX_INVOKE(task);
-                }));
+            // Start the sender but don't wait for it to complete
+            ex::start_detached(HPX_MOVE(sender));
         }
 
         /// \brief Adds a task to compute \c f() and returns immediately.
