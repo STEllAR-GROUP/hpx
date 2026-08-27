@@ -507,12 +507,13 @@ void test_disconnect_unreachable_locality(
         std::atomic<bool> connection_failed = false;
     };
 
+    bool connection_failure_received = false;
+
     // Every connection still cached for the killed locality fails its first
     // write with the socket's own error and is evicted, so up to
     // HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY probes can be spent that way.
     // The probe after those has to open a new connection, and that is the one
     // that reports network_error.
-    bool connection_failure_received = false;
     constexpr std::size_t max_probe_attempts =
         HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY + 1;
 
