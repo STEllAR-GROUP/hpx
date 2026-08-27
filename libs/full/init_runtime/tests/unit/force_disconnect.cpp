@@ -48,6 +48,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
+#include <memory>
 #include <string>
 #include <system_error>
 #include <thread>
@@ -491,8 +492,14 @@ void test_disconnect_unreachable_locality(
     // keep an unsent parcel queued for a possible reconnect.
     hpx::get_config().tolerate_node_faults(false);
 
-    std::atomic<bool> probe_write_completed = false;
-    std::atomic<bool> probe_connection_failed = false;
+    // A probe that times out leaves its write callback pending, so each probe
+    // owns its state and the callback keeps that state alive on its own.
+    struct probe_state
+    {
+        std::atomic<bool> write_completed = false;
+        std::atomic<bool> connection_failed = false;
+    };
+
     bool connection_failure_received = false;
     constexpr std::size_t max_probe_attempts =
         HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY + 1;
@@ -500,28 +507,26 @@ void test_disconnect_unreachable_locality(
     for (std::size_t i = 0; i != max_probe_attempts; ++i)
     {
         std::int64_t const evictions_before = get_cache_evictions();
-        probe_write_completed.store(false, std::memory_order_relaxed);
-        probe_connection_failed.store(false, std::memory_order_relaxed);
+        auto probe = std::make_shared<probe_state>();
 
-        hpx::post_cb<ping_locality_action>(target,
-            [&probe_write_completed, &probe_connection_failed](
-                std::error_code const& ec, auto const&) {
-                probe_connection_failed.store(ec ==
+        hpx::post_cb<ping_locality_action>(
+            target, [probe](std::error_code const& ec, auto const&) {
+                probe->connection_failed.store(ec ==
                         hpx::make_system_error_code(hpx::error::network_error),
                     std::memory_order_relaxed);
-                probe_write_completed.store(true, std::memory_order_release);
+                probe->write_completed.store(true, std::memory_order_release);
             });
 
         auto const probe_deadline =
             std::chrono::steady_clock::now() + std::chrono::seconds(5);
-        while (!probe_write_completed.load(std::memory_order_acquire) &&
+        while (!probe->write_completed.load(std::memory_order_acquire) &&
             std::chrono::steady_clock::now() < probe_deadline)
         {
             hpx::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
 
         bool const write_completed =
-            probe_write_completed.load(std::memory_order_acquire);
+            probe->write_completed.load(std::memory_order_acquire);
         HPX_TEST(write_completed);
         if (!write_completed)
         {
@@ -534,7 +539,7 @@ void test_disconnect_unreachable_locality(
         HPX_TEST(wait_for_cache_eviction(evictions_before));
 
         connection_failure_received =
-            probe_connection_failed.load(std::memory_order_relaxed);
+            probe->connection_failed.load(std::memory_order_relaxed);
         if (connection_failure_received)
         {
             break;
