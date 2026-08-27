@@ -497,7 +497,7 @@ void test_disconnect_unreachable_locality(
     // keep an unsent parcel queued for a possible reconnect.
     hpx::get_config().tolerate_node_faults(false);
     auto const restore_fault_tolerance = hpx::experimental::scope_exit(
-        [] { hpx::get_config().tolerate_node_faults(true); });
+        []() noexcept { hpx::get_config().tolerate_node_faults(true); });
 
     // A probe that times out leaves its write callback pending, so each probe
     // owns its state and the callback keeps that state alive on its own.
