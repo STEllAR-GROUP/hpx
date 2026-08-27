@@ -208,6 +208,16 @@ namespace hpx::agas {
         bool mark_connecting_locality_as_disconnecting(
             hpx::naming::gid_type const& locality);
 
+        /// \brief Release a claim made by
+        ///        mark_connecting_locality_as_disconnecting.
+        ///
+        /// \param locality The locality GID to release.
+        ///
+        /// \returns `true` if this call changed the locality state from
+        ///          disconnecting back to connecting, and `false` otherwise.
+        bool mark_disconnecting_locality_as_connecting(
+            hpx::naming::gid_type const& locality);
+
         bool resolve_locally_known_addresses(
             naming::gid_type const& id, naming::address& addr) const;
 

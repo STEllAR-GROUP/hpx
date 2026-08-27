@@ -17,6 +17,7 @@
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/ini.hpp>
 #include <hpx/modules/logging.hpp>
@@ -897,6 +898,14 @@ namespace hpx::components::server {
                 "disconnected.");
             return false;
         }
+
+        // A removal that throws must not leave the locality claimed forever.
+        // If it fails without throwing, the console connection cache removal
+        // below still erases the entry.
+        auto release_claim = hpx::experimental::scope_fail([&]() noexcept {
+            agas_client.mark_disconnecting_locality_as_connecting(
+                locality.get_gid());
+        });
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE) && defined(HPX_HAVE_NETWORKING)
         // try to inform the locality that it has been disconnected (ignore any

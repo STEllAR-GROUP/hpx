@@ -291,6 +291,26 @@ namespace hpx::agas {
         return true;
     }
 
+    bool addressing_service::mark_disconnecting_locality_as_connecting(
+        hpx::naming::gid_type const& locality)
+    {
+        if (!locality)
+        {
+            return false;
+        }
+
+        std::lock_guard<hpx::shared_mutex> l(resolved_localities_mtx_);
+        auto const it = resolved_localities_.find(locality);
+        if (it == resolved_localities_.end() ||
+            it->second.state != resolved_locality_state::disconnecting)
+        {
+            return false;
+        }
+
+        it->second.state = resolved_locality_state::connecting;
+        return true;
+    }
+
     void addressing_service::register_console(
         parcelset::endpoints_type const& eps)
     {
