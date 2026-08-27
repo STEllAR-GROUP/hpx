@@ -536,7 +536,13 @@ void test_disconnect_unreachable_locality(
         // The write callback runs before TCP has read the acknowledgment and
         // returned or removed the connection. Wait for that postprocessing so
         // the next probe cannot overlap it and leave a checked-out connection.
-        HPX_TEST(wait_for_cache_eviction(evictions_before));
+        bool const connection_evicted =
+            wait_for_cache_eviction(evictions_before);
+        HPX_TEST(connection_evicted);
+        if (!connection_evicted)
+        {
+            break;
+        }
 
         connection_failure_received =
             probe->connection_failed.load(std::memory_order_relaxed);
