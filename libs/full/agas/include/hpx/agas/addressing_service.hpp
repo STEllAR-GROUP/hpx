@@ -105,13 +105,23 @@ namespace hpx::agas {
         std::atomic<hpx::state> state_;
         naming::gid_type locality_;
 
+        /// How a locality became known to this instance, which decides whether
+        /// hpx::force_disconnect may remove it.
         enum class resolved_locality_state : std::uint8_t
         {
+            /// Started with the application, or learned about by resolving
+            /// its address. hpx::force_disconnect rejects it.
             connected,
+            /// Connected after the application started and registered as
+            /// such here, which only the console does. hpx::force_disconnect
+            /// accepts it.
             connecting,
+            /// Claimed by an hpx::force_disconnect call that is still removing
+            /// it. Further claims are rejected until the entry is erased.
             disconnecting
         };
 
+        /// What this instance knows about one locality.
         struct resolved_locality
         {
             parcelset::endpoints_type endpoints;
