@@ -376,8 +376,8 @@ namespace hpx::agas {
         {
             if (HPX_UNLIKELY(!util::insert_checked(
                     resolved_localities_.emplace(gid,
-                        resolved_locality{
-                            endpoints, resolved_locality_state::connected}),
+                        resolved_locality{HPX_MOVE(endpoints),
+                            resolved_locality_state::connected}),
                     it)))
             {
                 l.unlock();
