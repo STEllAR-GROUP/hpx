@@ -19,7 +19,8 @@
 // an action is still in flight to it; repeated connect/disconnect cycles across
 // distinct localities; two concurrent force_disconnect calls racing on the same
 // target; and disconnecting a locality whose process has already been killed
-// outright (rather than one that is cooperatively still running).
+// outright (rather than one that is cooperatively still running), after
+// checking that parcels sent to it report network_error.
 //
 // The remote localities are spawned as separate worker processes (see
 // force_disconnect_worker.cpp) via process::launch_connecting_locality(), since
