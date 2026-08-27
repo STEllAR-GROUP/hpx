@@ -568,9 +568,19 @@ void test_disconnect_unreachable_locality(
     hpx::future<std::uint32_t> f = hpx::async(act, target);
     hpx::future_status const status = f.wait_for(parcel_error_timeout);
     HPX_TEST(status == hpx::future_status::ready);
-    bool const parcel_write_error_received =
-        status == hpx::future_status::ready && f.has_exception();
-    HPX_TEST(parcel_write_error_received);
+    if (status == hpx::future_status::ready)
+    {
+        hpx::error thrown_error = hpx::error::success;
+        try
+        {
+            f.get();
+        }
+        catch (hpx::exception const& e)
+        {
+            thrown_error = e.get_error();
+        }
+        HPX_TEST_EQ(thrown_error, hpx::error::network_error);
+    }
 
     auto const start = std::chrono::steady_clock::now();
 
