@@ -10,7 +10,7 @@
 #include <atomic>
 #include <chrono>
 #include <exception>
-#include <future>
+#include <semaphore>
 #include <stdexcept>
 #include <string>
 #include <thread>
@@ -166,10 +166,8 @@ void test_counting_scope_concurrent_join()
     constexpr int n = 8;
 
     // Synchronization: held op signals arrival, main thread releases it
-    std::promise<void> arrived;
-    std::promise<void> release;
-    auto arrived_fut = arrived.get_future();
-    auto release_fut = release.get_future();
+    std::binary_semaphore arrived{0};
+    std::binary_semaphore release{0};
 
     for (int i = 0; i < n; ++i)
     {
@@ -178,8 +176,8 @@ void test_counting_scope_concurrent_join()
                 if (i == 0)
                 {
                     // Signal that this operation is running and blocked
-                    arrived.set_value();
-                    release_fut.wait();
+                    arrived.release();
+                    release.acquire();
                 }
                 completed.fetch_add(1, std::memory_order_release);
             });
@@ -187,7 +185,7 @@ void test_counting_scope_concurrent_join()
     }
 
     // Wait until the held operation confirms it is running
-    arrived_fut.wait();
+    arrived.acquire();
 
     scope.close();
 
@@ -203,7 +201,7 @@ void test_counting_scope_concurrent_join()
     HPX_TEST(!join_done.load(std::memory_order_acquire));
 
     // Release the held operation
-    release.set_value();
+    release.release();
     joiner.join();
 
     // join() completed only after all work finished
@@ -224,10 +222,8 @@ void test_counting_scope_multithreaded_spawn()
     constexpr int n = num_threads * spawns_per_thread;
 
     // One held operation: signals arrival, waits for release
-    std::promise<void> arrived;
-    std::promise<void> release;
-    auto arrived_fut = arrived.get_future();
-    auto release_fut = release.get_future();
+    std::binary_semaphore arrived{0};
+    std::binary_semaphore release{0};
     std::atomic<bool> first_claimed{false};
 
     std::vector<std::thread> threads;
@@ -243,8 +239,8 @@ void test_counting_scope_multithreaded_spawn()
                         if (first_claimed.compare_exchange_strong(
                                 expected, true, std::memory_order_acq_rel))
                         {
-                            arrived.set_value();
-                            release_fut.wait();
+                            arrived.release();
+                            release.acquire();
                         }
                         completed.fetch_add(1, std::memory_order_release);
                     });
@@ -257,7 +253,7 @@ void test_counting_scope_multithreaded_spawn()
         th.join();
 
     // Wait until the held operation confirms it is running
-    arrived_fut.wait();
+    arrived.acquire();
 
     scope.close();
 
@@ -273,7 +269,7 @@ void test_counting_scope_multithreaded_spawn()
     HPX_TEST(!join_done.load(std::memory_order_acquire));
 
     // Release the held operation
-    release.set_value();
+    release.release();
     joiner.join();
 
     HPX_TEST(join_done.load(std::memory_order_acquire));
