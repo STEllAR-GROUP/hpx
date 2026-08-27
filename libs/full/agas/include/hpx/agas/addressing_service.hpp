@@ -195,8 +195,9 @@ namespace hpx::agas {
         ///                 return the connecting status of the calling
         ///                 locality.
         ///
-        /// \returns `true` if the locality joined while connecting and has not
-        ///          been removed.
+        /// \returns `true` if the locality connected late, also while it is
+        ///          being removed and after it was disconnected, and `false`
+        ///          for a locality that started with the application.
         bool is_connecting(hpx::naming::gid_type const& locality) const;
 
         /// \brief Atomically claim a connecting locality for disconnection.

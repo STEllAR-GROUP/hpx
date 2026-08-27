@@ -10,10 +10,9 @@
 // remote locality succeeds and actually removes it from AGAS/the connection
 // caches while leaving the remaining localities unaffected. Calling
 // force_disconnect a second time on an already-disconnected locality does not
-// hang. Once a locality has been removed, its gid no longer reports
-// is_connecting() == true, so the atomic claim in force_disconnect fails fast
-// with hpx::error::bad_parameter rather than attempting a second removal or
-// blocking.
+// hang. Once a locality has been removed, the parcel layer remembers it as
+// disconnected, so force_disconnect rejects the gid with
+// hpx::error::bad_parameter before it attempts a second removal or blocks.
 //
 // Beyond that baseline, this test also covers: disconnecting a locality while
 // an action is still in flight to it; repeated connect/disconnect cycles across
@@ -283,10 +282,9 @@ std::pair<hpx::id_type, hpx::id_type> test_force_disconnect_removes_locality()
 }
 
 // Calling force_disconnect a second time on an already-disconnected
-// locality does not hang. Once a locality has been removed, its gid no
-// longer reports is_connecting() == true, so the atomic claim in
-// force_disconnect fails fast with hpx::error::bad_parameter rather than
-// attempting a second removal or blocking.
+// locality does not hang. Once a locality has been removed, the parcel layer
+// remembers it as disconnected, so force_disconnect rejects the gid with
+// hpx::error::bad_parameter before it attempts a second removal or blocks.
 void test_double_disconnect_should_fail(hpx::id_type const& target)
 {
     if (!target)
