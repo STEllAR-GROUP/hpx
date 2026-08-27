@@ -892,7 +892,7 @@ namespace hpx::components::server {
                 locality.get_gid()))
         {
             HPX_THROWS_IF(ec, hpx::error::bad_parameter,
-                "hpx::force_disconnect",
+                "runtime_support::remove_locality",
                 "hpx::force_disconnect can be called to disconnect only a "
                 "locality that was connecting late and is not already being "
                 "disconnected.");
