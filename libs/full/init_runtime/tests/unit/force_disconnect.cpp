@@ -416,6 +416,33 @@ void test_repeated_connect_disconnect_cycles(fs::path const& exe,
     }
 }
 
+// A claimed locality is rejected by force_disconnect until the claim is
+// released, which is what remove_locality does when a removal throws. The
+// claim and its release each succeed exactly once, and the locality reports
+// is_connecting() throughout.
+void test_claim_and_release(hpx::id_type const& target)
+{
+    if (!target)
+    {
+        return;
+    }
+
+    hpx::agas::addressing_service& agas_client = hpx::naming::get_agas_client();
+    hpx::naming::gid_type const gid = target.get_gid();
+
+    HPX_TEST(agas_client.mark_connecting_locality_as_disconnecting(gid));
+    HPX_TEST(!agas_client.mark_connecting_locality_as_disconnecting(gid));
+    HPX_TEST(hpx::agas::is_connecting(gid));
+
+    hpx::error_code ec(hpx::throwmode::lightweight);
+    HPX_TEST_EQ(hpx::force_disconnect(target, ec), -1);
+    HPX_TEST_EQ(ec.value(), static_cast<int>(hpx::error::bad_parameter));
+
+    HPX_TEST(agas_client.mark_disconnecting_locality_as_connecting(gid));
+    HPX_TEST(!agas_client.mark_disconnecting_locality_as_connecting(gid));
+    HPX_TEST(hpx::agas::is_connecting(gid));
+}
+
 // Two concurrent hpx::force_disconnect calls targeting the same locality
 // must not corrupt state or hang: exactly one succeeds, and the losing call is
 // rejected with hpx::error::bad_parameter before it duplicates the removal.
@@ -559,9 +586,11 @@ int hpx_main(hpx::program_options::variables_map& vm)
         << "Repeated connect/disconnect cycles across distinct localities.\n";
     test_repeated_connect_disconnect_cycles(exe, 2, 4);
 
-    std::cout << "Concurrent double force_disconnect on the same locality.\n";
+    std::cout << "Claiming a locality, releasing it, and racing two "
+                 "force_disconnect calls on it.\n";
     {
         auto [w6, id6] = launch_worker(exe, 6);
+        test_claim_and_release(id6);
         test_concurrent_double_disconnect_race(id6);
         int const exit_code6 = w6.wait_for_exit(hpx::launch::sync);
         HPX_TEST_EQ(exit_code6, 0);
