@@ -7,8 +7,8 @@
 // Tests for P3149 async_scope facilities (spawn, spawn_future, associate)
 
 #include <hpx/config.hpp>
-#include <hpx/executors/thread_pool_scheduler.hpp>
 #include <hpx/init.hpp>
+#include <hpx/modules/executors.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <atomic>
