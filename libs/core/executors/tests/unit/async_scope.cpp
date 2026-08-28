@@ -12,6 +12,8 @@
 #include <hpx/modules/testing.hpp>
 
 #include <atomic>
+#include <chrono>
+#include <exception>
 #include <semaphore>
 #include <stdexcept>
 #include <string>
