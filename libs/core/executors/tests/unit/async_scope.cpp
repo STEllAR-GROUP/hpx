@@ -11,13 +11,14 @@
 #include <hpx/modules/executors.hpp>
 #include <hpx/modules/testing.hpp>
 
+#include <hpx/modules/synchronization.hpp>
+#include <hpx/thread.hpp>
+
 #include <atomic>
 #include <chrono>
 #include <exception>
-#include <semaphore>
 #include <stdexcept>
 #include <string>
-#include <thread>
 #include <utility>
 
 #include <hpx/modules/execution_base.hpp>
@@ -103,15 +104,16 @@ void test_spawn_with_scheduler()
 }
 
 // join() blocks until in-flight work on the HPX thread pool completes.
-// A semaphore holds one operation; join() must not return until released.
+// Uses hpx::binary_semaphore (HPX-aware: suspends the HPX thread instead
+// of blocking the OS worker) so this works even with few HPX threads.
 void test_join_blocks_for_async_work()
 {
     ex::simple_counting_scope scope;
     std::atomic<int> completed{0};
     constexpr int n = 8;
 
-    std::binary_semaphore arrived{0};
-    std::binary_semaphore release{0};
+    hpx::binary_semaphore arrived{0};
+    hpx::binary_semaphore release{0};
 
     for (int i = 0; i < n; ++i)
     {
@@ -133,15 +135,15 @@ void test_join_blocks_for_async_work()
 
     scope.close();
 
-    // Start join() on a separate thread
+    // Start join() on a separate HPX thread
     std::atomic<bool> join_done{false};
-    std::thread joiner([&]() {
+    hpx::thread joiner([&]() {
         ex::sync_wait(scope.join());
         join_done.store(true, std::memory_order_release);
     });
 
     // The held operation is blocked; join() must not complete
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    hpx::this_thread::sleep_for(std::chrono::milliseconds(50));
     HPX_TEST(!join_done.load(std::memory_order_acquire));
 
     // Release the held operation
