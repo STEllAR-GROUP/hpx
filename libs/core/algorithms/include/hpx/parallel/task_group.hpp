@@ -112,6 +112,8 @@ namespace hpx::experimental {
             // Extract the lambda into a separate variable to prevent AST depth crashes on Clang compilers during complex template instantiations.
             auto task = wrap_task(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
 
+            auto stopped_handler = []() { return ex::just(); };
+
             auto sender = ex::schedule(HPX_FORWARD(Scheduler, sched)) |
                 ex::then(HPX_MOVE(task)) |
                 ex::let_error([this](std::exception_ptr e) mutable {
@@ -119,7 +121,7 @@ namespace hpx::experimental {
                     // Convert the error channel to a value channel to satisfy start_detached
                     return ex::just();
                 }) |
-                ex::let_stopped([]() { return ex::just(); });
+                ex::let_stopped(HPX_MOVE(stopped_handler));
 
             // Start the sender but don't wait for it to complete
             ex::start_detached(HPX_MOVE(sender));
