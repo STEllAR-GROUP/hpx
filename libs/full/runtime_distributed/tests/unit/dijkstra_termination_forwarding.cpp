@@ -185,6 +185,65 @@ void test_no_forwarding_when_already_at_initiator()
     HPX_TEST(send.succeeded_calls_.empty());
 }
 
+// 7. Regression for the --hpx:threads=1 termination-detection livelock
+//    (dijkstra_termination_detection). The retry loop restarts the ring cursor
+//    for every probe; dijkstra_forward_token consumes it (walks it backwards
+//    in-place), so a probe that resumes from the leftover value walks past the
+//    remaining localities and the initiator ends up handing the token to
+//    itself, which can never terminate. These cases pin the two-probe contract
+//    the loop must uphold, exercised through the real forwarding helper.
+void test_repeated_probe_restarts_cursor()
+{
+    constexpr std::uint32_t initiating_locality_id = 0;
+    constexpr std::uint32_t num_localities = 2;
+
+    // The initiator's predecessor in the ring, recomputed at the start of each
+    // probe (this mirrors dijkstra_termination_detection).
+    auto const probe_start = [](std::uint32_t const initiating,
+                                 std::uint32_t const n) {
+        std::uint32_t target = initiating;
+        if (0 == target)
+            target = n;
+        return target;
+    };
+
+    // Restarting the cursor for each of two probes reaches N-1 every time and
+    // never targets the initiator.
+    {
+        mock_send send({num_localities - 1});    // only the neighbor is alive
+        for (int probe = 0; probe != 2; ++probe)
+        {
+            std::uint32_t target =
+                probe_start(initiating_locality_id, num_localities);
+            HPX_TEST(
+                dijkstra_forward_token(target, initiating_locality_id, send));
+        }
+        std::vector<std::uint32_t> const expected_calls = {
+            num_localities - 1, num_localities - 1};
+        HPX_TEST(send.calls_ == expected_calls);
+        for (std::uint32_t const call : send.calls_)
+        {
+            HPX_TEST_NEQ(call, initiating_locality_id);
+        }
+    }
+
+    // The failure mode being guarded against: reusing the cursor consumed by
+    // the first probe makes the second walk fall straight through to the
+    // initiator, i.e. the token is handed to the initiator itself.
+    {
+        mock_send send({num_localities - 1});
+        std::uint32_t target =
+            probe_start(initiating_locality_id, num_localities);
+        HPX_TEST(dijkstra_forward_token(target, initiating_locality_id, send));
+        HPX_TEST_EQ(target, num_localities - 1);    // cursor consumed
+
+        bool const reused =
+            dijkstra_forward_token(target, initiating_locality_id, send);
+        HPX_TEST(!reused);
+        HPX_TEST_EQ(target, initiating_locality_id);
+    }
+}
+
 int main()
 {
     test_immediate_neighbor_alive();
@@ -193,6 +252,7 @@ int main()
     test_fallback_to_initiator_also_unreachable();
     test_wrap_around_before_forwarding();
     test_no_forwarding_when_already_at_initiator();
+    test_repeated_probe_restarts_cursor();
 
     return hpx::util::report_errors();
 }
