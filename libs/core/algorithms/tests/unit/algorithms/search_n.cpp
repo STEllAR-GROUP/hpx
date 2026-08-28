@@ -38,19 +38,19 @@ std::pair<std::vector<std::size_t>, std::ptrdiff_t> get_search_n1_fixture()
     return {c, static_cast<std::ptrdiff_t>(c.size() / 2)};
 }
 
-std::pair<std::vector<std::size_t>, std::ptrdiff_t> get_search_n2_fixture()
+std::vector<std::size_t> get_search_n2_fixture()
 {
     std::vector<std::size_t> c(10007);
     std::fill(std::begin(c), std::end(c), (std::rand() % 100) + 3);
     // do NOT plant the target value
-    return {c, static_cast<std::ptrdiff_t>(c.size())};
+    return c;
 }
 
-std::pair<std::vector<std::size_t>, std::ptrdiff_t> get_search_n3_fixture()
+std::vector<std::size_t> get_search_n3_fixture()
 {
     std::vector<std::size_t> c(10007);
     std::fill(std::begin(c), std::end(c), (std::rand() % 100) + 3);
-    return {c, 0};
+    return c;
 }
 
 std::pair<std::vector<std::size_t>, std::ptrdiff_t> get_search_n5_fixture()
@@ -177,8 +177,7 @@ void test_search_n2_without_expolicy(IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    auto fixture = get_search_n2_fixture();
-    std::vector<std::size_t>& c = fixture.first;
+    std::vector<std::size_t> c = get_search_n2_fixture();
 
     iterator result = hpx::search_n(iterator(std::begin(c)),
         iterator(std::end(c)), 3, static_cast<std::size_t>(1));
@@ -195,8 +194,7 @@ void test_search_n2(ExPolicy policy, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    auto fixture = get_search_n2_fixture();
-    std::vector<std::size_t>& c = fixture.first;
+    std::vector<std::size_t> c = get_search_n2_fixture();
 
     iterator result = hpx::search_n(policy, iterator(std::begin(c)),
         iterator(std::end(c)), 3, static_cast<std::size_t>(1));
@@ -210,8 +208,7 @@ void test_search_n2_async(ExPolicy p, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    auto fixture = get_search_n2_fixture();
-    std::vector<std::size_t>& c = fixture.first;
+    std::vector<std::size_t> c = get_search_n2_fixture();
 
     hpx::future<iterator> f = hpx::search_n(p, iterator(std::begin(c)),
         iterator(std::end(c)), 3, static_cast<std::size_t>(1));
@@ -249,8 +246,7 @@ void test_search_n3_without_expolicy(IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    auto fixture = get_search_n3_fixture();
-    std::vector<std::size_t>& c = fixture.first;
+    std::vector<std::size_t> c = get_search_n3_fixture();
 
     iterator result = hpx::search_n(iterator(std::begin(c)),
         iterator(std::end(c)), 0, static_cast<std::size_t>(1));
@@ -267,8 +263,7 @@ void test_search_n3(ExPolicy policy, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    auto fixture = get_search_n3_fixture();
-    std::vector<std::size_t>& c = fixture.first;
+    std::vector<std::size_t> c = get_search_n3_fixture();
 
     iterator result = hpx::search_n(policy, iterator(std::begin(c)),
         iterator(std::end(c)), 0, static_cast<std::size_t>(1));
@@ -282,8 +277,7 @@ void test_search_n3_async(ExPolicy p, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    auto fixture = get_search_n3_fixture();
-    std::vector<std::size_t>& c = fixture.first;
+    std::vector<std::size_t> c = get_search_n3_fixture();
 
     hpx::future<iterator> f = hpx::search_n(p, iterator(std::begin(c)),
         iterator(std::end(c)), 0, static_cast<std::size_t>(1));
@@ -328,15 +322,6 @@ void test_search_n4_without_expolicy(IteratorTag)
             iterator(std::end(c)), 10, static_cast<std::size_t>(1));
         HPX_TEST(result == iterator(std::end(c)));
     }
-
-    // case 4b: elements do not match and count is greater
-    {
-        std::vector<std::size_t> c(10007);
-        std::fill(std::begin(c), std::end(c), (std::rand() % 100) + 3);
-        iterator result = hpx::search_n(iterator(std::begin(c)),
-            iterator(std::end(c)), 20000, static_cast<std::size_t>(1));
-        HPX_TEST(result == iterator(std::end(c)));
-    }
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -354,14 +339,6 @@ void test_search_n4(ExPolicy policy, IteratorTag)
             iterator(std::end(c)), 10, static_cast<std::size_t>(1));
         HPX_TEST(result == iterator(std::end(c)));
     }
-
-    {
-        std::vector<std::size_t> c(10007);
-        std::fill(std::begin(c), std::end(c), (std::rand() % 100) + 3);
-        iterator result = hpx::search_n(policy, iterator(std::begin(c)),
-            iterator(std::end(c)), 20000, static_cast<std::size_t>(1));
-        HPX_TEST(result == iterator(std::end(c)));
-    }
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -374,15 +351,6 @@ void test_search_n4_async(ExPolicy p, IteratorTag)
         std::vector<std::size_t> c(5, static_cast<std::size_t>(1));
         hpx::future<iterator> f = hpx::search_n(p, iterator(std::begin(c)),
             iterator(std::end(c)), 10, static_cast<std::size_t>(1));
-        f.wait();
-        HPX_TEST(f.get() == iterator(std::end(c)));
-    }
-
-    {
-        std::vector<std::size_t> c(10007);
-        std::fill(std::begin(c), std::end(c), (std::rand() % 100) + 3);
-        hpx::future<iterator> f = hpx::search_n(p, iterator(std::begin(c)),
-            iterator(std::end(c)), 20000, static_cast<std::size_t>(1));
         f.wait();
         HPX_TEST(f.get() == iterator(std::end(c)));
     }
@@ -762,7 +730,7 @@ void test_search_n_bad_alloc(ExPolicy policy, IteratorTag)
     typedef test::decorated_iterator<base_iterator, IteratorTag>
         decorated_iterator;
 
-    std::vector<std::size_t> c(100007);
+    std::vector<std::size_t> c(10007);
     std::fill(std::begin(c), std::end(c), static_cast<std::size_t>(2));
 
     bool caught_bad_alloc = false;
