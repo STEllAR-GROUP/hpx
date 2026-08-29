@@ -132,16 +132,26 @@ void test_join_blocks_for_async_work()
 
     scope.close();
 
-    // Start join() detached; its continuation signals when complete
+    // Start join() detached; its continuation signals when complete.
+    // schedule + let_value provides the completion domain that
+    // start_detached requires; join_started ensures join() is in
+    // flight before the assertion.
     std::atomic<bool> join_done{false};
+    hpx::binary_semaphore join_started{0};
     hpx::binary_semaphore join_finished{0};
 
     ex::start_detached(ex::schedule(ex::thread_pool_scheduler{}) |
-        ex::let_value([&]() { return scope.join(); }) |
+        ex::let_value([&]() {
+            join_started.release();
+            return scope.join();
+        }) |
         ex::then([&]() noexcept {
             join_done.store(true, std::memory_order_release);
             join_finished.release();
         }));
+
+    // Wait until join() has actually started
+    join_started.acquire();
 
     // Task 0 is still held, so join() cannot have completed
     HPX_TEST(!join_done.load(std::memory_order_acquire));
