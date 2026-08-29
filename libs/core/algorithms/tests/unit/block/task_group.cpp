@@ -9,6 +9,7 @@
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/testing.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <string>
 #include <vector>
