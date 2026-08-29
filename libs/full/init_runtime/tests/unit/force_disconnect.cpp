@@ -19,7 +19,8 @@
 // an action is still in flight to it; repeated connect/disconnect cycles across
 // distinct localities; two concurrent force_disconnect calls racing on the same
 // target; and disconnecting a locality whose process has already been killed
-// outright (rather than one that is cooperatively still running).
+// outright (rather than one that is cooperatively still running), after
+// checking that parcels sent to it report network_error.
 //
 // The remote localities are spawned as separate worker processes (see
 // force_disconnect_worker.cpp) via process::launch_connecting_locality(), since
@@ -36,16 +37,20 @@
 #include <hpx/modules/components_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/naming_base.hpp>
+#include <hpx/modules/parcelset.hpp>
 #include <hpx/modules/prefix.hpp>
 #include <hpx/modules/runtime_distributed.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/testing.hpp>
 
+#include <atomic>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
+#include <memory>
 #include <string>
 #include <system_error>
 #include <thread>
@@ -443,10 +448,14 @@ void test_concurrent_double_disconnect_race(hpx::id_type const& target)
     HPX_TEST(succeeded1 != succeeded2);
 }
 
-// Force-disconnecting a locality whose process has already been killed (rather
-// than one that is cooperatively still running) must complete within the
-// best-effort notify timeout instead of hanging, and must still succeed in
-// cleaning up the local AGAS/connection-cache state.
+// How long a parcel addressed to a killed locality may take to report its
+// error through the parcel layer.
+constexpr std::chrono::seconds parcel_error_timeout(5);
+
+// An async action sent to a locality whose process has already been killed must
+// report the parcel-write error through its future. Force-disconnecting that
+// locality must then complete within the best-effort notify timeout instead of
+// hanging, and must still clean up the local AGAS/connection-cache state.
 void test_disconnect_unreachable_locality(
     process::child& worker, hpx::id_type const& target)
 {
@@ -455,7 +464,125 @@ void test_disconnect_unreachable_locality(
         return;
     }
 
+    constexpr ping_locality_action act;
+    HPX_TEST_EQ(act(target), hpx::naming::get_locality_id_from_id(target));
+
     worker.terminate(hpx::launch::sync);
+
+    auto parcelport = hpx::get_runtime_distributed()
+                          .get_parcel_handler()
+                          .get_bootstrap_parcelport();
+    HPX_TEST(parcelport);
+    if (!parcelport)
+    {
+        return;
+    }
+
+    auto const get_cache_evictions = [&parcelport] {
+        return parcelport->get_connection_cache_statistics(
+            hpx::parcelset::parcelport::connection_cache_evictions, false);
+    };
+    auto const wait_for_cache_eviction = [&get_cache_evictions](
+                                             std::int64_t const previous) {
+        auto const deadline =
+            std::chrono::steady_clock::now() + parcel_error_timeout;
+        while (get_cache_evictions() == previous &&
+            std::chrono::steady_clock::now() < deadline)
+        {
+            hpx::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
+        return get_cache_evictions() > previous;
+    };
+
+    // Exercise normal async error delivery. Fault-tolerant sends deliberately
+    // keep an unsent parcel queued for a possible reconnect.
+    hpx::get_config().tolerate_node_faults(false);
+    auto const restore_fault_tolerance = hpx::experimental::scope_exit(
+        []() noexcept { hpx::get_config().tolerate_node_faults(true); });
+
+    // A probe that times out leaves its write callback pending, so each probe
+    // owns its state and the callback keeps that state alive on its own.
+    struct probe_state
+    {
+        std::atomic<bool> write_completed = false;
+        std::atomic<bool> connection_failed = false;
+    };
+
+    bool connection_failure_received = false;
+
+    // Every connection still cached for the killed locality fails its first
+    // write with the socket's own error and is evicted, so up to
+    // HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY probes can be spent that way.
+    // The probe after those has to open a new connection, and that is the one
+    // that reports network_error.
+    constexpr std::size_t max_probe_attempts =
+        HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY + 1;
+
+    for (std::size_t i = 0; i != max_probe_attempts; ++i)
+    {
+        std::int64_t const evictions_before = get_cache_evictions();
+        auto probe = std::make_shared<probe_state>();
+
+        hpx::post_cb<ping_locality_action>(
+            target, [probe](std::error_code const& ec, auto const&) {
+                probe->connection_failed.store(ec ==
+                        hpx::make_system_error_code(hpx::error::network_error),
+                    std::memory_order_relaxed);
+                probe->write_completed.store(true, std::memory_order_release);
+            });
+
+        auto const probe_deadline =
+            std::chrono::steady_clock::now() + parcel_error_timeout;
+        while (!probe->write_completed.load(std::memory_order_acquire) &&
+            std::chrono::steady_clock::now() < probe_deadline)
+        {
+            hpx::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
+
+        bool const write_completed =
+            probe->write_completed.load(std::memory_order_acquire);
+        HPX_TEST(write_completed);
+        if (!write_completed)
+        {
+            break;
+        }
+
+        // The write callback runs before TCP has read the acknowledgment and
+        // returned or removed the connection. Wait for that postprocessing so
+        // the next probe cannot overlap it and leave a checked-out connection.
+        bool const connection_evicted =
+            wait_for_cache_eviction(evictions_before);
+        HPX_TEST(connection_evicted);
+        if (!connection_evicted)
+        {
+            break;
+        }
+
+        connection_failure_received =
+            probe->connection_failed.load(std::memory_order_relaxed);
+        if (connection_failure_received)
+        {
+            break;
+        }
+    }
+    HPX_TEST(connection_failure_received);
+
+    hpx::future<std::uint32_t> f = hpx::async(act, target);
+    hpx::future_status const status = f.wait_for(parcel_error_timeout);
+    HPX_TEST(status == hpx::future_status::ready);
+    if (status == hpx::future_status::ready)
+    {
+        hpx::error thrown_error = hpx::error::success;
+        try
+        {
+            f.get();
+        }
+        catch (hpx::exception const& e)
+        {
+            thrown_error = e.get_error();
+        }
+        HPX_TEST_EQ(thrown_error, hpx::error::network_error);
+    }
 
     auto const start = std::chrono::steady_clock::now();
 
