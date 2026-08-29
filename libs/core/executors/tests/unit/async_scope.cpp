@@ -7,6 +7,7 @@
 // Tests for P3149 async_scope facilities (spawn, spawn_future, associate)
 
 #include <hpx/config.hpp>
+#include <hpx/execution.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/executors.hpp>
 #include <hpx/modules/testing.hpp>
@@ -15,6 +16,7 @@
 
 #include <atomic>
 #include <exception>
+#include <iostream>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -22,6 +24,22 @@
 #include <hpx/modules/execution_base.hpp>
 
 namespace ex = hpx::execution::experimental;
+namespace tt = hpx::this_thread::experimental;
+
+// scope.join() has no completion scheduler. ex::sync_wait(scope.join())
+// from hpx_main can take stdexec's OS-blocking wait and starve the pool.
+// start_detached with get_start_scheduler connects join immediately;
+// binary_semaphore::acquire suspends the HPX task instead.
+template <typename Scope>
+void wait_join(Scope& scope)
+{
+    hpx::binary_semaphore done{0};
+    ex::start_detached(
+        scope.join() | ex::then([&]() noexcept { done.release(); }),
+        ex::make_env(
+            ex::prop(ex::get_start_scheduler, ex::thread_pool_scheduler{})));
+    done.acquire();
+}
 
 // spawn_future with thread_pool_scheduler: value propagation
 void test_spawn_future_value()
@@ -34,12 +52,12 @@ void test_spawn_future_value()
 
     scope.close();
 
-    auto result = ex::sync_wait(std::move(fut));
+    auto result = tt::sync_wait(std::move(fut));
     HPX_TEST(result.has_value());
     auto [val] = std::move(*result);
     HPX_TEST_EQ(val, 42);
 
-    ex::sync_wait(scope.join());
+    wait_join(scope);
 }
 
 // spawn_future with thread_pool_scheduler: error propagation
@@ -67,13 +85,13 @@ void test_spawn_future_error()
         return ex::just(-1);
     });
 
-    auto result = ex::sync_wait(std::move(handled));
+    auto result = tt::sync_wait(std::move(handled));
     HPX_TEST(caught);
     HPX_TEST(result.has_value());
     auto [val] = std::move(*result);
     HPX_TEST_EQ(val, -1);
 
-    ex::sync_wait(scope.join());
+    wait_join(scope);
 }
 
 // spawn with thread_pool_scheduler: observable side effect.
@@ -96,7 +114,7 @@ void test_spawn_with_scheduler()
     }
 
     scope.close();
-    ex::sync_wait(scope.join());
+    wait_join(scope);
 
     HPX_TEST_EQ(completed.load(), n);
 }
@@ -128,7 +146,9 @@ void test_join_blocks_for_async_work()
     }
 
     // Wait until the held operation is running
+    std::cerr << "async_scope: before arrived.acquire\n" << std::flush;
     arrived.acquire();
+    std::cerr << "async_scope: after arrived.acquire\n" << std::flush;
 
     scope.close();
 
@@ -138,21 +158,26 @@ void test_join_blocks_for_async_work()
     std::atomic<bool> join_done{false};
     hpx::binary_semaphore join_finished{0};
 
+    std::cerr << "async_scope: before start_detached\n" << std::flush;
     ex::start_detached(scope.join() | ex::then([&]() noexcept {
         join_done.store(true, std::memory_order_release);
         join_finished.release();
     }),
         ex::make_env(
             ex::prop(ex::get_start_scheduler, ex::thread_pool_scheduler{})));
+    std::cerr << "async_scope: after start_detached\n" << std::flush;
 
     // Task 0 is still held, so join() cannot have completed
     HPX_TEST(!join_done.load(std::memory_order_acquire));
 
     // Release the held operation
+    std::cerr << "async_scope: before release.release\n" << std::flush;
     release.release();
 
     // Suspends the HPX task; does not block the OS worker
+    std::cerr << "async_scope: before join_finished.acquire\n" << std::flush;
     join_finished.acquire();
+    std::cerr << "async_scope: after join_finished.acquire\n" << std::flush;
 
     HPX_TEST(join_done.load(std::memory_order_acquire));
     HPX_TEST_EQ(completed.load(std::memory_order_acquire), n);
@@ -168,12 +193,12 @@ void test_spawn_future_closed_scope()
             ex::then([]() { return 99; }),
         scope.get_token());
 
-    auto result = ex::sync_wait(std::move(fut) | ex::stopped_as_optional());
+    auto result = tt::sync_wait(std::move(fut) | ex::stopped_as_optional());
     HPX_TEST(result.has_value());
     auto [opt_val] = std::move(*result);
     HPX_TEST(!opt_val.has_value());
 
-    ex::sync_wait(scope.join());
+    wait_join(scope);
 }
 
 // counting_scope with request_stop: stop is delivered to HPX work.
@@ -193,7 +218,7 @@ void test_counting_scope_stop_with_scheduler()
         scope.get_token());
 
     // stopped_as_optional: set_stopped -> nullopt, set_value -> optional
-    auto result = ex::sync_wait(std::move(fut) | ex::stopped_as_optional());
+    auto result = tt::sync_wait(std::move(fut) | ex::stopped_as_optional());
     HPX_TEST(result.has_value());
     auto [opt_val] = std::move(*result);
 
@@ -205,17 +230,30 @@ void test_counting_scope_stop_with_scheduler()
     }
 
     scope.close();
-    ex::sync_wait(scope.join());
+    wait_join(scope);
 }
 
 int hpx_main(int, char*[])
 {
+    std::cerr << "async_scope: before test_spawn_future_value\n" << std::flush;
     test_spawn_future_value();
+    std::cerr << "async_scope: before test_spawn_future_error\n" << std::flush;
     test_spawn_future_error();
+    std::cerr << "async_scope: before test_spawn_with_scheduler\n"
+              << std::flush;
     test_spawn_with_scheduler();
+    std::cerr << "async_scope: before test_join_blocks_for_async_work\n"
+              << std::flush;
     test_join_blocks_for_async_work();
+    std::cerr << "async_scope: after test_join_blocks_for_async_work\n"
+              << std::flush;
+    std::cerr << "async_scope: before test_spawn_future_closed_scope\n"
+              << std::flush;
     test_spawn_future_closed_scope();
+    std::cerr << "async_scope: before test_counting_scope_stop_with_scheduler\n"
+              << std::flush;
     test_counting_scope_stop_with_scheduler();
+    std::cerr << "async_scope: after all tests\n" << std::flush;
 
     return hpx::local::finalize();
 }
