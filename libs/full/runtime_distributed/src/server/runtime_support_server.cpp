@@ -444,11 +444,6 @@ namespace hpx::components::server {
 #if defined(HPX_HAVE_NETWORKING)
         std::uint32_t const initiating_locality_id = get_locality_id();
 
-        // send token to previous node
-        std::uint32_t target_id = initiating_locality_id;
-        if (0 == target_id)
-            target_id = num_localities;
-
         std::size_t count = 0;    // keep track of number of trials
 
         {
@@ -463,6 +458,16 @@ namespace hpx::components::server {
                 // and sending a white token to machine nr.N - 1.
                 dijkstra_color_ = false;    // start off with white
                 dijkstra_cond_ = std::make_unique<hpx::latch>(2);
+
+                // Start each probe at the initiator's predecessor in the ring.
+                // dijkstra_forward_token consumes target_id (it walks it
+                // backwards in-place), so it has to be re-initialized for every
+                // probe; reusing the value left over from the previous probe
+                // makes a repeated probe walk past the other localities and the
+                // initiator ends up handing the token to itself indefinitely.
+                std::uint32_t target_id = initiating_locality_id;
+                if (0 == target_id)
+                    target_id = num_localities;
 
                 {
                     // accommodate for disconnected localities
