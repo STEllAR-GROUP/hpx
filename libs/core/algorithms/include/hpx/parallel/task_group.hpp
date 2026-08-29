@@ -109,7 +109,8 @@ namespace hpx::experimental {
         {
             namespace ex = hpx::execution::experimental;
 
-            // Extract the lambda into a separate variable to prevent AST depth crashes on Clang compilers during complex template instantiations.
+            // Extract the lambda into a separate variable to prevent AST depth
+            // crashes on Clang compilers during complex template instantiations.
             auto task = wrap_task(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
 
             auto stopped_handler = []() { return ex::just(); };
@@ -118,7 +119,8 @@ namespace hpx::experimental {
                 ex::then(HPX_MOVE(task)) |
                 ex::let_error([this](std::exception_ptr e) mutable {
                     add_exception(HPX_MOVE(e));
-                    // Convert the error channel to a value channel to satisfy start_detached
+                    // Convert the error channel to a value channel to satisfy
+                    // start_detached
                     return ex::just();
                 }) |
                 ex::let_stopped(HPX_MOVE(stopped_handler));

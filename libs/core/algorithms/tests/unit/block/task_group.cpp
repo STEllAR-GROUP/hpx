@@ -115,6 +115,19 @@ void task_group_test3()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+void task_group_test_scheduler()
+{
+    hpx::execution::experimental::thread_pool_scheduler sched{};
+    hpx::experimental::task_group g;
+    std::atomic<bool> executed{false};
+
+    g.run(sched, [&]() { executed = true; });
+    g.wait();
+
+    HPX_TEST(executed);
+}
+
+///////////////////////////////////////////////////////////////////////////////
 void task_group_test_scheduler_exception()
 {
     bool throws_exception = true;
@@ -150,6 +163,7 @@ int hpx_main()
     task_group_test1_reuse();
     task_group_test2();
     task_group_test3();
+    task_group_test_scheduler();
     task_group_test_scheduler_exception();
 
     return hpx::local::finalize();
