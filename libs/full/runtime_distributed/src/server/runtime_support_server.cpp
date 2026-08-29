@@ -17,6 +17,7 @@
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/ini.hpp>
 #include <hpx/modules/logging.hpp>
@@ -886,6 +887,28 @@ namespace hpx::components::server {
     bool runtime_support::remove_locality(
         hpx::id_type const& locality, error_code& ec)
     {
+        agas::addressing_service& agas_client = naming::get_agas_client();
+        if (!agas_client.mark_connecting_locality_as_disconnecting(
+                locality.get_gid()))
+        {
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "runtime_support::remove_locality",
+                "hpx::force_disconnect can be called to disconnect only a "
+                "locality that was connecting late and is not already being "
+                "disconnected.");
+            return false;
+        }
+
+        // A removal that throws must not leave the locality claimed forever,
+        // so hand it back as connecting. A retry then repeats the shutdown
+        // notification and the cache removal broadcasts, which are idempotent.
+        // A removal that fails without throwing needs nothing, because the
+        // console connection cache removal below still erases the entry.
+        auto release_claim = hpx::experimental::scope_fail([&]() noexcept {
+            agas_client.mark_disconnecting_locality_as_connecting(
+                locality.get_gid());
+        });
+
 #if !defined(HPX_COMPUTE_DEVICE_CODE) && defined(HPX_HAVE_NETWORKING)
         // try to inform the locality that it has been disconnected (ignore any
         // errors)
@@ -910,7 +933,6 @@ namespace hpx::components::server {
 
         remove_locality_from_connection_cache(locality.get_gid(), true);
 
-        agas::addressing_service& agas_client = naming::get_agas_client();
         bool const result =
             agas_client.unregister_locality(locality.get_gid(), ec);
 

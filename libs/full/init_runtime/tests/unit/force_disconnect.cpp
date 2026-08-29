@@ -10,10 +10,9 @@
 // remote locality succeeds and actually removes it from AGAS/the connection
 // caches while leaving the remaining localities unaffected. Calling
 // force_disconnect a second time on an already-disconnected locality does not
-// hang. Once a locality has been removed, its gid no longer reports
-// is_connecting() == true, so the eligibility check in force_disconnect fails
-// fast with hpx::error::bad_parameter rather than attempting a second removal
-// or blocking.
+// hang. Once a locality has been removed, the parcel layer remembers it as
+// disconnected, so force_disconnect rejects the gid with
+// hpx::error::bad_parameter before it attempts a second removal or blocks.
 //
 // Beyond that baseline, this test also covers: disconnecting a locality while
 // an action is still in flight to it; repeated connect/disconnect cycles across
@@ -43,6 +42,7 @@
 #include <hpx/modules/prefix.hpp>
 #include <hpx/modules/runtime_distributed.hpp>
 #include <hpx/modules/runtime_local.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <atomic>
@@ -287,10 +287,9 @@ std::pair<hpx::id_type, hpx::id_type> test_force_disconnect_removes_locality()
 }
 
 // Calling force_disconnect a second time on an already-disconnected
-// locality does not hang. Once a locality has been removed, its gid no
-// longer reports is_connecting() == true, so the eligibility check in
-// force_disconnect fails fast with hpx::error::bad_parameter rather than
-// attempting a second removal or blocking.
+// locality does not hang. Once a locality has been removed, the parcel layer
+// remembers it as disconnected, so force_disconnect rejects the gid with
+// hpx::error::bad_parameter before it attempts a second removal or blocks.
 void test_double_disconnect_should_fail(hpx::id_type const& target)
 {
     if (!target)
@@ -422,9 +421,36 @@ void test_repeated_connect_disconnect_cycles(fs::path const& exe,
     }
 }
 
+// A claimed locality is rejected by force_disconnect until the claim is
+// released, which is what remove_locality does when a removal throws. The
+// claim and its release each succeed exactly once, and the locality reports
+// is_connecting() throughout.
+void test_claim_and_release(hpx::id_type const& target)
+{
+    if (!target)
+    {
+        return;
+    }
+
+    hpx::agas::addressing_service& agas_client = hpx::naming::get_agas_client();
+    hpx::naming::gid_type const gid = target.get_gid();
+
+    HPX_TEST(agas_client.mark_connecting_locality_as_disconnecting(gid));
+    HPX_TEST(!agas_client.mark_connecting_locality_as_disconnecting(gid));
+    HPX_TEST(hpx::agas::is_connecting(gid));
+
+    hpx::error_code ec(hpx::throwmode::lightweight);
+    HPX_TEST_EQ(hpx::force_disconnect(target, ec), -1);
+    HPX_TEST_EQ(ec.value(), static_cast<int>(hpx::error::bad_parameter));
+
+    HPX_TEST(agas_client.mark_disconnecting_locality_as_connecting(gid));
+    HPX_TEST(!agas_client.mark_disconnecting_locality_as_connecting(gid));
+    HPX_TEST(hpx::agas::is_connecting(gid));
+}
+
 // Two concurrent hpx::force_disconnect calls targeting the same locality
-// must not corrupt state or hang: at most one may succeed, and the losing
-// call must fail cleanly instead of duplicating the removal.
+// must not corrupt state or hang: exactly one succeeds, and the losing call is
+// rejected with hpx::error::bad_parameter before it duplicates the removal.
 void test_concurrent_double_disconnect_race(hpx::id_type const& target)
 {
     if (!target)
@@ -434,11 +460,18 @@ void test_concurrent_double_disconnect_race(hpx::id_type const& target)
 
     hpx::error_code ec1(hpx::throwmode::lightweight);
     hpx::error_code ec2(hpx::throwmode::lightweight);
+    hpx::latch start(3);
 
-    hpx::future<int> f1 = hpx::async(
-        [&target, &ec1]() { return hpx::force_disconnect(target, ec1); });
-    hpx::future<int> f2 = hpx::async(
-        [&target, &ec2]() { return hpx::force_disconnect(target, ec2); });
+    hpx::future<int> f1 = hpx::async([&target, &ec1, &start]() {
+        start.arrive_and_wait();
+        return hpx::force_disconnect(target, ec1);
+    });
+    hpx::future<int> f2 = hpx::async([&target, &ec2, &start]() {
+        start.arrive_and_wait();
+        return hpx::force_disconnect(target, ec2);
+    });
+
+    start.arrive_and_wait();
 
     int const r1 = f1.get();
     int const r2 = f2.get();
@@ -446,6 +479,17 @@ void test_concurrent_double_disconnect_race(hpx::id_type const& target)
     bool const succeeded1 = (r1 == 0) && !ec1;
     bool const succeeded2 = (r2 == 0) && !ec2;
     HPX_TEST(succeeded1 != succeeded2);
+
+    if (succeeded1)
+    {
+        HPX_TEST_EQ(r2, -1);
+        HPX_TEST_EQ(ec2.value(), static_cast<int>(hpx::error::bad_parameter));
+    }
+    else if (succeeded2)
+    {
+        HPX_TEST_EQ(r1, -1);
+        HPX_TEST_EQ(ec1.value(), static_cast<int>(hpx::error::bad_parameter));
+    }
 }
 
 // How long a parcel addressed to a killed locality may take to report its
@@ -669,9 +713,11 @@ int hpx_main(hpx::program_options::variables_map& vm)
         << "Repeated connect/disconnect cycles across distinct localities.\n";
     test_repeated_connect_disconnect_cycles(exe, 2, 4);
 
-    std::cout << "Concurrent double force_disconnect on the same locality.\n";
+    std::cout << "Claiming a locality, releasing it, and racing two "
+                 "force_disconnect calls on it.\n";
     {
         auto [w6, id6] = launch_worker(exe, 6);
+        test_claim_and_release(id6);
         test_concurrent_double_disconnect_race(id6);
         int const exit_code6 = w6.wait_for_exit(hpx::launch::sync);
         HPX_TEST_EQ(exit_code6, 0);
