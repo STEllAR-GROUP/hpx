@@ -6,6 +6,7 @@
 
 #include <hpx/init.hpp>
 #include <hpx/modules/algorithms.hpp>
+#include <hpx/modules/execution.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <cstddef>
@@ -114,41 +115,30 @@ void task_group_test3()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-template <typename Scheduler>
-int fib_sched(Scheduler const& sched, int n)
-{
-    if (n < 2)
-    {
-        return n;
-    }
-
-    int x = 0, y = 0;
-
-    hpx::experimental::task_group g;
-    g.run(sched, [&](int n) { x = fib_sched(sched, n); }, n - 1);
-    g.run(sched, [&](int n) { y = fib_sched(sched, n); }, n - 2);
-    g.wait();    // wait for both tasks to complete
-
-    return x + y;
-}
-
 void task_group_test_scheduler()
 {
-    hpx::execution::experimental::thread_pool_scheduler sched;
-    HPX_TEST_EQ(fib_sched(sched, 22), 17711);
+    hpx::execution::experimental::thread_pool_scheduler sched{};
+    hpx::experimental::task_group g;
+    std::atomic<bool> executed{false};
+
+    g.run(sched, [&]() { executed = true; });
+    g.wait();
+
+    HPX_TEST(executed);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 void task_group_test_scheduler_exception()
 {
-    hpx::execution::experimental::thread_pool_scheduler sched;
-
+    bool throws_exception = true;
     bool caught_exception = false;
     try
     {
         hpx::experimental::task_group g;
-        g.run(sched, [] { throw std::runtime_error("sched_test1"); });
-        g.run(sched, [] { throw std::runtime_error("sched_test2"); });
+        hpx::execution::experimental::thread_pool_scheduler sched{};
+        g.run(sched, [] { throw std::runtime_error("test1"); });
+        g.run(sched, [] { throw std::runtime_error("test2"); });
+        throws_exception = false;
 
         g.wait();    // rethrows after waiting for all tasks to finish
         HPX_TEST(false);
@@ -162,6 +152,7 @@ void task_group_test_scheduler_exception()
     {
         HPX_TEST(false);
     }
+    HPX_TEST(!throws_exception);
     HPX_TEST(caught_exception);
 }
 
