@@ -12,10 +12,8 @@
 #include <hpx/modules/testing.hpp>
 
 #include <hpx/modules/synchronization.hpp>
-#include <hpx/thread.hpp>
 
 #include <atomic>
-#include <chrono>
 #include <exception>
 #include <stdexcept>
 #include <string>
@@ -103,9 +101,8 @@ void test_spawn_with_scheduler()
     HPX_TEST_EQ(completed.load(), n);
 }
 
-// join() blocks until in-flight work on the HPX thread pool completes.
-// Uses hpx::binary_semaphore (HPX-aware: suspends the HPX thread instead
-// of blocking the OS worker) so this works even with few HPX threads.
+// join() waits for all spawned work to finish. Uses start_detached
+// instead of sync_wait on a separate thread to avoid blocking an OS worker.
 void test_join_blocks_for_async_work()
 {
     ex::simple_counting_scope scope;
@@ -135,20 +132,25 @@ void test_join_blocks_for_async_work()
 
     scope.close();
 
-    // Start join() on a separate HPX thread
+    // Start join() detached; its continuation signals when complete
     std::atomic<bool> join_done{false};
-    hpx::thread joiner([&]() {
-        ex::sync_wait(scope.join());
-        join_done.store(true, std::memory_order_release);
-    });
+    hpx::binary_semaphore join_finished{0};
 
-    // The held operation is blocked; join() must not complete
-    hpx::this_thread::sleep_for(std::chrono::milliseconds(50));
+    ex::start_detached(ex::schedule(ex::thread_pool_scheduler{}) |
+        ex::let_value([&]() { return scope.join(); }) |
+        ex::then([&]() noexcept {
+            join_done.store(true, std::memory_order_release);
+            join_finished.release();
+        }));
+
+    // Task 0 is still held, so join() cannot have completed
     HPX_TEST(!join_done.load(std::memory_order_acquire));
 
     // Release the held operation
     release.release();
-    joiner.join();
+
+    // Suspends the HPX task; does not block the OS worker
+    join_finished.acquire();
 
     HPX_TEST(join_done.load(std::memory_order_acquire));
     HPX_TEST_EQ(completed.load(std::memory_order_acquire), n);
