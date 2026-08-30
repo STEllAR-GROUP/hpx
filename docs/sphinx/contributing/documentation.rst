@@ -23,10 +23,10 @@ Prerequisites
 To build the |hpx| documentation, you need recent versions of the following
 packages:
 
-- ``python3``
-- ``sphinx 4.5.0`` (Python package)
+- ``python3`` (3.9 or later)
+- ``sphinx`` (Python package, version 7.2 or later)
 - ``sphinx-book-theme`` (Python package)
-- ``breathe 4.33.1`` (Python package)
+- ``breathe`` (Python package, version 4.36.0 or later)
 - ``doxygen``
 - ``sphinxcontrib-bibtex``
 - ``sphinx-copybutton``
@@ -36,7 +36,7 @@ manager, you can install them using the Python package manager ``pip``:
 
 .. code-block:: bash
 
-   pip install --user "sphinx<5" sphinx-book-theme breathe sphinxcontrib-bibtex sphinx-copybutton
+   pip install --user sphinx breathe sphinx-book-theme sphinxcontrib-bibtex sphinx-copybutton
 
 You may need to set the following CMake variables to make sure CMake can
 find the required dependencies.
