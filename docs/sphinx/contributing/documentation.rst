@@ -36,7 +36,9 @@ manager, you can install them using the Python package manager ``pip``:
 
 .. code-block:: bash
 
-   pip install --user sphinx breathe sphinx-book-theme sphinxcontrib-bibtex sphinx-copybutton
+   pip install --user \
+      sphinx breathe sphinx-book-theme \
+      sphinxcontrib-bibtex sphinx-copybutton
 
 You may need to set the following CMake variables to make sure CMake can
 find the required dependencies.
