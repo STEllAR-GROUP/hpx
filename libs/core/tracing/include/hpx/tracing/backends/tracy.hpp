@@ -403,13 +403,19 @@ namespace hpx::tracing {
         // were gated instead, a run that started disconnected and finished
         // connected would decrement without a matching increment (and the
         // reverse would leak a permanent positive drift).
+        //
+        // The plot value is loaded inside each _emit body rather than
+        // snapshotted at the fetch_add/fetch_sub call site, so that Tracy
+        // records the counter's value at emit time rather than at update
+        // time. This avoids the reordering artefact where two concurrent
+        // continuations could publish stale snapshots to the plot.
         HPX_CORE_EXPORT extern std::atomic<std::int64_t> g_active_continuations;
 
         HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void continuation_run_emit(
-            void const* task_id, std::int64_t current_active) noexcept;
+            void const* task_id) noexcept;
 
-        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void continuation_finished_emit(
-            std::int64_t current_active) noexcept;
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void
+        continuation_finished_emit() noexcept;
 
         HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void handle_on_completed_fired_impl(
             void const* task_id = nullptr) noexcept;
@@ -459,12 +465,10 @@ namespace hpx::tracing {
     {
         // Counter update runs unconditionally so the tally stays consistent
         // across connect/disconnect transitions -- see g_active_continuations.
-        auto const current_active = detail::g_active_continuations.fetch_add(
-                                        1, std::memory_order_relaxed) +
-            1;
+        detail::g_active_continuations.fetch_add(1, std::memory_order_relaxed);
         if (!detail::is_profiler_connected())
             return;
-        detail::continuation_run_emit(task_id, current_active);
+        detail::continuation_run_emit(task_id);
     }
 
     /// \brief Consumer-side signal: a continuation has finished
@@ -472,12 +476,10 @@ namespace hpx::tracing {
     inline void continuation_finished(
         void const* /* task_id */ = nullptr) noexcept
     {
-        auto const current_active = detail::g_active_continuations.fetch_sub(
-                                        1, std::memory_order_relaxed) -
-            1;
+        detail::g_active_continuations.fetch_sub(1, std::memory_order_relaxed);
         if (!detail::is_profiler_connected())
             return;
-        detail::continuation_finished_emit(current_active);
+        detail::continuation_finished_emit();
     }
 
     /// \brief Consumer-side signal: handle_on_completed fired,

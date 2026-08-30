@@ -372,8 +372,7 @@ namespace hpx::tracing {
         // Tracy is connected or not.
         HPX_CORE_EXPORT std::atomic<std::int64_t> g_active_continuations{0};
 
-        void continuation_run_emit(
-            void const* task_id, std::int64_t const current_active) noexcept
+        void continuation_run_emit(void const* task_id) noexcept
         {
             char buffer[256];
             if (task_id)
@@ -391,16 +390,20 @@ namespace hpx::tracing {
             // Embed directly into active fiber visual zone text
             hpx::tracy::detail::add_zone_text_to_fiber(buffer, len);
 
-            // Update live time-series plot graph for Active Continuations
-            hpx::tracy::sample_value(
-                "Active Continuations", static_cast<double>(current_active));
+            // Sample the counter at emit time so Tracy's plot records the
+            // value as of this timestamp, not the snapshot taken at the
+            // fetch_add call site. Two concurrent emits can still see
+            // slightly different reads, but neither is stale.
+            hpx::tracy::sample_value("Active Continuations",
+                static_cast<double>(
+                    g_active_continuations.load(std::memory_order_relaxed)));
         }
 
-        void continuation_finished_emit(
-            std::int64_t const current_active) noexcept
+        void continuation_finished_emit() noexcept
         {
-            hpx::tracy::sample_value(
-                "Active Continuations", static_cast<double>(current_active));
+            hpx::tracy::sample_value("Active Continuations",
+                static_cast<double>(
+                    g_active_continuations.load(std::memory_order_relaxed)));
         }
 
         void handle_on_completed_fired_impl(void const* task_id) noexcept
