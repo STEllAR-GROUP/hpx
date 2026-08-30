@@ -17,6 +17,8 @@
 
 #include <hpx/modules/tracy.hpp>
 
+#include <tracy/TracyC.h>
+
 #include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx::tracing {
@@ -34,11 +36,7 @@ namespace hpx::tracing {
 
     // Inline connection-gate. When no Tracy client is attached, the per-task
     // hot-path entries below short-circuit at the call site to a single
-    // atomic load. Forward-declared instead of including <tracy/TracyC.h>
-    // so the ~60 TUs that transitively include hpx/tracing don't pick up
-    // Tracy's C API header; the symbol resolves at link time.
-    extern "C" std::int32_t ___tracy_connected(void);
-
+    // atomic load.
     namespace detail {
         inline bool is_profiler_connected() noexcept
         {
