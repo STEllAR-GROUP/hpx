@@ -16,7 +16,6 @@
 
 #include <atomic>
 #include <exception>
-#include <iostream>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -146,9 +145,7 @@ void test_join_blocks_for_async_work()
     }
 
     // Wait until the held operation is running
-    std::cerr << "async_scope: before arrived.acquire\n" << std::flush;
     arrived.acquire();
-    std::cerr << "async_scope: after arrived.acquire\n" << std::flush;
 
     scope.close();
 
@@ -158,26 +155,21 @@ void test_join_blocks_for_async_work()
     std::atomic<bool> join_done{false};
     hpx::binary_semaphore join_finished{0};
 
-    std::cerr << "async_scope: before start_detached\n" << std::flush;
     ex::start_detached(scope.join() | ex::then([&]() noexcept {
         join_done.store(true, std::memory_order_release);
         join_finished.release();
     }),
         ex::make_env(
             ex::prop(ex::get_start_scheduler, ex::thread_pool_scheduler{})));
-    std::cerr << "async_scope: after start_detached\n" << std::flush;
 
     // Task 0 is still held, so join() cannot have completed
     HPX_TEST(!join_done.load(std::memory_order_acquire));
 
     // Release the held operation
-    std::cerr << "async_scope: before release.release\n" << std::flush;
     release.release();
 
     // Suspends the HPX task; does not block the OS worker
-    std::cerr << "async_scope: before join_finished.acquire\n" << std::flush;
     join_finished.acquire();
-    std::cerr << "async_scope: after join_finished.acquire\n" << std::flush;
 
     HPX_TEST(join_done.load(std::memory_order_acquire));
     HPX_TEST_EQ(completed.load(std::memory_order_acquire), n);
@@ -235,25 +227,12 @@ void test_counting_scope_stop_with_scheduler()
 
 int hpx_main(int, char*[])
 {
-    std::cerr << "async_scope: before test_spawn_future_value\n" << std::flush;
     test_spawn_future_value();
-    std::cerr << "async_scope: before test_spawn_future_error\n" << std::flush;
     test_spawn_future_error();
-    std::cerr << "async_scope: before test_spawn_with_scheduler\n"
-              << std::flush;
     test_spawn_with_scheduler();
-    std::cerr << "async_scope: before test_join_blocks_for_async_work\n"
-              << std::flush;
     test_join_blocks_for_async_work();
-    std::cerr << "async_scope: after test_join_blocks_for_async_work\n"
-              << std::flush;
-    std::cerr << "async_scope: before test_spawn_future_closed_scope\n"
-              << std::flush;
     test_spawn_future_closed_scope();
-    std::cerr << "async_scope: before test_counting_scope_stop_with_scheduler\n"
-              << std::flush;
     test_counting_scope_stop_with_scheduler();
-    std::cerr << "async_scope: after all tests\n" << std::flush;
 
     return hpx::local::finalize();
 }
