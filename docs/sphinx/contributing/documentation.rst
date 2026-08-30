@@ -27,7 +27,7 @@ packages:
 - ``sphinx`` (Python package, version 7.2 or later)
 - ``sphinx-book-theme`` (Python package)
 - ``breathe`` (Python package, version 4.36.0 or later)
-- ``doxygen`` (version 1.9.2 or later)
+- ``doxygen``
 - ``sphinxcontrib-bibtex``
 - ``sphinx-copybutton``
 
