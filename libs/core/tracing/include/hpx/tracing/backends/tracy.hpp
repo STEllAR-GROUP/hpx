@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
@@ -151,7 +152,7 @@ namespace hpx::tracing {
     // are safe whether Tracy is connected or not, so we gate only the four
     // take/release member functions. The ctor snapshots the connected state
     // so that a lock announced while disconnected keeps skipping its
-    // per-cycle events even if a client connects mid-lifetime — announce
+    // per-cycle events even if a client connects mid-lifetime -- announce
     // and per-cycle events stay consistent.
     HPX_CXX_CORE_EXPORT struct HPX_CORE_EXPORT [[maybe_unused]] lock_context
     {
@@ -192,6 +193,7 @@ namespace hpx::tracing {
     }    // namespace detail
 
     ////////////////////////////////////////////////////////////////////////////
+    /// \brief Set the OS thread name in the profiler timeline.
     HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void set_thread_name(
         char const* name) noexcept;
 
@@ -201,6 +203,8 @@ namespace hpx::tracing {
             char const* name) noexcept;
     }    // namespace detail
 
+    /// \brief Rename the currently active region on this thread; returns
+    ///        the previous name, or the caller's input if no rename occurred.
     // Disconnected path returns the caller's input, mirroring the underlying
     // `hpx::tracy::detail::rename_region`'s in-fiber no-op. Returning nullptr
     // would risk a strlen(nullptr) if a caller later restored a saved name.
@@ -283,6 +287,12 @@ namespace hpx::tracing {
     // Inline gate wrappers. When the profiler is not connected, the whole
     // per-task snprintf/message/log-string chain is short-circuited at the
     // call site; only a single atomic load runs.
+
+    /// \brief Task-lifecycle signal: task description registered before the
+    ///        thread object exists.
+    ///
+    /// \param parent_task_id  Optional pointer to the spawning task, for
+    ///                        parent-child correlation.
     inline void task_staged(
         char const* description, void const* parent_task_id = nullptr) noexcept
     {
@@ -291,6 +301,10 @@ namespace hpx::tracing {
         detail::task_staged_impl(description, parent_task_id);
     }
 
+    /// \brief Task-lifecycle signal: thread object fully constructed.
+    ///
+    /// \param parent_task_id  Optional pointer to the spawning task, for
+    ///                        parent-child correlation.
     inline void task_created(char const* description, void const* task_id,
         void const* parent_task_id = nullptr) noexcept
     {
@@ -299,6 +313,9 @@ namespace hpx::tracing {
         detail::task_created_impl(description, task_id, parent_task_id);
     }
 
+    /// \brief Task-lifecycle signal: task begins executing on a worker thread.
+    ///
+    /// \param worker_thread  Index of the worker executing this task.
     inline void task_executing(void const* task_id, char const* description,
         std::size_t worker_thread) noexcept
     {
@@ -307,6 +324,7 @@ namespace hpx::tracing {
         detail::task_executing_impl(task_id, description, worker_thread);
     }
 
+    /// \brief Task-lifecycle signal: task voluntarily yielded to the scheduler.
     inline void task_yielded(
         void const* task_id, char const* description) noexcept
     {
@@ -315,6 +333,9 @@ namespace hpx::tracing {
         detail::task_yielded_impl(task_id, description);
     }
 
+    /// \brief Task-lifecycle signal: task blocked on an external resource.
+    ///
+    /// \param reason  Optional description of what the task is waiting on.
     inline void task_suspended(void const* task_id, char const* description,
         char const* reason = nullptr) noexcept
     {
@@ -323,6 +344,10 @@ namespace hpx::tracing {
         detail::task_suspended_impl(task_id, description, reason);
     }
 
+    /// \brief Task-lifecycle signal: task unblocked and returned to a
+    ///        pending state.
+    ///
+    /// \param wake_reason  Optional description of what unblocked the task.
     inline void task_resumed(void const* task_id, char const* description,
         char const* wake_reason = nullptr) noexcept
     {
@@ -331,6 +356,7 @@ namespace hpx::tracing {
         detail::task_resumed_impl(task_id, description, wake_reason);
     }
 
+    /// \brief Task-lifecycle signal: task finished its execution loop.
     inline void task_completed(
         void const* task_id, char const* description) noexcept
     {
@@ -339,6 +365,7 @@ namespace hpx::tracing {
         detail::task_completed_impl(task_id, description);
     }
 
+    /// \brief Task-lifecycle signal: task identity removed from scheduler maps.
     inline void task_deleted(void const* task_id) noexcept
     {
         if (!detail::is_profiler_connected())
@@ -368,11 +395,21 @@ namespace hpx::tracing {
         HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void future_exception_set_impl(
             void const* future_id, char const* desc = nullptr) noexcept;
 
-        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void continuation_run_impl(
-            void const* task_id = nullptr) noexcept;
+        // Active-continuations counter. Updated unconditionally by the
+        // continuation_run / continuation_finished inline wrappers below,
+        // even when no profiler is attached, so the tally stays consistent
+        // across connect/disconnect transitions. Only the Tracy emission
+        // (message + sample_value + fiber text) is gated. If both sides
+        // were gated instead, a run that started disconnected and finished
+        // connected would decrement without a matching increment (and the
+        // reverse would leak a permanent positive drift).
+        HPX_CORE_EXPORT extern std::atomic<std::int64_t> g_active_continuations;
 
-        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void continuation_finished_impl(
-            void const* task_id = nullptr) noexcept;
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void continuation_run_emit(
+            void const* task_id, std::int64_t current_active) noexcept;
+
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void continuation_finished_emit(
+            std::int64_t current_active) noexcept;
 
         HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void handle_on_completed_fired_impl(
             void const* task_id = nullptr) noexcept;
@@ -420,18 +457,27 @@ namespace hpx::tracing {
     ///        executing, correlated with the source future state.
     inline void continuation_run(void const* task_id = nullptr) noexcept
     {
+        // Counter update runs unconditionally so the tally stays consistent
+        // across connect/disconnect transitions -- see g_active_continuations.
+        auto const current_active = detail::g_active_continuations.fetch_add(
+                                        1, std::memory_order_relaxed) +
+            1;
         if (!detail::is_profiler_connected())
             return;
-        detail::continuation_run_impl(task_id);
+        detail::continuation_run_emit(task_id, current_active);
     }
 
     /// \brief Consumer-side signal: a continuation has finished
     ///        executing.
-    inline void continuation_finished(void const* task_id = nullptr) noexcept
+    inline void continuation_finished(
+        void const* /* task_id */ = nullptr) noexcept
     {
+        auto const current_active = detail::g_active_continuations.fetch_sub(
+                                        1, std::memory_order_relaxed) -
+            1;
         if (!detail::is_profiler_connected())
             return;
-        detail::continuation_finished_impl(task_id);
+        detail::continuation_finished_emit(current_active);
     }
 
     /// \brief Consumer-side signal: handle_on_completed fired,

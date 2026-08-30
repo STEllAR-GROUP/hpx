@@ -128,6 +128,9 @@ namespace hpx::tracy {
 
     HPX_CXX_CORE_EXPORT struct background_work_region
     {
+        /// \brief Opens a background-work zone on the given worker thread.
+        ///
+        /// \param active  If false, the ctor and dtor emit no Tracy events.
         // Two-arg ctor: caller supplies an explicit `active` flag captured
         // at the outer wrapper's construction (see backends/tracy.hpp
         // background_work_region). Disconnected -> we skip start_named_region
@@ -147,7 +150,7 @@ namespace hpx::tracy {
 
         // Legacy single-arg ctor kept for source-compat with code that
         // instantiates this type directly (nothing in-tree does today).
-        // Defaults to active — the classic pre-gate behaviour.
+        // Defaults to active -- the classic pre-gate behaviour.
         explicit background_work_region(std::size_t num_thread) noexcept
           : background_work_region(num_thread, true)
         {
@@ -172,6 +175,9 @@ namespace hpx::tracy {
 
     HPX_CXX_CORE_EXPORT struct mark_event
     {
+        /// \brief Opens a Tracy zone for the given event name.
+        ///
+        /// \param active  If false, the ctor and dtor emit no Tracy events.
         // Two-arg ctor: `active` records the profiler-connected decision
         // taken by the outer wrapper. If not active, we skip push_zone and
         // the paired pop_zone in the dtor.
@@ -213,9 +219,13 @@ namespace hpx::tracy {
     // start_region() - so there is no zone-stack conflict.
     struct fiber_suspend_region
     {
+        /// \brief Suspends the currently active fiber zone with the given
+        ///        reason.
+        ///
+        /// \param active  If false, the ctor and dtor emit no Tracy events.
         // Two-arg ctor honours the profiler-connected decision captured by
         // the outer wrapper. Skipping suspend_fiber_zone means the paired
-        // resume_fiber_zone in the dtor is also skipped — critical for
+        // resume_fiber_zone in the dtor is also skipped -- critical for
         // zone-stack balance.
         explicit fiber_suspend_region(
             char const* suspend_reason, bool active) noexcept

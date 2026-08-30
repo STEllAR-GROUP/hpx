@@ -12,11 +12,11 @@
 #include <hpx/modules/tracy.hpp>
 #include <hpx/tracing/tracing.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
-#include <mutex>
 #include <string>
 
 namespace hpx::tracing {
@@ -80,7 +80,7 @@ namespace hpx::tracing {
     fiber_region::~fiber_region() = default;
 
     ////////////////////////////////////////////////////////////////////////////
-    // fiber_suspend_region — inner impl runs suspend/resume unconditionally,
+    // fiber_suspend_region -- inner impl runs suspend/resume unconditionally,
     // so we only construct it when active. When not active, we pass nullptr
     // (see the inline ctor in tracy_tls.hpp, which gates on active).
 
@@ -98,7 +98,7 @@ namespace hpx::tracing {
     fiber_suspend_region::~fiber_suspend_region() = default;
 
     ////////////////////////////////////////////////////////////////////////////
-    // background_work_region — inner impl always emits start/stop_region, so
+    // background_work_region -- inner impl always emits start/stop_region, so
     // we forward the connected state explicitly.
 
     background_work_region::background_work_region(
@@ -110,7 +110,7 @@ namespace hpx::tracing {
     background_work_region::~background_work_region() = default;
 
     ////////////////////////////////////////////////////////////////////////////
-    // lock_context — see rationale in header.
+    // lock_context -- see rationale in header.
 
     lock_context::lock_context(
         char const* name, void const* /* addr */) noexcept
@@ -367,12 +367,13 @@ namespace hpx::tracing {
             hpx::tracy::detail::add_zone_text_to_fiber(buffer, len);
         }
 
-        namespace {
-            std::int64_t g_active_continuations{0};
-            std::mutex g_active_continuations_mtx;
-        }    // namespace
+        // Definition of the atomic counter declared extern in tracy.hpp.
+        // Updated by the inline continuation_{run,finished} wrappers whether
+        // Tracy is connected or not.
+        HPX_CORE_EXPORT std::atomic<std::int64_t> g_active_continuations{0};
 
-        void continuation_run_impl(void const* task_id) noexcept
+        void continuation_run_emit(
+            void const* task_id, std::int64_t const current_active) noexcept
         {
             char buffer[256];
             if (task_id)
@@ -390,25 +391,16 @@ namespace hpx::tracing {
             // Embed directly into active fiber visual zone text
             hpx::tracy::detail::add_zone_text_to_fiber(buffer, len);
 
-            // Update live time-series plot graph for Active Continuations in Tracy
-            std::int64_t current_active = 0;
-            {
-                std::lock_guard<std::mutex> lock(g_active_continuations_mtx);
-                current_active = ++g_active_continuations;
-                hpx::tracy::sample_value("Active Continuations",
-                    static_cast<double>(current_active));
-            }
+            // Update live time-series plot graph for Active Continuations
+            hpx::tracy::sample_value(
+                "Active Continuations", static_cast<double>(current_active));
         }
 
-        void continuation_finished_impl(void const* /* task_id */) noexcept
+        void continuation_finished_emit(
+            std::int64_t const current_active) noexcept
         {
-            std::int64_t current_active = 0;
-            {
-                std::lock_guard<std::mutex> lock(g_active_continuations_mtx);
-                current_active = --g_active_continuations;
-                hpx::tracy::sample_value("Active Continuations",
-                    static_cast<double>(current_active));
-            }
+            hpx::tracy::sample_value(
+                "Active Continuations", static_cast<double>(current_active));
         }
 
         void handle_on_completed_fired_impl(void const* task_id) noexcept
