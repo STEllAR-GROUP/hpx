@@ -15,8 +15,7 @@
 /// Reports min, median, and stddev over --nruns timed passes.
 ///
 /// Usage:
-///   ./reflect_action_overhead_test \
-///       --nparcels=1000 --nwarmup=100 --nruns=10
+///   ./reflect_action_overhead_test --nparcels=1000 --nwarmup=100 --nruns=10
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
