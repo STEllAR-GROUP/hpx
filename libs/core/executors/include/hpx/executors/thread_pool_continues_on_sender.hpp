@@ -112,20 +112,21 @@ namespace hpx::execution::experimental::detail {
 
             // Slow path: not on target pool -- schedule onto it.
             //
-            // Capture receiver_ by reference in the outer lambda so
-            // that if scheduler_.execute() throws synchronously, the
-            // catch block can still deliver set_error on the valid
-            // receiver. Use hpx::bind_back to safely capture the
-            // forwarded values by value instead of C++20 pack
+            // The posted task must own the receiver: this receiver object is
+            // only guaranteed to be alive for the duration of this set_value
+            // call (it may live in a transient completion context, such as a
+            // CUDA event callback), while the task runs later. Capturing
+            // `this` here is a use-after-free. Use hpx::bind_back to safely
+            // capture the forwarded values by value instead of C++20 pack
             // init-capture.
             hpx::detail::try_catch_exception_ptr(
                 [&]() {
                     scheduler_.execute(
-                        [this,
+                        [r = HPX_MOVE(receiver_),
                             f = hpx::bind_back(
                                 hpx::execution::experimental::set_value,
                                 HPX_FORWARD(Ts, ts)...)]() mutable {
-                            HPX_MOVE(f)(HPX_MOVE(receiver_));
+                            HPX_MOVE(f)(HPX_MOVE(r));
                         });
                 },
                 [&](std::exception_ptr ep) {
