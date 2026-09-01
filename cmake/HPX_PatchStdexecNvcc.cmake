@@ -18,9 +18,21 @@ if(NOT DEFINED HPX_STDEXEC_NVCC_PATCH_FILE)
   message(FATAL_ERROR "HPX_STDEXEC_NVCC_PATCH_FILE must be defined")
 endif()
 
+# Only an nvcc build is broken by an unpatched stdexec, and
+# HPX_STDEXEC_NVCC_PATCH_REQUIRED says whether this is one. Fail hard there;
+# warn everywhere else rather than failing configuration for users whose
+# compiler parses stdexec unpatched.
+if(HPX_STDEXEC_NVCC_PATCH_REQUIRED)
+  set(_hpx_stdexec_nvcc_patch_severity FATAL_ERROR)
+else()
+  set(_hpx_stdexec_nvcc_patch_severity WARNING)
+endif()
+
 find_package(Git QUIET)
 if(NOT GIT_EXECUTABLE)
-  message(WARNING "git not found, cannot apply the stdexec nvcc workarounds")
+  message(${_hpx_stdexec_nvcc_patch_severity}
+          "git not found, cannot apply the stdexec nvcc workarounds"
+  )
   return()
 endif()
 
@@ -44,7 +56,7 @@ execute_process(
 )
 if(NOT _hpx_stdexec_nvcc_patch_result EQUAL 0)
   message(
-    WARNING
-      "Failed to apply the stdexec nvcc workarounds: ${_hpx_stdexec_nvcc_patch_error}"
+    ${_hpx_stdexec_nvcc_patch_severity}
+    "Failed to apply the stdexec nvcc workarounds: ${_hpx_stdexec_nvcc_patch_error}"
   )
 endif()
