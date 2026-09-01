@@ -462,7 +462,7 @@ namespace hpx::tracing {
         }
 
         // Mirror of naming::invalid_locality_id (~std::uint32_t(0)) from
-        // libs/full/naming_base/include/hpx/naming_base/gid_type.hpp.
+        // libs/full/naming_base/include/hpx/naming_base/naming_base.hpp.
         // Duplicated because core cannot depend on full; if the real
         // constant ever changes, update this or the invalid-locality
         // branches will silently start printing L#4294967295 again.
