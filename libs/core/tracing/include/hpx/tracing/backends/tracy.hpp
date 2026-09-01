@@ -427,6 +427,19 @@ namespace hpx::tracing {
 
         HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void os_thread_sleep_impl(
             std::size_t num_thread) noexcept;
+
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void send_parcel_impl(
+            std::uint64_t tag_msb, std::uint64_t tag_lsb, std::uint64_t size,
+            std::uint64_t target_locality_id) noexcept;
+
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void recv_parcel_impl(
+            std::uint64_t tag_msb, std::uint64_t tag_lsb,
+            std::uint64_t source_locality_id) noexcept;
+
+        HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void parcel_scheduled_impl(
+            std::uint64_t tag_msb, std::uint64_t tag_lsb,
+            std::uint64_t source_locality_id,
+            std::uint64_t source_thread_id) noexcept;
     }    // namespace detail
 
     /// \brief Producer-side signal: a future shared state was set to a value.
@@ -537,23 +550,64 @@ namespace hpx::tracing {
         std::string const& name, std::string const& short_name,
         double value) noexcept;
 
-    HPX_CXX_CORE_EXPORT constexpr void send_parcel(std::uint64_t /*tag_msb*/,
-        std::uint64_t /*tag_lsb*/, std::uint64_t /*size*/,
-        std::uint64_t /*target_locality_id*/) noexcept
+    /// \brief Parcel-send signal: a parcel has been handed to the
+    ///        parcelport for transmission.
+    ///
+    /// \param tag_msb              High 64 bits of the parcel id.
+    /// \param tag_lsb              Low 64 bits of the parcel id. Together
+    ///                             with tag_msb they form the full 128-bit
+    ///                             id used to pair events across localities;
+    ///                             lsb alone restarts per locality and
+    ///                             would produce false matches.
+    /// \param size                 Wire size of the parcel in bytes.
+    /// \param target_locality_id   Destination locality id, or
+    ///                             `naming::invalid_locality_id` if unknown.
+    inline void send_parcel(std::uint64_t tag_msb, std::uint64_t tag_lsb,
+        std::uint64_t size, std::uint64_t target_locality_id) noexcept
     {
+        if (!detail::is_profiler_connected())
+            return;
+        detail::send_parcel_impl(tag_msb, tag_lsb, size, target_locality_id);
     }
 
-    HPX_CXX_CORE_EXPORT constexpr void recv_parcel(std::uint64_t /*tag_msb*/,
-        std::uint64_t /*tag_lsb*/,
-        std::uint64_t /*source_locality_id*/) noexcept
+    /// \brief Parcel-receive signal: a parcel has arrived and its header
+    ///        has been deserialized.
+    ///
+    /// \param tag_msb              High 64 bits of the parcel id.
+    /// \param tag_lsb              Low 64 bits of the parcel id.
+    /// \param source_locality_id   Sending locality id, or
+    ///                             `naming::invalid_locality_id` when the
+    ///                             parcel has no source id yet (pre-AGAS
+    ///                             handshake parcels).
+    inline void recv_parcel(std::uint64_t tag_msb, std::uint64_t tag_lsb,
+        std::uint64_t source_locality_id) noexcept
     {
+        if (!detail::is_profiler_connected())
+            return;
+        detail::recv_parcel_impl(tag_msb, tag_lsb, source_locality_id);
     }
 
-    HPX_CXX_CORE_EXPORT constexpr void parcel_scheduled(
-        std::uint64_t /*tag_msb*/, std::uint64_t /*tag_lsb*/,
-        std::uint64_t /*source_locality_id*/,
-        std::uint64_t /*source_thread_id*/) noexcept
+    /// \brief Parcel-scheduled signal: an action carried by a parcel has
+    ///        been placed onto the local scheduler. Fires for deferred
+    ///        receives (zero-copy or multi-parcel message), for
+    ///        AGAS-routed parcels, and for parcels the AGAS re-route
+    ///        chain delivered after a migration detection. Does not fire
+    ///        for the non-deferred path where load_schedule schedules
+    ///        inline.
+    ///
+    /// \param tag_msb              High 64 bits of the parcel id.
+    /// \param tag_lsb              Low 64 bits of the parcel id.
+    /// \param source_locality_id   Sending locality id (see recv_parcel).
+    /// \param source_thread_id     Parent HPX thread id captured on the
+    ///                             sender; may be 0 when unavailable.
+    inline void parcel_scheduled(std::uint64_t tag_msb, std::uint64_t tag_lsb,
+        std::uint64_t source_locality_id,
+        std::uint64_t source_thread_id) noexcept
     {
+        if (!detail::is_profiler_connected())
+            return;
+        detail::parcel_scheduled_impl(
+            tag_msb, tag_lsb, source_locality_id, source_thread_id);
     }
 
     HPX_CXX_CORE_EXPORT constexpr void set_enable_parent_task_handler(
