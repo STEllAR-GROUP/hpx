@@ -247,6 +247,13 @@ namespace hpx::tracing {
         util::external_timer::recv(tag_lsb, 0, source_locality_id, 0);
     }
 
+    void parcel_scheduled(std::uint64_t const /*tag_msb*/,
+        std::uint64_t const /*tag_lsb*/,
+        std::uint64_t const /*source_locality_id*/,
+        std::uint64_t const /*source_thread_id*/) noexcept
+    {
+    }
+
     void set_enable_parent_task_handler(enable_parent_task_handler_type f)
     {
         util::set_enable_parent_task_handler(f);

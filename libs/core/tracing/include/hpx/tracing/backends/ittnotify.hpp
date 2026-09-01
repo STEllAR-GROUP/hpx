@@ -362,6 +362,13 @@ namespace hpx::tracing {
     {
     }
 
+    HPX_CXX_CORE_EXPORT constexpr void parcel_scheduled(
+        std::uint64_t /*tag_msb*/, std::uint64_t /*tag_lsb*/,
+        std::uint64_t /*source_locality_id*/,
+        std::uint64_t /*source_thread_id*/) noexcept
+    {
+    }
+
     HPX_CXX_CORE_EXPORT constexpr void set_enable_parent_task_handler(
         enable_parent_task_handler_type) noexcept
     {
