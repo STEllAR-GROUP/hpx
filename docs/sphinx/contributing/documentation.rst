@@ -32,7 +32,9 @@ packages:
 - ``sphinx-copybutton``
 
 If the |python|_ dependencies are not available through your system package
-manager, you can install them using the Python package manager ``pip``:
+manager, you can install them using the Python package manager ``pip``. We
+recommend doing this inside a virtual environment (for example, one created
+with ``python3 -m venv .venv``) to avoid polluting the global package state:
 
 .. code-block:: bash
 
