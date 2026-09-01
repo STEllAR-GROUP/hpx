@@ -77,8 +77,12 @@ namespace hpx::agas::detail {
 
         if (nullptr == threads::get_self_ptr())
         {
-            // this should happen only during bootstrap
-            HPX_ASSERT(hpx::is_starting());
+            // This should happen only during bootstrap. If it happens later
+            // we're dealing with a disconnected locality.
+            if (!hpx::is_starting())
+            {
+                return {};
+            }
 
             while (!endpoints_future.is_ready())
                 /**/;

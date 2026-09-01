@@ -226,7 +226,7 @@ namespace hpx {
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::traits {
 
-    HPX_CXX_CORE_EXPORT template <typename Sig>
+    template <typename Sig>
     struct get_function_address<hpx::function_ref<Sig>>
     {
         [[nodiscard]] static constexpr std::size_t call(
@@ -236,7 +236,7 @@ namespace hpx::traits {
         }
     };
 
-    HPX_CXX_CORE_EXPORT template <typename Sig>
+    template <typename Sig>
     struct get_function_annotation<hpx::function_ref<Sig>>
     {
         [[nodiscard]] static constexpr char const* call(
@@ -246,7 +246,7 @@ namespace hpx::traits {
         }
     };
 
-    HPX_CXX_CORE_EXPORT template <typename Sig>
+    template <typename Sig>
     struct get_function_annotation_tracing<hpx::function_ref<Sig>>
     {
         [[nodiscard]] static hpx::tracing::annotation_handle call(

@@ -78,6 +78,12 @@ namespace hpx::tracing {
     };
 
     ////////////////////////////////////////////////////////////////////////////
+    HPX_CXX_CORE_EXPORT struct [[maybe_unused]] background_work_region
+    {
+        constexpr explicit background_work_region(std::size_t = 0) noexcept {}
+    };
+
+    ////////////////////////////////////////////////////////////////////////////
     HPX_CXX_CORE_EXPORT struct [[maybe_unused]] lock_context
     {
         constexpr explicit lock_context(
@@ -271,11 +277,20 @@ namespace hpx::tracing {
     {
     }
 
+    /// \brief Signal emitted when a worker thread steals a task from another worker.
+    HPX_CXX_CORE_EXPORT constexpr void work_stolen(
+        std::size_t, std::size_t, void const*, char const* = nullptr) noexcept
+    {
+    }
+
     /// \brief Frame boundary marker (no-op stub for APEX).
     HPX_CXX_CORE_EXPORT constexpr void frame_mark(
         char const* = nullptr) noexcept
     {
     }
+
+    HPX_CXX_CORE_EXPORT constexpr void os_thread_sleep(std::size_t) noexcept {}
+
     HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void tracing_init(char const* name,
         int argc, char** argv, std::uint32_t rank = 0, std::uint32_t size = 1);
 

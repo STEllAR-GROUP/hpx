@@ -228,7 +228,7 @@ namespace hpx::components::stubs {
             hpx::id_type const& gid, bool pre_startup);
 
         /// \brief Shutdown the given runtime system
-        static hpx::future<void> shutdown_async(hpx::id_type const& targetgid,
+        static hpx::future<void> shutdown_async(hpx::id_type const& targetid,
             double timeout = -1, bool force_disconnect = false);
         static void shutdown(hpx::id_type const& targetgid, double timeout = -1,
             bool force_disconnect = false);

@@ -34,6 +34,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/threadmanager.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/supervision.hpp>
 #include <hpx/modules/timing.hpp>
@@ -87,8 +88,10 @@ int run_worker(std::chrono::milliseconds idle_timeout,
 
     if (peers.empty())
     {
-        std::cerr << "late_component_worker: failed to discover/join root "
-                     "locality\n";
+        hpx::util::format_to(std::cerr,
+            "{}: late_component_worker: failed to discover/join root "
+            "locality\n",
+            hpx::find_here());
 
         hpx::supervision::publish_event(
             hpx::launch::sync, handle, hpx::supervision::event::failed, epoch);
@@ -109,13 +112,21 @@ int run_worker(std::chrono::milliseconds idle_timeout,
     }
     else
     {
-        std::cerr << "late_component_worker: failed to find root locality\n";
+        hpx::util::format_to(std::cerr,
+            "{}: late_component_worker: failed to find root locality\n",
+            hpx::find_here());
+
         hpx::supervision::publish_event(
             hpx::launch::sync, handle, hpx::supervision::event::failed, epoch);
         hpx::supervision::finalize();
         hpx::disconnect();
         return -1;
     }
+
+    // This needs to be seen by the compiler to instantiate the necessary remote
+    // component creation infrastructure.
+    auto const worker =
+        hpx::new_<late_component::test_client>(hpx::find_here());
 
     // "Last observed activity" -- see the file comment above for why this
     // can only ever mean "time since this loop started/last polled" here,
@@ -133,15 +144,19 @@ int run_worker(std::chrono::milliseconds idle_timeout,
                 root_peer.locality, root_peer.join_epoch);
         if (outcome == hpx::supervision::dispatch_outcome::rejected_fenced)
         {
-            std::cerr << "late_component_worker: root locality fenced; "
-                         "shutting down\n";
+            hpx::util::format_to(std::cerr,
+                "{}: late_component_worker: root locality fenced; "
+                "shutting down\n",
+                hpx::find_here());
             break;
         }
 
         if (std::chrono::duration<double>(idle_timer.elapsed()) >= idle_timeout)
         {
-            std::cerr << "late_component_worker: idle timeout elapsed with "
-                         "no further root demand; shutting down\n";
+            hpx::util::format_to(std::cerr,
+                "{}: late_component_worker: idle timeout elapsed with "
+                "no further root demand; shutting down\n",
+                hpx::find_here());
             break;
         }
     }
@@ -152,11 +167,19 @@ int run_worker(std::chrono::milliseconds idle_timeout,
 
     hpx::supervision::finalize();
 
-    return hpx::disconnect();
+    hpx::util::format_to(std::cerr,
+        "{}: late_component_worker: complete, exiting.\n", hpx::find_here());
+
+    // Disconnect from HPX, ignore all errors.
+    hpx::error_code ec(hpx::throwmode::lightweight);
+    return hpx::disconnect(ec);
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)
 {
+    hpx::util::format_to(
+        std::cerr, "{}: late_component_worker: started\n", hpx::find_here());
+
     std::chrono::milliseconds const idle_timeout{
         vm["idle-timeout"].as<std::uint64_t>()};
     std::chrono::milliseconds const poll_interval{
@@ -186,7 +209,12 @@ int main(int argc, char* argv[])
     init_args.mode = hpx::runtime_mode::connect;
     init_args.desc_cmdline = desc_commandline;
 
-    return hpx::init(argc, argv, init_args);
+    int const result = hpx::init(argc, argv, init_args);
+
+    hpx::util::format_to(
+        std::cerr, "late_component_worker: complete, exited.\n");
+
+    return result;
 }
 
 #else

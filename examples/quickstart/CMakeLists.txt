@@ -6,6 +6,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(example_programs
+    background_work_smoke
     causal_chain_smoke
     causal_exception_smoke
     barrier_docs
@@ -38,6 +39,7 @@ set(example_programs
     vector_counting_dotproduct
     vector_zip_dotproduct
     wait_composition
+    work_stealing_smoke
 )
 
 if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD" AND NOT HPX_WITH_STATIC_LINKING)
@@ -162,6 +164,7 @@ set(simple_future_continuation_PARAMETERS THREADS_PER_LOCALITY 4)
 set(timed_futures_PARAMETERS THREADS_PER_LOCALITY 4)
 set(vector_counting_dotproduct_PARAMETERS THREADS_PER_LOCALITY 4)
 set(vector_zip_dotproduct_PARAMETERS THREADS_PER_LOCALITY 4)
+set(work_stealing_smoke_PARAMETERS THREADS_PER_LOCALITY 4)
 set(custom_serialization_PARAMETERS LOCALITIES 2)
 
 # the following example fails compiling on someversions of MSVC
@@ -202,6 +205,7 @@ if(HPX_WITH_CXX_MODULES
 )
   foreach(
     example
+    background_work_smoke
     barrier_docs
     customize_async
     component_ctors
