@@ -40,6 +40,39 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::util::detail { namespace {
 
+    struct startup_gate
+    {
+        bool wait()
+        {
+            std::unique_lock<std::mutex> l(mtx);
+            cond.wait(l, [this] { return ready || cancelled; });
+            return !cancelled;
+        }
+
+        void release()
+        {
+            {
+                std::scoped_lock l(mtx);
+                ready = true;
+            }
+            cond.notify_all();
+        }
+
+        void cancel()
+        {
+            {
+                std::scoped_lock l(mtx);
+                cancelled = true;
+            }
+            cond.notify_all();
+        }
+
+        std::mutex mtx;
+        std::condition_variable cond;
+        bool ready = false;
+        bool cancelled = false;
+    };
+
     /// A pool of io_service objects.
     class io_service_pool final : public io_service_pool_base
     {
@@ -312,21 +345,46 @@ namespace hpx::util::detail { namespace {
     {
         if (io_services_.empty())
         {
-            pool_size_ = num_threads;
+            std::vector<io_service_ptr> io_services;
+            std::vector<work_type> work;
+            io_services.reserve(num_threads);
+            work.reserve(num_threads);
 
-            for (std::size_t i = 0; i < num_threads; ++i)
+            for (std::size_t i = 0; i != num_threads; ++i)
             {
                 auto p = std::make_unique<::asio::io_context>();
-                io_services_.emplace_back(HPX_MOVE(p));
-                work_.emplace_back(initialize_work(*io_services_[i]));
+                io_services.emplace_back(HPX_MOVE(p));
+                work.emplace_back(initialize_work(*io_services[i]));
             }
+
+            io_services_ = HPX_MOVE(io_services);
+            work_ = HPX_MOVE(work);
+            pool_size_ = num_threads;
         }
 
-        for (std::size_t i = 0; i < num_threads; ++i)
+        auto const gate = std::make_shared<startup_gate>();
+        threads_.reserve(num_threads);
+
+        try
         {
-            std::thread t(&io_service_pool::thread_run, this, i, startup);
-            threads_.emplace_back(HPX_MOVE(t));
+            for (std::size_t i = 0; i < num_threads; ++i)
+            {
+                threads_.emplace_back([this, i, startup, gate] {
+                    if (gate->wait())
+                    {
+                        thread_run(i, startup);
+                    }
+                });
+            }
         }
+        catch (...)
+        {
+            gate->cancel();
+            join_locked();
+            throw;
+        }
+
+        gate->release();
 
         next_io_service_ = 0;
         stopped_ = false;

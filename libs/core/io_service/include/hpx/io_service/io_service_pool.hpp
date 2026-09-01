@@ -77,13 +77,31 @@ namespace hpx::util {
 
         ~io_service_pool();
 
-        /// Run all io_service objects in the pool. If join_threads is true
-        /// this will also wait for all threads to complete
+        /// \brief Run all io_service objects in the pool. If join_threads is
+        ///        true this will also wait for all threads to complete.
+        ///
+        /// \param join_threads [in] If true, wait for all pool threads to join
+        ///                      before returning.
+        /// \param startup [in] Optional startup barrier used to synchronize
+        ///                pool worker thread startup with the caller. Its
+        ///                participant count must equal the number of pool
+        ///                worker threads plus one for the caller. The caller
+        ///                must call startup->wait() after invoking run().
         bool run(bool join_threads = true,
             std::shared_ptr<barrier> startup = {}) const;
 
-        /// Run all io_service objects in the pool. If join_threads is true
-        /// this will also wait for all threads to complete
+        /// \brief Run num_threads io_service objects in the pool. If
+        ///        join_threads is true this will also wait for all threads to
+        ///        complete.
+        ///
+        /// \param num_threads [in] The number of worker threads to start.
+        /// \param join_threads [in] If true, wait for all pool threads to join
+        ///                      before returning.
+        /// \param startup [in] Optional startup barrier used to synchronize
+        ///                pool worker thread startup with the caller. Its
+        ///                participant count must equal num_threads plus one for
+        ///                the caller. The caller must call startup->wait()
+        ///                after invoking run().
         bool run(std::size_t num_threads, bool join_threads = true,
             std::shared_ptr<barrier> startup = {}) const;
 

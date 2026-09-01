@@ -87,7 +87,10 @@ namespace hpx::threads::detail {
 
         auto const startup = std::make_shared<util::barrier>(num_threads + 1);
         bool const result = threads_->run(num_threads, false, startup);
-        startup->wait();
+        if (result)
+        {
+            startup->wait();
+        }
         return result;
     }
 
