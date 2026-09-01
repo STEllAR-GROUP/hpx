@@ -376,12 +376,12 @@ namespace hpx::components::server {
             locality_id = num_localities;
 
         // accommodate for disconnected localities
-        bool const token_sent = detail::dijkstra_forward_token(locality_id,
-            initiating_locality_id,
-            [&](std::uint32_t const target_locality_id) {
-                return send_dijkstra_termination_token(target_locality_id,
-                    initiating_locality_id, num_localities, dijkstra_color_);
-            });
+        bool const token_sent =
+            detail::dijkstra_forward_token(locality_id, initiating_locality_id,
+                [&](std::uint32_t const target_locality_id) {
+                    return send_dijkstra_termination_token(target_locality_id,
+                        initiating_locality_id, num_localities, dijkstra_token);
+                });
 
         if (!token_sent && initiating_locality_id != agas::get_locality_id())
         {
@@ -396,9 +396,9 @@ namespace hpx::components::server {
             for (int attempt = 0;
                 !fallback_sent && attempt != max_fallback_attempts; ++attempt)
             {
-                fallback_sent = send_dijkstra_termination_token(
-                    initiating_locality_id, initiating_locality_id,
-                    num_localities, dijkstra_color_);
+                fallback_sent =
+                    send_dijkstra_termination_token(initiating_locality_id,
+                        initiating_locality_id, num_localities, dijkstra_token);
             }
 
             if (!fallback_sent)
