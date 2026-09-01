@@ -444,9 +444,9 @@ namespace hpx::parcelset::detail {
     {
         load_data(ar);
 
-        // Emit immediately after load_data, before any early return can
-        // skip it (migrated targets, zero-copy, and multi-parcel messages
-        // would otherwise never appear on the receive side).
+        // Emit immediately after load_data, before either early return
+        // can skip it (migrated targets and zero-copy receives would
+        // otherwise never appear on the receive side).
         HPX_TRACING_MARK_EVENT("recv_parcel");
 
 #if defined(HPX_HAVE_PARCEL_PROFILING)

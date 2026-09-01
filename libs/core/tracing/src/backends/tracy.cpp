@@ -516,8 +516,8 @@ namespace hpx::tracing {
             hpx::tracy::message(buffer, std::strlen(buffer), 0x4CAF50u);
         }
 
-        void parcel_scheduled_impl(std::uint64_t tag_msb,
-            std::uint64_t tag_lsb, std::uint64_t source_locality_id,
+        void parcel_scheduled_impl(std::uint64_t tag_msb, std::uint64_t tag_lsb,
+            std::uint64_t source_locality_id,
             std::uint64_t /*source_thread_id*/) noexcept
         {
             char buffer[160];
