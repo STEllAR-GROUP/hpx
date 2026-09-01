@@ -305,12 +305,12 @@ namespace hpx::tracing {
         std::string const& name, std::string const& short_name,
         double value) noexcept;
 
-    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void send_parcel(std::uint64_t tag,
-        std::uint64_t size, std::uint64_t target_locality_id) noexcept;
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void send_parcel(std::uint64_t tag_msb,
+        std::uint64_t tag_lsb, std::uint64_t size,
+        std::uint64_t target_locality_id) noexcept;
 
-    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void recv_parcel(std::uint64_t tag,
-        std::uint64_t size, std::uint64_t source_locality_id,
-        std::uint64_t source_thread_id) noexcept;
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void recv_parcel(std::uint64_t tag_msb,
+        std::uint64_t tag_lsb, std::uint64_t source_locality_id) noexcept;
 
     HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void set_enable_parent_task_handler(
         enable_parent_task_handler_type f);

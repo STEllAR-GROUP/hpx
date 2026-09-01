@@ -474,10 +474,9 @@ namespace hpx::parcelset::detail {
         HPX_TRACING_MARK_EVENT("recv_parcel");
 
 #if defined(HPX_HAVE_PARCEL_PROFILING)
-        hpx::tracing::recv_parcel(data_.parcel_id_.get_lsb(), size_,
-            naming::get_locality_id_from_gid(data_.source_id_),
-            reinterpret_cast<std::uint64_t>(
-                action_->get_parent_thread_id().get()));
+        hpx::tracing::recv_parcel(data_.parcel_id_.get_msb(),
+            data_.parcel_id_.get_lsb(),
+            naming::get_locality_id_from_gid(data_.source_id_));
 #endif
 
         return false;
