@@ -3610,6 +3610,31 @@ addition, you can override the tag used for |apex|_ with the
 :option:`HPX_WITH_APEX_TAG` option. Please see the |apex_hpx_doc|_ for detailed
 instructions on using |apex|_ with |hpx|.
 
+.. _optimizing_with_tracy:
+
+Tracy integration
+=================
+
+|hpx| provides integration with the |tracy|_ profiler, which offers
+per-thread zone tracking, message logs, and fiber support. Enable it with
+:option:`HPX_WITH_TRACY`\ ``=ON`` during |cmake|_ configuration.
+
+Tracy can be supplied via a system install (point ``Tracy_ROOT`` at the install
+tree) or fetched by CMake at configure time by adding
+``HPX_WITH_FETCH_TRACY=ON``. The version fetched is pinned by
+``HPX_WITH_TRACY_TAG``, which defaults to ``v0.13.1``. When Tracy is
+fetched, |hpx| enables ``TRACY_ON_DEMAND`` and ``TRACY_FIBERS`` on the built
+client.
+
+To profile a distributed run, additionally enable
+:option:`HPX_WITH_PARCEL_PROFILING`\ ``=ON`` so per-parcel identifiers are
+carried on the wire and the ``send_parcel`` / ``recv_parcel`` /
+``parcel_scheduled`` events can be correlated across localities by parcel id.
+
+Start ``tracy-profiler`` (or ``tracy-capture`` for headless capture) before
+or during the run. Tracy discovers instrumented processes via UDP broadcast
+on the local network; no port configuration is required for the common case.
+
 References
 ==========
 
