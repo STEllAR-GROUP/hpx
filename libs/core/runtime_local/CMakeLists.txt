@@ -107,6 +107,7 @@ add_hpx_module(
   MODULE_DEPENDENCIES
     hpx_async_base
     hpx_command_line_handling_local
+    hpx_concurrency
     hpx_coroutines
     hpx_debugging
     hpx_errors
