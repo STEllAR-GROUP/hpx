@@ -518,23 +518,27 @@ namespace hpx::tracing {
 
         void parcel_scheduled_impl(std::uint64_t tag_msb, std::uint64_t tag_lsb,
             std::uint64_t source_locality_id,
-            std::uint64_t /*source_thread_id*/) noexcept
+            std::uint64_t source_thread_id) noexcept
         {
             char buffer[160];
             if (source_locality_id == invalid_locality)
             {
                 std::snprintf(buffer, sizeof(buffer),
-                    "Parcel Scheduled: id=%016llx:%016llx from=L#unknown",
+                    "Parcel Scheduled: id=%016llx:%016llx from=L#unknown "
+                    "thread=0x%016llx",
                     static_cast<unsigned long long>(tag_msb),
-                    static_cast<unsigned long long>(tag_lsb));
+                    static_cast<unsigned long long>(tag_lsb),
+                    static_cast<unsigned long long>(source_thread_id));
             }
             else
             {
                 std::snprintf(buffer, sizeof(buffer),
-                    "Parcel Scheduled: id=%016llx:%016llx from=L#%llu",
+                    "Parcel Scheduled: id=%016llx:%016llx from=L#%llu "
+                    "thread=0x%016llx",
                     static_cast<unsigned long long>(tag_msb),
                     static_cast<unsigned long long>(tag_lsb),
-                    static_cast<unsigned long long>(source_locality_id));
+                    static_cast<unsigned long long>(source_locality_id),
+                    static_cast<unsigned long long>(source_thread_id));
             }
             hpx::tracy::message(buffer, std::strlen(buffer), 0x9C27B0u);
         }
