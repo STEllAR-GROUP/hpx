@@ -16,7 +16,9 @@ API that annotates |hpx| runtime events (task lifecycle, futures, parcels, work
 stealing, worker sleep, and more) and routes those annotations to a single
 profiler backend selected at build time.
 
-Four backends are supported, one at a time:
+Four backends are supported; ``HPX_SetupTracing.cmake`` errors out at
+configure time if more than one of :option:`HPX_WITH_APEX`,
+:option:`HPX_WITH_ITTNOTIFY` or :option:`HPX_WITH_TRACY` is enabled.
 
 * :ref:`modules_tracy` — the |tracy|_ profiler, enabled with
   :option:`HPX_WITH_TRACY`.
