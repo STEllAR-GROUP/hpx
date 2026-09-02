@@ -24,20 +24,21 @@ To build the |hpx| documentation, you need recent versions of the following
 packages:
 
 - ``python3`` (3.9 or later)
-- ``sphinx`` (Python package, version 7.2 or later)
+- ``sphinx`` 7.2 or later (Python package)
 - ``sphinx-book-theme`` (Python package)
-- ``breathe`` (Python package, version 4.36.0 or later)
+- ``breathe`` 4.36.0 or later (Python package)
 - ``doxygen``
 - ``sphinxcontrib-bibtex``
 - ``sphinx-copybutton``
 
 If the |python|_ dependencies are not available through your system package
-manager, you can install them using the Python package manager ``pip``. We
-recommend doing this inside a virtual environment (for example, one created
-with ``python3 -m venv .venv``) to avoid polluting the global package state:
+manager, you can install them using the Python package manager ``pip``.
+We recommend using a virtual environment:
 
 .. code-block:: bash
 
+   python3 -m venv .venv
+   source .venv/bin/activate
    pip install \
       "sphinx>=7.2" "breathe>=4.36.0" \
       sphinx-book-theme sphinxcontrib-bibtex \
