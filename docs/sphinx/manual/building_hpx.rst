@@ -107,7 +107,8 @@ used CMake options.
 
 .. option:: HPX_WITH_ITTNOTIFY
 
-   Enable |ittnotify|_ integration. Requires Intel VTune.
+   Enable |ittnotify|_ integration. Requires Intel VTune; point
+   ``Amplifier_ROOT`` at the install.
 
 .. option:: HPX_WITH_PARCEL_PROFILING
 

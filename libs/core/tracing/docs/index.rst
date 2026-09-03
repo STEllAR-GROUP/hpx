@@ -28,10 +28,12 @@ configure time if more than one of :option:`HPX_WITH_APEX`,
   ``constexpr`` no-ops and the tracing macros expand to nothing, so every
   entry compiles out at zero runtime cost.
 
-The public entry points live in ``hpx/tracing/backends/{empty,ittnotify,apex,tracy}.hpp``
-and are all under the ``hpx::tracing`` namespace. The dispatch macros
-(``HPX_TRACING_MARK_EVENT``, ``HPX_TRACING_ZONE``, ``HPX_TRACING_PAUSE``,
-``HPX_TRACING_RESUME``) live in ``hpx/tracing/macros.hpp``.
+Include ``hpx/modules/tracing.hpp`` to get the public API; it dispatches
+at compile time to one of the four per-backend headers under
+``hpx/tracing/backends/``. Entries are declared in the ``hpx::tracing``
+namespace and the dispatch macros (``HPX_TRACING_MARK_EVENT``,
+``HPX_TRACING_ZONE``, ``HPX_TRACING_PAUSE``, ``HPX_TRACING_RESUME``) live
+in ``hpx/tracing/macros.hpp``.
 
 See :ref:`optimizing_with_tracy` for how to build |hpx| against Tracy and
 attach the profiler.
