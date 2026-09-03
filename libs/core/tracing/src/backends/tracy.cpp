@@ -472,6 +472,9 @@ namespace hpx::tracing {
             std::uint64_t size, std::uint64_t target_locality_id) noexcept
         {
             char buffer[160];
+            // "Parcel Send: id=<msb>:<lsb> size=<N> to=L#<N>" + NUL
+            static_assert(
+                sizeof(buffer) >= 16 + 16 + 1 + 16 + 6 + 20 + 6 + 20 + 1);
             if (target_locality_id == invalid_locality)
             {
                 std::snprintf(buffer, sizeof(buffer),
@@ -498,6 +501,8 @@ namespace hpx::tracing {
             std::uint64_t source_locality_id) noexcept
         {
             char buffer[160];
+            // "Parcel Recv: id=<msb>:<lsb> from=L#<N>" + NUL
+            static_assert(sizeof(buffer) >= 16 + 16 + 1 + 16 + 8 + 20 + 1);
             if (source_locality_id == invalid_locality)
             {
                 std::snprintf(buffer, sizeof(buffer),
@@ -521,6 +526,9 @@ namespace hpx::tracing {
             std::uint64_t source_thread_id) noexcept
         {
             char buffer[160];
+            // "Parcel Scheduled: id=<msb>:<lsb> from=L#<N> thread=0x<hex>" + NUL
+            static_assert(
+                sizeof(buffer) >= 21 + 16 + 1 + 16 + 8 + 20 + 10 + 16 + 1);
             if (source_locality_id == invalid_locality)
             {
                 std::snprintf(buffer, sizeof(buffer),
