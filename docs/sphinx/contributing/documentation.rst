@@ -37,8 +37,9 @@ We recommend using a virtual environment:
 
 .. code-block:: bash
 
-   python3 -m venv .venv
-   source .venv/bin/activate
+   mkdir -p build
+   python3 -m venv build/.venv
+   source build/.venv/bin/activate
    pip install \
       "sphinx>=7.2" "breathe>=4.36.0" \
       sphinx-book-theme sphinxcontrib-bibtex \
