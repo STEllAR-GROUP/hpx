@@ -19,6 +19,7 @@
 #include <vector>
 
 using hpx::components::server::detail::dijkstra_forward_token;
+using hpx::components::server::detail::dijkstra_should_reprobe;
 
 namespace {
 
@@ -244,6 +245,89 @@ void test_repeated_probe_restarts_cursor()
     }
 }
 
+// 8. Regression for the unbounded retry when the token cannot be handed to any
+//    locality (dijkstra_termination_detection). An undeliverable probe marks
+//    the initiator black again, so before this bound the retry loop reprobed
+//    forever and shutdown burned the whole job wall clock instead of failing
+//    with a diagnostic. dijkstra_should_reprobe is the loop's real exit
+//    condition, so these cases pin it directly.
+void test_undeliverable_probes_are_bounded()
+{
+    constexpr std::size_t max_probes = 3;
+
+    // A white initiator terminates regardless of the count.
+    HPX_TEST(!dijkstra_should_reprobe(false, 0, max_probes));
+    HPX_TEST(!dijkstra_should_reprobe(false, max_probes, max_probes));
+
+    // A black initiator keeps probing while probes are still being delivered.
+    HPX_TEST(dijkstra_should_reprobe(true, 0, max_probes));
+    HPX_TEST(dijkstra_should_reprobe(true, max_probes - 1, max_probes));
+
+    // Once the bound is reached the loop stops even though the initiator is
+    // still black. This is the case that used to spin forever.
+    HPX_TEST(!dijkstra_should_reprobe(true, max_probes, max_probes));
+
+    // Rule 3 repetition stays unbounded: an undeliverable count that never
+    // grows keeps reprobing however many probes have run.
+    for (std::size_t probe = 0; probe != 100; ++probe)
+    {
+        HPX_TEST(dijkstra_should_reprobe(true, 0, max_probes));
+    }
+}
+
+// 9. The loop drives that predicate off a real ring walk: with nothing
+//    reachable every probe is undeliverable and the loop stops at the bound,
+//    while an intact ring delivers on the first probe and never approaches it.
+void test_bound_reached_only_when_nothing_is_reachable()
+{
+    constexpr std::uint32_t initiating_locality_id = 0;
+    constexpr std::uint32_t num_localities = 4;
+    constexpr std::size_t max_probes = 3;
+
+    auto const run_probes = [&](mock_send& send) {
+        std::size_t undeliverable = 0;
+        std::size_t probes = 0;
+        bool initiator_black = false;
+        do
+        {
+            // The initiator's predecessor, recomputed per probe as the retry
+            // loop does.
+            std::uint32_t target = initiating_locality_id;
+            if (0 == target)
+                target = num_localities;
+
+            if (dijkstra_forward_token(target, initiating_locality_id, send))
+            {
+                undeliverable = 0;
+                initiator_black = false;
+            }
+            else
+            {
+                ++undeliverable;
+                initiator_black = true;
+            }
+            ++probes;
+        } while (dijkstra_should_reprobe(
+            initiator_black, undeliverable, max_probes));
+
+        return probes;
+    };
+
+    {
+        mock_send send({});    // nothing reachable
+        HPX_TEST_EQ(run_probes(send), max_probes);
+        HPX_TEST(send.succeeded_calls_.empty());
+        HPX_TEST(!send.calls_.empty());
+    }
+
+    {
+        mock_send send({num_localities - 1});    // intact ring
+        HPX_TEST_EQ(run_probes(send), static_cast<std::size_t>(1));
+        std::vector<std::uint32_t> const expected = {num_localities - 1};
+        HPX_TEST(send.succeeded_calls_ == expected);
+    }
+}
+
 int main()
 {
     test_immediate_neighbor_alive();
@@ -253,6 +337,8 @@ int main()
     test_wrap_around_before_forwarding();
     test_no_forwarding_when_already_at_initiator();
     test_repeated_probe_restarts_cursor();
+    test_undeliverable_probes_are_bounded();
+    test_bound_reached_only_when_nothing_is_reachable();
 
     return hpx::util::report_errors();
 }
