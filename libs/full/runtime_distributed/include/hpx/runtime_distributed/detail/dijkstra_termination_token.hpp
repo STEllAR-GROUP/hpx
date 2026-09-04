@@ -31,8 +31,8 @@ namespace hpx::components::server::detail {
     /// \param max_undeliverable_probes  Bound on that count.
     ///
     /// \return true if another probe should be initiated.
-    constexpr bool dijkstra_should_reprobe(bool const initiator_black,
-        std::size_t const undeliverable_probes,
+    HPX_CXX_EXPORT constexpr bool dijkstra_should_reprobe(
+        bool const initiator_black, std::size_t const undeliverable_probes,
         std::size_t const max_undeliverable_probes) noexcept
     {
         return initiator_black &&
