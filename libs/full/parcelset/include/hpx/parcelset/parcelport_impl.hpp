@@ -1093,10 +1093,10 @@ namespace hpx::parcelset {
                     parcel_locality_id, HPX_MOVE(parcels), HPX_MOVE(handlers));
             }
 
-            // We yield here for a short amount of time to give another HPX
-            // thread the chance to put a subsequent parcel which leads to a
-            // more effective parcel buffering
-            hpx::execution_base::this_thread::yield();
+            // Note: this function must not suspend. It executes within the
+            // operations_in_flight_ window opened by the caller, and a
+            // suspension here can live-lock against a higher-priority thread
+            // spinning in flush_parcels waiting for that count to drop.
         }
 
     public:
