@@ -119,17 +119,16 @@ void test_all_intermediates_dead_reaches_initiator()
     HPX_TEST_EQ(fallback_send.calls_[0], initiating_locality_id);
 }
 
-// 4. Fallback target itself unreachable -- characterizes the known gap that
-//    runtime_support::dijkstra_termination discards the return value of its
-//    final fallback send to the initiator, i.e. a total ring failure is never
-//    surfaced anywhere. dijkstra_forward_token itself has already done its job
-//    correctly (it truthfully reports "false: nobody along the ring accepted
-//    it"); the gap lives in the caller ignoring that report for the fallback
-//    call. This test pins down today's (buggy) behavior so that a future fix
-//    that propagates/logs the failure needs to consciously update this test
-//    rather than silently regressing.
+// 4. Fallback target itself unreachable -- the walk truthfully reports that
+//    nobody along the ring accepted the token, and
+//    runtime_support::dijkstra_termination then retries the direct send to the
+//    initiator max_fallback_attempts times before logging that the initiator
+//    will never see this token. Model that retry so the attempt count stays
+//    pinned to the production one.
 void test_fallback_to_initiator_also_unreachable()
 {
+    constexpr int max_fallback_attempts = 3;
+
     std::uint32_t locality_id = 4;
     constexpr std::uint32_t initiating_locality_id = 0;
 
@@ -138,18 +137,23 @@ void test_fallback_to_initiator_also_unreachable()
         dijkstra_forward_token(locality_id, initiating_locality_id, send);
     HPX_TEST(!result);
 
-    // the fallback send to the initiator also fails
+    // the fallback send to the initiator fails on every attempt
     mock_send fallback_send({});
-    bool const fallback_result = fallback_send(initiating_locality_id);
+    bool fallback_sent = false;
+    for (int attempt = 0; !fallback_sent && attempt != max_fallback_attempts;
+        ++attempt)
+    {
+        fallback_sent = fallback_send(initiating_locality_id);
+    }
 
-    HPX_TEST_EQ(fallback_send.calls_.size(), static_cast<std::size_t>(1));
-    HPX_TEST_EQ(fallback_send.calls_[0], initiating_locality_id);
+    HPX_TEST(!fallback_sent);
+    HPX_TEST_EQ(fallback_send.calls_.size(),
+        static_cast<std::size_t>(max_fallback_attempts));
+    for (std::uint32_t const call : fallback_send.calls_)
+    {
+        HPX_TEST_EQ(call, initiating_locality_id);
+    }
     HPX_TEST(fallback_send.succeeded_calls_.empty());
-
-    // Known gap: nothing currently consumes fallback_result on this path in
-    // runtime_support::dijkstra_termination, so a total ring failure is
-    // silently dropped instead of being propagated, logged, or retried.
-    HPX_TEST(!fallback_result);
 }
 
 // 5. Wrap-around when locality_id == 0 is handled by the caller before

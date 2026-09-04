@@ -551,12 +551,15 @@ namespace hpx::components::server {
                     // Report this loudly rather than blocking shutdown: the
                     // caller only logs the trial count, so giving up here lets
                     // the runtime shut down instead of probing forever.
+                    // Termination is abandoned here, not confirmed, which is a
+                    // deliberate best-effort relaxation for a ring that is
+                    // missing a locality.
                     LRT_(error).format(
                         "runtime_support::dijkstra_termination_detection: "
-                        "could not deliver the termination token to any "
-                        "locality in {} consecutive probes; giving up so "
-                        "shutdown can proceed.",
-                        max_undeliverable_probes);
+                        "could not deliver the termination token to any other "
+                        "locality in {} consecutive probes (trial {}); giving "
+                        "up so shutdown can proceed.",
+                        max_undeliverable_probes, count);
                 }
                 else if (dijkstra_color_)
                 {
