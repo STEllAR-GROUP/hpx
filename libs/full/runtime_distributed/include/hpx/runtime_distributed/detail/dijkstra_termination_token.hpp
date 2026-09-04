@@ -26,7 +26,8 @@ namespace hpx::components::server::detail {
     /// \param initiator_black           Whether the probe left the initiator
     ///                                  black, i.e. the probe was unsuccessful.
     /// \param undeliverable_probes      Number of consecutive probes that
-    ///                                  could not be handed to any locality.
+    ///                                  could not be handed to any locality
+    ///                                  other than the initiator itself.
     /// \param max_undeliverable_probes  Bound on that count.
     ///
     /// \return true if another probe should be initiated.
@@ -67,11 +68,17 @@ namespace hpx::components::server::detail {
     /// \param send_token              Callable used to attempt handing off
     ///                                the token to a candidate locality.
     ///
-    /// \return true if the token was handed off to some locality strictly
-    ///         between \p locality_id and \p initiating_locality_id, false if
-    ///         the walk reached \p initiating_locality_id without a successful
-    ///         send (the caller is then responsible for the fallback of sending
-    ///         directly to \p initiating_locality_id).
+    /// \return true if the token was handed off, false if the walk reached
+    ///         \p initiating_locality_id without a successful send (the caller
+    ///         is then responsible for the fallback of sending directly to
+    ///         \p initiating_locality_id).
+    ///
+    /// \note   The initiator is itself the last candidate of the walk when
+    ///         \p initiating_locality_id is 0, because the ring wraps through
+    ///         it. That send is local and always succeeds, so a true return
+    ///         does not on its own mean the token reached another locality;
+    ///         a caller that needs to know must check the target it was
+    ///         handed to.
     HPX_CXX_EXPORT template <typename SendToken>
     bool dijkstra_forward_token(std::uint32_t& locality_id,
         std::uint32_t const initiating_locality_id, SendToken&& send_token)

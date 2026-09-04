@@ -446,7 +446,7 @@ namespace hpx::components::server {
 
         std::size_t count = 0;    // keep track of number of trials
 
-        // A probe that could not be handed to any locality will not be
+        // A probe that could not be handed to any other locality will not be
         // delivered by repeating it, the ring is simply missing a locality.
         // Bound those retries the way dijkstra_termination already bounds its
         // own fallback, so an unreachable locality ends shutdown with a
@@ -480,13 +480,25 @@ namespace hpx::components::server {
                     target_id = num_localities;
 
                 {
+                    // The ring walk ends at the initiator, so its last hop
+                    // hands the token back to this locality, and the fallback
+                    // below targets this locality as well. Both of those sends
+                    // are local and therefore always succeed, so a probe that
+                    // reached nobody still reports a successful handoff. Track
+                    // whether some other locality accepted the token and count
+                    // undeliverable probes off that instead.
+                    bool reached_other_locality = false;
+
                     // accommodate for disconnected localities
                     bool token_sent = detail::dijkstra_forward_token(target_id,
                         initiating_locality_id,
                         [&](std::uint32_t const target_locality_id) {
-                            return send_dijkstra_termination_token(
+                            bool const sent = send_dijkstra_termination_token(
                                 target_locality_id, initiating_locality_id,
                                 num_localities, dijkstra_color_);
+                            reached_other_locality |= sent &&
+                                target_locality_id != initiating_locality_id;
+                            return sent;
                         });
 
                     if (!token_sent)
@@ -496,10 +508,17 @@ namespace hpx::components::server {
                             num_localities, dijkstra_color_);
                     }
 
-                    if (token_sent)
+                    if (reached_other_locality)
                     {
                         undeliverable_probes = 0;
+                    }
+                    else
+                    {
+                        ++undeliverable_probes;
+                    }
 
+                    if (token_sent)
+                    {
                         LRT_(info).format(
                             "runtime_support::dijkstra_termination_detection: "
                             "wait for token to come back to us.");
@@ -509,8 +528,6 @@ namespace hpx::components::server {
                     }
                     else
                     {
-                        ++undeliverable_probes;
-
                         // No response will ever arrive to count down the latch;
                         // force it to zero and mark this probe unsuccessful so
                         // another round runs.

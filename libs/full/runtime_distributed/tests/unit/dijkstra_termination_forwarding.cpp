@@ -91,7 +91,11 @@ void test_one_dead_intermediate_locality()
 
 // 3. All intermediates dead down to the initiator -- the walk returns false
 //    once it reaches the initiating locality, leaving the fallback send to the
-//    initiator to the caller.
+//    initiator to the caller. Note that the initiator is the walk's own last
+//    candidate here (the calls end at 0), and this mock fails it like any
+//    other; in production that send is local and succeeds, which is why the
+//    return value alone cannot tell the caller whether the token left this
+//    locality. See test 9.
 void test_all_intermediates_dead_reaches_initiator()
 {
     std::uint32_t locality_id = 4;
@@ -275,9 +279,12 @@ void test_undeliverable_probes_are_bounded()
     }
 }
 
-// 9. The loop drives that predicate off a real ring walk: with nothing
-//    reachable every probe is undeliverable and the loop stops at the bound,
-//    while an intact ring delivers on the first probe and never approaches it.
+// 9. The loop drives that predicate off a real ring walk. The initiator is the
+//    walk's own last candidate when it is locality 0, because the ring wraps
+//    through it, and that send is local and always succeeds. A broken ring
+//    therefore still reports a successful handoff, so the bound has to count
+//    probes that reached no other locality rather than probes that failed to
+//    send. These cases pin that contract down.
 void test_bound_reached_only_when_nothing_is_reachable()
 {
     constexpr std::uint32_t initiating_locality_id = 0;
@@ -296,16 +303,34 @@ void test_bound_reached_only_when_nothing_is_reachable()
             if (0 == target)
                 target = num_localities;
 
-            if (dijkstra_forward_token(target, initiating_locality_id, send))
+            bool reached_other_locality = false;
+            bool token_sent =
+                dijkstra_forward_token(target, initiating_locality_id,
+                    [&](std::uint32_t const target_locality_id) {
+                        bool const sent = send(target_locality_id);
+                        reached_other_locality |= sent &&
+                            target_locality_id != initiating_locality_id;
+                        return sent;
+                    });
+
+            if (!token_sent)
+            {
+                token_sent = send(initiating_locality_id);
+            }
+
+            if (reached_other_locality)
             {
                 undeliverable = 0;
-                initiator_black = false;
             }
             else
             {
                 ++undeliverable;
-                initiator_black = true;
             }
+
+            // A probe that reached another locality comes back white; one that
+            // only ever reached the initiator leaves it black, which is the
+            // case the bound exists for.
+            initiator_black = !reached_other_locality;
             ++probes;
         } while (dijkstra_should_reprobe(
             initiator_black, undeliverable, max_probes));
@@ -314,10 +339,24 @@ void test_bound_reached_only_when_nothing_is_reachable()
     };
 
     {
-        mock_send send({});    // nothing reachable
+        mock_send send({});    // nothing reachable at all
         HPX_TEST_EQ(run_probes(send), max_probes);
         HPX_TEST(send.succeeded_calls_.empty());
         HPX_TEST(!send.calls_.empty());
+    }
+
+    {
+        // The case that actually happens: the ring is broken, but the walk's
+        // last hop and the fallback both target the initiator, whose own send
+        // is local and cannot fail. Every probe reports a successful handoff
+        // and must still count as undeliverable, or the loop never terminates.
+        mock_send send({initiating_locality_id});
+        HPX_TEST_EQ(run_probes(send), max_probes);
+        HPX_TEST(!send.succeeded_calls_.empty());
+        for (std::uint32_t const call : send.succeeded_calls_)
+        {
+            HPX_TEST_EQ(call, initiating_locality_id);
+        }
     }
 
     {
