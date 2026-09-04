@@ -8,9 +8,35 @@
 
 #include <hpx/config.hpp>
 
+#include <cstddef>
 #include <cstdint>
 
 namespace hpx::components::server::detail {
+
+    /// \brief Whether the initiator should initiate another termination probe.
+    ///
+    /// A probe that leaves the initiator black means some locality was still
+    /// active, and rule 3 requires a further probe; that repetition is
+    /// deliberately unbounded. A probe that could not be handed to any
+    /// locality is a different case: the ring is missing a locality, so
+    /// repeating the probe cannot deliver it. Those are bounded, letting
+    /// shutdown proceed with a diagnostic instead of probing until the process
+    /// is killed.
+    ///
+    /// \param initiator_black           Whether the probe left the initiator
+    ///                                  black, i.e. the probe was unsuccessful.
+    /// \param undeliverable_probes      Number of consecutive probes that
+    ///                                  could not be handed to any locality.
+    /// \param max_undeliverable_probes  Bound on that count.
+    ///
+    /// \return true if another probe should be initiated.
+    constexpr bool dijkstra_should_reprobe(bool const initiator_black,
+        std::size_t const undeliverable_probes,
+        std::size_t const max_undeliverable_probes) noexcept
+    {
+        return initiator_black &&
+            undeliverable_probes < max_undeliverable_probes;
+    }
 
     /// \brief Pure ring-walk decision logic used while forwarding the Dijkstra
     ///        termination detection token.
