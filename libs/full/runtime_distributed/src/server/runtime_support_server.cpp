@@ -284,14 +284,8 @@ namespace hpx::components::server {
         // Rule 2: When machine nr.i + 1 propagates the probe, it hands over a
         // black token to machine nr.i if it is black itself, whereas while
         // being white it leaves the color of the token unchanged.
-        {
-            if (!passive || dijkstra_color_)
-                dijkstra_token = true;
-
-            // Rule 5: Upon transmission of the token to machine nr.i, machine
-            // nr.i + 1 becomes white.
-            dijkstra_color_ = false;
-        }
+        if (!passive || dijkstra_color_)
+            dijkstra_token = true;
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         // Only the post_cb completion callback ever counts down the latch;
@@ -318,7 +312,18 @@ namespace hpx::components::server {
                 // callback above has been registered and is guaranteed to run
                 // (and count down the latch) eventually.
                 l->wait();
-                return !ec;
+                if (ec)
+                {
+                    return false;
+                }
+
+                // Rule 5: Upon transmission of the token to machine nr.i,
+                // machine nr.i + 1 becomes white. Whitening before the send
+                // would drop the local taint whenever the send fails, because
+                // dijkstra_forward_token and the fallback loop both re-read
+                // dijkstra_color_ for every retry.
+                dijkstra_color_ = false;
+                return true;
             },
             [&](std::exception_ptr const& e) {
                 // post_cb threw synchronously, i.e. the completion callback
@@ -376,12 +381,12 @@ namespace hpx::components::server {
             locality_id = num_localities;
 
         // accommodate for disconnected localities
-        bool const token_sent = detail::dijkstra_forward_token(locality_id,
-            initiating_locality_id,
-            [&](std::uint32_t const target_locality_id) {
-                return send_dijkstra_termination_token(target_locality_id,
-                    initiating_locality_id, num_localities, dijkstra_color_);
-            });
+        bool const token_sent =
+            detail::dijkstra_forward_token(locality_id, initiating_locality_id,
+                [&](std::uint32_t const target_locality_id) {
+                    return send_dijkstra_termination_token(target_locality_id,
+                        initiating_locality_id, num_localities, dijkstra_token);
+                });
 
         if (!token_sent && initiating_locality_id != agas::get_locality_id())
         {
@@ -396,9 +401,9 @@ namespace hpx::components::server {
             for (int attempt = 0;
                 !fallback_sent && attempt != max_fallback_attempts; ++attempt)
             {
-                fallback_sent = send_dijkstra_termination_token(
-                    initiating_locality_id, initiating_locality_id,
-                    num_localities, dijkstra_color_);
+                fallback_sent =
+                    send_dijkstra_termination_token(initiating_locality_id,
+                        initiating_locality_id, num_localities, dijkstra_token);
             }
 
             if (!fallback_sent)
