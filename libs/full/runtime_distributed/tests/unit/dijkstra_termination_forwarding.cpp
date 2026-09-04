@@ -288,14 +288,19 @@ void test_undeliverable_probes_are_bounded()
 //    through it, and that send is local and always succeeds. A broken ring
 //    therefore still reports a successful handoff, so the bound has to count
 //    probes that reached no other locality rather than probes that failed to
-//    send. These cases pin that contract down.
+//    send. The bound then only has to fire for a busy initiator, since a
+//    passive one settles termination on the first probe: if nothing else is
+//    reachable, nothing else can still be running. These cases pin that down.
 void test_bound_reached_only_when_nothing_is_reachable()
 {
     constexpr std::uint32_t initiating_locality_id = 0;
     constexpr std::uint32_t num_localities = 4;
     constexpr std::size_t max_probes = 3;
 
-    auto const run_probes = [&](mock_send& send) {
+    // Whether the token comes back black is decided by the local thread
+    // manager inside send_dijkstra_termination_token, not by the ring walk, so
+    // it is an input here rather than something inferred from reachability.
+    auto const run_probes = [&](mock_send& send, bool const initiator_busy) {
         std::size_t undeliverable = 0;
         std::size_t probes = 0;
         bool initiator_black = false;
@@ -331,10 +336,7 @@ void test_bound_reached_only_when_nothing_is_reachable()
                 ++undeliverable;
             }
 
-            // A probe that reached another locality comes back white; one that
-            // only ever reached the initiator leaves it black, which is the
-            // case the bound exists for.
-            initiator_black = !reached_other_locality;
+            initiator_black = initiator_busy;
             ++probes;
         } while (dijkstra_should_reprobe(
             initiator_black, undeliverable, max_probes));
@@ -344,7 +346,7 @@ void test_bound_reached_only_when_nothing_is_reachable()
 
     {
         mock_send send({});    // nothing reachable at all
-        HPX_TEST_EQ(run_probes(send), max_probes);
+        HPX_TEST_EQ(run_probes(send, true), max_probes);
         HPX_TEST(send.succeeded_calls_.empty());
         HPX_TEST(!send.calls_.empty());
     }
@@ -353,9 +355,10 @@ void test_bound_reached_only_when_nothing_is_reachable()
         // The case that actually happens: the ring is broken, but the walk's
         // last hop and the fallback both target the initiator, whose own send
         // is local and cannot fail. Every probe reports a successful handoff
-        // and must still count as undeliverable, or the loop never terminates.
+        // and must still count as undeliverable, or a busy initiator reprobes
+        // forever.
         mock_send send({initiating_locality_id});
-        HPX_TEST_EQ(run_probes(send), max_probes);
+        HPX_TEST_EQ(run_probes(send, true), max_probes);
         HPX_TEST(!send.succeeded_calls_.empty());
         for (std::uint32_t const call : send.succeeded_calls_)
         {
@@ -364,8 +367,17 @@ void test_bound_reached_only_when_nothing_is_reachable()
     }
 
     {
+        // Same broken ring, but this locality has gone passive. Nothing else
+        // is reachable, so nothing else can still be running, and the white
+        // token settles termination on the first probe. The bound is not
+        // needed here and must not delay shutdown.
+        mock_send send({initiating_locality_id});
+        HPX_TEST_EQ(run_probes(send, false), static_cast<std::size_t>(1));
+    }
+
+    {
         mock_send send({num_localities - 1});    // intact ring
-        HPX_TEST_EQ(run_probes(send), static_cast<std::size_t>(1));
+        HPX_TEST_EQ(run_probes(send, false), static_cast<std::size_t>(1));
         std::vector<std::uint32_t> const expected = {num_localities - 1};
         HPX_TEST(send.succeeded_calls_ == expected);
     }
