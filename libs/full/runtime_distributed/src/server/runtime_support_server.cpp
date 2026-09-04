@@ -460,6 +460,7 @@ namespace hpx::components::server {
         // unsuccessful probe under rule 3 and stays unbounded.
         constexpr std::size_t max_undeliverable_probes = 3;
         std::size_t undeliverable_probes = 0;
+        bool reprobe = false;
 
         {
             do
@@ -501,8 +502,11 @@ namespace hpx::components::server {
                             bool const sent = send_dijkstra_termination_token(
                                 target_locality_id, initiating_locality_id,
                                 num_localities, dijkstra_color_);
-                            reached_other_locality |= sent &&
-                                target_locality_id != initiating_locality_id;
+                            if (sent &&
+                                target_locality_id != initiating_locality_id)
+                            {
+                                reached_other_locality = true;
+                            }
                             return sent;
                         });
 
@@ -551,14 +555,27 @@ namespace hpx::components::server {
 
                 ++count;
 
-                if (undeliverable_probes == max_undeliverable_probes)
+                // Decide once whether to probe again and report off that same
+                // answer, so the diagnostic can never disagree with the loop.
+                reprobe = detail::dijkstra_should_reprobe(dijkstra_color_,
+                    undeliverable_probes, max_undeliverable_probes);
+
+                if (reprobe)
                 {
-                    // Report this loudly rather than blocking shutdown: the
-                    // caller only logs the trial count, so giving up here lets
-                    // the runtime shut down instead of probing forever.
-                    // Termination is abandoned here, not confirmed, which is a
-                    // deliberate best-effort relaxation for a ring that is
-                    // missing a locality.
+                    LRT_(info).format(
+                        "runtime_support::dijkstra_termination_detection: "
+                        "After the completion of an unsuccessful probe, "
+                        "initiate next probe.");
+                }
+                else if (dijkstra_color_)
+                {
+                    // Still black and out of undeliverable probes. Report this
+                    // loudly rather than blocking shutdown: the caller only
+                    // logs the trial count, so giving up here lets the runtime
+                    // shut down instead of probing forever. Termination is
+                    // abandoned here, not confirmed, which is a deliberate
+                    // best-effort relaxation for a ring that is missing a
+                    // locality.
                     LRT_(error).format(
                         "runtime_support::dijkstra_termination_detection: "
                         "could not deliver the termination token to any other "
@@ -566,16 +583,8 @@ namespace hpx::components::server {
                         "up so shutdown can proceed.",
                         max_undeliverable_probes, count);
                 }
-                else if (dijkstra_color_)
-                {
-                    LRT_(info).format(
-                        "runtime_support::dijkstra_termination_detection: "
-                        "After the completion of an unsuccessful probe, "
-                        "initiate next probe.");
-                }
 
-            } while (detail::dijkstra_should_reprobe(dijkstra_color_,
-                undeliverable_probes, max_undeliverable_probes));
+            } while (reprobe);
 
             // We need the lock here to ensure the mutual exclusion of
             // hpx::latch::count_down and hpx::latch::~latch
