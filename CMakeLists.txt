@@ -1185,6 +1185,21 @@ hpx_option(
   CATEGORY "Profiling"
 )
 
+if(HPX_WITH_TRACY)
+  hpx_option(
+    HPX_WITH_TRACY_TAG STRING "Tracy repository tag or branch" "v0.13.1"
+    CATEGORY "Profiling"
+  )
+endif()
+
+hpx_option(
+  HPX_WITH_FETCH_TRACY
+  BOOL
+  "Use FetchContent to fetch Tracy. By default an installed Tracy will be used. (default: OFF)"
+  OFF
+  CATEGORY "Build Targets"
+)
+
 # Experimental settings
 hpx_option(
   HPX_WITH_IO_POOL
