@@ -8,14 +8,14 @@
 
 #include <hpx/config/defines.hpp>
 
-#if defined(HPX_HAVE_BUILTIN_FORWARD_MOVE)
+// nvcc's cudafe strips the && from static_cast<decltype(x)&&>, so route CUDA
+// through std::forward, which avoids that pattern.
+#if defined(HPX_HAVE_BUILTIN_FORWARD_MOVE) || defined(__CUDACC__)
 #include <utility>
 
 #define HPX_FORWARD(T, ...) std::forward<T>(__VA_ARGS__)
 
-// nvcc's cudafe rewrites static_cast<decltype(x)&&> and drops the &&, so this
-// form silently produces an lvalue under CUDA compilation. Skip it under nvcc.
-#elif defined(HPX_HAVE_CXX_LAMBDA_CAPTURE_DECLTYPE) && !defined(__CUDACC__)
+#elif defined(HPX_HAVE_CXX_LAMBDA_CAPTURE_DECLTYPE)
 
 #define HPX_FORWARD(T, ...) static_cast<decltype(__VA_ARGS__)&&>(__VA_ARGS__)
 
