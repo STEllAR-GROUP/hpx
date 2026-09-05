@@ -284,7 +284,18 @@ namespace hpx::components::server {
         // Rule 2: When machine nr.i + 1 propagates the probe, it hands over a
         // black token to machine nr.i if it is black itself, whereas while
         // being white it leaves the color of the token unchanged.
-        if (!passive || dijkstra_color_)
+        // Rule 5: Upon transmission of the token to machine nr.i, machine
+        // nr.i + 1 becomes white. Capture and clear the color in one step, so
+        // that a concurrent dijkstra_make_black() cannot slip in between the
+        // token decision and the whitening, and whiten before handing the
+        // token to the parcelport. The token can complete its round trip
+        // before the send completion callback is observed, delivering a black
+        // token to the initiator or turning this locality black again through
+        // a message sent in between, and whitening after that point erases
+        // that taint. If the send fails the taint is restored so that a retry
+        // carries it.
+        bool const was_black = dijkstra_color_.exchange(false);
+        if (!passive || was_black)
             dijkstra_token = true;
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
@@ -314,15 +325,10 @@ namespace hpx::components::server {
                 l->wait();
                 if (ec)
                 {
+                    if (was_black)
+                        dijkstra_color_ = true;
                     return false;
                 }
-
-                // Rule 5: Upon transmission of the token to machine nr.i,
-                // machine nr.i + 1 becomes white. Whitening before the send
-                // would drop the local taint whenever the send fails, because
-                // dijkstra_forward_token and the fallback loop both re-read
-                // dijkstra_color_ for every retry.
-                dijkstra_color_ = false;
                 return true;
             },
             [&](std::exception_ptr const& e) {
@@ -331,6 +337,8 @@ namespace hpx::components::server {
                 // latch's counter to zero ourselves so its destructor's
                 // invariant holds, then rethrow.
                 l->count_down(1);
+                if (was_black)
+                    dijkstra_color_ = true;
 
                 if (auto const err = hpx::get_error(e);
                     err != hpx::error::locality_was_disconnected)
