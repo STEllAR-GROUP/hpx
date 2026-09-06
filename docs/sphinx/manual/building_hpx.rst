@@ -99,6 +99,24 @@ used CMake options.
    Enable APEX integration. `APEX <https://uo-oaciss.github.io/apex/quickstarthpx/>`_ can be used to profile |hpx|
    applications. In particular, it provides information about individual tasks in the |hpx| runtime.
 
+.. option:: HPX_WITH_TRACY
+
+   Enable |tracy|_ integration. Tracy shows task lifecycle, work stealing, suspension, and (with
+   :option:`HPX_WITH_PARCEL_PROFILING`) distributed parcel events. See :ref:`optimizing_with_tracy` for
+   build and attach instructions.
+
+.. option:: HPX_WITH_ITTNOTIFY
+
+   Enable |ittnotify|_ integration. Requires VTune or any other |ittnotify|
+   provider; point ``Amplifier_ROOT`` at the install (the name is legacy;
+   it accepts any ITTNotify installation).
+
+.. option:: HPX_WITH_PARCEL_PROFILING
+
+   Enable per-parcel profiling data. Adds per-parcel identifier and timestamp fields (creation time,
+   start time, parcel id) that are carried on the wire and surfaced to whichever tracing backend is
+   enabled. Defaults to ``ON`` when :option:`HPX_WITH_APEX` is on, ``OFF`` otherwise.
+
 .. option:: HPX_WITH_GENERIC_CONTEXT_COROUTINES
 
    Enable Boost. Context for task context switching. It must be enabled for non-x86 architectures such as ARM and Power.
