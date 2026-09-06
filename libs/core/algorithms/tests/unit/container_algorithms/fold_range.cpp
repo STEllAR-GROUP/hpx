@@ -366,7 +366,7 @@ struct ref_constructible_accumulator
     int value;
 
     // Constructible from a const lvalue reference - matches iter_reference_t
-    explicit ref_constructible_accumulator(int const& v)
+    ref_constructible_accumulator(int const& v)
       : value(v)
     {
     }
@@ -473,48 +473,80 @@ void test_fold_right_last_asymmetric()
 
 // Exercises the tightened constructible_from<U, iter_reference_t<Iter>>
 // constraint with ref_constructible_accumulator as the accumulator type U.
-// The seed expression U result{*first} / U result{*--it} constructs U
-// directly from the iterator reference - exactly what the requires()-clause
-// now mandates.
+//
+// For fold_left_first, U = decay_t<invoke_result_t<F&, iter_value_t<I>,
+// iter_reference_t<I>>>. The constraint additionally requires:
+//   constructible_from<U, iter_reference_t<I>>
+// so that the initial seed U result{*first} is valid.
+//
+// To satisfy is_indirect_binary_left_foldable the operator must also be
+// invocable with (U, iter_reference_t<I>), i.e. both the first call
+// F(iter_value_t, iter_reference_t) and subsequent calls F(U, iter_ref)
+// must compile. A generic lambda handles both overloads transparently.
 void test_fold_left_first_ref_constructible_constraint()
 {
     std::vector<int> c = {3, 1, 4, 1, 5};
 
-    // op: (ref_constructible_accumulator, int) -> ref_constructible_accumulator
-    // U = ref_constructible_accumulator
-    // The requires()-clause checks constructible_from<U, int const&>,
-    // which must hold for this to compile.
-    auto op = [](ref_constructible_accumulator acc,
-                  int const& elem) -> ref_constructible_accumulator {
-        acc.value += elem;
-        return acc;
+    // Use a struct with two overloads to handle both call sites:
+    // First call: F(int, int&)  -> rca  (satisfies invocable<F&, int, int&>)
+    // Later calls: F(rca, int&) -> rca  (satisfies invocable<F&, rca, int&>)
+    // U = ref_constructible_accumulator.
+    // constructible_from<rca, int&> is satisfied by rca(int const&).
+    struct fold_op
+    {
+        ref_constructible_accumulator operator()(
+            int seed, int const& elem) const
+        {
+            return ref_constructible_accumulator(seed + elem);
+        }
+        ref_constructible_accumulator operator()(
+            ref_constructible_accumulator acc, int const& elem) const
+        {
+            return ref_constructible_accumulator(acc.value + elem);
+        }
     };
 
-    auto result = hpx::ranges::fold_left_first(c, op);
+    auto result = hpx::ranges::fold_left_first(c, fold_op{});
     HPX_TEST(result.has_value());
-    // 3 + 1 + 4 + 1 + 5 = 14
+    // seed = c[0] = 3, then op(3, 1)=rca{4}, op(rca{4},4)=rca{8},
+    // op(rca{8},1)=rca{9}, op(rca{9},5)=rca{14}
     if (result)
     {
         HPX_TEST_EQ(result->value, 14);
     }
 }
 
+// Exercises the tightened constructible_from<U, iter_reference_t<Iter>>
+// constraint on fold_right_last. U = decay_t<invoke_result_t<F&,
+// iter_reference_t<I>, iter_value_t<I>>>. The constraint requires:
+//   constructible_from<U, iter_reference_t<I>>
+// so that U result{*--it} is valid.
 void test_fold_right_last_ref_constructible_constraint()
 {
     std::vector<int> c = {3, 1, 4, 1, 5};
 
-    // op: (int, ref_constructible_accumulator) -> ref_constructible_accumulator
-    // U = ref_constructible_accumulator
-    // The requires()-clause checks constructible_from<U, int const&>.
-    auto op = [](int const& elem, ref_constructible_accumulator acc)
-        -> ref_constructible_accumulator {
-        acc.value += elem;
-        return acc;
+    // Generic op: (int const&, auto) -> ref_constructible_accumulator.
+    // First call: F(int&, int) -> rca   (satisfies invocable<F&, int&, int>)
+    // Later calls: F(int&, rca) -> rca  (satisfies invocable<F&, int&, rca>)
+    struct fold_op
+    {
+        ref_constructible_accumulator operator()(
+            int const& elem, int seed) const
+        {
+            return ref_constructible_accumulator(elem + seed);
+        }
+        ref_constructible_accumulator operator()(
+            int const& elem, ref_constructible_accumulator acc) const
+        {
+            return ref_constructible_accumulator(elem + acc.value);
+        }
     };
 
-    auto result = hpx::ranges::fold_right_last(c, op);
+    auto result = hpx::ranges::fold_right_last(c, fold_op{});
     HPX_TEST(result.has_value());
-    // 3 + 1 + 4 + 1 + 5 = 14
+    // fold_right_last on {3,1,4,1,5}:
+    // seed=c[4]=5, op(1,5)=rca{6}, op(4,rca{6})=rca{10},
+    // op(1,rca{10})=rca{11}, op(3,rca{11})=rca{14}
     if (result)
     {
         HPX_TEST_EQ(result->value, 14);

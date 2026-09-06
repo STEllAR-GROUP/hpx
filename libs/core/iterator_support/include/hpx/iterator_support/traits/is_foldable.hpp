@@ -9,7 +9,6 @@
 
 #include <hpx/config.hpp>
 
-
 #include <concepts>
 #include <iterator>
 #include <type_traits>
@@ -26,8 +25,7 @@ namespace hpx {
 
     template <typename F, typename T, typename I>
     concept is_indirectly_binary_left_foldable =
-        std::copy_constructible<F> &&
-        std::indirectly_readable<I> &&
+        std::copy_constructible<F> && std::indirectly_readable<I> &&
         std::invocable<F&, T, std::iter_reference_t<I>> &&
         std::convertible_to<
             std::invoke_result_t<F&, T, std::iter_reference_t<I>>,
@@ -47,8 +45,7 @@ namespace hpx {
 
     template <typename F, typename T, typename I>
     concept is_indirectly_binary_right_foldable =
-        std::copy_constructible<F> &&
-        std::indirectly_readable<I> &&
+        std::copy_constructible<F> && std::indirectly_readable<I> &&
         std::invocable<F&, std::iter_reference_t<I>, T> &&
         std::convertible_to<
             std::invoke_result_t<F&, std::iter_reference_t<I>, T>,

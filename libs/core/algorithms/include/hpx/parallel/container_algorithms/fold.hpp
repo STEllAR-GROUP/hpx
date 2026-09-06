@@ -291,8 +291,8 @@ namespace hpx::ranges {
         // clang-format on
         static auto invoke_default(InIter first, Sent last, T init, F f)
         {
-            using U = std::decay_t<std::invoke_result_t<F&, T,
-                std::iter_reference_t<InIter>>>;
+            using U = std::decay_t<
+                std::invoke_result_t<F&, T, std::iter_reference_t<InIter>>>;
             using result_type = fold_left_with_iter_result<InIter, U>;
 
             if (first == last)
@@ -329,8 +329,8 @@ namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::fold_left_first_with_iter
-    HPX_CXX_CORE_EXPORT inline constexpr struct fold_left_first_with_iter_t
-        final
+    HPX_CXX_CORE_EXPORT inline constexpr struct
+        fold_left_first_with_iter_t final
       : hpx::detail::tag_dispatch<fold_left_first_with_iter_t,
             hpx::detail::tag_parallel_algorithm<fold_left_first_with_iter_t>>
     {
@@ -351,8 +351,7 @@ namespace hpx::ranges {
         static auto invoke_default(InIter first, Sent last, F f)
         {
             using U = std::decay_t<std::invoke_result_t<F&,
-                std::iter_value_t<InIter>,
-                std::iter_reference_t<InIter>>>;
+                std::iter_value_t<InIter>, std::iter_reference_t<InIter>>>;
             using result_type =
                 fold_left_first_with_iter_result<InIter, hpx::optional<U>>;
 
