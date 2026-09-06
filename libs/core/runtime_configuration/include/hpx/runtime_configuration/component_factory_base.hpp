@@ -8,7 +8,6 @@
 
 #include <hpx/config.hpp>
 
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/runtime_configuration/component_registry_base.hpp>
 
 namespace hpx::components {
@@ -16,4 +15,3 @@ namespace hpx::components {
     HPX_CXX_CORE_EXPORT struct HPX_CORE_EXPORT component_factory_base;
 }    // namespace hpx::components
 
-#endif
