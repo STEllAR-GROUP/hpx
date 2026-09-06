@@ -1029,14 +1029,6 @@ namespace hpx {
             return -1;
         }
 
-        if (!is_running())
-        {
-            HPX_THROWS_IF(ec, hpx::error::invalid_status, "hpx::finalize",
-                "the runtime system is not active (did you already "
-                "call finalize?)");
-            return -1;
-        }
-
         if (&ec != &throws)
             ec = make_success_code();
 
@@ -1175,12 +1167,12 @@ namespace hpx {
             return -1;
         }
 
-        if (!agas::is_connecting(locality.get_gid()))
+        if (parcelset::locality_was_disconnected(
+                naming::get_locality_id_from_id(locality)))
         {
             HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                 "hpx::force_disconnect",
-                "hpx::force_disconnect can be called to disconnect only a "
-                "locality that was connecting late.");
+                "the requested locality was already disconnected.");
             return -1;
         }
 

@@ -467,7 +467,6 @@ namespace hpx::agas {
                 "worker node ({}) can't suggest locality_id zero, "
                 "this is reserved for the console",
                 header.endpoints);
-            return;
         }
 
         if (!agas_client.register_locality(header.endpoints, prefix,
@@ -508,12 +507,11 @@ namespace hpx::agas {
 
         parcelset::locality dest;
         parcelset::locality here = bbb.here();
-        for (parcelset::endpoints_type::value_type const& loc :
-            header.endpoints)
+        for (auto const& endpoint : header.endpoints | std::views::values)
         {
-            if (loc.second.type() == here.type())
+            if (endpoint.type() == here.type())
             {
-                dest = loc.second;
+                dest = endpoint;
                 break;
             }
         }
@@ -522,8 +520,6 @@ namespace hpx::agas {
         bbb.add_locality_endpoints(
             naming::get_locality_id_from_gid(prefix), header.endpoints);
 
-        // TODO: Handle cases where localities try to connect to AGAS while it's
-        // shutting down.
         if (agas_client.get_status() != hpx::state::starting)
         {
             // We can just send the parcel now, the connecting locality isn't a part
@@ -594,7 +590,7 @@ namespace hpx::agas {
             rt.get_runtime_support_lva());
         agas_client.bind_local(runtime_support_gid, runtime_support_address);
 
-        runtime_support_gid.set_lsb(std::uint64_t(0));
+        runtime_support_gid.set_lsb(static_cast<std::uint64_t>(0));
         agas_client.bind_local(runtime_support_gid, runtime_support_address);
 
         // Assign the initial parcel gid range to the parcelport.
@@ -710,8 +706,8 @@ namespace hpx::agas {
             for (std::uint32_t i = 0; i != num_cores; ++i)
             {
                 std::uint32_t const num_pus_core = static_cast<std::uint32_t>(
-                    top.get_number_of_core_pus(std::size_t(i)));
-                if (num_pus_core == ~std::uint32_t(0))
+                    top.get_number_of_core_pus(static_cast<std::size_t>(i)));
+                if (num_pus_core == ~static_cast<std::uint32_t>(0))
                     return num_cores;    // assume one pu per core
 
                 num_pus += num_pus_core;

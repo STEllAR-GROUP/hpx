@@ -951,6 +951,10 @@ rst_prolog += '''
 .. _apex_hpx_doc: https://uo-oaciss.github.io/apex/usage/#hpx-louisiana-state-university
 .. |tau| replace:: TAU
 .. _tau: https://www.cs.uoregon.edu/research/tau/home.php
+.. |tracy| replace:: Tracy
+.. _tracy: https://github.com/wolfpld/tracy
+.. |ittnotify| replace:: Intel ITT API
+.. _ittnotify: https://github.com/intel/ittapi
 .. |cmake| replace:: CMake
 .. _cmake: https://www.cmake.org
 .. |cppdependencies| replace:: cpp-dependencies

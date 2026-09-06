@@ -94,16 +94,13 @@ namespace hpx::agas {
         {
             std::string::size_type const p =
                 key.find_first_not_of("0123456789", 1);
-            if (p != std::string::npos)
+            if (p != std::string::npos && key[p] == '/')
             {
                 std::int32_t const locality_id =
                     util::from_string<std::int32_t>(key.substr(1, p - 1), -1);
 
-                if ((locality_id >= 0 &&
-                        static_cast<std::uint32_t>(locality_id) <
-                            get_initial_num_localities()) ||
-                    agas::get_locality_id() ==
-                        static_cast<std::uint32_t>(locality_id))
+                if (static_cast<std::uint32_t>(locality_id) !=
+                    naming::invalid_locality_id)
                 {
                     return {get_service_instance(locality_id),
                         hpx::id_type::management_type::unmanaged};

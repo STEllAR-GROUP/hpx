@@ -37,6 +37,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <exception>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -216,8 +217,11 @@ namespace hpx::agas {
 
             {
                 std::unique_lock<hpx::shared_mutex> l(resolved_localities_mtx_);
+                resolved_locality_state const state = is_connecting ?
+                    resolved_locality_state::connecting :
+                    resolved_locality_state::connected;
                 auto const [it, inserted] = resolved_localities_.emplace(
-                    prefix, std::make_pair(endpoints, is_connecting));
+                    prefix, resolved_locality{endpoints, state});
 
                 if (!inserted)
                 {
@@ -246,9 +250,61 @@ namespace hpx::agas {
             return is_connecting();
         }
 
+        {
+            std::shared_lock<hpx::shared_mutex> l(resolved_localities_mtx_);
+            if (auto const it = resolved_localities_.find(locality);
+                it != resolved_localities_.end())
+            {
+                resolved_locality_state const state = it->second.state;
+                return state == resolved_locality_state::connecting ||
+                    state == resolved_locality_state::disconnecting;
+            }
+        }
+
+#if defined(HPX_HAVE_NETWORKING)
+        // if we don't know anything about this locality it may have been
+        // disconnected
+        return parcelset::locality_was_disconnected(
+            naming::get_locality_id_from_gid(locality));
+#else
+        return false;
+#endif
+    }
+
+    bool addressing_service::transition_resolved_locality(
+        hpx::naming::gid_type const& locality,
+        resolved_locality_state const from, resolved_locality_state const to)
+    {
+        if (!locality)
+        {
+            return false;
+        }
+
         std::lock_guard<hpx::shared_mutex> l(resolved_localities_mtx_);
         auto const it = resolved_localities_.find(locality);
-        return it != resolved_localities_.end() && it->second.second;
+        if (it == resolved_localities_.end() || it->second.state != from)
+        {
+            return false;
+        }
+
+        it->second.state = to;
+        return true;
+    }
+
+    bool addressing_service::mark_connecting_locality_as_disconnecting(
+        hpx::naming::gid_type const& locality)
+    {
+        return transition_resolved_locality(locality,
+            resolved_locality_state::connecting,
+            resolved_locality_state::disconnecting);
+    }
+
+    bool addressing_service::mark_disconnecting_locality_as_connecting(
+        hpx::naming::gid_type const& locality)
+    {
+        return transition_resolved_locality(locality,
+            resolved_locality_state::disconnecting,
+            resolved_locality_state::connecting);
     }
 
     void addressing_service::register_console(
@@ -257,7 +313,7 @@ namespace hpx::agas {
         std::lock_guard<hpx::shared_mutex> l(resolved_localities_mtx_);
         [[maybe_unused]] auto const [it, inserted] =
             resolved_localities_.emplace(naming::get_gid_from_locality_id(0),
-                std::make_pair(eps, false));
+                resolved_locality{eps, resolved_locality_state::connected});
         HPX_ASSERT(inserted);
     }
 
@@ -277,7 +333,8 @@ namespace hpx::agas {
         {
             resolved_localities_.emplace(
                 naming::get_gid_from_locality_id(locality_id),
-                std::make_pair(endpoint, false));
+                resolved_locality{
+                    endpoint, resolved_locality_state::connected});
             ++locality_id;
         }
     }
@@ -289,9 +346,10 @@ namespace hpx::agas {
         {
             std::shared_lock<hpx::shared_mutex> l(resolved_localities_mtx_);
             it = resolved_localities_.find(gid);
-            if (it != resolved_localities_.end() && !it->second.first.empty())
+            if (it != resolved_localities_.end() &&
+                !it->second.endpoints.empty())
             {
-                return it->second.first;
+                return it->second.endpoints;
             }
         }
 
@@ -316,10 +374,11 @@ namespace hpx::agas {
         it = resolved_localities_.find(gid);
         if (it == resolved_localities_.end())
         {
-            if (HPX_UNLIKELY(
-                    !util::insert_checked(resolved_localities_.emplace(gid,
-                                              std::make_pair(endpoints, false)),
-                        it)))
+            if (HPX_UNLIKELY(!util::insert_checked(
+                    resolved_localities_.emplace(gid,
+                        resolved_locality{HPX_MOVE(endpoints),
+                            resolved_locality_state::connected}),
+                    it)))
             {
                 l.unlock();
 
@@ -332,12 +391,11 @@ namespace hpx::agas {
                 return empty_endpoints;
             }
         }
-        else if (it->second.first.empty() && !endpoints.empty())
+        else if (it->second.endpoints.empty() && !endpoints.empty())
         {
-            resolved_localities_[gid] =
-                std::make_pair(HPX_MOVE(endpoints), false);
+            it->second.endpoints = HPX_MOVE(endpoints);
         }
-        return it->second.first;
+        return it->second.endpoints;
     }
 
     bool addressing_service::unregister_locality(
@@ -788,8 +846,8 @@ namespace hpx::agas {
     bool addressing_service::is_local_address_cached(
         naming::gid_type const& gid, naming::address& addr,
         [[maybe_unused]] std::pair<bool, components::pinned_ptr>& r,
-        hpx::move_only_function<std::pair<bool, components::pinned_ptr>(
-            naming::address const&)>&& f,
+        [[maybe_unused]] hpx::move_only_function<std::pair<bool,
+            components::pinned_ptr>(naming::address const&)>&& f,
         error_code& ec)
     {
         if (!naming::detail::is_migratable(gid))
@@ -2214,16 +2272,30 @@ namespace hpx::agas {
             auto const end = requests.end();
             for (auto it = requests.begin(); it != end; ++it)
             {
-                server::primary_namespace::decrement_credit_action action;
-                hpx::post(action, it->first, HPX_MOVE(it->second));
-            }
+                // ignore errors caused by disconnected localities
+                hpx::detail::try_catch_exception_ptr<hpx::exception>(
+                    [&] {
+                        server::primary_namespace::decrement_credit_action
+                            action;
+                        hpx::post(action, it->first, HPX_MOVE(it->second));
+                    },
+                    [&](hpx::exception const& e) {
+                        if (auto const err = hpx::get_error(e);
+                            err != hpx::error::locality_was_disconnected)
+                        {
+                            throw e;
+                        }
+                    },
+                    [&](std::exception_ptr const& ep) {
+                        std::rethrow_exception(ep);
+                    });
 
-            if (&ec != &throws)
-                ec = make_success_code();
+                if (&ec != &throws)
+                    ec = make_success_code();
+            }
         }
         catch (hpx::exception const& e)
         {
-            l.unlock();
             HPX_RETHROWS_IF(
                 ec, e, "addressing_service::send_refcnt_requests_non_blocking");
         }
@@ -2285,9 +2357,28 @@ namespace hpx::agas {
         auto const end = requests.end();
         for (auto it = requests.begin(); it != end; ++it)
         {
-            server::primary_namespace::decrement_credit_action action;
-            lazy_results.push_back(
-                hpx::async(action, it->first, HPX_MOVE(it->second)));
+            // ignore errors caused by disconnected localities
+            hpx::future<std::vector<std::int64_t>> f;
+            hpx::detail::try_catch_exception_ptr<hpx::exception>(
+                [&] {
+                    server::primary_namespace::decrement_credit_action action;
+                    f = hpx::async(action, it->first, HPX_MOVE(it->second));
+                },
+                [&](hpx::exception const& e) {
+                    if (auto const err = hpx::get_error(e);
+                        err != hpx::error::locality_was_disconnected)
+                    {
+                        throw e;
+                    }
+                },
+                [&](std::exception_ptr const& ep) {
+                    std::rethrow_exception(ep);
+                });
+
+            if (f.valid())
+            {
+                lazy_results.push_back(HPX_MOVE(f));
+            }
         }
 
         return lazy_results;
@@ -2307,8 +2398,39 @@ namespace hpx::agas {
         std::vector<hpx::future<std::vector<std::int64_t>>> lazy_results =
             send_refcnt_requests_async(l);
 
-        // re throw possible errors
-        hpx::wait_all(lazy_results);
+        // wait for operations to finish
+        if (hpx::wait_all_nothrow(lazy_results))
+        {
+            // re throw possible errors
+            for (auto& result : lazy_results)
+            {
+                if (!result.has_exception())
+                {
+                    continue;
+                }
+
+                hpx::detail::try_catch_exception_ptr<hpx::exception>(
+                    [&]() { result.get(); },
+                    [&](hpx::exception const& e) {
+                        if (hpx::get_error(e) !=
+                            hpx::error::locality_was_disconnected)
+                        {
+                            HPX_RETHROWS_IF(ec, e,
+                                "addressing_service::send_refcnt_requests_"
+                                "sync");
+                        }
+                    },
+                    [&](std::exception_ptr const& ep) {
+                        HPX_RETHROWS_IF(ec, ep,
+                            "addressing_service::send_refcnt_requests_sync");
+                    });
+
+                if (ec)
+                {
+                    return;
+                }
+            }
+        }
 
         if (&ec != &throws)
             ec = make_success_code();
