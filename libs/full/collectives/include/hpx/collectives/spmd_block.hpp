@@ -12,7 +12,6 @@
 
 #include <hpx/config.hpp>
 
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/components_base.hpp>
@@ -378,4 +377,3 @@ namespace hpx::lcos {
     }
 }    // namespace hpx::lcos
 
-#endif
