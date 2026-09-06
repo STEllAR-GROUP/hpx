@@ -8,7 +8,6 @@
 
 #include <hpx/config.hpp>
 
-
 #include <hpx/assert.hpp>
 #include <hpx/modules/actions_base.hpp>
 #include <hpx/modules/components.hpp>
@@ -160,4 +159,3 @@ namespace hpx::collectives::detail {
         std::vector<client_type> clients_;
     };
 }    // namespace hpx::collectives::detail
-

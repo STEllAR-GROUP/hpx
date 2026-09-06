@@ -98,4 +98,3 @@ namespace hpx::detail {
             HPX_FORWARD(Continuation, cont), id, HPX_FORWARD(Ts, vs)...);
     }
 }    // namespace hpx::detail
-

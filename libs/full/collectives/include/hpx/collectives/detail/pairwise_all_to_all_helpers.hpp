@@ -16,7 +16,6 @@
 
 #include <hpx/config.hpp>
 
-
 #include <hpx/collectives/argument_types.hpp>
 #include <hpx/collectives/channel_communicator.hpp>
 #include <hpx/collectives/detail/hierarchical_helpers.hpp>
@@ -212,4 +211,3 @@ namespace hpx::collectives::detail {
                 });
     }
 }    // namespace hpx::collectives::detail
-

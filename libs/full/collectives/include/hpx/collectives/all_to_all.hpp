@@ -235,7 +235,6 @@ namespace hpx { namespace collectives {
 
 #include <hpx/config.hpp>
 
-
 #include <hpx/assert.hpp>
 #include <hpx/collectives/argument_types.hpp>
 #include <hpx/collectives/channel_communicator.hpp>

@@ -14,7 +14,6 @@
 
 #include <hpx/config.hpp>
 
-
 #include <hpx/assert.hpp>
 #include <hpx/collectives/create_communicator.hpp>
 #include <hpx/collectives/detail/flattened_data.hpp>
@@ -205,4 +204,3 @@ namespace hpx::collectives::detail {
     }
 
 }    // namespace hpx::collectives::detail
-
