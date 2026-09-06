@@ -66,7 +66,7 @@ namespace {
                 ;
             return true;
         }
-    } parcel_tcp;
+    } parcel_tcp_sim;
 
     // AGAS resolution: fires every ~23 background calls, simulates ~5 us of
     // address-resolution work.
@@ -89,7 +89,7 @@ namespace {
                 ;
             return true;
         }
-    } agas;
+    } agas_sim;
 
     // CUDA/MPI completion polling: fires every ~41 background calls, simulates
     // ~2 us of completion-queue draining.
@@ -112,14 +112,14 @@ namespace {
                 ;
             return true;
         }
-    } cuda;
+    } cuda_sim;
 
     bool background_poll(std::size_t num_thread) noexcept
     {
         bool did_work = false;
-        did_work |= parcel_tcp.poll(num_thread);
-        did_work |= agas.poll(num_thread);
-        did_work |= cuda.poll(num_thread);
+        did_work |= parcel_tcp_sim.poll(num_thread);
+        did_work |= agas_sim.poll(num_thread);
+        did_work |= cuda_sim.poll(num_thread);
         return did_work;
     }
 
@@ -155,14 +155,14 @@ int hpx_main(hpx::program_options::variables_map& vm)
         }
     }
 
-    std::size_t const total_polls = parcel_tcp.polls.load();
+    std::size_t const total_polls = parcel_tcp_sim.polls.load();
 
-    std::cout << "  parcel::tcp  polls=" << parcel_tcp.polls.load()
-              << "  work=" << parcel_tcp.work_done.load() << "\n"
-              << "  agas         polls=" << agas.polls.load()
-              << "  work=" << agas.work_done.load() << "\n"
-              << "  cuda         polls=" << cuda.polls.load()
-              << "  work=" << cuda.work_done.load() << "\n";
+    std::cout << "  parcel::tcp  polls=" << parcel_tcp_sim.polls.load()
+              << "  work=" << parcel_tcp_sim.work_done.load() << "\n"
+              << "  agas         polls=" << agas_sim.polls.load()
+              << "  work=" << agas_sim.work_done.load() << "\n"
+              << "  cuda         polls=" << cuda_sim.polls.load()
+              << "  work=" << cuda_sim.work_done.load() << "\n";
 
     if (total_polls == 0)
     {

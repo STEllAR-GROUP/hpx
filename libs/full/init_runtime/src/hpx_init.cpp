@@ -1176,15 +1176,6 @@ namespace hpx {
             return -1;
         }
 
-        if (!agas::is_connecting(locality.get_gid()))
-        {
-            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
-                "hpx::force_disconnect",
-                "hpx::force_disconnect can be called to disconnect only a "
-                "locality that was connecting late.");
-            return -1;
-        }
-
         auto* p = static_cast<components::server::runtime_support*>(
             get_runtime_distributed().get_runtime_support_lva());
 
