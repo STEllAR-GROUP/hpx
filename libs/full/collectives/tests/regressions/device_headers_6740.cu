@@ -5,17 +5,18 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 // Regression test for GitHub issue #6740: a CUDA translation unit must be able
-// to name HPX types and functions from the collectives, colocated and
-// component-factory APIs in host member functions of a class that also owns a
-// __global__ kernel. Compile-only smoke test; a successful build is the pass.
+// to name HPX types and functions from the collectives, component-factory and
+// coalescing-registration APIs in host member functions of a class that also
+// owns a __global__ kernel. Compile-only smoke test; a successful build is the
+// pass.
 
-#include <hpx/async_colocated/post_colocated.hpp>
 #include <hpx/collectives.hpp>
+#include <hpx/parcelset/coalescing_message_handler_registration.hpp>
 #include <hpx/runtime_configuration/component_factory_base.hpp>
 
 __global__ void k() {}
 
-// 1. Collectives shape — spans the headers whose whole-file guards were
+// 1. Collectives shape - spans the headers whose whole-file guards were
 //    removed: create_communicator, barrier, broadcast, all_reduce, all_gather,
 //    scatter.
 struct collectives_shape
@@ -37,22 +38,7 @@ struct collectives_shape
     }
 };
 
-// 2. post_colocated shape — the whole-file guard in post_colocated.hpp used
-//    to hide the definitions of hpx::detail::post_colocated. Compile-only,
-//    since a real call would only surface as a link-time reference here.
-struct post_colocated_shape
-{
-    void host_side()
-    {
-        using hpx::detail::post_colocated;
-    }
-    void launch()
-    {
-        k<<<1, 1>>>();
-    }
-};
-
-// 3. component_factory_base shape — small guard used to hide the forward
+// 2. component_factory_base shape - small guard used to hide the forward
 //    declaration of the struct on the device pass.
 struct component_factory_base_shape
 {
@@ -66,6 +52,25 @@ struct component_factory_base_shape
         k<<<1, 1>>>();
     }
 };
+
+// 3. coalescing_message_handler_registration shape - the compound guard on
+//    the header dropped its HPX_COMPUTE_DEVICE_CODE clause. The names below
+//    only exist when parcel coalescing and networking are on, so wrap the
+//    reference in the same conditions the header uses.
+#if defined(HPX_HAVE_PARCEL_COALESCING) && defined(HPX_HAVE_NETWORKING)
+struct coalescing_registration_shape
+{
+    void host_side()
+    {
+        hpx::parcelset::register_coalescing_for_action<int>* p = nullptr;
+        (void) p;
+    }
+    void launch()
+    {
+        k<<<1, 1>>>();
+    }
+};
+#endif
 
 int main()
 {
