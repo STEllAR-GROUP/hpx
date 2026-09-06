@@ -242,23 +242,34 @@ if(HPX_WITH_LOGGING)
   hpx_add_config_define(HPX_HAVE_LOGGING)
 endif()
 
+# Explicitly enable the supervision functionalities
+hpx_option(
+  HPX_WITH_SUPERVISION BOOL "Enable supervision functionalities. (default: OFF)"
+  OFF
+  CATEGORY "Modules"
+  ADVANCED
+)
+if(HPX_WITH_SUPERVISION)
+  hpx_add_config_define(HPX_HAVE_SUPERVISION)
+endif()
+
 hpx_option(
   HPX_WITH_FAULT_TOLERANCE
   BOOL
   "Build HPX to tolerate failures of nodes, i.e. ignore errors in active communication channels (default: OFF)"
-  OFF
+  ${HPX_WITH_SUPERVISION}
   ADVANCED
 )
-if(HPX_WITH_FAULT_TOLERANCE)
+if(HPX_WITH_FAULT_TOLERANCE OR HPX_WITH_SUPERVISION)
   hpx_add_config_define(HPX_HAVE_FAULT_TOLERANCE)
 endif()
 
 hpx_option(
   HPX_WITH_FORCE_DISCONNECT BOOL
-  "Build HPX to support forceful disconnect of localities (default: OFF)" OFF
-  ADVANCED
+  "Build HPX to support forceful disconnect of localities (default: OFF)"
+  ${HPX_WITH_SUPERVISION} ADVANCED
 )
-if(HPX_WITH_FORCE_DISCONNECT)
+if(HPX_WITH_FORCE_DISCONNECT OR HPX_WITH_SUPERVISION)
   hpx_add_config_define(HPX_HAVE_FORCE_DISCONNECT)
 endif()
 
@@ -1034,20 +1045,6 @@ if(HPX_WITH_SPINLOCK_DEADLOCK_DETECTION)
   hpx_add_config_define(HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION)
 endif()
 
-# Explicitly enable the supervision functionalities
-hpx_option(
-  HPX_WITH_SUPERVISION BOOL "Enable supervision functionalities. (default: OFF)"
-  OFF
-  CATEGORY "Modules"
-  ADVANCED
-)
-
-if(HPX_WITH_SUPERVISION)
-  hpx_add_config_define(HPX_HAVE_SUPERVISION)
-  hpx_add_config_define(HPX_HAVE_FAULT_TOLERANCE)
-  hpx_add_config_define(HPX_HAVE_FORCE_DISCONNECT)
-endif()
-
 # Profiling related build options
 hpx_option(
   HPX_WITH_APEX BOOL "Enable APEX instrumentation support." OFF
@@ -1186,6 +1183,21 @@ hpx_option(
 hpx_option(
   HPX_WITH_TRACY BOOL "Enable Tracy instrumentation support." OFF
   CATEGORY "Profiling"
+)
+
+if(HPX_WITH_TRACY)
+  hpx_option(
+    HPX_WITH_TRACY_TAG STRING "Tracy repository tag or branch" "v0.13.1"
+    CATEGORY "Profiling"
+  )
+endif()
+
+hpx_option(
+  HPX_WITH_FETCH_TRACY
+  BOOL
+  "Use FetchContent to fetch Tracy. By default an installed Tracy will be used. (default: OFF)"
+  OFF
+  CATEGORY "Build Targets"
 )
 
 # Experimental settings

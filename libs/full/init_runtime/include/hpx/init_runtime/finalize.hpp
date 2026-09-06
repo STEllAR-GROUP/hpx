@@ -211,6 +211,11 @@ namespace hpx {
     /// used by a locality to disconnect itself (use \a hpx::disconnect()
     /// without the locality argument for this purpose).
     ///
+    /// Only a locality that connected late can be removed this way. The
+    /// function fails with \a hpx::error::bad_parameter if the given locality
+    /// started with the application, was already disconnected, or is being
+    /// disconnected by another call.
+    ///
     /// \param locality The locality to remove from the distributed connection
     ///        caches
     /// \param ec [in,out] this represents the error status on exit, if this
@@ -224,9 +229,10 @@ namespace hpx {
     ///           parameter \a ec. Otherwise, it throws an instance of
     ///           hpx::exception.
     ///
-    /// This function will block and wait for this locality to finish executing
-    /// before returning to the caller. It should be the last HPX-function
-    /// called by any locality being disconnected.
+    /// This function blocks until the locality has been removed from AGAS and
+    /// from the connection caches of the remaining localities. It waits a
+    /// bounded time for the locality to acknowledge its shutdown, so an
+    /// unreachable locality does not block the caller indefinitely.
     ///
     HPX_CXX_EXPORT HPX_EXPORT int force_disconnect(
         hpx::id_type const& locality, hpx::error_code& ec = throws);

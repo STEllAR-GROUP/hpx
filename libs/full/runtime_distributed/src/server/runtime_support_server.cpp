@@ -17,6 +17,7 @@
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/ini.hpp>
 #include <hpx/modules/logging.hpp>
@@ -283,14 +284,19 @@ namespace hpx::components::server {
         // Rule 2: When machine nr.i + 1 propagates the probe, it hands over a
         // black token to machine nr.i if it is black itself, whereas while
         // being white it leaves the color of the token unchanged.
-        {
-            if (!passive || dijkstra_color_)
-                dijkstra_token = true;
-
-            // Rule 5: Upon transmission of the token to machine nr.i, machine
-            // nr.i + 1 becomes white.
-            dijkstra_color_ = false;
-        }
+        // Rule 5: Upon transmission of the token to machine nr.i, machine
+        // nr.i + 1 becomes white. Capture and clear the color in one step, so
+        // that a concurrent dijkstra_make_black() cannot slip in between the
+        // token decision and the whitening, and whiten before handing the
+        // token to the parcelport. The token can complete its round trip
+        // before the send completion callback is observed, delivering a black
+        // token to the initiator or turning this locality black again through
+        // a message sent in between, and whitening after that point erases
+        // that taint. If the send fails the taint is restored so that a retry
+        // carries it.
+        bool const was_black = dijkstra_color_.exchange(false);
+        if (!passive || was_black)
+            dijkstra_token = true;
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         // Only the post_cb completion callback ever counts down the latch;
@@ -317,7 +323,13 @@ namespace hpx::components::server {
                 // callback above has been registered and is guaranteed to run
                 // (and count down the latch) eventually.
                 l->wait();
-                return !ec;
+                if (ec)
+                {
+                    if (was_black)
+                        dijkstra_color_ = true;
+                    return false;
+                }
+                return true;
             },
             [&](std::exception_ptr const& e) {
                 // post_cb threw synchronously, i.e. the completion callback
@@ -325,6 +337,8 @@ namespace hpx::components::server {
                 // latch's counter to zero ourselves so its destructor's
                 // invariant holds, then rethrow.
                 l->count_down(1);
+                if (was_black)
+                    dijkstra_color_ = true;
 
                 if (auto const err = hpx::get_error(e);
                     err != hpx::error::locality_was_disconnected)
@@ -375,12 +389,12 @@ namespace hpx::components::server {
             locality_id = num_localities;
 
         // accommodate for disconnected localities
-        bool const token_sent = detail::dijkstra_forward_token(locality_id,
-            initiating_locality_id,
-            [&](std::uint32_t const target_locality_id) {
-                return send_dijkstra_termination_token(target_locality_id,
-                    initiating_locality_id, num_localities, dijkstra_color_);
-            });
+        bool const token_sent =
+            detail::dijkstra_forward_token(locality_id, initiating_locality_id,
+                [&](std::uint32_t const target_locality_id) {
+                    return send_dijkstra_termination_token(target_locality_id,
+                        initiating_locality_id, num_localities, dijkstra_token);
+                });
 
         if (!token_sent && initiating_locality_id != agas::get_locality_id())
         {
@@ -395,9 +409,9 @@ namespace hpx::components::server {
             for (int attempt = 0;
                 !fallback_sent && attempt != max_fallback_attempts; ++attempt)
             {
-                fallback_sent = send_dijkstra_termination_token(
-                    initiating_locality_id, initiating_locality_id,
-                    num_localities, dijkstra_color_);
+                fallback_sent =
+                    send_dijkstra_termination_token(initiating_locality_id,
+                        initiating_locality_id, num_localities, dijkstra_token);
             }
 
             if (!fallback_sent)
@@ -443,11 +457,6 @@ namespace hpx::components::server {
 #if defined(HPX_HAVE_NETWORKING)
         std::uint32_t const initiating_locality_id = get_locality_id();
 
-        // send token to previous node
-        std::uint32_t target_id = initiating_locality_id;
-        if (0 == target_id)
-            target_id = num_localities;
-
         std::size_t count = 0;    // keep track of number of trials
 
         {
@@ -462,6 +471,16 @@ namespace hpx::components::server {
                 // and sending a white token to machine nr.N - 1.
                 dijkstra_color_ = false;    // start off with white
                 dijkstra_cond_ = std::make_unique<hpx::latch>(2);
+
+                // Start each probe at the initiator's predecessor in the ring.
+                // dijkstra_forward_token consumes target_id (it walks it
+                // backwards in-place), so it has to be re-initialized for every
+                // probe; reusing the value left over from the previous probe
+                // makes a repeated probe walk past the other localities and the
+                // initiator ends up handing the token to itself indefinitely.
+                std::uint32_t target_id = initiating_locality_id;
+                if (0 == target_id)
+                    target_id = num_localities;
 
                 {
                     // accommodate for disconnected localities
@@ -886,6 +905,28 @@ namespace hpx::components::server {
     bool runtime_support::remove_locality(
         hpx::id_type const& locality, error_code& ec)
     {
+        agas::addressing_service& agas_client = naming::get_agas_client();
+        if (!agas_client.mark_connecting_locality_as_disconnecting(
+                locality.get_gid()))
+        {
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "runtime_support::remove_locality",
+                "hpx::force_disconnect can be called to disconnect only a "
+                "locality that was connecting late and is not already being "
+                "disconnected.");
+            return false;
+        }
+
+        // A removal that throws must not leave the locality claimed forever,
+        // so hand it back as connecting. A retry then repeats the shutdown
+        // notification and the cache removal broadcasts, which are idempotent.
+        // A removal that fails without throwing needs nothing, because the
+        // console connection cache removal below still erases the entry.
+        auto release_claim = hpx::experimental::scope_fail([&]() noexcept {
+            agas_client.mark_disconnecting_locality_as_connecting(
+                locality.get_gid());
+        });
+
 #if !defined(HPX_COMPUTE_DEVICE_CODE) && defined(HPX_HAVE_NETWORKING)
         // try to inform the locality that it has been disconnected (ignore any
         // errors)
@@ -910,7 +951,6 @@ namespace hpx::components::server {
 
         remove_locality_from_connection_cache(locality.get_gid(), true);
 
-        agas::addressing_service& agas_client = naming::get_agas_client();
         bool const result =
             agas_client.unregister_locality(locality.get_gid(), ec);
 
