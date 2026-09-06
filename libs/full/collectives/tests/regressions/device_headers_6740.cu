@@ -11,8 +11,8 @@
 // pass.
 
 #include <hpx/collectives.hpp>
-#include <hpx/parcelset/coalescing_message_handler_registration.hpp>
-#include <hpx/runtime_configuration/component_factory_base.hpp>
+#include <hpx/modules/parcelset.hpp>
+#include <hpx/modules/runtime_configuration.hpp>
 
 __global__ void k() {}
 
