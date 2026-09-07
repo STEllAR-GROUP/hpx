@@ -415,6 +415,8 @@ struct copyable_asymmetric_accumulator
 namespace constraint_checks {
 
     using iter_ref_t = int const&;    // representative iter_reference_t
+    using vec_iter_ref_t =
+        std::iter_reference_t<std::vector<int>::iterator>;    // int&
 
     // U = ref_constructible_accumulator (produced by the fold callable below)
     // The constraint: constructible_from<U, iter_ref_t> must hold.
@@ -423,11 +425,21 @@ namespace constraint_checks {
         "fold_left_first constraint: U must be constructible from "
         "iter_reference_t<Iter>");
 
+    static_assert(
+        std::constructible_from<ref_constructible_accumulator, vec_iter_ref_t>,
+        "fold_left_first constraint: U must be constructible from "
+        "iter_reference_t<std::vector<int>::iterator>");
+
     // Symmetrically for fold_right_last (same iterator/reference types here).
     static_assert(
         std::constructible_from<ref_constructible_accumulator, iter_ref_t>,
         "fold_right_last constraint: U must be constructible from "
         "iter_reference_t<Iter>");
+
+    static_assert(
+        std::constructible_from<ref_constructible_accumulator, vec_iter_ref_t>,
+        "fold_right_last constraint: U must be constructible from "
+        "iter_reference_t<std::vector<int>::iterator>");
 
 }    // namespace constraint_checks
 
