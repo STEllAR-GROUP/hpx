@@ -11,7 +11,7 @@
 
 #if defined(HPX_HAVE_TRACY)
 
-#include <hpx/type_support/aligned_storage.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <cstdint>
