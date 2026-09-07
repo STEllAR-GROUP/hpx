@@ -12,7 +12,7 @@
 
 namespace hpx::agas {
 
-    static std::atomic<std::uint64_t> agas_rpc_timeout_ms{5000};
+    static std::atomic<std::uint64_t> agas_rpc_timeout_ms{60000};
 
     void set_rpc_timeout(hpx::chrono::steady_duration const& timeout) noexcept
     {

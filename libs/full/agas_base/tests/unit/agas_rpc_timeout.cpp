@@ -19,7 +19,7 @@ int hpx_main()
             current_timeout.value())
                             .count();
 
-        HPX_TEST_EQ(ms, std::int64_t(5000));
+        HPX_TEST_EQ(ms, std::int64_t(60000));
     }
 
     {
