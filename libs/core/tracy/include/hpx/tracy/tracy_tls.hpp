@@ -11,16 +11,22 @@
 
 #if defined(HPX_HAVE_TRACY)
 
+#include <hpx/type_support/aligned_storage.hpp>
+
 #include <cstddef>
 #include <cstdint>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::tracy {
 
+    // Holds a TracyCZoneCtx without pulling in Tracy's headers. 16 bytes is
+    // Tracy 0.14 with TRACY_ON_DEMAND; tracy_tls.cpp asserts it still matches.
+    using zone_ctx_storage = hpx::aligned_storage_t<16, 8>;
+
     HPX_CXX_CORE_EXPORT struct region_data
     {
         char const* name = nullptr;
-        std::uint64_t data = 0;
+        zone_ctx_storage data{};
         std::uint32_t color = 0;
         std::uint32_t phase = 0;
     };
@@ -34,8 +40,8 @@ namespace hpx::tracy {
         HPX_CORE_EXPORT void add_worker_thread_text(
             region_data const& r, std::size_t num_thread) noexcept;
         HPX_CORE_EXPORT char const* rename_region(char const*) noexcept;
-        HPX_CORE_EXPORT std::uint64_t push_zone(char const*) noexcept;
-        HPX_CORE_EXPORT void pop_zone(std::uint64_t) noexcept;
+        HPX_CORE_EXPORT zone_ctx_storage push_zone(char const*) noexcept;
+        HPX_CORE_EXPORT void pop_zone(zone_ctx_storage const&) noexcept;
         HPX_CORE_EXPORT region_data stop_region(
             region_data const& prev_region) noexcept;
         // Set/clear the per-OS-thread "inside fiber" flag used to guard
@@ -183,7 +189,7 @@ namespace hpx::tracy {
         // the paired pop_zone in the dtor.
         explicit mark_event(char const* name, bool active) noexcept
           : active_(active)
-          , ctx_value(active_ ? detail::push_zone(name) : 0)
+          , ctx_value(active_ ? detail::push_zone(name) : zone_ctx_storage{})
         {
         }
 
@@ -208,7 +214,7 @@ namespace hpx::tracy {
 
     private:
         bool active_;
-        std::uint64_t ctx_value;
+        zone_ctx_storage ctx_value;
     };
 
     // RAII guard that closes the running fiber zone before self_.yield() and
