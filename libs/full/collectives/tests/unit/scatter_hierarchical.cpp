@@ -25,11 +25,11 @@ using namespace hpx::collectives;
 
 // Keep independently created communicators from aliasing in AGAS while
 // localities transition between test phases.
-constexpr char const* scatter_direct_basename = "/test/scatter_hierachical/";
+constexpr char const* scatter_direct_basename = "/test/scatter_hierarchical/";
 constexpr char const* scatter_direct_explicit_generation_basename =
-    "/test/scatter_hierachical/explicit_generation/";
+    "/test/scatter_hierarchical/explicit_generation/";
 constexpr char const* scatter_direct_local_basename =
-    "/test/scatter_hierachical/local/";
+    "/test/scatter_hierarchical/local/";
 #if defined(HPX_DEBUG)
 constexpr int ITERATIONS = 50;
 #else
