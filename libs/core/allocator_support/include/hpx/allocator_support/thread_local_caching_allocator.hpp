@@ -177,7 +177,15 @@ namespace hpx::util {
             std::size_t const capacity = DefaultCapacity;
         };
 
-        allocated_cache& cache()
+        // Keep this lookup out of line. HPX threads migrate between OS
+        // threads. If the compiler inlines the thread_local access into a
+        // caller that suspends the HPX thread, it reuses the thread pointer
+        // from before the suspension, and after the HPX thread resumes on
+        // another worker the caller pushes into that worker's cache instead
+        // of its own. That is harmless while the other worker lives, because
+        // the stack is lock-free, and corrupts the node list once the other
+        // worker has exited and its destructor is walking it.
+        HPX_NOINLINE allocated_cache& cache()
         {
             thread_local allocated_cache allocated_data(alloc, DefaultCapacity);
             return allocated_data;
