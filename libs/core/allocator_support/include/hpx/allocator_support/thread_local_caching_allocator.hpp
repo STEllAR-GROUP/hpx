@@ -93,7 +93,9 @@ namespace hpx::util {
 
             pointer allocate(size_type n)
             {
+#if defined(HPX_ALLOCATOR_SUPPORT_VERIFY_CACHE_OWNER)
                 verify_owner();
+#endif
 
                 // Search for an entry with matching size. We try popping until
                 // we find matching size or data empty. Popped non-matching
@@ -147,7 +149,9 @@ namespace hpx::util {
 
             void deallocate(pointer p, size_type n)
             {
+#if defined(HPX_ALLOCATOR_SUPPORT_VERIFY_CACHE_OWNER)
                 verify_owner();
+#endif
 
                 if (cached.load(std::memory_order_relaxed) < capacity)
                 {
@@ -169,6 +173,7 @@ namespace hpx::util {
             }
 
         private:
+#if defined(HPX_ALLOCATOR_SUPPORT_VERIFY_CACHE_OWNER)
             // A cache belongs to the OS thread that created it. Reaching it
             // from any other thread means a caller held on to the reference
             // returned by cache() across a point where its HPX thread
@@ -180,12 +185,11 @@ namespace hpx::util {
             // before the suspension and hide the very mismatch we look for.
             HPX_NOINLINE void verify_owner() const noexcept
             {
-#if defined(HPX_ALLOCATOR_SUPPORT_VERIFY_CACHE_OWNER)
                 HPX_ASSERT_(owner == std::this_thread::get_id(),
                     "the thread_local allocator cache is being used by a "
                     "thread other than the one that created it, see #6540");
-#endif
             }
+#endif
 
             void clear_cache() noexcept
             {
