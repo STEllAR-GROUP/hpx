@@ -27,7 +27,7 @@ add_hpx_module(
   GLOBAL_HEADER_MODULE_GEN ON
   SOURCES ${tracy_sources}
   HEADERS ${tracy_headers}
-  MODULE_DEPENDENCIES hpx_config hpx_type_support
+  MODULE_DEPENDENCIES hpx_config
   DEPENDENCIES tracy::tracy
   CMAKE_SUBDIRS tests
 )

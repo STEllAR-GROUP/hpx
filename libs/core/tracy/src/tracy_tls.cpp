@@ -14,14 +14,38 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
-#include <type_traits>
 
+#include <common/TracyVersion.hpp>
 #include <tracy/TracyC.h>
+
+// zone_ctx_storage mirrors ___tracy_c_zone_context under TRACY_ON_DEMAND. The
+// version check pins the range the layout was written for; the size and
+// alignment asserts catch a change within a patch release.
+static_assert(tracy::Version::Major == 0 && tracy::Version::Minor == 14,
+    "zone_ctx_storage layout was written for Tracy 0.14.x; re-check "
+    "___tracy_c_zone_context before widening the range.");
+static_assert(sizeof(TracyCZoneCtx) == sizeof(hpx::tracy::zone_ctx_storage));
+static_assert(alignof(TracyCZoneCtx) == alignof(hpx::tracy::zone_ctx_storage));
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::tracy {
 
     namespace {
+
+        // Conversions to and from Tracy's C ctx type. Designated initialisers
+        // turn a future field reorder or rename into a compile error.
+        constexpr zone_ctx_storage to_storage(TracyCZoneCtx const& c) noexcept
+        {
+            return {
+                .id = c.id, .active = c.active, .connectionId = c.connectionId};
+        }
+
+        constexpr TracyCZoneCtx to_tracy(zone_ctx_storage const& s) noexcept
+        {
+            return {
+                .id = s.id, .active = s.active, .connectionId = s.connectionId};
+        }
+
         char const* intern_zone_label(
             char const* label, char const* fallback) noexcept
         {
@@ -51,25 +75,12 @@ namespace hpx::tracy {
             return flag;
         }
 
-        // Aliases TracyCZoneCtx with a byte buffer of matching size and
-        // alignment so callers can hold the ctx opaquely. The static_asserts
-        // are the guardrail against a Tracy version bump that grows the ctx.
-        union tracy_context
+        // "Unset" sentinel for a ctx stashed in TLS. A live ctx opened while
+        // disconnected is also all-zero, but TracyCZoneEnd is a no-op when
+        // active is 0, so treating that case as "unset" is safe.
+        constexpr bool ctx_is_empty(zone_ctx_storage const& s) noexcept
         {
-            static_assert(sizeof(TracyCZoneCtx) == sizeof(zone_ctx_storage));
-            static_assert(alignof(TracyCZoneCtx) == alignof(zone_ctx_storage));
-            static_assert(std::is_trivially_copyable_v<zone_ctx_storage>);
-
-            TracyCZoneCtx context;
-            zone_ctx_storage value;
-        };
-
-        // Compare against a zero-initialised storage. Used as the
-        // "unset" sentinel by callers that stash a ctx into TLS.
-        bool ctx_is_empty(zone_ctx_storage const& s) noexcept
-        {
-            zone_ctx_storage const zero{};
-            return std::memcmp(&s, &zero, sizeof(zone_ctx_storage)) == 0;
+            return s.id == 0 && s.active == 0 && s.connectionId == 0;
         }
 
         // Store the zone ctx that was opened on the fiber's stack.
@@ -99,10 +110,7 @@ namespace hpx::tracy {
             TracyCZoneC(ctx, color, 1);
             TracyCZoneName(ctx, zone_name, std::strlen(zone_name));
 
-            tracy_context data;
-            data.context = ctx;
-
-            fz.ctx_value = data.value;
+            fz.ctx_value = to_storage(ctx);
             fz.active = true;
         }
     }    // namespace
@@ -121,14 +129,11 @@ namespace hpx::tracy {
             TracyCZoneName(ctx, new_region, std::strlen(new_region));
             TracyCZoneValue(ctx, static_cast<std::uint32_t>(phase));
 
-            tracy_context data;
-            data.context = ctx;
-
             region_data& region = current_region();
             region_data const prev_region = region;
 
             region.name = new_region;
-            region.data = data.value;
+            region.data = to_storage(ctx);
             region.color = static_cast<std::uint32_t>(thread_num);
             region.phase = static_cast<std::uint32_t>(phase);
 
@@ -141,14 +146,11 @@ namespace hpx::tracy {
             TracyCZoneC(ctx, color, 1);
             TracyCZoneName(ctx, name, std::strlen(name));
 
-            tracy_context data;
-            data.context = ctx;
-
             region_data& region = current_region();
             region_data const prev_region = region;
 
             region.name = name;
-            region.data = data.value;
+            region.data = to_storage(ctx);
             region.color = color;
             region.phase = 0;
 
@@ -163,9 +165,7 @@ namespace hpx::tracy {
             current_region() = prev_region;
             if (curr_region.name != nullptr)
             {
-                tracy_context data;
-                data.value = curr_region.data;
-                TracyCZoneEnd(data.context);
+                TracyCZoneEnd(to_tracy(curr_region.data));
             }
 
             return curr_region;
@@ -193,9 +193,7 @@ namespace hpx::tracy {
             auto& fz = current_fiber_zone();
             if (fz.active)
             {
-                tracy_context data;
-                data.value = fz.ctx_value;
-                TracyCZoneEnd(data.context);
+                TracyCZoneEnd(to_tracy(fz.ctx_value));
                 fz.active = false;
                 fz.ctx_value = {};
             }
@@ -215,11 +213,7 @@ namespace hpx::tracy {
                 return;
 
             // Close the running zone.
-            {
-                tracy_context data;
-                data.value = fz.ctx_value;
-                TracyCZoneEnd(data.context);
-            }
+            TracyCZoneEnd(to_tracy(fz.ctx_value));
             fz.active = false;
 
             // Open a grey "suspended" zone on the fiber stack.
@@ -252,11 +246,7 @@ namespace hpx::tracy {
                 return;
 
             // Close the suspended (grey) zone.
-            {
-                tracy_context data;
-                data.value = fz.ctx_value;
-                TracyCZoneEnd(data.context);
-            }
+            TracyCZoneEnd(to_tracy(fz.ctx_value));
             fz.active = false;
 
             // Reopen the running zone with cached or supplied name/color.
@@ -279,10 +269,8 @@ namespace hpx::tracy {
                 ctx_is_empty(fz.ctx_value))
                 return;
 
-            tracy_context data;
-            data.value = fz.ctx_value;
             // TracyCZoneText sends the text via the zone validation protocol.
-            TracyCZoneText(data.context, txt, size);
+            TracyCZoneText(to_tracy(fz.ctx_value), txt, size);
         }
 
         namespace {
@@ -345,9 +333,7 @@ namespace hpx::tracy {
 
             if (len > 0)
             {
-                tracy_context data;
-                data.value = r.data;
-                TracyCZoneText(data.context, text, len);
+                TracyCZoneText(to_tracy(r.data), text, len);
             }
         }
 
@@ -367,10 +353,8 @@ namespace hpx::tracy {
                 char const* previous_name = name;
                 name = new_region;
 
-                tracy_context data;
-                data.value = value;
                 TracyCZoneName(
-                    data.context, new_region, std::strlen(new_region));
+                    to_tracy(value), new_region, std::strlen(new_region));
                 return previous_name;
             }
             return nullptr;
@@ -381,9 +365,7 @@ namespace hpx::tracy {
             char const* safe_name = intern_zone_label(name, "event");
             TracyCZoneC(ctx, 0x0078D7, 1);
             TracyCZoneName(ctx, safe_name, std::strlen(safe_name));
-            tracy_context data;
-            data.context = ctx;
-            return data.value;
+            return to_storage(ctx);
         }
 
         HPX_CORE_EXPORT void pop_zone(
@@ -391,9 +373,7 @@ namespace hpx::tracy {
         {
             if (!ctx_is_empty(ctx_value))
             {
-                tracy_context data;
-                data.value = ctx_value;
-                TracyCZoneEnd(data.context);
+                TracyCZoneEnd(to_tracy(ctx_value));
             }
         }
     }    // namespace detail

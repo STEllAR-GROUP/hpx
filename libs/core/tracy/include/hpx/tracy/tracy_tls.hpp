@@ -11,17 +11,21 @@
 
 #if defined(HPX_HAVE_TRACY)
 
-#include <hpx/modules/type_support.hpp>
-
 #include <cstddef>
 #include <cstdint>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::tracy {
 
-    // Holds a TracyCZoneCtx without pulling in Tracy's headers. 16 bytes is
-    // Tracy 0.14 with TRACY_ON_DEMAND; tracy_tls.cpp asserts it still matches.
-    using zone_ctx_storage = hpx::aligned_storage_t<16, 8>;
+    // Mirror of TracyCZoneCtx under TRACY_ON_DEMAND (which HPX forces on).
+    // Keeping our own struct lets tracy_tls.hpp stay free of Tracy's headers.
+    // tracy_tls.cpp asserts the Tracy version and that the layouts still match.
+    struct zone_ctx_storage
+    {
+        std::uint32_t id = 0;
+        std::int32_t active = 0;
+        std::uint64_t connectionId = 0;
+    };
 
     HPX_CXX_CORE_EXPORT struct region_data
     {
