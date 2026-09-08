@@ -23,6 +23,7 @@
 #include <iomanip>
 #include <iostream>
 #include <iterator>
+#include <mutex>
 #include <string>
 #include <thread>
 #include <type_traits>
@@ -267,45 +268,55 @@ namespace hpx::debug {
         // ------------------------------------------------------------------
         [[nodiscard]] char const* hostname_print_helper::get_hostname() const
         {
-            static bool initialized = false;
+            // The lazy initialization of the hostname buffer must be guarded:
+            // this helper is called from on_start_thread and can be invoked
+            // concurrently by multiple worker threads during startup.
+            static std::once_flag once_flag;
             static char hostname_[32] = {'\0'};
-            if (!initialized)
-            {
-                initialized = true;
+            std::call_once(once_flag, [this]() {
 #if !defined(__FreeBSD__)
                 gethostname(hostname_, static_cast<std::size_t>(12));
 #endif
-                int const rank = guess_rank();
+                int const rank = this->guess_rank();
                 if (rank >= 0)
                 {
                     std::size_t const len = std::strlen(hostname_);
                     std::snprintf(
                         hostname_ + len, sizeof(hostname_) - len, "(%d)", rank);
                 }
-            }
+            });
             return hostname_;
         }
 
-        [[nodiscard]] int hostname_print_helper::guess_rank() const
+        [[nodiscard]] int hostname_print_helper::guess_rank() const noexcept
         {
-#if defined(__FreeBSD__)
-            char** env = freebsd_environ;
-#else
-            char** env = environ;
-#endif
-            std::vector<std::string> const env_strings{//-V826
-                "_RANK=", "_NODEID="};
-            for (char** current = env; *current; ++current)
+            try
             {
-                auto e = std::string(*current);
-                for (auto const& s : env_strings)
+#if defined(__FreeBSD__)
+                char** env = freebsd_environ;
+#else
+                char** env = environ;
+#endif
+                std::vector<std::string> const env_strings{//-V826
+                    "_RANK=", "_NODEID="};
+                for (char** current = env; *current; ++current)
                 {
-                    auto const pos = e.find(s);
-                    if (pos != std::string::npos)
+                    auto e = std::string(*current);
+                    for (auto const& s : env_strings)
                     {
-                        return std::stoi(e.substr(pos + s.size(), 5));
+                        auto const pos = e.find(s);
+                        if (pos != std::string::npos)
+                        {
+                            return std::stoi(e.substr(pos + s.size(), 5));
+                        }
                     }
                 }
+            }
+            // NOLINTNEXTLINE(bugprone-empty-catch)
+            catch (...)
+            {
+                // Silently ignore malformed environment variables;
+                // returning -1 disables the rank suffix.
             }
             return -1;
         }
