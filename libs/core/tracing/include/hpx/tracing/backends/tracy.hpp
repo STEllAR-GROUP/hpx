@@ -253,6 +253,7 @@ namespace hpx::tracing {
     };
 
     namespace detail {
+#if defined(HPX_HAVE_TRACING_LIFECYCLE_EVENTS)
         HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void task_staged_impl(
             char const* description,
             void const* parent_task_id = nullptr) noexcept;
@@ -281,6 +282,7 @@ namespace hpx::tracing {
 
         HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void task_deleted_impl(
             void const* task_id) noexcept;
+#endif    // HPX_HAVE_TRACING_LIFECYCLE_EVENTS
     }    // namespace detail
 
     // Inline gate wrappers. When the profiler is not connected, each wrapper
@@ -461,9 +463,11 @@ namespace hpx::tracing {
             void const* task_id = nullptr) noexcept;
 #endif    // HPX_HAVE_TRACING_CAUSAL_EVENTS
 
+#if defined(HPX_HAVE_TRACING_WORK_STEALING_EVENTS)
         HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void work_stolen_impl(
             std::size_t thief_id, std::size_t victim_id, void const* task_id,
             char const* desc = nullptr) noexcept;
+#endif    // HPX_HAVE_TRACING_WORK_STEALING_EVENTS
 
         HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void frame_mark_impl(
             char const* name = nullptr) noexcept;
