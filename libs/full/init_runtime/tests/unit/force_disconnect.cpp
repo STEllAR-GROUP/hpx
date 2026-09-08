@@ -10,16 +10,16 @@
 // remote locality succeeds and actually removes it from AGAS/the connection
 // caches while leaving the remaining localities unaffected. Calling
 // force_disconnect a second time on an already-disconnected locality does not
-// hang. Once a locality has been removed, its gid no longer reports
-// is_connecting() == true, so the eligibility check in force_disconnect fails
-// fast with hpx::error::bad_parameter rather than attempting a second removal
-// or blocking.
+// hang. Once a locality has been removed, the parcel layer remembers it as
+// disconnected, so force_disconnect rejects the gid with
+// hpx::error::bad_parameter before it attempts a second removal or blocks.
 //
 // Beyond that baseline, this test also covers: disconnecting a locality while
 // an action is still in flight to it; repeated connect/disconnect cycles across
 // distinct localities; two concurrent force_disconnect calls racing on the same
 // target; and disconnecting a locality whose process has already been killed
-// outright (rather than one that is cooperatively still running).
+// outright (rather than one that is cooperatively still running), after
+// checking that parcels sent to it report network_error.
 //
 // The remote localities are spawned as separate worker processes (see
 // force_disconnect_worker.cpp) via process::launch_connecting_locality(), since
@@ -36,16 +36,21 @@
 #include <hpx/modules/components_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/naming_base.hpp>
+#include <hpx/modules/parcelset.hpp>
 #include <hpx/modules/prefix.hpp>
 #include <hpx/modules/runtime_distributed.hpp>
 #include <hpx/modules/runtime_local.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/testing.hpp>
 
+#include <atomic>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
+#include <memory>
 #include <string>
 #include <system_error>
 #include <thread>
@@ -282,10 +287,9 @@ std::pair<hpx::id_type, hpx::id_type> test_force_disconnect_removes_locality()
 }
 
 // Calling force_disconnect a second time on an already-disconnected
-// locality does not hang. Once a locality has been removed, its gid no
-// longer reports is_connecting() == true, so the eligibility check in
-// force_disconnect fails fast with hpx::error::bad_parameter rather than
-// attempting a second removal or blocking.
+// locality does not hang. Once a locality has been removed, the parcel layer
+// remembers it as disconnected, so force_disconnect rejects the gid with
+// hpx::error::bad_parameter before it attempts a second removal or blocks.
 void test_double_disconnect_should_fail(hpx::id_type const& target)
 {
     if (!target)
@@ -417,9 +421,36 @@ void test_repeated_connect_disconnect_cycles(fs::path const& exe,
     }
 }
 
+// A claimed locality is rejected by force_disconnect until the claim is
+// released, which is what remove_locality does when a removal throws. The
+// claim and its release each succeed exactly once, and the locality reports
+// is_connecting() throughout.
+void test_claim_and_release(hpx::id_type const& target)
+{
+    if (!target)
+    {
+        return;
+    }
+
+    hpx::agas::addressing_service& agas_client = hpx::naming::get_agas_client();
+    hpx::naming::gid_type const gid = target.get_gid();
+
+    HPX_TEST(agas_client.mark_connecting_locality_as_disconnecting(gid));
+    HPX_TEST(!agas_client.mark_connecting_locality_as_disconnecting(gid));
+    HPX_TEST(hpx::agas::is_connecting(gid));
+
+    hpx::error_code ec(hpx::throwmode::lightweight);
+    HPX_TEST_EQ(hpx::force_disconnect(target, ec), -1);
+    HPX_TEST_EQ(ec.value(), static_cast<int>(hpx::error::bad_parameter));
+
+    HPX_TEST(agas_client.mark_disconnecting_locality_as_connecting(gid));
+    HPX_TEST(!agas_client.mark_disconnecting_locality_as_connecting(gid));
+    HPX_TEST(hpx::agas::is_connecting(gid));
+}
+
 // Two concurrent hpx::force_disconnect calls targeting the same locality
-// must not corrupt state or hang: at most one may succeed, and the losing
-// call must fail cleanly instead of duplicating the removal.
+// must not corrupt state or hang: exactly one succeeds, and the losing call is
+// rejected with hpx::error::bad_parameter before it duplicates the removal.
 void test_concurrent_double_disconnect_race(hpx::id_type const& target)
 {
     if (!target)
@@ -429,11 +460,18 @@ void test_concurrent_double_disconnect_race(hpx::id_type const& target)
 
     hpx::error_code ec1(hpx::throwmode::lightweight);
     hpx::error_code ec2(hpx::throwmode::lightweight);
+    hpx::latch start(3);
 
-    hpx::future<int> f1 = hpx::async(
-        [&target, &ec1]() { return hpx::force_disconnect(target, ec1); });
-    hpx::future<int> f2 = hpx::async(
-        [&target, &ec2]() { return hpx::force_disconnect(target, ec2); });
+    hpx::future<int> f1 = hpx::async([&target, &ec1, &start]() {
+        start.arrive_and_wait();
+        return hpx::force_disconnect(target, ec1);
+    });
+    hpx::future<int> f2 = hpx::async([&target, &ec2, &start]() {
+        start.arrive_and_wait();
+        return hpx::force_disconnect(target, ec2);
+    });
+
+    start.arrive_and_wait();
 
     int const r1 = f1.get();
     int const r2 = f2.get();
@@ -441,12 +479,27 @@ void test_concurrent_double_disconnect_race(hpx::id_type const& target)
     bool const succeeded1 = (r1 == 0) && !ec1;
     bool const succeeded2 = (r2 == 0) && !ec2;
     HPX_TEST(succeeded1 != succeeded2);
+
+    if (succeeded1)
+    {
+        HPX_TEST_EQ(r2, -1);
+        HPX_TEST_EQ(ec2.value(), static_cast<int>(hpx::error::bad_parameter));
+    }
+    else if (succeeded2)
+    {
+        HPX_TEST_EQ(r1, -1);
+        HPX_TEST_EQ(ec1.value(), static_cast<int>(hpx::error::bad_parameter));
+    }
 }
 
-// Force-disconnecting a locality whose process has already been killed (rather
-// than one that is cooperatively still running) must complete within the
-// best-effort notify timeout instead of hanging, and must still succeed in
-// cleaning up the local AGAS/connection-cache state.
+// How long a parcel addressed to a killed locality may take to report its
+// error through the parcel layer.
+constexpr std::chrono::seconds parcel_error_timeout(5);
+
+// An async action sent to a locality whose process has already been killed must
+// report the parcel-write error through its future. Force-disconnecting that
+// locality must then complete within the best-effort notify timeout instead of
+// hanging, and must still clean up the local AGAS/connection-cache state.
 void test_disconnect_unreachable_locality(
     process::child& worker, hpx::id_type const& target)
 {
@@ -455,7 +508,125 @@ void test_disconnect_unreachable_locality(
         return;
     }
 
+    constexpr ping_locality_action act;
+    HPX_TEST_EQ(act(target), hpx::naming::get_locality_id_from_id(target));
+
     worker.terminate(hpx::launch::sync);
+
+    auto parcelport = hpx::get_runtime_distributed()
+                          .get_parcel_handler()
+                          .get_bootstrap_parcelport();
+    HPX_TEST(parcelport);
+    if (!parcelport)
+    {
+        return;
+    }
+
+    auto const get_cache_evictions = [&parcelport] {
+        return parcelport->get_connection_cache_statistics(
+            hpx::parcelset::parcelport::connection_cache_evictions, false);
+    };
+    auto const wait_for_cache_eviction = [&get_cache_evictions](
+                                             std::int64_t const previous) {
+        auto const deadline =
+            std::chrono::steady_clock::now() + parcel_error_timeout;
+        while (get_cache_evictions() == previous &&
+            std::chrono::steady_clock::now() < deadline)
+        {
+            hpx::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
+        return get_cache_evictions() > previous;
+    };
+
+    // Exercise normal async error delivery. Fault-tolerant sends deliberately
+    // keep an unsent parcel queued for a possible reconnect.
+    hpx::get_config().tolerate_node_faults(false);
+    auto const restore_fault_tolerance = hpx::experimental::scope_exit(
+        []() noexcept { hpx::get_config().tolerate_node_faults(true); });
+
+    // A probe that times out leaves its write callback pending, so each probe
+    // owns its state and the callback keeps that state alive on its own.
+    struct probe_state
+    {
+        std::atomic<bool> write_completed = false;
+        std::atomic<bool> connection_failed = false;
+    };
+
+    bool connection_failure_received = false;
+
+    // Every connection still cached for the killed locality fails its first
+    // write with the socket's own error and is evicted, so up to
+    // HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY probes can be spent that way.
+    // The probe after those has to open a new connection, and that is the one
+    // that reports network_error.
+    constexpr std::size_t max_probe_attempts =
+        HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY + 1;
+
+    for (std::size_t i = 0; i != max_probe_attempts; ++i)
+    {
+        std::int64_t const evictions_before = get_cache_evictions();
+        auto probe = std::make_shared<probe_state>();
+
+        hpx::post_cb<ping_locality_action>(
+            target, [probe](std::error_code const& ec, auto const&) {
+                probe->connection_failed.store(ec ==
+                        hpx::make_system_error_code(hpx::error::network_error),
+                    std::memory_order_relaxed);
+                probe->write_completed.store(true, std::memory_order_release);
+            });
+
+        auto const probe_deadline =
+            std::chrono::steady_clock::now() + parcel_error_timeout;
+        while (!probe->write_completed.load(std::memory_order_acquire) &&
+            std::chrono::steady_clock::now() < probe_deadline)
+        {
+            hpx::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
+
+        bool const write_completed =
+            probe->write_completed.load(std::memory_order_acquire);
+        HPX_TEST(write_completed);
+        if (!write_completed)
+        {
+            break;
+        }
+
+        // The write callback runs before TCP has read the acknowledgment and
+        // returned or removed the connection. Wait for that postprocessing so
+        // the next probe cannot overlap it and leave a checked-out connection.
+        bool const connection_evicted =
+            wait_for_cache_eviction(evictions_before);
+        HPX_TEST(connection_evicted);
+        if (!connection_evicted)
+        {
+            break;
+        }
+
+        connection_failure_received =
+            probe->connection_failed.load(std::memory_order_relaxed);
+        if (connection_failure_received)
+        {
+            break;
+        }
+    }
+    HPX_TEST(connection_failure_received);
+
+    hpx::future<std::uint32_t> f = hpx::async(act, target);
+    hpx::future_status const status = f.wait_for(parcel_error_timeout);
+    HPX_TEST(status == hpx::future_status::ready);
+    if (status == hpx::future_status::ready)
+    {
+        hpx::error thrown_error = hpx::error::success;
+        try
+        {
+            f.get();
+        }
+        catch (hpx::exception const& e)
+        {
+            thrown_error = e.get_error();
+        }
+        HPX_TEST_EQ(thrown_error, hpx::error::network_error);
+    }
 
     auto const start = std::chrono::steady_clock::now();
 
@@ -542,9 +713,11 @@ int hpx_main(hpx::program_options::variables_map& vm)
         << "Repeated connect/disconnect cycles across distinct localities.\n";
     test_repeated_connect_disconnect_cycles(exe, 2, 4);
 
-    std::cout << "Concurrent double force_disconnect on the same locality.\n";
+    std::cout << "Claiming a locality, releasing it, and racing two "
+                 "force_disconnect calls on it.\n";
     {
         auto [w6, id6] = launch_worker(exe, 6);
+        test_claim_and_release(id6);
         test_concurrent_double_disconnect_race(id6);
         int const exit_code6 = w6.wait_for_exit(hpx::launch::sync);
         HPX_TEST_EQ(exit_code6, 0);

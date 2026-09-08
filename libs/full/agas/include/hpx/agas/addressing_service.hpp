@@ -105,9 +105,32 @@ namespace hpx::agas {
         std::atomic<hpx::state> state_;
         naming::gid_type locality_;
 
+        /// How a locality became known to this instance, which decides whether
+        /// hpx::force_disconnect may remove it.
+        enum class resolved_locality_state : std::uint8_t
+        {
+            /// Started with the application, or learned about by resolving
+            /// its address. hpx::force_disconnect rejects it.
+            connected,
+            /// Connected after the application started and registered as
+            /// such here, which only the console does. hpx::force_disconnect
+            /// accepts it.
+            connecting,
+            /// Claimed by an hpx::force_disconnect call that is still removing
+            /// it. Further claims are rejected until the entry is erased.
+            disconnecting
+        };
+
+        /// What this instance knows about one locality.
+        struct resolved_locality
+        {
+            parcelset::endpoints_type endpoints;
+            resolved_locality_state state;
+        };
+
         mutable hpx::shared_mutex resolved_localities_mtx_;
-        using resolved_localities_type = std::map<naming::gid_type,
-            std::pair<parcelset::endpoints_type, bool>>;
+        using resolved_localities_type =
+            std::map<naming::gid_type, resolved_locality>;
         resolved_localities_type resolved_localities_;
 
         explicit addressing_service(util::runtime_configuration const& ini_);
@@ -172,8 +195,29 @@ namespace hpx::agas {
         ///                 return the connecting status of the calling
         ///                 locality.
         ///
-        /// \returns `true` if the locality is marked as connecting.
+        /// \returns `true` if the locality connected late, also while it is
+        ///          being removed and after it was disconnected, and `false`
+        ///          for a locality that started with the application.
         bool is_connecting(hpx::naming::gid_type const& locality) const;
+
+        /// \brief Atomically claim a connecting locality for disconnection.
+        ///
+        /// \param locality The locality GID to claim.
+        ///
+        /// \returns `true` if this call changed the locality state from
+        ///          connecting to disconnecting, and `false` otherwise.
+        bool mark_connecting_locality_as_disconnecting(
+            hpx::naming::gid_type const& locality);
+
+        /// \brief Release a claim made by
+        ///        mark_connecting_locality_as_disconnecting.
+        ///
+        /// \param locality The locality GID to release.
+        ///
+        /// \returns `true` if this call changed the locality state from
+        ///          disconnecting back to connecting, and `false` otherwise.
+        bool mark_disconnecting_locality_as_connecting(
+            hpx::naming::gid_type const& locality);
 
         bool resolve_locally_known_addresses(
             naming::gid_type const& id, naming::address& addr) const;
@@ -240,6 +284,11 @@ namespace hpx::agas {
         bool was_object_migrated_locked(naming::gid_type const& id) const;
 
     private:
+        /// Move a locality from one state to another under the resolved
+        /// localities lock. Returns `false` if it is unknown or not in \a from.
+        bool transition_resolved_locality(hpx::naming::gid_type const& locality,
+            resolved_locality_state from, resolved_locality_state to);
+
         /// Assumes that \a refcnt_requests_mtx_ is locked.
         void send_refcnt_requests(
             std::unique_lock<mutex_type>& l, error_code& ec = throws);
