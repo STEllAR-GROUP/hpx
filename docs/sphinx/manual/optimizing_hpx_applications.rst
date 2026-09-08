@@ -3622,7 +3622,7 @@ per-thread zone tracking, message logs, and fiber support. Enable it with
 Tracy can be supplied via a system install (point ``Tracy_ROOT`` at the install
 tree) or fetched by CMake at configure time by adding
 ``HPX_WITH_FETCH_TRACY=ON``. The version fetched is pinned by
-``HPX_WITH_TRACY_TAG``, which defaults to ``v0.14.0``. When Tracy is
+``HPX_WITH_TRACY_TAG``, which defaults to ``v0.14.1``. When Tracy is
 fetched, |hpx| forces ``TRACY_ENABLE``, ``TRACY_ON_DEMAND`` and
 ``TRACY_FIBERS`` on the built client. A system-supplied Tracy must have
 been built with the same three options; Tracy 0.14 mangles its exported
