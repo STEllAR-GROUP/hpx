@@ -18,6 +18,10 @@
 #include <utility>
 #include <vector>
 
+#if defined(HPX_ALLOCATOR_SUPPORT_HAVE_CACHING) &&                             \
+    !((defined(HPX_HAVE_CUDA) && defined(__CUDACC__)) ||                       \
+        defined(HPX_HAVE_HIP))
+
 // The cache owner verification is enabled either by its own configuration
 // option or implicitly in debug builds. The option exists so that CI can turn
 // the check on for release builds as well, which is where a stale cache
@@ -28,6 +32,7 @@
 #include <hpx/assert.hpp>
 
 #include <thread>
+#endif
 #endif
 
 namespace hpx::util {
