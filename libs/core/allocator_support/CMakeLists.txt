@@ -18,14 +18,13 @@ if(HPX_ALLOCATOR_SUPPORT_WITH_CACHING)
   )
 endif()
 
-# Allow to verify that a per-thread allocator cache is only ever used by the OS
-# thread that created it. This is implicitly enabled for debug builds, the
-# option turns it on for release builds as well.
+# Diagnose access to a per-thread allocator cache from the wrong OS thread with
+# an assertion. This option is independent of the compiler protections in
+# cache(), which are always enabled. Debug builds enable the diagnostic
+# implicitly; this option enables it for release builds as well.
 hpx_option(
-  HPX_ALLOCATOR_SUPPORT_WITH_CACHE_OWNER_VERIFICATION
-  BOOL
-  "Verify that the caching allocator's per-thread cache is only used by its owning thread. (default: OFF, implicitly enabled in debug builds)"
-  OFF
+  HPX_ALLOCATOR_SUPPORT_WITH_CACHE_OWNER_VERIFICATION BOOL
+  "Diagnose invalid cache ownership. (default: OFF, implicit in Debug)" OFF
   ADVANCED
   CATEGORY "Modules"
   MODULE ALLOCATOR_SUPPORT

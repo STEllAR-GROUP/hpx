@@ -22,10 +22,11 @@
     !((defined(HPX_HAVE_CUDA) && defined(__CUDACC__)) ||                       \
         defined(HPX_HAVE_HIP))
 
-// The cache owner verification is enabled either by its own configuration
-// option or implicitly in debug builds. The option exists so that CI can turn
-// the check on for release builds as well, which is where a stale cache
-// reference has been observed (see #6540).
+// This diagnostic asserts that the cache is used by its owning OS thread.
+// It is independent of the compiler protections in cache(), which are
+// always enabled. Verification is enabled by its own configuration option
+// or implicitly in debug builds. The option lets CI enable it in release
+// builds, where stale cache references have been observed (see #6540).
 #if defined(HPX_ALLOCATOR_SUPPORT_HAVE_CACHE_OWNER_VERIFICATION) ||            \
     defined(HPX_DEBUG)
 #define HPX_ALLOCATOR_SUPPORT_VERIFY_CACHE_OWNER
@@ -188,8 +189,11 @@ namespace hpx::util {
             // standard libraries declare the underlying thread id lookup as
             // const, which would allow the compiler to reuse a value read
             // before the suspension and hide the very mismatch we look for.
+            // The compiler fence prevents interprocedural optimizations,
+            // including LTO, from eliminating repeated calls to this check.
             HPX_NOINLINE void verify_owner() const noexcept
             {
+                HPX_COMPILER_FENCE;
                 HPX_ASSERT_(owner == std::this_thread::get_id(),
                     "the thread_local allocator cache is being used by a "
                     "thread other than the one that created it, see #6540");
@@ -231,8 +235,12 @@ namespace hpx::util {
         // pushes into it. The lock-free stack tolerates that while the
         // previous worker lives. Once that worker has exited and its cache
         // destructor is walking the node list, the list is corrupted.
+        // The compiler fence also prevents interprocedural optimizations,
+        // including LTO, from treating this lookup as side-effect-free and
+        // reusing an earlier call's result.
         HPX_NOINLINE allocated_cache& cache()
         {
+            HPX_COMPILER_FENCE;
             thread_local allocated_cache allocated_data(alloc, DefaultCapacity);
             return allocated_data;
         }
