@@ -18,6 +18,26 @@ if(HPX_ALLOCATOR_SUPPORT_WITH_CACHING)
   )
 endif()
 
+# Allow to verify that a per-thread allocator cache is only ever used by the OS
+# thread that created it. This is implicitly enabled for debug builds, the
+# option turns it on for release builds as well.
+hpx_option(
+  HPX_ALLOCATOR_SUPPORT_WITH_CACHE_OWNER_VERIFICATION
+  BOOL
+  "Verify that the caching allocator's per-thread cache is only used by its owning thread. (default: OFF, implicitly enabled in debug builds)"
+  OFF
+  ADVANCED
+  CATEGORY "Modules"
+  MODULE ALLOCATOR_SUPPORT
+)
+
+if(HPX_ALLOCATOR_SUPPORT_WITH_CACHE_OWNER_VERIFICATION)
+  hpx_add_config_define_namespace(
+    DEFINE HPX_ALLOCATOR_SUPPORT_HAVE_CACHE_OWNER_VERIFICATION
+    NAMESPACE ALLOCATOR_SUPPORT
+  )
+endif()
+
 set(allocator_support_headers
     hpx/allocator_support/aligned_allocator.hpp
     hpx/allocator_support/allocator_deleter.hpp
@@ -54,6 +74,7 @@ add_hpx_module(
   COMPAT_HEADERS ${allocator_support_compat_headers}
   ADD_TO_GLOBAL_HEADER "hpx/allocator_support/detail/new.hpp"
   DEPENDENCIES hpx_dependencies_allocator
-  MODULE_DEPENDENCIES hpx_concepts hpx_config hpx_preprocessor hpx_type_support
+  MODULE_DEPENDENCIES hpx_assertion hpx_concepts hpx_config hpx_preprocessor
+                      hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

@@ -18,6 +18,18 @@
 #include <utility>
 #include <vector>
 
+// The cache owner verification is enabled either by its own configuration
+// option or implicitly in debug builds. The option exists so that CI can turn
+// the check on for release builds as well, which is where a stale cache
+// reference has been observed (see #6540).
+#if defined(HPX_ALLOCATOR_SUPPORT_HAVE_CACHE_OWNER_VERIFICATION) ||            \
+    defined(HPX_DEBUG)
+#define HPX_ALLOCATOR_SUPPORT_VERIFY_CACHE_OWNER
+#include <hpx/assert.hpp>
+
+#include <thread>
+#endif
+
 namespace hpx::util {
 
 #if defined(HPX_ALLOCATOR_SUPPORT_HAVE_CACHING) &&                             \
@@ -81,6 +93,8 @@ namespace hpx::util {
 
             pointer allocate(size_type n)
             {
+                verify_owner();
+
                 // Search for an entry with matching size. We try popping until
                 // we find matching size or data empty. Popped non-matching
                 // entries are temporarily stored and then pushed back to
@@ -133,6 +147,8 @@ namespace hpx::util {
 
             void deallocate(pointer p, size_type n)
             {
+                verify_owner();
+
                 if (cached.load(std::memory_order_relaxed) < capacity)
                 {
                     try
@@ -153,6 +169,24 @@ namespace hpx::util {
             }
 
         private:
+            // A cache belongs to the OS thread that created it. Reaching it
+            // from any other thread means a caller held on to the reference
+            // returned by cache() across a point where its HPX thread
+            // suspended and was resumed on a different worker.
+            //
+            // This is kept out of line for the same reason cache() is: some
+            // standard libraries declare the underlying thread id lookup as
+            // const, which would allow the compiler to reuse a value read
+            // before the suspension and hide the very mismatch we look for.
+            HPX_NOINLINE void verify_owner() const noexcept
+            {
+#if defined(HPX_ALLOCATOR_SUPPORT_VERIFY_CACHE_OWNER)
+                HPX_ASSERT_(owner == std::this_thread::get_id(),
+                    "the thread_local allocator cache is being used by a "
+                    "thread other than the one that created it, see #6540");
+#endif
+            }
+
             void clear_cache() noexcept
             {
                 cached_entry p;
@@ -175,6 +209,9 @@ namespace hpx::util {
             Stack<cached_entry, Allocator> data;
             std::atomic<std::size_t> cached;
             std::size_t const capacity = DefaultCapacity;
+#if defined(HPX_ALLOCATOR_SUPPORT_VERIFY_CACHE_OWNER)
+            std::thread::id const owner = std::this_thread::get_id();
+#endif
         };
 
         // Keep this lookup out of line. Once it is inlined, the compiler may
