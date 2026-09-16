@@ -89,7 +89,10 @@ foreach(test ${tests})
   set(sources ${test}.cpp)
 
   set(${test}_FLAGS DEPENDENCIES partitioned_vector_component)
-  if(test STREQUAL "partitioned_vector_merge")
+  if(test STREQUAL "partitioned_vector_sort")
+    # Four localities so k-way merge of more than two runs is exercised.
+    set(test_localities 4)
+  elseif(test STREQUAL "partitioned_vector_merge")
     set(test_localities 3)
   elseif(test STREQUAL "partitioned_vector_merge_extended")
     set(test_localities 4)
