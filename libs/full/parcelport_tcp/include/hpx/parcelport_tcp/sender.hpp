@@ -222,6 +222,7 @@ namespace hpx::parcelset::policies::tcp {
                 {
                     threads::register_thread(data);
                 }
+                // NOLINTNEXTLINE(bugprone-empty-catch)
                 catch (hpx::exception const&)
                 {
                     // the runtime started shutting down after the check
