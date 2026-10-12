@@ -17,6 +17,7 @@
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
 #include <map>
 #include <string>
 #include <string_view>
@@ -219,7 +220,7 @@ namespace hpx::tracing {
         // the same address always names the same live task.
         ___itt_id task_id_value(void const* task_id) noexcept
         {
-            return ::itt_id_value(const_cast<void*>(task_id), 0);
+            return ::itt_id_value(task_id, 0);
         }
 
         // Emits a marker the first time one of the fixed limits below is hit,
@@ -229,6 +230,32 @@ namespace hpx::tracing {
         {
             if (!reported.exchange(true, std::memory_order_relaxed))
                 util::itt::emit_marker(get_itt_globals().domain, name);
+        }
+
+        // Creating a string handle can take a lock and walk a list in the ITT
+        // static part, so each worker remembers the handles of the names it
+        // has seen. The stored text is compared as well, in case a name
+        // pointer is reused for a different string.
+        ___itt_string_handle* name_handle(char const* name) noexcept
+        {
+            struct entry
+            {
+                char const* name;
+                ___itt_string_handle* handle;
+            };
+            constexpr std::size_t cache_size = 64;
+            thread_local entry cache[cache_size] = {};
+
+            entry& e = cache[(reinterpret_cast<std::uintptr_t>(name) >> 3) %
+                cache_size];
+            if (e.name != name || e.handle == nullptr ||
+                e.handle->strA == nullptr ||
+                std::strcmp(e.handle->strA, name) != 0)
+            {
+                e.name = name;
+                e.handle = ::itt_string_handle_create(name);
+            }
+            return e.handle;
         }
 
         struct frame
@@ -287,9 +314,8 @@ namespace hpx::tracing {
             ++worker.depth;
 
             ___itt_id id = task_id_value(task);
-            util::itt::string_handle const sh(name != nullptr ? name : "task");
-            ::itt_task_begin_overlapped(
-                get_itt_globals().domain.domain_, &id, sh.handle_);
+            ::itt_task_begin_overlapped(get_itt_globals().domain.domain_, &id,
+                name_handle(name != nullptr ? name : "task"));
         }
 
         void save_frames() noexcept
@@ -387,10 +413,10 @@ namespace hpx::tracing {
             worker.depth = 0;
         }
 
-        // Completion ends just the innermost frame, since an inline child
-        // finishing leaves its parent running. Past the capacity that frame
-        // has no segment, and inline frames unwind in order, so it is only
-        // counted down.
+        // Completion ends the completing task's frame and any frame still open
+        // above it, and leaves the frames below it, its parents, running.
+        // Past the capacity the innermost frame has no segment, and inline
+        // frames unwind in order, so it is only counted down.
         void end_task(void const* task) noexcept
         {
             if (worker.depth > worker.stored)
@@ -398,16 +424,24 @@ namespace hpx::tracing {
                 --worker.depth;
                 return;
             }
-            if (worker.stored == 0 ||
-                worker.frames[worker.stored - 1].task != task)
-            {
-                return;
-            }
 
-            ___itt_id id = task_id_value(task);
-            ::itt_task_end_overlapped(get_itt_globals().domain.domain_, &id);
-            --worker.stored;
-            --worker.depth;
+            std::size_t pos = worker.stored;
+            while (pos != 0 && worker.frames[pos - 1].task != task)
+                --pos;
+            if (pos == 0)
+                return;
+
+            // A child runs on its parent's stack and cannot outlive it, so a
+            // frame still open above the completing task missed its own end.
+            // Those are closed with it instead of staying open on this worker.
+            auto const* domain = get_itt_globals().domain.domain_;
+            while (worker.stored >= pos)
+            {
+                ___itt_id id =
+                    task_id_value(worker.frames[--worker.stored].task);
+                ::itt_task_end_overlapped(domain, &id);
+            }
+            worker.depth = worker.stored;
         }
     }    // namespace
 
@@ -419,7 +453,8 @@ namespace hpx::tracing {
         // A staged task has no thread_data yet, hence no id; a plain marker
         // records the enqueue without opening an overlapped task.
         util::itt::emit_marker(get_itt_globals().domain,
-            util::itt::string_handle(name != nullptr ? name : "staged"));
+            util::itt::string_handle(
+                name_handle(name != nullptr ? name : "staged")));
     }
 
     void task_created(char const*, void const* task_id, void const*) noexcept

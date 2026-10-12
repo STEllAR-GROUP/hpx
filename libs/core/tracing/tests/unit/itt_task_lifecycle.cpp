@@ -19,6 +19,7 @@
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/threading_base.hpp>
+#include <hpx/modules/tracing.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/thread.hpp>
 
@@ -214,6 +215,29 @@ namespace {
         HPX_TEST(inlined);
         HPX_TEST_EQ(begins(start, after, child), 1);
         HPX_TEST_EQ(open_at(start, after, child, 0), 0);
+        HPX_TEST_EQ(open_at(start, after, parent, 1), 1);
+    }
+
+    // A nested frame whose completion signal never arrives must not stay open
+    // on the worker: it is closed when the frame below it completes. The
+    // signals are sent by hand for two made-up task ids to skip one of them.
+    void test_missed_completion()
+    {
+        std::size_t const start = note("missed:start");
+        void const* const parent = self();
+        int outer = 0;
+        int inner = 0;
+
+        hpx::tracing::task_executing(&outer, "outer", std::size_t(0));
+        hpx::tracing::task_executing(&inner, "inner", std::size_t(0));
+        hpx::tracing::task_completed(&outer, "outer");
+
+        std::size_t const after = note("missed:after");
+
+        HPX_TEST_EQ(begins(start, after, &outer), 1);
+        HPX_TEST_EQ(begins(start, after, &inner), 1);
+        HPX_TEST_EQ(open_at(start, after, &inner, 0), 0);
+        HPX_TEST_EQ(open_at(start, after, &outer, 0), 0);
         HPX_TEST_EQ(open_at(start, after, parent, 1), 1);
     }
 
@@ -453,6 +477,7 @@ int hpx_main()
     {
 #if defined(HPX_HAVE_TRACING_LIFECYCLE_EVENTS)
         test_inline_completion();
+        test_missed_completion();
         test_inline_park("yield:start", [] { hpx::this_thread::yield(); });
         test_inline_park("suspend:start",
             [] { hpx::this_thread::sleep_for(std::chrono::milliseconds(2)); });
