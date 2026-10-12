@@ -17,6 +17,7 @@
 
 #include <atomic>
 #include <chrono>
+#include <cstddef>
 #include <mutex>
 #include <string>
 #include <vector>
@@ -320,7 +321,20 @@ void test_timed_mutex_try_lock_until_retries_while_still_owned()
         {
             hpx::this_thread::yield();
         }
-        hpx::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+        // waiter_state == 1 is set before try_lock_until is entered, so it
+        // does not prove the waiter is blocked. Wait until the waiter thread
+        // is actually suspended inside the timed wait (a fixed sleep is a
+        // race under load) and remember its phase so we can observe the
+        // wakeup below.
+        hpx::threads::thread_id_type const waiter_id = waiter.native_handle();
+        while (hpx::threads::get_thread_state(waiter_id).state() !=
+            hpx::threads::thread_schedule_state::suspended)
+        {
+            hpx::this_thread::yield();
+        }
+        std::size_t const phase_before =
+            hpx::threads::get_thread_phase(waiter_id);
 
         // Wake the waiter, then steal the mutex so it is still owned when
         // the waiter re-evaluates owner_id_.
@@ -332,12 +346,14 @@ void test_timed_mutex_try_lock_until_retries_while_still_owned()
             continue;
         }
 
-        for (int i = 0; i != 1000; ++i)
+        // Wait until the waiter has been resumed by the unlock above and has
+        // either returned (old single-wait bug) or gone back to waiting
+        // while the mutex is still owned by this thread (fixed behavior).
+        while (waiter_state.load(std::memory_order_acquire) == 1 &&
+            (hpx::threads::get_thread_phase(waiter_id) == phase_before ||
+                hpx::threads::get_thread_state(waiter_id).state() !=
+                    hpx::threads::thread_schedule_state::suspended))
         {
-            if (waiter_state.load(std::memory_order_acquire) != 1)
-            {
-                break;
-            }
             hpx::this_thread::yield();
         }
 
