@@ -222,12 +222,15 @@ namespace hpx::parcelset::policies::tcp {
                 {
                     threads::register_thread(data);
                 }
-                // NOLINTNEXTLINE(bugprone-empty-catch)
                 catch (hpx::exception const&)
                 {
-                    // the runtime started shutting down after the check
-                    // above; data still owns the handler and destroys it here
-                    // instead of letting the exception terminate the io thread
+                    // only a shutdown that started after the check above is
+                    // expected here, anything else is a real error
+                    if (threads::threadmanager_is(hpx::state::running))
+                        throw;
+
+                    // data still owns the handler and destroys it here instead
+                    // of letting the exception terminate the io thread
                 }
             }
             else
