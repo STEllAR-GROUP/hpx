@@ -19,6 +19,7 @@
 
 #include <mpi.h>
 
+#include <cstddef>
 #include <cstdint>
 #include <vector>
 
@@ -53,8 +54,11 @@ int hpx_main()
     exchange_message_with_self();
 
     // the parcelport must still be functional after user polling was disabled
+    std::vector<hpx::id_type> const localities = hpx::find_all_localities();
+    HPX_TEST_EQ(localities.size(), std::size_t(2));
+
     std::vector<hpx::future<std::uint32_t>> futures;
-    for (hpx::id_type const& loc : hpx::find_all_localities())
+    for (hpx::id_type const& loc : localities)
     {
         futures.push_back(hpx::async(get_locality_action(), loc));
     }

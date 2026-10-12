@@ -67,14 +67,45 @@ void test_channel()
         HPX_TEST_EQ(get_post_f.get(), 43);
     }
 
-    hpx::future<std::size_t> close_f = c.close(hpx::launch::async);
+    // close must not block either if the id is not known yet
+    hpx::promise<hpx::id_type> close_p;
+    hpx::distributed::channel<T> close_c(close_p.get_future());
+    hpx::future<std::size_t> close_f = close_c.close(hpx::launch::async);
+    HPX_TEST(!close_f.is_ready());
+
+    close_p.set_value(target.get_id());
     HPX_TEST_EQ(close_f.get(), std::size_t(0));
+}
+
+// The same must hold when the client is passed as its base type, which
+// selects a different overload of hpx::async and hpx::post.
+void test_client_base()
+{
+    using channel_type = hpx::distributed::channel<int>;
+    using base_type = hpx::components::client_base<channel_type,
+        hpx::lcos::server::channel<int>>;
+    using get_action = hpx::lcos::server::channel<int>::get_generation_action;
+    using set_action = hpx::lcos::server::channel<int>::set_generation_action;
+
+    channel_type const target(hpx::find_here());
+
+    hpx::promise<hpx::id_type> p;
+    channel_type c(p.get_future());
+    base_type const& base = c;
+
+    hpx::future<int> get_f = hpx::async(get_action(), base, std::size_t(1));
+    hpx::post(set_action(), base, 5, std::size_t(1));
+    HPX_TEST(!get_f.is_ready());
+
+    p.set_value(target.get_id());
+    HPX_TEST_EQ(get_f.get(), 5);
 }
 
 int hpx_main()
 {
     test_channel<int>();
     test_channel<void>();
+    test_client_base();
 
     return hpx::finalize();
 }

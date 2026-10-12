@@ -10,7 +10,7 @@ if(HPX_WITH_ASYNC_MPI)
   list(APPEND tests user_polling_finalize_5919)
 endif()
 
-set(user_polling_finalize_5919_PARAMETERS LOCALITIES 2 RUNWRAPPER mpi)
+set(user_polling_finalize_5919_PARAMETERS LOCALITIES 2 PARCELPORTS mpi)
 
 foreach(test ${tests})
   set(sources ${test}.cpp)
