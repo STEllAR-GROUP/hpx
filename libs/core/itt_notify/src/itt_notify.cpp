@@ -758,9 +758,9 @@ void itt_id_destroy(___itt_domain const* domain, ___itt_id const* id) noexcept
     delete id;
 }
 
-___itt_id itt_id_value(void* addr, std::size_t const extra) noexcept
+___itt_id itt_id_value(void const* addr, std::size_t const extra) noexcept
 {
-    return HPX_INTERNAL_ITT_MAKE_ID(addr, extra);
+    return HPX_INTERNAL_ITT_MAKE_ID(const_cast<void*>(addr), extra);
 }
 
 void itt_id_destroy_value(
