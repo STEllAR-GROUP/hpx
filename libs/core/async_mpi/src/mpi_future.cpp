@@ -425,8 +425,11 @@ namespace hpx { namespace mpi { namespace experimental {
         {
             int required = MPI_THREAD_MULTIPLE;
             int provided;
+            int was_initialized = 0;
+            MPI_Initialized(&was_initialized);
             hpx::util::mpi_environment::init(
                 nullptr, nullptr, required, required, provided);
+            detail::get_mpi_info().mpi_initialized_ = !was_initialized;
             if (provided != required)
             {
                 mpi_debug.error(debug::str<>("hpx::mpi::experimental::init"),
@@ -437,7 +440,6 @@ namespace hpx { namespace mpi { namespace experimental {
             }
             MPI_Comm_rank(MPI_COMM_WORLD, &detail::get_mpi_info().rank_);
             MPI_Comm_size(MPI_COMM_WORLD, &detail::get_mpi_info().size_);
-            detail::get_mpi_info().mpi_initialized_ = true;
         }
         else
         {

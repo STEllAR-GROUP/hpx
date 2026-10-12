@@ -7,7 +7,7 @@
 set(tests)
 
 if(HPX_WITH_ASYNC_MPI)
-  set(tests ${tests} user_polling_finalize_5919)
+  list(APPEND tests user_polling_finalize_5919)
 endif()
 
 set(user_polling_finalize_5919_PARAMETERS LOCALITIES 2 RUNWRAPPER mpi)
@@ -19,7 +19,7 @@ foreach(test ${tests})
 
   add_hpx_executable(
     ${test}_test INTERNAL_FLAGS
-    SOURCES ${sources} ${${test}_FLAGS}
+    SOURCES ${sources}
     EXCLUDE_FROM_ALL
     DEPENDENCIES Mpi::mpi
     HPX_PREFIX ${HPX_BUILD_PREFIX}
