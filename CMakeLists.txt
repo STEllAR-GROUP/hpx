@@ -1224,7 +1224,7 @@ if(HPX_WITH_TRACY)
   hpx_option(
     HPX_WITH_TRACING_CAUSAL_EVENTS
     BOOL
-    "Emit causal chain events (future_fulfilled, future_exception_set, continuation_run, continuation_finished, handle_on_completed_fired). Default: ON."
+    "Emit causal chain events (future_fulfilled, future_exception_set, continuation_run, continuation_finished, handle_on_completed_fired). Tracy backend only. Default: ON."
     ON
     CATEGORY "Profiling"
   )
@@ -1238,7 +1238,7 @@ if(HPX_WITH_TRACY)
   hpx_option(
     HPX_WITH_TRACING_SAMPLE_RATE
     STRING
-    "1-in-N task-lifecycle sampling rate for the Tracy backend; 1 emits every task, higher values emit correspondingly fewer (default: 1)"
+    "1-in-N task-lifecycle sampling rate for the Tracy backend; 1 emits every task, higher values emit correspondingly fewer. Ignored by the ITTNotify backend, which emits every task (default: 1)"
     "1"
     ADVANCED
   )
