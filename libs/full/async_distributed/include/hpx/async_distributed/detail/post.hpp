@@ -22,9 +22,9 @@
 #include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/parcelset.hpp>
 #include <hpx/modules/parcelset_base.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/tracing.hpp>
-#include <hpx/modules/runtime_local.hpp>
 
 #include <exception>
 #include <type_traits>
