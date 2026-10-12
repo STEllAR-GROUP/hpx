@@ -515,17 +515,10 @@ namespace hpx { namespace mpi { namespace experimental {
             detail::hpx_mpi_errhandler = 0;
         }
 
-        // clean up only if we initialized mpi, MPI might still be in use
-        // elsewhere (e.g. by the MPI parcelport) otherwise
-        if (detail::get_mpi_info().mpi_initialized_)
-        {
-            detail::get_mpi_info().mpi_initialized_ = false;
-            hpx::util::mpi_environment::finalize();
-        }
-
         mpi_debug.debug(debug::str<>("Clearing mode"), detail::get_mpi_info(),
             "disable_user_polling");
 
+        // stop polling before MPI is finalized below
         if (pool_name.empty())
         {
             detail::unregister_polling(hpx::resource::get_thread_pool(0));
@@ -534,6 +527,14 @@ namespace hpx { namespace mpi { namespace experimental {
         {
             detail::unregister_polling(
                 hpx::resource::get_thread_pool(pool_name));
+        }
+
+        // clean up only if we initialized mpi, MPI might still be in use
+        // elsewhere (e.g. by the MPI parcelport) otherwise
+        if (detail::get_mpi_info().mpi_initialized_)
+        {
+            detail::get_mpi_info().mpi_initialized_ = false;
+            hpx::util::mpi_environment::finalize();
         }
     }
 }}}    // namespace hpx::mpi::experimental

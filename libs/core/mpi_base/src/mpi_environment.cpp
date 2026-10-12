@@ -315,7 +315,10 @@ namespace hpx::util {
 
     void mpi_environment::finalize() noexcept
     {
-        if (enabled() && has_called_init())
+        // Finalize MPI only if it was initialized here, either for the MPI
+        // parcelport or by hpx::mpi::experimental::init. Note that the
+        // latter does not enable the MPI parcelport.
+        if (has_called_init())
         {
             scoped_lock l;
 

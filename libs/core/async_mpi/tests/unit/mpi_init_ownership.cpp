@@ -6,7 +6,8 @@
 
 // hpx::mpi::experimental::init(true) must take ownership of MPI only if it
 // actually initialized it. A subsequent call must not drop that ownership,
-// and hpx::mpi::experimental::finalize must release it (see #5919).
+// and hpx::mpi::experimental::finalize must release it and finalize MPI
+// (see #5919).
 
 #include <hpx/init.hpp>
 #include <hpx/modules/async_mpi.hpp>
@@ -30,8 +31,13 @@ int hpx_main(int, char**)
     mpix::init(true);
     HPX_TEST(mpix::detail::get_mpi_info().mpi_initialized_);
 
+    // finalize releases the ownership and finalizes MPI
     mpix::finalize();
     HPX_TEST(!mpix::detail::get_mpi_info().mpi_initialized_);
+
+    int finalized = 0;
+    MPI_Finalized(&finalized);
+    HPX_TEST(finalized);
 
     return hpx::local::finalize();
 }
@@ -40,8 +46,7 @@ int main(int argc, char* argv[])
 {
     HPX_TEST_EQ(hpx::local::init(hpx_main, argc, argv), 0);
 
-    // hpx::util::mpi_environment::finalize only finalizes MPI if the MPI
-    // parcelport is enabled, make sure MPI is finalized before exiting.
+    // make sure MPI is finalized before exiting, even if the test failed
     int finalized = 0;
     MPI_Finalized(&finalized);
     if (!finalized)
