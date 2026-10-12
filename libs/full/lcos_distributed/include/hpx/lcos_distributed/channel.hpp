@@ -355,8 +355,10 @@ namespace hpx::lcos {
 
         receive_channel() = default;
 
+        // share the id of the channel, this does not block if the id is
+        // not available yet
         receive_channel(channel<T> const& c)
-          : base_type(c.get_id())
+          : base_type(c.share())
         {
         }
 
@@ -381,7 +383,12 @@ namespace hpx::lcos {
         {
             using action_type =
                 typename lcos::server::channel<T>::get_generation_action;
-            return hpx::async(action_type(), *this, generation);
+            // Use a channel sharing this client's id. Passing the client
+            // itself defers the invocation until the id is available (and
+            // does not block), but that would also check receive_channel for
+            // being a future range, which instantiates begin()/end() below.
+            return hpx::async(
+                action_type(), channel<T>(this->share()), generation);
         }
         hpx::future<T> get(std::size_t generation = default_generation) const
         {
@@ -399,22 +406,22 @@ namespace hpx::lcos {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        channel_iterator<T, receive_channel<T>> begin() const
+        channel_iterator<T, channel<T>> begin() const
         {
-            return channel_iterator<T, receive_channel<T>>(*this);
+            return channel_iterator<T, channel<T>>(*this);
         }
-        channel_iterator<T, receive_channel<T>> end() const
+        channel_iterator<T, channel<T>> end() const
         {
-            return channel_iterator<T, receive_channel<T>>();
+            return channel_iterator<T, channel<T>>();
         }
 
-        channel_iterator<T, receive_channel<T>> rbegin() const
+        channel_iterator<T, channel<T>> rbegin() const
         {
-            return channel_iterator<T, receive_channel<T>>(*this);
+            return channel_iterator<T, channel<T>>(*this);
         }
-        channel_iterator<T, receive_channel<T>> rend() const
+        channel_iterator<T, channel<T>> rend() const
         {
-            return channel_iterator<T, receive_channel<T>>();
+            return channel_iterator<T, channel<T>>();
         }
     };
 
@@ -438,8 +445,10 @@ namespace hpx::lcos {
 
         send_channel() = default;
 
+        // share the id of the channel, this does not block if the id is
+        // not available yet
         send_channel(channel<T> const& c)
-          : base_type(c.get_id())
+          : base_type(c.share())
         {
         }
 

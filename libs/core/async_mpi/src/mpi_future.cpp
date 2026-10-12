@@ -9,6 +9,7 @@
 #include <hpx/async_mpi/mpi_exception.hpp>
 #include <hpx/async_mpi/mpi_future.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/mpi_base.hpp>
 #include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/threading_base.hpp>
@@ -425,11 +426,35 @@ namespace hpx { namespace mpi { namespace experimental {
         {
             int required = MPI_THREAD_MULTIPLE;
             int provided;
+
             int was_initialized = 0;
-            MPI_Initialized(&was_initialized);
-            hpx::util::mpi_environment::init(
+            int retval = MPI_Initialized(&was_initialized);
+            if (retval != MPI_SUCCESS)
+            {
+                throw mpi_exception(retval, "MPI_Initialized failed: ");
+            }
+
+            // Remember whether this call initialized MPI, even if one of
+            // the checks below throws. Only ever set the flag here (never
+            // reset it), a subsequent call to init must not drop the
+            // ownership acquired by an earlier one.
+            auto const on_exit = hpx::experimental::scope_exit([&] {
+                int is_initialized = 0;
+                if (!was_initialized &&
+                    MPI_Initialized(&is_initialized) == MPI_SUCCESS &&
+                    is_initialized)
+                {
+                    detail::get_mpi_info().mpi_initialized_ = true;
+                }
+            });
+
+            retval = hpx::util::mpi_environment::init(
                 nullptr, nullptr, required, required, provided);
-            detail::get_mpi_info().mpi_initialized_ = !was_initialized;
+            if (retval != MPI_SUCCESS)
+            {
+                throw mpi_exception(retval, "MPI initialization failed: ");
+            }
+
             if (provided != required)
             {
                 mpi_debug.error(debug::str<>("hpx::mpi::experimental::init"),

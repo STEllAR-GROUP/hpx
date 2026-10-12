@@ -19,6 +19,8 @@
 #include <hpx/modules/testing.hpp>
 
 #include <cstddef>
+#include <exception>
+#include <stdexcept>
 #include <type_traits>
 
 HPX_REGISTER_CHANNEL(int)
@@ -46,25 +48,27 @@ void test_channel()
         set_f = c.set(hpx::launch::async, 42, 1);
         c.set(hpx::launch::apply, 43, 2);
     }
-    hpx::future<T> get_f = c.get(hpx::launch::async, 1);
-    hpx::future<T> get_post_f = c.get(hpx::launch::async, 2);
+    // receive the values sent above using launch::async (generation 1)
+    // and launch::apply (generation 2)
+    hpx::future<T> get_async_set_f = c.get(hpx::launch::async, 1);
+    hpx::future<T> get_apply_set_f = c.get(hpx::launch::async, 2);
 
     HPX_TEST(!set_f.is_ready());
-    HPX_TEST(!get_f.is_ready());
-    HPX_TEST(!get_post_f.is_ready());
+    HPX_TEST(!get_async_set_f.is_ready());
+    HPX_TEST(!get_apply_set_f.is_ready());
 
     p.set_value(target.get_id());
 
     set_f.get();
     if constexpr (std::is_void_v<T>)
     {
-        get_f.get();
-        get_post_f.get();
+        get_async_set_f.get();
+        get_apply_set_f.get();
     }
     else
     {
-        HPX_TEST_EQ(get_f.get(), 42);
-        HPX_TEST_EQ(get_post_f.get(), 43);
+        HPX_TEST_EQ(get_async_set_f.get(), 42);
+        HPX_TEST_EQ(get_apply_set_f.get(), 43);
     }
 
     // close must not block either if the id is not known yet
@@ -101,11 +105,65 @@ void test_client_base()
     HPX_TEST_EQ(get_f.get(), 5);
 }
 
+// Creating send_channel/receive_channel clients from a channel and using
+// them must not block either.
+void test_send_receive_channel()
+{
+    hpx::distributed::channel<int> const target(hpx::find_here());
+
+    hpx::promise<hpx::id_type> p;
+    hpx::distributed::channel<int> c(p.get_future());
+
+    hpx::lcos::send_channel<int> send(c);
+    hpx::lcos::receive_channel<int> receive(c);
+
+    hpx::future<void> set_f = send.set(hpx::launch::async, 1, 1);
+    send.set(hpx::launch::apply, 2, 2);
+    hpx::future<int> get_async_set_f = receive.get(hpx::launch::async, 1);
+    hpx::future<int> get_apply_set_f = receive.get(hpx::launch::async, 2);
+    hpx::future<std::size_t> close_f = send.close(hpx::launch::async);
+
+    HPX_TEST(!set_f.is_ready());
+    HPX_TEST(!get_async_set_f.is_ready());
+    HPX_TEST(!get_apply_set_f.is_ready());
+    HPX_TEST(!close_f.is_ready());
+
+    p.set_value(target.get_id());
+
+    set_f.get();
+    HPX_TEST_EQ(get_async_set_f.get(), 1);
+    HPX_TEST_EQ(get_apply_set_f.get(), 2);
+    close_f.get();
+}
+
+// If the id of the client can't be resolved, the deferred operations must
+// propagate the error.
+void test_exceptional_id()
+{
+    hpx::promise<hpx::id_type> p;
+    hpx::distributed::channel<int> c(p.get_future());
+
+    hpx::future<int> get_f = c.get(hpx::launch::async, 1);
+    hpx::future<void> set_f = c.set(hpx::launch::async, 1, 1);
+    hpx::future<std::size_t> close_f = c.close(hpx::launch::async);
+
+    p.set_exception(std::make_exception_ptr(std::runtime_error("no id")));
+
+    get_f.wait();
+    set_f.wait();
+    close_f.wait();
+    HPX_TEST(get_f.has_exception());
+    HPX_TEST(set_f.has_exception());
+    HPX_TEST(close_f.has_exception());
+}
+
 int hpx_main()
 {
     test_channel<int>();
     test_channel<void>();
     test_client_base();
+    test_send_receive_channel();
+    test_exceptional_id();
 
     return hpx::finalize();
 }

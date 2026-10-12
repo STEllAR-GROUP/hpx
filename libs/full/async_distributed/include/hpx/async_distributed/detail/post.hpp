@@ -24,10 +24,9 @@
 #include <hpx/modules/parcelset_base.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/tracing.hpp>
-#if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
 #include <hpx/modules/runtime_local.hpp>
-#endif
 
+#include <exception>
 #include <type_traits>
 #include <utility>
 
@@ -238,8 +237,20 @@ namespace hpx {
                 hpx::launch policy, Ts&&... ts) const
             {
                 HPX_ASSERT(c.is_ready());
-                return hpx::detail::post_impl<Action>(
-                    c.get_id(), policy, HPX_FORWARD(Ts, ts)...);
+                try
+                {
+                    return hpx::detail::post_impl<Action>(
+                        c.get_id(), policy, HPX_FORWARD(Ts, ts)...);
+                }
+                catch (...)
+                {
+                    // Nobody observes the outcome of a deferred post (for
+                    // instance, the client's id could not be resolved).
+                    // Report the error, as for any other fire-and-forget
+                    // operation, instead of silently dropping it.
+                    hpx::report_error(std::current_exception());
+                    return false;
+                }
             }
         };
     }    // namespace detail
@@ -252,6 +263,14 @@ namespace hpx {
             id, policy, HPX_FORWARD(Ts, vs)...);
     }
 
+    // Returns true if the action was scheduled locally (no parcel was sent)
+    // and false otherwise. If the id of the client is not available yet, the
+    // invocation is deferred until it is, and false is returned since the
+    // destination is not known at this point. As for any remote invocation,
+    // the arguments are decay-copied (or moved) to be stored for the
+    // deferred call. If the client's id refers to an exception, it is
+    // rethrown if it is already available, or reported using
+    // hpx::report_error once it becomes available.
     HPX_CXX_EXPORT template <typename Action, typename Client, typename Stub,
         typename Data, typename... Ts>
     bool post_p(components::client_base<Client, Stub, Data> const& c,
