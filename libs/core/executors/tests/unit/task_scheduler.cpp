@@ -13,6 +13,7 @@
 
 #include <atomic>
 #include <cstddef>
+#include <exception>
 #include <memory>
 #include <mutex>
 #include <set>
@@ -47,12 +48,6 @@ namespace {
             custom_mock_scheduler const& rhs) noexcept
         {
             return lhs.id == rhs.id;
-        }
-
-        friend bool operator!=(custom_mock_scheduler const& lhs,
-            custom_mock_scheduler const& rhs) noexcept
-        {
-            return !(lhs == rhs);
         }
     };
 

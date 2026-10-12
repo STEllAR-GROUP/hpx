@@ -96,7 +96,7 @@ namespace hpx::execution::experimental {
     // backend method so the backend can avoid heap allocation.
     // Backends that need more can fall back to their own allocation.
     HPX_CXX_CORE_EXPORT inline constexpr std::size_t
-        parallel_scheduler_storage_size = 512;
+        parallel_scheduler_storage_size = 256;
     HPX_CXX_CORE_EXPORT inline constexpr std::size_t
         parallel_scheduler_storage_alignment = alignof(std::max_align_t);
 
