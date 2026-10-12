@@ -437,6 +437,7 @@ namespace hpx { namespace mpi { namespace experimental {
             }
             MPI_Comm_rank(MPI_COMM_WORLD, &detail::get_mpi_info().rank_);
             MPI_Comm_size(MPI_COMM_WORLD, &detail::get_mpi_info().size_);
+            detail::get_mpi_info().mpi_initialized_ = true;
         }
         else
         {
@@ -487,8 +488,13 @@ namespace hpx { namespace mpi { namespace experimental {
             detail::hpx_mpi_errhandler = 0;
         }
 
-        // clean up if we initialized mpi
-        hpx::util::mpi_environment::finalize();
+        // clean up only if we initialized mpi, MPI might still be in use
+        // elsewhere (e.g. by the MPI parcelport) otherwise
+        if (detail::get_mpi_info().mpi_initialized_)
+        {
+            detail::get_mpi_info().mpi_initialized_ = false;
+            hpx::util::mpi_environment::finalize();
+        }
 
         mpi_debug.debug(debug::str<>("Clearing mode"), detail::get_mpi_info(),
             "disable_user_polling");
