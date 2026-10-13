@@ -320,4 +320,45 @@ namespace hpx::threads::detail {
         }
         return false;
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void stop_background_thread(thread_id_ref_type& background_thread,
+        thread_id_ref_type& next_thrd,
+        threads::policies::scheduler_base& scheduler_base,
+        std::size_t const num_thread, background_work_exec_time& exec_time,
+        hpx::execution_base::this_thread::detail::agent_storage*
+            context_storage,
+        std::shared_ptr<bool>& running)
+    {
+        HPX_ASSERT(background_thread);
+        HPX_ASSERT(running);
+        *running = false;
+
+        // do background work in parcel layer and in agas
+        [[maybe_unused]] bool const has_exited =
+            call_background_thread(background_thread, next_thrd, scheduler_base,
+                num_thread, exec_time, context_storage);
+
+        // the background thread should not have been suspended
+        HPX_ASSERT(has_exited);
+
+        // The background thread yielded in the middle of its work (for
+        // instance while waiting for a spinlock) and has not seen the request
+        // to exit yet. Dropping it here would leave that work unfinished for
+        // good, so let the scheduler run it to completion as a regular thread.
+        if (background_thread &&
+            get_thread_id_data(background_thread)->get_state().state() ==
+                thread_schedule_state::pending)
+        {
+            scheduler_base.decrement_background_thread_count();
+            scheduler_base.schedule_thread(HPX_MOVE(background_thread),
+                threads::thread_schedule_hint(
+                    static_cast<std::int16_t>(num_thread)),
+                true);
+            scheduler_base.do_some_work(num_thread);
+        }
+
+        background_thread = thread_id_type();
+        running.reset();
+    }
 }    // namespace hpx::threads::detail

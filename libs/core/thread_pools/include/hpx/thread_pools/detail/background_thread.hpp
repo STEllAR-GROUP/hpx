@@ -73,4 +73,16 @@ namespace hpx::threads::detail {
             context_storage,
         scheduling_callbacks const& callbacks, std::shared_ptr<bool>& running,
         std::int64_t& idle_loop_count);
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Tell the background thread to exit and run it one last time. If it is
+    // still in the middle of its work afterwards, hand it to the scheduler so
+    // that work completes before the worker thread exits.
+    HPX_CORE_EXPORT void stop_background_thread(
+        thread_id_ref_type& background_thread, thread_id_ref_type& next_thrd,
+        threads::policies::scheduler_base& scheduler_base,
+        std::size_t num_thread, background_work_exec_time& exec_time,
+        hpx::execution_base::this_thread::detail::agent_storage*
+            context_storage,
+        std::shared_ptr<bool>& running);
 }    // namespace hpx::threads::detail
