@@ -34,7 +34,7 @@ endif()
 
 # Already applied (a reconfigure re-runs the patch command)?
 execute_process(
-  COMMAND "${GIT_EXECUTABLE}" apply --reverse --check
+  COMMAND "${GIT_EXECUTABLE}" apply --unidiff-zero --reverse --check
           "${HPX_STDEXEC_NVCC_PATCH_FILE}"
   WORKING_DIRECTORY "${HPX_STDEXEC_SOURCE_DIR}"
   RESULT_VARIABLE _hpx_stdexec_nvcc_patch_applied
@@ -45,7 +45,8 @@ if(_hpx_stdexec_nvcc_patch_applied EQUAL 0)
 endif()
 
 execute_process(
-  COMMAND "${GIT_EXECUTABLE}" apply "${HPX_STDEXEC_NVCC_PATCH_FILE}"
+  COMMAND "${GIT_EXECUTABLE}" apply --unidiff-zero
+          "${HPX_STDEXEC_NVCC_PATCH_FILE}"
   WORKING_DIRECTORY "${HPX_STDEXEC_SOURCE_DIR}"
   RESULT_VARIABLE _hpx_stdexec_nvcc_patch_result
   ERROR_VARIABLE _hpx_stdexec_nvcc_patch_error
