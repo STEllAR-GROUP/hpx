@@ -314,11 +314,27 @@ void test_timed_mutex_try_lock_until_retries_while_still_owned()
         });
 
         hpx::threads::thread_id_type const waiter_id = waiter.native_handle();
-        while (waiter_state.load(std::memory_order_acquire) < 1 ||
-            hpx::threads::get_thread_state(waiter_id).state() !=
-                hpx::threads::thread_schedule_state::suspended)
+        bool waiter_suspended = false;
+        while (waiter_state.load(std::memory_order_acquire) < 2)
         {
+            if (waiter_state.load(std::memory_order_acquire) == 1 &&
+                hpx::threads::get_thread_state(waiter_id).state() ==
+                    hpx::threads::thread_schedule_state::suspended)
+            {
+                waiter_suspended = true;
+                break;
+            }
             hpx::this_thread::yield();
+        }
+
+        // the waiter finished before it was observed waiting, report the
+        // missed checkpoint and clean up instead of polling forever
+        if (!waiter_suspended)
+        {
+            mtx.unlock();
+            waiter.join();
+            HPX_TEST(waiter_suspended);
+            continue;
         }
 
         bool owned = true;

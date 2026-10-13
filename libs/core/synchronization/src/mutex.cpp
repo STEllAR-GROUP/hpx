@@ -171,6 +171,15 @@ namespace hpx {
                 return false;
             }
 
+            // abort_all_suspended_threads() resumes waiters with 'abort',
+            // treat it as terminal instead of waiting again
+            if (reason == threads::thread_restart_state::abort)    //-V110
+            {
+                if (run_after)
+                    context_.after_try_lock(false);
+                return false;
+            }
+
             if (reason == threads::thread_restart_state::timeout)    //-V110
             {
                 break;
