@@ -35,7 +35,8 @@ void test(Policy policy)
             std::size_t const iterations = size / stride + (size % stride != 0);
             run([&] {
                 return hpx::experimental::for_loop_n_strided(policy, first,
-                    size, stride, hpx::experimental::induction(index), body);
+                    iterations, stride, hpx::experimental::induction(index),
+                    body);
             });
             HPX_TEST_EQ(index, iterations);
             for (std::size_t i = 0; i != size; ++i)

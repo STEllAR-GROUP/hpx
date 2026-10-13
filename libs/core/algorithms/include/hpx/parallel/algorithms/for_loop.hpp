@@ -846,6 +846,22 @@ namespace hpx::parallel {
             return distance;
         }
 
+        HPX_CXX_CORE_EXPORT template <typename B, typename E>
+        HPX_HOST_DEVICE constexpr std::size_t loop_size(B first, E last)
+        {
+            if constexpr (std::is_integral_v<B> && std::is_signed_v<B> &&
+                std::is_integral_v<E> && std::is_signed_v<E>)
+            {
+                if (first >= last)
+                {
+                    return 0;
+                }
+            }
+
+            return static_cast<std::size_t>(
+                parallel::detail::distance(first, last));
+        }
+
         ///////////////////////////////////////////////////////////////////////
         HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename F,
             typename S = void, typename Tuple = hpx::tuple<>>

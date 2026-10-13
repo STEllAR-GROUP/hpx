@@ -44,26 +44,28 @@ void test_for_loop_n_strided_sender(std::mt19937& gen, LnPolicy ln_policy,
     });
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
+    std::size_t const step = static_cast<std::size_t>(stride);
+    std::size_t const n = (c.size() + step - 1) / step;
 
-    tt::sync_wait(ex::just(iterator(std::begin(c)), c.size(), stride,
-                      [](iterator it) { *it = 42; }) |
-        hpx::experimental::for_loop_n_strided(ex_policy.on(exec)));
+    tt::sync_wait(ex::just(iterator(std::begin(c)), n, stride, [](iterator it) {
+        *it = 42;
+    }) | hpx::experimental::for_loop_n_strided(ex_policy.on(exec)));
 
     // verify values
     std::size_t count = 0;
     for (std::size_t i = 0; i != c.size(); ++i)
     {
-        if (i % stride == 0)    //-V104
+        if (i % step == 0)
         {
             HPX_TEST_EQ(c[i], std::size_t(42));
+            ++count;
         }
         else
         {
             HPX_TEST_NEQ(c[i], std::size_t(42));
         }
-        ++count;
     }
-    HPX_TEST_EQ(count, c.size());
+    HPX_TEST_EQ(count, n);
 }
 
 template <typename IteratorTag>
