@@ -1200,7 +1200,7 @@ if(HPX_WITH_TRACY OR HPX_WITH_ITTNOTIFY)
   hpx_option(
     HPX_WITH_TRACING_LIFECYCLE_EVENTS
     BOOL
-    "Emit per-task lifecycle events (staged, created, executing, yielded, suspended, resumed, completed, deleted). Default: ON."
+    "Emit per-task lifecycle events (staged, created, executing, yielded, suspended, resumed, completed, deleted). Tracy and ITTNotify backends. Default: ON."
     ON
     CATEGORY "Profiling"
   )
@@ -1211,7 +1211,7 @@ if(HPX_WITH_TRACY OR HPX_WITH_ITTNOTIFY)
   hpx_option(
     HPX_WITH_TRACING_WORK_STEALING_EVENTS
     BOOL
-    "Emit work-stealing events when a worker steals a task from another. Default: ON."
+    "Emit work-stealing events when a worker steals a task from another. Tracy and ITTNotify backends. Default: ON."
     ON
     CATEGORY "Profiling"
   )
