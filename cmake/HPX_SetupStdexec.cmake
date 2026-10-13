@@ -50,7 +50,9 @@ if(HPX_WITH_FETCH_STDEXEC)
       "-DHPX_STDEXEC_SPIN_LOOP_PAUSE_FILE=<SOURCE_DIR>/include/stdexec/__detail/__spin_loop_pause.hpp"
       -P ${CMAKE_CURRENT_LIST_DIR}/HPX_PatchStdexecSpinLoopPause.cmake COMMAND
       ${CMAKE_COMMAND} "-DHPX_STDEXEC_SOURCE_DIR=<SOURCE_DIR>"
-      "-DHPX_STDEXEC_PATCH_FILE=${_hpx_stdexec_nested_sender_ctad_patch}" -P
+      "-DHPX_STDEXEC_PATCH_FILE=${_hpx_stdexec_nested_sender_ctad_patch}"
+      "-DHPX_STDEXEC_PATCH_PROBE_FILE=<SOURCE_DIR>/include/stdexec/__detail/__just.hpp"
+      "-DHPX_STDEXEC_PATCH_PROBE_STRING=__sender(just_t, __tuple" -P
       ${CMAKE_CURRENT_LIST_DIR}/HPX_ApplyStdexecPatch.cmake COMMAND
       ${CMAKE_COMMAND} "-DHPX_STDEXEC_SOURCE_DIR=<SOURCE_DIR>"
       "-DHPX_STDEXEC_NVCC_PATCH_FILE=${CMAKE_CURRENT_LIST_DIR}/HPX_StdexecNvccWorkarounds.patch"
