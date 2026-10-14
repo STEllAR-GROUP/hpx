@@ -23,8 +23,8 @@ int hpx_main()
 {
     // use the queue type of the scheduler running this test, so that threads
     // released below are handed back to their queue through it
-    using queue_type =
-        hpx::threads::policies::local_priority_queue_scheduler<>::thread_queue_type;
+    using queue_type = hpx::threads::policies::
+        local_priority_queue_scheduler<>::thread_queue_type;
 
     auto* scheduler = hpx::threads::get_self_id_data()->get_scheduler_base();
 
