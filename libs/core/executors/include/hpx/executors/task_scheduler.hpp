@@ -36,8 +36,8 @@ namespace hpx::execution::experimental {
         // P3927R2: Bulk sender returned by task_scheduler_domain::transform_sender.
         // Adapts bulk_chunked_t and bulk_unchunked_t algorithms to route through
         // the backend's virtual dispatch methods.
-        template <typename ChildSender, typename F, bool IsChunked,
-            bool IsParallel>
+        HPX_CXX_CORE_EXPORT template <typename ChildSender, typename F,
+            bool IsChunked, bool IsParallel>
         struct task_bulk_sender
         {
             using sender_concept = sender_t;
@@ -120,11 +120,30 @@ namespace hpx::execution::experimental {
         // dispatch methods (schedule, schedule_bulk_chunked,
         // schedule_bulk_unchunked) by creating and executing senders from the
         // wrapped scheduler.
-        template <typename Sch>
+        HPX_CXX_CORE_EXPORT template <typename Sch>
         class task_scheduler_backend_wrapper final
           : public parallel_scheduler_backend
         {
         private:
+            struct custom_receiver_env
+            {
+                Sch const* sched_ = nullptr;
+
+                constexpr Sch const& query(
+                    hpx::execution::experimental::get_scheduler_t)
+                    const noexcept
+                {
+                    return *sched_;
+                }
+
+                constexpr Sch const&
+                query(hpx::execution::experimental::get_completion_scheduler_t<
+                    hpx::execution::experimental::set_value_t>) const noexcept
+                {
+                    return *sched_;
+                }
+            };
+
             struct custom_receiver
             {
                 using receiver_concept =
@@ -132,6 +151,7 @@ namespace hpx::execution::experimental {
                 parallel_scheduler_receiver_proxy* proxy_;
                 void (*destroy_)(void*) = nullptr;
                 void* storage_ = nullptr;
+                Sch const* sched_ = nullptr;
 
                 void set_value() noexcept
                 {
@@ -172,10 +192,9 @@ namespace hpx::execution::experimental {
                     proxy->set_stopped();
                 }
 
-                constexpr hpx::execution::experimental::empty_env get_env()
-                    const noexcept
+                constexpr custom_receiver_env get_env() const noexcept
                 {
-                    return {};
+                    return {sched_};
                 }
             };
 
@@ -186,6 +205,7 @@ namespace hpx::execution::experimental {
                 parallel_scheduler_bulk_item_receiver_proxy* proxy_;
                 void (*destroy_)(void*) = nullptr;
                 void* storage_ = nullptr;
+                Sch const* sched_ = nullptr;
 
                 void set_value() noexcept
                 {
@@ -226,10 +246,9 @@ namespace hpx::execution::experimental {
                     proxy->set_stopped();
                 }
 
-                constexpr hpx::execution::experimental::empty_env get_env()
-                    const noexcept
+                constexpr custom_receiver_env get_env() const noexcept
                 {
-                    return {};
+                    return {sched_};
                 }
             };
 
@@ -252,7 +271,8 @@ namespace hpx::execution::experimental {
                         using op_state_t =
                             decltype(hpx::execution::experimental::connect(
                                 HPX_MOVE(snd),
-                                custom_receiver{&proxy, nullptr, nullptr}));
+                                custom_receiver{
+                                    &proxy, nullptr, nullptr, &scheduler_}));
 
                         if constexpr (sizeof(op_state_t) <=
                                 parallel_scheduler_storage_size &&
@@ -271,20 +291,36 @@ namespace hpx::execution::experimental {
                                         hpx::execution::experimental::connect(
                                             HPX_MOVE(snd),
                                             custom_receiver{&proxy, destroy_fn,
-                                                storage.data()}));
+                                                storage.data(), &scheduler_}));
                             hpx::execution::experimental::start(*op);
                         }
                         else
                         {
+                            void* heap_storage =
+                                ::operator new(sizeof(op_state_t),
+                                    std::align_val_t{alignof(op_state_t)});
+
                             auto destroy_fn = [](void* ptr) {
-                                delete static_cast<op_state_t*>(ptr);
+                                static_cast<op_state_t*>(ptr)->~op_state_t();
+                                ::operator delete(
+                                    ptr, std::align_val_t{alignof(op_state_t)});
                             };
 
-                            auto* op = new op_state_t(
-                                hpx::execution::experimental::connect(
-                                    HPX_MOVE(snd),
-                                    custom_receiver{
-                                        &proxy, destroy_fn, nullptr}));
+                            op_state_t* op = nullptr;
+                            try
+                            {
+                                op = ::new (heap_storage) op_state_t(
+                                    hpx::execution::experimental::connect(
+                                        HPX_MOVE(snd),
+                                        custom_receiver{&proxy, destroy_fn,
+                                            heap_storage, &scheduler_}));
+                            }
+                            catch (...)
+                            {
+                                ::operator delete(heap_storage,
+                                    std::align_val_t{alignof(op_state_t)});
+                                throw;
+                            }
                             hpx::execution::experimental::start(*op);
                         }
                     },
@@ -308,15 +344,16 @@ namespace hpx::execution::experimental {
                     [&]() {
                         auto snd =
                             hpx::execution::experimental::schedule(scheduler_) |
-                            hpx::execution::experimental::bulk(
-                                count, [&proxy](std::size_t i) {
-                                    proxy.execute(i, i + 1);
+                            hpx::execution::experimental::bulk_chunked(
+                                hpx::execution::experimental::par, count,
+                                [&proxy](std::size_t begin, std::size_t end) {
+                                    proxy.execute(begin, end);
                                 });
                         using op_state_t =
                             decltype(hpx::execution::experimental::connect(
                                 HPX_MOVE(snd),
                                 custom_bulk_receiver{
-                                    &proxy, nullptr, nullptr}));
+                                    &proxy, nullptr, nullptr, &scheduler_}));
 
                         if constexpr (sizeof(op_state_t) <=
                                 parallel_scheduler_storage_size &&
@@ -329,26 +366,42 @@ namespace hpx::execution::experimental {
                                 static_cast<op_state_t*>(ptr)->~op_state_t();
                             };
 
-                            auto* op =
-                                ::new (static_cast<void*>(storage.data()))
-                                    op_state_t(
-                                        hpx::execution::experimental::connect(
-                                            HPX_MOVE(snd),
-                                            custom_bulk_receiver{&proxy,
-                                                destroy_fn, storage.data()}));
+                            auto* op = ::new (
+                                static_cast<void*>(storage.data()))
+                                op_state_t(
+                                    hpx::execution::experimental::connect(
+                                        HPX_MOVE(snd),
+                                        custom_bulk_receiver{&proxy, destroy_fn,
+                                            storage.data(), &scheduler_}));
                             hpx::execution::experimental::start(*op);
                         }
                         else
                         {
+                            void* heap_storage =
+                                ::operator new(sizeof(op_state_t),
+                                    std::align_val_t{alignof(op_state_t)});
+
                             auto destroy_fn = [](void* ptr) {
-                                delete static_cast<op_state_t*>(ptr);
+                                static_cast<op_state_t*>(ptr)->~op_state_t();
+                                ::operator delete(
+                                    ptr, std::align_val_t{alignof(op_state_t)});
                             };
 
-                            auto* op = new op_state_t(
-                                hpx::execution::experimental::connect(
-                                    HPX_MOVE(snd),
-                                    custom_bulk_receiver{
-                                        &proxy, destroy_fn, nullptr}));
+                            op_state_t* op = nullptr;
+                            try
+                            {
+                                op = ::new (heap_storage) op_state_t(
+                                    hpx::execution::experimental::connect(
+                                        HPX_MOVE(snd),
+                                        custom_bulk_receiver{&proxy, destroy_fn,
+                                            heap_storage, &scheduler_}));
+                            }
+                            catch (...)
+                            {
+                                ::operator delete(heap_storage,
+                                    std::align_val_t{alignof(op_state_t)});
+                                throw;
+                            }
                             hpx::execution::experimental::start(*op);
                         }
                     },
@@ -372,15 +425,16 @@ namespace hpx::execution::experimental {
                     [&]() {
                         auto snd =
                             hpx::execution::experimental::schedule(scheduler_) |
-                            hpx::execution::experimental::bulk(
-                                count, [&proxy](std::size_t i) {
+                            hpx::execution::experimental::bulk_unchunked(
+                                hpx::execution::experimental::par, count,
+                                [&proxy](std::size_t i) {
                                     proxy.execute(i, i + 1);
                                 });
                         using op_state_t =
                             decltype(hpx::execution::experimental::connect(
                                 HPX_MOVE(snd),
                                 custom_bulk_receiver{
-                                    &proxy, nullptr, nullptr}));
+                                    &proxy, nullptr, nullptr, &scheduler_}));
 
                         if constexpr (sizeof(op_state_t) <=
                                 parallel_scheduler_storage_size &&
@@ -393,26 +447,42 @@ namespace hpx::execution::experimental {
                                 static_cast<op_state_t*>(ptr)->~op_state_t();
                             };
 
-                            auto* op =
-                                ::new (static_cast<void*>(storage.data()))
-                                    op_state_t(
-                                        hpx::execution::experimental::connect(
-                                            HPX_MOVE(snd),
-                                            custom_bulk_receiver{&proxy,
-                                                destroy_fn, storage.data()}));
+                            auto* op = ::new (
+                                static_cast<void*>(storage.data()))
+                                op_state_t(
+                                    hpx::execution::experimental::connect(
+                                        HPX_MOVE(snd),
+                                        custom_bulk_receiver{&proxy, destroy_fn,
+                                            storage.data(), &scheduler_}));
                             hpx::execution::experimental::start(*op);
                         }
                         else
                         {
+                            void* heap_storage =
+                                ::operator new(sizeof(op_state_t),
+                                    std::align_val_t{alignof(op_state_t)});
+
                             auto destroy_fn = [](void* ptr) {
-                                delete static_cast<op_state_t*>(ptr);
+                                static_cast<op_state_t*>(ptr)->~op_state_t();
+                                ::operator delete(
+                                    ptr, std::align_val_t{alignof(op_state_t)});
                             };
 
-                            auto* op = new op_state_t(
-                                hpx::execution::experimental::connect(
-                                    HPX_MOVE(snd),
-                                    custom_bulk_receiver{
-                                        &proxy, destroy_fn, nullptr}));
+                            op_state_t* op = nullptr;
+                            try
+                            {
+                                op = ::new (heap_storage) op_state_t(
+                                    hpx::execution::experimental::connect(
+                                        HPX_MOVE(snd),
+                                        custom_bulk_receiver{&proxy, destroy_fn,
+                                            heap_storage, &scheduler_}));
+                            }
+                            catch (...)
+                            {
+                                ::operator delete(heap_storage,
+                                    std::align_val_t{alignof(op_state_t)});
+                                throw;
+                            }
                             hpx::execution::experimental::start(*op);
                         }
                     },
@@ -484,14 +554,25 @@ namespace hpx::execution::experimental {
                 constexpr bool is_parallel =
                     !is_sequenced_policy_v<std::decay_t<decltype(pol.__get())>>;
 
-                constexpr bool move_out = !std::is_lvalue_reference_v<Sender>;
-
-                return detail::task_bulk_sender<std::decay_t<decltype(child)>,
-                    std::decay_t<decltype(f)>, is_chunked, is_parallel>{
-                    task_sched.get_backend(),
-                    static_cast<std::size_t>(is_parallel ? shape : 1),
-                    static_cast<std::size_t>(shape), move_out ? HPX_MOVE(f) : f,
-                    move_out ? HPX_MOVE(child) : child};
+                if constexpr (!std::is_lvalue_reference_v<Sender>)
+                {
+                    return detail::task_bulk_sender<
+                        std::decay_t<decltype(child)>,
+                        std::decay_t<decltype(f)>, is_chunked, is_parallel>{
+                        task_sched.get_backend(),
+                        static_cast<std::size_t>(is_parallel ? shape : 1),
+                        static_cast<std::size_t>(shape), HPX_MOVE(f),
+                        HPX_MOVE(child)};
+                }
+                else
+                {
+                    return detail::task_bulk_sender<
+                        std::decay_t<decltype(child)>,
+                        std::decay_t<decltype(f)>, is_chunked, is_parallel>{
+                        task_sched.get_backend(),
+                        static_cast<std::size_t>(is_parallel ? shape : 1),
+                        static_cast<std::size_t>(shape), f, child};
+                }
             }
             else
             {
@@ -586,7 +667,7 @@ namespace hpx::execution::experimental {
         }
 
         // P3927R2: get_completion_scheduler returns this scheduler.
-        task_scheduler const& query(
+        task_scheduler query(
             get_completion_scheduler_t<set_value_t>) const noexcept
         {
             return *this;
