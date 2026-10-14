@@ -38,6 +38,9 @@ if(HPX_WITH_FETCH_STDEXEC)
   set(_hpx_stdexec_gcc13_nvcc_patch
       "${CMAKE_CURRENT_LIST_DIR}/HPX_StdexecNvccGcc13.patch"
   )
+  set(_hpx_stdexec_sycl_atomic_patch
+      "${CMAKE_CURRENT_LIST_DIR}/HPX_StdexecSyclAtomic.patch"
+  )
 
   include(FetchContent)
   # We only consume stdexec's headers; HPX wraps them with its own `Stdexec`
@@ -70,9 +73,10 @@ if(HPX_WITH_FETCH_STDEXEC)
       "-DHPX_STDEXEC_NVCC_PATCH_FILE=${_hpx_stdexec_gcc13_nvcc_patch}"
       "-DHPX_STDEXEC_NVCC_PATCH_REQUIRED=${_hpx_stdexec_nvcc_patch_required}"
       -P ${CMAKE_CURRENT_LIST_DIR}/HPX_PatchStdexecNvcc.cmake COMMAND
-      ${CMAKE_COMMAND}
-      "-DHPX_STDEXEC_ATOMIC_FILE=<SOURCE_DIR>/include/stdexec/__detail/__atomic.hpp"
-      -P ${CMAKE_CURRENT_LIST_DIR}/HPX_PatchStdexecSyclAtomic.cmake
+      ${CMAKE_COMMAND} "-DHPX_STDEXEC_SOURCE_DIR=<SOURCE_DIR>"
+      "-DHPX_STDEXEC_NVCC_PATCH_FILE=${_hpx_stdexec_sycl_atomic_patch}"
+      "-DHPX_STDEXEC_NVCC_PATCH_REQUIRED=${HPX_WITH_SYCL}" -P
+      ${CMAKE_CURRENT_LIST_DIR}/HPX_PatchStdexecNvcc.cmake
   )
 
   fetchcontent_makeavailable(Stdexec)
@@ -84,13 +88,14 @@ if(HPX_WITH_FETCH_STDEXEC)
                              $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
   )
   if(_hpx_stdexec_nvcc_patch_required)
-    # This changes the sender representation, not just diagnostic names. Export
-    # it to all C++ and CUDA consumers to keep their definitions consistent.
+    # Without this, nvcc 12.8/GCC 13 crashes compiling sync_wait(just(42)). See
+    # HPX_StdexecNvccGcc13.patch for the reproducer. This changes the sender
+    # representation, so export it to both C++ and CUDA consumers.
     target_compile_definitions(Stdexec INTERFACE STDEXEC_DEMANGLE_SENDER_NAMES)
   endif()
   if(HPX_WITH_SYCL)
-    # CUDA's atomic headers conflict with SYCL's __assert_fail declaration.
-    # Keep atomic types consistent across host-only, SYCL and consumer TUs.
+    # CUDA's atomic headers conflict with SYCL's __assert_fail declaration. Keep
+    # atomic types consistent across host-only, SYCL and consumer TUs.
     target_compile_definitions(Stdexec INTERFACE STDEXEC_NO_CUDA_STD_ATOMIC)
   endif()
 
