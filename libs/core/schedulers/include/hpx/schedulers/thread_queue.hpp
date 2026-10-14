@@ -1068,7 +1068,7 @@ namespace hpx::threads::policies {
             std::size_t const max_items_requested = max_items;
 
             thread_description_ptr task_desc;
-            while (work_items_.pop(task_desc, steal))
+            while (max_items != 0 && work_items_.pop(task_desc, steal))
             {
                 if (get_maintain_queue_wait_times_enabled())
                 {

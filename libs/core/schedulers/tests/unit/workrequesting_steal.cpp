@@ -54,7 +54,7 @@ int hpx_main()
     hpx::wait_all(futures);
 
     // a lower bound only, to stay robust on slow or oversubscribed machines
-    HPX_TEST_LT(std::size_t(0), num_stolen.load());
+    HPX_TEST(num_stolen > 0);
 
     return hpx::local::finalize();
 }

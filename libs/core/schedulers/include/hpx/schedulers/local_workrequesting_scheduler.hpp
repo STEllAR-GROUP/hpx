@@ -33,6 +33,7 @@
 #include <random>
 #include <string>
 #include <string_view>
+#include <thread>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -949,7 +950,7 @@ namespace hpx::threads::policies {
                     thrd = thread_id_ref_type{};
                 }
 #else
-                // reserve() does not change size(), append the stolen threads
+                // append the stolen threads to the reserved vector
                 d.queue_->get_next_threads(std::back_inserter(thrds.tasks_),
                     max_num_to_steal, false, true);
 #endif
@@ -1001,6 +1002,11 @@ namespace hpx::threads::policies {
                 return;
             }
 
+            // The victim holds the channel while it dequeues and sends tasks;
+            // if it gets preempted, don't keep spinning for a whole timeslice.
+            constexpr int max_spins = 64;
+            int spins = 0;
+
             auto expected = channel_state::accepting;
             while (!d.task_channel_state_.data_.compare_exchange_weak(expected,
                 channel_state::closed, std::memory_order_acquire,
@@ -1013,7 +1019,15 @@ namespace hpx::threads::policies {
 
                 // a victim is sending tasks right now, wait for it to finish
                 expected = channel_state::accepting;
-                HPX_SMT_PAUSE;
+                if (spins < max_spins)
+                {
+                    ++spins;
+                    HPX_SMT_PAUSE;
+                }
+                else
+                {
+                    std::this_thread::yield();
+                }
             }
         }
 
