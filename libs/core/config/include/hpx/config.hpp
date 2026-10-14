@@ -347,7 +347,7 @@
 // away). Stealing staged tasks early takes load off the pending queue of a
 // busy worker, which all idle workers would otherwise pop from concurrently.
 #if !defined(HPX_IDLE_LOOP_COUNT_STEAL_STAGED)
-#  define HPX_IDLE_LOOP_COUNT_STEAL_STAGED 100
+#  define HPX_IDLE_LOOP_COUNT_STEAL_STAGED 30
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
