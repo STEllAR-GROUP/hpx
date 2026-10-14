@@ -120,9 +120,10 @@ namespace hpx::threads::detail {
 
         // number of empty loop iterations after which staged threads are
         // stolen if fast idle mode is off, see HPX_IDLE_LOOP_COUNT_STEAL_STAGED
-        std::int64_t const steal_staged_threshold = (std::min) (
-            static_cast<std::int64_t>(HPX_IDLE_LOOP_COUNT_STEAL_STAGED),
-            params.max_idle_loop_count_ / 2);
+        std::int64_t const steal_staged_threshold =
+            (std::min) (static_cast<std::int64_t>(
+                            HPX_IDLE_LOOP_COUNT_STEAL_STAGED),
+                params.max_idle_loop_count_ / 2);
 
         auto added = static_cast<std::size_t>(-1);
         thread_id_ref_type next_thrd;
