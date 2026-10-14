@@ -23,9 +23,7 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 --- a/include/stdexec/__detail/__atomic.hpp
 +++ b/include/stdexec/__detail/__atomic.hpp
-@@ -26,7 +26,7 @@
- #  include "__concepts.hpp"  // IWYU pragma: keep for __std::integral
- 
+@@ -28,5 +28,5 @@
  #  if !STDEXEC_USE_MODULES()
 -#    if __has_include(<cuda/std/atomic>)
 +#    if !defined(STDEXEC_NO_CUDA_STD_ATOMIC) && __has_include(<cuda/std/atomic>)
