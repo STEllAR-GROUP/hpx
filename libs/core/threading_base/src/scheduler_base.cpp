@@ -121,8 +121,13 @@ namespace hpx::threads::policies {
         // Only touch the wait data of threads that are actually backing off.
         // Unconditionally writing wait_count would pull the cache line of
         // every (busy) worker into the calling core on each new work item. A
-        // thread that is about to start backing off (wait_count == 0) sleeps
-        // for at most one microsecond before its first re-check.
+        // thread that is about to start backing off (wait_count == 0) is not
+        // notified; its first backoff period is one microsecond.
+        //
+        // As before, the notification is sent without holding wait_mtx: if it
+        // arrives while idle_callback is between incrementing wait_count and
+        // waiting, it is lost and that thread sleeps for the period it has
+        // already computed (at most max_idle_backoff_time).
         auto const wake_up = [this](std::size_t i) noexcept {
             auto& data = wait_count_data_[i].data_;
             if (data.wait_count.load(std::memory_order_relaxed) != 0)
