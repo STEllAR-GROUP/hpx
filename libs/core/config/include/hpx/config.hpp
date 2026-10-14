@@ -341,6 +341,16 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+// Number of consecutive empty thread manager loop executions after which a
+// worker starts stealing staged (not yet converted) tasks from other workers
+// (unless fast idle mode is on, in which case staged tasks are stolen right
+// away). Stealing staged tasks early takes load off the pending queue of a
+// busy worker, which all idle workers would otherwise pop from concurrently.
+#if !defined(HPX_IDLE_LOOP_COUNT_STEAL_STAGED)
+#  define HPX_IDLE_LOOP_COUNT_STEAL_STAGED 100
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 // Count number of busy thread manager loop executions before forcefully
 // cleaning up terminated thread objects
 #if !defined(HPX_BUSY_LOOP_COUNT_MAX)

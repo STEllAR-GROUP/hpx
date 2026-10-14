@@ -18,6 +18,7 @@
 #include <hpx/thread_pools/detail/scheduling_counters.hpp>
 #include <hpx/thread_pools/detail/scheduling_log.hpp>
 
+#include <algorithm>
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
@@ -141,14 +142,19 @@ namespace hpx::threads::detail {
             // stealing staged threads is enabled if:
             // - fast idle mode is on: same as normal stealing
             // - fast idle mode off: only after normal stealing has failed for
-            //                       a while
+            //                       a short while (see
+            //                       HPX_IDLE_LOOP_COUNT_STEAL_STAGED)
             bool enable_stealing_staged = enable_stealing;
             if (enable_stealing_staged &&
                 !scheduler.has_scheduler_mode(
                     policies::scheduler_mode::fast_idle_mode, num_thread))
             {
-                enable_stealing_staged = !may_exit &&
-                    idle_loop_count > params.max_idle_loop_count_ / 2;
+                std::int64_t const steal_staged_threshold =
+                    (std::min) (static_cast<std::int64_t>(
+                                    HPX_IDLE_LOOP_COUNT_STEAL_STAGED),
+                        params.max_idle_loop_count_ / 2);
+                enable_stealing_staged =
+                    !may_exit && idle_loop_count > steal_staged_threshold;
             }
 
             if (HPX_LIKELY(thrd ||
