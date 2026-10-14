@@ -9,7 +9,7 @@ set(tests lockfree_fifo_double_backend schedule_last
 )
 
 if(HPX_WITH_WORK_REQUESTING_SCHEDULERS)
-  list(APPEND tests workrequesting_random_victim)
+  list(APPEND tests workrequesting_random_victim workrequesting_steal)
 endif()
 
 # ##############################################################################

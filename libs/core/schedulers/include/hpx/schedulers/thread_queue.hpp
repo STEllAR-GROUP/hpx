@@ -35,6 +35,7 @@
 #endif
 
 #include <algorithm>
+#include <array>
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
@@ -1091,8 +1092,29 @@ namespace hpx::threads::policies {
 #else
             if constexpr (work_items_type::support_bulk_dequeue)
             {
-                std::size_t const dequeued =
-                    work_items_.pop_bulk(it, work_items_count, steal);
+                // Dequeue raw pointers in chunks and hand over the reference
+                // held by the queue (do not addref, same as the loop below).
+                std::array<thread_description_ptr, 64> chunk;
+
+                std::size_t dequeued = 0;
+                while (dequeued != work_items_count)
+                {
+                    std::size_t const n = work_items_.pop_bulk(chunk.begin(),
+                        (std::min) (chunk.size(), work_items_count - dequeued),
+                        steal);
+                    if (n == 0)
+                    {
+                        break;
+                    }
+
+                    for (std::size_t i = 0; i != n; ++i)
+                    {
+                        *it++ = threads::thread_id_ref_type(
+                            chunk[i], threads::thread_id_addref::no);
+                    }
+                    dequeued += n;
+                }
+
                 work_items_count_.data_ -= dequeued;
                 return dequeued;
             }
