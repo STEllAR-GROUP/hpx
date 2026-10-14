@@ -169,6 +169,9 @@ namespace hpx::threads::detail {
                 idle_loop_count = 0;
                 ++busy_loop_count;
 
+                // stop do_some_work from notifying this (now busy) worker
+                scheduler.reset_idle_backoff(num_thread);
+
                 may_exit = false;
 
                 // Only pending HPX threads will be executed. Any non-pending

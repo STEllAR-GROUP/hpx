@@ -101,6 +101,22 @@ namespace hpx::threads::policies {
 
         bool idle_callback(std::size_t num_thread);
 
+        /// Called by a worker thread that found work: clear its idle backoff
+        /// count (if set), so that do_some_work does not keep notifying it
+        /// while it is busy. Only the worker itself writes here unless the
+        /// count is non-zero, keeping its cache line clean otherwise.
+        void reset_idle_backoff(
+            [[maybe_unused]] std::size_t num_thread) noexcept
+        {
+#if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
+            auto& count = wait_count_data_[num_thread].data_.wait_count;
+            if (count.load(std::memory_order_relaxed) != 0)
+            {
+                count.store(0, std::memory_order_relaxed);
+            }
+#endif
+        }
+
         /// This function gets called by the thread-manager whenever new work
         /// has been added, allowing the scheduler to reactivate one or more of
         /// possibly idling OS threads
