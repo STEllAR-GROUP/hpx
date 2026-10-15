@@ -44,7 +44,12 @@ namespace hpx::threads::policies {
             std::ptrdiff_t small_stacksize = HPX_SMALL_STACK_SIZE,
             std::ptrdiff_t medium_stacksize = HPX_MEDIUM_STACK_SIZE,
             std::ptrdiff_t large_stacksize = HPX_LARGE_STACK_SIZE,
-            std::ptrdiff_t huge_stacksize = HPX_HUGE_STACK_SIZE) noexcept
+            std::ptrdiff_t huge_stacksize = HPX_HUGE_STACK_SIZE,
+            std::int64_t min_tasks_to_steal_staged_early =
+                static_cast<std::int64_t>(
+                    HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_STAGED_EARLY),
+            std::int64_t max_idle_loop_count = static_cast<std::int64_t>(
+                HPX_IDLE_LOOP_COUNT_MAX)) noexcept
           : max_thread_count_(max_thread_count)
           , min_tasks_to_steal_pending_(min_tasks_to_steal_pending)
           , min_tasks_to_steal_staged_(min_tasks_to_steal_staged)
@@ -63,6 +68,8 @@ namespace hpx::threads::policies {
           , large_stacksize_(large_stacksize)
           , huge_stacksize_(huge_stacksize)
           , nostack_stacksize_((std::numeric_limits<std::ptrdiff_t>::max)())
+          , min_tasks_to_steal_staged_early_(min_tasks_to_steal_staged_early)
+          , max_idle_loop_count_(max_idle_loop_count)
         {
         }
 
@@ -82,5 +89,11 @@ namespace hpx::threads::policies {
         std::ptrdiff_t const large_stacksize_;
         std::ptrdiff_t const huge_stacksize_;
         std::ptrdiff_t const nostack_stacksize_;
+
+        // staged tasks are stolen only from queues holding at least this many
+        // of them until max_idle_loop_count_ / 2 empty scheduling loop
+        // iterations (see HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_STAGED_EARLY)
+        std::int64_t min_tasks_to_steal_staged_early_;
+        std::int64_t max_idle_loop_count_;
     };
 }    // namespace hpx::threads::policies

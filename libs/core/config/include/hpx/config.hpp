@@ -346,6 +346,9 @@
 // (unless fast idle mode is on, in which case staged tasks are stolen right
 // away). Stealing staged tasks early takes load off the pending queue of a
 // busy worker, which all idle workers would otherwise pop from concurrently.
+// The local priority queue scheduler steals only from workers that have at
+// least HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_STAGED_EARLY staged tasks until
+// max_idle_loop_count / 2 empty iterations.
 #if !defined(HPX_IDLE_LOOP_COUNT_STEAL_STAGED)
 #  define HPX_IDLE_LOOP_COUNT_STEAL_STAGED 30
 #endif
@@ -375,6 +378,17 @@
 // Minimum number of staged tasks required to steal tasks.
 #if !defined(HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_STAGED)
 #  define HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_STAGED 0
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+// Minimum number of staged tasks a worker must have for other workers to steal
+// staged tasks from it early, i.e. after HPX_IDLE_LOOP_COUNT_STEAL_STAGED
+// instead of max_idle_loop_count / 2 empty loop iterations (used by the local
+// priority queue scheduler). A worker with only a few staged tasks converts
+// them soon itself; stealing those would move them away from the worker they
+// were placed on (and from the data in its caches).
+#if !defined(HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_STAGED_EARLY)
+#  define HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_STAGED_EARLY 10
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
