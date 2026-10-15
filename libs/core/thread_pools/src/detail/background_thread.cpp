@@ -32,6 +32,14 @@ namespace hpx::threads::detail {
 
         background_running = std::make_shared<bool>(true);
 
+        // The references captured below point into the scheduling loop of the
+        // worker creating this thread. background_thread is read only by the
+        // first statement of the thread function and idle_loop_count is
+        // written only while *background_running is true. After this thread
+        // was given to the scheduler (see call_and_create_background_thread
+        // and stop_background_thread) it may run on another worker after the
+        // creating scheduling loop has exited, so callbacks has to stay valid
+        // until a background_() call in flight at that point returns.
         thread_init_data background_init(
             [&, background_running, keep_alive = thread_id_ref_type()](
                 thread_restart_state) mutable -> thread_result_type {
