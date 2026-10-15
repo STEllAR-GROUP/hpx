@@ -19,7 +19,7 @@
 #include "test_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////////
-int seed = std::random_device{}();
+unsigned int seed = std::random_device{}();
 std::mt19937 gen(seed);
 
 constexpr std::size_t num_elements{10007};
@@ -44,17 +44,17 @@ void test_nth_element_sender(
     std::vector<std::size_t> d = c;
 
     auto rand_index = std::rand() % num_elements;
+    auto const nth = static_cast<std::ptrdiff_t>(rand_index);
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-    tt::sync_wait(
-        ex::just(iterator(std::begin(c)), iterator(std::begin(c) + rand_index),
-            iterator(std::end(c))) |
+    tt::sync_wait(ex::just(iterator(std::begin(c)),
+                      iterator(std::begin(c) + nth), iterator(std::end(c))) |
         hpx::nth_element(ex_policy.on(exec)));
 
-    std::nth_element(std::begin(d), std::begin(d) + rand_index, std::end(d));
+    std::nth_element(std::begin(d), std::begin(d) + nth, std::end(d));
 
-    HPX_TEST(*(std::begin(c) + rand_index) == *(std::begin(d) + rand_index));
+    HPX_TEST(*(std::begin(c) + nth) == *(std::begin(d) + nth));
 
     for (size_t k = 0; k < rand_index; k++)
     {
