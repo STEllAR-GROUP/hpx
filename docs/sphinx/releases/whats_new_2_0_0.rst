@@ -19,6 +19,11 @@ General changes
   variants), which select the number of vector lanes explicitly. Execution
   policy properties, including ``num_lanes``, are exposed through
   ``hpx::execution::policy_traits``.
+- ``hpx.thread_queue.min_tasks_to_steal_staged`` now only applies to other
+  workers stealing staged tasks. A worker always converts its own staged
+  tasks, even if there are fewer of them than the configured minimum; before,
+  such tasks were never run, so any non-zero setting could hang applications.
+  The default (``0``) is not affected.
 
 Breaking changes
 ================

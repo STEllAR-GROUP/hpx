@@ -12,6 +12,8 @@ if(HPX_WITH_WORK_REQUESTING_SCHEDULERS)
   list(APPEND tests workrequesting_random_victim)
 endif()
 
+set(min_tasks_to_steal_staged_PARAMETERS THREADS_PER_LOCALITY 4)
+
 # ##############################################################################
 foreach(test ${tests})
   set(sources ${test}.cpp)
@@ -29,3 +31,10 @@ foreach(test ${tests})
 
   add_hpx_unit_test("modules.schedulers" ${test} ${${test}_PARAMETERS})
 endforeach()
+
+# with a single worker nobody else could convert the staged tasks
+add_hpx_unit_test(
+  "modules.schedulers" min_tasks_to_steal_staged_single_worker
+  EXECUTABLE min_tasks_to_steal_staged
+  THREADS_PER_LOCALITY 1
+)
