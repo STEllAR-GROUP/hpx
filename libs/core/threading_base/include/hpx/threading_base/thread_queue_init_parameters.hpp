@@ -48,8 +48,9 @@ namespace hpx::threads::policies {
             std::int64_t min_tasks_to_steal_staged_early =
                 static_cast<std::int64_t>(
                     HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_STAGED_EARLY),
-            std::int64_t max_idle_loop_count = static_cast<std::int64_t>(
-                HPX_IDLE_LOOP_COUNT_MAX)) noexcept
+            std::int64_t idle_loop_count_steal_staged =
+                static_cast<std::int64_t>(
+                    HPX_IDLE_LOOP_COUNT_STEAL_STAGED)) noexcept
           : max_thread_count_(max_thread_count)
           , min_tasks_to_steal_pending_(min_tasks_to_steal_pending)
           , min_tasks_to_steal_staged_(min_tasks_to_steal_staged)
@@ -69,7 +70,7 @@ namespace hpx::threads::policies {
           , huge_stacksize_(huge_stacksize)
           , nostack_stacksize_((std::numeric_limits<std::ptrdiff_t>::max)())
           , min_tasks_to_steal_staged_early_(min_tasks_to_steal_staged_early)
-          , max_idle_loop_count_(max_idle_loop_count)
+          , idle_loop_count_steal_staged_(idle_loop_count_steal_staged)
         {
         }
 
@@ -90,10 +91,13 @@ namespace hpx::threads::policies {
         std::ptrdiff_t const huge_stacksize_;
         std::ptrdiff_t const nostack_stacksize_;
 
-        // staged tasks are stolen only from queues holding at least this many
-        // of them until max_idle_loop_count_ / 2 empty scheduling loop
-        // iterations (see HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_STAGED_EARLY)
+        // used by the local priority queue scheduler: staged tasks are stolen
+        // after idle_loop_count_steal_staged_ empty scheduling loop iterations
+        // already, but only from queues holding at least
+        // min_tasks_to_steal_staged_early_ of them until max_idle_loop_count / 2
+        // iterations (see HPX_IDLE_LOOP_COUNT_STEAL_STAGED and
+        // HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_STAGED_EARLY)
         std::int64_t min_tasks_to_steal_staged_early_;
-        std::int64_t max_idle_loop_count_;
+        std::int64_t idle_loop_count_steal_staged_;
     };
 }    // namespace hpx::threads::policies

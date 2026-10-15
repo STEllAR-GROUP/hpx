@@ -119,10 +119,10 @@ namespace hpx::threads::detail {
                 hpx::execution_base::this_thread::detail::get_agent_storage();
 
         // number of empty loop iterations after which staged threads are
-        // stolen if fast idle mode is off, see HPX_IDLE_LOOP_COUNT_STEAL_STAGED
+        // stolen if fast idle mode is off (max_idle_loop_count / 2, unless the
+        // scheduler starts earlier, see get_steal_staged_threshold)
         std::int64_t const steal_staged_threshold =
-            (std::min) (static_cast<std::int64_t>(
-                            HPX_IDLE_LOOP_COUNT_STEAL_STAGED),
+            (std::min) (scheduler.get_steal_staged_threshold(),
                 params.max_idle_loop_count_ / 2);
 
         auto added = static_cast<std::size_t>(-1);
@@ -149,8 +149,7 @@ namespace hpx::threads::detail {
             // stealing staged threads is enabled if:
             // - fast idle mode is on: same as normal stealing
             // - fast idle mode off: only after normal stealing has failed for
-            //                       a short while (see
-            //                       HPX_IDLE_LOOP_COUNT_STEAL_STAGED)
+            //                       a while (see steal_staged_threshold)
             bool enable_stealing_staged = enable_stealing;
             if (enable_stealing_staged &&
                 !scheduler.has_scheduler_mode(

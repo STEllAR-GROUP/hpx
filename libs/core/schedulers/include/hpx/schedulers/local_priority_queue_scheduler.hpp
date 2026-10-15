@@ -126,6 +126,13 @@ namespace hpx::threads::policies {
           , victims_(num_queues_)
           , thread_numa_domain_(num_queues_, 0)
         {
+            // Start stealing staged tasks soon after a worker ran out of work
+            // (see wait_or_add_new). This takes load off the pending queue of
+            // a busy worker, which all idle workers would otherwise pop from
+            // concurrently.
+            set_steal_staged_threshold(
+                thread_queue_init_.idle_loop_count_steal_staged_);
+
             if (!deferred_initialization)
             {
                 HPX_ASSERT(num_queues_ != 0);
@@ -1604,14 +1611,13 @@ namespace hpx::threads::policies {
 
             if (enable_stealing)
             {
-                // Staged stealing starts early (see
-                // HPX_IDLE_LOOP_COUNT_STEAL_STAGED). Until the worker has been
-                // idle for a long time, only steal from workers that have more
-                // staged tasks than they will convert soon themselves, leaving
-                // the others where they were placed.
+                // Staged stealing starts early (see the constructor). Until the
+                // worker has been idle for max_idle_loop_count / 2 iterations,
+                // only steal from workers that have more staged tasks than they
+                // will convert soon themselves, leaving the others where they
+                // were placed.
                 std::int64_t min_tasks = 0;
-                if (idle_loop_count <=
-                        thread_queue_init_.max_idle_loop_count_ / 2 &&
+                if (idle_loop_count <= get_max_idle_loop_count() / 2 &&
                     !has_scheduler_mode(
                         policies::scheduler_mode::fast_idle_mode, num_thread))
                 {

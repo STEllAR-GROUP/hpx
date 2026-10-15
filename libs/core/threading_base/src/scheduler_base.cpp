@@ -129,10 +129,12 @@ namespace hpx::threads::policies {
         // waiting, it is lost and that thread sleeps for the period it has
         // already computed (at most max_idle_backoff_time).
         auto const wake_up = [this](std::size_t i) noexcept {
+            // read first: most workers are not backing off, keep their cache
+            // lines shared in that case
             auto& data = wait_count_data_[i].data_;
-            if (data.wait_count.load(std::memory_order_relaxed) != 0)
+            if (data.wait_count.load(std::memory_order_relaxed) != 0 &&
+                data.wait_count.exchange(0, std::memory_order_relaxed) != 0)
             {
-                data.wait_count.store(0, std::memory_order_relaxed);
                 data.wait_cond.notify_one();
             }
         };

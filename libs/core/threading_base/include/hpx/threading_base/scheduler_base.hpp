@@ -23,12 +23,14 @@
 #include <hpx/modules/coroutines.hpp>
 #endif
 
+#include <algorithm>
 #include <atomic>
 #include <condition_variable>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
 #include <iosfwd>
+#include <limits>
 #include <memory>
 #include <mutex>
 #include <utility>
@@ -82,6 +84,30 @@ namespace hpx::threads::policies {
         {
             HPX_ASSERT(parent_pool_ == nullptr);
             parent_pool_ = p;
+        }
+
+        /// Set by the owning thread pool: the number of consecutive empty
+        /// scheduling loop iterations after which a worker backs off (see
+        /// hpx.max_idle_loop_count).
+        void set_max_idle_loop_count(std::int64_t count) noexcept
+        {
+            max_idle_loop_count_ = count;
+        }
+
+        [[nodiscard]] std::int64_t get_max_idle_loop_count() const noexcept
+        {
+            return max_idle_loop_count_;
+        }
+
+        /// The number of consecutive empty scheduling loop iterations after
+        /// which a worker starts stealing staged tasks (unless fast idle mode
+        /// is on, in which case they are stolen right away). This is
+        /// max_idle_loop_count / 2, unless the scheduler asked for an earlier
+        /// start (see set_steal_staged_threshold).
+        [[nodiscard]] std::int64_t get_steal_staged_threshold() const noexcept
+        {
+            std::int64_t const late_threshold = max_idle_loop_count_ / 2;
+            return (std::min) (steal_staged_threshold_, late_threshold);
         }
 
         std::size_t global_to_local_thread_index(std::size_t n) const
@@ -301,6 +327,13 @@ namespace hpx::threads::policies {
         }
 
     protected:
+        // allow derived schedulers to start stealing staged tasks earlier than
+        // after max_idle_loop_count / 2 empty scheduling loop iterations
+        void set_steal_staged_threshold(std::int64_t count) noexcept
+        {
+            steal_staged_threshold_ = count;
+        }
+
         // the scheduler mode, protected from false sharing
         std::vector<util::cache_line_data<std::atomic<scheduler_mode>>> modes_;
 
@@ -326,6 +359,11 @@ namespace hpx::threads::policies {
         char const* description_;
 
         thread_queue_init_parameters thread_queue_init_;
+
+        // see set_max_idle_loop_count and get_steal_staged_threshold
+        std::int64_t max_idle_loop_count_ = HPX_IDLE_LOOP_COUNT_MAX;
+        std::int64_t steal_staged_threshold_ =
+            (std::numeric_limits<std::int64_t>::max)();
 
         // the pool that owns this scheduler
         threads::thread_pool_base* parent_pool_;

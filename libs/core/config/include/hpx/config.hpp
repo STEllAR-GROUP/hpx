@@ -341,14 +341,16 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-// Number of consecutive empty thread manager loop executions after which a
-// worker starts stealing staged (not yet converted) tasks from other workers
-// (unless fast idle mode is on, in which case staged tasks are stolen right
-// away). Stealing staged tasks early takes load off the pending queue of a
-// busy worker, which all idle workers would otherwise pop from concurrently.
-// The local priority queue scheduler steals only from workers that have at
-// least HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_STAGED_EARLY staged tasks until
-// max_idle_loop_count / 2 empty iterations.
+// Default number of consecutive empty thread manager loop executions after
+// which a worker of the local priority queue scheduler starts stealing staged
+// (not yet converted) tasks from other workers (unless fast idle mode is on,
+// in which case staged tasks are stolen right away; other schedulers start at
+// max_idle_loop_count / 2). Stealing staged tasks early takes load off the
+// pending queue of a busy worker, which all idle workers would otherwise pop
+// from concurrently. Until max_idle_loop_count / 2 empty iterations, only
+// workers that have at least HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_STAGED_EARLY
+// staged tasks are stolen from. Can be changed at runtime with
+// hpx.thread_queue.idle_loop_count_steal_staged.
 #if !defined(HPX_IDLE_LOOP_COUNT_STEAL_STAGED)
 #  define HPX_IDLE_LOOP_COUNT_STEAL_STAGED 30
 #endif
@@ -386,7 +388,8 @@
 // instead of max_idle_loop_count / 2 empty loop iterations (used by the local
 // priority queue scheduler). A worker with only a few staged tasks converts
 // them soon itself; stealing those would move them away from the worker they
-// were placed on (and from the data in its caches).
+// were placed on (and from the data in its caches). Can be changed at runtime
+// with hpx.thread_queue.min_tasks_to_steal_staged_early.
 #if !defined(HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_STAGED_EARLY)
 #  define HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_STAGED_EARLY 10
 #endif
