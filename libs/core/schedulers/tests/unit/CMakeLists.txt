@@ -36,5 +36,6 @@ endforeach()
 add_hpx_unit_test(
   "modules.schedulers" min_tasks_to_steal_staged_single_worker
   EXECUTABLE min_tasks_to_steal_staged
+  PSEUDO_DEPS_NAME min_tasks_to_steal_staged
   THREADS_PER_LOCALITY 1
 )
