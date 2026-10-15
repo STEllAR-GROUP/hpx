@@ -21,6 +21,7 @@
 #include <hpx/future.hpp>
 #include <hpx/init.hpp>
 #include <hpx/latch.hpp>
+#include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/thread.hpp>
 
@@ -156,7 +157,13 @@ int main(int argc, char* argv[])
 
     hpx::local::init_params init_args;
     init_args.desc_cmdline = desc;
-    init_args.cfg = {"hpx.scheduler=local-priority-fifo"};
+    // the tested behavior is specific to the local priority queue scheduler,
+    // make sure it is used regardless of --hpx:queuing
+    init_args.rp_callback = [](hpx::resource::partitioner& rp,
+                                hpx::program_options::variables_map const&) {
+        rp.create_thread_pool(
+            "default", hpx::resource::scheduling_policy::local_priority_fifo);
+    };
 
     HPX_TEST_EQ(hpx::local::init(hpx_main, argc, argv, init_args), 0);
     return hpx::util::report_errors();
