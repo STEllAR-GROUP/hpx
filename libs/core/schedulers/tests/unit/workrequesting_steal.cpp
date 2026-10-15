@@ -59,7 +59,7 @@ int hpx_main()
     return hpx::local::finalize();
 }
 
-int main(int argc, char* argv[])
+int main(int, char* argv[])
 {
     for (char const* scheduler :
         {"local-workrequesting-fifo", "local-workrequesting-mc"})

@@ -9,9 +9,11 @@
 // whose dequeue loop used to ignore the limit).
 
 #include <hpx/init.hpp>
+#include <hpx/latch.hpp>
 #include <hpx/modules/schedulers.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/threading_base.hpp>
+#include <hpx/thread.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -31,13 +33,17 @@ int hpx_main()
     constexpr std::size_t num_threads = 16;
     constexpr std::size_t max_items = 5;
 
+    // all threads have to run before they can be destroyed
+    hpx::latch done(static_cast<std::ptrdiff_t>(num_threads + 1));
+
     {
         queue_type queue;
 
         for (std::size_t i = 0; i != num_threads; ++i)
         {
             hpx::threads::thread_init_data data(
-                hpx::threads::make_thread_function_nullary([] {}),
+                hpx::threads::make_thread_function_nullary(
+                    [&done] { done.count_down(1); }),
                 "thread_queue_get_next_threads",
                 hpx::threads::thread_priority::normal,
                 hpx::threads::thread_schedule_hint(),
@@ -71,10 +77,28 @@ int hpx_main()
         HPX_TEST_EQ(rest.size(), num_threads - max_items);
         HPX_TEST_EQ(queue.get_pending_queue_length(), std::int64_t(0));
 
-        // release the threads (they are handed back to the queue as
-        // terminated) and recycle them before the queue goes away
+        // run the threads through the scheduler, they are handed back to
+        // this queue once they have terminated
+        for (auto& thrd : taken)
+        {
+            scheduler->schedule_thread(
+                HPX_MOVE(thrd), hpx::threads::thread_schedule_hint(), true);
+        }
+        for (auto& thrd : rest)
+        {
+            scheduler->schedule_thread(
+                HPX_MOVE(thrd), hpx::threads::thread_schedule_hint(), true);
+        }
         taken.clear();
         rest.clear();
+        done.arrive_and_wait();
+
+        // wait for all threads to have terminated and recycle them before the
+        // queue goes away
+        while (queue.get_thread_count() != 0)
+        {
+            hpx::this_thread::yield();
+        }
         queue.cleanup_terminated(true);
     }
 
