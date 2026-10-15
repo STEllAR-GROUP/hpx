@@ -21,6 +21,10 @@ fi
 # These tests only make sense if hpx is being installed
 configure_extra_options+=" -DHPX_WITH_TESTS_EXTERNAL_BUILD=OFF"
 
+# Enable additional handshaking in MPI parcelport to prevent sends from being
+# posted before their corresponding receives under Open MPI multi-threading.
+configure_extra_options+=" -DHPX_WITH_TESTS_COMMAND_LINE=--hpx:ini=hpx.parcel.mpi.ack_handshake!=1"
+
 # Slurm on rostam has MpiDefault=none, so a bare srun (as issued by hpxrun.py)
 # does not provide a PMIx bootstrap and every rank starts as its own
 # single-rank MPI job. Distributed tests then hang in finalization waiting for
