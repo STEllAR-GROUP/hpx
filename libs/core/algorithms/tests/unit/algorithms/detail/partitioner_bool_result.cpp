@@ -51,8 +51,8 @@ void test_partitioner_bool_result(ExPolicy&& policy)
     c[c.size() / 2] = 1;
 
     auto f1 = [](iterator first, std::size_t count) -> bool {
-        return std::find(first, std::next(first, count), 1) !=
-            std::next(first, count);
+        auto const last = std::next(first, static_cast<std::ptrdiff_t>(count));
+        return std::find(first, last, 1) != last;
     };
 
     auto f2 = [](auto&& results) {
