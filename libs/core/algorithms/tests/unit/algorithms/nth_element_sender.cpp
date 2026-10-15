@@ -22,7 +22,7 @@
 int seed = std::random_device{}();
 std::mt19937 gen(seed);
 
-constexpr std::size_t SIZE{10007};
+constexpr std::size_t num_elements{10007};
 
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
 void test_nth_element_sender(
@@ -38,12 +38,12 @@ void test_nth_element_sender(
     namespace tt = hpx::this_thread::experimental;
     using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
 
-    std::vector<std::size_t> c(SIZE);
-    std::generate(
-        std::begin(c), std::end(c), []() { return std::rand() % SIZE; });
+    std::vector<std::size_t> c(num_elements);
+    std::generate(std::begin(c), std::end(c),
+        []() { return std::rand() % num_elements; });
     std::vector<std::size_t> d = c;
 
-    auto rand_index = std::rand() % SIZE;
+    auto rand_index = std::rand() % num_elements;
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
@@ -61,7 +61,7 @@ void test_nth_element_sender(
         HPX_TEST(c[k] <= c[rand_index]);
     }
 
-    for (size_t k = rand_index + 1; k < SIZE; k++)
+    for (size_t k = rand_index + 1; k < num_elements; k++)
     {
         HPX_TEST(c[k] >= c[rand_index]);
     }
