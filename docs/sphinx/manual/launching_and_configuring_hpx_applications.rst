@@ -784,6 +784,10 @@ equivalent CMake variable is ``HPX_WITH_PARCELPORT_MPI`` and has to be set to
      * This property enables acknowledgement handshakes for parcels
        transmitted via MPI to serialize delivery and avoid race conditions
        in multithreaded MPI environments. The default is 0 (disabled).
+   * * ``hpx.parcel.mpi.max_header_receives``
+     * This property defines the number of concurrent MPI wildcard receive
+       buffers pre-posted for incoming parcel headers. A value of 0 (default)
+       automatically sizes the pool based on the communicator size.
 
 The ``hpx.agas`` configuration section
 ......................................
