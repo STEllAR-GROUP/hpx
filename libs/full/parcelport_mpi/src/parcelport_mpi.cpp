@@ -415,7 +415,8 @@ struct hpx::traits::plugin_config_data<
             // number of cores that do background work, default: all
             "background_threads = "
             "${HPX_HAVE_PARCELPORT_MPI_BACKGROUND_THREADS:-1}\n"
-            "sendimm = 0\n";
+            "sendimm = 0\n"
+            "ack_handshake = 0\n";
     }
 };    // namespace hpx::traits
 
