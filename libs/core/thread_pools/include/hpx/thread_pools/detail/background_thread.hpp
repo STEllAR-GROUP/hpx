@@ -76,8 +76,8 @@ namespace hpx::threads::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     // Tell the background thread to exit and run it one last time. If it is
-    // still in the middle of its work afterwards, hand it to the scheduler so
-    // that work completes before the worker thread exits.
+    // still in the middle of its work afterwards (it yielded or was suspended),
+    // leave it to the scheduler to run it to completion as a regular thread.
     HPX_CORE_EXPORT void stop_background_thread(
         thread_id_ref_type& background_thread, thread_id_ref_type& next_thrd,
         threads::policies::scheduler_base& scheduler_base,
