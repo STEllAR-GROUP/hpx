@@ -1291,10 +1291,10 @@ namespace hpx::threads::policies {
                 return !running;
             }
 
-            if (new_tasks_count < parameters_.min_tasks_to_steal_staged_)
-            {
-                return false;
-            }
+            // Note: min_tasks_to_steal_staged_ does not apply here, this queue
+            // converts its own staged tasks (see the overload below for
+            // stealing). Otherwise fewer staged tasks than that minimum would
+            // never be converted.
 
             // No obvious work has to be done, so a lock won't hurt too much.
             //
