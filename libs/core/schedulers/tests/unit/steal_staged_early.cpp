@@ -65,12 +65,14 @@ std::ptrdiff_t run_case(std::ptrdiff_t num_tasks,
         hpx::threads::thread_schedule_hint(0));
 
     // bound threads are never stolen, so this really keeps worker 0 busy
-    hpx::execution::parallel_executor exec0_bound(
-        hpx::threads::thread_priority::bound,
-        hpx::threads::thread_stacksize::default_,
-        hpx::threads::thread_schedule_hint(0));
+    // (launch::task: never run the thread inline, i.e., as a child of a
+    // thread waiting for its future)
+    auto const policy0_bound =
+        hpx::launch::task_policy(hpx::threads::thread_priority::bound,
+            hpx::threads::thread_stacksize::default_,
+            hpx::threads::thread_schedule_hint(0));
 
-    hpx::future<void> busy = hpx::async(exec0_bound, [state] {
+    hpx::future<void> busy = hpx::async(policy0_bound, [state] {
         HPX_TEST_EQ(hpx::get_worker_thread_num(), std::size_t(0));
         state->busy_started = true;
         auto const deadline = std::chrono::steady_clock::now() + 2 * timeout;
@@ -140,9 +142,11 @@ int hpx_main(hpx::program_options::variables_map& vm)
     }
 
     // run the test from a worker other than the one kept busy
-    hpx::execution::parallel_executor exec1(
-        hpx::threads::thread_schedule_hint(1));
-    hpx::async(exec1, [&] { return test(mode); }).get();
+    auto const policy1 =
+        hpx::launch::task_policy(hpx::threads::thread_priority::default_,
+            hpx::threads::thread_stacksize::default_,
+            hpx::threads::thread_schedule_hint(1));
+    hpx::async(policy1, [&] { return test(mode); }).get();
 
     return hpx::local::finalize();
 }
