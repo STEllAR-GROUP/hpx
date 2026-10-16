@@ -36,7 +36,6 @@
 #endif
 
 #include <cstdint>
-#include <cstring>
 #include <exception>
 #include <string>
 #include <system_error>
@@ -335,40 +334,6 @@ namespace hpx::util {
             address, port);
     }
 
-#if defined(HPX_WINDOWS)
-    namespace {
-
-        // IO control command (see asio::basic_socket::io_control) disabling
-        // the retransmission of the SYN of a connection attempt.
-        class no_syn_retransmissions
-        {
-        public:
-            no_syn_retransmissions() noexcept
-            {
-                TCP_INITIAL_RTO_PARAMETERS const params = {
-                    TCP_INITIAL_RTO_UNSPECIFIED_RTT,
-                    TCP_INITIAL_RTO_NO_SYN_RETRANSMISSIONS};
-
-                static_assert(sizeof(params) <= sizeof(data_));
-                std::memcpy(&data_, &params, sizeof(params));
-            }
-
-            static constexpr int name() noexcept
-            {
-                return static_cast<int>(SIO_TCP_INITIAL_RTO);
-            }
-
-            void* data() noexcept
-            {
-                return &data_;
-            }
-
-        private:
-            u_long data_ = 0;
-        };
-    }    // namespace
-#endif
-
     void open_socket_for_connect(::asio::ip::tcp::socket& s,
         ::asio::ip::tcp::endpoint const& ep, std::error_code& ec)
     {
@@ -377,11 +342,16 @@ namespace hpx::util {
 #if defined(HPX_WINDOWS)
         if (!ec)
         {
-            // this is an optimization only, ignore failures
-            no_syn_retransmissions command;
-            std::error_code ignored;
-            // NOLINTNEXTLINE(bugprone-unused-return-value)
-            s.io_control(command, ignored);
+            // Disable the retransmission of the SYN of a connection attempt.
+            // SIO_TCP_INITIAL_RTO is supported by WSAIoctl only (asio's
+            // io_control uses ioctlsocket). This is an optimization only,
+            // ignore failures.
+            TCP_INITIAL_RTO_PARAMETERS params = {
+                TCP_INITIAL_RTO_UNSPECIFIED_RTT,
+                TCP_INITIAL_RTO_NO_SYN_RETRANSMISSIONS};
+            DWORD bytes = 0;
+            WSAIoctl(s.native_handle(), SIO_TCP_INITIAL_RTO, &params,
+                sizeof(params), nullptr, 0, &bytes, nullptr, nullptr);
         }
 #endif
     }
