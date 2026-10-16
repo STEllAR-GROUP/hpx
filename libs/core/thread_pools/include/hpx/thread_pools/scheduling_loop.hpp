@@ -436,23 +436,10 @@ namespace hpx::threads::detail {
                                 // immediately
                                 if (background_thread != nullptr)
                                 {
-                                    HPX_ASSERT(background_running);
-                                    *background_running = false;    //-V522
-
-                                    // do background work in parcel layer and in
-                                    // agas
-                                    [[maybe_unused]] bool const has_exited =
-                                        call_background_thread(
-                                            background_thread, next_thrd,
-                                            scheduler, num_thread,
-                                            bg_work_exec_time_init,
-                                            context_storage);
-
-                                    // the background thread should have exited
-                                    HPX_ASSERT(has_exited);
-
-                                    background_thread.reset();
-                                    background_running.reset();
+                                    stop_background_thread(background_thread,
+                                        next_thrd, scheduler, num_thread,
+                                        bg_work_exec_time_init, context_storage,
+                                        background_running);
                                 }
                                 else
                                 {
@@ -555,20 +542,9 @@ namespace hpx::threads::detail {
 
                 if (background_thread)
                 {
-                    HPX_ASSERT(background_running);
-                    *background_running = false;
-
-                    // do background work in parcel layer and in agas
-                    [[maybe_unused]] bool const has_exited =
-                        call_background_thread(background_thread, next_thrd,
-                            scheduler, num_thread, bg_work_exec_time_init,
-                            context_storage);
-
-                    // the background thread should have exited
-                    HPX_ASSERT(has_exited);
-
-                    background_thread.reset();
-                    background_running.reset();
+                    stop_background_thread(background_thread, next_thrd,
+                        scheduler, num_thread, bg_work_exec_time_init,
+                        context_storage, background_running);
                 }
                 else
                 {
