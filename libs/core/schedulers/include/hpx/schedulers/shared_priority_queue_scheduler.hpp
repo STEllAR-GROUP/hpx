@@ -178,11 +178,10 @@ namespace hpx::threads::policies {
         }
 
         // get/set scheduler mode
-        void set_scheduler_mode(scheduler_mode mode,
-            hpx::threads::mask_cref_type pu_mask) noexcept override
+        scheduler_mode adjust_scheduler_mode(
+            scheduler_mode mode) noexcept override
         {
             // clang-format off
-            scheduler_base::set_scheduler_mode(mode, pu_mask);
             round_robin_ = mode & policies::scheduler_mode::assign_work_round_robin;
             steal_hp_first_ =
                 mode & policies::scheduler_mode::steal_high_priority_first;
@@ -194,6 +193,7 @@ namespace hpx::threads::policies {
                 , core_stealing_ ? "stealing" : "no stealing", ','
                 , numa_stealing_ ? "numa stealing" : "no numa stealing");
             // clang-format on
+            return mode;
         }
 
         // ------------------------------------------------------------
