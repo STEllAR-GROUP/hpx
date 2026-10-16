@@ -356,8 +356,8 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-// Count number of busy thread manager loop executions before forcefully
-// cleaning up terminated thread objects
+// Number of HPX threads a worker thread runs before it does background work
+// in between. Can be changed at runtime with hpx.max_busy_loop_count.
 #if !defined(HPX_BUSY_LOOP_COUNT_MAX)
 #  define HPX_BUSY_LOOP_COUNT_MAX 2000
 #endif
@@ -392,6 +392,29 @@
 // with hpx.thread_queue.min_tasks_to_steal_staged_early.
 #if !defined(HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_STAGED_EARLY)
 #  define HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_STAGED_EARLY 10
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+// Minimum number of pending tasks a worker must have for other workers of the
+// local priority queue scheduler to steal pending tasks from it, until they
+// have been idle for HPX_IDLE_LOOP_COUNT_STEAL_PENDING scheduling loop
+// iterations (not used in fast idle mode). Otherwise, all idle workers pop the
+// few tasks a worker has just converted one by one, contending on its queue,
+// and then go idle together again. Can be changed at runtime with
+// hpx.thread_queue.min_tasks_to_steal_pending_early.
+#if !defined(HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_PENDING_EARLY)
+#  define HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_PENDING_EARLY 4
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+// Number of consecutive empty scheduling loop iterations after which a worker
+// of the local priority queue scheduler steals pending tasks from any other
+// worker again (see HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_PENDING_EARLY). This
+// has to be short: the few tasks queued behind a long running task can only be
+// stolen afterwards. Can be changed at runtime with
+// hpx.thread_queue.idle_loop_count_steal_pending.
+#if !defined(HPX_IDLE_LOOP_COUNT_STEAL_PENDING)
+#  define HPX_IDLE_LOOP_COUNT_STEAL_PENDING 100
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -438,8 +461,9 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-// Maximum sleep time for idle backoff in milliseconds (used only if
-// HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF is defined).
+// Maximum sleep time for idle backoff in microseconds (used only if
+// HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF is defined). Can be changed at runtime
+// with hpx.max_idle_backoff_time.
 #if !defined(HPX_IDLE_BACKOFF_TIME_MAX)
 #  define HPX_IDLE_BACKOFF_TIME_MAX 1000
 #endif

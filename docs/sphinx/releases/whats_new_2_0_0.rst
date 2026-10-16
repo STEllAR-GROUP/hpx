@@ -32,6 +32,16 @@ General changes
   ``hpx.thread_queue.min_tasks_to_steal_staged_early``. New work items now
   only wake workers that are backing off, and a worker that finds work resets
   its own idle backoff.
+- **Bimodal performance**: during their first 100 empty scheduling loop
+  iterations, idle workers of the local priority queue scheduler steal pending
+  tasks only from workers holding at least 4 of them. Before, all idle workers
+  popped the few tasks a worker had just made ready one by one, contending on
+  its queue, which made some applications run at one of two very different
+  speeds. Both values can be changed with the new settings
+  ``hpx.thread_queue.idle_loop_count_steal_pending`` and
+  ``hpx.thread_queue.min_tasks_to_steal_pending_early``. The new section
+  :ref:`thread_scheduler_configuration` describes how the scheduler finds work
+  and all settings that influence it.
 
 Breaking changes
 ================

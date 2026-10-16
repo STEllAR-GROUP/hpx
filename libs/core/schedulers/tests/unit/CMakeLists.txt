@@ -5,8 +5,12 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
-    lockfree_fifo_double_backend min_tasks_to_steal_staged schedule_last
-    schedule_hint_none_stale_queue_6978 steal_staged_early
+    lockfree_fifo_double_backend
+    min_tasks_to_steal_staged
+    schedule_last
+    schedule_hint_none_stale_queue_6978
+    steal_pending_early
+    steal_staged_early
     thread_queue_get_next_threads
 )
 
@@ -21,6 +25,11 @@ set(min_tasks_to_steal_staged_PARAMETERS THREADS_PER_LOCALITY 4)
 set(steal_staged_early_PARAMETERS
     THREADS_PER_LOCALITY 4 ARGS --mode=early
     --hpx:ini=hpx.max_idle_loop_count=1000000000000000
+)
+
+set(steal_pending_early_PARAMETERS
+    THREADS_PER_LOCALITY 4 ARGS --mode=early
+    --hpx:ini=hpx.thread_queue.idle_loop_count_steal_pending=1000000000000000
 )
 
 # ##############################################################################
@@ -63,4 +72,21 @@ add_hpx_unit_test(
   PSEUDO_DEPS_NAME steal_staged_early
   THREADS_PER_LOCALITY 4
   ARGS --mode=fast-idle --hpx:ini=hpx.max_idle_loop_count=1000000000000000
+)
+
+# the same test after the early pending-steal phase and in fast idle mode
+add_hpx_unit_test(
+  "modules.schedulers" steal_pending_early_late
+  EXECUTABLE steal_pending_early
+  PSEUDO_DEPS_NAME steal_pending_early
+  THREADS_PER_LOCALITY 4
+  ARGS --mode=late
+)
+add_hpx_unit_test(
+  "modules.schedulers" steal_pending_early_fast_idle
+  EXECUTABLE steal_pending_early
+  PSEUDO_DEPS_NAME steal_pending_early
+  THREADS_PER_LOCALITY 4
+  ARGS --mode=fast-idle
+       --hpx:ini=hpx.thread_queue.idle_loop_count_steal_pending=1000000000000000
 )
