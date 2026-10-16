@@ -194,8 +194,8 @@ namespace hpx::parallel::util::detail {
         }
 
     private:
-        static constexpr IterOrR next(IterOrR const& target, std::size_t first,
-            [[maybe_unused]] std::size_t size)
+        static constexpr IterOrR next(IterOrR const& target,
+            std::ptrdiff_t first, [[maybe_unused]] std::size_t size)
         {
             if constexpr (is_iterator || std::is_integral_v<IterOrR>)
             {
@@ -447,8 +447,8 @@ namespace hpx::parallel::util::detail {
         }
 
     private:
-        static constexpr IterOrR next(IterOrR const& target, std::size_t first,
-            [[maybe_unused]] std::size_t size)
+        static constexpr IterOrR next(IterOrR const& target,
+            std::ptrdiff_t first, [[maybe_unused]] std::size_t size)
         {
             if constexpr (is_iterator || std::is_integral_v<IterOrR>)
             {

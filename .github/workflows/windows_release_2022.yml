@@ -60,6 +60,9 @@ jobs:
           cmake --build build --config Release \
           --target ALL_BUILD \
           -- -maxcpucount:2 -verbosity:minimal -nologo
+          cmake --build build --config Release \
+          --target chunk_size_iterator_test chunk_size_idx_iterator_test \
+          -- -maxcpucount:2 -verbosity:minimal -nologo
     # HPX_WITH_MALLOC used to be silently ignored on MSVC (the allocator was
     # not linked), make sure the HPX core library really uses mimalloc
     - name: Check that HPX uses mimalloc
@@ -85,5 +88,5 @@ jobs:
           ctest `
           --output-on-failure `
             --build-config Release `
-            --tests-regex tests.examples `
+            --tests-regex 'tests\.examples|tests\.unit\.modules\.algorithms\.detail\.chunk_size_(idx_)?iterator' `
             --exclude-regex $exclude_regex
