@@ -5,11 +5,13 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests lockfree_fifo_double_backend min_tasks_to_steal_staged schedule_last
-          schedule_hint_none_stale_queue_6978
+          schedule_hint_none_stale_queue_6978 thread_queue_get_next_threads
 )
 
 if(HPX_WITH_WORK_REQUESTING_SCHEDULERS)
-  list(APPEND tests workrequesting_random_victim)
+  list(APPEND tests workrequesting_random_victim workrequesting_steal
+       workrequesting_suspend_resume
+  )
 endif()
 
 set(min_tasks_to_steal_staged_PARAMETERS THREADS_PER_LOCALITY 4)
