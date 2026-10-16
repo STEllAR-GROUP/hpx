@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2025 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -24,7 +24,19 @@
 #include <asio/ip/host_name.hpp>
 #include <asio/ip/tcp.hpp>
 
+#if defined(HPX_WINDOWS)
+#include <mstcpip.h>
+// mstcpip.h defines ASSERT if it is not defined, but fails to undefine it
+// again (it checks MSTCPIPDEF_ASSERT_UNDEFINED instead of
+// MSTCPIP_ASSERT_UNDEFINED)
+#if defined(MSTCPIP_ASSERT_UNDEFINED)
+#undef ASSERT
+#undef MSTCPIP_ASSERT_UNDEFINED
+#endif
+#endif
+
 #include <cstdint>
+#include <cstring>
 #include <exception>
 #include <string>
 #include <system_error>
@@ -321,6 +333,57 @@ namespace hpx::util {
         HPX_THROW_EXCEPTION(hpx::error::network_error, "connect_begin",
             "{} (while trying to connect to: {}:{})", errors.get_message(),
             address, port);
+    }
+
+#if defined(HPX_WINDOWS)
+    namespace {
+
+        // IO control command (see asio::basic_socket::io_control) disabling
+        // the retransmission of the SYN of a connection attempt.
+        class no_syn_retransmissions
+        {
+        public:
+            no_syn_retransmissions() noexcept
+            {
+                TCP_INITIAL_RTO_PARAMETERS const params = {
+                    TCP_INITIAL_RTO_UNSPECIFIED_RTT,
+                    TCP_INITIAL_RTO_NO_SYN_RETRANSMISSIONS};
+
+                static_assert(sizeof(params) <= sizeof(data_));
+                std::memcpy(&data_, &params, sizeof(params));
+            }
+
+            static constexpr int name() noexcept
+            {
+                return static_cast<int>(SIO_TCP_INITIAL_RTO);
+            }
+
+            void* data() noexcept
+            {
+                return &data_;
+            }
+
+        private:
+            u_long data_ = 0;
+        };
+    }    // namespace
+#endif
+
+    void open_socket_for_connect(::asio::ip::tcp::socket& s,
+        ::asio::ip::tcp::endpoint const& ep, std::error_code& ec)
+    {
+        // NOLINTNEXTLINE(bugprone-unused-return-value)
+        s.open(ep.protocol(), ec);
+#if defined(HPX_WINDOWS)
+        if (!ec)
+        {
+            // this is an optimization only, ignore failures
+            no_syn_retransmissions command;
+            std::error_code ignored;
+            // NOLINTNEXTLINE(bugprone-unused-return-value)
+            s.io_control(command, ignored);
+        }
+#endif
     }
 
     detail::endpoint_iterator_type accept_begin(std::string const& address,
