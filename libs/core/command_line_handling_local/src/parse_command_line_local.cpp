@@ -594,11 +594,11 @@ namespace hpx::local::detail {
                 "--hpx:queuing=local-workrequesting-mc, "
                 "--hpx:queuing=abp-priority-fifo, and "
                 "--hpx:queuing=abp-priority-lifo only)")
-            ("hpx:numa-sensitive", value<std::size_t>()->implicit_value(0),
+            ("hpx:numa-sensitive", value<std::size_t>()->implicit_value(1),
                 "makes the local-priority scheduler NUMA sensitive ("
                 "allowed values: 0 - no NUMA sensitivity, 1 - allow only for "
                 "boundary cores to steal across NUMA domains, 2 - "
-                "no cross boundary stealing is allowed (default value: 0)")
+                "no cross boundary stealing is allowed (default value: 1)")
         ;
 
         all_options.emplace(options_type::config_options,
