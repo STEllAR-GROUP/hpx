@@ -42,6 +42,12 @@ General changes
   ``hpx.thread_queue.min_tasks_to_steal_pending_early``. The new section
   :ref:`thread_scheduler_configuration` describes how the scheduler finds work
   and all settings that influence it.
+- **Cheaper search for work**: each pending queue of the local priority and
+  local queue schedulers (and their static variants) now keeps a flag that
+  changes only when the queue becomes empty or non-empty. Idle workers looking
+  for tasks to steal check this flag instead of the queue's counter, which
+  changes with every task, so they no longer keep pulling that counter into
+  their caches. This mostly helps with many idle workers.
 
 Breaking changes
 ================
