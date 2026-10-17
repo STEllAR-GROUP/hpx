@@ -21,7 +21,7 @@ namespace hpx::threads::detail {
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \
     defined(HPX_HAVE_THREAD_IDLE_RATES)
-    struct background_work_exec_time
+    HPX_CXX_CORE_EXPORT struct background_work_exec_time
     {
         explicit constexpr background_work_exec_time(
             scheduling_counters& counters) noexcept
@@ -32,7 +32,7 @@ namespace hpx::threads::detail {
         std::int64_t& timer;
     };
 #else
-    struct background_work_exec_time
+    HPX_CXX_CORE_EXPORT struct background_work_exec_time
     {
         constexpr explicit background_work_exec_time(
             scheduling_counters&) noexcept
