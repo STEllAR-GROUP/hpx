@@ -394,8 +394,8 @@ namespace hpx::threads {
 
             // conditionally set/unset this flag
             sched->update_scheduler_mode(
-                policies::scheduler_mode::enable_stealing_numa, !numa_sensitive,
-                full_mask);
+                policies::scheduler_mode::enable_stealing_numa,
+                numa_sensitive != 2, full_mask);
 
             // instantiate the pool
             pool = std::make_unique<
@@ -479,7 +479,8 @@ namespace hpx::threads {
         local_sched_type::init_parameter_type init(
             thread_pool_init.num_threads_, thread_pool_init.affinity_data_,
             num_high_priority_queues, thread_queue_init,
-            "core-abp_priority_queue_scheduler-fifo");
+            "core-abp_priority_queue_scheduler-fifo",
+            static_cast<policies::numa_sensitive_mode>(numa_sensitive));
 
         auto sched = std::make_unique<local_sched_type>(init);
         auto const full_mask =
@@ -491,7 +492,7 @@ namespace hpx::threads {
 
         // conditionally set/unset this flag
         sched->update_scheduler_mode(
-            policies::scheduler_mode::enable_stealing_numa, !numa_sensitive,
+            policies::scheduler_mode::enable_stealing_numa, numa_sensitive != 2,
             full_mask);
 
         // instantiate the pool
@@ -537,7 +538,8 @@ namespace hpx::threads {
         local_sched_type::init_parameter_type init(
             thread_pool_init.num_threads_, thread_pool_init.affinity_data_,
             num_high_priority_queues, thread_queue_init,
-            "core-abp_priority_queue_scheduler-lifo");
+            "core-abp_priority_queue_scheduler-lifo",
+            static_cast<policies::numa_sensitive_mode>(numa_sensitive));
 
         auto sched = std::make_unique<local_sched_type>(init);
         auto const full_mask =
@@ -549,7 +551,7 @@ namespace hpx::threads {
 
         // conditionally set/unset this flag
         sched->update_scheduler_mode(
-            policies::scheduler_mode::enable_stealing_numa, !numa_sensitive,
+            policies::scheduler_mode::enable_stealing_numa, numa_sensitive != 2,
             full_mask);
 
         // instantiate the pool
@@ -588,7 +590,7 @@ namespace hpx::threads {
 
         // conditionally set/unset this flag
         sched->update_scheduler_mode(
-            policies::scheduler_mode::enable_stealing_numa, !numa_sensitive,
+            policies::scheduler_mode::enable_stealing_numa, numa_sensitive != 2,
             full_mask);
 
         // instantiate the pool
@@ -633,7 +635,7 @@ namespace hpx::threads {
 
         // conditionally set/unset this flag
         sched->update_scheduler_mode(
-            policies::scheduler_mode::enable_stealing_numa, !numa_sensitive,
+            policies::scheduler_mode::enable_stealing_numa, numa_sensitive != 2,
             full_mask);
 
         // instantiate the pool
@@ -685,7 +687,7 @@ namespace hpx::threads {
 
         // conditionally set/unset this flag
         sched->update_scheduler_mode(
-            policies::scheduler_mode::enable_stealing_numa, !numa_sensitive,
+            policies::scheduler_mode::enable_stealing_numa, numa_sensitive != 2,
             full_mask);
 
         // instantiate the pool
@@ -738,7 +740,7 @@ namespace hpx::threads {
 
         // conditionally set/unset this flag
         sched->update_scheduler_mode(
-            policies::scheduler_mode::enable_stealing_numa, !numa_sensitive,
+            policies::scheduler_mode::enable_stealing_numa, numa_sensitive != 2,
             full_mask);
 
         // instantiate the pool

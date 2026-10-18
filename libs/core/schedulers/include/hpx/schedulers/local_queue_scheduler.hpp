@@ -18,6 +18,7 @@
 #include <hpx/modules/topology.hpp>
 #include <hpx/schedulers/deadlock_detection.hpp>
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
+#include <hpx/schedulers/queue_helpers.hpp>
 #include <hpx/schedulers/thread_queue.hpp>
 
 #include <atomic>
@@ -360,95 +361,33 @@ namespace hpx::threads::policies {
 
             bool const numa_stealing = has_scheduler_mode(
                 policies::scheduler_mode::enable_stealing_numa, num_thread);
-            if (!numa_stealing ||
-                numa_sensitive_ != numa_sensitive_mode::strict)
-            {
-                // steal work items: first try to steal from other cores in
-                // the same NUMA node
-                std::size_t const pu_number =
-                    affinity_data_.get_pu_num(num_thread);
+            // steal work items: first try to steal from other cores in
+            // the same NUMA node
+            std::size_t const pu_number = affinity_data_.get_pu_num(num_thread);
 
-                // we know that the MIC has one NUMA domain only
+            // we know that the MIC has one NUMA domain only
 #if !defined(HPX_NATIVE_MIC)
-                if (test(steals_in_numa_domain_, pu_number))    //-V600 //-V111
+            if (test(steals_in_numa_domain_, pu_number))    //-V600 //-V111
 #endif
-                {
-                    mask_cref_type this_numa_domain =
-                        numa_domain_masks_[num_thread];
-
-                    // steal thread from other queue
-                    for (std::size_t i = 1; i != queues_size; ++i)
-                    {
-                        // FIXME: Do a better job here.
-                        std::size_t const idx = (i + num_thread) % queues_size;
-
-                        HPX_ASSERT(idx != num_thread);
-
-                        if (std::size_t const pu_num =
-                                affinity_data_.get_pu_num(idx);
-                            !test(this_numa_domain,
-                                pu_num))    //-V560 //-V600 //-V111
-                        {
-                            continue;
-                        }
-
-                        thread_queue_type* q = queues_[idx];
-                        if (q->get_next_thread(thrd, running))
-                        {
-                            q->increment_num_stolen_from_pending();
-                            queues_[num_thread]
-                                ->increment_num_stolen_to_pending();
-                            return true;
-                        }
-                    }
-                }
-
-                // we know that the MIC has one NUMA domain only)
-#if !defined(HPX_NATIVE_MIC)
-                // if nothing found, ask everybody else
-                if (numa_stealing &&
-                    numa_sensitive_ != numa_sensitive_mode::strict &&
-                    test(steals_outside_numa_domain_,
-                        pu_number))    //-V600 //-V111
-                {
-                    mask_cref_type numa_domain =
-                        outside_numa_domain_masks_[num_thread];
-
-                    // steal thread from other queue
-                    for (std::size_t i = 1; i != queues_size; ++i)
-                    {
-                        // FIXME: Do a better job here.
-                        std::size_t const idx = (i + num_thread) % queues_size;
-
-                        HPX_ASSERT(idx != num_thread);
-
-                        std::size_t const pu_num =
-                            affinity_data_.get_pu_num(idx);
-                        if (!test(numa_domain,
-                                pu_num))    //-V560 //-V600 //-V111
-                            continue;
-
-                        thread_queue_type* q = queues_[idx];
-                        if (q->get_next_thread(thrd, running))
-                        {
-                            q->increment_num_stolen_from_pending();
-                            queues_[num_thread]
-                                ->increment_num_stolen_to_pending();
-                            return true;
-                        }
-                    }
-                }
-#endif
-            }
-
-            else    // not NUMA-sensitive - numa stealing ok
             {
+                mask_cref_type this_numa_domain =
+                    numa_domain_masks_[num_thread];
+
+                // steal thread from other queue
                 for (std::size_t i = 1; i != queues_size; ++i)
                 {
                     // FIXME: Do a better job here.
                     std::size_t const idx = (i + num_thread) % queues_size;
 
                     HPX_ASSERT(idx != num_thread);
+
+                    if (std::size_t const pu_num =
+                            affinity_data_.get_pu_num(idx);
+                        !test(this_numa_domain,
+                            pu_num))    //-V560 //-V600 //-V111
+                    {
+                        continue;
+                    }
 
                     thread_queue_type* q = queues_[idx];
                     if (q->get_next_thread(thrd, running))
@@ -459,6 +398,41 @@ namespace hpx::threads::policies {
                     }
                 }
             }
+
+            // we know that the MIC has one NUMA domain only)
+#if !defined(HPX_NATIVE_MIC)
+            // if nothing found, ask everybody else
+            if (numa_stealing &&
+                numa_sensitive_ != numa_sensitive_mode::strict &&
+                test(steals_outside_numa_domain_,
+                    pu_number))    //-V600 //-V111
+            {
+                mask_cref_type numa_domain =
+                    outside_numa_domain_masks_[num_thread];
+
+                // steal thread from other queue
+                for (std::size_t i = 1; i != queues_size; ++i)
+                {
+                    // FIXME: Do a better job here.
+                    std::size_t const idx = (i + num_thread) % queues_size;
+
+                    HPX_ASSERT(idx != num_thread);
+
+                    std::size_t const pu_num = affinity_data_.get_pu_num(idx);
+                    if (!test(numa_domain,
+                            pu_num))    //-V560 //-V600 //-V111
+                        continue;
+
+                    thread_queue_type* q = queues_[idx];
+                    if (q->get_next_thread(thrd, running))
+                    {
+                        q->increment_num_stolen_from_pending();
+                        queues_[num_thread]->increment_num_stolen_to_pending();
+                        return true;
+                    }
+                }
+            }
+#endif
 
             return false;
         }
@@ -740,93 +714,64 @@ namespace hpx::threads::policies {
             // limited or no stealing across domains
             bool const numa_stealing = has_scheduler_mode(
                 policies::scheduler_mode::enable_stealing_numa, num_thread);
-            if (!numa_stealing ||
-                numa_sensitive_ != numa_sensitive_mode::strict)
-            {
-                // steal work items: first try to steal from other cores in the
-                // same NUMA node
-                std::size_t const pu_number =
-                    affinity_data_.get_pu_num(num_thread);
+            // steal work items: first try to steal from other cores in the
+            // same NUMA node
+            std::size_t const pu_number = affinity_data_.get_pu_num(num_thread);
 
-                // we know that the MIC has one NUMA domain only
+            // we know that the MIC has one NUMA domain only
 #if !defined(HPX_NATIVE_MIC)
-                if (test(steals_in_numa_domain_, pu_number))    //-V600 //-V111
+            if (test(steals_in_numa_domain_, pu_number))    //-V600 //-V111
 #endif
-                {
-                    mask_cref_type numa_domain_mask =
-                        numa_domain_masks_[num_thread];
-                    for (std::size_t i = 1; i != queues_size; ++i)
-                    {
-                        // FIXME: Do a better job here.
-                        std::size_t const idx = (i + num_thread) % queues_size;
-
-                        HPX_ASSERT(idx != num_thread);
-
-                        if (!test(numa_domain_mask,
-                                affinity_data_.get_pu_num(idx)))    //-V600
-                        {
-                            continue;
-                        }
-                        result = queues_[num_thread]->wait_or_add_new(
-                                     running, added, queues_[idx]) &&
-                            result;
-                        if (0 != added)
-                        {
-                            queues_[idx]->increment_num_stolen_from_staged(
-                                added);
-                            queues_[num_thread]->increment_num_stolen_to_staged(
-                                added);
-                            return result;
-                        }
-                    }
-                }
-
-                // we know that the MIC has one NUMA domain only)
-#if !defined(HPX_NATIVE_MIC)
-                // if nothing found, ask everybody else
-                if (numa_stealing &&
-                    numa_sensitive_ != numa_sensitive_mode::strict &&
-                    test(steals_outside_numa_domain_,
-                        pu_number))    //-V600 //-V111
-                {
-                    mask_cref_type numa_domain_mask =
-                        outside_numa_domain_masks_[num_thread];
-                    for (std::size_t i = 1; i != queues_size; ++i)
-                    {
-                        // FIXME: Do a better job here.
-                        std::size_t const idx = (i + num_thread) % queues_size;
-
-                        HPX_ASSERT(idx != num_thread);
-
-                        if (!test(numa_domain_mask,
-                                affinity_data_.get_pu_num(idx)))    //-V600
-                        {
-                            continue;
-                        }
-
-                        result = queues_[num_thread]->wait_or_add_new(
-                                     running, added, queues_[idx]) &&
-                            result;
-                        if (0 != added)
-                        {
-                            queues_[idx]->increment_num_stolen_from_staged(
-                                added);
-                            queues_[num_thread]->increment_num_stolen_to_staged(
-                                added);
-                            return result;
-                        }
-                    }
-                }
-#endif
-            }
-            else    // not NUMA-sensitive : numa stealing ok
             {
+                mask_cref_type numa_domain_mask =
+                    numa_domain_masks_[num_thread];
                 for (std::size_t i = 1; i != queues_size; ++i)
                 {
                     // FIXME: Do a better job here.
                     std::size_t const idx = (i + num_thread) % queues_size;
 
                     HPX_ASSERT(idx != num_thread);
+
+                    if (!test(numa_domain_mask,
+                            affinity_data_.get_pu_num(idx)))    //-V600
+                    {
+                        continue;
+                    }
+                    result = queues_[num_thread]->wait_or_add_new(
+                                 running, added, queues_[idx]) &&
+                        result;
+                    if (0 != added)
+                    {
+                        queues_[idx]->increment_num_stolen_from_staged(added);
+                        queues_[num_thread]->increment_num_stolen_to_staged(
+                            added);
+                        return result;
+                    }
+                }
+            }
+
+            // we know that the MIC has one NUMA domain only)
+#if !defined(HPX_NATIVE_MIC)
+            // if nothing found, ask everybody else
+            if (numa_stealing &&
+                numa_sensitive_ != numa_sensitive_mode::strict &&
+                test(steals_outside_numa_domain_,
+                    pu_number))    //-V600 //-V111
+            {
+                mask_cref_type numa_domain_mask =
+                    outside_numa_domain_masks_[num_thread];
+                for (std::size_t i = 1; i != queues_size; ++i)
+                {
+                    // FIXME: Do a better job here.
+                    std::size_t const idx = (i + num_thread) % queues_size;
+
+                    HPX_ASSERT(idx != num_thread);
+
+                    if (!test(numa_domain_mask,
+                            affinity_data_.get_pu_num(idx)))    //-V600
+                    {
+                        continue;
+                    }
 
                     result = queues_[num_thread]->wait_or_add_new(
                                  running, added, queues_[idx]) &&
@@ -840,6 +785,7 @@ namespace hpx::threads::policies {
                     }
                 }
             }
+#endif
 
 #ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
             // no new work is available, are we deadlocked?
@@ -910,18 +856,36 @@ namespace hpx::threads::policies {
             else
                 first_mask = core_mask;
 
-            if (numa_sensitive_ != numa_sensitive_mode::strict &&
-                has_scheduler_mode(
-                    policies::scheduler_mode::enable_stealing_numa,
-                    num_thread) &&
-                (numa_sensitive_ == numa_sensitive_mode::none ||
-                    any(first_mask & core_mask)))
+            if (has_scheduler_mode(
+                    policies::scheduler_mode::enable_stealing_numa, num_thread))
             {
+                std::size_t num_nodes = topo.get_number_of_numa_nodes();
+                if (num_nodes == 0)
+                    num_nodes = 1;
+
+                auto const remote_domains = detail::get_numa_stealing_domains(
+                    numa_sensitive_, topo.get_numa_node_number(num_pu),
+                    num_nodes, any(first_mask & core_mask),
+                    [&topo](std::size_t from, std::size_t to) {
+                        return topo.get_numa_distance(from, to);
+                    });
+
+                if (remote_domains.empty())
+                    return;
+
 #if !defined(HPX_NATIVE_MIC)    // we know that the MIC has one NUMA domain only
                 set(steals_outside_numa_domain_, num_pu);
 #endif
+                mask_type outside_numa_domain_mask = mask_type();
+                resize(outside_numa_domain_mask, mask_size(machine_mask));
+                for (std::size_t domain : remote_domains)
+                {
+                    outside_numa_domain_mask |=
+                        topo.init_numa_node_affinity_mask_from_numa_node(
+                            domain);
+                }
                 outside_numa_domain_masks_[num_thread] =
-                    not_(node_mask) & machine_mask;
+                    outside_numa_domain_mask & machine_mask;
             }
         }
 
