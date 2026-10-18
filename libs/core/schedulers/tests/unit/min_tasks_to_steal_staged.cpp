@@ -12,6 +12,7 @@
 #include <hpx/future.hpp>
 #include <hpx/init.hpp>
 #include <hpx/latch.hpp>
+#include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/thread.hpp>
 
@@ -19,6 +20,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <string>
 
 constexpr std::ptrdiff_t min_tasks = 10;
 
@@ -82,9 +84,27 @@ int hpx_main()
 
 int main(int argc, char* argv[])
 {
+    hpx::program_options::options_description desc(
+        "Usage: " HPX_APPLICATION_STRING " [options]");
+    desc.add_options()("scheduler",
+        hpx::program_options::value<std::string>()->default_value("default"),
+        "default (as selected by --hpx:queuing) | workrequesting");
+
     hpx::local::init_params init_args;
+    init_args.desc_cmdline = desc;
     init_args.cfg = {"hpx.thread_queue.min_tasks_to_steal_staged=10",
         "hpx.thread_queue.min_tasks_to_steal_pending=10"};
+
+    // select the scheduler through the resource partitioner instead of
+    // --hpx:queuing, which may be given on the command line already
+    init_args.rp_callback = [](hpx::resource::partitioner& rp,
+                                hpx::program_options::variables_map const& vm) {
+        if (vm["scheduler"].as<std::string>() == "workrequesting")
+        {
+            rp.create_thread_pool("default",
+                hpx::resource::scheduling_policy::local_workrequesting_fifo);
+        }
+    };
 
     HPX_TEST_EQ(hpx::local::init(hpx_main, argc, argv, init_args), 0);
     return hpx::util::report_errors();
