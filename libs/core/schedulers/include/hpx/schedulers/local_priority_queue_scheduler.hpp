@@ -738,18 +738,17 @@ namespace hpx::threads::policies {
 #endif
                 };
 
+            victims const& victim_data = victims_[num_thread].data_;
             std::vector<std::size_t> const& victim_threads =
-                victims_[num_thread].data_.victim_threads_;
-            std::size_t const victim_count = victim_threads.size();
+                victim_data.victim_threads_;
+            std::size_t const victim_count =
+                has_scheduler_mode(
+                    policies::scheduler_mode::enable_stealing_numa,
+                    num_thread) ?
+                victim_threads.size() :
+                victim_data.local_victim_count_;
             if (victim_count == 0)
                 return false;
-
-            bool const numa_stealing = has_scheduler_mode(
-                policies::scheduler_mode::enable_stealing_numa, num_thread);
-            auto const is_eligible_victim = [&](std::size_t idx) {
-                return numa_stealing ||
-                    thread_numa_domain_[idx] == thread_numa_domain_[num_thread];
-            };
 
             auto const steal = [&](std::size_t idx) -> bool {
                 HPX_ASSERT(idx != num_thread);
@@ -795,16 +794,14 @@ namespace hpx::threads::policies {
             {
                 return for_each_circular(offset % victim_count, victim_count,
                     [&](std::size_t const i) {
-                        std::size_t const idx = victim_threads[i];
-                        return is_eligible_victim(idx) && steal_hp(idx);
+                        return steal_hp(victim_threads[i]);
                     });
             }
             else
             {
                 return for_each_circular(offset % victim_count, victim_count,
                     [&](std::size_t const i) {
-                        std::size_t const idx = victim_threads[i];
-                        return is_eligible_victim(idx) && steal(idx);
+                        return steal(victim_threads[i]);
                     });
             }
         }
@@ -1462,18 +1459,17 @@ namespace hpx::threads::policies {
 #endif
                 };
 
+            victims const& victim_data = victims_[num_thread].data_;
             std::vector<std::size_t> const& victim_threads =
-                victims_[num_thread].data_.victim_threads_;
-            std::size_t const victim_count = victim_threads.size();
+                victim_data.victim_threads_;
+            std::size_t const victim_count =
+                has_scheduler_mode(
+                    policies::scheduler_mode::enable_stealing_numa,
+                    num_thread) ?
+                victim_threads.size() :
+                victim_data.local_victim_count_;
             if (victim_count == 0)
                 return false;
-
-            bool const numa_stealing = has_scheduler_mode(
-                policies::scheduler_mode::enable_stealing_numa, num_thread);
-            auto const is_eligible_victim = [&](std::size_t idx) {
-                return numa_stealing ||
-                    thread_numa_domain_[idx] == thread_numa_domain_[num_thread];
-            };
 
             bool result = true;
 
@@ -1531,8 +1527,7 @@ namespace hpx::threads::policies {
             {
                 if (for_each_circular(offset % victim_count, victim_count,
                         [&](std::size_t const i) {
-                            std::size_t const idx = victim_threads[i];
-                            return is_eligible_victim(idx) && steal_hp(idx);
+                            return steal_hp(victim_threads[i]);
                         }))
                     return result;
             }
@@ -1540,8 +1535,7 @@ namespace hpx::threads::policies {
             {
                 if (for_each_circular(offset % victim_count, victim_count,
                         [&](std::size_t const i) {
-                            std::size_t const idx = victim_threads[i];
-                            return is_eligible_victim(idx) && steal(idx);
+                            return steal(victim_threads[i]);
                         }))
                     return result;
             }
@@ -1796,6 +1790,9 @@ namespace hpx::threads::policies {
                     any(numa_mask & numa_masks[other_num_thread]);
             });
 
+            victims_[num_thread].data_.local_victim_count_ =
+                victim_threads.size();
+
             // Cache remote victims allowed by the configured NUMA sensitivity.
             // The scheduler mode is checked for every steal attempt so that
             // runtime mode changes take effect without rebuilding this list.
@@ -1910,13 +1907,14 @@ namespace hpx::threads::policies {
         struct victims
         {
             std::vector<std::size_t> victim_threads_;
+            std::size_t local_victim_count_ = 0;
             std::size_t victim_offset_ = 0;
         };
         std::vector<util::cache_line_data<victims>> victims_;
 
         // NUMA domain index for each worker thread, indexed by thread number.
         // Populated during on_start_thread(); used for NUMA-hint routing in
-        // create_thread() and for distance-ordered victim list construction.
+        // create_thread().
         std::vector<std::size_t> thread_numa_domain_;
     };    // namespace hpx::threads::policies
 }    // namespace hpx::threads::policies
