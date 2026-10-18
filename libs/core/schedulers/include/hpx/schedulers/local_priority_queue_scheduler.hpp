@@ -81,7 +81,8 @@ namespace hpx::threads::policies {
                 thread_queue_init_parameters const& thread_queue_init =
                     thread_queue_init_parameters{},
                 char const* description = "local_priority_queue_scheduler",
-                std::size_t numa_sensitive = 0) noexcept
+                numa_sensitive_mode numa_sensitive =
+                    numa_sensitive_mode::boundary) noexcept
               : num_queues_(num_queues)
               , num_high_priority_queues_(
                     num_high_priority_queues == static_cast<std::size_t>(-1) ?
@@ -101,7 +102,7 @@ namespace hpx::threads::policies {
               , num_high_priority_queues_(num_queues)
               , affinity_data_(affinity_data)
               , description_(description)
-              , numa_sensitive_(0)
+              , numa_sensitive_(numa_sensitive_mode::boundary)
             {
             }
 
@@ -110,7 +111,7 @@ namespace hpx::threads::policies {
             thread_queue_init_parameters thread_queue_init_;
             detail::affinity_data const& affinity_data_;
             char const* description_;
-            std::size_t numa_sensitive_;
+            numa_sensitive_mode numa_sensitive_;
         };
         using init_parameter_type = init_parameter;
 
@@ -1781,10 +1782,11 @@ namespace hpx::threads::policies {
             if (has_scheduler_mode(
                     policies::scheduler_mode::enable_stealing_numa,
                     num_thread) &&
-                numa_sensitive_ != 2 &&
-                (numa_sensitive_ == 0 || any(first_mask & pu_mask)))
+                numa_sensitive_ != numa_sensitive_mode::strict &&
+                (numa_sensitive_ == numa_sensitive_mode::none ||
+                    any(first_mask & pu_mask)))
             {
-                if (numa_sensitive_ == 0)
+                if (numa_sensitive_ == numa_sensitive_mode::none)
                 {
                     iterate([&](std::size_t const other_num_thread) {
                         return !any(numa_mask & numa_masks[other_num_thread]);
@@ -1877,7 +1879,7 @@ namespace hpx::threads::policies {
         util::cache_aligned_data_derived<std::atomic<std::size_t>> curr_queue_;
 
         detail::affinity_data const& affinity_data_;
-        std::size_t const numa_sensitive_;
+        numa_sensitive_mode const numa_sensitive_;
 
         std::size_t const num_queues_;
         std::size_t const num_high_priority_queues_;

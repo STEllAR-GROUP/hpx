@@ -183,7 +183,8 @@ namespace hpx::threads {
 
         local_sched_type::init_parameter_type init(
             thread_pool_init.num_threads_, thread_pool_init.affinity_data_,
-            thread_queue_init, "core-local_queue_scheduler", numa_sensitive);
+            thread_queue_init, "core-local_queue_scheduler",
+            static_cast<policies::numa_sensitive_mode>(numa_sensitive));
 
         auto sched = std::make_unique<local_sched_type>(init);
         auto const full_mask =
@@ -228,7 +229,8 @@ namespace hpx::threads {
         local_sched_type::init_parameter_type init(
             thread_pool_init.num_threads_, thread_pool_init.affinity_data_,
             num_high_priority_queues, thread_queue_init,
-            "core-local_priority_queue_scheduler-fifo", numa_sensitive);
+            "core-local_priority_queue_scheduler-fifo",
+            static_cast<policies::numa_sensitive_mode>(numa_sensitive));
 
         auto sched = std::make_unique<local_sched_type>(init);
         auto const full_mask =
@@ -273,7 +275,8 @@ namespace hpx::threads {
         local_sched_type::init_parameter_type init(
             thread_pool_init.num_threads_, thread_pool_init.affinity_data_,
             num_high_priority_queues, thread_queue_init,
-            "core-local_priority_queue_scheduler-fifo_double", numa_sensitive);
+            "core-local_priority_queue_scheduler-fifo_double",
+            static_cast<policies::numa_sensitive_mode>(numa_sensitive));
 
         auto sched = std::make_unique<local_sched_type>(init);
         auto const full_mask =
@@ -319,7 +322,8 @@ namespace hpx::threads {
         local_sched_type::init_parameter_type init(
             thread_pool_init.num_threads_, thread_pool_init.affinity_data_,
             num_high_priority_queues, thread_queue_init,
-            "core-local_priority_queue_scheduler-lifo", numa_sensitive);
+            "core-local_priority_queue_scheduler-lifo",
+            static_cast<policies::numa_sensitive_mode>(numa_sensitive));
 
         auto sched = std::make_unique<local_sched_type>(init);
         auto const full_mask =
@@ -475,7 +479,8 @@ namespace hpx::threads {
         local_sched_type::init_parameter_type init(
             thread_pool_init.num_threads_, thread_pool_init.affinity_data_,
             num_high_priority_queues, thread_queue_init,
-            "core-abp_priority_queue_scheduler-fifo", numa_sensitive);
+            "core-abp_priority_queue_scheduler-fifo",
+            static_cast<policies::numa_sensitive_mode>(numa_sensitive));
 
         auto sched = std::make_unique<local_sched_type>(init);
         auto const full_mask =
@@ -533,7 +538,8 @@ namespace hpx::threads {
         local_sched_type::init_parameter_type init(
             thread_pool_init.num_threads_, thread_pool_init.affinity_data_,
             num_high_priority_queues, thread_queue_init,
-            "core-abp_priority_queue_scheduler-lifo", numa_sensitive);
+            "core-abp_priority_queue_scheduler-lifo",
+            static_cast<policies::numa_sensitive_mode>(numa_sensitive));
 
         auto sched = std::make_unique<local_sched_type>(init);
         auto const full_mask =
