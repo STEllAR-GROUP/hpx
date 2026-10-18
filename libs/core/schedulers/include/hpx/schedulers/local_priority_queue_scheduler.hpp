@@ -744,6 +744,13 @@ namespace hpx::threads::policies {
             if (victim_count == 0)
                 return false;
 
+            bool const numa_stealing = has_scheduler_mode(
+                policies::scheduler_mode::enable_stealing_numa, num_thread);
+            auto const is_eligible_victim = [&](std::size_t idx) {
+                return numa_stealing ||
+                    thread_numa_domain_[idx] == thread_numa_domain_[num_thread];
+            };
+
             auto const steal = [&](std::size_t idx) -> bool {
                 HPX_ASSERT(idx != num_thread);
 
@@ -788,14 +795,16 @@ namespace hpx::threads::policies {
             {
                 return for_each_circular(offset % victim_count, victim_count,
                     [&](std::size_t const i) {
-                        return steal_hp(victim_threads[i]);
+                        std::size_t const idx = victim_threads[i];
+                        return is_eligible_victim(idx) && steal_hp(idx);
                     });
             }
             else
             {
                 return for_each_circular(offset % victim_count, victim_count,
                     [&](std::size_t const i) {
-                        return steal(victim_threads[i]);
+                        std::size_t const idx = victim_threads[i];
+                        return is_eligible_victim(idx) && steal(idx);
                     });
             }
         }
@@ -1459,6 +1468,13 @@ namespace hpx::threads::policies {
             if (victim_count == 0)
                 return false;
 
+            bool const numa_stealing = has_scheduler_mode(
+                policies::scheduler_mode::enable_stealing_numa, num_thread);
+            auto const is_eligible_victim = [&](std::size_t idx) {
+                return numa_stealing ||
+                    thread_numa_domain_[idx] == thread_numa_domain_[num_thread];
+            };
+
             bool result = true;
 
             auto const steal = [&](std::size_t idx) -> bool {
@@ -1515,7 +1531,8 @@ namespace hpx::threads::policies {
             {
                 if (for_each_circular(offset % victim_count, victim_count,
                         [&](std::size_t const i) {
-                            return steal_hp(victim_threads[i]);
+                            std::size_t const idx = victim_threads[i];
+                            return is_eligible_victim(idx) && steal_hp(idx);
                         }))
                     return result;
             }
@@ -1523,7 +1540,8 @@ namespace hpx::threads::policies {
             {
                 if (for_each_circular(offset % victim_count, victim_count,
                         [&](std::size_t const i) {
-                            return steal(victim_threads[i]);
+                            std::size_t const idx = victim_threads[i];
+                            return is_eligible_victim(idx) && steal(idx);
                         }))
                     return result;
             }
@@ -1778,11 +1796,10 @@ namespace hpx::threads::policies {
                     any(numa_mask & numa_masks[other_num_thread]);
             });
 
-            // check for the rest and if we are NUMA aware
-            if (has_scheduler_mode(
-                    policies::scheduler_mode::enable_stealing_numa,
-                    num_thread) &&
-                numa_sensitive_ != numa_sensitive_mode::strict &&
+            // Cache remote victims allowed by the configured NUMA sensitivity.
+            // The scheduler mode is checked for every steal attempt so that
+            // runtime mode changes take effect without rebuilding this list.
+            if (numa_sensitive_ != numa_sensitive_mode::strict &&
                 (numa_sensitive_ == numa_sensitive_mode::none ||
                     any(first_mask & pu_mask)))
             {
