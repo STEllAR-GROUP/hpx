@@ -26,11 +26,13 @@ struct test_receiver
     void set_error(E&&) && noexcept
     {
         HPX_TEST(false);
+        loop.finish();
     }
 
     void set_stopped() && noexcept
     {
         HPX_TEST(false);
+        loop.finish();
     }
 
     void set_value() && noexcept
