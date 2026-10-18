@@ -599,7 +599,8 @@ namespace hpx::local::detail {
                 "local-priority schedulers: 0 - all workers may steal across "
                 "NUMA domains, 1 - only boundary workers may steal from the "
                 "nearest NUMA domains, 2 - no cross-domain stealing; other "
-                "schedulers interpret 0 as disabled and nonzero as enabled; "
+                "work-stealing schedulers allow cross-domain stealing for 0 "
+                "and 1, and disable it for 2; "
                 "default and implicit value: 1)")
         ;
 

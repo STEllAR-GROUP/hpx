@@ -1680,8 +1680,9 @@ The predefined command line options for any application using
    * ``1``: only boundary workers may steal from the nearest NUMA domains;
    * ``2``: workers may not steal across NUMA domains.
 
-   Other schedulers treat the setting as a Boolean value: ``0`` disables NUMA
-   sensitivity and a nonzero value enables it.
+   Other work-stealing schedulers do not distinguish boundary workers. They
+   allow cross-domain stealing for levels ``0`` and ``1`` and disable it for
+   level ``2``.
 
 
 |hpx| configuration options
