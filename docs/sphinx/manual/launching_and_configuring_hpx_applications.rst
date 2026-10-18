@@ -441,19 +441,19 @@ The ``hpx.thread_queue`` configuration section
    * * ``hpx.thread_queue.idle_loop_count_steal_staged``
      * The value of this property defines the number of consecutive empty
        scheduling loop iterations after which a core starts stealing staged
-       |hpx| tasks from other cores (local priority queue scheduler only, other
-       schedulers start after ``hpx.max_idle_loop_count / 2`` iterations). It
-       has no effect if fast idle mode is on, which steals staged tasks right
-       away.
+       |hpx| tasks from other cores (local priority queue and work-requesting
+       schedulers only; other schedulers start after
+       ``hpx.max_idle_loop_count / 2`` iterations). It has no effect if fast
+       idle mode is on, which steals staged tasks right away.
    * * ``hpx.thread_queue.min_tasks_to_steal_staged_early``
      * The value of this property defines the number of staged |hpx| tasks that
        need to be available before neighboring cores are allowed to steal work
        shortly after running out of work, i.e. after
        ``hpx.thread_queue.idle_loop_count_steal_staged`` iterations (local
-       priority queue scheduler only). Cores that have been idle for
-       ``hpx.max_idle_loop_count / 2`` iterations steal staged tasks
-       regardless. Leaving a few staged tasks to the core they were placed on
-       keeps them close to the data in that core's caches.
+       priority queue and work-requesting schedulers only). Cores that have
+       been idle for ``hpx.max_idle_loop_count / 2`` iterations steal staged
+       tasks regardless. Leaving a few staged tasks to the core they were
+       placed on keeps them close to the data in that core's caches.
    * * ``hpx.thread_queue.min_add_new_count``
      * The value of this property defines the minimal number of tasks to be
        converted into |hpx| threads whenever the thread queues for a core have
