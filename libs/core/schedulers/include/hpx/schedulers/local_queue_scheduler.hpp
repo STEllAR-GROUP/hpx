@@ -360,7 +360,8 @@ namespace hpx::threads::policies {
 
             bool const numa_stealing = has_scheduler_mode(
                 policies::scheduler_mode::enable_stealing_numa, num_thread);
-            if (!numa_stealing || numa_sensitive_ != numa_sensitive_mode::none)
+            if (!numa_stealing ||
+                numa_sensitive_ != numa_sensitive_mode::strict)
             {
                 // steal work items: first try to steal from other cores in
                 // the same NUMA node
@@ -739,7 +740,8 @@ namespace hpx::threads::policies {
             // limited or no stealing across domains
             bool const numa_stealing = has_scheduler_mode(
                 policies::scheduler_mode::enable_stealing_numa, num_thread);
-            if (!numa_stealing || numa_sensitive_ != numa_sensitive_mode::none)
+            if (!numa_stealing ||
+                numa_sensitive_ != numa_sensitive_mode::strict)
             {
                 // steal work items: first try to steal from other cores in the
                 // same NUMA node
@@ -912,7 +914,8 @@ namespace hpx::threads::policies {
                 has_scheduler_mode(
                     policies::scheduler_mode::enable_stealing_numa,
                     num_thread) &&
-                any(first_mask & core_mask))
+                (numa_sensitive_ == numa_sensitive_mode::none ||
+                    any(first_mask & core_mask)))
             {
 #if !defined(HPX_NATIVE_MIC)    // we know that the MIC has one NUMA domain only
                 set(steals_outside_numa_domain_, num_pu);

@@ -1040,7 +1040,7 @@ namespace hpx {
                 "the runtime system has not been initialized yet");
         }
         return hpx::util::get_entry_as<std::size_t>(
-                   rt->get_config(), "hpx.numa_sensitive", 0) != 0;
+                   rt->get_config(), "hpx.numa_sensitive", 1) != 0;
     }
 
     ///////////////////////////////////////////////////////////////////////////

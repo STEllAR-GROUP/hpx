@@ -479,8 +479,7 @@ namespace hpx::threads {
         local_sched_type::init_parameter_type init(
             thread_pool_init.num_threads_, thread_pool_init.affinity_data_,
             num_high_priority_queues, thread_queue_init,
-            "core-abp_priority_queue_scheduler-fifo",
-            static_cast<policies::numa_sensitive_mode>(numa_sensitive));
+            "core-abp_priority_queue_scheduler-fifo");
 
         auto sched = std::make_unique<local_sched_type>(init);
         auto const full_mask =
@@ -492,7 +491,7 @@ namespace hpx::threads {
 
         // conditionally set/unset this flag
         sched->update_scheduler_mode(
-            policies::scheduler_mode::enable_stealing_numa, numa_sensitive != 2,
+            policies::scheduler_mode::enable_stealing_numa, !numa_sensitive,
             full_mask);
 
         // instantiate the pool
@@ -538,8 +537,7 @@ namespace hpx::threads {
         local_sched_type::init_parameter_type init(
             thread_pool_init.num_threads_, thread_pool_init.affinity_data_,
             num_high_priority_queues, thread_queue_init,
-            "core-abp_priority_queue_scheduler-lifo",
-            static_cast<policies::numa_sensitive_mode>(numa_sensitive));
+            "core-abp_priority_queue_scheduler-lifo");
 
         auto sched = std::make_unique<local_sched_type>(init);
         auto const full_mask =
@@ -551,7 +549,7 @@ namespace hpx::threads {
 
         // conditionally set/unset this flag
         sched->update_scheduler_mode(
-            policies::scheduler_mode::enable_stealing_numa, numa_sensitive != 2,
+            policies::scheduler_mode::enable_stealing_numa, !numa_sensitive,
             full_mask);
 
         // instantiate the pool
@@ -775,7 +773,7 @@ namespace hpx::threads {
                 rtcfg_, "hpx.max_busy_loop_count", HPX_BUSY_LOOP_COUNT_MAX);
 
         std::size_t const numa_sensitive = hpx::util::get_entry_as<std::size_t>(
-            rtcfg_, "hpx.numa_sensitive", 0);
+            rtcfg_, "hpx.numa_sensitive", 1);
 
         policies::thread_queue_init_parameters const thread_queue_init =
             get_init_parameters();

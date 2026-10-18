@@ -16,7 +16,7 @@
 
 namespace {
 
-    std::size_t expected_numa_sensitivity = 0;
+    std::size_t expected_numa_sensitivity = 1;
 
     void set_expected_numa_sensitivity(int argc, char* argv[])
     {

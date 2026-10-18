@@ -21,12 +21,12 @@
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
 #include <hpx/schedulers/thread_queue.hpp>
 
+#include <algorithm>
 #include <atomic>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
-#include <limits>
 #include <mutex>
 #include <string_view>
 #include <type_traits>
@@ -37,6 +37,47 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::threads::policies {
+
+    namespace detail {
+
+        template <typename GetDistance>
+        std::vector<std::size_t> get_numa_stealing_domains(
+            numa_sensitive_mode mode, std::size_t current_domain,
+            std::size_t num_domains, bool is_boundary_worker,
+            GetDistance&& get_distance)
+        {
+            if (mode == numa_sensitive_mode::strict ||
+                (mode == numa_sensitive_mode::boundary && !is_boundary_worker))
+            {
+                return {};
+            }
+
+            std::vector<std::pair<std::size_t, std::size_t>> distances;
+            distances.reserve(num_domains > 0 ? num_domains - 1 : 0);
+            for (std::size_t domain = 0; domain != num_domains; ++domain)
+            {
+                if (domain != current_domain)
+                {
+                    distances.emplace_back(
+                        get_distance(current_domain, domain), domain);
+                }
+            }
+            std::sort(distances.begin(), distances.end());
+
+            std::vector<std::size_t> domains;
+            domains.reserve(distances.size());
+            for (auto const& [distance, domain] : distances)
+            {
+                if (mode == numa_sensitive_mode::boundary &&
+                    distance != distances.front().first)
+                {
+                    break;
+                }
+                domains.push_back(domain);
+            }
+            return domains;
+        }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
@@ -1778,55 +1819,29 @@ namespace hpx::threads::policies {
                     any(numa_mask & numa_masks[other_num_thread]);
             });
 
-            // check for the rest and if we are NUMA aware
+            // Check other NUMA domains in increasing distance order. Depending
+            // on the configured sensitivity this includes all workers, only
+            // boundary workers and their nearest domains, or no remote workers.
             if (has_scheduler_mode(
-                    policies::scheduler_mode::enable_stealing_numa,
-                    num_thread) &&
-                numa_sensitive_ != numa_sensitive_mode::strict &&
-                (numa_sensitive_ == numa_sensitive_mode::none ||
-                    any(first_mask & pu_mask)))
+                    policies::scheduler_mode::enable_stealing_numa, num_thread))
             {
-                if (numa_sensitive_ == numa_sensitive_mode::none)
-                {
-                    iterate([&](std::size_t const other_num_thread) {
-                        return !any(numa_mask & numa_masks[other_num_thread]);
-                    });
-                    return;
-                }
-
-                // Build a list of (hardware_latency_distance, domain_id)
-                // for all NUMA domains other than our own, then sweep them
-                // in ascending distance order so that the victim list
-                // prefers closer domains over farther ones.
                 std::size_t const my_domain =
                     static_cast<std::size_t>(numa_domains[num_thread]);
                 std::size_t num_nodes = topo.get_number_of_numa_nodes();
                 if (num_nodes == 0)
                     num_nodes = 1;
 
-                // Only steal from directly neighboring NUMA domains
-                // (minimum distance) to limit cross-NUMA traffic.
-                std::size_t min_dist =
-                    (std::numeric_limits<std::size_t>::max)();
-                for (std::size_t n = 0; n < num_nodes; ++n)
+                auto const remote_domains =
+                    detail::get_numa_stealing_domains(numa_sensitive_,
+                        my_domain, num_nodes, any(first_mask & pu_mask),
+                        [&topo](std::size_t from, std::size_t to) {
+                            return topo.get_numa_distance(from, to);
+                        });
+                for (std::size_t domain : remote_domains)
                 {
-                    if (n != my_domain)
-                    {
-                        std::size_t const d =
-                            topo.get_numa_distance(my_domain, n);
-                        if (d < min_dist)
-                            min_dist = d;
-                    }
-                }
-                for (std::size_t n = 0; n < num_nodes; ++n)
-                {
-                    if (n == my_domain)
-                        continue;
-                    if (topo.get_numa_distance(my_domain, n) != min_dist)
-                        continue;
                     iterate([&](std::size_t const other_num_thread) {
                         return static_cast<std::size_t>(
-                                   numa_domains[other_num_thread]) == n;
+                                   numa_domains[other_num_thread]) == domain;
                     });
                 }
             }

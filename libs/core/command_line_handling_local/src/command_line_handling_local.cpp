@@ -236,8 +236,8 @@ namespace hpx::local::detail {
         if (numa_sensitive > 2)
         {
             throw hpx::detail::command_line_error(
-                "Invalid argument value for --hpx:numa-sensitive. Allowed "
-                "values are 0, 1, or 2");
+                "Invalid NUMA sensitivity value in hpx.numa_sensitive or "
+                "--hpx:numa-sensitive. Allowed values are 0, 1, or 2");
         }
         return numa_sensitive;
     }
@@ -429,7 +429,7 @@ namespace hpx::local::detail {
       , num_cores_(1)
       , pu_step_(1)
       , pu_offset_(static_cast<std::size_t>(-1))
-      , numa_sensitive_(0)
+      , numa_sensitive_(1)
       , use_process_mask_(false)
       , cmd_line_parsed_(false)
       , info_printed_(false)
@@ -644,8 +644,7 @@ namespace hpx::local::detail {
 
         check_pu_offset();
 
-        numa_sensitive_ = detail::handle_numa_sensitive(
-            cfgmap, vm, affinity_bind_.empty() ? 0 : 1);
+        numa_sensitive_ = detail::handle_numa_sensitive(cfgmap, vm, 1);
         ini_config.emplace_back(
             "hpx.numa_sensitive=" + std::to_string(numa_sensitive_));
 
