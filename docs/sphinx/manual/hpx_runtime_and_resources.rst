@@ -67,6 +67,19 @@ Local scheduling policy
 The local scheduling policy maintains one queue per OS thread from which each OS
 thread pulls its tasks (user threads).
 
+.. note::
+
+   This scheduler ignores all thread priorities. In particular,
+   ``thread_priority::bound`` and ``thread_priority::initially_bound`` only
+   determine the initial placement of a thread. A thread can subsequently be
+   stolen by, or resumed on, any other worker thread. If a thread must stay on
+   the OS thread it was assigned to (for instance because it holds a lock tied
+   to that OS thread), use a scheduler that supports priorities, such as the
+   default local priority scheduler (:option:`--hpx:queuing`\
+   ``local-priority-fifo``), the work-requesting schedulers, or the shared
+   priority scheduler. The static scheduling policy also keeps threads in place
+   because it does not steal.
+
 Static scheduling policy
 ------------------------
 
