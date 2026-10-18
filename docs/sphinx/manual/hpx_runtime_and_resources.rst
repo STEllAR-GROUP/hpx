@@ -36,10 +36,11 @@ of the OS threads before any other work is executed. When a queue is empty, work
 will be taken from high priority queues first. There is one low priority queue
 from which threads will be scheduled only when there is no other work.
 
-For this scheduling policy there is an option to turn on NUMA sensitivity using
-the command line option :option:`--hpx:numa-sensitive`. When NUMA sensitivity is
-turned on, work stealing is done from queues associated with the same NUMA domain
-first, only after that work is stolen from other NUMA domains.
+The command line option :option:`--hpx:numa-sensitive` controls NUMA-sensitive
+work stealing for this policy. At level ``0`` all workers may steal across NUMA
+domains, preferring nearer domains. At the default level ``1`` only boundary
+workers may steal from the nearest NUMA domains. At level ``2`` workers may not
+steal across NUMA domains.
 
 This scheduler is enabled at build time by default using the FIFO
 (first-in-first-out) queueing policy. This policy can be invoked using

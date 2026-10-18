@@ -1631,11 +1631,11 @@ The predefined command line options for any application using
 
 .. option:: --hpx:bind arg
 
-   he detailed affinity description for the OS threads, see :ref:`details` for
+   The detailed affinity description for the OS threads, see :ref:`details` for
    a detailed description of possible values. Do not use with
    :option:`--hpx:pu-step`, :option:`--hpx:pu-offset` or
-   :option:`--hpx:affinity` options. Implies :option:`--hpx:numa-sensitive`
-   (:option:`--hpx:bind`\ ``=none``) disables defining thread affinities).
+   :option:`--hpx:affinity` options. :option:`--hpx:bind`\ ``=none`` disables
+   defining thread affinities.
 
 .. option:: --hpx:use-process-mask
 
@@ -1670,9 +1670,18 @@ The predefined command line options for any application using
    :option:`--hpx:queuing`\ ``=abp-priority-fifo``, and
    :option:`--hpx:queuing`\ ``=abp-priority-lifo`` only.
 
-.. option:: --hpx:numa-sensitive
+.. option:: --hpx:numa-sensitive [arg]
 
-   Makes the scheduler NUMA sensitive.
+   Controls NUMA-sensitive work stealing. The default and the value used when
+   the option is given without an argument are both ``1``. For the local and
+   local-priority schedulers the allowed values are:
+
+   * ``0``: all workers may steal across NUMA domains;
+   * ``1``: only boundary workers may steal from the nearest NUMA domains;
+   * ``2``: workers may not steal across NUMA domains.
+
+   Other schedulers treat the setting as a Boolean value: ``0`` disables NUMA
+   sensitivity and a nonzero value enables it.
 
 
 |hpx| configuration options

@@ -557,7 +557,7 @@ namespace hpx::local::detail {
                 "the detailed affinity description for the OS threads, see "
                 "the documentation for a detailed description of possible "
                 "values. Do not use with --hpx:pu-step, --hpx:pu-offset, or "
-                "--hpx:affinity options. Implies --hpx:numa-sensitive=1"
+                "--hpx:affinity options "
                 "(--hpx:bind=none disables defining thread affinities).")
             ("hpx:use-process-mask", "use the process mask to restrict "
                 "available hardware resources (implies "
@@ -595,10 +595,12 @@ namespace hpx::local::detail {
                 "--hpx:queuing=abp-priority-fifo, and "
                 "--hpx:queuing=abp-priority-lifo only)")
             ("hpx:numa-sensitive", value<std::size_t>()->implicit_value(1),
-                "makes the local-priority scheduler NUMA sensitive ("
-                "allowed values: 0 - no NUMA sensitivity, 1 - allow only for "
-                "boundary cores to steal across NUMA domains, 2 - "
-                "no cross boundary stealing is allowed (default value: 1)")
+                "controls NUMA-sensitive work stealing (for local and "
+                "local-priority schedulers: 0 - all workers may steal across "
+                "NUMA domains, 1 - only boundary workers may steal from the "
+                "nearest NUMA domains, 2 - no cross-domain stealing; other "
+                "schedulers interpret 0 as disabled and nonzero as enabled; "
+                "default and implicit value: 1)")
         ;
 
         all_options.emplace(options_type::config_options,
