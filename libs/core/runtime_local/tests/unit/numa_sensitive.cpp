@@ -1,4 +1,4 @@
-//  Copyright (c) 2026 Hartmut Kaiser
+//  Copyright (c) 2026 the-ivii
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -52,16 +52,18 @@ int hpx_main()
 
 int main(int argc, char* argv[])
 {
-    bool caught_exception = false;
     try
     {
         (void) hpx::is_scheduler_numa_sensitive();
+        HPX_TEST(false);
     }
     catch (hpx::exception const& e)
     {
-        caught_exception = e.get_error() == hpx::error::invalid_status;
+        if (e.get_error() != hpx::error::invalid_status)
+        {
+            throw;
+        }
     }
-    HPX_TEST(caught_exception);
 
     set_expected_numa_sensitivity(argc, argv);
     HPX_TEST_EQ(hpx::local::init(hpx_main, argc, argv), 0);
