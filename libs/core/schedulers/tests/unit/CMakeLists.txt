@@ -16,8 +16,14 @@ set(tests
 )
 
 if(HPX_WITH_WORK_REQUESTING_SCHEDULERS)
-  list(APPEND tests workrequesting_random_victim workrequesting_steal
-       workrequesting_scheduler_mode workrequesting_suspend_resume
+  list(
+    APPEND
+    tests
+    workrequesting_numa
+    workrequesting_random_victim
+    workrequesting_steal
+    workrequesting_scheduler_mode
+    workrequesting_suspend_resume
   )
 endif()
 
