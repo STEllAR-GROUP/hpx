@@ -738,15 +738,9 @@ namespace hpx::threads::policies {
 #endif
                 };
 
-            victims const& victim_data = victims_[num_thread].data_;
             std::vector<std::size_t> const& victim_threads =
-                victim_data.victim_threads_;
-            std::size_t const victim_count =
-                has_scheduler_mode(
-                    policies::scheduler_mode::enable_stealing_numa,
-                    num_thread) ?
-                victim_threads.size() :
-                victim_data.local_victim_count_;
+                victims_[num_thread].data_.victim_threads_;
+            std::size_t const victim_count = victim_threads.size();
             if (victim_count == 0)
                 return false;
 
@@ -1459,15 +1453,9 @@ namespace hpx::threads::policies {
 #endif
                 };
 
-            victims const& victim_data = victims_[num_thread].data_;
             std::vector<std::size_t> const& victim_threads =
-                victim_data.victim_threads_;
-            std::size_t const victim_count =
-                has_scheduler_mode(
-                    policies::scheduler_mode::enable_stealing_numa,
-                    num_thread) ?
-                victim_threads.size() :
-                victim_data.local_victim_count_;
+                victims_[num_thread].data_.victim_threads_;
+            std::size_t const victim_count = victim_threads.size();
             if (victim_count == 0)
                 return false;
 
@@ -1790,13 +1778,11 @@ namespace hpx::threads::policies {
                     any(numa_mask & numa_masks[other_num_thread]);
             });
 
-            victims_[num_thread].data_.local_victim_count_ =
-                victim_threads.size();
-
-            // Cache remote victims allowed by the configured NUMA sensitivity.
-            // The scheduler mode is checked for every steal attempt so that
-            // runtime mode changes take effect without rebuilding this list.
-            if (numa_sensitive_ != numa_sensitive_mode::strict &&
+            // check for the rest and if we are NUMA aware
+            if (has_scheduler_mode(
+                    policies::scheduler_mode::enable_stealing_numa,
+                    num_thread) &&
+                numa_sensitive_ != numa_sensitive_mode::strict &&
                 (numa_sensitive_ == numa_sensitive_mode::none ||
                     any(first_mask & pu_mask)))
             {
@@ -1907,7 +1893,6 @@ namespace hpx::threads::policies {
         struct victims
         {
             std::vector<std::size_t> victim_threads_;
-            std::size_t local_victim_count_ = 0;
             std::size_t victim_offset_ = 0;
         };
         std::vector<util::cache_line_data<victims>> victims_;
