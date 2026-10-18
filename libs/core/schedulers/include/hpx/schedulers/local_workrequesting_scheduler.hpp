@@ -775,29 +775,7 @@ namespace hpx::threads::policies {
         {
             bool ret = d.requests_->get(&req);
 
-            // 26813: Use 'bitwise and' to check if a flag is set.
-#if defined(HPX_MSVC)
-#pragma warning(push)
-#pragma warning(disable : 26813)
-#endif
-            while (ret && req.state_ == steal_request::state::failed)
-#if defined(HPX_MSVC)
-#pragma warning(pop)
-#endif
-            {
-                // forget the received steal request
-                --data_[req.num_thread_].data_.requested_;
-
-                // there should have been exactly one outstanding steal request
-                HPX_ASSERT(data_[req.num_thread_].data_.requested_ == 0);
-
-                // try to retrieve next steal request
-                ret = d.requests_->get(&req);
-            }
-
-            // No special treatment for other states
-            HPX_ASSERT(
-                (ret && req.state_ != steal_request::state::failed) || !ret);
+            HPX_ASSERT(!ret || req.state_ != steal_request::state::failed);
 
             return ret;
         }
