@@ -1993,9 +1993,11 @@ namespace hpx::threads::policies {
         scheduler_mode adjust_scheduler_mode(
             scheduler_mode mode) noexcept override
         {
-            // we should not disable stealing for this scheduler, this would
-            // possibly lead to deadlocks
-            return mode | policies::scheduler_mode::enable_stealing |
+            // We should not disable stealing for this scheduler, as this could
+            // lead to deadlocks. Fast idle mode lets idle workers send steal
+            // requests immediately.
+            return mode | policies::scheduler_mode::fast_idle_mode |
+                policies::scheduler_mode::enable_stealing |
                 policies::scheduler_mode::enable_stealing_numa;
         }
 
@@ -2003,7 +2005,10 @@ namespace hpx::threads::policies {
         std::vector<util::cache_line_data<scheduler_data>> data_;
         thread_queue_type low_priority_queue_;
 
-        std::atomic<std::size_t> curr_queue_;
+        // Round-robin counter for threads created without a placement hint.
+        // It is written by every spawning thread; keep it on its own cache
+        // line, away from the read-mostly members below.
+        util::cache_aligned_data_derived<std::atomic<std::size_t>> curr_queue_;
 
         detail::affinity_data const& affinity_data_;
         std::size_t const num_queues_;
