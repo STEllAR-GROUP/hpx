@@ -1680,9 +1680,10 @@ The predefined command line options for any application using
    * ``1``: only boundary workers may steal from the nearest NUMA domains;
    * ``2``: workers may not steal across NUMA domains.
 
-   Other work-stealing schedulers do not distinguish boundary workers. They
-   allow cross-domain stealing for levels ``0`` and ``1`` and disable it for
-   level ``2``.
+   The static, static-priority, shared-priority, and ABP-priority schedulers do
+   not distinguish boundary workers. They allow cross-domain stealing for
+   levels ``0`` and ``1`` and disable it for level ``2``. Work-requesting
+   schedulers currently ignore this option.
 
 
 |hpx| configuration options
