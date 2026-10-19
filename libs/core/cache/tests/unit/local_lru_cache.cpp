@@ -189,6 +189,98 @@ void test_lru_update()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+void test_lru_reserve()
+{
+    using entry_type = hpx::util::cache::entries::lru_entry<std::string>;
+    using cache_type = hpx::util::cache::local_cache<std::string, entry_type>;
+
+    {
+        cache_type c(10);    // this time we can hold 10 items
+
+        HPX_TEST_EQ(static_cast<cache_type::size_type>(10), c.capacity());
+
+        // insert 3 items into the cache
+        int i = 0;
+        data* d = &cache_entries[0];
+        for (/**/; i < 3 && d->key != nullptr; ++d, ++i)
+        {
+            HPX_TEST(c.insert(d->key, d->value));
+            HPX_TEST_LTE(c.size(), static_cast<cache_type::size_type>(3));
+        }
+
+        // there should be 3 items in the cache
+        HPX_TEST_EQ(static_cast<cache_type::size_type>(3), c.size());
+
+        // shrink the capacity but not below number of entries in the cache
+        HPX_TEST(c.reserve(5));
+        HPX_TEST_EQ(static_cast<cache_type::size_type>(5), c.capacity());
+
+        // nothing needed to be evicted
+        HPX_TEST_EQ(static_cast<cache_type::size_type>(3), c.size());
+        HPX_TEST(c.holds_key("white"));
+        HPX_TEST(c.holds_key("yellow"));
+        HPX_TEST(c.holds_key("green"));
+    }
+
+    {
+        cache_type c(10);
+
+        HPX_TEST_EQ(static_cast<cache_type::size_type>(10), c.capacity());
+        HPX_TEST_EQ(static_cast<cache_type::size_type>(0), c.size());
+
+        // shrinking an empty cache must succeed
+        HPX_TEST(c.reserve(5));
+        HPX_TEST_EQ(static_cast<cache_type::size_type>(5), c.capacity());
+        HPX_TEST_EQ(static_cast<cache_type::size_type>(0), c.size());
+    }
+
+    {
+        cache_type c(0);    // 0 means: no limit
+
+        HPX_TEST_EQ(static_cast<cache_type::size_type>(0), c.capacity());
+
+        // insert 5 items into the cache
+        int i = 0;
+        data* d = &cache_entries[0];
+        for (/**/; i < 5 && d->key != nullptr; ++d, ++i)
+        {
+            HPX_TEST(c.insert(d->key, d->value));
+            HPX_TEST_LTE(c.size(), static_cast<cache_type::size_type>(5));
+        }
+
+        // there should be 5 items in the cache
+        HPX_TEST_EQ(static_cast<cache_type::size_type>(5), c.size());
+
+        HPX_TEST(c.reserve(2));
+        HPX_TEST_EQ(static_cast<cache_type::size_type>(2), c.capacity());
+        HPX_TEST_EQ(static_cast<cache_type::size_type>(2), c.size());
+    }
+
+    {
+        cache_type c(5);
+
+        HPX_TEST_EQ(static_cast<cache_type::size_type>(5), c.capacity());
+
+        // insert 3 items into the cache
+        int i = 0;
+        data* d = &cache_entries[0];
+        for (/**/; i < 3 && d->key != nullptr; ++d, ++i)
+        {
+            HPX_TEST(c.insert(d->key, d->value));
+            HPX_TEST_LTE(c.size(), static_cast<cache_type::size_type>(5));
+        }
+
+        // there should be 3 items in the cache
+        HPX_TEST_EQ(static_cast<cache_type::size_type>(3), c.size());
+
+        // reserve(0) removes the limit, it must not evict anything
+        HPX_TEST(c.reserve(0));
+        HPX_TEST_EQ(static_cast<cache_type::size_type>(0), c.capacity());
+        HPX_TEST_EQ(static_cast<cache_type::size_type>(3), c.size());
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
 int main()
 {
     test_lru_insert();
@@ -196,6 +288,7 @@ int main()
     test_lru_clear();
     test_lru_erase_one();
     test_lru_update();
+    test_lru_reserve();
 
     return hpx::util::report_errors();
 }
