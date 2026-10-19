@@ -1046,23 +1046,27 @@ namespace hpx::threads::policies {
         std::size_t get_next_threads(Iterator it, std::size_t max_items,
             bool allow_stealing = false, bool steal = false)
         {
-            // the result is bounded by max_items, so it fits a std::size_t
-            std::size_t const work_items_count = static_cast<std::size_t>(
-                (std::min) (work_items_count_.data_.load(
-                                std::memory_order_relaxed),
-                    static_cast<std::uint64_t>(max_items)));
+            std::uint64_t const pending_count =
+                work_items_count_.data_.load(std::memory_order_relaxed);
 
-            if (work_items_count == 0)
+            if (pending_count == 0)
             {
                 return 0;
             }
 
+            // compare the minimum with all pending items, not with the
+            // (possibly smaller) number of items requested
             if (allow_stealing &&
                 parameters_.min_tasks_to_steal_pending_ >
-                    static_cast<std::int64_t>(work_items_count))
+                    static_cast<std::int64_t>(pending_count))
             {
                 return 0;
             }
+
+            // the result is bounded by max_items, so it fits a std::size_t
+            std::size_t const work_items_count =
+                static_cast<std::size_t>((std::min) (pending_count,
+                    static_cast<std::uint64_t>(max_items)));
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
             std::size_t const max_items_requested = max_items;
