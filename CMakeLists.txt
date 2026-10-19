@@ -1125,6 +1125,10 @@ hpx_option(
   CATEGORY "Build Targets"
   ADVANCED
 )
+if(HPX_WITH_NANOBENCH)
+  hpx_add_config_define(HPX_HAVE_NANOBENCH)
+  include(HPX_SetupNanobench)
+endif()
 
 # cmake-format: off
 # LibCDS option
@@ -1483,10 +1487,6 @@ if(HPX_WITH_NETWORKING)
   )
   if(HPX_WITH_PARCELPORT_ACTION_COUNTERS)
     hpx_add_config_define(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
-  endif()
-  if(HPX_WITH_NANOBENCH)
-    hpx_add_config_define(HPX_HAVE_NANOBENCH)
-    include(HPX_SetupNanobench)
   endif()
 else(HPX_WITH_NETWORKING)
   # if networking is off,  then allow the option of using our asynchronous MPI
