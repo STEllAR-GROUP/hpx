@@ -8,7 +8,9 @@
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 
+#include <cstddef>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace {
@@ -16,6 +18,36 @@ namespace {
     int hpx_main()
     {
         return hpx::local::finalize();
+    }
+
+    std::vector<char*> remove_queuing_option(int argc, char* argv[])
+    {
+        std::vector<char*> result;
+        result.reserve(static_cast<std::size_t>(argc) + 1);
+        result.push_back(argv[0]);
+
+        for (int i = 1; i != argc; ++i)
+        {
+            std::string_view const arg(argv[i]);
+            if (arg == "--hpx:queuing")
+            {
+                if (i + 1 != argc)
+                {
+                    ++i;
+                }
+                continue;
+            }
+
+            if (arg.starts_with("--hpx:queuing="))
+            {
+                continue;
+            }
+
+            result.push_back(argv[i]);
+        }
+
+        result.push_back(nullptr);
+        return result;
     }
 
     void test_queuing(int argc, char* argv[], std::string const& scheduler,
@@ -35,6 +67,13 @@ namespace {
 
 int main(int argc, char* argv[])
 {
+    // Test configurations may inject a scheduler through
+    // HPX_WITH_TESTS_COMMAND_LINE. Each case below supplies its own scheduler,
+    // so retain all external arguments except that scheduler option.
+    std::vector<char*> test_argv = remove_queuing_option(argc, argv);
+    argc = static_cast<int>(test_argv.size() - 1);
+    argv = test_argv.data();
+
     // A leading exclamation mark forces the command-line value to override
     // configuration without becoming part of the scheduler name.
     test_queuing(argc, argv, "!local", false, 0);
