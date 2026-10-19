@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach, Katelyn Kufahl
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c) 2015 Patricia Grubel
@@ -11,6 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/modules/async_combinators.hpp>
+#include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/execution_base.hpp>
@@ -38,6 +39,7 @@
 #include <mutex>
 #include <numeric>
 #include <string>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -123,16 +125,24 @@ namespace hpx::threads {
             hpx::util::get_entry_as<std::int64_t>(rtcfg_,
                 "hpx.thread_queue.max_terminated_threads",
                 HPX_THREAD_QUEUE_MAX_TERMINATED_THREADS);
-        std::uint64_t const init_threads_count =
-            hpx::util::get_entry_as<std::int64_t>(rtcfg_,
+        std::size_t const init_threads_count =
+            hpx::util::get_entry_as<std::size_t>(rtcfg_,
                 "hpx.thread_queue.init_threads_count",
                 HPX_THREAD_QUEUE_INIT_THREADS_COUNT);
-        std::uint64_t const cached_threads_count =
-            hpx::util::get_entry_as<std::int64_t>(rtcfg_,
+        std::size_t const cached_threads_count =
+            hpx::util::get_entry_as<std::size_t>(rtcfg_,
                 "hpx.thread_queue.cached_threads_count",
                 HPX_THREAD_QUEUE_CACHED_THREADS_COUNT);
         double const max_idle_backoff_time = hpx::util::get_entry_as<double>(
             rtcfg_, "hpx.max_idle_backoff_time", HPX_IDLE_BACKOFF_TIME_MAX);
+        std::int64_t const min_tasks_to_steal_staged_early =
+            hpx::util::get_entry_as<std::int64_t>(rtcfg_,
+                "hpx.thread_queue.min_tasks_to_steal_staged_early",
+                HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_STAGED_EARLY);
+        std::int64_t const idle_loop_count_steal_staged =
+            hpx::util::get_entry_as<std::int64_t>(rtcfg_,
+                "hpx.thread_queue.idle_loop_count_steal_staged",
+                HPX_IDLE_LOOP_COUNT_STEAL_STAGED);
 
         std::ptrdiff_t const small_stacksize =
             rtcfg_.get_stack_size(thread_stacksize::small_);
@@ -148,7 +158,8 @@ namespace hpx::threads {
             min_add_new_count, max_add_new_count, min_delete_count,
             max_delete_count, max_terminated_threads, init_threads_count,
             cached_threads_count, max_idle_backoff_time, small_stacksize,
-            medium_stacksize, large_stacksize, huge_stacksize);
+            medium_stacksize, large_stacksize, huge_stacksize,
+            min_tasks_to_steal_staged_early, idle_loop_count_steal_staged);
     }
 
     void threadmanager::create_scheduler_user_defined(
@@ -450,10 +461,16 @@ namespace hpx::threads {
         detail::check_num_high_priority_queues(
             thread_pool_init.num_threads_, num_high_priority_queues);
 
-        // instantiate the scheduler
+        // instantiate the scheduler (ABP FIFO backend - see #6793)
         using local_sched_type =
             hpx::threads::policies::local_priority_queue_scheduler<std::mutex,
-                hpx::threads::policies::lockfree_fifo>;
+                hpx::threads::policies::lockfree_abp_fifo>;
+        // Negative guard: catch silent reversion to the pre-#6793 backend.
+        static_assert(
+            !std::is_same_v<local_sched_type,
+                hpx::threads::policies::local_priority_queue_scheduler<
+                    std::mutex, hpx::threads::policies::lockfree_fifo>>,
+            "create_scheduler_abp_priority_fifo must not use lockfree_fifo");
 
         local_sched_type::init_parameter_type init(
             thread_pool_init.num_threads_, thread_pool_init.affinity_data_,
@@ -502,10 +519,16 @@ namespace hpx::threads {
         detail::check_num_high_priority_queues(
             thread_pool_init.num_threads_, num_high_priority_queues);
 
-        // instantiate the scheduler
+        // instantiate the scheduler (ABP LIFO backend - see #6793)
         using local_sched_type =
             hpx::threads::policies::local_priority_queue_scheduler<std::mutex,
-                hpx::threads::policies::lockfree_lifo>;
+                hpx::threads::policies::lockfree_abp_lifo>;
+        // Negative guard: catch silent reversion to the pre-#6793 backend.
+        static_assert(
+            !std::is_same_v<local_sched_type,
+                hpx::threads::policies::local_priority_queue_scheduler<
+                    std::mutex, hpx::threads::policies::lockfree_lifo>>,
+            "create_scheduler_abp_priority_lifo must not use lockfree_lifo");
 
         local_sched_type::init_parameter_type init(
             thread_pool_init.num_threads_, thread_pool_init.affinity_data_,
@@ -738,10 +761,10 @@ namespace hpx::threads {
         auto& rp = hpx::resource::get_partitioner();
         size_t const num_pools = rp.get_num_pools();
         std::size_t thread_offset = 0;
-        std::size_t const max_idle_loop_count =
+        std::int64_t const max_idle_loop_count =
             hpx::util::get_entry_as<std::int64_t>(
                 rtcfg_, "hpx.max_idle_loop_count", HPX_IDLE_LOOP_COUNT_MAX);
-        std::size_t const max_busy_loop_count =
+        std::int64_t const max_busy_loop_count =
             hpx::util::get_entry_as<std::int64_t>(
                 rtcfg_, "hpx.max_busy_loop_count", HPX_BUSY_LOOP_COUNT_MAX);
 
@@ -756,9 +779,21 @@ namespace hpx::threads {
                 "hpx.max_background_threads",
                 (std::numeric_limits<std::size_t>::max)());
 
+        // The distributed runtime's background callback also performs
+        // non-network work, such as AGAS garbage collection. Keep one worker
+        // eligible when the callback is nonempty and the configured maximum
+        // is nonzero.
         if (!rtcfg_.enable_networking())
         {
-            max_background_threads = 0;
+            if (network_background_callback_.empty() ||
+                max_background_threads == 0)
+            {
+                max_background_threads = 0;
+            }
+            else
+            {
+                max_background_threads = 1;
+            }
         }
 
         // instantiate the pools
@@ -1579,8 +1614,15 @@ namespace hpx::threads {
         init_tss(rp.get_num_threads());
 
 #ifdef HPX_HAVE_TIMER_POOL
-        LTM_(info).format("run: running timer pool");
-        timer_pool_.run(false);
+        {
+            LTM_(info).format("run: running timer pool");
+            auto const p =
+                std::make_shared<util::barrier>(timer_pool_.size() + 1);
+            if (timer_pool_.run(false, p))
+            {
+                p->wait();
+            }
+        }
 #endif
 
         for (auto const& pool_iter : pools_)

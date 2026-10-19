@@ -43,6 +43,7 @@ set(tests
     persistent_executor_parameters
     query_get_allocator
     rebind_executor_parameters
+    rebind_policy
 )
 
 set(future_then_executor_PARAMETERS THREADS_PER_LOCALITY 4)
@@ -75,6 +76,7 @@ if(HPX_WITH_CXX_MODULES AND ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
   # Clang (last tested version is v22) fails compiling the following tests when
   # C++ module support is enabled.
   set(failing_clang_tests
+      algorithm_continues_on
       algorithm_bulk
       algorithm_ensure_started
       algorithm_just

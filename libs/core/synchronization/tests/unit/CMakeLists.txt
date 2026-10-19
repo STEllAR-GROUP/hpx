@@ -22,6 +22,7 @@ set(tests
     latch_cpp20
     latch_notification
     local_latch
+    local_latch_reset
     local_barrier
     local_barrier_count_up
     local_barrier_reset
@@ -49,6 +50,7 @@ set(latch_cpp20_PARAMETERS THREADS_PER_LOCALITY 4)
 set(latch_notification_PARAMETERS THREADS_PER_LOCALITY 4)
 set(local_barrier_PARAMETERS THREADS_PER_LOCALITY 4)
 set(local_latch_PARAMETERS THREADS_PER_LOCALITY 4)
+set(local_latch_reset_PARAMETERS THREADS_PER_LOCALITY 4)
 set(local_event_PARAMETERS THREADS_PER_LOCALITY 4)
 set(local_mutex_PARAMETERS THREADS_PER_LOCALITY 4)
 
@@ -78,6 +80,17 @@ foreach(test ${tests})
   add_hpx_unit_test("modules.synchronization" ${test} ${${test}_PARAMETERS})
 
 endforeach()
+
+if(HPX_WITH_CXX_MODULES AND ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
+  # Clang (last tested version is v22) fails compiling the following tests when
+  # C++ module support is enabled.
+  set(failing_clang_tests async_rw_mutex)
+  foreach(test ${failing_clang_tests})
+    target_compile_definitions(
+      ${test}_test PRIVATE HPX_HAVE_FORCE_NO_CXX_MODULES
+    )
+  endforeach()
+endif()
 
 if(HPX_WITH_COMPILE_ONLY_TESTS)
   # add compile time tests

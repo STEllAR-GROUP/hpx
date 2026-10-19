@@ -15,6 +15,7 @@
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/threading_base.hpp>
+#include <hpx/modules/tracing.hpp>
 #include <hpx/modules/type_support.hpp>
 
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
@@ -26,11 +27,13 @@
 #include <cstddef>
 #include <cstdint>
 #include <exception>
+#include <iterator>
 #include <memory>
 #include <mutex>
 #include <random>
 #include <string>
 #include <string_view>
+#include <thread>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -102,7 +105,7 @@ namespace hpx::threads::policies {
         ////////////////////////////////////////////////////////////////////////
         inline unsigned int random_seed() noexcept
         {
-            static std::random_device rd;
+            std::random_device rd;
             return rd();
         }
 
@@ -163,7 +166,7 @@ namespace hpx::threads::policies {
                 lcos::local::channel_mode::dont_support_close>;
 
         ////////////////////////////////////////////////////////////////////////
-        struct workrequesting_steal_request
+        HPX_CXX_CORE_EXPORT struct workrequesting_steal_request
         {
             enum class state : std::uint16_t
             {
@@ -269,6 +272,10 @@ namespace hpx::threads::policies {
                     // initialize channels needed for work stealing
                     requests_ = new steal_request_channel(size);
                     tasks_ = new task_channel(1);
+
+                    // seed the generator used for victim selection on this
+                    // core
+                    gen_.seed(detail::random_seed());
                 }
             }
 
@@ -290,8 +297,28 @@ namespace hpx::threads::policies {
             // the number of outstanding steal requests
             std::uint16_t requested_ = 0;
 
+            // handshake between this core (as a thief that is being stopped
+            // or suspended) and a victim sending tasks to it, see
+            // stop_accepting_tasks and handle_steal_request
+            //
+            // 32 bit wide to avoid emulated sub-word atomics (e.g. on
+            // RISC-V), and on its own cache line as it is written by other
+            // cores while this core keeps updating its other members.
+            enum class task_channel_state : std::uint32_t
+            {
+                accepting,    // victims may send tasks
+                sending,      // a victim is sending tasks right now
+                closed        // core is stopping, don't send tasks
+            };
+            util::cache_aligned_data<std::atomic<task_channel_state>>
+                task_channel_state_{task_channel_state::accepting};
+
             // core number this scheduler data instance refers to
             std::uint16_t num_thread_ = static_cast<std::uint16_t>(-1);
+
+            // generator used to select a victim for this core, only ever
+            // used by the core itself
+            std::mt19937 gen_;
 
             // adaptive stealing
             std::uint16_t num_recent_steals_ = 0;
@@ -319,7 +346,6 @@ namespace hpx::threads::policies {
           , data_(init.num_queues_)
           , low_priority_queue_(thread_queue_init_)
           , curr_queue_(0)
-          , gen_(detail::random_seed())
           , affinity_data_(init.affinity_data_)
           , num_queues_(init.num_queues_)
           , num_high_priority_queues_(init.num_high_priority_queues_)
@@ -884,9 +910,29 @@ namespace hpx::threads::policies {
             std::size_t max_num_to_steal = 1;
             if (req.stealhalf_)
             {
-                max_num_to_steal = d.queue_->get_pending_queue_length(
-                                       std::memory_order_relaxed) /
-                    2;
+                // the pending queue length is never negative
+                max_num_to_steal =
+                    static_cast<std::size_t>(d.queue_->get_pending_queue_length(
+                                                 std::memory_order_relaxed) /
+                        2);
+            }
+
+            // The requesting core may be stopping or suspended, in which case
+            // it would not pick up any tasks we send. Claim its task channel
+            // for sending, which fails if it does not accept tasks anymore
+            // (see stop_accepting_tasks for the other side of this handshake).
+            using channel_state = scheduler_data::task_channel_state;
+            auto& thief_state =
+                data_[req.num_thread_].data_.task_channel_state_.data_;
+            if (max_num_to_steal != 0)
+            {
+                auto expected = channel_state::accepting;
+                if (!thief_state.compare_exchange_strong(expected,
+                        channel_state::sending, std::memory_order_acquire,
+                        std::memory_order_relaxed))
+                {
+                    max_num_to_steal = 0;
+                }
             }
 
             if (max_num_to_steal != 0)
@@ -904,16 +950,24 @@ namespace hpx::threads::policies {
                     thrd = thread_id_ref_type{};
                 }
 #else
-                d.queue_->get_next_threads(
-                    thrds.tasks_.begin(), thrds.tasks_.size(), false, true);
+                // append the stolen threads to the reserved vector
+                d.queue_->get_next_threads(std::back_inserter(thrds.tasks_),
+                    max_num_to_steal, false, true);
 #endif
 
                 // we are ready to send at least one task
                 if (!thrds.tasks_.empty())
                 {
+                    hpx::tracing::work_stolen_range(
+                        req.num_thread_, d.num_thread_, thrds.tasks_);
+
                     // send these tasks to the core that has sent the steal
                     // request
                     req.channel_->set(HPX_MOVE(thrds));
+
+                    // publish the tasks to a thief that may be about to stop
+                    thief_state.store(
+                        channel_state::accepting, std::memory_order_release);
 
                     // wake the thread up so that it can pick up the stolen
                     // tasks
@@ -921,12 +975,60 @@ namespace hpx::threads::policies {
 
                     return true;
                 }
+
+                thief_state.store(
+                    channel_state::accepting, std::memory_order_release);
             }
 
             // There's nothing we can do with this steal request except pass
             // it on to a different worker
             decline_or_forward_steal_request(d, req);
             return false;
+        }
+
+        // Called by a core that is being stopped or suspended: make sure no
+        // victim sends tasks to it anymore and wait for a send that may be in
+        // flight. Together with the check in handle_steal_request this
+        // guarantees that, once this returns, all tasks sent to this core are
+        // in its task channel.
+        static void stop_accepting_tasks(scheduler_data& d) noexcept
+        {
+            using channel_state = scheduler_data::task_channel_state;
+
+            // this is called repeatedly while the core is stopping
+            if (d.task_channel_state_.data_.load(std::memory_order_relaxed) ==
+                channel_state::closed)
+            {
+                return;
+            }
+
+            // The victim holds the channel while it dequeues and sends tasks;
+            // if it gets preempted, don't keep spinning for a whole timeslice.
+            constexpr int max_spins = 64;
+            int spins = 0;
+
+            auto expected = channel_state::accepting;
+            while (!d.task_channel_state_.data_.compare_exchange_weak(expected,
+                channel_state::closed, std::memory_order_acquire,
+                std::memory_order_relaxed))
+            {
+                if (expected == channel_state::closed)
+                {
+                    return;    // already closed earlier
+                }
+
+                // a victim is sending tasks right now, wait for it to finish
+                expected = channel_state::accepting;
+                if (spins < max_spins)
+                {
+                    ++spins;
+                    HPX_SMT_PAUSE;
+                }
+                else
+                {
+                    std::this_thread::yield();
+                }
+            }
         }
 
         // Return the next thread to be executed, return false if none is
@@ -1475,9 +1577,12 @@ namespace hpx::threads::policies {
         }
 #endif
 
-        // return a random victim for the current stealing operation
-        std::size_t random_victim(steal_request const& req) noexcept
+        // return a random victim for the current stealing operation, drawn
+        // from the generator owned by the core performing the selection
+        std::size_t random_victim(
+            std::size_t num_thread, steal_request const& req) noexcept
         {
+            std::mt19937& gen = data_[num_thread].data_.gen_;
             std::size_t result;
 
             {
@@ -1489,7 +1594,7 @@ namespace hpx::threads::policies {
                 int attempts = 0;
                 do
                 {
-                    result = uniform(gen_);
+                    result = uniform(gen);
                     if (result != req.num_thread_ &&
                         !test(req.victims_, result))
                     {
@@ -1506,7 +1611,7 @@ namespace hpx::threads::policies {
                     num_queues_ - count(req.victims_) - 1));
 
             // generate one more random number
-            std::size_t selected_victim = uniform(gen_);
+            std::size_t selected_victim = uniform(gen);
             for (std::size_t i = 0; i != num_queues_; ++i)
             {
                 if (!test(req.victims_, i))
@@ -1527,8 +1632,8 @@ namespace hpx::threads::policies {
         }
 
         // return the number of the next victim core
-        std::size_t next_victim([[maybe_unused]] scheduler_data& d,
-            steal_request const& req) noexcept
+        std::size_t next_victim(
+            scheduler_data& d, steal_request const& req) noexcept
         {
             std::size_t victim;
 
@@ -1552,7 +1657,7 @@ namespace hpx::threads::policies {
                 else
 #endif
                 {
-                    victim = random_victim(req);
+                    victim = random_victim(d.num_thread_, req);
                 }
             }
 
@@ -1716,11 +1821,37 @@ namespace hpx::threads::policies {
                     result;
             }
 
-            // check if we have been disabled or if no stealing is requested (or
-            // not possible)
-            if (!running || num_queues_ == 1)
+            // check if we have been disabled
+            if (!running)
             {
-                return !running;
+                // This core is being stopped or suspended: make sure no victim
+                // sends it tasks anymore, pick up whatever has been sent so
+                // far, and keep other cores' steal requests moving.
+                stop_accepting_tasks(d);
+                if (!d.tasks_->is_empty() &&
+                    try_receiving_tasks(d, added, next_thrd))
+                {
+                    return false;
+                }
+
+                decline_or_forward_one_steal_requests(d);
+                return true;
+            }
+
+            // accept tasks from victims again (e.g. after being resumed), only
+            // this core itself moves its channel out of the closed state
+            using channel_state = scheduler_data::task_channel_state;
+            if (d.task_channel_state_.data_.load(std::memory_order_relaxed) ==
+                channel_state::closed)
+            {
+                d.task_channel_state_.data_.store(
+                    channel_state::accepting, std::memory_order_release);
+            }
+
+            // check if no stealing is possible
+            if (num_queues_ == 1)
+            {
+                return false;
             }
 
             // attempt to steal more work
@@ -1862,9 +1993,11 @@ namespace hpx::threads::policies {
         void set_scheduler_mode(scheduler_mode mode,
             hpx::threads::mask_cref_type pu_mask) noexcept override
         {
-            // we should not disable stealing for this scheduler, this would
-            // possibly lead to deadlocks
+            // We should not disable stealing for this scheduler, as this could
+            // lead to deadlocks. Fast idle mode lets idle workers send steal
+            // requests immediately.
             scheduler_base::set_scheduler_mode(mode |
+                    policies::scheduler_mode::fast_idle_mode |
                     policies::scheduler_mode::enable_stealing |
                     policies::scheduler_mode::enable_stealing_numa,
                 pu_mask);
@@ -1874,9 +2007,10 @@ namespace hpx::threads::policies {
         std::vector<util::cache_line_data<scheduler_data>> data_;
         thread_queue_type low_priority_queue_;
 
-        std::atomic<std::size_t> curr_queue_;
-
-        std::mt19937 gen_;
+        // Round-robin counter for threads created without a placement hint.
+        // It is written by every spawning thread; keep it on its own cache
+        // line, away from the read-mostly members below.
+        util::cache_aligned_data_derived<std::atomic<std::size_t>> curr_queue_;
 
         detail::affinity_data const& affinity_data_;
         std::size_t const num_queues_;

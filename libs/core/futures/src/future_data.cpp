@@ -18,7 +18,10 @@
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/tracing.hpp>
 
+#include <atomic>
+#include <chrono>
 #include <cstddef>
+#include <cstdint>
 #include <exception>
 #include <mutex>
 #include <utility>
@@ -188,10 +191,9 @@ namespace hpx::lcos::detail {
 
         if (s == empty)
         {
-            // the value has already been moved out of this future
-            HPX_THROWS_IF(ec, hpx::error::no_state,
+            HPX_THROWS_IF(ec, hpx::error::future_uncompleted,
                 "future_data_base::get_result",
-                "this future has no valid shared state");
+                "this future was resumed while its state was 'empty'");
             return nullptr;
         }
 
@@ -374,7 +376,16 @@ namespace hpx::lcos::detail {
                 }
 
                 // reload the state, it's not empty anymore
-                s = state_.load(std::memory_order_relaxed);
+                //
+                // Use memory_order_acquire (not relaxed) to establish a
+                // happens-before relationship with the memory_order_release
+                // CAS in set_value() / set_exception().  Without an acquire
+                // here, weakly-ordered CPUs (ARM, POWER) are permitted to
+                // reorder the subsequent read of storage_ before the release
+                // store of state_ has been observed, which would silently
+                // return stale (uninitialised) bytes to the caller of
+                // future::get().
+                s = state_.load(std::memory_order_acquire);
             }
         }
 
@@ -425,3 +436,28 @@ namespace hpx::lcos::detail {
         return hpx::future_status::ready;    //-V110
     }
 }    // namespace hpx::lcos::detail
+
+namespace hpx {
+
+    namespace {
+
+        std::atomic<std::int64_t> future_timeout_ms{
+            default_future_timeout.count()};
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    std::chrono::milliseconds get_future_timeout() noexcept
+    {
+        return std::chrono::milliseconds(
+            future_timeout_ms.load(std::memory_order_relaxed));
+    }
+
+    void set_future_timeout(
+        hpx::chrono::steady_duration const& timeout) noexcept
+    {
+        auto const timeout_ms =
+            std::chrono::duration_cast<std::chrono::milliseconds>(
+                timeout.value());
+        future_timeout_ms.store(timeout_ms.count(), std::memory_order_relaxed);
+    }
+}    // namespace hpx

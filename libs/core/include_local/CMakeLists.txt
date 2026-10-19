@@ -31,9 +31,12 @@ set(include_local_headers
     hpx/unwrap.hpp
     hpx/include_local/iostream.hpp
     hpx/experimental/run_on_all.hpp
+    hpx/experimental/sandbox.hpp
     hpx/experimental/scope.hpp
     hpx/experimental/task_group.hpp
 )
+
+set(include_local_sources sandbox.cpp)
 
 if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
   set(generated_include_local_headers
@@ -88,6 +91,7 @@ include(HPX_AddModule)
 add_hpx_module(
   core include_local
   GLOBAL_HEADER_GEN OFF
+  SOURCES ${include_local_sources}
   HEADERS ${include_local_headers}
   COMPAT_HEADERS ${include_local_compat_headers}
   GENERATED_HEADERS ${generated_include_local_headers}
@@ -113,12 +117,12 @@ add_hpx_module(
     hpx_runtime_local
     hpx_string_util
     hpx_synchronization
-    hpx_tag_invoke
     hpx_threading
     hpx_threading_base
     hpx_thread_support
     hpx_timed_execution
     hpx_timing
+    hpx_topology
     hpx_type_support
     hpx_util
   CMAKE_SUBDIRS examples tests

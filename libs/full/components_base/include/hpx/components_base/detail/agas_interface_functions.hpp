@@ -27,6 +27,8 @@ namespace hpx::agas::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_CXX_EXPORT extern HPX_EXPORT bool (*is_console)();
+    HPX_CXX_EXPORT extern HPX_EXPORT bool (*is_connecting)(
+        naming::gid_type const&);
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_CXX_EXPORT extern HPX_EXPORT bool (*register_name)(
@@ -225,8 +227,17 @@ namespace hpx::agas::detail {
         *was_object_migrated)(naming::gid_type const& gid,
         hpx::move_only_function<components::pinned_ptr()>&& f);
 
+    HPX_CXX_EXPORT extern HPX_EXPORT std::pair<bool, components::pinned_ptr> (
+        *was_object_migrated_with_lva)(naming::gid_type const& gid,
+        naming::address_type lva,
+        hpx::move_only_function<components::pinned_ptr()>&& f);
+
     HPX_CXX_EXPORT extern HPX_EXPORT void (*unmark_as_migrated)(
         naming::gid_type const& gid, hpx::move_only_function<void()>&& f);
+
+    HPX_CXX_EXPORT extern HPX_EXPORT void (*unmark_as_migrated_with_lva)(
+        naming::gid_type const& gid, naming::address_type lva,
+        hpx::move_only_function<void()>&& f);
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_CXX_EXPORT extern HPX_EXPORT

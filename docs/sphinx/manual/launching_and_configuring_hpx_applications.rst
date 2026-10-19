@@ -193,6 +193,7 @@ The |hpx| configuration section
    large_size = ${HPX_LARGE_STACK_SIZE:<hpx_large_stack_size>}
    huge_size = ${HPX_HUGE_STACK_SIZE:<hpx_huge_stack_size>}
    use_guard_pages = ${HPX_THREAD_GUARD_PAGE:1}
+   unbind_on_reset = ${HPX_STACKS_UNBIND_ON_RESET:1}
 
 .. _ini_hpx:
 
@@ -329,6 +330,53 @@ The |hpx| configuration section
        the ``HPX_USE_GENERIC_COROUTINE_CONTEXT`` option is not enabled and the
        ``HPX_WITH_THREAD_GUARD_PAGE`` is set to 1 while configuring the build
        system. It is set by default to ``1``.
+   * * ``hpx.stacks.unbind_on_reset``
+     * Controls how recycled mmap'd coroutine stacks are advised when an HPX
+       thread terminates (Linux/FreeBSD with ``HPX_WITH_THREAD_STACK_MMAP=ON``;
+       not used on Apple Silicon, which allocates stacks via ``calloc``).
+       ``0`` never advises (pages stay resident). ``1`` (default) uses
+       ``MADV_FREE`` when available, otherwise keeps pages resident; this
+       avoids the cross-CPU TLB shootdowns caused by ``MADV_DONTNEED`` on
+       recursive fork-join workloads (see :hpx-issue:`6793`). ``2`` restores
+       the legacy ``MADV_DONTNEED`` behaviour.
+       Modes ``0`` and ``1`` do **not** guarantee that recycled stack pages
+       are zero-filled before reuse: with ``MADV_FREE``, prior contents remain
+       visible until the kernel actually reclaims the page (and mode ``0``
+       never discards them). That can expose leftover stack data from one HPX
+       thread to a later HPX thread that reuses the same stack in the same
+       process. On Linux, ``MADV_DONTNEED`` (mode ``2``) faults in fresh zero
+       pages on next touch. FreeBSD's ``MADV_DONTNEED`` only lowers page
+       priority and does **not** scrub residual stack data; ``MADV_FREE`` is
+       not a substitute for that guarantee either. Even on Linux, mode ``2``
+       does not sanitize the entire stack: the top page is excluded, a clean
+       watermark skips advice, and failed advice leaves old contents in place
+       for reuse. Do not rely on any stack recycling mode to scrub secrets;
+       clear sensitive data explicitly before its lifetime ends.
+
+The ``hpx.tracing`` configuration section
+.........................................
+
+.. code-block:: ini
+
+   [hpx.tracing]
+   sample_rate = ${HPX_TRACING_SAMPLE_RATE:1}
+
+.. _ini_hpx_tracing:
+
+.. list-table::
+
+   * * Property
+     * Description
+   * * ``hpx.tracing.sample_rate``
+     * 1-in-N sampling rate for the per-task lifecycle events on Tracy
+       builds. Initialized from the CMake option
+       :option:`HPX_WITH_TRACING_SAMPLE_RATE` (default ``1``, every task
+       sampled). Values below 1 are clamped to 1. Applied at
+       ``init_global_data`` time; can also be updated from user code via
+       ``hpx::threads::set_tracing_sample_rate(int)``, in which case each
+       worker abandons its current countdown and starts a fresh one on
+       the next task creation. Only present on Tracy builds
+       (``HPX_WITH_TRACY=ON``).
 
 The ``hpx.threadpools`` configuration section
 .............................................
@@ -370,6 +418,8 @@ The ``hpx.thread_queue`` configuration section
    [hpx.thread_queue]
    min_tasks_to_steal_pending = ${HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_PENDING:0}
    min_tasks_to_steal_staged = ${HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_STAGED:0}
+   min_tasks_to_steal_staged_early = ${HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_STAGED_EARLY:10}
+   idle_loop_count_steal_staged = ${HPX_IDLE_LOOP_COUNT_STEAL_STAGED:30}
    min_add_new_count = ${HPX_THREAD_QUEUE_MIN_ADD_NEW_COUNT:10}
    max_add_new_count = ${HPX_THREAD_QUEUE_MAX_ADD_NEW_COUNT:10}
    max_delete_count = ${HPX_THREAD_QUEUE_MAX_DELETE_COUNT:1000}
@@ -388,6 +438,22 @@ The ``hpx.thread_queue`` configuration section
      * The value of this property defines the number of staged |hpx| tasks that
        need to be available before neighboring cores are allowed to steal work.
        The default is to allow stealing always.
+   * * ``hpx.thread_queue.idle_loop_count_steal_staged``
+     * The value of this property defines the number of consecutive empty
+       scheduling loop iterations after which a core starts stealing staged
+       |hpx| tasks from other cores (local priority queue scheduler only, other
+       schedulers start after ``hpx.max_idle_loop_count / 2`` iterations). It
+       has no effect if fast idle mode is on, which steals staged tasks right
+       away.
+   * * ``hpx.thread_queue.min_tasks_to_steal_staged_early``
+     * The value of this property defines the number of staged |hpx| tasks that
+       need to be available before neighboring cores are allowed to steal work
+       shortly after running out of work, i.e. after
+       ``hpx.thread_queue.idle_loop_count_steal_staged`` iterations (local
+       priority queue scheduler only). Cores that have been idle for
+       ``hpx.max_idle_loop_count / 2`` iterations steal staged tasks
+       regardless. Leaving a few staged tasks to the core they were placed on
+       keeps them close to the data in that core's caches.
    * * ``hpx.thread_queue.min_add_new_count``
      * The value of this property defines the minimal number of tasks to be
        converted into |hpx| threads whenever the thread queues for a core have
@@ -746,6 +812,7 @@ The ``hpx.agas`` configuration section
    use_caching = ${HPX_AGAS_USE_CACHING:1}
    use_range_caching = ${HPX_AGAS_USE_RANGE_CACHING:1}
    local_cache_size = ${HPX_AGAS_LOCAL_CACHE_SIZE:<hpx_agas_local_cache_size>}
+   rpc_timeout = ${HPX_AGAS_RPC_TIMEOUT:60000}
 
 .. REVIEW regarding hpx.agas.address and hpx.agas.port: Technically, I believe
    --hpx:agas sets this parameter, this may need to be reworded.
@@ -800,6 +867,12 @@ The ``hpx.agas`` configuration section
        maximum number of ranges stored in the cache, not the number of entries
        spanned by the cache. The default depends on the compile time
        preprocessor constant ``HPX_AGAS_LOCAL_CACHE_SIZE`` (``4096``).
+   * * ``hpx.agas.rpc_timeout``
+     * This property specifies the timeout (in milliseconds) for :term:`AGAS`
+       RPC requests. Defaults to ``60000`` ms. This property can be configured
+       at startup (e.g., ``--hpx:ini=hpx.agas.rpc_timeout=val``), set through
+       the ``HPX_AGAS_RPC_TIMEOUT`` environment variable, or updated at
+       runtime via the atomic setter ``hpx::agas::set_rpc_timeout()``.
 
 The ``hpx.commandline`` configuration section
 .............................................
@@ -1412,7 +1485,7 @@ one of the localities the application runs on.
 ==========================
 
 The predefined command line options for any application using
-:cpp:func:`hpx::init` are described in the following subsections.
+:hpx:func:`hpx::init` are described in the following subsections.
 
 .. todo:: Proofread the options.
 
@@ -1577,9 +1650,10 @@ The predefined command line options for any application using
 .. option:: --hpx:queuing arg
 
    The queue scheduling policy to use. Options are ``local``,
-   ``local-priority-fifo``, ``local-priority-lifo``, ``static``,
-   ``static-priority``, ``abp-priority-fifo``,
-   ``local-workrequesting-fifo``, ``local-workrequesting-lifo``
+   ``local-priority-fifo``, ``local-priority-fifo-double``,
+   ``local-priority-lifo``, ``static``, ``static-priority``,
+   ``abp-priority-fifo``,
+   ``local-workrequesting-fifo``, ``local-workrequesting-lifo``,
    ``local-workrequesting-mc``, and ``abp-priority-lifo``
    (default: ``local-priority-fifo``).
 
@@ -1587,8 +1661,14 @@ The predefined command line options for any application using
 
    The number of operating system threads maintaining a high priority queue
    (default: number of OS threads), valid for :option:`--hpx:queuing`\
-   ``=abp-priority``, :option:`--hpx:queuing`\ ``static-priority`` and
-   :option:`--hpx:queuing`\ ``local-priority`` only.
+   ``=local-priority-fifo``, :option:`--hpx:queuing`\
+   ``=local-priority-fifo-double``, :option:`--hpx:queuing`\
+   ``=local-priority-lifo``, :option:`--hpx:queuing`\ ``=static-priority``,
+   :option:`--hpx:queuing`\ ``=local-workrequesting-fifo``,
+   :option:`--hpx:queuing`\ ``=local-workrequesting-lifo``,
+   :option:`--hpx:queuing`\ ``=local-workrequesting-mc``,
+   :option:`--hpx:queuing`\ ``=abp-priority-fifo``, and
+   :option:`--hpx:queuing`\ ``=abp-priority-lifo`` only.
 
 .. option:: --hpx:numa-sensitive
 

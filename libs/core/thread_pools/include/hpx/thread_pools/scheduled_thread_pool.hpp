@@ -15,6 +15,7 @@
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/topology.hpp>
+
 #include <hpx/thread_pools/scheduling_loop.hpp>
 
 #include <atomic>
@@ -140,7 +141,7 @@ namespace hpx::threads::detail {
         void stop(
             std::unique_lock<std::mutex>& l, bool blocking = true) override;
 
-        void wait() override;
+        void wait(std::unique_lock<std::mutex>& l) override;
         bool is_busy() override;
         bool is_idle() override;
 
@@ -401,8 +402,8 @@ namespace hpx::threads::detail {
         network_background_callback_type network_background_callback_;
 
         std::size_t max_background_threads_;
-        std::size_t max_idle_loop_count_;
-        std::size_t max_busy_loop_count_;
+        std::int64_t max_idle_loop_count_;
+        std::int64_t max_busy_loop_count_;
         std::size_t shutdown_check_count_;
     };
 }    // namespace hpx::threads::detail

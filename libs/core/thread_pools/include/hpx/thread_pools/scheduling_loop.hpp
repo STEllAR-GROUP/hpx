@@ -18,6 +18,7 @@
 #include <hpx/thread_pools/detail/scheduling_counters.hpp>
 #include <hpx/thread_pools/detail/scheduling_log.hpp>
 
+#include <algorithm>
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
@@ -117,6 +118,13 @@ namespace hpx::threads::detail {
             context_storage =
                 hpx::execution_base::this_thread::detail::get_agent_storage();
 
+        // number of empty loop iterations after which staged threads are
+        // stolen if fast idle mode is off (max_idle_loop_count / 2, unless the
+        // scheduler starts earlier, see get_steal_staged_threshold)
+        std::int64_t const steal_staged_threshold =
+            (std::min) (scheduler.get_steal_staged_threshold(),
+                params.max_idle_loop_count_ / 2);
+
         auto added = static_cast<std::size_t>(-1);
         thread_id_ref_type next_thrd;
         while (true)
@@ -141,14 +149,14 @@ namespace hpx::threads::detail {
             // stealing staged threads is enabled if:
             // - fast idle mode is on: same as normal stealing
             // - fast idle mode off: only after normal stealing has failed for
-            //                       a while
+            //                       a while (see steal_staged_threshold)
             bool enable_stealing_staged = enable_stealing;
             if (enable_stealing_staged &&
                 !scheduler.has_scheduler_mode(
                     policies::scheduler_mode::fast_idle_mode, num_thread))
             {
-                enable_stealing_staged = !may_exit &&
-                    idle_loop_count > params.max_idle_loop_count_ / 2;
+                enable_stealing_staged =
+                    !may_exit && idle_loop_count > steal_staged_threshold;
             }
 
             if (HPX_LIKELY(thrd ||
@@ -160,6 +168,9 @@ namespace hpx::threads::detail {
 
                 idle_loop_count = 0;
                 ++busy_loop_count;
+
+                // stop do_some_work from notifying this (now busy) worker
+                scheduler.reset_idle_backoff(num_thread);
 
                 may_exit = false;
 
@@ -317,6 +328,16 @@ namespace hpx::threads::detail {
                         [[maybe_unused]] auto oldstate =
                             thrdptr->set_state(thread_schedule_state::pending);
 
+                        // A bound thread has to resume on this worker thread,
+                        // it may hold locks that are tied to the OS thread.
+                        // Boosting its priority would move it to a queue
+                        // other worker threads steal from.
+                        bool const is_bound = thrdptr->get_priority() ==
+                            threads::thread_priority::bound;
+                        auto const boosted_priority = is_bound ?
+                            threads::thread_priority::bound :
+                            thread_priority::boost;
+
                         if (HPX_LIKELY(!next_thrd))
                         {
                             // reschedule this thread right away if the
@@ -339,7 +360,7 @@ namespace hpx::threads::detail {
                                     HPX_MOVE(thrd),
                                     threads::thread_schedule_hint(
                                         static_cast<std::int16_t>(num_thread)),
-                                    true, thread_priority::boost);
+                                    !is_bound, boosted_priority);
 
                                 scheduler.SchedulingPolicy::do_some_work(
                                     num_thread);
@@ -353,7 +374,7 @@ namespace hpx::threads::detail {
                                 HPX_MOVE(thrd),
                                 threads::thread_schedule_hint(
                                     static_cast<std::int16_t>(num_thread)),
-                                true, thread_priority::boost);
+                                !is_bound, boosted_priority);
 
                             scheduler.SchedulingPolicy::do_some_work(
                                 num_thread);
@@ -402,6 +423,8 @@ namespace hpx::threads::detail {
                         idle_loop_count, enable_stealing_staged, added,
                         &next_thrd))
                 {
+                    hpx::tracing::os_thread_sleep(num_thread);
+
                     // Clean up terminated threads before trying to exit
                     bool can_exit = !running &&
                         scheduler.SchedulingPolicy::cleanup_terminated(
@@ -434,23 +457,10 @@ namespace hpx::threads::detail {
                                 // immediately
                                 if (background_thread != nullptr)
                                 {
-                                    HPX_ASSERT(background_running);
-                                    *background_running = false;    //-V522
-
-                                    // do background work in parcel layer and in
-                                    // agas
-                                    [[maybe_unused]] bool const has_exited =
-                                        call_background_thread(
-                                            background_thread, next_thrd,
-                                            scheduler, num_thread,
-                                            bg_work_exec_time_init,
-                                            context_storage);
-
-                                    // the background thread should have exited
-                                    HPX_ASSERT(has_exited);
-
-                                    background_thread.reset();
-                                    background_running.reset();
+                                    stop_background_thread(background_thread,
+                                        next_thrd, scheduler, num_thread,
+                                        bg_work_exec_time_init, context_storage,
+                                        background_running);
                                 }
                                 else
                                 {
@@ -485,7 +495,8 @@ namespace hpx::threads::detail {
 
                 if (do_background_work)
                 {
-                    // do background work in parcel layer and in agas
+                    [[maybe_unused]] hpx::tracing::background_work_region
+                        bg_zone(num_thread);
                     call_and_create_background_thread(background_thread,
                         next_thrd, scheduler, num_thread,
                         bg_work_exec_time_init, context_storage, params,
@@ -514,7 +525,8 @@ namespace hpx::threads::detail {
 
                 if (do_background_work)
                 {
-                    // do background work in parcel layer and in agas
+                    [[maybe_unused]] hpx::tracing::background_work_region
+                        bg_zone(num_thread);
                     call_and_create_background_thread(background_thread,
                         next_thrd, scheduler, num_thread,
                         bg_work_exec_time_init, context_storage, params,
@@ -551,20 +563,9 @@ namespace hpx::threads::detail {
 
                 if (background_thread)
                 {
-                    HPX_ASSERT(background_running);
-                    *background_running = false;
-
-                    // do background work in parcel layer and in agas
-                    [[maybe_unused]] bool const has_exited =
-                        call_background_thread(background_thread, next_thrd,
-                            scheduler, num_thread, bg_work_exec_time_init,
-                            context_storage);
-
-                    // the background thread should have exited
-                    HPX_ASSERT(has_exited);
-
-                    background_thread.reset();
-                    background_running.reset();
+                    stop_background_thread(background_thread, next_thrd,
+                        scheduler, num_thread, bg_work_exec_time_init,
+                        context_storage, background_running);
                 }
                 else
                 {

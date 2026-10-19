@@ -13,6 +13,7 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <string_view>
 
 #include <hpx/modules/itt_notify.hpp>
 
@@ -51,7 +52,7 @@ namespace hpx::tracing {
         loop_context& operator=(loop_context const&) = delete;
 
         util::itt::stack_context stack_ctx;
-        util::itt::thread_domain thread_domain;
+        util::itt::domain const& domain;
         util::itt::string_handle task_id;
         util::itt::string_handle task_phase;
     };
@@ -77,26 +78,60 @@ namespace hpx::tracing {
     ////////////////////////////////////////////////////////////////////////////
     HPX_CXX_CORE_EXPORT struct [[maybe_unused]] mark_event
     {
-        constexpr explicit mark_event(char const*) noexcept {}
+        HPX_CORE_EXPORT explicit mark_event(char const* name) noexcept;
     };
 
     ////////////////////////////////////////////////////////////////////////////
     HPX_CXX_CORE_EXPORT struct fiber_region_init_data
     {
+        char const* name = nullptr;
     };
 
     HPX_CXX_CORE_EXPORT struct [[maybe_unused]] fiber_region
     {
-        constexpr explicit fiber_region(
-            fiber_region_init_data const&, std::size_t) noexcept
-        {
-        }
+        HPX_CORE_EXPORT explicit fiber_region(
+            fiber_region_init_data const& data,
+            std::size_t num_thread) noexcept;
+        HPX_CORE_EXPORT ~fiber_region();
+
+        fiber_region(fiber_region const&) = delete;
+        fiber_region& operator=(fiber_region const&) = delete;
+
+    private:
+        util::itt::task task_;
     };
 
     ////////////////////////////////////////////////////////////////////////////
     HPX_CXX_CORE_EXPORT struct [[maybe_unused]] fiber_suspend_region
     {
-        constexpr explicit fiber_suspend_region(char const*) noexcept {}
+        HPX_CORE_EXPORT explicit fiber_suspend_region(
+            char const* desc) noexcept;
+        HPX_CORE_EXPORT ~fiber_suspend_region();
+
+        fiber_suspend_region(fiber_suspend_region const&) = delete;
+        fiber_suspend_region& operator=(fiber_suspend_region const&) = delete;
+
+    private:
+        // overlapped_task, not task: the region can span a self.yield()
+        // and be destroyed on a different worker than it was constructed
+        // on. __itt_task_end without an id would close whatever is on the
+        // resuming worker's stack.
+        util::itt::overlapped_task task_;
+    };
+
+    ////////////////////////////////////////////////////////////////////////////
+    HPX_CXX_CORE_EXPORT struct [[maybe_unused]] background_work_region
+    {
+        HPX_CORE_EXPORT explicit background_work_region(
+            std::size_t num_thread = 0) noexcept;
+        HPX_CORE_EXPORT ~background_work_region();
+
+        background_work_region(background_work_region const&) = delete;
+        background_work_region& operator=(
+            background_work_region const&) = delete;
+
+    private:
+        util::itt::task task_;
     };
 
     ////////////////////////////////////////////////////////////////////////////
@@ -247,6 +282,35 @@ namespace hpx::tracing {
         }
     };
 
+#if defined(HPX_HAVE_TRACING_LIFECYCLE_EVENTS)
+    // The task-lifecycle signals drive ITT overlapped tasks so VTune can
+    // follow a fiber as it migrates between worker threads. Each is emitted
+    // out-of-line and gated on the live tool state inside the translation
+    // unit, mirroring the other real ITT entry points below.
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void task_staged(
+        char const* name, void const* task_id = nullptr) noexcept;
+
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void task_created(char const* name,
+        void const* task_id, void const* parent_id = nullptr) noexcept;
+
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void task_executing(
+        void const* task_id, char const* name, std::size_t worker) noexcept;
+
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void task_yielded(
+        void const* task_id, char const* name) noexcept;
+
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void task_suspended(void const* task_id,
+        char const* name, char const* desc = nullptr) noexcept;
+
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void task_resumed(void const* task_id,
+        char const* name, char const* desc = nullptr) noexcept;
+
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void task_completed(
+        void const* task_id, char const* name) noexcept;
+
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void task_deleted(
+        void const* task_id) noexcept;
+#else
     HPX_CXX_CORE_EXPORT constexpr void task_staged(
         char const*, void const* = nullptr) noexcept
     {
@@ -283,6 +347,7 @@ namespace hpx::tracing {
     }
 
     HPX_CXX_CORE_EXPORT constexpr void task_deleted(void const*) noexcept {}
+#endif
 
     /// \brief Producer-side signal: future state fulfilled (no-op stub for ITTNotify).
     HPX_CXX_CORE_EXPORT constexpr void future_fulfilled(
@@ -314,19 +379,36 @@ namespace hpx::tracing {
     {
     }
 
-    /// \brief Frame boundary marker (no-op stub for ITTNotify).
-    HPX_CXX_CORE_EXPORT constexpr void frame_mark(
-        char const* = nullptr) noexcept
+    /// \brief Signal emitted when a worker thread steals a task from
+    ///        another worker.
+#if defined(HPX_HAVE_TRACING_WORK_STEALING_EVENTS)
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void work_stolen(std::size_t thief,
+        std::size_t victim, void const* task_id,
+        char const* name = nullptr) noexcept;
+#else
+    HPX_CXX_CORE_EXPORT constexpr void work_stolen(
+        std::size_t, std::size_t, void const*, char const* = nullptr) noexcept
     {
     }
-    HPX_CXX_CORE_EXPORT constexpr void tracing_init(
-        char const*, int, char**, std::uint32_t = 0, std::uint32_t = 1) noexcept
-    {
-    }
+#endif
+
+    /// \brief Frame boundary marker.
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void frame_mark(
+        char const* name = nullptr) noexcept;
+
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void os_thread_sleep(
+        std::size_t num_thread) noexcept;
+
+    HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void tracing_init(char const*, int,
+        char**, std::uint32_t = 0, std::uint32_t = 1,
+        std::string_view = {}) noexcept;
 
     HPX_CXX_CORE_EXPORT constexpr void tracing_finalize() noexcept {}
 
-    HPX_CXX_CORE_EXPORT constexpr void register_thread(char const*) noexcept {}
+    HPX_CXX_CORE_EXPORT inline void register_thread(char const* name) noexcept
+    {
+        HPX_ITT_THREAD_SET_NAME(name);
+    }
 
     HPX_CXX_CORE_EXPORT HPX_CORE_EXPORT void create_counter(
         std::string const& full_name, std::string const& short_name) noexcept;
@@ -335,13 +417,27 @@ namespace hpx::tracing {
         std::string const& name, std::string const& short_name,
         double value) noexcept;
 
-    HPX_CXX_CORE_EXPORT constexpr void send_parcel(
-        std::uint64_t, std::uint64_t, std::uint64_t) noexcept
+    /// \brief Parcel-send signal: parcel handed to parcelport
+    ///        (no-op stub for ITTNotify).
+    HPX_CXX_CORE_EXPORT constexpr void send_parcel(std::uint64_t /*tag_msb*/,
+        std::uint64_t /*tag_lsb*/, std::uint64_t /*size*/,
+        std::uint64_t /*target_locality_id*/) noexcept
     {
     }
 
-    HPX_CXX_CORE_EXPORT constexpr void recv_parcel(
-        std::uint64_t, std::uint64_t, std::uint64_t, std::uint64_t) noexcept
+    /// \brief Parcel-receive signal: parcel arrived (no-op stub for ITTNotify).
+    HPX_CXX_CORE_EXPORT constexpr void recv_parcel(std::uint64_t /*tag_msb*/,
+        std::uint64_t /*tag_lsb*/,
+        std::uint64_t /*source_locality_id*/) noexcept
+    {
+    }
+
+    /// \brief Parcel-scheduled signal: action entered local scheduler
+    ///        (no-op stub for ITTNotify).
+    HPX_CXX_CORE_EXPORT constexpr void parcel_scheduled(
+        std::uint64_t /*tag_msb*/, std::uint64_t /*tag_lsb*/,
+        std::uint64_t /*source_locality_id*/,
+        std::uint64_t /*source_thread_id*/) noexcept
     {
     }
 

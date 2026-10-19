@@ -29,6 +29,11 @@ namespace hpx::agas::detail::impl {
         return naming::get_agas_client().is_console();
     }
 
+    bool is_connecting(naming::gid_type const& locality)
+    {
+        return naming::get_agas_client().is_connecting(locality);
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     bool register_name(
         std::string const& name, naming::gid_type const& gid, error_code&)
@@ -466,10 +471,25 @@ namespace hpx::agas::detail::impl {
         return naming::get_agas_client().was_object_migrated(gid, HPX_MOVE(f));
     }
 
+    std::pair<bool, components::pinned_ptr> was_object_migrated_with_lva(
+        naming::gid_type const& gid, naming::address_type lva,
+        hpx::move_only_function<components::pinned_ptr()>&& f)
+    {
+        return naming::get_agas_client().was_object_migrated(
+            gid, lva, HPX_MOVE(f));
+    }
+
     void unmark_as_migrated(
         naming::gid_type const& gid, hpx::move_only_function<void()>&& f)
     {
         return naming::get_agas_client().unmark_as_migrated(gid, HPX_MOVE(f));
+    }
+
+    void unmark_as_migrated_with_lva(naming::gid_type const& gid,
+        naming::address_type lva, hpx::move_only_function<void()>&& f)
+    {
+        return naming::get_agas_client().unmark_as_migrated(
+            gid, lva, HPX_MOVE(f));
     }
 
     hpx::future<symbol_namespace::iterate_names_return_type> find_symbols_async(
@@ -534,6 +554,7 @@ namespace hpx::agas {
         agas_interface_functions()
         {
             detail::is_console = &detail::impl::is_console;
+            detail::is_connecting = &detail::impl::is_connecting;
 
             detail::register_name = &detail::impl::register_name;
             detail::register_name_async = &detail::impl::register_name_async;
@@ -622,6 +643,10 @@ namespace hpx::agas {
             detail::mark_as_migrated = &detail::impl::mark_as_migrated;
             detail::was_object_migrated = &detail::impl::was_object_migrated;
             detail::unmark_as_migrated = &detail::impl::unmark_as_migrated;
+            detail::was_object_migrated_with_lva =
+                &detail::impl::was_object_migrated_with_lva;
+            detail::unmark_as_migrated_with_lva =
+                &detail::impl::unmark_as_migrated_with_lva;
 
             detail::find_symbols_async = &detail::impl::find_symbols_async;
             detail::find_symbols = &detail::impl::find_symbols;

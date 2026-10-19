@@ -229,6 +229,8 @@ namespace hpx {
     defined(__FreeBSD__)
                 threads::coroutines::detail::posix::use_guard_pages =
                     cmdline.rtcfg_.use_stack_guard_pages();
+                threads::coroutines::detail::posix::unbind_on_reset =
+                    cmdline.rtcfg_.stack_unbind_on_reset();
 #endif
 #ifdef HPX_HAVE_VERIFY_LOCKS
                 if (cmdline.rtcfg_.enable_lock_detection())
@@ -356,6 +358,12 @@ namespace hpx {
                 [[maybe_unused]] hpx::util::runtime_configuration const& cfg)
             {
                 HPX_UNUSED(hpx::filesystem::initial_path());
+
+#if defined(HPX_WINDOWS) && defined(HPX_HAVE_APEX)
+                // artificially force the apex shared library to be loaded by the
+                // application
+                apex::version();
+#endif
 
                 hpx::assertion::set_assertion_handler(
                     &hpx::detail::assertion_handler);

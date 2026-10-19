@@ -118,6 +118,7 @@ _DOXYGEN_KIND_TO_DIRECTIVE = {
     'class': 'doxygenclass',
     'struct': 'doxygenstruct',
     'union': 'doxygenclass',
+    'define': 'doxygendefine',
     'variable': 'doxygenvariable',
     'enum': 'doxygenenum',
     'typedef': 'doxygentypedef',
@@ -224,10 +225,15 @@ def _load_doxygen_symbol_kinds():
                 if name_el is None or not name_el.text:
                     continue
                 name = name_el.text.strip()
-                qualname = f'{compoundname}::{name}' if compoundname else name
                 member_directive = _DOXYGEN_KIND_TO_DIRECTIVE.get(
                     memberdef.get('kind'))
                 if member_directive:
+                    # Doxygen records macros as members of their defining
+                    # file, while their documented API names are unqualified.
+                    # Other members are qualified with their enclosing
+                    # namespace/class as above.
+                    qualname = (name if memberdef.get('kind') == 'define'
+                        else f'{compoundname}::{name}' if compoundname else name)
                     kinds[qualname] = member_directive
     _symbol_kinds_by_qualname = kinds
     return kinds
@@ -806,11 +812,11 @@ rst_prolog += '''
 .. |cpplang_slack| replace:: Cpplang Slack
 .. _cpplang_slack: https://cpplang.slack.com
 .. |stellar_hpx_download| replace:: |hpx| Downloads
-.. _stellar_hpx_download: https://hpx.stellar-group.org/downloads/
+.. _stellar_hpx_download: https://hpx.dev/downloads/
 .. |stellar_hpx_funding| replace:: |hpx| Funding Acknowledgements
-.. _stellar_hpx_funding: https://hpx.stellar-group.org/funding-acknowledgements/
+.. _stellar_hpx_funding: https://hpx.dev/funding-acknowledgements/
 .. |stellar_hpx_users| replace:: |hpx| Users
-.. _stellar_hpx_users: https://hpx.stellar-group.org/hpx-users/
+.. _stellar_hpx_users: https://hpx.dev/hpx-users/
 .. |hpx_github| replace:: Github
 .. _hpx_github: https://github.com/TheHPXProject/hpx/
 .. |hpx_github_issues| replace:: |hpx| Issues
@@ -951,6 +957,10 @@ rst_prolog += '''
 .. _apex_hpx_doc: https://uo-oaciss.github.io/apex/usage/#hpx-louisiana-state-university
 .. |tau| replace:: TAU
 .. _tau: https://www.cs.uoregon.edu/research/tau/home.php
+.. |tracy| replace:: Tracy
+.. _tracy: https://github.com/wolfpld/tracy
+.. |ittnotify| replace:: Intel ITT API
+.. _ittnotify: https://github.com/intel/ittapi
 .. |cmake| replace:: CMake
 .. _cmake: https://www.cmake.org
 .. |cppdependencies| replace:: cpp-dependencies

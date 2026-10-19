@@ -35,7 +35,10 @@ namespace hpx::detail {
     HPX_CXX_CORE_EXPORT template <typename T>
     using empty_vtable_t = typename empty_vtable_type<T>::type;
 
-#if !defined(HPX_MSVC) && !defined(__CUDACC__) &&                              \
+    // On Windows the empty vtable types are imported from the HPX DLL in
+    // shared builds, and the address of an object whose vtable is imported
+    // is not a constant expression, so fall back to a function-local static.
+#if !defined(HPX_WINDOWS) && !defined(__CUDACC__) &&                           \
     !defined(HPX_COMPUTE_DEVICE_CODE)
     HPX_CXX_CORE_EXPORT template <typename T>
     inline constexpr empty_vtable_t<T> empty_vtable{};
@@ -473,7 +476,7 @@ namespace hpx::execution::experimental::detail {
 
         void set_stopped() && noexcept override
         {
-            HPX_UNREACHABLE;
+            hpx::execution::experimental::set_stopped(HPX_MOVE(receiver));
         }
     };
 
@@ -700,7 +703,7 @@ namespace hpx::execution::experimental::detail {
 
 namespace hpx::execution::experimental {
 
-#if defined(HPX_MSVC) || !defined(HPX_HAVE_CXX20_TRIVIAL_VIRTUAL_DESTRUCTOR)
+#if defined(HPX_WINDOWS) || !defined(HPX_HAVE_CXX20_TRIVIAL_VIRTUAL_DESTRUCTOR)
     namespace detail {
         // This helper only exists to make it possible to use
         // any_(unique_)sender in global variables or in general static that may
@@ -727,7 +730,7 @@ namespace hpx::execution::experimental {
 
     HPX_CXX_CORE_EXPORT template <typename... Ts>
     class unique_any_sender
-#if defined(HPX_MSVC)
+#if defined(HPX_WINDOWS)
       : private detail::any_sender_static_empty_vtable_helper<Ts...>
 #endif
     {
@@ -772,10 +775,14 @@ namespace hpx::execution::experimental {
         unique_any_sender& operator=(unique_any_sender&&) = default;
         unique_any_sender& operator=(unique_any_sender const&) = delete;
 
-        // TODO: Remove this
-        using completion_signatures =
-            hpx::execution::experimental::completion_signatures<
-                set_value_t(Ts...), set_error_t(std::exception_ptr)>;
+        template <typename Self, typename... Env>
+        static consteval auto get_completion_signatures() noexcept
+            -> hpx::execution::experimental::completion_signatures<set_value_t(
+                                                                       Ts...),
+                set_error_t(std::exception_ptr), set_stopped_t()>
+        {
+            return {};
+        }
 
         template <typename R>
         detail::any_operation_state connect(R&& r) &&
@@ -792,7 +799,7 @@ namespace hpx::execution::experimental {
 
     HPX_CXX_CORE_EXPORT template <typename... Ts>
     class any_sender
-#if defined(HPX_MSVC)
+#if defined(HPX_WINDOWS)
       : private detail::any_sender_static_empty_vtable_helper<Ts...>
 #endif
     {
@@ -847,10 +854,14 @@ namespace hpx::execution::experimental {
         any_sender& operator=(any_sender&&) = default;
         any_sender& operator=(any_sender const&) = default;
 
-        // TODO: Remove this
-        using completion_signatures =
-            hpx::execution::experimental::completion_signatures<
-                set_value_t(Ts...), set_error_t(std::exception_ptr)>;
+        template <typename Self, typename... Env>
+        static consteval auto get_completion_signatures() noexcept
+            -> hpx::execution::experimental::completion_signatures<set_value_t(
+                                                                       Ts...),
+                set_error_t(std::exception_ptr), set_stopped_t()>
+        {
+            return {};
+        }
 
         template <typename R>
         detail::any_operation_state connect(R&& r) &

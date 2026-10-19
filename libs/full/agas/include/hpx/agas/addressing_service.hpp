@@ -29,7 +29,6 @@
 #include <map>
 #include <memory>
 #include <mutex>
-#include <set>
 #include <string>
 #include <system_error>
 #include <utility>
@@ -65,7 +64,10 @@ namespace hpx::agas {
         using gva_cache_type = hpx::util::cache::lru_cache<gva_cache_key, gva,
             hpx::util::cache::statistics::local_full_statistics>;
 
-        using migrated_objects_table_type = std::set<naming::gid_type>;
+        // A null address marks an object as away. A non-null address records
+        // the current LVA after the object has migrated back to this locality.
+        using migrated_objects_table_type =
+            std::map<naming::gid_type, naming::address_type>;
         using refcnt_requests_type = std::map<naming::gid_type, std::int64_t>;
 
         mutable hpx::shared_mutex gva_cache_mtx_;
@@ -105,9 +107,32 @@ namespace hpx::agas {
         std::atomic<hpx::state> state_;
         naming::gid_type locality_;
 
+        /// How a locality became known to this instance, which decides whether
+        /// hpx::force_disconnect may remove it.
+        enum class resolved_locality_state : std::uint8_t
+        {
+            /// Started with the application, or learned about by resolving
+            /// its address. hpx::force_disconnect rejects it.
+            connected,
+            /// Connected after the application started and registered as
+            /// such here, which only the console does. hpx::force_disconnect
+            /// accepts it.
+            connecting,
+            /// Claimed by an hpx::force_disconnect call that is still removing
+            /// it. Further claims are rejected until the entry is erased.
+            disconnecting
+        };
+
+        /// What this instance knows about one locality.
+        struct resolved_locality
+        {
+            parcelset::endpoints_type endpoints;
+            resolved_locality_state state;
+        };
+
         mutable hpx::shared_mutex resolved_localities_mtx_;
         using resolved_localities_type =
-            std::map<naming::gid_type, parcelset::endpoints_type>;
+            std::map<naming::gid_type, resolved_locality>;
         resolved_localities_type resolved_localities_;
 
         explicit addressing_service(util::runtime_configuration const& ini_);
@@ -165,6 +190,36 @@ namespace hpx::agas {
         {
             return runtime_type == runtime_mode::connect;
         }
+
+        /// \brief Return whether a locality joined while connecting.
+        ///
+        /// \param locality The locality GID to inspect. If locality is invalid,
+        ///                 return the connecting status of the calling
+        ///                 locality.
+        ///
+        /// \returns `true` if the locality connected late, also while it is
+        ///          being removed and after it was disconnected, and `false`
+        ///          for a locality that started with the application.
+        bool is_connecting(hpx::naming::gid_type const& locality) const;
+
+        /// \brief Atomically claim a connecting locality for disconnection.
+        ///
+        /// \param locality The locality GID to claim.
+        ///
+        /// \returns `true` if this call changed the locality state from
+        ///          connecting to disconnecting, and `false` otherwise.
+        bool mark_connecting_locality_as_disconnecting(
+            hpx::naming::gid_type const& locality);
+
+        /// \brief Release a claim made by
+        ///        mark_connecting_locality_as_disconnecting.
+        ///
+        /// \param locality The locality GID to release.
+        ///
+        /// \returns `true` if this call changed the locality state from
+        ///          disconnecting back to connecting, and `false` otherwise.
+        bool mark_disconnecting_locality_as_connecting(
+            hpx::naming::gid_type const& locality);
 
         bool resolve_locally_known_addresses(
             naming::gid_type const& id, naming::address& addr) const;
@@ -227,10 +282,18 @@ namespace hpx::agas {
         bool bind_postproc(
             naming::gid_type const& id, gva const& g, future<bool> f);
 
-        /// Maintain list of migrated objects
-        bool was_object_migrated_locked(naming::gid_type const& id);
+        /// Return whether the object is currently marked as away.
+        bool was_object_migrated_locked(naming::gid_type const& id) const;
+        /// Erase a resident record only if it still refers to the given LVA.
+        void erase_migrated_object(
+            naming::gid_type const& id, naming::address_type lva);
 
     private:
+        /// Move a locality from one state to another under the resolved
+        /// localities lock. Returns `false` if it is unknown or not in \a from.
+        bool transition_resolved_locality(hpx::naming::gid_type const& locality,
+            resolved_locality_state from, resolved_locality_state to);
+
         /// Assumes that \a refcnt_requests_mtx_ is locked.
         void send_refcnt_requests(
             std::unique_lock<mutex_type>& l, error_code& ec = throws);
@@ -269,7 +332,7 @@ namespace hpx::agas {
         /// \brief Add a locality to the runtime.
         bool register_locality(parcelset::endpoints_type const& endpoints,
             naming::gid_type& prefix, std::uint32_t num_threads,
-            error_code& ec = throws);
+            bool is_connecting, error_code& ec = throws);
 
         /// \brief Resolve a locality to its prefix.
         ///
@@ -277,7 +340,7 @@ namespace hpx::agas {
         parcelset::endpoints_type const& resolve_locality(
             naming::gid_type const& gid, error_code& ec = throws);
 
-        bool has_resolved_locality(naming::gid_type const& gid);
+        bool has_resolved_locality(naming::gid_type const& gid) const;
 
         /// \brief Remove a locality from the runtime.
         bool unregister_locality(
@@ -930,7 +993,7 @@ namespace hpx::agas {
         }
 
         bool resolve_cached(naming::gid_type const& id, naming::address& addr,
-            error_code& ec = throws);
+            error_code& ec = throws) const;
 
         bool resolve_cached(hpx::id_type const& id, naming::address& addr,
             error_code& ec = throws)
@@ -964,7 +1027,8 @@ namespace hpx::agas {
 
         bool resolve_cached(naming::gid_type const* gids,
             naming::address* addrs, std::size_t size,
-            hpx::detail::dynamic_bitset<>& locals, error_code& ec = throws);
+            hpx::detail::dynamic_bitset<>& locals,
+            error_code& ec = throws) const;
 
 #if defined(HPX_HAVE_NETWORKING)
         /// \brief Route the given parcel to the appropriate AGAS service instance
@@ -1222,10 +1286,15 @@ namespace hpx::agas {
             hpx::id_type const& id);
         bool end_migration(hpx::id_type const& id);
 
-        /// Maintain list of migrated objects
+        /// Check whether an object is marked as having migrated away.
         std::pair<bool, components::pinned_ptr> was_object_migrated(
             naming::gid_type const& gid,
-            hpx::move_only_function<components::pinned_ptr()>&& f);
+            hpx::move_only_function<components::pinned_ptr()>&& f) const;
+
+        /// Check the supplied LVA against the local migration state.
+        std::pair<bool, components::pinned_ptr> was_object_migrated(
+            naming::gid_type const& gid, naming::address_type lva,
+            hpx::move_only_function<components::pinned_ptr()>&& f) const;
 
         /// Mark the given object as being migrated (if the object is unpinned).
         /// Delay migration until the object is unpinned otherwise.
@@ -1233,9 +1302,13 @@ namespace hpx::agas {
             hpx::move_only_function<std::pair<bool, hpx::future<void>>()>&& f,
             bool expect_to_be_marked_as_migrating);
 
-        /// Remove the given object from the table of migrated objects
+        /// Remove an object's migration record when its LVA is unavailable.
         void unmark_as_migrated(
-            naming::gid_type const& gid_, hpx::move_only_function<void()>&& f);
+            naming::gid_type const& gid, hpx::move_only_function<void()>&& f);
+
+        /// Record the current LVA of an object which is resident again.
+        void unmark_as_migrated(naming::gid_type const& gid_,
+            naming::address_type lva, hpx::move_only_function<void()>&& f);
 
         // Pre-cache locality endpoints in hosted locality namespace
         void pre_cache_endpoints(std::vector<parcelset::endpoints_type> const&);
