@@ -151,6 +151,7 @@ set(algorithms_headers
     hpx/parallel/container_algorithms/partial_sort.hpp
     hpx/parallel/container_algorithms/partial_sort_copy.hpp
     hpx/parallel/container_algorithms/partition.hpp
+    hpx/parallel/container_algorithms/radix_sort.hpp
     hpx/parallel/container_algorithms/reduce.hpp
     hpx/parallel/container_algorithms/remove_copy.hpp
     hpx/parallel/container_algorithms/remove.hpp

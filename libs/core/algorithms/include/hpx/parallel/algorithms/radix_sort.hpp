@@ -4,38 +4,112 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file parallel/algorithms/radix_sort.hpp
 /// \page hpx::radix_sort
 /// \headerfile hpx/algorithm.hpp
-///
-/// In-place MSD radix sort over fixed-width integral keys, structured along
-/// the IPS^2Ra pipeline of Axtmann et al. (ACM TOPC 2022): classify into
-/// digit buckets, compute boundaries via prefix sums, permute in place, then
-/// recurse or fall back to a sequential base case for small partitions.
-///
-/// Large partitions are distributed with the blockwise engine from
-/// detail/ips_distribution.hpp (in parallel for parallel execution
-/// policies); smaller ones use an element-wise in-place permutation, and the
-/// smallest ones are handed to std::sort.
 
 #pragma once
 
 #if defined(DOXYGEN)
 
 namespace hpx {
+    // clang-format off
 
-    /// Sort the range [first, last) of integral keys (or values whose
-    /// projection yields an integral key) in ascending order, in place,
-    /// using radix sort.
+    ///////////////////////////////////////////////////////////////////////////
+    /// Sorts the elements in the range [first, last) in ascending order of
+    /// their integral keys, using an in-place MSD radix sort (IPS2Ra, see
+    /// Axtmann et al., "Engineering In-place (Shared-memory) Sorting
+    /// Algorithms", ACM TOPC 2022). The key of an element is the result of
+    /// applying \a proj to it; it must be of an integral type other than
+    /// bool. The order of elements with equal keys is not guaranteed to be
+    /// preserved.
+    ///
+    /// \note   Complexity: O(N * W / 8) element moves and key extractions,
+    ///         where N = std::distance(first, last) and W is the number of
+    ///         bits in the key type, plus O(N log N) comparisons for the
+    ///         small partitions sorted by comparison. Digits that are equal
+    ///         in all keys are skipped. Auxiliary memory is independent of N.
+    ///
+    /// \tparam RandomIt    The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     random access iterator.
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a hpx::identity.
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     yields the integral key of an element.
+    ///
+    /// The assignments in the parallel \a radix_sort algorithm invoked
+    /// without an execution policy object execute in sequential order in the
+    /// calling thread.
+    ///
     template <typename RandomIt, typename Proj = hpx::identity>
     void radix_sort(RandomIt first, RandomIt last, Proj proj = Proj());
 
-    /// Execution-policy overload. Parallel policies distribute large ranges
-    /// with the parallel blockwise engine and sort the resulting buckets as
-    /// separate tasks.
+    ///////////////////////////////////////////////////////////////////////////
+    /// Sorts the elements in the range [first, last) in ascending order of
+    /// their integral keys, using an in-place MSD radix sort (IPS2Ra, see
+    /// Axtmann et al., "Engineering In-place (Shared-memory) Sorting
+    /// Algorithms", ACM TOPC 2022). The key of an element is the result of
+    /// applying \a proj to it; it must be of an integral type other than
+    /// bool. The order of elements with equal keys is not guaranteed to be
+    /// preserved.
+    ///
+    /// \note   Complexity: O(N * W / 8) element moves and key extractions,
+    ///         where N = std::distance(first, last) and W is the number of
+    ///         bits in the key type, plus O(N log N) comparisons for the
+    ///         small partitions sorted by comparison. Digits that are equal
+    ///         in all keys are skipped. Auxiliary memory is O(P * B * 256)
+    ///         elements, where P is the number of threads used and B the
+    ///         block size (2 KiB worth of elements).
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam RandomIt    The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     random access iterator.
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a hpx::identity.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     yields the integral key of an element.
+    ///
+    /// The application of function objects in parallel algorithm
+    /// invoked with an execution policy object of type
+    /// \a sequenced_policy execute in sequential order in the
+    /// calling thread.
+    ///
+    /// The application of function objects in parallel algorithm
+    /// invoked with an execution policy object of type
+    /// \a parallel_policy or \a parallel_task_policy are
+    /// permitted to execute in an unordered fashion in unspecified
+    /// threads, and indeterminately sequenced within each thread.
+    ///
+    /// \returns  The \a radix_sort algorithm returns a
+    ///           \a hpx::future<void> if the execution policy is of
+    ///           type
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and returns \a void
+    ///           otherwise.
+    ///
     template <typename ExPolicy, typename RandomIt,
         typename Proj = hpx::identity>
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy> radix_sort(
         ExPolicy&& policy, RandomIt first, RandomIt last, Proj proj = Proj());
+
+    // clang-format on
 }    // namespace hpx
 
 #else
@@ -70,6 +144,14 @@ namespace hpx {
 #include <utility>
 #include <vector>
 
+// Implementation overview: an MSD radix sort with 8-bit digits, structured
+// along the IPS^2Ra pipeline. Every level classifies elements into digit
+// buckets, computes bucket boundaries via prefix sums, permutes in place and
+// recurses into the buckets. Large partitions are distributed with the
+// blockwise engine from detail/ips_distribution.hpp (in parallel for parallel
+// execution policies), smaller ones with an element-wise in-place
+// permutation, and the smallest ones are handed to std::sort.
+
 namespace hpx::parallel::detail {
 
     ///////////////////////////////////////////////////////////////////////////
@@ -102,6 +184,17 @@ namespace hpx::parallel::detail {
             }
         }
     };
+
+    // Whether projecting the elements of Iter with Proj yields a key that
+    // radix_sort can sort by: integral, but not bool.
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Proj>
+    using radix_sort_key_t = std::decay_t<decltype(HPX_INVOKE(
+        std::declval<Proj&>(), *std::declval<Iter>()))>;
+
+    HPX_CXX_CORE_EXPORT template <typename Iter, typename Proj>
+    inline constexpr bool is_radix_sort_key_v =
+        std::is_integral_v<radix_sort_key_t<Iter, Proj>> &&
+        !std::is_same_v<radix_sort_key_t<Iter, Proj>, bool>;
 
     ///////////////////////////////////////////////////////////////////////////
     // Pipeline parameters.
@@ -701,20 +794,9 @@ namespace hpx {
       : hpx::detail::tag_dispatch<radix_sort_t,
             hpx::detail::tag_parallel_algorithm<radix_sort_t>>
     {
-    private:
-        template <typename Iter, typename Proj>
-        using projected_key_t = std::decay_t<decltype(HPX_INVOKE(
-            std::declval<Proj&>(), *std::declval<Iter>()))>;
-
-        template <typename Iter, typename Proj>
-        static constexpr bool is_radix_key_v =
-            std::is_integral_v<projected_key_t<Iter, Proj>> &&
-            !std::is_same_v<projected_key_t<Iter, Proj>, bool>;
-
-    public:
         template <typename RandomIt, typename Proj = hpx::identity>
             requires(hpx::traits::is_iterator_v<RandomIt> &&
-                is_radix_key_v<RandomIt, Proj>)
+                hpx::parallel::detail::is_radix_sort_key_v<RandomIt, Proj>)
         static void invoke_default(
             RandomIt first, RandomIt last, Proj proj = Proj())
         {
@@ -729,7 +811,7 @@ namespace hpx {
             typename Proj = hpx::identity>
             requires(hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<RandomIt> &&
-                is_radix_key_v<RandomIt, Proj>)
+                hpx::parallel::detail::is_radix_sort_key_v<RandomIt, Proj>)
         static parallel::util::detail::algorithm_result_t<ExPolicy>
         invoke_default(ExPolicy&& policy, RandomIt first, RandomIt last,
             Proj proj = Proj())
