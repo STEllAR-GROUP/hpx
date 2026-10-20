@@ -116,14 +116,16 @@ namespace hpx::parallel::detail {
     HPX_CXX_CORE_EXPORT inline constexpr std::size_t radix_sort_bucket_mask =
         radix_sort_buckets - 1;
 
-    // Below this many elements, fall back to std::sort. Chosen so that the
-    // overhead of histogramming + permutation does not dominate.
-    HPX_CXX_CORE_EXPORT inline constexpr std::size_t radix_sort_base_case = 128;
+    // Below this many elements, fall back to std::sort. Tuned on x86-64:
+    // smaller values make the radix passes dominate (16 is ~2x slower for
+    // 2^20 keys), larger ones pay for std::sort on buckets that another pass
+    // would have split (512 is ~1.6x slower for 2^16 keys).
+    HPX_CXX_CORE_EXPORT inline constexpr std::size_t radix_sort_base_case = 64;
 
     // At or above this many elements, use the blockwise distribution engine
     // instead of element-wise permutation. Below it the engine's buffers
-    // (one block per bucket) would be mostly empty. Initial guess, to be
-    // tuned with benchmarks.
+    // (one block per bucket) would be mostly empty. Sequential timings were
+    // insensitive to this value between 1/32 and 2 times K * B.
     HPX_CXX_CORE_EXPORT template <typename T>
     inline constexpr std::size_t radix_sort_blockwise_threshold =
         radix_sort_buckets * ips_default_block_size<T>;
@@ -451,9 +453,10 @@ namespace hpx::parallel::detail {
     // indicate skewed keys, which tend to share further digits.
 
     // Smallest amount of work, in elements, given to a task. Ranges smaller
-    // than two tasks are sorted sequentially.
+    // than two tasks are sorted sequentially. With 16 threads, 2^14 sorts
+    // 2^16 keys ~2x faster than 2^16 did; 2^17 and up were slower throughout.
     HPX_CXX_CORE_EXPORT inline constexpr std::size_t radix_sort_min_task_size =
-        std::size_t(1) << 15;
+        std::size_t(1) << 14;
 
     HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename RandomIt,
         typename Proj>
