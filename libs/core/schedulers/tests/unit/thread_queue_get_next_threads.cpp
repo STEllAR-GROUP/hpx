@@ -6,7 +6,9 @@
 
 // thread_queue::get_next_threads must not hand out more threads than
 // requested, in every configuration (including HPX_HAVE_THREAD_QUEUE_WAITTIME,
-// whose dequeue loop used to ignore the limit).
+// whose dequeue loop used to ignore the limit). When stealing, the minimum
+// number of pending threads applies to all of them, not to the number of
+// threads requested.
 
 #include <hpx/init.hpp>
 #include <hpx/latch.hpp>
@@ -37,7 +39,11 @@ int hpx_main()
     hpx::latch done(static_cast<std::ptrdiff_t>(num_threads + 1));
 
     {
-        queue_type queue;
+        // stealing is allowed only while all threads are pending
+        hpx::threads::policies::thread_queue_init_parameters const parameters(
+            HPX_THREAD_QUEUE_MAX_THREAD_COUNT,
+            static_cast<std::int64_t>(num_threads));
+        queue_type queue(parameters);
 
         for (std::size_t i = 0; i != num_threads; ++i)
         {
@@ -57,19 +63,25 @@ int hpx_main()
         HPX_TEST_EQ(queue.get_pending_queue_length(),
             static_cast<std::int64_t>(num_threads));
 
-        // take fewer threads than are available
+        // steal fewer threads than are available
         std::vector<hpx::threads::thread_id_ref_type> taken;
         taken.reserve(max_items);
         std::size_t const n = queue.get_next_threads(
-            std::back_inserter(taken), max_items, false, true);
+            std::back_inserter(taken), max_items, true, true);
 
         HPX_TEST_EQ(n, max_items);
         HPX_TEST_EQ(taken.size(), max_items);
         HPX_TEST_EQ(queue.get_pending_queue_length(),
             static_cast<std::int64_t>(num_threads - max_items));
 
-        // the rest is still there
+        // fewer threads than the minimum are left, they can't be stolen
         std::vector<hpx::threads::thread_id_ref_type> rest;
+        HPX_TEST_EQ(queue.get_next_threads(
+                        std::back_inserter(rest), num_threads, true, true),
+            std::size_t(0));
+        HPX_TEST(rest.empty());
+
+        // the rest is still there
         std::size_t const m = queue.get_next_threads(
             std::back_inserter(rest), num_threads, false, true);
 
