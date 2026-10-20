@@ -18,6 +18,7 @@
 #include <hpx/parcelport_mpi/receiver_connection.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <deque>
 #include <memory>
 #include <mutex>
@@ -44,11 +45,14 @@ namespace hpx::parcelset::policies::mpi {
             std::size_t num_slots = pp_.get_max_header_receives();
             if (num_slots == 0)
             {
-                std::size_t const env_size = util::mpi_environment::size() > 0 ?
-                    static_cast<std::size_t>(util::mpi_environment::size()) :
-                    1;
-                num_slots = (std::min) (static_cast<std::size_t>(64),
-                    (std::max) (static_cast<std::size_t>(16), env_size * 2));
+                constexpr std::size_t min_header_receives = 16;
+                constexpr std::size_t max_header_receives = 64;
+
+                int const env_size = util::mpi_environment::size();
+                std::size_t const size =
+                    env_size > 0 ? static_cast<std::size_t>(env_size) : 1;
+                num_slots = (std::min) (max_header_receives,
+                    (std::max) (min_header_receives, size * 2));
             }
 
             std::size_t const buf_size =
@@ -175,7 +179,6 @@ namespace hpx::parcelset::policies::mpi {
             if (l.locked)
             {
                 int index = MPI_UNDEFINED;
-                int completed = 0;
                 MPI_Status status;
                 // Multiple wildcard receives may complete out-of-order with
                 // respect to their sending order when polled via MPI_Testany.
@@ -183,13 +186,7 @@ namespace hpx::parcelset::policies::mpi {
                 // not require per-sender FIFO delivery at the parcelport layer;
                 // each header carries a distinct sender-allocated tag and
                 // self-contained metadata to create its receiver_connection.
-                int const ret =
-                    MPI_Testany(static_cast<int>(hdr_requests_.size()),
-                        hdr_requests_.data(), &index, &completed, &status);
-                util::mpi_environment::check_mpi_error(
-                    l, HPX_CURRENT_SOURCE_LOCATION(), ret);
-
-                if (completed && index != MPI_UNDEFINED)
+                if (request_any_done_locked(l, hdr_requests_, index, &status))
                 {
                     int recv_size = 0;
                     int const count_ret =
@@ -240,6 +237,36 @@ namespace hpx::parcelset::policies::mpi {
 
         hpx::spinlock connections_mtx_;
         connection_list connections_;
+
+        template <typename Lock>
+        static bool request_done_locked(
+            Lock& l, MPI_Request& r, MPI_Status* status) noexcept
+        {
+            HPX_ASSERT_OWNS_LOCK(l);
+
+            int completed = 0;
+            int const ret = MPI_Test(&r, &completed, status);
+            util::mpi_environment::check_mpi_error(
+                l, HPX_CURRENT_SOURCE_LOCATION(), ret);
+
+            return completed ? true : false;
+        }
+
+        template <typename Lock>
+        static bool request_any_done_locked(Lock& l,
+            std::vector<MPI_Request>& requests, int& index,
+            MPI_Status* status) noexcept
+        {
+            HPX_ASSERT_OWNS_LOCK(l);
+
+            int completed = 0;
+            int const ret = MPI_Testany(static_cast<int>(requests.size()),
+                requests.data(), &index, &completed, status);
+            util::mpi_environment::check_mpi_error(
+                l, HPX_CURRENT_SOURCE_LOCATION(), ret);
+
+            return completed && index != MPI_UNDEFINED;
+        }
     };
 }    // namespace hpx::parcelset::policies::mpi
 
