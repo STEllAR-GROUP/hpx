@@ -135,9 +135,9 @@ Peer discovery
     call did not settle in time, or settled with an exception, are omitted
     from the result (rather than left as gaps or defaulted entries), so the
     returned vector is a same-order *subset* of ``peers``, not index-aligned
-    with it. For each omitted peer, ``registry::leave()`` retracts the join
-    once it settles, so ``snapshot_peers()`` never reports a peer this call
-    dropped.
+    with it. A join that timed out is retracted via ``registry::leave()`` if
+    it later succeeds; a join that failed has nothing to retract. Either way,
+    ``snapshot_peers()`` never reports a peer this call dropped.
 
 .. cpp:function:: std::vector<hpx::supervision::discovered_peer> hpx::supervision::discover_and_join(hpx::supervision::registry const& local_registry, hpx::chrono::steady_duration const& timeout = hpx::supervision::default_discovery_timeout)
 
@@ -160,11 +160,12 @@ State query and event publication
 .. cpp:function:: std::uint64_t hpx::supervision::current_epoch(hpx::launch::sync_policy, hpx::id_type const& locality, hpx::error_code& ec = hpx::throws)
 
     Returns the dispatch-cycle epoch of the supervision-dispatch runtime on
-    ``locality``: the counter ``init()`` increments once per successful call
-    and publishes ``event::started`` under. ``0`` if ``init()`` has never
-    completed on ``locality``. This is unrelated to any target's
-    ``lifecycle_state::epoch``; ``registry::join()`` uses it to seed a new
-    peer's shadow from the peer's real epoch.
+    ``locality``: the counter ``init()`` increments once per initialization
+    sequence (before registration and discovery, so a sequence that later
+    fails still advances it) and publishes ``event::started`` under. ``0``
+    if no initialization sequence has run on ``locality``. This is unrelated
+    to any target's ``lifecycle_state::epoch``; ``registry::join()`` uses it
+    to seed a new peer's shadow from the peer's real epoch.
 
 .. cpp:function:: hpx::future<hpx::supervision::lifecycle_state> hpx::supervision::query_state(hpx::supervision::registry const& handle)
 .. cpp:function:: hpx::supervision::lifecycle_state hpx::supervision::query_state(hpx::launch::sync_policy, hpx::supervision::registry const& handle, hpx::error_code& ec = hpx::throws)
