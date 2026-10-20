@@ -9,6 +9,7 @@ set(tests
     chunk_size_idx_iterator
     partitioner_bool_result
     test_insertion_sort
+    test_ips_distribution
     test_parallel_stable_sort
     test_sample_sort
     test_spin_sort
