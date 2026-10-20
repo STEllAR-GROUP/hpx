@@ -42,6 +42,7 @@
 #include <iostream>
 #include <map>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <utility>
 #include <vector>
@@ -156,20 +157,42 @@ namespace hpx {
                 return -1;
             }
 
-            std::unique_ptr<runtime> const rt(
-                get_runtime_ptr());    // take ownership!
-            if (!rt)
+            static std::mutex mtx;
+            static bool is_stopping = false;
+
+            runtime* p = nullptr;
             {
-                HPX_THROWS_IF(ec, hpx::error::invalid_status, "hpx::stop",
-                    "the runtime system is not active (did you already "
-                    "call hpx::stop?)");
-                return -1;
+                std::unique_lock<std::mutex> l(mtx);
+                if (is_stopping || get_runtime_ptr() == nullptr)
+                {
+                    l.unlock();
+                    HPX_THROWS_IF(ec, hpx::error::invalid_status, "hpx::stop",
+                        "the runtime system is not active");
+                    return -1;
+                }
+                is_stopping = true;
+                p = get_runtime_ptr();
             }
 
-            int const result = rt->wait();
+            auto cleanup_state = hpx::experimental::scope_exit([&]() {
+                std::lock_guard<std::mutex> l(mtx);
+                is_stopping = false;
+                if (get_runtime_ptr() == p)
+                {
+                    get_runtime_ptr() = nullptr;
+                }
+            });
 
-            rt->stop();
-            rt->rethrow_exception();
+            std::unique_ptr<runtime> const rt(p);
+
+            int result = 0;
+            hpx::detail::try_catch_exception_ptr(
+                [&]() {
+                    result = p->wait();
+                    p->stop();
+                    p->rethrow_exception();
+                },
+                [&](std::exception_ptr ep) { std::rethrow_exception(ep); });
 
             return result;
         }
