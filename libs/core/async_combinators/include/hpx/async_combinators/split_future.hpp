@@ -124,11 +124,9 @@ namespace hpx {
 
                 if (!state)
                 {
-                    this->base_type::set_exception(
-                        hpx::detail::make_exception_ptr(
-                            HPX_GET_EXCEPTION(hpx::error::no_state,
-                                "split_nth_continuation::attach",
-                                "the future has no valid shared state")));
+                    this->base_type::set_exception(HPX_GET_EXCEPTION(
+                        hpx::error::no_state, "split_nth_continuation::attach",
+                        "the future has no valid shared state"));
                     return;
                 }
 
@@ -271,10 +269,9 @@ namespace hpx {
 
                 if (!state)
                 {
-                    this->base_type::set_exception(
-                        hpx::detail::make_exception_ptr(HPX_GET_EXCEPTION(
-                            hpx::error::no_state, "split_continuation::attach",
-                            "the future has no valid shared state")));
+                    this->base_type::set_exception(HPX_GET_EXCEPTION(
+                        hpx::error::no_state, "split_continuation::attach",
+                        "the future has no valid shared state"));
                     return;
                 }
 
