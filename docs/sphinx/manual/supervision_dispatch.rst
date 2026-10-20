@@ -823,6 +823,10 @@ Waiting on a dispatch outcome with a timeout
             // Authoritative rejection: the target latched a terminal event
             // for this epoch before the action could run.
         }
+        else
+        {
+            throw;    // the dispatch or the action itself failed
+        }
     }
 
 Querying state and publishing events through a handle
