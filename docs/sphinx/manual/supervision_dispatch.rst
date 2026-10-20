@@ -55,10 +55,13 @@ Supervision dispatch is brought up with a single call to
    discover and join a not-yet-started locality.
 #. Registration of the symbol name.
 #. A single :hpx:func:`hpx::supervision::discover_and_join` pass that joins
-   every peer registry reachable within ``discovery_timeout``. Its result is
-   a list of ``discovered_peer`` (the peer's locality paired with the
-   ``join_epoch`` its ``join()`` call returned); peers that time out mid-pass
-   are omitted from that list entirely rather than leaving a gap in it.
+   every peer registry discovered and joined within ``discovery_timeout``.
+   Its result is a list of ``discovered_peer`` (the peer's locality paired
+   with the ``join_epoch`` its ``join()`` call returned); peers that time out
+   during discovery or during their ``join()`` call are omitted from that
+   list entirely rather than leaving a gap in it. Peers that did join stay in
+   the result even if the final visibility poll runs out of time before
+   ``snapshot_peers()`` reflects them.
 
 ``init()`` is idempotent: calling it while already active is a no-op, and
 concurrent callers attach to a single in-flight initialization rather than
@@ -392,12 +395,14 @@ the joined peer.
 Registration, at join time
 --------------------------
 
-When ``registry::join(peer_locality)`` is called, the local registry does
-two things before returning a ``joined_peer`` to the caller. A peer's
-identity *is* its locality since exactly one registry exists per locality,
-so ``joined_peer::target`` is ``peer_locality`` itself, paired with the
-``join_epoch`` it was joined at; the shadow id below is internal to the
-registry and never returned.
+When ``registry::join(peer_locality)`` is called for a peer that is not
+already fully joined, the local registry does two things before returning a
+``joined_peer`` to the caller. A peer's identity *is* its locality since
+exactly one registry exists per locality, so ``joined_peer::target`` is
+``peer_locality`` itself, paired with the ``join_epoch`` it was joined at;
+the shadow id below is internal to the registry and never returned. If the
+peer is already fully joined, ``join()`` returns the existing
+``joined_peer`` without repeating either step.
 
 #. **Seeds the shadow with the peer's current state.** It performs a single,
    synchronous ``query_state()`` call against ``peer_locality`` to read
@@ -795,27 +800,29 @@ Waiting on a dispatch outcome with a timeout
     hpx::future<result_type> f =
         hpx::supervision::dispatch_work(action, target, epoch, args...);
 
-    if (hpx::wait_all_for(std::chrono::seconds(5), f) ==
-        hpx::future_status::ready)
+    // wait_all_for() rethrows if `f` becomes ready with an exception, so it
+    // has to sit inside the try block along with f.get().
+    try
     {
-        try
+        if (hpx::wait_all_for(std::chrono::seconds(5), f) ==
+            hpx::future_status::ready)
         {
             result_type result = f.get();
         }
-        catch (hpx::exception const& e)
+        else
         {
-            if (e.get_error() == hpx::error::target_fenced)
-            {
-                // Authoritative rejection: the target latched a terminal
-                // event for this epoch before the action could run.
-            }
+            // Dispatch did not complete within the timeout; the target may
+            // be slow, unreachable, or the shadow state used for client-side
+            // filtering may be stale.
         }
     }
-    else
+    catch (hpx::exception const& e)
     {
-        // Dispatch did not complete within the timeout; the target may be
-        // slow, unreachable, or the shadow state used for client-side
-        // filtering may be stale.
+        if (e.get_error() == hpx::error::target_fenced)
+        {
+            // Authoritative rejection: the target latched a terminal event
+            // for this epoch before the action could run.
+        }
     }
 
 Querying state and publishing events through a handle
