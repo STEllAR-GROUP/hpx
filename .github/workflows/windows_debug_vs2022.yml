@@ -56,6 +56,7 @@ jobs:
           -- -maxcpucount:2 -verbosity:minimal -nologo
           cmake --build build --config Debug \
           --target autolink_test auto_wrap_main_test \
+          --target chunk_size_iterator_test chunk_size_idx_iterator_test \
           -- -maxcpucount:2 -verbosity:minimal -nologo
     - name: Install
       shell: bash
@@ -69,5 +70,5 @@ jobs:
           ctest `
           --output-on-failure `
             --build-config Debug `
-            --tests-regex 'tests\.examples|tests\.unit\.modules\.config\.autolink|tests\.unit\.init\.auto_wrap_main' `
+            --tests-regex 'tests\.examples|tests\.unit\.modules\.config\.autolink|tests\.unit\.init\.auto_wrap_main|tests\.unit\.modules\.algorithms\.detail\.chunk_size_(idx_)?iterator' `
             --exclude-regex $exclude_regex

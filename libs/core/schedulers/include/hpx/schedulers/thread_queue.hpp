@@ -35,6 +35,7 @@
 #endif
 
 #include <algorithm>
+#include <array>
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
@@ -1045,29 +1046,33 @@ namespace hpx::threads::policies {
         std::size_t get_next_threads(Iterator it, std::size_t max_items,
             bool allow_stealing = false, bool steal = false)
         {
-            // the result is bounded by max_items, so it fits a std::size_t
-            std::size_t const work_items_count = static_cast<std::size_t>(
-                (std::min) (work_items_count_.data_.load(
-                                std::memory_order_relaxed),
-                    static_cast<std::uint64_t>(max_items)));
+            std::uint64_t const pending_count =
+                work_items_count_.data_.load(std::memory_order_relaxed);
 
-            if (work_items_count == 0)
+            if (pending_count == 0)
             {
                 return 0;
             }
 
+            // compare the minimum with all pending items, not with the
+            // (possibly smaller) number of items requested
             if (allow_stealing &&
                 parameters_.min_tasks_to_steal_pending_ >
-                    static_cast<std::int64_t>(work_items_count))
+                    static_cast<std::int64_t>(pending_count))
             {
                 return 0;
             }
+
+            // the result is bounded by max_items, so it fits a std::size_t
+            std::size_t const work_items_count =
+                static_cast<std::size_t>((std::min) (pending_count,
+                    static_cast<std::uint64_t>(max_items)));
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
             std::size_t const max_items_requested = max_items;
 
             thread_description_ptr task_desc;
-            while (work_items_.pop(task_desc, steal))
+            while (max_items != 0 && work_items_.pop(task_desc, steal))
             {
                 if (get_maintain_queue_wait_times_enabled())
                 {
@@ -1091,8 +1096,29 @@ namespace hpx::threads::policies {
 #else
             if constexpr (work_items_type::support_bulk_dequeue)
             {
-                std::size_t const dequeued =
-                    work_items_.pop_bulk(it, work_items_count, steal);
+                // Dequeue raw pointers in chunks and hand over the reference
+                // held by the queue (do not addref, same as the loop below).
+                std::array<thread_description_ptr, 64> chunk;
+
+                std::size_t dequeued = 0;
+                while (dequeued != work_items_count)
+                {
+                    std::size_t const n = work_items_.pop_bulk(chunk.begin(),
+                        (std::min) (chunk.size(), work_items_count - dequeued),
+                        steal);
+                    if (n == 0)
+                    {
+                        break;
+                    }
+
+                    for (std::size_t i = 0; i != n; ++i)
+                    {
+                        *it++ = threads::thread_id_ref_type(
+                            chunk[i], threads::thread_id_addref::no);
+                    }
+                    dequeued += n;
+                }
+
                 work_items_count_.data_ -= dequeued;
                 return dequeued;
             }
@@ -1292,7 +1318,8 @@ namespace hpx::threads::policies {
         }
 
         inline bool wait_or_add_new(bool const running, std::size_t& added,
-            thread_queue* add_from, bool const steal = false) HPX_HOT
+            thread_queue* add_from, bool const steal = false,
+            std::int64_t const min_tasks_to_steal = 0) HPX_HOT
         {
             // try to generate new threads from task lists, but only if our own
             // list of threads is empty
@@ -1307,7 +1334,8 @@ namespace hpx::threads::policies {
                         std::memory_order_relaxed);
 
                 bool const enough_threads = new_tasks_count != 0 &&
-                    new_tasks_count >= parameters_.min_tasks_to_steal_staged_;
+                    new_tasks_count >= parameters_.min_tasks_to_steal_staged_ &&
+                    new_tasks_count >= min_tasks_to_steal;
 
                 if (running && !enough_threads)
                 {

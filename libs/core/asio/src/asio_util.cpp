@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2025 Hartmut Kaiser
+//  Copyright (c) 2007-2026 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -23,6 +23,17 @@
 #include <asio/ip/address_v6.hpp>
 #include <asio/ip/host_name.hpp>
 #include <asio/ip/tcp.hpp>
+
+#if defined(HPX_WINDOWS)
+#include <mstcpip.h>
+// mstcpip.h defines ASSERT if it is not defined, but fails to undefine it
+// again (it checks MSTCPIPDEF_ASSERT_UNDEFINED instead of
+// MSTCPIP_ASSERT_UNDEFINED)
+#if defined(MSTCPIP_ASSERT_UNDEFINED)
+#undef ASSERT
+#undef MSTCPIP_ASSERT_UNDEFINED
+#endif
+#endif
 
 #include <cstdint>
 #include <exception>
@@ -321,6 +332,28 @@ namespace hpx::util {
         HPX_THROW_EXCEPTION(hpx::error::network_error, "connect_begin",
             "{} (while trying to connect to: {}:{})", errors.get_message(),
             address, port);
+    }
+
+    void open_socket_for_connect(::asio::ip::tcp::socket& s,
+        ::asio::ip::tcp::endpoint const& ep, std::error_code& ec)
+    {
+        // NOLINTNEXTLINE(bugprone-unused-return-value)
+        s.open(ep.protocol(), ec);
+#if defined(HPX_WINDOWS)
+        if (!ec)
+        {
+            // Disable the retransmission of the SYN of a connection attempt.
+            // SIO_TCP_INITIAL_RTO is supported by WSAIoctl only (asio's
+            // io_control uses ioctlsocket). This is an optimization only,
+            // ignore failures.
+            TCP_INITIAL_RTO_PARAMETERS params = {
+                TCP_INITIAL_RTO_UNSPECIFIED_RTT,
+                TCP_INITIAL_RTO_NO_SYN_RETRANSMISSIONS};
+            DWORD bytes = 0;
+            WSAIoctl(s.native_handle(), SIO_TCP_INITIAL_RTO, &params,
+                sizeof(params), nullptr, 0, &bytes, nullptr, nullptr);
+        }
+#endif
     }
 
     detail::endpoint_iterator_type accept_begin(std::string const& address,
