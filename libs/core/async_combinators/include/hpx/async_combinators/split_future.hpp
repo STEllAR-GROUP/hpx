@@ -122,6 +122,16 @@ namespace hpx {
                 shared_state_ptr const& state =
                     hpx::traits::detail::get_shared_state(future);
 
+                if (!state)
+                {
+                    this->base_type::set_exception(
+                        hpx::detail::make_exception_ptr(
+                            HPX_GET_EXCEPTION(hpx::error::no_state,
+                                "split_nth_continuation::attach",
+                                "the future has no valid shared state")));
+                    return;
+                }
+
                 state->execute_deferred();
                 state->set_on_completed(util::deferred_call(
                     &split_nth_continuation::on_ready<I, Future>,
@@ -258,6 +268,15 @@ namespace hpx {
                 hpx::intrusive_ptr<split_continuation> this_(this);
                 shared_state_ptr const& state =
                     hpx::traits::detail::get_shared_state(future);
+
+                if (!state)
+                {
+                    this->base_type::set_exception(
+                        hpx::detail::make_exception_ptr(HPX_GET_EXCEPTION(
+                            hpx::error::no_state, "split_continuation::attach",
+                            "the future has no valid shared state")));
+                    return;
+                }
 
                 state->execute_deferred();
                 state->set_on_completed(
