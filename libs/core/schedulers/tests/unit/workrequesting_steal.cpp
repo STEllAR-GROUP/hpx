@@ -30,10 +30,12 @@ constexpr std::uint64_t task_duration_ns = 20000;
 std::atomic<std::size_t> num_stolen(0);
 hpx::threads::thread_priority task_priority =
     hpx::threads::thread_priority::normal;
+hpx::threads::thread_priority expected_task_priority =
+    hpx::threads::thread_priority::normal;
 
 void busy_task()
 {
-    HPX_TEST_EQ(hpx::this_thread::get_priority(), task_priority);
+    HPX_TEST_EQ(hpx::this_thread::get_priority(), expected_task_priority);
 
     auto const start = hpx::chrono::high_resolution_clock::now();
     while (hpx::chrono::high_resolution_clock::now() - start < task_duration_ns)
@@ -74,9 +76,14 @@ int main(int, char* argv[])
 {
     for (hpx::threads::thread_priority const priority :
         {hpx::threads::thread_priority::normal,
-            hpx::threads::thread_priority::high})
+            hpx::threads::thread_priority::high,
+            hpx::threads::thread_priority::boost})
     {
         task_priority = priority;
+        expected_task_priority =
+            priority == hpx::threads::thread_priority::boost ?
+            hpx::threads::thread_priority::normal :
+            priority;
         for (char const* scheduler :
             {"local-workrequesting-fifo", "local-workrequesting-mc"})
         {
