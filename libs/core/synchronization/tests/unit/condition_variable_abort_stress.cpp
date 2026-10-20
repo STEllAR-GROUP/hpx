@@ -4,6 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/exception.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/testing.hpp>
@@ -48,6 +49,13 @@ void test_condition_variable_abort_stress()
                 }
                 catch (hpx::thread_interrupted const&)
                 {
+                }
+                catch (hpx::exception const& e)
+                {
+                    if (e.get_error() != hpx::error::yield_aborted)
+                    {
+                        throw;
+                    }
                 }
                 hpx::this_thread::yield();
             }
