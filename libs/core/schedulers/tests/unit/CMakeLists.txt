@@ -7,6 +7,7 @@
 set(tests
     lockfree_fifo_double_backend
     min_tasks_to_steal_staged
+    numa_stealing_domains
     schedule_last
     schedule_hint_none_stale_queue_6978
     steal_staged_early
