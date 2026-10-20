@@ -942,17 +942,12 @@ namespace hpx::threads::policies {
                 {
                     // A thread waiting for one of these tasks would otherwise
                     // run it directly (run_as_child) before the requesting
-                    // core gets to it. Tasks that already ran directly are
-                    // not pending anymore and will be dropped by the
+                    // core gets to it. Tasks that are already running (or ran)
+                    // directly are not pending and will be dropped by the
                     // requesting core.
                     for (auto const& task : thrds.tasks_)
                     {
-                        auto* thrdptr = get_thread_id_data(task);
-                        if (thrdptr->get_state().state() ==
-                            thread_schedule_state::pending)
-                        {
-                            thrdptr->reset_runs_as_child();
-                        }
+                        get_thread_id_data(task)->stop_running_as_child();
                     }
 
                     hpx::tracing::work_stolen_range(
