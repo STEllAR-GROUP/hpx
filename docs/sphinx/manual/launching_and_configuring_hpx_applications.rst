@@ -718,6 +718,8 @@ equivalent CMake variable is ``HPX_WITH_PARCELPORT_MPI`` and has to be set to
    max_message_size =  ${HPX_HAVE_PARCEL_MPI_MAX_MESSAGE_SIZE:$[hpx.parcel.max_message_size]}
    max_outbound_message_size =  ${HPX_HAVE_PARCEL_MPI_MAX_OUTBOUND_MESSAGE_SIZE:$[hpx.parcel.max_outbound_message_size]}
    max_background_threads =  ${HPX_PARCEL_MPI_MAX_BACKGROUND_THREADS:$[hpx.parcel.max_background_threads]}
+   ack_handshake = 0
+   max_header_receives = ${HPX_HAVE_PARCELPORT_MPI_MAX_HEADER_RECEIVES:0}
 
 .. _ini_hpx_parcel_mpi:
 
@@ -797,6 +799,16 @@ equivalent CMake variable is ``HPX_WITH_PARCELPORT_MPI`` and has to be set to
    * * ``hpx.parcel.mpi.max_background_threads``
      * This property defines how many cores should be used to perform background
        operations. The default is taken from ``hpx.parcel.max_background_threads``.
+   * * ``hpx.parcel.mpi.ack_handshake``
+     * This property enables acknowledgement handshakes for parcels
+       transmitted via MPI to serialize delivery and avoid race conditions
+       in multithreaded MPI environments. The default is 0 (disabled).
+   * * ``hpx.parcel.mpi.max_header_receives``
+     * This property defines the number of concurrent MPI wildcard receive
+       buffers pre-posted for incoming parcel headers. The default is taken
+       from ``HPX_HAVE_PARCELPORT_MPI_MAX_HEADER_RECEIVES`` (``0`` if not
+       defined). A value of ``0`` automatically sizes the pool based on the
+       communicator size: ``min(64, max(16, 2 * communicator_size))``.
 
 The ``hpx.agas`` configuration section
 ......................................
