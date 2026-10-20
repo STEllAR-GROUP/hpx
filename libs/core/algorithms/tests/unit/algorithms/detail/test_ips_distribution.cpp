@@ -24,7 +24,9 @@
 #include <vector>
 
 using hpx::parallel::detail::ips_distribute;
+using hpx::parallel::detail::ips_distribute_parallel;
 using hpx::parallel::detail::ips_distribution_buffers;
+using hpx::parallel::detail::ips_parallel_distribution_buffers;
 
 namespace {
 
@@ -76,8 +78,18 @@ namespace {
         return v;
     }
 
+    // Runs every phase of the parallel engine on HPX threads.
+    auto const hpx_run = [](std::size_t count, auto&& f) {
+        hpx::parallel::execution::bulk_sync_execute(
+            hpx::execution::par.executor(), f,
+            hpx::util::iterator_range(
+                hpx::util::counting_iterator<std::size_t>(0),
+                hpx::util::counting_iterator<std::size_t>(count)));
+    };
+
+    // threads == 0 selects the sequential engine.
     void check_distribution(std::size_t n, std::size_t k, std::size_t block,
-        distribution d, std::mt19937_64& gen)
+        distribution d, std::mt19937_64& gen, std::size_t threads = 0)
     {
         auto v = make_input(n, k, d, gen);
 
@@ -85,25 +97,49 @@ namespace {
         for (auto const& x : v)
             ++expected_sizes[x.bucket];
 
-        ips_distribution_buffers<item> buf(k, block);
-        ips_distribute(
-            v.begin(), n, [](item const& x) { return x.bucket; }, buf);
+        auto classify = [](item const& x) { return x.bucket; };
+        std::vector<std::size_t> bucket_start;
+        bool empty = true;
+        if (threads == 0)
+        {
+            ips_distribution_buffers<item> buf(k, block);
+            ips_distribute(v.begin(), n, classify, buf);
+            bucket_start = buf.bucket_start;
+
+            empty = buf.overflow.empty();
+            for (auto const& bucket : buf.buckets)
+                empty = empty && bucket.empty();
+        }
+        else
+        {
+            ips_parallel_distribution_buffers<item> buf(threads, k, block);
+            ips_distribute_parallel(v.begin(), n, classify, buf, hpx_run);
+            bucket_start = buf.bucket_start;
+
+            empty = buf.overflow.empty();
+            for (auto const& s : buf.spill)
+                empty = empty && s.empty();
+            for (auto const& worker : buf.workers)
+            {
+                for (auto const& bucket : worker.buckets)
+                    empty = empty && bucket.empty();
+            }
+        }
 
         // Boundaries match the bucket sizes.
-        HPX_TEST_EQ(buf.bucket_start[0], std::size_t(0));
-        HPX_TEST_EQ(buf.bucket_start[k], n);
+        HPX_TEST_EQ(bucket_start[0], std::size_t(0));
+        HPX_TEST_EQ(bucket_start[k], n);
         for (std::size_t b = 0; b != k; ++b)
         {
-            HPX_TEST_EQ(buf.bucket_start[b + 1] - buf.bucket_start[b],
-                expected_sizes[b]);
+            HPX_TEST_EQ(
+                bucket_start[b + 1] - bucket_start[b], expected_sizes[b]);
         }
 
         // Every element sits in its bucket's range.
         bool all_in_place = true;
         for (std::size_t b = 0; b != k; ++b)
         {
-            for (std::size_t i = buf.bucket_start[b];
-                i != buf.bucket_start[b + 1]; ++i)
+            for (std::size_t i = bucket_start[b]; i != bucket_start[b + 1]; ++i)
             {
                 all_in_place = all_in_place && v[i].bucket == b;
             }
@@ -122,9 +158,6 @@ namespace {
         HPX_TEST_MSG(is_permutation, "elements lost or duplicated");
 
         // The buffers are left empty for reuse.
-        bool empty = buf.overflow.empty();
-        for (auto const& bucket : buf.buckets)
-            empty = empty && bucket.empty();
         HPX_TEST(empty);
     }
 
@@ -143,6 +176,27 @@ namespace {
                     check_distribution(1000, k, block, d, gen);
                     check_distribution(1013, k, block, d, gen);
                 }
+            }
+        }
+    }
+
+    void test_parallel(std::mt19937_64& gen)
+    {
+        for (distribution d :
+            {distribution::uniform, distribution::skewed, distribution::single,
+                distribution::last_only, distribution::two_ends})
+        {
+            for (std::size_t threads : {1, 2, 3, 8})
+            {
+                for (std::size_t k : {1, 3, 16})
+                {
+                    for (std::size_t block : {1, 3, 8})
+                    {
+                        for (std::size_t n : {0, 1, 5, 17, 64, 1000, 4099})
+                            check_distribution(n, k, block, d, gen, threads);
+                    }
+                }
+                check_distribution(100003, 256, 128, d, gen, threads);
             }
         }
     }
@@ -205,6 +259,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     test_small_parameters(gen);
     test_realistic_parameters(gen);
+    test_parallel(gen);
     test_move_only();
 
     return hpx::local::finalize();

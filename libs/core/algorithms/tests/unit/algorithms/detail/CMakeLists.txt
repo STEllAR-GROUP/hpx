@@ -15,6 +15,7 @@ set(tests
     test_spin_sort
 )
 
+set(test_ips_distribution_PARAMETERS THREADS_PER_LOCALITY 4)
 set(test_parallel_stable_sort_PARAMETERS THREADS_PER_LOCALITY 4)
 set(test_sample_sort_PARAMETERS THREADS_PER_LOCALITY 4)
 
