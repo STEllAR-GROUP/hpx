@@ -128,6 +128,117 @@ namespace {
             HPX_TEST_EQ(payloads[i], static_cast<int>(i));
     }
 
+    // Large enough to go through the parallel distribution engine and the
+    // task-based recursion.
+    template <typename T>
+    void test_parallel_large(std::mt19937_64& gen)
+    {
+        using U = std::make_unsigned_t<T>;
+        std::size_t const n = std::size_t(1) << 21;
+
+        check_sorted_against_std<T>(hpx::execution::par, random_vec<T>(n, gen));
+
+        // Most keys share the top digit, so one bucket holds ~90% of the
+        // elements and recurses in parallel.
+        auto skewed = random_vec<T>(n, gen);
+        for (auto& x : skewed)
+        {
+            if (gen() % 10 != 0)
+                x = static_cast<T>(static_cast<U>(x) & (U(~U(0)) >> 8));
+        }
+        check_sorted_against_std<T>(hpx::execution::par, skewed);
+
+        // Few distinct keys: every level but the last is a single bucket.
+        std::vector<T> few(n);
+        for (auto& x : few)
+            x = static_cast<T>(gen() % 4);
+        check_sorted_against_std<T>(hpx::execution::par, few);
+
+        check_sorted_against_std<T>(
+            hpx::execution::par, std::vector<T>(n, T(5)));
+
+        // Already sorted input returns after the key summary pass. The near
+        // misses must still be sorted: one element out of place at the end,
+        // and two sorted halves in the wrong order, where only the boundary
+        // between the parallel summary chunks is unsorted.
+        std::vector<T> sorted_input = random_vec<T>(n, gen);
+        std::sort(sorted_input.begin(), sorted_input.end());
+        check_sorted_against_std<T>(hpx::execution::seq, sorted_input);
+        check_sorted_against_std<T>(hpx::execution::par, sorted_input);
+
+        auto last_unsorted = sorted_input;
+        last_unsorted.back() = (std::numeric_limits<T>::min)();
+        check_sorted_against_std<T>(hpx::execution::seq, last_unsorted);
+        check_sorted_against_std<T>(hpx::execution::par, last_unsorted);
+
+        auto swapped_halves = sorted_input;
+        std::rotate(swapped_halves.begin(),
+            swapped_halves.begin() + static_cast<std::ptrdiff_t>(n / 2),
+            swapped_halves.end());
+        check_sorted_against_std<T>(hpx::execution::seq, swapped_halves);
+        check_sorted_against_std<T>(hpx::execution::par, swapped_halves);
+
+        // Narrow key range away from zero: the leading digits are skipped.
+        std::vector<T> narrow(n);
+        T const base = static_cast<T>((std::numeric_limits<T>::max)() / 3);
+        for (auto& x : narrow)
+            x = static_cast<T>(base + static_cast<T>(gen() % 1000));
+        check_sorted_against_std<T>(hpx::execution::seq, narrow);
+        check_sorted_against_std<T>(hpx::execution::par, narrow);
+
+        // For signed keys, a small range around zero spans the sign flip of
+        // the lifted key.
+        if constexpr (std::is_signed_v<T>)
+        {
+            std::vector<T> around_zero(n);
+            for (auto& x : around_zero)
+                x = static_cast<T>(static_cast<int>(gen() % 1001) - 500);
+            check_sorted_against_std<T>(hpx::execution::seq, around_zero);
+            check_sorted_against_std<T>(hpx::execution::par, around_zero);
+        }
+
+        // Asynchronous execution.
+        auto v = random_vec<T>(n, gen);
+        auto reference = v;
+        std::sort(reference.begin(), reference.end());
+        auto f = hpx::radix_sort(
+            hpx::execution::par(hpx::execution::task), v.begin(), v.end());
+        f.get();
+        HPX_TEST(v == reference);
+    }
+
+    void test_parallel_projection(std::mt19937_64& gen)
+    {
+        struct item
+        {
+            std::uint32_t key;
+            std::uint32_t payload;
+        };
+
+        std::size_t const n = std::size_t(1) << 20;
+        std::vector<item> v(n);
+        for (std::size_t i = 0; i != n; ++i)
+            v[i] = item{static_cast<std::uint32_t>(gen()),
+                static_cast<std::uint32_t>(i)};
+
+        hpx::radix_sort(hpx::execution::par, v.begin(), v.end(),
+            [](item const& it) { return it.key; });
+
+        bool sorted = true;
+        for (std::size_t i = 1; i < n; ++i)
+            sorted = sorted && v[i - 1].key <= v[i].key;
+        HPX_TEST(sorted);
+
+        std::vector<std::uint32_t> payloads(n);
+        for (std::size_t i = 0; i != n; ++i)
+            payloads[i] = v[i].payload;
+        std::sort(payloads.begin(), payloads.end());
+        bool complete = true;
+        for (std::size_t i = 0; i != n; ++i)
+            complete = complete && payloads[i] == i;
+        HPX_TEST(complete);
+    }
+
 }    // namespace
 
 // bool keys have no meaningful radix decomposition and must be rejected.
@@ -157,6 +268,13 @@ int hpx_main(hpx::program_options::variables_map& vm)
         test_random<std::int8_t>(n, gen);
         test_random<std::int16_t>(n, gen);
     }
+
+    test_parallel_large<std::uint32_t>(gen);
+    test_parallel_large<std::int32_t>(gen);
+    test_parallel_large<std::uint64_t>(gen);
+    test_parallel_large<std::int64_t>(gen);
+    test_parallel_large<std::uint16_t>(gen);
+    test_parallel_projection(gen);
 
     return hpx::local::finalize();
 }

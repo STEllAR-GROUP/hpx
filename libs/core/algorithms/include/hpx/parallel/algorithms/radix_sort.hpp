@@ -13,10 +13,9 @@
 /// recurse or fall back to a sequential base case for small partitions.
 ///
 /// Large partitions are distributed with the blockwise engine from
-/// detail/ips_distribution.hpp; smaller ones use an element-wise in-place
-/// permutation, and the smallest ones are handed to std::sort. The
-/// implementation is still sequential; the CPO already accepts an execution
-/// policy so the parallel version can land behind the same surface.
+/// detail/ips_distribution.hpp (in parallel for parallel execution
+/// policies); smaller ones use an element-wise in-place permutation, and the
+/// smallest ones are handed to std::sort.
 
 #pragma once
 
@@ -30,9 +29,9 @@ namespace hpx {
     template <typename RandomIt, typename Proj = hpx::identity>
     void radix_sort(RandomIt first, RandomIt last, Proj proj = Proj());
 
-    /// Execution-policy overload. The current implementation dispatches to
-    /// the sequential path regardless of policy; parallelization is a
-    /// follow-up milestone.
+    /// Execution-policy overload. Parallel policies distribute large ranges
+    /// with the parallel blockwise engine and sort the resulting buckets as
+    /// separate tasks.
     template <typename ExPolicy, typename RandomIt,
         typename Proj = hpx::identity>
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy> radix_sort(
@@ -44,11 +43,15 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/modules/async_combinators.hpp>
+#include <hpx/modules/async_local.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/execution.hpp>
+#include <hpx/modules/executors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/type_support.hpp>
+#include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/ips_distribution.hpp>
 #include <hpx/parallel/algorithms/detail/tag_dispatch.hpp>
@@ -57,12 +60,15 @@ namespace hpx {
 
 #include <algorithm>
 #include <array>
+#include <bit>
 #include <cstddef>
+#include <exception>
 #include <iterator>
 #include <limits>
 #include <memory>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 namespace hpx::parallel::detail {
 
@@ -209,43 +215,47 @@ namespace hpx::parallel::detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // Stage 4: recurse on each non-trivial bucket at the next-lower digit.
-    // Buckets of size <= radix_sort_base_case go through std::sort with a
-    // projection-aware comparator built on the lifted key.
-    //
-    // `buf` holds the blockwise engine's buffers. It is allocated on first
-    // use and reused by every recursive call, since the buffers are empty
-    // again once ips_distribute returns.
+    // Base case: comparison sort on the lifted key.
 
     HPX_CXX_CORE_EXPORT template <typename RandomIt, typename Proj>
-    void radix_sort_serial(RandomIt first, RandomIt last, int shift, Proj& proj,
-        std::unique_ptr<ips_distribution_buffers<
-            typename std::iterator_traits<RandomIt>::value_type>>& buf)
+    void radix_sort_base_case_sort(RandomIt first, RandomIt last, Proj& proj)
     {
         using value_type = typename std::iterator_traits<RandomIt>::value_type;
         using key_t = std::decay_t<decltype(HPX_INVOKE(
             proj, std::declval<value_type const&>()))>;
         using traits = radix_key_traits<key_t>;
 
-        std::ptrdiff_t const n = last - first;
-        if (n < 2)
-            return;
+        std::sort(
+            first, last, [&proj](value_type const& a, value_type const& b) {
+                return traits::lift(HPX_INVOKE(proj, a)) <
+                    traits::lift(HPX_INVOKE(proj, b));
+            });
+    }
 
-        if (shift < 0 || static_cast<std::size_t>(n) <= radix_sort_base_case)
-        {
-            std::sort(
-                first, last, [&proj](value_type const& a, value_type const& b) {
-                    return traits::lift(HPX_INVOKE(proj, a)) <
-                        traits::lift(HPX_INVOKE(proj, b));
-                });
-            return;
-        }
+    HPX_CXX_CORE_EXPORT using radix_sort_bounds =
+        std::array<std::size_t, radix_sort_buckets + 1>;
 
-        std::array<std::size_t, radix_sort_buckets> bucket_begin{};
-        std::array<std::size_t, radix_sort_buckets> bucket_end{};
+    ///////////////////////////////////////////////////////////////////////////
+    // One sequential distribution step on the digit at `shift`: reorder
+    // [first, first + n) by digit and store the bucket boundaries in `bounds`.
+    //
+    // `buf` holds the blockwise engine's buffers. It is allocated on first
+    // use and can be reused by later calls, since the buffers are empty again
+    // once ips_distribute returns.
 
-        if (static_cast<std::size_t>(n) >=
-            radix_sort_blockwise_threshold<value_type>)
+    HPX_CXX_CORE_EXPORT template <typename RandomIt, typename Proj>
+    void radix_sort_partition(RandomIt first, std::size_t n, int shift,
+        Proj& proj,
+        std::unique_ptr<ips_distribution_buffers<
+            typename std::iterator_traits<RandomIt>::value_type>>& buf,
+        radix_sort_bounds& bounds)
+    {
+        using value_type = typename std::iterator_traits<RandomIt>::value_type;
+        using key_t = std::decay_t<decltype(HPX_INVOKE(
+            proj, std::declval<value_type const&>()))>;
+        using traits = radix_key_traits<key_t>;
+
+        if (n >= radix_sort_blockwise_threshold<value_type>)
         {
             if (!buf)
             {
@@ -254,61 +264,324 @@ namespace hpx::parallel::detail {
             }
 
             ips_distribute(
-                first, static_cast<std::size_t>(n),
+                first, n,
                 [&proj, shift](value_type const& v) {
                     return radix_sort_digit(
                         traits::lift(HPX_INVOKE(proj, v)), shift);
                 },
                 *buf);
 
-            for (std::size_t b = 0; b < radix_sort_buckets; ++b)
-            {
-                bucket_begin[b] = buf->bucket_start[b];
-                bucket_end[b] = buf->bucket_start[b + 1];
-            }
+            std::copy(buf->bucket_start.begin(), buf->bucket_start.end(),
+                bounds.begin());
+            return;
         }
-        else
+
+        std::array<std::size_t, radix_sort_buckets> bucket_begin{};
+        std::array<std::size_t, radix_sort_buckets> bucket_end{};
+        radix_sort_classify(first, first + static_cast<std::ptrdiff_t>(n),
+            shift, proj, bucket_begin, bucket_end);
+
+        // Lazy pass skipping (proposal section 5): if every element fell in
+        // the same bucket this pass would do no useful separation.
+        bool single_bucket = false;
+        for (std::size_t b = 0; b < radix_sort_buckets; ++b)
         {
-            radix_sort_classify(
-                first, last, shift, proj, bucket_begin, bucket_end);
-
-            // Lazy pass skipping (proposal section 5): if every element fell
-            // in the same bucket this pass would do no useful separation.
-            bool single_bucket = false;
-            for (std::size_t b = 0; b < radix_sort_buckets; ++b)
+            if (bucket_end[b] - bucket_begin[b] == n)
             {
-                if (bucket_end[b] - bucket_begin[b] ==
-                    static_cast<std::size_t>(n))
-                {
-                    single_bucket = true;
-                    break;
-                }
-            }
-
-            if (!single_bucket)
-            {
-                radix_sort_permute(
-                    first, shift, proj, bucket_begin, bucket_end);
+                single_bucket = true;
+                break;
             }
         }
+
+        if (!single_bucket)
+            radix_sort_permute(first, shift, proj, bucket_begin, bucket_end);
+
+        std::copy(bucket_begin.begin(), bucket_begin.end(), bounds.begin());
+        bounds[radix_sort_buckets] = n;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Sequential MSD recursion: distribute on the current digit, then recurse
+    // on each non-trivial bucket at the next-lower digit. Buckets of size <=
+    // radix_sort_base_case go through std::sort.
+
+    HPX_CXX_CORE_EXPORT template <typename RandomIt, typename Proj>
+    void radix_sort_serial(RandomIt first, RandomIt last, int shift, Proj& proj,
+        std::unique_ptr<ips_distribution_buffers<
+            typename std::iterator_traits<RandomIt>::value_type>>& buf)
+    {
+        std::size_t const n = static_cast<std::size_t>(last - first);
+        if (n < 2)
+            return;
+
+        if (shift < 0 || n <= radix_sort_base_case)
+        {
+            radix_sort_base_case_sort(first, last, proj);
+            return;
+        }
+
+        radix_sort_bounds bounds;
+        radix_sort_partition(first, n, shift, proj, buf, bounds);
 
         int const next_shift = shift - radix_sort_bits_per_pass;
         for (std::size_t b = 0; b < radix_sort_buckets; ++b)
         {
-            std::size_t const sz = bucket_end[b] - bucket_begin[b];
-            if (sz < 2)
+            if (bounds[b + 1] - bounds[b] < 2)
                 continue;
-            radix_sort_serial(
-                first + static_cast<std::ptrdiff_t>(bucket_begin[b]),
-                first + static_cast<std::ptrdiff_t>(bucket_end[b]), next_shift,
+            radix_sort_serial(first + static_cast<std::ptrdiff_t>(bounds[b]),
+                first + static_cast<std::ptrdiff_t>(bounds[b + 1]), next_shift,
                 proj, buf);
         }
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // Algorithm entry struct. Both sequential() and parallel() currently go
-    // through the serial pipeline; the parallel branch will be filled in by
-    // later milestones (parallel histogram + blockwise permutation).
+    // Leading-digit skipping and sortedness check.
+    //
+    // Before sorting, one read-only pass over the keys collects their minimum
+    // and maximum and whether they are already in order. The highest bit in
+    // which any two keys differ is the highest set bit of min ^ max, so the
+    // sort can start at the digit containing it: all digits above are shared
+    // by every key and would each cost a full pass that puts everything into
+    // one bucket. If the keys are already sorted (in particular, if they are
+    // all equal) there is nothing to do.
+
+    HPX_CXX_CORE_EXPORT template <typename UInt>
+    struct radix_sort_key_summary
+    {
+        UInt min_key;
+        UInt max_key;
+        UInt first_key;
+        UInt last_key;
+        bool sorted;
+
+        // Summary of the concatenation of the ranges described by *this and
+        // `next`, in that order.
+        constexpr void append(radix_sort_key_summary const& next) noexcept
+        {
+            min_key = (std::min) (min_key, next.min_key);
+            max_key = (std::max) (max_key, next.max_key);
+            sorted = sorted && next.sorted && last_key <= next.first_key;
+            last_key = next.last_key;
+        }
+
+        // The shift of the first digit to sort by, or -1 if the keys are
+        // already sorted.
+        constexpr int start_shift() const noexcept
+        {
+            if (sorted)
+                return -1;
+            UInt const diff = min_key ^ max_key;
+            HPX_ASSERT(diff != 0);
+            int const top_bit = static_cast<int>(std::bit_width(diff)) - 1;
+            return top_bit / radix_sort_bits_per_pass *
+                radix_sort_bits_per_pass;
+        }
+    };
+
+    // Key summary of [first, first + n), n > 0.
+    HPX_CXX_CORE_EXPORT template <typename RandomIt, typename Proj>
+    auto radix_sort_summarize_keys(RandomIt first, std::size_t n, Proj& proj)
+    {
+        using value_type = typename std::iterator_traits<RandomIt>::value_type;
+        using key_t = std::decay_t<decltype(HPX_INVOKE(
+            proj, std::declval<value_type const&>()))>;
+        using traits = radix_key_traits<key_t>;
+        using unsigned_t = typename traits::unsigned_t;
+
+        HPX_ASSERT(n != 0);
+        unsigned_t const k0 = traits::lift(HPX_INVOKE(proj, *first));
+        radix_sort_key_summary<unsigned_t> summary{k0, k0, k0, k0, true};
+        unsigned_t prev = k0;
+        for (std::size_t i = 1; i != n; ++i)
+        {
+            unsigned_t const k = traits::lift(
+                HPX_INVOKE(proj, *(first + static_cast<std::ptrdiff_t>(i))));
+            summary.min_key = (std::min) (summary.min_key, k);
+            summary.max_key = (std::max) (summary.max_key, k);
+            summary.sorted = summary.sorted && prev <= k;
+            prev = k;
+        }
+        summary.last_key = prev;
+        return summary;
+    }
+
+    // Parallel version of the above over `chunks` slices; returns the start
+    // shift (or -1 if the keys are already sorted).
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename RandomIt,
+        typename Proj>
+    int radix_sort_parallel_start_shift(ExPolicy& policy, RandomIt first,
+        std::size_t n, Proj& proj, std::size_t chunks)
+    {
+        HPX_ASSERT(n != 0 && chunks != 0 && chunks <= n);
+        using summary_t = decltype(radix_sort_summarize_keys(first, n, proj));
+        std::vector<summary_t> summaries(chunks);
+
+        execution::bulk_sync_execute(
+            policy.executor(),
+            [&](std::size_t i) {
+                std::size_t const b = n * i / chunks;
+                std::size_t const e = n * (i + 1) / chunks;
+                summaries[i] = radix_sort_summarize_keys(
+                    first + static_cast<std::ptrdiff_t>(b), e - b, proj);
+            },
+            hpx::util::iterator_range(
+                hpx::util::counting_iterator<std::size_t>(0),
+                hpx::util::counting_iterator<std::size_t>(chunks)));
+
+        summary_t summary = summaries[0];
+        for (std::size_t i = 1; i != chunks; ++i)
+            summary.append(summaries[i]);
+        return summary.start_shift();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Parallel recursion.
+    //
+    // A range of n elements with a budget of `threads` workers is distributed
+    // by ips_distribute_parallel when it is large enough to give every worker
+    // a reasonable stripe, and sequentially otherwise. The buckets are then
+    // sorted as tasks: a bucket holding at least 1/threads of the elements
+    // (skewed inputs) recurses in parallel with a proportional share of the
+    // workers; the remaining buckets are grouped into tasks of roughly n / (4
+    // * threads) elements that are each sorted sequentially.
+    //
+    // With `skip_leading_digits`, the key range is computed first so that
+    // digits shared by all keys are skipped. The top level always does this;
+    // in the recursion it is done for the large buckets only, as those
+    // indicate skewed keys, which tend to share further digits.
+
+    // Smallest amount of work, in elements, given to a task. Ranges smaller
+    // than two tasks are sorted sequentially.
+    HPX_CXX_CORE_EXPORT inline constexpr std::size_t radix_sort_min_task_size =
+        std::size_t(1) << 15;
+
+    HPX_CXX_CORE_EXPORT template <typename ExPolicy, typename RandomIt,
+        typename Proj>
+    void radix_sort_parallel(ExPolicy& policy, RandomIt first, std::size_t n,
+        int shift, Proj& proj, std::size_t threads, bool skip_leading_digits)
+    {
+        using value_type = typename std::iterator_traits<RandomIt>::value_type;
+        using key_t = std::decay_t<decltype(HPX_INVOKE(
+            proj, std::declval<value_type const&>()))>;
+        using traits = radix_key_traits<key_t>;
+        using serial_buffers =
+            std::unique_ptr<ips_distribution_buffers<value_type>>;
+
+        if (threads <= 1 || shift < 0 || n < 2 * radix_sort_min_task_size)
+        {
+            serial_buffers buf;
+            radix_sort_serial(first, first + static_cast<std::ptrdiff_t>(n),
+                shift, proj, buf);
+            return;
+        }
+
+        if (skip_leading_digits)
+        {
+            std::size_t const chunks = (std::min) (threads,
+                (std::max) (std::size_t(1), n / radix_sort_min_task_size));
+            shift =
+                radix_sort_parallel_start_shift(policy, first, n, proj, chunks);
+            if (shift < 0)
+                return;
+        }
+
+        radix_sort_bounds bounds;
+
+        // Every worker should classify at least one block per bucket on
+        // average, otherwise the per-worker buffers dominate.
+        std::size_t const workers = (std::min) (threads,
+            n / radix_sort_blockwise_threshold<value_type>);
+        if (workers >= 2)
+        {
+            ips_parallel_distribution_buffers<value_type> buf(workers,
+                radix_sort_buckets, ips_default_block_size<value_type>);
+
+            auto run = [&policy](std::size_t count, auto&& f) {
+                execution::bulk_sync_execute(policy.executor(), f,
+                    hpx::util::iterator_range(
+                        hpx::util::counting_iterator<std::size_t>(0),
+                        hpx::util::counting_iterator<std::size_t>(count)));
+            };
+
+            ips_distribute_parallel(
+                first, n,
+                [&proj, shift](value_type const& v) {
+                    return radix_sort_digit(
+                        traits::lift(HPX_INVOKE(proj, v)), shift);
+                },
+                buf, run);
+
+            std::copy(buf.bucket_start.begin(), buf.bucket_start.end(),
+                bounds.begin());
+        }
+        else
+        {
+            serial_buffers buf;
+            radix_sort_partition(first, n, shift, proj, buf, bounds);
+        }
+
+        int const next_shift = shift - radix_sort_bits_per_pass;
+        std::size_t const grain =
+            (std::max) (n / (4 * threads), radix_sort_min_task_size);
+
+        // All tasks are joined before returning, so they can capture locals
+        // by reference.
+        std::vector<hpx::future<void>> tasks;
+
+        std::size_t group_first = 0;
+        std::size_t group_size = 0;
+        auto flush_group = [&](std::size_t group_last) {
+            if (group_size != 0)
+            {
+                tasks.push_back(execution::async_execute(
+                    policy.executor(), [&, group_first, group_last]() {
+                        serial_buffers buf;
+                        for (std::size_t b = group_first; b != group_last; ++b)
+                        {
+                            if (bounds[b + 1] - bounds[b] < 2)
+                                continue;
+                            radix_sort_serial(
+                                first + static_cast<std::ptrdiff_t>(bounds[b]),
+                                first +
+                                    static_cast<std::ptrdiff_t>(bounds[b + 1]),
+                                next_shift, proj, buf);
+                        }
+                    }));
+            }
+            group_first = group_last;
+            group_size = 0;
+        };
+
+        for (std::size_t b = 0; b != radix_sort_buckets; ++b)
+        {
+            std::size_t const size = bounds[b + 1] - bounds[b];
+            std::size_t const share = size * threads / n;
+            if (share >= 2 && size >= 2 * radix_sort_min_task_size)
+            {
+                flush_group(b);
+                tasks.push_back(execution::async_execute(
+                    policy.executor(), [&, b, size, share]() {
+                        radix_sort_parallel(policy,
+                            first + static_cast<std::ptrdiff_t>(bounds[b]),
+                            size, next_shift, proj, share, true);
+                    }));
+                group_first = b + 1;
+                continue;
+            }
+
+            group_size += size;
+            if (group_size >= grain)
+                flush_group(b + 1);
+        }
+        flush_group(radix_sort_buckets);
+
+        hpx::wait_all(tasks);
+        for (auto& task : tasks)
+            task.get();    // rethrow the first exception, if any
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Algorithm entry struct.
 
     HPX_CXX_CORE_EXPORT template <typename RandomIt>
     struct radix_sort_algo
@@ -319,22 +592,40 @@ namespace hpx::parallel::detail {
         {
         }
 
+        template <typename Proj>
+        static constexpr int start_shift() noexcept
+        {
+            using value_type =
+                typename std::iterator_traits<RandomIt>::value_type;
+            using key_t = std::decay_t<decltype(HPX_INVOKE(
+                std::declval<Proj&>(), std::declval<value_type const&>()))>;
+            return radix_key_traits<key_t>::bits - radix_sort_bits_per_pass;
+        }
+
         template <typename ExPolicy, typename Sent, typename Proj>
         static RandomIt sequential(
             ExPolicy, RandomIt first, Sent last, Proj proj)
         {
-            RandomIt last_iter = first;
-            std::advance(last_iter, static_cast<std::ptrdiff_t>(last - first));
-
             using value_type =
                 typename std::iterator_traits<RandomIt>::value_type;
-            using key_t = std::decay_t<decltype(HPX_INVOKE(
-                proj, std::declval<value_type const&>()))>;
-            using traits = radix_key_traits<key_t>;
 
-            int const start_shift = traits::bits - radix_sort_bits_per_pass;
+            RandomIt const last_iter = detail::advance_to_sentinel(first, last);
+            std::size_t const n = static_cast<std::size_t>(last_iter - first);
+            if (n < 2)
+                return last_iter;
+
+            // Skipping leading digits only pays off where a pass is
+            // expensive; small ranges go straight to the base case.
+            int shift = start_shift<Proj>();
+            if (n > radix_sort_base_case)
+            {
+                shift = radix_sort_summarize_keys(first, n, proj).start_shift();
+                if (shift < 0)
+                    return last_iter;
+            }
+
             std::unique_ptr<ips_distribution_buffers<value_type>> buf;
-            radix_sort_serial(first, last_iter, start_shift, proj, buf);
+            radix_sort_serial(first, last_iter, shift, proj, buf);
             return last_iter;
         }
 
@@ -342,18 +633,58 @@ namespace hpx::parallel::detail {
         static util::detail::algorithm_result_t<ExPolicy, RandomIt> parallel(
             ExPolicy&& policy, RandomIt first, Sent last, Proj proj)
         {
-            // TODO(GSoC milestone Weeks 8-10): parallel histogram + blockwise
-            // in-place permutation. Until then, run the serial pipeline on
-            // the executor so the policy still routes work off-thread for
-            // task policies.
             using algorithm_result =
                 util::detail::algorithm_result<ExPolicy, RandomIt>;
-            return algorithm_result::get(
-                execution::async_execute(policy.executor(),
-                    [first, last, proj = HPX_MOVE(proj)]() mutable {
-                        return radix_sort_algo::sequential(
-                            hpx::execution::seq, first, last, HPX_MOVE(proj));
-                    }));
+
+            RandomIt const last_iter = detail::advance_to_sentinel(first, last);
+            auto sort = [policy, first, last_iter,
+                            proj = HPX_MOVE(proj)]() mutable -> RandomIt {
+                std::size_t const n =
+                    static_cast<std::size_t>(last_iter - first);
+                if (n < 2)
+                    return last_iter;
+
+                std::size_t const cores =
+                    hpx::execution::experimental::processing_units_count(
+                        policy.parameters(), policy.executor(),
+                        hpx::chrono::null_duration, n);
+
+                // radix_sort_parallel skips the leading digits itself unless
+                // the range is too small to be split at all.
+                int shift = start_shift<Proj>();
+                if (cores <= 1 || n < 2 * radix_sort_min_task_size)
+                {
+                    if (n > radix_sort_base_case)
+                    {
+                        shift = radix_sort_summarize_keys(first, n, proj)
+                                    .start_shift();
+                        if (shift < 0)
+                            return last_iter;
+                    }
+                }
+
+                radix_sort_parallel(policy, first, n, shift, proj, cores, true);
+                return last_iter;
+            };
+
+            try
+            {
+                if constexpr (hpx::is_async_execution_policy_v<ExPolicy>)
+                {
+                    return algorithm_result::get(execution::async_execute(
+                        policy.executor(), HPX_MOVE(sort)));
+                }
+                else
+                {
+                    return algorithm_result::get(sort());
+                }
+            }
+            catch (...)
+            {
+                return algorithm_result::get(
+                    detail::handle_exception<ExPolicy, RandomIt>::call(
+                        std::current_exception()));
+            }
         }
     };
 
