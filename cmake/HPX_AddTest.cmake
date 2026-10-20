@@ -19,7 +19,7 @@ function(add_hpx_test category name)
       NO_PARCELPORT_GASNET
   )
   set(one_value_args EXECUTABLE LOCALITIES THREADS_PER_LOCALITY TIMEOUT
-                     RUNWRAPPER
+                     RUNWRAPPER PSEUDO_DEPS_NAME
   )
   set(multi_value_args ARGS PARCELPORTS)
   cmake_parse_arguments(
@@ -128,7 +128,10 @@ function(add_hpx_test category name)
      AND NOT "${name}_RUNWRAPPER"
      AND (${name}_LOCALITIES STREQUAL "1" OR NOT ${HPX_WITH_NETWORKING})
   )
-    set(args ${args} "--hpx:bind=none")
+    list(FIND args "--hpx:bind=none" _bind_none_index)
+    if(_bind_none_index EQUAL -1)
+      set(args ${args} "--hpx:bind=none")
+    endif()
   endif()
 
   if(HPX_WITH_INSTALLED_VERSION)
