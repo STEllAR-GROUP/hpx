@@ -1657,6 +1657,12 @@ The predefined command line options for any application using
    ``local-workrequesting-mc``, and ``abp-priority-lifo``
    (default: ``local-priority-fifo``).
 
+   .. note::
+
+      The ``local`` scheduler ignores all thread priorities, including
+      ``thread_priority::bound`` and ``thread_priority::initially_bound``,
+      which then only determine the initial placement of a thread.
+
 .. option:: --hpx:high-priority-threads arg
 
    The number of operating system threads maintaining a high priority queue
