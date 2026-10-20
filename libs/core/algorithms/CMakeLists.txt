@@ -84,6 +84,7 @@ set(algorithms_headers
     hpx/parallel/algorithms/partial_sort.hpp
     hpx/parallel/algorithms/partial_sort_copy.hpp
     hpx/parallel/algorithms/partition.hpp
+    hpx/parallel/algorithms/radix_sort.hpp
     hpx/parallel/algorithms/reduce_by_key.hpp
     hpx/parallel/algorithms/reduce.hpp
     hpx/parallel/algorithms/reduce_deterministic.hpp
