@@ -218,7 +218,7 @@ namespace hpx::threads::detail {
                     hint.hint);
         }
 
-        HPX_ASSERT(state_val != thread_schedule_state::terminated);
-        return state_val == thread_schedule_state::deleted;
+        return state_val == thread_schedule_state::terminated ||
+            state_val == thread_schedule_state::deleted;
     }
 }    // namespace hpx::threads::detail

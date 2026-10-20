@@ -17,6 +17,7 @@ set(tests
     set_hpx_limit_798
     shared_future_continuation_order
     shared_future_then_2166
+    stackless_direct_execution_7708
     wait_for_1751
 )
 
@@ -40,6 +41,15 @@ foreach(test ${tests})
 
   add_hpx_regression_test("modules.futures" ${test} ${${test}_PARAMETERS})
 endforeach()
+
+# with more workers a leftover queue entry can also be dequeued while the parent
+# is still running the child
+add_hpx_regression_test(
+  "modules.futures" stackless_direct_execution_7708_4
+  EXECUTABLE stackless_direct_execution_7708
+  PSEUDO_DEPS_NAME stackless_direct_execution_7708
+  THREADS_PER_LOCALITY 4
+)
 
 # compile only tests
 if(HPX_WITH_COMPILE_ONLY_TESTS)
