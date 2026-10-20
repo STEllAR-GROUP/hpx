@@ -25,7 +25,7 @@ For the detailed semantics of individual lifecycle events, ``check_admission``,
 and ``dispatch_outcome`` values, see :ref:`modules_supervision`; this page does
 not repeat that reference material. For the API reference of the
 dispatch-specific types and functions this component introduces -
-``registry``, ``discovery::discover_and_join``, and
+``registry``, ``discover_and_join``, and
 ``dispatch_work`` - see :ref:`modules_supervision_dispatch`.
 
 Initialization and shutdown ordering
@@ -56,9 +56,9 @@ Supervision dispatch is brought up with a single call to
 #. Registration of the symbol name.
 #. A single :hpx:func:`hpx::supervision::discover_and_join` pass that joins
    every peer registry reachable within ``discovery_timeout``. Its result is
-   a list of ``joined_discovery_result`` (peer paired with the shadow id its
-   ``join()`` call was assigned); peers that time out mid-pass are omitted
-   from that list entirely rather than leaving a gap in it.
+   a list of ``discovered_peer`` (the peer's locality paired with the
+   ``join_epoch`` its ``join()`` call returned); peers that time out mid-pass
+   are omitted from that list entirely rather than leaving a gap in it.
 
 ``init()`` is idempotent: calling it while already active is a no-op, and
 concurrent callers attach to a single in-flight initialization rather than
@@ -393,8 +393,11 @@ Registration, at join time
 --------------------------
 
 When ``registry::join(peer_locality)`` is called, the local registry does
-two things before returning a shadow id to the caller. A peer's identity
-*is* its locality since exactly one registry exists per locality.
+two things before returning a ``joined_peer`` to the caller. A peer's
+identity *is* its locality since exactly one registry exists per locality,
+so ``joined_peer::target`` is ``peer_locality`` itself, paired with the
+``join_epoch`` it was joined at; the shadow id below is internal to the
+registry and never returned.
 
 #. **Seeds the shadow with the peer's current state.** It performs a single,
    synchronous ``query_state()`` call against ``peer_locality`` to read
@@ -551,7 +554,7 @@ protection rather than fixing the underlying condition.
 How fenced work is invoked
 ==========================
 
-``hpx::supervision::dispatch_work<action_type>(target, epoch, action, args...)``
+``hpx::supervision::dispatch_work<Action>(target, epoch, args...)``
 is the entry point callers use. It performs two distinct steps, on two different localities:
 
 #. **Local, non-authoritative early-out (caller's locality).**
@@ -668,6 +671,14 @@ directly -- don't need an extra step to obtain one, the same convenience
 ``hpx::async`` itself offers by accepting either an action type or an action
 instance.
 
+A further overload, ``dispatch_work(Action, discovered_peer const&,
+args...)``, takes a peer returned by ``discover_and_join()`` in place of an
+explicit ``target``/``epoch`` pair and forwards to
+``dispatch_work<Action>(peer.locality, peer.join_epoch, args...)``. A peer
+that was never joined (``join_epoch == unjoined_epoch``, e.g. one returned by
+``discover_peers()`` alone) is rejected up front with the same
+``hpx::error::target_fenced`` exceptional future.
+
 Everything else - ``target``, the returned ``hpx::future<result_type>``, and
 how the caller consumes it (``.get()``, continuations, etc.) - stays the
 same. The only additional caller-side responsibility is handling
@@ -737,26 +748,40 @@ Fencing a silent peer
 
     #include <hpx/supervision_dispatch.hpp>
 
-    hpx::supervision::registry local_registry(hpx::find_here());
+    hpx::supervision::registry const handle =
+        hpx::supervision::init(hpx::launch::sync);
 
-    hpx::supervision::joined_peer const peer = local_registry.join(
-        hpx::launch::sync, hpx::find_here());
+    std::vector<hpx::supervision::discovered_peer> const peers =
+        hpx::supervision::discover_and_join(handle);
 
-    // ... time passes; the peer's heartbeat stops ...
+    // ... time passes; one peer's heartbeat stops ...
 
-    // Client-side filtering: cheap, but only as fresh as the last observed
-    // heartbeat/lifecycle event mirrored onto `shadow`.
-    for (auto const& peer : local_registry.snapshot_peers(hpx::launch::sync))
+    for (auto const& peer : peers)
     {
-        if (peer.state == hpx::supervision::lifecycle_state::failed)
+        // Client-side filtering: cheap, but only as fresh as the last
+        // heartbeat/lifecycle event mirrored onto this peer's local shadow.
+        if (hpx::supervision::check_admission(peer.locality, peer.join_epoch) ==
+            hpx::supervision::dispatch_outcome::rejected_fenced)
         {
             // Skip obviously-dead peers before even attempting dispatch.
             continue;
         }
+
         // Attempt fenced dispatch anyway; the target-side re-check inside
-        // invoke_fenced_action() is authoritative and will reject the action
+        // invoke_fenced_action() is authoritative and rejects the action
         // with hpx::error::target_fenced if the peer has latched a terminal
         // event we haven't observed locally yet.
+        try
+        {
+            hpx::supervision::dispatch_work(action, peer, args...).get();
+        }
+        catch (hpx::exception const& e)
+        {
+            if (e.get_error() != hpx::error::target_fenced)
+            {
+                throw;
+            }
+        }
     }
 
 Waiting on a dispatch outcome with a timeout
@@ -768,7 +793,7 @@ Waiting on a dispatch outcome with a timeout
     #include <hpx/supervision_dispatch.hpp>
 
     hpx::future<result_type> f =
-        hpx::supervision::dispatch_work(target, epoch, action, args...);
+        hpx::supervision::dispatch_work(action, target, epoch, args...);
 
     if (hpx::wait_all_for(std::chrono::seconds(5), f) ==
         hpx::future_status::ready)
@@ -842,5 +867,5 @@ above - is available in ``components/supervision_dispatch/examples/plain_worker.
 See :ref:`modules_supervision` for the full semantics of ``check_admission``,
 ``dispatch_outcome``, and the individual lifecycle events referenced above,
 and :ref:`modules_supervision_dispatch` for the API reference of this
-component's own types and functions (``registry``, ``discovery``, and
-``dispatch_work``).
+component's own types and functions (``registry``, ``discover_and_join``,
+and ``dispatch_work``).
