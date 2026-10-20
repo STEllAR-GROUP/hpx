@@ -579,6 +579,13 @@ namespace hpx::threads {
             return runs_as_child_.load(mo);
         }
 
+        // a thread handed to another worker should run there, and not be run
+        // directly by a thread waiting for it
+        void reset_runs_as_child() noexcept
+        {
+            runs_as_child_.store(false, std::memory_order_release);
+        }
+
         HPX_FORCEINLINE bool is_stackless() const noexcept
         {
             std::scoped_lock<mutex_type> l(mtx_);
