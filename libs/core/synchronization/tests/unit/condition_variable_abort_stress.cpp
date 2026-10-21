@@ -7,9 +7,8 @@
 #include <hpx/exception.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/synchronization/detail/condition_variable.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/thread.hpp>
 
 #include <atomic>

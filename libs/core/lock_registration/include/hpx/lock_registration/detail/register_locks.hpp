@@ -147,10 +147,7 @@ namespace hpx::util {
 
     namespace detail {
 
-#if !defined(HPX_HAS_MEMBER_MUTEX_TRAIT_DEFINED)
-#define HPX_HAS_MEMBER_MUTEX_TRAIT_DEFINED
         HPX_HAS_MEMBER_XXX_TRAIT_DEF(mutex)
-#endif
     }    // namespace detail
 
     // clang-format off
