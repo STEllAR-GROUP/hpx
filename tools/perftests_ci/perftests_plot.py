@@ -75,6 +75,22 @@ def median_statistic(sample1, sample2, axis=-1):
     median2 = np.median(sample2, axis=axis)
     return (median1 - median2)
 
+def execution_medians(test):
+    # The median of the timings of each execution of the benchmark. The timings
+    # of one execution depend on each other, most of the variation is between
+    # the executions, so the confidence interval of the comparison is computed
+    # from these medians; bootstrapping all timings as if they were independent
+    # makes it far too narrow, and noise shows up as a change. A result without
+    # the number of timings per execution (recorded by the perftest driver)
+    # counts every timing as an execution of its own.
+    series = np.asarray(test["series"], dtype=float)
+    sizes = test.get("executions")
+    if not sizes or sum(sizes) != len(series):
+        return series
+    bounds = np.cumsum(sizes)[:-1]
+    return np.array([np.median(part) for part in np.split(series, bounds)
+                     if len(part) > 0])
+
 def time_unit(seconds):
     # the unit that shows the given time with one to three integer digits
     for unit, factor in (("s", 1), ("ms", 1e3), ("\u00b5s", 1e6)):
@@ -204,10 +220,11 @@ def plot_report(result_path, reference_path, output_prefix):
             if test2 is not None:
                 # classify expects the change of the current time relative
                 # to the baseline, so a positive interval means slower
-                data = (test1["series"] / median2, test2["series"] / median2)
-                # The default BCa method needs a jackknife over all values,
-                # which takes minutes for the larger series; the percentile
-                # interval of the median is practically the same here
+                data = (execution_medians(test1) / median2,
+                        execution_medians(test2) / median2)
+                # The percentile interval, the default BCa method needs a
+                # jackknife over all values, which takes minutes for a result
+                # without the timings per execution
                 res = scipy.stats.bootstrap(data, median_statistic,
                     n_resamples=1000, method="percentile")
                 lower, upper = res.confidence_interval

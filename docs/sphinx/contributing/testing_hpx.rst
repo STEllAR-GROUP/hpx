@@ -33,7 +33,7 @@ For each pull request, Jenkins runs the performance tests on Rostam (see
 on the pull request. To run a performance test yourself, configure |hpx| with
 ``-DHPX_WITH_TESTS_RUN_BENCHMARKS=ON`` (and ``-DHPX_WITH_NANOBENCH=ON``, as the
 CI does) and build the target ``<name>_perftest``, e.g.
-``benchmark_merge_perftest``. It runs the benchmark 15 times (or as often as
+``benchmark_merge_perftest``. It runs the benchmark 30 times (or as often as
 the ``N_EXECUTIONS`` argument of ``add_hpx_performance_report_test`` says) and
 writes the results to ``tools/perftests_ci/results/<name>.json`` in the build
 directory. Then build the target ``perftests_plot``, which compares all results

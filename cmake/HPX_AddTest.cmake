@@ -387,7 +387,7 @@ function(add_hpx_performance_report_test subcategory name)
   set(command_args ${command_args} ${${name}_UNPARSED_ARGUMENTS})
   # How often the benchmark is run, every run adds its measurements to the
   # results compared with the reference
-  set(n_executions 15)
+  set(n_executions 30)
   if(${name}_N_EXECUTIONS)
     set(n_executions ${${name}_N_EXECUTIONS})
   endif()
