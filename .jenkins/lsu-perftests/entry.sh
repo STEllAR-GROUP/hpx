@@ -13,11 +13,12 @@ set -eux
 status_file="jenkins-hpx-${configuration_name}-ctest-status.txt"
 report_file="${configuration_name}-reports/reference-comparison/index.html"
 changed_file="${configuration_name}-reports/reference-comparison/changed.txt"
+new_references_dir="${configuration_name}-reports/reference-comparison/new-references"
 history_dir="${configuration_name}-reports/history"
 rm -f "jenkins-hpx-${configuration_name}.out" \
     "jenkins-hpx-${configuration_name}.err" "${status_file}" "${report_file}" \
     "${changed_file}"
-rm -rf "${history_dir}"
+rm -rf "${new_references_dir}" "${history_dir}"
 
 source .jenkins/common/slurm.sh
 source .jenkins/lsu-perftests/report_common.sh
@@ -286,7 +287,15 @@ fi
 
 # Comment on a pull request only if a measurement got more than 5% faster or
 # slower than its reference (see perftests_plot.py). Failures don't produce a
-# comment, they turn the status red.
+# comment, they turn the status red. Uploading the plots uploads the new
+# references as well, if there are any.
+new_references=$(compgen -G "${new_references_dir}/*/" || true)
+references_status=0
+if [[ -n "${new_references}" ]]; then
+    perftest_log "New references of all benchmarks of" \
+        $(basename -a ${new_references}) "were made by this run"
+fi
+images_uploaded=0
 if [[ -n "${ghprbPullId:-}" ]]; then
     if [[ ! -s "${report_file}" ]]; then
         perftest_log "No report, not commenting on the pull request"
@@ -297,13 +306,30 @@ if [[ -n "${ghprbPullId:-}" ]]; then
         perftest_log "Commenting on pull request #${ghprbPullId} about" \
             "$(grep -c . "${changed_file}") measurements"
         # Post the report without plots if they can't be uploaded
+        images_uploaded=1
         if ! PERFTEST_IMAGES_URL="$(./.jenkins/lsu-perftests/upload_images.sh \
             "$(dirname "${report_file}")" "${ghprbPullId}" "${BUILD_NUMBER}")"; then
             echo "Warning: could not upload the plots of the report" >&2
             PERFTEST_IMAGES_URL=""
+            if [[ -n "${new_references}" ]]; then
+                references_status=1
+            fi
         fi
         PERFTEST_IMAGES_URL="${PERFTEST_IMAGES_URL}" \
             ./.jenkins/lsu-perftests/comment_github.sh
+    fi
+fi
+
+# New references are uploaded in any case, also without a comment and for a
+# build of a branch. They also stay in the Jenkins artifacts, but a failed
+# upload turns the status red.
+if [[ -n "${new_references}" && "${images_uploaded}" == 0 ]]; then
+    perftest_log "Uploading the new references"
+    if ! ./.jenkins/lsu-perftests/upload_images.sh \
+        "$(dirname "${report_file}")" "${ghprbPullId:-${git_local_branch}}" \
+        "${BUILD_NUMBER}" > /dev/null; then
+        echo "Warning: could not upload the new references" >&2
+        references_status=1
     fi
 fi
 
@@ -330,6 +356,7 @@ fi
 
 # Set GitHub status with CDash url
 if [[ "${slurm_status}" -eq 0 && "${history_status}" -eq 0 &&
+    "${references_status}" -eq 0 &&
     -s "${status_file}" && "$(cat "${status_file}")" == 0 ]]; then
     github_commit_status="success"
 else
@@ -342,6 +369,7 @@ if [[ -s "${cdash_build_id_file}" ]]; then
 fi
 perftest_log "Setting the GitHub status to ${github_commit_status}" \
     "(Slurm ${slurm_status}, history ${history_status}," \
+    "references ${references_status}," \
     "CDash build ${cdash_build_id:-none})"
 
 # Do not print the token passed to the status helper.
@@ -376,6 +404,9 @@ if [[ "${slurm_status}" -ne 0 ]]; then
 fi
 if [[ "${history_status}" -ne 0 ]]; then
     exit "${history_status}"
+fi
+if [[ "${references_status}" -ne 0 ]]; then
+    exit "${references_status}"
 fi
 if [[ ! -s "${status_file}" ]]; then
     echo "Missing performance test status: ${status_file}" >&2

@@ -58,10 +58,10 @@ report_new_references() {
         fi
         node="$(basename "${node_dir}")"
         if [[ -n "${2:-}" ]]; then
-            printf '<p>%s has no references for some of the benchmarks yet. Its references, completed with the results of this run, are uploaded as <a href="%s">%s</a>, copy it to tools/perftests_ci/perftest/references to use them.</p>' \
+            printf '<p>%s has no references for some of the benchmarks (new ones, or ones whose measurements changed). New references of all its benchmarks, measured by this run, are uploaded as <a href="%s">%s</a>, copy it to tools/perftests_ci/perftest/references to use them.</p>' \
                 "${node}" "$2/${node}.tar.gz" "${node}.tar.gz"
         else
-            printf '<p>%s has no references for some of the benchmarks yet. Its references, completed with the results of this run, are in the Jenkins artifacts (perftests-reports/reference-comparison/new-references/%s), pack them with tools/perftests_ci/pack_references.sh to use them.</p>' \
+            printf '<p>%s has no references for some of the benchmarks (new ones, or ones whose measurements changed). New references of all its benchmarks, measured by this run, are in the Jenkins artifacts (perftests-reports/reference-comparison/new-references/%s), pack them with tools/perftests_ci/pack_references.sh to use them.</p>' \
                 "${node}" "${node}"
         fi
     done

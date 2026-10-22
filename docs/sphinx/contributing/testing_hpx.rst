@@ -57,16 +57,21 @@ To add the test to the CI report, register it with
 ``add_hpx_performance_report_test`` if ``HPX_WITH_TESTS_RUN_BENCHMARKS`` is
 enabled (see ``libs/core/algorithms/tests/performance/CMakeLists.txt``); the CI
 builds and runs all registered performance tests.
-Finally, add a reference result. The timings differ between the nodes the CI
-may run on, so each node has its own reference results in
+Finally, add the reference results. The timings differ between the nodes the
+CI may run on, so each node has its own reference results in
 ``tools/perftests_ci/perftest/references/<node>.tar.gz``, and the comparison
-uses the ones of the node the benchmarks ran on. Build the ``<name>_perftest``
-target on that node, copy ``tools/perftests_ci/results/<name>.json`` from the
-build directory to the unpacked reference results of the node, and pack them
-again with ``tools/perftests_ci/pack_references.sh`` (see the comment at the top
-of the script). If the CI runs on a node without references for all
-benchmarks, it uploads the node's references together with the results of the
-run, packed, next to the plots of the report, and the report links to them.
+uses the ones of the node the benchmarks ran on. If a benchmark has no
+reference on that node, because it is new or its measurements changed, the CI
+makes new references of all benchmarks of the node from the run, so that they
+are measured together, and always uploads them, packed, to
+``TheHPXProject/hpx-perftest-images`` (``pr/<pull request>/<build>/references``
+or ``branch/<branch>/<build>/references``); the report links to them. Copy the
+archive to ``tools/perftests_ci/perftest/references`` to use them. To update
+a single reference by hand, build the ``<name>_perftest`` target on that node,
+copy ``tools/perftests_ci/results/<name>.json`` from the build directory to the
+unpacked reference results of the node, and pack them again with
+``tools/perftests_ci/pack_references.sh`` (see the comment at the top of the
+script).
 The CI comments on a pull request only about measurements that got more than
 5% faster or slower; the pull request comment ``retest lsu perf full`` starts a
 run that reports all measurements.

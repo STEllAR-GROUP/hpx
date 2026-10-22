@@ -23,7 +23,8 @@ class PerformanceResults(unittest.TestCase):
                   upload=0, comment_body=None, branch="origin/master",
                   record=True, history_upload=0, idle_nodes=None,
                   partition_nodes="first second third", queue_timeout=None,
-                  nodes="first second", history_node=None):
+                  nodes="first second", new_references=False,
+                  history_node=None):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             lane = root / ".jenkins/lsu-perftests"
@@ -62,6 +63,11 @@ hpx_slurm_run() {
     if [[ -n "${BUILD_STATUS}" ]]; then
         echo "${BUILD_STATUS}" > jenkins-hpx-perftests-ctest-status.txt
     fi
+    if [[ "${CREATE_NEW_REFERENCES}" == 1 ]]; then
+        mkdir -p perftests-reports/reference-comparison/new-references/first
+        echo '{}' > \\
+            perftests-reports/reference-comparison/new-references/first/a.json
+    fi
     if [[ "${CREATE_REPORT}" == 1 ]]; then
         mkdir -p perftests-reports/reference-comparison
         echo current > perftests-reports/reference-comparison/index.html
@@ -79,7 +85,7 @@ hpx_slurm_run() {
             comment.chmod(0o755)
             upload_stub = lane / "upload_images.sh"
             upload_stub.write_text(
-                "#!/bin/sh\nprintf '%s\\n' \"$@\" > upload-args.txt\n"
+                "#!/bin/sh\nprintf '%s\\n' \"$@\" >> upload-args.txt\n"
                 "[ \"${UPLOAD_STATUS}\" = 0 ] || exit 1\n"
                 "echo https://images.example/abc/pr/123/7\n")
             upload_stub.chmod(0o755)
@@ -121,6 +127,7 @@ hpx_slurm_run() {
                 old_report = root / "perftests-reports/reference-comparison"
                 old_report.mkdir(parents=True)
                 (old_report / "index.html").write_text("previous run")
+                (old_report / "new-references/first").mkdir(parents=True)
             env = dict(os.environ, PATH=str(root) + ":" + os.environ["PATH"],
                        configuration_name="perftests", GIT_BRANCH=branch,
                        CREATE_RECORD=str(int(record)),
@@ -128,6 +135,7 @@ hpx_slurm_run() {
                        BUILD_STATUS="" if status is None else str(status),
                        SLURM_STATUS=str(slurm), CREATE_REPORT=str(int(report)),
                        CREATE_CHANGED=str(int(changed)),
+                       CREATE_NEW_REFERENCES=str(int(new_references)),
                        UPLOAD_STATUS=str(upload), BUILD_NUMBER="7",
                        ghprbPullId="123" if pull_request else "",
                        GITHUB_TOKEN="dummy-token", GIT_COMMIT="branch-sha",
@@ -308,6 +316,45 @@ hpx_slurm_run() {
         self.assertEqual(self.run_entry(slurm=1, status=1, pull_request=False),
                          (1, False))
         self.assertEqual(self.history_args, "perftests-reports")
+
+    def test_new_references_are_uploaded_without_a_comment(self):
+        self.assertEqual(self.run_entry(status=0, report=True,
+                                        new_references=True), (0, False))
+        self.assertEqual(self.upload_args, [
+            "perftests-reports/reference-comparison", "123", "7"])
+        self.assertEqual(self.status_args[2], "success")
+
+    def test_new_references_are_uploaded_once_with_a_comment(self):
+        self.assertEqual(self.run_entry(status=0, report=True, changed=True,
+                                        new_references=True), (0, True))
+        self.assertEqual(self.upload_args, [
+            "perftests-reports/reference-comparison", "123", "7"])
+
+    def test_new_references_of_a_branch_build_are_uploaded(self):
+        self.assertEqual(self.run_entry(status=0, report=True,
+                                        pull_request=False,
+                                        new_references=True), (0, False))
+        self.assertEqual(self.upload_args, [
+            "perftests-reports/reference-comparison", "master", "7"])
+
+    def test_failed_upload_of_new_references_is_a_failure(self):
+        self.assertEqual(self.run_entry(status=0, report=True, upload=1,
+                                        new_references=True), (1, False))
+        self.assertEqual(self.status_args[2], "failure")
+
+    def test_failed_upload_with_a_comment_and_new_references_is_a_failure(self):
+        self.assertEqual(self.run_entry(status=0, report=True, changed=True,
+                                        upload=1, new_references=True),
+                         (1, True))
+        self.assertEqual(self.status_args[2], "failure")
+
+    def test_without_new_references_nothing_is_uploaded(self):
+        self.run_entry(status=0, report=True)
+        self.assertIsNone(self.upload_args)
+
+    def test_stale_new_references_are_not_uploaded(self):
+        self.assertEqual(self.run_entry(slurm=124, stale=True), (124, False))
+        self.assertIsNone(self.upload_args)
 
     def test_missing_status_is_a_failure(self):
         self.assertEqual(self.run_entry(), (1, False))

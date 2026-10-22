@@ -73,23 +73,24 @@ status_computation_and_artifacts_storage() {
         done
     fi
 
-    # Results without a reference (listed in no_reference.txt) become the new
-    # references of this node, together with its existing ones. upload_images.sh
-    # uploads them packed next to the plots.
+    # If a benchmark has no reference (listed in no_reference.txt), because it
+    # is new or its measurements changed, all references of this node are made
+    # again from this run, so that they are measured together. The existing
+    # references are kept only for the benchmarks without a result.
+    # entry.sh uploads them in any case (see upload_images.sh).
     if [[ -s "${perftests_dir}/no_reference.txt" ]]; then
         node="$(hostname -s)"
         perftest_log "No references on ${node} for:" \
-            $(cat "${perftests_dir}/no_reference.txt")
+            $(cat "${perftests_dir}/no_reference.txt") \
+            "- making new references of all benchmarks from this run"
         new_references_dir="${new_references_root}/${node}"
         mkdir -p "${new_references_dir}"
-        for reference in "${perftests_dir}/references/${node}"/*.json; do
+        for reference in "${perftests_dir}/references/${node}"/*.json \
+            "${perftests_dir}"/results/*.json; do
             if [[ -e "${reference}" ]]; then
                 cp "${reference}" "${new_references_dir}"
             fi
         done
-        while read -r result; do
-            cp "${perftests_dir}/results/${result}" "${new_references_dir}"
-        done < "${perftests_dir}/no_reference.txt"
     fi
 
     # The record of a run of a master commit (HPX_PERFTESTS_HISTORY, set by

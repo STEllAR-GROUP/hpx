@@ -267,6 +267,16 @@ def plot_report(result_path, reference_path, output_prefix):
     return True
 
 
+def same_measurements(result_path, reference_path):
+    # Whether a result has the same measurements (names and executors, in the
+    # same order) as its reference
+    def measurements(path):
+        with open(path, 'r') as f:
+            return [(output["name"], output.get("executor"))
+                    for output in json.load(f)["outputs"]]
+    return measurements(result_path) == measurements(reference_path)
+
+
 if len(sys.argv) < 4 or (len(sys.argv) - 1) % 3 != 0:
     print("Usage: python perftests_plot.py [path_to_result.json] [path_to_reference.json] [perftest_name] ...")
     exit(1)
@@ -291,10 +301,15 @@ for k in range(0, len(args), 3):
     # The references are kept per node, the node this ran on may not have
     # any yet. This is reported (and commented on), but is not a failure: the
     # results are reported and plotted on their own, and are listed in
-    # no_reference.txt, so that batch.sh keeps them as the new references of
-    # that node.
-    if not os.path.exists(reference_path):
-        print(f"No reference: {reference_path}")
+    # no_reference.txt, so that batch.sh makes new references of that node
+    # from this run. A benchmark whose measurements changed (one was added,
+    # removed or renamed) has no reference for them either.
+    if not os.path.exists(reference_path) or \
+            not same_measurements(result_path, reference_path):
+        if os.path.exists(reference_path):
+            print(f"The measurements differ from the reference: {reference_path}")
+        else:
+            print(f"No reference: {reference_path}")
         plot_report(result_path, None, output_prefix)
         with open(f'{curr_path}/no_reference.txt', "a+") as no_reference_file:
             no_reference_file.write(
