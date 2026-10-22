@@ -426,14 +426,16 @@ namespace hpx::threads::detail {
                     hpx::tracing::os_thread_sleep(num_thread);
 
                     // Clean up terminated threads before trying to exit
-                    bool can_exit = !running &&
+                    bool can_exit =
                         scheduler.SchedulingPolicy::cleanup_terminated(
                             num_thread, true) &&
                         scheduler.SchedulingPolicy::get_queue_length(
                             num_thread) == 0;
 
-                    if (this_state.load(std::memory_order_relaxed) ==
-                        hpx::state::pre_sleep)
+                    auto current_state =
+                        this_state.load(std::memory_order_relaxed);
+
+                    if (current_state == hpx::state::pre_sleep)
                     {
                         if (can_exit)
                         {
@@ -443,6 +445,7 @@ namespace hpx::threads::detail {
                     else
                     {
                         can_exit = can_exit &&
+                            (current_state > hpx::state::pre_sleep) &&
                             scheduler.SchedulingPolicy::get_thread_count(
                                 thread_schedule_state::suspended,
                                 thread_priority::default_, num_thread) == 0;
@@ -569,7 +572,12 @@ namespace hpx::threads::detail {
                 }
                 else
                 {
-                    bool const can_exit = !running &&
+                    auto const current_state =
+                        this_state.load(std::memory_order_relaxed);
+
+                    bool const can_exit =
+                        (current_state == hpx::state::stopping ||
+                            current_state == hpx::state::terminating) &&
                         scheduler.SchedulingPolicy::cleanup_terminated(true) &&
                         scheduler.SchedulingPolicy::get_thread_count(
                             thread_schedule_state::suspended,
