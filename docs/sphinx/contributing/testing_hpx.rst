@@ -73,6 +73,25 @@ run that reports all measurements.
 Every CI run also keeps all of its results packed as references of its node
 (``perftests-reports/references/<node>.tar.gz`` in the Jenkins artifacts).
 
+The performance tests also run for the commits of the master branch, always
+on the same node (``configuration_slurm_history_node`` in
+``.jenkins/lsu-perftests/slurm-constraint-perftests.sh``, a node the build
+matrix doesn't use) and always reporting all measurements. Each of these runs is
+added to the performance history in
+`hpx-performance <https://github.com/TheHPXProject/hpx-performance>`_
+(``.jenkins/lsu-perftests/upload_history.sh``): a directory
+``<year>/<node>/<commit date>-<commit>-b<build>`` with all results, their
+medians, the comparison with the references (without the plots, which
+``perftests_plot.py`` can draw again from the results), and the commit (hash,
+dates, pull request), when the benchmarks ran, the Jenkins build and the
+configuration in ``metadata.json``. ``runs.tsv`` lists all runs, and
+``timeline.csv`` the medians of all measurements of all runs, which the
+README of the repository shows as a graph per benchmark over time (drawn by
+``tools/perftests_ci/perftests_timeline.py`` with every new run).
+``tools/perftests_ci/perftests_history.py`` rebuilds ``timeline.csv`` from the
+run directories of a clone of the repository, optionally for one node, one
+benchmark or a range of dates.
+
 Issue tracker
 =============
 

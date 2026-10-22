@@ -13,21 +13,39 @@ set -eux
 status_file="jenkins-hpx-${configuration_name}-ctest-status.txt"
 report_file="${configuration_name}-reports/reference-comparison/index.html"
 changed_file="${configuration_name}-reports/reference-comparison/changed.txt"
+history_dir="${configuration_name}-reports/history"
 rm -f "jenkins-hpx-${configuration_name}.out" \
     "jenkins-hpx-${configuration_name}.err" "${status_file}" "${report_file}" \
     "${changed_file}"
+rm -rf "${history_dir}"
 
 source .jenkins/common/slurm.sh
 source .jenkins/lsu-perftests/report_common.sh
 
 source .jenkins/lsu-perftests/slurm-constraint-${configuration_name}.sh
 
+perftest_history=0
 if [[ -z "${ghprbPullId:-}" ]]; then
     # Set name of branch if not building a pull request
     export git_local_branch=$(echo ${GIT_BRANCH} | cut -f2 -d'/')
     job_name="jenkins-hpx-${git_local_branch}-${configuration_name}"
-    perftest_log "Build ${BUILD_NUMBER:-} of branch ${git_local_branch}," \
-        "commit ${GIT_COMMIT:-unknown}"
+
+    # Every master commit that is built adds its results to the performance
+    # history: all measurements are reported (and plotted), and batch.sh
+    # records the run, which is uploaded to the performance data repository
+    # below (see upload_history.sh). Older master builds are not cancelled,
+    # each of them is a point of the history.
+    if [[ "${git_local_branch}" == "master" ]]; then
+        perftest_history=1
+        export HPX_PERFTESTS_HISTORY=1
+        export HPX_PERFTESTS_REPORT_ALL=1
+        perftest_log "Build ${BUILD_NUMBER:-} of master commit" \
+            "${GIT_COMMIT:-unknown}, its results are added to the" \
+            "performance history"
+    else
+        perftest_log "Build ${BUILD_NUMBER:-} of branch ${git_local_branch}," \
+            "commit ${GIT_COMMIT:-unknown}"
+    fi
 else
     job_name="jenkins-hpx-${ghprbPullId}-${configuration_name}"
     perftest_log "Build ${BUILD_NUMBER:-} of pull request #${ghprbPullId}," \
@@ -49,8 +67,12 @@ sleep $[(RANDOM % 10) + 1].$[(RANDOM % 10)]s
 
 # The job needs its node exclusively, so it waits in the queue for as long as
 # another job runs there. Fail after a few hours instead of keeping the pull
-# request pending for up to a day (the default of hpx_slurm_run).
-export HPX_SLURM_QUEUE_TIMEOUT="${HPX_SLURM_QUEUE_TIMEOUT:-3h}"
+# request pending for up to a day (the default of hpx_slurm_run). A master
+# build waits for up to a day, so that its commit isn't missing from the
+# history.
+if [[ "${perftest_history}" != 1 ]]; then
+    export HPX_SLURM_QUEUE_TIMEOUT="${HPX_SLURM_QUEUE_TIMEOUT:-3h}"
+fi
 
 # Run on the first of the nodes that is idle, as the job needs a node for
 # itself. This comes after cancelling the previous jobs of the pull request, so
@@ -127,58 +149,70 @@ idle_candidate_node() {
 
 configuration_slurm_nodelist=""
 node_status=0
-# A job submitted for a busy node waits for that node, even if others
-# become idle in the meantime, so wait for any of them to be idle before
-# submitting, out of the same time budget as the queue. The idle nodes are
-# reported whenever they change, the progress every
-# HPX_SLURM_PROGRESS_INTERVAL seconds, without tracing the polls.
-{ set +x; } 2> /dev/null
-queue_seconds=$(hpx_slurm_seconds "${HPX_SLURM_QUEUE_TIMEOUT}")
-poll_seconds="${HPX_SLURM_POLL_INTERVAL:-30}"
-progress_seconds="${HPX_SLURM_PROGRESS_INTERVAL:-600}"
-node_deadline=$((SECONDS + queue_seconds))
-next_progress=$((SECONDS + progress_seconds))
-reported_idle_nodes="unknown"
-perftest_log "Looking for an idle node, candidates in this order" \
-    "(with references first):${candidate_nodes}"
-while true; do
-    node_status=0
-    idle_candidate_node || node_status=$?
-    if [[ "${node_status}" -ne 2 &&
-        "${idle_nodes}" != "${reported_idle_nodes}" ]]; then
-        perftest_log "Idle nodes of partition" \
-            "${configuration_slurm_partition}:" ${idle_nodes:-none}
-        reported_idle_nodes="${idle_nodes}"
+if [[ "${perftest_history}" == 1 ]]; then
+    # The history compares the runs with each other, so they all run on the
+    # same node (the first one, if none is configured), waiting in the queue
+    # for it if needed
+    configuration_slurm_nodelist="${configuration_slurm_history_node:-}"
+    if [[ -z "${configuration_slurm_nodelist}" ]]; then
+        configuration_slurm_nodelist="${configuration_slurm_nodes%% *}"
     fi
-    if [[ "${node_status}" -ne 1 ]]; then
-        break
+    perftest_log "The runs of the history all run on" \
+        "${configuration_slurm_nodelist}, waiting for it if it is busy"
+else
+    # A job submitted for a busy node waits for that node, even if others
+    # become idle in the meantime, so wait for any of them to be idle before
+    # submitting, out of the same time budget as the queue. The idle nodes are
+    # reported whenever they change, the progress every
+    # HPX_SLURM_PROGRESS_INTERVAL seconds, without tracing the polls.
+    { set +x; } 2> /dev/null
+    queue_seconds=$(hpx_slurm_seconds "${HPX_SLURM_QUEUE_TIMEOUT}")
+    poll_seconds="${HPX_SLURM_POLL_INTERVAL:-30}"
+    progress_seconds="${HPX_SLURM_PROGRESS_INTERVAL:-600}"
+    node_deadline=$((SECONDS + queue_seconds))
+    next_progress=$((SECONDS + progress_seconds))
+    reported_idle_nodes="unknown"
+    perftest_log "Looking for an idle node, candidates in this order" \
+        "(with references first):${candidate_nodes}"
+    while true; do
+        node_status=0
+        idle_candidate_node || node_status=$?
+        if [[ "${node_status}" -ne 2 &&
+            "${idle_nodes}" != "${reported_idle_nodes}" ]]; then
+            perftest_log "Idle nodes of partition" \
+                "${configuration_slurm_partition}:" ${idle_nodes:-none}
+            reported_idle_nodes="${idle_nodes}"
+        fi
+        if [[ "${node_status}" -ne 1 ]]; then
+            break
+        fi
+        if [[ "${SECONDS}" -ge "${node_deadline}" ]]; then
+            perftest_log "None of the candidate nodes became idle within" \
+                "${HPX_SLURM_QUEUE_TIMEOUT}, the performance tests don't run"
+            break
+        fi
+        if [[ "${SECONDS}" -ge "${next_progress}" ]]; then
+            perftest_log "Still waiting for one of the candidate nodes to" \
+                "become idle ($(( (SECONDS - node_deadline + queue_seconds) / 60 ))" \
+                "of $((queue_seconds / 60)) min)"
+            next_progress=$((SECONDS + progress_seconds))
+        fi
+        sleep "${poll_seconds}"
+    done
+    set -x
+    configuration_slurm_nodelist="${idle_node}"
+    # The rest of the time budget is left for the queue
+    if [[ "${node_status}" -eq 0 ]]; then
+        queue_left=$((node_deadline - SECONDS))
+        export HPX_SLURM_QUEUE_TIMEOUT="$((queue_left > 60 ? queue_left : 60))s"
     fi
-    if [[ "${SECONDS}" -ge "${node_deadline}" ]]; then
-        perftest_log "None of the candidate nodes became idle within" \
-            "${HPX_SLURM_QUEUE_TIMEOUT}, the performance tests don't run"
-        break
+    # If Slurm can't be asked, submit for the first node as before
+    if [[ "${node_status}" -eq 2 ]]; then
+        echo "Warning: could not find the idle nodes, submitting for" \
+            "${configuration_slurm_nodes%% *}" >&2
+        configuration_slurm_nodelist="${configuration_slurm_nodes%% *}"
+        node_status=0
     fi
-    if [[ "${SECONDS}" -ge "${next_progress}" ]]; then
-        perftest_log "Still waiting for one of the candidate nodes to" \
-            "become idle ($(( (SECONDS - node_deadline + queue_seconds) / 60 ))" \
-            "of $((queue_seconds / 60)) min)"
-        next_progress=$((SECONDS + progress_seconds))
-    fi
-    sleep "${poll_seconds}"
-done
-set -x
-configuration_slurm_nodelist="${idle_node}"
-# The rest of the time budget is left for the queue
-if [[ "${node_status}" -eq 0 ]]; then
-    queue_left=$((node_deadline - SECONDS))
-    export HPX_SLURM_QUEUE_TIMEOUT="$((queue_left > 60 ? queue_left : 60))s"
-fi
-# If Slurm can't be asked, submit for the first node as before
-if [[ "${node_status}" -eq 2 ]]; then
-    echo "Warning: could not find the idle nodes, submitting for" \
-        "${configuration_slurm_nodes%% *}" >&2
-    configuration_slurm_nodelist="${configuration_slurm_nodes%% *}"
-    node_status=0
 fi
 if [[ "${node_status}" -eq 0 ]]; then
     if [[ " ${reference_nodes} " == *" ${configuration_slurm_nodelist} "* ]]; then
@@ -273,9 +307,30 @@ if [[ -n "${ghprbPullId:-}" ]]; then
     fi
 fi
 
+# Add the run of a master commit to the performance history, also if some of
+# the benchmarks failed (the record says which). A run that couldn't be
+# uploaded turns the status red, its record stays in the Jenkins artifacts
+# (perftests-reports/history).
+history_status=0
+if [[ "${perftest_history}" == 1 ]]; then
+    if [[ -s "${history_dir}/path.txt" ]]; then
+        perftest_log "Adding the run to the performance history"
+        if ! ./.jenkins/lsu-perftests/upload_history.sh \
+            "${configuration_name}-reports"; then
+            echo "Warning: could not upload the run to the performance" \
+                "history" >&2
+            history_status=1
+        fi
+    else
+        echo "Warning: the run wasn't recorded, it is missing from the" \
+            "performance history" >&2
+        history_status=1
+    fi
+fi
+
 # Set GitHub status with CDash url
-if [[ "${slurm_status}" -eq 0 && -s "${status_file}" &&
-    "$(cat "${status_file}")" == 0 ]]; then
+if [[ "${slurm_status}" -eq 0 && "${history_status}" -eq 0 &&
+    -s "${status_file}" && "$(cat "${status_file}")" == 0 ]]; then
     github_commit_status="success"
 else
     github_commit_status="failure"
@@ -286,7 +341,8 @@ if [[ -s "${cdash_build_id_file}" ]]; then
     cdash_build_id="$(cat "${cdash_build_id_file}")"
 fi
 perftest_log "Setting the GitHub status to ${github_commit_status}" \
-    "(Slurm ${slurm_status}, CDash build ${cdash_build_id:-none})"
+    "(Slurm ${slurm_status}, history ${history_status}," \
+    "CDash build ${cdash_build_id:-none})"
 
 # Do not print the token passed to the status helper.
 set +x
@@ -317,6 +373,9 @@ set -x
 set -e
 if [[ "${slurm_status}" -ne 0 ]]; then
     exit "${slurm_status}"
+fi
+if [[ "${history_status}" -ne 0 ]]; then
+    exit "${history_status}"
 fi
 if [[ ! -s "${status_file}" ]]; then
     echo "Missing performance test status: ${status_file}" >&2

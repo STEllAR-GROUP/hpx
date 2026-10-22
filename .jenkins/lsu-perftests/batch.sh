@@ -92,6 +92,28 @@ status_computation_and_artifacts_storage() {
         done < "${perftests_dir}/no_reference.txt"
     fi
 
+    # The record of a run of a master commit (HPX_PERFTESTS_HISTORY, set by
+    # entry.sh), which entry.sh uploads to the performance data repository
+    # with upload_history.sh, also if some of the benchmarks failed
+    if [[ -n "${HPX_PERFTESTS_HISTORY:-}" ]]; then
+        perftest_log "Recording the run for the performance history"
+        python3 "${src_dir}/tools/perftests_ci/perftests_record.py" \
+            --source-dir "${src_dir}" \
+            --results-dir "${perftests_dir}/results" \
+            --output-dir "${history_dir}" \
+            --commit "${GIT_COMMIT:-HEAD}" \
+            --branch "${git_local_branch:-}" \
+            --node "$(hostname -s)" \
+            --build-number "${BUILD_NUMBER:-}" \
+            --build-url "${BUILD_URL:-}" \
+            --started "${run_started}" \
+            --finished "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --status "${ctest_status}" \
+            --errors-file "${errors_file}" \
+            --configure-options="${configure_extra_options:-}" ||
+            echo "Warning: could not record the run" >&2
+    fi
+
     exit $ctest_status
 }
 
@@ -100,10 +122,14 @@ source "${src_dir}/.jenkins/lsu-perftests/report_common.sh"
 
 trap "status_computation_and_artifacts_storage" EXIT
 
+run_started="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 build_dir="${src_dir}/build/${configuration_name}"
 perftest_log "Slurm job ${SLURM_JOB_ID:-unknown} on $(hostname -s)," \
     "commit $(git -C "${src_dir}" rev-parse HEAD 2> /dev/null || echo unknown)," \
     "build directory ${build_dir}"
+if [[ -n "${HPX_PERFTESTS_HISTORY:-}" ]]; then
+    perftest_log "The run is recorded for the performance history"
+fi
 
 mkdir -p "${build_dir}/tools"
 cp -r "${src_dir}/tools/perftests_ci" "${build_dir}/tools"
@@ -123,7 +149,8 @@ rm -f "${perftests_dir}/index.html" "${perftests_dir}/changed.txt" \
     "jenkins-hpx-${configuration_name}-perftest-errors.txt"
 new_references_root="${src_dir}/${configuration_name}-reports/reference-comparison/new-references"
 references_artifact_dir="${src_dir}/${configuration_name}-reports/references"
-rm -rf "${new_references_root}" "${references_artifact_dir}"
+history_dir="${src_dir}/${configuration_name}-reports/history"
+rm -rf "${new_references_root}" "${references_artifact_dir}" "${history_dir}"
 rm -f "${src_dir}/${configuration_name}-reports"/*.json
 
 # Load python packages

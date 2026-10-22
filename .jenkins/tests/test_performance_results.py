@@ -20,9 +20,10 @@ SCRIPT = Path(__file__).resolve().parents[1] / "lsu-perftests/entry.sh"
 class PerformanceResults(unittest.TestCase):
     def run_entry(self, *, slurm=0, status=None, report=False, changed=False,
                   stale=False, pull_request=True, cdash_build_id=None,
-                  upload=0, comment_body=None, idle_nodes=None,
+                  upload=0, comment_body=None, branch="origin/master",
+                  record=True, history_upload=0, idle_nodes=None,
                   partition_nodes="first second third", queue_timeout=None,
-                  nodes="first second"):
+                  nodes="first second", history_node=None):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             lane = root / ".jenkins/lsu-perftests"
@@ -34,7 +35,9 @@ class PerformanceResults(unittest.TestCase):
                             lane / "report_common.sh")
             (lane / "slurm-constraint-perftests.sh").write_text(
                 "configuration_slurm_partition=test\n"
-                "configuration_slurm_nodes='" + nodes + "'\n")
+                "configuration_slurm_nodes='" + nodes + "'\n" +
+                ("" if history_node is None else
+                 "configuration_slurm_history_node=" + history_node + "\n"))
             (common / "slurm.sh").write_text('''
 hpx_slurm_cancel_previous() { return 0; }
 hpx_slurm_seconds() {
@@ -47,10 +50,15 @@ hpx_slurm_seconds() {
 }
 hpx_slurm_run() {
     echo "${HPX_PERFTESTS_REPORT_ALL:-}" > report-all.txt
+    echo "${HPX_PERFTESTS_HISTORY:-}" > history.txt
     echo "${HPX_SLURM_QUEUE_TIMEOUT:-}" > queue-timeout.txt
     for arg in "$@"; do
         case "${arg}" in --nodelist=*) echo "${arg#*=}" > node.txt ;; esac
     done
+    if [[ "${HPX_PERFTESTS_HISTORY:-}" == 1 && "${CREATE_RECORD}" == 1 ]]; then
+        mkdir -p perftests-reports/history
+        echo 2026/first/run > perftests-reports/history/path.txt
+    fi
     if [[ -n "${BUILD_STATUS}" ]]; then
         echo "${BUILD_STATUS}" > jenkins-hpx-perftests-ctest-status.txt
     fi
@@ -75,6 +83,11 @@ hpx_slurm_run() {
                 "[ \"${UPLOAD_STATUS}\" = 0 ] || exit 1\n"
                 "echo https://images.example/abc/pr/123/7\n")
             upload_stub.chmod(0o755)
+            history_stub = lane / "upload_history.sh"
+            history_stub.write_text(
+                "#!/bin/sh\nprintf '%s\\n' \"$@\" > history-args.txt\n"
+                "[ \"${HISTORY_UPLOAD_STATUS}\" = 0 ]\n")
+            history_stub.chmod(0o755)
             github_status = common / "set_github_status.sh"
             github_status.write_text(
                 "#!/bin/sh\nshift\nprintf '%s\\n' \"$@\" > status-args.txt\n")
@@ -109,7 +122,9 @@ hpx_slurm_run() {
                 old_report.mkdir(parents=True)
                 (old_report / "index.html").write_text("previous run")
             env = dict(os.environ, PATH=str(root) + ":" + os.environ["PATH"],
-                       configuration_name="perftests", GIT_BRANCH="origin/master",
+                       configuration_name="perftests", GIT_BRANCH=branch,
+                       CREATE_RECORD=str(int(record)),
+                       HISTORY_UPLOAD_STATUS=str(history_upload),
                        BUILD_STATUS="" if status is None else str(status),
                        SLURM_STATUS=str(slurm), CREATE_REPORT=str(int(report)),
                        CREATE_CHANGED=str(int(changed)),
@@ -118,7 +133,8 @@ hpx_slurm_run() {
                        GITHUB_TOKEN="dummy-token", GIT_COMMIT="branch-sha",
                        ghprbActualCommit="pr-sha",
                        ghprbPullLink="https://github.com/TheHPXProject/hpx/pull/123")
-            for name in ("HPX_PERFTESTS_REPORT_ALL", "HPX_SLURM_QUEUE_TIMEOUT"):
+            for name in ("HPX_PERFTESTS_REPORT_ALL", "HPX_PERFTESTS_HISTORY",
+                         "HPX_SLURM_QUEUE_TIMEOUT"):
                 env.pop(name, None)
             if comment_body is not None:
                 env["ghprbCommentBody"] = comment_body
@@ -137,8 +153,10 @@ hpx_slurm_run() {
                 path = root / name
                 return path.read_text().strip() if path.exists() else None
             self.report_all = read("report-all.txt")
+            self.history = read("history.txt")
             self.queue_timeout = read("queue-timeout.txt")
             self.node = read("node.txt")
+            self.history_args = read("history-args.txt")
             comment_called = root / "comment-called"
             self.images_url = (comment_called.read_text().strip()
                                if comment_called.exists() else None)
@@ -211,8 +229,30 @@ hpx_slurm_run() {
             "TheHPXProject/hpx", "branch-sha", "failure", "perftests", "",
             "jenkins/lsu-perftests"])
 
-    def test_without_slurm_the_first_node_is_used(self):
+    def test_master_build_adds_the_run_to_the_history(self):
+        self.assertEqual(self.run_entry(status=0, report=True,
+                                        pull_request=False), (0, False))
+        self.assertEqual(self.history, "1")
+        self.assertEqual(self.report_all, "1")
+        self.assertEqual(self.history_args, "perftests-reports")
+        self.assertEqual(self.status_args[2], "success")
+
+    def test_master_build_waits_for_the_history_node(self):
+        # also if another node is idle
+        self.run_entry(status=0, pull_request=False, history_node="third",
+                       idle_nodes="first second")
+        self.assertEqual(self.node, "third")
+        # the default of hpx_slurm_run (a day), not the 3 hours of a PR
+        self.assertEqual(self.queue_timeout, "")
+
+    def test_master_build_waits_for_the_first_node_without_history_node(self):
+        self.run_entry(status=0, pull_request=False)
+        self.assertEqual(self.node, "first")
+
+    def test_pull_request_build_is_not_added_to_the_history(self):
         self.run_entry(status=0, report=True)
+        self.assertEqual(self.history, "")
+        self.assertIsNone(self.history_args)
         # sinfo can't be run here, the job is submitted for the first node
         self.assertEqual(self.node, "first")
         self.assertEqual(self.queue_timeout, "3h")
@@ -238,6 +278,36 @@ hpx_slurm_run() {
         # never submitted
         self.assertIsNone(self.node)
         self.assertEqual(self.status_args[2], "failure")
+
+    def test_master_build_doesnt_wait_for_an_idle_node(self):
+        self.assertEqual(self.run_entry(status=0, pull_request=False,
+                                        idle_nodes="", history_node="third"),
+                         (0, False))
+        self.assertEqual(self.node, "third")
+
+    def test_other_branch_is_not_added_to_the_history(self):
+        self.assertEqual(self.run_entry(status=0, pull_request=False,
+                                        branch="origin/release-2.0.X"),
+                         (0, False))
+        self.assertEqual(self.history, "")
+        self.assertEqual(self.report_all, "")
+        self.assertIsNone(self.history_args)
+
+    def test_failed_history_upload_is_a_failure(self):
+        self.assertEqual(self.run_entry(status=0, pull_request=False,
+                                        history_upload=1), (1, False))
+        self.assertEqual(self.status_args[2], "failure")
+
+    def test_missing_history_record_is_a_failure(self):
+        self.assertEqual(self.run_entry(status=0, pull_request=False,
+                                        record=False), (1, False))
+        self.assertIsNone(self.history_args)
+        self.assertEqual(self.status_args[2], "failure")
+
+    def test_failed_master_build_is_still_added_to_the_history(self):
+        self.assertEqual(self.run_entry(slurm=1, status=1, pull_request=False),
+                         (1, False))
+        self.assertEqual(self.history_args, "perftests-reports")
 
     def test_missing_status_is_a_failure(self):
         self.assertEqual(self.run_entry(), (1, False))

@@ -41,6 +41,11 @@ if name == "sbatch":
         for suffix in (".out", ".err", "-cdash-submission.txt",
                        "-cdash-build-id.txt", "-ctest-status.txt"):
             Path(prefix + suffix).write_text("0\n")
+    # batch.sh of lsu-perftests records the run of a master commit
+    if os.environ.get("HPX_PERFTESTS_HISTORY"):
+        record = Path(os.environ["configuration_name"] + "-reports/history")
+        record.mkdir(parents=True, exist_ok=True)
+        (record / "path.txt").write_text("2026/test/run\n")
     if os.environ.get("IGNORE_TERM"):
         signal.signal(signal.SIGTERM, signal.SIG_IGN)
     time.sleep(float(os.environ.get("SUBMIT_DELAY", "0")))
@@ -159,6 +164,9 @@ class SlurmLifecycle(unittest.TestCase):
         comment_script = target / "comment_github.sh"
         comment_script.write_text("#!/bin/sh\nexit 0\n")
         comment_script.chmod(0o755)
+        history_script = target / "upload_history.sh"
+        history_script.write_text("#!/bin/sh\nexit 0\n")
+        history_script.chmod(0o755)
         # No downloads, unpacking, or randomized entry delays in this fixture,
         # and its only node is idle.
         for command in ("wget", "sha256sum", "tar", "sleep"):
