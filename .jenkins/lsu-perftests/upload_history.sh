@@ -128,8 +128,10 @@ main_readme() {
     echo
     echo "## Performance over time"
     echo
+    # The links of the graphs are relative to timeline/
     if [[ -s "${data}/timeline/README-timeline.md" ]]; then
-        cat "${data}/timeline/README-timeline.md"
+        sed 's|](\([^/)]*\.svg\))|](timeline/\1)|' \
+            "${data}/timeline/README-timeline.md"
     else
         echo "The graphs couldn't be drawn yet."
     fi

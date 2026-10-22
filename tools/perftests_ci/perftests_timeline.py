@@ -12,7 +12,9 @@
 # the median time of each of its measurements (one line per measurement and
 # executor) for every run, over the date of the commit. The graphs are written
 # as <output directory>/<benchmark>.svg, and the part of the README.md of the
-# repository that shows them to <output directory>/README-timeline.md.
+# repository that shows them to <output directory>/README-timeline.md. Its
+# links are relative to the output directory, so that it shows the graphs on
+# its own as well; upload_history.sh adjusts them for the README.md.
 #
 # The graphs are SVG, so that the repository, which gets new versions of all of
 # them with every run, stores only their differences. They are reproducible:
@@ -106,7 +108,7 @@ def main():
         plot(benchmark, benchmarks[benchmark],
             os.path.join(output_dir, f"{benchmark}.svg"))
         sections.append(f"### {benchmark}\n\n"
-            f"![{benchmark}]({os.path.basename(output_dir)}/{benchmark}.svg)\n")
+            f"![{benchmark}]({benchmark}.svg)\n")
     with open(os.path.join(output_dir, 'README-timeline.md'), 'w',
             newline='') as f:
         f.write('\n'.join(sections))
