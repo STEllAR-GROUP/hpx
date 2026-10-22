@@ -272,7 +272,8 @@ void test_try_acquire_until_multiple_waiters_all_succeed()
 
 void test_wait_until_timeout_does_not_lose_signal()
 {
-    for (int i = 0; i != 8; ++i)
+    int exercised = 0;
+    for (int attempt = 0; exercised != 8 && attempt != 1000; ++attempt)
     {
         hpx::lcos::local::detail::counting_semaphore sem(0);
         hpx::spinlock mtx;
@@ -294,6 +295,8 @@ void test_wait_until_timeout_does_not_lose_signal()
         }
 
         std::unique_lock<hpx::spinlock> l(mtx);
+        bool const before_deadline =
+            std::chrono::steady_clock::now() < deadline;
         while (std::chrono::steady_clock::now() <
             deadline + std::chrono::milliseconds(100))
         {
@@ -304,9 +307,15 @@ void test_wait_until_timeout_does_not_lose_signal()
 
         std::unique_lock<hpx::spinlock> l2(mtx);
         bool const left_over = sem.try_acquire(l2);
+        if (!before_deadline)
+        {
+            continue;
+        }
         HPX_TEST_EQ(state.load(), 3);
         HPX_TEST(!left_over);
+        ++exercised;
     }
+    HPX_TEST_NEQ(exercised, 0);
 }
 
 int hpx_main()
