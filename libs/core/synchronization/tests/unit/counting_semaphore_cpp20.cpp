@@ -297,8 +297,9 @@ void test_wait_until_timeout_does_not_lose_signal()
         std::unique_lock<hpx::spinlock> l(mtx);
         bool const before_deadline =
             std::chrono::steady_clock::now() < deadline;
-        while (std::chrono::steady_clock::now() <
-            deadline + std::chrono::milliseconds(100))
+        while (before_deadline &&
+            std::chrono::steady_clock::now() <
+                deadline + std::chrono::milliseconds(100))
         {
         }
         sem.signal(std::move(l), 1);
