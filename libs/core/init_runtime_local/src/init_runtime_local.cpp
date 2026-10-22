@@ -192,7 +192,9 @@ namespace hpx {
                     p->stop();
                     p->rethrow_exception();
                 },
-                [&](std::exception_ptr ep) { std::rethrow_exception(ep); });
+                [&](std::exception_ptr const& ep) {
+                    std::rethrow_exception(ep);
+                });
 
             return result;
         }
