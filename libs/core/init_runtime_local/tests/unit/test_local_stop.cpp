@@ -24,7 +24,7 @@ int main(int argc, char* argv[])
         hpx::error_code ec(hpx::throwmode::lightweight);
         int const res = hpx::local::stop(ec);
         HPX_TEST(ec);
-        HPX_TEST_EQ(ec.get_error(), hpx::error::invalid_status);
+        HPX_TEST_EQ(ec.value(), hpx::error::invalid_status);
         HPX_TEST_EQ(res, -1);
     }
 
@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
         hpx::error_code ec(hpx::throwmode::lightweight);
         int const res = hpx::local::stop(ec);
         HPX_TEST(ec);
-        HPX_TEST_EQ(ec.get_error(), hpx::error::invalid_status);
+        HPX_TEST_EQ(ec.value(), hpx::error::invalid_status);
         HPX_TEST_EQ(res, -1);
     }
 
