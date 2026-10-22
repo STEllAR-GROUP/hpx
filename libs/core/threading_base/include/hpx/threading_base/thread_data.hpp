@@ -583,19 +583,19 @@ namespace hpx::threads {
         // be run directly by a thread waiting for it. The thread is switched
         // to active while the flag is reset, so this can't interleave with
         // execute_thread claiming the thread for running it directly, which
-        // does the same switch. Returns false if the thread wasn't pending.
-        bool stop_running_as_child() noexcept
+        // does the same switch. Does nothing if the thread isn't pending.
+        void stop_running_as_child() noexcept
         {
             thread_state const state = get_state();
             if (state.state() != thread_schedule_state::pending)
             {
-                return false;
+                return;
             }
 
             thread_state active;
             if (!set_state_tagged(thread_schedule_state::active, state, active))
             {
-                return false;
+                return;
             }
 
             runs_as_child_.store(false, std::memory_order_release);
@@ -605,7 +605,6 @@ namespace hpx::threads {
             while (!restore_state(state, active))
             {
             }
-            return true;
         }
 
         HPX_FORCEINLINE bool is_stackless() const noexcept

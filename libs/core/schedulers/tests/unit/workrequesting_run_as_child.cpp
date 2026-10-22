@@ -5,17 +5,20 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 // This test case demonstrates the issue described in #7789: all tasks below
-// are placed on worker 0 and run_as_child, so hpx_main can run them directly
-// while it waits for them. Worker 0 doesn't get back to its scheduling loop in
-// the meantime, so it used to leave the steal requests of the other workers
-// unanswered and none of the tasks was stolen.
+// are placed on the worker running hpx_main and run_as_child, so hpx_main can
+// run them directly while it waits for them. That worker doesn't get back to
+// its scheduling loop in the meantime, so it used to leave the steal requests
+// of the other workers unanswered and none of the tasks was stolen.
 
-#include <hpx/chrono.hpp>
-#include <hpx/execution.hpp>
-#include <hpx/future.hpp>
-#include <hpx/init.hpp>
+#include <hpx/modules/async_combinators.hpp>
+#include <hpx/modules/async_local.hpp>
+#include <hpx/modules/coroutines.hpp>
+#include <hpx/modules/executors.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/init_runtime_local.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/thread.hpp>
+#include <hpx/modules/threading_base.hpp>
+#include <hpx/modules/timing.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -28,6 +31,10 @@ constexpr std::uint64_t task_duration_ns = 20000;
 
 std::atomic<std::size_t> num_stolen(0);
 
+// the worker hpx_main runs on, which isn't necessarily worker 0, as another
+// worker may have stolen hpx_main before it started
+std::size_t home_worker = 0;
+
 void busy_task()
 {
     auto const start = hpx::chrono::high_resolution_clock::now();
@@ -35,7 +42,7 @@ void busy_task()
     {
     }
 
-    if (hpx::get_worker_thread_num() != 0)
+    if (hpx::get_worker_thread_num() != home_worker)
     {
         ++num_stolen;
     }
@@ -43,7 +50,10 @@ void busy_task()
 
 int hpx_main()
 {
-    hpx::threads::thread_schedule_hint hint(0);
+    home_worker = hpx::get_worker_thread_num();
+
+    hpx::threads::thread_schedule_hint hint(
+        static_cast<std::int16_t>(home_worker));
     hint.runs_as_child_mode(hpx::threads::thread_execution_hint::run_as_child);
     hpx::execution::parallel_executor exec(hint);
 
