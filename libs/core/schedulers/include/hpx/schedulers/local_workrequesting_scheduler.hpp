@@ -1972,17 +1972,15 @@ namespace hpx::threads::policies {
             curr_queue_.store(0, std::memory_order_release);
         }
 
-        void set_scheduler_mode(scheduler_mode mode,
-            hpx::threads::mask_cref_type pu_mask) noexcept override
+        scheduler_mode adjust_scheduler_mode(
+            scheduler_mode mode) noexcept override
         {
             // We should not disable stealing for this scheduler, as this could
             // lead to deadlocks. Fast idle mode lets idle workers send steal
             // requests immediately.
-            scheduler_base::set_scheduler_mode(mode |
-                    policies::scheduler_mode::fast_idle_mode |
-                    policies::scheduler_mode::enable_stealing |
-                    policies::scheduler_mode::enable_stealing_numa,
-                pu_mask);
+            return mode | policies::scheduler_mode::fast_idle_mode |
+                policies::scheduler_mode::enable_stealing |
+                policies::scheduler_mode::enable_stealing_numa;
         }
 
     protected:

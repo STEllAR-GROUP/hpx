@@ -10,6 +10,7 @@ set(tests
     numa_stealing_domains
     schedule_last
     schedule_hint_none_stale_queue_6978
+    scheduler_mode_overrides
     steal_staged_early
     thread_queue_get_next_threads
     thread_queue_parameters
