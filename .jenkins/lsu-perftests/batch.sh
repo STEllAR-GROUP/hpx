@@ -23,6 +23,8 @@ status_computation_and_artifacts_storage() {
     fi
 
     ctest_status=$(( ctest_exit_code + configure_build_errors + test_errors + plot_errors ))
+    perftest_log "Performance tests finished with status ${ctest_status}" \
+        "(ctest ${ctest_exit_code}, failed steps ${test_errors})"
 
     # Write status file first
     echo "${ctest_status}" > "jenkins-hpx-${configuration_name}-ctest-status.txt"
@@ -38,7 +40,12 @@ status_computation_and_artifacts_storage() {
 
     # The results of this run packed as references of this node (see
     # tools/perftests_ci/pack_references.sh), ready to replace the current ones
-    if compgen -G "${perftests_dir}/results/*.json" > /dev/null; then
+    results=$(compgen -G "${perftests_dir}/results/*.json" | wc -l)
+    perftest_log "${results} benchmarks have results:" \
+        $(cd "${perftests_dir}/results" 2> /dev/null && ls *.json 2> /dev/null)
+    if [[ "${results}" -gt 0 ]]; then
+        perftest_log "Packing the results as references of $(hostname -s)" \
+            "(${configuration_name}-reports/references in the artifacts)"
         mkdir -p "${references_artifact_dir}"
         "${src_dir}/tools/perftests_ci/pack_references.sh" \
             "${perftests_dir}/results" "$(hostname -s)" \
@@ -71,6 +78,8 @@ status_computation_and_artifacts_storage() {
     # uploads them packed next to the plots.
     if [[ -s "${perftests_dir}/no_reference.txt" ]]; then
         node="$(hostname -s)"
+        perftest_log "No references on ${node} for:" \
+            $(cat "${perftests_dir}/no_reference.txt")
         new_references_dir="${new_references_root}/${node}"
         mkdir -p "${new_references_dir}"
         for reference in "${perftests_dir}/references/${node}"/*.json; do
@@ -86,10 +95,15 @@ status_computation_and_artifacts_storage() {
     exit $ctest_status
 }
 
+src_dir="$(pwd)"
+source "${src_dir}/.jenkins/lsu-perftests/report_common.sh"
+
 trap "status_computation_and_artifacts_storage" EXIT
 
-src_dir="$(pwd)"
 build_dir="${src_dir}/build/${configuration_name}"
+perftest_log "Slurm job ${SLURM_JOB_ID:-unknown} on $(hostname -s)," \
+    "commit $(git -C "${src_dir}" rev-parse HEAD 2> /dev/null || echo unknown)," \
+    "build directory ${build_dir}"
 
 mkdir -p "${build_dir}/tools"
 cp -r "${src_dir}/tools/perftests_ci" "${build_dir}/tools"
@@ -127,6 +141,8 @@ wait
 source "${src_dir}/.jenkins/lsu-perftests/env-${configuration_name}.sh"
 
 # CTest to upload the results to CDash
+perftest_log "Configuring HPX, building the benchmarks, running and comparing" \
+    "them (see ctest.cmake)"
 ctest \
     --verbose --output-on-failure \
     -S "${src_dir}/.jenkins/lsu-perftests/ctest.cmake" \

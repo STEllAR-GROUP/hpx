@@ -9,6 +9,17 @@
 # share. perftests_plot.py writes the rows of the table into index.html, and
 # what the results and the references were measured with into info.html.
 
+# Writes a message about what the performance test scripts do to stderr,
+# prefixed with the time (UTC) and the name of the script, so that it stands
+# out in the traced output of the Jenkins log
+perftest_log() {
+    { local tracing="${-//[^x]/}"; set +x; } 2> /dev/null
+    echo "[perftests $(date -u +%H:%M:%S) ${0##*/}] $*" >&2
+    if [[ -n "${tracing}" ]]; then
+        set -x
+    fi
+}
+
 # Prints the commit the report belongs to and the Jenkins build that measured
 # it, from the variables Jenkins sets
 report_intro() {

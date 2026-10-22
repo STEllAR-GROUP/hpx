@@ -20,7 +20,9 @@ SCRIPT = Path(__file__).resolve().parents[1] / "lsu-perftests/entry.sh"
 class PerformanceResults(unittest.TestCase):
     def run_entry(self, *, slurm=0, status=None, report=False, changed=False,
                   stale=False, pull_request=True, cdash_build_id=None,
-                  upload=0, comment_body=None):
+                  upload=0, comment_body=None, idle_nodes=None,
+                  partition_nodes="first second third", queue_timeout=None,
+                  nodes="first second"):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             lane = root / ".jenkins/lsu-perftests"
@@ -28,13 +30,27 @@ class PerformanceResults(unittest.TestCase):
             lane.mkdir(parents=True)
             common.mkdir()
             shutil.copyfile(SCRIPT, lane / "entry.sh")
+            shutil.copyfile(SCRIPT.parent / "report_common.sh",
+                            lane / "report_common.sh")
             (lane / "slurm-constraint-perftests.sh").write_text(
                 "configuration_slurm_partition=test\n"
-                "configuration_slurm_nodes=test\n")
+                "configuration_slurm_nodes='" + nodes + "'\n")
             (common / "slurm.sh").write_text('''
 hpx_slurm_cancel_previous() { return 0; }
+hpx_slurm_seconds() {
+    case "$1" in
+        *s) echo "${1%s}" ;;
+        *m) echo $(( ${1%m} * 60 )) ;;
+        *h) echo $(( ${1%h} * 3600 )) ;;
+        *d) echo $(( ${1%d} * 86400 )) ;;
+    esac
+}
 hpx_slurm_run() {
     echo "${HPX_PERFTESTS_REPORT_ALL:-}" > report-all.txt
+    echo "${HPX_SLURM_QUEUE_TIMEOUT:-}" > queue-timeout.txt
+    for arg in "$@"; do
+        case "${arg}" in --nodelist=*) echo "${arg#*=}" > node.txt ;; esac
+    done
     if [[ -n "${BUILD_STATUS}" ]]; then
         echo "${BUILD_STATUS}" > jenkins-hpx-perftests-ctest-status.txt
     fi
@@ -69,6 +85,24 @@ hpx_slurm_run() {
             sleep = root / "sleep"
             sleep.write_text("#!/bin/sh\nexit 0\n")
             sleep.chmod(0o755)
+            # Without the stub, sinfo can't be run, as without Slurm. The
+            # partition has the nodes in partition_nodes, the idle ones are
+            # idle_nodes (padded, as sinfo may print them). Like sinfo, it
+            # rejects options it doesn't know.
+            if idle_nodes is not None:
+                sinfo = root / "sinfo"
+                sinfo.write_text(
+                    "#!/bin/sh\nfor option in \"$@\"; do case \"$option\" in\n"
+                    "  --noheader|--Node|--partition=*|--states=*|--format=*) ;;\n"
+                    "  *) echo \"sinfo: unrecognized option '$option'\" >&2;"
+                    " exit 1 ;;\n"
+                    "esac; done\n"
+                    "case \"$*\" in\n"
+                    "  *--states=idle*) nodes='" + idle_nodes + "' ;;\n"
+                    "  *) nodes='" + partition_nodes + "' ;;\n"
+                    "esac\n"
+                    "for node in $nodes; do echo \"$node  \"; done\n")
+                sinfo.chmod(0o755)
             if stale:
                 (root / "jenkins-hpx-perftests-ctest-status.txt").write_text("1")
                 old_report = root / "perftests-reports/reference-comparison"
@@ -84,9 +118,12 @@ hpx_slurm_run() {
                        GITHUB_TOKEN="dummy-token", GIT_COMMIT="branch-sha",
                        ghprbActualCommit="pr-sha",
                        ghprbPullLink="https://github.com/TheHPXProject/hpx/pull/123")
-            env.pop("HPX_PERFTESTS_REPORT_ALL", None)
+            for name in ("HPX_PERFTESTS_REPORT_ALL", "HPX_SLURM_QUEUE_TIMEOUT"):
+                env.pop(name, None)
             if comment_body is not None:
                 env["ghprbCommentBody"] = comment_body
+            if queue_timeout is not None:
+                env["HPX_SLURM_QUEUE_TIMEOUT"] = queue_timeout
             result = subprocess.run(
                 [os.environ.get("HPX_TEST_BASH", "bash"), str(lane / "entry.sh")],
                 cwd=root, env=env, capture_output=True, text=True, timeout=10)
@@ -96,9 +133,12 @@ hpx_slurm_run() {
             upload_args = root / "upload-args.txt"
             self.upload_args = (upload_args.read_text().splitlines()
                                 if upload_args.exists() else None)
-            report_all = root / "report-all.txt"
-            self.report_all = (report_all.read_text().strip()
-                               if report_all.exists() else None)
+            def read(name):
+                path = root / name
+                return path.read_text().strip() if path.exists() else None
+            self.report_all = read("report-all.txt")
+            self.queue_timeout = read("queue-timeout.txt")
+            self.node = read("node.txt")
             comment_called = root / "comment-called"
             self.images_url = (comment_called.read_text().strip()
                                if comment_called.exists() else None)
@@ -170,6 +210,34 @@ hpx_slurm_run() {
         self.assertEqual(self.status_args, [
             "TheHPXProject/hpx", "branch-sha", "failure", "perftests", "",
             "jenkins/lsu-perftests"])
+
+    def test_without_slurm_the_first_node_is_used(self):
+        self.run_entry(status=0, report=True)
+        # sinfo can't be run here, the job is submitted for the first node
+        self.assertEqual(self.node, "first")
+        self.assertEqual(self.queue_timeout, "3h")
+
+    def test_pull_request_build_runs_on_an_idle_node(self):
+        self.assertEqual(self.run_entry(status=0, idle_nodes="second"),
+                         (0, False))
+        self.assertEqual(self.node, "second")
+        # what is left of the 3 hours for the queue
+        self.assertRegex(self.queue_timeout, r"^1[0-9]{4}s$")
+
+    def test_nodes_outside_the_partition_are_not_used(self):
+        # "other" is idle, but not in the partition, it would never start
+        self.assertEqual(self.run_entry(status=0, nodes="other second",
+                                        idle_nodes="other second",
+                                        partition_nodes="first second"),
+                         (0, False))
+        self.assertEqual(self.node, "second")
+
+    def test_pull_request_build_waits_for_an_idle_node(self):
+        self.assertEqual(self.run_entry(status=0, idle_nodes="",
+                                        queue_timeout="1s"), (124, False))
+        # never submitted
+        self.assertIsNone(self.node)
+        self.assertEqual(self.status_args[2], "failure")
 
     def test_missing_status_is_a_failure(self):
         self.assertEqual(self.run_entry(), (1, False))

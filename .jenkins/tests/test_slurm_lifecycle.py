@@ -137,7 +137,10 @@ class SlurmLifecycle(unittest.TestCase):
         target = jenkins / lane
         target.mkdir(parents=True, exist_ok=True)
         (jenkins / "common").mkdir(exist_ok=True)
-        for relative in (lane + "/entry.sh", "common/slurm.sh"):
+        scripts = [lane + "/entry.sh", "common/slurm.sh"]
+        if lane == "lsu-perftests":
+            scripts.append(lane + "/report_common.sh")
+        for relative in scripts:
             shutil.copyfile(ROOT / ".jenkins" / relative, jenkins / relative)
         config = ("slurm-configuration-test.sh" if lane == "lsu" else
                   "slurm-constraint-test.sh")
@@ -156,12 +159,15 @@ class SlurmLifecycle(unittest.TestCase):
         comment_script = target / "comment_github.sh"
         comment_script.write_text("#!/bin/sh\nexit 0\n")
         comment_script.chmod(0o755)
-        # No downloads, unpacking, randomized entry delays, or idle nodes in
-        # this fixture.
-        for command in ("wget", "sha256sum", "tar", "sleep", "sinfo"):
+        # No downloads, unpacking, or randomized entry delays in this fixture,
+        # and its only node is idle.
+        for command in ("wget", "sha256sum", "tar", "sleep"):
             stub = self.path / command
             stub.write_text("#!/bin/sh\nexit 0\n")
             stub.chmod(0o755)
+        stub = self.path / "sinfo"
+        stub.write_text("#!/bin/sh\necho test\n")
+        stub.chmod(0o755)
         (self.path / "grcov").touch()
         (self.path / "grcov.tar.bz2").touch()
         prefix = "jenkins-hpx-test" + ("-debug" if lane == "lsu" else "")

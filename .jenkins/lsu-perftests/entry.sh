@@ -18,6 +18,7 @@ rm -f "jenkins-hpx-${configuration_name}.out" \
     "${changed_file}"
 
 source .jenkins/common/slurm.sh
+source .jenkins/lsu-perftests/report_common.sh
 
 source .jenkins/lsu-perftests/slurm-constraint-${configuration_name}.sh
 
@@ -25,12 +26,18 @@ if [[ -z "${ghprbPullId:-}" ]]; then
     # Set name of branch if not building a pull request
     export git_local_branch=$(echo ${GIT_BRANCH} | cut -f2 -d'/')
     job_name="jenkins-hpx-${git_local_branch}-${configuration_name}"
+    perftest_log "Build ${BUILD_NUMBER:-} of branch ${git_local_branch}," \
+        "commit ${GIT_COMMIT:-unknown}"
 else
     job_name="jenkins-hpx-${ghprbPullId}-${configuration_name}"
+    perftest_log "Build ${BUILD_NUMBER:-} of pull request #${ghprbPullId}," \
+        "commit ${ghprbActualCommit:-unknown}"
 
     # Cancel currently running builds on the same branch, but only for pull
     # requests. Old jobs that are slow to go away must not stop this build,
     # or the lane ends here without running or reporting anything.
+    perftest_log "Cancelling the earlier Slurm jobs of the pull request" \
+        "(${job_name}), if any"
     if ! hpx_slurm_cancel_previous "${job_name}"; then
         echo "Warning: could not clear previous Slurm jobs for ${job_name}," \
             "starting this build anyway" >&2
@@ -40,15 +47,21 @@ fi
 # delay things for a random amount of time
 sleep $[(RANDOM % 10) + 1].$[(RANDOM % 10)]s
 
+# The job needs its node exclusively, so it waits in the queue for as long as
+# another job runs there. Fail after a few hours instead of keeping the pull
+# request pending for up to a day (the default of hpx_slurm_run).
+export HPX_SLURM_QUEUE_TIMEOUT="${HPX_SLURM_QUEUE_TIMEOUT:-3h}"
+
 # Run on the first of the nodes that is idle, as the job needs a node for
-# itself; wait for the first one if none is. This comes after cancelling the
-# previous jobs of the pull request, so that the node they ran on counts as
-# idle. The comparison uses the references of the node the job runs on, so the
-# nodes that have references come first.
+# itself. This comes after cancelling the previous jobs of the pull request, so
+# that the node they ran on counts as idle. The comparison uses the references
+# of the node the job runs on, so the nodes that have references come first.
 references_dir="tools/perftests_ci/perftest/references"
+reference_nodes=""
 candidate_nodes=""
 for node in ${configuration_slurm_nodes}; do
     if [[ -e "${references_dir}/${node}.tar.gz" ]]; then
+        reference_nodes="${reference_nodes} ${node}"
         candidate_nodes="${candidate_nodes} ${node}"
     fi
 done
@@ -57,20 +70,127 @@ for node in ${configuration_slurm_nodes}; do
         candidate_nodes="${candidate_nodes} ${node}"
     fi
 done
-idle_nodes=$(timeout --kill-after=5s 30s sinfo --noheader --node-oriented \
-    --partition="${configuration_slurm_partition}" --states=idle \
-    --format=%N) || idle_nodes=""
+perftest_log "Nodes with references:${reference_nodes:- none}"
+
+# Prints the nodes of the partition, one per line, optionally only those in
+# the given states (--states=...). Fails with 2 if Slurm can't be asked.
+partition_nodes() {
+    local nodes
+    nodes=$(timeout --kill-after=5s 30s sinfo --noheader --Node \
+        --partition="${configuration_slurm_partition}" "$@" --format=%N) ||
+        return 2
+    awk 'NF { print $1 }' <<< "${nodes}" | sort -u
+}
+
+# Only the nodes of the partition can be used, a job asking for others
+# would never start
+all_partition_nodes=$(partition_nodes) || all_partition_nodes=""
+if [[ -n "${all_partition_nodes}" ]]; then
+    usable_nodes="" skipped_nodes=""
+    for node in ${candidate_nodes}; do
+        if grep -qx "${node}" <<< "${all_partition_nodes}"; then
+            usable_nodes="${usable_nodes} ${node}"
+        else
+            skipped_nodes="${skipped_nodes} ${node}"
+        fi
+    done
+    if [[ -n "${skipped_nodes}" ]]; then
+        perftest_log "Not in partition ${configuration_slurm_partition}," \
+            "skipped:${skipped_nodes}"
+    fi
+    if [[ -n "${usable_nodes}" ]]; then
+        candidate_nodes="${usable_nodes}"
+    else
+        echo "Warning: none of the nodes is in partition" \
+            "${configuration_slurm_partition}" >&2
+    fi
+else
+    echo "Warning: could not find the nodes of partition" \
+        "${configuration_slurm_partition}" >&2
+fi
+
+# Sets idle_node to the first of the candidate nodes that is idle, and
+# idle_nodes to all idle nodes of the partition. Fails with 1 if none of the
+# candidates is idle, and with 2 if Slurm can't be asked.
+idle_candidate_node() {
+    local node
+    idle_node=""
+    idle_nodes=$(partition_nodes --states=idle) || return 2
+    for node in ${candidate_nodes}; do
+        if grep -qx "${node}" <<< "${idle_nodes}"; then
+            idle_node="${node}"
+            return 0
+        fi
+    done
+    return 1
+}
+
 configuration_slurm_nodelist=""
-for node in ${candidate_nodes}; do
-    if grep -qx "${node}" <<< "${idle_nodes}"; then
-        configuration_slurm_nodelist="${node}"
+node_status=0
+# A job submitted for a busy node waits for that node, even if others
+# become idle in the meantime, so wait for any of them to be idle before
+# submitting, out of the same time budget as the queue. The idle nodes are
+# reported whenever they change, the progress every
+# HPX_SLURM_PROGRESS_INTERVAL seconds, without tracing the polls.
+{ set +x; } 2> /dev/null
+queue_seconds=$(hpx_slurm_seconds "${HPX_SLURM_QUEUE_TIMEOUT}")
+poll_seconds="${HPX_SLURM_POLL_INTERVAL:-30}"
+progress_seconds="${HPX_SLURM_PROGRESS_INTERVAL:-600}"
+node_deadline=$((SECONDS + queue_seconds))
+next_progress=$((SECONDS + progress_seconds))
+reported_idle_nodes="unknown"
+perftest_log "Looking for an idle node, candidates in this order" \
+    "(with references first):${candidate_nodes}"
+while true; do
+    node_status=0
+    idle_candidate_node || node_status=$?
+    if [[ "${node_status}" -ne 2 &&
+        "${idle_nodes}" != "${reported_idle_nodes}" ]]; then
+        perftest_log "Idle nodes of partition" \
+            "${configuration_slurm_partition}:" ${idle_nodes:-none}
+        reported_idle_nodes="${idle_nodes}"
+    fi
+    if [[ "${node_status}" -ne 1 ]]; then
         break
     fi
+    if [[ "${SECONDS}" -ge "${node_deadline}" ]]; then
+        perftest_log "None of the candidate nodes became idle within" \
+            "${HPX_SLURM_QUEUE_TIMEOUT}, the performance tests don't run"
+        break
+    fi
+    if [[ "${SECONDS}" -ge "${next_progress}" ]]; then
+        perftest_log "Still waiting for one of the candidate nodes to" \
+            "become idle ($(( (SECONDS - node_deadline + queue_seconds) / 60 ))" \
+            "of $((queue_seconds / 60)) min)"
+        next_progress=$((SECONDS + progress_seconds))
+    fi
+    sleep "${poll_seconds}"
 done
-if [[ -z "${configuration_slurm_nodelist}" ]]; then
-    configuration_slurm_nodelist="${configuration_slurm_nodes%% *}"
+set -x
+configuration_slurm_nodelist="${idle_node}"
+# The rest of the time budget is left for the queue
+if [[ "${node_status}" -eq 0 ]]; then
+    queue_left=$((node_deadline - SECONDS))
+    export HPX_SLURM_QUEUE_TIMEOUT="$((queue_left > 60 ? queue_left : 60))s"
 fi
-echo "Running the performance tests on ${configuration_slurm_nodelist}"
+# If Slurm can't be asked, submit for the first node as before
+if [[ "${node_status}" -eq 2 ]]; then
+    echo "Warning: could not find the idle nodes, submitting for" \
+        "${configuration_slurm_nodes%% *}" >&2
+    configuration_slurm_nodelist="${configuration_slurm_nodes%% *}"
+    node_status=0
+fi
+if [[ "${node_status}" -eq 0 ]]; then
+    if [[ " ${reference_nodes} " == *" ${configuration_slurm_nodelist} "* ]]; then
+        perftest_log "Running the performance tests on" \
+            "${configuration_slurm_nodelist}, comparing with its references"
+    else
+        perftest_log "Running the performance tests on" \
+            "${configuration_slurm_nodelist}, which has no references yet:" \
+            "the report shows only the results, and they are kept as its" \
+            "new references"
+    fi
+fi
 # The report names the node (see report_common.sh)
 export PERFTEST_NODE="${configuration_slurm_nodelist}"
 
@@ -83,26 +203,38 @@ if [[ "${trigger_comment,,}" =~ retest([[:space:]]+lsu)?([[:space:]]+perf)?[[:sp
     echo "Full performance report requested by a pull request comment"
     export HPX_PERFTESTS_REPORT_ALL=1
 fi
+if [[ -n "${HPX_PERFTESTS_REPORT_ALL:-}" ]]; then
+    perftest_log "Reporting all measurements"
+else
+    perftest_log "Reporting only the measurements that changed by more" \
+        "than 5%"
+fi
 
-# The job needs its node exclusively, so it waits in the queue for as long as
-# another job runs there. Fail after a few hours instead of keeping the pull
-# request pending for up to a day (the default of hpx_slurm_run).
-export HPX_SLURM_QUEUE_TIMEOUT="${HPX_SLURM_QUEUE_TIMEOUT:-3h}"
-
-# Start the actual build
+# Start the actual build, unless no node became idle (a timeout, as if the
+# job had waited in the queue for that long)
 set +e
-hpx_slurm_run "${HPX_SLURM_TIMEOUT:-4h}" \
-    --verbose --verbose --verbose --verbose \
-    --exclusive \
-    --job-name="${job_name}" \
-    --nodes="1" \
-    --partition="${configuration_slurm_partition}" \
-    --nodelist="${configuration_slurm_nodelist}" \
-    --time="03:00:00" \
-    --output="jenkins-hpx-${configuration_name}.out" \
-    --error="jenkins-hpx-${configuration_name}.err" \
-    .jenkins/lsu-perftests/batch.sh
-slurm_status=$?
+if [[ "${node_status}" -eq 0 ]]; then
+    perftest_log "Submitting the Slurm job ${job_name}, waiting up to" \
+        "${HPX_SLURM_QUEUE_TIMEOUT:-24h} for it to start and up to" \
+        "${HPX_SLURM_TIMEOUT:-4h} for it to finish"
+    hpx_slurm_run "${HPX_SLURM_TIMEOUT:-4h}" \
+        --verbose --verbose --verbose --verbose \
+        --exclusive \
+        --job-name="${job_name}" \
+        --nodes="1" \
+        --partition="${configuration_slurm_partition}" \
+        --nodelist="${configuration_slurm_nodelist}" \
+        --time="03:00:00" \
+        --output="jenkins-hpx-${configuration_name}.out" \
+        --error="jenkins-hpx-${configuration_name}.err" \
+        .jenkins/lsu-perftests/batch.sh
+    slurm_status=$?
+    perftest_log "The Slurm job ended with status ${slurm_status}"
+else
+    slurm_status=124
+    touch "jenkins-hpx-${configuration_name}.out" \
+        "jenkins-hpx-${configuration_name}.err"
+fi
 
 # Print slurm logs
 echo "= stdout =================================================="
@@ -111,18 +243,34 @@ cat jenkins-hpx-${configuration_name}.out
 echo "= stderr =================================================="
 cat jenkins-hpx-${configuration_name}.err
 
+if [[ -s "${status_file}" ]]; then
+    perftest_log "Status of the performance tests: $(cat "${status_file}")" \
+        "(0 if all benchmarks were built, run and compared)"
+else
+    perftest_log "The performance tests didn't write a status"
+fi
+
 # Comment on a pull request only if a measurement got more than 5% faster or
 # slower than its reference (see perftests_plot.py). Failures don't produce a
 # comment, they turn the status red.
-if [[ -n "${ghprbPullId:-}" && -s "${report_file}" && -s "${changed_file}" ]]; then
-    # Post the report without plots if they can't be uploaded
-    if ! PERFTEST_IMAGES_URL="$(./.jenkins/lsu-perftests/upload_images.sh \
-        "$(dirname "${report_file}")" "${ghprbPullId}" "${BUILD_NUMBER}")"; then
-        echo "Warning: could not upload the plots of the report" >&2
-        PERFTEST_IMAGES_URL=""
+if [[ -n "${ghprbPullId:-}" ]]; then
+    if [[ ! -s "${report_file}" ]]; then
+        perftest_log "No report, not commenting on the pull request"
+    elif [[ ! -s "${changed_file}" ]]; then
+        perftest_log "No measurement to report, not commenting on the pull" \
+            "request"
+    else
+        perftest_log "Commenting on pull request #${ghprbPullId} about" \
+            "$(grep -c . "${changed_file}") measurements"
+        # Post the report without plots if they can't be uploaded
+        if ! PERFTEST_IMAGES_URL="$(./.jenkins/lsu-perftests/upload_images.sh \
+            "$(dirname "${report_file}")" "${ghprbPullId}" "${BUILD_NUMBER}")"; then
+            echo "Warning: could not upload the plots of the report" >&2
+            PERFTEST_IMAGES_URL=""
+        fi
+        PERFTEST_IMAGES_URL="${PERFTEST_IMAGES_URL}" \
+            ./.jenkins/lsu-perftests/comment_github.sh
     fi
-    PERFTEST_IMAGES_URL="${PERFTEST_IMAGES_URL}" \
-        ./.jenkins/lsu-perftests/comment_github.sh
 fi
 
 # Set GitHub status with CDash url
@@ -137,6 +285,8 @@ cdash_build_id=""
 if [[ -s "${cdash_build_id_file}" ]]; then
     cdash_build_id="$(cat "${cdash_build_id_file}")"
 fi
+perftest_log "Setting the GitHub status to ${github_commit_status}" \
+    "(Slurm ${slurm_status}, CDash build ${cdash_build_id:-none})"
 
 # Do not print the token passed to the status helper.
 set +x

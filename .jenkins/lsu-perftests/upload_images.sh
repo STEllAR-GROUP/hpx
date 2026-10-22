@@ -34,8 +34,13 @@ plots=$(grep -o '<img src="[^"/]*\.png"' "${report_dir}/index.html" |
     sed 's/<img src="\(.*\)"/\1/' | sort -u || true)
 new_references=$(ls -d "${report_dir}"/new-references/*/ 2>/dev/null || true)
 if [[ -z "${plots}" && -z "${new_references}" ]]; then
+    perftest_log "The report shows no plots and there are no new" \
+        "references, nothing to upload"
     exit 0
 fi
+perftest_log "Uploading $(wc -w <<< "${plots}") plots" \
+    "${new_references:+and the new references }of pull request" \
+    "#${pull_request}, build ${build_number}, to ${images_repo}"
 
 work_dir="$(mktemp -d)"
 trap 'rm -rf "${work_dir}"' EXIT
@@ -121,10 +126,14 @@ add_report
 # Other builds may push at the same time. Add the report again on top of their
 # commits, the README.md of the pull request may have changed.
 for attempt in 1 2 3; do
+    perftest_log "Pushing to ${images_repo} (attempt ${attempt})"
     if git_images -C images push --quiet origin HEAD:main; then
+        perftest_log "Uploaded the plots to ${target}"
         echo "${images_url}/$(git_images -C images rev-parse HEAD)/${target}"
         exit 0
     fi
+    perftest_log "The push failed, adding the plots again on top of the" \
+        "current repository"
     sleep "${attempt}"
     git_images -C images fetch --quiet --depth 1 origin main
     git_images -C images reset --quiet --hard FETCH_HEAD
