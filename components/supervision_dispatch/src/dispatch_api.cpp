@@ -9,6 +9,7 @@
 #include <hpx/modules/actions.hpp>
 #include <hpx/modules/async_combinators.hpp>
 #include <hpx/modules/async_distributed.hpp>
+#include <hpx/modules/async_local.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/futures.hpp>
@@ -259,13 +260,17 @@ namespace {
     //   - If the stop signal fires mid-sweep, outstanding per-peer
     //     continuations are abandoned (not cancelled): they hold their own
     //     reference-counted future shared state independent of the `checks`
-    //     vector, so they run to completion safely after this function returns.
-    //     This is intentionally allowed: each continuation only touches a
+    //     vector, so they are still invoked after this function returns, at
+    //     the latest when the supervision manager invalidates all pending
+    //     waiters as a pre-shutdown step. Each continuation runs inline
+    //     (hpx::launch::sync) and returns right away once the loop was stopped
+    //     or the runtime is no longer running; only otherwise is the actual
+    //     probe posted to a new thread. That probe only touches a
     //     captured-by-value shadow/epoch and calls publish_event against that
     //     local shadow, never reaching into dispatch_state's registry_, so it
-    //     cannot race finalize()'s teardown. Consequently, finalize() returning
-    //     promptly does not imply all background poll activity has ceased -
-    //     only that this loop itself has stopped issuing new sweeps.
+    //     cannot race finalize()'s teardown. Consequently, once finalize() has
+    //     returned no continuation spawns any further work, and
+    //     hpx::disconnect()/hpx::stop() may follow right away.
 
     void pace_consecutive_sweeps(std::atomic<bool> const& flag,
         std::chrono::milliseconds const& poll_interval)
@@ -576,9 +581,24 @@ namespace {
                         });
                 };
 
+                // Run inline and only spawn a thread for the probe while it can
+                // still matter: the waiter may be resolved long after this loop
+                // was stopped, possibly while the runtime is already shutting
+                // down, where hpx::launch::async would fail to register the
+                // continuation's thread.
+                auto guarded_cont = [&ds, cont = HPX_MOVE(cont)](
+                                        auto&& f) mutable {
+                    if (needs_stopping(ds.stop_failure_detection_) ||
+                        !hpx::is_running())
+                    {
+                        return;
+                    }
+                    hpx::post(HPX_MOVE(cont), HPX_MOVE(f));
+                };
+
                 checks.push_back(hpx::supervision::await_terminal(
                     peer.peer_locality, state.epoch, poll_timeout)
-                        .then(hpx::launch::async, HPX_MOVE(cont)));
+                        .then(hpx::launch::sync, HPX_MOVE(guarded_cont)));
             }
 
             {

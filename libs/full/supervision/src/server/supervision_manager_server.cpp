@@ -1650,6 +1650,22 @@ namespace hpx::supervision::server {
                         target, previous_epoch, epoch)));
         }
 
+        if (waiters_closed_)
+        {
+            // cancel_all_waiters() already drained waiters_ for shutdown, a
+            // waiter registered now would never be resolved before the
+            // destructor runs
+            l.unlock();
+
+            return hpx::make_exceptional_future<lifecycle_state>(
+                HPX_GET_EXCEPTION(hpx::error::invalid_status,
+                    "supervision_manager::await_terminal",
+                    hpx::util::format(
+                        "invoking await_terminal() for target {} is invalid: "
+                        "the runtime is shutting down",
+                        target)));
+        }
+
         // std::chrono::steady_clock::duration::max() (the default) defers to
         // the live default_await_terminal_timeout_ms; any other value overrides
         // the deadline for this call only.
@@ -1768,5 +1784,43 @@ namespace hpx::supervision::server {
 
         std::ranges::for_each(targets,
             [&](hpx::id_type const& target) { remove_target(target); });
+    }
+
+    // Drains every waiter still pending in waiters_ (all targets, all epochs)
+    // under mtx_ and closes waiters_ for good, then invalidates the drained
+    // promises after releasing the lock. tidy() is not sufficient for this, as
+    // it only reaches targets present in states_ or observers_. Registered as
+    // a pre-shutdown function (see pre_main()): a waiter left in waiters_
+    // until the destructor runs would have its promise broken at a point
+    // where the runtime is no longer active, and any continuation attached
+    // with hpx::launch::async would fail to register its thread.
+    void supervision_manager::cancel_all_waiters()
+    {
+        std::map<waiter_key, waiters_t> waiters;
+
+        {
+            std::unique_lock<hpx::spinlock> l(mtx_);
+
+            waiters_closed_ = true;
+            waiters = HPX_MOVE(waiters_);
+            waiters_.clear();
+            earliest_deadline_ =
+                (std::chrono::steady_clock::time_point::max) ();
+        }
+
+        for (auto& [key, entries] : waiters)
+        {
+            auto exception = HPX_GET_EXCEPTION(hpx::error::invalid_status,
+                "supervision_manager::cancel_all_waiters",
+                hpx::util::format(
+                    "await_terminal() waiter for target {} at epoch {} was "
+                    "invalidated: the runtime is shutting down",
+                    key.target, key.epoch));
+
+            for (auto& [promise, _] : entries)
+            {
+                promise.set_exception(exception);
+            }
+        }
     }
 }    // namespace hpx::supervision::server

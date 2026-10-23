@@ -215,6 +215,21 @@ namespace hpx::supervision::server {
         /// not exposed as a remote action.
         void tidy();
 
+        /// \brief Invalidates every pending await_terminal() waiter.
+        ///
+        /// Drains all of waiters_, regardless of target or epoch, and sets
+        /// each drained promise to an hpx::error::invalid_status exception.
+        /// Unlike tidy(), this also reaches waiters registered for targets
+        /// this manager has no recorded state for (e.g. a peer locality
+        /// polled by a failure detector). Any await_terminal() call made
+        /// afterwards that would have to register a new waiter fails right
+        /// away with the same error. Run as a pre-shutdown function, so the
+        /// continuations attached to the drained futures still execute
+        /// while the runtime is active, instead of from this object's
+        /// destructor once it has stopped. Local-only, not exposed as a
+        /// remote action.
+        void cancel_all_waiters();
+
         /// \brief Registers a locality-scoped activity observer.
         ///
         /// Replays targets that are already active when registration takes its
@@ -576,6 +591,12 @@ namespace hpx::supervision::server {
         // than the one it is already running for.
         std::chrono::steady_clock::time_point armed_deadline_ =
             (std::chrono::steady_clock::time_point::max) ();
+
+        // Set by cancel_all_waiters(), under mtx_, once all pending waiters
+        // have been drained for shutdown; checked by await_terminal() under
+        // mtx_ before it registers a new waiter, so no waiter can be added
+        // after the drain and be left for the destructor to break.
+        bool waiters_closed_ = false;
 
         // Set by the destructor, under mtx_, before waiting for any
         // sweep_timer_callback() invocation already in flight (tracked by

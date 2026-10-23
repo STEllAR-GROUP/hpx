@@ -42,6 +42,14 @@ namespace hpx::detail {
         return ::hpx::agas::garbage_collect();
     }
 
+#if defined(HPX_HAVE_SUPERVISION)
+    static void cancel_supervision_waiters()
+    {
+        hpx::error_code ec;    // swallow exceptions
+        hpx::supervision::get_supervision_manager().cancel_all_waiters(ec);
+    }
+#endif
+
     ///////////////////////////////////////////////////////////////////////////
     // Install performance counter startup functions for core subsystems.
     static void register_counter_types()
@@ -99,6 +107,12 @@ namespace hpx::detail {
         // reference counting operations.
         register_pre_shutdown_function(&garbage_collect_non_blocking);
         register_shutdown_function(&garbage_collect);
+
+#if defined(HPX_HAVE_SUPERVISION)
+        // Invalidate any still pending await_terminal() waiters while the
+        // runtime is active, their continuations may need to spawn threads.
+        register_pre_shutdown_function(&cancel_supervision_waiters);
+#endif
 
         using components::stubs::runtime_support;
 
