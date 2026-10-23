@@ -311,6 +311,10 @@ function(hpx_construct_library_list link_libraries link_options library_list)
     endif()
   endforeach()
   foreach(option IN LISTS ${link_options})
+    # $<HOST_LINK:...> (used by FindMPI for the MPI wrapper's link flags) can
+    # only be evaluated for a binary target, not by file(GENERATE)
+    string(REPLACE "$<HOST_LINK:SHELL:" "$<1:" option "${option}")
+    string(REPLACE "$<HOST_LINK:" "$<1:" option "${option}")
     set(_library_list "${_library_list} ${option}")
   endforeach()
   set(${library_list}
