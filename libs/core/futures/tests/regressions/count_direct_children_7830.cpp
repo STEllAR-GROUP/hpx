@@ -31,6 +31,12 @@ namespace {
             static_cast<std::size_t>(-1), false);
     }
 
+    std::int64_t executed_thread_phases()
+    {
+        return hpx::resource::get_thread_pool("default")
+            .get_executed_thread_phases(static_cast<std::size_t>(-1), false);
+    }
+
     // A child run by a worker is counted when the worker releases it, a little
     // after its value is set, so wait for the count to settle before checking
     // that every child was counted exactly once.
@@ -68,6 +74,7 @@ namespace {
 
         int inlined = 0;
         std::int64_t const before = executed_threads();
+        std::int64_t const phases_before = executed_thread_phases();
         for (int i = 0; i != num_children; ++i)
         {
             hpx::lcos::local::futures_factory<void()> task([&] {
@@ -82,11 +89,18 @@ namespace {
             task.post("child", child_policy(policy));
             f.get();
         }
+        // read before check_counted, whose yields add phases of their own
+        std::int64_t const phases = executed_thread_phases() - phases_before;
         check_counted(before, what);
 
+        // With one worker the parent never yields in the loop, so each child
+        // run directly is exactly one phase. More workers run some children
+        // themselves and count those phases when they are done.
         if (hpx::get_os_thread_count() == 1)
         {
             HPX_TEST_EQ_MSG(inlined, num_children, what);
+            HPX_TEST_EQ_MSG(
+                phases, static_cast<std::int64_t>(num_children), what);
         }
     }
 
