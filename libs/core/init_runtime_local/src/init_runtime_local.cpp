@@ -167,12 +167,15 @@ namespace hpx {
                 {
                     l.unlock();
                     HPX_THROWS_IF(ec, hpx::error::invalid_status, "hpx::stop",
-                        "the runtime system is not active");
+                        "the runtime system is not active (did you already "
+                        "call hpx::stop?)");
                     return -1;
                 }
                 is_stopping = true;
                 p = get_runtime_ptr();
             }
+
+            std::unique_ptr<runtime> const rt(p);
 
             auto cleanup_state = hpx::experimental::scope_exit([&]() {
                 std::lock_guard<std::mutex> l(mtx);
@@ -183,18 +186,9 @@ namespace hpx {
                 }
             });
 
-            std::unique_ptr<runtime> const rt(p);
-
-            int result = 0;
-            hpx::detail::try_catch_exception_ptr(
-                [&]() {
-                    result = p->wait();
-                    p->stop();
-                    p->rethrow_exception();
-                },
-                [&](std::exception_ptr const& ep) {
-                    std::rethrow_exception(ep);
-                });
+            int const result = p->wait();
+            p->stop();
+            p->rethrow_exception();
 
             return result;
         }
