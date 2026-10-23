@@ -109,6 +109,35 @@ namespace hpx::threads::policies {
             return rd();
         }
 
+        HPX_CXX_CORE_EXPORT inline std::int64_t
+        get_workrequesting_staged_steal_minimum(std::int64_t idle_loop_count,
+            std::int64_t max_idle_loop_count,
+            std::int64_t steal_staged_threshold,
+            std::int64_t min_tasks_to_steal_staged_early) noexcept
+        {
+            if (idle_loop_count <= steal_staged_threshold)
+            {
+                return -1;
+            }
+            if (idle_loop_count <= max_idle_loop_count / 2)
+            {
+                return min_tasks_to_steal_staged_early;
+            }
+            return 0;
+        }
+
+        HPX_CXX_CORE_EXPORT inline std::size_t
+        get_workrequesting_pending_steal_count(std::int64_t pending_count,
+            std::int64_t min_tasks_to_steal_pending, bool steal_half) noexcept
+        {
+            if (pending_count == 0 ||
+                pending_count < min_tasks_to_steal_pending)
+            {
+                return 0;
+            }
+            return steal_half ? static_cast<std::size_t>(pending_count / 2) : 1;
+        }
+
         ////////////////////////////////////////////////////////////////////////
         struct workrequesting_init_parameter
         {
@@ -150,14 +179,17 @@ namespace hpx::threads::policies {
         struct workrequesting_task_data
         {
             explicit workrequesting_task_data(
-                std::uint16_t num_thread = static_cast<std::uint16_t>(
-                    -1)) noexcept
+                std::uint16_t num_thread = static_cast<std::uint16_t>(-1),
+                std::size_t staged_tasks = 0) noexcept
               : num_thread_(num_thread)
+              , staged_tasks_(staged_tasks)
             {
             }
 
             // core number this task data originated from
             std::uint16_t num_thread_;
+            // number of staged tasks converted directly into the thief's queue
+            std::size_t staged_tasks_;
             hpx::detail::small_vector<thread_id_ref_type, 1> tasks_;
         };
 
@@ -179,11 +211,13 @@ namespace hpx::threads::policies {
 
             workrequesting_steal_request(std::size_t const num_thread,
                 workrequesting_task_channel* channel, mask_cref_type victims,
-                bool idle, bool const stealhalf)
+                bool idle, bool const stealhalf,
+                std::int64_t min_tasks_to_steal_staged = -1)
               : channel_(channel)
               , victims_(victims)
               , num_thread_(static_cast<std::uint16_t>(num_thread))
               , attempt_(static_cast<std::uint16_t>(count(victims) - 1))
+              , min_tasks_to_steal_staged_(min_tasks_to_steal_staged)
               , state_(idle ? state::idle : state::working)
               , stealhalf_(stealhalf)
             {
@@ -193,6 +227,10 @@ namespace hpx::threads::policies {
             mask_type victims_ = mask_type();
             std::uint16_t num_thread_ = static_cast<std::uint16_t>(-1);
             std::uint16_t attempt_ = 0;
+            // A negative value disables staged stealing for this request. The
+            // value is fixed when the thief creates the request and remains
+            // unchanged while the request visits possible victims.
+            std::int64_t min_tasks_to_steal_staged_ = -1;
             state state_ = state::failed;
             // true ? attempt steal-half : attempt steal-one
             bool stealhalf_ = true;
@@ -353,6 +391,9 @@ namespace hpx::threads::policies {
             HPX_ASSERT(init.num_queues_ != 0);
             HPX_ASSERT(num_high_priority_queues_ != 0);
             HPX_ASSERT(num_high_priority_queues_ <= num_queues_);
+
+            set_steal_staged_threshold(
+                thread_queue_init_.idle_loop_count_steal_staged_);
 
             if (!deferred_initialization)
             {
@@ -890,14 +931,10 @@ namespace hpx::threads::policies {
             std::int64_t const pending_count =
                 d.queue_->get_pending_queue_length(std::memory_order_relaxed);
 
-            std::size_t max_num_to_steal = 0;
-            if (pending_count >= thread_queue_init_.min_tasks_to_steal_pending_)
-            {
-                // the pending queue length is never negative
-                max_num_to_steal = req.stealhalf_ ?
-                    static_cast<std::size_t>(pending_count / 2) :
-                    1;
-            }
+            std::size_t max_num_to_steal =
+                detail::get_workrequesting_pending_steal_count(pending_count,
+                    thread_queue_init_.min_tasks_to_steal_pending_,
+                    req.stealhalf_);
 
             // The requesting core may be stopping or suspended, in which case
             // it would not pick up any tasks we send. Claim its task channel
@@ -906,12 +943,15 @@ namespace hpx::threads::policies {
             using channel_state = scheduler_data::task_channel_state;
             auto& thief_state =
                 data_[req.num_thread_].data_.task_channel_state_.data_;
-            if (max_num_to_steal != 0)
+            bool const try_staged = req.min_tasks_to_steal_staged_ >= 0;
+            bool channel_claimed = false;
+            if (max_num_to_steal != 0 || try_staged)
             {
                 auto expected = channel_state::accepting;
-                if (!thief_state.compare_exchange_strong(expected,
-                        channel_state::sending, std::memory_order_acquire,
-                        std::memory_order_relaxed))
+                channel_claimed = thief_state.compare_exchange_strong(expected,
+                    channel_state::sending, std::memory_order_acquire,
+                    std::memory_order_relaxed);
+                if (!channel_claimed)
                 {
                     max_num_to_steal = 0;
                 }
@@ -957,7 +997,33 @@ namespace hpx::threads::policies {
 
                     return true;
                 }
+            }
 
+            if (try_staged && channel_claimed)
+            {
+                std::size_t added = 0;
+                thread_queue_type* thief_queue =
+                    data_[req.num_thread_].data_.queue_;
+                thief_queue->wait_or_add_new(true, added, d.queue_, true,
+                    req.min_tasks_to_steal_staged_);
+                if (added != 0)
+                {
+#ifdef HPX_HAVE_THREAD_STEALING_COUNTS
+                    d.queue_->increment_num_stolen_from_staged(added);
+                    thief_queue->increment_num_stolen_to_staged(added);
+#endif
+                    // Acknowledge the request. The converted tasks are already
+                    // queued at the requesting worker.
+                    req.channel_->set(task_data(d.num_thread_, added));
+                    thief_state.store(
+                        channel_state::accepting, std::memory_order_release);
+                    do_some_work(req.num_thread_);
+                    return true;
+                }
+            }
+
+            if (channel_claimed)
+            {
                 thief_state.store(
                     channel_state::accepting, std::memory_order_release);
             }
@@ -1661,7 +1727,8 @@ namespace hpx::threads::policies {
         // is still busy working on some tasks. A steal request with idle ==
         // true indicates that the requesting worker is in fact idle and has
         // nothing to work on.
-        void send_steal_request(scheduler_data& d, bool idle = true) noexcept
+        void send_steal_request(scheduler_data& d,
+            std::int64_t min_tasks_to_steal_staged, bool idle = true) noexcept
         {
             if (d.requested_ == 0)
             {
@@ -1694,8 +1761,8 @@ namespace hpx::threads::policies {
                     }
                 }
 
-                steal_request req(
-                    d.num_thread_, d.tasks_, d.victims_, idle, d.stealhalf_);
+                steal_request req(d.num_thread_, d.tasks_, d.victims_, idle,
+                    d.stealhalf_, min_tasks_to_steal_staged);
                 std::size_t victim = next_victim(d, req);
 
                 ++d.requested_;
@@ -1738,12 +1805,6 @@ namespace hpx::threads::policies {
                         ++added;
                     }
 
-#if defined(HPX_HAVE_WORKREQUESTING_LAST_VICTIM)
-                    // store the originating core for the next stealing
-                    // operation
-                    d.last_victim_ = thrds.num_thread_;
-                    HPX_ASSERT(d.last_victim_ != d.num_thread_);
-#endif
                     // the last of the received tasks will be either directly
                     // executed or normally scheduled
                     if (next_thrd != nullptr)
@@ -1763,7 +1824,17 @@ namespace hpx::threads::policies {
 #endif
                         ++added;
                     }
+                }
 
+                added += thrds.staged_tasks_;
+                if (!thrds.tasks_.empty() || thrds.staged_tasks_ != 0)
+                {
+#if defined(HPX_HAVE_WORKREQUESTING_LAST_VICTIM)
+                    // store the originating core for the next stealing
+                    // operation
+                    d.last_victim_ = thrds.num_thread_;
+                    HPX_ASSERT(d.last_victim_ != d.num_thread_);
+#endif
                     ++d.num_recent_steals_;
                     return true;
                 }
@@ -1787,6 +1858,23 @@ namespace hpx::threads::policies {
 
             // We don't need to call wait_or_add_new for high priority or bound
             // threads as these threads are never created 'staged'.
+
+            bool handled_request = false;
+            if (running && allow_stealing && !d.requests_->is_empty())
+            {
+                steal_request req;
+                while (try_receiving_steal_request(d, req))
+                {
+                    if (!handle_steal_request(d, req))
+                        break;
+                    handled_request = true;
+                }
+            }
+
+            if (handled_request)
+            {
+                return false;
+            }
 
             bool result =
                 d.queue_->wait_or_add_new(running, added, allow_stealing);
@@ -1839,7 +1927,13 @@ namespace hpx::threads::policies {
             // attempt to steal more work
             if (allow_stealing)
             {
-                send_steal_request(d);
+                std::int64_t const min_tasks_to_steal_staged =
+                    detail::get_workrequesting_staged_steal_minimum(
+                        idle_loop_count, get_max_idle_loop_count(),
+                        get_steal_staged_threshold(),
+                        thread_queue_init_.min_tasks_to_steal_staged_early_);
+
+                send_steal_request(d, min_tasks_to_steal_staged);
                 HPX_ASSERT(d.requested_ != 0);
             }
 
