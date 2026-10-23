@@ -54,18 +54,6 @@ namespace hpx::threads::policies {
         };
     }    // namespace detail
 
-    // Holds per-worker scheduler data, aligned to the cache line size. Unlike
-    // util::cache_line_data, which only pads, this makes every element of a
-    // std::vector start on its own cache line, so neighboring workers never
-    // share one (false sharing). Over-aligned types need the aligned
-    // allocation path, which is fine here: this data is allocated only when
-    // the scheduler is created.
-    HPX_CXX_CORE_EXPORT template <typename T>
-    struct alignas(threads::get_cache_line_size()) aligned_line_data
-    {
-        T data_;
-    };
-
     ///////////////////////////////////////////////////////////////////////////
     /// The scheduler_base defines the interface to be implemented by all
     /// scheduler policies
@@ -353,7 +341,8 @@ namespace hpx::threads::policies {
         }
 
         // the scheduler mode, protected from false sharing
-        std::vector<aligned_line_data<std::atomic<scheduler_mode>>> modes_;
+        std::vector<util::aligned_line_data<std::atomic<scheduler_mode>>>
+            modes_;
 
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
         // support for suspension on idle queues
@@ -364,7 +353,8 @@ namespace hpx::threads::policies {
             std::condition_variable wait_cond;
             std::atomic<std::uint32_t> wait_count{0};
         };
-        std::vector<aligned_line_data<idle_backoff_data>> wait_count_data_;
+        std::vector<util::aligned_line_data<idle_backoff_data>>
+            wait_count_data_;
 #endif
 
         // support for suspension of pus
@@ -373,7 +363,7 @@ namespace hpx::threads::policies {
 
         std::vector<pu_mutex_type> pu_mtxs_;
 
-        std::vector<aligned_line_data<std::atomic<hpx::state>>> states_;
+        std::vector<util::aligned_line_data<std::atomic<hpx::state>>> states_;
         char const* description_;
 
         thread_queue_init_parameters thread_queue_init_;
