@@ -176,7 +176,8 @@ namespace hpx::threads::policies {
             });
         }
 
-        hpx::state const current_state = states_[num_thread].data_.load();
+        [[maybe_unused]] hpx::state const current_state =
+            states_[num_thread].data_.load();
         HPX_ASSERT(current_state == hpx::state::pre_sleep ||
             current_state == hpx::state::running ||
             current_state == hpx::state::stopping ||
