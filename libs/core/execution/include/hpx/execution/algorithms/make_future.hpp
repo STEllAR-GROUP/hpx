@@ -234,11 +234,12 @@ namespace hpx::execution::experimental {
             unique_ptr p(allocator_traits::allocate(alloc, 1),
                 hpx::util::allocator_deleter<other_allocator>{alloc});
 
-            allocator_traits::construct(alloc, p.get(), init_no_addref{}, alloc,
-                HPX_FORWARD(Sender, sender));
+            hpx::intrusive_ptr<shared_state> sp(p.release(), false);
+            allocator_traits::construct(alloc, sp.get(), init_no_addref{},
+                alloc, HPX_FORWARD(Sender, sender));
 
             return hpx::traits::future_access<future<result_type>>::create(
-                p.release(), false);
+                sp.detach(), false);
         }
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
 #pragma GCC diagnostic pop
@@ -276,11 +277,12 @@ namespace hpx::execution::experimental {
             unique_ptr p(allocator_traits::allocate(alloc, 1),
                 hpx::util::allocator_deleter<other_allocator>{alloc});
 
-            allocator_traits::construct(alloc, p.get(), init_no_addref{}, alloc,
-                sched, HPX_FORWARD(Sender, sender));
+            hpx::intrusive_ptr<shared_state> sp(p.release(), false);
+            allocator_traits::construct(alloc, sp.get(), init_no_addref{},
+                alloc, sched, HPX_FORWARD(Sender, sender));
 
             return hpx::traits::future_access<future<result_type>>::create(
-                p.release(), false);
+                sp.detach(), false);
         }
     }    // namespace detail
 }    // namespace hpx::execution::experimental
