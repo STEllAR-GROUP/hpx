@@ -153,8 +153,11 @@ year_readme() {
     echo
     echo "| Commit date | Commit | Pull request | Build | Node | Status |"
     echo "| --- | --- | --- | --- | --- | --- |"
-    tail -n +2 "${data}/runs.tsv" | sort -r | while IFS=$'\t' read -r date \
-        commit pull_request build status run_node directory; do
+    # read would merge consecutive tabs (tab is IFS whitespace) and shift the
+    # fields of a run without pull request, so split at \037 instead
+    tail -n +2 "${data}/runs.tsv" | sort -r | tr '\t' '\037' |
+        while IFS=$'\037' read -r date commit pull_request build status \
+            run_node directory; do
         if [[ "${directory%%/*}" != "${run_year}" ]]; then
             continue
         fi
