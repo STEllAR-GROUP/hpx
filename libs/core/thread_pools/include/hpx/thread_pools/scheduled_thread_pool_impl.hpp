@@ -608,7 +608,7 @@ namespace hpx::threads::detail {
         LTM_(info).format("thread_func: {} thread_num: {}, ending OS thread, "
                           "executed {} HPX threads",
             id_.name(), global_thread_num,
-            counter_data_[global_thread_num].executed_threads_);
+            counter_data_[thread_num].executed_threads_);
     }
 
     ///////////////////////////////////////////////////////////////////////////
