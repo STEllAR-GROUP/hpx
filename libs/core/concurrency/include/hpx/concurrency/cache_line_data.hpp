@@ -173,6 +173,22 @@ namespace hpx::util {
     HPX_CXX_CORE_EXPORT template <typename T>
     struct alignas(threads::get_cache_line_size()) aligned_line_data
     {
+        // We have an explicit (default) constructor here to avoid for the
+        // entire cache-line to be initialized by the compiler.
+        constexpr aligned_line_data() noexcept(
+            std::is_nothrow_default_constructible_v<T>)
+          : data_()
+        {
+        }
+
+        template <typename... Ts,
+            typename = std::enable_if_t<std::is_constructible_v<T, Ts&&...>>>
+        aligned_line_data(Ts&&... ts) noexcept(
+            std::is_nothrow_constructible_v<T, Ts&&...>)
+          : data_(HPX_FORWARD(Ts, ts)...)
+        {
+        }
+
         T data_;
     };
 
