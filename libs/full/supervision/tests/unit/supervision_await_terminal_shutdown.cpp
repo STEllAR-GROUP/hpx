@@ -32,21 +32,23 @@ std::atomic<bool> continuation_ran{false};
 std::atomic<bool> saw_invalid_status{false};
 std::atomic<bool> late_waiter_rejected{false};
 
-bool is_invalid_status(
-    hpx::future<hpx::supervision::lifecycle_state>&& f) noexcept
+bool is_invalid_status(hpx::future<hpx::supervision::lifecycle_state> f)
 {
+    bool caught_invalid_status = false;
     try
     {
         f.get();
+        HPX_TEST(false);
     }
     catch (hpx::exception const& e)
     {
-        return e.get_error() == hpx::error::invalid_status;
+        caught_invalid_status = e.get_error() == hpx::error::invalid_status;
     }
     catch (...)
     {
+        HPX_TEST(false);
     }
-    return false;
+    return caught_invalid_status;
 }
 
 // Registers a waiter on a target that never publishes an event, with a timeout
@@ -60,10 +62,11 @@ void test_await_terminal_pending_waiter_cancelled_on_shutdown()
     HPX_TEST(!f.is_ready());
 
     // the continuation's own future is not needed, it reports via the flags
-    [[maybe_unused]] auto _ = f.then(hpx::launch::async, [](auto&& f) {
-        saw_invalid_status = is_invalid_status(HPX_MOVE(f));
-        continuation_ran = true;
-    });
+    [[maybe_unused]] auto _ = f.then(hpx::launch::async,
+        [](hpx::future<hpx::supervision::lifecycle_state> f) {
+            saw_invalid_status = is_invalid_status(HPX_MOVE(f));
+            continuation_ran = true;
+        });
 }
 
 // Shutdown functions run after all pre-shutdown functions, so by then the

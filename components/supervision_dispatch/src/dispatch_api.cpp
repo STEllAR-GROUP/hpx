@@ -407,6 +407,11 @@ namespace {
             // still silent -> loop again for one more grace
         }
 
+        // The last grace window may have ended after finalize() stopped the
+        // loop, check again before the final probe (and the caller's fence).
+        if (needs_stopping(ds.stop_failure_detection_))
+            return false;
+
         // Close the observation gap left by the loop above.
         auto const [final_seq, final_status] =
             probe_peer_silence(last_seq, peer.peer_locality);
