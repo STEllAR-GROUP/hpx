@@ -46,8 +46,10 @@ void test_condition_variable_abort_stress()
                                 .from_now());
                     cv.wait_until(lk, timeout);
                 }
+                // NOLINTNEXTLINE(bugprone-empty-catch)
                 catch (hpx::thread_interrupted const&)
                 {
+                    // Expected interruption while aborting waiters
                 }
                 catch (hpx::exception const& e)
                 {
