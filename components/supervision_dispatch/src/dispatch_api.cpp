@@ -270,7 +270,11 @@ namespace {
     //     local shadow, never reaching into dispatch_state's registry_, so it
     //     cannot race finalize()'s teardown. Consequently, once finalize() has
     //     returned no continuation spawns any further work, and
-    //     hpx::disconnect()/hpx::stop() may follow right away.
+    //     hpx::disconnect()/hpx::stop() may follow right away. A probe that
+    //     was posted right before finalize() set the stop flag may still be
+    //     in its current grace window after finalize() returns, though: it no
+    //     longer fences, and returns at its next stop check (or as soon as
+    //     the pre-shutdown invalidation of all waiters ends that wait).
 
     void pace_consecutive_sweeps(std::atomic<bool> const& flag,
         std::chrono::milliseconds const& poll_interval)

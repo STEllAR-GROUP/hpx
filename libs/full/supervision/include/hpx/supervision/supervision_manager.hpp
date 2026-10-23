@@ -129,6 +129,11 @@ namespace hpx::supervision {
         /// continuations execute while the runtime is still active.
         /// Local-only, not exposed as a remote action.
         ///
+        /// \note This is meant for runtime shutdown only: it is registered as
+        ///       a pre-shutdown function by the runtime itself, and must not
+        ///       be called by applications, as it permanently closes
+        ///       await_terminal() on this locality.
+        ///
         /// \param ec Error code receiving the operation result.
         void cancel_all_waiters(hpx::error_code& ec = throws) const;
 

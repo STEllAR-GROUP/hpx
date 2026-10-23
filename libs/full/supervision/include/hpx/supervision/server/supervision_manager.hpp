@@ -227,7 +227,8 @@ namespace hpx::supervision::server {
         /// continuations attached to the drained futures still execute
         /// while the runtime is active, instead of from this object's
         /// destructor once it has stopped. Local-only, not exposed as a
-        /// remote action.
+        /// remote action. Meant for runtime shutdown only, applications must
+        /// not call it.
         void cancel_all_waiters();
 
         /// \brief Registers a locality-scoped activity observer.
