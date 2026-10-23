@@ -160,6 +160,15 @@ namespace hpx::threads::detail {
                     // and was not run here.
                     if (prev_state == thread_schedule_state::terminated)
                     {
+#if defined(HPX_HAVE_THREAD_CUMULATIVE_COUNTS)
+                        // Counted on the worker running now: a child that
+                        // suspended may have resumed on another worker.
+                        get_self_id_data()
+                            ->get_scheduler_base()
+                            ->get_parent_pool()
+                            ->add_directly_executed_thread(
+                                get_local_thread_num_tss());
+#endif
                         hpx::tracing::task_completed(thrdptr);
                     }
                 });
