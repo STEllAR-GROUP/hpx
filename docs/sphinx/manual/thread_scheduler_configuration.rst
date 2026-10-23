@@ -113,8 +113,10 @@ phases (default values in parentheses):
        :ref:`thread_scheduler_idle_backoff`), then starts counting again.
 
 Fast idle mode (see :ref:`thread_scheduler_modes`, always on for the
-work-requesting schedulers) shortens this: all restrictions are lifted from the
-first empty iteration, and the idle loop count
+work-requesting schedulers) shortens this: a worker steals staged tasks from the
+first empty iteration, and ``hpx.thread_queue.min_tasks_to_steal_staged_early``
+does not apply (``hpx.thread_queue.min_tasks_to_steal_pending`` and
+``hpx.thread_queue.min_tasks_to_steal_staged`` still do). The idle loop count
 grows by ``hpx.max_idle_loop_count / 1024`` with each iteration that did not
 find work to steal, so a worker thread goes to sleep after about 1024 such
 iterations.
@@ -317,7 +319,9 @@ these modes has no effect there.
    * * ``do_background_work`` (``0x1``)
      * on
      * Worker threads do background work (see
-       :ref:`thread_scheduler_background_work`).
+       :ref:`thread_scheduler_background_work`). A worker thread reads this
+       mode when it starts; changing it later does not start or stop its
+       background work.
    * * ``reduce_thread_priority`` (``0x2``)
      * on
      * Worker threads lower their operating system thread priority when they
@@ -328,8 +332,8 @@ these modes has no effect there.
        they exit.
    * * ``fast_idle_mode`` (``0x8``)
      * off (always on for the work-requesting schedulers)
-     * Idle workers steal without the restrictions described above and go to
-       sleep sooner (see :ref:`thread_scheduler_find_work`).
+     * Idle workers steal staged tasks right away, without the early minimum,
+       and go to sleep sooner (see :ref:`thread_scheduler_find_work`).
    * * ``enable_elasticity`` (``0x10``)
      * off
      * New work is not placed on suspended worker threads. Required for
