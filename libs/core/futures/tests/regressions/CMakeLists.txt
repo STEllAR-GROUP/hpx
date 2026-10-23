@@ -6,6 +6,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
+    count_direct_children_7830
     exception_from_continuation_1613
     future_2667
     future_790
@@ -56,6 +57,14 @@ add_hpx_regression_test(
   "modules.futures" stackful_direct_execution_7713_4
   EXECUTABLE stackful_direct_execution_7713
   PSEUDO_DEPS_NAME stackful_direct_execution_7713
+  THREADS_PER_LOCALITY 4
+)
+
+# every child has to be counted once also when workers can run some of them
+add_hpx_regression_test(
+  "modules.futures" count_direct_children_7830_4
+  EXECUTABLE count_direct_children_7830
+  PSEUDO_DEPS_NAME count_direct_children_7830
   THREADS_PER_LOCALITY 4
 )
 
