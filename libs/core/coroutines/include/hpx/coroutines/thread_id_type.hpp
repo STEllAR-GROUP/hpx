@@ -37,20 +37,8 @@ namespace hpx::threads {
 
         ~thread_id() = default;
 
-        constexpr thread_id(thread_id&& rhs) noexcept
-          : thrd_(rhs.thrd_)
-        {
-            rhs.thrd_ = nullptr;
-        }
-        constexpr thread_id& operator=(thread_id&& rhs) noexcept
-        {
-            if (this != &rhs)
-            {
-                thrd_ = rhs.thrd_;
-                rhs.thrd_ = nullptr;
-            }
-            return *this;
-        }
+        constexpr thread_id(thread_id&& rhs) noexcept = default;
+        constexpr thread_id& operator=(thread_id&& rhs) noexcept = default;
 
         explicit constexpr thread_id(thread_id_repr const thrd) noexcept
           : thrd_(thrd)

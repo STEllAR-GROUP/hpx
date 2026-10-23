@@ -204,7 +204,9 @@ namespace hpx::detail {
 
         // Callback has either already executed or is executing concurrently
         // on another thread.
-        if (signalling_thread_ == hpx::threads::get_self_id())
+        auto const self_id = hpx::threads::get_self_id();
+        if (self_id != hpx::threads::invalid_thread_id &&
+            signalling_thread_.load(std::memory_order_acquire) == self_id)
         {
             // Callback executed on this thread or is still currently executing
             // and is unregistering itself from within the callback.

@@ -207,7 +207,8 @@ namespace hpx {
 
             std::atomic<std::uint64_t> state_;
             stop_callback_base* callbacks_ = nullptr;
-            hpx::threads::thread_id_type signalling_thread_;
+            std::atomic<hpx::threads::thread_id_type> signalling_thread_{
+                hpx::threads::invalid_thread_id};
         };
     }    // namespace detail
 
