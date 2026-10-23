@@ -775,29 +775,7 @@ namespace hpx::threads::policies {
         {
             bool ret = d.requests_->get(&req);
 
-            // 26813: Use 'bitwise and' to check if a flag is set.
-#if defined(HPX_MSVC)
-#pragma warning(push)
-#pragma warning(disable : 26813)
-#endif
-            while (ret && req.state_ == steal_request::state::failed)
-#if defined(HPX_MSVC)
-#pragma warning(pop)
-#endif
-            {
-                // forget the received steal request
-                --data_[req.num_thread_].data_.requested_;
-
-                // there should have been exactly one outstanding steal request
-                HPX_ASSERT(data_[req.num_thread_].data_.requested_ == 0);
-
-                // try to retrieve next steal request
-                ret = d.requests_->get(&req);
-            }
-
-            // No special treatment for other states
-            HPX_ASSERT(
-                (ret && req.state_ != steal_request::state::failed) || !ret);
+            HPX_ASSERT(!ret || req.state_ != steal_request::state::failed);
 
             return ret;
         }
@@ -906,15 +884,19 @@ namespace hpx::threads::policies {
             }
 
             // Send tasks from our queue to the requesting core, depending on
-            // what's requested, either one task or half of the available tasks
-            std::size_t max_num_to_steal = 1;
-            if (req.stealhalf_)
+            // what's requested, either one task or half of the available tasks.
+            // As with the other schedulers, nothing is stolen while there are
+            // fewer pending tasks than min_tasks_to_steal_pending.
+            std::int64_t const pending_count =
+                d.queue_->get_pending_queue_length(std::memory_order_relaxed);
+
+            std::size_t max_num_to_steal = 0;
+            if (pending_count >= thread_queue_init_.min_tasks_to_steal_pending_)
             {
                 // the pending queue length is never negative
-                max_num_to_steal =
-                    static_cast<std::size_t>(d.queue_->get_pending_queue_length(
-                                                 std::memory_order_relaxed) /
-                        2);
+                max_num_to_steal = req.stealhalf_ ?
+                    static_cast<std::size_t>(pending_count / 2) :
+                    1;
             }
 
             // The requesting core may be stopping or suspended, in which case
@@ -1990,17 +1972,15 @@ namespace hpx::threads::policies {
             curr_queue_.store(0, std::memory_order_release);
         }
 
-        void set_scheduler_mode(scheduler_mode mode,
-            hpx::threads::mask_cref_type pu_mask) noexcept override
+        scheduler_mode adjust_scheduler_mode(
+            scheduler_mode mode) noexcept override
         {
             // We should not disable stealing for this scheduler, as this could
             // lead to deadlocks. Fast idle mode lets idle workers send steal
             // requests immediately.
-            scheduler_base::set_scheduler_mode(mode |
-                    policies::scheduler_mode::fast_idle_mode |
-                    policies::scheduler_mode::enable_stealing |
-                    policies::scheduler_mode::enable_stealing_numa,
-                pu_mask);
+            return mode | policies::scheduler_mode::fast_idle_mode |
+                policies::scheduler_mode::enable_stealing |
+                policies::scheduler_mode::enable_stealing_numa;
         }
 
     protected:

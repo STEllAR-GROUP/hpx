@@ -718,6 +718,8 @@ equivalent CMake variable is ``HPX_WITH_PARCELPORT_MPI`` and has to be set to
    max_message_size =  ${HPX_HAVE_PARCEL_MPI_MAX_MESSAGE_SIZE:$[hpx.parcel.max_message_size]}
    max_outbound_message_size =  ${HPX_HAVE_PARCEL_MPI_MAX_OUTBOUND_MESSAGE_SIZE:$[hpx.parcel.max_outbound_message_size]}
    max_background_threads =  ${HPX_PARCEL_MPI_MAX_BACKGROUND_THREADS:$[hpx.parcel.max_background_threads]}
+   ack_handshake = 0
+   max_header_receives = ${HPX_HAVE_PARCELPORT_MPI_MAX_HEADER_RECEIVES:0}
 
 .. _ini_hpx_parcel_mpi:
 
@@ -797,6 +799,16 @@ equivalent CMake variable is ``HPX_WITH_PARCELPORT_MPI`` and has to be set to
    * * ``hpx.parcel.mpi.max_background_threads``
      * This property defines how many cores should be used to perform background
        operations. The default is taken from ``hpx.parcel.max_background_threads``.
+   * * ``hpx.parcel.mpi.ack_handshake``
+     * This property enables acknowledgement handshakes for parcels
+       transmitted via MPI to serialize delivery and avoid race conditions
+       in multithreaded MPI environments. The default is 0 (disabled).
+   * * ``hpx.parcel.mpi.max_header_receives``
+     * This property defines the number of concurrent MPI wildcard receive
+       buffers pre-posted for incoming parcel headers. The default is taken
+       from ``HPX_HAVE_PARCELPORT_MPI_MAX_HEADER_RECEIVES`` (``0`` if not
+       defined). A value of ``0`` automatically sizes the pool based on the
+       communicator size: ``min(64, max(16, 2 * communicator_size))``.
 
 The ``hpx.agas`` configuration section
 ......................................
@@ -1631,11 +1643,11 @@ The predefined command line options for any application using
 
 .. option:: --hpx:bind arg
 
-   he detailed affinity description for the OS threads, see :ref:`details` for
+   The detailed affinity description for the OS threads, see :ref:`details` for
    a detailed description of possible values. Do not use with
    :option:`--hpx:pu-step`, :option:`--hpx:pu-offset` or
-   :option:`--hpx:affinity` options. Implies :option:`--hpx:numa-sensitive`
-   (:option:`--hpx:bind`\ ``=none``) disables defining thread affinities).
+   :option:`--hpx:affinity` options. :option:`--hpx:bind`\ ``=none`` disables
+   defining thread affinities.
 
 .. option:: --hpx:use-process-mask
 
@@ -1657,6 +1669,12 @@ The predefined command line options for any application using
    ``local-workrequesting-mc``, and ``abp-priority-lifo``
    (default: ``local-priority-fifo``).
 
+   .. note::
+
+      The ``local`` scheduler ignores all thread priorities, including
+      ``thread_priority::bound`` and ``thread_priority::initially_bound``,
+      which then only determine the initial placement of a thread.
+
 .. option:: --hpx:high-priority-threads arg
 
    The number of operating system threads maintaining a high priority queue
@@ -1670,9 +1688,20 @@ The predefined command line options for any application using
    :option:`--hpx:queuing`\ ``=abp-priority-fifo``, and
    :option:`--hpx:queuing`\ ``=abp-priority-lifo`` only.
 
-.. option:: --hpx:numa-sensitive
+.. option:: --hpx:numa-sensitive [arg]
 
-   Makes the scheduler NUMA sensitive.
+   Controls NUMA-sensitive work stealing. The default and the value used when
+   the option is given without an argument are both ``1``. For the local,
+   local-priority, and ABP-priority schedulers the allowed values are:
+
+   * ``0``: all workers may steal across NUMA domains;
+   * ``1``: only boundary workers may steal from the nearest NUMA domains;
+   * ``2``: workers may not steal across NUMA domains.
+
+   The static, static-priority, and shared-priority schedulers do not distinguish
+   boundary workers. They allow cross-domain stealing for levels ``0`` and ``1``
+   and disable it for level ``2``. Work-requesting schedulers currently ignore
+   this option.
 
 
 |hpx| configuration options

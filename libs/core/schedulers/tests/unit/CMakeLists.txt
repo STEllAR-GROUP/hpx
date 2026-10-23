@@ -7,8 +7,10 @@
 set(tests
     lockfree_fifo_double_backend
     min_tasks_to_steal_staged
+    numa_stealing_domains
     schedule_last
     schedule_hint_none_stale_queue_6978
+    scheduler_mode_overrides
     steal_staged_early
     thread_queue_get_next_threads
     thread_queue_parameters
@@ -52,6 +54,19 @@ add_hpx_unit_test(
   PSEUDO_DEPS_NAME min_tasks_to_steal_staged
   THREADS_PER_LOCALITY 1
 )
+
+# the work-requesting scheduler sends tasks to the workers requesting them, it
+# has to honor the minimum as well (--scheduler is used instead of --hpx:queuing
+# to avoid conflicts with HPX_WITH_TESTS_COMMAND_LINE)
+if(HPX_WITH_WORK_REQUESTING_SCHEDULERS)
+  add_hpx_unit_test(
+    "modules.schedulers" min_tasks_to_steal_staged_workrequesting
+    EXECUTABLE min_tasks_to_steal_staged
+    PSEUDO_DEPS_NAME min_tasks_to_steal_staged
+    THREADS_PER_LOCALITY 4
+    ARGS --scheduler=workrequesting
+  )
+endif()
 
 # the same test after the late staged-steal point and in fast idle mode
 add_hpx_unit_test(

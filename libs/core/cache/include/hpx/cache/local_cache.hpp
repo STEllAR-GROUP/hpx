@@ -185,11 +185,11 @@ namespace hpx::util::cache {
         ///             the new maximum size.
         bool reserve(size_type max_size)
         {
-            // we need to shrink the cache if the new max size if smaller than
-            // the old one
+            // we need to shrink the cache if it currently holds more than
+            // the new max size
             bool retval = true;
-            if (max_size && max_size < max_size_ &&
-                !free_space(static_cast<long>(max_size_ - max_size)))
+            if (max_size && max_size < current_size_ &&
+                !free_space(static_cast<long>(current_size_ - max_size)))
             {
                 retval = false;    // not able to shrink cache
             }
@@ -764,10 +764,12 @@ namespace hpx::util::cache {
                     {
                         // if we're at the top of the list, just pop the item
                         // this doesn't disturb the heap property of the heap
-                        ++it;
                         std::pop_heap(entry_heap_.begin(), entry_heap_.end(),
                             update_policy_);
                         entry_heap_.pop_back();
+                        // pop_heap moved the next candidate to the front,
+                        // so look at it next
+                        it = entry_heap_.begin();
                     }
                     else
                     {

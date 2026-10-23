@@ -12,14 +12,20 @@ set(tests
     future_uncompleted_7490
     future_unwrap_878
     future_unwrap_1182
+    run_as_child_hint_7724
+    runs_child_race_7724
     set_hpx_limit_798
     shared_future_continuation_order
     shared_future_then_2166
+    stackful_direct_execution_7713
+    stackless_direct_execution_7708
     wait_for_1751
 )
 
 set(exception_from_continuation_1613_PARAMETERS THREADS_PER_LOCALITY 2)
 set(wait_for_1751_PARAMETERS THREADS_PER_LOCALITY 4)
+set(run_as_child_hint_7724_PARAMETERS THREADS_PER_LOCALITY 4)
+set(runs_child_race_7724_PARAMETERS THREADS_PER_LOCALITY 8)
 
 foreach(test ${tests})
   set(sources ${test}.cpp)
@@ -36,6 +42,22 @@ foreach(test ${tests})
 
   add_hpx_regression_test("modules.futures" ${test} ${${test}_PARAMETERS})
 endforeach()
+
+# with more workers a leftover queue entry can also be dequeued while the parent
+# is still running the child
+add_hpx_regression_test(
+  "modules.futures" stackless_direct_execution_7708_4
+  EXECUTABLE stackless_direct_execution_7708
+  PSEUDO_DEPS_NAME stackless_direct_execution_7708
+  THREADS_PER_LOCALITY 4
+)
+
+add_hpx_regression_test(
+  "modules.futures" stackful_direct_execution_7713_4
+  EXECUTABLE stackful_direct_execution_7713
+  PSEUDO_DEPS_NAME stackful_direct_execution_7713
+  THREADS_PER_LOCALITY 4
+)
 
 # compile only tests
 if(HPX_WITH_COMPILE_ONLY_TESTS)
