@@ -103,6 +103,25 @@ namespace hpx::threads::policies {
     namespace detail {
 
         ////////////////////////////////////////////////////////////////////////
+        inline std::size_t select_numa_worker(
+            std::vector<std::size_t> const& thread_numa_domain,
+            std::size_t num_queues, std::size_t requested_domain,
+            std::size_t start) noexcept
+        {
+            HPX_ASSERT(num_queues != 0);
+            HPX_ASSERT(num_queues <= thread_numa_domain.size());
+            for (std::size_t i = 0; i != num_queues; ++i)
+            {
+                std::size_t const idx = (start + i) % num_queues;
+                if (thread_numa_domain[idx] == requested_domain)
+                {
+                    return idx;
+                }
+            }
+            return start;
+        }
+
+        ////////////////////////////////////////////////////////////////////////
         inline unsigned int random_seed() noexcept
         {
             std::random_device rd;
@@ -347,6 +366,7 @@ namespace hpx::threads::policies {
           , low_priority_queue_(thread_queue_init_)
           , curr_queue_(0)
           , affinity_data_(init.affinity_data_)
+          , thread_numa_domain_(init.num_queues_, 0)
           , num_queues_(init.num_queues_)
           , num_high_priority_queues_(init.num_high_priority_queues_)
         {
@@ -701,9 +721,7 @@ namespace hpx::threads::policies {
             error_code& ec) override
         {
             std::size_t num_thread =
-                data.schedulehint.mode == thread_schedule_hint_mode::thread ?
-                data.schedulehint.hint :
-                static_cast<std::size_t>(-1);
+                select_worker(data.schedulehint, data.priority);
 
             if (static_cast<std::size_t>(-1) == num_thread)
             {
@@ -1095,12 +1113,9 @@ namespace hpx::threads::policies {
             bool allow_fallback = false,
             thread_priority priority = thread_priority::default_) override
         {
-            auto num_thread = static_cast<std::size_t>(-1);
-            if (schedulehint.mode == thread_schedule_hint_mode::thread)
-            {
-                num_thread = schedulehint.hint;
-            }
-            else
+            std::size_t num_thread = select_worker(schedulehint, priority);
+            if (schedulehint.mode != thread_schedule_hint_mode::thread &&
+                schedulehint.mode != thread_schedule_hint_mode::numa)
             {
                 allow_fallback = false;
             }
@@ -1165,12 +1180,9 @@ namespace hpx::threads::policies {
             bool allow_fallback = false,
             thread_priority priority = thread_priority::default_) override
         {
-            auto num_thread = static_cast<std::size_t>(-1);
-            if (schedulehint.mode == thread_schedule_hint_mode::thread)
-            {
-                num_thread = schedulehint.hint;
-            }
-            else
+            std::size_t num_thread = select_worker(schedulehint, priority);
+            if (schedulehint.mode != thread_schedule_hint_mode::thread &&
+                schedulehint.mode != thread_schedule_hint_mode::numa)
             {
                 allow_fallback = false;
             }
@@ -1923,6 +1935,10 @@ namespace hpx::threads::policies {
             resize(d.victims_, num_queues_);
             reset(d.victims_);
             set(d.victims_, num_thread);
+
+            auto const& topo = create_topology();
+            std::size_t const num_pu = affinity_data_.get_pu_num(num_thread);
+            thread_numa_domain_[num_thread] = topo.get_numa_node_number(num_pu);
         }
 
         void on_stop_thread(std::size_t num_thread) override
@@ -1984,6 +2000,42 @@ namespace hpx::threads::policies {
         }
 
     protected:
+        std::size_t select_worker(
+            threads::thread_schedule_hint const& schedulehint,
+            thread_priority priority)
+        {
+            if (schedulehint.mode == thread_schedule_hint_mode::thread)
+            {
+                HPX_ASSERT(schedulehint.hint >= 0);
+                return static_cast<std::size_t>(schedulehint.hint);
+            }
+
+            if (schedulehint.mode == thread_schedule_hint_mode::numa)
+            {
+                HPX_ASSERT(schedulehint.hint >= 0);
+                auto const& topo = create_topology();
+                std::size_t num_nodes = topo.get_number_of_numa_nodes();
+                if (num_nodes == 0)
+                {
+                    num_nodes = 1;
+                }
+
+                std::size_t const requested_domain =
+                    static_cast<std::size_t>(schedulehint.hint) % num_nodes;
+                bool const high_priority =
+                    priority == thread_priority::high_recursive ||
+                    priority == thread_priority::high ||
+                    priority == thread_priority::boost;
+                std::size_t const hint_queues =
+                    high_priority ? num_high_priority_queues_ : num_queues_;
+                std::size_t const start = curr_queue_++ % hint_queues;
+                return detail::select_numa_worker(
+                    thread_numa_domain_, hint_queues, requested_domain, start);
+            }
+
+            return static_cast<std::size_t>(-1);
+        }
+
         std::vector<util::cache_line_data<scheduler_data>> data_;
         thread_queue_type low_priority_queue_;
 
@@ -1993,6 +2045,7 @@ namespace hpx::threads::policies {
         util::cache_aligned_data_derived<std::atomic<std::size_t>> curr_queue_;
 
         detail::affinity_data const& affinity_data_;
+        std::vector<std::size_t> thread_numa_domain_;
         std::size_t const num_queues_;
         std::size_t const num_high_priority_queues_;
     };
