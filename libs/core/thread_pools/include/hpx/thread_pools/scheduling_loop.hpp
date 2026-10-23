@@ -432,7 +432,7 @@ namespace hpx::threads::detail {
                         scheduler.SchedulingPolicy::get_queue_length(
                             num_thread) == 0;
 
-                    auto current_state =
+                    auto const current_state =
                         this_state.load(std::memory_order_relaxed);
 
                     if (current_state == hpx::state::pre_sleep)
