@@ -369,9 +369,17 @@ namespace {
         auto const grace_interval =
             poll_timeout / max_consecutive_silent_windows;
 
+        dispatch_state const& ds = get_dispatch_state();
+
         for (int attempt = 0; attempt < max_consecutive_silent_windows;
             ++attempt)
         {
+            // A probe posted just before finalize() stopped the loop must not
+            // keep going (or fence) once it did; bail out between grace
+            // windows.
+            if (needs_stopping(ds.stop_failure_detection_))
+                return false;
+
             auto const [seq, status] =
                 probe_peer_silence(last_seq, peer.peer_locality);
             if (status == silence_status::alive_or_unknown)
@@ -586,15 +594,17 @@ namespace {
                 // was stopped, possibly while the runtime is already shutting
                 // down, where hpx::launch::async would fail to register the
                 // continuation's thread.
-                auto guarded_cont = [&ds, cont = HPX_MOVE(cont)](
-                                        auto&& f) mutable {
-                    if (needs_stopping(ds.stop_failure_detection_) ||
-                        !hpx::is_running())
-                    {
-                        return;
-                    }
-                    hpx::post(HPX_MOVE(cont), HPX_MOVE(f));
-                };
+                auto guarded_cont =
+                    [&ds, cont = HPX_MOVE(cont)](
+                        hpx::future<hpx::supervision::lifecycle_state>
+                            f) mutable {
+                        if (needs_stopping(ds.stop_failure_detection_) ||
+                            !hpx::is_running())
+                        {
+                            return;
+                        }
+                        hpx::post(HPX_MOVE(cont), HPX_MOVE(f));
+                    };
 
                 checks.push_back(hpx::supervision::await_terminal(
                     peer.peer_locality, state.epoch, poll_timeout)

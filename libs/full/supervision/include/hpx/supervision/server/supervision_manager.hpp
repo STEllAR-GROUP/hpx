@@ -614,7 +614,9 @@ namespace hpx::supervision::server {
         // setting shutting_down_, guaranteeing no invocation is still touching
         // mtx_/waiters_/etc. before the rest of this object's state starts
         // being destroyed. Mirrors agent_component::deactivate_and_wait() (see
-        // agent_server.cpp).
+        // agent_server.cpp). cancel_all_waiters() waits for it the same way
+        // after setting waiters_closed_, so that no waiter drained by an
+        // in-flight callback is still unresolved when it returns.
         std::size_t callbacks_in_flight_ = 0;
         hpx::lcos::local::detail::condition_variable shutdown_cv_;
     };

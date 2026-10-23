@@ -563,7 +563,8 @@ namespace hpx::supervision::server {
 
         {
             std::unique_lock<hpx::spinlock> l(mtx_);
-            if (--callbacks_in_flight_ == 0 && shutting_down_)
+            if (--callbacks_in_flight_ == 0 &&
+                (shutting_down_ || waiters_closed_))
             {
                 shutdown_cv_.notify_all(HPX_MOVE(l));
             }
@@ -1806,6 +1807,15 @@ namespace hpx::supervision::server {
             waiters_.clear();
             earliest_deadline_ =
                 (std::chrono::steady_clock::time_point::max) ();
+
+            // A sweep_timer_callback() invocation already in flight may have
+            // drained expired waiters before they could be moved out above,
+            // and resolves them only after releasing mtx_. Wait for it, so
+            // that no waiter is still pending once this function returns.
+            while (callbacks_in_flight_ > 0)
+            {
+                shutdown_cv_.wait(l);
+            }
         }
 
         for (auto& [key, entries] : waiters)
