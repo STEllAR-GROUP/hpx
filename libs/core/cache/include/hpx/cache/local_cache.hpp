@@ -580,6 +580,10 @@ namespace hpx::util::cache {
         ///               cache entry, while the other overload replaces the
         ///               cached value only, leaving the cache entry properties
         ///               untouched.
+        /// \note         If the new entry is larger than the one it replaces,
+        ///               other entries may be evicted to keep the cache within
+        ///               its capacity. An entry larger than the capacity of
+        ///               the cache is rejected and the existing entry is kept.
         ///
         /// \returns      This function returns \a true if the entry has been
         ///               successfully updated, otherwise it returns \a false.
@@ -611,20 +615,30 @@ namespace hpx::util::cache {
             if (!insert_policy_(e) || !e.insert())
                 return false;    // entry doesn't want to be inserted
 
+            // an entry larger than the whole cache can never be stored
+            size_type const old_size = (*it).second.get_size();
+            size_type const new_size = e.get_size();
+            if (0 != max_size_ && new_size > max_size_)
+                return false;
+
             // update cache entry
             (*it).second = HPX_FORWARD(Entry_, e);
+            current_size_ = current_size_ - old_size + new_size;
 
-            // touch the entry
-            if ((*it).second.touch())
-            {
-                // reorder heap based on the changed entry attributes
-                std::make_heap(
-                    entry_heap_.begin(), entry_heap_.end(), update_policy_);
-            }
+            // touch the entry, then reorder the heap, as the new entry might
+            // compare differently from the one it replaced
+            (*it).second.touch();
+            std::make_heap(
+                entry_heap_.begin(), entry_heap_.end(), update_policy_);
 
             // update statistics
             statistics_.got_hit();
 
+            // make sure cache doesn't get too large
+            if (0 != max_size_ && current_size_ > max_size_)
+            {
+                return free_space(static_cast<long>(current_size_ - max_size_));
+            }
             return true;
         }
 
