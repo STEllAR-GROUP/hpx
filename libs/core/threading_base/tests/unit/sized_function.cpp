@@ -7,7 +7,7 @@
 // This test checks hpx::threads::with_task_size: the size is visible through
 // traits::get_task_size (also through annotated_function and deferred_call),
 // the wrapper forwards arguments and results, and it runs through hpx::async,
-// hpx::post and an executor.
+// hpx::post, an executor and future::then.
 
 #include <hpx/execution.hpp>
 #include <hpx/functional.hpp>
@@ -115,6 +115,12 @@ void test_launch()
     HPX_TEST_EQ(hpx::parallel::execution::sync_execute(
                     exec, f, std::make_unique<int>(1), 2),
         3);
+
+    HPX_TEST_EQ(hpx::make_ready_future(1)
+                    .then(with_task_size<task_size::small_>(
+                        [](hpx::future<int> fut) { return fut.get() + 1; }))
+                    .get(),
+        2);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
