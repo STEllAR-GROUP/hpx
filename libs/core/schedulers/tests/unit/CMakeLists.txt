@@ -27,15 +27,8 @@ endif()
 set(min_tasks_to_steal_staged_PARAMETERS THREADS_PER_LOCALITY 4)
 set(queue_length_all_threads_PARAMETERS THREADS_PER_LOCALITY 1)
 
-set(steal_staged_early_PARAMETERS
-    THREADS_PER_LOCALITY 4 ARGS --mode=early
-    --hpx:ini=hpx.max_idle_loop_count=1000000000000000
-)
-
-set(steal_pending_early_PARAMETERS
-    THREADS_PER_LOCALITY 4 ARGS --mode=early
-    --hpx:ini=hpx.thread_queue.idle_loop_count_steal_pending=1000000000000000
-)
+set(steal_staged_early_PARAMETERS THREADS_PER_LOCALITY 4)
+set(steal_pending_early_PARAMETERS THREADS_PER_LOCALITY 4)
 
 # ##############################################################################
 foreach(test ${tests})
@@ -76,29 +69,13 @@ if(HPX_WITH_WORK_REQUESTING_SCHEDULERS)
   )
 endif()
 
-# the same test after the late staged-steal point and in fast idle mode
-add_hpx_unit_test(
-  "modules.schedulers" steal_staged_early_late
-  EXECUTABLE steal_staged_early
-  PSEUDO_DEPS_NAME steal_staged_early
-  THREADS_PER_LOCALITY 4
-  ARGS --mode=late --hpx:ini=hpx.max_idle_loop_count=1000
-)
+# the same tests in fast idle mode
 add_hpx_unit_test(
   "modules.schedulers" steal_staged_early_fast_idle
   EXECUTABLE steal_staged_early
   PSEUDO_DEPS_NAME steal_staged_early
   THREADS_PER_LOCALITY 4
-  ARGS --mode=fast-idle --hpx:ini=hpx.max_idle_loop_count=1000000000000000
-)
-
-# the same test after the early pending-steal phase and in fast idle mode
-add_hpx_unit_test(
-  "modules.schedulers" steal_pending_early_late
-  EXECUTABLE steal_pending_early
-  PSEUDO_DEPS_NAME steal_pending_early
-  THREADS_PER_LOCALITY 4
-  ARGS --mode=late
+  ARGS --mode=fast-idle
 )
 add_hpx_unit_test(
   "modules.schedulers" steal_pending_early_fast_idle
@@ -106,5 +83,4 @@ add_hpx_unit_test(
   PSEUDO_DEPS_NAME steal_pending_early
   THREADS_PER_LOCALITY 4
   ARGS --mode=fast-idle
-       --hpx:ini=hpx.thread_queue.idle_loop_count_steal_pending=1000000000000000
 )
