@@ -153,7 +153,7 @@ namespace hpx::lcos::detail {
     {
         template <typename F>
         void operator()(F&& f, hpx::threads::thread_description desc,
-            threads::thread_id_ref_type& id) const
+            threads::thread_id_ref_type& id, threads::task_size size) const
         {
             threads::thread_init_data data(
                 threads::make_thread_function_nullary(HPX_FORWARD(F, f)),
@@ -161,6 +161,7 @@ namespace hpx::lcos::detail {
                 threads::thread_schedule_hint(),
                 threads::thread_stacksize::default_,
                 threads::thread_schedule_state::pending);
+            data.size = size;
 
             threads::register_thread(data, id);
         }
@@ -173,7 +174,7 @@ namespace hpx::lcos::detail {
 
         template <typename F>
         void operator()(F&& f, hpx::threads::thread_description,
-            threads::thread_id_ref_type& id) const
+            threads::thread_id_ref_type& id, threads::task_size) const
         {
             id = threads::invalid_thread_id;
             hpx::parallel::execution::post(exec, HPX_FORWARD(F, f));
