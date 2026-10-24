@@ -621,6 +621,33 @@ namespace hpx::util::cache {
             if (0 != max_size_ && new_size > max_size_)
                 return false;
 
+            // make sure cache doesn't get too large, evicting only other
+            // entries, as insert does
+            if (0 != max_size_ &&
+                current_size_ - old_size + new_size > max_size_)
+            {
+                // take the entry out of the heap while making room
+                entry_heap_.erase(
+                    std::find(entry_heap_.begin(), entry_heap_.end(), it));
+                std::make_heap(
+                    entry_heap_.begin(), entry_heap_.end(), update_policy_);
+                current_size_ -= old_size;
+
+                bool const freed = free_space(
+                    static_cast<long>(current_size_ + new_size - max_size_));
+
+                entry_heap_.push_back(it);
+                current_size_ += old_size;
+
+                if (!freed)
+                {
+                    // keep the old entry
+                    std::push_heap(
+                        entry_heap_.begin(), entry_heap_.end(), update_policy_);
+                    return false;
+                }
+            }
+
             // update cache entry
             (*it).second = HPX_FORWARD(Entry_, e);
             current_size_ = current_size_ - old_size + new_size;
@@ -634,11 +661,6 @@ namespace hpx::util::cache {
             // update statistics
             statistics_.got_hit();
 
-            // make sure cache doesn't get too large
-            if (0 != max_size_ && current_size_ > max_size_)
-            {
-                return free_space(static_cast<long>(current_size_ - max_size_));
-            }
             return true;
         }
 
