@@ -39,7 +39,32 @@ namespace {
     {
         return size_of<F>;
     }
+
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+    // Has a name only through the trait, so the name its thread gets must
+    // come from sized_function forwarding get_function_annotation.
+    struct named_function
+    {
+        std::string operator()() const
+        {
+            return hpx::threads::get_thread_description(
+                hpx::threads::get_self_id())
+                .get_description();
+        }
+    };
+#endif
 }    // namespace
+
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+template <>
+struct hpx::traits::get_function_annotation<named_function>
+{
+    static constexpr char const* call(named_function const&) noexcept
+    {
+        return "named";
+    }
+};
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_trait()
@@ -156,23 +181,9 @@ void test_composition()
             "inner"),
         0);
 
-    // the name also reaches the thread the task runs on
-    auto name_of_thread = [] {
-        return std::string(
-            hpx::threads::get_thread_description(hpx::threads::get_self_id())
-                .get_description());
-    };
     HPX_TEST_EQ(
-        hpx::async(with_task_size<task_size::large>(
-                       hpx::annotated_function(name_of_thread, "outer")))
-            .get(),
-        std::string("outer"));
-    HPX_TEST_EQ(
-        hpx::async(
-            hpx::annotated_function(
-                with_task_size<task_size::medium>(name_of_thread), "inner"))
-            .get(),
-        std::string("inner"));
+        hpx::async(with_task_size<task_size::large>(named_function{})).get(),
+        std::string("named"));
 #endif
 
     HPX_TEST_EQ(sized_annotated(), 1);
