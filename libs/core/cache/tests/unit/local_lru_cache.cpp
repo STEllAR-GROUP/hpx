@@ -7,6 +7,7 @@
 #include <hpx/modules/cache.hpp>
 #include <hpx/modules/testing.hpp>
 
+#include <cstddef>
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -354,6 +355,130 @@ void test_lru_insert_oversize_entry()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+void test_update_entry_size()
+{
+    using entry_type = hpx::util::cache::entries::size_entry<int>;
+    using cache_type = hpx::util::cache::local_cache<int, entry_type>;
+
+    // replacing an entry accounts for the size of the new entry
+    {
+        cache_type c(10);
+
+        HPX_TEST(c.insert(0, entry_type(0, 1)));
+        HPX_TEST(c.insert(1, entry_type(1, 2)));
+        HPX_TEST_EQ(static_cast<cache_type::size_type>(3), c.size());
+
+        // grow key 0 from size 1 to size 4
+        HPX_TEST(c.update(0, entry_type(10, 4)));
+        HPX_TEST_EQ(static_cast<cache_type::size_type>(6), c.size());
+
+        // shrink key 1 from size 2 to size 1
+        HPX_TEST(c.update(1, entry_type(11, 1)));
+        HPX_TEST_EQ(static_cast<cache_type::size_type>(5), c.size());
+
+        // erasing everything brings the size back to zero, this used to
+        // underflow and make every following insert fail
+        c.erase();
+        HPX_TEST_EQ(static_cast<cache_type::size_type>(0), c.size());
+        HPX_TEST(c.insert(2, entry_type(2, 1)));
+        HPX_TEST_EQ(static_cast<cache_type::size_type>(1), c.size());
+    }
+
+    // growing an entry beyond the capacity evicts other entries
+    {
+        cache_type c(3);
+
+        HPX_TEST(c.insert(0, entry_type(0, 1)));
+        HPX_TEST(c.insert(1, entry_type(1, 1)));
+        HPX_TEST(c.insert(2, entry_type(2, 1)));
+
+        // grow key 0 to size 2, one of the other entries has to go
+        HPX_TEST(c.update(0, entry_type(10, 2)));
+        HPX_TEST_EQ(static_cast<cache_type::size_type>(3), c.size());
+        HPX_TEST(c.holds_key(0));
+        HPX_TEST(c.holds_key(1) != c.holds_key(2));
+
+        int value = 0;
+        HPX_TEST(c.get_entry(0, value));
+        HPX_TEST_EQ(10, value);
+    }
+
+    // an entry larger than the whole cache is rejected and the old entry is
+    // kept
+    {
+        cache_type c(3);
+
+        HPX_TEST(c.insert(0, entry_type(0, 1)));
+        HPX_TEST(!c.update(0, entry_type(10, 5)));
+        HPX_TEST_EQ(static_cast<cache_type::size_type>(1), c.size());
+
+        int value = -1;
+        HPX_TEST(c.get_entry(0, value));
+        HPX_TEST_EQ(0, value);
+    }
+
+    // the updated entry is not evicted to make room for itself, even if it
+    // becomes the first candidate for eviction
+    {
+        cache_type c(6);
+
+        HPX_TEST(c.insert(0, entry_type(0, 1)));
+        HPX_TEST(c.insert(1, entry_type(1, 5)));
+
+        // size_entry evicts smaller entries first, key 0 is still smaller
+        // than key 1 after the update, so only key 1 can make room
+        HPX_TEST(c.update(0, entry_type(10, 2)));
+        HPX_TEST_EQ(static_cast<cache_type::size_type>(2), c.size());
+        HPX_TEST(c.holds_key(0));
+        HPX_TEST(!c.holds_key(1));
+
+        int value = 0;
+        HPX_TEST(c.get_entry(0, value));
+        HPX_TEST_EQ(10, value);
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// an entry which can refuse to be removed from the cache
+struct pinned_entry : hpx::util::cache::entries::size_entry<int>
+{
+    pinned_entry() = default;
+
+    pinned_entry(int value, std::size_t size, bool removable = true)
+      : hpx::util::cache::entries::size_entry<int>(value, size)
+      , removable_(removable)
+    {
+    }
+
+    [[nodiscard]] bool remove() const noexcept
+    {
+        return removable_;
+    }
+
+    bool removable_ = true;
+};
+
+void test_update_entry_size_no_room()
+{
+    using cache_type = hpx::util::cache::local_cache<int, pinned_entry>;
+
+    // if the other entries can't make room, the update fails and the old
+    // entry is kept
+    cache_type c(3);
+
+    HPX_TEST(c.insert(0, pinned_entry(0, 1)));
+    HPX_TEST(c.insert(1, pinned_entry(1, 2, false)));
+
+    HPX_TEST(!c.update(0, pinned_entry(10, 2)));
+    HPX_TEST_EQ(static_cast<cache_type::size_type>(3), c.size());
+    HPX_TEST(c.holds_key(1));
+
+    int value = -1;
+    HPX_TEST(c.get_entry(0, value));
+    HPX_TEST_EQ(0, value);
+}
+
+///////////////////////////////////////////////////////////////////////////////
 int main()
 {
     test_lru_insert();
@@ -364,6 +489,8 @@ int main()
     test_lru_reserve();
     test_lru_free_space_order();
     test_lru_insert_oversize_entry();
+    test_update_entry_size();
+    test_update_entry_size_no_room();
 
     return hpx::util::report_errors();
 }
