@@ -43,10 +43,19 @@ namespace hpx::detail {
     }
 
 #if defined(HPX_HAVE_SUPERVISION)
+    // get_supervision_manager() only returns a reference to the runtime's own
+    // member, and with no pending waiters this merely acquires a lock, so this
+    // is cheap even if supervision is never used.
     static void cancel_supervision_waiters()
     {
-        hpx::error_code ec;    // swallow exceptions
+        hpx::error_code ec(hpx::throwmode::lightweight);
         hpx::supervision::get_supervision_manager().cancel_all_waiters(ec);
+        if (ec)
+        {
+            LRT_(warning).format("pre-shutdown: failed to cancel pending "
+                                 "supervision waiters: {}",
+                ec.get_message());
+        }
     }
 #endif
 

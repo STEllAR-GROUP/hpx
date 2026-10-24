@@ -1795,6 +1795,14 @@ namespace hpx::supervision::server {
     // until the destructor runs would have its promise broken at a point
     // where the runtime is no longer active, and any continuation attached
     // with hpx::launch::async would fail to register its thread.
+    //
+    // Other paths extracting waiters under mtx_ and resolving them after
+    // releasing it (publish_event(), record_error(), remove_target() and the
+    // opportunistic sweeps) are not waited for here: they all run on HPX
+    // threads, and the runtime stops only after all HPX threads have finished,
+    // so whatever they extracted is resolved while registering a thread still
+    // works. sweep_timer_callback() is waited for anyway (see below), which
+    // keeps "no waiter is pending once this returns" true.
     void supervision_manager::cancel_all_waiters()
     {
         std::map<waiter_key, waiters_t> waiters;

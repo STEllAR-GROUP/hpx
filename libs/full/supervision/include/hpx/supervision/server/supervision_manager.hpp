@@ -596,7 +596,11 @@ namespace hpx::supervision::server {
         // Set by cancel_all_waiters(), under mtx_, once all pending waiters
         // have been drained for shutdown; checked by await_terminal() under
         // mtx_ before it registers a new waiter, so no waiter can be added
-        // after the drain and be left for the destructor to break.
+        // after the drain and be left for the destructor to break. Never
+        // reset: each runtime instance owns its own supervision_manager (a
+        // runtime started later gets a fresh one), and the pre-shutdown step
+        // setting this only runs once that runtime is going down, so there is
+        // no point after which await_terminal() would have to work again.
         bool waiters_closed_ = false;
 
         // Set by the destructor, under mtx_, before waiting for any

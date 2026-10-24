@@ -265,16 +265,26 @@ namespace {
     //     waiters as a pre-shutdown step. Each continuation runs inline
     //     (hpx::launch::sync) and returns right away once the loop was stopped
     //     or the runtime is no longer running; only otherwise is the actual
-    //     probe posted to a new thread. That probe only touches a
-    //     captured-by-value shadow/epoch and calls publish_event against that
-    //     local shadow, never reaching into dispatch_state's registry_, so it
-    //     cannot race finalize()'s teardown. Consequently, once finalize() has
-    //     returned no continuation spawns any further work, and
-    //     hpx::disconnect()/hpx::stop() may follow right away. A probe that
-    //     was posted right before finalize() set the stop flag may still be
-    //     in its current grace window after finalize() returns, though: it no
-    //     longer fences, and returns at its next stop check (or as soon as
-    //     the pre-shutdown invalidation of all waiters ends that wait).
+    //     probe launched on a new thread, whose future the continuation
+    //     returns, so a sweep's entry in `checks` stays pending until its
+    //     probe has finished and consecutive sweeps never probe the same peer
+    //     concurrently. The continuation itself only reads the stop and
+    //     lifecycle flags of dispatch_state, which is a function-local static
+    //     (see get_dispatch_state()) and therefore outlives the runtime. The
+    //     probe only touches a captured-by-value shadow/epoch and calls
+    //     publish_event against that local shadow; neither reaches into
+    //     dispatch_state's registry_, so they cannot race finalize()'s
+    //     teardown. Probe failures are reported through hpx::error_code
+    //     throughout (an await_terminal() waiter invalidated at shutdown just
+    //     ends the probe without fencing), and anything unexpected ends up in
+    //     the returned future rather than escaping its thread. Consequently,
+    //     once finalize() has returned no continuation spawns any further
+    //     work, and hpx::disconnect()/hpx::stop() may follow right away. A
+    //     probe that was launched right before finalize() set the stop flag
+    //     may still be in its current grace window after finalize() returns,
+    //     though: it no longer fences, and returns at its next stop check (or
+    //     as soon as the pre-shutdown invalidation of all waiters ends that
+    //     wait).
 
     void pace_consecutive_sweeps(std::atomic<bool> const& flag,
         std::chrono::milliseconds const& poll_interval)
@@ -602,18 +612,20 @@ namespace {
                 // still matter: the waiter may be resolved long after this loop
                 // was stopped, possibly while the runtime is already shutting
                 // down, where hpx::launch::async would fail to register the
-                // continuation's thread.
+                // continuation's thread. Returning the probe's future (which
+                // .then() unwraps) keeps this entry in `checks` pending until
+                // the probe has finished.
                 auto guarded_cont =
                     [&ds, cont = HPX_MOVE(cont)](
                         hpx::future<hpx::supervision::lifecycle_state>
-                            f) mutable {
-                        if (needs_stopping(ds.stop_failure_detection_) ||
-                            !hpx::is_running())
-                        {
-                            return;
-                        }
-                        hpx::post(HPX_MOVE(cont), HPX_MOVE(f));
-                    };
+                            f) mutable -> hpx::future<void> {
+                    if (needs_stopping(ds.stop_failure_detection_) ||
+                        !hpx::is_running())
+                    {
+                        return hpx::make_ready_future();
+                    }
+                    return hpx::async(HPX_MOVE(cont), HPX_MOVE(f));
+                };
 
                 checks.push_back(hpx::supervision::await_terminal(
                     peer.peer_locality, state.epoch, poll_timeout)
