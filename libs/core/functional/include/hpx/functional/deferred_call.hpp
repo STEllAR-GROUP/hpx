@@ -11,6 +11,7 @@
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/functional/traits/get_function_address.hpp>
 #include <hpx/functional/traits/get_function_annotation.hpp>
+#include <hpx/functional/traits/get_task_size.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/tracing.hpp>
@@ -196,6 +197,17 @@ namespace hpx::traits {
     };
 }    // namespace hpx::traits
 #endif
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx::traits {
+
+    // hpx::async binds the arguments with deferred_call, which runs as long
+    // as the function it calls.
+    template <typename F, typename... Ts>
+    struct get_task_size<util::detail::deferred<F, Ts...>> : get_task_size<F>
+    {
+    };
+}    // namespace hpx::traits
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::serialization {
