@@ -11,7 +11,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/functional.hpp>
-#include <hpx/modules/type_support.hpp>
+#include <hpx/modules/tracing.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -60,6 +60,7 @@ struct hpx::traits::get_task_size<hpx::threads::sized_function<F, Size>>
     static constexpr threads::task_size value = Size;
 };
 
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
 // The wrapped function keeps its address and annotation.
 template <typename F, hpx::threads::task_size Size>
 struct hpx::traits::get_function_address<hpx::threads::sized_function<F, Size>>
@@ -81,3 +82,15 @@ struct hpx::traits::get_function_annotation<
         return get_function_annotation<F>::call(f.f);
     }
 };
+
+template <typename F, hpx::threads::task_size Size>
+struct hpx::traits::get_function_annotation_tracing<
+    hpx::threads::sized_function<F, Size>>
+{
+    static hpx::tracing::annotation_handle call(
+        hpx::threads::sized_function<F, Size> const& f) noexcept
+    {
+        return get_function_annotation_tracing<F>::call(f.f);
+    }
+};
+#endif
