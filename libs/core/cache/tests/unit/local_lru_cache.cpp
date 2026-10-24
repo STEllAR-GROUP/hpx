@@ -7,6 +7,7 @@
 #include <hpx/modules/cache.hpp>
 #include <hpx/modules/testing.hpp>
 
+#include <cstddef>
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
