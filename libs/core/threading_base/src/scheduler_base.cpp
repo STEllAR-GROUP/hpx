@@ -166,35 +166,52 @@ namespace hpx::threads::policies {
     {
         HPX_ASSERT(num_thread < suspend_conds_.size());
 
-        states_[num_thread].data_.store(hpx::state::sleeping);
         std::unique_lock<pu_mutex_type> l(suspend_mtxs_[num_thread]);
-        suspend_conds_[num_thread].wait(l);    //-V1089
+        hpx::state expected_pre_sleep = hpx::state::pre_sleep;
+        if (states_[num_thread].data_.compare_exchange_strong(
+                expected_pre_sleep, hpx::state::sleeping))
+        {
+            suspend_conds_[num_thread].wait(l, [this, num_thread]() noexcept {
+                return states_[num_thread].data_.load() != hpx::state::sleeping;
+            });
+        }
 
-        // Only set running if still in hpx::state::sleeping. Can be set with
-        // non-blocking/locking functions to stopping or terminating, in which
-        // case the state is left untouched.
-        hpx::state expected = hpx::state::sleeping;
-        states_[num_thread].data_.compare_exchange_strong(
-            expected, hpx::state::running);
-
-        HPX_ASSERT(expected == hpx::state::sleeping ||
-            expected == hpx::state::stopping ||
-            expected == hpx::state::terminating);
+        [[maybe_unused]] hpx::state const current_state =
+            states_[num_thread].data_.load();
+        HPX_ASSERT(current_state == hpx::state::pre_sleep ||
+            current_state == hpx::state::running ||
+            current_state == hpx::state::stopping ||
+            current_state == hpx::state::terminating);
     }
 
     void scheduler_base::resume(std::size_t num_thread)
     {
+        auto resume_pu = [this](std::size_t pu) {
+            std::lock_guard<pu_mutex_type> l(suspend_mtxs_[pu]);
+            hpx::state expected = hpx::state::sleeping;
+            if (!states_[pu].data_.compare_exchange_strong(
+                    expected, hpx::state::running))
+            {
+                expected = hpx::state::pre_sleep;
+                states_[pu].data_.compare_exchange_strong(
+                    expected, hpx::state::running);
+            }
+            // Always notify under the lock. The state may have changed to
+            // stopping or terminating while the worker was waiting.
+            suspend_conds_[pu].notify_one();
+        };
+
         if (num_thread == static_cast<std::size_t>(-1))
         {
-            for (std::condition_variable& c : suspend_conds_)
+            for (std::size_t i = 0; i < suspend_conds_.size(); ++i)
             {
-                c.notify_one();
+                resume_pu(i);
             }
         }
         else
         {
             HPX_ASSERT(num_thread < suspend_conds_.size());
-            suspend_conds_[num_thread].notify_one();
+            resume_pu(num_thread);
         }
     }
 
