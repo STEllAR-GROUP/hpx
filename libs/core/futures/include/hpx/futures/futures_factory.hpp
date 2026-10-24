@@ -133,6 +133,7 @@ namespace hpx::lcos::local {
                         policy.stacksize(),
                         threads::thread_schedule_state::pending_do_not_schedule,
                         true);
+                    data.size = traits::get_task_size<std::decay_t<F>>::value;
 
                     if (hint.runs_as_child_mode() ==
                         hpx::threads::thread_execution_hint::run_as_child)
@@ -164,6 +165,7 @@ namespace hpx::lcos::local {
                         threads::thread_description(f_, annotation),
                         policy.priority(), policy.hint(), policy.stacksize(),
                         threads::thread_schedule_state::suspended, true);
+                    data.size = traits::get_task_size<std::decay_t<F>>::value;
 
                     HPX_ASSERT(this->runs_child_ == threads::invalid_thread_id);
 
@@ -193,6 +195,7 @@ namespace hpx::lcos::local {
                     threads::thread_description(f_, annotation),
                     policy.priority(), policy.hint(), policy.stacksize(),
                     threads::thread_schedule_state::pending);
+                data.size = traits::get_task_size<std::decay_t<F>>::value;
 
                 return threads::register_work(data, pool, ec);
             }
